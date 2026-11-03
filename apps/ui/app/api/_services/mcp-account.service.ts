@@ -442,9 +442,11 @@ export async function dispatchAccountTool(workspaceId: number, name: string, arg
             }
 
             const identity = rehandled ?? renamed
+            // renameAgent writes name and handle, changeAgentHandle writes handle alone.
+            const identityFields = [...(renamed ? ['name'] : []), ...(identity ? ['handle'] : [])]
             return {
                 agentId,
-                updated: [...Object.keys(patch), ...(moved ? ['spaceId'] : [])],
+                updated: [...identityFields, ...Object.keys(patch), ...(moved ? ['spaceId'] : [])],
                 ...(moved?.ok ? { spaceId: requestedSpaceId, position: moved.position } : {}),
                 ...(identity ? { name: identity.name, handle: identity.handle } : {}),
                 ...(patched && checked ? { runsOn: projectRunsOn(patched, checked.connections) } : {}),

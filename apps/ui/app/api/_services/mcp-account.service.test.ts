@@ -7,7 +7,7 @@ import { fakeSupabase, type FakeSupabase, type SupabaseCall } from '@/test/supab
 import type { ServiceManifest } from '@/lib/services/manifest'
 import type { InstalledService } from '@/lib/services/types'
 
-import { createAgent, deleteAgent, renameAgent } from './agent.service'
+import { changeAgentHandle, createAgent, deleteAgent, renameAgent } from './agent.service'
 import { LOCKED_WRITE_ERROR } from './agent-content.service'
 import { declareService } from './agent-setup.service'
 import { resolveAgentTarget } from './chat.service'
@@ -240,6 +240,38 @@ describe('dispatchAccountTool', () => {
             await expect(dispatchAccountTool(WORKSPACE_ID, 'upsert_trigger', { agentId: 'agent-sealed', slug: 'inbound', enabled: false })).resolves.toMatchObject({ slug: 'inbound', enabled: false })
 
             expect(updateTrigger).toHaveBeenCalledWith(expect.anything(), 'engine-sealed', 'inbound', expect.objectContaining({ enabled: false, body: undefined }))
+        })
+    })
+
+    describe('update_agent identity reporting', () => {
+        beforeEach(() => {
+            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: { url: 'https://engine.test', apiKey: 'key' }, engineAgentId: 'engine-own', contentLocked: false } as never)
+            vi.mocked(renameAgent).mockResolvedValue({ name: 'Worker B', handle: 'worker_b' })
+            vi.mocked(changeAgentHandle).mockResolvedValue({ name: 'Worker A', handle: 'custom_key' })
+        })
+
+        it('reports the handle in updated for a handle-only update', async () => {
+            await expect(dispatchAccountTool(WORKSPACE_ID, 'update_agent', { agentId: 'agent-own', handle: 'custom_key' }))
+                .resolves.toMatchObject({ agentId: 'agent-own', name: 'Worker A', handle: 'custom_key', updated: ['handle'] })
+
+            expect(changeAgentHandle).toHaveBeenCalledWith('agent-own', 'custom_key')
+            expect(renameAgent).not.toHaveBeenCalled()
+        })
+
+        it('reports the name and handle in updated for a name-only update', async () => {
+            await expect(dispatchAccountTool(WORKSPACE_ID, 'update_agent', { agentId: 'agent-own', name: 'Worker B' }))
+                .resolves.toMatchObject({ agentId: 'agent-own', name: 'Worker B', handle: 'worker_b', updated: ['name', 'handle'] })
+
+            expect(renameAgent).toHaveBeenCalledWith('agent-own', 'Worker B')
+            expect(changeAgentHandle).not.toHaveBeenCalled()
+        })
+
+        it('reports identity and config fields together without duplicates', async () => {
+            await expect(dispatchAccountTool(WORKSPACE_ID, 'update_agent', { agentId: 'agent-own', name: 'Worker B', handle: 'custom_key', description: 'Finds leads' }))
+                .resolves.toMatchObject({ updated: ['name', 'handle', 'description'] })
+
+            expect(renameAgent).toHaveBeenCalledWith('agent-own', 'Worker B')
+            expect(changeAgentHandle).toHaveBeenCalledWith('agent-own', 'custom_key')
         })
     })
 })
