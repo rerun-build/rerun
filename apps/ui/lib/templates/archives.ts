@@ -1,4 +1,5 @@
 import { agentArchiveMcpAuthSchema, agentArchiveRedactionSchema, type AgentArchivePlan, type TemplateAgent } from '@rerun/contracts'
+import { randomUuid } from '@rerun/db/helpers'
 import { z } from 'zod'
 
 export const AGENT_ARCHIVE_BUCKET = 'agent-archives'
@@ -42,7 +43,7 @@ export function archiveAgentNames(archives: TemplateAgentArchive[], agents: Temp
 }
 
 export function archivePath(templateSlug: string, agentKey: string): string {
-    return `${templateSlug}/${agentKey}/${crypto.randomUUID()}.tar.gz`
+    return `${templateSlug}/${agentKey}/${randomUuid()}.tar.gz`
 }
 
 // Agent keys are the stable identifier behind React keys and board tiles, so a re-capture

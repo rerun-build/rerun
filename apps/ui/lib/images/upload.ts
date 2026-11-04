@@ -1,5 +1,6 @@
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { randomUuid } from '@rerun/db/helpers'
 
 // Paths are random UUIDs, so an object is never overwritten and can be cached forever.
 const IMMUTABLE_CACHE_CONTROL = '31536000'
@@ -30,7 +31,7 @@ export async function uploadPublicImage(
         .resize(maxSize, maxSize, { fit: 'inside', withoutEnlargement: true })
     const webp = await (sharpen ? pipeline.sharpen({ sigma: 0.6 }) : pipeline).webp({ quality: 82, effort: 6 }).toBuffer()
 
-    const path = `${folder}/${crypto.randomUUID()}.webp`
+    const path = `${folder}/${randomUuid()}.webp`
     const { error } = await supabase.storage
         .from(bucket)
         .upload(path, new Uint8Array(webp), { contentType: 'image/webp', cacheControl: IMMUTABLE_CACHE_CONTROL, upsert: true })

@@ -9,6 +9,7 @@ import type { ForemanSurface } from '@/lib/foreman/surface'
 import { rememberForemanOpen } from '@/lib/foreman-open'
 import { useBoardStore } from '@/stores/board.store'
 import type { ForemanTab } from '@rerun/ui/foreman'
+import { randomUuid } from '@rerun/db/helpers'
 
 export type ForemanFunnel = 'unknown' | 'guided' | 'companion'
 
@@ -158,7 +159,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     waitlisted: false,
     activity: 'idle',
     engineRunId: null,
-    sessionId: crypto.randomUUID(),
+    sessionId: randomUuid(),
     backend: null,
     surface: 'unknown',
     planPreview: null,
@@ -223,7 +224,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         set({ funnel: 'guided', intake, open: true, yieldedToSheet: false, tab: 'assistant' })
     },
     setArrival: arrival => set({ arrival }),
-    newChat: () => set({ tab: 'assistant', sessionId: crypto.randomUUID(), backend: null, activity: 'idle', engineRunId: null, planPreview: null, intake: false, intakePreview: null, dock: IDLE_DOCK_FEED }),
+    newChat: () => set({ tab: 'assistant', sessionId: randomUuid(), backend: null, activity: 'idle', engineRunId: null, planPreview: null, intake: false, intakePreview: null, dock: IDLE_DOCK_FEED }),
     setActivity: activity => set({ activity }),
     setEngineRunId: engineRunId => set({ engineRunId }),
     setSessionId: (sessionId, backend) => set({ sessionId, backend: backend ?? null }),
@@ -259,7 +260,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             waitlisted: false,
             activity: 'idle',
             engineRunId: null,
-            sessionId: crypto.randomUUID(),
+            sessionId: randomUuid(),
             backend: null,
             surface: 'unknown',
             planPreview: null,

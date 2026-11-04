@@ -3,6 +3,7 @@
 import type { Database, Tables } from '@/app/api/database.types'
 import { createClient } from '@/supabase/client'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { randomUuid } from '@rerun/db/helpers'
 import { useEffect, useRef } from 'react'
 
 type TableName = keyof Database['public']['Tables']
@@ -84,7 +85,7 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
             // rend le canal EXISTANT sur collision — un canal encore joint dont les `.on()`
             // throwent ("cannot add callbacks after subscribe"). Le filtrage postgres_changes est
             // server-side, le nom du topic n'y joue aucun rôle.
-            const channel = supabase.channel(`${channelId}:${crypto.randomUUID()}`)
+            const channel = supabase.channel(`${channelId}:${randomUuid()}`)
 
             // INSERT et UPDATE supportent les filtres
             if (callbacksRef.current.onInsert) {

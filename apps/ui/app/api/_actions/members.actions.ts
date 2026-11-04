@@ -9,6 +9,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectAll, selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { MemberProfile } from '@rerun/contracts'
+import { randomUuid } from '@rerun/db/helpers'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { ActionResult } from './space.actions'
@@ -76,7 +77,7 @@ export async function inviteToWorkspaceAction(rawEmail: string): Promise<ActionR
                 return { ok: false, error: 'This workspace has reached its seat limit.' }
             }
 
-            token = crypto.randomUUID()
+            token = randomUuid()
             const { error } = await supabase.from('workspace_invitations').insert<Database['public']['Tables']['workspace_invitations']['Insert']>({
                 workspace_id: workspace.id,
                 email,

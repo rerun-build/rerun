@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from './database.types'
+import { randomUuid } from './helpers'
 
 // The single owner of the experts image storage layout, shared by the three write paths: the admin
 // form (`admin/`), the landing claim wizard and the in-app profile dialog (both `claimed/`).
@@ -24,7 +25,7 @@ export async function uploadExpertImage(
     await supabase.storage.createBucket(EXPERT_PHOTOS_BUCKET, { public: true }).catch(() => {})
 
     const extension = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'png'
-    const path = `${prefix}/${expertId}/${folder}/${crypto.randomUUID()}.${extension}`
+    const path = `${prefix}/${expertId}/${folder}/${randomUuid()}.${extension}`
     const { error } = await supabase.storage
         .from(EXPERT_PHOTOS_BUCKET)
         .upload(path, new Uint8Array(await file.arrayBuffer()), { contentType: file.type, upsert: true })

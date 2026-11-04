@@ -3,6 +3,7 @@
 // vocabulaire métier du board réel (SpacePublic / IsoAgent / AgentLink), pas avec des Tiles : c'est
 // l'adaptateur de l'app qui fait la traduction, donc l'image est celle que l'app rendrait.
 
+import { randomUuid } from '@rerun/db/helpers'
 import { CONTAINER_SIDES, GRID_SIZE, hashUnit, isoPosition, TILE_H, TILE_W } from '@rerun/ui/iso-grid/iso'
 import type { IsoCamera } from '@rerun/ui/iso-grid'
 
@@ -214,7 +215,7 @@ function frameScene(spaces: SpacePublic[], agents: IsoAgent[], frame: { width: n
 }
 
 export function randomSeed(): string {
-    return crypto.randomUUID().slice(0, 8)
+    return randomUuid().slice(0, 8)
 }
 
 export function buildWorkspaceScene(seed: string, options: SceneOptions = {}): WorkspaceScene {

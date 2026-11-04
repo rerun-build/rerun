@@ -352,3 +352,17 @@ export async function selectManyWithJoins<T extends TableName, K extends keyof T
     const { data, error } = await query
     return { data: data as (Pick<TableRow<T>, S[number]> & WithJoins<T, J>)[] | null, error }
 }
+
+// crypto.randomUUID only exists in secure contexts (HTTPS or localhost). On a plain-HTTP LAN
+// host it is undefined, so any call site that uses it crashes the whole page after sign-in.
+// Fall back to a v4 UUID built from crypto.getRandomValues, which is available everywhere.
+export function randomUuid(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID()
+    }
+    const bytes = crypto.getRandomValues(new Uint8Array(16))
+    bytes[6] = (bytes[6] & 0x0f) | 0x40
+    bytes[8] = (bytes[8] & 0x3f) | 0x80
+    const hex = [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('')
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+}
