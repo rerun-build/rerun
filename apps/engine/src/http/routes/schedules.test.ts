@@ -73,6 +73,7 @@ describe('creating a schedule', () => {
         ['neither a cron nor a runAt', {}, 'body: Provide exactly one of cron or runAt'],
         ['an invalid cron', { cron: 'every morning' }, 'body: Invalid cron expression'],
         ['an invalid runAt', { runAt: 'tomorrow-ish' }, 'body: Invalid runAt timestamp'],
+        ['a timezone croner cannot run', { cron: '0 9 * * *', timezone: 'Eastern' }, 'body: Invalid timezone'],
     ])('refuses %s', async (_, timing, error) => {
         const res = await send('POST', '', { name: 'Bad timing', body: 'x', ...timing })
         expect(res.status).toBe(400)
@@ -123,7 +124,7 @@ describe('PATCH a schedule', () => {
         expect(await patch('retime-me', { cron: '30 18 * * 1-5', body: 'new' })).toMatchObject({ cron: '30 18 * * 1-5', body: 'new' })
     })
 
-    it('refuses an invalid cron or runAt', async () => {
+    it('refuses an invalid cron, runAt or timezone', async () => {
         await create({ name: 'Guard me', body: 'x', cron: '0 9 * * *' })
         const badCron = await send('PATCH', '/guard-me', { cron: 'nonsense' })
         expect(badCron.status).toBe(400)
@@ -131,6 +132,9 @@ describe('PATCH a schedule', () => {
         const badRunAt = await send('PATCH', '/guard-me', { runAt: 'soon' })
         expect(badRunAt.status).toBe(400)
         expect(await badRunAt.json()).toEqual({ error: 'invalid runAt timestamp' })
+        const badTimezone = await send('PATCH', '/guard-me', { timezone: 'Eastern' })
+        expect(badTimezone.status).toBe(400)
+        expect(await badTimezone.json()).toEqual({ error: 'invalid timezone' })
         expect((await send('PATCH', '/guard-me', { enabled: 'yes' })).status).toBe(400)
     })
 

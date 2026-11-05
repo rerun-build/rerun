@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isDue, isValidCron, nextRunAt } from './cron.js'
+import { isDue, isValidCron, isValidTimezone, nextRunAt } from './cron.js'
 import type { Schedule } from './loader.js'
 
 function make(overrides: Partial<Schedule>): Schedule {
@@ -68,5 +68,34 @@ describe('nextRunAt', () => {
     it('returns null for a spent one-shot', () => {
         const s = make({ runAt: '2026-06-02T10:00:00.000Z', lastRunAt: '2026-06-02T10:00:05.000Z' })
         expect(nextRunAt(s, new Date('2026-06-02T11:00:00.000Z'))).toBe(null)
+    })
+})
+
+describe('isValidTimezone', () => {
+    it('accepts the zones croner can run a schedule in', () => {
+        expect(isValidTimezone('Europe/Paris')).toBe(true)
+        expect(isValidTimezone('America/New_York')).toBe(true)
+        expect(isValidTimezone('UTC')).toBe(true)
+    })
+    it('rejects names croner cannot convert to', () => {
+        expect(isValidTimezone('Eastern')).toBe(false)
+        expect(isValidTimezone('Europe/Pariss')).toBe(false)
+    })
+})
+
+// A schedule whose timing can't be computed (a timezone or cron edited into the file by hand, or
+// written before both were checked) must not throw: the scheduler checks every schedule of every
+// agent in one tick, and a throw there ends the tick, and the process with it.
+describe('a schedule croner cannot compute', () => {
+    const now = new Date('2026-06-02T10:00:00.000Z')
+    it('is never due and has no next run, with an unknown timezone', () => {
+        const s = make({ cron: '0 8 * * *', timezone: 'Eastern' })
+        expect(isDue(s, now)).toBe(false)
+        expect(nextRunAt(s, now)).toBeNull()
+    })
+    it('is never due and has no next run, with a cron that does not parse', () => {
+        const s = make({ cron: 'every morning' })
+        expect(isDue(s, now)).toBe(false)
+        expect(nextRunAt(s, now)).toBeNull()
     })
 })

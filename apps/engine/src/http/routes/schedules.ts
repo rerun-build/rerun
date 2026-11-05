@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { z } from 'zod'
 import { providerSchema } from '@rerun/contracts'
 import { deleteSchedule, listSchedules, readSchedule, scheduleExists, updateScheduleAt, writeSchedule } from '../../schedules/loader.js'
-import { isValidCron } from '../../schedules/cron.js'
+import { isValidCron, isValidTimezone } from '../../schedules/cron.js'
 import { fireSchedule } from '../../runtime/scheduler.js'
 import { getAgent } from '../../agents/registry.js'
 import { hasPendingSetup } from '../../agents/setup.js'
@@ -28,6 +28,7 @@ const createSchema = z
     .refine(d => Boolean(d.cron) !== Boolean(d.runAt), { message: 'Provide exactly one of cron or runAt' })
     .refine(d => !d.cron || isValidCron(d.cron), { message: 'Invalid cron expression' })
     .refine(d => !d.runAt || !Number.isNaN(new Date(d.runAt).getTime()), { message: 'Invalid runAt timestamp' })
+    .refine(d => !d.timezone || isValidTimezone(d.timezone), { message: 'Invalid timezone' })
 
 scheduleRoutes.get('/', async c => {
     const agentId = c.req.param('id')!
@@ -68,6 +69,7 @@ scheduleRoutes.patch('/:slug', async c => {
         .parse(await c.req.json())
     if (body.cron && !isValidCron(body.cron)) return c.json({ error: 'invalid cron expression' }, 400)
     if (body.runAt && Number.isNaN(new Date(body.runAt).getTime())) return c.json({ error: 'invalid runAt timestamp' }, 400)
+    if (body.timezone && !isValidTimezone(body.timezone)) return c.json({ error: 'invalid timezone' }, 400)
     const schedule = await updateScheduleAt(agentId, slug, body)
     return c.json(schedule)
 })

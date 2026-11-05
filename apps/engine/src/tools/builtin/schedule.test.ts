@@ -71,6 +71,19 @@ describe('schedule_edit', () => {
     })
 })
 
+describe('a timezone croner cannot run', () => {
+    it('is refused on create, and nothing is written', async () => {
+        const res = await run('schedule_create', { name: 'Morning brief', description: 'x', body: 'x', cron: '0 9 * * *', timezone: 'Eastern' })
+        expect(res).toBe("Invalid timezone: Eastern. Use an IANA name, e.g. 'Europe/Paris' or 'America/New_York'.")
+        await expect(readSchedule(id, 'morning-brief')).rejects.toThrow()
+    })
+    it('is refused on update, and the schedule keeps its timezone', async () => {
+        const res = await run('schedule_update', { slug, timezone: 'Europe/Pariss' })
+        expect(res).toBe("Invalid timezone: Europe/Pariss. Use an IANA name, e.g. 'Europe/Paris' or 'America/New_York'.")
+        expect((await readSchedule(id, slug)).timezone).toBe('Europe/Paris')
+    })
+})
+
 describe('schedule_update', () => {
     it('reports the size of a body it replaced', async () => {
         const res = await run('schedule_update', { slug, body: 'Run the daily research.' })

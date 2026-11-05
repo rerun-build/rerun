@@ -2,7 +2,7 @@ import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import { providerSchema } from '@rerun/contracts'
 import { deleteSchedule, listSchedules, readSchedule, scheduleExists, updateScheduleAt, writeSchedule } from '../../schedules/loader.js'
-import { isValidCron, nextRunAt } from '../../schedules/cron.js'
+import { isValidCron, isValidTimezone, nextRunAt } from '../../schedules/cron.js'
 import type { RunContext } from '../../runtime/context.js'
 import { PROVIDER_WITHOUT_MODEL, pinnedModel } from './automation-model.js'
 
@@ -64,6 +64,7 @@ export function scheduleTools(ctx: RunContext): ToolSet {
                 if (cron && runAt) return 'Provide only one of cron or runAt, not both.'
                 if (cron && !isValidCron(cron)) return `Invalid cron expression: ${cron}`
                 if (runAt && Number.isNaN(new Date(runAt).getTime())) return `Invalid runAt timestamp: ${runAt}`
+                if (timezone && !isValidTimezone(timezone)) return `Invalid timezone: ${timezone}. Use an IANA name, e.g. 'Europe/Paris' or 'America/New_York'.`
                 const pin = await pinnedModel(ctx, provider, model)
                 if ('refusal' in pin) return pin.refusal
                 const schedule = await writeSchedule(id, { name, description, body, cron, runAt, timezone, ...pin }, ctx.author)
@@ -88,6 +89,7 @@ export function scheduleTools(ctx: RunContext): ToolSet {
                 if (!scheduleExists(id, slug)) return `Schedule not found: ${slug}`
                 if (cron && !isValidCron(cron)) return `Invalid cron expression: ${cron}`
                 if (runAt && Number.isNaN(new Date(runAt).getTime())) return `Invalid runAt timestamp: ${runAt}`
+                if (timezone && !isValidTimezone(timezone)) return `Invalid timezone: ${timezone}. Use an IANA name, e.g. 'Europe/Paris' or 'America/New_York'.`
                 if (provider && !model) return PROVIDER_WITHOUT_MODEL
                 const pin = model ? await pinnedModel(ctx, provider, model) : {}
                 if ('refusal' in pin) return pin.refusal
