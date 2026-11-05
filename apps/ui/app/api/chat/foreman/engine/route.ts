@@ -63,7 +63,7 @@ export async function POST(req: Request): Promise<Response> {
     if (existing?.backend === 'hub') return Response.json({ error: 'hub_conversation' }, { status: 409 })
 
     const state = await loadForemanState(ctx, req.headers.get('accept-language'))
-    if (!existing && (await resolveForemanSurface(ctx.workspace.id, state)) !== 'engine') return Response.json({ error: 'foreman_unavailable' }, { status: 409 })
+    if (!existing && (await resolveForemanSurface(ctx.workspace.id, state, { canClaim: true })) !== 'engine') return Response.json({ error: 'foreman_unavailable' }, { status: 409 })
 
     let engineRes: Response
     let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>

@@ -17,7 +17,8 @@ import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import {
     KEY_PROVIDERS,
     PLAN_LABELS,
-    PLAN_PROVIDERS,
+    connectMethod,
+    planProviders,
     PROVIDER_PITCH,
     creditResetPhrase,
     effectiveDefault,
@@ -68,7 +69,7 @@ export function AiProvidersPanel({
     initialAddProvider?: AddableProvider | null
     onInitialAddProviderConsumed?: () => void
 }) {
-    const { connections, boxDefault, loading, create, update, updateKeys, remove, setDefault } = useWorkspaceConnections({ revalidate: true })
+    const { connections, boxDefault, opencodeOffered, loading, create, update, updateKeys, remove, setDefault } = useWorkspaceConnections({ revalidate: true })
     const credit = useRerunCredit()
     const needsPlan = useNeedsPlanToConnect()
     const [page, setPage] = useState<ConnectionsPage>({ kind: 'list' })
@@ -150,8 +151,8 @@ export function AiProvidersPanel({
                         taken={taken}
                         onOpen={open}
                         onAdd={needsPlan ? undefined : add}
-                        pitch="Already use Claude Code or Codex? Your coworkers can run on your plan."
-                        providers={PLAN_PROVIDERS}
+                        pitch={opencodeOffered ? 'Already use Claude Code, Codex or OpenCode? Your coworkers can run on your plan.' : 'Already use Claude Code or Codex? Your coworkers can run on your plan.'}
+                        providers={planProviders(opencodeOffered)}
                     />
 
                     <SourceGroup
@@ -224,7 +225,7 @@ function DefaultRow({ connections, current, credit, onPick, onFix }: DefaultRowP
                     <>
                         {broken && !creditGone && (
                             <Button size="xs" variant="outline" onClick={() => onFix(source.id)}>
-                                {sourceKind(source.provider) === 'plan' ? 'Sign in again' : 'Add key'}
+                                {connectMethod(source.provider) === 'key' ? 'Add key' : 'Sign in again'}
                             </Button>
                         )}
                         <TooltipDisabledReason reason={canChange ? undefined : 'No other model is ready. Add a plan or an API key first.'}>
@@ -262,7 +263,7 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
     // The pitch already offers every provider, so the header's Add only shows once the group has entries.
     const addMenu =
         onAdd && sources.length > 0 ? (
-            <ProviderPicker only={only} taken={taken} onPick={onAdd}>
+            <ProviderPicker only={only} taken={taken} onPick={onAdd} planProviders={only === 'plan' ? providers : undefined}>
                 <AddButton label={only === 'plan' ? 'Add subscription' : 'Add API key'} />
             </ProviderPicker>
         ) : undefined
@@ -273,7 +274,7 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
                 const tightest = source.connected ? tightestPlanWindow(livePlanWindows(source)) : null
                 return (
                     <SourceRow key={source.id} source={source} credit={credit} onClick={() => onOpen(source.id)}>
-                        {tightest && <PlanLimitMeter percent={tightest.usedPercent} label={`${planWindowName(tightest)} limit used`} className="mt-1.5 max-w-56" />}
+                        {tightest && <PlanLimitMeter percent={tightest.usedPercent} label={`${planWindowName(tightest, source.provider)} limit used`} className="mt-1.5 max-w-56" />}
                     </SourceRow>
                 )
             })}

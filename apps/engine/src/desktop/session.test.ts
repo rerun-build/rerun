@@ -112,6 +112,19 @@ describe('desktop session', () => {
         expect(session.runningDesktops()).toEqual([{ agentId: 'a1', viewers: 0, dock: false }])
     })
 
+    it('starts the screen processes without the engine configuration', async () => {
+        vi.stubEnv('RERUN_API_KEY', 'engine-key')
+        vi.stubEnv('RERUN_DATA_DIR', '/data')
+        vi.stubEnv('HOME', '/home/rerun')
+        const session = await freshModule()
+        await session.ensureDesktop('a1')
+        for (const spawned of state.spawns) {
+            expect(spawned.env).toMatchObject({ DISPLAY: ':42', HOME: '/home/rerun', PATH: '/usr/bin' })
+            expect(spawned.env).not.toHaveProperty('RERUN_API_KEY')
+            expect(spawned.env).not.toHaveProperty('RERUN_DATA_DIR')
+        }
+    })
+
     it('gives two agents two screens, each with its own display and VNC port', async () => {
         const session = await freshModule()
         expect(await session.ensureDesktop('a1')).toEqual({ display: ':42', vncPort: 5942 })
@@ -244,20 +257,24 @@ describe('desktop session', () => {
     it('paints the wallpaper, themes the windows and runs a dock and a top bar where their packages are installed', async () => {
         state.panels = true
         vi.stubEnv('RERUN_PORT', '3100')
+        vi.stubEnv('RERUN_API_KEY', 'engine-key')
         const session = await freshModule()
         await session.ensureDesktop('a1', { timeZone: 'Europe/Paris' })
         expect(state.spawns.map(s => s.command)).toEqual(['hsetroot', 'openbox', 'x11vnc', 'tint2', 'tint2'])
         expect(state.spawns[0]!.args).toEqual(['-cover', expect.stringMatching(/assets\/desktop\/wallpaper\.png$/)])
         expect(state.spawns[1]!.env.XDG_DATA_DIRS).toMatch(/assets\/desktop:\/usr\/local\/share:\/usr\/share$/)
         expect(state.spawns[2]!.env.XDG_DATA_DIRS).toBeUndefined()
+        expect(state.spawns.slice(0, 3).map(s => s.env.RERUN_API_KEY)).toEqual([undefined, undefined, undefined])
         expect(state.spawns.slice(3).map(s => s.args[1])).toEqual([expect.stringMatching(/dock\.tint2rc$/), expect.stringMatching(/bar\.tint2rc$/)])
         expect(state.spawns[3]!.env).toMatchObject({
             DISPLAY: ':42',
+            RERUN_API_KEY: 'engine-key',
             RERUN_DESKTOP_AGENT: 'a1',
             RERUN_DESKTOP_AGENT_NAME: 'Maya',
             RERUN_DESKTOP_ENGINE: 'http://127.0.0.1:3100',
             TZ: 'Europe/Paris',
         })
+        expect(state.spawns[4]!.env.RERUN_API_KEY).toBe('engine-key')
         expect(session.runningDesktops()).toEqual([{ agentId: 'a1', viewers: 0, dock: true }])
     })
 

@@ -42,7 +42,7 @@ const appUrl = valueOf('NEXT_PUBLIC_APP_URL')
 if (appUrl && (!/^https?:\/\//.test(appUrl) || appUrl.endsWith('/'))) problems.push('NEXT_PUBLIC_APP_URL must start with http:// or https:// and end without a slash')
 const supabaseUrl = valueOf('NEXT_PUBLIC_SUPABASE_URL')
 if (supabaseUrl && /127\.0\.0\.1|localhost/.test(supabaseUrl) && !/:54421\b/.test(supabaseUrl)) problems.push('A local Supabase answers on port 54421 here: use http://localhost:54421')
-if (!valueOf('OPENROUTER_API_KEY')) console.warn('! OPENROUTER_API_KEY is empty: the onboarding guide will not answer. Your coworkers still run on the AI you connect in the app.')
+if (!valueOf('OPENROUTER_API_KEY')) console.warn('! OPENROUTER_API_KEY is empty: the Foreman skips the guided onboarding. It and your coworkers run on the AI you connect in the app.')
 
 if (generated.length) console.log(`Generated ${generated.join(', ')} in .env`)
 if (problems.length) {

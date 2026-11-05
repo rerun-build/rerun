@@ -1,5 +1,5 @@
 import { existsSync, statSync } from 'node:fs'
-import { cp, readFile } from 'node:fs/promises'
+import { cp, lstat, readFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
@@ -7,7 +7,7 @@ import { connectorSkillReadOnlyError } from '@rerun/contracts'
 import { parseFrontmatter } from '../../skills/frontmatter.js'
 import { deleteSkill, deleteSkillFile, listSkills, readSkill, resolveSkillFile, skillExists, writeSkill, writeSkillFile } from '../../skills/loader.js'
 import { paginateText } from '../../files/store.js'
-import { resolveWithin } from '../sandbox.js'
+import { resolveWithinReal } from '../sandbox.js'
 import { skillDir, workspaceDir } from '../../config/paths.js'
 import { connectorSkillOwners } from '../../services/registry.js'
 import { slugify } from '../../lib/ids.js'
@@ -70,7 +70,7 @@ export function skillTools(ctx: RunContext): ToolSet {
                 if (!skillExists(id, slug)) return `Skill not found: ${slug}`
                 if (!Number.isInteger(offset) || offset < 0) return 'offset must be a non-negative integer.'
                 try {
-                    const content = await readFile(resolveSkillFile(id, slug, path), 'utf8')
+                    const content = await readFile(await resolveSkillFile(id, slug, path), 'utf8')
                     const page = paginateText(content, offset)
                     if (offset === 0 && !page.truncated) return page.content
 
@@ -144,7 +144,7 @@ export function skillTools(ctx: RunContext): ToolSet {
             }),
             execute: async ({ sourcePath, name, description }) => {
                 const root = workspaceDir(id)
-                const source = resolveWithin(root, sourcePath)
+                const source = await resolveWithinReal(root, sourcePath)
                 if (!existsSync(source)) return `Source not found: ${sourcePath}`
                 const isDir = statSync(source).isDirectory()
                 const markdownPath = isDir ? join(source, 'SKILL.md') : source
@@ -157,7 +157,14 @@ export function skillTools(ctx: RunContext): ToolSet {
                 if (readOnly) return readOnly
                 const skill = await writeSkill(id, finalName, finalDescription, body)
                 if (!isDir) return `Imported skill ${skill.slug}`
-                await cp(source, skillDir(id, skill.slug), { recursive: true, force: true, filter: entry => entry !== markdownPath })
+                // A link in the pack is left behind rather than copied: once inside the skill folder it
+                // would point wherever it likes, and the skill readers only check the path they are given.
+                await cp(source, skillDir(id, skill.slug), {
+                    recursive: true,
+                    force: true,
+                    dereference: false,
+                    filter: async entry => entry !== markdownPath && !(await lstat(entry)).isSymbolicLink(),
+                })
                 const imported = await readSkill(id, skill.slug)
                 return `Imported skill ${skill.slug} with ${imported.files.length} bundled file${imported.files.length === 1 ? '' : 's'}`
             },

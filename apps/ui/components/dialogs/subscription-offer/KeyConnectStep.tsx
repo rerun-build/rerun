@@ -9,7 +9,7 @@ import { CredentialGuide } from '@/components/services/CredentialGuide'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
-import { KEY_PROVIDERS, PROVIDER_GUIDE, PROVIDER_PITCH, type AddableProvider, type KeyProvider } from '@/lib/engine/ai-sources'
+import { KEY_PROVIDERS, PROVIDER_GUIDE, PROVIDER_PITCH, type AddableProvider, type GuidedProvider, type KeyProvider } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { KeyIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -22,12 +22,18 @@ type KeyConnectStepProps = {
     onBack: () => void
     onSkip: () => void
     onKeys: (provider: AddableProvider, keys: Record<string, string>) => Promise<KeysResult>
+    // A single provider whose key is pasted here, with no list to pick from: OpenCode, a plan sold as a key.
+    only?: GuidedProvider
 }
+
+const OPENCODE_HEADLINE = { title: 'Connect OpenCode', detail: 'Paste your OpenCode key: the Go models run on your plan, the Console ones on your credits.' }
+const KEY_HEADLINE = { title: 'Use an API key', detail: 'Your coworkers run on your key, billed per token by its provider.' }
 
 // The rows of the API key road. Nothing is picked up front: a preselected row would read as a
 // recommendation, and none of the four is one.
-export function KeyConnectStep({ onPick, onBack, onSkip, onKeys }: KeyConnectStepProps) {
-    const [provider, setProvider] = useState<KeyProvider | null>(null)
+export function KeyConnectStep({ onPick, onBack, onSkip, onKeys, only }: KeyConnectStepProps) {
+    const [provider, setProvider] = useState<GuidedProvider | null>(only ?? null)
+    const headline = only === 'opencode' ? OPENCODE_HEADLINE : KEY_HEADLINE
     const [apiKey, setApiKey] = useState('')
     const [busy, setBusy] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -61,22 +67,24 @@ export function KeyConnectStep({ onPick, onBack, onSkip, onKeys }: KeyConnectSte
                     <div className="flex items-center gap-3">
                         <Icon icon={KeyIcon} />
                         <div className="min-w-0">
-                            <h2 className="text-sm font-medium">Use an API key</h2>
-                            <p className="text-sm text-muted-foreground">Your coworkers run on your key, billed per token by its provider.</p>
+                            <h2 className="text-sm font-medium">{headline.title}</h2>
+                            <p className="text-sm text-muted-foreground">{headline.detail}</p>
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                        {KEY_PROVIDERS.map(id => (
-                            <button key={id} type="button" onClick={() => pick(id)} className={cn('flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors hover:bg-accent/30', provider === id ? 'border-foreground ring-1 ring-foreground' : 'bg-muted/20')}>
-                                <ProviderIcon provider={id} className="size-4" />
-                                <span className="flex min-w-0 flex-1 flex-col">
-                                    <span className="truncate text-sm">{PROVIDER_PITCH[id].title}</span>
-                                    <span className="truncate text-[11px] text-muted-foreground">{PROVIDER_PITCH[id].hint}</span>
-                                </span>
-                            </button>
-                        ))}
-                    </div>
+                    {!only && (
+                        <div className="flex flex-col gap-2">
+                            {KEY_PROVIDERS.map(id => (
+                                <button key={id} type="button" onClick={() => pick(id)} className={cn('flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors hover:bg-accent/30', provider === id ? 'border-foreground ring-1 ring-foreground' : 'bg-muted/20')}>
+                                    <ProviderIcon provider={id} className="size-4" />
+                                    <span className="flex min-w-0 flex-1 flex-col">
+                                        <span className="truncate text-sm">{PROVIDER_PITCH[id].title}</span>
+                                        <span className="truncate text-[11px] text-muted-foreground">{PROVIDER_PITCH[id].hint}</span>
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {provider && (
                         <div className="flex flex-col gap-3">

@@ -33,12 +33,12 @@ export function SubscriptionOfferDialog() {
 // Mounted with the dialog rather than with the app: the connections are only asked for once there
 // is a machine to hold them.
 function ConnectedOffer({ onClose }: { onClose: () => void }) {
-    const { connections, create } = useWorkspaceConnections()
+    const { connections, opencodeOffered, create } = useWorkspaceConnections()
 
     const connect = (provider: AddableProvider, keys: Record<string, string>) => {
         const takenNames = connections.map(connection => connection.name)
         return create({ name: suggestName(provider, takenNames), provider, models: DEFAULT_CONNECTION_MODELS[provider], extraModels: [], keys }, 'subscription_offer')
     }
 
-    return <SubscriptionOffer onPick={provider => track('connection_cta_clicked', { source: `onboarding_offer_${provider}` })} onKeys={connect} onSkip={onClose} onDone={onClose} />
+    return <SubscriptionOffer onPick={provider => track('connection_cta_clicked', { source: `onboarding_offer_${provider}` })} onKeys={connect} onSkip={onClose} onDone={onClose} opencodeOffered={opencodeOffered} />
 }

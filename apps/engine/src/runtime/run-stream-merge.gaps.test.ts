@@ -78,6 +78,23 @@ describe('mergeRunStream', () => {
         expect(chunks[1]).toMatchObject({ toolCallId: 'c1', input: { questions: [] } })
     })
 
+    // An iOS build that shipped before option descriptions would hand an option object to a text
+    // node: the v2 stamp makes it fall back to its text card instead.
+    it('stamps v2 on an ask_user call whose options carry a description, and only on it', async () => {
+        const described = { questions: [{ question: 'Format?', header: 'Format', options: [{ label: 'One-pager', description: 'One page' }, 'Deck'] }] }
+        const plain = { questions: [{ question: 'Format?', header: 'Format', options: ['One-pager', 'Deck'] }] }
+        const { run, writer, merged } = fakeRun([
+            { type: 'tool-input-available', toolCallId: 'c1', toolName: 'mcp__rerun__ask_user', input: described },
+            { type: 'tool-input-available', toolCallId: 'c2', toolName: 'ask_user', input: plain },
+        ])
+
+        mergeRunStream(writer, run, { provider: 'claude', model: 'opus' })
+        const chunks = (await drain(merged())) as Array<{ input?: unknown }>
+
+        expect(chunks[0]).toMatchObject({ toolName: 'ask_user', input: { ...described, v: 2 } })
+        expect(chunks[1].input).toEqual(plain)
+    })
+
     it('stamps each finished step with the provider, the model and its usage', () => {
         const { run, writer, captured } = fakeRun([])
         mergeRunStream(writer, run, { provider: 'rerun', model: 'rerun-max' })

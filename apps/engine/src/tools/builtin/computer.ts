@@ -1,3 +1,4 @@
+import { modelSeesImages } from '../../agents/opencode.js'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
@@ -6,6 +7,7 @@ import { tool, type ToolSet } from 'ai'
 import { desktopAppSchema, type DesktopApp } from '@rerun/contracts'
 import { z } from 'zod'
 import { CLI_PROVIDERS, type AgentConfig } from '../../agents/types.js'
+import type { Provider } from '@rerun/contracts'
 import { openDesktopApp } from '../../desktop/apps.js'
 import { ControlRefusal, captureScreen, click, controlScreen, drag, movePointer, pressKeys, scroll, typeText, type ScreenControl, type Screenshot } from '../../desktop/control.js'
 import { computerAvailable, holdDesktop, humanDriving } from '../../desktop/session.js'
@@ -14,6 +16,7 @@ import { withKeyedLock } from '../../lib/lock.js'
 import type { RunContext } from '../../runtime/context.js'
 import { newId } from '../../lib/ids.js'
 import { createScreenshotStore } from '../../runtime/screenshots.js'
+import { publicHttpUrl } from '../url.js'
 
 const ACTIONS = ['screenshot', 'left_click', 'right_click', 'double_click', 'mouse_move', 'left_click_drag', 'scroll', 'type', 'key', 'wait'] as const
 type Action = (typeof ACTIONS)[number]
@@ -51,6 +54,12 @@ const refused = (reason: string): Refused => ({ status: 'refused', reason })
 // Nobody watches a delegate, and the foreman has no screen to show.
 export function offersComputer(config: AgentConfig): boolean {
     return config.tools.computer && !config.ephemeral && config.kind !== 'foreman' && computerAvailable()
+}
+
+// Decided on the model the run uses, not on the agent's setting: driving a screen means reading its
+// screenshots, and an OpenCode model without vision never gets them.
+export function runOffersComputer(config: AgentConfig, provider: Provider, model: string): boolean {
+    return offersComputer(config) && modelSeesImages(provider, model)
 }
 
 // One screen per agent and runs of one agent can overlap (a chat, a schedule): the first to touch
@@ -193,7 +202,7 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
                 description: OPEN_APP_DESCRIPTION,
                 inputSchema: z.object({
                     app: desktopAppSchema,
-                    url: z.string().url().optional().describe('For the browser only: the page to open.'),
+                    url: publicHttpUrl.optional().describe('For the browser only: the page to open.'),
                 }),
                 execute: ({ app, url }, { abortSignal }) => onScreen(abortSignal, APP_OPEN_SETTLE_MS, () => openApp(app, url)),
             }),

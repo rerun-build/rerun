@@ -295,6 +295,14 @@ describe('computer_open_app', () => {
         expect(state.browserHolds).toBe(0)
     })
 
+    it('takes only an http(s) page for the browser', () => {
+        const schema = (build(ctxWith()).tools.computer_open_app as any).inputSchema
+        expect(schema.safeParse({ app: 'browser', url: 'https://site.example/' }).success).toBe(true)
+        expect(schema.safeParse({ app: 'browser' }).success).toBe(true)
+        expect(schema.safeParse({ app: 'browser', url: 'file:///etc/passwd' }).success).toBe(false)
+        expect(schema.safeParse({ app: 'browser', url: 'javascript:alert(1)' }).success).toBe(false)
+    })
+
     it('opens the files and the terminal without holding a browser', async () => {
         const built = build(ctxWith())
         await settled(openApp(built, { app: 'files' }))

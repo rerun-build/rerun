@@ -1,4 +1,4 @@
-import { cliUnavailableReason, inTierOrder, isHiddenModel, isModelLocked, livePlanWindows, rerunTierDescription } from '@/lib/engine/ai-sources'
+import { cliUnavailableReason, inPlanOrder, inTierOrder, isHiddenModel, isModelLocked, livePlanWindows, modelDescription } from '@/lib/engine/ai-sources'
 import { modelLabel, modelPower } from '@/lib/engine/models'
 import type { BoxConnection, EngineProvider } from '@/lib/engine/types'
 import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@rerun/contracts'
@@ -7,7 +7,9 @@ export type ConnectionGroup = {
     connectionId: string
     label: string
     provider: EngineProvider
-    // `description` is set on the Rerun tiers only, which read as two-line rows. `locked` is a model
+    // `description` is set on the Rerun tiers and the OpenCode models (Go or Console), which read as
+    // two-line rows. One group per connection even for OpenCode's two catalogs: the iOS app keys the
+    // running model on the connection. `locked` is a model
     // listed but not included in the plan: picking it opens the plan instead. `unavailable` is why the
     // subscription's CLI cannot run it on this box: the row is disabled and says so.
     models: { id: string; label: string; power?: number; description?: string; locked?: boolean; unavailable?: string }[]
@@ -38,13 +40,13 @@ export function toGroup(connection: BoxConnection, premiumAllowed: boolean): Con
         id,
         label: modelLabel(id),
         power: modelPower(id),
-        description: rerunTierDescription(connection.id, id),
+        description: modelDescription(connection, id),
         locked: isModelLocked(connection.id, id, premiumAllowed),
         unavailable: cliUnavailableReason(connection, id),
     }))
     // Ids the catalog does not know (a custom router's own): the id is the only label there is.
     const extra = connection.extraModels.map(id => ({ id, label: id, locked: isModelLocked(connection.id, id, premiumAllowed), unavailable: cliUnavailableReason(connection, id) }))
-    const models = inTierOrder(connection.id, [...catalog, ...extra])
+    const models = inPlanOrder(connection.provider, inTierOrder(connection.id, [...catalog, ...extra]))
     // The engine skips what the plan does not run, then what the CLI does not serve, when it picks a
     // connection's default.
     const runnable = [...offered, ...connection.extraModels]

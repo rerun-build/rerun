@@ -5,6 +5,7 @@ import { CustomModelList } from '@/components/connections/CustomModelList'
 import { DeleteConnectionButton, type DeleteResult } from '@/components/connections/DeleteConnectionButton'
 import { DetailBlock } from '@/components/connections/DetailBlock'
 import { ModelBuckets } from '@/components/connections/ModelBuckets'
+import { OpencodeModels } from '@/components/connections/OpencodeModels'
 import { PlanConnect } from '@/components/connections/plan-connect/PlanConnect'
 import { PlanLimitsBlock } from '@/components/connections/PlanLimitsBlock'
 import { DetailHeader } from '@/components/connections/SourceBits'
@@ -12,7 +13,7 @@ import { Button } from '@/components/ui/button'
 import { CreditsUsageBar } from '@/cloud/billing.client'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { creditResetPhrase, isCreditUsedUp, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
+import { connectMethod, creditResetPhrase, isCreditUsedUp, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
 import { catalogFor } from '@/lib/engine/models'
 import type { BoxConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { AlertTriangle, CoinsIcon } from '@/lib/icons'
@@ -63,7 +64,7 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
             const result = await onUpdateKeys(connection.id, { set: keys, remove })
             if (result.success && rejected) {
                 onReconnected?.()
-                toast.success(sourceKind(connection.provider) === 'plan' ? 'Signed in again' : 'Key replaced')
+                toast.success(connectMethod(connection.provider) === 'key' ? 'Key replaced' : 'Signed in again')
             }
             return result
         },
@@ -77,7 +78,11 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
                 {error && <p className="text-[11px] text-destructive">{error}</p>}
                 <SourceAlert connection={connection} credit={credit} reconnectRequested={rejected} onKeys={applyKeys} />
                 {sourceKind(connection.provider) === 'plan' && connection.connected && <PlanLimitsBlock connection={connection} />}
-                <ModelBuckets connection={connection} defaultModel={defaultModel} onModelsChange={models => void patch({ models })} />
+                {connection.provider === 'opencode' ? (
+                    <OpencodeModels connection={connection} defaultModel={defaultModel} onModelsChange={models => void patch({ models })} />
+                ) : (
+                    <ModelBuckets connection={connection} defaultModel={defaultModel} onModelsChange={models => void patch({ models })} />
+                )}
                 {isOpenRouter && <BaseUrlField baseUrl={connection.baseUrl ?? ''} onCommit={value => void patch({ baseUrl: value })} />}
                 {isOpenRouter && connection.connected && <CustomModelList models={connection.extraModels} onChange={extraModels => void patch({ extraModels })} reserved={catalog.models.map(m => m.id)} />}
             </PanelScroller>
@@ -131,13 +136,14 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
 
     if (connection.connected && !reconnectRequested) return null
 
-    if (kind === 'plan') {
+    const method = connectMethod(connection.provider)
+    if (method !== 'key') {
         return (
             <div className="space-y-5">
                 <AlertBlock>
                     <p className="text-xs">{connection.connected ? 'This sign-in was rejected. Coworkers using it are stopped until you sign in again.' : 'This sign-in expired. Coworkers using it are stopped until you sign in again.'}</p>
                 </AlertBlock>
-                <PlanConnect provider={connection.provider === 'codex' ? 'codex' : 'claude'} onKeys={onKeys} surface="reconnect" lastStep={() => ({ title: 'Your coworkers start again' })} />
+                <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={onKeys} surface="reconnect" lastStep={() => ({ title: 'Your coworkers start again' })} />
             </div>
         )
     }

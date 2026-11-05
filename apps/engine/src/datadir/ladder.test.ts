@@ -2,13 +2,14 @@ import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 
-process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-datadir-ladder-'))
+const dataDir = mkdtempSync(resolve(tmpdir(), 'rerun-datadir-ladder-'))
+process.env.RERUN_DATA_DIR = dataDir
 
 const { beforeEach, describe, expect, it } = await import('vitest')
-const { mkdir, readFile, rm, writeFile } = await import('node:fs/promises')
+const { chmod, mkdir, readFile, rm, stat, symlink, writeFile } = await import('node:fs/promises')
 const { existsSync } = await import('node:fs')
 const { RERUN_CONNECTION_ID } = await import('@rerun/contracts')
-const { agentEnvPath, agentDir, agentsDir, boxPlanPath, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpPackagesDir } = await import('../config/paths.js')
+const { agentEnvPath, agentDir, agentsDir, boxPlanPath, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpDir, mcpPackagesDir, mcpPendingPath, mcpTokenPath } = await import('../config/paths.js')
 const { writeEnvFile, readEnvFile } = await import('../lib/env-file.js')
 const { raw } = await import('../db/client.js')
 const { buildCommit } = await import('../runtime/build-info.js')
@@ -149,7 +150,7 @@ describe('v2 to v3: mcp-packages', () => {
         await rm(mcpPackagesDir(), { recursive: true, force: true })
         await writeDataVersion(2)
         await migrateDataDir()
-        expect(readDataVersion()).toBe(3)
+        expect(readDataVersion()).toBe(DATA_DIR_VERSION)
         expect(existsSync(mcpPackagesDir())).toBe(true)
     })
 
@@ -159,6 +160,72 @@ describe('v2 to v3: mcp-packages', () => {
         await mcpPackages.up()
         await mcpPackages.up()
         expect(await readFile(resolve(mcpPackagesDir(), 'abc', 'current.json'), 'utf8')).toBe('{}')
+    })
+})
+
+describe('v3 to v4: secret-file-modes', () => {
+    const secretModes = DATA_DIR_MIGRATIONS.find(s => s.id === 'secret-file-modes')!
+    const mode = async (path: string) => (await stat(path)).mode & 0o777
+
+    async function writeWithMode(path: string, fileMode: number) {
+        await writeFile(path, '{}', 'utf8')
+        await chmod(path, fileMode)
+    }
+
+    // What an engine from before this step left behind: everything at the default modes.
+    async function legacyAgent(id: string) {
+        await mkdir(mcpDir(id), { recursive: true })
+        await chmod(mcpDir(id), 0o755)
+        await writeWithMode(configPath(id), 0o644)
+        await writeWithMode(mcpTokenPath(id, 'srv'), 0o644)
+        await writeWithMode(mcpPendingPath(id, 'srv'), 0o644)
+    }
+
+    it('closes config.json and the mcp folder to other users, from v3', async () => {
+        await legacyAgent('alpha')
+        await writeDataVersion(3)
+        await migrateDataDir()
+        expect(readDataVersion()).toBe(4)
+        expect(await mode(configPath('alpha'))).toBe(0o600)
+        expect(await mode(mcpDir('alpha'))).toBe(0o700)
+        expect(await mode(mcpTokenPath('alpha', 'srv'))).toBe(0o600)
+        expect(await mode(mcpPendingPath('alpha', 'srv'))).toBe(0o600)
+    })
+
+    it('replays without harm', async () => {
+        await legacyAgent('beta')
+        await secretModes.up()
+        await secretModes.up()
+        expect(await mode(configPath('beta'))).toBe(0o600)
+        expect(await mode(mcpDir('beta'))).toBe(0o700)
+        expect(await mode(mcpTokenPath('beta', 'srv'))).toBe(0o600)
+    })
+
+    it('does nothing on a data-dir without agents', async () => {
+        await expect(secretModes.up()).resolves.toBeUndefined()
+        expect(existsSync(agentsDir())).toBe(false)
+    })
+
+    it('leaves an agent without an mcp folder as it is, and skips what is not an agent folder', async () => {
+        await mkdir(agentDir('gamma'), { recursive: true })
+        await writeWithMode(configPath('gamma'), 0o644)
+        await writeWithMode(resolve(agentsDir(), 'stray.json'), 0o644)
+        await secretModes.up()
+        expect(await mode(configPath('gamma'))).toBe(0o600)
+        expect(existsSync(mcpDir('gamma'))).toBe(false)
+        expect(await mode(resolve(agentsDir(), 'stray.json'))).toBe(0o644)
+    })
+
+    it('touches only the json files of mcp/, never what a link points to', async () => {
+        await legacyAgent('delta')
+        await writeWithMode(resolve(mcpDir('delta'), 'notes.txt'), 0o644)
+        const elsewhere = resolve(dataDir, 'elsewhere.json')
+        await writeWithMode(elsewhere, 0o644)
+        await symlink(elsewhere, mcpTokenPath('delta', 'linked'))
+        await secretModes.up()
+        expect(await mode(mcpTokenPath('delta', 'srv'))).toBe(0o600)
+        expect(await mode(resolve(mcpDir('delta'), 'notes.txt'))).toBe(0o644)
+        expect(await mode(elsewhere)).toBe(0o644)
     })
 })
 
@@ -184,6 +251,10 @@ describe('data-dir ladder', () => {
             [
               3,
               "mcp-packages",
+            ],
+            [
+              4,
+              "secret-file-modes",
             ],
           ]
         `)

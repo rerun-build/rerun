@@ -31,7 +31,7 @@ export function CreditsUsageBar(_props: { usedMicros?: number | null; budgetMicr
     return null
 }
 
-export function BudgetExhaustedNotice(_props: { onConnectProvider?: (provider: SubscriptionProvider) => void; preTrial?: boolean; trialing?: boolean; paused?: boolean }) {
+export function BudgetExhaustedNotice(_props: { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: { label: string; provider: string; onUse: () => void }; preTrial?: boolean; trialing?: boolean; paused?: boolean; noCredit?: boolean }) {
     return null
 }
 

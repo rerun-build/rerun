@@ -37,18 +37,18 @@ beforeEach(async () => {
 })
 
 describe('resolveSkillFile', () => {
-    it('resolves a path inside the skill folder', () => {
-        expect(resolveSkillFile(id, 'research', 'references/api.md')).toBe(resolve(skillsDir(id), 'research/references/api.md'))
+    it('resolves a path inside the skill folder', async () => {
+        expect(await resolveSkillFile(id, 'research', 'references/api.md')).toBe(resolve(skillsDir(id), 'research/references/api.md'))
     })
 
-    it('lets a path reach a sibling skill but never climb out of skills/', () => {
-        expect(resolveSkillFile(id, 'research', '../writing/SKILL.md')).toBe(resolve(skillsDir(id), 'writing/SKILL.md'))
-        expect(() => resolveSkillFile(id, 'research', '../../SOUL.md')).toThrow(/escapes/)
-        expect(() => resolveSkillFile(id, '..', 'config.json')).toThrow(/escapes/)
+    it('lets a path reach a sibling skill but never climb out of skills/', async () => {
+        expect(await resolveSkillFile(id, 'research', '../writing/SKILL.md')).toBe(resolve(skillsDir(id), 'writing/SKILL.md'))
+        await expect(resolveSkillFile(id, 'research', '../../SOUL.md')).rejects.toThrow(/escapes/)
+        await expect(resolveSkillFile(id, '..', 'config.json')).rejects.toThrow(/escapes/)
     })
 
-    it('keeps a leading slash inside the skill, since it is joined rather than resolved', () => {
-        expect(resolveSkillFile(id, 'research', '/etc/passwd')).toBe(resolve(skillsDir(id), 'research/etc/passwd'))
+    it('keeps a leading slash inside the skill, since it is joined rather than resolved', async () => {
+        expect(await resolveSkillFile(id, 'research', '/etc/passwd')).toBe(resolve(skillsDir(id), 'research/etc/passwd'))
     })
 })
 

@@ -35,7 +35,13 @@ describe('hubTools', () => {
         ['rerun_hub_service_details', { slug: 'stripe' }, 'service_details', { slug: 'stripe' }],
         ['rerun_hub_service_install', { slug: 'stripe', values: { region: 'eu' } }, 'service_install', { slug: 'stripe', values: { region: 'eu' } }],
         ['rerun_hub_service_list_installed', {}, 'service_list_installed', {}],
-        ['rerun_hub_publish_file', { path: 'r.html', slug: 'report' }, 'publish_file', { path: 'r.html', slug: 'report' }],
+        ['rerun_hub_publish_file', { path: 'r.html', slug: 'report' }, 'publish_file', { path: 'r.html', slug: 'report', access: undefined, invite: undefined, password: undefined }],
+        [
+            'rerun_hub_publish_file',
+            { path: 'q3/', access: 'invited', invite: ['marie@northwind.com', '@northwind.com'] },
+            'publish_file',
+            { path: 'q3/', slug: undefined, access: 'invited', invite: ['marie@northwind.com', '@northwind.com'], password: undefined },
+        ],
         ['rerun_hub_unpublish_file', { slug: 'report' }, 'unpublish_file', { path: undefined, slug: 'report' }],
         ['rerun_hub_list_published', {}, 'list_published', {}],
     ])('%s calls the hub tool with its arguments', async (name, args, hubTool, hubArgs) => {

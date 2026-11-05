@@ -239,6 +239,8 @@ describe('codex bridge server', () => {
         const schema = (result.tools as Array<{ name: string; inputSchema: any }>).find(t => t.name === 'ask_user')!.inputSchema
         expect(schema.properties.questions.type).toBe('array')
         expect(schema.properties.questions.items.properties.question.type).toBe('string')
+        expect(schema.properties.questions.items.properties.header).toBeDefined()
+        expect(JSON.stringify(schema.properties.questions.items.properties.options)).toContain('"label"')
 
         const approvalSchema = (result.tools as Array<{ name: string; inputSchema: any }>).find(t => t.name === 'request_approval')!.inputSchema
         expect(approvalSchema.properties.approvals.type).toBe('array')
@@ -247,6 +249,12 @@ describe('codex bridge server', () => {
 
     it('runs a bridged tool and returns its result', async () => {
         const { result } = await rpc('tools/call', { name: 'ask_user', arguments: { questions: [{ question: 'Ready?', options: ['Yes', 'No'] }] } })
+        expect(JSON.parse(result.content[0].text).status).toBe('delivered')
+    })
+
+    it('runs a bridged ask_user whose options carry a header and descriptions', async () => {
+        const questions = [{ question: 'Which format?', header: 'Format', options: [{ label: 'One-pager', description: 'A single page' }, 'Deck'] }]
+        const { result } = await rpc('tools/call', { name: 'ask_user', arguments: { questions } })
         expect(JSON.parse(result.content[0].text).status).toBe('delivered')
     })
 

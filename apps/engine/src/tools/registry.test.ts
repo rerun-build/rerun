@@ -69,7 +69,7 @@ beforeEach(() => {
 // The schemas ride along on every step of every run: the budget is what the whole set may cost a
 // prompt (a ratchet, set just above what the set weighs today and lowered as families move on
 // demand), and the per-tool cap is what the OpenAI chat API accepts for a description.
-const TOOL_PAYLOAD_CHARS_BUDGET = 71_600
+const TOOL_PAYLOAD_CHARS_BUDGET = 72_040
 const TOOL_DESCRIPTION_CHARS_CAP = 1_024
 
 describe('tool payload', () => {
@@ -118,6 +118,9 @@ describe('buildTools', () => {
         expect(await namesOf(ctxWith({ kind: 'foreman' }))).not.toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'claude' }))).toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'codex' }))).toContain('computer')
+        // Decided on the model the run uses: an OpenCode model that cannot see never gets the screen.
+        expect(await namesOf(ctxWith({}, { provider: 'opencode', model: 'go/kimi-k3.1-pro' }))).toContain('computer')
+        expect(await namesOf(ctxWith({}, { provider: 'opencode', model: 'go/deepseek-v4-pro' }))).not.toContain('computer')
         state.capture = false
         expect(await namesOf(ctxWith())).not.toContain('computer')
     })

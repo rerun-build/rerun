@@ -1,4 +1,5 @@
 import { RERUN_MODEL, type Provider } from './agent.js'
+import { OPENCODE_SNAPSHOT } from './opencode-snapshot.js'
 
 // What each model accepts when reached through its own API.
 export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
@@ -86,6 +87,9 @@ export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
     'moonshotai/kimi-k3.1-pro': 1_000_000,
     'moonshotai/kimi-k3': 1_000_000,
     'moonshotai/kimi-k2.6': 256_000,
+    // `go/…` and `console/…` collide with no other id. A model OpenCode publishes after this snapshot
+    // is read off the engine's live catalog instead.
+    ...Object.fromEntries(OPENCODE_SNAPSHOT.map(model => [model.id, model.contextWindow])),
 }
 
 // A CLI provider does not serve the model's own window: it serves whatever its client allows on
@@ -182,6 +186,7 @@ export const MODEL_LABEL: Record<string, string> = {
     'qwen/qwen3.8-flash': 'Qwen3.8 Flash',
     'minimax/minimax-m3.1-flash': 'MiniMax M3.1 Flash',
     'minimax/minimax-m3': 'MiniMax M3',
+    ...Object.fromEntries(OPENCODE_SNAPSHOT.map(model => [model.id, model.label])),
 }
 
 // Friendly label for a model id; falls back to the raw id for custom/unknown models.

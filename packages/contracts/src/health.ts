@@ -40,6 +40,9 @@ export const ENGINE_CAPABILITY_SCHEDULE_RENAME = 'schedules.rename'
 // `POST /update` takes a prebuilt artifact (`{ artifact: { url, sha256, commit } }`) instead of pulling and building.
 export const ENGINE_CAPABILITY_ARTIFACT_UPDATE = 'update.artifact'
 
+// The engine runs OpenCode connections: the hub offers OpenCode only to a box that says so.
+export const ENGINE_CAPABILITY_OPENCODE = 'connections.opencode'
+
 // What the last `rerun update` on a box did, as `/health` reports it.
 export const engineLastUpdateSchema = z.object({
     status: z.enum(['running', 'error', 'restarting', 'success']),

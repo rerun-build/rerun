@@ -36,7 +36,7 @@ Rerun reads its settings from `.env` at the root of your clone. `.env.example` l
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `OPENROUTER_API_KEY` | empty | Runs the Foreman, the helpers behind it (company research, naming, ideas) and the [Rerun models](/self-host/models) every coworker starts on. Without it, the Foreman does not answer and coworkers need another AI provider. |
+| `OPENROUTER_API_KEY` | empty | Runs the Foreman, the helpers behind it (company research, naming, ideas) and the [Rerun models](/self-host/models) every coworker starts on. Without it, the Foreman skips the guided onboarding, and the Foreman and the coworkers run on the AI provider you connect. |
 | `RERUN_EMBED_API_KEY` | empty | An OpenRouter key for embeddings. It turns on semantic search of the services catalog and of the coworkers' memories. Without it, both fall back to keyword search. |
 
 ## Admins

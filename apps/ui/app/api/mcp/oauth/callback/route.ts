@@ -1,7 +1,7 @@
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { putMcpToken } from '@/lib/engine/client'
 import { oauthPopupResponse } from '@/lib/oauth/popup-result'
-import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, decodeContext, exchangeCode } from '@/lib/mcp-oauth'
+import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, decodeContext, engineClientSecret, exchangeCode } from '@/lib/mcp-oauth'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
@@ -26,6 +26,7 @@ function htmlResult(result: CallbackResult, serverName?: string): NextResponse {
 // OAuth redirect target on our own domain. Exchanges the code for tokens, writes the bundle
 // to the engine token store (never Supabase), then messages the opener popup and closes. For the
 // app, which has no session here, the bundle is parked instead, for the app to claim with its bearer.
+// A pre-registered client's secret is never parked: the claim reads it from the environment again.
 export async function GET(req: Request) {
     const url = new URL(req.url)
     const code = url.searchParams.get('code')
@@ -68,10 +69,10 @@ export async function GET(req: Request) {
             obtainedAt: Date.now(),
         }
         if (grant) {
-            await parkSignIn(grant, { kind: 'mcp', serverName: ctx.serverName, token: bundle })
+            await parkSignIn(grant, { kind: 'mcp', serverName: ctx.serverName, mcpUrl: ctx.mcpUrl, token: bundle })
             return finish({ ok: true, claim: grant.jti })
         }
-        await putMcpToken(conn, engineAgentId, ctx.serverName, bundle)
+        await putMcpToken(conn, engineAgentId, ctx.serverName, { ...bundle, clientSecret: engineClientSecret(ctx) })
         return finish({ ok: true })
     } catch (err) {
         return finish({ ok: false, error: err instanceof Error ? err.message : 'Authorization failed' })

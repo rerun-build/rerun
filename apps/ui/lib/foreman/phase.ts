@@ -96,9 +96,14 @@ export type PhaseInput = {
     // Arrived on a template or a share link the server could still put a name on. Only then is it
     // installed before the welcome card: a link nobody can read has nothing to install.
     arrivedReadyMade?: boolean
+    // The hub has a key to run the onboarding on. A self-hosted install without one skips it: its
+    // foreman runs on the engine, on whatever AI the user connects there.
+    hubForeman?: boolean
 }
 
-export function foremanPhase({ foreman, onboardingCompletedAt, entitled, trialing = false, agentCount, waitlisted = false, arrivedReadyMade = false }: PhaseInput): ForemanPhase {
+export function foremanPhase({ foreman, onboardingCompletedAt, entitled, trialing = false, agentCount, waitlisted = false, arrivedReadyMade = false, hubForeman = true }: PhaseInput): ForemanPhase {
+    if (!hubForeman) return 'companion'
+
     // Being in the funnel is a workspace fact: discovery happened, or a team was agreed. Reading the
     // plan here and not just the profile is what keeps a conversation that never got a profile
     // written inside the funnel past its own checkout: `entitled` flips true there, and the funnel

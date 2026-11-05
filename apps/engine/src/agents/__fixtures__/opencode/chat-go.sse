@@ -1,0 +1,16 @@
+data: {"id": "chatcmpl-1", "object": "chat.completion.chunk", "created": 1793802733, "model": "deepseek-v4-pro", "choices": [{"index": 0, "delta": {"role": "assistant", "content": "", "reasoning_content": "The user wants a lookup. "}}]}
+
+data: {"id": "chatcmpl-1", "object": "chat.completion.chunk", "created": 1793802733, "model": "deepseek-v4-pro", "choices": [{"index": 0, "delta": {"content": "", "reasoning_content": "I will call the tool."}}]}
+
+data: {"id": "chatcmpl-1", "object": "chat.completion.chunk", "created": 1793802733, "model": "deepseek-v4-pro", "choices": [{"index": 0, "delta": {"content": "Let me check."}}]}
+
+data: {"id": "chatcmpl-1", "object": "chat.completion.chunk", "created": 1793802733, "model": "deepseek-v4-pro", "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, "id": "call_1", "type": "function", "function": {"name": "lookup", "arguments": ""}}]}}]}
+
+data: {"id": "chatcmpl-1", "object": "chat.completion.chunk", "created": 1793802733, "model": "deepseek-v4-pro", "choices": [{"index": 0, "delta": {"tool_calls": [{"index": 0, "function": {"arguments": "{\"q\":\"rerun\"}"}}]}}]}
+
+data: {"id": "chatcmpl-1", "object": "chat.completion.chunk", "created": 1793802733, "model": "deepseek-v4-pro", "choices": [{"index": 0, "delta": {}, "finish_reason": "tool_calls"}]}
+
+data: {"id": "chatcmpl-1", "object": "chat.completion.chunk", "created": 1793802733, "model": "deepseek-v4-pro", "choices": [], "usage": {"prompt_tokens": 162, "completion_tokens": 12, "total_tokens": 174, "cost": 0, "opencode": {"billing_source": "go", "list_cost": 3.03e-05, "allowance": {"remaining": 0.97}, "tokens": {"cache_read": 0, "cache_write_5m": 0, "cache_write_1h": 0}}}}
+
+data: [DONE]
+

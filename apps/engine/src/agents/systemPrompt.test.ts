@@ -146,6 +146,17 @@ describe('skills section', () => {
         expect(without).not.toContain('The card never carries your explanation')
     })
 
+    it('places the card below the message, whichever comes first in the reply', async () => {
+        for (const provider of ['claude', 'codex'] as const) {
+            const prompt = await buildSystemPrompt(agentWith({ askUser: true }), { source: 'chat' }, provider)
+            const section = prompt.slice(prompt.indexOf('<asking_the_user>'), prompt.indexOf('</asking_the_user>'))
+            expect(section).toContain('the card shows at the bottom of the conversation, below your message')
+            expect(section).toContain('never the card above')
+        }
+        const without = await buildSystemPrompt(agentWith({ askUser: false, requestApproval: false, suggestService: false, requestSecret: false }), { source: 'chat' })
+        expect(without).not.toContain('never the card above')
+    })
+
     it('holds the proposal back while a flow is still being built', async () => {
         const prompt = await buildSystemPrompt(agentWith({ skills: true }), { source: 'chat' })
         expect(prompt).toContain('never while it is still being shaped')
@@ -233,17 +244,17 @@ describe('buildSystemPrompt provider notes', () => {
         expect(prompt).toContain(`web_search is the one exception: it names your own built-in ${builtIn} tool`)
     })
 
-    it('tells codex to make the closing calls before writing its message', async () => {
-        const prompt = await buildSystemPrompt(agent, { source: 'chat' }, 'codex')
+    it.each(['codex', 'claude', 'anthropic'] as const)('tells %s to make the closing calls before writing its message', async provider => {
+        const prompt = await buildSystemPrompt(agent, { source: 'chat' }, provider)
         expect(prompt).toContain('<turn_order>')
-        expect(prompt).toContain('the first message you write to the user ends your turn')
+        expect(prompt).toContain('a message written before a call does not reach the user as your message')
         expect(prompt).not.toContain('A turn ends in this order, your message first')
     })
 
-    it.each(['claude', 'rerun', 'anthropic'] as const)('puts the message before the closing calls on %s', async provider => {
-        const prompt = await buildSystemPrompt(agent, { source: 'chat' }, provider)
+    it('puts the message before the closing calls on a Rerun alias the hub has not resolved', async () => {
+        const prompt = await buildSystemPrompt(agent, { source: 'chat' }, 'rerun')
         expect(prompt).toContain('A turn ends in this order, your message first')
-        expect(prompt).not.toContain('the first message you write to the user ends your turn')
+        expect(prompt).not.toContain('a message written before a call does not reach the user as your message')
     })
 
     it('leaves the turn order out for an agent with nothing that closes a turn', async () => {
@@ -344,7 +355,7 @@ describe('quick replies section', () => {
 
     it('keeps the replies out of the turn order, which only orders the cards', async () => {
         expect(await buildSystemPrompt(agent, { source: 'chat' }, 'codex')).toMatch(/the calls first: .*at most one card that asks the user something \(.*ask_user.*\); \d\) your message, complete/)
-        expect(await buildSystemPrompt(agent, { source: 'chat' }, 'claude')).toMatch(/A turn ends in this order, your message first: 1\) your message.*\) at most one card that asks the user something/)
+        expect(await buildSystemPrompt(agent, { source: 'chat' }, 'rerun')).toMatch(/A turn ends in this order, your message first: 1\) your message.*\) at most one card that asks the user something/)
     })
 
     it('stays out of a sub-agent, and out of an agent with the switch off', async () => {

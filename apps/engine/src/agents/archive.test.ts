@@ -55,7 +55,7 @@ beforeAll(async () => {
     await writeFile(resolve(root, 'config.json'), JSON.stringify(config, null, 2))
     await writeFile(resolve(root, 'SOUL.md'), 'You are a research agent.')
     await writeFile(resolve(root, 'INSTALL.md'), 'Connect the Stripe connector, then confirm you can read a customer.')
-    await writeFile(resolve(root, '.env'), 'RERUN_SVC_FAL_FAL_KEY=fal-AAAAAAAAAAAAAAAAAAAA\nCLAUDE_CODE_OAUTH_TOKEN=sk-ant-CCCCCCCCCCCCCCCCCCCCCC\n')
+    await writeFile(resolve(root, '.env'), 'RERUN_SVC_FAL_FAL_KEY=fal-AAAAAAAAAAAAAAAAAAAA\nCLAUDE_CODE_OAUTH_TOKEN=sk-ant-CCCCCCCCCCCCCCCCCCCCCC\nOPENCODE_API_KEY=oc_sk_DDDDDDDDDDDDDDDDDDDD\n')
     await writeFile(resolve(root, 'mcp/fal.json'), JSON.stringify({ accessToken: 'secret-token' }))
     await writeFile(resolve(root, 'mcp/fal.pending.json'), JSON.stringify({ startedAt: 0 }))
     await writeFile(resolve(root, 'data/agent.db'), 'the agent own tables')
@@ -289,6 +289,7 @@ describe('buildArchive', () => {
         const env = await readFile(resolve(staged, '.env'), 'utf8')
         expect(env).toBe('RERUN_SVC_FAL_FAL_KEY=\n')
         expect(env).not.toContain('CLAUDE_CODE_OAUTH_TOKEN')
+        expect(env).not.toContain('OPENCODE_API_KEY')
 
         const scrubbed = JSON.parse(await readFile(resolve(staged, 'config.json'), 'utf8')) as typeof config
         expect(scrubbed.mcpServers[1].headers.Authorization).toBe('Bearer ${RERUN_SVC_FAL_FAL_KEY}')

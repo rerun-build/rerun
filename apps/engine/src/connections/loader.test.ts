@@ -52,7 +52,7 @@ describe('isConnected', () => {
 describe('toSummary', () => {
     it('carries the config and the verdict, never the credential', () => {
         const summary = toSummary(loaded('anthropic', { ANTHROPIC_API_KEY: 'sk-secret' }))
-        expect(summary).toEqual({ id: 'cnx', ...config, connected: true, credentialRejected: false, planLimits: null, cliModels: null })
+        expect(summary).toEqual({ id: 'cnx', ...config, connected: true, credentialRejected: false, planLimits: null, cliModels: null, providerModels: null })
         expect(JSON.stringify(summary)).not.toContain('sk-secret')
         expect(summary).not.toHaveProperty('env')
     })

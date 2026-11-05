@@ -64,3 +64,8 @@ export function isBuildCommit(commit: string): boolean {
     if (!commitFull) return false
     return commit.length <= commitFull.length ? commitFull.startsWith(commit) : commit.startsWith(commitFull)
 }
+
+// How the engine names itself to OpenCode, which sees every box behind one product.
+export function opencodeUserAgent(): string {
+    return `rerun-engine/${buildCommit() ?? 'dev'}`
+}

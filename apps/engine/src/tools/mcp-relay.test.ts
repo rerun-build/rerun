@@ -33,11 +33,64 @@ async function clientOf(relay: Relay) {
     return client
 }
 
+// send_email as mcp-mail-server@2.1.2 lists it on an engine box: the root anyOf kept it away from the
+// model of every claude agent carrying the Email (IMAP/SMTP) app.
+const SIGNATURE = {
+    type: 'object',
+    anyOf: [{ required: ['text'] }, { required: ['html'] }],
+    properties: { text: { type: 'string', minLength: 1 }, html: { type: 'string', minLength: 1 } },
+    additionalProperties: false,
+}
+const SEND_EMAIL_PROPERTIES = {
+    to: { type: 'string', minLength: 1, maxLength: 8192 },
+    subject: { type: 'string', minLength: 1, maxLength: 998 },
+    text: { type: 'string', minLength: 1, maxLength: 10000000 },
+    html: { type: 'string', minLength: 1, maxLength: 10000000 },
+    signature: SIGNATURE,
+}
+const SEND_EMAIL = {
+    name: 'send_email',
+    description: 'Send a new email via SMTP.',
+    inputSchema: {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        anyOf: [{ required: ['text'] }, { required: ['html'] }],
+        type: 'object' as const,
+        properties: SEND_EMAIL_PROPERTIES,
+        required: ['to', 'subject'],
+        additionalProperties: false,
+    },
+}
+
 describe('relayMcpServer', () => {
-    it('lists the tools as the server did, JSON schemas untouched', async () => {
-        const inputSchema = { type: 'object' as const, properties: { channel: { type: 'string' } }, oneOf: [{ required: ['channel'] }] }
+    it('lists a tool without a root union exactly as the server did', async () => {
+        const inputSchema = { type: 'object' as const, properties: { channel: { type: 'string', oneOf: [{ minLength: 1 }] } } }
         const client = await clientOf({ name: 'discord', tools: [{ name: 'send', description: 'Send a message', inputSchema }], call: async () => ({ content: [] }) })
         expect((await client.listTools()).tools).toEqual([{ name: 'send', description: 'Send a message', inputSchema }])
+    })
+
+    it('lifts a root oneOf and tells the model the rule in the description', async () => {
+        const inputSchema = { type: 'object' as const, properties: { channel: { type: 'string' }, user: { type: 'string' } }, oneOf: [{ required: ['channel'] }, { required: ['user'] }] }
+        const client = await clientOf({ name: 'discord', tools: [{ name: 'send', description: 'Send a message', inputSchema }], call: async () => ({ content: [] }) })
+        expect((await client.listTools()).tools).toEqual([
+            { name: 'send', description: 'Send a message\n\nProvide exactly one of: channel, user.', inputSchema: { type: 'object', properties: inputSchema.properties } },
+        ])
+    })
+
+    it('lists the mail server send_email without its root anyOf, the nested one kept', async () => {
+        const client = await clientOf({ name: 'email', tools: [SEND_EMAIL], call: async () => ({ content: [] }) })
+        expect((await client.listTools()).tools).toEqual([
+            {
+                name: 'send_email',
+                description: 'Send a new email via SMTP.\n\nProvide at least one of: text, html.',
+                inputSchema: {
+                    $schema: 'http://json-schema.org/draft-07/schema#',
+                    type: 'object',
+                    properties: SEND_EMAIL_PROPERTIES,
+                    required: ['to', 'subject'],
+                    additionalProperties: false,
+                },
+            },
+        ])
     })
 
     it('passes each call on to the pooled connection, with the tool timeout', async () => {

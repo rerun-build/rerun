@@ -21,7 +21,7 @@ import { SignInPillButton } from '@/components/layout/SignInPill'
 import { ThemeMenuRow } from '@/components/layout/ThemeMenuRow'
 import { HelpMenuItems, WeeklyRewindMenuItem, WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
 import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from '@/components/layout/WorkspacePowerControl'
-import { WorkspacePill } from '@rerun/ui/chrome'
+import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
 import { Badge } from '@rerun/ui/primitives'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { activeAgentLimitFor, BILLING_ENABLED, isWorkspaceApiEntitled } from '@/cloud/billing'
@@ -177,7 +177,7 @@ export function WorkspaceSwitcher() {
     const headerSection = (
         <div className="flex flex-col gap-2.5 p-1.5">
             <div className="flex items-center gap-2.5">
-                <img src={workspace.icon_url || activeIcon} alt="" className="size-8 shrink-0 rounded-full object-cover" />
+                <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-8 shrink-0 rounded-full object-cover" />
                 <div className="min-w-0">
                     <div className="truncate text-sm font-medium text-foreground">{workspace.name || 'Workspace'}</div>
                     <div className="truncate text-xs text-muted-foreground">{workspaceSummary(workspace)}</div>
@@ -238,9 +238,10 @@ export function WorkspaceSwitcher() {
             {email && <DropdownMenuLabel className="truncate pl-7.5 text-xs font-normal text-muted-foreground">{email}</DropdownMenuLabel>}
             {sorted.map((w, index) => {
                 const active = w.id === workspace.id
+                const fallbackIcon = PRICING_ICONS[index % PRICING_ICONS.length]
                 return (
                     <DropdownMenuItem key={w.id} disabled={busy} onSelect={() => handleSwitch(w.id)} className={cn('gap-2', !active && 'text-muted-foreground')}>
-                        <img src={w.icon_url || PRICING_ICONS[index % PRICING_ICONS.length]} alt="" className="size-5 shrink-0 rounded-full object-cover" />
+                        <WorkspaceLogoImage src={w.icon_url || fallbackIcon} fallbackSrc={fallbackIcon} className="size-5 shrink-0 rounded-full object-cover" />
                         <span className="flex-1 truncate">{w.name || 'Workspace'}</span>
                         {active && <CheckIcon className="size-4" />}
                     </DropdownMenuItem>
@@ -402,7 +403,7 @@ export function WorkspaceSwitcher() {
 
             <AccountDialog />
             <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />
-            <WorkspaceSettingsDialog open={panel === 'workspace'} onOpenChange={open => setPanel(open ? 'workspace' : null)} />
+            <WorkspaceSettingsDialog open={panel === 'workspace'} onOpenChange={open => setPanel(open ? 'workspace' : null)} fallbackIconUrl={activeIcon} />
             <WorkspaceMembersDialog
                 open={panel === 'members' || membersLinked}
                 onOpenChange={open => {

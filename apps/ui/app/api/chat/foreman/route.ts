@@ -9,6 +9,7 @@ import { MICROS_PER_USD } from '@/cloud/billing'
 import { engineSessionOf, loadForemanConversation, saveForemanConversation } from '@/lib/foreman/conversation'
 import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
 import { foremanErrorText } from '@/lib/foreman/error-text'
+import { foremanHubApiKey } from '@/lib/foreman/hub-api-key'
 import { withInlineAttachments } from '@/lib/foreman/inline-attachments'
 import { arrivingIntent } from '@/lib/foreman/opening'
 import { forcesFirstPlan, isOnboardingPhase, pinnedPlanBoxes } from '@/lib/foreman/phases'
@@ -66,8 +67,7 @@ export async function POST(req: Request): Promise<Response> {
     if (ctx.authUser.is_anonymous) return Response.json({ error: 'Unauthorized' }, { status: 401 })
     if (await isPhoneStepPending(ctx.supabase, ctx.userId)) return Response.json({ error: PHONE_REQUIRED_MESSAGE }, { status: 403 })
 
-    // A self-hosted install runs its onboarding on the same OpenRouter key as the rest of the app.
-    const apiKey = process.env.RERUN_MAX_API_KEY || process.env.OPENROUTER_API_KEY
+    const apiKey = foremanHubApiKey()
     if (!apiKey) return Response.json({ error: 'The foreman is unavailable' }, { status: 503 })
 
     let body: ForemanRequestBody

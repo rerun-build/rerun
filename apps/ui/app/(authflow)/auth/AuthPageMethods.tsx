@@ -8,13 +8,14 @@ import { PhoneSignIn } from '@/cloud/phone.client'
 import { useSignupFunnel } from '@/components/auth/useSignupFunnel'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { signupStep } from '@/lib/auth/signup-abandon'
+import { internalPath } from '@/lib/auth/internal-path'
 import { routes } from '@/lib/routes'
 import { useRouter, useSearchParams } from 'next/navigation'
 import EmailAuth from './EmailAuth'
 
 export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlone: boolean; showGoogle: boolean }) {
     const searchParams = useSearchParams()
-    const next = searchParams.get('next') || routes.home
+    const next = internalPath(searchParams.get('next'), routes.home)
     const router = useRouter()
     // A link that carries an address was written for the email form.
     const initialMethod = searchParams.get('email') || !PHONE_ENABLED ? 'email' : 'phone'

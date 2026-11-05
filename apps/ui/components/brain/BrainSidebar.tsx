@@ -13,7 +13,7 @@ import { isCardType } from '@/lib/brain/labels'
 import { humanizeTableName } from '@/lib/data/table-name'
 import type { EngineDbTable } from '@/lib/engine/types'
 import type { UploadEntry } from '@/lib/files/upload'
-import { BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, type LucideIcon } from '@/lib/icons'
+import { BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { BrainPageSummary } from '@rerun/contracts'
 import { useMemo, useState, type ReactNode, type Ref } from 'react'
@@ -24,6 +24,7 @@ type BrainSidebarProps = {
     pagesAvailable: boolean
     selection: BrainSelection | null
     openProposals: number
+    publishedEnabled: boolean
     files: SharedFilesTree
     // Null while the shared database is being listed.
     tables: EngineDbTable[] | null
@@ -158,7 +159,7 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
 
 // One tree for everything the workspace shares, as Notion keeps its pages and databases side by
 // side: what agents proposed, the company pages, the shared folder and the shared database.
-export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, files, tables, searchRef, onSelect, onUpload }: BrainSidebarProps) {
+export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, searchRef, onSelect, onUpload }: BrainSidebarProps) {
     const [query, setQuery] = useState('')
     const card = pages.filter(page => isCardType(page.type))
     const products = pages.filter(page => page.type === 'product')
@@ -251,6 +252,7 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
                                 onClick={() => onSelect({ kind: 'proposals' })}
                                 trailing={openProposals > 0 && <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white tabular-nums">{openProposals}</span>}
                             />
+                            {publishedEnabled && <SidebarRow icon={GlobeIcon} label="Published" active={selection?.kind === 'published'} onClick={() => onSelect({ kind: 'published' })} />}
                         </div>
 
                         <SectionHeader label="Company" />

@@ -2,12 +2,18 @@ import { mkdtempSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
+import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-web-hub-'))
+
+// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
+vi.mock('node:dns/promises', () => ({
+    lookup: async (host: string) => [{ address: host.startsWith('internal.') ? '10.0.0.7' : '93.184.216.34', family: 4 }],
+}))
 process.env.RERUN_API_KEY = 'engine-secret'
 process.env.RERUN_HUB_BASE_URL = 'https://hub.example.test/'
 
-const { afterEach, describe, expect, it, vi } = await import('vitest')
+const { afterEach, describe, expect, it } = await import('vitest')
 const { HostBreaker } = await import('../host-breaker.js')
 const { workspaceDir } = await import('../../config/paths.js')
 const { webTools } = await import('./web.js')
@@ -43,6 +49,13 @@ afterEach(() => {
 })
 
 describe('web_fetch falling back to the hub', () => {
+    it('never asks the hub for a private host it refused itself', async () => {
+        const fetchMock = mockFetch(() => Response.json({ markdown: 'leaked' }))
+
+        expect(await fetchPage(ctxWith(), 'http://127.0.0.1:8080/admin')).toMatch(/^Fetch refused: 127\.0\.0\.1:8080 is not a public host/)
+        expect(fetchMock).not.toHaveBeenCalled()
+    })
+
     it('asks the hub for a page the site refused, and does not count the host as failed', async () => {
         const fetchMock = mockFetch(url => (url === HUB_FETCH_URL ? Response.json({ markdown: '# Reviews' }) : new Response('<h1>Forbidden</h1>', { status: 403 })))
 

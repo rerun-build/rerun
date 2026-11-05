@@ -5,20 +5,29 @@ import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-mcp-packages-'))
 process.env.RERUN_LOG_LEVEL = 'fatal'
+process.env.RERUN_API_KEY = 'engine-key'
 
 // A fake npm: it lays the tree `npm install --prefix <dir> <spec>` would, or fails as told.
-const npm = vi.hoisted(() => ({ runs: [] as string[], missing: false, fail: null as string | null, bins: { 'mcp-tool': 'cli.js' } as string | Record<string, string>, gate: null as Promise<void> | null }))
+const npm = vi.hoisted(() => ({
+    runs: [] as string[],
+    envs: [] as Array<Record<string, string> | undefined>,
+    missing: false,
+    fail: null as string | null,
+    bins: { 'mcp-tool': 'cli.js' } as string | Record<string, string>,
+    gate: null as Promise<void> | null,
+}))
 
 vi.mock('node:child_process', async () => {
     const { EventEmitter } = await import('node:events')
     const { mkdirSync, writeFileSync } = await import('node:fs')
     const { resolve: join } = await import('node:path')
     return {
-        spawn: (_cmd: string, args: string[]) => {
+        spawn: (_cmd: string, args: string[], options: { env?: Record<string, string> }) => {
             const child = Object.assign(new EventEmitter(), { stderr: new EventEmitter(), kill: () => {} })
             const dir = args[args.indexOf('--prefix') + 1]!
             const spec = args.at(-1)!
             npm.runs.push(spec)
+            npm.envs.push(options.env)
             void (async () => {
                 await new Promise(r => setImmediate(r))
                 if (npm.gate) await npm.gate
@@ -55,6 +64,7 @@ async function currentOf(): Promise<{ bin: string; installedAt: number; installI
 beforeEach(async () => {
     await rm(mcpPackagesDir(), { recursive: true, force: true })
     npm.runs.length = 0
+    npm.envs.length = 0
     npm.fail = null
     npm.missing = false
     npm.bins = { 'mcp-tool': 'cli.js' }
@@ -106,6 +116,14 @@ describe('withInstalledPackage', () => {
         expect(launched).toEqual({ ...server, command: (await currentOf()).bin, args: ['--flag'] })
         expect(launched.command).toMatch(/node_modules\/\.bin\/mcp-tool$/)
         expect(npm.runs).toEqual(['mcp-tool@1.0.0'])
+    })
+
+    it('runs npm, and the install scripts of the package with it, without the engine configuration', async () => {
+        await installInBackground('mcp-tool@1.0.0')
+        const [env] = npm.envs
+        expect(env?.PATH).toBe(process.env.PATH)
+        expect(env).not.toHaveProperty('RERUN_API_KEY')
+        expect(env).not.toHaveProperty('RERUN_DATA_DIR')
     })
 
     it('installs a spec once however many runs ask for it at the same time', async () => {

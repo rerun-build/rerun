@@ -18,7 +18,7 @@ const REASONING_REQUEST = { enabled: true }
 // stream, and only when asked for.
 const USAGE_REQUEST = { include: true }
 
-const REASONING_ID = 'reasoning-0'
+export const REASONING_ID = 'reasoning-0'
 
 /**
  * A thought ends when the model starts saying something, which is narrower than it sounds:
@@ -27,7 +27,7 @@ const REASONING_ID = 'reasoning-0'
  * thought into one block per chunk. `finish` covers a turn that reasons and then says nothing at
  * all, and `flush` covers a stream cut before it.
  */
-function closesReasoning(part: { type: string; delta?: unknown }): boolean {
+export function closesReasoning(part: { type: string; delta?: unknown }): boolean {
     if (part.type === 'text-delta') return typeof part.delta === 'string' && part.delta.length > 0
     return part.type === 'tool-input-start' || part.type === 'tool-call' || part.type === 'finish'
 }

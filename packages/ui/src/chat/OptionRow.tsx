@@ -22,6 +22,7 @@ function activate(event: React.KeyboardEvent, choose: () => void) {
 export type OptionRowProps = {
     index: number
     label: ReactNode
+    description?: ReactNode
     selected: boolean
     multi?: boolean
     disabled?: boolean
@@ -29,7 +30,7 @@ export type OptionRowProps = {
     className?: string
 }
 
-export function OptionRow({ index, label, selected, multi = false, disabled, onChoose, className }: OptionRowProps) {
+export function OptionRow({ index, label, description, selected, multi = false, disabled, onChoose, className }: OptionRowProps) {
     return (
         <div
             role={multi ? 'checkbox' : 'button'}
@@ -43,9 +44,18 @@ export function OptionRow({ index, label, selected, multi = false, disabled, onC
             aria-disabled={disabled}
         >
             <OptionMark index={index} selected={selected} multi={multi} />
-            <div data-selected={selected} className="flex min-h-7 min-w-0 flex-1 items-center text-left text-muted-foreground data-[selected=true]:font-medium data-[selected=true]:text-foreground">
-                {label}
-            </div>
+            {description ? (
+                <div className="flex min-h-7 min-w-0 flex-1 flex-col justify-center text-left">
+                    <div data-selected={selected} className="text-muted-foreground data-[selected=true]:font-medium data-[selected=true]:text-foreground">
+                        {label}
+                    </div>
+                    <div className="line-clamp-2 text-xs text-muted-foreground/80">{description}</div>
+                </div>
+            ) : (
+                <div data-selected={selected} className="flex min-h-7 min-w-0 flex-1 items-center text-left text-muted-foreground data-[selected=true]:font-medium data-[selected=true]:text-foreground">
+                    {label}
+                </div>
+            )}
         </div>
     )
 }

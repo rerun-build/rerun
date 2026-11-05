@@ -1,5 +1,5 @@
 import { mkdtempSync } from 'node:fs'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 
@@ -224,6 +224,21 @@ describe('token and pending storage', () => {
         expect(await auth.loadPending('pending-agent', 'srv')).toEqual(pending)
         await auth.clearPending('pending-agent', 'srv')
         expect(await auth.loadPending('pending-agent', 'srv')).toBeNull()
+    })
+
+    it('keeps the folder and its files readable by the engine alone', async () => {
+        const mode = async (path: string) => (await stat(path)).mode & 0o777
+        const pending = { auth: { deviceEndpoint: 'd', tokenEndpoint: 't' }, start: { deviceCode: 'dc', verificationUri: 'u', interval: 5, expiresIn: 900 }, startedAt: 7 }
+        await auth.saveToken('mode-agent', 'srv', token)
+        await auth.savePending('mode-agent', 'srv', pending)
+        expect(await mode(mcpDir('mode-agent'))).toBe(0o700)
+        expect(await mode(mcpTokenPath('mode-agent', 'srv'))).toBe(0o600)
+        expect(await mode(mcpPendingPath('mode-agent', 'srv'))).toBe(0o600)
+
+        await chmod(mcpTokenPath('mode-agent', 'srv'), 0o644)
+        await auth.saveToken('mode-agent', 'srv', { ...token, accessToken: 'rotated' })
+        expect(await mode(mcpTokenPath('mode-agent', 'srv'))).toBe(0o600)
+        expect(await auth.loadToken('mode-agent', 'srv')).toMatchObject({ accessToken: 'rotated' })
     })
 
     it('refuses a server name that would leave the mcp folder', async () => {

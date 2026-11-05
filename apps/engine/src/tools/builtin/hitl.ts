@@ -4,6 +4,7 @@ import type { RunContext } from '../../runtime/context.js'
 import { cardCallTiming, type TurnOrder } from '../../agents/turn-order.js'
 import type { AgentConfig } from '../../agents/types.js'
 import { desktopAvailable } from '../../desktop/session.js'
+import { publicHttpUrl } from '../url.js'
 
 export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover'] as const
 export type HitlToolName = (typeof HITL_TOOL_NAMES)[number]
@@ -89,13 +90,27 @@ export function hitlTurnIsOver(steps: ReadonlyArray<StepLike>, cli: boolean): bo
     return lastStepHasHitlCall(steps) && (cli || !hitlStepLacksMessage(steps))
 }
 
+// A model that writes its message first is left to judge whether it did: the card may have come
+// after a message, or after nothing.
 export const HITL_ACK = {
     status: 'delivered',
-    instruction: 'Delivered to the user. Call no other tool. If you wrote nothing to the user before this call, they are looking at a bare card: write now, as your normal message, what you found, why you ask, and in full what the question is about, then end your turn. If you already did, end your turn now. The user will reply in the chat and you will continue from their reply.',
+    instruction: 'Delivered to the user. Call no other tool. If you wrote nothing to the user before this call, they are looking at a bare card: write now, as your normal message, what you found, why you ask, and in full what the question is about, then end your turn. The card shows below that message, so point to it as the card below, never above. If you already did, end your turn now. The user will reply in the chat and you will continue from their reply.',
 } as const
 
+// A model that calls first is told, not asked: a Claude's note before a call comes back as a
+// thinking block the chat folds away, so a model that wrote one believes the user has read it and
+// ends its turn on a line pointing at the card. The message is expected now, whatever came before.
+export const HITL_ACK_CALL_FIRST = {
+    status: 'delivered',
+    instruction: 'Delivered to the user. Whatever you wrote before this call was at most a note, and a note written before a call is not shown to them: they are looking at the card. Write your message now, as your normal reply: what you found, why you ask, and in full what the card asks about, then end your turn. The card shows below that message, so point to it as the card below, never above. Call no other tool. The user will reply in the chat and you will continue from their reply.',
+} as const
+
+export function hitlAck(order: TurnOrder): typeof HITL_ACK | typeof HITL_ACK_CALL_FIRST {
+    return order === 'call-first' ? HITL_ACK_CALL_FIRST : HITL_ACK
+}
+
 function hitlTool<S extends z.ZodTypeAny>(order: TurnOrder, description: string, inputSchema: S) {
-    return tool({ description: `${description} ${cardCallTiming(order)}`, inputSchema, execute: async () => HITL_ACK })
+    return tool({ description: `${description} ${cardCallTiming(order)}`, inputSchema, execute: async () => hitlAck(order) })
 }
 
 export function jsonTolerantArray<S extends z.ZodTypeAny>(schema: S) {
@@ -170,6 +185,14 @@ export function offersTakeover(config: AgentConfig): boolean {
 const askUserDescription = (cards: boolean) =>
     `Ask the user one or more questions at once, then END YOUR TURN until they reply. Use it only when you cannot proceed without their input. Anything they are asked to review or choose among (a hook, slides, images) must be in the turn that asks, in full, even when you showed it earlier or are asking again: its text in your message${cards ? ', its files in a card_file call made before this one' : ''}. Put every open question in the questions array, not across several turns. A question offers short options as buttons, or none for a free-text answer: options only when concrete choices help, never for a value only the user knows (a URL, a name, a number). Set multiple: true when the options combine. The user can always type a custom answer, attach files (they arrive as workspace paths) or skip a question. Keep each question to one short line and each option to a few words: longer explanations go in your message.`
 
+const questionOption = z.union([
+    z.string().min(1),
+    z.object({
+        label: z.string().min(1),
+        description: nullTolerantOptional(z.string().min(1)).describe('One line on what picking it implies, only when the label does not say it.'),
+    }),
+])
+
 export function askUserTool(ctx: RunContext): ToolSet {
     return {
         ask_user: hitlTool(
@@ -181,7 +204,8 @@ export function askUserTool(ctx: RunContext): ToolSet {
                         .array(
                             z.object({
                                 question: z.string().min(1).describe('The question alone, one short line: no greeting, lead-in or context, those go in your message.'),
-                                options: nullTolerantOptional(z.array(z.string().min(1)).min(2)).describe('Omit for a free-text question. Otherwise at least two short labels shown as buttons, six or fewer unless the set is genuinely enumerated (every channel, every account). Never a catch-all like "Other" or "All of the above": the free field already covers it, and every option is a real answer to the question.'),
+                                header: nullTolerantOptional(z.string().min(1)).describe('One or two words shown above the question, e.g. "Format".'),
+                                options: nullTolerantOptional(z.array(questionOption).min(2)).describe('Omit for a free-text question. Otherwise at least two short labels shown as buttons, six or fewer unless the set is genuinely enumerated (every channel, every account). Never a catch-all like "Other" or "All of the above": the free field already covers it, and every option is a real answer to the question.'),
                                 multiple: nullTolerantOptional(z.boolean()).describe('Set true when the user may tick several options at once; ignored without options. Defaults to false.'),
                                 suggestions: nullTolerantOptional(z.array(z.string().min(1)).min(2)).describe('Deprecated alias of options.'),
                             }),
@@ -286,7 +310,7 @@ export function requestTakeoverTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet
             ctx.turnOrder,
             'Hand your browser to the user so they do by hand what you cannot: sign in to an account, pass a captcha or a bot check, approve a device prompt. Then END YOUR TURN. The user sees your browser window on this URL, acts in it, and confirms when they are done; cookies and the signed-in session stay in your browser profile, so the page is past the wall when you open it again (computer_open_app on your screen, browser_navigate otherwise); the window itself is closed when you get it back. Use it only when a page you need is blocked behind something a person can clear, never to ask them to browse in your place.',
             z.object({
-                url: z.string().url().describe('The page to open for the user, usually the one that blocked you or its sign-in page.'),
+                url: publicHttpUrl.describe('The page to open for the user, usually the one that blocked you or its sign-in page.'),
                 reason: z.string().min(1).max(200).describe('One short line telling the user what to do there, e.g. "Sign in to LinkedIn" or "Pass the Cloudflare check". Shown as the title of the card.'),
             }),
         ),

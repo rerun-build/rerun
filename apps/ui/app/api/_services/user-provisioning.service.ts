@@ -46,7 +46,7 @@ export async function provisionUser(
         .from('workspaces')
         .insert<Database['public']['Tables']['workspaces']['Insert']>({
             name: 'My workspace',
-            icon_url: randomBlob().url,
+            icon_url: randomBlob()?.url ?? null,
             plan: BASE_PLAN_SLUG,
             ...baseLimitsToColumns(),
             // The plan's credit belongs to the plan: an account with no subscription gets the

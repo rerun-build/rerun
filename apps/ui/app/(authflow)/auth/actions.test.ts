@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ verifyTurnstile: vi.fn(), ensureEmailAccount: vi.fn(), getUser: vi.fn(), provisionUser: vi.fn(), cookies: new Map<string, string>() }))
+const mocks = vi.hoisted(() => ({ verifyTurnstile: vi.fn(), ensureEmailAccount: vi.fn(), claimEmailCodeAsk: vi.fn(), lookupEmailForSignUp: vi.fn(), getUser: vi.fn(), provisionUser: vi.fn(), cookies: new Map<string, string>() }))
 
 vi.mock('next/headers', () => ({
     headers: async () => new Headers({ 'x-real-ip': '203.0.113.7', 'user-agent': 'Mozilla/5.0' }),
@@ -8,13 +8,13 @@ vi.mock('next/headers', () => ({
 }))
 vi.mock('@/lib/auth/turnstile', () => ({ verifyTurnstile: mocks.verifyTurnstile }))
 vi.mock('@/cloud/billing', () => ({ drawPriceArm: () => '29' }))
-vi.mock('@/app/api/_services/email-sign-up.service', () => ({ ensureEmailAccount: mocks.ensureEmailAccount }))
+vi.mock('@/app/api/_services/email-sign-up.service', () => ({ ensureEmailAccount: mocks.ensureEmailAccount, claimEmailCodeAsk: mocks.claimEmailCodeAsk, lookupEmailForSignUp: mocks.lookupEmailForSignUp }))
 vi.mock('@/app/api/_services/sign-in-code.service', () => ({ resendSignInCodeIfLive: vi.fn() }))
 vi.mock('@/app/api/_services/user-provisioning.service', () => ({ provisionUser: mocks.provisionUser }))
 vi.mock('@/supabase/server', () => ({ createClient: async () => ({ auth: { getUser: mocks.getUser } }) }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 
-const { completeSignupAction, prepareEmailSignIn } = await import('./actions')
+const { completeSignupAction, prepareAnonymousEmailStep, prepareEmailSignIn } = await import('./actions')
 
 const account = { id: 'user-1', is_anonymous: false }
 
@@ -23,6 +23,8 @@ beforeEach(() => {
     mocks.cookies.clear()
     mocks.verifyTurnstile.mockResolvedValue(true)
     mocks.ensureEmailAccount.mockResolvedValue({ ok: true, created: true })
+    mocks.claimEmailCodeAsk.mockResolvedValue(true)
+    mocks.lookupEmailForSignUp.mockResolvedValue({ ok: true, exists: false })
     mocks.getUser.mockResolvedValue({ data: { user: account } })
     mocks.provisionUser.mockResolvedValue({ signedUp: true })
 })
@@ -89,5 +91,50 @@ describe('prepareEmailSignIn', () => {
         mocks.ensureEmailAccount.mockResolvedValue({ ok: false, error: 'too_many' })
 
         expect(await prepareEmailSignIn({ email: 'ada@example.com', captchaToken: 'token' })).toMatchObject({ ok: false, reason: 'too_many' })
+    })
+
+    it('holds back a network that asked for too many codes, before any account is opened', async () => {
+        mocks.claimEmailCodeAsk.mockResolvedValue(false)
+
+        expect(await prepareEmailSignIn({ email: 'ada@example.com', captchaToken: 'token' })).toEqual({ ok: false, reason: 'too_many_codes', error: 'Too many codes were asked from your network. Try again later.' })
+        expect(mocks.claimEmailCodeAsk).toHaveBeenCalledWith('203.0.113.7')
+        expect(mocks.ensureEmailAccount).not.toHaveBeenCalled()
+    })
+})
+
+describe('prepareAnonymousEmailStep', () => {
+    it('says whether a normalized address has an account, once the robot check and the pace let the caller through', async () => {
+        mocks.lookupEmailForSignUp.mockResolvedValue({ ok: true, exists: true })
+
+        expect(await prepareAnonymousEmailStep({ email: '  Ada@Example.com ', captchaToken: 'token' })).toEqual({ ok: true, exists: true })
+
+        expect(mocks.verifyTurnstile).toHaveBeenCalledWith('token', '203.0.113.7')
+        expect(mocks.claimEmailCodeAsk).toHaveBeenCalledWith('203.0.113.7')
+        expect(mocks.lookupEmailForSignUp).toHaveBeenCalledWith('ada@example.com')
+    })
+
+    it('tells a visitor the robot check turned away nothing about the address', async () => {
+        mocks.verifyTurnstile.mockResolvedValue(false)
+
+        expect(await prepareAnonymousEmailStep({ email: 'ada@example.com' })).toMatchObject({ ok: false, reason: 'captcha_failed' })
+        expect(mocks.lookupEmailForSignUp).not.toHaveBeenCalled()
+    })
+
+    it('holds back a network that asked for too many codes', async () => {
+        mocks.claimEmailCodeAsk.mockResolvedValue(false)
+
+        expect(await prepareAnonymousEmailStep({ email: 'ada@example.com', captchaToken: 'token' })).toMatchObject({ ok: false, reason: 'too_many_codes' })
+        expect(mocks.lookupEmailForSignUp).not.toHaveBeenCalled()
+    })
+
+    it('refuses a blocked domain the anonymous flow used to let through', async () => {
+        mocks.lookupEmailForSignUp.mockResolvedValue({ ok: false, error: 'blocked_domain' })
+
+        expect(await prepareAnonymousEmailStep({ email: 'someone@blocked.example', captchaToken: 'token' })).toEqual({ ok: false, reason: 'blocked_domain', error: 'This email domain is not accepted. Use another address.' })
+    })
+
+    it('refuses what is not an email', async () => {
+        expect(await prepareAnonymousEmailStep({ email: 'nope', captchaToken: 'token' })).toMatchObject({ ok: false, reason: 'invalid_email' })
+        expect(mocks.verifyTurnstile).not.toHaveBeenCalled()
     })
 })

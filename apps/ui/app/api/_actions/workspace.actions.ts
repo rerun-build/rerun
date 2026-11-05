@@ -3,7 +3,8 @@
 import type { Database } from '@/app/api/database.types'
 import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { hasPendingCreatorTerms, isExpertAccount, requireSandboxWorkspaceId } from '@/app/api/_auth/expert'
-import { BASE_PLAN_SLUG, baseLimitsToColumns } from '@/cloud/billing'
+import { BASE_PLAN_SLUG, baseLimitsToColumns, SIGNUP_BUDGET_MICROS } from '@/cloud/billing'
+import { grantRerunTopup } from '@/cloud/billing.server'
 import { BLOB_ILLUSTRATIONS, getBlobByFile, randomBlob } from '@/lib/blobs/catalog'
 import { uploadPublicImage } from '@/lib/images/upload'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -114,11 +115,11 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
         .from('workspaces')
         .insert<Database['public']['Tables']['workspaces']['Insert']>({
             name: name.trim() || workspaceNameFrom({ firstName: readFirstName(session?.user_metadata) }),
-            icon_url: icon?.url ?? randomBlob().url,
+            icon_url: icon?.url ?? randomBlob()?.url ?? null,
             plan: BASE_PLAN_SLUG,
             ...baseLimitsToColumns(),
-            // No subscription behind this workspace yet, so no Rerun credit either. The plan's
-            // credit lands when the plan does.
+            // No subscription behind this workspace yet, so no monthly budget either: the plan's
+            // budget lands when the plan does. It starts on the signup allowance, granted below.
             rerun_budget_micros: 0,
             // One person is quoted one price, whichever of their workspaces they stand in.
             price_arm: current?.price_arm ?? null,
@@ -135,6 +136,10 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
         workspace_id: workspaceId,
     })
     if (membershipError) return { ok: false, error: membershipError.message }
+
+    // Without it the workspace starts at zero and its trial adds nothing: every Rerun model answers
+    // "credits used up" on the first message, though none was ever used.
+    await grantRerunTopup(workspaceId, SIGNUP_BUDGET_MICROS)
 
     const { error: switchError } = await supabase.from('users').update<Database['public']['Tables']['users']['Update']>({ workspace_id: workspaceId }).eq('id', userId)
     if (switchError) return { ok: false, error: switchError.message }

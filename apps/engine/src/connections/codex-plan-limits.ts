@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline'
 import { CONNECTION_TOKEN_KEY } from '@rerun/contracts'
 import { codexHomeDir } from '../config/paths.js'
+import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
 import { codexCommand, codexOffPin, parseCodexVersion } from '../runtime/codex-cli.js'
 import { recordCliModels } from './cli-models.js'
@@ -31,7 +32,7 @@ export function readCodexSession(connectionId: string, timeoutMs = READ_TIMEOUT_
         const home = codexHomeDir(connectionId)
         const child = spawn(cmd, [...args, 'app-server', '--listen', 'stdio://'], {
             stdio: ['pipe', 'pipe', 'ignore'],
-            env: { ...process.env, CODEX_HOME: home, RUST_LOG: process.env.RUST_LOG || 'error' },
+            env: { ...childProcessEnv({}), CODEX_HOME: home, RUST_LOG: process.env.RUST_LOG || 'error' },
             cwd: home,
         })
         const lines = createInterface({ input: child.stdout, crlfDelay: Infinity })

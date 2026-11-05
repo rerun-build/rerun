@@ -11,7 +11,8 @@ import { type ServiceInstanceTarget, compileService, decompileService } from '@/
 import { embedText, toVectorLiteral } from '@/lib/services/embed'
 import { type ServiceManifest, defaultMethod, getMethod, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema } from '@/lib/services/manifest'
 import { newServiceInstanceId, ordinalInstanceLabel } from '@/lib/services/instances'
-import { listPublished, publishFile, unpublishFile } from '@/lib/services/publish'
+import { isPublishedAccess } from '@/lib/published/access'
+import { listPublished, publishWithThumbnail, unpublishFile } from '@/lib/services/publish-thumbnail'
 import {
     type ServiceRegistry,
     entriesOfSlug,
@@ -612,6 +613,11 @@ function requireString(v: unknown, field: string): string {
     return v
 }
 
+function asStringArray(v: unknown): string[] | undefined {
+    if (typeof v === 'string') return v.split(',')
+    return Array.isArray(v) ? v.filter((entry): entry is string => typeof entry === 'string') : undefined
+}
+
 function asStringRecord(v: unknown): Record<string, string> {
     if (!v || typeof v !== 'object') return {}
     const out: Record<string, string> = {}
@@ -638,7 +644,11 @@ export async function dispatchHubTool(agentId: string, name: string, args: Recor
             return { status: 'uninstalled', slug }
         }
         case 'publish_file':
-            return publishFile(agentId, requireString(args.path, 'path'), asString(args.slug))
+            return publishWithThumbnail(agentId, requireString(args.path, 'path'), asString(args.slug), {
+                access: isPublishedAccess(args.access) ? args.access : undefined,
+                invite: asStringArray(args.invite),
+                password: asString(args.password),
+            })
         case 'unpublish_file':
             return unpublishFile(agentId, { path: asString(args.path), slug: asString(args.slug) })
         case 'list_published':

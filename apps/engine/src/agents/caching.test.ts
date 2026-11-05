@@ -7,6 +7,25 @@ const system = { stable: 'You are a test agent.', volatile: '<current_time>\nTod
 const input = { system, messages, sessionId: 'session-1' }
 const hour = { anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } } }
 
+describe('applyCaching on OpenCode', () => {
+    it('caches a model as the provider of its format does', () => {
+        expect(applyCaching('opencode', { ...input, model: 'go/claude-haiku-5-5' })).toEqual(applyCaching('anthropic', input))
+        expect(applyCaching('opencode', { ...input, model: 'go/gpt-6-luna' })).toEqual(applyCaching('openai', input))
+        expect(applyCaching('opencode', { ...input, model: 'go/deepseek-v4-pro' })).toEqual(applyCaching('openrouter', input))
+        expect(applyCaching('opencode', { ...input, model: 'go/gemini-4-argon' })).toEqual(applyCaching('google', input))
+    })
+
+    // The branches of the providers that were there before OpenCode do not move with it.
+    it('leaves every other provider as it was', () => {
+        for (const provider of ['anthropic', 'openai', 'openrouter', 'rerun', 'google', 'claude', 'codex'] as const) {
+            expect(applyCaching(provider, { ...input, model: 'go/deepseek-v4-pro' }), provider).toEqual(applyCaching(provider, input))
+        }
+        expect(applyCaching('openrouter', input)).toMatchSnapshot()
+        expect(applyCaching('anthropic', input)).toMatchSnapshot()
+        expect(applyCaching('google', input)).toMatchSnapshot()
+    })
+})
+
 describe('applyCaching', () => {
     it.each(['claude', 'codex'] as const)('drops the system prompt for %s, which takes it through its CLI settings', provider => {
         const out = applyCaching(provider, input)

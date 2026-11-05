@@ -6,7 +6,7 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-vision-'))
 
 const { model } = vi.hoisted(() => ({
-    model: { hang: false, prompts: [] as unknown[] },
+    model: { hang: false, prompts: [] as unknown[], calls: [] as unknown[][] },
 }))
 
 vi.mock('../../agents/providers.js', async importOriginal => {
@@ -14,8 +14,9 @@ vi.mock('../../agents/providers.js', async importOriginal => {
     const { MockLanguageModelV3 } = await import('ai/test')
     return {
         ...actual,
-        modelFor: () =>
-            new MockLanguageModelV3({
+        modelFor: (...args: unknown[]) => {
+            model.calls.push(args)
+            return new MockLanguageModelV3({
                 doGenerate: async options => {
                     model.prompts.push(options.prompt)
                     // Deaf to the abort signal on purpose: the call that held a run for hours had
@@ -28,7 +29,8 @@ vi.mock('../../agents/providers.js', async importOriginal => {
                         warnings: [],
                     }
                 },
-            }),
+            })
+        },
     }
 })
 
@@ -64,6 +66,7 @@ async function png(name: string, width: number, height: number): Promise<void> {
 afterEach(() => {
     model.hang = false
     model.prompts.length = 0
+    model.calls.length = 0
 })
 
 describe('vision_analyze', () => {
@@ -109,5 +112,28 @@ describe('vision_analyze', () => {
         setTimeout(() => run.abort(), 20)
 
         await expect(pending).rejects.toBeDefined()
+    })
+})
+
+describe('vision_analyze on an OpenCode model that cannot see', () => {
+    const openCodeCtx = (models: string[]) =>
+        ({
+            agent: { id: agentId, resolved: { provider: 'opencode', model: 'go/deepseek-v4-pro', connection: { id: 'oc', config: { provider: 'opencode', models }, env: {} } } },
+            sessionId: 'session-9',
+            logger: { warn: () => {} },
+        }) as any
+
+    it('asks a model of the same connection that sees, in the same conversation', async () => {
+        await png('small.png', 40, 30)
+        expect(await analyze(openCodeCtx(['go/deepseek-v4-pro', 'go/kimi-k3.1-pro']), 'chat-uploads/small.png')).toBe('a ring on a white background')
+        const [, override, , , options] = model.calls.at(-1) as [unknown, { model: string }, unknown, unknown, { sessionId: string }]
+        expect(override).toEqual({ model: 'go/kimi-k3.1-pro' })
+        expect(options.sessionId).toBe('session-9')
+    })
+
+    it('says so plainly when none of its models sees, without calling one', async () => {
+        await png('small.png', 40, 30)
+        expect(await analyze(openCodeCtx(['go/deepseek-v4-pro', 'go/glm-5.3']), 'chat-uploads/small.png')).toContain('None of the models switched on for this OpenCode connection can read images')
+        expect(model.calls).toHaveLength(0)
     })
 })

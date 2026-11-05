@@ -27,7 +27,7 @@ export async function reconcileWrite(agent: LoadedAgent, content: string, kind: 
     try {
         release = await ensureCliAuth(agent.resolved.provider, agent.resolved.connection)
         const output = await generateStructured({
-            model: modelFor(agent, override),
+            model: modelFor(agent, override, undefined, undefined, { sessionId: `${agent.id}:memory-reconcile` }),
             schema: decisionSchema,
             prompt: `A memory is about to be saved:\n"${content}"\n\nExisting similar memories you already hold:\n${candidates.map(c => `- [${c.id}] (${c.kind}) ${c.content}`).join('\n')}\n\nDoes the new memory update, replace, or restate one of the existing ones (the same underlying fact, e.g. a changed or corrected value)? If so return its id. If the new memory is a genuinely distinct fact, return null. Be conservative: only return an id when it clearly supersedes an existing memory.`,
             abortSignal: AbortSignal.timeout(RECONCILE_TIMEOUT_MS),

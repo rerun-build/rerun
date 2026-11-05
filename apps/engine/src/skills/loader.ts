@@ -5,7 +5,7 @@ import matter from 'gray-matter'
 import { parseFrontmatter } from './frontmatter.js'
 import { agentDir, skillDir, skillsDir } from '../config/paths.js'
 import { newId, slugify } from '../lib/ids.js'
-import { resolveWithin } from '../tools/sandbox.js'
+import { resolveWithinReal } from '../tools/sandbox.js'
 
 export type Skill = {
     slug: string
@@ -24,8 +24,8 @@ function skillFile(agentId: string, slug: string) {
     return resolve(skillDir(agentId, slug), 'SKILL.md')
 }
 
-export function resolveSkillFile(agentId: string, slug: string, path: string): string {
-    return resolveWithin(skillsDir(agentId), posix.join(slug, path))
+export function resolveSkillFile(agentId: string, slug: string, path: string): Promise<string> {
+    return resolveWithinReal(skillsDir(agentId), posix.join(slug, path))
 }
 
 async function walkSkillFiles(dir: string, prefix: string, out: string[]): Promise<void> {
@@ -127,7 +127,7 @@ export async function writeSkillFolder(
         await writeFile(stagedSkillFile, matter.stringify(`\n${input.body.trim()}\n`, { name: input.name, description: input.description }), 'utf8')
 
         for (const file of input.files) {
-            const path = resolveWithin(staging, file.path)
+            const path = await resolveWithinReal(staging, file.path)
             if (path === stagedSkillFile) throw new Error('Use the skill body to change SKILL.md')
             await mkdir(resolve(path, '..'), { recursive: true })
             await writeFile(path, file.content, 'utf8')
@@ -143,14 +143,14 @@ export async function writeSkillFolder(
 }
 
 export async function writeSkillFile(agentId: string, slug: string, path: string, content: string): Promise<void> {
-    const target = resolveWithin(skillDir(agentId, slug), path)
+    const target = await resolveWithinReal(skillDir(agentId, slug), path)
     if (target === skillFile(agentId, slug)) throw new Error('Use the skill body to change SKILL.md')
     await mkdir(resolve(target, '..'), { recursive: true })
     await writeFile(target, content, 'utf8')
 }
 
 export async function deleteSkillFile(agentId: string, slug: string, path: string): Promise<void> {
-    const target = resolveWithin(skillDir(agentId, slug), path)
+    const target = await resolveWithinReal(skillDir(agentId, slug), path, { followLast: false })
     if (target === skillFile(agentId, slug)) throw new Error('Delete the whole skill instead of its SKILL.md')
     await rm(target, { recursive: true, force: true })
 }

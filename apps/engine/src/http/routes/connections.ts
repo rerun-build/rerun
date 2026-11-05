@@ -8,6 +8,8 @@ import { clearBoxDefault, readBoxDefault, writeBoxDefault } from '../../connecti
 import { servesModel } from '../../connections/resolve.js'
 import { defaultModelOf } from '../../agents/availability.js'
 import { refreshCodexPlanLimits, refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
+import { refreshOpencodeCatalog, refreshStaleOpencodeCatalog } from '../../connections/opencode-catalog.js'
+import { refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { sendNotification } from '../../runtime/notify.js'
 
@@ -23,6 +25,8 @@ function announceConnected(connection: LoadedConnection): void {
 connectionRoutes.get('/', async c => {
     const connections = await listConnections()
     refreshStaleCodexPlanLimits(connections)
+    refreshStaleOpencodePlanLimits(connections)
+    if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()
     return c.json({ connections: connections.map(toSummary), default: await readBoxDefault() })
 })
 
@@ -95,9 +99,11 @@ connectionRoutes.delete('/:id', async c => {
 // The first default a box adopts must be a model the account's Codex serves, and the only reading
 // that can say so is the one taken against the credential that just arrived. Awaited here, a few
 // seconds at most, because the adoption below is the one write that cannot wait for the next list.
-// Nothing to read for the other providers: Claude refuses nothing, a key has no CLI.
+// OpenCode's live catalog says the same of a model it stopped publishing. Nothing to read for the
+// other providers: Claude refuses nothing, a key has no CLI.
 async function readCliModelsBeforeAdopting(connection: LoadedConnection): Promise<void> {
     if (connection.config.provider === 'codex') await refreshCodexPlanLimits(connection)
+    if (connection.config.provider === 'opencode') await Promise.all([refreshOpencodeCatalog(), refreshOpencodePlanLimits(connection)])
 }
 
 // Plugging the first credential into a box is the whole setup, and on its own it changes nothing:

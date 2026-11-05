@@ -19,6 +19,7 @@ import { connectionExists } from './loader.js'
 import { withConnectionLock } from './lock.js'
 import { forgetCliModels } from './cli-models.js'
 import { forgetPlanLimits } from './plan-limits.js'
+import { forgetOpencodePlanLimitsAttempt } from './opencode-plan-limits.js'
 import { getConnection, reloadConnection, unloadConnection } from './registry.js'
 import type { LoadedConnection } from './types.js'
 
@@ -70,6 +71,7 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
         // New keys can be another account altogether, and its plan stands somewhere else.
         forgetPlanLimits(id)
         forgetCliModels(id)
+        forgetOpencodePlanLimitsAttempt(id)
         forgetCredentialRejected(id)
         await reloadConnection(id)
         return Object.keys(next).sort()
@@ -87,6 +89,7 @@ export async function deleteConnection(id: string): Promise<void> {
     unloadConnection(id)
     forgetPlanLimits(id)
     forgetCliModels(id)
+    forgetOpencodePlanLimitsAttempt(id)
     forgetCredentialRejected(id)
     await rm(connectionDir(id), { recursive: true, force: true })
 }

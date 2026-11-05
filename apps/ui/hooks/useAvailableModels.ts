@@ -27,7 +27,9 @@ export function useAvailableModels(agentId: string) {
     // `model: null` patch. Offering the entry would hand the user a dead button.
     const supportsBoxDefault = !!agentModel?.loaded && agentModel.resolvedModel !== null
 
-    const loading = !loaded || connectionsLoading
+    // A read of the agent that failed leaves every field null, which reads exactly like an agent
+    // following the Box: the picker would repair a state it does not know. It waits for a read.
+    const loading = !loaded || connectionsLoading || !agentModel?.loaded
 
     const availableGroups = useMemo(() => connectionGroups(connections, premiumAllowed), [connections, premiumAllowed])
     // The connection owning a model id. Ambiguous by construction — two Claude subscriptions both

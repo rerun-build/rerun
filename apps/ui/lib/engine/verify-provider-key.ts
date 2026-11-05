@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { CONNECTION_TOKEN_KEY, type Provider } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, OPENCODE_USAGE_URL, type Provider } from '@rerun/contracts'
 
 const VERIFY_TIMEOUT_MS = 5000
 
@@ -37,6 +37,13 @@ const KEY_CHECKS: Partial<Record<Provider, KeyCheck>> = {
         request: key => ['https://generativelanguage.googleapis.com/v1beta/models?pageSize=1', { headers: { 'x-goog-api-key': key } }],
         // Google answers a malformed or unknown key with a 400 rather than a 401.
         rejects: async res => (await deniedAuth(res)) || (res.status === 400 && (await res.text()).includes('API_KEY_INVALID')),
+    },
+    // The only OpenCode endpoint that checks a key. A Console-only key may well be refused the Go
+    // plan's usage with a 403, so only a 401 says the key itself is wrong.
+    opencode: {
+        name: 'OpenCode',
+        request: key => [OPENCODE_USAGE_URL, { headers: { Authorization: `Bearer ${key}` } }],
+        rejects: async res => res.status === 401,
     },
     openrouter: {
         name: 'OpenRouter',

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findUnknownPendingCall, hitlVersionOf } from '@rerun/contracts'
+import { findUnknownPendingCall, hitlVersionOf, withHitlVersion } from '@rerun/contracts'
 import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeTakeoverResult } from './chat-hitl'
 import { parseAttachments } from './chat/attachments-marker'
 
@@ -14,7 +14,7 @@ describe('pendingQuestions', () => {
             })
         ).toEqual([
             { question: 'Which domain?', options: [], multiple: false },
-            { question: 'Report language?', options: ['English', 'French'], multiple: false },
+            { question: 'Report language?', options: [{ label: 'English' }, { label: 'French' }], multiple: false },
         ])
     })
 
@@ -24,15 +24,63 @@ describe('pendingQuestions', () => {
 
     it('keeps a long option list whole and carries the multiple flag', () => {
         const options = Array.from({ length: 12 }, (_, i) => `#channel-${i + 1}`)
-        expect(pendingQuestions({ questions: [{ question: 'Which channels?', options, multiple: true }] })).toEqual([{ question: 'Which channels?', options, multiple: true }])
+        expect(pendingQuestions({ questions: [{ question: 'Which channels?', options, multiple: true }] })).toEqual([{ question: 'Which channels?', options: options.map(label => ({ label })), multiple: true }])
     })
 
     it('normalizes a stringified batch and the suggestions alias', () => {
-        expect(pendingQuestions({ questions: '[{"question":"Which domain?","suggestions":["example.com"]}]' })).toEqual([{ question: 'Which domain?', options: ['example.com'], multiple: false }])
+        expect(pendingQuestions({ questions: '[{"question":"Which domain?","suggestions":["example.com"]}]' })).toEqual([{ question: 'Which domain?', options: [{ label: 'example.com' }], multiple: false }])
     })
 
     it('reads the legacy singular input', () => {
-        expect(pendingQuestions({ question: 'Which domain?', options: ['example.com'] })).toEqual([{ question: 'Which domain?', options: ['example.com'], multiple: false }])
+        expect(pendingQuestions({ question: 'Which domain?', options: ['example.com'] })).toEqual([{ question: 'Which domain?', options: [{ label: 'example.com' }], multiple: false }])
+    })
+
+    it('reads a header and options written as a label with its description', () => {
+        expect(
+            pendingQuestions({
+                questions: [
+                    {
+                        question: 'Which format should the report take?',
+                        header: 'Format',
+                        options: [{ label: 'One-pager', description: 'A single page with the key numbers' }, { label: 'Deck', description: null }, 'Spreadsheet'],
+                    },
+                ],
+            }),
+        ).toEqual([
+            {
+                question: 'Which format should the report take?',
+                header: 'Format',
+                options: [{ label: 'One-pager', description: 'A single page with the key numbers' }, { label: 'Deck' }, { label: 'Spreadsheet' }],
+                multiple: false,
+            },
+        ])
+    })
+
+    it('drops a blank header and options that carry no label', () => {
+        expect(pendingQuestions({ questions: [{ question: 'Which?', header: ' ', options: [{ description: 'orphan' }, '', { label: 'A' }, null] }] })).toEqual([{ question: 'Which?', options: [{ label: 'A' }], multiple: false }])
+    })
+})
+
+describe('withHitlVersion', () => {
+    it('stamps v2 on an ask_user call that writes an option as an object', () => {
+        const input = { questions: [{ question: 'Which?', options: [{ label: 'A', description: 'first' }, 'B'] }] }
+        expect(withHitlVersion('ask_user', input)).toEqual({ ...input, v: 2 })
+        expect(withHitlVersion('mcp__rerun__ask_user', input)).toEqual({ ...input, v: 2 })
+    })
+
+    it('reads a stringified batch', () => {
+        const input = { questions: '[{"question":"Which?","options":[{"label":"A"},{"label":"B"}]}]' }
+        expect(withHitlVersion('ask_user', input)).toEqual({ ...input, v: 2 })
+    })
+
+    it('leaves string options, other tools and an already versioned input untouched', () => {
+        const strings = { questions: [{ question: 'Which?', header: 'Pick', options: ['A', 'B'] }] }
+        expect(withHitlVersion('ask_user', strings)).toBe(strings)
+        const approval = { approvals: [{ action: 'Send', detail: { label: 'x' } }] }
+        expect(withHitlVersion('request_approval', approval)).toBe(approval)
+        const stamped = { v: 2, questions: [{ question: 'Which?', options: [{ label: 'A' }, { label: 'B' }] }] }
+        expect(withHitlVersion('ask_user', stamped)).toBe(stamped)
+        expect(withHitlVersion('ask_user', 'not an object')).toBe('not an object')
     })
 })
 

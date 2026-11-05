@@ -2,7 +2,7 @@
 
 import { listMemberProfilesAction } from '@/app/api/_actions/members.actions'
 import { FORMER_MEMBER, type AuthorProfile } from '@/lib/chat/message-author'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 type Directory = Map<string, AuthorProfile>
 
@@ -57,4 +57,34 @@ export function useMemberProfiles(workspaceId: number | undefined, authorIds: re
     }, [workspaceId, wanted])
 
     return useCallback((authorId: string) => (directory ? (directory.get(authorId) ?? FORMER_MEMBER) : null), [directory])
+}
+
+/**
+ * Who is in the workspace, read as soon as it is known. Looking up someone the directory does not
+ * hold reads it again, at most once a minute, so a teammate who just joined is found. Nobody is
+ * known (`null`) before the directory has been read, and a stranger stays unknown.
+ */
+export function useMemberDirectory(workspaceId: number | undefined): (userId: string) => AuthorProfile | null {
+    const [directory, setDirectory] = useState<Directory | null>(() => (workspaceId === undefined ? null : (cache.get(workspaceId)?.directory ?? null)))
+    const currentWorkspaceRef = useRef(workspaceId)
+
+    useEffect(() => {
+        currentWorkspaceRef.current = workspaceId
+        if (workspaceId === undefined) return
+        void directoryFor(workspaceId, []).then(next => {
+            if (currentWorkspaceRef.current === workspaceId) setDirectory(next)
+        })
+    }, [workspaceId])
+
+    return useCallback(
+        (userId: string) => {
+            const known = directory?.get(userId)
+            if (known || workspaceId === undefined) return known ?? null
+            void directoryFor(workspaceId, [userId]).then(next => {
+                if (currentWorkspaceRef.current === workspaceId) setDirectory(next)
+            })
+            return null
+        },
+        [directory, workspaceId]
+    )
 }

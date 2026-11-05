@@ -1,5 +1,5 @@
 import { mkdtempSync } from 'node:fs'
-import { mkdir, writeFile, readFile } from 'node:fs/promises'
+import { lstat, mkdir, symlink, writeFile, readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 
@@ -72,6 +72,32 @@ describe('skill_import', () => {
         await mkdir(resolve(ws, 'not-a-pack'), { recursive: true })
         const res = await run('skill_import', { sourcePath: 'not-a-pack' })
         expect(res).toContain('No SKILL.md')
+    })
+
+    it('imports a folder without the links it carries', async () => {
+        const outside = resolve(dataDir, 'outside-skill')
+        await mkdir(outside, { recursive: true })
+        await writeFile(resolve(outside, 'leak.md'), 'not yours', 'utf8')
+        await mkdir(resolve(ws, 'linked-pack/references'), { recursive: true })
+        await writeFile(resolve(ws, 'linked-pack/SKILL.md'), '---\nname: Linked Pack\ndescription: links\n---\n\nBody\n', 'utf8')
+        await writeFile(resolve(ws, 'linked-pack/references/ok.md'), '# ok\n', 'utf8')
+        await symlink(outside, resolve(ws, 'linked-pack/references/out'))
+        await symlink(resolve(outside, 'leak.md'), resolve(ws, 'linked-pack/leak.md'))
+
+        const res = await run('skill_import', { sourcePath: 'linked-pack' })
+
+        expect(res).toBe('Imported skill linked-pack with 1 bundled file')
+        expect(await readFile(resolve(skillDir(id, 'linked-pack'), 'references/ok.md'), 'utf8')).toBe('# ok\n')
+        expect(await lstat(resolve(skillDir(id, 'linked-pack'), 'references/out')).catch(() => null)).toBeNull()
+        expect(await lstat(resolve(skillDir(id, 'linked-pack'), 'leak.md')).catch(() => null)).toBeNull()
+    })
+
+    it('refuses a source that is a link out of the workspace', async () => {
+        const outside = resolve(dataDir, 'outside-source')
+        await mkdir(outside, { recursive: true })
+        await writeFile(resolve(outside, 'SKILL.md'), '---\nname: Stolen\n---\n\nBody\n', 'utf8')
+        await symlink(outside, resolve(ws, 'out-link'))
+        await expect(run('skill_import', { sourcePath: 'out-link' })).rejects.toThrow('Path escapes the root: out-link')
     })
 })
 

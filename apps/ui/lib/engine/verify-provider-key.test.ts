@@ -33,6 +33,21 @@ describe('providerKeyProblem', () => {
         expect(JSON.stringify(fetchMock.mock.calls[0][1].headers)).toContain('bad-key')
     })
 
+    it('asks OpenCode about the key on its usage endpoint, the only one that checks it', async () => {
+        answer(401)
+        expect(await providerKeyProblem('opencode', { OPENCODE_API_KEY: 'oc_sk_bad' })).toBe('OpenCode turned this key down. Check it was copied in full and is still active.')
+        expect(fetchMock.mock.calls[0][0]).toBe('https://opencode.ai/zen/go/v1/usage')
+        expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: 'Bearer oc_sk_bad' })
+    })
+
+    // A key with Console credits and no Go plan may be refused the Go usage: it still runs.
+    it('lets an OpenCode key through on anything but a 401', async () => {
+        answer(403)
+        expect(await providerKeyProblem('opencode', { OPENCODE_API_KEY: 'oc_sk_console' })).toBeNull()
+        answer(200, JSON.stringify({ usage: {} }))
+        expect(await providerKeyProblem('opencode', { OPENCODE_API_KEY: 'oc_sk_go' })).toBeNull()
+    })
+
     it('takes a key its provider accepted', async () => {
         answer(200)
         expect(await providerKeyProblem('anthropic', { ANTHROPIC_API_KEY: 'sk-ant-api03-good' })).toBeNull()

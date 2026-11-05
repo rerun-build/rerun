@@ -4,20 +4,31 @@ import { fetchRawFile, listFiles } from '@/lib/engine/client'
 import { siteContentType, withUtf8Charset } from '@/lib/files/content-type'
 import type { EngineConnection } from '@/lib/engine/types'
 import { isOpaqueToken, opaqueToken } from '@/lib/opaque-token'
-import { PUBLISHED_SLUG_TOKEN_LENGTH, publishedSiteOrigin, rendersAsPage, slugPrefix, suffixedSlug } from '@/lib/published/host'
+import {
+    coworkerAccessMessage,
+    effectivePolicy,
+    humanMayGrant,
+    isPublishedAccess,
+    normalizeInvites,
+    resolveCoworkerAccess,
+    type AccessResolution,
+    type EffectivePolicy,
+    type PublishedAccess,
+} from '@/lib/published/access'
+import { PUBLISHED_SLUG_TOKEN_LENGTH, publishedSiteOrigin, slugPrefix, suffixedSlug } from '@/lib/published/host'
+import { hashPassword } from '@/lib/published/password'
 import { siteObjectKey } from '@/lib/published/site-path'
+import { htmlTitle } from '@/lib/published/title'
 import { hubBaseUrl } from '@/lib/services/hub'
 import type { PublishResult, PublishedFile } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 
-// Public file publishing. An agent publishes a file from its engine workspace; the bytes are
-// copied server-to-server (engine /raw → Supabase Storage), NEVER through the LLM context.
-// A `published_files` row records the mapping and the public identity (slug). The friendly
-// URL is /p/<slug> (see app/p/[slug]/route.ts), which 302s to the stored Storage URL — so
-// removing the row truly revokes the link. Upload pattern mirrors lib/services/brand-icon.ts.
-// HTML pages and whole folders are served from <slug>.rerun.site instead (lib/published/host.ts),
-// since Storage refuses to render HTML.
+// File publishing. An agent publishes a file from its engine workspace; the bytes are copied
+// server-to-server (engine /raw → Supabase Storage), NEVER through the LLM context. A
+// `published_files` row records the mapping, the identity (slug) and who may open it. Everything
+// is served from <slug>.rerun.site (lib/published/host.ts), which checks that access before any
+// byte leaves the private bucket; /p/<slug> is the older link and redirects there.
 
 export const PUBLISHED_BUCKET = 'published'
 const MAX_PUBLISH_BYTES = 25 * 1024 * 1024 // 25 MB — keep well under Storage's per-object limit.
@@ -26,8 +37,11 @@ const MAX_SITE_DEPTH = 8
 const MAX_SITE_BYTES = 50 * 1024 * 1024
 const SITE_UPLOAD_CONCURRENCY = 8
 const SITE_ENTRY = 'index.html'
+const THUMBNAIL_URL_TTL_SECONDS = 60 * 60
 
 type ServiceClient = ReturnType<typeof createServiceRoleClient>
+type PublishedRow = Database['public']['Tables']['published_files']['Row']
+type PublishedUpdate = Database['public']['Tables']['published_files']['Update']
 
 type AgentContext = {
     engineAgentId: string
@@ -47,8 +61,17 @@ async function resolveAgent(agentId: string): Promise<AgentContext> {
     return { engineAgentId: agent.engine_agent_id, spaceId: agent.space_id, workspaceId: agent.workspace_id, conn }
 }
 
+export async function workspacePublishPolicy(workspaceId: number): Promise<EffectivePolicy> {
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['publish_policy'] as const, { id: workspaceId })
+    return effectivePolicy(data?.publish_policy)
+}
+
+// The bucket was public before links had an access: a raw Storage URL kept working for whoever
+// held it. Turned private here rather than in a migration, so it only happens once this code,
+// which never hands out a public Storage URL, is the one running.
 async function ensureBucket(supabase: ServiceClient): Promise<void> {
-    await supabase.storage.createBucket(PUBLISHED_BUCKET, { public: true }).catch(() => {}) // idempotent
+    const { error } = await supabase.storage.createBucket(PUBLISHED_BUCKET, { public: false })
+    if (error) await supabase.storage.updateBucket(PUBLISHED_BUCKET, { public: false }).catch(() => {})
 }
 
 function fileNameOf(path: string): string {
@@ -56,7 +79,7 @@ function fileNameOf(path: string): string {
 }
 
 type PublishedKind = 'file' | 'site'
-type PublishedObjects = { kind: string; storage_key: string; files: string[] | null }
+type PublishedObjects = { kind: string; storage_key: string; files: string[] | null; thumbnail_key?: string | null }
 
 // Key bytes by workspace + slug + original filename, so re-publishing a different file under a
 // new slug never collides, and the browser sees a sensible filename.
@@ -64,17 +87,17 @@ function storageKeyFor(workspaceId: number, slug: string, path: string): string 
     return `${workspaceId}/${slug}/${fileNameOf(path)}`
 }
 
-function friendlyUrlFor(slug: string): string {
-    return `${hubBaseUrl()}/p/${slug}`
+export function thumbnailKeyFor(workspaceId: number, slug: string, version: number): string {
+    return `${workspaceId}/${slug}/thumb-${version}.png`
 }
 
-function shareUrlFor(slug: string, kind: string, contentType: string): string {
-    return (rendersAsPage(kind, contentType) && publishedSiteOrigin(slug)) || friendlyUrlFor(slug)
+export function shareUrlFor(slug: string): string {
+    return publishedSiteOrigin(slug) ?? `${hubBaseUrl()}/p/${slug}`
 }
 
 function storageKeysOf(row: PublishedObjects): string[] {
-    if (row.kind !== 'site') return [row.storage_key]
-    return (row.files ?? []).map((_, index) => siteObjectKey(row.storage_key, index))
+    const keys = row.kind !== 'site' ? [row.storage_key] : (row.files ?? []).map((_, index) => siteObjectKey(row.storage_key, index))
+    return row.thumbnail_key ? [...keys, row.thumbnail_key] : keys
 }
 
 async function generateFreeSlug(supabase: ServiceClient, customSlug?: string): Promise<string> {
@@ -146,7 +169,12 @@ async function uploadObject(supabase: ServiceClient, key: string, bytes: Uint8Ar
     if (error) throw new Error(`Storage upload failed: ${error.message}`)
 }
 
-type UploadedObjects = { kind: PublishedKind; storageKey: string; files: string[] | null; contentType: string; size: number; publicUrl: string }
+type UploadedObjects = { kind: PublishedKind; storageKey: string; files: string[] | null; contentType: string; size: number; title: string }
+
+function decodedTitle(bytes: Uint8Array, contentType: string, fallback: string): string {
+    if (!contentType.startsWith('text/html')) return fallback
+    return htmlTitle(new TextDecoder().decode(bytes.subarray(0, 64 * 1024))) ?? fallback
+}
 
 async function uploadFile(supabase: ServiceClient, conn: EngineConnection, base: string, path: string, storageKey: string): Promise<UploadedObjects> {
     const res = await readWorkspaceFile(conn, base, path)
@@ -157,9 +185,8 @@ async function uploadFile(supabase: ServiceClient, conn: EngineConnection, base:
         throw new Error(`File too large to publish (${(bytes.byteLength / 1024 / 1024).toFixed(1)} MB; max ${MAX_PUBLISH_BYTES / 1024 / 1024} MB).`)
     }
     await uploadObject(supabase, storageKey, bytes, contentType)
-    const { data: pub } = supabase.storage.from(PUBLISHED_BUCKET).getPublicUrl(storageKey)
-    const publicUrl = `${pub.publicUrl}?v=${Date.now()}` // cache-bust so republished bytes are served
-    return { kind: 'file', storageKey, files: null, contentType, size: bytes.byteLength, publicUrl }
+    const title = decodedTitle(bytes, contentType, fileNameOf(path))
+    return { kind: 'file', storageKey, files: null, contentType, size: bytes.byteLength, title }
 }
 
 // A folder goes under a fresh prefix on every publish, and each file under its index in the
@@ -167,6 +194,8 @@ async function uploadFile(supabase: ServiceClient, conn: EngineConnection, base:
 // landed, so a republish never serves half a site, and no file name can trip Storage's key rules.
 async function uploadSite(supabase: ServiceClient, conn: EngineConnection, base: string, root: string, prefix: string): Promise<UploadedObjects> {
     const files = await listSiteFiles(conn, base, root)
+    const entryIndex = files.indexOf(SITE_ENTRY)
+    let title = fileNameOf(root)
     let size = 0
     let next = 0
     const worker = async (): Promise<void> => {
@@ -175,6 +204,7 @@ async function uploadSite(supabase: ServiceClient, conn: EngineConnection, base:
             const res = await readWorkspaceFile(conn, base, joinPath(root, files[index]))
             const bytes = new Uint8Array(await res.arrayBuffer())
             size += bytes.byteLength
+            if (index === entryIndex) title = decodedTitle(bytes, siteContentType(SITE_ENTRY), title)
             await uploadObject(supabase, siteObjectKey(prefix, index), bytes, siteContentType(files[index]))
         }
     }
@@ -184,14 +214,43 @@ async function uploadSite(supabase: ServiceClient, conn: EngineConnection, base:
         await supabase.storage.from(PUBLISHED_BUCKET).remove(files.map((_, index) => siteObjectKey(prefix, index))).catch(() => {})
         throw err
     }
-    const { data: pub } = supabase.storage.from(PUBLISHED_BUCKET).getPublicUrl(siteObjectKey(prefix, files.indexOf(SITE_ENTRY)))
-    return { kind: 'site', storageKey: prefix, files, contentType: siteContentType(SITE_ENTRY), size, publicUrl: pub.publicUrl }
+    return { kind: 'site', storageKey: prefix, files, contentType: siteContentType(SITE_ENTRY), size, title }
 }
 
-// Publish a workspace file, or a folder with an index.html served as a site, to a public URL.
-// Re-publishing the same path upserts in place and keeps the existing slug/URL (unless a new slug
-// is given).
-export async function publishFile(agentId: string, path: string, customSlug?: string): Promise<PublishResult> {
+const ACCESS_COLUMNS = ['access', 'requested_access', 'invited', 'password_hash', 'access_version'] as const
+type AccessRow = Pick<PublishedRow, (typeof ACCESS_COLUMNS)[number]>
+type AccessFields = Pick<PublishedUpdate, 'access' | 'requested_access' | 'invited' | 'password_hash' | 'access_version'>
+
+export type AccessInput = { invite?: readonly string[]; password?: string }
+
+function sameEntries(a: readonly string[], b: readonly string[]): boolean {
+    return a.length === b.length && a.every(entry => b.includes(entry))
+}
+
+function currentAccess(row: AccessRow | null | undefined): AccessResolution | undefined {
+    if (!row || !isPublishedAccess(row.access)) return undefined
+    return { access: row.access, requestedAccess: row.requested_access === 'public' ? 'public' : null }
+}
+
+// The columns a change of access writes. The version moves whenever someone who could open the link
+// before might no longer: another mode, another password, another list of invites.
+async function accessFields(next: AccessResolution, input: AccessInput, existing?: AccessRow | null): Promise<AccessFields> {
+    const invited = input.invite ? normalizeInvites(input.invite) : (existing?.invited ?? [])
+    const passwordHash = input.password ? await hashPassword(input.password) : (existing?.password_hash ?? null)
+    if (next.access === 'invited' && invited.length === 0) throw new Error('Name at least one email or @domain to invite.')
+    if (next.access === 'password' && !passwordHash) throw new Error('Give a password for a password-protected link.')
+
+    const changed = !existing || existing.access !== next.access || !!input.password || !sameEntries(invited, existing.invited)
+    const version = existing ? existing.access_version + (changed ? 1 : 0) : 1
+    return { access: next.access, requested_access: next.requestedAccess, invited, password_hash: passwordHash, access_version: version }
+}
+
+export type PublishOptions = AccessInput & { access?: PublishedAccess }
+
+// Publish a workspace file, or a folder with an index.html served as a site. Re-publishing the same
+// path upserts in place and keeps the existing slug/URL (unless a new slug is given), and the access
+// it had unless a new one is asked for.
+export async function publishFile(agentId: string, path: string, customSlug?: string, options: PublishOptions = {}): Promise<PublishResult> {
     const cleanPath = path.trim().replace(/(.)\/+$/, '$1')
     if (!cleanPath) throw new Error('Missing required argument: path')
 
@@ -203,12 +262,17 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
     const { data: existing } = await selectMaybeSingle(
         supabase,
         'published_files',
-        ['slug', 'kind', 'storage_key', 'files'] as const,
+        ['slug', 'kind', 'storage_key', 'files', 'thumbnail_key', ...ACCESS_COLUMNS] as const,
         { agent_id: agentId, source_path: cleanPath },
     )
 
+    const policy = await workspacePublishPolicy(workspaceId)
+    const resolution = resolveCoworkerAccess({ policy, requested: options.access, current: currentAccess(existing) })
+    const access = await accessFields(resolution, options, existing)
+
     const keepsExistingSlug = existing && (!customSlug || isSameCustomSlug(existing.slug, customSlug))
     const slug = keepsExistingSlug ? existing.slug : await generateFreeSlug(supabase, customSlug)
+    const url = shareUrlFor(slug)
 
     // The bytes go engine → Storage server-to-server, never through the LLM context.
     await ensureBucket(supabase)
@@ -226,16 +290,20 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
         files: uploaded.files,
         content_type: uploaded.contentType,
         size: uploaded.size,
-        public_url: uploaded.publicUrl,
+        public_url: url,
         slug,
+        title: uploaded.title,
+        thumbnail_key: null,
         updated_at: new Date().toISOString(),
+        ...access,
     }
     const { error: rowErr } = await supabase
         .from('published_files')
         .upsert<Database['public']['Tables']['published_files']['Insert']>(row, { onConflict: 'agent_id,source_path' })
     if (rowErr) throw new Error(`Failed to record published file: ${rowErr.message}`)
 
-    // Whatever the previous publish left behind and this one no longer points at.
+    // Whatever the previous publish left behind and this one no longer points at, the old
+    // thumbnail included: it showed the previous bytes.
     if (existing) {
         const current = new Set(storageKeysOf({ kind: uploaded.kind, storage_key: uploaded.storageKey, files: uploaded.files }))
         const stale = storageKeysOf(existing).filter(key => !current.has(key))
@@ -244,18 +312,29 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
 
     return {
         status: 'published',
-        url: shareUrlFor(slug, uploaded.kind, uploaded.contentType),
-        publicUrl: uploaded.publicUrl,
+        url,
         slug,
         path: cleanPath,
         kind: uploaded.kind,
         contentType: uploaded.contentType,
         size: uploaded.size,
+        title: uploaded.title,
+        access: resolution.access,
+        requestedAccess: resolution.requestedAccess,
+        message: coworkerAccessMessage(options.access, resolution, access.invited ?? []),
     }
 }
 
-// Remove a published file: delete the Storage object first (tolerate already-gone), then the
-// row — so /p/<slug> returns 404 immediately afterwards. Scoped to the agent: an agent can
+async function removePublished(supabase: ServiceClient, row: PublishedObjects & { id: string }): Promise<void> {
+    await supabase.storage.from(PUBLISHED_BUCKET).remove(storageKeysOf(row)).catch(() => {})
+    const { error } = await supabase.from('published_files').delete().eq('id', row.id)
+    if (error) throw new Error(`Failed to unpublish: ${error.message}`)
+}
+
+const REMOVAL_COLUMNS = ['id', 'slug', 'source_path', 'kind', 'storage_key', 'files', 'thumbnail_key'] as const
+
+// Remove a published file: delete the Storage objects first (tolerate already-gone), then the
+// row — so the link stops working immediately afterwards. Scoped to the agent: an agent can
 // only unpublish its own files.
 export async function unpublishFile(agentId: string, ident: { path?: string; slug?: string }): Promise<{ status: 'unpublished'; slug: string; path: string }> {
     const path = ident.path?.trim()
@@ -264,34 +343,136 @@ export async function unpublishFile(agentId: string, ident: { path?: string; slu
 
     const supabase = createServiceRoleClient()
     const filters = slug ? { agent_id: agentId, slug } : { agent_id: agentId, source_path: path as string }
-    const { data: rowData } = await selectMaybeSingle(supabase, 'published_files', ['id', 'slug', 'source_path', 'kind', 'storage_key', 'files'] as const, filters)
+    const { data: rowData } = await selectMaybeSingle(supabase, 'published_files', REMOVAL_COLUMNS, filters)
     if (!rowData) throw new Error(slug ? `No published file with slug: ${slug}` : `No published file for path: ${path}`)
 
-    await supabase.storage.from(PUBLISHED_BUCKET).remove(storageKeysOf(rowData)).catch(() => {})
-    const { error } = await supabase.from('published_files').delete().eq('id', rowData.id)
-    if (error) throw new Error(`Failed to unpublish: ${error.message}`)
-
+    await removePublished(supabase, rowData)
     return { status: 'unpublished', slug: rowData.slug, path: rowData.source_path }
+}
+
+// A person may take down any link of their workspace, whichever coworker published it.
+export async function unpublishInWorkspace(workspaceId: number, slug: string): Promise<void> {
+    const supabase = createServiceRoleClient()
+    const { data: rowData } = await selectMaybeSingle(supabase, 'published_files', REMOVAL_COLUMNS, { workspace_id: workspaceId, slug })
+    if (!rowData) throw new Error('This link no longer exists')
+    await removePublished(supabase, rowData)
+}
+
+export type AccessChange = AccessInput & { access: PublishedAccess }
+
+// What a person sets from the share dialog. It answers a coworker's pending ask as well: whatever
+// they pick, the ask is settled.
+export async function updatePublishedAccess(workspaceId: number, slug: string, change: AccessChange): Promise<PublishedFile> {
+    const supabase = createServiceRoleClient()
+    const { data: row } = await selectMaybeSingle(supabase, 'published_files', ['id', ...ACCESS_COLUMNS] as const, { workspace_id: workspaceId, slug })
+    if (!row) throw new Error('This link no longer exists')
+
+    const policy = await workspacePublishPolicy(workspaceId)
+    if (!humanMayGrant(policy, change.access)) throw new Error('Public links are turned off for this workspace.')
+
+    const fields = await accessFields({ access: change.access, requestedAccess: null }, change, row)
+    const { error } = await supabase.from('published_files').update<PublishedUpdate>(fields).eq('id', row.id)
+    if (error) throw new Error(`Failed to update the link: ${error.message}`)
+
+    const updated = await getPublishedInWorkspace(workspaceId, slug)
+    if (!updated) throw new Error('This link no longer exists')
+    return updated
+}
+
+// "Keep private" in the chat: the link stays as it is and the ask goes away.
+export async function dismissAccessRequest(workspaceId: number, slug: string): Promise<void> {
+    const { error } = await createServiceRoleClient()
+        .from('published_files')
+        .update<PublishedUpdate>({ requested_access: null })
+        .eq('workspace_id', workspaceId)
+        .eq('slug', slug)
+    if (error) throw new Error(`Failed to update the link: ${error.message}`)
+}
+
+// Turning public links off for the workspace closes the ones already open: they go back to the
+// members, and every cookie a visitor held stops working.
+export async function closePublicLinks(workspaceId: number): Promise<number> {
+    const supabase = createServiceRoleClient()
+    const { data: rows } = await selectMany(supabase, 'published_files', ['id', 'access_version'] as const, { workspace_id: workspaceId, access: 'public' })
+    for (const row of rows ?? []) {
+        await supabase
+            .from('published_files')
+            .update<PublishedUpdate>({ access: 'workspace', requested_access: null, access_version: row.access_version + 1 })
+            .eq('id', row.id)
+    }
+    await supabase.from('published_files').update<PublishedUpdate>({ requested_access: null }).eq('workspace_id', workspaceId).not('requested_access', 'is', null)
+    return rows?.length ?? 0
+}
+
+export async function countPublicLinks(workspaceId: number): Promise<number> {
+    const { data } = await selectMany(createServiceRoleClient(), 'published_files', ['id'] as const, { workspace_id: workspaceId, access: 'public' })
+    return data?.length ?? 0
+}
+
+const LISTED_COLUMNS = [
+    'slug',
+    'agent_id',
+    'source_path',
+    'kind',
+    'content_type',
+    'size',
+    'title',
+    'access',
+    'requested_access',
+    'invited',
+    'password_hash',
+    'thumbnail_key',
+    'created_at',
+    'updated_at',
+] as const
+
+type ListedRow = Pick<PublishedRow, (typeof LISTED_COLUMNS)[number]>
+
+async function thumbnailUrls(supabase: ServiceClient, rows: readonly ListedRow[]): Promise<Map<string, string>> {
+    const keys = rows.map(row => row.thumbnail_key).filter((key): key is string => !!key)
+    if (keys.length === 0) return new Map()
+    const { data } = await supabase.storage.from(PUBLISHED_BUCKET).createSignedUrls(keys, THUMBNAIL_URL_TTL_SECONDS)
+    return new Map((data ?? []).flatMap(entry => (entry.path && entry.signedUrl ? [[entry.path, entry.signedUrl] as const] : [])))
+}
+
+async function toPublishedFiles(supabase: ServiceClient, rows: readonly ListedRow[]): Promise<PublishedFile[]> {
+    const thumbnails = await thumbnailUrls(supabase, rows)
+    return rows.map(r => ({
+        slug: r.slug,
+        agentId: r.agent_id,
+        path: r.source_path,
+        url: shareUrlFor(r.slug),
+        kind: r.kind === 'site' ? 'site' : 'file',
+        contentType: r.content_type,
+        size: r.size,
+        title: r.title ?? fileNameOf(r.source_path),
+        access: isPublishedAccess(r.access) ? r.access : 'workspace',
+        requestedAccess: r.requested_access === 'public' ? 'public' : null,
+        invited: r.invited,
+        hasPassword: !!r.password_hash,
+        thumbnailUrl: (r.thumbnail_key && thumbnails.get(r.thumbnail_key)) || null,
+        publishedAt: r.created_at,
+        updatedAt: r.updated_at,
+    }))
 }
 
 // List the files this agent currently has published.
 export async function listPublished(agentId: string): Promise<{ files: PublishedFile[] }> {
     const supabase = createServiceRoleClient()
-    const { data } = await selectMany(
-        supabase,
-        'published_files',
-        ['slug', 'source_path', 'kind', 'content_type', 'size', 'created_at', 'updated_at'] as const,
-        { agent_id: agentId },
-        { column: 'updated_at', ascending: false },
-    )
-    const files = (data ?? []).map(r => ({
-        slug: r.slug,
-        path: r.source_path,
-        url: shareUrlFor(r.slug, r.kind, r.content_type),
-        contentType: r.content_type,
-        size: r.size,
-        publishedAt: r.created_at,
-        updatedAt: r.updated_at,
-    }))
-    return { files }
+    const { data } = await selectMany(supabase, 'published_files', LISTED_COLUMNS, { agent_id: agentId }, { column: 'updated_at', ascending: false })
+    return { files: await toPublishedFiles(supabase, data ?? []) }
+}
+
+export async function listWorkspacePublished(workspaceId: number): Promise<PublishedFile[]> {
+    const supabase = createServiceRoleClient()
+    const { data } = await selectMany(supabase, 'published_files', LISTED_COLUMNS, { workspace_id: workspaceId }, { column: 'updated_at', ascending: false })
+    return toPublishedFiles(supabase, data ?? [])
+}
+
+export async function getPublishedInWorkspace(workspaceId: number, slug: string): Promise<PublishedFile | null> {
+    const supabase = createServiceRoleClient()
+    const { data } = await selectMaybeSingle(supabase, 'published_files', LISTED_COLUMNS, { workspace_id: workspaceId, slug })
+    if (!data) return null
+    const [file] = await toPublishedFiles(supabase, [data])
+    return file
 }

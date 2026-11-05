@@ -52,6 +52,7 @@ import {
     CalendarIcon as LucideCalendarIcon,
     CameraIcon as LucideCameraIcon,
     CandlestickChart as LucideCandlestickChart,
+    CaptionsIcon as LucideCaptionsIcon,
     Check as LucideCheck,
     CheckCheckIcon as LucideCheckCheckIcon,
     CheckCircle2 as LucideCheckCircle2,
@@ -391,6 +392,7 @@ export const CalendarClock: LucideIcon = LucideCalendarClock
 export const CalendarClockIcon: LucideIcon = LucideCalendarClockIcon
 export const CalendarIcon: LucideIcon = LucideCalendarIcon
 export const CameraIcon: LucideIcon = LucideCameraIcon
+export const CaptionsIcon: LucideIcon = LucideCaptionsIcon
 export const CandlestickChart: LucideIcon = LucideCandlestickChart
 export const Check: LucideIcon = LucideCheck
 export const CheckCheckIcon: LucideIcon = LucideCheckCheckIcon

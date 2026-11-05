@@ -17,6 +17,20 @@ vi.mock('../../connections/codex-plan-limits.js', async () => {
         refreshStaleCodexPlanLimits: () => {},
     }
 })
+// OpenCode's live catalog, as the test poses it: null until a reading lands, like on a fresh box.
+const opencodeLive = vi.hoisted(() => ({ models: null as string[] | null, refreshed: 0 }))
+vi.mock('../../connections/opencode-catalog.js', async importOriginal => {
+    const actual = await importOriginal<typeof import('../../connections/opencode-catalog.js')>()
+    return {
+        ...actual,
+        refreshOpencodeCatalog: async () => {
+            opencodeLive.refreshed += 1
+        },
+        refreshStaleOpencodeCatalog: () => {},
+        liveOpencodeProviderModels: () => (opencodeLive.models ? actual.opencodeProviderModels().filter(model => opencodeLive.models!.includes(model.id)) : null),
+    }
+})
+vi.mock('../../connections/opencode-plan-limits.js', () => ({ refreshOpencodePlanLimits: async () => {}, refreshStaleOpencodePlanLimits: () => {}, forgetOpencodePlanLimitsAttempt: () => {} }))
 const { mkdir, readFile, rm, writeFile } = await import('node:fs/promises')
 const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID } = await import('@rerun/contracts')
 const { connectionRoutes } = await import('./connections.js')
@@ -66,6 +80,8 @@ async function writeScheduleFile(agentId: string, slug: string, front: Record<st
 
 beforeEach(async () => {
     codexCli.models = []
+    opencodeLive.models = null
+    opencodeLive.refreshed = 0
     unloadConnection(RERUN_CONNECTION_ID)
     await clearBoxDefault()
     await rm(connectionsDir(), { recursive: true, force: true })
@@ -238,6 +254,25 @@ describe('box default model', () => {
         const res = await post('/', { name: 'codex', provider: 'codex', models: DEFAULT_CONNECTION_MODELS.codex, keys: { CODEX_OAUTH_TOKEN: 'codex-secret' } })
         const created = (await res.json()) as Summary
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'gpt-6-luna' })
+    })
+
+    it('adopts DeepSeek V4 Pro on a fresh OpenCode connection, after reading the catalog', async () => {
+        const res = await post('/', { name: 'OpenCode', provider: 'opencode', models: DEFAULT_CONNECTION_MODELS.opencode, keys: { OPENCODE_API_KEY: 'oc_sk_secret' } })
+        const created = (await res.json()) as Summary & { providerModels: { id: string }[] | null }
+        expect(res.status).toBe(201)
+        expect(created.connected).toBe(true)
+        expect(JSON.stringify(created)).not.toContain('oc_sk_secret')
+        expect(created.providerModels?.some(model => model.id === 'console/claude-sonnet-5-5')).toBe(true)
+        expect(opencodeLive.refreshed).toBe(1)
+        expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'go/deepseek-v4-pro' })
+    })
+
+    // A model OpenCode stopped publishing is never the one a box adopts.
+    it('adopts the first model OpenCode still serves', async () => {
+        opencodeLive.models = DEFAULT_CONNECTION_MODELS.opencode.filter(id => id !== 'go/deepseek-v4-pro')
+        const res = await post('/', { name: 'OpenCode', provider: 'opencode', models: DEFAULT_CONNECTION_MODELS.opencode, keys: { OPENCODE_API_KEY: 'oc_sk_secret' } })
+        const created = (await res.json()) as Summary
+        expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: DEFAULT_CONNECTION_MODELS.opencode[1] })
     })
 
     it('reads the Codex models again when the credential arrives after the connection', async () => {

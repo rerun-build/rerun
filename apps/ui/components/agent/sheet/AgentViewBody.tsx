@@ -13,6 +13,7 @@ import { AgentPanelSetup } from '@/components/agent/AgentPanelSetup'
 import { AgentPanelTools } from '@/components/agent/AgentPanelTools'
 import { AgentPanelTriggers } from '@/components/agent/AgentPanelTriggers'
 import { AgentPanelSkills } from '@/components/agent/skills/AgentPanelSkills'
+import { AgentPublishedPanel } from '@/components/published/AgentPublishedPanel'
 import type { AgentViewTab } from '@/lib/board/agent-sheet-views'
 import type { IsoAgent } from '@/lib/board/types'
 import { useBoardStore } from '@/stores/board.store'
@@ -45,6 +46,8 @@ export function AgentViewBody({ agent, tab, onOpenSession }: AgentViewBodyProps)
             return <AgentPanelMemories agentId={agent.id} />
         case 'files':
             return <AgentPanelFiles key={agent.id} agentId={agent.id} focusPath={agentFileFocus?.agentId === agent.id ? agentFileFocus.path : null} onFocusConsumed={clearAgentFileFocus} />
+        case 'published':
+            return <AgentPublishedPanel key={agent.id} agentId={agent.id} agentName={agent.name} />
         case 'data':
             return (
                 <AgentPanelData

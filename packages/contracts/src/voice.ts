@@ -95,3 +95,23 @@ export function parseVoiceMessage(text: string): VoiceMessage | null {
         peaks: decodePeaks(attributes.get('peaks') ?? ''),
     }
 }
+
+export type TranscriptWord = {
+    text: string
+    /** Share of the transcript read before this word, 0 to 1: a stand-in for its time in the audio. */
+    start: number
+}
+
+/** Splits a transcript into words and the gaps between them, each placed by the characters before it. */
+export function transcriptWords(transcript: string): TranscriptWord[] {
+    const length = transcript.length
+    let offset = 0
+    return transcript
+        .split(/(\s+)/)
+        .filter(piece => piece.length > 0)
+        .map(piece => {
+            const word = { text: piece, start: length > 0 ? offset / length : 0 }
+            offset += piece.length
+            return word
+        })
+}

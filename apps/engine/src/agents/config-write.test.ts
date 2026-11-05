@@ -8,7 +8,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-cw-'))
 const { describe, expect, it } = await import('vitest')
 const { mergeMcpServers, writeAgentConfig } = await import('./config-write.js')
 const { agentConfigSchema, BRIDGE_SERVER_NAME } = await import('./types.js')
-const { mkdir, readFile } = await import('node:fs/promises')
+const { chmod, mkdir, readFile, stat } = await import('node:fs/promises')
 const { agentDir, configPath } = await import('../config/paths.js')
 
 const srv = (name: string, url = `http://${name}`): McpServer => ({ name, transport: 'http', url, args: [], env: {}, headers: {} })
@@ -79,5 +79,16 @@ describe('writeAgentConfig', () => {
         await writeAgentConfig(id, config)
         const roundTripped = agentConfigSchema.parse(JSON.parse(await readFile(configPath(id), 'utf8')))
         expect(roundTripped.mcpServers.map(s => s.name)).toEqual(['a'])
+    })
+
+    it('writes config.json readable by the engine alone, and narrows one left wider', async () => {
+        const id = 'cwmodes'
+        const mode = async () => (await stat(configPath(id))).mode & 0o777
+        await mkdir(agentDir(id), { recursive: true })
+        await writeAgentConfig(id, agentConfigSchema.parse({ name: 'modes' }))
+        expect(await mode()).toBe(0o600)
+        await chmod(configPath(id), 0o644)
+        await writeAgentConfig(id, agentConfigSchema.parse({ name: 'modes again' }))
+        expect(await mode()).toBe(0o600)
     })
 })

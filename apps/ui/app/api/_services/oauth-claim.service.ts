@@ -4,6 +4,7 @@ import { markComposioAuthorized, markManagedAuthorized, markServiceAuthorized } 
 import { ApiError } from '@/lib/api-error'
 import { putMcpToken } from '@/lib/engine/client'
 import { getManagedProvider } from '@/lib/managed/registry'
+import { engineClientSecret } from '@/lib/mcp-oauth'
 import { claimSignIn, SignInClaimError, type ParkedSignIn } from '@/lib/oauth/pending-grant'
 
 type Claimant = { agentId: string; workspaceId: number; userId: string }
@@ -27,7 +28,8 @@ export async function finishParkedSignIn(agentId: string, workspaceId: number, p
     }
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, workspaceId)
     if (parked.kind === 'mcp') {
-        await putMcpToken(conn, engineAgentId, parked.serverName, parked.token)
+        const clientSecret = parked.mcpUrl ? engineClientSecret({ mcpUrl: parked.mcpUrl, clientId: parked.token.clientId, clientSecret: parked.token.clientSecret }) : parked.token.clientSecret
+        await putMcpToken(conn, engineAgentId, parked.serverName, { ...parked.token, clientSecret })
         return
     }
     const provider = getManagedProvider(parked.provider)

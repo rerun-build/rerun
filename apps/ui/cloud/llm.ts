@@ -18,7 +18,9 @@ async function knownBox(req: Request): Promise<boolean> {
 export async function rerunChatCompletions(req: Request): Promise<Response> {
     if (!(await knownBox(req))) return Response.json({ error: 'Unauthorized' }, { status: 401 })
     const key = process.env.OPENROUTER_API_KEY
-    if (!key) return Response.json({ error: 'Set OPENROUTER_API_KEY to run the Rerun models, or connect another AI provider in the app.' }, { status: 503 })
+    // The OpenAI error shape is what the engine's SDK reads the sentence out of, and a 403 is neither
+    // retried nor taken for an overloaded provider: the chat shows the sentence itself.
+    if (!key) return Response.json({ error: { message: 'Set OPENROUTER_API_KEY to run the Rerun models, or connect another AI provider in the app.', code: 'rerun_models_not_configured' } }, { status: 403 })
 
     let body: Record<string, unknown>
     try {

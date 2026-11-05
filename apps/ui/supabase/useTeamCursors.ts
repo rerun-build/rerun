@@ -1,54 +1,35 @@
 'use client'
 
-import { displayNameOf, readProfile } from '@/lib/auth/user-profile'
+import { useMemberDirectory } from '@/hooks/useMemberProfiles'
+import { type CursorPayload, cursorFromPayload, leavingUserId, placeCursor, type TeamCursor, type TimedCursor } from '@/lib/board/team-cursor'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { REALTIME_CHANNEL_STATES, type RealtimeChannel } from '@supabase/supabase-js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export type TeamCursor = {
-    userId: string
-    name: string
-    avatarUrl: string | null
-    color: string
-    x: number
-    y: number
-}
+export type { TeamCursor } from '@/lib/board/team-cursor'
 
 const STALE_MS = 5000
 const THROTTLE_MS = 50
 
-function colorFromId(id: string): string {
-    let hash = 0
-    for (let i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash)
-    return `hsl(${Math.abs(hash) % 360} 70% 55%)`
-}
-
-type Identity = { userId: string | undefined; name: string; avatarUrl: string | null; color: string }
-
-export function useTeamCursors(channelKey: string | undefined) {
+export function useTeamCursors(workspaceId: number | undefined) {
     const { session } = useSession()
-    const authUser = session?.user
+    const userId = session?.user?.id
+    const channelKey = workspaceId === undefined ? undefined : `cursors:${workspaceId}`
 
-    const identity: Identity = {
-        userId: authUser?.id,
-        name: (authUser && displayNameOf(authUser)) || 'Anonymous',
-        avatarUrl: authUser ? readProfile(authUser).avatarUrl : null,
-        color: authUser?.id ? colorFromId(authUser.id) : '#888',
-    }
-    const identityRef = useRef(identity)
+    const memberOf = useMemberDirectory(workspaceId)
+    const memberOfRef = useRef(memberOf)
     useEffect(() => {
-        identityRef.current = identity
+        memberOfRef.current = memberOf
     })
 
     const [cursors, setCursors] = useState<TeamCursor[]>([])
-    const cursorsRef = useRef<Map<string, TeamCursor & { ts: number }>>(new Map())
+    const cursorsRef = useRef<Map<string, TimedCursor>>(new Map())
     const channelRef = useRef<RealtimeChannel | null>(null)
     const lastSentRef = useRef(0)
 
     const flush = useCallback(() => setCursors(Array.from(cursorsRef.current.values())), [])
 
-    const userId = identity.userId
     useEffect(() => {
         if (!channelKey || !userId) return
 
@@ -68,23 +49,24 @@ export function useTeamCursors(channelKey: string | undefined) {
             if (stale) await supabase.removeChannel(stale)
             if (disposed) return
 
+            // Private: Realtime checks the policies on `realtime.messages` with the user's JWT, so
+            // only a member of the workspace joins or sends on it.
             const created = supabase.channel(channelKey, {
-                config: { broadcast: { self: false }, presence: { key: userId } },
+                config: { private: true, broadcast: { self: false }, presence: { key: userId } },
             })
             channel = created
             channelRef.current = created
 
             created.on('broadcast', { event: 'cursor' }, ({ payload }) => {
-                const p = payload as TeamCursor
-                if (p.userId === userId) return
-                cursorsMap.set(p.userId, { ...p, ts: performance.now() })
-                flush()
+                const cursor = cursorFromPayload(payload, memberOfRef.current)
+                if (!cursor || cursor.userId === userId) return
+                if (placeCursor(cursorsMap, cursor, performance.now())) flush()
             })
 
-            const drop = (id: string | undefined) => {
+            const drop = (id: string | null | undefined) => {
                 if (id && cursorsMap.delete(id)) flush()
             }
-            created.on('broadcast', { event: 'cursor-leave' }, ({ payload }) => drop((payload as { userId?: string }).userId))
+            created.on('broadcast', { event: 'cursor-leave' }, ({ payload }) => drop(leavingUserId(payload)))
             created.on('presence', { event: 'leave' }, ({ key }) => drop(key))
 
             let alive = true
@@ -132,23 +114,25 @@ export function useTeamCursors(channelKey: string | undefined) {
         }
     }, [channelKey, userId, flush])
 
-    const onPointerWorldMove = useCallback((world: { x: number; y: number } | null) => {
-        const channel = channelRef.current
-        const { userId, name, avatarUrl, color } = identityRef.current
-        // Hors d'un canal joint, realtime-js retombe sur un POST HTTP à chaque appel, soit jusqu'à
-        // 20 requêtes par seconde pendant un pan. Un curseur perdu n'a aucune importance.
-        if (!channel || channel.state !== REALTIME_CHANNEL_STATES.joined || !userId) return
+    const onPointerWorldMove = useCallback(
+        (world: { x: number; y: number } | null) => {
+            const channel = channelRef.current
+            // Hors d'un canal joint, realtime-js retombe sur un POST HTTP à chaque appel, soit jusqu'à
+            // 20 requêtes par seconde pendant un pan. Un curseur perdu n'a aucune importance.
+            if (!channel || channel.state !== REALTIME_CHANNEL_STATES.joined || !userId) return
 
-        if (!world) {
-            channel.send({ type: 'broadcast', event: 'cursor-leave', payload: { userId } })
-            return
-        }
+            if (!world) {
+                channel.send({ type: 'broadcast', event: 'cursor-leave', payload: { userId } })
+                return
+            }
 
-        const now = performance.now()
-        if (now - lastSentRef.current < THROTTLE_MS) return
-        lastSentRef.current = now
-        channel.send({ type: 'broadcast', event: 'cursor', payload: { userId, name, avatarUrl, color, x: world.x, y: world.y } })
-    }, [])
+            const now = performance.now()
+            if (now - lastSentRef.current < THROTTLE_MS) return
+            lastSentRef.current = now
+            channel.send({ type: 'broadcast', event: 'cursor', payload: { userId, x: world.x, y: world.y } satisfies CursorPayload })
+        },
+        [userId]
+    )
 
     return { cursors, onPointerWorldMove }
 }

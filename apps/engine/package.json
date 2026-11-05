@@ -20,7 +20,7 @@
         "test:coverage": "vitest run --coverage"
     },
     "dependencies": {
-        "@ai-sdk/anthropic": "^3.0.81",
+        "@ai-sdk/anthropic": "^3.0.138",
         "@ai-sdk/google": "^3.0.80",
         "@ai-sdk/openai": "^3.0.67",
         "@hono/node-server": "^1.19.14",

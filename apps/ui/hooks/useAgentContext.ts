@@ -20,15 +20,27 @@ function emit(agentId: string) {
     for (const listener of listeners.get(agentId) ?? []) listener()
 }
 
-async function load(agentId: string) {
+// A failed read is asked again while a picker still shows the agent, so it does not wait on a spinner
+// for the next mount.
+const FAILED_READ_RETRY_MS = 3_000
+const FAILED_READ_RETRIES = 3
+
+async function load(agentId: string, attempt = 0) {
     if (inflight.has(agentId)) return
     inflight.add(agentId)
+    let context: AgentContext
     try {
-        snapshots.set(agentId, { context: await getAgentContextAction(agentId), loaded: true })
+        context = await getAgentContextAction(agentId)
+        snapshots.set(agentId, { context, loaded: true })
     } finally {
         inflight.delete(agentId)
     }
     emit(agentId)
+    if (!context.model.loaded && attempt < FAILED_READ_RETRIES) {
+        setTimeout(() => {
+            if (listeners.get(agentId)?.size && !snapshots.get(agentId)?.context?.model.loaded) void load(agentId, attempt + 1)
+        }, FAILED_READ_RETRY_MS)
+    }
 }
 
 function subscribe(agentId: string, listener: () => void) {

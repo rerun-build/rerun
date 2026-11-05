@@ -90,6 +90,17 @@ describe('classifyChatError', () => {
         expect(classifyChatError('ProviderRefusedError: Provider returned error: tools.0.custom.input_schema: invalid')).toBe('provider_error')
     })
 
+    // Anthropic refusing a signed thinking block the engine replayed against another tool list. It
+    // reads "Provider returned error" too, but switching models does not help: a fresh run does.
+    it('tells a rejected thinking replay apart from a refusal', () => {
+        const fromApi = 'ProviderRefusedError: Provider returned error: messages.25.content.0: Invalid `signature` in `thinking` block. The block is bound to a different conversation. The `tools` list differs from the one this block was created with.'
+        const pastedWithoutBackticks = 'ProviderRefusedError: Provider returned error: messages.402.content.0: Invalid signature in thinking block. The block is bound to a different conversation.'
+        expect(classifyChatError(fromApi)).toBe('thinking_replay')
+        expect(classifyChatError(pastedWithoutBackticks)).toBe('thinking_replay')
+        expect(chatErrorTitle('thinking_replay', fromApi)).toBe('The run could not continue')
+        expect(friendlyError(fromApi)).toContain('switching models will not help')
+    })
+
     // The engine keeps the provider's reason in the run's error for the logs; the chat says what to do.
     it('tells the user a refusal will repeat, without the technical reason', () => {
         const message = friendlyError('ProviderRefusedError: Provider returned error: tools.0.custom.input_schema: invalid')
@@ -193,6 +204,35 @@ describe('describeSubscriptionLimit', () => {
     it('says whose plan is out rather than "this subscription"', () => {
         expect(friendlyError("AI_APICallError: You've hit your session limit · resets 3pm")).toContain('Your Claude plan')
         expect(friendlyError('Error: usage_limit_exceeded')).toContain('Your ChatGPT plan')
+    })
+})
+
+// The engine rewrites OpenCode's refusals into these sentences: OpenCode's own say neither which plan
+// nor which window ran out.
+describe('OpenCode limits', () => {
+    const credits = 'AI_APICallError: OpenCode Console credits used up: Insufficient account funds'
+    const goWeekly = 'AI_APICallError: OpenCode Go limit reached: weekly window · resets Nov 6, 3:00 PM UTC'
+
+    it('reads as a usage limit, never as the Rerun budget, and names OpenCode', () => {
+        expect(classifyChatError(credits)).toBe('usage_limit')
+        expect(classifyChatError(goWeekly)).toBe('usage_limit')
+        expect(chatErrorTitle('usage_limit', credits)).toBe('OpenCode credits used up')
+        expect(friendlyError(credits)).toBe('No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.')
+    })
+
+    // A Console model is often a Claude: the OpenCode rule runs before the "claude" one.
+    it('names OpenCode on a Console Claude model', () => {
+        const onClaude = `${credits} (console/claude-sonnet-5-5)`
+        expect(describeSubscriptionLimit(onClaude)).toEqual({ plan: 'opencode', scope: 'credits' })
+        expect(friendlyError(onClaude)).not.toContain('Claude plan')
+    })
+
+    it('names the Go window that ran out, and when it comes back', () => {
+        expect(describeSubscriptionLimit(goWeekly)).toEqual({ plan: 'opencode', scope: 'weekly', resetsAt: 'Nov 6, 3:00 PM UTC' })
+        expect(chatErrorTitle('usage_limit', goWeekly)).toBe('OpenCode Go weekly limit reached')
+        expect(friendlyError(goWeekly)).toContain('reached its weekly limit. It resets Nov 6, 3:00 PM UTC')
+        expect(describeSubscriptionLimit('OpenCode Go limit reached: monthly window')).toEqual({ plan: 'opencode', scope: 'monthly' })
+        expect(friendlyError('OpenCode Go limit reached: 5-hour window')).toContain('its 5-hour limit')
     })
 })
 

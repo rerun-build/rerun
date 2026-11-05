@@ -77,6 +77,18 @@ describe('migrateConnections', () => {
         expect(await readEnvFile(agentEnvPath('alpha'))).toEqual({ STRIPE_API_KEY: 'sk_test_x', MY_VAR: 'hello' })
     })
 
+    // The fold shipped before OpenCode existed: on a v0 data-dir, an OPENCODE_API_KEY in an agent's
+    // .env can only be a variable of the user's shell, and it stays where it is.
+    it('leaves a provider added after the fold alone', async () => {
+        await seedAgent('alpha', { provider: 'opencode' }, { OPENCODE_API_KEY: 'oc_sk_shell', MY_VAR: 'hello' })
+
+        await migrateConnections()
+
+        expect(await connections()).toHaveLength(0)
+        expect(await readEnvFile(agentEnvPath('alpha'))).toEqual({ OPENCODE_API_KEY: 'oc_sk_shell', MY_VAR: 'hello' })
+        expect((await readConfig('alpha')).connectionId).toBeNull()
+    })
+
     it('carries the OpenRouter overrides onto the connection', async () => {
         await seedAgent(
             'alpha',

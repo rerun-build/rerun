@@ -18,9 +18,11 @@ type FileDetailActionsProps = {
     publicUrl?: string
     onPublish?: () => void
     onUnpublish?: () => void
+    onShareSettings?: () => void
+    openUrl?: string
 }
 
-export function FileDetailActions({ name, truncated, editDisabledReason, onEdit, onDownload, onDelete, publicUrl, onPublish, onUnpublish }: FileDetailActionsProps) {
+export function FileDetailActions({ name, truncated, editDisabledReason, onEdit, onDownload, onDelete, publicUrl, onPublish, onUnpublish, onShareSettings, openUrl }: FileDetailActionsProps) {
     return (
         <>
             {truncated && (
@@ -38,7 +40,7 @@ export function FileDetailActions({ name, truncated, editDisabledReason, onEdit,
             <Button size="icon-sm" variant="ghost" onClick={onDownload} title="Download" aria-label="Download">
                 <DownloadIcon className="size-4" />
             </Button>
-            {onPublish && <FilePublishControl name={name} publicUrl={publicUrl} onPublish={onPublish} onUnpublish={onUnpublish} />}
+            {onPublish && <FilePublishControl name={name} publicUrl={publicUrl} onPublish={onPublish} onUnpublish={onUnpublish} onShareSettings={onShareSettings} openUrl={openUrl} />}
             <PanelDeleteButton
                 label="Delete file"
                 onClick={onDelete}

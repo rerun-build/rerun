@@ -7,6 +7,7 @@ import {
     createAiConnection,
     deleteAiConnection,
     getAiConnectionUsage,
+    isOpencodeOfferedTo,
     listAiConnections,
     setWorkspaceDefaultModel,
     startClaudeSignIn,
@@ -36,11 +37,15 @@ function failure(err: unknown, fallback: string): { success: false; error: strin
 // to hold a credential, whatever the user pastes.
 type CreateResult = { success: true; connection: BoxConnection } | { success: false; error: string; reason?: 'no_plan' }
 
-export async function listAiConnectionsAction(): Promise<BoxConnectionsList> {
+// `opencodeOffered`: whether this workspace may add OpenCode, behind its flag and on an engine that
+// runs it.
+export async function listAiConnectionsAction(): Promise<BoxConnectionsList & { opencodeOffered: boolean }> {
     try {
-        return await listAiConnections(await requireWorkspaceId())
+        const workspaceId = await requireWorkspaceId()
+        const [list, opencodeOffered] = await Promise.all([listAiConnections(workspaceId), isOpencodeOfferedTo(workspaceId).catch(() => false)])
+        return { ...list, opencodeOffered }
     } catch {
-        return { connections: [], default: null }
+        return { connections: [], default: null, opencodeOffered: false }
     }
 }
 

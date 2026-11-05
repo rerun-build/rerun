@@ -1,4 +1,4 @@
-import type { PlanLimitWindow, PlanLimits } from '@rerun/contracts'
+import { opencodeUsageSchema, type PlanLimitWindow, type PlanLimits } from '@rerun/contracts'
 
 // Kept in memory on purpose: a reading is only as good as its age, and the next run or the next
 // read refills it. Nothing here is worth a file a restored data-dir would have to carry.
@@ -66,4 +66,28 @@ export function planLimitWindowsFromCodex(response: CodexRateLimits | null | und
     const limits = response?.rateLimits
     if (!limits) return []
     return [...codexWindow(limits.primary, 'session'), ...codexWindow(limits.secondary, 'weekly')]
+}
+
+// OpenCode Go's `/usage` names its windows outright: `rolling` is the five-hour one. A window it
+// answers with a status other than `ok` is spent whatever the percentage says.
+const OPENCODE_WINDOWS = [
+    ['rolling', 'session'],
+    ['weekly', 'weekly'],
+    ['monthly', 'monthly'],
+] as const
+
+export function planLimitWindowsFromOpencode(body: unknown): PlanLimitWindow[] {
+    const parsed = opencodeUsageSchema.safeParse(body)
+    if (!parsed.success) return []
+    return OPENCODE_WINDOWS.flatMap(([field, kind]) => {
+        const window = parsed.data.usage[field]
+        if (!window) return []
+        const usedPercent = window.status === 'ok' ? window.percent : Math.max(window.percent, 100)
+        return [{ kind, label: null, usedPercent, resetsAt: window.resetsAt ?? null }]
+    })
+}
+
+// The window a refused call ran into, when the last reading says one is spent.
+export function spentPlanWindow(connectionId: string): PlanLimitWindow | null {
+    return readings.get(connectionId)?.windows.find(window => window.usedPercent >= 100) ?? null
 }

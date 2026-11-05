@@ -41,15 +41,21 @@ export function hubTools(ctx: RunContext): ToolSet {
         }),
         rerun_hub_publish_file: tool({
             description:
-                'Publish a file or folder from your workspace to a PUBLIC URL anyone can open in a browser. Use it whenever the user needs to see, open, download or share something you produced (a page or site you built, a report, a chart, a PDF, an export) instead of saying it is in your workspace. Returns the URL to share. The file is served as-is, so make sure it is final. An HTML page, site or mini-app gets its own address (https://<slug>.rerun.site) with its scripts, localStorage and a small "Made with Rerun" badge. For more than one self-contained page, publish the FOLDER with an index.html at its root: every file in it is published and relative paths resolve, so never inline images as base64. Re-publishing the same path keeps the same URL.',
+                'Publish a file or folder from your workspace to a URL the user can open. Use it whenever the user needs to see, open or share something you produced (a page, site, report, chart, PDF, export) instead of saying it is in your workspace. Returns the URL and who can open it. Served as-is, so make it final. A page or site gets its own address (https://<slug>.rerun.site) with a "Made with Rerun" badge. For several pages, publish the FOLDER with an index.html at its root; never inline images as base64. Re-publishing a path keeps its URL and access. A public link may wait for a person to approve it: say so when the result does.',
             inputSchema: z.object({
                 path: z.string().describe('Path to the file or folder in your workspace, e.g. "reports/q2.pdf" or "sites/launch" (a folder needs an index.html at its root).'),
-                slug: z.string().optional().describe('Optional readable name for the public URL (lowercase letters, digits and hyphens, starting with a letter or digit). A short random suffix is always appended, e.g. "q2-report" gives "q2-report-k3m9xqw7pt". If omitted, a fully random one is generated. Always share the URL returned, never guess it.'),
+                slug: z.string().optional().describe('Optional readable name for the URL (lowercase letters, digits, hyphens). A random suffix is appended: "q2-report" gives "q2-report-k3m9xqw7pt". Share the URL returned, never guess it.'),
+                access: z
+                    .enum(['public', 'workspace', 'password', 'invited'])
+                    .optional()
+                    .describe('Who can open it: "workspace" (members, default), "public", "password" or "invited". Omit on a republish to keep it.'),
+                invite: z.array(z.string()).optional().describe('For "invited": emails or @domains; visitors confirm by email code.'),
+                password: z.string().optional().describe('For "password": tell it to the user, it is never shown again.'),
             }),
-            execute: ({ path, slug }) => call('publish_file', { path, slug }),
+            execute: ({ path, slug, access, invite, password }) => call('publish_file', { path, slug, access, invite, password }),
         }),
         rerun_hub_unpublish_file: tool({
-            description: 'Remove a file you previously published: deletes the public copy and makes its URL return 404. Identify it by the workspace path you published, or by its slug.',
+            description: 'Remove a file you previously published: deletes the published copy and makes its URL stop working. Identify it by the workspace path you published, or by its slug.',
             inputSchema: z.object({
                 path: z.string().optional().describe('The workspace path you originally published.'),
                 slug: z.string().optional().describe('Or the slug of the published file.'),
@@ -57,7 +63,7 @@ export function hubTools(ctx: RunContext): ToolSet {
             execute: ({ path, slug }) => call('unpublish_file', { path, slug }),
         }),
         rerun_hub_list_published: tool({
-            description: 'List the files you currently have published, with their public URLs and original workspace paths.',
+            description: 'List the files you currently have published, with their URLs, who can open each one and their original workspace paths.',
             inputSchema: z.object({}),
             execute: () => call('list_published', {}),
         }),

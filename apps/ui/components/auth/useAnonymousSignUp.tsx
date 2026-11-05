@@ -1,8 +1,8 @@
 'use client'
 
-import { checkEmailExists, completeSignupAction, resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
+import { completeSignupAction, prepareAnonymousEmailStep, resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
 import { AuthMethods } from '@/components/auth/AuthMethods'
-import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
+import { AnonymousEmailStep, type GetCaptchaToken } from '@/components/auth/AnonymousEmailStep'
 import { OAuthSignInButton } from '@/components/auth/OAuthSignInButton'
 import { PHONE_ENABLED } from '@/cloud/phone'
 import { PhoneSignIn } from '@/cloud/phone.client'
@@ -42,8 +42,10 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
         setFormKey(k => k + 1)
     }
 
-    const sendCode = async (email: string) => {
-        const { exists } = await checkEmailExists(email)
+    const sendCode = async (email: string, getToken: GetCaptchaToken) => {
+        const prepared = await prepareAnonymousEmailStep({ email, captchaToken: await getToken() })
+        if (!prepared.ok) throw new Error(prepared.error)
+        const { exists } = prepared
         emailIsNew.current = !exists
         if (!exists) setSharedCookie(SIGNUP_INTENT_COOKIE, 'email', 1)
         const live = await resendLiveSignInCode(email)
@@ -110,9 +112,7 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
                 )
             }
             phone={PHONE_ENABLED ? surroundings => <PhoneSignIn onSignedIn={enter} onStepChange={step => funnel.setStep(signupStep('phone', step === 'code'))} {...surroundings} /> : undefined}
-            email={beforeEmail => (
-                <EmailCodeForm sendCode={sendCode} verifyCode={verifyCode} onStepChange={step => funnel.setStep(signupStep('email', step === 'code'))} beforeEmail={beforeEmail} />
-            )}
+            email={beforeEmail => <AnonymousEmailStep sendCode={sendCode} verifyCode={verifyCode} onStepChange={step => funnel.setStep(signupStep('email', step === 'code'))} beforeEmail={beforeEmail} />}
         />
     )
 

@@ -146,7 +146,9 @@ The coworker is on a Rerun model, and the app has no OpenRouter key. Either:
 
 ## The Foreman does not answer
 
-The Foreman runs on `OPENROUTER_API_KEY` only. Set it and run `docker compose up -d`. If it is set, look for `[llm]` or OpenRouter errors in `docker compose logs app`: an empty balance or a spending limit on the key stops it too.
+With `OPENROUTER_API_KEY` set, the Foreman walks a new workspace through its onboarding on that key: look for `[llm]` or OpenRouter errors in `docker compose logs app`, an empty balance or a spending limit on the key stops it too.
+
+Without the key, the Foreman skips the onboarding and runs on the AI you connect. If it answers "Set OPENROUTER_API_KEY to run the Rerun models", connect a provider or your Claude or ChatGPT plan from its model picker and pick it.
 
 ## A Composio app does not connect
 

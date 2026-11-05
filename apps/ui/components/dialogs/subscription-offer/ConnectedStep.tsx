@@ -13,6 +13,7 @@ function connectedCopy(provider: AddableProvider) {
         const { name } = PLANS[provider]
         return { title: `${name} is connected`, detail: `Your coworkers now run on your ${name} plan.` }
     }
+    if (provider === 'opencode') return { title: 'OpenCode is connected', detail: 'Your coworkers now run on your OpenCode Go plan.' }
     return { title: `${PROVIDER_PITCH[provider].title} is connected`, detail: 'Your coworkers now run on this key.' }
 }
 

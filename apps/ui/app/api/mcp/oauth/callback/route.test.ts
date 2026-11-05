@@ -224,8 +224,44 @@ describe('GET /api/mcp/oauth/callback', () => {
         expect(location.searchParams.get('status')).toBe('success')
         expect(location.searchParams.get('claim')).toBe('row-1')
         expect(putMcpToken).not.toHaveBeenCalled()
-        expect(parkSignIn).toHaveBeenCalledWith(expect.objectContaining({ jti: 'row-1', userId: 'user-1' }), { kind: 'mcp', serverName: 'acme', token: expect.objectContaining({ accessToken: 'access', refreshToken: 'refresh', tokenEndpoint: CONTEXT.tokenEndpoint }) })
+        expect(parkSignIn).toHaveBeenCalledWith(expect.objectContaining({ jti: 'row-1', userId: 'user-1' }), { kind: 'mcp', serverName: 'acme', mcpUrl: CONTEXT.mcpUrl, token: expect.objectContaining({ accessToken: 'access', refreshToken: 'refresh', tokenEndpoint: CONTEXT.tokenEndpoint }) })
         expect(deletesStateCookie(res)).toBe(true)
+    })
+
+    describe('pre-registered Asana client', () => {
+        const ASANA: OAuthContext = { ...CONTEXT, serverName: 'asana', mcpUrl: 'https://mcp.asana.com/v2/mcp', clientId: 'asana-id' }
+
+        beforeEach(() => {
+            vi.stubEnv('RERUN_ASANA_MCP_CLIENT_ID', 'asana-id')
+            vi.stubEnv('RERUN_ASANA_MCP_CLIENT_SECRET', 'asana-secret')
+        })
+
+        it('hands the engine the secret on the web path', async () => {
+            withContext(ASANA)
+
+            await callback({ code: 'code-1', state: STATE })
+
+            expect(putMcpToken).toHaveBeenCalledWith(expect.anything(), 'engine-agent', 'asana', expect.objectContaining({ accessToken: 'access', clientId: 'asana-id', clientSecret: 'asana-secret' }))
+        })
+
+        it('parks the mobile bundle without the secret, naming the MCP server for the claim to read it again', async () => {
+            vi.mocked(getServerSession).mockResolvedValue({ user: null, workspaceRefused: false } as never)
+            withContext({ ...ASANA, mobileGrant: GRANT() })
+
+            await callback({ code: 'code-1', state: STATE })
+
+            expect(parkSignIn).toHaveBeenCalledWith(expect.objectContaining({ jti: 'row-1' }), { kind: 'mcp', serverName: 'asana', mcpUrl: ASANA.mcpUrl, token: expect.objectContaining({ accessToken: 'access', clientId: 'asana-id' }) })
+            expect(JSON.stringify(vi.mocked(parkSignIn).mock.calls[0][1])).not.toContain('asana-secret')
+        })
+    })
+
+    it('parks the secret of a dynamically registered client, which belongs to that registration alone', async () => {
+        vi.mocked(getServerSession).mockResolvedValue({ user: null, workspaceRefused: false } as never)
+        withContext({ ...CONTEXT, clientSecret: 'dcr-secret', mobileGrant: GRANT() })
+
+        await callback({ code: 'code-1', state: STATE })
+
+        expect(parkSignIn).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ token: expect.objectContaining({ clientSecret: 'dcr-secret' }) }))
     })
 
     it('ends in the app with the reason when the row of the grant is gone', async () => {

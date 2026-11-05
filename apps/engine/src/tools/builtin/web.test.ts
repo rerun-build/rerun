@@ -1,12 +1,21 @@
-import { mkdtempSync } from 'node:fs'
+import { existsSync, mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
+import { vi } from 'vitest'
+import type { z } from 'zod'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-web-'))
+process.env.RERUN_API_KEY = ''
 
-const { afterEach, describe, expect, it, vi } = await import('vitest')
+// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
+vi.mock('node:dns/promises', () => ({
+    lookup: async (host: string) => [{ address: host.startsWith('internal.') ? '10.0.0.7' : '93.184.216.34', family: 4 }],
+}))
+
+const { afterEach, describe, expect, it } = await import('vitest')
 const { HostBreaker, BLOCKED_SOURCE_PREFIX } = await import('../host-breaker.js')
 const { webTools } = await import('./web.js')
+const { workspaceDir } = await import('../../config/paths.js')
 
 const originalFetch = globalThis.fetch
 
@@ -19,6 +28,15 @@ const withoutSavedLine = (text: string): string => text.replace(/\nSaved whole: 
 
 async function fetchPage(ctx: ReturnType<typeof ctxWith>, url: string, timeoutMs?: number): Promise<string> {
     return withoutSavedLine((await (webTools(ctx, timeoutMs).web_fetch as any).execute({ url, raw: false }, { toolCallId: 'call-1', messages: [] })) as string)
+}
+
+const inputSchema = (name: string) => (webTools(ctxWith())[name] as any).inputSchema as z.ZodTypeAny
+
+// A Response built by hand has no url; a real fetch reports the one of the hop it ended on.
+function responseAt(url: string, body: string, init?: ResponseInit): Response {
+    const res = new Response(body, init)
+    Object.defineProperty(res, 'url', { value: url })
+    return res
 }
 
 afterEach(() => {
@@ -35,6 +53,43 @@ describe('web_search description', () => {
 })
 
 describe('web_fetch', () => {
+    it.each(['file:///etc/passwd', 'ftp://example.com/x', 'javascript:alert(1)'])('refuses %s in its schema, so the model is told before anything runs', url => {
+        const result = inputSchema('web_fetch').safeParse({ url, raw: true })
+        expect(result.success).toBe(false)
+        expect(JSON.stringify(result.error?.issues)).toContain('only http and https URLs on public hosts are accepted')
+        expect(inputSchema('web_fetch').safeParse({ url: 'https://example.com/', raw: true }).success).toBe(true)
+    })
+
+    it.each(['file:///etc/passwd', 'http://127.0.0.1:8080/', 'http://[::1]/', 'http://169.254.169.254/latest/meta-data/', 'http://internal.test/admin'])('refuses %s without fetching, as a result the model reads and not an exception', async url => {
+        const fetchMock = vi.fn()
+        globalThis.fetch = fetchMock as unknown as typeof fetch
+        const out = await fetchPage(ctxWith(), url)
+        expect(out).toMatch(/^Fetch refused: .* is not a public host \(.*\), only http and https URLs on public hosts are accepted\.$/)
+        expect(out).not.toContain('failed in this run')
+        expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('refuses a redirect from a public host to a private one, and does not follow it', async () => {
+        const fetchMock = vi.fn(async () => new Response(null, { status: 302, headers: { location: 'http://169.254.169.254/latest/meta-data/' } }))
+        globalThis.fetch = fetchMock as unknown as typeof fetch
+        expect(await fetchPage(ctxWith(), 'https://example.com/go')).toBe('Fetch refused: 169.254.169.254 is not a public host (https://example.com/go), only http and https URLs on public hosts are accepted.')
+        expect(fetchMock).toHaveBeenCalledOnce()
+        expect(fetchMock.mock.calls[0]![1]).toMatchObject({ redirect: 'manual', headers: { 'User-Agent': 'rerun-engine/1.0' } })
+    })
+
+    it('follows a redirect between public hosts and reports where it landed', async () => {
+        const fetchMock = vi.fn(async (url: string) =>
+            url === 'https://example.com/old'
+                ? new Response(null, { status: 301, headers: { location: 'https://www.example.com/new' } })
+                : responseAt('https://www.example.com/new', '<html><head><title>New</title></head><body><h1>New</h1></body></html>', { headers: { 'content-type': 'text/html' } }),
+        )
+        globalThis.fetch = fetchMock as unknown as typeof fetch
+        const out = await fetchPage(ctxWith(), 'https://example.com/old')
+        expect(out).toContain('[200] https://example.com/old')
+        expect(out).toContain('redirected to: https://www.example.com/new')
+        expect(fetchMock.mock.calls.map(([url]) => url)).toEqual(['https://example.com/old', 'https://www.example.com/new'])
+    })
+
     it('closes a host after three refused attempts and stops fetching it', async () => {
         const fetchMock = vi.fn(async () => new Response('<h1>Forbidden</h1>', { status: 403 }))
         globalThis.fetch = fetchMock as unknown as typeof fetch
@@ -67,5 +122,28 @@ describe('web_fetch', () => {
     it('does not count a missing page against the host', async () => {
         globalThis.fetch = vi.fn(async () => new Response('gone', { status: 404 })) as unknown as typeof fetch
         expect(await fetchPage(ctxWith(), 'https://example.com/missing')).toBe('[404] https://example.com/missing (no page here: if you guessed this URL instead of following a link, that is not proof of a broken page)\n\ngone')
+    })
+})
+
+describe('download', () => {
+    it('refuses a private host without fetching nor writing anything', async () => {
+        const fetchMock = vi.fn()
+        globalThis.fetch = fetchMock as unknown as typeof fetch
+        const out = await (webTools(ctxWith()).download as any).execute({ url: 'http://127.0.0.1:9/loot', path: 'loot.txt' }, { toolCallId: 'call-1', messages: [] })
+        expect(out).toBe('Download refused: 127.0.0.1:9 is not a public host (http://127.0.0.1:9/loot), only http and https URLs on public hosts are accepted.')
+        expect(fetchMock).not.toHaveBeenCalled()
+        expect(existsSync(resolve(workspaceDir('surfer'), 'loot.txt'))).toBe(false)
+    })
+
+    it('refuses a redirect to a private host', async () => {
+        const fetchMock = vi.fn(async () => new Response(null, { status: 302, headers: { location: 'http://10.0.0.5/' } }))
+        globalThis.fetch = fetchMock as unknown as typeof fetch
+        const out = await (webTools(ctxWith()).download as any).execute({ url: 'https://cdn.example.com/a.bin', path: 'a.bin' }, { toolCallId: 'call-1', messages: [] })
+        expect(out).toMatch(/^Download refused: 10\.0\.0\.5 is not a public host/)
+        expect(fetchMock).toHaveBeenCalledOnce()
+    })
+
+    it('refuses file URLs in its schema', () => {
+        expect(inputSchema('download').safeParse({ url: 'file:///etc/shadow', path: 'x' }).success).toBe(false)
     })
 })

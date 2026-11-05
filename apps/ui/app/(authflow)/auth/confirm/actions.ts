@@ -1,6 +1,7 @@
 'use server'
 
 import { LAST_SIGN_IN_COOKIE, LAST_SIGN_IN_MAX_AGE_SECONDS } from '@/lib/auth/last-sign-in-cookie'
+import { internalPath } from '@/lib/auth/internal-path'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { routes } from '@/lib/routes'
 import { createClient } from '@/supabase/server'
@@ -33,5 +34,5 @@ export async function confirmLogin(formData: FormData) {
 
     const pendingInvite = cookieStore.get(PENDING_INVITE_COOKIE)?.value
     if (pendingInvite) cookieStore.delete(PENDING_INVITE_COOKIE)
-    redirect(pendingInvite || routes.home)
+    redirect(internalPath(pendingInvite, routes.home))
 }

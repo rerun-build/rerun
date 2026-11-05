@@ -1880,52 +1880,111 @@ export type Database = {
         }
         Relationships: []
       }
+      published_access_codes: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          published_file_id: string
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          published_file_id: string
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          published_file_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "published_access_codes_published_file_id_fkey"
+            columns: ["published_file_id"]
+            isOneToOne: false
+            referencedRelation: "published_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       published_files: {
         Row: {
+          access: string
+          access_version: number
           agent_id: string
           content_type: string
           created_at: string
           files: string[] | null
           id: string
+          invited: string[]
           kind: string
+          password_hash: string | null
           public_url: string
+          requested_access: string | null
           size: number
           slug: string
           source_path: string
           space_id: string | null
           storage_key: string
+          thumbnail_key: string | null
+          title: string | null
           updated_at: string
           workspace_id: number
         }
         Insert: {
+          access?: string
+          access_version?: number
           agent_id: string
           content_type?: string
           created_at?: string
           files?: string[] | null
           id?: string
+          invited?: string[]
           kind?: string
+          password_hash?: string | null
           public_url: string
+          requested_access?: string | null
           size?: number
           slug: string
           source_path: string
           space_id?: string | null
           storage_key: string
+          thumbnail_key?: string | null
+          title?: string | null
           updated_at?: string
           workspace_id: number
         }
         Update: {
+          access?: string
+          access_version?: number
           agent_id?: string
           content_type?: string
           created_at?: string
           files?: string[] | null
           id?: string
+          invited?: string[]
           kind?: string
+          password_hash?: string | null
           public_url?: string
+          requested_access?: string | null
           size?: number
           slug?: string
           source_path?: string
           space_id?: string | null
           storage_key?: string
+          thumbnail_key?: string | null
+          title?: string | null
           updated_at?: string
           workspace_id?: number
         }
@@ -1952,6 +2011,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      published_gate_attempts: {
+        Row: {
+          attempt_count: number
+          scope: string
+          window_started_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          scope: string
+          window_started_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          scope?: string
+          window_started_at?: string
+        }
+        Relationships: []
       }
       rerun_usage_events: {
         Row: {
@@ -3395,7 +3472,7 @@ export type Database = {
           current_period_end: string | null
           custom_integrations: boolean
           first_paid_at: string | null
-          icon_url: string
+          icon_url: string | null
           id: number
           is_sandbox: boolean
           last_active_at: string | null
@@ -3407,6 +3484,7 @@ export type Database = {
           payment_failed_at: string | null
           plan: string
           price_arm: string | null
+          publish_policy: string | null
           renewal_reminder_at: string | null
           renewal_reminder_user_id: string | null
           rerun_budget_micros: number
@@ -3431,7 +3509,7 @@ export type Database = {
           current_period_end?: string | null
           custom_integrations?: boolean
           first_paid_at?: string | null
-          icon_url: string
+          icon_url?: string | null
           id?: number
           is_sandbox?: boolean
           last_active_at?: string | null
@@ -3443,6 +3521,7 @@ export type Database = {
           payment_failed_at?: string | null
           plan?: string
           price_arm?: string | null
+          publish_policy?: string | null
           renewal_reminder_at?: string | null
           renewal_reminder_user_id?: string | null
           rerun_budget_micros?: number
@@ -3467,7 +3546,7 @@ export type Database = {
           current_period_end?: string | null
           custom_integrations?: boolean
           first_paid_at?: string | null
-          icon_url?: string
+          icon_url?: string | null
           id?: number
           is_sandbox?: boolean
           last_active_at?: string | null
@@ -3479,6 +3558,7 @@ export type Database = {
           payment_failed_at?: string | null
           plan?: string
           price_arm?: string | null
+          publish_policy?: string | null
           renewal_reminder_at?: string | null
           renewal_reminder_user_id?: string | null
           rerun_budget_micros?: number
@@ -3560,6 +3640,10 @@ export type Database = {
           p_window_seconds: number
         }
         Returns: string
+      }
+      claim_published_gate_attempt: {
+        Args: { p_max: number; p_scopes: string[]; p_window_seconds: number }
+        Returns: boolean
       }
       consume_rerun_credit: {
         Args: { p_micros: number; p_workspace_id: number }

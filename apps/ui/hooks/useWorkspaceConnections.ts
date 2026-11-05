@@ -19,10 +19,10 @@ import { useCallback, useEffect, useSyncExternalStore } from 'react'
 // Mutations update the shared list from the connection the engine echoes back, so a rename or a
 // model toggle lands without a second round-trip.
 
-type ConnectionsState = { connections: BoxConnection[]; boxDefault: BoxDefault | null; loaded: boolean }
+type ConnectionsState = { connections: BoxConnection[]; boxDefault: BoxDefault | null; opencodeOffered: boolean; loaded: boolean }
 
 // A shared constant, since useSyncExternalStore compares snapshots by reference.
-const EMPTY: ConnectionsState = { connections: [], boxDefault: null, loaded: false }
+const EMPTY: ConnectionsState = { connections: [], boxDefault: null, opencodeOffered: false, loaded: false }
 
 let snapshot: ConnectionsState = EMPTY
 const listeners = new Set<() => void>()
@@ -44,7 +44,7 @@ function subscribe(listener: () => void) {
 function fetchList(): Promise<void> {
     if (inflight) return inflight
     inflight = listAiConnectionsAction()
-        .then(list => setState({ connections: list.connections, boxDefault: list.default, loaded: true }))
+        .then(list => setState({ connections: list.connections, boxDefault: list.default, opencodeOffered: list.opencodeOffered, loaded: true }))
         .catch(() => {})
         .finally(() => {
             inflight = null
@@ -155,5 +155,5 @@ export function useWorkspaceConnections({ revalidate = false }: { revalidate?: b
         return result
     }, [])
 
-    return { connections: state.connections, boxDefault: state.boxDefault, loading: !state.loaded, refresh, create, update, updateKeys, remove, setDefault }
+    return { connections: state.connections, boxDefault: state.boxDefault, opencodeOffered: state.opencodeOffered, loading: !state.loaded, refresh, create, update, updateKeys, remove, setDefault }
 }

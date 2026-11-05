@@ -7,6 +7,7 @@ import { ApprovalBlock } from '@/components/chat/ApprovalBlock'
 import { AgentInstallBlock } from '@/components/chat/AgentInstallBlock'
 import { AgentWorkspaceMessage } from '@/components/chat/AgentWorkspaceMessage'
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
+import { CopyAction } from '@/components/chat/CopyAction'
 import { MessageAttachments } from '@/components/chat/MessageAttachments'
 import { FileCard, type FileAccess } from '@/components/chat/FileCard'
 import { HitlReceipt } from '@/components/chat/HitlReceipt'
@@ -27,9 +28,11 @@ import { SkillProposalBlock } from '@/components/chat/SkillProposalBlock'
 import { StepGroup, type StepGroupItem } from '@/components/chat/StepGroup'
 import { SubRunBlock } from '@/components/chat/SubRunBlock'
 import { ToolCallStep, toolStatusOf, type ToolState } from '@/components/chat/ToolCallBlock'
-import { VoiceMessageBubble } from '@/components/chat/VoiceMessageBubble'
+import { VoiceUserMessage } from '@/components/chat/VoiceUserMessage'
 import { WebhookRunBlock } from '@/components/chat/WebhookRunBlock'
 import { ServiceInstalledBlock } from '@/components/services/ServiceInstalledBlock'
+import { PublishedChatCard } from '@/components/published/PublishedChatCard'
+import { usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { parseAttachments } from '@/lib/chat/attachments-marker'
 import { hitlKindOf, parseHitlReply } from '@/lib/chat-hitl'
 import type { HitlCallPart } from '@/lib/chat/hitl-receipts'
@@ -41,7 +44,7 @@ import { stripBridgePrefix } from '@/lib/chat/bridge-name'
 import { cancelSubRunAction } from '@/app/api/_actions/agent.actions'
 import { isSubRunLive, pairSubRuns, SUB_RUN_TOOL_NAMES } from '@/lib/chat/sub-run-progress'
 import { parseHubOutput } from '@/lib/services/parse-hub-output'
-import type { InstallResult } from '@/lib/services/types'
+import type { InstallResult, PublishResult } from '@/lib/services/types'
 import type { EngineSkillProposal } from '@/lib/engine/types'
 import { useToolDisplay } from '@/hooks/useToolDisplay'
 import { parseTriggerPayload } from '@/lib/triggers/trigger-payload'
@@ -50,8 +53,8 @@ import { parseVoiceMessage } from '@/lib/voice/marker'
 import { cn } from '@/lib/utils'
 import { QUICK_REPLIES_TOOL, fileCardSchema, quickRepliesOf, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
-import { BrainIcon, CheckIcon, CopyIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
-import { Fragment, isValidElement, memo, type ReactNode, useState } from 'react'
+import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
+import { Fragment, isValidElement, memo, type ReactNode } from 'react'
 
 type RenderStep =
     | ({ kind: 'group-item' } & StepGroupItem)
@@ -85,23 +88,6 @@ function messageSources(message: { parts: readonly MessagePartLike[] }): Normali
             const sp = p as { url?: string; title?: string; filename?: string }
             return { url: sp.url, title: sp.title ?? sp.filename ?? sp.url }
         })
-}
-
-function CopyAction({ text }: { text: string }) {
-    const [copied, setCopied] = useState(false)
-    return (
-        <MessageAction
-            tooltip={copied ? 'Copied!' : 'Copy'}
-            onClick={() => {
-                navigator.clipboard.writeText(text).then(() => {
-                    setCopied(true)
-                    setTimeout(() => setCopied(false), 1500)
-                })
-            }}
-        >
-            {copied ? <CheckIcon className="size-3.5" /> : <CopyIcon className="size-3.5" />}
-        </MessageAction>
-    )
 }
 
 function FeedbackAction({ rating, current, onRate }: { rating: MessageFeedbackRating; current: MessageFeedbackRating | null; onRate: (rating: MessageFeedbackRating) => void }) {
@@ -174,6 +160,7 @@ export function UnderText({ children }: { children: ReactNode }) {
 
 function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
     const toolDisplay = useToolDisplay(agentId)
+    const publishedAccess = usePublishedAccessEnabled()
     const sources = message.role === 'assistant' ? messageSources(message) : []
     const install = message.role === 'user' ? parseInstallMessage(messageText(message)) : null
     const hitlReply = message.role === 'user' && !install ? parseHitlReply(messageText(message)) : null
@@ -195,6 +182,8 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
             </Message>
         )
     }
+
+    if (voice) return <VoiceUserMessage voice={voice} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} attachmentPaths={attachments?.paths} createdAt={createdAt} />
 
     const renderAssistantSteps = (): AssistantStep[] => {
         const lastPart = message.parts.length - 1
@@ -265,6 +254,11 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                         return { kind: 'standalone', key, node: <ServiceInstalledBlock agentId={agentId} name={out.name} toolNames={out.toolNames} /> }
                     }
                     if (out?.status === 'needs_auth') return { kind: 'standalone', key, node: <NeedsAuthCard agentId={agentId} slug={out.slug} name={out.name} /> }
+                }
+                // What a coworker published, and who can open it, where it said so.
+                if (publishedAccess && toolName === 'rerun_hub_publish_file' && toolPart.state === 'output-available') {
+                    const out = parseHubOutput<PublishResult>(toolPart.output)
+                    if (out?.status === 'published' && out.slug) return { kind: 'standalone', key, node: <PublishedChatCard agentId={agentId} result={out} /> }
                 }
                 // A server registered outside the catalog: what the user sees in Apps, and the one
                 // place a sign-in it still owes can be made.
@@ -389,8 +383,6 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 <MessageContent className={cn(USER_BUBBLE_SHAPE, inkBubble && USER_BUBBLE_INK, assistantSteps && assistantLayout && 'overflow-visible')} data-ink={inkBubble || undefined}>
                     {assistantSteps ? (
                         assistantLayout ? assistantLayout(assistantSteps) : assistantSteps.map(step => <Fragment key={step.key}>{step.node}</Fragment>)
-                    ) : voice ? (
-                        <VoiceMessageBubble agentId={agentId} rawUrlFor={rawUrlFor} src={voice.src} durationMs={voice.durationMs} peaks={voice.peaks} transcript={voice.transcript} />
                     ) : message.role === 'user' ? (
                         <ExpandableMessage agentId={agentId} mentions={mentions}>{attachments ? attachments.text : messageText(message)}</ExpandableMessage>
                     ) : (

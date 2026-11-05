@@ -44,7 +44,7 @@ async function draft(agent: LoadedAgent, row: SkillProposalRow, abortSignal: Abo
     const others = editing ? [] : await listSkillSummaries(agent.id).catch(() => [])
 
     const output = await generateStructured({
-        model: modelFor(agent),
+        model: modelFor(agent, undefined, undefined, undefined, { sessionId: `${agent.id}:skill-proposal` }),
         schema: draftSchema,
         prompt: applyProposalPrompt({ title: row.title, instructions, current: editing, others }),
         abortSignal,

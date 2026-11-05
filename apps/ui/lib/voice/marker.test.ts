@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { appendVoiceMarker, buildVoiceMarker, parseVoiceMessage, stripVoiceMarker } from './marker'
+import { appendVoiceMarker, buildVoiceMarker, parseVoiceMessage, stripVoiceMarker, transcriptWords } from './marker'
 
 const marker = buildVoiceMarker({ src: 'chat-uploads/abc-voice.webm', durationMs: 12480, levels: [0, 1, 0.5] })
 
@@ -54,5 +54,28 @@ describe('stripVoiceMarker', () => {
 
     it('leaves a plain message untouched', () => {
         expect(stripVoiceMarker('Ship it tomorrow')).toBe('Ship it tomorrow')
+    })
+})
+
+describe('transcriptWords', () => {
+    it('keeps every character, words and gaps alike', () => {
+        const text = 'Okay  so\nsend them.'
+        expect(
+            transcriptWords(text)
+                .map(word => word.text)
+                .join('')
+        ).toBe(text)
+    })
+
+    it('places each word by the characters before it', () => {
+        expect(transcriptWords('ab cd')).toEqual([
+            { text: 'ab', start: 0 },
+            { text: ' ', start: 0.4 },
+            { text: 'cd', start: 0.6 },
+        ])
+    })
+
+    it('reads an empty transcript as no words', () => {
+        expect(transcriptWords('')).toEqual([])
     })
 })

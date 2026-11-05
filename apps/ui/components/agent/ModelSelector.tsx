@@ -64,6 +64,9 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     // Only when nothing at all was chosen: an override on this conversation is still a choice, and
     // the trigger has to say which model that turn will bill.
     const showingBoxDefault = followsBoxDefault && !selection.model
+    // The engine resolves an agent that follows the Box on every run, so there is nothing to repair
+    // here: an override written for it would freeze the conversation on whatever the picker read.
+    const engineResolvesModel = showingBoxDefault && supportsBoxDefault
 
     // The pick is only usable when the connection it names still serves the model. A connection
     // deleted from the Box, or a model switched off on it, lands here.
@@ -72,15 +75,16 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         return group?.models.some(m => m.id === model) ? group : undefined
     }, [availableGroups, connectionId, model])
 
-    // An agent whose stored default no longer resolves (a template just imported, a connection
-    // removed) is repointed at whatever the Box can actually run. Writing the override rather than
-    // just the display matters: the chat transport sends the stored selection.
+    // A pin or an override that no longer resolves (a template just imported, a connection removed)
+    // is repointed at whatever the Box can actually run, the Box default first: Rerun only heads the
+    // list, it is not what the owner chose. Writing the override rather than just the display
+    // matters: the chat transport sends the stored selection.
     useEffect(() => {
-        if (loading || active || !hasAvailable) return
-        const fallback = connectionOf(model, connectionId) ?? availableGroups[0]
+        if (loading || active || !hasAvailable || engineResolvesModel) return
+        const fallback = connectionOf(model, connectionId) ?? availableGroups.find(group => group.connectionId === boxDefaultPick?.connectionId) ?? availableGroups[0]
         const nextModel = model && fallback.models.some(m => m.id === model) ? model : fallback.defaultModel
         select({ connectionId: fallback.connectionId, model: nextModel })
-    }, [loading, active, hasAvailable, availableGroups, connectionOf, model, connectionId, select])
+    }, [loading, active, hasAvailable, engineResolvesModel, availableGroups, connectionOf, boxDefaultPick, model, connectionId, select])
 
     // With nothing to pick from, the request lands where a model gets set up.
     useEffect(() => {
@@ -109,10 +113,10 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         // Don't report "not ready" while still loading — that would block the composer and flash a
         // false "no model" state before the fetch resolves.
         if (loading) return
-        onReadyChange?.(Boolean(active))
+        onReadyChange?.(Boolean(active) || (engineResolvesModel && hasAvailable))
         onOwnConnectionChange?.(hasOwnConnection)
         onConnectionChange?.(connectionId)
-    }, [loading, active, hasOwnConnection, connectionId, onReadyChange, onOwnConnectionChange, onConnectionChange])
+    }, [loading, active, engineResolvesModel, hasAvailable, hasOwnConnection, connectionId, onReadyChange, onOwnConnectionChange, onConnectionChange])
 
     const selectModel = useCallback(
         (group: ConnectionGroup, nextModel: string) => {
@@ -148,7 +152,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         [addProvider]
     )
 
-    const label = !hasAvailable ? 'Set up a model' : !active ? 'Select model' : showingBoxDefault ? `Default · ${modelLabel(model)}` : modelLabel(model)
+    const label = !hasAvailable ? 'Set up a model' : engineResolvesModel ? `Default · ${modelLabel(model)}` : !active ? 'Select model' : modelLabel(model)
 
     if (loading) {
         return (
@@ -200,7 +204,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                     <span className="flex min-w-0 items-center gap-1.5">
                                         <ProviderIcon provider={group.provider} className="size-3.5 shrink-0" />
                                         <span className="truncate">{group.label}</span>
-                                        {group.connectionId === RERUN_CONNECTION_ID ? <RerunCreditHint credit={rerunCredit} /> : <PlanLimitHint windows={group.planWindows} />}
+                                        {group.connectionId === RERUN_CONNECTION_ID ? <RerunCreditHint credit={rerunCredit} /> : <PlanLimitHint windows={group.planWindows} provider={group.provider} />}
                                     </span>
                                 }
                             >

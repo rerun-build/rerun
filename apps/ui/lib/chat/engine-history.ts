@@ -5,7 +5,7 @@ import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { encodePeaks } from '@/lib/voice/peaks'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { hitlKindOf } from '@/lib/chat-hitl'
-import { isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, stripBridgePrefix, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata } from '@rerun/contracts'
+import { isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, stripBridgePrefix, withHitlVersion, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata } from '@rerun/contracts'
 import { randomUuid } from '@rerun/db/helpers'
 
 type TextPart = { type: 'text'; text: string }
@@ -120,7 +120,7 @@ function toolPartOf(call: unknown, toolResults: Map<string, unknown>): ToolInvoc
     const toolCallId = c.toolCallId ?? c.id ?? randomUuid()
     const toolName = c.toolName ?? c.name ?? c.function?.name ?? 'tool'
     const rawInput = c.input ?? c.args ?? c.arguments ?? {}
-    const input = typeof rawInput === 'string' ? safeParse(rawInput) : rawInput
+    const input = withHitlVersion(toolName, typeof rawInput === 'string' ? safeParse(rawInput) : rawInput)
     const output = toolResults.get(toolCallId)
     // An unresolved tool call (no matching tool-result) is still awaiting input, e.g. a paused
     // ask_user / request_approval. Keep it 'input-available' so the pinned block re-renders on reload.

@@ -9,9 +9,11 @@ type PendingInsert = Database['public']['Tables']['oauth_pending_grants']['Inser
 type PendingUpdate = Database['public']['Tables']['oauth_pending_grants']['Update']
 
 // What the callback leaves for the app to finish with: the engine never hears from the callback itself.
-// A managed token carries no client secret, the claim reads the provider's from the environment again.
+// A managed token carries no client secret, nor does an MCP token for a pre-registered client: the
+// claim reads the provider's from the environment again. `mcpUrl` names that client, rows parked by
+// a hub predating it have none.
 export type ParkedSignIn =
-    | { kind: 'mcp'; serverName: string; token: McpTokenBundle }
+    | { kind: 'mcp'; serverName: string; mcpUrl?: string; token: McpTokenBundle }
     | { kind: 'managed'; key: string; provider: string; serverName: string; token: Pick<McpTokenBundle, 'accessToken' | 'refreshToken' | 'expiresAt' | 'scope'>; email?: string }
     | { kind: 'composio'; key: string; connectedAccountId: string }
 

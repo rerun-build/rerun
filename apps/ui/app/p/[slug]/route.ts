@@ -1,21 +1,36 @@
-import { publishedSiteOrigin, rendersAsPage } from '@/lib/published/host'
+import { publishedSiteOrigin } from '@/lib/published/host'
+import { PUBLISHED_BUCKET } from '@/lib/services/publish'
+import { loadPublished } from '@/lib/published/gate'
+import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// Friendly public URL for a published file (see lib/services/publish.ts). Resolves the slug
-// to its row and 302-redirects to the stored Storage URL. Public by design — that's the point
-// of publishing. If the row is gone (unpublished), return 404: this is what makes unpublish a
-// real revocation, even though raw Storage public URLs are otherwise permanent.
-// A page or a site goes to <slug>.rerun.site instead, Storage would show its source as text.
+// The first links a coworker shared, before every link had its own host. Where a publish host is
+// configured they all lead there, which checks the access. Without one (staging, a self-hosted app
+// with no wildcard domain) there is no host to hold a gate's cookie: a public file opens through a
+// short signed URL, and any other only for a signed-in member of its workspace.
 export const dynamic = 'force-dynamic'
+
+const SIGNED_URL_TTL_SECONDS = 60
+
+async function isMember(workspaceId: number): Promise<boolean> {
+    const { data } = await (await createClient()).auth.getUser()
+    if (!data.user || data.user.is_anonymous) return false
+    const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['user_id'] as const, { user_id: data.user.id, workspace_id: workspaceId })
+    return !!membership
+}
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }): Promise<Response> {
     const { slug } = await params
-    const supabase = createServiceRoleClient()
-    const { data } = await selectMaybeSingle(supabase, 'published_files', ['public_url', 'kind', 'content_type'] as const, { slug })
-    if (!data?.public_url) {
-        return new Response('Not found', { status: 404 })
-    }
-    const siteOrigin = rendersAsPage(data.kind, data.content_type) ? publishedSiteOrigin(slug) : null
-    return Response.redirect(siteOrigin ?? data.public_url, 302)
+    const entry = await loadPublished(slug)
+    if (!entry) return new Response('Not found', { status: 404 })
+
+    const origin = publishedSiteOrigin(slug)
+    if (origin) return Response.redirect(`${origin}/`, 302)
+
+    if (entry.kind === 'site') return new Response('Not found', { status: 404 })
+    if (entry.access !== 'public' && !(await isMember(entry.workspace_id))) return new Response('Not found', { status: 404 })
+
+    const { data } = await createServiceRoleClient().storage.from(PUBLISHED_BUCKET).createSignedUrl(entry.storage_key, SIGNED_URL_TTL_SECONDS)
+    return data?.signedUrl ? Response.redirect(data.signedUrl, 302) : new Response('Not found', { status: 404 })
 }

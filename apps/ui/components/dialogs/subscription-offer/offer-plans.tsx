@@ -43,4 +43,5 @@ export const PROVIDER_GLYPH: Record<AddableProvider, Glyph> = {
     openai: ({ className }) => <ProviderIcon provider="openai" className={className} />,
     google: ({ className }) => <ProviderIcon provider="google" className={className} />,
     openrouter: ({ className }) => <ProviderIcon provider="openrouter" className={className} />,
+    opencode: ({ className }) => <ProviderIcon provider="opencode" className={className} />,
 }

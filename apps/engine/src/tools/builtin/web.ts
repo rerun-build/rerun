@@ -5,6 +5,8 @@ import { z } from 'zod'
 import { resolveInWorkspace } from '../sandbox.js'
 import { env } from '../../config/env.js'
 import { deadlineSignal } from '../../lib/abort.js'
+import { NonPublicHostError, fetchPublic } from '../../lib/public-fetch.js'
+import { PUBLIC_HTTP_URL_MESSAGE, publicHttpUrl } from '../url.js'
 import { HostBreaker, hostOf, isFailureStatus, withHostBreaker, type HostAttempt } from '../host-breaker.js'
 import type { RunContext } from '../../runtime/context.js'
 import { hubCallerHeaders, type HubCaller } from '../../runtime/hub.js'
@@ -15,12 +17,15 @@ export const FETCH_TIMEOUT_MS = 30_000
 const SEARCH_TIMEOUT_MS = 15_000
 const HUB_FETCH_TIMEOUT_MS = 60_000
 const MAX_FETCH_CHARS = 50_000
+const MAX_REDIRECTS = 10
 
 const USER_AGENT = { 'User-Agent': 'rerun-engine/1.0' }
 
 function failureReason(e: unknown, signal: AbortSignal, timeoutMs: number): string {
     return signal.aborted ? `timed out after ${Math.round(timeoutMs / 1000)} s` : (e as Error).message
 }
+
+const refusal = (verb: string, e: NonPublicHostError, url: string): HostAttempt => ({ text: `${verb} refused: ${e.message} (${url}), ${PUBLIC_HTTP_URL_MESSAGE}.`, failed: false })
 
 // What a coworker auditing a site must not read as a fact about it: the status went to our reader,
 // from a datacenter with our user agent, and a URL it guessed proves nothing when it does not exist.
@@ -108,7 +113,7 @@ export function webTools(ctx: RunContext, fetchTimeoutMs = FETCH_TIMEOUT_MS): To
     return {
         web_fetch: tool({
             description: WEB_FETCH_DESCRIPTION,
-            inputSchema: z.object({ url: z.string().url(), raw: z.boolean().default(false).describe('Return raw body instead of stripped text') }),
+            inputSchema: z.object({ url: publicHttpUrl, raw: z.boolean().default(false).describe('Return raw body instead of stripped text') }),
             execute: async ({ url, raw }, { abortSignal }) =>
                 withHostBreaker(breaker, hostsOfUrl(url), async (): Promise<HostAttempt> => {
                     const runSignal = ctx.abortSignal ?? abortSignal
@@ -116,21 +121,23 @@ export function webTools(ctx: RunContext, fetchTimeoutMs = FETCH_TIMEOUT_MS): To
                     let directStatus: number | null = null
                     let direct: HostAttempt
                     try {
-                        const res = await fetch(url, { headers: USER_AGENT, signal })
+                        const res = await fetchPublic(url, { headers: USER_AGENT, signal }, { maxRedirects: MAX_REDIRECTS })
                         const body = await res.text()
                         directStatus = res.status
+                        const finalUrl = res.url || url
                         const xRobotsTag = res.headers.get('x-robots-tag')
                         const facts =
                             !raw && res.status < 400 && isHtml(res)
-                                ? pageFacts(body, { url, source: 'served', xRobotsTag, redirectedTo: res.redirected ? res.url : null })
+                                ? pageFacts(body, { url, source: 'served', xRobotsTag, redirectedTo: finalUrl !== url ? finalUrl : null })
                                 : null
                         const contentType = res.headers.get('content-type')
                         const ext = textExtension(contentType)
-                        const saved = ext ? await savePage(id, { url, view: 'served', body, ext, status: res.status, finalUrl: res.url, contentType, xRobotsTag }) : null
+                        const saved = ext ? await savePage(id, { url, view: 'served', body, ext, status: res.status, finalUrl, contentType, xRobotsTag }) : null
                         const text = raw ? body : stripHtml(body)
                         direct = { text: `${statusLine(res.status, url)}${savedLine(saved)}\n\n${facts ? `${facts}\n\n` : ''}${text.slice(0, MAX_FETCH_CHARS)}`, failed: isFailureStatus(res.status) }
                     } catch (e) {
                         if (runSignal?.aborted) throw e
+                        if (e instanceof NonPublicHostError) return refusal('Fetch', e, url)
                         direct = { text: `Fetch failed: ${failureReason(e, signal, fetchTimeoutMs)} (${url}). This is Rerun's reader failing, not proof that the site is down.`, failed: true }
                     }
                     if (raw || !isRefusal(directStatus)) return direct
@@ -159,22 +166,23 @@ export function webTools(ctx: RunContext, fetchTimeoutMs = FETCH_TIMEOUT_MS): To
         }),
         download: tool({
             description: 'Download a URL into your workspace as a file (binary-safe). Use for assets you want to process locally.',
-            inputSchema: z.object({ url: z.string().url(), path: z.string().describe('Workspace-relative destination path') }),
+            inputSchema: z.object({ url: publicHttpUrl, path: z.string().describe('Workspace-relative destination path') }),
             execute: async ({ url, path }, { abortSignal }) =>
                 withHostBreaker(breaker, hostsOfUrl(url), async (): Promise<HostAttempt> => {
                     const runSignal = ctx.abortSignal ?? abortSignal
                     const signal = deadlineSignal(fetchTimeoutMs, runSignal)
                     let res: Response
                     try {
-                        res = await fetch(url, { headers: USER_AGENT, signal })
+                        res = await fetchPublic(url, { headers: USER_AGENT, signal }, { maxRedirects: MAX_REDIRECTS })
                     } catch (e) {
                         if (runSignal?.aborted) throw e
+                        if (e instanceof NonPublicHostError) return refusal('Download', e, url)
                         return { text: `Download failed: ${failureReason(e, signal, fetchTimeoutMs)} (${url})`, failed: true }
                     }
                     if (!res.ok) return { text: `Download failed: [${res.status}] ${url}`, failed: isFailureStatus(res.status) }
                     const buffer = Buffer.from(await res.arrayBuffer())
                     if (buffer.byteLength > 50_000_000) return { text: `Download too large (${buffer.byteLength} bytes, limit 50MB)`, failed: false }
-                    const target = resolveInWorkspace(id, path)
+                    const target = await resolveInWorkspace(id, path)
                     await mkdir(dirname(target), { recursive: true })
                     await writeFile(target, buffer)
                     return { text: `Downloaded ${buffer.byteLength} bytes to ${path}`, failed: false }

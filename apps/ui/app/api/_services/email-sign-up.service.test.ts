@@ -11,18 +11,18 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => Object
 const EMAIL = 'ada@example.com'
 const IP = '203.0.113.7'
 
-const stored = (state: { exists?: boolean; blocked?: boolean; claimed?: boolean; existsError?: boolean }) => {
+const stored = (state: { exists?: boolean; blocked?: boolean; claimed?: boolean; existsError?: boolean; claimError?: boolean }) => {
     supabase = fakeSupabase(table => {
         if (table === 'rpc:check_email_exists') return state.existsError ? { error: { message: 'down' } } : { data: state.exists ?? false }
         if (table === 'rpc:email_domain_is_blocked') return { data: state.blocked ?? false }
-        if (table === 'rpc:claim_email_sign_up') return { data: state.claimed ?? true }
+        if (table === 'rpc:claim_email_sign_up') return state.claimError ? { error: { message: 'down' } } : { data: state.claimed ?? true }
         return undefined
     })
 }
 
 const rpcArgs = (fn: string) => supabase.calls.filter(call => call.method === 'rpc' && call.args[0] === fn).map(call => call.args[1])
 
-const { ensureEmailAccount, MAX_SIGN_UPS_PER_IP } = await import('./email-sign-up.service')
+const { claimAuthEmailSend, ensureEmailAccount, lookupEmailForSignUp, MAX_AUTH_EMAILS_PER_ADDRESS, MAX_SIGN_UPS_PER_IP } = await import('./email-sign-up.service')
 
 beforeEach(() => {
     admin.createUser.mockReset()
@@ -94,5 +94,57 @@ describe('ensureEmailAccount', () => {
 
         expect(await ensureEmailAccount(EMAIL, IP)).toEqual({ ok: false, error: 'unavailable' })
         expect(admin.createUser).not.toHaveBeenCalled()
+    })
+})
+
+describe('lookupEmailForSignUp', () => {
+    it('says an address has an account without looking at its domain', async () => {
+        stored({ exists: true, blocked: true })
+
+        expect(await lookupEmailForSignUp(EMAIL)).toEqual({ ok: true, exists: true })
+        expect(rpcArgs('email_domain_is_blocked')).toEqual([])
+    })
+
+    it('lets a new address through once its domain is allowed, and counts nothing', async () => {
+        stored({})
+
+        expect(await lookupEmailForSignUp(EMAIL)).toEqual({ ok: true, exists: false })
+        expect(rpcArgs('claim_email_sign_up')).toEqual([])
+        expect(admin.createUser).not.toHaveBeenCalled()
+    })
+
+    it('refuses a new address on a blocked domain', async () => {
+        stored({ blocked: true })
+
+        expect(await lookupEmailForSignUp('someone@edu.catchall.example')).toEqual({ ok: false, error: 'blocked_domain' })
+    })
+
+    it('says unavailable when the account cannot be looked up', async () => {
+        stored({ existsError: true })
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+
+        expect(await lookupEmailForSignUp(EMAIL)).toEqual({ ok: false, error: 'unavailable' })
+    })
+})
+
+describe('claimAuthEmailSend', () => {
+    it('counts every email under its address, in the window of the sign-ups', async () => {
+        stored({})
+
+        expect(await claimAuthEmailSend(EMAIL)).toBe(true)
+        expect(rpcArgs('claim_email_sign_up')).toEqual([{ p_ip: `mail:${EMAIL}`, p_ip_max: MAX_AUTH_EMAILS_PER_ADDRESS, p_window_seconds: 3600 }])
+    })
+
+    it('holds back an address that was mailed too often', async () => {
+        stored({ claimed: false })
+
+        expect(await claimAuthEmailSend(EMAIL)).toBe(false)
+    })
+
+    it('lets the email through when the counter cannot be read', async () => {
+        stored({ claimError: true })
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+
+        expect(await claimAuthEmailSend(EMAIL)).toBe(true)
     })
 })

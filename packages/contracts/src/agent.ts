@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { OPENCODE_DEFAULT_MODEL } from './opencode.js'
 
 // Tools surface as "<server>_<tool>" and CLI providers key their config records by server name, so
 // anything outside this set (a dot, a space) makes every run of the agent fail at settings
@@ -65,7 +66,7 @@ export type SelfImprovement = z.infer<typeof selfImprovementSchema>
 export type SelfImprovementKey = keyof SelfImprovement
 export const SELF_IMPROVEMENT_KEYS = Object.keys(selfImprovementSchema.shape) as SelfImprovementKey[]
 
-export const providerSchema = z.enum(['rerun', 'anthropic', 'claude', 'codex', 'openai', 'google', 'openrouter'])
+export const providerSchema = z.enum(['rerun', 'anthropic', 'claude', 'codex', 'openai', 'google', 'openrouter', 'opencode'])
 export type Provider = z.infer<typeof providerSchema>
 
 // The names the boxes know the Rerun models by. Aliases, not OpenRouter ids: the hub proxy resolves
@@ -104,6 +105,7 @@ export const DEFAULT_PROVIDER_MODEL: Record<Provider, string> = {
     openai: 'gpt-5.4',
     google: 'gemini-3.6-flash',
     openrouter: 'anthropic/claude-sonnet-5.5',
+    opencode: OPENCODE_DEFAULT_MODEL,
 }
 
 // How much prose the agent addresses to the user, independent of how much work it does. `normal`

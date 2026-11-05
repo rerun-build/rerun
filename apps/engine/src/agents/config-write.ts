@@ -1,14 +1,11 @@
-import { writeFile, rename } from 'node:fs/promises'
 import { configPath } from '../config/paths.js'
+import { writeFileAtomic } from '../lib/atomic-write.js'
 import { BRIDGE_SERVER_NAME, MCP_SERVER_NAME_RE, type AgentConfig, type McpServer } from './types.js'
 
-// tmp + rename so a concurrent reader (loadAgentFromDisk, GET /:id, mcp_status) never
-// observes a half-written file: rename is atomic on the same filesystem.
+// Atomic so a concurrent reader (loadAgentFromDisk, GET /:id, mcp_status) never observes a
+// half-written file. 0600: the config carries MCP server headers and env, which are secrets.
 export async function writeAgentConfig(id: string, config: AgentConfig): Promise<void> {
-    const target = configPath(id)
-    const tmp = `${target}.tmp`
-    await writeFile(tmp, JSON.stringify(config, null, 4), 'utf8')
-    await rename(tmp, target)
+    await writeFileAtomic(configPath(id), JSON.stringify(config, null, 4), { mode: 0o600 })
 }
 
 // Refused here rather than at the provider, which can only drop the server and has nobody left to

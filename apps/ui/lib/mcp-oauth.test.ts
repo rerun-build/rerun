@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { type OAuthContext, buildAuthorizeUrl, callbackUrl, clientMetadataDocument, createPkce, decodeContext, discoverAuthServer, encodeContext, exchangeCode, registerClient, resolveClient } from './mcp-oauth'
+import { type OAuthContext, buildAuthorizeUrl, callbackUrl, clientMetadataDocument, createPkce, decodeContext, discoverAuthServer, encodeContext, engineClientSecret, exchangeCode, registerClient, resolveClient } from './mcp-oauth'
 
 vi.mock('node:dns/promises', () => ({ lookup: async () => [{ address: '93.184.216.34', family: 4 }] }))
 
@@ -264,6 +264,17 @@ describe('exchangeCode', () => {
         vi.unstubAllEnvs()
     })
 
+    it('sends the pre-registered Asana secret at the exchange', async () => {
+        vi.stubEnv('RERUN_ASANA_MCP_CLIENT_ID', 'asana-id')
+        vi.stubEnv('RERUN_ASANA_MCP_CLIENT_SECRET', 'asana-secret')
+        const fetchMock = vi.fn(async () => Response.json({ access_token: 'at' }))
+        vi.stubGlobal('fetch', fetchMock)
+        await exchangeCode({ ...CTX, mcpUrl: 'https://mcp.asana.com/v2/mcp', clientId: 'asana-id' }, 'code')
+        const body = new URLSearchParams((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)
+        expect(body.get('client_secret')).toBe('asana-secret')
+        vi.unstubAllEnvs()
+    })
+
     it('surfaces the start of the error body on a refused exchange', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('invalid_grant', { status: 400 })))
         await expect(exchangeCode(CTX, 'x')).rejects.toThrow('token exchange failed (400): invalid_grant')
@@ -272,6 +283,44 @@ describe('exchangeCode', () => {
     it('throws when no access token comes back', async () => {
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ token_type: 'bearer' })))
         await expect(exchangeCode(CTX, 'x')).rejects.toThrow('no access_token')
+    })
+})
+
+describe('engineClientSecret', () => {
+    const ASANA = { ...CTX, mcpUrl: 'https://mcp.asana.com/v2/mcp', clientId: 'asana-id' }
+    const GITHUB = { ...CTX, mcpUrl: 'https://api.githubcopilot.com/mcp/', clientId: 'gh-id' }
+
+    beforeEach(() => {
+        vi.stubEnv('RERUN_ASANA_MCP_CLIENT_ID', 'asana-id')
+        vi.stubEnv('RERUN_ASANA_MCP_CLIENT_SECRET', 'asana-secret')
+        vi.stubEnv('RERUN_GITHUB_MCP_CLIENT_ID', 'gh-id')
+        vi.stubEnv('RERUN_GITHUB_MCP_CLIENT_SECRET', 'gh-secret')
+    })
+
+    afterEach(() => {
+        vi.unstubAllEnvs()
+    })
+
+    it('hands the engine the Asana secret, whose hour-long tokens it refreshes on its own', () => {
+        expect(engineClientSecret(ASANA)).toBe('asana-secret')
+    })
+
+    it('keeps the GitHub secret on the hub, its tokens never expire', () => {
+        expect(engineClientSecret(GITHUB)).toBeUndefined()
+    })
+
+    it('never hands the Asana secret to another client id or another MCP server', () => {
+        expect(engineClientSecret({ ...ASANA, clientId: 'someone-else' })).toBeUndefined()
+        expect(engineClientSecret({ ...ASANA, mcpUrl: 'https://mcp.evil.example/mcp' })).toBeUndefined()
+    })
+
+    it('passes a dynamically registered secret through', () => {
+        expect(engineClientSecret({ ...CTX, clientSecret: 'dcr-secret' })).toBe('dcr-secret')
+    })
+
+    it('answers from the MCP URL and client id alone, all a parked bundle still knows', () => {
+        expect(engineClientSecret({ mcpUrl: ASANA.mcpUrl, clientId: 'asana-id' })).toBe('asana-secret')
+        expect(engineClientSecret({ mcpUrl: ASANA.mcpUrl })).toBeUndefined()
     })
 })
 

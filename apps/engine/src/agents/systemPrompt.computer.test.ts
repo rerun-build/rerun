@@ -37,6 +37,12 @@ beforeEach(() => {
 })
 
 describe('computer section', () => {
+    it('leaves the section out on an OpenCode model that cannot read a screenshot', async () => {
+        const onModel = (model: string) => ({ ...agentWith({ computer: true }), resolved: { connection: null, provider: 'opencode', model } })
+        expect(await buildSystemPrompt(onModel('go/deepseek-v4-pro'), { source: 'chat' }, 'opencode')).not.toContain('<computer>')
+        expect(await buildSystemPrompt(onModel('go/kimi-k3.1-pro'), { source: 'chat' }, 'opencode')).toContain('<computer>')
+    })
+
     it('tells an agent with a computer how to use it, and to hand a sign-in to the user', async () => {
         const prompt = await buildSystemPrompt(agentWith({ computer: true }), { source: 'chat' })
         expect(prompt).toContain('<computer>')

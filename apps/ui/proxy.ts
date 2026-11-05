@@ -1,3 +1,16 @@
+import {
+    GATE_EMAIL_PARAM,
+    GATE_ERROR_PARAM,
+    isSecureRequest,
+    loadPublished,
+    mayOpen,
+    opensInViewer,
+    PUBLISHED_GATE_ROUTE,
+    PUBLISHED_VIEW_ROUTE,
+    readAccessCookie,
+    RESERVED_PREFIX,
+    siteFileExists,
+} from '@/lib/published/gate'
 import { extractPublishedSlug, PUBLISHED_SITE_ROUTE } from '@/lib/published/host'
 import { STAGING_GATE_CHALLENGE, stagingGateVerdict } from '@/lib/staging-gate'
 import { updateSession } from '@/supabase/middleware'
@@ -42,15 +55,40 @@ function brandGate(request: NextRequest): NextResponse {
     return response
 }
 
-export async function proxy(request: NextRequest) {
-    // A published page answers before anything reads or writes a session: rerun.site must never
-    // hold a cookie, nor provision an anonymous user for every visitor of a shared link.
-    const publishedSlug = extractPublishedSlug(request.headers.get('host'))
-    if (publishedSlug) {
-        const url = request.nextUrl.clone()
-        url.pathname = `${PUBLISHED_SITE_ROUTE}/${publishedSlug}${request.nextUrl.pathname}`
-        return NextResponse.rewrite(url)
+function rewriteTo(request: NextRequest, pathname: string, params: Record<string, string> = {}, status?: number): NextResponse {
+    const url = request.nextUrl.clone()
+    url.pathname = pathname
+    for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value)
+    return NextResponse.rewrite(url, status ? { status } : undefined)
+}
+
+// A published host answers before anything reads or writes a session: rerun.site never provisions
+// an anonymous user for every visitor of a shared link, and the only cookie it ever holds is the
+// one its own gate sets. The link decides what a path shows: the site's file, the viewer of a single
+// file, or the gate when the visitor may not open it yet. The reserved `/__rerun/` paths (the gate's
+// forms, the raw file, the preview image) always reach the route, which checks for itself, and the
+// app's own `/_next/` assets serve the gate and the viewer unless the site has a file of that name.
+async function publishedHost(request: NextRequest, slug: string): Promise<NextResponse> {
+    const { pathname } = request.nextUrl
+    if (pathname.startsWith(RESERVED_PREFIX)) return rewriteTo(request, `${PUBLISHED_SITE_ROUTE}/${slug}${pathname}`)
+
+    const entry = await loadPublished(slug)
+    if (pathname.startsWith('/_next/') && !(entry && siteFileExists(entry, pathname))) return NextResponse.next()
+    if (!entry) return rewriteTo(request, `${PUBLISHED_GATE_ROUTE}/${slug}`, { gate: 'gone' }, 404)
+
+    if (!mayOpen(entry, readAccessCookie(request.headers.get('cookie'), isSecureRequest(request)))) {
+        const next = new URL(request.nextUrl)
+        next.searchParams.delete(GATE_ERROR_PARAM)
+        next.searchParams.delete(GATE_EMAIL_PARAM)
+        return rewriteTo(request, `${PUBLISHED_GATE_ROUTE}/${slug}`, { gate: entry.access, next: `${next.pathname}${next.search}` })
     }
+    if (pathname === '/' && opensInViewer(entry)) return rewriteTo(request, `${PUBLISHED_VIEW_ROUTE}/${slug}`)
+    return rewriteTo(request, `${PUBLISHED_SITE_ROUTE}/${slug}${pathname}`)
+}
+
+export async function proxy(request: NextRequest) {
+    const publishedSlug = extractPublishedSlug(request.headers.get('host'))
+    if (publishedSlug) return publishedHost(request, publishedSlug)
 
     if (isGatedPath(request.nextUrl.pathname, APP_GATED_PATHS)) return brandGate(request)
 
@@ -99,11 +137,13 @@ export const config = {
          *   there is no session to refresh)
          * - p/ (published file links: opened by whoever the link was shared with, who has no session
          *   to refresh, and would otherwise each get an anonymous user and a workspace)
+         * - published-auth (the round trip a member makes to open a page of their workspace on its
+         *   published host: a visitor without a session is sent to sign in, never handed one)
          * - desktop-view (the screen of a coworker in the iOS app's web view: the ticket in its
          *   fragment is the only key, there is no session to refresh nor one to provision)
          * Feel free to modify this pattern to include more paths.
          */
-        '/((?!_next/static|_next/image|favicon.ico|api/version|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/public/|og/|render/|email/|r/|p/|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|api/version|api/t/|api/files|api/llm/|api/v1/|api/host-metrics|api/public/|og/|render/|email/|r/|p/|published-auth|desktop-view|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
         // The two trees under /render put back in, for the gate alone: proxy() returns before it
         // ever reaches updateSession(). The OG renders next to them, /render/brand and
         // /render/templates, stay out: the screenshot service captures those on every card.

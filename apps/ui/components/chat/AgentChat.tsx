@@ -35,6 +35,7 @@ import { cancelRunAction, getRunAction } from '@/app/api/_actions/agent.actions'
 import { acknowledgeSessionAlertAction, cancelSessionRunsAction, fetchSessionActiveRun, fetchSessionMessages, finalizeSessionAction, openSessionAction } from '@/app/api/_actions/session.actions'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import { useAgentModel } from '@/hooks/useAgentModel'
+import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import { useArriveByTop } from '@/hooks/useArriveByTop'
 import { useMemberProfiles } from '@/hooks/useMemberProfiles'
 import { useMessageFeedback } from '@/hooks/useMessageFeedback'
@@ -63,6 +64,9 @@ import { lastUserText } from '@/lib/chat-payload'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
 import { browserPermission } from '@/lib/notifications/browser'
 import { modelContextWindow } from '@/lib/engine/models'
+import { rerunCreditOf } from '@/lib/engine/ai-sources'
+import { toGroup } from '@/lib/engine/model-groups'
+import { isPremiumModelEntitled } from '@/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { useChat } from '@ai-sdk/react'
@@ -168,7 +172,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
 
     // Per-conversation model override (see useAgentModel). Read via a ref so the
     // transport body picks up the latest pick without recreating the transport.
-    const { selection: modelSelection } = useAgentModel(agentId)
+    const { selection: modelSelection, select: selectModel } = useAgentModel(agentId)
     const modelSelectionRef = useRef(modelSelection)
     modelSelectionRef.current = modelSelection
 
@@ -391,10 +395,33 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
 
     const contextStats = useMemo(() => contextStatsOf(messages, seededUsage, modelSelection.model), [messages, modelSelection.model, seededUsage])
 
+    // Terminal run error (e.g. missing API key) surfaced to the user. Kept in its
+    // own state because the reconnect flow clears useChat's internal `error`, and
+    // because a genuine run failure must stay visible (not be swallowed as a drop).
+    const [runError, setRunError] = useState<string | null>(null)
+
+    // A failure read back from the engine on reopening, rather than one this tab just streamed. It
+    // was reported when it happened, and a budget refusal is over once the credit has room again:
+    // a payment made since must not meet the same notice on the way back.
+    const rerunCredit = useMemo(() => rerunCreditOf(workspace), [workspace])
+    const creditHasRoom = !rerunCredit.paused && rerunCredit.budgetMicros > rerunCredit.usedMicros
+    const creditHasRoomRef = useRef(creditHasRoom)
+    useEffect(() => {
+        creditHasRoomRef.current = creditHasRoom
+    }, [creditHasRoom])
+    const replayedRunErrorRef = useRef<string | null>(null)
+    const showReplayedRunError = useCallback((error: string) => {
+        if (creditHasRoomRef.current && classifyChatError(unwrapChatError(error)) === 'budget') return
+        replayedRunErrorRef.current = error
+        setRunError(error)
+    }, [])
+
     // Clear a previously surfaced run error whenever a fresh turn starts or the
     // conversation switches, so a stale failure banner never lingers.
     useEffect(() => {
-        if (status === 'submitted' || status === 'streaming') setRunError(null)
+        if (status !== 'submitted' && status !== 'streaming') return
+        setRunError(null)
+        replayedRunErrorRef.current = null
     }, [status])
 
     useEffect(() => {
@@ -449,7 +476,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                 if (sessionIdRef.current !== sessionId) return
                 // The engine never writes a failure into the transcript, so without this a run that
                 // died before answering leaves the conversation looking like nothing ever happened.
-                if (snapshot.lastError) setRunError(snapshot.lastError)
+                if (snapshot.lastError) showReplayedRunError(snapshot.lastError)
                 if (snapshot.activeRunId && sessionWorkingRef.current && !activeRunIdRef.current) setAttachRunId(snapshot.activeRunId)
             })
             .catch(() => {})
@@ -457,12 +484,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                 setHistoryLoading(false)
                 setSnapshotPendingFor(null)
             })
-    }, [active, sessionId, messages.length, setMessages, initialRunId])
-
-    // Terminal run error (e.g. missing API key) surfaced to the user. Kept in its
-    // own state because the reconnect flow clears useChat's internal `error`, and
-    // because a genuine run failure must stay visible (not be swallowed as a drop).
-    const [runError, setRunError] = useState<string | null>(null)
+    }, [active, sessionId, messages.length, setMessages, initialRunId, showReplayedRunError])
 
     const reconnecting = useRunReconnect({
         error,
@@ -510,7 +532,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
     useEffect(() => {
         // A run that reached the engine is reported by the hub when it ends. A budget refusal can stop
         // the request before any run exists, so that one is only visible from here.
-        if (runError && !prevRunErrorRef.current && classifyChatError(unwrapChatError(runError)) === 'budget') {
+        if (runError && !prevRunErrorRef.current && runError !== replayedRunErrorRef.current && classifyChatError(unwrapChatError(runError)) === 'budget') {
             track('agent_run_failed', { agent_id: agentId, error_type: 'budget_exhausted' })
         }
         prevRunErrorRef.current = runError
@@ -639,6 +661,27 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
         manageModels()
     }, [manageModels])
     const addAiProvider = useWorkspaceSettingsStore(state => state.addAiProvider)
+    // A Claude or ChatGPT plan already plugged into the Box, the Box default first. A conversation
+    // that ran into the Rerun credit while one is there was pinned to Rerun: the way out is to run it
+    // on that plan, not to sign in to it again.
+    const { connections, boxDefault } = useWorkspaceConnections()
+    const ownConnection = useMemo(() => {
+        const own = connections.filter(connection => connection.connected && connection.id !== RERUN_CONNECTION_ID)
+        return own.find(connection => connection.id === boxDefault?.connectionId) ?? own[0] ?? null
+    }, [connections, boxDefault])
+    const premiumAllowed = !workspace || isPremiumModelEntitled(workspace)
+    const runOnOwnConnection = useMemo(() => {
+        if (!ownConnection) return undefined
+        const onUse = () => {
+            track('connection_cta_clicked', { source: 'budget_notice_use_connection' })
+            // The Box default is resolved by the engine on every run, so following it beats freezing it.
+            if (boxDefault?.connectionId === ownConnection.id) selectModel({})
+            else selectModel({ connectionId: ownConnection.id, model: toGroup(ownConnection, premiumAllowed).defaultModel })
+            setRunError(null)
+            clearError()
+        }
+        return { label: ownConnection.name, provider: ownConnection.provider, onUse }
+    }, [ownConnection, boxDefault, premiumAllowed, selectModel, clearError])
     const connectProvider = useCallback(
         (provider: 'claude' | 'codex') => {
             track('connection_cta_clicked', { source: `budget_notice_${provider}` })
@@ -718,7 +761,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
             if (!mountedRef.current) return
             // The run this conversation was opened on already carries its own failure: a schedule
             // opened from the inbox has no stream left to replay the error through.
-            if (run?.status === 'error' && run.error && sessionIdRef.current === sessionId) setRunError(run.error)
+            if (run?.status === 'error' && run.error && sessionIdRef.current === sessionId) showReplayedRunError(run.error)
             if (!run || run.status === 'running') await resumeStream().catch(() => {})
             // The engine writes the assistant row after its stream closed, so the transcript can lag
             // the replay by a moment. The live transcript is read after the fetch, once React has
@@ -735,7 +778,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                 await wait()
             }
         })()
-    }, [attachRunId, initialRunId, active, sessionId, agentId, resumeStream, setMessages])
+    }, [attachRunId, initialRunId, active, sessionId, agentId, resumeStream, setMessages, showReplayedRunError])
 
     // Inline, this arrow would be a new prop on every render and would defeat MessageView's memo
     // for every message of the conversation.
@@ -906,13 +949,13 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                             <Message from="assistant">
                                 {/* Paid data only runs on Rerun credit: connecting a Claude or ChatGPT plan would not buy it. */}
                                 <MessageContent>
-                                    <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} />
+                                    <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} />
                                 </MessageContent>
                             </Message>
                         )}
                         {displayedError !== null && errorKind !== null && (
                             <Message from="assistant">
-                                <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} />}</MessageContent>
+                                <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} />}</MessageContent>
                             </Message>
                         )}
                     </ConversationContent>

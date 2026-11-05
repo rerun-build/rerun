@@ -3,6 +3,7 @@ import type { TakeoverResult } from '@rerun/contracts'
 import { browserProfileDir } from '../config/paths.js'
 import { withKeyedLock } from '../lib/lock.js'
 import { logger } from '../lib/logger.js'
+import { assertPublicUrl } from '../lib/public-fetch.js'
 import { dropProfileCaches, launchContext } from '../tools/builtin/browser.js'
 import { ensureDesktop, holdDesktop, viewersOf } from './session.js'
 
@@ -28,6 +29,17 @@ const active = new Map<string, Takeover>()
 function lastUrl(context: BrowserContext): string | null {
     const url = context.pages().at(-1)?.url()
     return url && url !== 'about:blank' ? url : null
+}
+
+// A refused page leaves the window on about:blank rather than on a LAN or local address.
+async function openable(url: string): Promise<boolean> {
+    try {
+        await assertPublicUrl(url)
+        return true
+    } catch (err) {
+        logger.warn({ err: String(err), url }, 'takeover refused to open the page')
+        return false
+    }
 }
 
 // The person drives the agent's own profile, so a sign-in they complete is the agent's from then on.
@@ -68,7 +80,7 @@ export async function startTakeover(agentId: string, url?: string, { endWhenUnwa
             context = await launchContext(browserProfileDir(agentId), display, { viewport: null, args: ['--start-maximized'] })
             context.once('close', finish)
             const page = context.pages()[0] ?? (await context.newPage())
-            if (url) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: OPEN_TIMEOUT_MS }).catch(() => {})
+            if (url && (await openable(url))) await page.goto(url, { waitUntil: 'domcontentloaded', timeout: OPEN_TIMEOUT_MS }).catch(() => {})
             takeover.context = context
             opened()
             timer = setTimeout(() => {
@@ -103,14 +115,13 @@ function joinActive(agentId: string, url: string | undefined, endWhenUnwatched: 
     const takeover = active.get(agentId)
     if (!takeover || takeover.closing) return null
     if (!endWhenUnwatched) takeover.endWhenUnwatched = false
-    if (!url || !takeover.context) return Promise.resolve()
-    return takeover.context
-        .newPage()
-        .then(page => page.goto(url, { waitUntil: 'domcontentloaded', timeout: OPEN_TIMEOUT_MS }))
-        .then(
-            () => {},
-            () => {},
-        )
+    const context = takeover.context
+    if (!url || !context) return Promise.resolve()
+    return openable(url)
+        .then(async ok => {
+            if (ok) await context.newPage().then(page => page.goto(url, { waitUntil: 'domcontentloaded', timeout: OPEN_TIMEOUT_MS }))
+        })
+        .catch(() => {})
 }
 
 export async function finishTakeover(agentId: string): Promise<TakeoverResult> {

@@ -5,7 +5,7 @@ import type { BoxConnection } from '@/lib/engine/types'
 import { readModelPin } from './model-pin'
 
 function connection(id: string, name: string, provider: BoxConnection['provider'], models: string[], connected = true): BoxConnection {
-    return { id, name, provider, models, extraModels: [], createdAt: '2026-01-01T00:00:00.000Z', connected, credentialRejected: false, planLimits: null, cliModels: null }
+    return { id, name, provider, models, extraModels: [], createdAt: '2026-01-01T00:00:00.000Z', connected, credentialRejected: false, planLimits: null, cliModels: null, providerModels: null }
 }
 
 const CODEX = connection('codex-clem', 'Codex Clem', 'codex', ['gpt-6-sol'])

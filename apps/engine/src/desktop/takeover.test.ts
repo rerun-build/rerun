@@ -3,6 +3,11 @@ import { vi } from 'vitest'
 
 process.env.RERUN_API_KEY = ''
 
+// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
+vi.mock('node:dns/promises', () => ({
+    lookup: async (host: string) => [{ address: host.startsWith('internal.') ? '10.0.0.7' : '93.184.216.34', family: 4 }],
+}))
+
 type FakeContext = EventEmitter & { pages: () => Array<{ url: () => string; goto: (url: string) => Promise<void> }>; newPage: () => Promise<unknown>; close: () => Promise<void>; closed: boolean }
 
 const state = vi.hoisted(() => ({
@@ -85,6 +90,19 @@ afterEach(async () => {
 })
 
 describe('takeover', () => {
+    it.each(['file:///etc/passwd', 'http://127.0.0.1:8080/', 'http://internal.example/', 'http://169.254.169.254/'])('opens the window on nothing rather than on %s', async url => {
+        await startTakeover('a1', url)
+        expect(state.launches).toHaveLength(1)
+        expect(state.url).toBe('about:blank')
+        expect(activeTakeovers()).toEqual(['a1'])
+    })
+
+    it('does not open a tab on a private host in a window already open', async () => {
+        await startTakeover('a1', 'https://site.example/login')
+        await startTakeover('a1', 'http://10.0.0.5/admin')
+        expect(state.url).toBe('https://site.example/login')
+    })
+
     it('opens the agent profile in a real window on the page, and reports where the person ended up', async () => {
         await startTakeover('a1', 'https://site.example/login')
         expect(state.launches).toHaveLength(1)

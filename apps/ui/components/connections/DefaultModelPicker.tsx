@@ -5,7 +5,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { PowerBars } from '@/components/ui/power-bars'
 import { isPremiumModelEntitled } from '@/cloud/billing'
-import { PREMIUM_MODEL_BILLING_TRIGGER, enabledModels, isModelLocked, isUsable, modelName, rerunTierDescription, type RerunCredit } from '@/lib/engine/ai-sources'
+import { PREMIUM_MODEL_BILLING_TRIGGER, enabledModels, isModelLocked, isUsable, modelName, modelDescription, type RerunCredit } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { CheckIcon } from '@/lib/icons'
@@ -45,7 +45,7 @@ export function DefaultModelPicker({ connections, current, credit, onPick, child
                             <CommandGroup key={source.id} heading={source.name}>
                                 {enabledModels(source).map(model => {
                                     const selected = current.connectionId === source.id && current.model === model.id
-                                    const description = rerunTierDescription(source.id, model.id)
+                                    const description = modelDescription(source, model.id)
                                     const locked = isModelLocked(source.id, model.id, premiumAllowed)
                                     const pick = () => {
                                         setOpen(false)

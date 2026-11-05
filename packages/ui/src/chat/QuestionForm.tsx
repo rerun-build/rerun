@@ -253,6 +253,7 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
             <div className="flex items-start gap-2.5 text-sm">
                 <AnimatePresence mode="wait" initial={false}>
                     <motion.div key={current} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="min-w-0 flex-1 font-medium leading-snug">
+                        {q.header && <span className="mb-1 block truncate text-xs font-medium text-muted-foreground">{q.header}</span>}
                         <ScrollFade className="max-h-24">{renderText(q.question)}</ScrollFade>
                         {multi && <span className="mt-1 block text-xs font-normal text-muted-foreground">Select all that apply</span>}
                     </motion.div>
@@ -275,7 +276,16 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
                             ) : (
                                 <>
                                     {q.options.map((opt, oi) => (
-                                        <OptionRow key={oi} index={oi} label={renderText(opt)} selected={value.selected.includes(opt)} multi={multi} disabled={locked} onChoose={() => chooseOption(current, opt)} />
+                                        <OptionRow
+                                            key={oi}
+                                            index={oi}
+                                            label={renderText(opt.label)}
+                                            description={opt.description && renderText(opt.description)}
+                                            selected={value.selected.includes(opt.label)}
+                                            multi={multi}
+                                            disabled={locked}
+                                            onChoose={() => chooseOption(current, opt.label)}
+                                        />
                                     ))}
 
                                     <CustomOptionRow open={isCustom} onOpen={() => openCustom(current)}>

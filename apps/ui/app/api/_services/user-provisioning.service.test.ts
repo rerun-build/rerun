@@ -7,6 +7,7 @@ const payloads = (client: FakeSupabase) => client.writes('user_phones').map(writ
 
 const grantRerunTopup = vi.fn()
 vi.mock('@/cloud/billing.server', () => ({ grantRerunTopup: (...args: unknown[]) => grantRerunTopup(...args) }))
+vi.mock('@/cloud/illustrations', () => ({ ILLUSTRATION_ENTRIES: [] }))
 
 let service = fakeSupabase()
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => service.client }))
@@ -86,5 +87,16 @@ describe('provisionUser and the price test', () => {
         await provisionUser(fakeSupabase().client, account, { phoneStep: false, priceArm: null })
 
         expect(workspaceInserts()).toEqual([expect.objectContaining({ price_arm: null })])
+    })
+})
+
+describe('provisionUser on an install without the illustration library', () => {
+    it('creates the workspace with no icon rather than a link to a missing file', async () => {
+        service = fakeSupabase(table => (table === 'workspaces' ? { data: { id: 7 } } : undefined))
+
+        await provisionUser(fakeSupabase().client, account, { phoneStep: false, priceArm: null })
+
+        const inserts = service.writes('workspaces').filter(write => write.method === 'insert').map(write => write.payload)
+        expect(inserts).toEqual([expect.objectContaining({ icon_url: null })])
     })
 })

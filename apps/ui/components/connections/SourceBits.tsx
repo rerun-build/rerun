@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
-import { PROVIDER_PITCH, isCreditExhausted, isRerunPaused, planLimitTone, sourceKind, type AddableProvider, type RerunCredit } from '@/lib/engine/ai-sources'
+import { PROVIDER_PITCH, connectMethod, sourceKind, isCreditExhausted, isRerunPaused, planLimitTone, type AddableProvider, type RerunCredit } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection } from '@/lib/engine/types'
 import { ChevronLeftIcon, PencilIcon } from '@/lib/icons'
@@ -28,10 +28,10 @@ export function SourceStatus({ source, credit }: { source: BoxConnection; credit
         )
     }
     if (!source.connected || source.credentialRejected) {
-        const isPlan = sourceKind(source.provider) === 'plan'
+        const signsIn = connectMethod(source.provider) !== 'key'
         return (
             <Badge size="xs" tone="orange" className="shrink-0">
-                {isPlan ? 'Sign in again' : source.connected ? 'Key rejected' : 'Key missing'}
+                {signsIn ? 'Sign in again' : source.connected ? 'Key rejected' : 'Key missing'}
             </Badge>
         )
     }

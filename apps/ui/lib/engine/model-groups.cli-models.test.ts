@@ -18,6 +18,7 @@ function codex(cliModels: CliModels | null, extraModels: string[] = []): BoxConn
         credentialRejected: false,
         planLimits: null,
         cliModels,
+        providerModels: null,
     }
 }
 

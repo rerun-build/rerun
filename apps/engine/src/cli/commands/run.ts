@@ -10,6 +10,8 @@ import { installBrowserInBackground, installDesktopInBackground, updateCliToolsI
 import { CODEX_VERSION } from '../../runtime/codex-cli.js'
 import { listConnections } from '../../connections/registry.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
+import { refreshOpencodeCatalog } from '../../connections/opencode-catalog.js'
+import { refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
 import { env } from '../../config/env.js'
 import { logger } from '../../lib/logger.js'
 import { closeAllMcp } from '../../tools/mcp-pool.js'
@@ -29,8 +31,12 @@ export async function runCommand(): Promise<void> {
     if (cliTools === 'spawned') logger.info({ codex: CODEX_VERSION }, 'codex CLI off its pin: installing it in the background')
     if (cliTools === 'no-root') logger.warn({ codex: CODEX_VERSION }, 'codex CLI off its pin and the service user cannot sudo: run `sudo rerun update-cli-tools`')
     void listConnections()
-        .then(refreshStaleCodexPlanLimits)
-        .catch(err => logger.warn({ err: String(err) }, 'codex plan limits boot read skipped'))
+        .then(connections => {
+            refreshStaleCodexPlanLimits(connections)
+            refreshStaleOpencodePlanLimits(connections)
+            if (connections.some(connection => connection.config.provider === 'opencode')) void refreshOpencodeCatalog()
+        })
+        .catch(err => logger.warn({ err: String(err) }, 'plan limits boot read skipped'))
     const stopScheduler = startScheduler()
     logger.info('scheduler started')
     const { RERUN_PORT, RERUN_HOST, RERUN_API_KEY } = env()

@@ -11,12 +11,14 @@ type ProviderPickerProps = {
     // Providers already plugged in are still offered, since two people can bring two Claude plans.
     taken: Set<string>
     onPick: (provider: AddableProvider) => void
+    // The plans on offer: OpenCode only joins Claude and ChatGPT where it can run.
+    planProviders?: AddableProvider[]
     children: ReactNode
 }
 
-export function ProviderPicker({ only, taken, onPick, children }: ProviderPickerProps) {
+export function ProviderPicker({ only, taken, onPick, planProviders = PLAN_PROVIDERS, children }: ProviderPickerProps) {
     const [open, setOpen] = useState(false)
-    const providers = only === 'plan' ? PLAN_PROVIDERS : KEY_PROVIDERS
+    const providers = only === 'plan' ? planProviders : KEY_PROVIDERS
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

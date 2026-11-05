@@ -234,7 +234,8 @@ describe('modelFor', () => {
             cwd: workspaceDir('agent-codex'),
             configOverrides: { ...CODEX_HARNESS_OVERRIDES, instructions: CODEX_ONE_SHOT_INSTRUCTIONS },
         })
-        expect(model.settings.env).toMatchObject({ CODEX_HOME: codexHomeDir('codex-cnx'), AGENT_SECRET: 's', RERUN_WORKSPACE: workspaceDir('agent-codex') })
+        expect(model.settings.env).toMatchObject({ CODEX_HOME: codexHomeDir('codex-cnx'), AGENT_SECRET: 's', RERUN_WORKSPACE: workspaceDir('agent-codex'), PATH: process.env.PATH })
+        expect(model.settings.env).toMatchObject({ RERUN_API_KEY: '', RERUN_HUB_BASE_URL: '', RERUN_DATA_DIR: '' })
     })
 
     it('reopens the named claude built-ins for that call alone', () => {
@@ -246,7 +247,7 @@ describe('modelFor', () => {
 
 describe('resolveModel on the claude subscription', () => {
     it('runs the CLI on the connection token, never on an API key, with the harness switched off', () => {
-        resolveModel(agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 'oauth-token' }), undefined, undefined, undefined, 'You are Rerun.')
+        resolveModel(agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 'oauth-token' }), undefined, undefined, undefined, { system: 'You are Rerun.' })
         const settings = claudeCalls[0]!.defaultSettings
 
         expect(settings.systemPrompt).toBe('You are Rerun.')
@@ -285,7 +286,7 @@ describe('resolveModel on the claude subscription', () => {
 describe('resolveModel on the codex subscription', () => {
     it('streams through the app-server, with the run prompt as its base instructions', async () => {
         const tools = { fs_read: tool({ description: 'read', inputSchema: z.object({ path: z.string() }), execute: async () => 'ok' }) }
-        const resolved = resolveModel(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' }), { model: 'gpt-5.5-mini' }, tools, [], 'You are Rerun.')
+        const resolved = resolveModel(agentOn('codex', 'gpt-5.5', { CODEX_OAUTH_TOKEN: 't' }), { model: 'gpt-5.5-mini' }, tools, [], { system: 'You are Rerun.' })
 
         expect((resolved.model as any).modelId).toBe('gpt-5.5-mini')
         expect(codexAppServerCalls).toHaveLength(1)

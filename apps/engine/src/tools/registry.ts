@@ -16,7 +16,7 @@ import { delegateTools } from './builtin/delegate.js'
 import { callAgentTools } from './builtin/call-agent.js'
 import { browserTools } from './builtin/browser.js'
 import { visionTools } from './builtin/vision.js'
-import { computerTools, offersComputer } from './builtin/computer.js'
+import { computerTools, runOffersComputer } from './builtin/computer.js'
 import { notifyTools } from './builtin/notify.js'
 import { hubTools } from './builtin/hub.js'
 import { paidDataTools } from '../cloud/index.js'
@@ -55,7 +55,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (cfg.browser) Object.assign(tools, browserTools(ctx))
     if (offersTakeover(ctx.agent.config)) Object.assign(tools, requestTakeoverTool(ctx))
     if (cfg.vision) Object.assign(tools, visionTools(ctx))
-    const computer = offersComputer(ctx.agent.config) ? computerTools(ctx) : null
+    const computer = runOffersComputer(ctx.agent.config, ctx.provider, ctx.model) ? computerTools(ctx) : null
     if (computer) Object.assign(tools, computer.tools)
     if (cfg.notify) Object.assign(tools, notifyTools(ctx))
     if (cfg.hub) Object.assign(tools, hubTools(ctx))

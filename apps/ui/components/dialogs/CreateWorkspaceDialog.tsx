@@ -19,7 +19,9 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const STEPS = ['Name', 'Icon', 'Team'] as const
+type Step = 'Name' | 'Icon' | 'Team'
+
+const STEPS: readonly Step[] = BLOB_ILLUSTRATIONS.length > 0 ? ['Name', 'Icon', 'Team'] : ['Name', 'Team']
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -36,6 +38,7 @@ const defaultValues: FormValues = { name: '', iconFile: '', members: [], memberD
 
 export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const { index: step, direction, goForward, back, reset: resetStepper } = useStepper(STEPS.length)
+    const current = STEPS[step]
     // Already the active workspace server-side: the dialog is only still open to report the
     // invitations that failed, and closing it can only lead into the new workspace.
     const [created, setCreated] = useState(false)
@@ -51,7 +54,8 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
     const memberDraft = form.watch('memberDraft')
 
     useEffect(() => {
-        if (open && !iconFile) form.setValue('iconFile', randomBlob().file)
+        const blob = open && !iconFile ? randomBlob() : undefined
+        if (blob) form.setValue('iconFile', blob.file)
     }, [open, iconFile, form])
 
     const handleOpenChange = (next: boolean) => {
@@ -113,21 +117,21 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                         <DialogHeader className="mb-4">
                             <StepTransition stepKey={step} direction={direction} variant="header" className="grid gap-1">
                                 <DialogTitle>
-                                    {step === 0 && 'Name your workspace'}
-                                    {step === 1 && 'Pick an icon'}
-                                    {step === 2 && 'Invite your team'}
+                                    {current === 'Name' && 'Name your workspace'}
+                                    {current === 'Icon' && 'Pick an icon'}
+                                    {current === 'Team' && 'Invite your team'}
                                 </DialogTitle>
                                 <p className="text-sm text-muted-foreground">
-                                    {step === 0 && 'A workspace groups your Boxes, coworkers and team. You can rename it later.'}
-                                    {step === 1 && 'Choose an illustration for your workspace. You can change it later.'}
-                                    {step === 2 && 'Add teammates to collaborate in this workspace.'}
+                                    {current === 'Name' && 'A workspace groups your Boxes, coworkers and team. You can rename it later.'}
+                                    {current === 'Icon' && 'Choose an illustration for your workspace. You can change it later.'}
+                                    {current === 'Team' && 'Add teammates to collaborate in this workspace.'}
                                 </p>
                             </StepTransition>
                         </DialogHeader>
 
                         <ScrollFade className="-mx-1 -mt-1 min-h-0 flex-1 px-1 pb-6 pt-1">
                             <StepTransition stepKey={step} direction={direction}>
-                                {step === 0 && (
+                                {current === 'Name' && (
                                     <div className="space-y-4">
                                         <FormField
                                             control={form.control}
@@ -144,7 +148,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                     </div>
                                 )}
 
-                                {step === 1 && (
+                                {current === 'Icon' && (
                                     <div className="grid grid-cols-5 gap-2">
                                         {BLOB_ILLUSTRATIONS.map(blob => (
                                             <button
@@ -167,7 +171,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                     </div>
                                 )}
 
-                                {step === 2 && (
+                                {current === 'Team' && (
                                     <div className="space-y-4">
                                         <div className="flex items-end gap-2">
                                             <div className="flex-1">
@@ -223,17 +227,17 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                     Cancel
                                 </Button>
                             )}
-                            {!created && step === 0 && (
+                            {!created && current === 'Name' && (
                                 <Button type="button" onClick={goForward} disabled={!name.trim()}>
                                     Continue
                                 </Button>
                             )}
-                            {!created && step === 1 && (
+                            {!created && current === 'Icon' && (
                                 <Button type="button" onClick={goForward}>
                                     Continue
                                 </Button>
                             )}
-                            {!created && step === 2 && (
+                            {!created && current === 'Team' && (
                                 <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting && <Loader2Icon className="animate-spin" />}
                                     {isSubmitting ? 'Creating' : 'Create workspace'}

@@ -1,6 +1,7 @@
 import type { ModelMessage, streamText } from 'ai'
 import type { Provider } from '@rerun/contracts'
 import { CLI_PROVIDERS } from './types.js'
+import { behaviourOf } from './opencode.js'
 import { systemPromptText, type SystemPrompt } from './systemPrompt.js'
 
 type ProviderOptions = NonNullable<Parameters<typeof streamText>[0]['providerOptions']>
@@ -10,7 +11,8 @@ type SystemMessage = Extract<ModelMessage, { role: 'system' }>
 // find the whole conversation gone from the cache, and the longer write only costs on the delta.
 const ephemeral: ProviderOptions = { anthropic: { cacheControl: { type: 'ephemeral', ttl: '1h' } } }
 
-type CachingInput = { system: SystemPrompt; messages: ModelMessage[]; sessionId: string }
+// `model` only matters on OpenCode, whose caching is the one of the format the model is served on.
+type CachingInput = { system: SystemPrompt; messages: ModelMessage[]; sessionId: string; model?: string }
 type CachingOutput = { system?: string | SystemMessage[]; messages: ModelMessage[]; providerOptions?: ProviderOptions }
 
 function systemMessages(system: SystemPrompt, providerOptions?: ProviderOptions): SystemMessage[] {
@@ -31,7 +33,8 @@ export function withTailBreakpoint(messages: ModelMessage[]): ModelMessage[] {
     })
 }
 
-export function applyCaching(provider: Provider, { system, messages, sessionId }: CachingInput): CachingOutput {
+export function applyCaching(runProvider: Provider, { system, messages, sessionId, model = '' }: CachingInput): CachingOutput {
+    const provider = behaviourOf(runProvider, model)
     if (provider === 'anthropic') return { system: systemMessages(system, ephemeral), messages: withTailBreakpoint(messages) }
 
     // Two system messages on the OpenAI chat format: the hub (for `rerun`) and `cacheBreakpointsFetch`

@@ -75,7 +75,7 @@ export async function ensureWorkspaceNamed(params: { workspaceId: number; userId
         if (name === DEFAULT_WORKSPACE_NAME) return
 
         const domain = profile.companyName && profile.companyUrl ? siteDomain(profile.companyUrl) : null
-        const icon = domain && isBlobUrl(workspace.icon_url) ? await faviconIfServed(domain) : null
+        const icon = domain && (!workspace.icon_url || isBlobUrl(workspace.icon_url)) ? await faviconIfServed(domain) : null
 
         const { error } = await supabase
             .from('workspaces')

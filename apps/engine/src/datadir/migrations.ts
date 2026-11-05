@@ -1,9 +1,45 @@
 import { existsSync } from 'node:fs'
-import { mkdir, rename, writeFile } from 'node:fs/promises'
+import { chmod, lstat, mkdir, readdir, rename, writeFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 import { migrate } from '../db/migrate.js'
 import { latestVersion } from '../db/ladder.js'
 import { foldAgentKeysIntoConnections } from '../connections/migrate.js'
-import { boxPlanPath, mcpPackagesDir } from '../config/paths.js'
+import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir } from '../config/paths.js'
+import { logger } from '../lib/logger.js'
+
+const isMissing = (err: unknown): boolean => (err as NodeJS.ErrnoException).code === 'ENOENT'
+
+async function listDirOrEmpty(dir: string): Promise<string[]> {
+    try {
+        return await readdir(dir)
+    } catch (err) {
+        if (!isMissing(err)) logger.warn({ dir, err: (err as Error).message }, 'data-dir migration: folder left unread')
+        return []
+    }
+}
+
+// Checked with lstat first: a link planted among the files must never have its target's mode
+// changed. A missing path is nothing to do; any other failure is logged and skipped, so one stray
+// file does not keep the engine from booting.
+async function chmodRegular(path: string, mode: number, kind: 'file' | 'dir'): Promise<void> {
+    try {
+        const info = await lstat(path)
+        if (kind === 'file' ? !info.isFile() : !info.isDirectory()) return
+        await chmod(path, mode)
+    } catch (err) {
+        if (!isMissing(err)) logger.warn({ path, err: (err as Error).message }, 'data-dir migration: mode left as is')
+    }
+}
+
+async function listAgentFolders(): Promise<string[]> {
+    const folders: string[] = []
+    for (const name of await listDirOrEmpty(agentsDir())) {
+        if (!isPathSegment(name)) continue
+        const info = await lstat(resolve(agentsDir(), name)).catch(() => null)
+        if (info?.isDirectory()) folders.push(name)
+    }
+    return folders
+}
 
 // One change to the layout of the data-dir: a file or folder moved, renamed, rewritten, or a schema
 // change of `rerun.db`. A shipped step is never edited nor removed, because an archived data-dir may
@@ -43,6 +79,23 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
         id: 'mcp-packages',
         up: async () => {
             await mkdir(mcpPackagesDir(), { recursive: true })
+        },
+    },
+    {
+        // `config.json` (MCP server headers and env) and `mcp/*.json` (OAuth tokens, pending device
+        // sign-ins) were written with the default mode, readable by every uid on the box. New writes
+        // are 0600 since this step; the files already there are brought to the same mode here.
+        version: 4,
+        id: 'secret-file-modes',
+        up: async () => {
+            for (const id of await listAgentFolders()) {
+                await chmodRegular(configPath(id), 0o600, 'file')
+                const mcp = mcpDir(id)
+                for (const name of await listDirOrEmpty(mcp)) {
+                    if (name.endsWith('.json')) await chmodRegular(resolve(mcp, name), 0o600, 'file')
+                }
+                await chmodRegular(mcp, 0o700, 'dir')
+            }
         },
     },
 ]

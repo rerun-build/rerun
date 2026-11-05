@@ -61,7 +61,7 @@ function clampLabel(title: string): string {
 export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpaces = [] }: { onRequestRecruitAgent?: () => void; onRequestBoxAgent?: (spaceId: string) => void; initialSpaces?: SpacePublic[] }) {
     const { workspace, isAnonymous } = useSession()
     const { access: workspaceAccess, needsMachineReason } = useWorkspaceAccess()
-    const { cursors, onPointerWorldMove } = useTeamCursors(workspace ? `cursors:${workspace.id}` : undefined)
+    const { cursors, onPointerWorldMove } = useTeamCursors(workspace?.id)
     const agents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
     const sessions = useBoardStore(s => s.sessions)

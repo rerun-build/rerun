@@ -2,7 +2,7 @@ import { rerunCreditTotalMicros, type RerunCreditColumns } from '@/cloud/billing
 import { catalogFor, modelLabel, modelPower, type CatalogModel } from '@/lib/engine/models'
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { shortUntil } from '@/lib/time'
-import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, canonicalModelId, cliServesModel, isPremiumModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
+import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isPremiumModel, opencodePlanOf, opencodeServesModel, toProviderModel, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
 
 // The AI providers dialog sorts every connection by who pays for it: the credit included with
 // Rerun, the user's own subscription, or the user's own API key.
@@ -10,11 +10,25 @@ export type SourceKind = 'included' | 'plan' | 'key'
 
 export type AddableProvider = Exclude<Provider, 'rerun'>
 
-export type KeyProvider = Exclude<AddableProvider, 'claude' | 'codex'>
+export type KeyProvider = Exclude<AddableProvider, 'claude' | 'codex' | 'opencode'>
+
+// The providers connected by pasting a key, whose page walks the user through getting one. OpenCode
+// is one of them while it sells a plan: it sits with the subscriptions, not with the API keys.
+export type GuidedProvider = KeyProvider | 'opencode'
 
 export function sourceKind(provider: string): SourceKind {
     const section = catalogFor(provider).section
     return section === 'free' ? 'included' : section === 'subscription' ? 'plan' : 'key'
+}
+
+// How a provider is connected, and therefore how it is connected again once its credential is
+// turned away. A comparison on the provider name alone sent OpenCode to Claude's sign-in.
+export type ConnectMethod = 'oauth-claude' | 'device-codex' | 'key'
+
+export function connectMethod(provider: string): ConnectMethod {
+    if (provider === 'claude') return 'oauth-claude'
+    if (provider === 'codex') return 'device-codex'
+    return 'key'
 }
 
 export const KIND_LABEL: Record<SourceKind, string> = { included: 'Included', plan: 'Plan', key: 'API key' }
@@ -26,10 +40,11 @@ export const PROVIDER_PITCH: Record<AddableProvider, { title: string; hint: stri
     openai: { title: 'OpenAI', hint: 'GPT models, billed per token' },
     google: { title: 'Google', hint: 'Gemini models, billed per token' },
     openrouter: { title: 'OpenRouter', hint: 'Every model behind one key' },
+    opencode: { title: 'OpenCode Go or Console', hint: 'Paste your OpenCode key' },
 }
 
 // Numbered steps rendered by CredentialGuide, the same fold the service credentials use.
-export const PROVIDER_GUIDE: Record<KeyProvider, { title: string; steps: string }> = {
+export const PROVIDER_GUIDE: Record<GuidedProvider, { title: string; steps: string }> = {
     anthropic: {
         title: 'How to get your Anthropic key',
         steps: [
@@ -62,14 +77,28 @@ export const PROVIDER_GUIDE: Record<KeyProvider, { title: string; steps: string 
             '3. Copy the key (it starts with `sk-or-`) and paste it above. It is shown only once.',
         ].join('\n'),
     },
+    opencode: {
+        title: 'How to get your OpenCode key',
+        steps: [
+            '1. Open [OpenCode](https://opencode.ai/auth) and sign in.',
+            '2. Subscribe to **OpenCode Go**, or add credits to use the Console models.',
+            '3. Create an API key, copy it (it starts with `oc_sk_`) and paste it above.',
+        ].join('\n'),
+    },
 }
 
 export const PLAN_PROVIDERS: AddableProvider[] = ['claude', 'codex']
+
+// OpenCode joins the subscriptions only where it can run: behind its release flag, on a machine
+// whose engine says it knows the provider.
+export function planProviders(opencodeOffered: boolean): AddableProvider[] {
+    return opencodeOffered ? [...PLAN_PROVIDERS, 'opencode'] : PLAN_PROVIDERS
+}
 export const KEY_PROVIDERS: KeyProvider[] = ['anthropic', 'openai', 'google', 'openrouter']
 
-export const PLAN_LABELS: Partial<Record<AddableProvider, string>> = { claude: 'Claude Code', codex: 'Codex' }
+export const PLAN_LABELS: Partial<Record<AddableProvider, string>> = { claude: 'Claude Code', codex: 'Codex', opencode: 'OpenCode' }
 
-const PLAN_NAMES: Partial<Record<Provider, string>> = { claude: 'Claude', codex: 'ChatGPT' }
+const PLAN_NAMES: Partial<Record<Provider, string>> = { claude: 'Claude', codex: 'ChatGPT', opencode: 'OpenCode' }
 
 export const RERUN_FALLBACK: BoxDefault = { connectionId: RERUN_CONNECTION_ID, model: RERUN_MODEL }
 
@@ -107,8 +136,10 @@ export function isHiddenModel(connectionId: string, model: string): boolean {
 }
 
 // Extra ids are served on top of `models` by the engine, so they are always on.
+// OpenCode's list is the box's live reading of its catalog when there is one, the snapshot this build
+// was cut with otherwise.
 export function offeredModels(source: BoxConnection): CatalogModel[] {
-    const catalog = catalogFor(source.provider).models
+    const catalog = source.providerModels ? source.providerModels.map(m => ({ id: m.id, label: m.label })) : catalogFor(source.provider).models
     const catalogIds = new Set(catalog.map(m => m.id))
     // A model the connection still offers that the catalog no longer lists (retired between two
     // deploys) has to stay switchable off.
@@ -142,7 +173,10 @@ export function isModelLocked(connectionId: string, model: string, premiumAllowe
 // A model the subscription's own CLI does not list on this box. Upgrading the Rerun plan would not
 // bring it, so the row is disabled rather than routed to billing. Undefined when the CLI serves it,
 // when it has not been asked yet, or for Claude, whose list is its picker rather than the account.
-export function cliUnavailableReason(connection: Pick<BoxConnection, 'provider' | 'cliModels'>, model: string): string | undefined {
+// OpenCode's counterpart is a model it stopped publishing: its own wording, since no plan of the
+// user's is at stake.
+export function cliUnavailableReason(connection: Pick<BoxConnection, 'provider' | 'cliModels'> & Partial<Pick<BoxConnection, 'providerModels'>>, model: string): string | undefined {
+    if (!opencodeServesModel(connection.provider, connection.providerModels, model)) return 'No longer offered by OpenCode'
     if (cliServesModel(connection.provider, connection.cliModels, model)) return undefined
     return connection.cliModels?.outdated ? 'Codex CLI outdated on this box' : 'Not in your ChatGPT plan'
 }
@@ -154,6 +188,54 @@ export const PREMIUM_MODEL_BILLING_TRIGGER = 'premium_model'
 const RERUN_TIER_DESCRIPTION: Partial<Record<RerunTier, string>> = {
     fast: 'Quick and cheap',
     smart: 'The smartest',
+}
+
+// What an OpenCode model costs on top of the plan, beside its name in every picker: a Go model is
+// paid by the subscription, a Console one by the account's credits. Plan-scoped ids only.
+const OPENCODE_PLAN_DESCRIPTION: Record<OpencodePlan, string> = { go: 'Included in Go', console: 'Console credits' }
+
+export function opencodePlanDescription(provider: string, model: string): string | undefined {
+    if (provider !== 'opencode') return undefined
+    const plan = opencodePlanOf(model)
+    return plan ? OPENCODE_PLAN_DESCRIPTION[plan] : undefined
+}
+
+// The line under a model's name in a picker: a Rerun tier's hint, or what an OpenCode model is paid with.
+export function modelDescription(connection: Pick<BoxConnection, 'id' | 'provider'>, model: string): string | undefined {
+    return rerunTierDescription(connection.id, model) ?? opencodePlanDescription(connection.provider, model)
+}
+
+// Go before Console, each in the order it came: the models the plan pays for come first.
+export function inPlanOrder<T extends { id: string }>(provider: string, models: T[]): T[] {
+    if (provider !== 'opencode') return models
+    const rank = (id: string) => (opencodePlanOf(id) === 'console' ? 1 : 0)
+    return [...models].sort((a, b) => rank(a.id) - rank(b.id))
+}
+
+// One row of an OpenCode connection's model list. `info` is null for a model the catalog no longer
+// lists, still switched on: it stays there to be switched off.
+export type OpencodeModelRow = { id: string; label: string; plan: OpencodePlan; info: ProviderModel | null; isNew: boolean; enabled: boolean; unavailable?: string }
+
+const SNAPSHOT_IDS = new Set(OPENCODE_SNAPSHOT.map(model => model.id))
+
+// What an OpenCode connection lists: the box's live catalog, or the snapshot this build was cut with.
+// A model newer than that snapshot is "New": OpenCode published it after the connection was set up,
+// so it was not switched on with the others.
+export function opencodeModelRows(source: BoxConnection): OpencodeModelRow[] {
+    const catalog = source.providerModels ?? OPENCODE_SNAPSHOT.map(toProviderModel)
+    const listed = new Set(catalog.map(model => model.id))
+    const retired = source.models.filter(id => !listed.has(id) && opencodePlanOf(id))
+    const rows = [
+        ...catalog.map(info => ({ id: info.id, label: info.label, plan: info.plan, info, isNew: !SNAPSHOT_IDS.has(info.id) })),
+        ...retired.map(id => ({ id, label: modelLabel(id), plan: opencodePlanOf(id)!, info: null, isNew: false })),
+    ]
+    return rows.map(row => ({ ...row, enabled: isModelEnabled(source, row.id), unavailable: cliUnavailableReason(source, row.id) }))
+}
+
+// USD per million tokens, the way OpenCode's own pricing reads.
+export function pricePerMillion(price: ProviderModel['price']): string {
+    const usd = (value: number) => `$${Number(value.toFixed(3))}`
+    return `${usd(price.input)} in · ${usd(price.output)} out /M`
 }
 
 // The hint beside a Rerun tier's name. Nothing for any other model: only the tiers get one, a
@@ -207,9 +289,11 @@ export function planLimitTone(usedPercent: number): PlanLimitTone {
     return 'brand'
 }
 
-export function planWindowName(window: PlanLimitWindow): string {
-    if (window.kind === 'session') return 'Session'
+// OpenCode Go's rolling window is five hours long, and its plan says so.
+export function planWindowName(window: PlanLimitWindow, provider?: string): string {
+    if (window.kind === 'session') return provider === 'opencode' ? '5-hour' : 'Session'
     if (window.kind === 'weekly') return 'Weekly'
+    if (window.kind === 'monthly') return 'Monthly'
     return window.label ? `${window.label} weekly` : 'Model weekly'
 }
 
@@ -225,7 +309,7 @@ export function sourceSummary(source: BoxConnection, credit: RerunCredit): strin
     if (source.id === RERUN_CONNECTION_ID && credit.paused) return RERUN_CREDIT_PAUSED_REASON
     if (source.id === RERUN_CONNECTION_ID) return isCreditUsedUp(credit) ? `Monthly credits used up, back ${creditResetPhrase(credit)}` : `${credit.percent}% of this month's credits used`
     const planWindows = livePlanWindows(source).filter(window => window.kind !== 'model')
-    if (planWindows.length) return planWindows.map(window => `${planWindowName(window)} ${planWindowPercent(window)}`).join(' · ')
+    if (planWindows.length) return planWindows.map(window => `${planWindowName(window, source.provider)} ${planWindowPercent(window)}`).join(' · ')
     const count = enabledModels(source).length
     const models = count === 1 ? '1 model' : `${count} models`
     return `${KIND_LABEL[sourceKind(source.provider)]} · ${models}`

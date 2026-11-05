@@ -18,7 +18,6 @@ const mcp = vi.hoisted(() => ({
 }))
 
 vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
-    getDefaultEnvironment: () => ({ PATH: '/usr/bin', HOME: '/home/rerun' }),
     StdioClientTransport: class {
         constructor(options: { command: string }) {
             Object.assign(this, { kind: 'stdio', target: options.command, options })
@@ -187,8 +186,10 @@ describe('pooledMcpTools', () => {
         const stdio = byTarget.node.options as { command: string; args: string[]; env: Record<string, string>; cwd: string }
         expect(stdio.args).toEqual(['srv.js'])
         expect(stdio.cwd).toBe(workspaceDir('mcp-agent'))
-        expect(stdio.env).toMatchObject({ TOKEN: 't', AGENT_KEY: 'a', PATH: '/usr/bin', HOME: '/home/rerun', RERUN_WORKSPACE: workspaceDir('mcp-agent') })
+        expect(stdio.env).toMatchObject({ TOKEN: 't', AGENT_KEY: 'a', PATH: process.env.PATH, HOME: process.env.HOME, RERUN_WORKSPACE: workspaceDir('mcp-agent') })
         expect(stdio.env.MCP_TEST_INHERITED).toBeUndefined()
+        expect(stdio.env).not.toHaveProperty('RERUN_API_KEY')
+        expect(stdio.env).not.toHaveProperty('RERUN_DATA_DIR')
         expect(byTarget['https://s.example/sse']).toMatchObject({ kind: 'sse', options: undefined })
         expect(byTarget['https://p.example/mcp']).toMatchObject({ kind: 'http', options: undefined })
         expect(byTarget['https://f.example/events']).toMatchObject({ kind: 'sse', options: { requestInit: { headers: { 'x-k': 'v' } } } })

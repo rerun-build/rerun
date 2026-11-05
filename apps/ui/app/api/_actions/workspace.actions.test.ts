@@ -5,7 +5,7 @@ import { faviconUrl } from '@/lib/onboarding/site-favicon'
 import { WORKSPACE_NAME_MAX } from '@/lib/naming/workspace-name'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 
-const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), uploadPublicImage: vi.fn(), lookup: vi.fn() }))
+const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), uploadPublicImage: vi.fn(), lookup: vi.fn(), grantRerunTopup: vi.fn() }))
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -13,6 +13,16 @@ vi.mock('@/app/api/_auth/expert', () => ({ hasPendingCreatorTerms: vi.fn(), isEx
 vi.mock('@/app/api/_services/sandbox.service', () => ({ enterSandbox: vi.fn(), ensureSandboxSpace: vi.fn() }))
 vi.mock('@/lib/images/upload', () => ({ uploadPublicImage: mocks.uploadPublicImage }))
 vi.mock('node:dns/promises', () => ({ lookup: mocks.lookup }))
+vi.mock('@/cloud/billing.server', () => ({ grantRerunTopup: mocks.grantRerunTopup }))
+// The public build stubs `@/cloud/billing` with no signup allowance, so the test pins one of its own.
+const SIGNUP_ALLOWANCE_MICROS = vi.hoisted(() => 5_000_000)
+vi.mock('@/cloud/billing', async (importOriginal) => ({ ...(await importOriginal<typeof import('@/cloud/billing')>()), SIGNUP_BUDGET_MICROS: SIGNUP_ALLOWANCE_MICROS }))
+vi.mock('@/cloud/illustrations', () => ({
+    ILLUSTRATION_ENTRIES: [
+        { file: 'green-energy-blob.webp', desc: 'Green blob', color: 'green', form: 'blob' },
+        { file: 'blue-vortex-ring.webp', desc: 'Blue vortex', color: 'blue', form: 'vortex' },
+    ],
+}))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
 const { createWorkspaceAction, switchWorkspaceAction, updateWorkspaceAction } = await import('./workspace.actions')
@@ -255,5 +265,19 @@ describe('createWorkspaceAction', () => {
 
         await expect(createWorkspaceAction('Acme')).resolves.toEqual({ ok: true, workspaceId: NEW_WORKSPACE_ID })
         expect(CATALOGUE_URLS).toContain((db.writes('workspaces')[0].payload as { icon_url: string }).icon_url)
+    })
+
+    it('starts the new workspace on the signup allowance rather than on zero credit', async () => {
+        creatableDatabase()
+
+        await expect(createWorkspaceAction('Acme')).resolves.toEqual({ ok: true, workspaceId: NEW_WORKSPACE_ID })
+        expect(mocks.grantRerunTopup).toHaveBeenCalledWith(NEW_WORKSPACE_ID, SIGNUP_ALLOWANCE_MICROS)
+    })
+
+    it('grants nothing when the workspace could not be created', async () => {
+        database(() => ({ data: null }))
+
+        await createWorkspaceAction('Acme')
+        expect(mocks.grantRerunTopup).not.toHaveBeenCalled()
     })
 })

@@ -6,6 +6,18 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-browser-'))
 process.env.RERUN_API_KEY = ''
 
+type RouteHandler = (route: { request: () => { url: () => string; resourceType: () => string }; abort: (code?: string) => Promise<void>; continue: () => Promise<void> }) => Promise<void>
+
+const dns = vi.hoisted(() => ({ lookups: [] as string[] }))
+
+// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
+vi.mock('node:dns/promises', () => ({
+    lookup: async (host: string) => {
+        dns.lookups.push(host)
+        return [{ address: host.startsWith('internal.') ? '10.0.0.7' : '93.184.216.34', family: 4 }]
+    },
+}))
+
 type View = { html: string; body: string; links?: Array<{ href: string; text: string }> }
 type PageScript = { status: number | null; views: View[]; documentStatuses: number[]; gotoError?: string; consentBanner: boolean; consentNavigates?: boolean }
 
@@ -22,6 +34,7 @@ const pw = vi.hoisted(() => ({
     gotos: [] as Array<{ url: string; options: unknown }>,
     screenshots: [] as Array<{ path: string; fullPage: boolean }>,
     routes: 0,
+    routeHandler: null as RouteHandler | null,
     consentClicks: 0,
     open: 0,
     maxOpen: 0,
@@ -100,8 +113,9 @@ vi.mock('patchright', () => ({
                     pw.newPages += 1
                     return page
                 },
-                route: async () => {
+                route: async (_pattern: string, handler: RouteHandler) => {
                     pw.routes += 1
+                    pw.routeHandler = handler
                 },
                 close: async () => {
                     pw.open -= 1
@@ -116,7 +130,7 @@ vi.mock('patchright', () => ({
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { HostBreaker, BLOCKED_SOURCE_PREFIX } = await import('../host-breaker.js')
 const { browserProfileDir, workspaceDir } = await import('../../config/paths.js')
-const { browserTools } = await import('./browser.js')
+const { browserTools, launchContext, publicRequestsOnly } = await import('./browser.js')
 const { chromium } = await import('patchright')
 
 const agentId = 'browsing-agent'
@@ -136,6 +150,22 @@ function showing(body: string, html = '<html></html>'): View[] {
     return [{ html, body }]
 }
 
+async function decide(handler: RouteHandler, url: string, resourceType: string): Promise<string> {
+    let outcome = 'none'
+    await handler({
+        request: () => ({ url: () => url, resourceType: () => resourceType }),
+        abort: async code => {
+            outcome = code ? `abort:${code}` : 'abort'
+        },
+        continue: async () => {
+            outcome = 'continue'
+        },
+    })
+    return outcome
+}
+
+const verdict = (url: string, resourceType: string): Promise<string> => decide(pw.routeHandler!, url, resourceType)
+
 beforeEach(() => {
     pw.page = { status: 200, views: showing(''), documentStatuses: [], consentBanner: false }
     pw.display = null
@@ -147,7 +177,9 @@ beforeEach(() => {
     pw.gotos.length = 0
     pw.screenshots.length = 0
     pw.routes = 0
+    pw.routeHandler = null
     pw.consentClicks = 0
+    dns.lookups.length = 0
     pw.open = 0
     pw.maxOpen = 0
     pw.closes = 0
@@ -197,8 +229,66 @@ describe('browser_navigate', () => {
     it('blocks images, media and fonts unless a screenshot is wanted', async () => {
         await navigate(ctxWith(), { url: 'https://example.com/' })
         expect(pw.routes).toBe(1)
+        expect(await verdict('https://example.com/logo.png', 'image')).toBe('abort')
+        expect(await verdict('https://example.com/app.js', 'script')).toBe('continue')
         await navigate(ctxWith(), { url: 'https://example.com/', screenshotPath: 'shot.png' })
-        expect(pw.routes).toBe(1)
+        expect(pw.routes).toBe(2)
+        expect(await verdict('https://example.com/logo.png', 'image')).toBe('continue')
+    })
+
+    it.each(['file:///etc/passwd', 'ftp://example.com/x', 'javascript:alert(1)'])('refuses %s in its schema, so the model is told before anything runs', url => {
+        const schema = (browserTools(ctxWith()).browser_navigate as any).inputSchema
+        const result = schema.safeParse({ url, timeoutMs: 1000 })
+        expect(result.success).toBe(false)
+        expect(JSON.stringify(result.error?.issues)).toContain('only http and https URLs on public hosts are accepted')
+        expect(schema.safeParse({ url: 'https://example.com/', timeoutMs: 1000 }).success).toBe(true)
+    })
+
+    it.each(['file:///etc/passwd', 'http://127.0.0.1:8080/', 'http://169.254.169.254/latest/meta-data/', 'http://internal.example/admin'])('refuses %s before opening a browser, as a result the model reads', async url => {
+        const out = await navigate(ctxWith(), { url })
+        expect(out).toMatch(/^Navigation refused: .* is not a public host \(.*\), only http and https URLs on public hosts are accepted\.$/)
+        expect(out).not.toContain('failed in this run')
+        expect(pw.launches).toEqual([])
+        expect(pw.gotos).toEqual([])
+        expect(pw.displayHolds).toEqual([])
+    })
+
+    describe('requests of the browser', () => {
+        it('aborts a request to a private host, a redirect or a sub-frame included, and lets public ones through', async () => {
+            await navigate(ctxWith(), { url: 'https://example.com/' })
+            expect(await verdict('http://10.0.0.5/latest/meta-data/', 'document')).toBe('abort:blockedbyclient')
+            expect(await verdict('http://internal.example/', 'document')).toBe('abort:blockedbyclient')
+            expect(await verdict('http://127.0.0.1:8080/frame', 'document')).toBe('abort:blockedbyclient')
+            expect(await verdict('https://cdn.example.com/app.js', 'script')).toBe('continue')
+        })
+
+        it('aborts any scheme but http and https', async () => {
+            await navigate(ctxWith(), { url: 'https://example.com/' })
+            expect(await verdict('file:///etc/passwd', 'document')).toBe('abort:blockedbyclient')
+            expect(await verdict('ftp://example.com/x', 'other')).toBe('abort:blockedbyclient')
+        })
+
+        it('resolves each hostname once for the life of the browser', async () => {
+            await navigate(ctxWith(), { url: 'https://example.com/' })
+            dns.lookups.length = 0
+            await verdict('https://cdn.example.com/a.js', 'script')
+            await verdict('https://cdn.example.com/b.js', 'script')
+            await verdict('https://cdn.example.com/c.css', 'stylesheet')
+            expect(dns.lookups).toEqual(['cdn.example.com'])
+        })
+
+        it('guards a window opened for a person the same way, assets included', async () => {
+            await launchContext('some-profile', ':9', { viewport: null })
+            expect(pw.routes).toBe(1)
+            expect(await verdict('http://192.168.1.1/', 'document')).toBe('abort:blockedbyclient')
+            expect(await verdict('https://example.com/logo.png', 'image')).toBe('continue')
+        })
+
+        it('is the handler a context gets, usable on its own', async () => {
+            const handler = publicRequestsOnly({ blockHeavyResources: true })
+            expect(await decide(handler, 'https://example.com/logo.png', 'image')).toBe('abort')
+            expect(await decide(handler, 'http://[::1]/', 'document')).toBe('abort:blockedbyclient')
+        })
     })
 
     it('caps the text at 50k characters', async () => {
@@ -389,6 +479,14 @@ describe('browser_navigate', () => {
             pw.launches.length = 0
             return context
         }
+
+        it('refuses a private host without opening a tab in that window', async () => {
+            const context = await openWindow()
+            pw.joinable = async () => context
+            expect(await navigate(ctxWith(), { url: 'http://127.0.0.1:3000/' })).toMatch(/^Navigation refused: 127\.0\.0\.1:3000 is not a public host/)
+            expect(pw.newPages).toBe(0)
+            expect(pw.gotos).toEqual([])
+        })
 
         it('reads the page in a new tab of that window and leaves the window as it is', async () => {
             const context = await openWindow()

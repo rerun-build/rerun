@@ -5,7 +5,8 @@ import { generateText } from 'ai'
 import { tool, type ModelMessage, type ToolSet } from 'ai'
 import { z } from 'zod'
 import { resolveInWorkspace } from '../sandbox.js'
-import { CLI_PROVIDERS, modelFor } from '../../agents/providers.js'
+import { CLI_PROVIDERS, modelFor, type ModelOverride } from '../../agents/providers.js'
+import { modelSeesImages, opencodeVisionModel } from '../../agents/opencode.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
 import { deadlineSignal, raceAbort } from '../../lib/abort.js'
 import type { RunContext } from '../../runtime/context.js'
@@ -52,6 +53,18 @@ async function imageMessages(ctx: RunContext, target: string, mediaType: string,
     return [{ role: 'user', content: [{ type: 'image', image: sent.image, mediaType: sent.mediaType }, { type: 'text', text: prompt }] }]
 }
 
+export const NO_VISION_MODEL =
+    'None of the models switched on for this OpenCode connection can read images. Switch one on that can (most Go models do), or go on without the image.'
+
+// The model the run is on, unless it is an OpenCode model that cannot see: then another model of the
+// same connection that can, or null when it has none.
+function visionModelFor(ctx: RunContext): ModelOverride | undefined | null {
+    const { provider, model, connection } = ctx.agent.resolved
+    if (modelSeesImages(provider, model)) return undefined
+    const seeing = opencodeVisionModel(connection)
+    return seeing ? { model: seeing } : null
+}
+
 export function visionTools(ctx: RunContext, timeoutMs = VISION_TIMEOUT_MS): ToolSet {
     const id = ctx.agent.id
     return {
@@ -62,7 +75,7 @@ export function visionTools(ctx: RunContext, timeoutMs = VISION_TIMEOUT_MS): Too
                 prompt: z.string().describe('What you want to know about the image'),
             }),
             execute: async ({ imagePath, prompt }, { abortSignal }) => {
-                const target = resolveInWorkspace(id, imagePath)
+                const target = await resolveInWorkspace(id, imagePath)
                 if (!existsSync(target)) return `Image not found: ${imagePath}`
                 const mediaType = MEDIA_TYPES[extname(imagePath).toLowerCase()]
                 if (!mediaType) return `Unsupported image type: ${imagePath}`
@@ -72,6 +85,8 @@ export function visionTools(ctx: RunContext, timeoutMs = VISION_TIMEOUT_MS): Too
                 } catch (e) {
                     return `Could not read ${imagePath} as an image: ${(e as Error).message}`
                 }
+                const seeing = visionModelFor(ctx)
+                if (seeing === null) return NO_VISION_MODEL
                 const runSignal = ctx.abortSignal ?? abortSignal
                 const signal = deadlineSignal(timeoutMs, runSignal)
                 let release = () => {}
@@ -79,7 +94,7 @@ export function visionTools(ctx: RunContext, timeoutMs = VISION_TIMEOUT_MS): Too
                     release = await ensureCliAuth(ctx.agent.resolved.provider, ctx.agent.resolved.connection)
                     const { text } = await raceAbort(
                         generateText({
-                            model: modelFor(ctx.agent, undefined, undefined, undefined, { claudeTools: CLAUDE_VISION_TOOLS }),
+                            model: modelFor(ctx.agent, seeing, undefined, undefined, { claudeTools: CLAUDE_VISION_TOOLS, sessionId: ctx.sessionId }),
                             messages,
                             abortSignal: signal,
                         }),

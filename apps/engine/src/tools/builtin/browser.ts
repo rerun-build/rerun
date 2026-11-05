@@ -10,6 +10,8 @@ import { holdDisplay, type DisplayHold } from '../virtual-display.js'
 import { offersTakeover } from './hitl.js'
 import { browserProfileDir } from '../../config/paths.js'
 import { withKeyedLock } from '../../lib/lock.js'
+import { NonPublicHostError, assertPublicUrl, isHttpUrl, resolvesToPublicAddresses } from '../../lib/public-fetch.js'
+import { PUBLIC_HTTP_URL_MESSAGE, publicHttpUrl } from '../url.js'
 import type { RunContext } from '../../runtime/context.js'
 import { joinableBrowser } from '../../desktop/takeover.js'
 import { savePage } from './page-file.js'
@@ -40,15 +42,30 @@ const CONSENT_SELECTORS = [
 const CONSENT_BUTTON_NAME = /^(accept all|accept|allow all|i agree|agree|tout accepter|accepter|alle akzeptieren|aceptar todo)$/i
 
 type LaunchOptions = NonNullable<Parameters<typeof chromium.launchPersistentContext>[1]>
+type RouteHandler = Parameters<BrowserContext['route']>[1]
+type ContextGuards = { blockHeavyResources?: boolean }
 
-export async function launchContext(profileDir: string, display: string | null, extra: LaunchOptions = {}): Promise<BrowserContext> {
-    const options: LaunchOptions = {
-        channel: 'chromium',
-        headless: !display,
-        ...(display ? { env: { ...process.env, DISPLAY: display } } : {}),
-        ...extra,
+// Every request of the context, main document, redirect hop, sub-frame or asset, goes to a public
+// host over http(s), judged by where its name resolves. One verdict per hostname for the life of the context.
+export function publicRequestsOnly({ blockHeavyResources = false }: ContextGuards = {}): RouteHandler {
+    const verdicts = new Map<string, Promise<boolean>>()
+    const allowed = (hostname: string): Promise<boolean> => {
+        const known = verdicts.get(hostname)
+        if (known) return known
+        const verdict = resolvesToPublicAddresses(hostname)
+        verdicts.set(hostname, verdict)
+        return verdict
     }
-    await mkdir(profileDir, { recursive: true })
+    return async route => {
+        const request = route.request()
+        const url = request.url()
+        if (!isHttpUrl(url) || !(await allowed(new URL(url).hostname))) return route.abort('blockedbyclient')
+        if (blockHeavyResources && BLOCKED_RESOURCE_TYPES.has(request.resourceType())) return route.abort()
+        return route.continue()
+    }
+}
+
+async function launchPersistentContext(profileDir: string, options: LaunchOptions): Promise<BrowserContext> {
     try {
         return await chromium.launchPersistentContext(profileDir, options)
     } catch (e) {
@@ -58,6 +75,19 @@ export async function launchContext(profileDir: string, display: string | null, 
         await Promise.all(PROFILE_LOCK_FILES.map(name => rm(resolve(profileDir, name), { force: true })))
         return chromium.launchPersistentContext(profileDir, options)
     }
+}
+
+export async function launchContext(profileDir: string, display: string | null, extra: LaunchOptions = {}, guards: ContextGuards = {}): Promise<BrowserContext> {
+    const options: LaunchOptions = {
+        channel: 'chromium',
+        headless: !display,
+        ...(display ? { env: { ...process.env, DISPLAY: display } } : {}),
+        ...extra,
+    }
+    await mkdir(profileDir, { recursive: true })
+    const context = await launchPersistentContext(profileDir, options)
+    await context.route('**/*', publicRequestsOnly(guards))
+    return context
 }
 
 export async function dropProfileCaches(agentId: string): Promise<void> {
@@ -139,7 +169,7 @@ async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, link
     const saved = html === null ? null : await savePage(ctx.agent.id, { url, view: 'browser', body: html, ext: 'html', status, finalUrl: page.url() })
     let note = ''
     if (screenshotPath) {
-        const target = resolveInWorkspace(ctx.agent.id, screenshotPath)
+        const target = await resolveInWorkspace(ctx.agent.id, screenshotPath)
         await mkdir(dirname(target), { recursive: true })
         await page.screenshot({ path: target, fullPage: true })
         note = `\n\n[screenshot saved to ${screenshotPath}]`
@@ -149,6 +179,7 @@ async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, link
 }
 
 const navigationFailed = (e: unknown): HostAttempt => ({ text: `Navigation failed: ${(e as Error).message}`, failed: true })
+const navigationRefused = (e: NonPublicHostError, url: string): HostAttempt => ({ text: `Navigation refused: ${e.message} (${url}), ${PUBLIC_HTTP_URL_MESSAGE}.`, failed: false })
 
 // The tab stays open and loads everything: it is on the screen the agent and a person look at.
 async function readInOpenBrowser(ctx: RunContext, context: BrowserContext, visit: Visit): Promise<HostAttempt> {
@@ -166,7 +197,7 @@ export function browserTools(ctx: RunContext): ToolSet {
         browser_navigate: tool({
             description: 'Open a URL in a real Chromium browser, wait for it to render (including JavaScript and bot-protection challenges, cookie banners accepted), and return the visible text, plus the links on the page when you ask for them. Cookies persist between your calls. Use this instead of web_fetch for pages that need JS to load or that block simple requests. Optionally save a screenshot into your workspace to inspect later with vision_analyze.',
             inputSchema: z.object({
-                url: z.string().url(),
+                url: publicHttpUrl,
                 screenshotPath: z.string().optional().describe('Workspace-relative path to save a full-page PNG screenshot'),
                 links: z.boolean().default(false).describe('Also list the links on the page (text and URL), e.g. to open the results of a search'),
                 timeoutMs: z.number().int().positive().max(120_000).default(30_000),
@@ -174,6 +205,12 @@ export function browserTools(ctx: RunContext): ToolSet {
             execute: async (visit: Visit) => {
                 const host = hostOf(visit.url)
                 return withHostBreaker(breaker, host ? [host] : [], async (): Promise<HostAttempt> => {
+                    try {
+                        await assertPublicUrl(visit.url)
+                    } catch (e) {
+                        if (e instanceof NonPublicHostError) return navigationRefused(e, visit.url)
+                        throw e
+                    }
                     // Nothing is awaited when there is no window to join, so the lock below is
                     // taken before a session opening right now can take it and be missed.
                     const joining = joinableBrowser(id)
@@ -184,10 +221,7 @@ export function browserTools(ctx: RunContext): ToolSet {
                         let screen: DisplayHold | undefined
                         try {
                             screen = await holdDisplay(id)
-                            context = await launchContext(browserProfileDir(id), screen.display)
-                            if (!visit.screenshotPath) {
-                                await context.route('**/*', route => (BLOCKED_RESOURCE_TYPES.has(route.request().resourceType()) ? route.abort() : route.continue()))
-                            }
+                            context = await launchContext(browserProfileDir(id), screen.display, {}, { blockHeavyResources: !visit.screenshotPath })
                             return await readPage(ctx, context.pages()[0] ?? (await context.newPage()), visit)
                         } catch (e) {
                             return navigationFailed(e)

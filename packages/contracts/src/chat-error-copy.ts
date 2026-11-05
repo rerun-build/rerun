@@ -1,4 +1,4 @@
-import { classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
+import { OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
 import { modelLabel } from './models.js'
 
 const GENERIC_ERROR = 'Something went wrong. Try sending your message again.'
@@ -18,8 +18,8 @@ export function isBudgetExhausted(message: string): boolean {
 // `not_in_plan` is a model the plan does not include at all ("Fable 5.1 requires usage credits"),
 // `credits` the paid overage spent, `spend` an organization's monthly cap.
 export type SubscriptionLimit = {
-    plan: 'claude' | 'chatgpt' | null
-    scope: 'session' | 'weekly' | 'model' | 'not_in_plan' | 'credits' | 'spend'
+    plan: 'claude' | 'chatgpt' | 'opencode' | null
+    scope: 'session' | 'weekly' | 'monthly' | 'model' | 'not_in_plan' | 'credits' | 'spend'
     modelName?: string
     resetsAt?: string
 }
@@ -44,9 +44,21 @@ function modelNotInPlan(message: string): string | undefined {
     return id ? modelLabel(id) : undefined
 }
 
+// The engine rewrites what OpenCode answers into these two sentences (see `opencodeFetch`): its own
+// wording names neither the plan nor the window.
+function opencodeLimit(message: string, m: string): SubscriptionLimit | null {
+    if (m.includes(OPENCODE_CREDITS_USED_UP.toLowerCase())) return { plan: 'opencode', scope: 'credits' }
+    if (!m.includes(OPENCODE_GO_LIMIT.toLowerCase())) return null
+    const scope = m.includes('weekly') ? 'weekly' : m.includes('monthly') ? 'monthly' : 'session'
+    return withReset({ plan: 'opencode', scope }, message)
+}
+
 export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
     const message = stripErrorPrefix(raw)
     const m = message.toLowerCase()
+    // Before the Claude rules: a Console model is often a Claude, and its 402 names it.
+    const opencode = opencodeLimit(message, m)
+    if (opencode) return opencode
     const codex = m.includes('codex') || m.includes('chatgpt')
     if (m.includes('requires usage credits')) return { plan: 'claude', scope: 'not_in_plan', modelName: modelNotInPlan(message) }
     if (m.includes('not supported when using codex') || m.includes('does not exist or you do not have access')) return { plan: codex ? 'chatgpt' : null, scope: 'not_in_plan', modelName: modelNotInPlan(message) }
@@ -62,11 +74,28 @@ export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
     return { plan: null, scope: 'session' }
 }
 
-const PLAN_LABELS: Record<'claude' | 'chatgpt', string> = { claude: 'Claude', chatgpt: 'ChatGPT' }
+const PLAN_LABELS: Record<'claude' | 'chatgpt' | 'opencode', string> = { claude: 'Claude', chatgpt: 'ChatGPT', opencode: 'OpenCode Go' }
+
+const WINDOW_NAME: Record<'session' | 'weekly' | 'monthly', string> = { session: '5-hour', weekly: 'weekly', monthly: 'monthly' }
+
+function opencodeLimitMessage(limit: SubscriptionLimit): string {
+    if (limit.scope === 'credits') return 'No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.'
+    const window = WINDOW_NAME[limit.scope as keyof typeof WINDOW_NAME] ?? '5-hour'
+    return limit.resetsAt
+        ? `Your OpenCode Go plan has reached its ${window} limit. It resets ${limit.resetsAt}; switch to a Console model or another provider until then.`
+        : `Your OpenCode Go plan has reached its ${window} limit. Switch to a Console model or another provider until it resets.`
+}
+
+function opencodeLimitTitle(limit: SubscriptionLimit): string {
+    if (limit.scope === 'credits') return 'OpenCode credits used up'
+    if (limit.scope === 'weekly' || limit.scope === 'monthly') return `OpenCode Go ${limit.scope} limit reached`
+    return 'OpenCode Go limit reached'
+}
 
 // The one line the notice puts under its title. It names the plan the user pays for rather than
 // "the provider", because a Box can hold both and only one of them is out.
 export function subscriptionLimitMessage(limit: SubscriptionLimit): string {
+    if (limit.plan === 'opencode') return opencodeLimitMessage(limit)
     if (limit.scope === 'not_in_plan') {
         const model = limit.modelName ?? 'this model'
         if (!limit.plan) return `This connection can't run ${model}. Pick another model to keep going.`
@@ -84,6 +113,7 @@ export function subscriptionLimitMessage(limit: SubscriptionLimit): string {
 }
 
 export function subscriptionLimitTitle(limit: SubscriptionLimit): string {
+    if (limit.plan === 'opencode') return opencodeLimitTitle(limit)
     if (limit.scope === 'not_in_plan') {
         if (!limit.plan) return `${limit.modelName ?? 'Model'} unavailable`
         return limit.modelName ? `${limit.modelName} isn't in your ${PLAN_LABELS[limit.plan]} plan` : `Model not in your ${PLAN_LABELS[limit.plan]} plan`
@@ -92,7 +122,7 @@ export function subscriptionLimitTitle(limit: SubscriptionLimit): string {
     const plan = PLAN_LABELS[limit.plan]
     if (limit.scope === 'credits') return `${plan} usage credits used up`
     if (limit.scope === 'spend') return `${plan} spend limit reached`
-    if (limit.scope === 'weekly') return `${plan} weekly limit reached`
+    if (limit.scope === 'weekly' || limit.scope === 'monthly') return `${plan} ${limit.scope} limit reached`
     if (limit.scope === 'model') return `${plan} ${limit.modelName} limit reached`
     return `${plan} ${limit.plan === 'claude' ? 'session' : 'usage'} limit reached`
 }
@@ -103,6 +133,7 @@ const KIND_TITLES: Record<Exclude<ChatErrorKind, 'generic' | 'usage_limit'>, str
     overloaded: 'Provider overloaded',
     context_window: 'Conversation too long',
     provider_error: 'The model could not answer',
+    thinking_replay: 'The run could not continue',
     interrupted: 'Run interrupted',
     run_in_flight: 'This conversation is still busy',
 }
@@ -127,6 +158,7 @@ const KIND_MESSAGES: Partial<Record<ChatErrorKind, string>> = {
     overloaded: 'The provider is overloaded right now. Try again in a moment.',
     context_window: 'This conversation no longer fits the model, and sending it again will hit the same wall. Switch to a model with a larger context window, or start a new conversation.',
     provider_error: 'The model provider refused this request, and sending it again will get the same answer. Switch to another model to keep going.',
+    thinking_replay: 'The engine replayed this turn in a way the model provider rejects. This is an engine bug, not the model: switching models will not help. Try again, and update the engine if it keeps happening.',
     interrupted: 'The run was cut off before it could finish.',
 }
 

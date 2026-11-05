@@ -19,6 +19,7 @@ import { codexPath } from '../runtime/codex-cli.js'
 import { codexHomeDir } from '../config/paths.js'
 import { allowedModel } from '../connections/plan.js'
 import { RERUN_CONNECTION_ID } from '@rerun/contracts'
+import { childProcessEnv, envOverlay } from '../lib/child-env.js'
 import { newId } from '../lib/ids.js'
 import { resolveTransport } from '../tools/mcp.js'
 import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
@@ -33,6 +34,8 @@ import { cardTagStopHook } from './claude-card-nudge.js'
 import { openrouterReasoningMiddleware, reasoningFetch } from './openrouter-reasoning.js'
 import { cacheBreakpointsFetch } from './openrouter-cache.js'
 import { openrouterStreamRetryMiddleware } from './openrouter-stream-retry.js'
+import { opencodeLanguageModel } from './opencode.js'
+import { opencodeUsageMiddleware } from './opencode-stream.js'
 import { agentProcessEnv } from './process-env.js'
 import { BRIDGE_SERVER_NAME, CLI_PROVIDERS, type LoadedAgent } from './types.js'
 import { hubCallerHeaders } from '../runtime/hub.js'
@@ -234,7 +237,18 @@ export function codexMcpConfig(tools?: ToolSet, mcpServers: McpServer[] = []): R
 // one-shot call (compaction, curator, vision) has none here and keeps passing its own to
 // generateText, where the provider folds it into the user turn. `claudeTools` reopens named Claude
 // built-ins for that call alone; a run has only CLAUDE_RUN_TOOLS.
-export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup }
+//
+// `sessionId` is what an OpenCode request names its conversation by: a one-shot call inside a run
+// (compaction, vision) passes the run's own, the others one of their own making.
+export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string }
+
+// What a run hands its model beyond the tools: the prompt and the screenshots for the CLIs, the
+// conversation for OpenCode.
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string }
+
+function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
+    return options?.sessionId ?? `${agent.id}:one-shot`
+}
 
 // The subscription pays for the CLI's own web search, where Rerun's web_search would bill Brave to
 // Rerun. Its WebFetch stays closed: it hands back a summary of the page, web_fetch the page itself.
@@ -299,14 +313,15 @@ function connectionEnv(agent: LoadedAgent): Record<string, string> {
 }
 
 // Codex reads its credentials from `$CODEX_HOME/auth.json`, which codex-auth.ts writes before the
-// run — there is no token setting to pass. `env` is merged over process.env by the provider. The
-// home is the connection's, so agents sharing a subscription share one auth.json.
+// run — there is no token setting to pass. `env` is merged over process.env by the provider, so it
+// is given as an overlay that empties every engine variable the child must not see. The home is
+// the connection's, so agents sharing a subscription share one auth.json.
 function codexShared(agent: LoadedAgent): CodexExecSettings & CodexAppServerSettings {
     const { cwd, env: agentEnv } = agentProcessEnv(agent)
     const path = codexPath()
     return {
         cwd,
-        env: { ...agentEnv, CODEX_HOME: codexHomeDir(agent.resolved.connection?.id ?? RERUN_CONNECTION_ID) },
+        env: envOverlay(childProcessEnv(agentEnv, { CODEX_HOME: codexHomeDir(agent.resolved.connection?.id ?? RERUN_CONNECTION_ID) })),
         ...(path ? { codexPath: path } : {}),
     }
 }
@@ -406,6 +421,10 @@ function pairFor(agent: LoadedAgent, override?: ModelOverride): { provider: Prov
 // and exits — nothing to dispose. A run that streams must use `resolveModel` instead.
 export function modelFor(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: McpServer[], options?: CliModelOptions): LanguageModel {
     const { provider, model } = pairFor(agent, override)
+    if (provider === 'opencode') {
+        const opencode = opencodeLanguageModel(agent.resolved.connection, model, oneShotSessionId(agent, options))
+        return wrapLanguageModel({ model: opencode.model, middleware: opencode.middleware })
+    }
     return registryFor(agent, tools, mcpServers, options).languageModel(`${provider}:${model}`)
 }
 
@@ -418,7 +437,7 @@ export type ResolvedModel = { model: LanguageModel; close: () => Promise<void>; 
 
 const noClose = async (): Promise<void> => {}
 
-export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], system?: string, screenshots?: ScreenshotLookup): ResolvedModel {
+export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId }: ResolveModelOptions = {}): ResolvedModel {
     const { provider, model } = pairFor(agent, override)
     // `wrapLanguageModel` runs the list from the end: the guard sits nearest the model, so no other
     // middleware ever reads a fake tool call, the card tags go next, and the quick replies read the
@@ -434,6 +453,11 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
         const capture = claudeContextCapture(agent.resolved.connection?.id)
         const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
         return { model: wrapLanguageModel({ model: claude, middleware: [claudeScreenshotMiddleware, replies.middleware, cardTags, guard] }), close: noClose, contextUsage: capture.read, quickReplies: replies.read }
+    }
+    // OpenCode runs in Rerun's own loop, on the SDK of whichever format the model is served on.
+    if (provider === 'opencode') {
+        const opencode = opencodeLanguageModel(agent.resolved.connection, model, sessionId ?? oneShotSessionId(agent))
+        return { model: wrapLanguageModel({ model: opencode.model, middleware: [...opencode.middleware, opencodeUsageMiddleware, replies.middleware, cardTags, guard] }), close: noClose, quickReplies: replies.read }
     }
     // Asking for the reasoning and reading it back are both off the OpenAI chat format, so they are
     // wired here rather than in the registry: the one-shot calls that go through `modelFor`

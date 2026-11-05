@@ -14,6 +14,8 @@ import { ensureCliAuth } from '../connections/cli-auth.js'
 import { syncCodexAuth } from '../connections/codex-auth.js'
 import { forgetCredentialRejected, recordCredentialRejected } from '../connections/credential-rejections.js'
 import { refreshCodexPlanLimits } from '../connections/codex-plan-limits.js'
+import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.js'
+import { behaviourOf } from '../agents/opencode.js'
 import { buildSystemPrompt, nowBlock, recallMemories, recallSection, systemPromptText, userLanguageBlock } from '../agents/systemPrompt.js'
 import type { LoadedAgent } from '../agents/types.js'
 import { turnOrder } from '../agents/turn-order.js'
@@ -134,8 +136,10 @@ async function emitSkillProposalEvent(agent: LoadedAgent, sessionId: string, run
     await sendNotification({ event: 'agent.notification', kind: 'approval', agentId: agent.id, sessionId, runId, message, metadata: { toolName: 'skill_propose', proposalId: notice.proposalId, ...authorMetadata(author) } }).catch(() => {})
 }
 
+// OpenRouter's own cost, or what OpenCode says a step was worth to the user: 0 on the Go plan.
 function costMicrosFrom(providerMetadata: unknown): number | null {
-    const cost = (providerMetadata as { openrouter?: { usage?: { cost?: unknown } } } | undefined)?.openrouter?.usage?.cost
+    const metadata = providerMetadata as { openrouter?: { usage?: { cost?: unknown } }; opencode?: { cost?: unknown } } | undefined
+    const cost = metadata?.opencode?.cost ?? metadata?.openrouter?.usage?.cost
     return typeof cost === 'number' && Number.isFinite(cost) ? Math.round(cost * 1_000_000) : null
 }
 
@@ -243,6 +247,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             await syncCodexAuth(connection).catch(() => {})
             void refreshCodexPlanLimits(connection)
         }
+        if (provider === 'opencode') void refreshOpencodePlanLimits(connection)
     }
 
     const closeSafely = async (): Promise<void> => {
@@ -441,11 +446,11 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const turnText = shared ? signText(userText, author) : userText
         const turnMessages: ModelMessage[] = [...history, { role: 'user', content: [{ type: 'text', text: turnText }, ...context] }]
 
-        const cached = applyCaching(provider, { system, messages: turnMessages, sessionId })
+        const cached = applyCaching(provider, { system, messages: turnMessages, sessionId, model })
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
         spawnToken = claudeTokenOf(connection)
-        const resolvedModel = resolveModel(agent, override, tools, mcpServers, systemText, id => ctx.screenshots?.get(id))
+        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         // Cut out of the text whoever wrote it; only a coworker that offers replies gets the buttons.
@@ -458,7 +463,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             model: languageModel,
             system: cached.system,
             messages: cached.messages,
-            providerOptions: mergeProviderOptions(mergeProviderOptions(cached.providerOptions, reasoningProviderOptions(provider)), resumeThreadId ? { 'codex-app-server': { threadId: resumeThreadId } } : undefined),
+            providerOptions: mergeProviderOptions(mergeProviderOptions(cached.providerOptions, reasoningProviderOptions(provider, model)), resumeThreadId ? { 'codex-app-server': { threadId: resumeThreadId } } : undefined),
             tools,
             abortSignal: controller.signal,
             experimental_repairToolCall: repairToolCall,
@@ -467,10 +472,10 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             // rather than an empty `activeTools`, since Anthropic refuses a transcript holding
             // tool_use blocks when the request defines no tool.
             prepareStep: ({ messages, steps }) => {
-                const step = stepWithScreenshots(messages, ctx.screenshots, provider)
+                const step = stepWithScreenshots(messages, ctx.screenshots, provider, model)
                 return {
                     ...step,
-                    ...(provider === 'anthropic' ? { messages: withTailBreakpoint(step.messages ?? messages) } : {}),
+                    ...(behaviourOf(provider, model) === 'anthropic' ? { messages: withTailBreakpoint(step.messages ?? messages) } : {}),
                     ...(!CLI_PROVIDERS.has(provider) && hitlStepLacksMessage(steps) ? { toolChoice: 'none' as const } : {}),
                 }
             },

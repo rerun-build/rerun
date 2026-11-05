@@ -1,5 +1,5 @@
 import { isAdminEmail } from '@/lib/auth/admin-emails'
-import { COMPUTER_RELEASED, REWIND_RELEASED } from '@/lib/features'
+import { COMPUTER_RELEASED, PUBLISHED_ACCESS_RELEASED, REWIND_RELEASED } from '@/lib/features'
 import { createClient } from '@/supabase/server'
 import { dedupe, flag } from 'flags/next'
 
@@ -36,4 +36,11 @@ export const computerFlag = flag<boolean, Entities>({
     defaultValue: false,
     identify,
     decide: releasedOrEarlyAccess(COMPUTER_RELEASED),
+})
+
+export const publishedAccessFlag = flag<boolean, Entities>({
+    key: 'published-access',
+    defaultValue: false,
+    identify,
+    decide: releasedOrEarlyAccess(PUBLISHED_ACCESS_RELEASED),
 })

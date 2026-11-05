@@ -95,8 +95,8 @@ export function createFilesRouter(getRoot: (c: Context) => string): Hono {
             'Content-Disposition': `inline; filename="${name}"`,
             'Accept-Ranges': 'bytes',
         }
-        if (!range) return c.body(store.readByteStream(root, path), 200, { ...headers, 'Content-Length': String(size) })
-        return c.body(store.readByteStream(root, path, range), 206, {
+        if (!range) return c.body(await store.readByteStream(root, path), 200, { ...headers, 'Content-Length': String(size) })
+        return c.body(await store.readByteStream(root, path, range), 206, {
             ...headers,
             'Content-Length': String(range.end - range.start + 1),
             'Content-Range': `bytes ${range.start}-${range.end}/${size}`,

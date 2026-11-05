@@ -2,11 +2,17 @@ import { mkdtempSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
+import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-web-gaps-'))
+
+// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
+vi.mock('node:dns/promises', () => ({
+    lookup: async (host: string) => [{ address: host.startsWith('internal.') ? '10.0.0.7' : '93.184.216.34', family: 4 }],
+}))
 process.env.RERUN_API_KEY = ''
 
-const { afterEach, describe, expect, it, vi } = await import('vitest')
+const { afterEach, describe, expect, it } = await import('vitest')
 const { HostBreaker } = await import('../host-breaker.js')
 const { workspaceDir } = await import('../../config/paths.js')
 const { webTools } = await import('./web.js')
@@ -125,7 +131,7 @@ describe('download', () => {
     })
 
     it('refuses a body over 50 MB without writing it', async () => {
-        globalThis.fetch = vi.fn(async () => ({ ok: true, status: 200, arrayBuffer: async () => new ArrayBuffer(50_000_001) })) as unknown as typeof fetch
+        globalThis.fetch = vi.fn(async () => ({ ok: true, status: 200, headers: new Headers(), arrayBuffer: async () => new ArrayBuffer(50_000_001) })) as unknown as typeof fetch
         expect(await call(ctxWith(), 'download', { url: 'https://cdn.test/huge.bin', path: 'huge.bin' })).toBe('Download too large (50000001 bytes, limit 50MB)')
         await expect(readFile(resolve(workspaceDir('surfer'), 'huge.bin'))).rejects.toThrow()
     })

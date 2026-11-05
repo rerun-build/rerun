@@ -47,7 +47,7 @@ flowchart LR
 - The browser talks to the app, and directly to Supabase for sign-in and live updates. That is why the Supabase address must work from the browser too.
 - The app calls the engine with the engine's key. The engine calls the app back at `RERUN_HUB_BASE_URL` with the same key: to report what happened in a run, to reach the Rerun models, to compute embeddings.
 - The desktop screen is the one exception: the browser opens it directly on the engine's address, over `ws://` or `wss://`.
-- The app reaches OpenRouter with your key for the Foreman and the [Rerun models](/self-host/models).
+- The app reaches OpenRouter with your key for the Foreman's onboarding and the [Rerun models](/self-host/models).
 
 ## What runs where
 
@@ -75,7 +75,7 @@ The data-dir is a plain folder of files and SQLite databases. Credentials stay t
 
 - A machine with Docker and Docker Compose. Building the images needs about 6 GB of memory available to Docker.
 - A Supabase project, free on [supabase.com](https://supabase.com), or Supabase running on the same machine.
-- An [OpenRouter key](https://openrouter.ai/keys), for the Foreman and the default models.
+- An [OpenRouter key](https://openrouter.ai/keys), for the Foreman's onboarding and the default models. Optional if you connect your own AI.
 - Node.js 22, for two small setup commands.
 
 ## Next steps

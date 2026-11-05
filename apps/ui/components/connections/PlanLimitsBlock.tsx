@@ -12,7 +12,7 @@ function readingAge(capturedAt: string): string {
 }
 
 // Where a subscription stands against its own plan: what the provider meters, not what Rerun bills.
-export function PlanLimitsBlock({ connection }: { connection: Pick<BoxConnection, 'planLimits'> }) {
+export function PlanLimitsBlock({ connection }: { connection: Pick<BoxConnection, 'planLimits' | 'provider'> }) {
     const windows = livePlanWindows(connection)
 
     if (!connection.planLimits || windows.length === 0) {
@@ -27,7 +27,7 @@ export function PlanLimitsBlock({ connection }: { connection: Pick<BoxConnection
         <DetailBlock title="Plan usage" aside={<span className="text-[11px] text-muted-foreground">{readingAge(connection.planLimits.capturedAt)}</span>}>
             <div className="space-y-3 rounded-md border bg-muted/20 p-3">
                 {windows.map(window => {
-                    const name = planWindowName(window)
+                    const name = planWindowName(window, connection.provider)
                     const reset = planWindowReset(window)
                     return (
                         <div key={`${window.kind}:${window.label ?? ''}`} className="space-y-1.5">

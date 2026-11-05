@@ -47,6 +47,10 @@ export async function sendWorkspaceInviteEmail(input: { to: string; workspaceNam
     return skipped('workspace invite', input.to)
 }
 
+export async function sendPublishedAccessCodeEmail(input: { to: string; code: string; workspaceName: string; pageTitle: string; expiresInMinutes: number }): Promise<SendEmailResult> {
+    return skipped('published access code', input.to)
+}
+
 export async function sendSignInCodeEmail(input: { to: string; code: string; signInUrl?: string; expiresInMinutes: number }): Promise<SendEmailResult> {
     return skipped('sign-in code', input.to)
 }

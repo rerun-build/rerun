@@ -1,3 +1,4 @@
+import { behaviourOf, modelSeesImages } from '../agents/opencode.js'
 import type { Provider } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { newId } from '../lib/ids.js'
@@ -83,7 +84,9 @@ export function withScreenshots(messages: ModelMessage[], store: ScreenshotStore
     })
 }
 
-export function stepWithScreenshots(messages: ModelMessage[], store: ScreenshotStore | undefined, provider: Provider): { messages?: ModelMessage[] } {
-    if (!store) return {}
-    return { messages: withScreenshots(messages, store, CHAT_COMPLETIONS_PROVIDERS.has(provider) ? 'user-message' : 'tool-result') }
+// A model that cannot see never gets the picture: OpenCode would drop it without a word, and the
+// model would answer about a screen it never saw.
+export function stepWithScreenshots(messages: ModelMessage[], store: ScreenshotStore | undefined, provider: Provider, model = ''): { messages?: ModelMessage[] } {
+    if (!store || !modelSeesImages(provider, model)) return {}
+    return { messages: withScreenshots(messages, store, CHAT_COMPLETIONS_PROVIDERS.has(behaviourOf(provider, model)) ? 'user-message' : 'tool-result') }
 }

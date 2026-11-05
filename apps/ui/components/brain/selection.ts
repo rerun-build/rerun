@@ -5,6 +5,7 @@ export type BrainSelection =
     | { kind: 'history'; slug: string }
     | { kind: 'new-page' }
     | { kind: 'proposals' }
+    | { kind: 'published' }
     | { kind: 'folder'; path: string }
     | { kind: 'file'; path: string }
     // The database before a table is picked: lands on its first table, or says there is none yet.
@@ -39,6 +40,7 @@ export function selectionDepth(selection: BrainSelection | null): number {
 // The tabs the rest of the app still opens the Brain on.
 export function selectionForTab(tab: KnowledgeBaseTab): BrainSelection | null {
     if (tab === 'proposals') return { kind: 'proposals' }
+    if (tab === 'published') return { kind: 'published' }
     if (tab === 'files') return { kind: 'folder', path: '' }
     if (tab === 'database') return { kind: 'database' }
     return null

@@ -29,7 +29,7 @@ SOUL.md                 personality / system prompt
 INSTALL.md              guided setup the agent runs once on a new owner's account (optional)
 config.json             model, provider, enabled tools, MCP servers, self-improvement flags, setup state
 .env                    per-agent API keys (chmod 600, never returned by the API)
-workspace/              private sandbox for the filesystem and shell tools
+workspace/              private root for the file tools, working directory of the shell tool (which is not confined to it)
 skills/<slug>/SKILL.md  reusable procedures (markdown + frontmatter), read on demand
 memory/<id>.md          durable memories (markdown + frontmatter)
 ```

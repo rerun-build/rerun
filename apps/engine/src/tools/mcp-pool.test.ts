@@ -18,7 +18,6 @@ const mcp = vi.hoisted(() => ({
 }))
 
 vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
-    getDefaultEnvironment: () => ({ PATH: '/usr/bin' }),
     StdioClientTransport: class {
         constructor(options: { command: string }) {
             Object.assign(this, { target: options.command })

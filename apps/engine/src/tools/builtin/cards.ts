@@ -7,7 +7,7 @@ import { AGENT_HIDDEN_TABLES, getAgentDb } from '../../db/agentDb.js'
 import { getSharedDb, SHARED_HIDDEN_TABLES } from '../../db/sharedDb.js'
 import { deleteView, findView, listViews, saveView } from '../../db/tableViews.js'
 import { sharedDir, workspaceDir } from '../../config/paths.js'
-import { resolveWithin } from '../sandbox.js'
+import { resolveWithinReal } from '../sandbox.js'
 import type { RunContext } from '../../runtime/context.js'
 import { buildTableCard, tableCardInput, tableDisplayInput, tableTargetInput } from './table-card.js'
 import { jsonTolerantArray } from './hitl.js'
@@ -124,7 +124,7 @@ function scopeOf(agentId: string, path: string, scope: FileCardEntry['scope'] | 
 async function fileCardEntry(agentId: string, path: string, requestedScope: FileCardEntry['scope'] | undefined): Promise<FileCardEntry> {
     const scope = scopeOf(agentId, path, requestedScope)
     const root = scope === 'shared' ? sharedDir() : workspaceDir(agentId)
-    const absolute = resolveWithin(root, path)
+    const absolute = await resolveWithinReal(root, path)
     const info = await stat(absolute)
     if (info.isDirectory()) throw new Error('it is a folder, not a file. Point to a file inside it.')
     // The chat opens files through the app's own proxy, which addresses them relative to the root

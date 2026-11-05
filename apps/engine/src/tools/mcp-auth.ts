@@ -1,7 +1,8 @@
-import { readFile, writeFile, mkdir, rm } from 'node:fs/promises'
+import { readFile, mkdir, rm } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { isPathSegment, mcpDir, mcpPendingPath, mcpTokenPath } from '../config/paths.js'
 import type { McpServer } from '../agents/types.js'
+import { writeFileAtomic } from '../lib/atomic-write.js'
 import { logger } from '../lib/logger.js'
 
 const DEVICE_CLIENT_ID = 'hermes'
@@ -158,9 +159,10 @@ async function refreshToken(auth: DeviceAuth, token: StoredToken): Promise<Store
     return null
 }
 
+// Tokens are the agent's credentials: the folder and its files are readable by the engine's uid only.
 export async function saveToken(agentId: string, name: string, token: StoredToken): Promise<void> {
-    await mkdir(mcpDir(agentId), { recursive: true })
-    await writeFile(mcpTokenPath(agentId, name), JSON.stringify(token, null, 4), 'utf8')
+    await mkdir(mcpDir(agentId), { recursive: true, mode: 0o700 })
+    await writeFileAtomic(mcpTokenPath(agentId, name), JSON.stringify(token, null, 4), { mode: 0o600 })
 }
 
 // A legacy server name that could never have been saved under has nothing stored: the read paths
@@ -183,8 +185,8 @@ export async function clearToken(agentId: string, name: string): Promise<void> {
 }
 
 export async function savePending(agentId: string, name: string, pending: PendingDevice): Promise<void> {
-    await mkdir(mcpDir(agentId), { recursive: true })
-    await writeFile(mcpPendingPath(agentId, name), JSON.stringify(pending, null, 4), 'utf8')
+    await mkdir(mcpDir(agentId), { recursive: true, mode: 0o700 })
+    await writeFileAtomic(mcpPendingPath(agentId, name), JSON.stringify(pending, null, 4), { mode: 0o600 })
 }
 
 export async function loadPending(agentId: string, name: string): Promise<PendingDevice | null> {

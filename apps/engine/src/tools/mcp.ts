@@ -57,16 +57,24 @@ export async function openMcpClient(server: McpServer, spawn: McpSpawn): Promise
     }
 }
 
+// A tool as the model may be handed it, whichever provider carries it: a root union Anthropic would
+// refuse is lifted into plain properties, and the rule it carried is appended to the description.
+export function modelReadyMcpTool(serverName: string, tool: McpTool): McpTool {
+    const { schema, note } = toToolInputSchema(tool.inputSchema)
+    if (schema === tool.inputSchema) return tool
+    logger.debug({ server: serverName, tool: tool.name }, 'mcp: tool schema normalised')
+    const description = tool.description ?? tool.name
+    return { ...tool, description: note ? `${description}\n\n${note}` : description, inputSchema: schema as McpTool['inputSchema'] }
+}
+
 // The server's tools as AI SDK tools named `<server>_<tool>`, for the providers the engine drives itself.
 export function mcpToolSet(serverName: string, tools: McpTool[], call: McpCall): ToolSet {
     const set: ToolSet = {}
-    for (const t of tools) {
-        const { schema, note } = toToolInputSchema(t.inputSchema)
-        if (schema !== t.inputSchema) logger.debug({ server: serverName, tool: t.name }, 'mcp: tool schema normalised')
-        const description = t.description ?? t.name
+    for (const original of tools) {
+        const t = modelReadyMcpTool(serverName, original)
         set[`${serverName}_${t.name}`] = dynamicTool({
-            description: note ? `${description}\n\n${note}` : description,
-            inputSchema: jsonSchema(schema),
+            description: t.description ?? t.name,
+            inputSchema: jsonSchema(t.inputSchema),
             execute: async args => JSON.stringify((await call(t.name, args as Record<string, unknown>)).content),
         })
     }

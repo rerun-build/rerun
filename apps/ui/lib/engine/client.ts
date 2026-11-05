@@ -1,5 +1,6 @@
 import {
     ENGINE_CAPABILITY_DESKTOP,
+    ENGINE_CAPABILITY_OPENCODE,
     desktopStatusSchema,
     takeoverResultSchema,
     type DesktopApp,
@@ -633,6 +634,10 @@ export async function supportsForemanFiles(conn: EngineConnection): Promise<bool
 
 export async function supportsDesktop(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_DESKTOP)
+}
+
+export async function supportsOpencode(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_OPENCODE)
 }
 
 export async function supportsScheduleRename(conn: EngineConnection): Promise<boolean> {

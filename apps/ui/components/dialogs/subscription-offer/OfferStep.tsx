@@ -10,7 +10,7 @@ import { OfferArguments } from './offer-arguments'
 import { DeclineButton, OfferFooter } from './offer-footer'
 import { OfferConnect } from './OfferConnect'
 
-export function OfferStep({ onPick, onKey, onSkip }: { onPick: (provider: SubscriptionProvider) => void; onKey: () => void; onSkip: () => void }) {
+export function OfferStep({ onPick, onKey, onOpencode, onSkip }: { onPick: (provider: SubscriptionProvider) => void; onKey: () => void; onOpencode?: () => void; onSkip: () => void }) {
     return (
         <>
             <DialogHeader className="mb-5">
@@ -19,7 +19,7 @@ export function OfferStep({ onPick, onKey, onSkip }: { onPick: (provider: Subscr
                 <p className="text-sm text-muted-foreground">Connect it and your coworkers run on the plan you already pay for.</p>
             </DialogHeader>
 
-            <OfferConnect onPick={onPick} onKey={onKey} />
+            <OfferConnect onPick={onPick} onKey={onKey} onOpencode={onOpencode} />
 
             {/* The arguments are not a third way in: they sit on their own, centred in what the
                 buttons leave, well clear of the group above. The scroll is a guard, not a feature:

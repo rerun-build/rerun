@@ -167,7 +167,7 @@ Per-agent provider keys (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, …) are **not**
 }
 ```
 
-- `provider` is one of `anthropic`, `openai`, `google`, `openrouter`. The model is resolved through a per-agent AI SDK provider registry using that agent's keys.
+- `provider` is one of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`, `opencode`. The credentials live on the box connection the agent points at (`connectionId`), see `docs/API.md`.
 - `tools` switches whole tool families on/off.
 - `selfImprovement` controls the curator and whether the agent may install tools / register MCP servers.
 

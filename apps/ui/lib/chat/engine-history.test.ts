@@ -118,6 +118,15 @@ describe('a card and the message written after it', () => {
         expect(messages[0].metadata?.createdAt).toBe(at(1))
     })
 
+    // The reloaded transcript is what the iOS app reads: an older build has to see the v2 stamp
+    // there too, or it would draw option objects it cannot read.
+    it('stamps v2 on a reloaded ask_user whose options carry a description', () => {
+        const questions = [{ question: 'Which format?', header: 'Format', options: [{ label: 'One-pager', description: 'A single page' }, 'Deck'] }]
+        const call = { type: 'tool-call', toolCallId: 'c1', toolName: 'ask_user', input: { questions } }
+        const messages = transformEngineMessages([assistant('a1', [call], 1)])
+        expect(messages[0].parts[0]).toMatchObject({ type: 'tool-ask_user', state: 'input-available', input: { questions, v: 2 } })
+    })
+
     it('leaves a card that came with its message as it is', () => {
         const messages = transformEngineMessages([assistant('a1', [{ type: 'text', text: 'Two things to confirm.' }, askUser('c1')], 1), toolRow('t1', 'c1', 2)])
         expect(messages).toHaveLength(1)

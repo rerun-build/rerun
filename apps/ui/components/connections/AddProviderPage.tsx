@@ -8,7 +8,7 @@ import { CredentialGuide } from '@/components/services/CredentialGuide'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { PROVIDER_GUIDE, PROVIDER_PITCH, suggestName, type AddableProvider } from '@/lib/engine/ai-sources'
+import { PROVIDER_GUIDE, PROVIDER_PITCH, connectMethod, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
 import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS } from '@rerun/contracts'
 import { useState } from 'react'
@@ -41,7 +41,8 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
     const [created, setCreated] = useState<BoxConnection | null>(null)
     const [renaming, setRenaming] = useState(false)
     const [renameError, setRenameError] = useState<string | null>(null)
-    const isPlan = provider === 'claude' || provider === 'codex'
+    const method = connectMethod(provider)
+    const isPlan = method !== 'key'
 
     const create = async (keys: Record<string, string>): Promise<CreateConnectionResult> => {
         const trimmed = name.trim()
@@ -83,12 +84,12 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
                 {/* The two plans create the connection from inside their own flow, the moment the token lands,
                     and Done in the last step opens it. */}
                 {isPlan ? (
-                    <PlanConnect provider={provider} onKeys={create} surface="add_provider" lastStep={lastStep} />
+                    <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={create} surface="add_provider" lastStep={lastStep} />
                 ) : (
                     <>
                         <Input label="Name" value={name} onChange={e => setName(e.target.value)} helperText="Shown in every coworker's model picker" className="h-8" />
                         <Input hideRequired label="API key" type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="Paste your key" className="h-8 font-mono text-xs" />
-                        <CredentialGuide label={PROVIDER_PITCH[provider].title} title={PROVIDER_GUIDE[provider].title} guide={PROVIDER_GUIDE[provider].steps} />
+                        <CredentialGuide label={PROVIDER_PITCH[provider].title} title={PROVIDER_GUIDE[provider as GuidedProvider].title} guide={PROVIDER_GUIDE[provider as GuidedProvider].steps} />
                     </>
                 )}
 

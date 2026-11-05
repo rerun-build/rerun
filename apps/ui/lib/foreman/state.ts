@@ -5,12 +5,14 @@ import { isPaid, priceLabel, type ForemanClient } from '@rerun/contracts'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { readAgentShare } from '@/lib/agents/share-read'
 import { isSubscriptionEntitled, parsePriceArm, trialArm } from '@/cloud/billing'
+import { RERUN_CLOUD } from '@/cloud/edition'
 import { readFirstName } from '@/lib/naming/first-name'
 import { loadServiceCatalog } from '@/lib/templates/catalog'
 import { LIBRARY_COLUMNS, toLibraryTemplates, type LibraryRow } from '@/lib/templates/library'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AGENT_COLUMNS, SPACE_COLUMNS } from './board-map'
+import { foremanHubApiKey } from './hub-api-key'
 import type { KickoffIntent } from './kickoff-marker'
 import { preferredLanguage } from './language'
 import { stampWorkspaceOnboarded } from './profile'
@@ -59,7 +61,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
     const entitled = isSubscriptionEntitled(ctx.workspace.subscription_status)
     const trialing = ctx.workspace.subscription_status === 'trialing'
     const onboardingCompletedAt = ctx.workspace.onboarded_at ?? null
-    const input = { foreman, onboardingCompletedAt, entitled, trialing, agentCount: agents?.length ?? 0 }
+    const input = { foreman, onboardingCompletedAt, entitled, trialing, agentCount: agents?.length ?? 0, hubForeman: RERUN_CLOUD || !!foremanHubApiKey() }
     // A sandbox is an expert's workspace, handed its machine when it is created: it never goes
     // through the onboarding, and talks to the foreman on that machine from the start.
     const pastOnboarding = ctx.workspace.is_sandbox || foremanPhase(input) === 'companion'

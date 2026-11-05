@@ -5,7 +5,7 @@ import { ensureWorkspaceEngine, findWorkspaceEngine, getWorkspaceConnection } fr
 import { isPremiumModelEntitled } from '@/cloud/billing'
 import {
     KEY_PROVIDERS,
-    PLAN_PROVIDERS,
+    planProviders,
     PROVIDER_GUIDE,
     PROVIDER_PITCH,
     creditResetPhrase,
@@ -20,10 +20,11 @@ import {
     planWindowName,
     planWindowReset,
     rerunCreditOf,
-    rerunTierDescription,
+    modelDescription,
     sourceKind,
     sourceSummary,
     suggestName,
+    type GuidedProvider,
     type KeyProvider,
     type RerunCredit,
 } from '@/lib/engine/ai-sources'
@@ -32,6 +33,7 @@ import {
     createConnection as engineCreateConnection,
     deleteConnection as engineDeleteConnection,
     getConnectionUsage as engineGetConnectionUsage,
+    supportsOpencode,
     listConnections as engineListConnections,
     patchConnection as enginePatchConnection,
     setBoxDefault as engineSetBoxDefault,
@@ -42,6 +44,7 @@ import { pinFirst } from '@/lib/engine/model-groups'
 import type { BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, EngineConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { assertPublicUrl } from '@/lib/net/public-fetch'
+import { OPENCODE_ENABLED } from '@/lib/features'
 import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenProblem, type AddableProvider, type AiConnectionView, type AiConnectionsView } from '@rerun/contracts'
 
 // The AI providers of a workspace, for both the web dialog's server actions and the app's /api/v1
@@ -117,12 +120,30 @@ async function assertPublicBaseUrl(baseUrl: string | undefined): Promise<void> {
     }
 }
 
+// OpenCode runs inside the engine's own loop, so a machine on an older engine would store the key and
+// fail every run with it.
+export async function isOpencodeOffered(conn: EngineConnection | null | undefined): Promise<boolean> {
+    return OPENCODE_ENABLED && !!conn && (await supportsOpencode(conn))
+}
+
+export async function isOpencodeOfferedTo(workspaceId: number): Promise<boolean> {
+    if (!OPENCODE_ENABLED) return false
+    return isOpencodeOffered((await findWorkspaceEngine(workspaceId))?.conn)
+}
+
+async function assertProviderOffered(provider: CreateBoxConnectionInput['provider'], conn: EngineConnection): Promise<void> {
+    if (provider !== 'opencode') return
+    if (!OPENCODE_ENABLED) throw new ConnectionInputError('OpenCode is not available yet.')
+    if (!(await supportsOpencode(conn))) throw new ConnectionInputError('OpenCode arrives with the next update of this machine. Try again in a little while.')
+}
+
 // Throws NoPlanError (capacity.service) when the workspace has no plan: without one there is no machine to hold a
 // credential, whatever the user pastes.
 export async function createAiConnection(workspaceId: number, params: CreateBoxConnectionInput): Promise<BoxConnection> {
     assertValidClaudeToken(params.keys)
     await assertPublicBaseUrl(params.baseUrl)
     const conn = await connectionForCreate(workspaceId)
+    await assertProviderOffered(params.provider, conn)
     const keyProblem = await providerKeyProblem(params.provider, params.keys, params.baseUrl)
     if (keyProblem) throw new ConnectionInputError(keyProblem)
     return engineCreateConnection(conn, params)
@@ -226,13 +247,13 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
         models: offeredModels(source).map(model => ({
             id: model.id,
             label: model.label,
-            description: rerunTierDescription(source.id, model.id),
+            description: modelDescription(source, model.id),
             enabled: isModelEnabled(source, model.id),
             locked: isModelLocked(source.id, model.id, premiumAllowed),
         })),
         baseUrl: source.baseUrl ?? '',
         extraModels: source.extraModels,
-        planWindows: livePlanWindows(source).map(window => ({ name: planWindowName(window), usedPercent: window.usedPercent, reset: planWindowReset(window) })),
+        planWindows: livePlanWindows(source).map(window => ({ name: planWindowName(window, source.provider), usedPercent: window.usedPercent, reset: planWindowReset(window) })),
     }
 }
 
@@ -249,12 +270,12 @@ export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiCo
         connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, premiumAllowed)),
         default: { ...pick, label: modelName(pick.connectionId, pick.model) },
         credit: { percent: credit.percent, usedUp: isCreditUsedUp(credit), backOn: creditResetPhrase(credit) },
-        addable: [...PLAN_PROVIDERS, ...KEY_PROVIDERS].map(provider => ({
+        addable: [...planProviders(await isOpencodeOffered(engine?.conn)), ...KEY_PROVIDERS].map(provider => ({
             provider,
             kind: sourceKind(provider),
             ...PROVIDER_PITCH[provider],
             suggestedName: suggestName(provider, taken),
-            guide: KEY_PROVIDERS.includes(provider as KeyProvider) ? PROVIDER_GUIDE[provider as KeyProvider] : null,
+            guide: provider === 'opencode' || KEY_PROVIDERS.includes(provider as KeyProvider) ? PROVIDER_GUIDE[provider as GuidedProvider] : null,
         })),
     }
 }

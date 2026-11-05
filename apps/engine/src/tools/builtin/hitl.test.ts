@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import type { ModelMessage } from 'ai'
-import { HITL_ACK, approvalSummary, askUserTool, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, lastStepHasHitlCall, mcpSignInTool, requestApprovalTool, requestSecretTool, requestTakeoverTool, secretSummary, suggestServiceTool, takeoverSummary } from './hitl.js'
+import { HITL_ACK, HITL_ACK_CALL_FIRST, approvalSummary, askUserTool, findPendingHitl, hitlAck, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, lastStepHasHitlCall, mcpSignInTool, requestApprovalTool, requestSecretTool, requestTakeoverTool, secretSummary, suggestServiceTool, takeoverSummary } from './hitl.js'
 
 function askUserCall(toolCallId: string, toolName = 'ask_user'): ModelMessage {
     return { role: 'assistant', content: [{ type: 'tool-call', toolCallId, toolName, input: { questions: [{ question: 'Which domain?' }] } }] } as unknown as ModelMessage
@@ -44,9 +44,30 @@ describe('ask_user description', () => {
 })
 
 describe('the ack of a card', () => {
-    it('asks a bare card for what the question is about, and ends a turn that already wrote it', () => {
+    it('asks a bare card for what the question is about, and ends a turn that already wrote it, when the message comes first', () => {
+        expect(hitlAck('message-first')).toBe(HITL_ACK)
         expect(HITL_ACK.instruction).toContain('in full what the question is about')
         expect(HITL_ACK.instruction).toContain('If you already did, end your turn now.')
+    })
+
+    it('expects the message now, whatever was written before, when the calls come first', () => {
+        expect(hitlAck('call-first')).toBe(HITL_ACK_CALL_FIRST)
+        expect(HITL_ACK_CALL_FIRST.instruction).toContain('a note written before a call is not shown to them')
+        expect(HITL_ACK_CALL_FIRST.instruction).toContain('Write your message now')
+        expect(HITL_ACK_CALL_FIRST.instruction).toContain('in full what the card asks about')
+        expect(HITL_ACK_CALL_FIRST.instruction).not.toContain('If you already did')
+        expect(HITL_ACK_CALL_FIRST.instruction).not.toContain('If you wrote nothing')
+    })
+
+    it.each([HITL_ACK, HITL_ACK_CALL_FIRST])('tells a message written after the card that the card sits below it', ack => {
+        expect(ack.instruction).toContain('The card shows below that message, so point to it as the card below, never above.')
+    })
+
+    it('is the one a card returns on each runtime', async () => {
+        for (const order of ['message-first', 'call-first'] as const) {
+            const { request_secret } = requestSecretTool({ turnOrder: order })
+            expect(await (request_secret as any).execute({ secrets: [{ key: 'A_KEY', label: 'A key' }] }, {})).toBe(hitlAck(order))
+        }
     })
 })
 
@@ -116,6 +137,24 @@ describe('ask_user input schema', () => {
     it('accepts a double-encoded JSON string for questions', () => {
         const result = askUserSchema().safeParse({ questions: '[{"question":"x","options":["a","b"]}]' })
         expect(result.success).toBe(true)
+    })
+
+    it('accepts a header and options written as a label with its description', () => {
+        const parsed = askUserSchema().parse({
+            questions: [{ question: 'Which format?', header: 'Format', options: [{ label: 'One-pager', description: 'A single page' }, { label: 'Deck', description: null }, 'Spreadsheet'] }],
+        })
+        expect(parsed.questions[0].header).toBe('Format')
+        expect(parsed.questions[0].options).toEqual([{ label: 'One-pager', description: 'A single page' }, { label: 'Deck', description: undefined }, 'Spreadsheet'])
+    })
+
+    it('accepts a header that came back as an explicit null', () => {
+        const parsed = askUserSchema().parse({ questions: [{ question: 'x', header: null, options: ['a', 'b'] }] })
+        expect(parsed.questions[0].header).toBeUndefined()
+    })
+
+    it('rejects an option object without a label', () => {
+        const result = askUserSchema().safeParse({ questions: [{ question: 'x', options: [{ description: 'no label' }, 'b'] }] })
+        expect(result.success).toBe(false)
     })
 
     it('rejects a non-JSON string for questions', () => {
@@ -369,6 +408,8 @@ describe('request_takeover', () => {
     it('takes a page and one line telling the user what to do there', () => {
         expect(schema().safeParse({ url: 'https://www.linkedin.com/login', reason: 'Sign in to LinkedIn' }).success).toBe(true)
         expect(schema().safeParse({ url: 'not a url', reason: 'Sign in' }).success).toBe(false)
+        expect(schema().safeParse({ url: 'file:///etc/passwd', reason: 'Sign in' }).success).toBe(false)
+        expect(schema().safeParse({ url: 'ftp://files.example/', reason: 'Sign in' }).success).toBe(false)
         expect(schema().safeParse({ url: 'https://www.linkedin.com/login' }).success).toBe(false)
     })
 

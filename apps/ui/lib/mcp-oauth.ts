@@ -205,23 +205,26 @@ export async function registerClient(registrationEndpoint: string, redirectUri: 
     return { clientId: data.client_id, clientSecret: data.client_secret }
 }
 
-type PreRegisteredClient = { mcpOrigin: string; clientIdEnv: string; clientSecretEnv: string }
+type PreRegisteredClient = { mcpOrigin: string; clientIdEnv: string; clientSecretEnv: string; engineRefreshes?: boolean }
 
 // For authorization servers offering neither DCR nor Client ID Metadata Documents, an OAuth app
 // registered by Rerun itself. Keyed on the MCP origin rather than the authorization server, so
-// another MCP server naming github.com as its issuer cannot borrow our app. Its secret stays on
-// the hub: it is never sent to the browser, the context cookie or the engine token store.
+// another MCP server naming github.com as its issuer cannot borrow our app. Its secret never
+// reaches the browser or the context cookie, and reaches the engine token store only when the
+// provider's tokens expire and its token endpoint refuses a refresh without it.
 const PRE_REGISTERED_CLIENTS: PreRegisteredClient[] = [
     // GitHub OAuth App tokens never expire, so the engine never needs the secret to refresh.
     { mcpOrigin: 'https://api.githubcopilot.com', clientIdEnv: 'RERUN_GITHUB_MCP_CLIENT_ID', clientSecretEnv: 'RERUN_GITHUB_MCP_CLIENT_SECRET' },
+    // Asana access tokens last one hour and its token endpoint only takes authenticated clients.
+    { mcpOrigin: 'https://mcp.asana.com', clientIdEnv: 'RERUN_ASANA_MCP_CLIENT_ID', clientSecretEnv: 'RERUN_ASANA_MCP_CLIENT_SECRET', engineRefreshes: true },
 ]
 
-function preRegisteredClient(mcpUrl: string): { clientId: string; clientSecret: string } | null {
+function preRegisteredClient(mcpUrl: string): { clientId: string; clientSecret: string; engineRefreshes: boolean } | null {
     const origin = new URL(mcpUrl).origin
     const entry = PRE_REGISTERED_CLIENTS.find(client => client.mcpOrigin === origin)
     const clientId = entry && process.env[entry.clientIdEnv]
     const clientSecret = entry && process.env[entry.clientSecretEnv]
-    return clientId && clientSecret ? { clientId, clientSecret } : null
+    return clientId && clientSecret ? { clientId, clientSecret, engineRefreshes: entry.engineRefreshes === true } : null
 }
 
 export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string, req: Request): Promise<ClientInfo | null> {
@@ -240,10 +243,24 @@ export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string
     return metadata.clientIdMetadataDocumentSupported ? { clientId: clientMetadataDocumentUrl(req) } : null
 }
 
-function clientSecretFor(ctx: OAuthContext): string | undefined {
-    if (ctx.clientSecret) return ctx.clientSecret
-    const preRegistered = preRegisteredClient(ctx.mcpUrl)
-    return preRegistered?.clientId === ctx.clientId ? preRegistered.clientSecret : undefined
+// Enough to name the client without a full context: the mobile claim only holds the MCP URL and
+// the client id of the parked bundle.
+type ClientRef = { mcpUrl: string; clientId?: string; clientSecret?: string }
+
+function clientSecret(ref: ClientRef, forEngine: boolean): string | undefined {
+    if (ref.clientSecret) return ref.clientSecret
+    const preRegistered = preRegisteredClient(ref.mcpUrl)
+    if (!preRegistered || preRegistered.clientId !== ref.clientId) return undefined
+    return forEngine && !preRegistered.engineRefreshes ? undefined : preRegistered.clientSecret
+}
+
+function clientSecretFor(ref: ClientRef): string | undefined {
+    return clientSecret(ref, false)
+}
+
+// The secret the engine token store keeps to refresh on its own.
+export function engineClientSecret(ref: ClientRef): string | undefined {
+    return clientSecret(ref, true)
 }
 
 export function createPkce(): { verifier: string; challenge: string; state: string } {

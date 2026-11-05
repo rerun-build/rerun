@@ -319,6 +319,18 @@ describe('run loop paths', () => {
         expect((await getRun(id, started.runId))?.costMicros).toBe(12346)
     })
 
+    // OpenCode reports what a step was worth to the user: nothing on the Go plan, the list price on
+    // Console. Both are real costs, so a Go run stores 0 rather than null.
+    it('stores the OpenCode cost, a Go call at zero', async () => {
+        stream.parts = textTurn('paid', { opencode: { billingSource: 'balance', cost: 0.00042 } })
+        const { started } = await run('console?')
+        expect((await getRun(id, started.runId))?.costMicros).toBe(420)
+
+        stream.parts = textTurn('included', { opencode: { billingSource: 'go', cost: 0 } })
+        const second = await run('go?')
+        expect((await getRun(id, second.started.runId))?.costMicros).toBe(0)
+    })
+
     it('ignores a cost that is not a finite number', async () => {
         stream.parts = textTurn('free', { openrouter: { usage: { cost: 'n/a' } } })
 

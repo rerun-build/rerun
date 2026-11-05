@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { readAgentConfig } from '../agents/loader.js'
 import { desktopEnabled, env } from '../config/env.js'
 import { holdDisplay } from '../tools/virtual-display.js'
+import { inheritedEnv } from '../lib/child-env.js'
 import { HttpError } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 import { barConfig, dockConfig, openboxConfig } from './panels.js'
@@ -59,8 +60,10 @@ export function computerAvailable(): boolean {
     return computer
 }
 
-export function desktopEnv(display: string): NodeJS.ProcessEnv {
-    return { ...process.env, DISPLAY: display, GTK_THEME: 'Adwaita:dark' }
+// Shared by every process on the screen, the agent's own included: nothing of the engine's
+// configuration beyond what any agent process inherits.
+export function desktopEnv(display: string): Record<string, string> {
+    return { ...inheritedEnv(), DISPLAY: display, GTK_THEME: 'Adwaita:dark' }
 }
 
 function screenOf(agentId: string): Screen {
@@ -133,9 +136,12 @@ function writeConfig(name: string, content: string): string {
 }
 
 // The dock asks this engine to open what is clicked, so each panel is told whose screen it sits on.
+// The panels are the one child given the engine's key: their click handler authenticates with it.
 async function startPanels(agentId: string, display: string, timeZone?: string): Promise<ChildProcess[]> {
+    const apiKey = env().RERUN_API_KEY
     const panelEnv = {
         ...desktopEnv(display),
+        ...(apiKey ? { RERUN_API_KEY: apiKey } : {}),
         RERUN_DESKTOP_AGENT: agentId,
         RERUN_DESKTOP_AGENT_NAME: await displayNameOf(agentId),
         RERUN_DESKTOP_ENGINE: `http://127.0.0.1:${env().RERUN_PORT}`,

@@ -3,8 +3,10 @@
 import { BrainWorkspace, type BrainRequest } from '@/components/brain/BrainWorkspace'
 import { selectionForTab } from '@/components/brain/selection'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
+import { usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { Dialog, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
+import { useSession } from '@/supabase/session/SessionProvider'
 import { useCallback, useEffect, useState } from 'react'
 
 // Everything the whole workspace shares: the pages every agent reads about the company, the changes
@@ -13,6 +15,8 @@ import { useCallback, useEffect, useState } from 'react'
 export function KnowledgeBaseDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const focus = useWorkspaceSettingsStore(s => s.focus)
     const clearFocus = useWorkspaceSettingsStore(s => s.clearFocus)
+    const { workspace } = useSession()
+    const publishedEnabled = usePublishedAccessEnabled() && !(workspace?.is_sandbox ?? true)
     // What the rest of the app asked to open travels as one request, the table along with the
     // section: the database view only mounts once selected, and would miss a table sent apart.
     const [request, setRequest] = useState<BrainRequest | null>(null)
@@ -42,7 +46,7 @@ export function KnowledgeBaseDialog({ open, onOpenChange }: { open: boolean; onO
             >
                 <DialogTitle className="sr-only">Brain</DialogTitle>
                 <DialogDescription className="sr-only">What every coworker of this workspace knows about your company, and the files and tables they share.</DialogDescription>
-                <BrainWorkspace request={request} onRequestConsumed={consumeRequest} onClose={close} />
+                <BrainWorkspace request={request} publishedEnabled={publishedEnabled} onRequestConsumed={consumeRequest} onClose={close} />
             </PanelDialogContent>
         </Dialog>
     )

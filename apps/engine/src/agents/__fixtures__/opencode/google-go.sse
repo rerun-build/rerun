@@ -1,0 +1,4 @@
+data: {"candidates": [{"content": {"parts": [{"text": "Hello "}], "role": "model"}, "index": 0}], "modelVersion": "gemini-4-argon"}
+
+data: {"candidates": [{"content": {"parts": [{"text": "from Argon."}], "role": "model"}, "finishReason": "STOP", "index": 0}], "usageMetadata": {"promptTokenCount": 40, "candidatesTokenCount": 4, "totalTokenCount": 44, "opencode": {"billing_source": "go", "list_cost": 3.03e-05, "allowance": {"remaining": 0.97}, "tokens": {"cache_read": 0, "cache_write_5m": 0, "cache_write_1h": 0}}}, "modelVersion": "gemini-4-argon"}
+

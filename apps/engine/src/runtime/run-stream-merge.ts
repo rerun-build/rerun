@@ -1,6 +1,6 @@
 import type { Usage } from '@rerun/contracts'
 import type { LanguageModelUsage, UIMessageChunk, UIMessageStreamWriter } from 'ai'
-import { QUICK_REPLIES_TOOL } from '@rerun/contracts'
+import { QUICK_REPLIES_TOOL, withHitlVersion } from '@rerun/contracts'
 import { canonicalHitlName, isHitlToolName } from '../tools/builtin/hitl.js'
 import type { QuickRepliesCapture } from '../agents/quick-replies-stream.js'
 import type { AgentRun, RunOutcome } from './loop.js'
@@ -26,9 +26,14 @@ function normalizeHitlStream(stream: ReadableStream<UIMessageChunk>): ReadableSt
     return stream.pipeThrough(
         new TransformStream<UIMessageChunk, UIMessageChunk>({
             transform(chunk, controller) {
-                const c = chunk as { type?: string; toolName?: string }
-                if ((c.type === 'tool-input-start' || c.type === 'tool-input-available') && isHitlToolName(c.toolName)) {
+                const c = chunk as { type?: string; toolName?: string; input?: unknown }
+                if (c.type === 'tool-input-start' && isHitlToolName(c.toolName)) {
                     controller.enqueue({ ...chunk, toolName: canonicalHitlName(c.toolName) } as UIMessageChunk)
+                    return
+                }
+                if (c.type === 'tool-input-available' && isHitlToolName(c.toolName)) {
+                    const toolName = canonicalHitlName(c.toolName)
+                    controller.enqueue({ ...chunk, toolName, input: withHitlVersion(toolName, c.input) } as UIMessageChunk)
                     return
                 }
                 controller.enqueue(chunk)

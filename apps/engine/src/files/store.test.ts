@@ -1,12 +1,12 @@
 import { mkdtempSync } from 'node:fs'
-import { chmod, lstat, mkdir, readdir, stat, symlink, writeFile } from 'node:fs/promises'
+import { chmod, lstat, mkdir, readdir, readFile, stat, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 
 const dataDir = mkdtempSync(resolve(tmpdir(), 'rerun-store-'))
 process.env.RERUN_DATA_DIR = dataDir
 
-const { describe, expect, it } = await import('vitest')
+const { beforeAll, describe, expect, it } = await import('vitest')
 const store = await import('./store.js')
 
 const root = resolve(dataDir, 'root')
@@ -16,7 +16,7 @@ describe('files store', () => {
         await store.writeText(root, 'a/b.txt', 'hello')
         expect(await store.readText(root, 'a/b.txt')).toBe('hello')
         await store.writeBytes(root, 'a/c.bin', new Uint8Array([1, 2, 3]))
-        expect(Array.from(new Uint8Array(await new Response(store.readByteStream(root, 'a/c.bin')).arrayBuffer()))).toEqual([1, 2, 3])
+        expect(Array.from(new Uint8Array(await new Response(await store.readByteStream(root, 'a/c.bin')).arrayBuffer()))).toEqual([1, 2, 3])
         expect(await store.fileSize(root, 'a/c.bin')).toBe(3)
     })
 
@@ -71,5 +71,55 @@ describe('files store', () => {
         await store.writeText(root, 'src/x.txt', 'nothing\nTODO: fix\n')
         const hits = await store.searchText(root, '.', 'TODO', 50)
         expect(hits.some(h => h.includes('src/x.txt:2:') && h.includes('TODO: fix'))).toBe(true)
+    })
+})
+
+// `outside/` sits next to `root/`: `links/dir` points at it and `links/file` at the file in it.
+describe('symlinks', () => {
+    const outside = resolve(dataDir, 'outside')
+    const bytes = () => new ReadableStream<Uint8Array>({ start: c => (c.enqueue(new Uint8Array([1])), c.close()) })
+
+    beforeAll(async () => {
+        await mkdir(outside, { recursive: true })
+        await writeFile(resolve(outside, 'secret.txt'), 'TOP SECRET')
+        await mkdir(resolve(root, 'links'), { recursive: true })
+        await writeFile(resolve(root, 'links/own.txt'), 'mine')
+        await symlink(outside, resolve(root, 'links/dir'))
+        await symlink(resolve(outside, 'secret.txt'), resolve(root, 'links/file'))
+    })
+
+    it.each<[string, () => Promise<unknown>]>([
+        ['readText through a file link', () => store.readText(root, 'links/file')],
+        ['readText through a folder link', () => store.readText(root, 'links/dir/secret.txt')],
+        ['readByteStream', () => store.readByteStream(root, 'links/file')],
+        ['listEntries', () => store.listEntries(root, 'links/dir')],
+        ['fileSize', () => store.fileSize(root, 'links/file')],
+        ['stat', () => store.stat(root, 'links/dir/secret.txt')],
+        ['searchText', () => store.searchText(root, 'links/dir', 'SECRET', 10)],
+        ['writeText through a file link', () => store.writeText(root, 'links/file', 'overwritten')],
+        ['writeText under a folder link', () => store.writeText(root, 'links/dir/pwned.txt', 'x')],
+        ['writeBytes', () => store.writeBytes(root, 'links/dir/pwned.bin', new Uint8Array([1]))],
+        ['writeStream', () => store.writeStream(root, 'links/dir/pwned.up', bytes(), 100)],
+        ['ensureDir', () => store.ensureDir(root, 'links/dir/new')],
+        ['move out of the link', () => store.move(root, 'links/dir/secret.txt', 'stolen.txt')],
+        ['move into the link', () => store.move(root, 'links/own.txt', 'links/dir/moved.txt')],
+    ])('%s refuses a link that leaves the root', async (_label, run) => {
+        await expect(run()).rejects.toThrow('Path escapes the root')
+        expect(await readdir(outside)).toEqual(['secret.txt'])
+        expect(await readFile(resolve(outside, 'secret.txt'), 'utf8')).toBe('TOP SECRET')
+    })
+
+    it('removes an outgoing link itself and leaves its target alone', async () => {
+        await symlink(resolve(outside, 'secret.txt'), resolve(root, 'links/doomed'))
+        await store.remove(root, 'links/doomed')
+        expect(await lstat(resolve(root, 'links/doomed')).catch(() => null)).toBeNull()
+        expect(await readFile(resolve(outside, 'secret.txt'), 'utf8')).toBe('TOP SECRET')
+    })
+
+    it('moves an outgoing link itself and leaves its target alone', async () => {
+        await symlink(outside, resolve(root, 'links/dir-moving'))
+        await store.move(root, 'links/dir-moving', 'links/dir-moved')
+        expect((await lstat(resolve(root, 'links/dir-moved'))).isSymbolicLink()).toBe(true)
+        expect(await readdir(outside)).toEqual(['secret.txt'])
     })
 })

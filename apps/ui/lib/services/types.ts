@@ -118,25 +118,39 @@ export type InstallResult =
     | { status: 'needs_config'; key: string; slug: string; name: string; authMethods: AuthMethodSummary[]; authMethodId?: string; message: string }
     | { status: 'needs_auth'; key: string; slug: string; name: string; oauth?: OAuthTarget; managed?: ManagedTarget; composio?: ComposioTarget; app?: AppTarget; message: string }
 
-// --- Published files (public file publishing via the Hub) ---
+// --- Published files (publishing via the Hub) ---
+
+export type PublishedAccessMode = 'public' | 'workspace' | 'password' | 'invited'
 
 export type PublishResult = {
     status: 'published'
-    url: string // the one to share: <slug>.rerun.site for a page or a site, /p/<slug> for anything else
-    publicUrl: string // underlying Supabase Storage URL
+    url: string // <slug>.rerun.site, or /p/<slug> where no publish host is configured
     slug: string
     path: string
     kind: 'file' | 'site'
     contentType: string
     size: number
+    title: string
+    access: PublishedAccessMode
+    // 'public' when the coworker asked for it and the workspace policy holds it for a person.
+    requestedAccess: 'public' | null
+    message: string
 }
 
 export type PublishedFile = {
     slug: string
+    agentId: string
     path: string
     url: string
+    kind: 'file' | 'site'
     contentType: string
     size: number
+    title: string
+    access: PublishedAccessMode
+    requestedAccess: 'public' | null
+    invited: string[]
+    hasPassword: boolean
+    thumbnailUrl: string | null
     publishedAt: string
     updatedAt: string
 }

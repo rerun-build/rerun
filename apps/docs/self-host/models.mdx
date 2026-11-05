@@ -1,6 +1,6 @@
 ---
 title: "AI models"
-description: "The Rerun models on your OpenRouter key, your own API keys, and your Claude or ChatGPT plan."
+description: "The Rerun models on your OpenRouter key, your own API keys, and your Claude, ChatGPT or OpenCode plan."
 ---
 
 Every coworker thinks with one model at a time. On a self-hosted Rerun you pay the AI provider directly: there is no credit, no meter and no plan in between.
@@ -17,7 +17,7 @@ A new coworker starts on **Rerun**, with three tiers to pick from:
 
 On your install, these run on your `OPENROUTER_API_KEY`. The engine asks the app, the app relays the call to OpenRouter with your key, and nothing is counted. All three tiers are open to every workspace.
 
-The app only relays for engines it knows, so your key never serves anybody else. The Foreman and its helpers run on the same key.
+The app only relays for engines it knows, so your key never serves anybody else. The Foreman's onboarding and its helpers run on the same key. Without the key, the Foreman skips the onboarding and runs on the model you pick for it, like any coworker.
 
 <Tip>
   Set a credit limit on the key in your OpenRouter dashboard. It is the simplest way to cap what your coworkers can spend.
@@ -48,6 +48,15 @@ In the same **AI providers** dialog, connect a plan you already pay for:
 - **ChatGPT**, with a Plus or Pro plan
 
 Sign in once and your coworkers run on the plan. The engine image ships the official Claude Code and Codex command-line tools that make this work, so there is nothing to install on the server.
+
+### OpenCode
+
+Paste an OpenCode key (it starts with `oc_sk_`, get one at [opencode.ai/auth](https://opencode.ai/auth)) under **OpenCode Go or Console**. One key reaches both of OpenCode's catalogs:
+
+- **Go**, the subscription: its models are switched on when you connect, and cost nothing on top of the plan. The picker shows them with an **Included** badge, and the connection shows the plan's 5-hour, weekly and monthly limits.
+- **Console**, paid per token from your OpenCode credits: its models (Claude, GPT, Gemini and more) start switched off, with a **Credits** badge and their price per million tokens.
+
+A model sold on both sides appears twice, once per catalog. OpenCode runs inside the engine itself, with no command-line tool. Your app only offers it once `NEXT_PUBLIC_OPENCODE_ENABLED=1` is set and the engine is recent enough to run it.
 
 ## Choose the model per coworker
 

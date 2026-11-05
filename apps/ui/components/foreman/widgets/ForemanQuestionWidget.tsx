@@ -41,7 +41,7 @@ export function QuestionRecap({ question, answer }: { question: string; answer: 
 export function ForemanQuestionWidget({ input, output, onAnswer, onDismiss }: ForemanQuestionWidgetProps) {
     const args = input && typeof input === 'object' ? (input as Record<string, unknown>) : {}
     const question = typeof args.question === 'string' ? args.question : 'One question'
-    const options = asStringArray(args.options)
+    const options = asStringArray(args.options).map(label => ({ label }))
 
     const answered = readQuestionOutput(output)
     if (answered) return <QuestionRecap question={question} answer={answered} />

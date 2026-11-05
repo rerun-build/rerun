@@ -26,7 +26,7 @@ export async function createAgent(input: CreateAgentInput): Promise<LoadedAgent>
     await mkdir(resolve(agentDir(id), 'memory'), { recursive: true })
     const soul = input.soul ?? defaultSoul(config)
     const install = input.install?.trim() ?? ''
-    await writeFile(configPath(id), JSON.stringify(config, null, 4), 'utf8')
+    await writeFile(configPath(id), JSON.stringify(config, null, 4), { encoding: 'utf8', mode: 0o600 })
     await writeFile(soulPath(id), soul, 'utf8')
     if (install.length > 0) await writeFile(installPath(id), `${install}\n`, 'utf8')
     await writeAgentEnv(id, env)

@@ -70,7 +70,7 @@ describe.each(RUNTIMES)('the order of a turn on %s running %s', (provider, model
         expect(prompt.match(/<turn_order>/g)).toHaveLength(1)
         const note = sectionOf(prompt, 'turn_order') ?? ''
         expect(note).toContain('in full, what the card asks about')
-        if (order === 'call-first') expect(note).toContain('the first message you write to the user ends your turn')
+        if (order === 'call-first') expect(note).toContain('a message written before a call does not reach the user as your message')
         else {
             expect(note).toContain('A turn ends in this order, your message first')
             expect(note).toContain('make it in the same reply as your message')

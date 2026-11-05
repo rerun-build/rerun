@@ -202,6 +202,31 @@ lists model ids beyond the UI's curated catalog, served through that same connec
 { "name": "Team plan", "models": ["sonnet"], "baseUrl": "https://router.example.com/v1", "extraModels": ["acme/router-large"] }
 ```
 
+### OpenCode connections
+
+`provider: "opencode"` takes one key, `OPENCODE_API_KEY` (`oc_sk_…`), valid on both OpenCode
+catalogs: **Go**, a subscription, and **Console**, paid per token from the account's credits. Model
+ids carry their plan: `go/deepseek-v4-pro`, `console/claude-sonnet-5-5`. The same model sold on
+both sides is two ids, and only the id without its plan is sent to OpenCode.
+
+There is no CLI: the engine runs OpenCode in its own loop, on the SDK of the format each model is
+served on (Anthropic messages, OpenAI responses, OpenAI chat, Google). Every request carries
+`x-opencode-session` (the conversation id, refused without it) and follows no redirect.
+
+- The catalog is read live from `https://opencode.ai/inference/{go/,}v1/models` (public, no key):
+  at boot, on `GET /connections` when older than 30 minutes, before a new connection adopts the
+  default, and after a `400 Model is unavailable`. The snapshot built into `@rerun/contracts` stands
+  in until it answers. `providerModels` on the summary lists what the catalog reaches today.
+- `planLimits` reads `https://opencode.ai/zen/go/v1/usage`: the five-hour `session`, `weekly` and
+  `monthly` windows of the Go plan, for the whole account.
+- A step records its real cost: `0` on Go, OpenCode's list price on Console.
+- A refusal is rewritten into a sentence the chat knows: `402` → "OpenCode Console credits used
+  up", `429` on Go once the usage read taken on the spot says a window is spent → "OpenCode Go limit
+  reached", `401` →
+  "OpenCode key refused".
+- On a model without vision, the `vision_analyze` tool asks another model of the connection that
+  sees, and the computer tools are not offered.
+
 ### `PATCH /connections/:id/keys`
 
 ```json

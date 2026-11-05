@@ -2,6 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { applyCaching } from './caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from './reasoning.js'
 
+describe('reasoning provider options on OpenCode', () => {
+    it('asks the way the format asks, and nothing on the chat format', () => {
+        expect(reasoningProviderOptions('opencode', 'go/claude-haiku-5-5')).toEqual(reasoningProviderOptions('anthropic'))
+        expect(reasoningProviderOptions('opencode', 'go/gpt-6-luna')).toEqual(reasoningProviderOptions('openai'))
+        expect(reasoningProviderOptions('opencode', 'go/gemini-4-argon')).toEqual(reasoningProviderOptions('google'))
+        expect(reasoningProviderOptions('opencode', 'go/deepseek-v4-pro')).toBeUndefined()
+        expect(reasoningProviderOptions('opencode', 'go/unknown')).toBeUndefined()
+    })
+})
+
 describe('reasoning provider options', () => {
     it('asks each API provider for its reasoning in its own dialect', () => {
         expect(reasoningProviderOptions('anthropic')).toEqual({ anthropic: { thinking: { type: 'adaptive', display: 'summarized' } } })

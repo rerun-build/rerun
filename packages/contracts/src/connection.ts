@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { RERUN_MODELS, providerSchema, type Provider } from './agent.js'
+import { OPENCODE_DEFAULT_MODEL, providerModelSchema, type ProviderModel } from './opencode.js'
+import { OPENCODE_SNAPSHOT } from './opencode-snapshot.js'
 
 // A named credential held by the box rather than by an agent. Agents point at one through
 // `config.connectionId`, so plugging a subscription once is enough for every agent on the box, and
@@ -23,9 +25,10 @@ export type ConnectionConfig = z.infer<typeof connectionConfigSchema>
 // the shared key. It has a config.json like any other but no `.env`, and cannot be deleted.
 export const RERUN_CONNECTION_ID = 'rerun'
 
-// One metered window of a subscription: the rolling session, the week, or a per-model weekly cap.
+// One metered window of a subscription: the rolling session, the week, a per-model weekly cap, or the
+// month (OpenCode Go).
 export const planLimitWindowSchema = z.object({
-    kind: z.enum(['session', 'weekly', 'model']),
+    kind: z.enum(['session', 'weekly', 'model', 'monthly']),
     // Only a `model` window carries one: the name of the model it meters.
     label: z.string().nullable(),
     usedPercent: z.number(),
@@ -64,6 +67,12 @@ export function cliServesModel(provider: Provider, cliModels: CliModels | null |
     return cliModels.models.some(model => cliModelKey(model) === key)
 }
 
+// A model OpenCode stopped publishing. Without a live reading nothing is refused, as with the CLIs.
+export function opencodeServesModel(provider: Provider, providerModels: ProviderModel[] | null | undefined, id: string): boolean {
+    if (provider !== 'opencode' || !providerModels) return true
+    return providerModels.some(model => model.id === id)
+}
+
 export const connectionSummarySchema = connectionConfigSchema.extend({
     id: z.string(),
     // Whether the credential behind it is present. The value itself is never returned.
@@ -75,6 +84,9 @@ export const connectionSummarySchema = connectionConfigSchema.extend({
     // Defaulted rather than required: an engine older than plan limits answers without it.
     planLimits: planLimitsSchema.nullable().default(null),
     cliModels: cliModelsSchema.nullable().default(null),
+    // The models an API-key provider with a live catalog reaches today (OpenCode). Null on every
+    // other provider, and on an engine older than it: the hub then falls back on its snapshot.
+    providerModels: z.array(providerModelSchema).nullable().default(null),
 })
 export type ConnectionSummary = z.infer<typeof connectionSummarySchema>
 
@@ -142,6 +154,7 @@ export const CONNECTION_TOKEN_KEY: Record<z.infer<typeof providerSchema>, string
     openai: 'OPENAI_API_KEY',
     google: 'GOOGLE_GENERATIVE_AI_API_KEY',
     openrouter: 'OPENROUTER_API_KEY',
+    opencode: 'OPENCODE_API_KEY',
 }
 
 // What is wrong with a value about to be stored as a Claude subscription token, or null when it
@@ -164,6 +177,7 @@ export const CONNECTION_SATELLITE_KEYS: Record<z.infer<typeof providerSchema>, s
     // The engine still resolves this alias, so a migration has to carry it over.
     google: ['GOOGLE_API_KEY'],
     openrouter: [],
+    opencode: [],
 }
 
 // Every env var name that used to live on an agent and now belongs to a connection. What the boot
@@ -229,6 +243,9 @@ export const DEFAULT_CONNECTION_MODELS: Record<z.infer<typeof providerSchema>, s
         'qwen/qwen3.8-flash',
         'minimax/minimax-m3.1-flash',
     ],
+    // Every model the Go plan includes, the default first. Console models are paid per token from
+    // the account's credits, so they start switched off.
+    opencode: [OPENCODE_DEFAULT_MODEL, ...OPENCODE_SNAPSHOT.filter(model => model.plan === 'go' && model.id !== OPENCODE_DEFAULT_MODEL).map(model => model.id)],
 }
 
 // How a connection names itself when nobody has yet: the boot migration builds "Claude (Theo)"
@@ -241,6 +258,7 @@ export const PROVIDER_LABELS: Record<z.infer<typeof providerSchema>, string> = {
     openai: 'OpenAI',
     google: 'Google',
     openrouter: 'OpenRouter',
+    opencode: 'OpenCode',
 }
 
 // The model the app's picker offers for one coworker, grouped and labelled by the hub with the web

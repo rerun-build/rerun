@@ -50,12 +50,12 @@ describe('shell_exec child environment', () => {
         expect((await optionsSeenBy({ PATH: '/agent/bin' })).env?.PATH).toBe('/agent/bin')
     })
 
-    // Looks wrong: the whole engine environment is inherited, so any command the agent runs can read
-    // the box API key it uses to authenticate to the hub.
-    it('passes the engine hub credentials to every command', async () => {
+    it('keeps the engine hub credentials and data dir out of every command', async () => {
         const options = await optionsSeenBy({})
-        expect(options.env?.RERUN_API_KEY).toBe('engine-space-key')
-        expect(options.env?.RERUN_HUB_BASE_URL).toBe('https://hub.example')
-        expect(options.env?.RERUN_DATA_DIR).toBe(process.env.RERUN_DATA_DIR)
+        expect(options.env).not.toHaveProperty('RERUN_API_KEY')
+        expect(options.env).not.toHaveProperty('RERUN_HUB_BASE_URL')
+        expect(options.env).not.toHaveProperty('RERUN_DATA_DIR')
+        expect(options.env?.RERUN_WORKSPACE).toBe(workspaceDir('env-agent'))
+        expect(options.env?.PATH).toBe(process.env.PATH)
     })
 })

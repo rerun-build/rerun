@@ -10,7 +10,7 @@ const TONE_CLASS: Record<PlanLimitTone, string> = { brand: 'text-muted-foregroun
 
 // How far into its plan a subscription is, beside its name in a model picker. One figure for the
 // whole group: the limits are the subscription's, every model under it draws on the same ones.
-export function PlanLimitHint({ windows }: { windows: PlanLimitWindow[] }) {
+export function PlanLimitHint({ windows, provider }: { windows: PlanLimitWindow[]; provider?: string }) {
     const tightest = tightestPlanWindow(windows)
     if (!tightest) return null
 
@@ -20,7 +20,7 @@ export function PlanLimitHint({ windows }: { windows: PlanLimitWindow[] }) {
                 const reset = planWindowReset(window)
                 return (
                     <span key={`${window.kind}:${window.label ?? ''}`}>
-                        {planWindowName(window)}: {planWindowPercent(window)} used{reset ? `, ${reset}` : ''}
+                        {planWindowName(window, provider)}: {planWindowPercent(window)} used{reset ? `, ${reset}` : ''}
                     </span>
                 )
             })}

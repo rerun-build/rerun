@@ -1,3 +1,4 @@
+import { opencodeModel } from '../../connections/opencode-catalog.js'
 import { generateText, type ModelMessage } from 'ai'
 import { isContextPart, modelContextWindow, type Provider } from '@rerun/contracts'
 import { modelFor, type ModelOverride } from '../../agents/providers.js'
@@ -71,7 +72,7 @@ async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefi
         const signal = deadlineSignal(COMPACTION_TIMEOUT_MS, ctx.abortSignal)
         const { text } = await raceAbort(
             generateText({
-                model: modelFor(ctx.agent, override),
+                model: modelFor(ctx.agent, override, undefined, undefined, { sessionId: ctx.sessionId }),
                 system: SUMMARY_SYSTEM,
                 prompt: serializeForSummary(middle),
                 temperature: 0,
@@ -84,6 +85,13 @@ async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefi
     } finally {
         release()
     }
+}
+
+// An OpenCode model OpenCode published after this build is only known to the live catalog, which
+// also has the fresher figure for the others.
+export function runContextWindow(model: string, provider: Provider): number | undefined {
+    if (provider === 'opencode') return opencodeModel(model)?.contextWindow ?? modelContextWindow(model, provider)
+    return modelContextWindow(model, provider)
 }
 
 export function compactionThreshold(contextWindow: number, provider: Provider): number {
@@ -103,7 +111,7 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
     })
     const working = priorSummary ? [priorSummary, ...live] : live
 
-    const contextWindow = modelContextWindow(ctx.model, ctx.provider)
+    const contextWindow = runContextWindow(ctx.model, ctx.provider)
     if (!contextWindow) return working
     if (estimateTokens(working, system, toolChars) < compactionThreshold(contextWindow, ctx.provider)) return working
 

@@ -1,6 +1,6 @@
 'use server'
 
-import { ensureEmailAccount } from '@/app/api/_services/email-sign-up.service'
+import { claimEmailCodeAsk, ensureEmailAccount, lookupEmailForSignUp } from '@/app/api/_services/email-sign-up.service'
 import { resendSignInCodeIfLive } from '@/app/api/_services/sign-in-code.service'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import { callerIp } from '@/lib/auth/caller-ip'
@@ -10,17 +10,10 @@ import { verifyTurnstile } from '@/lib/auth/turnstile'
 import { drawPriceArm } from '@/cloud/billing'
 import { normalizeEmail } from '@/lib/email'
 import { createClient } from '@/supabase/server'
-import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
 import { CONSENT_COOKIE } from '@rerun/contracts'
 import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
-
-export async function checkEmailExists(email: string): Promise<{ exists: boolean }> {
-    const { data, error } = await createServiceRoleClient().rpc('check_email_exists', { email: normalizeEmail(email) })
-    if (error) throw error
-    return { exists: !!data }
-}
 
 // Asked before every new code: Supabase voids the previous code each time it mints one, so while
 // the last one is still good it is mailed again instead. `resent: false` means ask Supabase, `held`
@@ -36,18 +29,44 @@ const prepareSchema = z.object({ email: z.string().trim().email().max(320), capt
 
 export type EmailSignInPreparation = { ok: true; created: boolean } | { ok: false; error: string; reason: EmailPreparationFailure }
 
-const preparationRefused = (reason: EmailPreparationFailure): EmailSignInPreparation => ({ ok: false, error: EMAIL_PREPARATION_MESSAGES[reason], reason })
+const preparationRefused = (reason: EmailPreparationFailure) => ({ ok: false as const, error: EMAIL_PREPARATION_MESSAGES[reason], reason })
+
+// What every ask for a code goes through before Supabase hears of it: the robot check, then the pace
+// of the network behind the caller. `null` when the caller may go on.
+async function refuseCodeAsk(captchaToken: string | undefined): Promise<{ ip: string; refusal: EmailPreparationFailure | null }> {
+    const ip = callerIp(await headers())
+    if (!(await verifyTurnstile(captchaToken, ip))) return { ip, refusal: 'captcha_failed' }
+    if (!(await claimEmailCodeAsk(ip))) return { ip, refusal: 'too_many_codes' }
+    return { ip, refusal: null }
+}
 
 // Called before Supabase is asked for a new code, which it then mails to an account that exists.
 export async function prepareEmailSignIn(input: z.input<typeof prepareSchema>): Promise<EmailSignInPreparation> {
     const parsed = prepareSchema.safeParse(input)
     if (!parsed.success) return preparationRefused('invalid_email')
 
-    const ip = callerIp(await headers())
-    if (!(await verifyTurnstile(parsed.data.captchaToken, ip))) return preparationRefused('captcha_failed')
+    const { ip, refusal } = await refuseCodeAsk(parsed.data.captchaToken)
+    if (refusal) return preparationRefused(refusal)
 
     const result = await ensureEmailAccount(normalizeEmail(parsed.data.email), ip)
     return result.ok ? result : preparationRefused(result.error)
+}
+
+export type AnonymousEmailPreparation = { ok: true; exists: boolean } | { ok: false; error: string; reason: EmailPreparationFailure }
+
+// The address an anonymous visitor claims goes through the same gate as the auth page's, and the
+// domain rule with it. Whether the address has an account is what the visitor's browser needs next:
+// a known one is signed into, a new one is claimed on the anonymous user. It is only said past the
+// robot check and the pace, like `created` above.
+export async function prepareAnonymousEmailStep(input: z.input<typeof prepareSchema>): Promise<AnonymousEmailPreparation> {
+    const parsed = prepareSchema.safeParse(input)
+    if (!parsed.success) return preparationRefused('invalid_email')
+
+    const { refusal } = await refuseCodeAsk(parsed.data.captchaToken)
+    if (refusal) return preparationRefused(refusal)
+
+    const lookup = await lookupEmailForSignUp(normalizeEmail(parsed.data.email))
+    return lookup.ok ? lookup : preparationRefused(lookup.error)
 }
 
 export type SignupCompletion = { ok: true; signedUp: boolean } | { ok: false }

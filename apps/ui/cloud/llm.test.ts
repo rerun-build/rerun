@@ -25,6 +25,19 @@ describe('rerunChatCompletions', () => {
         await expect(response.text()).resolves.toBe(answer)
     })
 
+    it('answers without a key in the OpenAI error shape, with a status the engine neither retries nor reads as overloaded', async () => {
+        vi.stubEnv('OPENROUTER_API_KEY', '')
+        const upstream = vi.fn()
+        vi.stubGlobal('fetch', upstream)
+
+        const response = await rerunChatCompletions(request())
+
+        expect(response.status).toBe(403)
+        const body = (await response.json()) as { error: { message: string } }
+        expect(body.error.message).toContain('OPENROUTER_API_KEY')
+        expect(upstream).not.toHaveBeenCalled()
+    })
+
     it('keeps the status of a refusal', async () => {
         vi.stubGlobal('fetch', vi.fn(async () => Response.json({ error: 'nope' }, { status: 402 })))
         vi.spyOn(console, 'error').mockImplementation(() => {})

@@ -4,6 +4,7 @@ import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import { assertCommandAllowed } from '../sandbox.js'
 import { agentProcessEnv } from '../../agents/process-env.js'
+import { childProcessEnv } from '../../lib/child-env.js'
 import { HostBreaker, hostsOf, httpFailureInOutput, withHostBreaker, type HostAttempt } from '../host-breaker.js'
 import type { RunContext } from '../../runtime/context.js'
 
@@ -15,7 +16,7 @@ type ShellError = { stdout?: string; stderr?: string; message: string; killed?: 
 
 export function shellTools(ctx: RunContext, run: ShellRunner = execAsync): ToolSet {
     const { cwd, env: agentEnv } = agentProcessEnv(ctx.agent)
-    const env: NodeJS.ProcessEnv = { ...process.env, ...agentEnv }
+    const env = childProcessEnv(agentEnv)
     const breaker = ctx.hostBreaker ?? new HostBreaker()
     return {
         shell_exec: tool({

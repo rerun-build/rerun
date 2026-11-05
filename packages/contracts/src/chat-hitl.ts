@@ -4,7 +4,9 @@
 import { appendAttachmentsRef, attachmentDisplayName, buildAttachmentsRef, parseAttachments } from './chat-attachments.js'
 import { stripBridgePrefix } from './chat-tool-name.js'
 
-export type QuestionItem = { question: string; options: string[]; multiple?: boolean }
+export type QuestionOption = { label: string; description?: string }
+
+export type QuestionItem = { question: string; header?: string; options: QuestionOption[]; multiple?: boolean }
 
 export type ApprovalItem = {
     action: string
@@ -80,10 +82,19 @@ export function hitlInputIsUsable(kind: HitlKind, input: Record<string, unknown>
     return HITL_INPUT_KEYS[kind].some(key => input[key] !== undefined && input[key] !== null)
 }
 
-function toQuestionItem(question: unknown, options: unknown, multiple: unknown): QuestionItem {
-    const choices = Array.isArray(options) ? (options as string[]) : []
+function toQuestionOption(value: unknown): QuestionOption | null {
+    if (typeof value === 'string') return value.trim() ? { label: value } : null
+    if (!value || typeof value !== 'object') return null
+    const { label, description } = value as { label?: unknown; description?: unknown }
+    if (typeof label !== 'string' || !label.trim()) return null
+    return typeof description === 'string' && description.trim() ? { label, description } : { label }
+}
+
+function toQuestionItem(question: unknown, options: unknown, multiple: unknown, header?: unknown): QuestionItem {
+    const choices = Array.isArray(options) ? options.map(toQuestionOption).filter(option => option !== null) : []
     return {
         question: String(question ?? 'The coworker has a question'),
+        ...(typeof header === 'string' && header.trim() ? { header } : {}),
         options: choices,
         multiple: multiple === true && choices.length > 0,
     }
@@ -93,13 +104,36 @@ export function pendingQuestions(input: Record<string, unknown>): QuestionItem[]
     const questions = coerceJsonArray(input.questions)
     if (Array.isArray(questions)) {
         return questions.map(value => {
-            const item = (value ?? {}) as { question?: unknown; options?: unknown; suggestions?: unknown; multiple?: unknown }
+            const item = (value ?? {}) as { question?: unknown; header?: unknown; options?: unknown; suggestions?: unknown; multiple?: unknown }
             const options = Array.isArray(item.options) ? item.options : item.suggestions
-            return toQuestionItem(item.question, options, item.multiple)
+            return toQuestionItem(item.question, options, item.multiple, item.header)
         })
     }
 
     return [toQuestionItem(input.question, Array.isArray(input.options) ? input.options : input.suggestions, input.multiple)]
+}
+
+// An option written as an object (a label with its description) is the first ask_user shape an iOS
+// build that shipped before it cannot draw: it would hand the object to a text node. The server
+// stamps such a call v2 on its way to every client, since the model never writes `v` itself.
+const QUESTION_OPTIONS_VERSION = 2
+
+function questionsCarryOptionObjects(input: Record<string, unknown>): boolean {
+    const questions = coerceJsonArray(input.questions)
+    if (!Array.isArray(questions)) return false
+    return questions.some(value => {
+        const item = (value ?? {}) as { options?: unknown; suggestions?: unknown }
+        const options = Array.isArray(item.options) ? item.options : item.suggestions
+        return Array.isArray(options) && options.some(option => option !== null && typeof option === 'object')
+    })
+}
+
+export function withHitlVersion<T>(toolName: string | undefined, input: T): T {
+    if (!toolName || hitlKindOf(toolName) !== 'question') return input
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return input
+    const record = input as Record<string, unknown>
+    if (hitlVersionOf(record) >= QUESTION_OPTIONS_VERSION || !questionsCarryOptionObjects(record)) return input
+    return { ...record, v: QUESTION_OPTIONS_VERSION } as T
 }
 
 export type QuestionAnswer = { question: string; answers: string[]; attachments?: string[] }

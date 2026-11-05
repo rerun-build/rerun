@@ -1,5 +1,7 @@
 import type { streamText } from 'ai'
 import type { Provider } from '@rerun/contracts'
+import { opencodeModel } from '../connections/opencode-catalog.js'
+import { behaviourOf } from './opencode.js'
 
 type ProviderOptions = NonNullable<Parameters<typeof streamText>[0]['providerOptions']>
 
@@ -14,8 +16,12 @@ const REASONING_OPTIONS: Partial<Record<Provider, ProviderOptions>> = {
     google: { google: { thinkingConfig: { includeThoughts: true } } },
 }
 
-export function reasoningProviderOptions(provider: Provider): ProviderOptions | undefined {
-    return REASONING_OPTIONS[provider]
+// An OpenCode model is asked the way its format asks, and only when OpenCode says it reasons: the
+// chat format has no field for it, the model reasons or not on its own.
+export function reasoningProviderOptions(provider: Provider, model = ''): ProviderOptions | undefined {
+    if (provider !== 'opencode') return REASONING_OPTIONS[provider]
+    if (!opencodeModel(model)?.reasoning) return undefined
+    return REASONING_OPTIONS[behaviourOf(provider, model)]
 }
 
 // One level deep on purpose: `openai` already carries the `promptCacheKey` that applyCaching put

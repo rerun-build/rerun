@@ -42,6 +42,14 @@ describe('a self-hosted install, where every workspace is entitled from its firs
         expect(foremanPhase({ ...fresh, entitled: true, agentCount: 1 })).toBe('companion')
     })
 
+    it('hands every workspace to the foreman on the engine when the hub has no key to run the onboarding on', () => {
+        edition.cloud = false
+        expect(foremanPhase({ ...fresh, entitled: true, hubForeman: false })).toBe('companion')
+        expect(foremanPhase({ ...fresh, foreman: profiled, entitled: true, hubForeman: false })).toBe('companion')
+        expect(foremanPhase({ ...fresh, foreman: planned, entitled: true, hubForeman: false })).toBe('companion')
+        expect(foremanPhase({ ...fresh, entitled: true, arrivedReadyMade: true, hubForeman: false })).toBe('companion')
+    })
+
     it('makes the first plan a tool call, since no starter pack opens this step', () => {
         const shown = { id: 'a', role: 'assistant', parts: [{ type: 'tool-show_plan', state: 'output-available', toolCallId: 'c', input: planned.plan, output: {} }] } as never
         const planning = stateOf('plan', { foreman: profiled })

@@ -8,6 +8,7 @@ import { BrainPage } from '@/components/brain/BrainPage'
 import { BrainPageHistory } from '@/components/brain/BrainPageHistory'
 import { PageColumn } from '@/components/brain/BrainPageParts'
 import { BrainProposalsPanel } from '@/components/brain/BrainProposalsPanel'
+import { BrainPublishedView } from '@/components/brain/BrainPublishedView'
 import { BrainSeedForm } from '@/components/brain/BrainSeedForm'
 import { BrainSidebar } from '@/components/brain/BrainSidebar'
 import { BrainChromeContext, BrainTopBar } from '@/components/brain/BrainTopBar'
@@ -71,7 +72,7 @@ const toSummary = ({ slug, title, type, hash, updatedAt, updatedBy }: BrainPageD
 
 // The Brain as one workspace: a sidebar holding everything the company shares with its agents, and
 // whatever is selected in it, open in the main panel.
-export function BrainWorkspace({ request, onRequestConsumed, onClose }: { request: BrainRequest | null; onRequestConsumed: () => void; onClose: () => void }) {
+export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, onClose }: { request: BrainRequest | null; publishedEnabled: boolean; onRequestConsumed: () => void; onClose: () => void }) {
     const setOpenProposals = useBrainStore(s => s.setOpenProposals)
     const isMobile = useIsMobile()
     const [overview, setOverview] = useState<Overview | null>(null)
@@ -148,10 +149,10 @@ export function BrainWorkspace({ request, onRequestConsumed, onClose }: { reques
         (incoming: BrainRequest) => {
             setDataFocus(incoming.data)
             if (incoming.data?.table) select({ kind: 'table', name: incoming.data.table })
-            else if (incoming.selection) select(incoming.selection)
+            else if (incoming.selection && (incoming.selection.kind !== 'published' || publishedEnabled)) select(incoming.selection)
             onRequestConsumed()
         },
-        [select, onRequestConsumed],
+        [select, onRequestConsumed, publishedEnabled],
     )
 
     // A request made before mount is the first selection; one made while open replaces the current.
@@ -451,6 +452,8 @@ export function BrainWorkspace({ request, onRequestConsumed, onClose }: { reques
                 return <BrainNewPage pages={pages} titles={titles} files={files.knownFiles} onOpenPage={openPage} onOpenFile={openFile} onCreated={createdPage} />
             case 'proposals':
                 return <BrainProposalsPanel proposals={available ? proposals : []} onDecided={proposalDecided} onOpenPage={openPage} />
+            case 'published':
+                return <BrainPublishedView />
             case 'folder':
                 return <BrainFolderView path={selection.path} files={files} onSelect={select} onUpload={upload} />
             case 'file':
@@ -517,6 +520,7 @@ export function BrainWorkspace({ request, onRequestConsumed, onClose }: { reques
                                 pagesAvailable={available}
                                 selection={selection}
                                 openProposals={proposals?.length ?? (overview.available ? overview.openProposals : 0)}
+                                publishedEnabled={publishedEnabled}
                                 files={files}
                                 tables={tables}
                                 searchRef={searchRef}

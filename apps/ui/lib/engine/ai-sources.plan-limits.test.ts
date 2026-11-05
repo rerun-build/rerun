@@ -20,6 +20,7 @@ function plan(windows: PlanLimitWindow[] | null): BoxConnection {
         credentialRejected: false,
         planLimits: windows && { windows, capturedAt: '2026-10-05T11:55:00.000Z' },
         cliModels: null,
+        providerModels: null,
     }
 }
 
@@ -63,6 +64,12 @@ describe('planWindowName', () => {
     it('names a per-model window after its model', () => {
         expect(planWindowName({ ...weekly, kind: 'model', label: 'Opus' })).toBe('Opus weekly')
         expect(planWindowName(session)).toBe('Session')
+    })
+
+    it("names OpenCode Go's windows the way its plan does", () => {
+        expect(planWindowName(session, 'opencode')).toBe('5-hour')
+        expect(planWindowName({ ...weekly, kind: 'monthly' }, 'opencode')).toBe('Monthly')
+        expect(planWindowName(weekly, 'opencode')).toBe('Weekly')
     })
 })
 

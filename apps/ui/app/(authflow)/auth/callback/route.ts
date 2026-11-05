@@ -2,6 +2,7 @@ import type { Database } from '@/app/api/database.types'
 import { LAST_SIGN_IN_COOKIE, LAST_SIGN_IN_MAX_AGE_SECONDS } from '@/lib/auth/last-sign-in-cookie'
 import { ACCOUNT_LINK_ERROR_PARAM, ACCOUNT_LINK_PROVIDER_PARAM, ACCOUNT_PARAM, LINK_INTENT_COOKIE } from '@/lib/auth/link-intent'
 import { OAUTH_PROVIDER_COOKIE, isOAuthProvider, type OAuthProvider } from '@/lib/auth/oauth-providers'
+import { internalPath } from '@/lib/auth/internal-path'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { routes } from '@/lib/routes'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -89,7 +90,7 @@ export async function GET(request: Request) {
 
         if (!error && data.session) {
             const pendingInvite = linking ? undefined : cookieStore.get(PENDING_INVITE_COOKIE)?.value
-            const response = withSessionCookies(linking ? backToAccount(request) : NextResponse.redirect(publicUrl(request, pendingInvite || routes.home)))
+            const response = withSessionCookies(linking ? backToAccount(request) : NextResponse.redirect(publicUrl(request, internalPath(pendingInvite, routes.home))))
 
             if (pendingInvite) {
                 response.cookies.delete(PENDING_INVITE_COOKIE)

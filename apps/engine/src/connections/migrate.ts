@@ -1,7 +1,8 @@
 import { readFile, rename, writeFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { CONNECTION_ENV_KEYS, CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, PROVIDER_LABELS, canonicalModelId, canonicalModelIds, providerSchema, type Provider } from '@rerun/contracts'
+import { z } from 'zod'
+import { DEFAULT_CONNECTION_MODELS, PROVIDER_LABELS, canonicalModelId, canonicalModelIds, type Provider } from '@rerun/contracts'
 import { agentDir, agentEnvPath, configPath, connectionDir, connectionsDir, connectionsMigratedPath } from '../config/paths.js'
 import { listAgentIdsOnDisk } from '../agents/loader.js'
 import { agentConfigSchema } from '../agents/types.js'
@@ -17,21 +18,51 @@ import type { LoadedConnection } from './types.js'
 // the connection, so the current schema no longer describes what is on disk here.
 type LegacyAgentConfig = { name: string; provider: Provider; openrouterBaseUrl?: string; openrouterModels?: string[] }
 
-const KEYED_PROVIDERS = providerSchema.options.filter(p => !!CONNECTION_TOKEN_KEY[p])
+// The providers and their key names as they stood when this step shipped. It is a step of the
+// data-dir ladder, so a data-dir restored long after must be folded exactly as it would have been
+// then: a provider added since (OpenCode) is neither folded into a connection nor stripped from an
+// agent's `.env`, where it can only be a shell variable of the user's.
+const FOLD_PROVIDERS = ['rerun', 'anthropic', 'claude', 'codex', 'openai', 'google', 'openrouter'] as const satisfies readonly Provider[]
+type FoldProvider = (typeof FOLD_PROVIDERS)[number]
+const foldProviderSchema = z.enum(FOLD_PROVIDERS)
 
-function credentialOf(env: Record<string, string>, provider: Provider): string | null {
-    const primary = env[CONNECTION_TOKEN_KEY[provider]]
+const FOLD_TOKEN_KEY: Record<FoldProvider, string> = {
+    rerun: '',
+    anthropic: 'ANTHROPIC_API_KEY',
+    claude: 'CLAUDE_CODE_OAUTH_TOKEN',
+    codex: 'CODEX_OAUTH_TOKEN',
+    openai: 'OPENAI_API_KEY',
+    google: 'GOOGLE_GENERATIVE_AI_API_KEY',
+    openrouter: 'OPENROUTER_API_KEY',
+}
+
+const FOLD_SATELLITE_KEYS: Record<FoldProvider, string[]> = {
+    rerun: [],
+    anthropic: [],
+    claude: ['CLAUDE_CODE_OAUTH_REFRESH_TOKEN', 'CLAUDE_CODE_OAUTH_EXPIRES_AT'],
+    codex: ['CODEX_OAUTH_REFRESH_TOKEN', 'CODEX_OAUTH_ID_TOKEN', 'CODEX_OAUTH_ACCOUNT_ID', 'CODEX_OAUTH_EXPIRES_AT'],
+    openai: [],
+    google: ['GOOGLE_API_KEY'],
+    openrouter: [],
+}
+
+const FOLD_ENV_KEYS: string[] = [...Object.values(FOLD_TOKEN_KEY).filter(Boolean), ...Object.values(FOLD_SATELLITE_KEYS).flat()]
+
+const KEYED_PROVIDERS = FOLD_PROVIDERS.filter(p => !!FOLD_TOKEN_KEY[p])
+
+function credentialOf(env: Record<string, string>, provider: FoldProvider): string | null {
+    const primary = env[FOLD_TOKEN_KEY[provider]]
     if (primary) return primary
     // Google is the one provider the engine reads under two names, so a key stored only under the
     // alias still describes a real connection.
-    for (const alias of CONNECTION_SATELLITE_KEYS[provider]) {
+    for (const alias of FOLD_SATELLITE_KEYS[provider]) {
         if (alias.endsWith('_API_KEY') && env[alias]) return env[alias]
     }
     return null
 }
 
-function keysFor(env: Record<string, string>, provider: Provider): Record<string, string> {
-    const names = [CONNECTION_TOKEN_KEY[provider], ...CONNECTION_SATELLITE_KEYS[provider]]
+function keysFor(env: Record<string, string>, provider: FoldProvider): Record<string, string> {
+    const names = [FOLD_TOKEN_KEY[provider], ...FOLD_SATELLITE_KEYS[provider]]
     return Object.fromEntries(names.filter(name => env[name]).map(name => [name, env[name]]))
 }
 
@@ -93,7 +124,7 @@ export async function foldAgentKeysIntoConnections(): Promise<void> {
     for (const agentId of agentIds) {
         const env = await readEnvFile(agentEnvPath(agentId))
         const raw = JSON.parse(await readFile(configPath(agentId), 'utf8')) as LegacyAgentConfig
-        const agentProvider = providerSchema.catch('rerun').parse(raw.provider)
+        const agentProvider = foldProviderSchema.catch('rerun').parse(raw.provider)
 
         for (const provider of KEYED_PROVIDERS) {
             const credential = credentialOf(env, provider)
@@ -117,9 +148,9 @@ export async function foldAgentKeysIntoConnections(): Promise<void> {
         const own = credential ? byFingerprint.get(fingerprint(agentProvider, credential)) : undefined
 
         const next = agentConfigSchema.parse({ ...raw, connectionId: own?.id ?? null })
-        await writeFile(configPath(agentId), `${JSON.stringify(next, null, 4)}\n`, 'utf8')
+        await writeFile(configPath(agentId), `${JSON.stringify(next, null, 4)}\n`, { encoding: 'utf8', mode: 0o600 })
 
-        const remaining = Object.fromEntries(Object.entries(env).filter(([name]) => !CONNECTION_ENV_KEYS.includes(name)))
+        const remaining = Object.fromEntries(Object.entries(env).filter(([name]) => !FOLD_ENV_KEYS.includes(name)))
         if (Object.keys(remaining).length !== Object.keys(env).length) await writeEnvFile(agentEnvPath(agentId), remaining)
         migratedAgents += 1
     }

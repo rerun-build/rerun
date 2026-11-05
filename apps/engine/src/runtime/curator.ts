@@ -46,7 +46,7 @@ export async function runCurator(agent: LoadedAgent, sessionId: string, userText
 
     const release = await ensureCliAuth(agent.resolved.provider, agent.resolved.connection)
     const output = await generateStructured({
-        model: modelFor(agent, override),
+        model: modelFor(agent, override, undefined, undefined, { sessionId: `${agent.id}:curator` }),
         schema: curationSchema,
         prompt: curatorPrompt({ userText, assistantText, existing, skills }),
         abortSignal: AbortSignal.timeout(CURATOR_TIMEOUT_MS),

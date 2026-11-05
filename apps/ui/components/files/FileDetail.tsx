@@ -30,9 +30,11 @@ type FileDetailProps = {
     publicUrl?: string
     onPublish?: () => void
     onUnpublish?: () => void
+    onShareSettings?: () => void
+    openUrl?: string
 }
 
-export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onDownload, onDelete, writeFile, onSaved, publicUrl, onPublish, onUnpublish }: FileDetailProps) {
+export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onDownload, onDelete, writeFile, onSaved, publicUrl, onPublish, onUnpublish, onShareSettings, openUrl }: FileDetailProps) {
     const { content, truncated, loading, error, replaceContent } = useFileContent({ path, name, read: readFile })
     // Keyed on the path rather than a boolean, so opening another file leaves the editor by itself.
     const [editingPath, setEditingPath] = useState<string | null>(null)
@@ -98,6 +100,8 @@ export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onD
                     publicUrl={publicUrl}
                     onPublish={onPublish}
                     onUnpublish={onUnpublish}
+                    onShareSettings={onShareSettings}
+                    openUrl={openUrl}
                 />
             </PanelEditorHeader>
             <div key={path} ref={previewRef} className="flex-1 min-h-0 overflow-hidden">

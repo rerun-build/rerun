@@ -5,6 +5,7 @@ import { mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 import type { McpServer } from '../agents/types.js'
 import { mcpPackagesDir } from '../config/paths.js'
+import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
 
 // `npx -y <spec>` checks the registry, or clones a `github:` spec, every time it starts, which is on
@@ -64,9 +65,11 @@ function binOf(installDir: string): string | null {
     return picked ? resolve(installDir, 'node_modules', '.bin', picked) : null
 }
 
+// The package's install scripts run with the same environment as the server itself: native addons
+// still build, the engine's configuration is out of reach.
 function npmInstall(spec: string, installDir: string): Promise<void> {
     return new Promise((done, fail) => {
-        const child = spawn('npm', ['install', '--prefix', installDir, '--no-audit', '--no-fund', '--loglevel=error', spec], { stdio: ['ignore', 'ignore', 'pipe'] })
+        const child = spawn('npm', ['install', '--prefix', installDir, '--no-audit', '--no-fund', '--loglevel=error', spec], { stdio: ['ignore', 'ignore', 'pipe'], env: childProcessEnv({}) })
         let stderr = ''
         child.stderr.on('data', chunk => (stderr = (stderr + String(chunk)).slice(-2000)))
         const timer = setTimeout(() => child.kill('SIGKILL'), INSTALL_TIMEOUT_MS)

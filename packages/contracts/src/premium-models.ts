@@ -15,6 +15,7 @@ const TRIAL_CLAUDE_MODEL: Partial<Record<Provider, string>> = {
     claude: 'claude-sonnet-5-5',
     anthropic: 'claude-sonnet-5-5',
     openrouter: 'anthropic/claude-sonnet-5.5',
+    opencode: 'console/claude-sonnet-5-5',
 }
 
 // What a trial box runs in place of a premium model, one step down in the same family.

@@ -12,6 +12,7 @@ type NoticeKind = Exclude<ChatErrorKind, 'budget'>
 
 const ClaudeGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="claude" className={className} />
 const OpenAIGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="openai" className={className} />
+const OpencodeGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="opencode" className={className} />
 
 const ICONS: Record<NoticeKind, ComponentType<{ className?: string }>> = {
     usage_limit: GaugeIcon,
@@ -19,6 +20,7 @@ const ICONS: Record<NoticeKind, ComponentType<{ className?: string }>> = {
     overloaded: ServerIcon,
     context_window: ScrollTextIcon,
     provider_error: ServerIcon,
+    thinking_replay: RotateCwIcon,
     interrupted: RotateCwIcon,
     run_in_flight: RotateCwIcon,
     generic: AlertTriangleIcon,
@@ -33,7 +35,7 @@ function header(kind: NoticeKind, message: string): { title: string; icon: Compo
     if (kind !== 'usage_limit') return { title, icon: ICONS[kind] }
     const plan = describeSubscriptionLimit(message).plan
     if (!plan) return { title, icon: ICONS.usage_limit }
-    return { title, icon: plan === 'claude' ? ClaudeGlyph : OpenAIGlyph }
+    return { title, icon: plan === 'claude' ? ClaudeGlyph : plan === 'opencode' ? OpencodeGlyph : OpenAIGlyph }
 }
 
 // The dead end this replaces: a raw provider stack, or "A run is already in flight on this
@@ -63,8 +65,9 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
             onClick: onContinue,
         })
     }
-    // A refusal repeats on every send, so only a transient failure is offered a retry.
-    if ((kind === 'overloaded' || kind === 'generic') && onRetry) {
+    // A refusal repeats on every send, so only a transient failure is offered a retry. A rejected
+    // thinking replay is the engine's, and a fresh run does not carry it.
+    if ((kind === 'overloaded' || kind === 'generic' || kind === 'thinking_replay') && onRetry) {
         actions.push({
             key: 'retry',
             leading: <Icon icon={RotateCwIcon} size="sm" />,

@@ -37,12 +37,12 @@ const MODEL_PIN_PROPERTIES = {
     provider: {
         type: 'string',
         description:
-            'rerun | anthropic | claude | codex | openai | google | openrouter. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider; with several, the call is refused and lists them. It replaces whatever connection the coworker was pinned to.',
+            'rerun | anthropic | claude | codex | openai | google | openrouter | opencode. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider; with several, the call is refused and lists them. It replaces whatever connection the coworker was pinned to.',
     },
     model: {
         type: ['string', 'null'],
         description:
-            'A model the connection serves, as list_ai_connections spells it. Omit it at creation and the coworker runs the workspace default model, following it whenever that default changes. Pass null to go back to that after pinning one: it also drops the pinned connection. On the `rerun` provider: rerun-max.',
+            'A model the connection serves, as list_ai_connections spells it. Omit it at creation and the coworker runs the workspace default model, following it whenever that default changes. Pass null to go back to that after pinning one: it also drops the pinned connection. On the `rerun` provider: rerun-max. On `opencode` the id carries its catalog: `go/…` is paid by the Go plan, `console/…` by the account credits.',
     },
 } as const
 
@@ -142,7 +142,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'list_ai_connections',
         description:
-            'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT) and API keys plugged into it, plus the keyless Rerun one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',
+            'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT, OpenCode) and API keys plugged into it, plus the keyless Rerun one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',
         inputSchema: { type: 'object', properties: {} },
     },
     {

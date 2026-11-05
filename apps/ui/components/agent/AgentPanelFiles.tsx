@@ -17,6 +17,9 @@ import { FileDetail } from '@/components/files/FileDetail'
 import { FileGrid } from '@/components/files/FileGrid'
 import { FilesEmptyState } from '@/components/files/FilesEmptyState'
 import { useSiblingFiles } from '@/components/files/useSiblingFiles'
+import { usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
+import { ShareDialog } from '@/components/published/ShareDialog'
+import { openPublishedHref } from '@/lib/published/links'
 import { toast } from 'sonner'
 
 type AgentPanelFilesProps = {
@@ -30,6 +33,8 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
     const [dragOver, setDragOver] = useState(false)
     const [published, setPublished] = useState<PublishedFile[]>([])
     const [contentRevision, setContentRevision] = useState(0)
+    const publishedAccess = usePublishedAccessEnabled()
+    const [sharingSlug, setSharingSlug] = useState<string | null>(null)
 
     const rawUrlFor = useCallback((filePath: string) => agentFileRawUrl(agentId, filePath), [agentId])
 
@@ -68,18 +73,19 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
         }
     }, [agentId])
 
-    // Files in the CURRENT directory that are published → name → public URL. Published files
+    // Files in the CURRENT directory that are published → name → their link. Published files
     // are tracked by their full workspace path, so match the part before the last slash.
-    const publishedByName = useMemo(() => {
-        const map: Record<string, string> = {}
+    const publishedFileByName = useMemo(() => {
+        const map: Record<string, PublishedFile> = {}
         for (const f of published) {
             const slash = f.path.lastIndexOf('/')
             const dir = slash === -1 ? '' : f.path.slice(0, slash)
             const name = slash === -1 ? f.path : f.path.slice(slash + 1)
-            if (dir === currentPath) map[name] = f.url
+            if (dir === currentPath) map[name] = f
         }
         return map
     }, [published, currentPath])
+    const publishedByName = useMemo(() => Object.fromEntries(Object.entries(publishedFileByName).map(([name, file]) => [name, file.url])), [publishedFileByName])
 
     const handlePublish = useCallback(async (name: string) => {
         const filePath = currentPath ? `${currentPath}/${name}` : name
@@ -89,7 +95,9 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
             return
         }
         await loadPublished()
-    }, [agentId, currentPath, loadPublished])
+        // A new link starts with the access the workspace gives it: the share dialog is where it changes.
+        if (publishedAccess && result.slug) setSharingSlug(result.slug)
+    }, [agentId, currentPath, loadPublished, publishedAccess])
 
     const handleUnpublish = useCallback(async (name: string) => {
         const filePath = currentPath ? `${currentPath}/${name}` : name
@@ -179,6 +187,8 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
                         publicUrl={publishedByName[openFile.name]}
                         onPublish={() => void handlePublish(openFile.name)}
                         onUnpublish={() => void handleUnpublish(openFile.name)}
+                        onShareSettings={publishedAccess && publishedFileByName[openFile.name] ? () => setSharingSlug(publishedFileByName[openFile.name].slug) : undefined}
+                        openUrl={publishedAccess && publishedFileByName[openFile.name] ? openPublishedHref(publishedFileByName[openFile.name].slug) : undefined}
                     />
                 ) : (
                     <div
@@ -255,6 +265,16 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
                 )}
             </PanelSteps>
             <UploadTray items={uploads.items} totalProgress={uploads.totalProgress} onCancel={uploads.cancel} onRetry={uploads.retry} onDismiss={uploads.active ? uploads.cancelAll : uploads.clearFinished} />
+            {publishedAccess && (
+                <ShareDialog
+                    open={sharingSlug !== null}
+                    onOpenChange={open => !open && setSharingSlug(null)}
+                    slug={sharingSlug}
+                    initial={published.find(file => file.slug === sharingSlug) ?? null}
+                    onChanged={() => void loadPublished()}
+                    onUnpublished={() => void loadPublished()}
+                />
+            )}
         </div>
     )
 }

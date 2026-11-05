@@ -1,12 +1,13 @@
 import { assertAgentInWorkspace } from '@/app/api/_auth/ownership'
-import { publishFile } from '@/lib/services/publish'
+import { publishWithThumbnail } from '@/lib/services/publish-thumbnail'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { publishFileAction } from './publish.actions'
 
-vi.mock('@/app/api/_auth/ownership', () => ({ assertAgentInWorkspace: vi.fn() }))
+vi.mock('@/app/api/_auth/ownership', () => ({ assertAgentInWorkspace: vi.fn(), requireWorkspaceContext: vi.fn(), requireWorkspaceId: vi.fn() }))
+vi.mock('@/cloud/email', () => ({ EMAIL_DELIVERY: true }))
+vi.mock('@/lib/services/publish-thumbnail', () => ({ publishWithThumbnail: vi.fn() }))
 vi.mock('@/lib/services/publish', () => ({
     listPublished: vi.fn(),
-    publishFile: vi.fn(),
     unpublishFile: vi.fn(),
 }))
 
@@ -17,23 +18,27 @@ describe('publishFileAction', () => {
     })
 
     it('publishes an owned agent file without a billing entitlement check', async () => {
-        vi.mocked(publishFile).mockResolvedValue({
+        vi.mocked(publishWithThumbnail).mockResolvedValue({
             status: 'published',
-            url: 'https://rerun.test/p/file',
-            publicUrl: 'https://storage.test/file',
+            url: 'https://file.rerun.test',
             slug: 'file',
             path: 'report.pdf',
             kind: 'file',
             contentType: 'application/pdf',
             size: 42,
+            title: 'report.pdf',
+            access: 'workspace',
+            requestedAccess: null,
+            message: 'Only the members of this workspace can open it, once signed in.',
         })
 
         await expect(publishFileAction('agent', 'report.pdf')).resolves.toEqual({
             success: true,
-            url: 'https://rerun.test/p/file',
+            url: 'https://file.rerun.test',
+            slug: 'file',
         })
         expect(assertAgentInWorkspace).toHaveBeenCalledWith('agent')
-        expect(publishFile).toHaveBeenCalledWith('agent', 'report.pdf')
+        expect(publishWithThumbnail).toHaveBeenCalledWith('agent', 'report.pdf')
     })
 
     it('still refuses publishing when ownership verification fails', async () => {
@@ -43,6 +48,6 @@ describe('publishFileAction', () => {
             success: false,
             error: 'Agent not found',
         })
-        expect(publishFile).not.toHaveBeenCalled()
+        expect(publishWithThumbnail).not.toHaveBeenCalled()
     })
 })

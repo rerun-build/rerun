@@ -122,4 +122,22 @@ describe('stepWithScreenshots', () => {
         const messages = [toolResult('c1', { screenshotId: store.add(picture('screen')) })]
         expect(stepWithScreenshots(messages, store, provider).messages!.at(-1)!.role).toBe(role)
     })
+
+    it.each([
+        ['go/claude-haiku-5-5', 'tool'],
+        ['go/gpt-6-luna', 'tool'],
+        ['go/gemini-4-argon', 'tool'],
+        ['go/kimi-k3.1-pro', 'user'],
+    ] as const)('hands OpenCode %s its picture the way its format takes it, in a %s message', (model, role) => {
+        const store = createScreenshotStore()
+        const messages = [toolResult('c1', { screenshotId: store.add(picture('screen')) })]
+        expect(stepWithScreenshots(messages, store, 'opencode', model).messages!.at(-1)!.role).toBe(role)
+    })
+
+    // OpenCode drops an image sent to a model that cannot see without a word.
+    it('never attaches a picture for an OpenCode model without vision', () => {
+        const store = createScreenshotStore()
+        const messages = [toolResult('c1', { screenshotId: store.add(picture('screen')) })]
+        expect(stepWithScreenshots(messages, store, 'opencode', 'go/deepseek-v4-pro')).toEqual({})
+    })
 })

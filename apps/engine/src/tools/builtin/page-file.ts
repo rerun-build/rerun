@@ -71,7 +71,7 @@ async function readMeta(path: string): Promise<PageMeta | null> {
 // Best effort: a full disk or an unwritable workspace leaves the page read, only unsaved.
 export async function savePage(agentId: string, page: PageToSave): Promise<string | null> {
     try {
-        const root = resolveInWorkspace(agentId, PAGES_DIR)
+        const root = await resolveInWorkspace(agentId, PAGES_DIR)
         let base = pageFileBase(page.url)
         let meta = await readMeta(join(root, `${base}.meta.json`))
         if (meta && meta.url !== page.url) {

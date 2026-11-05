@@ -1,0 +1,92 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`applyCaching on OpenCode > leaves every other provider as it was 1`] = `
+{
+  "messages": [
+    {
+      "content": "hello",
+      "role": "user",
+    },
+  ],
+  "providerOptions": {
+    "openai": {
+      "promptCacheKey": "session-1",
+    },
+  },
+  "system": [
+    {
+      "content": "You are a test agent.",
+      "role": "system",
+    },
+    {
+      "content": "<current_time>
+Today is Monday.
+</current_time>",
+      "role": "system",
+    },
+  ],
+}
+`;
+
+exports[`applyCaching on OpenCode > leaves every other provider as it was 2`] = `
+{
+  "messages": [
+    {
+      "content": "hello",
+      "providerOptions": {
+        "anthropic": {
+          "cacheControl": {
+            "ttl": "1h",
+            "type": "ephemeral",
+          },
+        },
+      },
+      "role": "user",
+    },
+  ],
+  "system": [
+    {
+      "content": "You are a test agent.",
+      "providerOptions": {
+        "anthropic": {
+          "cacheControl": {
+            "ttl": "1h",
+            "type": "ephemeral",
+          },
+        },
+      },
+      "role": "system",
+    },
+    {
+      "content": "<current_time>
+Today is Monday.
+</current_time>",
+      "providerOptions": {
+        "anthropic": {
+          "cacheControl": {
+            "ttl": "1h",
+            "type": "ephemeral",
+          },
+        },
+      },
+      "role": "system",
+    },
+  ],
+}
+`;
+
+exports[`applyCaching on OpenCode > leaves every other provider as it was 3`] = `
+{
+  "messages": [
+    {
+      "content": "hello",
+      "role": "user",
+    },
+  ],
+  "system": "You are a test agent.
+
+<current_time>
+Today is Monday.
+</current_time>",
+}
+`;

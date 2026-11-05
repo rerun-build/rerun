@@ -25,8 +25,9 @@ here is not enough.
    - *A free project on supabase.com*: recommended on a server.
    - *Open source Supabase on their own server*: only if they ask for everything on their
      machines. Follow the "Open source Supabase on your server" tab of the human guide.
-3. **Do they have an OpenRouter key?** It runs the Foreman. They get one at
-   https://openrouter.ai/keys. Without it Rerun starts, but the Foreman stays silent.
+3. **Do they have an OpenRouter key?** It runs the Foreman's guided onboarding. They get one at
+   https://openrouter.ai/keys. Without it the Foreman skips the onboarding and runs on the AI they
+   connect in the app, their Claude or ChatGPT subscription included.
 
 ## 2. Check the machine
 
@@ -149,3 +150,7 @@ git pull && docker compose up -d --build
 
 and `npx supabase db push` (or `npx supabase migration up` for Supabase on this computer) when a
 release adds database migrations.
+
+Versions follow one rule: a patch (`v0.5.1`) only asks to pull, a minor (`v0.6.0`) has an
+`Upgrade` section in its [release notes](https://github.com/rerun-build/rerun/releases) to read
+first. The engine image `ghcr.io/rerun-build/rerun-engine:0.5` follows the patches of `0.5`.

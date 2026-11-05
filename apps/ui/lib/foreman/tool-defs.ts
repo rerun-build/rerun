@@ -119,6 +119,7 @@ const AGENT_TAB_HINTS: Record<AgentFocusTab, string> = {
     data: 'its tables',
     memories: 'what it remembers',
     files: 'its files',
+    published: 'the links it published, and who can open each',
     scheduled: 'its recurring tasks',
     triggers: 'its public URLs that start a run',
     tools: 'the tools it is allowed to use',
