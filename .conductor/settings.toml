@@ -1,8 +1,9 @@
 "$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
 
 [scripts]
-# The team's checkout clones the private `cloud/` next to the code when it has access to it (a contributor
-# without it gets the open source build), then runs cloud/'s own setup steps when they are there:
+# The team's checkout clones the private `cloud/` next to the code when it has access to it
+# (`clone-cloud.sh`: from the main checkout's copy on the Mac, from GitHub otherwise; a contributor without
+# access gets the open source build and a warning), then runs cloud/'s own setup steps when they are there:
 # joining the tailnet, linking the Supabase project, starting on the production profile. Each of them
 # is allowed to fail, so a workspace without credentials still finishes its setup.
 #
@@ -11,7 +12,7 @@
 #
 # `@rerun/contracts` resolves to its gitignored `dist/`, so the UI and the engine fail on "Can't resolve
 # '@rerun/contracts'" until it is built.
-setup = "([ -d cloud ] || git clone -q \"$(git remote get-url origin | sed -E 's#/rerun(\\.git)?$#/rerun-cloud.git#')\" cloud 2>/dev/null || true) && ([ ! -f cloud/conductor/tailscale-up.sh ] || bash cloud/conductor/tailscale-up.sh setup) && pnpm install --force && pnpm build:contracts && (pnpm cloud db:link || true) && (pnpm cloud env:prod || true)"
+setup = "bash .conductor/clone-cloud.sh && ([ ! -f cloud/conductor/tailscale-up.sh ] || bash cloud/conductor/tailscale-up.sh setup) && pnpm install --force && pnpm build:contracts && (pnpm cloud db:link || true) && (pnpm cloud env:prod || true)"
 run_mode = "concurrent"
 
 # Cloud workspaces only: on the Mac the actions live in `.conductor/settings.local.toml` of the main

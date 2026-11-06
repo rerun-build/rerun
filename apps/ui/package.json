@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "ts-check": "pnpm tsc --noEmit",
+    "ts-check": "next typegen && pnpm tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"
   },
