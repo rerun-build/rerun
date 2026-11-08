@@ -5,8 +5,13 @@
 //
 //   node scripts/self-host-check.mjs
 
+import { execFile } from 'node:child_process'
 import { randomBytes } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { basename } from 'node:path'
+import { promisify } from 'node:util'
+
+const execFileAsync = promisify(execFile)
 
 const FILE = '.env'
 const GENERATED = ['RERUN_ENGINE_API_KEY', 'FOREMAN_HUB_TOKEN_SECRET', 'BOARD_IMAGE_SECRET']
@@ -16,6 +21,9 @@ const REQUIRED = {
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'Supabase > Project settings > API keys > publishable (or anon) key',
     SUPABASE_SECRET_KEY: 'Supabase > Project settings > API keys > secret (or service_role) key',
 }
+// The sign-in templates Supabase serves from the local stack. Auth fetches them from Kong;
+// when Kong cannot read them it falls back to its default email, which has no six-digit code.
+const EMAIL_TEMPLATES = ['confirmation.html', 'email_change.html', 'magic_link.html']
 
 if (!existsSync(FILE)) {
     console.error('No .env here. Run `cp .env.example .env` first, from the root of the repository.')
@@ -56,6 +64,14 @@ if (supabaseProblem) {
     process.exit(1)
 }
 
+if (isLocalSupabase(supabaseUrl)) {
+    const templateProblem = await askTemplates()
+    if (templateProblem) {
+        console.error(`\nx ${templateProblem}\n`)
+        process.exit(1)
+    }
+}
+
 console.log(`
 .env is ready and Supabase answers. Next:
   docker compose${/localhost:54421/.test(supabaseUrl) ? ' --profile local-supabase' : ''} up -d --build
@@ -90,4 +106,51 @@ function schemaCommand(url) {
     const projectRef = url.match(/^https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1]
     if (projectRef) return `npx supabase link --project-ref ${projectRef} && npx supabase db push --include-seed`
     return 'npx supabase db push --include-seed --yes --db-url "postgresql://postgres.rerun:<POSTGRES_PASSWORD>@127.0.0.1:5432/postgres?sslmode=disable"'
+}
+
+function isLocalSupabase(url) {
+    return /localhost|127\.0\.0\.1/.test(url) && /:54421\b/.test(url)
+}
+
+// Kong serves the templates from inside its own container, on a port the host cannot reach,
+// so ask the container whether it can read them. On Fedora with SELinux enforcing, files
+// checked out into a home directory carry a label the container cannot read, and Kong
+// answers 403 where the sign-in would then fail without a code.
+async function askTemplates() {
+    const kong = await findKongContainer()
+    if (!kong) {
+        console.warn('! Could not find the Kong container of the local Supabase stack, so the email templates were not checked.')
+        return null
+    }
+    const unreadable = []
+    for (const template of EMAIL_TEMPLATES) {
+        if (await kongCanRead(kong, template)) continue
+        unreadable.push(template)
+    }
+    if (!unreadable.length) return null
+    const paths = unreadable.map((template) => `supabase/templates/${template}`)
+    return `Kong cannot read ${paths.join(', ')}: Auth falls back to its default email, so Rerun never receives the six-digit code. On Fedora with SELinux enforcing, the files carry a label the container cannot read. Fix it from the repository root, then run this check again:\n  chcon -t container_file_t ${paths.join(' ')}`
+}
+
+async function findKongContainer() {
+    const { code, stdout } = await run('docker', ['ps', '--filter', 'name=supabase_kong_', '--format', '{{.Names}}'])
+    if (code !== 0) return null
+    const names = stdout.split('\n').map((name) => name.trim()).filter(Boolean)
+    // The stack started from this checkout is named after the directory; another checkout's
+    // stack may also be running, so prefer the exact name over the first match.
+    return names.find((name) => name === `supabase_kong_${basename(process.cwd())}`) ?? names[0] ?? null
+}
+
+async function kongCanRead(container, template) {
+    const { code } = await run('docker', ['exec', container, 'cat', `/home/kong/templates/email/${template}`])
+    return code === 0
+}
+
+async function run(command, args) {
+    try {
+        const { stdout } = await execFileAsync(command, args, { timeout: 10_000 })
+        return { code: 0, stdout }
+    } catch (error) {
+        return { code: error.code ?? 1, stdout: error.stdout ?? '' }
+    }
 }
