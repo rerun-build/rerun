@@ -49,6 +49,17 @@ describe('resolveForemanSurface', () => {
             edition.cloud = false
         })
 
+        it('uses the connected engine during onboarding for signed-in users', async () => {
+            vi.mocked(ensureWorkspaceEngine).mockResolvedValue({ ok: true, instanceId: 'compose' })
+            expect(await resolveForemanSurface(7, { phase: 'discover' }, signedIn)).toBe('engine')
+            expect(ensureWorkspaceEngine).toHaveBeenCalledWith(7)
+        })
+
+        it('keeps anonymous onboarding on the hub without claiming an engine', async () => {
+            expect(await resolveForemanSurface(7, { phase: 'discover' }, anonymous)).toBe('onboarding')
+            expect(ensureWorkspaceEngine).not.toHaveBeenCalled()
+        })
+
         it('leaves the compose engine alone for an anonymous visitor, whose workspace is thrown away', async () => {
             expect(await resolveForemanSurface(7, { phase: 'companion' }, anonymous)).toBe('none')
             expect(ensureWorkspaceEngine).not.toHaveBeenCalled()

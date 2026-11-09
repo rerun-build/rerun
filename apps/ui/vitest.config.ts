@@ -24,6 +24,8 @@ export default defineConfig({
         ],
     },
     test: {
+        // Use the DOM environment's storage instead of Node's file-backed global.
+        execArgv: ['--no-experimental-webstorage'],
         setupFiles: ['test/setup-env.ts'],
         // The tests of Rerun Cloud's side run with the app's, against the same aliases and setup.
         include: ['**/*.test.?(c|m)[jt]s?(x)', ...(HAS_CLOUD ? [`${CLOUD_SOURCE}/**/*.test.?(c|m)[jt]s?(x)`, `${ADMIN_APP}/{app,lib}/**/*.test.?(c|m)[jt]s?(x)`] : [])],

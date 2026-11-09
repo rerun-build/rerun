@@ -8,6 +8,13 @@ import { foremanSurface, type ForemanSurface } from './surface'
 // `canClaim` is false for an anonymous visitor: their workspace is thrown away with them, so it must
 // never be the one the compose engine lands on.
 export async function resolveForemanSurface(workspaceId: number, state: Pick<ForemanState, 'phase'>, { canClaim }: { canClaim: boolean }): Promise<ForemanSurface> {
+    // A self-hosted workspace can use its own connected providers from its first turn.
+    // Anonymous sessions must never claim the shared compose engine.
+    if (!RERUN_CLOUD && canClaim) {
+        const available = await hasEngine(workspaceId, true)
+        if (available) return 'engine'
+        return foremanSurface(state.phase, false)
+    }
     if (state.phase !== 'companion') return 'onboarding'
     return foremanSurface(state.phase, await hasEngine(workspaceId, canClaim))
 }
