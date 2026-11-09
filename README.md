@@ -186,7 +186,7 @@ By hand, you need Docker, Node.js 22, and a Supabase project (a free one on [sup
 ```bash
 git clone https://github.com/rerun-build/rerun.git && cd rerun
 cp .env.example .env          # fill the Supabase URL and keys, and an OpenRouter key
-npx supabase link --project-ref <your-project-ref> && npx supabase db push --include-seed
+npx supabase@^2.113.0 link --project-ref <your-project-ref> && npx supabase@^2.113.0 db push --include-seed
 node scripts/self-host-check.mjs
 docker compose up -d --build  # then open http://localhost:3000
 ```

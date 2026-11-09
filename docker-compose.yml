@@ -3,7 +3,7 @@
 #   cp .env.example .env && node scripts/self-host-check.mjs   # fills the secrets, checks the rest
 #   docker compose up -d --build
 #
-# Supabase runs outside this file: a free project on supabase.com, or `npx supabase start` on this
+# Supabase runs outside this file: a free project on supabase.com, or `npx supabase@^2.113.0 start` on this
 # machine (then add `--profile local-supabase`). See https://docs.rerun.build/self-host.
 name: rerun
 
@@ -54,7 +54,7 @@ services:
     shm_size: 2gb
     restart: unless-stopped
 
-  # Only with `npx supabase start` on this machine: makes the local Supabase answer on the same
+  # Only with `npx supabase@^2.113.0 start` on this machine: makes the local Supabase answer on the same
   # address inside the app container as in your browser (http://localhost:54421).
   supabase-bridge:
     image: alpine/socat:1.8.0.3

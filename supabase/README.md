@@ -15,8 +15,8 @@ pnpm db:reset                   # replays every migration, then the seed, on the
 To apply the migrations to a hosted Supabase project:
 
 ```bash
-npx supabase link --project-ref <your-project-ref>
-npx supabase db push
+npx supabase@^2.113.0 link --project-ref <your-project-ref>
+npx supabase@^2.113.0 db push
 ```
 
 ## The baseline

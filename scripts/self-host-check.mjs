@@ -12,7 +12,7 @@ const FILE = '.env'
 const GENERATED = ['RERUN_ENGINE_API_KEY', 'FOREMAN_HUB_TOKEN_SECRET', 'BOARD_IMAGE_SECRET']
 const REQUIRED = {
     NEXT_PUBLIC_APP_URL: 'the address people open, e.g. http://localhost:3000',
-    NEXT_PUBLIC_SUPABASE_URL: 'Supabase > Project settings > API > Project URL, or `npx supabase status` (API URL)',
+    NEXT_PUBLIC_SUPABASE_URL: 'Supabase > Project settings > API > Project URL, or `npx supabase@^2.113.0 status` (API URL)',
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'Supabase > Project settings > API keys > publishable (or anon) key',
     SUPABASE_SECRET_KEY: 'Supabase > Project settings > API keys > secret (or service_role) key',
 }
@@ -86,8 +86,8 @@ async function askSupabase(url, secretKey) {
 }
 
 function schemaCommand(url) {
-    if (/:54421\b/.test(url)) return 'npx supabase db reset   (erases the data of the local stack)'
+    if (/:54421\b/.test(url)) return 'npx supabase@^2.113.0 db reset   (erases the data of the local stack)'
     const projectRef = url.match(/^https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1]
-    if (projectRef) return `npx supabase link --project-ref ${projectRef} && npx supabase db push --include-seed`
-    return 'npx supabase db push --include-seed --yes --db-url "postgresql://postgres.rerun:<POSTGRES_PASSWORD>@127.0.0.1:5432/postgres?sslmode=disable"'
+    if (projectRef) return `npx supabase@^2.113.0 link --project-ref ${projectRef} && npx supabase@^2.113.0 db push --include-seed`
+    return 'npx supabase@^2.113.0 db push --include-seed --yes --db-url "postgresql://postgres.rerun:<POSTGRES_PASSWORD>@127.0.0.1:5432/postgres?sslmode=disable"'
 }

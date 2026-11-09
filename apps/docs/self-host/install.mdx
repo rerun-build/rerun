@@ -9,7 +9,7 @@ This page takes about ten minutes, plus the time Docker needs to build the two i
 ## Before you start
 
 - **Docker** with Docker Compose. Give Docker at least 6 GB of memory: the app build needs it, and 60 GB of disk: the images and the build cache take about 40.
-- **Node.js 22**, for `npx supabase` and the setup check.
+- **Node.js 22**, for `npx supabase@^2.113.0` and the setup check.
 - **Git**.
 - **On a server:** a domain for the app, one for the engine, and a reverse proxy for HTTPS. See [On a server](#on-a-server).
 - **An OpenRouter key** from [openrouter.ai/keys](https://openrouter.ai/keys). It runs the Foreman's onboarding and the default models of every coworker. Without it, connect your own AI in the app, your Claude or ChatGPT plan included.
@@ -34,8 +34,8 @@ Pick one. The first is simpler to keep running, the second is the full open sour
     3. Apply the schema and the seed from your clone. `link` asks for the database password:
 
     ```bash
-    npx supabase link --project-ref <your-project-ref>
-    npx supabase db push --include-seed
+    npx supabase@^2.113.0 link --project-ref <your-project-ref>
+    npx supabase@^2.113.0 db push --include-seed
     ```
 
     The project ref is the part before `.supabase.co` in the project URL.
@@ -139,7 +139,7 @@ Pick one. The first is simpler to keep running, the second is the full open sour
     5. Apply the schema and the seed from your Rerun clone. Replace `<password>` with `POSTGRES_PASSWORD` from `supabase-stack/.env`:
 
     ```bash
-    npx supabase db push --include-seed --yes \
+    npx supabase@^2.113.0 db push --include-seed --yes \
       --db-url "postgresql://postgres.rerun:<password>@127.0.0.1:5432/postgres?sslmode=disable"
     ```
 
@@ -156,7 +156,7 @@ Pick one. The first is simpler to keep running, the second is the full open sour
     Start Supabase in Docker, from the root of your clone:
 
     ```bash
-    npx supabase start
+    npx supabase@^2.113.0 start
     ```
 
     It takes ports 54420 to 54429, applies every migration and loads the seed. Sign-in, the code templates and anonymous sign-ins are already configured.
@@ -167,7 +167,7 @@ Pick one. The first is simpler to keep running, the second is the full open sour
     | Studio, to browse the data | http://localhost:54423 |
     | Mailpit, where sign-in codes land | http://localhost:54424 |
 
-    Copy the keys from `npx supabase status` into `.env`:
+    Copy the keys from `npx supabase@^2.113.0 status` into `.env`:
 
     ```bash .env
     NEXT_PUBLIC_SUPABASE_URL=http://localhost:54421
@@ -305,7 +305,7 @@ git pull
 docker compose up -d --build
 ```
 
-The engine migrates its data-dir on start. When a release adds database migrations, apply them too: `npx supabase db push` for a project on supabase.com, the same command with `--yes --db-url` and the address from [Install](#2-set-up-supabase) for open source Supabase, or `npx supabase migration up` for the local stack.
+The engine migrates its data-dir on start. When a release adds database migrations, apply them too: `npx supabase@^2.113.0 db push` for a project on supabase.com, the same command with `--yes --db-url` and the address from [Install](#2-set-up-supabase) for open source Supabase, or `npx supabase@^2.113.0 migration up` for the local stack.
 
 <Note>
   The values starting with `NEXT_PUBLIC_` are baked into the app when it is built. So is `ADMIN_EMAILS`. After changing one, rebuild with `docker compose up -d --build`. Other values only need `docker compose up -d`.

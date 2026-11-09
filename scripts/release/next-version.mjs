@@ -115,7 +115,7 @@ function releaseNotes({ commits, migrations, envVars, ladders, compose, bump }) 
     const fixes = bullets(commits.filter((commit) => commit.type === 'fix' || commit.type === 'perf'))
 
     const upgrade = [
-        migrations.length && `- Database: ${migrations.length} new migration${migrations.length > 1 ? 's' : ''}. Run \`npx supabase db push\` before starting the new images.`,
+        migrations.length && `- Database: ${migrations.length} new migration${migrations.length > 1 ? 's' : ''}. Run \`npx supabase@^2.113.0 db push\` before starting the new images.`,
         envVars.required.length && `- New required variable${envVars.required.length > 1 ? 's' : ''} in \`.env.example\`: ${envVars.required.map((name) => `\`${name}\``).join(', ')}. Set ${envVars.required.length > 1 ? 'them' : 'it'} before starting the new images.`,
         envVars.optional.length && `- New optional variable${envVars.optional.length > 1 ? 's' : ''} in \`.env.example\`: ${envVars.optional.map((name) => `\`${name}\``).join(', ')}.`,
         ladders.length && '- Engine: migrates its data directory on first start. Back it up first; there is no downgrade.',

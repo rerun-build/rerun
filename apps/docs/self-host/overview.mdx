@@ -60,7 +60,7 @@ Every other workspace needs a server of its own. You start the engine image on a
 | App | `app` container, from `apps/ui/Dockerfile` | 3000, published as `RERUN_APP_PORT` |
 | Engine of the first workspace | `engine` container next to the app, from `apps/engine/Dockerfile` | 3000 inside Docker, published as `RERUN_ENGINE_PORT` (3001) |
 | Engines of other workspaces | Any machine, image `ghcr.io/rerun-build/rerun-engine:latest` | 3000 |
-| Supabase | supabase.com, open source on your server, or `npx supabase start` on your computer | 8000 on your server, 54420 to 54429 locally |
+| Supabase | supabase.com, open source on your server, or `npx supabase@^2.113.0 start` on your computer | 8000 on your server, 54420 to 54429 locally |
 
 ## What is stored where
 

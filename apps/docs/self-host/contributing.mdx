@@ -13,7 +13,7 @@ You need Node 22, pnpm 8 (`corepack enable`), Docker for the local Supabase, and
   <Step title="Install and start Supabase">
     ```bash
     pnpm install
-    npx supabase start      # Postgres, auth, storage and Mailpit on ports 54420 to 54429
+    npx supabase@^2.113.0 start      # Postgres, auth, storage and Mailpit on ports 54420 to 54429
     ```
   </Step>
   <Step title="Configure the app">
@@ -21,7 +21,7 @@ You need Node 22, pnpm 8 (`corepack enable`), Docker for the local Supabase, and
     cp .env.example .env
     ```
 
-    In `.env`, set `NEXT_PUBLIC_APP_URL=http://localhost:3050`, `NEXT_PUBLIC_SUPABASE_URL=http://localhost:54421`, the two keys from `npx supabase status`, and `OPENROUTER_API_KEY`. Then generate the secrets and hand the file to the app:
+    In `.env`, set `NEXT_PUBLIC_APP_URL=http://localhost:3050`, `NEXT_PUBLIC_SUPABASE_URL=http://localhost:54421`, the two keys from `npx supabase@^2.113.0 status`, and `OPENROUTER_API_KEY`. Then generate the secrets and hand the file to the app:
 
     ```bash
     node scripts/self-host-check.mjs

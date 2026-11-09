@@ -9,7 +9,7 @@ You need Node 22, pnpm 8 (`corepack enable`), Docker (for the local Supabase) an
 
 ```bash
 pnpm install
-npx supabase start                 # Postgres, auth, storage and Mailpit on ports 54420 to 54429
+npx supabase@^2.113.0 start                 # Postgres, auth, storage and Mailpit on ports 54420 to 54429
 pnpm --filter @rerun/contracts build
 cp .env.example apps/ui/.env
 cp apps/engine/.env.example apps/engine/.env
@@ -21,7 +21,7 @@ Then fill the two files. Pick any long random string as the engine key and use i
 |---|---|
 | `NEXT_PUBLIC_APP_URL` | `http://localhost:3050` |
 | `NEXT_PUBLIC_SUPABASE_URL` | `http://localhost:54421` |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` | the keys `npx supabase status` prints |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` | the keys `npx supabase@^2.113.0 status` prints |
 | `OPENROUTER_API_KEY` | your OpenRouter key |
 | `RERUN_ENGINE_URL` | `http://localhost:3000` |
 | `RERUN_ENGINE_API_KEY` | the engine key |

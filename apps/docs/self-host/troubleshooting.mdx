@@ -27,7 +27,7 @@ docker compose logs app | grep email-sign-up
 
 ## No sign-in code arrives
 
-**With `npx supabase start`**, no email leaves your computer. Every code lands in Mailpit, at [http://localhost:54424](http://localhost:54424).
+**With `npx supabase@^2.113.0 start`**, no email leaves your computer. Every code lands in Mailpit, at [http://localhost:54424](http://localhost:54424).
 
 **With open source Supabase on your server**, emails go through the SMTP server of `supabase-stack/.env`, and `docker logs supabase-auth` shows why one failed.
 
@@ -49,9 +49,9 @@ A visitor starts as an anonymous user, and signing up turns that user into an ac
 The database is missing migrations. The schema is built by every file of `supabase/migrations`, in order, and a single missing one leaves tables or grants out.
 
 ```bash
-npx supabase migration list      # what is applied, on a linked project
-npx supabase db push             # apply what is missing, on a project on supabase.com
-npx supabase migration up        # the same, on the local stack
+npx supabase@^2.113.0 migration list      # what is applied, on a linked project
+npx supabase@^2.113.0 db push             # apply what is missing, on a project on supabase.com
+npx supabase@^2.113.0 migration up        # the same, on the local stack
 ```
 
 With open source Supabase, add `--db-url` and the address from [Install](/self-host/install#2-set-up-supabase) to `migration list` and to `db push --yes`.
@@ -72,12 +72,12 @@ docker compose --profile local-supabase up -d --build
 
 And keep `NEXT_PUBLIC_SUPABASE_URL=http://localhost:54421`, the address your browser uses too.
 
-## Tables are missing after `npx supabase start`
+## Tables are missing after `npx supabase@^2.113.0 start`
 
 If the first start failed partway, the next one reuses a database that never received the migrations: pages fail with `relation "public.services" does not exist`. Rebuild it, which erases its data:
 
 ```bash
-npx supabase db reset
+npx supabase@^2.113.0 db reset
 ```
 
 ## No sign-in code in the email

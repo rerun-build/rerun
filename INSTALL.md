@@ -20,7 +20,7 @@ here is not enough.
 
 1. **Where should Rerun run?** On this computer, to try it alone, or on a server, for a team.
 2. **Which Supabase?** Rerun keeps its data in Supabase. Offer the one that fits:
-   - *On this computer*: Supabase started by `npx supabase start`. Nothing to sign up for. The
+   - *On this computer*: Supabase started by `npx supabase@^2.113.0 start`. Nothing to sign up for. The
      simplest path, recommended for a first try.
    - *A free project on supabase.com*: recommended on a server.
    - *Open source Supabase on their own server*: only if they ask for everything on their
@@ -55,8 +55,8 @@ Every command below runs from this folder.
 **On this computer:**
 
 ```bash
-npx supabase start
-npx supabase status
+npx supabase@^2.113.0 start
+npx supabase@^2.113.0 status
 ```
 
 Put the API URL and keys in `.env`:
@@ -78,8 +78,8 @@ one computer, never for a server reachable from the internet.
 3. Apply the schema. `link` asks for the database password:
 
    ```bash
-   npx supabase link --project-ref <the part before .supabase.co in the URL>
-   npx supabase db push --include-seed
+   npx supabase@^2.113.0 link --project-ref <the part before .supabase.co in the URL>
+   npx supabase@^2.113.0 db push --include-seed
    ```
 
 4. In **Authentication > Sign In / Providers**, turn on **Allow anonymous sign-ins**.
@@ -148,7 +148,7 @@ To update later:
 git pull && docker compose up -d --build
 ```
 
-and `npx supabase db push` (or `npx supabase migration up` for Supabase on this computer) when a
+and `npx supabase@^2.113.0 db push` (or `npx supabase@^2.113.0 migration up` for Supabase on this computer) when a
 release adds database migrations.
 
 Versions follow one rule: a patch (`v0.5.1`) only asks to pull, a minor (`v0.6.0`) has an
