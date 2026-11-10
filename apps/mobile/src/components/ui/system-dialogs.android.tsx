@@ -99,6 +99,9 @@ function TextPrompt({ request }: { request: TextPromptRequest }) {
         show(null)
         request.onCancel?.()
     }
+    const focusWhenShown = () => {
+        setTimeout(() => input.current?.focus(), KEYBOARD_DELAY_MS)
+    }
     const submit = () => {
         show(null)
         request.onSubmit(text)
@@ -106,7 +109,7 @@ function TextPrompt({ request }: { request: TextPromptRequest }) {
     return (
         // The keyboard only opens once the modal's window has the focus, a moment after it shows: autoFocus,
         // or a focus right on onShow, leaves the field focused with the keyboard closed.
-        <Modal visible transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={cancel} onShow={() => setTimeout(() => input.current?.focus(), KEYBOARD_DELAY_MS)}>
+        <Modal visible transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={cancel} onShow={focusWhenShown}>
             <Pressable testID="prompt-backdrop" accessibilityLabel={request.cancelLabel ?? t('actions.cancel')} onPress={cancel} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
             <View style={{ flex: 1, alignItems: 'center', paddingTop: '28%', paddingHorizontal: spacing.xl }} pointerEvents="box-none">
                 <View accessibilityViewIsModal style={{ width: '100%', maxWidth: DIALOG_MAX_WIDTH, backgroundColor: theme.card, borderRadius: radius.xl, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, padding: spacing.xl, gap: spacing.md }}>
