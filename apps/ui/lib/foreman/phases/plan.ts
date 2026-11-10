@@ -3,7 +3,7 @@ import type { UIMessage } from 'ai'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { intakeBoxes } from '@/lib/onboarding/intake'
 import { describeNeed } from '../needs'
-import { foremanUseCases } from '../phase'
+import { foremanUseCases, isMobileApp } from '../phase'
 import type { ForemanState } from '../phase'
 import { lastShownPlan } from '../shown-plan'
 import type { PlanItemKind } from '../tool-defs'
@@ -115,7 +115,7 @@ ${naming.map(line => `- ${line}\n`).join('')}- A coworker is a name and a job he
 - ${
             state.entitled
                 ? 'Do not create anything yet, and do not claim anything is running: nothing is built before the plan comes back confirmed. The moment it does, the app builds it, on the plan their account is already on, with no payment asked for.'
-                : state.client === 'ios'
+                : isMobileApp(state)
                   ? 'Do not create anything yet, and do not claim anything is running: nothing is built before the card comes back confirmed. The moment it does, the app asks them to start the build, then builds the coworker.'
                   : 'Do not create anything yet, and do not claim anything is running: their workspace has no plan, so no Box and no coworker can exist. The moment the card comes back confirmed, the app puts the free trial in front of them, then builds the coworker.'
         }`

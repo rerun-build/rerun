@@ -1,12 +1,18 @@
 import { apiRoute } from '@/app/api/v1/_lib/api-route'
-import type { ClientConfig, ClientServer } from '@rerun/contracts'
+import { appPlatformOf } from '@/app/api/v1/_lib/client-platform'
+import type { ClientConfig, ClientPlatform, ClientServer } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
 
-function minIosBuild(): number {
-    const build = Number.parseInt(process.env.MOBILE_IOS_MIN_BUILD ?? '', 10)
+const MIN_BUILD_ENV: Record<ClientPlatform, string> = {
+    ios: 'MOBILE_IOS_MIN_BUILD',
+    android: 'MOBILE_ANDROID_MIN_BUILD',
+}
+
+function minBuildOf(platform: ClientPlatform): number {
+    const build = Number.parseInt(process.env[MIN_BUILD_ENV[platform]] ?? '', 10)
     return Number.isInteger(build) && build > 0 ? build : 0
 }
 
@@ -32,4 +38,4 @@ function serverOf(req: Request): ClientServer | undefined {
     return { supabaseUrl: supabaseUrlSeenFrom(req, supabaseUrl), supabasePublishableKey }
 }
 
-export const GET = apiRoute({ auth: 'public' }, async ({ req }): Promise<ClientConfig> => ({ minBuild: minIosBuild(), server: serverOf(req) }))
+export const GET = apiRoute({ auth: 'public' }, async ({ req }): Promise<ClientConfig> => ({ minBuild: minBuildOf(appPlatformOf(req)), server: serverOf(req) }))

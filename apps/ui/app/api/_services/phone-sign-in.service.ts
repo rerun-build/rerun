@@ -9,6 +9,7 @@ import { isVerificationChannel, type VerificationChannel } from '@/lib/phone/ver
 import { checkVerification, sendVerification, type VerificationFailure } from '@/lib/sms/bird-verify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import type { ClientPlatform } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 const SEND_COLUMNS = ['phone', 'send_count', 'send_window_started_at', 'last_sent_at', 'last_channel'] as const
@@ -25,7 +26,7 @@ export const MAX_VERIFY_PER_PHONE = 5
 export const MAX_VERIFY_PER_IP = 20
 export const VERIFY_WINDOW_MS = 15 * 60_000
 
-export type SignInApp = 'ios'
+export type SignInApp = ClientPlatform
 
 type SendUpsert = Database['public']['Tables']['phone_sign_in_sends']['Insert']
 type SendUpdate = Database['public']['Tables']['phone_sign_in_sends']['Update']
@@ -45,7 +46,7 @@ const refused = <Failure extends string>(error: Failure, retryAfterSeconds?: num
 // is counted before it leaves and given back when nothing went out.
 // The caller's and everybody's counts are not given back: an attempt is what they measure.
 // `account` is who asks, when someone signed in is moving to this number. `app` is set when the code is
-// asked from the iOS app rather than the web.
+// asked from the mobile app rather than the web.
 export async function startPhoneSignIn(phone: string, channel: VerificationChannel, ip: string, language: string | null = null, account: { id: string; context: 'settings' } | null = null, app: SignInApp | null = null): Promise<PhoneSignInStart> {
     const supabase = createServiceRoleClient()
     const { data: row, error: readError } = await selectMaybeSingle(supabase, 'phone_sign_in_sends', SEND_COLUMNS, { phone })

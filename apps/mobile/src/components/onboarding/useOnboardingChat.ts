@@ -8,6 +8,7 @@ import { clientHeader, hubHeaders } from '@/api/client'
 import { fetchOnboardingConversation } from '@/api/onboarding'
 import type { ChatCaller } from '@/chat/transport'
 import { environment } from '@/config/environment'
+import { clientPlatform } from '@/lib/client-platform'
 
 import { widgetOf, type OnboardingWidget } from './parts'
 
@@ -20,12 +21,16 @@ export function resumesAfterAnswer({ messages }: { messages: UIMessage[] }): boo
     return lastAssistantMessageIsCompleteWithToolCalls({ messages })
 }
 
+export function onboardingSendBody(sessionId: string, messages: UIMessage[]) {
+    return { sessionId, messages, client: clientPlatform }
+}
+
 function onboardingTransport(callerRef: RefObject<ChatCaller | null>, sessionRef: RefObject<string>) {
     return new DefaultChatTransport<UIMessage>({
         api: `${environment.apiUrl}/api/chat/foreman`,
         headers: () => hubHeaders(clientHeader, { accessToken: callerRef.current?.accessToken, workspaceId: callerRef.current?.workspaceId }),
         fetch: expoFetch as unknown as typeof globalThis.fetch,
-        prepareSendMessagesRequest: ({ messages }) => ({ body: { sessionId: sessionRef.current, messages, client: 'ios' } }),
+        prepareSendMessagesRequest: ({ messages }) => ({ body: onboardingSendBody(sessionRef.current, messages) }),
     })
 }
 

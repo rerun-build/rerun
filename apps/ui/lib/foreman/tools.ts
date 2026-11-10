@@ -6,7 +6,7 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { requireString } from '@/lib/mcp/args'
 import { dispatchOnboardingTool } from './onboarding-tools'
 import { phaseSpec, phaseTools, pinnedPlanBoxes, planKinds } from './phases'
-import type { ForemanState } from './phase'
+import { isMobileApp, type ForemanState } from './phase'
 import { searchForemanDocs } from './search-docs'
 import type { ForemanTurn } from './turn'
 import { FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_TOOL_NAMES, FOREMAN_WIDGET_TOOL_DEFS, showPlanDef, showTemplatesDef, type ForemanToolDef } from './tool-defs'
@@ -29,7 +29,7 @@ export function foremanActiveTools(state: ForemanState): string[] {
     const tools = phaseTools(phaseSpec(state.phase), state) as readonly string[]
     // Asking for a card from a workspace that already has a plan throws ALREADY_SUBSCRIBED, and the
     // user reads a failed tool call. The app has no team chat to hand a contact_team over to.
-    return tools.filter(name => !(state.entitled && name === 'open_checkout') && !(state.client === 'ios' && name === 'contact_team'))
+    return tools.filter(name => !(state.entitled && name === 'open_checkout') && !(isMobileApp(state) && name === 'contact_team'))
 }
 
 export function foremanTools({ ctx, turn }: ForemanContext): ToolSet {

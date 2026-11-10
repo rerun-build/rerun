@@ -112,7 +112,7 @@ export interface AnalyticsEventMap {
     checkout_started: { plan: string; source: 'template_cta' | 'billing_dialog' | 'agent_share' | 'foreman' | 'pay_now' | 'ai_providers' }
     paywall_viewed: { trigger: string; addon_shown?: string; variant?: string }
     // `origin` is where the trial was started: the app's are all cardless, whatever the test's arm.
-    trial_started: SubscriptionLifecycleProps & { trial_type: TrialType; origin?: 'web' | 'ios' }
+    trial_started: SubscriptionLifecycleProps & { trial_type: TrialType; origin?: 'web' | 'ios' | 'android' }
     trial_converted: SubscriptionLifecycleProps
     trial_payment_failed: SubscriptionLifecycleProps & { invoice_id: string; amount_due: number }
     // A trial ended the second it began, because the card had already spent one elsewhere. Not a

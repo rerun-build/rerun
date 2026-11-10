@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { workspaceRoleSchema, workspaceSummarySchema } from './board.js'
+import { clientPlatformSchema } from './client.js'
 
 export const meSchema = z.object({
     user: z.object({
@@ -33,7 +34,7 @@ export const apiErrorSchema = z.object({
 // The app registers its push token on every launch (Expo can rotate it) and drops it on sign-out.
 export const deviceTokenSchema = z.object({
     token: z.string().trim().regex(/^ExponentPushToken\[[\w-]+\]$/).max(256),
-    platform: z.enum(['ios']),
+    platform: clientPlatformSchema,
     appVersion: z.string().max(64).optional(),
 })
 export type DeviceTokenInput = z.infer<typeof deviceTokenSchema>

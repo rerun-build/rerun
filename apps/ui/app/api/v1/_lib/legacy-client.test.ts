@@ -78,6 +78,20 @@ describe('clientKnowsProvider', () => {
     it('trusts no build while the first one is not set', () => {
         expect(clientKnowsProvider(request('ios/9.9.9 (999)'), 'opencode')).toBe(false)
     })
+
+    it('trusts every Android build: the Android app was born knowing every provider', () => {
+        expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'opencode')).toBe(true)
+        expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'custom')).toBe(true)
+        vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', '40')
+        vi.stubEnv('MOBILE_IOS_CUSTOM_BUILD', '52')
+        expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'opencode')).toBe(true)
+        expect(clientKnowsProvider(request('android/1.0.0 (1)'), 'custom')).toBe(true)
+    })
+
+    it('reads a header it cannot parse as an old build, whatever platform it names', () => {
+        expect(clientKnowsProvider(request('android/1.0.0'), 'opencode')).toBe(false)
+        expect(clientKnowsProvider(request('windows/1.0.0 (1)'), 'opencode')).toBe(false)
+    })
 })
 
 // The point of the filter: what an older build receives parses with the schemas it was built with,
@@ -104,6 +118,13 @@ describe('responses for an older build', () => {
         expect(aiConnectionsForClient(old, view).connections.map(c => c.id)).toEqual(['rerun'])
         expect(aiConnectionsForClient(old, view).addable.map(a => a.provider)).toEqual(['claude'])
         expect(agentModelsForClient(old, models).groups.map(g => g.connectionId)).toEqual(['rerun'])
+    })
+
+    it('hands an Android build the response untouched, with no first build set', () => {
+        const android = request('android/1.0.0 (1)')
+        expect(aiConnectionsForClient(android, view)).toBe(view)
+        expect(agentModelsForClient(android, models)).toBe(models)
+        expect(agentViewForClient(android, agentView)).toBe(agentView)
     })
 
     it('hands a build that knows every provider the response untouched', () => {

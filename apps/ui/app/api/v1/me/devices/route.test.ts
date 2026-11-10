@@ -34,6 +34,12 @@ describe('/api/v1/me/devices', () => {
         expect(write.payload).toMatchObject({ user_id: 'user-1', token: TOKEN, platform: 'ios', app_version: '1.0.0 (7)', revoked_at: null })
     })
 
+    it('registers an Android phone the same way', async () => {
+        expect((await call(POST, { token: TOKEN, platform: 'android', appVersion: '1.0.0 (3)' })).status).toBe(204)
+        expect(supabase.writes('device_tokens')[0].payload).toMatchObject({ token: TOKEN, platform: 'android', app_version: '1.0.0 (3)' })
+        expect((await call(POST, { token: TOKEN, platform: 'windows' })).status).toBe(400)
+    })
+
     it('moves a token to the new account of the phone once the previous one signed out or went quiet', async () => {
         holder = { user_id: 'user-2', revoked_at: daysAgo(2), last_seen_at: daysAgo(2) }
         expect((await call(POST, { token: TOKEN, platform: 'ios' })).status).toBe(204)

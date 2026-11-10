@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react-native'
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import * as Notifications from 'expo-notifications'
+import { Platform } from 'react-native'
 
 import { askForPushOnce, registerDevice, setConversationOnScreen, unregisterDevice } from './push'
 import { PushRouting } from './PushRouting'
@@ -43,7 +44,7 @@ describe('push registration', () => {
 
     it('registers the token of an allowed phone, and nothing from a simulator', async () => {
         await registerDevice(caller)
-        expect(mockApi).toHaveBeenCalledWith('/api/v1/me/devices', { ...caller, method: 'POST', body: { token: 'ExponentPushToken[abc]', platform: 'ios', appVersion: '1.0.0 (7)' } })
+        expect(mockApi).toHaveBeenCalledWith('/api/v1/me/devices', { ...caller, method: 'POST', body: { token: 'ExponentPushToken[abc]', platform: Platform.OS, appVersion: '1.0.0 (7)' } })
         mockApi.mockClear()
         mockDevice.isDevice = false
         await registerDevice(caller)
@@ -59,7 +60,7 @@ describe('push registration', () => {
     it('drops the token on sign-out', async () => {
         await registerDevice(caller)
         await unregisterDevice(caller)
-        expect(mockApi).toHaveBeenLastCalledWith('/api/v1/me/devices', { ...caller, method: 'DELETE', body: { token: 'ExponentPushToken[abc]', platform: 'ios' } })
+        expect(mockApi).toHaveBeenLastCalledWith('/api/v1/me/devices', { ...caller, method: 'DELETE', body: { token: 'ExponentPushToken[abc]', platform: Platform.OS } })
     })
 })
 

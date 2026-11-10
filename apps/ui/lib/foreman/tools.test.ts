@@ -15,7 +15,9 @@ function stateWith(patch: Partial<ForemanState>): ForemanState {
 describe('foremanActiveTools', () => {
     it('hands the app no contact_team: it has no team chat to open', () => {
         expect(foremanActiveTools(stateWith({ client: 'web' }))).toContain('contact_team')
-        expect(foremanActiveTools(stateWith({ client: 'ios' }))).not.toContain('contact_team')
-        expect(foremanActiveTools(stateWith({ client: 'ios', phase: 'trial' }))).toEqual(['search_docs'])
+        for (const client of ['ios', 'android'] as const) {
+            expect(foremanActiveTools(stateWith({ client }))).not.toContain('contact_team')
+            expect(foremanActiveTools(stateWith({ client, phase: 'trial' }))).toEqual(['search_docs'])
+        }
     })
 })
