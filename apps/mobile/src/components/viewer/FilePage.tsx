@@ -6,12 +6,14 @@ import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
+import { webViewPreviews } from '@/components/viewer/file-preview'
 
 // Below the viewer's close button, title and counter.
 const HEADER_ROOM = 64
 
 // A file that is not a photo, read in a web view from its copy in the cache: iOS draws PDFs, text,
-// spreadsheets and office documents there. What it cannot draw says so, the share sheet stays a tap away.
+// spreadsheets and office documents there, Android text only. What it cannot draw says so, the share
+// sheet stays a tap away.
 export function FilePage({ url, name, load }: { url: string; name: string; load: () => Promise<string> }) {
     const t = useTranslations('mobileCommon')
     const { width, height } = useWindowDimensions()
@@ -35,7 +37,7 @@ export function FilePage({ url, name, load }: { url: string; name: string; load:
         }
     }, [url])
 
-    if (failed) {
+    if (failed || !webViewPreviews(name)) {
         return (
             <View style={{ width, height, alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 32 }}>
                 <Icon name="file" size={28} color="#a1a1a1" />
