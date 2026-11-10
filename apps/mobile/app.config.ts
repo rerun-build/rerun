@@ -21,6 +21,21 @@ function withEasProject(config: ConfigContext['config']): ConfigContext['config'
     return { ...config, owner, extra: { ...config.extra, eas: { ...config.extra?.eas, projectId } }, updates: { ...config.updates, url: `https://u.expo.dev/${projectId}` } }
 }
 
+// The builder never receives cloud/, so a store build without it reads its hub from EXPO_PUBLIC_* (see
+// src/cloud-oss/environments.ts). Missing, the app ships pointing at localhost with an empty Supabase
+// key and crashes on launch: fail the build instead.
+const RERUN_CLOUD_SOURCE = `${__dirname}/../../cloud/apps/mobile/src/environments.ts`
+const STORE_PROFILES = ['production', 'staging']
+const REQUIRED_HUB_VARIABLES = ['EXPO_PUBLIC_API_URL', 'EXPO_PUBLIC_SUPABASE_URL', 'EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY'] as const
+
+function assertStoreBuildHasHub(): void {
+    if (process.env.EAS_BUILD !== 'true' || !STORE_PROFILES.includes(process.env.EAS_BUILD_PROFILE ?? '')) return
+    if (existsSync(RERUN_CLOUD_SOURCE)) return
+    const missing = REQUIRED_HUB_VARIABLES.filter(name => !process.env[name])
+    if (missing.length === 0) return
+    throw new Error(`Store build "${process.env.EAS_BUILD_PROFILE}" has no hub to point at: set ${missing.join(', ')} in its EAS environment.`)
+}
+
 // A free Apple ID (personal team) cannot claim a bundle ID some other team may own. Local dev builds
 // set RERUN_PERSONAL_TEAM=1 so they install on a real iPhone without a paid Apple Developer account.
 // Store builds leave it unset. Such a team cannot sign the push capability either, so its builds leave
@@ -40,6 +55,7 @@ function withLanguages(config: ConfigContext['config']): ConfigContext['config']
 }
 
 export default ({ config: base }: ConfigContext): ExpoConfig => {
+    assertStoreBuildHasHub()
     const config = withLanguages(withEasProject(base))
     if (!personalTeam) return config as ExpoConfig
 
