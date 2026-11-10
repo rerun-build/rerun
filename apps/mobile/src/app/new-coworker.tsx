@@ -8,6 +8,7 @@ import { useTranslations } from 'use-intl'
 import { createCoworker, fetchBoxes } from '@/api/board'
 import { boxForNewCoworker, manageableBoxes, newCoworkerBlocker } from '@/auth/access'
 import { useAuth, useIsWorkspaceAdmin } from '@/auth/AuthProvider'
+import { SheetChrome } from '@/components/layout/SheetChrome'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { Icon } from '@/components/ui/Icon'
@@ -84,39 +85,42 @@ export default function NewCoworker() {
 
     // A form sheet lays out its scroll view itself: wrapped in a view, it is laid out at no height.
     return (
-        <ScrollView style={{ backgroundColor: theme.background }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <GlassButton symbol="x" label={tCommon('actions.close')} onPress={() => router.back()} />
-                <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
-                    {t('title')}
-                </AppText>
-                <View style={{ width: GLASS_BUTTON_SIZE }} />
-            </View>
-
-            {blocked ? (
-                <AppText variant="callout" tone="muted">
-                    {tAccess(blocked, { host: webHost })}
-                </AppText>
-            ) : (
-                <>
-                    <TextField id="coworker-name" label={t('nameLabel')} value={name} onChangeText={setName} placeholder={t('namePlaceholder')} maxLength={NAME_MAX} autoFocus />
-                    <TextField id="coworker-description" label={t('descriptionLabel')} value={description} onChangeText={setDescription} placeholder={t('descriptionPlaceholder')} multiline help={t('descriptionHelp')} />
-                </>
-            )}
-
-            {boxes && boxes.length > 0 && (
-                <View style={{ gap: spacing.sm }}>
-                    <AppText variant="footnote" medium>
-                        {t('boxLabel')}
+        <>
+            <ScrollView style={{ backgroundColor: theme.background }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <GlassButton symbol="x" label={tCommon('actions.close')} onPress={() => router.back()} />
+                    <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
+                        {t('title')}
                     </AppText>
-                    <View style={{ borderRadius: radius.lg, borderCurve: 'continuous', backgroundColor: theme.card, overflow: 'hidden' }}>
-                        {boxes.map((box, index) => (
-                            <BoxRow key={box.id} box={box} selected={box.id === boxId} divided={index > 0} onPress={() => setBoxId(box.id)} />
-                        ))}
-                    </View>
+                    <View style={{ width: GLASS_BUTTON_SIZE }} />
                 </View>
-            )}
-            {!blocked && <PillButton label={t('submit')} onPress={create} loading={creating} disabled={!name.trim() || !boxId} />}
-        </ScrollView>
+
+                {blocked ? (
+                    <AppText variant="callout" tone="muted">
+                        {tAccess(blocked, { host: webHost })}
+                    </AppText>
+                ) : (
+                    <>
+                        <TextField id="coworker-name" label={t('nameLabel')} value={name} onChangeText={setName} placeholder={t('namePlaceholder')} maxLength={NAME_MAX} autoFocus />
+                        <TextField id="coworker-description" label={t('descriptionLabel')} value={description} onChangeText={setDescription} placeholder={t('descriptionPlaceholder')} multiline help={t('descriptionHelp')} />
+                    </>
+                )}
+
+                {boxes && boxes.length > 0 && (
+                    <View style={{ gap: spacing.sm }}>
+                        <AppText variant="footnote" medium>
+                            {t('boxLabel')}
+                        </AppText>
+                        <View style={{ borderRadius: radius.lg, borderCurve: 'continuous', backgroundColor: theme.card, overflow: 'hidden' }}>
+                            {boxes.map((box, index) => (
+                                <BoxRow key={box.id} box={box} selected={box.id === boxId} divided={index > 0} onPress={() => setBoxId(box.id)} />
+                            ))}
+                        </View>
+                    </View>
+                )}
+                {!blocked && <PillButton label={t('submit')} onPress={create} loading={creating} disabled={!name.trim() || !boxId} />}
+            </ScrollView>
+            <SheetChrome />
+        </>
     )
 }
