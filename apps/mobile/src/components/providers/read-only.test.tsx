@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native'
 
 import { AI_PROVIDERS_ADMIN_ONLY } from '@/auth/access'
 import { AI_CONNECTIONS_FULL, AI_CONNECTIONS_RERUN_ONLY } from '@/mocks/aiConnections'
+import { isSwitchDisabled } from '@/test/switch'
 
 import { ConnectionDetail } from './ConnectionDetail'
 import { ProvidersList } from './ProvidersList'
@@ -54,7 +55,7 @@ describe('AI providers for a member', () => {
         expect(onRename).not.toHaveBeenCalled()
         for (const model of connection.models) {
             const toggle = screen.queryByTestId(`model-${model.id}`)
-            if (toggle) expect(toggle.props.disabled).toBe(true)
+            if (toggle) expect(isSwitchDisabled(toggle)).toBe(true)
         }
     })
 })

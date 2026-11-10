@@ -4,6 +4,7 @@
 //   pnpm dev:mobile                     this workspace's own simulator, reusing a dev client already built for the same native inputs
 //   pnpm dev:mobile --device            the paired iPhone, signed with the Apple ID added in Xcode (a free one is enough)
 //   pnpm dev:mobile [--device] --rebuild   ignore the cached dev client and force the native build
+//   pnpm dev:mobile --android [--rebuild]  this workspace's own Android emulator (dev-mobile-android.mjs)
 //
 // The app talks to the Next server of this workspace (apps/ui, on CONDUCTOR_PORT), so the script
 // starts it too, unless the `ui` run script already serves that port or EXPO_PUBLIC_API_URL points
@@ -27,8 +28,9 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
-import { createInterface } from 'node:readline'
 import { fileURLToPath } from 'node:url'
+
+import { apiAnswers, startApi, waitForApi, waitForMetro } from './dev-mobile-shared.mjs'
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const APP_DIR = join(REPO_ROOT, 'apps/mobile')
@@ -50,6 +52,7 @@ const WORKSPACE_NAME = process.env.CONDUCTOR_WORKSPACE_NAME || basename(REPO_ROO
 const API_PORT = Number(process.env.CONDUCTOR_PORT ?? 3050)
 const METRO_PORT = API_PORT + 2
 const onDevice = process.argv.includes('--device')
+const onAndroid = process.argv.includes('--android')
 const forceRebuild = process.argv.includes('--rebuild')
 
 function dotenvValue(key) {
@@ -244,57 +247,6 @@ function lanAddress() {
     return 'localhost'
 }
 
-// Any HTTP answer counts, a 401 included: it means Next is up and the route is compiled.
-async function apiAnswers(timeoutMs) {
-    try {
-        await fetch(`http://localhost:${API_PORT}/api/v1/me`, { signal: AbortSignal.timeout(timeoutMs) })
-        return true
-    } catch {
-        return false
-    }
-}
-
-// Detached so that stopping the script can take down the whole pnpm > next tree through its process
-// group. Its output is prefixed to stay readable next to Metro's.
-function startApi() {
-    log(`starting the API (Next) on port ${API_PORT}`)
-    const api = spawn('pnpm', ['--filter', 'rerun', 'exec', 'next', 'dev', '-p', String(API_PORT)], {
-        cwd: REPO_ROOT,
-        env: { ...process.env, FORCE_COLOR: '1' },
-        stdio: ['ignore', 'pipe', 'pipe'],
-        detached: true,
-    })
-    for (const stream of [api.stdout, api.stderr]) {
-        createInterface({ input: stream }).on('line', line => console.log(`[api] ${line}`))
-    }
-    api.on('exit', code => log(`the API stopped (code ${code ?? 'signal'})`))
-    process.on('exit', () => {
-        try {
-            process.kill(-api.pid, 'SIGTERM')
-        } catch {}
-    })
-}
-
-async function waitForApi() {
-    for (let attempt = 0; attempt < 60; attempt++) {
-        if (await apiAnswers(60_000)) return true
-        await new Promise(done => setTimeout(done, 1000))
-    }
-    return false
-}
-
-// A cold Metro, the first run of a workspace, takes over a minute before it answers.
-async function waitForMetro() {
-    for (let attempt = 0; attempt < 600; attempt++) {
-        try {
-            const response = await fetch(`http://localhost:${METRO_PORT}/status`)
-            if ((await response.text()).includes('running')) return true
-        } catch {}
-        await new Promise(done => setTimeout(done, 500))
-    }
-    return false
-}
-
 function nativeInputsHash() {
     const hash = createHash('sha256')
     for (const file of NATIVE_INPUTS) hash.update(readFileSync(join(APP_DIR, file)))
@@ -335,13 +287,18 @@ function pruneClients() {
     for (const entry of [...staleCopies, ...oldClients]) rmSync(entry.path, { recursive: true, force: true })
 }
 
+if (onAndroid) {
+    const { runAndroid } = await import('./dev-mobile-android.mjs')
+    await runAndroid()
+}
+
 for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
     process.on(signal, () => process.exit(130))
 }
 
 if (usesLocalApi) {
-    if (await apiAnswers(3_000)) log(`reusing the API already served on port ${API_PORT}`)
-    else startApi()
+    if (await apiAnswers(API_PORT, 3_000)) log(`reusing the API already served on port ${API_PORT}`)
+    else startApi({ port: API_PORT, cwd: REPO_ROOT, log })
 } else {
     log(`the app talks to ${remoteApiUrl}`)
 }
@@ -414,7 +371,7 @@ if (onDevice) {
 
 if (usesLocalApi) {
     log('waiting for the API to answer')
-    if (await waitForApi()) log(`API ready, the app calls ${env.EXPO_PUBLIC_API_URL}`)
+    if (await waitForApi(API_PORT)) log(`API ready, the app calls ${env.EXPO_PUBLIC_API_URL}`)
     else log(`the API does not answer on port ${API_PORT}, the app will show "Can't reach Rerun" until it does`)
 }
 
@@ -428,7 +385,7 @@ const metro = spawn('pnpm', ['exec', 'expo', 'start', '--dev-client', ...(onDevi
 metro.on('exit', (code, signal) => process.exit(signal ? 1 : (code ?? 0)))
 process.on('exit', () => metro.kill('SIGTERM'))
 
-if (!(await waitForMetro())) {
+if (!(await waitForMetro(METRO_PORT))) {
     log(`Metro does not answer on port ${METRO_PORT}, open Rerun by hand once it does`)
 } else if (onDevice) {
     const bundleUrl = `http://${lanAddress()}:${METRO_PORT}`

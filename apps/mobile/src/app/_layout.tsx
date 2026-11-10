@@ -2,6 +2,7 @@ import { useFonts } from 'expo-font'
 import { DarkTheme, DefaultTheme, router, Stack, ThemeProvider, usePathname } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect, useState } from 'react'
+import { StatusBar } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { AuthProvider, useAuth } from '@/auth/AuthProvider'
@@ -81,6 +82,8 @@ function App() {
 
     return (
         <ThemeProvider value={navigationTheme}>
+            {/* iOS picks the bar's ink from the appearance on its own; Android keeps light icons unless told. */}
+            <StatusBar barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'} />
             <BuddyClock>
                 {updateRequired ? (
                     <UpdateRequired />
