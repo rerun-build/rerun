@@ -1,4 +1,5 @@
 import { parseInstallMessage } from './chat-run-origin.js'
+import { messageText } from './message-text.js'
 
 export type AuthorProfile = { id: string; name: string; photo?: string }
 
@@ -9,8 +10,6 @@ type AuthoredMessageLike = { id: string; role: string; parts: readonly PartLike[
 
 export type AuthorTurn<M> = { key: string; authorId: string | undefined; items: { message: M; index: number }[] }
 
-const textOf = (message: AuthoredMessageLike) => message.parts.map(part => (part.type === 'text' ? (part.text ?? '') : '')).join('')
-
 /**
  * Who typed a message, when someone did. A schedule, a trigger or the API leave it unsigned, and so
  * does an install guide: it is the template speaking, sent on the click of a button.
@@ -20,7 +19,7 @@ export function authorIdOf(message: AuthoredMessageLike): string | undefined {
     const metadata = message.metadata as { authorId?: unknown; install?: unknown } | null | undefined
     const authorId = metadata?.authorId
     if (typeof authorId !== 'string' || !authorId || metadata?.install) return undefined
-    return parseInstallMessage(textOf(message)) ? undefined : authorId
+    return parseInstallMessage(messageText(message)) ? undefined : authorId
 }
 
 /** Consecutive messages one person sent become one turn; everything else stands alone. */

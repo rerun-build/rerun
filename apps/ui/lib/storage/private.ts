@@ -1,3 +1,4 @@
+import { sleep } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -27,8 +28,6 @@ function isTransientStorageError(error: { name?: string; status?: number }): boo
     return error.name === 'StorageUnknownError'
 }
 
-const pause = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
 export async function downloadPrivateFile(supabase: SupabaseClient<Database>, bucket: string, path: string): Promise<Blob> {
     for (let attempt = 0; ; attempt += 1) {
         const { data, error } = await supabase.storage.from(bucket).download(path)
@@ -38,7 +37,7 @@ export async function downloadPrivateFile(supabase: SupabaseClient<Database>, bu
             console.warn('[storage] download gave up after retries', bucket, path, error.status, error.message)
             throw new Error(STORAGE_BUSY_ERROR, { cause: error })
         }
-        await pause(DOWNLOAD_RETRY_DELAYS_MS[attempt] * (1 + Math.random() * 0.25))
+        await sleep(DOWNLOAD_RETRY_DELAYS_MS[attempt] * (1 + Math.random() * 0.25))
     }
 }
 

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isRecord } from "./record.js";
 
 // The one question of the settings: which runs are worth hearing about at all.
 export const NOTIFICATION_SCOPES = [
@@ -102,9 +103,6 @@ export function taskNotifies(
       prefs.scope === "everything")
   );
 }
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  !!value && typeof value === "object" && !Array.isArray(value);
 
 function normalizeCategories(
   raw: Record<string, unknown>,

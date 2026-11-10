@@ -1,12 +1,10 @@
-import { stripBridgePrefix } from '@rerun/contracts'
+import { toolNameOf } from '@rerun/contracts'
 
 import { hitlKindOf } from '@/lib/chat-hitl'
 
 export type HitlCallPart = { type: string; toolName?: string; input?: unknown; output?: unknown }
 
 type MessageLike = { role: string; parts: readonly { type: string }[] }
-
-const toolNameOf = (part: HitlCallPart) => stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
 
 // The question a user reply answers: the last human-in-the-loop call of the assistant turn right
 // before it. The reply text alone says what was decided; this call holds what was asked (slugs,

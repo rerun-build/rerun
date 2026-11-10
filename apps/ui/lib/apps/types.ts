@@ -20,10 +20,6 @@ export function isAppSlug(value: string | null | undefined): value is AppSlug {
 // paused included: the slot is what they come back into.
 export const SLOT_HOLDING_STATUSES: readonly AppConnectionStatus[] = ['connecting', 'connected', 'needs_reconnect', 'paused']
 
-export function holdsSlot(status: string): boolean {
-    return (SLOT_HOLDING_STATUSES as readonly string[]).includes(status)
-}
-
 export const WORKSPACE_APP_COLUMNS = ['workspace_id', 'app_slug', 'status', 'slots', 'trial_ends_at', 'trial_reminder_sent_at', 'trial_settled_at', 'frozen_at'] as const
 
 export const APP_CONNECTION_COLUMNS = [

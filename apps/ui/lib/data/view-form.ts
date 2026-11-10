@@ -3,7 +3,6 @@ import {
     CARD_GALLERY_SHAPES,
     CARD_LAYOUTS,
     CARD_MAX_COLUMNS,
-    CARD_TONES,
     TABLE_VIEW_NAME_MAX,
     type CardFields,
     type CardLayout,
@@ -141,8 +140,6 @@ export function quickViewInput(layout: CardLayout, sample: { columns: string[]; 
     }
     return formValuesToInput(values)
 }
-
-export const isTone = (value: string): value is CardTone => (CARD_TONES as readonly string[]).includes(value)
 
 const PREVIEW_ROWS = { table: 5, list: 5, gallery: 6, board: 3 } as const
 

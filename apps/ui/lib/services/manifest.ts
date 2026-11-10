@@ -171,10 +171,6 @@ export function oauthServer(method: AuthMethod): McpServerTemplate | undefined {
     return method.mcpServers.find(s => s.oauth)
 }
 
-export function methodUsesOAuth(method: AuthMethod): boolean {
-    return oauthServer(method) !== undefined
-}
-
 // What declaring this service on an agent will actually leave behind, decided from the
 // manifest alone. installServiceSlugs auto-compiles only when there is a single method with
 // no required secret, and compileService then lands on needs_auth for an oauth/managed

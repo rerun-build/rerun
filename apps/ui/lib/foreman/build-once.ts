@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { sleep } from '@rerun/contracts'
 import type { Json } from '@/app/api/database.types'
 import type { SubRunTask } from '@/lib/chat/sub-run-progress'
 import { claimBuild, finishedBuild, releaseBuild } from './build-claim'
@@ -38,8 +39,6 @@ function readStored(value: Json | null | undefined): StoredBuild | null {
     const { result, tasks } = value as Partial<StoredBuild>
     return result && Array.isArray(result.agents) && Array.isArray(tasks) ? { result, tasks } : null
 }
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export async function buildTeamOnce({ ctx, state, emit, signal, reload, pollMs = POLL_MS, timeoutMs = WAIT_TIMEOUT_MS }: BuildTeamOnceOptions): Promise<BuildTeamResult> {
     const workspaceId = ctx.workspace.id

@@ -1,3 +1,4 @@
+import { asRecord } from '@rerun/contracts'
 import { TRIAL_ACTIVE_AGENTS } from '@rerun/cloud/billing'
 import { asString, asStringArray, requireString } from '@/lib/mcp/args'
 import type { ForemanPlanBox, ForemanPlanItem } from './phase'
@@ -15,8 +16,6 @@ import type { PlanItemKind } from './tool-defs'
 export type PlanBeats = { trigger: string; working: string; delivered: string }
 
 const MAX_GETS = 3
-
-const asRecord = (value: unknown): Record<string, unknown> => (value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {})
 
 // All three lines or none: a day with a beat missing is a loop that goes quiet halfway through.
 export function readBeats(input: unknown): PlanBeats | undefined {

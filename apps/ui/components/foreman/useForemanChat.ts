@@ -1,7 +1,7 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, type ForemanIntent } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, sleep, type ForemanIntent } from '@rerun/contracts'
 import { DefaultChatTransport, type UIMessage } from 'ai'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -43,8 +43,6 @@ async function fetchEngineTranscript(sessionId: string): Promise<UIMessage[]> {
     if (!res.ok) return []
     return ((await res.json()) as { messages?: UIMessage[] }).messages ?? []
 }
-
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 export function useForemanChat() {
     const sessionId = useForemanStore(state => state.sessionId)
@@ -366,7 +364,7 @@ export function useForemanChat() {
                     setEngineMessages(data)
                     return
                 }
-                await wait(600)
+                await sleep(600)
             }
         },
         [resumeEngineStream, setEngineMessages, setRunError]

@@ -17,10 +17,6 @@ function isMissingImportRoute(err: unknown): boolean {
     return err instanceof Error && /\/agents\/import failed: 404/.test(err.message)
 }
 
-function errorMessage(err: unknown): string {
-    return err instanceof Error ? err.message : 'Unknown error'
-}
-
 // `inactive` counts the agents that landed switched off because the plan had no slot left for
 // them. They are installed and complete, they just will not run until a slot frees up.
 // `alreadyInstalled`: the workspace had this template's coworkers already, and `agentIds` are those.
@@ -100,7 +96,7 @@ export async function installTemplate(supabase: SupabaseClient<Database>, slug: 
             // between Supabase and the engine, and an agent that already landed is real and
             // visible on the grid, so the rest of the batch carries on and reports what failed.
             if (isMissingImportRoute(err)) throw staleImportError()
-            failed.push({ name: names[index], error: errorMessage(err) })
+            failed.push({ name: names[index], error: err instanceof Error ? err.message : 'Unknown error' })
         }
     }
 

@@ -1,4 +1,4 @@
-import { hitlKindOf, isSubRunLive, pairSubRuns, parseHitlReply, parseInstallMessage, parseScheduledRun, parseTriggerPayload, QUICK_REPLIES_TOOL, skillProposalIdOf, stripBridgePrefix, SUB_RUN_TOOL_NAMES, toolActivityOf, toolLabelOf, type ConversationMessageMetadata, type MessageFeedbackRating, type PaidTurnSources, type TriggerPayload } from '@rerun/contracts'
+import { hitlKindOf, isSubRunLive, pairSubRuns, parseHitlReply, parseInstallMessage, parseScheduledRun, parseTriggerPayload, QUICK_REPLIES_TOOL, isToolPart, messageText, skillProposalIdOf, SUB_RUN_TOOL_NAMES, toolActivityOf, toolLabelOf, toolNameOf, type ConversationMessageMetadata, type MessageFeedbackRating, type PaidTurnSources, type TriggerPayload } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -18,7 +18,7 @@ import { Sources, type Source } from './cards/Sources'
 import { FileCardView } from './cards/FileCardView'
 import { TableCardView } from './cards/TableCardView'
 import { ApprovalReceipt, CancelledReceipt, McpReceipt, QuestionReceipt, SecretReceipt, ServiceReceipt, TakeoverReceipt } from './hitl/Receipts'
-import { attachmentsOf, textOf, userTextOf, voiceOf } from './message-text'
+import { attachmentsOf, userTextOf, voiceOf } from './message-text'
 import { InstallDivider, ScheduledRunDivider, WebhookRunDivider } from './origins/RunOrigins'
 import { AssistantMessage, UserBubble } from './Messages'
 import { MessageTimeReveal, type MessageStamp } from './MessageTimeReveal'
@@ -28,15 +28,10 @@ import { SubRunBlock, subRunStatus } from './steps/SubRunBlock'
 import { toolSymbolOf } from './steps/toolSymbols'
 import { VoiceUserMessage } from './VoiceUserMessage'
 
-type Part = UIMessage['parts'][number]
 type ToolPart = { type: string; toolName?: string; toolCallId?: string; state?: string; errorText?: string; input?: unknown; inputText?: string; output?: unknown }
-
-const toolNameOf = (part: ToolPart) => stripBridgePrefix(part.toolName ?? part.type.slice('tool-'.length))
 
 // The Foreman's shortcuts to a coworker: no question, nothing to answer, a chip under its text.
 const FOREMAN_SHORTCUTS = new Set(['show_agents', 'open_connector_setup'])
-
-const isToolPart = (part: Part): part is Part & ToolPart => part.type.startsWith('tool-') || part.type === 'dynamic-tool'
 
 // The quick replies are chips under the message, never a step. A HITL call is answered through its
 // block and its reply draws a receipt, so it only keeps its step when it failed, which is where the
@@ -53,7 +48,7 @@ type Origin = { kind: 'install'; agentName: string; guide: string } | { kind: 's
 // the bare guide or prompt as text; a message streamed before that still carries its raw marker.
 function originOf(message: UIMessage): Origin | null {
     const metadata = message.metadata as ConversationMessageMetadata | undefined
-    const text = textOf(message)
+    const text = messageText(message)
     if (metadata?.install) return { kind: 'install', agentName: metadata.install.agentName, guide: text }
     if (metadata?.scheduledRun) return { kind: 'scheduled', name: metadata.scheduledRun.name, prompt: text }
     const install = parseInstallMessage(text)
@@ -227,7 +222,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
     const held = underText
     const sources = message.parts.filter(part => part.type === 'source-url').map(part => ({ url: (part as Source).url, title: (part as Source).title }))
 
-    const answer = textOf(message)
+    const answer = messageText(message)
     const actions = { onRegenerate, rating: feedback?.ratingOf(message.id) ?? null, onRate: feedback ? (rating: MessageFeedbackRating) => void feedback.rate(message.id, rating, answer) : undefined }
     if (closing.trim().length > 0) blocks.push({ key: 'closing', node: <AssistantMessage text={closing} showActions={isLastAssistant && !running} streaming={isLastAssistant && running} owner={fileOwner} actions={actions} /> })
     blocks.push(...held)

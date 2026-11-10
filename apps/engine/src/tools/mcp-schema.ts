@@ -1,8 +1,8 @@
+import { isRecord } from '@rerun/contracts'
+
 type JsonObject = Record<string, unknown>
 
 const ROOT_COMBINATORS = ['oneOf', 'anyOf', 'allOf'] as const
-
-const isObject = (value: unknown): value is JsonObject => typeof value === 'object' && value !== null && !Array.isArray(value)
 
 const requiredOf = (branch: JsonObject): string[] => (Array.isArray(branch.required) ? branch.required.filter((name): name is string => typeof name === 'string') : [])
 
@@ -22,19 +22,19 @@ function constraintNote(kind: (typeof ROOT_COMBINATORS)[number], branches: JsonO
 // model as a sentence. Nothing is let through that the server would have taken: it still validates the
 // arguments it receives, and its refusal reaches the agent as the tool's result.
 export function toToolInputSchema(input: unknown): { schema: JsonObject; note: string | null } {
-    if (!isObject(input)) return { schema: { type: 'object' }, note: null }
+    if (!isRecord(input)) return { schema: { type: 'object' }, note: null }
     if (input.type === 'object' && ROOT_COMBINATORS.every(kind => !(kind in input))) return { schema: input, note: null }
 
     const schema: JsonObject = { ...input, type: 'object' }
-    const properties: JsonObject = isObject(input.properties) ? { ...input.properties } : {}
+    const properties: JsonObject = isRecord(input.properties) ? { ...input.properties } : {}
     const required = new Set(requiredOf(input))
     const notes: string[] = []
     for (const kind of ROOT_COMBINATORS) {
         if (!(kind in schema)) continue
-        const branches = Array.isArray(schema[kind]) ? (schema[kind] as unknown[]).filter(isObject) : []
+        const branches = Array.isArray(schema[kind]) ? (schema[kind] as unknown[]).filter(isRecord) : []
         delete schema[kind]
         for (const branch of branches) {
-            if (isObject(branch.properties)) for (const [name, property] of Object.entries(branch.properties)) if (!(name in properties)) properties[name] = property
+            if (isRecord(branch.properties)) for (const [name, property] of Object.entries(branch.properties)) if (!(name in properties)) properties[name] = property
             if (kind === 'allOf') for (const name of requiredOf(branch)) required.add(name)
         }
         const note = constraintNote(kind, branches)

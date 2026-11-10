@@ -41,9 +41,3 @@ export function useManageableSpaceIds(): Set<string> {
     const grants = useBoardStore(state => state.spaceGrants)
     return useMemo(() => new Set(spaces.filter(space => boxAccessFor(viewer, space, grants) === 'manage').map(space => space.id)), [viewer, spaces, grants])
 }
-
-// For callbacks outside React (drag handlers, store actions): the same rule on the store's state now.
-export function spaceAccessNow(viewer: BoxViewer, spaceId: string | null | undefined): BoxAccess {
-    const { spaces, spaceGrants } = useBoardStore.getState()
-    return boxAccessFor(viewer, spaceId ? spaces.find(s => s.id === spaceId) : undefined, spaceGrants)
-}

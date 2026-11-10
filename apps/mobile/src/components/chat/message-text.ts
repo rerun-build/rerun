@@ -1,23 +1,16 @@
-import { attachmentDisplayName, decodePeaks, parseAttachments, parseVoiceMessage, stripAttachmentsRef, stripVoiceMarker, type VoiceMessage } from '@rerun/contracts'
+import { attachmentDisplayName, decodePeaks, messageText, parseAttachments, parseVoiceMessage, stripAttachmentsRef, stripVoiceMarker, type VoiceMessage } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
-
-export function textOf(message: UIMessage): string {
-    return message.parts
-        .filter(part => part.type === 'text')
-        .map(part => (part as { text: string }).text)
-        .join('')
-}
 
 // What the person sent, without the markers the hub reads: attached paths and the voice recording.
 export function userTextOf(message: UIMessage): string {
-    return stripAttachmentsRef(stripVoiceMarker(textOf(message))).trim()
+    return stripAttachmentsRef(stripVoiceMarker(messageText(message))).trim()
 }
 
 // The files a message carried: from the transcript's metadata, or from the paths its text names.
 export function attachmentsOf(message: UIMessage): { name: string; path: string }[] {
     const stored = (message.metadata as { attachments?: { name: string; path: string }[] } | undefined)?.attachments
     if (stored?.length) return stored.map(({ name, path }) => ({ name, path }))
-    return parseAttachments(textOf(message))?.paths.map(path => ({ name: attachmentDisplayName(path), path })) ?? []
+    return parseAttachments(messageText(message))?.paths.map(path => ({ name: attachmentDisplayName(path), path })) ?? []
 }
 
 type StoredVoice = { transcript: string; src: string; durationMs: number; peaks?: string }
@@ -27,6 +20,6 @@ type StoredVoice = { transcript: string; src: string; durationMs: number; peaks?
 export function voiceOf(message: UIMessage): VoiceMessage | null {
     const stored = (message.metadata as { voice?: StoredVoice } | undefined)?.voice
     if (stored) return { transcript: stored.transcript, src: stored.src, durationMs: stored.durationMs, peaks: decodePeaks(stored.peaks ?? '') }
-    const text = textOf(message)
+    const text = messageText(message)
     return parseVoiceMessage(parseAttachments(text)?.text ?? text)
 }

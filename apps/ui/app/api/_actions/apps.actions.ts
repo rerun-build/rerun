@@ -11,7 +11,6 @@ import {
     cancelAppConnect,
     connectLinkedin,
     connectWhatsapp,
-    detachAgent,
     disconnectConnection,
     getAgentAppBinding,
     getAppsOverview,
@@ -118,13 +117,6 @@ export async function attachAgentToConnectionAction(slug: AppSlug, agentId: stri
         await attachAgentToConnection(slug, id.parse(agentId), id.parse(connectionId))
         const binding = await getAgentAppBinding(slug, agentId)
         await markAppAuthorized(agentId, appInfo(slug).serviceSlug, binding?.label ?? undefined, actor)
-        return null
-    })
-}
-
-export async function detachAgentAction(slug: AppSlug, agentId: string): Promise<Result<null>> {
-    return run(slug, 'detachAccountFailed', async () => {
-        await detachAgent(slug, id.parse(agentId))
         return null
     })
 }

@@ -1,4 +1,4 @@
-import { stripBridgePrefix } from '@/lib/chat/bridge-name'
+import { isToolPart, toolNameOf } from '@rerun/contracts'
 import { countSubRuns, isSubRunLive, pairSubRuns, subRunTroubleLabel, titledSubRun, type SubRunCopy } from '@/lib/chat/sub-run-progress'
 
 // The `chat.activity` namespace, in the reader's language.
@@ -18,7 +18,6 @@ const TERMINAL_TOOL_STATES = new Set(['output-available', 'output-error', 'outpu
 type PartLike = { type: string; id?: string; state?: string; toolName?: string; toolCallId?: string; input?: unknown; data?: unknown }
 type MessageLike = { role: string; parts: readonly PartLike[] }
 
-const isToolPart = (part: PartLike) => part.type.startsWith('tool-') || part.type === 'dynamic-tool'
 const isRunningTool = (part: PartLike) => isToolPart(part) && !TERMINAL_TOOL_STATES.has(part.state ?? '')
 
 /**
@@ -31,7 +30,7 @@ export function stepGroupShowsActivity(message: MessageLike | undefined): boolea
     if (!last) return false
     if (last.type === 'reasoning') return last.state === 'streaming'
     if (!isRunningTool(last) || last.state === 'approval-requested') return false
-    const toolName = stripBridgePrefix(last.toolName ?? last.type.replace(/^tool-/, ''))
+    const toolName = toolNameOf(last)
     if (HITL_TOOLS.has(toolName)) return false
     const progress = last.toolCallId ? pairSubRuns(message.parts).byToolCallId.get(last.toolCallId) : undefined
     return !progress
@@ -62,7 +61,7 @@ export function liveActivityLabel(message: MessageLike | undefined, { t, subRuns
     const last = message.parts.findLast(part => !part.type.startsWith('data-'))
     if (!last) return null
     if (isRunningTool(last)) {
-        const toolName = stripBridgePrefix(last.toolName ?? last.type.replace(/^tool-/, ''))
+        const toolName = toolNameOf(last)
         return HITL_TOOLS.has(toolName) ? null : t('runningTool', { tool: toolLabel(toolName, last.input) })
     }
     if (last.type === 'reasoning' && last.state === 'streaming') return t('thinking')

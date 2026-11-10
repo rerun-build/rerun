@@ -149,16 +149,6 @@ export function availabilityLabel(availability: ExpertAvailability): ExpertAvail
     return EXPERT_AVAILABILITY_LABELS[availability]
 }
 
-export const EXPERT_AVAILABILITY_HINTS: Record<ExpertAvailability, string> = {
-    available: 'Taking on new work now',
-    soon: 'Opening up shortly',
-    unavailable: 'Fully booked for now',
-}
-
-export function availabilityHint(availability: ExpertAvailability): string {
-    return EXPERT_AVAILABILITY_HINTS[availability]
-}
-
 const BADGE_TONES: Record<ExpertBadge, BadgeTone> = {
     Studio: 'neutral',
     Freelancer: 'neutral',

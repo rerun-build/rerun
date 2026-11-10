@@ -51,7 +51,7 @@ import { parseTriggerPayload } from '@/lib/triggers/trigger-payload'
 import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { cn } from '@/lib/utils'
-import { QUICK_REPLIES_TOOL, fileCardSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
+import { QUICK_REPLIES_TOOL, fileCardSchema, messageText, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
@@ -74,13 +74,6 @@ export type AssistantStep =
 type NormalizedSource = { url?: string; title?: string }
 
 type MessagePartLike = { type: string; text?: string; [key: string]: unknown }
-
-export function messageText(message: { parts: readonly MessagePartLike[] }): string {
-    return message.parts
-        .filter((p): p is { type: 'text'; text: string } => p.type === 'text' && 'text' in p)
-        .map(p => p.text)
-        .join('')
-}
 
 function messageSources(message: { parts: readonly MessagePartLike[] }): NormalizedSource[] {
     return message.parts

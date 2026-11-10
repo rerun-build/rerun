@@ -1,5 +1,4 @@
-import { isTemplateCategory } from '@/lib/onboarding/industries'
-import type { TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, type TemplateCategory } from '@rerun/contracts'
 
 // Names offered under the Box name field, so the field is not an empty page.
 //
@@ -8,7 +7,7 @@ import type { TemplateCategory } from '@rerun/contracts'
 // company already runs as its own thing: Marketing, Sales, Ops, because that is the grain someone
 // recognises in a picker, not because a finer one would break anything.
 //
-// Hand written per industry, same reasoning as INDUSTRY_TOOLS: the template catalogue is shaped by
+// Hand written per industry rather than derived from the template catalogue, which is shaped by
 // capability, not by how a business divides itself, and a suggestion that misses is worse than a
 // generic one. Six each, the most universal first, so four survive once the Boxes already created
 // are out.

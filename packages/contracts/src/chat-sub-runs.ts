@@ -1,4 +1,4 @@
-import { stripBridgePrefix } from './chat-tool-name.js'
+import { isToolPart, toolNameOf } from './chat-tool-name.js'
 
 export const SUB_RUN_STALLED_AFTER_MS = 3 * 60_000
 export const SUB_RUN_FAILURE_STREAK = 3
@@ -83,9 +83,6 @@ export function titledSubRun(progress: SubRunProgress, t: SubRunCopy): SubRunPro
     const untitled = (index: number) => (progress.kind === 'call-agent' ? t('untitledAgent') : t('untitledTask', { index: index + 1 }))
     return { ...progress, tasks: progress.tasks.map((task, index) => (task.title ? task : { ...task, title: untitled(index) })) }
 }
-
-const toolNameOf = (part: PartLike) => stripBridgePrefix(part.toolName ?? part.type.replace(/^tool-/, ''))
-const isToolPart = (part: PartLike) => part.type.startsWith('tool-') || part.type === 'dynamic-tool'
 
 export type SubRunPairing = {
     byToolCallId: Map<string, SubRunProgress>

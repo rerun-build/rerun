@@ -1,13 +1,11 @@
-import { QUICK_REPLIES_TOOL, stripBridgePrefix } from '@rerun/contracts'
+import { isToolPart, QUICK_REPLIES_TOOL, toolNameOf } from '@rerun/contracts'
 
 type PartLike = { type: string; toolCallId?: string; toolName?: string; state?: string }
 type MessageLike = { role: string; parts: readonly PartLike[] }
 
-const isToolPart = (part: PartLike) => part.type === 'dynamic-tool' || part.type.startsWith('tool-')
-
 // The engine hands the replies over as a call with an input and no output: there is nothing
 // left to wait for on it.
-const isQuickRepliesPart = (part: PartLike) => stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : '')) === QUICK_REPLIES_TOOL
+const isQuickRepliesPart = (part: PartLike) => toolNameOf(part) === QUICK_REPLIES_TOOL
 
 const userTurns = (messages: readonly MessageLike[]) => messages.filter(message => message.role === 'user').length
 

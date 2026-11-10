@@ -45,14 +45,6 @@ export function getBlobByFile(file: string): BlobIllustration | undefined {
     return BLOB_ILLUSTRATIONS.find(blob => blob.file === file)
 }
 
-export function getBlobsByColor(color: BlobColor): BlobIllustration[] {
-    return BLOB_ILLUSTRATIONS.filter(blob => blob.color === color)
-}
-
-export function getBlobsByForm(form: BlobForm): BlobIllustration[] {
-    return BLOB_ILLUSTRATIONS.filter(blob => blob.form === form)
-}
-
 export function randomBlob(): BlobIllustration | undefined {
     return BLOB_ILLUSTRATIONS[Math.floor(Math.random() * BLOB_ILLUSTRATIONS.length)]
 }

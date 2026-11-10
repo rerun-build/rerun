@@ -24,10 +24,6 @@ export function appInfo(slug: AppSlug): AppInfo {
     return APP_INFO[slug]
 }
 
-export function wakeEventsOf(slug: AppSlug): string[] {
-    return Object.keys(APP_INFO[slug].wakeEventLabels)
-}
-
 export function isWakeEventOf(slug: AppSlug, value: string): boolean {
     return Object.hasOwn(APP_INFO[slug].wakeEventLabels, value)
 }

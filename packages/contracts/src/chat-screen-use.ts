@@ -1,5 +1,6 @@
 import { parseHitlReply } from './chat-hitl.js'
-import { stripBridgePrefix } from './chat-tool-name.js'
+import { toolNameOf } from './chat-tool-name.js'
+import { messageText } from './message-text.js'
 
 const SCREEN_TOOLS = new Set(['computer', 'computer_open_app'])
 const NAVIGATE_TOOL = 'browser_navigate'
@@ -7,15 +8,11 @@ const NAVIGATE_TOOL = 'browser_navigate'
 type ToolPart = { type: string; toolName?: string; input?: unknown; text?: string }
 type MessageLike = { role: string; parts: readonly { type: string }[] }
 
-const toolNameOf = (part: ToolPart) => stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
-
-const textOf = (message: MessageLike) => (message.parts as readonly ToolPart[]).map(part => (part.type === 'text' ? (part.text ?? '') : '')).join('')
-
 // The run the thread is in: everything since the person last wrote. Answering a block the run asked
 // (a takeover handed back, a question) resumes that same run, so it does not start a new one.
 export function currentRunMessages<M extends MessageLike>(messages: readonly M[]): readonly M[] {
     for (let i = messages.length - 1; i >= 0; i--) {
-        if (messages[i].role === 'user' && !parseHitlReply(textOf(messages[i]))) return messages.slice(i + 1)
+        if (messages[i].role === 'user' && !parseHitlReply(messageText(messages[i]))) return messages.slice(i + 1)
     }
     return messages
 }

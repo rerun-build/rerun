@@ -7,7 +7,7 @@ import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/own
 import type { Database } from '@/app/api/database.types'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { reportWorkspaceEvent } from '@/lib/apps/analytics'
-import { dropWakeTrigger, unbindAgent } from '@/lib/apps/bindings'
+import { dropWakeTrigger } from '@/lib/apps/bindings'
 import { claimQuota, updateConnection, workspaceScope } from '@/lib/apps/connections'
 import { isWakeEventOf } from '@/lib/apps/catalog'
 import { loginLinkedin, type LinkedinCredentials } from '@/lib/apps/linkedin/connect'
@@ -444,12 +444,6 @@ export async function attachAgentToConnection(slug: AppSlug, agentId: string, co
     }
     const { error } = await supabase.from('app_connection_agents').insert<BindingInsert>({ agent_id: agentId, app_slug: slug, connection_id: connectionId })
     if (error) throw new Error(error.message)
-}
-
-export async function detachAgent(slug: AppSlug, agentId: string): Promise<void> {
-    await assertAgentInWorkspace(agentId, 'manage')
-    const { workspace, supabase } = await requireWorkspaceContext()
-    await unbindAgent(supabase, workspace.id, agentId, slug)
 }
 
 // The hub creates the trigger on the engine, and only it knows its token: the webhook fires it as

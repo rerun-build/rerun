@@ -1,4 +1,4 @@
-import { parseServiceRegistryKey } from '@rerun/contracts'
+import { parseServiceRegistryKey, sleep } from '@rerun/contracts'
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
 import { composioUserId, getConnectedAccount } from '@/lib/composio/client'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, decodeComposioContext } from '@/lib/composio/oauth'
@@ -24,10 +24,6 @@ function htmlResult(result: CallbackResult, key?: string): NextResponse {
         message: result.ok ? { type: 'composio-oauth-success', ...target, accountLabel: result.accountLabel } : { type: 'composio-oauth-error', ...target, error: result.error },
         label: result.ok ? `Connected${result.accountLabel ? ` as ${result.accountLabel}` : ''}. You can close this window.` : `Authorization failed: ${result.error}`,
     })
-}
-
-function sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 // Composio redirect target after the user completes the hosted sign-in. The query params are

@@ -1,5 +1,4 @@
-import { isTemplateCategory } from '@/lib/onboarding/industries'
-import type { TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, type TemplateCategory } from '@rerun/contracts'
 import type { AgentSuggestion } from '@rerun/ui/new-agent'
 
 export type { AgentSuggestion }
@@ -60,7 +59,7 @@ const WEEKLY_REPORT_SUGGESTION: Omit<AgentSuggestion, 'id'> = {
     apps: ['google-sheets', 'slack'],
 }
 
-// Hand written per industry, same reasoning as INDUSTRY_TOOLS: the template catalogue is too coarse
+// Hand written per industry rather than derived from the template catalogue, which is too coarse
 // and too volatile to derive a first task from, and a suggestion that misses is worse than a
 // generic one. Eight per industry, the most universal first: the dialog draws the first three as
 // cards, the rest are what a Box theme and the ideas of a company draw from.

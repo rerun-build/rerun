@@ -1,6 +1,5 @@
-import { type TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, type TemplateCategory } from '@rerun/contracts'
 
-import { isTemplateCategory } from '@/lib/onboarding/industries'
 import { INDUSTRY_GLOSS } from './industry'
 
 // Which line of business, in under a second, from a domain name or from a sentence someone typed.

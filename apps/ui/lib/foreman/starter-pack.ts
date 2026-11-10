@@ -1,3 +1,4 @@
+import { asRecord } from '@rerun/contracts'
 import type { TemplateCardImage } from '@/lib/templates/card-image'
 import { MAX_STARTER_PICKS } from '@/lib/onboarding/starter-packs'
 import { asString, asStringArray } from '@/lib/mcp/args'
@@ -23,8 +24,6 @@ export type StarterPackCard = {
 export type StarterPackInput = { cards: StarterPackCard[]; box?: string; boxes: { name: string }[] }
 
 export type StarterPackAnswer = { answered: true; chosen: string[] } | { answered: true; custom: string } | { answered: false }
-
-const asRecord = (value: unknown): Record<string, unknown> => (value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {})
 
 function readImage(value: unknown): TemplateCardImage | null {
     const image = asRecord(value)

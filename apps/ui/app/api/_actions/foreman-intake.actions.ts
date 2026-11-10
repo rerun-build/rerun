@@ -1,6 +1,6 @@
 'use server'
 
-import type { TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, type TemplateCategory } from '@rerun/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { decideIndustry } from '@/lib/company/decide-industry'
@@ -8,7 +8,6 @@ import { companySiteUrl } from '@/lib/company/firecrawl'
 import { analyzeCompanyProfile } from '@/lib/company/profile'
 import { mergeForeman, readAnswers, saveForemanProfile, stampWorkspaceOnboarded } from '@/lib/foreman/profile'
 import { takeIntakeCall } from '@/lib/onboarding/anonymous-intake-quota'
-import { isTemplateCategory } from '@/lib/onboarding/industries'
 import type { ForemanIntake } from '@/lib/onboarding/intake'
 
 // The welcome card's half of the onboarding: everything it needs that cannot happen in the browser.

@@ -204,18 +204,6 @@ export function modelPower(id: string | null | undefined): number | undefined {
     return id ? MODEL_POWER[id] : undefined
 }
 
-// Flat lookup of model id -> provider id, built once. Ids do collide: a subscription group and its
-// API twin serve the same model under the same id (`gpt-6-astra` on codex and openai,
-// `claude-opus-5` on claude and anthropic), so the last group listed wins. That is harmless
-// precisely because the two sides of such a pair are the same vendor: same label, same icon. The
-// per-connection pickers never read this map, they read `connection.models`.
-const MODEL_PROVIDER: Record<string, string> = Object.fromEntries(ENGINE_MODEL_CATALOG.flatMap(p => p.models.map(m => [m.id, p.provider])))
-
-// Provider id for a model id; undefined for custom/unknown models (no icon shown).
-export function modelProvider(id: string | null | undefined): string | undefined {
-    return id ? MODEL_PROVIDER[id] : undefined
-}
-
 // Every model id known to the catalog.
 export const ALL_CATALOG_MODEL_IDS: string[] = ENGINE_MODEL_CATALOG.flatMap(p => p.models.map(m => m.id))
 

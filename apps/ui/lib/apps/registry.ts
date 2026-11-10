@@ -78,10 +78,6 @@ export function appDefinition(slug: AppSlug): AppDefinition {
     return APPS[slug]
 }
 
-export function appForPlatform(platform: string): AppDefinition | undefined {
-    return Object.values(APPS).find(app => app.platform === platform)
-}
-
 export function linkupPlatforms(): string[] {
     return Object.values(APPS).map(app => app.platform)
 }

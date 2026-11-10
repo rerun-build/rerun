@@ -1,5 +1,6 @@
 import { readFile, mkdir, rm } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
+import { sleep } from '@rerun/contracts'
 import { isPathSegment, mcpDir, mcpPendingPath, mcpTokenPath } from '../config/paths.js'
 import type { McpServer } from '../agents/types.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
@@ -28,8 +29,6 @@ export type DeviceAuth = { deviceEndpoint: string; tokenEndpoint: string }
 export type DeviceStart = { deviceCode: string; verificationUri: string; interval: number; expiresIn: number }
 
 export type PendingDevice = { auth: DeviceAuth; start: DeviceStart; startedAt: number }
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 const trimSlash = (s: string) => s.replace(/\/+$/, '')
 

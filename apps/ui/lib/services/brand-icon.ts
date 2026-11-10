@@ -1,4 +1,5 @@
 import { fal } from '@fal-ai/client'
+import { isRecord } from '@rerun/contracts'
 import { withBrandIconTone, type BrandIconTone } from '@rerun/ui/brand-icon'
 import type { Database } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -155,10 +156,6 @@ export type ReclassifyBrandIconsResult = {
     failed: Array<{ slug: string; error: string }>
     templatesUpdated: string[]
     templateFailures: Array<{ slug: string; error: string }>
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 export function syncTemplateConnectorIconSnapshot(connectors: unknown, iconsBySlug: ReadonlyMap<string, string>): { connectors: unknown; changed: boolean } {

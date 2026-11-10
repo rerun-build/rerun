@@ -2,7 +2,7 @@
 // route that served a call (`servedBy`, "<vendor>.<route>"): a vendor that owns its data is named,
 // a scraper or reseller is not, the platform the data was read from is shown instead.
 import { capabilityOfCall, isPaidDataCapability, isPaidDataTool, paidDataEntry, type PaidDataCapability, type PaidDataGroup } from './paid-data.js'
-import { stripBridgePrefix } from './chat-tool-name.js'
+import { toolNameOf } from './chat-tool-name.js'
 import { parseHubOutput } from './tool-output.js'
 
 export type PaidSource = { id: string; name: string; domain: string | null; kind: 'origin' | 'vendor' | 'generic' }
@@ -142,8 +142,6 @@ export type PaidTurnSources = {
 
 type PartLike = { type: string; toolName?: string; state?: string; input?: unknown; output?: unknown }
 type MessageLike = { id: string; role: string; parts: readonly PartLike[] }
-
-const toolNameOf = (part: PartLike): string => stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
 
 // A call that was refused, failed or is still running bought nothing: only answered calls count.
 const COUNTED: ReadonlySet<PaidCallStatus> = new Set(['found', 'nothing_found'])

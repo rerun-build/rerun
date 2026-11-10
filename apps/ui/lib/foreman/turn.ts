@@ -1,3 +1,4 @@
+import { asRecord } from '@rerun/contracts'
 import { foremanPhase, isNamedReadyMade, type ForemanAnswers, type ForemanState } from './phase'
 
 // Where the workspace stands, kept up to date for the length of one POST.
@@ -16,10 +17,6 @@ import { foremanPhase, isNamedReadyMade, type ForemanAnswers, type ForemanState 
 export type ForemanTurn = {
     state: () => ForemanState
     note: (toolName: string, result: unknown) => void
-}
-
-function asRecord(value: unknown): Record<string, unknown> {
-    return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 }
 
 export function createForemanTurn(initial: ForemanState): ForemanTurn {

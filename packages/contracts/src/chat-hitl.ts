@@ -2,7 +2,7 @@
 // tool input. Lives here because the web chat and the iOS one both parse it, and because the
 // strings sent back are a protocol the agent reads: two wordings would be two protocols.
 import { appendAttachmentsRef, attachmentDisplayName, buildAttachmentsRef, parseAttachments } from './chat-attachments.js'
-import { stripBridgePrefix } from './chat-tool-name.js'
+import { stripBridgePrefix, toolNameOf } from './chat-tool-name.js'
 import type { TakeoverResult } from './desktop.js'
 
 export type QuestionOption = { label: string; description?: string }
@@ -321,11 +321,6 @@ export function findUnknownPendingCall(messages: readonly { role: string; parts:
 export type PendingAlert = { toolCallId: string | null; message: string }
 
 const ALERT_FALLBACK_MESSAGE = 'The coworker sent you a notification.'
-
-function toolNameOf(part: { type: string; toolName?: string }): string {
-    const raw = part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : '')
-    return stripBridgePrefix(raw)
-}
 
 // The notification the session is waiting on: the last `notify_user` raised with kind `info`. It is
 // not necessarily the last tool call, since it does not stop the run. The status in the database is

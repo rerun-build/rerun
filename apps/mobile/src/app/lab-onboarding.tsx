@@ -1,3 +1,4 @@
+import { sleep } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
@@ -26,11 +27,9 @@ const INTAKE: Record<IntakeLabStep, { initial: Parameters<typeof useIntake>[0]['
     name: { initial: { companyUrl: 'ateliernord.fr', position: 'Founder / Agency owner' }, index: 2, knownFirstName: null },
 }
 
-const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
-
 function IntakeLab({ step }: { step: IntakeLabStep }) {
     const { initial, index, knownFirstName } = INTAKE[step]
-    const intake = useIntake({ knownFirstName, initial, initialIndex: index, decideIndustry: async () => (await wait(400), 'agencies'), submit: () => wait(1200) })
+    const intake = useIntake({ knownFirstName, initial, initialIndex: index, decideIndustry: async () => (await sleep(400), 'agencies'), submit: () => sleep(1200) })
     return <IntakeView intake={intake} />
 }
 

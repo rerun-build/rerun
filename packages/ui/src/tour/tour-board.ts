@@ -197,10 +197,6 @@ export const FOCUS_BOX_ID = 'tour-marketing'
 const FOCUS_AGENTS = TOUR_AGENTS.filter(agent => agent.boxId === FOCUS_BOX_ID)
 export const FOCUS_TILE_IDS: ReadonlySet<string> = new Set([...FOCUS_AGENTS.map(agent => agent.id), ...TOUR_CONNECTORS.filter(connector => FOCUS_AGENTS.some(agent => agent.id === connector.agentId)).map(connector => connector.id)])
 
-export function tourAgentName(id: string): string {
-    return TOUR_AGENTS.find(agent => agent.id === id)?.name ?? ''
-}
-
 export function linkId(source: string, target: string) {
     return `${source}->${target}`
 }

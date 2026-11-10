@@ -63,15 +63,3 @@ export const BANNER_ILLUSTRATIONS: readonly BannerIllustration[] = ENTRIES.map(e
 export function getBannerByFile(file: string): BannerIllustration | undefined {
     return BANNER_ILLUSTRATIONS.find(banner => banner.file === file)
 }
-
-export function getBannersByColor(color: BannerColor): BannerIllustration[] {
-    return BANNER_ILLUSTRATIONS.filter(banner => banner.color === color)
-}
-
-export function getBannersByForm(form: BannerForm): BannerIllustration[] {
-    return BANNER_ILLUSTRATIONS.filter(banner => banner.form === form)
-}
-
-export function randomBanner(): BannerIllustration {
-    return BANNER_ILLUSTRATIONS[Math.floor(Math.random() * BANNER_ILLUSTRATIONS.length)]
-}

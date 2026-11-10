@@ -4,6 +4,7 @@ import type { CatalogFindings, CatalogProduct } from '@/lib/company/explore/cata
 import type { BusinessCard } from '@/lib/company/explore/synthesize'
 import { describeNeed } from '@/lib/foreman/needs'
 import { foremanUseCases, type ForemanProfile } from '@/lib/foreman/phase'
+import { slugify } from '@/lib/slugify'
 
 export type SeedPagesInput = {
     card: BusinessCard
@@ -38,17 +39,6 @@ const BRIEF_SECTION_MATCHERS: [BriefSection, RegExp][] = [
     ['tools', /^(tools|stack)/],
     ['questions', /^open questions/],
 ]
-
-export function slugify(value: string): string {
-    return value
-        .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .slice(0, SLUG_MAX)
-        .replace(/-+$/, '')
-}
 
 function clean(value: string | null | undefined): string {
     const trimmed = (value ?? '').trim()
@@ -164,7 +154,7 @@ type Entity = { slug: string; name: string }
 function entities(names: readonly string[], taken: Set<string>): Entity[] {
     const kept: Entity[] = []
     for (const name of cleanList(names)) {
-        const slug = slugify(name)
+        const slug = slugify(name, { maxLength: SLUG_MAX })
         if (!slug || taken.has(slug)) continue
         taken.add(slug)
         kept.push({ slug, name })

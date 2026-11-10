@@ -39,14 +39,6 @@ export async function writeWorkspaceFileAction(filePath: string, content: string
     return saveTextFile(conn, SHARED_FILES_BASE, filePath, content, baseHash)
 }
 
-// Thumbnails only need the first few lines. Slicing here keeps the browser payload tiny even
-// though the engine hands us a 100k page.
-export async function readWorkspaceFileHeadAction(filePath: string): Promise<string> {
-    const conn = await requireWorkspaceConnection()
-    const { content } = await engine.readFileText(conn, SHARED_FILES_BASE, filePath)
-    return content.slice(0, 600)
-}
-
 export async function deleteWorkspaceFileAction(filePath: string): Promise<void> {
     const conn = await requireWorkspaceConnection()
     await engine.deleteFile(conn, SHARED_FILES_BASE, filePath)

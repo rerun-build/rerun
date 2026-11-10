@@ -12,7 +12,3 @@ export function statusLine(coworker: Coworker, latest: Session | undefined): Sta
     if (last) return { text: last.text.replace(/\*\*/g, '').replace(/^- /gm, '').replace(/\s+/g, ' '), tone: 'muted' }
     return { text: coworker.role, tone: 'muted' }
 }
-
-export function sessionTitle(session: Session | undefined): string {
-    return session?.title ?? 'New conversation'
-}

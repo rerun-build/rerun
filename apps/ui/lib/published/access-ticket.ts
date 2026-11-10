@@ -66,7 +66,3 @@ export function mintAccessCookie(claims: Omit<AccessClaims, 'exp'>): string {
 export function openAccessCookie(raw: string | null | undefined, slug: string): AccessClaims | null {
     return unseal('cookie', raw, slug)
 }
-
-export function isAccessSecretConfigured(): boolean {
-    return !!process.env.PUBLISHED_ACCESS_SECRET
-}

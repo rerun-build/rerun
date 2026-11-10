@@ -2,6 +2,8 @@
 // whatever the provider sent, the items are the objects of its lists and the keys come from what the
 // values look like (an email, a phone, a website) or from the few fields that name someone.
 
+import { isRecord } from '@rerun/contracts'
+
 export type PaidScalar = string | number | boolean
 export type PaidItem = { fields: Record<string, PaidScalar>; href?: string }
 export type PaidItemKey = { key: string; field: string }
@@ -13,8 +15,6 @@ const MAX_FIELD_CHARS = 500
 // Hosts shared by every business that has a page on them: a key on the host alone would tie a row to
 // every item of a call. A path on them still names one page, so it is kept with its query.
 const GENERIC_HOSTS = ['google.com', 'goo.gl', 'g.page', 'googleusercontent.com', 'gstatic.com', 'facebook.com', 'fb.com', 'instagram.com', 'linkedin.com', 'x.com', 'twitter.com', 'tiktok.com', 'youtube.com', 'youtu.be', 'pinterest.com', 'reddit.com', 'wa.me', 'whatsapp.com', 't.me', 'linktr.ee', 'bit.ly', 'yelp.com', 'tripadvisor.com', 'booking.com', 'medium.com', 'github.com', 'wikipedia.org', 'gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'yahoo.com', 'icloud.com', 'me.com', 'aol.com', 'proton.me', 'protonmail.com']
-
-const isRecord = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value)
 
 function isGenericHost(host: string): boolean {
     if (/^(?:.+\.)?google\.[a-z.]+$/.test(host)) return true

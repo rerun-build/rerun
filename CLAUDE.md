@@ -8,6 +8,17 @@ Do not add comments in most cases. Only add a comment when it genuinely helps: c
 
 Never add comments that just restate what the code does.
 
+## Shared helpers
+
+Before writing a generic helper (a type guard like `isRecord`, `sleep`, `slugify`, the name of a tool part,
+the text of a message), search for it first: `rg "function <name>\b|const <name> ="`. Reuse the one in
+`@rerun/contracts` (shared by the engine, apps/ui, packages/ui and the mobile app) or in the app's `lib/`.
+
+- When a second file needs a helper that is private to another file, move it to one of those places and
+  import it; never paste a copy.
+- Do not export a function nothing imports.
+- A helper called from a single place is fine where it is: naming a block is not the problem, copies are.
+
 # Skills
 
 Every file under `.claude/skills/` is written in English: the frontmatter, the body, the references,

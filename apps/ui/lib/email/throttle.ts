@@ -1,4 +1,5 @@
 // No 'server-only', see client.ts: this is bundled into the Trigger.dev tasks too.
+import { sleep } from '@rerun/contracts'
 import type { ErrorResponse } from 'resend'
 
 // Resend allows ten requests per second. The bucket lives on their side and is shared by the Next
@@ -58,10 +59,6 @@ export function isRetriableFailure(error: string | null): boolean {
 export type ResendResult<T> = { data: T; error: null } | { data: null; error: ErrorResponse }
 
 let nextSlot = 0
-
-export function sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
 
 // Reserving the slot before awaiting is what makes concurrent callers queue behind each other
 // instead of all reading the same free instant and leaving together.

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { CatalogFindings } from '@/lib/company/explore/catalog-collector'
 import type { BusinessCard } from '@/lib/company/explore/synthesize'
-import { briefSections, buildSeedPages, seedPagesOutline, slugify, sourceTags } from './seed-pages'
+import { briefSections, buildSeedPages, seedPagesOutline, sourceTags } from './seed-pages'
 
 function card(overrides: Partial<BusinessCard> = {}): BusinessCard {
     return {
@@ -65,14 +65,6 @@ Shopify powers the shop [stack]. See [the docs](https://example.com).
 ## Open questions
 - Revenue is not public.
 `
-
-describe('slugify', () => {
-    it('strips diacritics and punctuation into kebab-case', () => {
-        expect(slugify('Café Richard & Co.')).toBe('cafe-richard-co')
-        expect(slugify('  --  ')).toBe('')
-        expect(slugify('a'.repeat(80)).length).toBe(64)
-    })
-})
 
 describe('brief parsing', () => {
     it('splits the brief on its known sections', () => {

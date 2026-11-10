@@ -1,3 +1,4 @@
+import { asRecord } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
 // Reading the onboarding conversation the hub streams: which cards it carries, what they hold and
@@ -12,7 +13,6 @@ export type WidgetPart = { widget: OnboardingWidget; toolCallId: string; input: 
 
 type LoosePart = { type: string; toolCallId?: string; state?: string; input?: unknown; output?: unknown; id?: string; data?: unknown }
 
-const asRecord = (value: unknown): Record<string, unknown> => (value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {})
 const asText = (value: unknown): string => (typeof value === 'string' ? value : '')
 const asTexts = (value: unknown): string[] => (Array.isArray(value) ? value.filter((row): row is string => typeof row === 'string' && row.trim().length > 0) : [])
 

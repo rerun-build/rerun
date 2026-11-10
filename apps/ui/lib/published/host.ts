@@ -22,10 +22,6 @@ function hostname(host: string): string {
     return host.split(':')[0].toLowerCase()
 }
 
-export function isPublishingEnabled(): boolean {
-    return publishHost() !== null
-}
-
 export function isReservedSlug(slug: string): boolean {
     return RESERVED_SLUGS.has(slug) || slug.startsWith('xn--')
 }

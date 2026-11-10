@@ -76,23 +76,12 @@ export function tileCoversCell(col: number, row: number, c: number, r: number, s
 export function tilesOverlap(a: { col: number; row: number }, b: { col: number; row: number }, spanA = DEFAULT_SPAN, spanB = DEFAULT_SPAN) {
     return a.col < b.col + spanB && b.col < a.col + spanA && a.row < b.row + spanB && b.row < a.row + spanA
 }
-
-// Alias rétro-compatibles (footprint 2×2) pour les consommateurs existants de @rerun/iso-grid/iso.
-export const agentCoversCell = (col: number, row: number, c: number, r: number) => tileCoversCell(col, row, c, r, DEFAULT_SPAN)
 export const agentsOverlap = (a: { col: number; row: number }, b: { col: number; row: number }) => tilesOverlap(a, b, DEFAULT_SPAN, DEFAULT_SPAN)
 
 export function screenToGrid(screenX: number, screenY: number) {
     const col = Math.floor((screenX / (TILE_W / 2) + screenY / (TILE_H / 2)) / 2)
     const row = Math.floor((screenY / (TILE_H / 2) - screenX / (TILE_W / 2)) / 2)
     return { col, row }
-}
-
-export function posKey(col: number, row: number) {
-    return `${col},${row}`
-}
-
-export function isValidPosition() {
-    return true
 }
 
 // Aléatoire déterministe (FNV-1a) seedé sur une chaîne. Les grilles sont prérendues côté serveur,

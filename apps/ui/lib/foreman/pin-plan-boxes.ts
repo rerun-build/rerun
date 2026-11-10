@@ -1,3 +1,4 @@
+import { asRecord } from '@rerun/contracts'
 import type { StreamTextTransform, TextStreamPart, ToolSet } from 'ai'
 
 // During the onboarding the Boxes of a plan are the ones the welcome card drew, so the model is only
@@ -5,10 +6,6 @@ import type { StreamTextTransform, TextStreamPart, ToolSet } from 'ai'
 // show_plan and show_templates calls itself. Rewritten on the stream rather than by each reader: the
 // card, the board, the saved transcript and the build all read that one call, so they cannot disagree
 // about which Boxes it holds.
-
-function asRecord(value: unknown): Record<string, unknown> {
-    return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
-}
 
 // A Box that is not on the board would become a sixth one at the build, so whatever was filed under
 // one lands in the first, the division the board centres on.

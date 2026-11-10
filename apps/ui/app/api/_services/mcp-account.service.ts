@@ -1,4 +1,4 @@
-import { connectorSkillReadOnlyError, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import { connectorSkillReadOnlyError, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentInWorkspace, callableEngineAgentIds, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import {
@@ -239,8 +239,6 @@ async function projectTrigger(agentId: string, trigger: EngineTrigger) {
         url: trigger.token ? await triggerWebhookUrl(agentId, trigger.slug, trigger.token) : null,
     }
 }
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 async function waitForRun(conn: EngineConnection, engineAgentId: string, runId: string, waitSeconds: number): Promise<EngineRunDetail> {
     const deadline = Date.now() + waitSeconds * 1000

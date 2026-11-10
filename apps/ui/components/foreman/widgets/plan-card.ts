@@ -4,6 +4,7 @@
 // the sections follow the order the model wrote them in, an agent whose Box was never declared
 // still has to appear somewhere, and a card drawn before divisions existed has to keep rendering.
 
+import { asRecord } from '@rerun/contracts'
 import { readBeats, readGets, type PlanBeats } from '@/lib/foreman/plan-items'
 
 export type { PlanBeats }
@@ -13,10 +14,6 @@ export type PlanItem = { key: string; name: string; role: string; when: string; 
 export type PlanGroup = { key: string; name: string | null; role: string; items: PlanItem[] }
 
 export type ShownPlan = { title: string; groups: PlanGroup[] }
-
-function asRecord(value: unknown): Record<string, unknown> {
-    return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
-}
 
 function asText(value: unknown): string {
     return typeof value === 'string' ? value : ''

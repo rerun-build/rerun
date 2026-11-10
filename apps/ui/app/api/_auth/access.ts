@@ -1,7 +1,7 @@
 import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors'
 import type { ErrorCode } from '@/lib/i18n/action-error'
 import { toBoxScope, type BoxScope } from '@/app/api/_auth/box-scope'
-import { requireWorkspaceContext, type WorkspaceContext, type WorkspaceRole } from '@/app/api/_auth/ownership'
+import type { WorkspaceContext, WorkspaceRole } from '@/app/api/_auth/ownership'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getSessionWorkspace } from '@/supabase/session/getServerSession'
 import { selectAll, selectMany, selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
@@ -67,12 +67,7 @@ export function isAdminActor(actor: Actor): boolean {
     return actor.kind === 'workspace' || actor.role === 'admin'
 }
 
-// The signed-in caller as an actor, in two reads: the session's workspace, then the membership row.
-export async function requireSessionActor(): Promise<Actor> {
-    return actorFromContext(await requireWorkspaceContext())
-}
-
-// The same as requireSessionActor in a single read: the membership row the session already proves.
+// The signed-in caller as an actor, in a single read: the membership row the session already proves.
 export async function requireLightSessionActor(): Promise<Actor> {
     const { user, workspaceRefused, membership } = await getSessionWorkspace()
     if (workspaceRefused) throw new AuthorizationError('notMember')
@@ -109,12 +104,6 @@ export async function readSpaceAccess(actor: Actor, spaceId: string): Promise<Bo
     const { data: space } = await selectMaybeSingle(createServiceRoleClient(), 'spaces', ['id', 'workspace_id', 'visibility'] as const, { id: spaceId })
     if (!space) return 'none'
     return spaceAccessFor(actor, space)
-}
-
-export async function readAgentAccess(actor: Actor, agentId: string): Promise<BoxAccess> {
-    const { data: agent } = await selectMaybeSingle(createServiceRoleClient(), 'agents', ['space_id', 'workspace_id'] as const, { id: agentId })
-    if (!agent || agent.workspace_id !== actor.workspaceId) return 'none'
-    return readSpaceAccess(actor, agent.space_id)
 }
 
 // Throws the way the caller expects: a Box the actor cannot see does not exist, a Box it only uses

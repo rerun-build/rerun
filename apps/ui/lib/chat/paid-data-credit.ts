@@ -1,9 +1,7 @@
-import { isPaidDataOutOfCredit, isPaidDataTool, stripBridgePrefix } from '@rerun/contracts'
+import { isPaidDataOutOfCredit, isPaidDataTool, toolNameOf } from '@rerun/contracts'
 
 type PartLike = { type: string; toolName?: string; output?: unknown }
 type MessageLike = { role: string; parts: readonly PartLike[] }
-
-const toolNameOf = (part: PartLike) => stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
 
 // Whether the turn since the user's last message had a paid data call refused for want of credit:
 // the coworker goes on with its free tools, and the chat shows how to add credit under its reply.

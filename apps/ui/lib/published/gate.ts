@@ -119,10 +119,6 @@ export function publishedUrl(slug: string, path = '/'): string | null {
 
 export type GateKind = 'password' | 'invited' | 'workspace'
 
-export function gateKindOf(access: PublishedAccess): GateKind | null {
-    return access === 'public' ? null : access
-}
-
 // The preview card's address names the state it was drawn for, so a crawler that cached the card of
 // a public link fetches a fresh one once the link is protected, and the other way round.
 export function previewImageUrl(entry: Pick<PublishedEntry, 'access_version' | 'updated_at'>, origin: string): string {

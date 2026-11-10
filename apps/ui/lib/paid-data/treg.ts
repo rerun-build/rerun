@@ -125,10 +125,6 @@ function resultOf(capability: PaidDataCapability, body: TregBody, asked: number 
     return { output, verification, advice, ignoredFilters, ...(rows ? { rows } : {}), ...(omittedFields ? { omittedFields } : {}) }
 }
 
-export function tregConfigured(): boolean {
-    return Boolean(process.env.TREG_API_TOKEN)
-}
-
 // Returns null when no token is configured: the caller has nothing to call Treg with.
 export async function callTregCapability(
     capability: PaidDataCapability,
