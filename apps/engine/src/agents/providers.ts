@@ -59,7 +59,7 @@ const BRIDGE_TOOL_TIMEOUT_SEC = 3600
 // The CLI is a transport for the subscription and nothing more: no built-in tool but WebSearch
 // (Rerun's reach it bridged over MCP), no settings file, no prompt of its own. What it still does
 // on its own initiative is switched off here so a run holds only what Rerun put in it. Every name exists in
-// the CLI the Agent SDK ships (2.1.317); the provider forwards any `CLAUDE_*` through its allowlist
+// the CLI the Agent SDK ships (2.1.322); the provider forwards any `CLAUDE_*` through its allowlist
 // and merges these over it, so the unprefixed one passes too.
 export const CLAUDE_HARNESS_ENV = {
     // Rerun compacts the session before the run. A second compaction inside the CLI would rewrite

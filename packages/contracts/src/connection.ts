@@ -214,6 +214,7 @@ export const DEFAULT_CONNECTION_MODELS: Record<z.infer<typeof providerSchema>, s
     // connect fails its very first run ("Fable 5.1 requires usage credits").
     rerun: [RERUN_MODELS.balanced, RERUN_MODELS.fast, RERUN_MODELS.smart],
     anthropic: [
+        'claude-fable-5-2',
         'claude-fable-5-1',
         'claude-fable-5',
         'claude-opus-5-5',
@@ -230,6 +231,7 @@ export const DEFAULT_CONNECTION_MODELS: Record<z.infer<typeof providerSchema>, s
     // natively and take no suffix.
     claude: [
         'claude-opus-5-5',
+        'claude-fable-5-2',
         'claude-fable-5-1',
         'claude-fable-5',
         'claude-opus-5',
@@ -247,6 +249,7 @@ export const DEFAULT_CONNECTION_MODELS: Record<z.infer<typeof providerSchema>, s
     openai: ['gpt-6-astra', 'gpt-6.1-sol', 'gpt-6-sol', 'gpt-6.1-terra', 'gpt-6-luna', 'gpt-5.6-sol', 'gpt-5.5', 'gpt-5.4', 'gpt-5.4-mini'],
     google: ['gemini-4-argon', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'],
     openrouter: [
+        'anthropic/claude-fable-5.2',
         'anthropic/claude-fable-5.1',
         'anthropic/claude-opus-5.5',
         'anthropic/claude-sonnet-5.5',

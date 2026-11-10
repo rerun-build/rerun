@@ -9,7 +9,7 @@ export type ProPerk = { id: string; icon: LucideIcon; title: string; trial: stri
 // premium model (`trialModelFor` in @rerun/contracts), which is what the models row names.
 export const PRO_PERKS: ProPerk[] = [
     { id: 'credits', icon: CoinsIcon, title: 'AI usage', trial: `${creditsLabel(TRIAL_CREDITS)}, once`, pro: `${creditsLabel(BASE_PLAN_CREDITS)} every month`, headline: `${BASE_PLAN_CREDITS.toLocaleString('en-US')} credits/mo` },
-    { id: 'models', icon: BrainIcon, title: 'Models', trial: 'Lighter models', trialDetail: 'Sonnet 5.5, GPT-6 Sol', pro: 'Every premium model unlocked', proDetail: 'Opus 5.5, Fable 5.1, GPT-6 Astra', headline: 'Premium models' },
+    { id: 'models', icon: BrainIcon, title: 'Models', trial: 'Lighter models', trialDetail: 'Sonnet 5.5, GPT-6 Sol', pro: 'Every premium model unlocked', proDetail: 'Opus 5.5, Fable 5.2, GPT-6 Astra', headline: 'Premium models' },
     { id: 'coworkers', icon: CpuIcon, title: 'Coworkers', trial: `${TRIAL_ACTIVE_AGENTS} active`, pro: 'Unlimited', headline: 'Unlimited coworkers' },
     { id: 'team', icon: UserPlus, title: 'Teammates', trial: 'Just you', pro: 'Invite your whole team', headline: 'Invite your team' },
     { id: 'topup', icon: CoinsIcon, title: 'Top-ups', trial: 'Not available', pro: `+${creditsLabel(CREDITS_PER_PACK)} when you need them`, headline: 'Top-ups anytime' },
