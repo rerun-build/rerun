@@ -24,6 +24,15 @@ describeOnAndroid('system dialogs on Android', () => {
         expect(screen.queryByText('Mark as read')).toBeNull()
     })
 
+    it('scrolls a long list inside the sheet instead of running off the screen', async () => {
+        const options = [...Array.from({ length: 40 }, (_, index) => `Coworker ${index + 1}`), 'Cancel']
+        await render(<SystemDialogHost />)
+        await act(async () => showActionSheet({ options, cancelButtonIndex: 40 }, () => {}))
+        const list = screen.getByTestId('action-sheet-rows')
+        expect(list.type).toBe('RCTScrollView')
+        expect(list.props.style).toMatchObject({ maxHeight: expect.any(Number) })
+    })
+
     it('answers the cancel index when the sheet is dismissed', async () => {
         const onSelect = jest.fn()
         await render(<SystemDialogHost />)

@@ -1,5 +1,5 @@
 import { useRef, useState, useSyncExternalStore } from 'react'
-import { Modal, Pressable, StyleSheet, TextInput, View, type TextInputInstance } from 'react-native'
+import { Modal, Pressable, ScrollView, StyleSheet, TextInput, useWindowDimensions, View, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { AppText } from '@/components/ui/AppText'
@@ -44,11 +44,14 @@ export function promptText(request: TextPromptRequest): void {
 const GRABBER = { width: 36, height: 4 }
 const ROW_HEIGHT = 52
 const DIALOG_MAX_WIDTH = 420
+// A long list (the coworkers of a big workspace) scrolls under the sheet's title.
+const ROWS_MAX_SHARE = 0.7
 const KEYBOARD_DELAY_MS = 250
 
 function ActionSheet({ request, onSelect }: { request: ActionSheetRequest; onSelect: (index: number) => void }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const { height } = useWindowDimensions()
     const answer = (index: number) => {
         show(null)
         onSelect(index)
@@ -74,15 +77,17 @@ function ActionSheet({ request, onSelect }: { request: ActionSheetRequest; onSel
                             ) : null}
                         </View>
                     ) : null}
-                    {request.options.map((label, index) =>
-                        index === request.cancelButtonIndex ? null : (
-                            <Pressable key={`${index}-${label}`} onPress={() => answer(index)} accessibilityRole="button" android_ripple={{ color: withAlpha(theme.foreground, 0.08) }} style={{ minHeight: ROW_HEIGHT, justifyContent: 'center', paddingHorizontal: spacing.xl }}>
-                                <AppText variant="body" tone={index === request.destructiveButtonIndex ? 'destructive' : 'default'} numberOfLines={2}>
-                                    {label}
-                                </AppText>
-                            </Pressable>
-                        )
-                    )}
+                    <ScrollView testID="action-sheet-rows" style={{ maxHeight: height * ROWS_MAX_SHARE }} bounces={false}>
+                        {request.options.map((label, index) =>
+                            index === request.cancelButtonIndex ? null : (
+                                <Pressable key={`${index}-${label}`} onPress={() => answer(index)} accessibilityRole="button" android_ripple={{ color: withAlpha(theme.foreground, 0.08) }} style={{ minHeight: ROW_HEIGHT, justifyContent: 'center', paddingHorizontal: spacing.xl }}>
+                                    <AppText variant="body" tone={index === request.destructiveButtonIndex ? 'destructive' : 'default'} numberOfLines={2}>
+                                        {label}
+                                    </AppText>
+                                </Pressable>
+                            )
+                        )}
+                    </ScrollView>
                 </View>
             </View>
         </Modal>
@@ -121,20 +126,7 @@ function TextPrompt({ request }: { request: TextPromptRequest }) {
                             {request.message}
                         </AppText>
                     ) : null}
-                    <TextInput
-                        ref={input}
-                        testID="prompt-input"
-                        value={text}
-                        onChangeText={setText}
-                        selectTextOnFocus
-                        accessibilityLabel={request.title}
-                        onSubmitEditing={submit}
-                        returnKeyType="done"
-                        onFocus={() => setFocused(true)}
-                        onBlur={() => setFocused(false)}
-                        placeholderTextColor={theme.mutedForeground}
-                        style={{ minHeight: controlSize.md.height, paddingHorizontal: spacing.md, borderRadius: controlSize.md.radius, ...fieldOutline(theme, { focused }), backgroundColor: theme.background, color: theme.foreground, fontFamily: fonts.regular, fontSize: 16 }}
-                    />
+                    <TextInput ref={input} testID="prompt-input" value={text} onChangeText={setText} selectTextOnFocus accessibilityLabel={request.title} onSubmitEditing={submit} returnKeyType="done" onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} placeholderTextColor={theme.mutedForeground} style={{ minHeight: controlSize.md.height, paddingHorizontal: spacing.md, borderRadius: controlSize.md.radius, ...fieldOutline(theme, { focused }), backgroundColor: theme.background, color: theme.foreground, fontFamily: fonts.regular, fontSize: 16 }} />
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: spacing.xs, marginTop: spacing.xs }}>
                         <DialogButton label={request.cancelLabel ?? t('actions.cancel')} color={theme.mutedForeground} onPress={cancel} />
                         <DialogButton label={request.submitLabel ?? t('actions.done')} color={theme.scheme === 'dark' ? brand.soft : brand.base} onPress={submit} />
