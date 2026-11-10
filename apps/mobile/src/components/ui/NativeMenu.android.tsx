@@ -1,14 +1,15 @@
 import { Column, DropdownMenu, DropdownMenuItem, Host, HorizontalDivider, RNHostView, Text } from '@expo/ui/jetpack-compose'
 import { height, padding } from '@expo/ui/jetpack-compose/modifiers'
 import { Image } from 'expo-image'
-import { Children, createContext, Fragment, isValidElement, use, useEffect, useState, type ReactElement, type ReactNode } from 'react'
-import { BackHandler, Pressable, View } from 'react-native'
+import { Children, createContext, Fragment, isValidElement, use, useState, type ReactElement, type ReactNode } from 'react'
+import { Pressable, View } from 'react-native'
 
 import { AppText } from '@/components/ui/AppText'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import type { LongPressMenuProps, MenuBadge, MenuItemProps, MenuSectionProps, MenuToggleProps, NativeMenuProps, SubMenuProps } from '@/components/ui/menu-types'
 import { opaqueSurface } from '@/components/ui/surface'
+import { useSystemBack } from '@/lib/system-back'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
@@ -49,14 +50,7 @@ function useRowModifiers({ singleLine }: { singleLine: boolean }) {
 function useMenuState() {
     const [open, setOpen] = useState(false)
     const [openings, setOpenings] = useState(0)
-    useEffect(() => {
-        if (!open) return
-        const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-            setOpen(false)
-            return true
-        })
-        return () => subscription.remove()
-    }, [open])
+    useSystemBack(open, () => setOpen(false))
     return {
         open,
         openings,
