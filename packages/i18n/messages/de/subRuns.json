@@ -1,0 +1,28 @@
+{
+    "untitledTask": "Sub-Coworker {index}",
+    "untitledAgent": "Coworker",
+    "trouble": {
+        "stalled": "{count} hängen fest",
+        "failing": "{count} schlagen fehl"
+    },
+    "progress": {
+        "step": "Schritt {steps}",
+        "calls": "{count, plural, =0 {# Aufruf} one {# Aufruf} other {# Aufrufe}}"
+    },
+    "headline": {
+        "messageSent": "Nachricht an {name} gesendet",
+        "calling": "{name} wird aufgerufen",
+        "callFailed": "{name} ist fehlgeschlagen",
+        "callAnswered": "{name} hat geantwortet",
+        "building": "{name} wird erstellt",
+        "buildFailed": "{name} konnte nicht erstellt werden",
+        "built": "{name} erstellt",
+        "buildingTeam": "Dein Team wird erstellt · {count, plural, =0 {# Coworker} one {# Coworker} other {# Coworker}}",
+        "delegating": "Delegieren · {count, plural, =0 {# Aufgabe} one {# Aufgabe} other {# Aufgaben}}",
+        "doneOfTotal": "{done}/{total} erledigt",
+        "coworkersBuilt": "{count, plural, =0 {# Coworker} one {# Coworker} other {# Coworker}} erstellt",
+        "openFromBoard": "Öffne einen über das Board",
+        "tasksDone": "{count, plural, =0 {# Aufgaben} one {# Aufgabe} other {# Aufgaben}} erledigt",
+        "doneAndFailed": "{done} erledigt · {failed} fehlgeschlagen"
+    }
+}

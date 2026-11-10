@@ -1,0 +1,51 @@
+{
+    "linkOff": {
+        "title": "Dieser Link funktioniert nicht mehr",
+        "subtitle": "Wer ihn geteilt hat, hat ihn deaktiviert."
+    },
+    "unsubscribe": {
+        "title": "E-Mail-Einstellungen",
+        "subtitle": "Lege fest, welche E-Mails Rerun dir schickt. Ohne Anmeldung.",
+        "subtitleRuns": "Lege fest, ob deine Coworker dir E-Mails schicken dürfen. Ohne Anmeldung.",
+        "invalid": "Dieser Abmeldelink ist ungültig oder abgelaufen.",
+        "logIn": "Anmelden, um Einstellungen zu verwalten"
+    },
+    "publishedView": {
+        "protectedTitle": "Geschützte Seite",
+        "protectedDescription": "Geteilt von {workspace}. Melde dich an oder bestätige deine E-Mail, um sie zu öffnen.",
+        "publishedBy": "Veröffentlicht von {agent} bei {workspace}",
+        "publishedByUnknown": "Veröffentlicht von einem Coworker bei {workspace}"
+    },
+    "publishedAuth": {
+        "metaTitle": "Seite öffnen",
+        "noAccess": "Du hast keinen Zugriff",
+        "signedInAs": "Angemeldet als {email}. Diese Seite ist für Mitglieder von {workspace}.",
+        "signedInAsOther": "Mit einem anderen Konto angemeldet. Diese Seite ist für Mitglieder von {workspace}."
+    },
+    "gate": {
+        "open": "Öffnen",
+        "errors": {
+            "limited": "Zu viele Versuche. Warte ein paar Minuten.",
+            "password": "Falsches Passwort",
+            "code": "Falscher oder abgelaufener Code",
+            "email": "Gib eine gültige E-Mail ein"
+        },
+        "password": {
+            "subtitle": "{workspace} hat diese Seite mit einem Passwort geschützt",
+            "placeholder": "Passwort"
+        },
+        "code": {
+            "title": "Schau in dein Postfach",
+            "subtitle": "Wenn {email} diese Seite öffnen darf, ist ein Code unterwegs",
+            "otherEmail": "Andere E-Mail verwenden"
+        },
+        "email": {
+            "subtitle": "Bestätige deine E-Mail, um sie zu öffnen",
+            "submit": "Code senden"
+        },
+        "members": {
+            "subtitle": "Für Mitglieder von {workspace}",
+            "continue": "Weiter mit Rerun"
+        }
+    }
+}

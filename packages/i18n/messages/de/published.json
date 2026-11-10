@@ -1,0 +1,117 @@
+{
+    "access": {
+        "short": {
+            "public": "Öffentlich",
+            "workspace": "Workspace",
+            "password": "Passwort",
+            "invited": "Eingeladen"
+        },
+        "hint": {
+            "public": "Keine Anmeldung nötig",
+            "workspace": "Nur angemeldete Mitglieder",
+            "password": "Besucher geben es einmal ein",
+            "invited": "Besucher bestätigen ihre E-Mail"
+        },
+        "label": {
+            "public": "Alle mit dem Link",
+            "workspace": "Mitglieder von {workspace}",
+            "password": "Alle mit dem Passwort",
+            "invited": "Nur Personen, die du einlädst"
+        },
+        "anyoneAt": "Alle bei {domain}",
+        "workspaceFallback": "Workspace"
+    },
+    "gate": {
+        "madeWith": "Erstellt mit Rerun",
+        "locked": "Seite von {workspace}, gesperrt",
+        "code": "Code",
+        "switchAccount": "Konto wechseln"
+    },
+    "viewer": {
+        "download": "Herunterladen",
+        "report": "Melden",
+        "updated": "Aktualisiert {when}",
+        "slides": "{count, plural, one {# Folie} other {# Folien}}",
+        "page": "Seite {page}",
+        "previousSlide": "Vorherige Folie",
+        "nextSlide": "Nächste Folie"
+    },
+    "csv": {
+        "meta": "{rows, plural, one {# Zeile} other {# Zeilen}}{truncated, select, true {+} other {}} · {columns, plural, one {# Spalte} other {# Spalten}}",
+        "truncated": "Es werden die ersten {rows, plural, one {# Zeile} other {# Zeilen}} angezeigt. Lade die Datei für den Rest herunter."
+    },
+    "row": {
+        "more": "Mehr",
+        "open": "Öffnen",
+        "copyLink": "Link kopieren",
+        "shareSettings": "Freigabe-Einstellungen",
+        "unpublish": "Veröffentlichung aufheben",
+        "unpublishFailed": "Veröffentlichung konnte nicht aufgehoben werden"
+    },
+    "unpublishConfirm": {
+        "title": "Veröffentlichung von {title} aufheben?",
+        "description": "Der Link funktioniert sofort nicht mehr, für alle, die ihn haben.",
+        "confirm": "Aufheben"
+    },
+    "panel": {
+        "emptyTitle": "Noch nichts veröffentlicht",
+        "emptyDescription": "Seiten, Berichte und Dateien, die {agent} teilt, erscheinen hier.",
+        "updated": "Aktualisiert {when}",
+        "copyLink": "Link kopieren"
+    },
+    "list": {
+        "filterAll": "Alle {count}",
+        "emptyTitle": "Noch nichts veröffentlicht",
+        "emptyDescription": "Seiten, Berichte und Dateien, die deine Coworker teilen, erscheinen hier.",
+        "fallbackCoworker": "Coworker"
+    },
+    "chat": {
+        "unpublished": "Nicht mehr veröffentlicht",
+        "updateFailed": "Link konnte nicht aktualisiert werden",
+        "copy": "Kopieren",
+        "open": "Öffnen",
+        "fallbackCoworker": "Dein Coworker",
+        "asksPublic": "{coworker} möchte, dass alle mit dem Link ihn öffnen können",
+        "keepPrivate": "Privat lassen",
+        "makePublic": "Öffentlich machen",
+        "madePublicByYou": "Von dir öffentlich gemacht",
+        "madePublic": "Öffentlich gemacht",
+        "keptFor": "Nur für Mitglieder von {workspace}"
+    },
+    "share": {
+        "title": "Teilen",
+        "description": "Wähle, wer diesen Link öffnen kann.",
+        "close": "Schließen",
+        "updateFailed": "Link konnte nicht aktualisiert werden",
+        "unpublishFailed": "Veröffentlichung konnte nicht aufgehoben werden",
+        "unpublish": "Veröffentlichung aufheben",
+        "publicOff": "Für {workspace} deaktiviert",
+        "noEmail": "Dieser Server sendet keine E-Mails",
+        "passwordSet": "Passwort festgelegt",
+        "setPassword": "Passwort festlegen",
+        "password": "Passwort",
+        "invitePlaceholder": "E-Mails oder @firma.de",
+        "invite": "E-Mails oder Domains einladen",
+        "removeInvite": "{entry} entfernen",
+        "copyLink": "Link kopieren",
+        "copied": "Kopiert"
+    },
+    "policy": {
+        "label": "Öffentliche Links",
+        "people": {
+            "title": "Nur Menschen können einen Link öffentlich machen",
+            "hint": "Coworker veröffentlichen für {workspace} und fragen, bevor etwas öffentlich wird"
+        },
+        "anyone": {
+            "title": "Coworker können einen Link öffentlich machen",
+            "hint": "Sie wählen den Zugriff selbst"
+        },
+        "never": {
+            "title": "Nichts wird öffentlich",
+            "hint": "Nur Workspace-, Passwort- und Einladungslinks"
+        },
+        "turnOffTitle": "Öffentliche Links deaktivieren?",
+        "turnOffDescription": "{count, plural, one {# öffentlicher Link wird nach dem Speichern auf Mitglieder von {workspace} umgestellt.} other {# öffentliche Links werden nach dem Speichern auf Mitglieder von {workspace} umgestellt.}}",
+        "turnOff": "Deaktivieren"
+    }
+}

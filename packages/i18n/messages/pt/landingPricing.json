@@ -1,0 +1,196 @@
+{
+    "seo": {
+        "title": "Preços",
+        "headline": "Um plano. Tudo incluído.",
+        "description": "Um plano Rerun a partir de {price} por mês: agentes ilimitados, usuários ilimitados, sua própria máquina privada, todos os apps e execuções ilimitadas. Teste grátis de {trialDays} dias.",
+        "breadcrumbHome": "Início"
+    },
+    "hero": {
+        "eyebrow": "Preços",
+        "description": "Teste o Rerun grátis por {trialDays} dias. Depois escolha quantos Coworkers você precisa e convide toda a sua equipe."
+    },
+    "price": {
+        "perMonth": "/mês",
+        "perMonthBilledYearly": "/mês, cobrado {total}/ano"
+    },
+    "billing": {
+        "label": "Período de cobrança",
+        "monthly": "Mensal",
+        "yearly": "Anual",
+        "discount": "-{percent}%"
+    },
+    "tiers": {
+        "trial": {
+            "name": "Teste grátis",
+            "description": "Coloque seus primeiros Coworkers para trabalhar e veja o que eles sabem fazer.",
+            "control": "Um cartão inicia o teste e nada é cobrado por {trialDays} dias. Cancele antes e você não paga nada.",
+            "cta": "Comece seu teste grátis de {trialDays} dias",
+            "featuresLabel": "O teste grátis inclui",
+            "features": {
+                "agents": "<b>Até {agents} Coworkers</b> para delegar suas primeiras tarefas",
+                "seats": "<b>Usuários ilimitados</b> para testar com sua equipe",
+                "credits": "<b>{credits, plural, one {# crédito grátis} other {# créditos grátis}}</b> para experimentar",
+                "models": "Os mesmos <b>modelos inteligentes</b> do Pro",
+                "privacy": "Seus dados ficam em um <b>workspace privado e seguro</b>",
+                "apps": "<b>Mais de {connectors} apps e MCPs</b> onde seus Coworkers podem trabalhar",
+                "byom": "Conecte sua <b>própria assinatura de IA</b> ou chave de API"
+            }
+        },
+        "pro": {
+            "name": "Pro",
+            "description": "Para equipes que colocam Coworkers para trabalhar todos os dias.",
+            "cta": "Começar",
+            "featuresLabel": "Tudo do Teste grátis, mais",
+            "features": {
+                "coworkers": "<b>Coworkers ilimitados</b> trabalhando para você, lado a lado",
+                "seats": "<b>Usuários ilimitados</b>, sem cobrança por usuário",
+                "team": "Gerencie seus Coworkers com <b>toda a sua equipe</b>",
+                "credits": "<b>{credits, plural, one {# crédito por nossa conta} other {# créditos por nossa conta}}</b>, todo mês",
+                "models": "<b>Modelos inteligentes</b> para suas tarefas mais difíceis",
+                "autopilot": "Coloque seu negócio no <b>piloto automático</b>"
+            },
+            "creditsNote": "Recarregue quando quiser"
+        }
+    },
+    "socialApps": {
+        "label": "Complementos",
+        "caption": "Acesso total à sua conta, como você.",
+        "lede": "Tudo o que você faz à mão, seus Coworkers podem fazer.",
+        "details": "O que o {app} permite aos seus Coworkers",
+        "add": "Adicionar {app}",
+        "price": "<b>+{price}</b>/mês",
+        "can": {
+            "linkedin_slot": {
+                "search": "Buscar pessoas, ler perfis",
+                "invite": "Enviar e aceitar convites",
+                "message": "Enviar mensagens, ler todas as conversas",
+                "post": "Publicar, comentar e reagir"
+            },
+            "whatsapp_slot": {
+                "send": "Enviar mensagens, arquivos, áudios",
+                "reply": "Ler e responder todas as conversas",
+                "check": "Verificar números no WhatsApp"
+            }
+        }
+    },
+    "enterprise": {
+        "name": "Enterprise",
+        "description": "Para grandes organizações com requisitos próprios",
+        "features": {
+            "everything": "Tudo do Rerun",
+            "infrastructure": "Infraestrutura sob medida",
+            "infrastructureDetail": "Dedicada ou auto-hospedada: seus Coworkers rodam onde sua organização precisa.",
+            "support": "Suporte dedicado",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "cta": "Falar com vendas",
+        "ctaNote": "Preço sob medida para sua organização"
+    },
+    "plan": {
+        "tagline": "Tudo o que você precisa para colocar Coworkers para trabalhar",
+        "from": "A partir de",
+        "flexible": "Adicione Coworkers ou créditos quando precisar.",
+        "cta": "Comece seu teste grátis",
+        "trialNote": "Teste grátis de {trialDays} dias · cartão obrigatório, {free} hoje",
+        "included": "Incluído",
+        "alsoIncluded": "Também incluído",
+        "features": {
+            "coworkers": {
+                "label": "Coworkers ilimitados",
+                "caption": "Quantos Coworkers você precisar, rodando lado a lado, cada um com sua função e suas ferramentas."
+            },
+            "machine": {
+                "label": "Sua própria máquina",
+                "caption": "Um computador privado na nuvem onde vive cada Coworker do seu workspace, compartilhando arquivos e dados. Só seu."
+            },
+            "seats": {
+                "label": "Usuários ilimitados",
+                "caption": "Toda a sua equipe no mesmo workspace, sem cobrança por usuário."
+            },
+            "byoAi": {
+                "label": "Use sua própria IA",
+                "caption": "Opcional: sua própria chave, assinatura ou modelo local."
+            },
+            "apps": {
+                "label": "Mais de {connectors} apps",
+                "caption": "Todas as suas ferramentas prontas para conectar, além de qualquer MCP ou API."
+            },
+            "delegate": {
+                "label": "Delegue qualquer tarefa",
+                "caption": "Passe adiante o trabalho repetitivo. Seus Coworkers cuidam disso 24 horas por dia."
+            },
+            "invite": {
+                "label": "Convide sua equipe",
+                "caption": "Compartilhe seu workspace e criem seus Coworkers juntos."
+            }
+        }
+    },
+    "addons": {
+        "label": "Complementos",
+        "title": "Cresça uma peça de cada vez.",
+        "lede": "Complementos são quantidades no plano que você já tem, não outro nível. Adicione um quando precisar e remova quando não precisar mais.",
+        "items": {
+            "credit_pack": {
+                "title": "Créditos Rerun",
+                "unit": "+{credits, plural, one {# crédito} other {# créditos}}/mês",
+                "caption": "Mais créditos para os modelos que hospedamos, além do plano."
+            }
+        }
+    },
+    "comparison": {
+        "badge": "Comparação",
+        "title": "Por que as pessoas mudam para o Rerun.",
+        "compareWith": "Compare o Rerun com",
+        "fullComparison": "Leia a comparação completa Rerun vs {competitor}",
+        "allComparisons": "Todas as comparações",
+        "alsoCompared": "Também comparado",
+        "versus": "Rerun vs {competitor}"
+    },
+    "faq": {
+        "label": "Perguntas sobre preços",
+        "title": "Perguntas sobre a cobrança.",
+        "items": {
+            "basePlan": {
+                "question": "O que o plano básico inclui?",
+                "answer": "Coworkers ilimitados, sua própria máquina privada na nuvem, usuários ilimitados e {credits, plural, one {# crédito} other {# créditos}} todo mês, além de todos os apps, todos os templates e execuções ilimitadas. Nenhum recurso fica bloqueado atrás de um nível superior."
+            },
+            "trial": {
+                "question": "Tem teste grátis?",
+                "answer": "Sim, {trialDays} dias com {agents} coworkers e {trialCredits, plural, one {# crédito} other {# créditos}}. O cartão é obrigatório, {free} é cobrado hoje e o plano começa no dia {trialDays}. Você monta sua primeira equipe, vê ela trabalhar e decide depois. Cancele antes do fim do teste e nada é cobrado."
+            },
+            "perTask": {
+                "question": "Vocês cobram por tarefa ou por execução?",
+                "answer": "Não. Seus Coworkers podem rodar todas as horas de todos os dias pelo mesmo preço fixo, não importa quantos você crie. As execuções nunca são contadas."
+            },
+            "ownAi": {
+                "question": "Posso usar minha própria assinatura de IA ou chaves de API?",
+                "answer": "Sim. Conecte sua assinatura do Claude ou do ChatGPT, suas próprias chaves de API ou um modelo local, e os modelos não custam nada do nosso lado. Os créditos incluídos estão aí para quando você preferir não fazer isso."
+            },
+            "whereRun": {
+                "question": "Onde meus Coworkers rodam de verdade?",
+                "answer": "No seu próprio computador privado na nuvem, um por workspace, onde seus Coworkers vivem e seus dados ficam. Dentro dele você os organiza em Boxes, por equipe, por cliente ou por projeto, quantos quiser."
+            },
+            "addons": {
+                "question": "Como funcionam os complementos?",
+                "answer": "São quantidades na sua assinatura atual, não outro plano. Adicione créditos quando precisar e remova do mesmo jeito."
+            },
+            "removeAddon": {
+                "question": "O que acontece quando removo um complemento?",
+                "answer": "Você mantém o que pagou até o fim do período de cobrança, e o valor menor vale a partir da próxima fatura. Nada é cortado no meio do mês."
+            },
+            "cancel": {
+                "question": "Posso cancelar a qualquer momento?",
+                "answer": "Sim, com um clique nas suas configurações de cobrança, sem aviso prévio e sem precisar mandar e-mail para ninguém. Nossa política de reembolso explica o resto."
+            },
+            "taxes": {
+                "question": "Os impostos estão incluídos no preço?",
+                "answer": "Os preços são mostrados sem impostos. O IVA ou imposto sobre vendas, quando se aplica ao seu país, é calculado e adicionado no checkout."
+            },
+            "enterprise": {
+                "question": "Vocês oferecem preço Enterprise?",
+                "answer": "Sim. Infraestrutura dedicada ou auto-hospedada, SSO, um SLA e suporte dedicado, com preço para a sua organização. Fale com a gente em help@rerun.build."
+            }
+        }
+    }
+}

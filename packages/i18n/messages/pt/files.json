@@ -1,0 +1,96 @@
+{
+    "detail": {
+        "readOnly": "Este arquivo é somente leitura",
+        "stillLoading": "O arquivo ainda está carregando",
+        "previousFile": "Arquivo anterior",
+        "nextFile": "Próximo arquivo",
+        "editNotText": "Só arquivos de texto podem ser editados aqui.",
+        "editTruncated": "Este arquivo tem mais de {limit} caracteres e não pode ser editado aqui. Baixe-o ou peça ao coworker para editá-lo.",
+        "editBinary": "Este arquivo não é texto, então editá-lo aqui o corromperia."
+    },
+    "actions": {
+        "truncated": "Truncado",
+        "edit": "Editar",
+        "download": "Baixar",
+        "deleteFile": "Excluir arquivo"
+    },
+    "delete": {
+        "title": "Excluir {name}?",
+        "file": "O arquivo é excluído da Box. Isso não pode ser desfeito.",
+        "folder": "A pasta e tudo o que há nela são excluídos da Box. Isso não pode ser desfeito."
+    },
+    "editor": {
+        "unsaved": "Não salvo",
+        "close": "Fechar editor",
+        "cancel": "Cancelar",
+        "noChanges": "Nenhuma alteração para salvar",
+        "save": "Salvar alterações",
+        "conflictTitle": "{name} mudou na Box",
+        "conflictDescription": "Alguém, ou um coworker, escreveu neste arquivo depois que você o abriu. Salvar agora substitui a versão dele pela sua.",
+        "overwrite": "Substituir",
+        "keepTheirs": "Manter a deles",
+        "discardTitle": "Descartar suas alterações?",
+        "discardDescription": "Suas edições em {name} ainda não foram salvas. Fechar o editor as descarta.",
+        "discard": "Descartar alterações",
+        "keepEditing": "Continuar editando"
+    },
+    "preview": {
+        "noPreview": "Sem prévia para este tipo de arquivo",
+        "download": "Baixar",
+        "readFailed": "Não foi possível ler este arquivo"
+    },
+    "publish": {
+        "publish": "Publicar",
+        "publishPublicly": "Publicar publicamente",
+        "publishedLink": "Link publicado",
+        "publicLink": "Link público",
+        "open": "Abrir",
+        "openPublicLink": "Abrir link público",
+        "copyLink": "Copiar link",
+        "copyPublicLink": "Copiar link público",
+        "shareSettings": "Compartilhamento",
+        "unpublish": "Despublicar",
+        "unshare": "Parar de compartilhar",
+        "unpublishTitle": "Despublicar {name}?",
+        "unshareTitle": "Parar de compartilhar {name}?",
+        "unpublishDescription": "O link para de funcionar na hora, para todos que o têm.",
+        "unshareDescription": "O link público para de funcionar na hora. Quem o tiver recebe um 404."
+    },
+    "empty": {
+        "title": "Pasta vazia",
+        "goUp": "Subir um nível"
+    },
+    "grid": {
+        "parentDirectory": "Pasta acima",
+        "openFolder": "Abrir pasta",
+        "open": "Abrir",
+        "download": "Baixar",
+        "rename": "Renomear",
+        "delete": "Excluir",
+        "published": "Publicado"
+    },
+    "list": {
+        "newName": "Novo nome",
+        "dropHere": "Solte arquivos ou pastas aqui para enviar",
+        "name": "Nome",
+        "size": "Tamanho",
+        "type": "Tipo",
+        "empty": "Nada aqui ainda. Tudo o que um coworker baixa, cria ou edita para o workspace inteiro vem para esta pasta, assim como o que você soltar nesta página.",
+        "actionsFor": "Ações para {name}",
+        "folder": "Pasta",
+        "file": "Arquivo"
+    },
+    "uploadOutcome": {
+        "allFailed": "Falha no envio",
+        "someFailed": "{failed} de {total, plural, one {# arquivo} other {# arquivos}} não foram enviados",
+        "uploaded": "{count, plural, one {# arquivo enviado} other {# arquivos enviados}}",
+        "sessionExpired": "Sua sessão expirou. Recarregue a página e tente de novo.",
+        "tooLarge": "Este arquivo é grande demais para enviar.",
+        "retryLater": "Falha no envio. Tente de novo em instantes.",
+        "networkFailed": "Falha no envio. Verifique sua conexão e tente de novo.",
+        "oversized": "{names}{more, plural, =0 {} one { e mais #} other { e mais #}} {count, plural, one {passa} other {passam}} do limite de {limit} MB.",
+        "machineUpdating": "A máquina deste workspace estava se atualizando. Tente o envio de novo.",
+        "engineUpdateNeeded": "Este workspace roda em uma máquina que precisa de uma atualização do engine para aceitar arquivos acima de {limit} MB. Ela se atualiza sozinha, então tente de novo em alguns minutos.",
+        "machineUnreachable": "Não foi possível enviar {name}. Sua máquina pode estar inacessível."
+    }
+}

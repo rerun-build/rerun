@@ -1,0 +1,16 @@
+{
+    "save": "Speichern",
+    "saving": "Wird gespeichert",
+    "cancel": "Abbrechen",
+    "somethingWentWrong": "Etwas ist schiefgelaufen. Versuch es noch einmal.",
+    "backToDashboard": "Zurück zum Dashboard",
+    "notFound": {
+        "title": "Seite nicht gefunden",
+        "body": "Diese Seite gibt es nicht oder sie wurde verschoben. Wir bringen dich zurück."
+    },
+    "crash": {
+        "title": "Etwas ist schiefgelaufen",
+        "body": "Auf dieser Seite ist ein unerwarteter Fehler aufgetreten. Deine Coworker und ihre Arbeit sind sicher. Lade neu, um dort weiterzumachen, wo du aufgehört hast.",
+        "reload": "Neu laden"
+    }
+}

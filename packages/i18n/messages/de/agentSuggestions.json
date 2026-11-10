@@ -1,0 +1,512 @@
+{
+    "default-seo": {
+        "title": "Automatisiere mein SEO",
+        "description": "Die lohnenden Fixes, priorisiert, mit Briefings.",
+        "name": "SEO-Assistent",
+        "kickoff": "Prüfe das SEO meiner Website. Liste die zehn wirkungsvollsten Fixes nach Aufwand sortiert auf und entwirf dann die Content-Briefings für die Seiten, die eins brauchen."
+    },
+    "default-inbox": {
+        "title": "Sortiere meinen Posteingang",
+        "description": "Was heute dich braucht, mit entworfenen Antworten.",
+        "name": "Posteingang-Sortierer",
+        "kickoff": "Hilf mir, meinen Posteingang abzuarbeiten. Frag mich, an welchem Konto du arbeiten sollst, sortiere dann, was reinkommt, sag mir, was heute wirklich mich braucht, und entwirf die Antworten, die ich so abschicken kann."
+    },
+    "default-research": {
+        "title": "Recherchiere für mich",
+        "description": "Ein Briefing, mit dem du handeln kannst, mit Quellen.",
+        "name": "Recherche-Assistent",
+        "kickoff": "Ich möchte, dass du Themen für mich recherchierst. Frag mich, womit du anfangen sollst, lies dich ein und komm mit einem Briefing samt Quellen zurück, mit dem ich handeln kann."
+    },
+    "default-content": {
+        "title": "Schreib meinen Content",
+        "description": "Das nächste Stück entworfen, plus drei weitere Ideen.",
+        "name": "Content-Texter",
+        "kickoff": "Hilf mir, Content zu schreiben. Frag mich, was ich veröffentliche, wer es liest und wie ich klinge, entwirf dann das nächste Stück und schlag drei weitere vor, die ich danach schreiben könnte."
+    },
+    "default-meeting-notes": {
+        "title": "Mach Meetings zu Aufgaben",
+        "description": "Notizen, und wer was bis wann erledigt.",
+        "name": "Meeting-Notizen",
+        "kickoff": "Mach aus meinen Meetings Notizen und Aufgaben. Frag mich, wo die Aufnahmen oder Transkripte landen, fasse dann jedes zusammen und liste auf, wer was bis wann erledigen muss."
+    },
+    "default-daily-brief": {
+        "title": "Brief mich jeden Morgen",
+        "description": "Dein Tag: Meetings, E-Mails und was fällig ist.",
+        "name": "Tagesbriefing",
+        "kickoff": "Sag mir jeden Morgen, wie mein Tag aussieht: meine Meetings, die E-Mails, die mich brauchen, und was fällig ist."
+    },
+    "default-follow-ups": {
+        "title": "Hak nach, worauf ich warte",
+        "description": "Wer dir eine Antwort schuldet, und die Erinnerung dazu.",
+        "name": "Nachfass-Assistent",
+        "kickoff": "Behalte im Blick, worauf ich warte. Sag mir jeden Morgen, wer mir eine Antwort schuldet, und entwirf für jeden eine kurze Erinnerung."
+    },
+    "default-weekly-report": {
+        "title": "Erstell meinen Wochenbericht",
+        "description": "Die Zahlen gezogen und aufgeschrieben, jeden Freitag.",
+        "name": "Bericht-Ersteller",
+        "kickoff": "Zieh jeden Freitag die Zahlen der Woche aus meiner Tabelle und schreib den Bericht, den ich ans Team schicke."
+    },
+    "agencies-client-report": {
+        "title": "Berichte an meine Kunden",
+        "description": "Ein wöchentlicher Zahlenrückblick, für den Kunden geschrieben.",
+        "name": "Kundenreporting",
+        "kickoff": "Hilf mir, einen wöchentlichen Kundenbericht aufzusetzen. Frag mich, mit welchem Kunden wir anfangen und wo seine Zahlen liegen, zieh dann die Werte, schreib die Zusammenfassung in klaren Worten und sag mir, was sich seit letzter Woche geändert hat."
+    },
+    "agencies-proposal": {
+        "title": "Entwirf meine Angebote",
+        "description": "Umfang, Preise und Zeitplan, in deinem gewohnten Ton.",
+        "name": "Angebotsschreiber",
+        "kickoff": "Ich möchte, dass du Angebote für neue Kunden entwirfst. Frag mich nach Umfang, Budgetrahmen und Leistungen und schreib dann das Angebot mit Preisen und Zeitplan, in dem Ton, den wir mit Kunden schon nutzen."
+    },
+    "agencies-meeting-notes": {
+        "title": "Mach Calls zu Aufgaben",
+        "description": "Notizen und Zuständige nach jedem Kunden-Call.",
+        "name": "Meeting-Notizen",
+        "kickoff": "Nach jedem Kunden-Call möchte ich Notizen und Aufgaben. Frag mich, wo die Aufnahmen oder Transkripte landen, fasse dann jeden zusammen, liste auf, wer was bis wann erledigen muss, und markiere alles, was den Umfang ändert."
+    },
+    "agencies-seo": {
+        "title": "Automatisiere mein SEO",
+        "description": "Die lohnenden Fixes, priorisiert, mit Briefings.",
+        "name": "SEO-Assistent",
+        "kickoff": "Prüfe das SEO meiner Website. Liste die zehn wirkungsvollsten Fixes nach Aufwand sortiert auf und entwirf dann die Content-Briefings für die Seiten, die eins brauchen."
+    },
+    "agencies-lead-responder": {
+        "title": "Beantworte neue Leads",
+        "description": "Jede Anfrage beantwortet und ans Team gemeldet.",
+        "name": "Lead-Responder",
+        "kickoff": "Beantworte jede neue Anfrage aus unserem Kontaktformular. Frag mich, wo sie ankommen, antworte dann innerhalb von Minuten, stell die Qualifizierungsfragen und poste den Lead in Slack."
+    },
+    "agencies-case-studies": {
+        "title": "Schreib meine Fallstudien",
+        "description": "Ein Entwurf aus dem Projekt, bereit zur Veröffentlichung.",
+        "name": "Fallstudien-Texter",
+        "kickoff": "Wenn ein Projekt abgeschlossen ist, entwirf die Fallstudie. Frag mich, wo die Projektnotizen liegen, schreib dann die Geschichte, die Ergebnisse und ein Zitat, und sag mir, was zur Veröffentlichung noch fehlt."
+    },
+    "agencies-inbox": {
+        "title": "Sortiere unser Team-Postfach",
+        "description": "Was das Team heute braucht, jeden Morgen.",
+        "name": "Posteingang-Sortierer",
+        "kickoff": "Sortiere jeden Morgen unser gemeinsames Postfach und sag uns in Slack, was uns heute braucht, mit entworfenen Antworten für die, die ich so abschicken kann."
+    },
+    "agencies-invoices": {
+        "title": "Mahne offene Rechnungen an",
+        "description": "Wer im Verzug ist, und die Mahnung dazu.",
+        "name": "Rechnungs-Mahner",
+        "kickoff": "Hilf mir, offene Rechnungen anzumahnen. Frag mich, wo meine Rechnungen liegen, sag mir dann jeden Montag, wer im Verzug ist, und entwirf für jeden die Mahnung."
+    },
+    "ecommerce-product-copy": {
+        "title": "Schreib Produkttexte",
+        "description": "Titel und Beschreibungen passend zu deinem Katalog.",
+        "name": "Produkttexte",
+        "kickoff": "Ich möchte, dass du Produktbeschreibungen für meinen Shop schreibst. Frag mich, mit welchen Produkten wir anfangen, und schreib dann Titel, Beschreibungen und Stichpunkte, die zum Rest des Katalogs passen."
+    },
+    "ecommerce-abandoned-cart": {
+        "title": "Hol Warenkörbe zurück",
+        "description": "Die Rückgewinnungsserie, und wann jede E-Mail rausgeht.",
+        "name": "Warenkorb-Rückholer",
+        "kickoff": "Hilf mir, abgebrochene Warenkörbe zurückzuholen. Frag mich, wie mein aktueller Ablauf aussieht, schreib dann die E-Mail-Serie, sag mir, wann jede rausgehen soll, und schlag vor, was ich zuerst testen sollte."
+    },
+    "ecommerce-reviews": {
+        "title": "Fasse Bewertungen zusammen",
+        "description": "Worüber Käufer immer wieder klagen, wöchentlich.",
+        "name": "Bewertungs-Digest",
+        "kickoff": "Lies meine neuesten Kundenbewertungen und Support-Nachrichten, gruppiere sie nach dem Problem dahinter und gib mir wöchentlich einen Überblick, worüber Käufer klagen und was sie lieben."
+    },
+    "ecommerce-sales-report": {
+        "title": "Verfolge täglich Umsätze",
+        "description": "Umsatz, Bestellungen und alles Ungewöhnliche.",
+        "name": "Umsatzbericht",
+        "kickoff": "Gib mir einen täglichen Umsatzbericht. Frag mich, wo meine Verkaufsdaten liegen, und schick mir dann jeden Morgen Umsatz, Bestellungen und Bestseller, mit Hinweis auf alles, was sich ungewöhnlich bewegt hat."
+    },
+    "ecommerce-support": {
+        "title": "Antworte meinen Kunden",
+        "description": "Bestellfragen beantwortet, Sonderfälle markiert.",
+        "name": "Support-Assistent",
+        "kickoff": "Hilf mir, Kunden-E-Mails zu beantworten. Frag mich, wo sie ankommen und wie meine Richtlinien sind, entwirf dann die Antwort auf jede Bestellfrage und markiere die, die mich brauchen."
+    },
+    "ecommerce-ads": {
+        "title": "Behalte Werbekosten im Blick",
+        "description": "Was jede Kampagne gebracht hat, und was pausieren.",
+        "name": "Ads-Wächter",
+        "kickoff": "Behalte meine Werbekampagnen im Blick. Sag mir jeden Montag, was jede ausgegeben und eingebracht hat und welche ich pausieren oder pushen sollte."
+    },
+    "ecommerce-newsletter": {
+        "title": "Schreib meinen Newsletter",
+        "description": "Die E-Mail der Woche, aus den Neuheiten im Shop.",
+        "name": "Newsletter-Texter",
+        "kickoff": "Schreib meinen wöchentlichen Newsletter. Frag mich, was es Neues im Shop gibt und wie ich normalerweise klinge, entwirf dann die E-Mail und schlag zwei Betreffzeilen vor."
+    },
+    "ecommerce-stock": {
+        "title": "Warn mich vor Engpässen",
+        "description": "Knapper Bestand und Ladenhüter, jede Woche.",
+        "name": "Bestandswächter",
+        "kickoff": "Behalte meinen Bestand im Blick. Sag mir jede Woche, welche Produkte beim aktuellen Tempo bald ausgehen und welche sich nicht mehr verkaufen."
+    },
+    "saas-changelog": {
+        "title": "Schreib mein Changelog",
+        "description": "Release Notes, die ein Kunde wirklich lesen kann.",
+        "name": "Changelog-Texter",
+        "kickoff": "Ich möchte ein Changelog aus dem, was wir ausliefern. Frag mich, wo unser Repository und unsere Releases liegen, und mach dann aus der gemergten Arbeit Release Notes, die ein Kunde lesen kann, gruppiert danach, was sich für ihn ändert."
+    },
+    "saas-issue-triage": {
+        "title": "Sortiere meine Issues",
+        "description": "Gelabelt, entdoppelt und nach Dringlichkeit sortiert.",
+        "name": "Issue-Triage",
+        "kickoff": "Hilf mir, eingehende Issues zu sortieren. Frag mich, wo sie landen, versieh dann jedes mit Labels, schätz ein, wie dringend es ist, erkenne Duplikate und sag mir jeden Morgen, was heute Aufmerksamkeit verdient."
+    },
+    "saas-onboarding-emails": {
+        "title": "Onboarde neue Nutzer",
+        "description": "Die Anmelde-Serie, geschrieben und geplant.",
+        "name": "Onboarding-E-Mails",
+        "kickoff": "Entwirf die Onboarding-E-Mail-Serie für neue Anmeldungen. Frag mich, was das Produkt macht und wie der erste Erfolg aussieht, schreib dann jede E-Mail und sag mir, wann sie verschickt werden soll."
+    },
+    "saas-seo": {
+        "title": "Automatisiere mein SEO",
+        "description": "Die lohnenden Fixes, priorisiert, mit Briefings.",
+        "name": "SEO-Assistent",
+        "kickoff": "Prüfe das SEO meiner Website. Liste die zehn wirkungsvollsten Fixes nach Aufwand sortiert auf und entwirf dann die Content-Briefings für die Seiten, die eins brauchen."
+    },
+    "saas-churn": {
+        "title": "Erkenne Kündigungsrisiken",
+        "description": "Wer still geworden ist, und was du ihnen schickst.",
+        "name": "Churn-Wächter",
+        "kickoff": "Hilf mir, Konten zu erkennen, die kurz vor der Kündigung stehen. Frag mich, wo Nutzung und Abrechnung liegen, sag mir dann jede Woche, wer still geworden ist, und entwirf die Nachricht, die ich ihnen schicken sollte."
+    },
+    "saas-support": {
+        "title": "Beantworte Support-Tickets",
+        "description": "Eine Antwort aus der Doku entworfen, Bugs erfasst.",
+        "name": "Support-Assistent",
+        "kickoff": "Hilf mir beim Support. Frag mich, wo Tickets ankommen, entwirf dann für jedes eine Antwort aus unserer Doku und eröffne ein Issue für die echten Bugs."
+    },
+    "saas-errors": {
+        "title": "Sortiere meine Fehler",
+        "description": "Neue Fehler gruppiert, mit der wahrscheinlichen Ursache.",
+        "name": "Fehler-Triage",
+        "kickoff": "Lies jeden Morgen die neuen Fehler in Sentry, gruppiere sie nach Ursache und sag mir in Slack, welche sich heute zu beheben lohnen."
+    },
+    "saas-metrics": {
+        "title": "Schick meine Wochenzahlen",
+        "description": "Anmeldungen, Aktivierung und Umsatz, mit Veränderungen.",
+        "name": "Kennzahlen-Digest",
+        "kickoff": "Schick mir jeden Montag die Zahlen, die zählen: Anmeldungen, Aktivierung, Umsatz und Churn, mit dem, was sich seit letzter Woche bewegt hat, und warum."
+    },
+    "sales-prospect-research": {
+        "title": "Recherchiere Interessenten",
+        "description": "Ein Briefing zum Unternehmen vor jedem Call.",
+        "name": "Interessenten-Recherche",
+        "kickoff": "Vor jedem Call möchte ich ein Briefing zum Interessenten. Frag mich, wen du zuerst recherchieren sollst, und gib mir dann das Unternehmen, die Personen, was sie kürzlich angekündigt haben, und den Einstieg, mit dem ich eröffnen sollte."
+    },
+    "sales-follow-ups": {
+        "title": "Fass bei Kontakten nach",
+        "description": "Wer still geworden ist, und die Nachricht dazu.",
+        "name": "Nachfass-Assistent",
+        "kickoff": "Hilf mir, beim Nachfassen am Ball zu bleiben. Frag mich, wo meine Pipeline liegt, sag mir dann jeden Morgen, wer still geworden ist, und entwirf für jeden die Nachfass-Nachricht."
+    },
+    "sales-outreach": {
+        "title": "Schreib meine Kaltakquise",
+        "description": "Eine erste E-Mail und zwei Follow-ups pro Interessent.",
+        "name": "Outreach-Texter",
+        "kickoff": "Ich möchte, dass du Kaltakquise für mich schreibst. Frag mich, an wen wir verkaufen und was wir verkaufen, und schreib dann eine erste E-Mail und zwei Follow-ups, pro Interessent personalisiert statt aus einer Vorlage."
+    },
+    "sales-crm-hygiene": {
+        "title": "Halte mein CRM sauber",
+        "description": "Fehlende Felder, veraltete Phasen und Duplikate, wöchentlich.",
+        "name": "CRM-Assistent",
+        "kickoff": "Halte mein CRM aktuell. Frag mich, welches CRM ich nutze, finde dann Einträge mit fehlenden Feldern, veralteten Phasen oder Duplikaten und gib mir wöchentlich eine Liste, was zu korrigieren ist."
+    },
+    "sales-reply-sorter": {
+        "title": "Sortiere Kampagnen-Antworten",
+        "description": "Interessierte markiert, Antworten entworfen.",
+        "name": "Antwort-Sortierer",
+        "kickoff": "Sortiere jede Antwort auf meine Kaltakquise-Kampagnen, entwirf meine Antwort an die Interessierten und gib mir in Slack Bescheid, wenn ein Interessent reden will."
+    },
+    "sales-lead-responder": {
+        "title": "Beantworte Inbound-Leads",
+        "description": "Jedes Formular in Minuten beantwortet.",
+        "name": "Lead-Responder",
+        "kickoff": "Beantworte jedes neue Kontaktformular innerhalb von fünf Minuten. Frag mich, wo sie landen, antworte dann, qualifiziere den Lead und poste ihn in Slack."
+    },
+    "sales-call-notes": {
+        "title": "Dokumentiere Sales-Calls",
+        "description": "Notizen und nächste Schritte, direkt im CRM.",
+        "name": "Call-Notizen",
+        "kickoff": "Schreib nach jedem Sales-Call die Notizen und die nächsten Schritte und trag sie beim Deal ein. Frag mich zuerst, wo meine Aufnahmen landen."
+    },
+    "sales-pipeline": {
+        "title": "Prüfe meine Pipeline",
+        "description": "Gefährdete Deals und was zu tun ist, jeden Montag.",
+        "name": "Pipeline-Review",
+        "kickoff": "Prüfe jeden Montag meine Pipeline und sag mir, welche Deals gefährdet sind, welche feststecken und was ich diese Woche bei jedem tun sollte."
+    },
+    "recruiting-screening": {
+        "title": "Sichte meine Bewerbungen",
+        "description": "Jede Bewerbung gelesen, zusammengefasst, gerankt.",
+        "name": "Bewerber-Screening",
+        "kickoff": "Hilf mir, Bewerbungen zu sichten. Frag mich nach der Stelle und was dabei am meisten zählt, prüfe dann jede Bewerbung daran, fasse den Kandidaten in fünf Zeilen zusammen und ordne sie für mich."
+    },
+    "recruiting-sourcing": {
+        "title": "Finde Kandidaten für mich",
+        "description": "Passende Profile, und die erste Nachricht an jedes.",
+        "name": "Sourcing-Assistent",
+        "kickoff": "Ich möchte, dass du Kandidaten für eine offene Stelle findest. Frag mich nach der Stelle, dem Senioritätslevel und dem Markt, finde dann passende Profile und entwirf die erste Nachricht an jeden."
+    },
+    "recruiting-job-posts": {
+        "title": "Schreib Stellenanzeigen",
+        "description": "Die Stelle so beschrieben, wie du wirklich sprichst.",
+        "name": "Stellenanzeigen-Texter",
+        "kickoff": "Schreib die Stellenanzeige für eine Stelle, die ich eröffne. Frag mich, was der Job wirklich umfasst und was wir bieten, und schreib die Anzeige dann so, wie wir sprechen, nicht wie Jobbörsen es tun."
+    },
+    "recruiting-scheduling": {
+        "title": "Plane meine Interviews",
+        "description": "Termine vorgeschlagen, Einladungen raus, Erinnerungen erledigt.",
+        "name": "Interview-Planer",
+        "kickoff": "Übernimm die Interviewplanung für mich. Frag mich, wo mein Kalender und meine Kandidaten liegen, schlag dann Termine vor, verschick die Einladungen und erinnere mich am Tag vor jedem Interview."
+    },
+    "recruiting-updates": {
+        "title": "Informiere Kandidaten",
+        "description": "Niemand wartet vergeblich auf eine Antwort.",
+        "name": "Kandidaten-Updates",
+        "kickoff": "Halte Kandidaten auf dem Laufenden. Frag mich, wo meine Pipeline liegt, sag mir dann jede Woche, wer auf eine Antwort wartet, und entwirf für jeden ein Update."
+    },
+    "recruiting-interview-prep": {
+        "title": "Bereite Interviews vor",
+        "description": "Profil und Fragen, vor jedem Gespräch.",
+        "name": "Interview-Vorbereitung",
+        "kickoff": "Schick mir vor jedem Interview in meinem Kalender ein Briefing zum Kandidaten und die Fragen, die ich für diese Stelle stellen sollte."
+    },
+    "recruiting-references": {
+        "title": "Prüfe meine Referenzen",
+        "description": "Referenzgeber kontaktiert, Antworten zusammengefasst.",
+        "name": "Referenz-Prüfer",
+        "kickoff": "Übernimm die Referenzprüfung. Frag mich nach dem Kandidaten und seinen Referenzgebern, schreib dann jedem, hak bei den Antworten nach und fasse zusammen, was sie gesagt haben."
+    },
+    "recruiting-offers": {
+        "title": "Entwirf meine Jobangebote",
+        "description": "Das Angebotsschreiben, bereit zur Unterschrift.",
+        "name": "Angebots-Texter",
+        "kickoff": "Entwirf Angebotsschreiben. Frag mich nach Stelle, Vergütungspaket und Startdatum, schreib dann das Schreiben aus unserer Vorlage und bereite es zur Unterschrift vor."
+    },
+    "real-estate-leads": {
+        "title": "Fass bei Leads nach",
+        "description": "Jede Anfrage noch am selben Tag beantwortet und qualifiziert.",
+        "name": "Lead-Nachfassung",
+        "kickoff": "Hilf mir, bei neuen Leads nachzufassen. Frag mich, wo Anfragen ankommen, antworte dann schnell auf jede, stell die Qualifizierungsfragen und sag mir, wer heute einen Anruf wert ist."
+    },
+    "real-estate-listings": {
+        "title": "Schreib meine Exposés",
+        "description": "Beschreibungen und Highlights ohne Klischees.",
+        "name": "Exposé-Texter",
+        "kickoff": "Ich möchte, dass du Immobilienexposés schreibst. Frag mich nach den Details der Immobilie, schreib dann die Beschreibung, die Highlights und eine Kurzfassung für Social Media, ohne die üblichen Klischees."
+    },
+    "real-estate-market-watch": {
+        "title": "Beobachte meinen Markt",
+        "description": "Neue Angebote, Preisänderungen und Verkäufe, wöchentlich.",
+        "name": "Marktbeobachtung",
+        "kickoff": "Behalte meinen Markt im Blick. Frag mich, in welchen Gegenden und Preisklassen ich arbeite, und schick mir dann wöchentlich eine Notiz zu neuen Angeboten, Preisänderungen und Verkäufen."
+    },
+    "real-estate-documents": {
+        "title": "Bereite meine Unterlagen vor",
+        "description": "Dokumente aus dem Deal befüllt, und was noch fehlt.",
+        "name": "Dokumenten-Assistent",
+        "kickoff": "Hilf mir mit den Unterlagen zu jedem Deal. Frag mich, welche Dokumente ich nutze, bereite sie dann aus den Deal-Details vor, prüfe, dass nichts fehlt, und verfolge, was noch nicht unterschrieben ist."
+    },
+    "real-estate-viewings": {
+        "title": "Buche Besichtigungen",
+        "description": "Termine vorgeschlagen, bestätigt und erinnert.",
+        "name": "Besichtigungs-Planer",
+        "kickoff": "Übernimm die Besichtigungen für mich. Frag mich, wo mein Kalender liegt, schlag dann jedem Käufer Termine vor, bestätige sie und erinnere alle am Vortag."
+    },
+    "real-estate-seller-updates": {
+        "title": "Berichte an Verkäufer",
+        "description": "Ein wöchentliches Update zu Besichtigungen und Feedback.",
+        "name": "Verkäufer-Updates",
+        "kickoff": "Schreib jeden Freitag jedem Verkäufer ein Update zu seiner Immobilie: Besichtigungen, Feedback und was ich als Nächstes vorschlage. Frag mich zuerst, wo ich sie erfasse."
+    },
+    "real-estate-social": {
+        "title": "Poste meine Angebote",
+        "description": "Jede neue Immobilie als Posts.",
+        "name": "Angebots-Posts",
+        "kickoff": "Wenn ich ein neues Angebot hinzufüge, mach daraus Posts für meine Social-Media-Konten, mit einer Bildunterschrift für jede Plattform."
+    },
+    "real-estate-nurture": {
+        "title": "Pflege frühere Kunden",
+        "description": "Wen du diesen Monat anrufst, und warum.",
+        "name": "Kundenpflege",
+        "kickoff": "Hilf mir, mit früheren Kunden in Kontakt zu bleiben. Sag mir jeden Monat, wen ich ansprechen sollte und warum, und entwirf die Nachricht."
+    },
+    "legal-contract-review": {
+        "title": "Prüfe meine Verträge",
+        "description": "Riskante Klauseln, Lücken und Verhandlungspunkte.",
+        "name": "Vertragsprüfung",
+        "kickoff": "Prüfe Verträge für mich. Frag mich, womit du anfangen sollst und welche Positionen wir üblicherweise vertreten, und markiere dann die riskanten Klauseln, was fehlt und was ich verhandeln sollte."
+    },
+    "legal-drafting": {
+        "title": "Entwirf meine Dokumente",
+        "description": "Ein Entwurf aus deinen Vorlagen, plus offene Entscheidungen.",
+        "name": "Dokumentenentwurf",
+        "kickoff": "Ich möchte, dass du juristische Dokumente aus unseren Vorlagen entwirfst. Frag mich, welches Dokument und für welches Mandat, erstelle dann den Entwurf und liste jeden Punkt auf, der noch meine Entscheidung braucht."
+    },
+    "legal-summaries": {
+        "title": "Fasse meine Akten zusammen",
+        "description": "Fakten, Daten und Pflichten, mit Fundstellen.",
+        "name": "Akten-Zusammenfasser",
+        "kickoff": "Fasse lange Dokumente und Akten für mich zusammen. Frag mich, wo sie liegen, und gib mir dann die Fakten, die Daten, die Pflichten und die offenen Fragen, mit Verweisen auf die Quelle."
+    },
+    "legal-deadlines": {
+        "title": "Überwache meine Fristen",
+        "description": "Eine datierte Liste, und eine Warnung vor jeder Frist.",
+        "name": "Fristen-Tracker",
+        "kickoff": "Überwache Fristen und Verlängerungen für mich. Frag mich, wo die Verträge und Mandate liegen, führe dann eine datierte Liste und warne mich rechtzeitig, bevor etwas fällig wird."
+    },
+    "legal-intake": {
+        "title": "Übernimm die Mandatsaufnahme",
+        "description": "Neue Anfragen vor dem ersten Gespräch qualifiziert.",
+        "name": "Mandatsaufnahme",
+        "kickoff": "Bearbeite neue Mandantenanfragen. Frag mich, was ich wissen muss, bevor ich ein Mandat annehme, sammle das dann bei jeder Anfrage ein und sag mir, wer einen Anruf wert ist."
+    },
+    "legal-signatures": {
+        "title": "Hak bei Unterschriften nach",
+        "description": "Was noch nicht unterschrieben ist, und die Erinnerung.",
+        "name": "Unterschriften-Tracker",
+        "kickoff": "Behalte im Blick, was zur Unterschrift raus ist. Sag mir jeden Morgen, welche Dokumente noch nicht unterschrieben sind, und schick die Erinnerung für die verspäteten."
+    },
+    "legal-research": {
+        "title": "Recherchiere Rechtsfragen",
+        "description": "Was die Quellen sagen, mit Zitaten.",
+        "name": "Rechtsrecherche",
+        "kickoff": "Ich möchte, dass du Rechtsfragen für mich recherchierst. Frag mich nach der Frage und der Rechtsordnung und komm dann mit dem zurück, was die Quellen sagen, mit Zitaten, die ich prüfen kann."
+    },
+    "legal-time-entries": {
+        "title": "Bereite Zeiteinträge vor",
+        "description": "Die Arbeit der Woche als abrechenbare Posten.",
+        "name": "Zeiteinträge",
+        "kickoff": "Geh jeden Freitag meinen Kalender und meine E-Mails durch und entwirf die Zeiteinträge der Woche, Mandat für Mandat, zur Prüfung für mich."
+    },
+    "creators-content-calendar": {
+        "title": "Plane meinen Content",
+        "description": "Ein Monat an Posts, jeder mit Hook und Blickwinkel.",
+        "name": "Content-Kalender",
+        "kickoff": "Hilf mir, meinen Content zu planen. Frag mich, was ich veröffentliche und für wen, und erstelle dann einen Kalender für den nächsten Monat, mit Hook und Blickwinkel für jeden Post."
+    },
+    "creators-repurpose": {
+        "title": "Verwerte meinen Content neu",
+        "description": "Ein Stück, neu geschrieben für jede deiner Plattformen.",
+        "name": "Repurposing-Assistent",
+        "kickoff": "Ich möchte mehr aus jedem Stück herausholen, das ich veröffentliche. Frag mich nach einem aktuellen und mach daraus Posts für jede Plattform, auf der ich bin, für die jeweilige Plattform neu geschrieben statt kopiert."
+    },
+    "creators-newsletter": {
+        "title": "Schreib meinen Newsletter",
+        "description": "Ein Entwurf in deiner Stimme, und was raus kann.",
+        "name": "Newsletter-Texter",
+        "kickoff": "Hilf mir, meinen Newsletter zu schreiben. Frag mich, worum es in der Ausgabe gehen soll und wie ich normalerweise klinge, entwirf sie dann und sag mir, was ich kürzen könnte."
+    },
+    "creators-seo": {
+        "title": "Automatisiere mein SEO",
+        "description": "Die lohnenden Fixes, priorisiert, mit Briefings.",
+        "name": "SEO-Assistent",
+        "kickoff": "Prüfe das SEO meiner Website. Liste die zehn wirkungsvollsten Fixes nach Aufwand sortiert auf und entwirf dann die Content-Briefings für die Seiten, die eins brauchen."
+    },
+    "creators-comments": {
+        "title": "Beantworte Kommentare",
+        "description": "Antworten entworfen, die wichtigen markiert.",
+        "name": "Kommentar-Antworten",
+        "kickoff": "Hilf mir, mit Kommentaren hinterherzukommen. Lies jeden Tag die neuen unter meinen Videos, entwirf die Antworten und sag mir, welche eine Antwort von mir verdienen."
+    },
+    "creators-scheduler": {
+        "title": "Plane meine Posts",
+        "description": "Die Woche auf jeder Plattform eingeplant.",
+        "name": "Post-Planer",
+        "kickoff": "Nimm jeden Montag die Posts, die ich fertig habe, und plane sie für die Woche auf meinen Plattformen ein, zu den Uhrzeiten, die am besten funktionieren."
+    },
+    "creators-ideas": {
+        "title": "Finde neue Ideen für mich",
+        "description": "Was deine Zielgruppe fragt, jede Woche.",
+        "name": "Ideen-Scout",
+        "kickoff": "Schau jede Woche, was Leute in meiner Nische fragen und diskutieren, und gib mir fünf Ideen, die einen Post wert sind, jeweils mit Blickwinkel."
+    },
+    "creators-analytics": {
+        "title": "Lies meine Zahlen",
+        "description": "Was diese Woche funktioniert hat, und was wiederholen.",
+        "name": "Zielgruppen-Bericht",
+        "kickoff": "Sag mir jeden Montag, wie der Content der letzten Woche gelaufen ist: was gewachsen ist, was gefloppt ist und wovon ich mehr machen sollte."
+    },
+    "productivity-inbox": {
+        "title": "Sortiere meinen Posteingang",
+        "description": "Was heute dich braucht, mit entworfenen Antworten.",
+        "name": "Posteingang-Sortierer",
+        "kickoff": "Hilf mir, meinen Posteingang abzuarbeiten. Frag mich, an welchem Konto du arbeiten sollst, sortiere dann, was reinkommt, sag mir, was heute wirklich mich braucht, und entwirf die Antworten, die ich so abschicken kann."
+    },
+    "productivity-meeting-notes": {
+        "title": "Mach Meetings zu Aufgaben",
+        "description": "Notizen, und wer was bis wann erledigt.",
+        "name": "Meeting-Notizen",
+        "kickoff": "Mach aus meinen Meetings Notizen und Aufgaben. Frag mich, wo die Aufnahmen oder Transkripte landen, fasse dann jedes zusammen und liste auf, wer was bis wann erledigen muss."
+    },
+    "productivity-weekly-review": {
+        "title": "Bereite Wochenrückblick vor",
+        "description": "Was vorankam und was feststeckt, jeden Freitag.",
+        "name": "Wochenrückblick",
+        "kickoff": "Bereite meinen Wochenrückblick vor. Frag mich, wo meine Arbeit erfasst wird, und sag mir dann jeden Freitag, was vorankam, was feststeckt und was ich mir vorgenommen und nicht getan habe."
+    },
+    "productivity-research": {
+        "title": "Recherchiere für mich",
+        "description": "Ein Briefing, mit dem du handeln kannst, mit Quellen.",
+        "name": "Recherche-Assistent",
+        "kickoff": "Ich möchte, dass du Themen für mich recherchierst. Frag mich, womit du anfangen sollst, lies dich ein und komm mit einem Briefing samt Quellen zurück, mit dem ich handeln kann."
+    },
+    "productivity-daily-brief": {
+        "title": "Brief mich jeden Morgen",
+        "description": "Dein Tag: Meetings, E-Mails und was fällig ist.",
+        "name": "Tagesbriefing",
+        "kickoff": "Sag mir jeden Morgen, wie mein Tag aussieht: meine Meetings, die E-Mails, die mich brauchen, und was fällig ist."
+    },
+    "productivity-follow-ups": {
+        "title": "Hak nach, worauf ich warte",
+        "description": "Wer dir eine Antwort schuldet, und die Erinnerung dazu.",
+        "name": "Nachfass-Assistent",
+        "kickoff": "Behalte im Blick, worauf ich warte. Sag mir jeden Morgen, wer mir eine Antwort schuldet, und entwirf für jeden eine kurze Erinnerung."
+    },
+    "productivity-weekly-report": {
+        "title": "Erstell meinen Wochenbericht",
+        "description": "Die Zahlen gezogen und aufgeschrieben, jeden Freitag.",
+        "name": "Bericht-Ersteller",
+        "kickoff": "Zieh jeden Freitag die Zahlen der Woche aus meiner Tabelle und schreib den Bericht, den ich ans Team schicke."
+    },
+    "productivity-docs": {
+        "title": "Halte meine Doku aktuell",
+        "description": "Veraltete Seiten gefunden, Updates entworfen.",
+        "name": "Doku-Pfleger",
+        "kickoff": "Halte unsere interne Doku aktuell. Finde jede Woche die Seiten, die veraltet sind, und entwirf für jede das Update."
+    },
+    "support-help-center": {
+        "title": "Pflege mein Hilfecenter",
+        "description": "Die Fragen, die immer wiederkommen, als Artikel.",
+        "name": "Hilfecenter-Texter",
+        "kickoff": "Hilf mir, mein Hilfecenter aktuell zu halten. Frag mich, wo Support-Fragen ankommen, sag mir dann jede Woche, welche immer wiederkommen, und entwirf für jede den Artikel, der sie beantwortet."
+    },
+    "support-escalations": {
+        "title": "Markiere unzufriedene Kunden",
+        "description": "Wer heute verärgert ist, warum, und was du antwortest.",
+        "name": "Eskalations-Wächter",
+        "kickoff": "Behalte meinen Support-Posteingang im Blick, was unzufriedene Kunden angeht. Sag mir jeden Morgen, wer verärgert ist und warum, und entwirf, was ich jedem antworten sollte."
+    },
+    "finance-cash-brief": {
+        "title": "Brief mich zur Liquidität",
+        "description": "Was reinkam, was rausging, was fällig ist.",
+        "name": "Liquiditäts-Briefing",
+        "kickoff": "Sag mir jeden Montag, wie es um meine Liquidität steht: was letzte Woche reinkam, was rausging und welche Zahlungen in den nächsten zwei Wochen fällig sind."
+    },
+    "finance-expenses": {
+        "title": "Sortiere meine Belege",
+        "description": "Jeder Beleg abgelegt, und was noch fehlt.",
+        "name": "Beleg-Sortierer",
+        "kickoff": "Hilf mir, meine Belege in Ordnung zu halten. Frag mich, wo sie ankommen, trag dann jeden mit Betrag, Datum und Kategorie in meine Tabelle ein und sag mir am Monatsende, welche fehlen."
+    },
+    "finance-failed-payments": {
+        "title": "Rette Zahlungsausfälle",
+        "description": "Jede fehlgeschlagene Abbuchung, mit der E-Mail dazu.",
+        "name": "Zahlungs-Rückholer",
+        "kickoff": "Hilf mir, fehlgeschlagene Zahlungen zurückzuholen. Liste jeden Morgen die Abbuchungen auf, die gestern fehlgeschlagen sind, und entwirf die E-Mail, die ich jedem Kunden schicken sollte."
+    }
+}

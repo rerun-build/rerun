@@ -1,0 +1,688 @@
+{
+    "account": {
+        "emailChangeNeedsCurrentAddress": "Esta alteração ainda precisa ser confirmada pelo seu endereço atual.",
+        "emailUpdated": "E-mail atualizado",
+        "phoneUpdated": "Número de telefone atualizado",
+        "connectFailed": "Não foi possível conectar {provider}. Tente de novo.",
+        "disconnectFailed": "Não foi possível desconectar {provider}. Tente de novo.",
+        "onlySignInMethod": "{provider} é o único método de login conectado a esta conta.",
+        "disconnected": "{provider} desconectado",
+        "changeEmail": "Alterar e-mail",
+        "addEmail": "Adicionar e-mail",
+        "changePhone": "Alterar número de telefone",
+        "addPhone": "Adicionar número de telefone",
+        "googleNeedsBrowser": "Abra o Rerun no navegador para conectar o Google."
+    },
+    "members": {
+        "title": "Membros",
+        "description": "Admins gerenciam cobrança, membros e configurações. Membros usam os coworkers.",
+        "adminOnly": "Só um admin pode gerenciar os membros",
+        "seatsFullOne": "Seu workspace está limitado a um assento.",
+        "seatsFull": "Seu workspace está limitado a {count, plural, one {# assento} other {# assentos}}.",
+        "fallbackLabel": "Membro",
+        "nowAdmin": "{name} agora é admin",
+        "nowMember": "{name} agora é membro",
+        "removed": "{name} removido do workspace",
+        "unknownUser": "Usuário desconhecido",
+        "lastAdmin": "O workspace precisa de pelo menos um admin",
+        "you": "Você",
+        "adminBadge": "Admin",
+        "manage": "Gerenciar {email}",
+        "makeAdmin": "Tornar admin",
+        "makeMember": "Tornar membro",
+        "remove": "Remover",
+        "removeConfirm": {
+            "title": "Remover {email}?",
+            "description": "A pessoa perde na hora o acesso a este workspace e a tudo o que há nele. Você pode convidá-la de novo depois."
+        },
+        "revokeConfirm": {
+            "title": "Revogar o convite para {email}?",
+            "description": "O link do convite para de funcionar. Você pode enviar um novo a qualquer momento.",
+            "confirm": "Revogar"
+        },
+        "invite": {
+            "assignLater": "atribuir depois",
+            "pending": "Pendente",
+            "revoke": "Revogar convite",
+            "linkHint": "Envie este link para {email}. Ele funciona só para essa pessoa, uma vez.",
+            "copyLink": "Copiar o link do convite",
+            "emailLabel": "Convidar por e-mail",
+            "emailPlaceholder": "colega@rerun.build",
+            "boxes": "Boxes",
+            "submit": "Convidar",
+            "sent": "Convite enviado para {email}"
+        },
+        "scope": {
+            "all": {
+                "label": "Todas as Boxes",
+                "description": "Todas as Boxes abertas ao workspace"
+            },
+            "assigned": {
+                "label": "Nenhuma, atribuir depois",
+                "description": "Só as Boxes que você der"
+            }
+        },
+        "boxes": {
+            "title": "Boxes de {person}",
+            "back": "Voltar aos membros",
+            "adminsSeeAll": "Admins têm acesso a todas as Boxes",
+            "sharedField": "Boxes compartilhadas com o workspace",
+            "sharedAll": "Usa todas as Boxes abertas a todos",
+            "sharedAssigned": "Usa só as Boxes indicadas abaixo",
+            "limit": {
+                "title": "Limitar {person} às Boxes indicadas?",
+                "confirm": "Limitar"
+            },
+            "group": "Boxes",
+            "empty": "Nenhuma Box ainda",
+            "everyone": {
+                "label": "Todos",
+                "description": "Pode usar, a Box está aberta ao workspace"
+            },
+            "coworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+            "coworkersRestricted": "{count, plural, one {# coworker} other {# coworkers}} · Só pessoas selecionadas",
+            "accessTo": "Acesso a {box}",
+            "restrictBox": "Restringir esta Box",
+            "restrict": {
+                "title": "Restringir {box}?",
+                "description": "Só {person}, as pessoas já indicadas nela e os admins mantêm o acesso.",
+                "confirm": "Restringir"
+            },
+            "removeAccess": {
+                "title": "Remover o acesso a {box}?",
+                "confirm": "Remover"
+            }
+        }
+    },
+    "createWorkspace": {
+        "nameRequired": "O nome é obrigatório",
+        "invitesFailed": "Workspace criado, mas {count, plural, one {# convite não pôde ser enviado} other {# convites não puderam ser enviados}}. Faça upgrade do seu plano para convidar colegas.",
+        "steps": {
+            "name": {
+                "title": "Dê um nome ao seu workspace",
+                "description": "Um workspace reúne suas Boxes, seus coworkers e sua equipe. Você pode renomeá-lo depois."
+            },
+            "icon": {
+                "title": "Escolha um ícone",
+                "description": "Escolha uma ilustração para o seu workspace. Você pode mudá-la depois."
+            },
+            "team": {
+                "title": "Convide sua equipe",
+                "description": "Adicione colegas para colaborar neste workspace."
+            }
+        },
+        "name": "Nome",
+        "namePlaceholder": "ex.: Acme Inc.",
+        "email": "E-mail",
+        "emailPlaceholder": "colega@rerun.build",
+        "emailHint": "Os colegas recebem um convite por e-mail quando você cria o workspace. Convidar exige um plano Team ou Scale.",
+        "add": "Adicionar",
+        "removeMember": "Remover {email}",
+        "open": "Abrir o workspace",
+        "back": "Voltar",
+        "continue": "Continuar",
+        "creating": "Criando",
+        "create": "Criar workspace",
+        "preview": {
+            "you": "você",
+            "namePlaceholder": "Nome do workspace",
+            "solo": "Solo",
+            "members": "Membros",
+            "owner": "Proprietário"
+        }
+    },
+    "deleteAccount": {
+        "title": "Excluir sua conta?",
+        "description": "Você será desconectado e não poderá entrar de novo nesta conta. Os workspaces em que só você está param de vez. Isso não pode ser desfeito.",
+        "typeToConfirm": "Digite <strong>{word}</strong> para confirmar.",
+        "confirm": "Excluir"
+    },
+    "deleteBox": {
+        "title": "Excluir a Box?",
+        "holdsCoworkers": "Esta Box ainda tem {count, plural, one {# coworker. Mova-o para outra Box ou exclua-o primeiro.} other {# coworkers. Mova-os para outra Box ou exclua-os primeiro.}}",
+        "description": "Esta ação não pode ser desfeita. A Box será removida para sempre.",
+        "typeToConfirm": "Digite <strong>{name}</strong> para confirmar.",
+        "confirm": "Excluir"
+    },
+    "claimBox": {
+        "title": "Nova Box",
+        "description": "Dê um nome à Box ou escolha um nome sugerido.",
+        "boxFirst": {
+            "heading": "Crie uma Box primeiro",
+            "description": "Seu novo coworker vai para ela, e você a gerencia."
+        }
+    },
+    "boxExplainer": {
+        "title": "O que é uma Box?",
+        "points": {
+            "room": {
+                "label": "Uma sala do workspace",
+                "description": "Uma por equipe, por cliente ou por projeto."
+            },
+            "home": {
+                "label": "Casa de vários coworkers",
+                "description": "Os coworkers vivem e trabalham lado a lado dentro dela."
+            },
+            "shared": {
+                "label": "Nada fica isolado",
+                "description": "Todos os coworkers compartilham os arquivos e os dados do workspace."
+            },
+            "free": {
+                "label": "Grátis e instantânea",
+                "description": "Crie quantas o trabalho pedir."
+            }
+        }
+    },
+    "auth": {
+        "welcome": {
+            "title": "Boas-vindas ao Rerun",
+            "subtitle": "Crie sua conta para começar a montar sua equipe de coworkers."
+        },
+        "build": {
+            "title": "Sua equipe está pronta para ser montada",
+            "subtitle": "Crie sua conta e o Foreman começa a montá-la na hora."
+        },
+        "signin": {
+            "title": "Boas-vindas",
+            "subtitle": "Entre ou crie sua conta para começar."
+        }
+    },
+    "phoneVerification": {
+        "title": "Uma última etapa",
+        "subtitle": "Adicione seu número de telefone."
+    },
+    "boxAccess": {
+        "title": "Acesso a {box}",
+        "description": "O acesso vale para todos os coworkers desta Box",
+        "unnamedBox": "Box sem nome",
+        "visibilityField": "Quem pode usar esta Box",
+        "visibility": {
+            "workspace": "Todos no workspace",
+            "restricted": "Só pessoas selecionadas"
+        },
+        "people": "Pessoas",
+        "addPeople": "Adicionar pessoas",
+        "emptyRestricted": "Por enquanto, só admins podem usar esta Box.",
+        "emptyOpen": "Indique pessoas para que elas gerenciem esta Box.",
+        "restrict": {
+            "title": "Restringir {box}?",
+            "descriptionWithPeople": "Só as pessoas listadas aqui e os admins mantêm o acesso.",
+            "descriptionEmpty": "Só os admins mantêm o acesso até você adicionar pessoas.",
+            "confirm": "Restringir"
+        },
+        "admin": "Admin",
+        "createdBox": "Criou esta Box",
+        "accessOf": "Acesso de {person}",
+        "remove": {
+            "title": "Remover {person}?",
+            "confirm": "Remover",
+            "ariaLabel": "Remover {person}"
+        },
+        "add": {
+            "title": "Adicionar pessoas",
+            "back": "Voltar ao acesso",
+            "peopleField": "Pessoas",
+            "placeholder": "Escolha colegas",
+            "search": "Buscar por nome ou e-mail",
+            "empty": "Não sobrou ninguém para adicionar",
+            "accessField": "Acesso",
+            "submit": "Adicionar",
+            "submitMany": "Adicionar {count, plural, one {# pessoa} other {# pessoas}}"
+        },
+        "levels": {
+            "none": {
+                "label": "Sem acesso",
+                "description": "Não vê esta Box"
+            },
+            "use": {
+                "label": "Pode usar",
+                "description": "Conversa com os coworkers e vê o trabalho deles"
+            },
+            "manage": {
+                "label": "Pode gerenciar",
+                "description": "Também edita, move e exclui coworkers"
+            }
+        },
+        "teammate": "Colega",
+        "adminOnly": "Só um admin pode mudar quem acessa uma Box",
+        "adminsAlways": "Admins sempre têm acesso",
+        "manageReason": "Só um admin ou um gestor desta Box pode mudar isso",
+        "outcome": {
+            "admin": "Admins mantêm o acesso a todas as Boxes; isto só remove a linha.",
+            "restricted": "A pessoa perde na hora o acesso a esta Box e aos coworkers dela.",
+            "manage": "A pessoa deixa de gerenciar esta Box. Ela continua aberta a todos no workspace.",
+            "use": "O acesso próprio dela é removido. A Box continua aberta a todos no workspace.",
+            "scope": "A pessoa fica só com as Boxes indicadas abaixo. Todas as Boxes abertas a todos saem do alcance dela na hora.",
+            "level": "A pessoa perde na hora o acesso a esta Box e aos coworkers dela."
+        }
+    },
+    "newBox": {
+        "heading": "Dê um nome à sua nova Box",
+        "description": "Uma Box é um nome no seu quadro, um lugar para organizar seus coworkers por departamento.",
+        "creating": "Criando…",
+        "createNamed": "Criar {name}",
+        "create": "Criar Box",
+        "nameLabel": "Nome da Box",
+        "failed": "Não foi possível criar a Box",
+        "placeholderName": "Marketing",
+        "suggestedNames": {
+            "clients": "Clientes",
+            "marketing": "Marketing",
+            "newBusiness": "Novos Negócios",
+            "operations": "Operações",
+            "finance": "Financeiro",
+            "personal": "Pessoal",
+            "store": "Loja",
+            "customerCare": "Atendimento",
+            "supplyChain": "Suprimentos",
+            "product": "Produto",
+            "engineering": "Engenharia",
+            "support": "Suporte",
+            "sales": "Vendas",
+            "accounts": "Contas",
+            "recruiting": "Recrutamento",
+            "listings": "Anúncios",
+            "legal": "Jurídico",
+            "compliance": "Compliance",
+            "content": "Conteúdo",
+            "business": "Negócios",
+            "community": "Comunidade",
+            "sponsors": "Patrocinadores",
+            "work": "Trabalho",
+            "projects": "Projetos",
+            "admin": "Admin",
+            "ops": "Ops"
+        }
+    },
+    "renameBox": {
+        "title": "Renomear a Box",
+        "description": "O nome que você lê no quadro. Nada mais depende dele.",
+        "nameLabel": "Nome",
+        "placeholder": "Box sem nome",
+        "submit": "Renomear",
+        "nameRequired": "O nome é obrigatório",
+        "nameTooLong": "Use menos de {max} caracteres"
+    },
+    "newAgent": {
+        "title": "Novo coworker",
+        "description": "Descreva o trabalho, ou comece de uma sugestão ou de um template.",
+        "headingNamed": "O que {name} deve fazer?",
+        "heading": "O que seu novo coworker deve fazer?",
+        "suggestionsForBox": "Ou comece de um escolhido para {boxName}"
+    },
+    "renameAgent": {
+        "title": "Renomear coworker",
+        "description": "O nome mostrado no quadro e nos chats. O @handle acompanha.",
+        "nameLabel": "Nome",
+        "submit": "Renomear",
+        "nameRequired": "O nome é obrigatório",
+        "nameTooLong": "Use menos de {max} caracteres"
+    },
+    "deleteAgent": {
+        "title": "Excluir este coworker?",
+        "description": "Isso exclui para sempre o coworker e os dados dele no engine. Esta ação não pode ser desfeita.",
+        "typeToConfirm": "Digite <b>{name}</b> para confirmar.",
+        "confirm": "Excluir"
+    },
+    "importAgent": {
+        "title": "Importar um coworker",
+        "description": "Seu agente se muda sozinho para cá, com suas skills, tarefas e memória.",
+        "connectorUrl": "URL do conector",
+        "copyConnectorUrl": "Copiar a URL do conector",
+        "pasteIn": "Cole no {source}",
+        "expires": "Expira em 24 horas.",
+        "copyPrompt": "Copiar o prompt",
+        "otherSource": "Outro",
+        "grokConnectorStep": "Adicione a URL em grok.com/connectors como conector personalizado e depois cole o prompt."
+    },
+    "agentShare": {
+        "unavailable": "Este link de compartilhamento não está mais disponível",
+        "titleNamed": "Adicionar {name}",
+        "title": "Adicionar este coworker",
+        "description": "Veja o que este coworker faz e depois coloque-o no seu quadro.",
+        "sentBy": "{name} enviou para você uma cópia deste coworker. Ele vai rodar na sua própria Box.",
+        "sentBySomeone": "Alguém enviou para você uma cópia deste coworker. Ele vai rodar na sua própria Box.",
+        "signUp": "Cadastre-se para adicionar este coworker",
+        "waiting": "Ele vai estar esperando por você logo em seguida."
+    },
+    "templateDeepLink": {
+        "unavailable": "Este link de template não está mais disponível",
+        "titleNamed": "Instalar \"{title}\"",
+        "title": "Instalar este template",
+        "description": "Veja o que este template instala e depois coloque os coworkers dele no seu quadro."
+    },
+    "createTemplate": {
+        "defaultDescription": "Crie um rascunho de template a partir da sua sandbox. A equipe do Rerun revisa antes de publicar.",
+        "title": "Novo template",
+        "doneLabel": "Abrir o template",
+        "titleField": "Título",
+        "titlePlaceholder": "ex.: SDR outbound",
+        "helperWithSlug": "{length}/{limit} · /templates/{slug}",
+        "helperEmpty": "{length}/{limit} · O endereço público vem do título.",
+        "titleRequired": "O título é obrigatório",
+        "continue": "Continuar"
+    },
+    "expertProfile": {
+        "title": "Seu perfil público",
+        "submit": "Salvar e publicar",
+        "submitting": "Salvando…",
+        "saved": "Seu perfil público foi atualizado."
+    },
+    "apiKeys": {
+        "title": "Chaves de API",
+        "description": "Conecte o Claude Code ou qualquer cliente MCP a este workspace.",
+        "connectSection": "Conectar um cliente",
+        "keysSection": "Chaves",
+        "docsLink": "Chaves de API",
+        "newKeyName": "Nome da nova chave",
+        "newKeyPlaceholder": "Claude Code, MacBook",
+        "create": "Criar chave",
+        "revoked": "{name} revogada",
+        "adminOnly": "Só um admin pode gerenciar as chaves de API",
+        "empty": "Nenhuma chave ainda. Uma chave dá acesso ao workspace inteiro, então trate-a como uma senha.",
+        "lastUsed": "Usada {time}",
+        "neverUsed": "Nunca usada",
+        "revokeThisKey": "Revogar esta chave",
+        "created": {
+            "warning": "Copie esta chave agora. Ela nunca mais será mostrada.",
+            "copyKey": "Copiar a chave",
+            "dismiss": "Já copiei"
+        },
+        "revoke": {
+            "title": "Revogar esta chave?",
+            "description": "{name} para de funcionar na hora, e o que roda com ela perde o acesso ao workspace. A chave não pode ser recuperada, mas você pode criar outra.",
+            "descriptionUnnamed": "Esta chave para de funcionar na hora, e o que roda com ela perde o acesso ao workspace. A chave não pode ser recuperada, mas você pode criar outra.",
+            "confirm": "Revogar"
+        }
+    },
+    "copy": {
+        "snippet": "Copiar {label}",
+        "fullGuide": "Guia completo de configuração"
+    },
+    "servers": {
+        "title": "Servidores",
+        "description": "A máquina em que seus coworkers rodam. Uma por workspace.",
+        "connected": "Conectado",
+        "unreachable": "Inacessível",
+        "runningSummary": "{address} · {count, plural, one {# coworker rodando} other {# coworkers rodando}}",
+        "runningSummaryWithCommit": "{address} · {count, plural, one {# coworker rodando} other {# coworkers rodando}} · {commit}",
+        "unreachableSummary": "{address} · o app não consegue acessá-lo agora",
+        "thisWorkspace": "Servidor deste workspace",
+        "remove": "Remover",
+        "manualSection": "Informar um servidor manualmente",
+        "address": "Endereço",
+        "apiKey": "Chave de API",
+        "apiKeyPlaceholder": "RERUN_API_KEY do engine",
+        "back": "Voltar",
+        "connect": "Conectar",
+        "addSection": "Adicionar um servidor",
+        "addIntro": "Seus coworkers rodam em uma máquina sua. Rode isto nela, com o Docker instalado. Ela se conecta sozinha.",
+        "publicAddress": "Endereço pelo qual o app a acessa (opcional)",
+        "copyCommand": "Copiar o comando",
+        "waiting": "Esperando o servidor. O comando funciona uma vez, por 15 minutos.",
+        "enterManually": "Informar endereço e chave",
+        "add": "Adicionar servidor",
+        "removed": "Servidor removido",
+        "confirmRemove": {
+            "title": "Remover este servidor?",
+            "description": "Seus coworkers param de responder até que um servidor seja conectado de novo. Tudo o que eles sabem fica na máquina: conecte-a de novo para tê-los de volta.",
+            "confirm": "Remover"
+        }
+    },
+    "aiProviders": {
+        "title": "Provedores de IA",
+        "description": "Os planos e as chaves de API em que seus coworkers rodam."
+    },
+    "knowledgeBase": {
+        "title": "Brain",
+        "description": "O que todos os coworkers deste workspace sabem sobre sua empresa, e os arquivos e as tabelas que eles compartilham."
+    },
+    "clearMemories": {
+        "title": "Apagar todas as memórias?",
+        "description": "Isso exclui para sempre todas as memórias deste coworker. Isso não pode ser desfeito.",
+        "confirm": "Apagar tudo"
+    },
+    "deleteTable": {
+        "title": "Excluir a tabela “{table}”?",
+        "description": "Isso exclui para sempre a tabela inteira e todas as linhas dela. Isso não pode ser desfeito.",
+        "confirm": "Excluir"
+    },
+    "purgeTable": {
+        "title": "Esvaziar a tabela “{table}”?",
+        "description": "Isso exclui todas as linhas da tabela, inclusive as escondidas pela busca atual. A tabela e as colunas continuam. Isso não pode ser desfeito.",
+        "confirm": "Esvaziar"
+    },
+    "notifications": {
+        "title": "Notificações",
+        "tabs": {
+            "coworkers": "Coworkers",
+            "account": "Conta"
+        },
+        "descriptions": {
+            "coworkers": "O que vale a pena interromper você. Salvo automaticamente.",
+            "account": "Escolha quais e-mails da conta você recebe."
+        },
+        "pickCoworker": "Escolha um coworker"
+    },
+    "notificationPermission": {
+        "title": "Ser avisado quando seu coworker terminar?",
+        "description": "Ele continua rodando depois que você fecha esta aba. Avisamos quando ele precisar de você.",
+        "enable": "Ativar notificações",
+        "later": "Agora não"
+    },
+    "confirm": {
+        "confirm": "Excluir"
+    },
+    "closeRunningTab": {
+        "title": "Fechar esta conversa?",
+        "description": "O agente ainda está trabalhando nesta conversa. Fechar a aba não interrompe a execução: ela continua rodando em segundo plano.",
+        "confirm": "Fechar"
+    },
+    "shortcuts": {
+        "title": "Atalhos de teclado",
+        "description": "Ande mais rápido pelo Rerun com estes atalhos.",
+        "groups": {
+            "general": "Geral",
+            "chat": "Chat",
+            "files": "Arquivos"
+        },
+        "actions": {
+            "controlCenter": "Abrir a central de controle",
+            "askRerun": "Perguntar ao Rerun, fora de um chat",
+            "holdToTalk": "Segure para falar com o Rerun",
+            "searchInPage": "Buscar na página",
+            "newConversation": "Nova conversa",
+            "closeTab": "Fechar a aba ativa",
+            "sendMessage": "Enviar mensagem",
+            "newLine": "Nova linha",
+            "previousFile": "Arquivo anterior",
+            "nextFile": "Próximo arquivo"
+        }
+    },
+    "viewSettings": {
+        "layoutDescriptions": {
+            "table": "Compare valores entre colunas.",
+            "list": "Linhas lidas por um nome: pessoas, empresas, mensagens.",
+            "gallery": "Linhas reconhecidas por uma imagem: produtos, anúncios.",
+            "board": "Linhas que passam por status: um pipeline, tarefas."
+        },
+        "editTitle": "Editar visualização",
+        "newTitle": "Nova visualização",
+        "description": "Uma visualização de <mono>{table}</mono>. Todos que abrem esta tabela a veem, e o coworker pode desenhá-la no chat.",
+        "name": "Nome",
+        "namePlaceholder": "ex.: Pipeline",
+        "layout": "Layout",
+        "columns": "Colunas",
+        "columnsHint": "Colunas desmarcadas continuam na tabela, só ficam escondidas nesta visualização.",
+        "groupBy": "Agrupar por",
+        "roles": {
+            "title": "Título",
+            "subtitle": "Subtítulo",
+            "image": "Imagem",
+            "badge": "Selo",
+            "value": "Valor",
+            "date": "Data"
+        },
+        "pictureShape": "Formato da imagem",
+        "shapes": {
+            "square": "Quadrada",
+            "landscape": "Paisagem",
+            "portrait": "Retrato"
+        },
+        "sortBy": "Ordenar por",
+        "insertionOrder": "Ordem de inserção",
+        "ascending": "Crescente",
+        "descending": "Decrescente",
+        "formats": "Formatos",
+        "formatsHint": "Como cada valor é lido: um preço, uma data, uma nota, um status.",
+        "formatOf": "Formato de {column}",
+        "plainFormat": "Simples",
+        "colors": "Cores",
+        "colorsBoardHint": "As colunas listadas aqui vêm primeiro, nesta ordem.",
+        "emptyValue": "Vazio",
+        "colorOf": "Cor de {value}",
+        "colorOfEmpty": "Cor dos valores vazios",
+        "automaticColor": "Automática",
+        "create": "Criar visualização",
+        "none": "Nenhuma",
+        "pickColumn": "Escolha uma coluna",
+        "preview": "Prévia",
+        "nameRequired": "Dê um nome à visualização",
+        "titleColumnRequired": "Escolha a coluna que dá nome a cada item",
+        "groupByRequired": "Escolha a coluna cujos valores viram as colunas"
+    },
+    "engineWaitlist": {
+        "title": "Estamos com capacidade máxima agora",
+        "subtitle": "Muitas equipes entraram hoje e todas as máquinas estão ocupadas. Você está na lista de espera: suas respostas estão salvas, e esta página libera sozinha assim que uma máquina ficar livre.",
+        "signedInAs": "Conectado como <b>{email}</b>",
+        "signOut": "Sair"
+    },
+    "sandboxReactivation": {
+        "title": "Pedir reativação",
+        "description": "Sua sandbox volta assim que aprovarmos seu pedido.",
+        "asideTitle": "Por que minha sandbox foi arquivada?",
+        "points": {
+            "archived": {
+                "label": "Arquivada após 30 dias sem uso",
+                "description": "Uma sandbox mantém uma máquina ligada, então uma que ninguém abre a devolve."
+            },
+            "kept": {
+                "label": "Nada foi jogado fora",
+                "description": "Seus coworkers, a memória e os arquivos deles ficam salvos com o arquivo."
+            },
+            "reviewed": {
+                "label": "Analisamos cada pedido",
+                "description": "Conte o que você está criando e trazemos sua sandbox de volta."
+            },
+            "restored": {
+                "label": "De volta exatamente como você deixou",
+                "description": "Depois da aprovação, a restauração leva alguns minutos."
+            }
+        },
+        "noteLabel": "O que você pretende criar?",
+        "noteHint": "Uma ou duas frases bastam.",
+        "submit": "Enviar pedido",
+        "failed": "Não foi possível enviar seu pedido. Tente de novo."
+    },
+    "paidApp": {
+        "slotAdded": "Vaga adicionada ao seu plano.",
+        "slotAddedTrial": "Vaga adicionada, {price} durante o seu teste."
+    },
+    "linkedinPro": {
+        "description": "As contas do LinkedIn com que seus coworkers atuam.",
+        "connectDescription": "Conecte a conta do LinkedIn com que seus coworkers atuam.",
+        "approvalNotSeen": "O LinkedIn ainda não recebeu a aprovação. Toque em Sim no app e tente de novo.",
+        "codeResent": "Um novo código está a caminho.",
+        "connect": {
+            "title": "Conectar o LinkedIn",
+            "reconnectTitle": "Reconectar o LinkedIn",
+            "back": "Voltar ao LinkedIn Pro"
+        },
+        "checkpoint": {
+            "title": "Confirme que é você",
+            "hint": "O LinkedIn pede uma segunda etapa",
+            "cancel": "Cancelar o login"
+        }
+    },
+    "whatsappPro": {
+        "description": "Os números de WhatsApp com que seus coworkers atuam.",
+        "connectDescription": "Vincule o número de WhatsApp com que seus coworkers atuam.",
+        "connect": {
+            "title": "Vincular o WhatsApp",
+            "reconnectTitle": "Vincular o WhatsApp de novo",
+            "back": "Voltar ao WhatsApp Pro"
+        },
+        "link": {
+            "title": "Vincular o celular",
+            "hint": "O WhatsApp adiciona o Rerun como aparelho conectado",
+            "cancel": "Cancelar a vinculação"
+        }
+    },
+    "subscriptionOffer": {
+        "title": "Rode seus coworkers no seu plano do Claude ou do ChatGPT",
+        "back": "Voltar",
+        "connect": "Conectar",
+        "or": "ou",
+        "useApiKey": "Usar uma chave de API",
+        "plans": {
+            "claude": "Claude Pro ou Max",
+            "codex": "ChatGPT Plus ou Pro"
+        },
+        "decline": {
+            "cloud": "Prefiro ficar nos créditos Rerun",
+            "selfHosted": "Prefiro ficar no OpenRouter"
+        },
+        "offer": {
+            "title": "O Rerun funciona melhor com sua assinatura do Claude ou do ChatGPT",
+            "description": "Conecte-a e seus coworkers rodam no plano que você já paga."
+        },
+        "arguments": {
+            "ownPlan": {
+                "label": "Cada um traz o seu",
+                "description": "Cada colega conecta o plano que paga. Nenhuma conta passada de mão em mão."
+            },
+            "password": {
+                "label": "O Rerun nunca vê sua senha",
+                "description": "Você aprova na própria página do Claude ou da OpenAI, e em nenhum outro lugar."
+            },
+            "unplug": {
+                "label": "Desconecte quando quiser",
+                "descriptionCloud": "Desconecte com um clique e seus coworkers voltam para os créditos Rerun.",
+                "descriptionSelfHosted": "Desconecte com um clique e seus coworkers voltam para sua chave do OpenRouter."
+            }
+        },
+        "board": {
+            "title": "Cada coworker em uma conexão sua",
+            "description": "Duas assinaturas e uma chave de API, lado a lado no mesmo quadro.",
+            "crew": {
+                "sales": "Vendas",
+                "customer_support": "Suporte ao cliente",
+                "accounting": "Contabilidade"
+            }
+        },
+        "plan": {
+            "title": "Conecte seu plano {name}",
+            "linked": "Seus coworkers rodam no {name}",
+            "switching": "Seus coworkers passam para o {name}"
+        },
+        "key": {
+            "title": "Usar uma chave de API",
+            "detail": "Seus coworkers rodam na sua chave, cobrada por token pelo provedor.",
+            "opencodeTitle": "Conectar o OpenCode",
+            "opencodeDetail": "Cole sua chave do OpenCode: os modelos Go rodam no seu plano, os do Console nos seus créditos.",
+            "field": "Chave de API",
+            "placeholder": "Cole sua chave",
+            "add": "Adicionar chave",
+            "connecting": "Conectando…",
+            "failed": "Não foi possível adicionar a chave",
+            "somethingWentWrong": "Algo deu errado. Tente de novo."
+        },
+        "connected": {
+            "title": "{name} está conectado",
+            "planDetail": "Seus coworkers agora rodam no seu plano {name}.",
+            "opencodeDetail": "Seus coworkers agora rodam no seu plano OpenCode Go.",
+            "keyDetail": "Seus coworkers agora rodam nesta chave.",
+            "done": "Concluído"
+        }
+    }
+}

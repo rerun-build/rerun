@@ -1,0 +1,141 @@
+{
+    "appAccount": {
+        "addAccount": "Konto hinzufügen",
+        "connectTitle": "{provider}-Konto verbinden",
+        "connectHint": "Einmal für den Workspace verbunden, dann kann jeder Coworker damit handeln.",
+        "connect": "{provider} verbinden",
+        "actsAs": "Handelt als",
+        "accountName": "{provider}-Konto",
+        "selected": "Dieser Coworker handelt als dieses Konto",
+        "appAccount": "{app}-Konto",
+        "needsAttention": "Braucht Aufmerksamkeit in {app}",
+        "wakeWhen": "Diesen Coworker wecken, wenn",
+        "timing": {
+            "rightAway": "Sofort",
+            "everyFewHours": "Alle paar Stunden geprüft"
+        },
+        "unavailable": "{app} ist in diesem Workspace noch nicht verfügbar."
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "Anmelden",
+            "key": "API-Schlüssel",
+            "stdio": "Lokal",
+            "app": "Workspace-Konto",
+            "other": "Verbinden"
+        },
+        "description": {
+            "oauth": "Melde dich über ein sicheres Pop-up an.",
+            "key": "Füge einen API-Schlüssel des Dienstes ein.",
+            "stdio": "Läuft lokal auf deiner Engine.",
+            "app": "Wähle ein mit dem Workspace verbundenes Konto.",
+            "other": "Keine Zugangsdaten nötig."
+        }
+    },
+    "connect": {
+        "authorizationFailed": "Autorisierung fehlgeschlagen",
+        "startFailed": "Verbindung konnte nicht gestartet werden",
+        "startOAuthFailed": "OAuth-Start fehlgeschlagen",
+        "connectedAs": "Verbunden als {account}",
+        "connected": "Verbunden",
+        "retry": "Erneut versuchen",
+        "secureTitle": "Sichere Verbindung",
+        "secureBody": "Diese Verbindung wird von einem unserer vertrauenswürdigen Partner abgewickelt.",
+        "waiting": "Warte auf Autorisierung…",
+        "connect": "Verbinden"
+    },
+    "credentialGuide": {
+        "title": "So bekommst du deinen {label}"
+    },
+    "customMcp": {
+        "custom": "Eigener",
+        "connect": "Verbinden",
+        "edit": "{name} bearbeiten",
+        "remove": "{name} entfernen",
+        "removeTitle": "{name} entfernen?",
+        "removeDescription": "Der Coworker verliert alle Tools dieses Servers, und seine Anmeldung wird gelöscht.",
+        "removeConfirm": "Entfernen",
+        "status": {
+            "connected": "Verbunden · {count, plural, one {# Tool} other {# Tools}}",
+            "needsAuth": "Anmeldung nötig",
+            "unreachable": "Nicht erreichbar",
+            "noAnswer": "Der Server hat nicht geantwortet."
+        }
+    },
+    "requestApp": {
+        "required": "Beschreib bitte die App, die du brauchst",
+        "sent": "Anfrage gesendet. Danke, wir schauen sie uns an.",
+        "title": "App anfragen",
+        "description": "Sag uns, welche App du brauchst und wie du sie nutzen würdest. Den Rest übernehmen wir.",
+        "placeholder": "Beschreib die App, die du brauchst…",
+        "cancel": "Abbrechen",
+        "send": "Anfrage senden"
+    },
+    "alternatives": {
+        "label": "Funktioniert auch mit"
+    },
+    "configForm": {
+        "configured": "{name} konfiguriert",
+        "connectTitle": "{name} verbinden",
+        "signInOAuth": "Melde dich bei {name} an, damit dein Agent es nutzen kann.",
+        "signInManaged": "Melde dich mit {name} an, damit dein Agent es nutzen kann. Rerun kümmert sich um die Verbindung.",
+        "setUp": "{name} einrichten",
+        "authentication": "Authentifizierung",
+        "backToMethods": "Zurück zu den Methoden",
+        "connecting": "Wird verbunden…",
+        "connect": "Verbinden",
+        "installing": "Wird installiert…",
+        "chooseAccount": "Konto wählen",
+        "install": "Installieren",
+        "noTarget": "Dieser Dienst braucht eine Anmeldung, hat aber kein Verbindungsziel zurückgegeben.",
+        "missingFields": "Einige Pflichtfelder fehlen noch."
+    },
+    "fields": {
+        "selectPlaceholder": "Auswählen…"
+    },
+    "installed": {
+        "title": "{name} installiert",
+        "nextTurn": "Ab der nächsten Runde verfügbar: {tools}"
+    },
+    "list": {
+        "emptyTitle": "Keine Apps gefunden",
+        "emptyDescription": "Wir haben keine App gefunden, die zu deiner Suche passt.",
+        "request": "App anfragen",
+        "installed": "Installiert",
+        "addAccount": "Konto hinzufügen",
+        "needsSignIn": "Anmeldung nötig",
+        "needsSetup": "Einrichtung nötig",
+        "removeApp": "App entfernen",
+        "finishSetup": "Einrichtung abschließen",
+        "install": "Installieren"
+    },
+    "suggestion": {
+        "loading": "Vorgeschlagene Apps werden geladen…",
+        "loadFailed": "{name} konnte nicht geladen werden.",
+        "notFoundSkipped": "Nicht im Katalog gefunden, übersprungen.",
+        "notNow": "Nicht jetzt",
+        "connect": "Verbinden",
+        "cancel": "Abbrechen",
+        "connected": "{name} verbunden",
+        "reconnect": "Neu verbinden",
+        "notFound": "Nicht im Katalog gefunden.",
+        "skipped": "Übersprungen.",
+        "skip": "Überspringen",
+        "finish": "Fertig",
+        "nextApp": "Nächste App"
+    },
+    "signInPopup": {
+        "connecting": "Verbindung zu {name}…"
+    },
+    "categories": {
+        "payments": "Zahlungen",
+        "ecommerce": "E-Commerce",
+        "crm": "CRM",
+        "marketing": "Marketing",
+        "seo": "SEO",
+        "analytics": "Analytics",
+        "dev": "Entwicklung",
+        "productivity": "Produktivität",
+        "other": "Sonstiges"
+    }
+}

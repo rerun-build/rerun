@@ -1,0 +1,51 @@
+{
+    "linkOff": {
+        "title": "Este link não funciona mais",
+        "subtitle": "Quem o compartilhou o desativou."
+    },
+    "unsubscribe": {
+        "title": "Preferências de e-mail",
+        "subtitle": "Escolha quais e-mails o Rerun envia para você. Sem precisar entrar na conta.",
+        "subtitleRuns": "Escolha se seus coworkers podem enviar e-mails para você. Sem precisar entrar na conta.",
+        "invalid": "Este link de cancelamento é inválido ou expirou.",
+        "logIn": "Entre para gerenciar suas preferências"
+    },
+    "publishedView": {
+        "protectedTitle": "Página protegida",
+        "protectedDescription": "Compartilhada por {workspace}. Entre ou confirme seu e-mail para abrir.",
+        "publishedBy": "Publicada por {agent} em {workspace}",
+        "publishedByUnknown": "Publicada por um coworker em {workspace}"
+    },
+    "publishedAuth": {
+        "metaTitle": "Abrir uma página",
+        "noAccess": "Você não tem acesso",
+        "signedInAs": "Conectado como {email}. Esta página é para membros de {workspace}.",
+        "signedInAsOther": "Conectado com outra conta. Esta página é para membros de {workspace}."
+    },
+    "gate": {
+        "open": "Abrir",
+        "errors": {
+            "limited": "Muitas tentativas. Aguarde alguns minutos.",
+            "password": "Senha incorreta",
+            "code": "Código incorreto ou expirado",
+            "email": "Digite um e-mail válido"
+        },
+        "password": {
+            "subtitle": "{workspace} protegeu esta página com uma senha",
+            "placeholder": "Senha"
+        },
+        "code": {
+            "title": "Confira sua caixa de entrada",
+            "subtitle": "Se {email} puder abrir esta página, um código está a caminho",
+            "otherEmail": "Usar outro e-mail"
+        },
+        "email": {
+            "subtitle": "Confirme seu e-mail para abrir",
+            "submit": "Enviar código"
+        },
+        "members": {
+            "subtitle": "Para membros de {workspace}",
+            "continue": "Continuar com o Rerun"
+        }
+    }
+}

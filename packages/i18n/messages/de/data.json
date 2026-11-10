@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "Tabelle nicht gefunden",
+        "deleteRowsFailed": "Zeilen konnten nicht gelöscht werden",
+        "saveRowFailed": "Diese Zeile konnte nicht gespeichert werden",
+        "deleteTableFailed": "Tabelle konnte nicht gelöscht werden",
+        "purgeTableFailed": "Tabelle konnte nicht geleert werden",
+        "addViewFailed": "Diese Ansicht konnte nicht hinzugefügt werden",
+        "deleteViewFailed": "Diese Ansicht konnte nicht gelöscht werden",
+        "unavailable": "Datenbank nicht verfügbar",
+        "tryAgain": "Erneut versuchen",
+        "rowCount": "{count, plural, one {{total} Zeile} other {{total} Zeilen}}",
+        "rowCountFound": "{count, plural, one {{total} Zeile gefunden} other {{total} Zeilen gefunden}}",
+        "noRows": "Keine Zeilen",
+        "noSearchMatch": "Keine Zeile passt zu dieser Suche.",
+        "tableEmpty": "Diese Tabelle ist leer."
+    },
+    "pagination": {
+        "count": "Anzahl <value>{count}</value>",
+        "rowsPerPage": "Zeilen pro Seite",
+        "perPage": "{size} pro Seite",
+        "range": "{range} von {total}",
+        "firstPage": "Erste Seite",
+        "previousPage": "Vorherige Seite",
+        "nextPage": "Nächste Seite",
+        "lastPage": "Letzte Seite"
+    },
+    "toolbar": {
+        "selected": "{count, plural, other {# ausgewählt}}",
+        "deleteRowTitle": "Diese Zeile löschen?",
+        "deleteRowsTitle": "{count} Zeilen löschen?",
+        "deleteRowDescription": "Die Zeile wird endgültig aus der Tabelle entfernt. Das lässt sich nicht rückgängig machen.",
+        "deleteRowsDescription": "Die Zeilen werden endgültig aus der Tabelle entfernt. Das lässt sich nicht rückgängig machen.",
+        "delete": "Löschen",
+        "clearSelection": "Auswahl aufheben",
+        "search": "Suchen",
+        "searchRows": "Zeilen durchsuchen",
+        "clearSearch": "Suche löschen",
+        "tableActions": "Tabellenaktionen",
+        "export": "Exportieren",
+        "purgeTable": "Tabelle leeren",
+        "deleteTable": "Tabelle löschen"
+    },
+    "viewBar": {
+        "allRows": "Alle Zeilen",
+        "viewOptions": "Optionen von {name}",
+        "editView": "Ansicht bearbeiten",
+        "deleteView": "Ansicht löschen",
+        "addView": "Ansicht hinzufügen",
+        "addNewView": "Neue Ansicht hinzufügen",
+        "expand": "Vergrößern",
+        "deleteViewTitle": "Die Ansicht \"{name}\" löschen?",
+        "deleteViewDescription": "Nur die Ansicht verschwindet. Die Zeilen der Tabelle bleiben unberührt."
+    },
+    "layouts": {
+        "table": "Tabelle",
+        "list": "Liste",
+        "gallery": "Galerie",
+        "board": "Board"
+    },
+    "table": {
+        "selectAllRows": "Alle Zeilen dieser Seite auswählen",
+        "selectRow": "Zeile auswählen",
+        "sources": "Quellen"
+    },
+    "cell": {
+        "yes": "Ja",
+        "no": "Nein"
+    },
+    "board": {
+        "moveFailed": "Diese Zeile konnte nicht verschoben werden",
+        "unavailable": "Board nicht verfügbar",
+        "showMore": "{count} weitere anzeigen"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "Verifiziert",
+                "detail": "Postfach existiert"
+            },
+            "unconfirmed": {
+                "label": "Unbestätigt",
+                "detail": "Postfach nicht bestätigt"
+            },
+            "invalid": {
+                "label": "Ungültig",
+                "detail": "Postfach existiert nicht"
+            }
+        },
+        "openSource": "Quelle öffnen",
+        "verified": "Verifiziert",
+        "row": "Zeile",
+        "cellLabel": "Quellen: {names}"
+    },
+    "shared": {
+        "emptyTitle": "Noch keine geteilten Tabellen",
+        "emptyDescription": "Jeder Coworker des Workspace liest und schreibt diese Datenbank. Brauchen sie einen gemeinsamen Datensatz (einen Katalog, eine Warteschlange, eine Liste, die mehrere Coworker abarbeiten), legen sie hier Tabellen an, die du jederzeit durchsehen kannst.",
+        "unreachable": "Die Maschine dieses Workspace war nicht erreichbar."
+    }
+}

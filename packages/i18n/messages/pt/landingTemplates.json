@@ -1,0 +1,21 @@
+{
+    "price": {
+        "free": "Grátis",
+        "monthly": "{amount}/mês",
+        "useForFree": "Usar grátis",
+        "hire": "{count, plural, one {Contratar este coworker · {price}} other {Contratar estes # coworkers · {price}}}",
+        "hireCard": "Contratar · {price}"
+    },
+    "categories": {
+        "agencies": "Agências",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Vendas",
+        "recruiting": "Recrutamento",
+        "real-estate": "Imóveis",
+        "legal": "Jurídico e compliance",
+        "creators": "Criadores",
+        "productivity": "Produtividade",
+        "other": "Outros"
+    }
+}

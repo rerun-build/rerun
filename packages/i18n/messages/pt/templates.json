@@ -1,0 +1,561 @@
+{
+    "installFeedback": {
+        "noLongerAvailable": "\"{title}\" não está mais disponível",
+        "buyFailed": "Não foi possível comprar \"{title}\"",
+        "alreadyOnBoard": "\"{title}\" já está no seu quadro",
+        "alreadyOnBoardHint": "Os coworkers dele estão abrindo onde você os deixou.",
+        "notImported": "Não foi possível importar {name}.",
+        "inactiveCount": "{count, plural, one {# deles está inativo: seu plano não tem vaga de coworker livre.} other {# deles estão inativos: seu plano não tem vaga de coworker livre.}}",
+        "landed": "{count, plural, one {# coworker de \"{title}\" chegou ao seu quadro} other {# coworkers de \"{title}\" chegaram ao seu quadro}}",
+        "openOne": "Abra um e comece a instalação: ele conecta com você o que precisa.",
+        "landedInactive": "Ele chegou inativo: seu plano não tem vaga de coworker livre.",
+        "agentLanded": "\"{name}\" chegou ao seu quadro",
+        "openIt": "Abra e comece a instalação: ele conecta com você o que precisa.",
+        "webhooksMoved": "{count, plural, one {# webhook ganhou uma nova URL: aponte seus serviços para o endereço da cópia.} other {# webhooks ganharam uma nova URL: aponte seus serviços para o endereço da cópia.}}",
+        "schedulesDoubled": "{count, plural, one {# agendamento também roda na cópia. Desative se o trabalho não deve acontecer duas vezes.} other {# agendamentos também rodam na cópia. Desative-os se o trabalho não deve acontecer duas vezes.}}",
+        "copyReady": "Ela leva tudo o que o original tinha e está pronta para rodar.",
+        "prepareBoxFailed": "Não foi possível preparar sua Box",
+        "settingUp": "Configurando \"{title}\"",
+        "settingUpHint": "Seus coworkers vão aparecer no quadro em instantes.",
+        "setUpFailed": "Não foi possível configurar \"{title}\""
+    },
+    "price": {
+        "free": "Grátis",
+        "monthly": "{amount}/mês",
+        "useForFree": "Usar grátis",
+        "hire": "{count, plural, one {Contratar este coworker · {price}} other {Contratar estes # coworkers · {price}}}",
+        "hireCard": "Contratar · {price}",
+        "purchased": "Comprado",
+        "expired": "Expirado",
+        "install": "Instalar",
+        "renew": "Renovar"
+    },
+    "connectors": {
+        "none": "Nenhum app necessário",
+        "label": "Apps: {names}"
+    },
+    "creator": {
+        "templateCount": "{count, plural, one {# template} other {# templates}}",
+        "rerunTeam": "Equipe Rerun",
+        "verified": "Criador verificado"
+    },
+    "spotlight": {
+        "viewProfile": "Ver o perfil de {name}",
+        "workWith": "Trabalhe com {name}",
+        "badge": "Criador da semana",
+        "website": "Site",
+        "socialLabel": "{name} no {network}",
+        "openTemplate": "Abrir template",
+        "recognizedFor": "Reconhecido por"
+    },
+    "about": {
+        "showMore": "Mostrar mais",
+        "showLess": "Mostrar menos"
+    },
+    "agentCard": {
+        "comesWith": "Inclui",
+        "apps": "Apps",
+        "skills": "Skills",
+        "schedules": "Tarefas agendadas",
+        "webhooks": "Webhooks",
+        "more": "+{count} mais"
+    },
+    "detail": {
+        "price": "Preço",
+        "coworkers": "Coworkers",
+        "apps": "Apps",
+        "setupTime": "Tempo de configuração",
+        "minutes": "{minutes} min",
+        "category": "Categoria",
+        "about": "Sobre",
+        "whatYouNeed": "Do que você vai precisar",
+        "carousel": "coworkers deste template",
+        "securityTitle": "Segurança",
+        "securityBody": "Credenciais e dados privados foram removidos deste template. Os apps chegam desconectados, e você os autoriza depois da importação.",
+        "cancelAnytime": "Cancele quando quiser nas configurações de cobrança."
+    },
+    "library": {
+        "title": "Biblioteca de templates",
+        "templates": "Templates",
+        "hideDetails": "Ocultar detalhes",
+        "newCoworker": "Novo coworker",
+        "createCoworker": "Criar novo coworker",
+        "viewProfile": "Ver perfil",
+        "filters": {
+            "app": "App",
+            "status": "Status"
+        },
+        "search": {
+            "placeholder": "Buscar templates",
+            "clear": "Limpar busca"
+        },
+        "nav": {
+            "discover": "Descobrir",
+            "forYou": "Para você",
+            "all": "Todos",
+            "allTemplates": "Todos os templates",
+            "mine": "Minha biblioteca",
+            "stack": "Suas ferramentas",
+            "popularApps": "Apps populares",
+            "categories": "Categorias"
+        },
+        "heading": {
+            "count": "{count, plural, one {# template} other {# templates}}",
+            "results": "Resultados para “{query}”",
+            "discoverEmpty": "Os templates que você cria aparecem aqui.",
+            "discover": "Coworkers prontos, criados por quem os usa.",
+            "forYou": "Escolhidos pelo seu setor e pelos apps que você usa primeiro.",
+            "mine": "Os templates deste workspace.",
+            "app": "App",
+            "appSubtitle": "{total} usando {app}",
+            "thisApp": "este app",
+            "creator": "Criador"
+        },
+        "discover": {
+            "seeAll": "Ver tudo",
+            "creators": "Criadores",
+            "creatorsSubtitle": "As pessoas por trás dos templates.",
+            "allCreators": "Todos os criadores",
+            "forYou": "Para você",
+            "forYouSubtitle": "Escolhidos pelo seu setor e pelos apps que você usa.",
+            "featured": "Destaques",
+            "featuredSubtitle": "Configurações escolhidas a dedo para ver primeiro.",
+            "justAdded": "Recém-adicionados",
+            "justAddedSubtitle": "Os templates publicados mais recentemente no Rerun."
+        },
+        "empty": {
+            "filtered": "Nenhum template corresponde a estes filtros",
+            "none": "Nenhum template aqui ainda",
+            "selfHosted": "Recrute um coworker e salve-o como template.",
+            "cloud": "Crie você mesmo e venda no Rerun.",
+            "become": "Torne-se um especialista Rerun"
+        }
+    },
+    "scratch": {
+        "title": "Começar do zero",
+        "description": "Sem template. Dê um nome ao seu coworker e coloque-o na grade."
+    },
+    "section": {
+        "back": "Voltar a todos os templates",
+        "filterBy": "Filtrar por {title}"
+    },
+    "authoring": {
+        "prefill": "Preenchimento mágico",
+        "altText": "Escrever o texto alternativo",
+        "content": {
+            "title": "Conteúdo",
+            "tagline": "Slogan",
+            "taglineHelp": "{count}/{limit}, uma frase.",
+            "taglinePlaceholder": "Encontra prospects, escreve o primeiro contato e faz follow-up até responderem.",
+            "longDescription": "Descrição longa",
+            "longDescriptionPlaceholder": "O que este template faz, para quem é e do que precisa para rodar."
+        },
+        "faq": {
+            "title": "FAQ",
+            "hint": "Aparece na página pública e é enviado aos buscadores como dados estruturados de FAQ.",
+            "empty": "Nenhuma pergunta ainda. Preencha com IA ou adicione à mão.",
+            "question": "Pergunta",
+            "questionPlaceholder": "Quais contas preciso conectar?",
+            "answer": "Resposta",
+            "answerPlaceholder": "Duas ou três frases que respondam por si só.",
+            "remove": "Remover esta pergunta",
+            "add": "Adicionar uma pergunta"
+        },
+        "media": {
+            "title": "Mídia",
+            "videoUrl": "URL do vídeo",
+            "videoPlaceholder": "https://youtube.com/watch?v=… ou um link do Loom",
+            "ogImage": "Imagem OG personalizada",
+            "ogImagePlaceholder": "Deixe vazio para gerar uma",
+            "ogImageHelp": "Só defina isto para um card social sob medida.",
+            "gallery": "Galeria",
+            "galleryHelp": "Opcional: os cards mostram o quadro de coworkers no lugar. Estas imagens ilustram a página de detalhes, a primeira à frente e uma gerada no final. Salve para manter. O texto alternativo é recomendado: elas aparecem em uma página indexada.",
+            "altCover": "Texto alternativo (capa)",
+            "alt": "Texto alternativo",
+            "cover": "Capa",
+            "remove": "Remover",
+            "dropOverlay": "Solte as imagens",
+            "uploading": "Enviando…",
+            "drop": "Solte as imagens aqui ou clique para escolher"
+        },
+        "meta": {
+            "title": "Metadados",
+            "titleLabel": "Título",
+            "titlePlaceholder": "SDR de outbound",
+            "slug": "Slug",
+            "category": "Categoria",
+            "setupTime": "Tempo de configuração (minutos)",
+            "setupTimeHelp": "Aparece na página pública. Seja honesto sobre a configuração dos apps.",
+            "tags": "Tags",
+            "tagsPlaceholder": "prospecção, vendas, automação",
+            "tagsHelp": "Separadas por vírgula. Usadas para filtrar na página pública.",
+            "metaTitle": "Meta title",
+            "metaTitlePlaceholder": "{title}, template de coworker de IA",
+            "metaTitleDefault": "Usa o título por padrão",
+            "metaDescription": "Meta description",
+            "metaDescriptionHelp": "{count}/{limit}, entre {min} e {limit} caracteres para publicar.",
+            "metaDescriptionPlaceholder": "Uma ou duas frases para os resultados de busca."
+        }
+    },
+    "capture": {
+        "failedRequest": "A solicitação não foi concluída. Verifique sua conexão e tente de novo.",
+        "steps": {
+            "select": {
+                "title": "Capturar coworkers",
+                "description": "Escolha os coworkers cuja pasta vai virar este template."
+            },
+            "review": {
+                "title": "Revisão de segurança",
+                "description": "Confira o que cada coworker leva e confirme antes de capturar."
+            },
+            "done": {
+                "title": "Capturado",
+                "description": "Os pacotes estão guardados e o template agora descreve estes coworkers."
+            }
+        },
+        "stages": {
+            "title": {
+                "title": "Dê um nome ao template",
+                "description": "O rascunho é salvo assim que você confirma.",
+                "points": {
+                    "private": "Privado até ser publicado",
+                    "signed": "Assinado com seu nome"
+                }
+            },
+            "select": {
+                "title": "Escolha seus coworkers",
+                "description": "A pasta do coworker é copiada como está.",
+                "points": {
+                    "snapshot": "Uma cópia, não um link",
+                    "edits": "Edições futuras ficam do seu lado"
+                }
+            },
+            "review": {
+                "title": "Revisão de segurança",
+                "description": "Os segredos são removidos antes de qualquer coisa sair da Box.",
+                "points": {
+                    "env": "Valores de env apagados",
+                    "apps": "Apps redefinidos",
+                    "scan": "Busca de segredos em arquivos e caminhos",
+                    "memories": "Memórias ficam para trás"
+                }
+            },
+            "done": {
+                "title": "Captura",
+                "description": "O pacote fica guardado de forma privada e descreve o template.",
+                "points": {
+                    "stored": "Guardado fora de alcance",
+                    "warnings": "Avisos, não surpresas"
+                }
+            }
+        },
+        "select": {
+            "emptyTitle": "Nenhum coworker para capturar",
+            "emptyDescription": "Crie primeiro um coworker em uma Box e depois volte aqui.",
+            "box": "Box",
+            "boxPlaceholder": "Escolha a Box com os coworkers",
+            "boxFallback": "Box",
+            "coworkers": "Coworkers",
+            "coworkersIn": "Coworkers em {box}",
+            "search": "Buscar por nome ou identificador",
+            "selected": "{selected} de {total} selecionados",
+            "clear": "Limpar",
+            "selectAll": "Selecionar tudo",
+            "noMatch": "Nenhum coworker corresponde a esta busca."
+        },
+        "review": {
+            "reviewed": "{approved} de {total, plural, one {# coworker revisado} other {# coworkers revisados}}",
+            "files": "{kept} de {total} arquivos, {size}",
+            "tools": "Ferramentas",
+            "apps": "Apps",
+            "skills": "Skills",
+            "schedules": "Agendamentos",
+            "oneShot": "Execução única",
+            "webhooks": "Webhooks",
+            "memories": "Memórias",
+            "memoriesNote": "{count} registradas, excluídas do pacote por padrão",
+            "removed": "Removido na saída",
+            "toProvide": "A informar de novo em uma cópia",
+            "envKeys": "Chaves de env",
+            "flagged": "Arquivos sinalizados",
+            "flaggedKept": "{kept} de {total} arquivos que parecem conter uma credencial ainda estão incluídos. Eles vão dentro do pacote.",
+            "flaggedOut": "{count, plural, one {# arquivo parece ter uma credencial e fica fora do pacote.} other {# arquivos parecem ter uma credencial e ficam fora do pacote.}}",
+            "install": "Instalação",
+            "filesGroup": "Arquivos",
+            "hideFolder": "Ocultar a pasta",
+            "showFolder": "Mostrar a pasta",
+            "kept": "{kept} de {total} mantidos",
+            "confirm": "Revisei o que este coworker leva",
+            "answerFirst": "Responda primeiro à pergunta de instalação acima.",
+            "writeFirst": "Escreva primeiro as instruções de instalação acima.",
+            "flaggedTravel": "{count} arquivo(s) sinalizado(s) vão dentro do pacote.",
+            "nothingSecret": "Nada nesta lista é um segredo que não deveria ser enviado.",
+            "more": "+{count} mais"
+        },
+        "tree": {
+            "collapse": "Recolher",
+            "expand": "Expandir",
+            "flagged": "{count} sinalizados"
+        },
+        "done": "{count, plural, one {# coworker capturado} other {# coworkers capturados}}. As skills, agendamentos e apps deles agora descrevem este template.",
+        "panel": {
+            "inspect": "Inspecionar {count, plural, =0 {coworkers} one {# coworker} other {# coworkers}}",
+            "reviewEach": "Revise cada agente para ativar a captura ({approved}/{total})",
+            "back": "Voltar",
+            "capture": "Capturar"
+        },
+        "dialog": {
+            "cancel": "Cancelar",
+            "done": "Concluído"
+        }
+    },
+    "expert": {
+        "agents": {
+            "title": "Coworkers ({count})",
+            "empty": "Nenhum coworker capturado ainda. Capture um do seu sandbox para que as pessoas possam instalar esta configuração.",
+            "noRole": "Sem função ainda",
+            "connectors": "{count, plural, one {# conector} other {# conectores}}",
+            "setup": {
+                "guided": "Instalação guiada",
+                "none": "Sem instalação",
+                "missing": "Resposta de instalação faltando"
+            },
+            "removeTitle": "Remover {name}?",
+            "removeDescription": "O pacote capturado da pasta dele também é excluído. Para adicionar o coworker de volta, será preciso capturá-lo de novo.",
+            "removeConfirm": "Remover",
+            "removeLabel": "Remover {name}",
+            "capture": "Capturar do seu sandbox",
+            "removeNote": "Remover um coworker também exclui o pacote capturado da pasta dele. Para adicioná-lo de volta, será preciso capturá-lo de novo."
+        },
+        "list": {
+            "newTemplate": "Novo template",
+            "emptyTitle": "Nenhum template ainda",
+            "emptyDescription": "Descreva uma configuração de coworkers uma vez, e nós revisamos antes de chegar ao marketplace."
+        },
+        "row": {
+            "agents": "{count, plural, one {# agente} other {# agentes}}"
+        },
+        "tabs": {
+            "details": "Detalhes",
+            "pricing": "Preço",
+            "media": "Mídia",
+            "faq": "FAQ",
+            "agents": "Coworkers"
+        },
+        "dialog": {
+            "title": "Meus templates",
+            "description": "Crie o rascunho de um template a partir do seu sandbox e depois envie. Nós revisamos antes de entrar no ar.",
+            "pickTitle": "Escolha um template",
+            "pickDescription": "Ou comece um novo para capturar nele um coworker do seu sandbox."
+        },
+        "toasts": {
+            "saved": "Template salvo.",
+            "submitted": "Enviado. Vamos responder em breve."
+        },
+        "footer": {
+            "requirements": {
+                "title": "Um título",
+                "tagline": "Um slogan",
+                "description": "Uma descrição",
+                "metaDescription": "Uma meta description de {min} a {max} caracteres",
+                "agent": "Pelo menos um coworker capturado",
+                "installAnswers": "Uma resposta de instalação para cada coworker",
+                "payouts": "Uma conta Stripe que possa receber repasses"
+            },
+            "live": "Este template está no ar no marketplace. Fale com a equipe do Rerun para alterá-lo.",
+            "inReview": "Estamos revisando este template. Retire-o para continuar editando.",
+            "withdraw": "Retirar",
+            "completeChecklist": "Complete o checklist primeiro",
+            "saveFirst": "Salve suas alterações primeiro",
+            "sentBack": "Devolvemos este para ajustes",
+            "deleteTitle": "Excluir este template de vez?",
+            "deleteDescription": "O template, suas mídias e todos os coworkers capturados para ele são removidos. Isso não pode ser desfeito.",
+            "deleteTooltip": "Excluir este template de vez",
+            "deleteLabel": "Excluir template",
+            "checklistLabel": "Checklist de envio: {met} de {total} concluídos",
+            "ready": "Pronto para enviar",
+            "checklistHint": "O que um template precisa antes da nossa revisão.",
+            "setUpPayouts": "Configurar repasses",
+            "save": "Salvar",
+            "submit": "Enviar para revisão"
+        }
+    },
+    "pricing": {
+        "title": "Preço",
+        "models": {
+            "free": "Grátis",
+            "one_time": "Compra única",
+            "recurring": "Assinatura mensal"
+        },
+        "helpers": {
+            "free": "Qualquer pessoa com um plano Rerun pode instalar.",
+            "one_time": "Cobrado uma vez. O comprador fica com ele para sempre.",
+            "recurring": "Cobrado todo mês. O acesso termina quando o comprador cancela."
+        },
+        "modelHelp": "{helper} Os compradores ainda precisam de um plano Rerun ativo para instalar um template.",
+        "priceLabel": "Preço (USD)",
+        "priceHelp": "Mínimo {min}. Mudanças futuras só valem para novos compradores.",
+        "payoutsTitle": "Os repasses não estão ativados",
+        "payoutsBody": "Você pode salvar este preço agora, mas um template pago só pode ser enviado para revisão quando os repasses do Stripe estiverem ativados.",
+        "setUpPayouts": "Configurar repasses",
+        "payout": {
+            "yourPrice": "Seu preço{recurring, select, true { por mês} other {}}",
+            "fee": "Taxa do Rerun ({fee})",
+            "earn": "Você recebe{recurring, select, true { por mês} other {}}",
+            "vat": "O IVA é somado ao seu preço no checkout e pago pelo comprador, então nunca sai do seu lado. O que você recebe é o mesmo, onde quer que ele esteja."
+        }
+    },
+    "payouts": {
+        "expired": "Seu link de configuração expirou, reabrindo o Stripe.",
+        "title": "Repasses",
+        "subtitle": "Para onde vai o dinheiro dos seus templates pagos.",
+        "yourPrice": "Seu preço",
+        "yourPriceValue": "Você define por template, sem IVA",
+        "commission": "Comissão do Rerun",
+        "schedule": "Calendário de repasses",
+        "scheduleValue": "Padrão do Stripe",
+        "planNote": "Os compradores ainda precisam de um plano Rerun ativo para instalar um template, então uma compra libera o template e nada mais.",
+        "states": {
+            "not_started": {
+                "headline": "Receba pelos seus templates",
+                "body": "O Rerun fica com {fee} de cada venda. O resto cai na sua conta bancária pelo Stripe.",
+                "cta": "Configurar repasses"
+            },
+            "incomplete": {
+                "headline": "Conclua sua configuração do Stripe",
+                "body": "O Stripe ainda precisa de alguns dados antes de poder pagar você.",
+                "cta": "Concluir configuração"
+            },
+            "pending_verification": {
+                "headline": "O Stripe está verificando seus dados",
+                "body": "Isso costuma levar alguns minutos. Enquanto isso, você pode continuar criando templates.",
+                "cta": "Ver status"
+            },
+            "restricted": {
+                "headline": "Os repasses estão pausados",
+                "body": "O Stripe restringiu esta conta. Seus templates publicados continuam no ar, mas ninguém pode comprá-los até isso ser resolvido.",
+                "cta": "Resolver no Stripe"
+            },
+            "ready": {
+                "headline": "Você está pronto para receber repasses",
+                "body": "Defina o preço de um template e ele entra à venda depois da nossa revisão. O Rerun fica com {fee} de cada venda.",
+                "cta": "Abrir painel do Stripe"
+            }
+        },
+        "stripeReported": "O Stripe informou: {reason}",
+        "terms": "Ao continuar, você aceita os <link>Termos de Criador do Marketplace</link>, incluindo como reembolsos e estornos são resolvidos.",
+        "sidebar": {
+            "payouts": "Repasses",
+            "revenue": "Receita"
+        },
+        "stateLabels": {
+            "not_started": "Não configurado",
+            "incomplete": "Ação necessária",
+            "pending_verification": "Em análise",
+            "restricted": "Restrito",
+            "ready": "Pronto"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "Um site da empresa",
+                "mcc": "Seu ramo de atividade"
+            },
+            "external_account": "Uma conta bancária",
+            "individual": {
+                "verification": {
+                    "document": "Um documento de identidade",
+                    "additional_document": "Um comprovante de endereço"
+                },
+                "id_number": "Seu número de identidade",
+                "address": {
+                    "line1": "Seu endereço"
+                },
+                "dob": {
+                    "day": "Sua data de nascimento"
+                }
+            },
+            "tos_acceptance": {
+                "date": "Aceitar os termos do Stripe"
+            }
+        },
+        "saleKinds": {
+            "one_time": "Única",
+            "recurring": "Mensal",
+            "refund": "Reembolso"
+        }
+    },
+    "revenue": {
+        "ranges": {
+            "30d": "30 dias",
+            "12m": "12 meses",
+            "all": "Desde o início"
+        },
+        "noAccountTitle": "Nenhuma conta de repasses ainda",
+        "noAccountDescription": "Configure os repasses para começar a vender seus templates.",
+        "setUpPayouts": "Configurar repasses",
+        "title": "Receita",
+        "openDashboard": "Abrir painel do Stripe",
+        "youEarned": "Você recebeu",
+        "noSales": "Nenhuma venda neste período.",
+        "recentSales": "Vendas recentes",
+        "date": "Data",
+        "template": "Template",
+        "type": "Tipo",
+        "sales": "Vendas",
+        "gross": "Bruto",
+        "fee": "Taxa do Rerun",
+        "pending": "Repasse pendente",
+        "available": "Disponível agora",
+        "subscriptions": "{count, plural, one {# assinatura ativa} other {# assinaturas ativas}}",
+        "perMonth": "{amount}/mês"
+    },
+    "categories": {
+        "agencies": "Agências",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Vendas",
+        "recruiting": "Recrutamento",
+        "real-estate": "Imóveis",
+        "legal": "Jurídico e compliance",
+        "creators": "Criadores",
+        "productivity": "Produtividade",
+        "other": "Outros"
+    },
+    "status": {
+        "draft": "Rascunho",
+        "in_review": "Em revisão",
+        "published": "Publicado",
+        "unlisted": "Não listado",
+        "archived": "Arquivado"
+    },
+    "creatorKind": {
+        "studio": "Estúdio",
+        "freelancer": "Freelancer",
+        "expert": "Especialista"
+    },
+    "cta": {
+        "place": "{count, plural, one {Colocar # coworker} other {Colocar # coworkers}}",
+        "placeCaption": "{count, plural, one {Arraste para o seu quadro, pronto para rodar.} other {Arraste para o seu quadro, prontos para rodar.}}",
+        "trialInstall": "Começar teste grátis e instalar",
+        "trialThenSubscribe": "Começar teste grátis e assinar por {price}/mês",
+        "trialThenPay": "Começar teste grátis e pagar {price}",
+        "planInstall": "Assinar por {plan}/mês e instalar",
+        "planThenSubscribe": "Assinar por {plan}/mês e depois por {price}/mês",
+        "planThenPay": "Assinar por {plan}/mês e pagar {price}",
+        "subscribe": "Assinar por {price}/mês",
+        "pay": "Pagar {price}",
+        "payCaption": "Este template, cobrado à parte.",
+        "useTemplate": "Usar este template",
+        "nothingCaptured": "Nenhum coworker foi capturado neste template ainda.",
+        "open": "Abrir {name}",
+        "alreadyOnBoard": "Já está no seu quadro.",
+        "installAgain": "Instalar de novo",
+        "sandboxCannotBuy": "Mude para um workspace para comprar templates.",
+        "trialBilledSeparately": "{terms} Este template é cobrado à parte.",
+        "trialUsedBilledSeparately": "Seu teste grátis já foi usado. Cobrado hoje; este template é cobrado à parte.",
+        "resubscribe": "Assinar de novo por {price}/mês",
+        "lapsed": "Sua assinatura terminou. Os coworkers que este template instalou estão desativados.",
+        "billedTo": "Cobrado de {workspace}. Seu plano Rerun já está ativo.",
+        "yours": "Seu template, sem custo."
+    }
+}

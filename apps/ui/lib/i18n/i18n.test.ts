@@ -18,20 +18,24 @@ describe('resolveLocale', () => {
     it('takes the account first, then the cookie, then the browser', () => {
         expect(resolveLocale({ userLocale: 'es', cookie: 'fr', acceptLanguage: 'en' })).toBe('es')
         expect(resolveLocale({ userLocale: null, cookie: 'fr', acceptLanguage: 'es' })).toBe('fr')
-        expect(resolveLocale({ acceptLanguage: 'de-DE,es;q=0.8,fr;q=0.9' })).toBe('fr')
-        expect(resolveLocale({ acceptLanguage: 'de-DE' })).toBe('en')
+        expect(resolveLocale({ acceptLanguage: 'it-IT,es;q=0.8,fr;q=0.9' })).toBe('fr')
+        expect(resolveLocale({ acceptLanguage: 'it-IT' })).toBe('en')
         expect(resolveLocale({})).toBe('en')
     })
 
     it('ignores what it does not ship', () => {
-        expect(resolveLocale({ userLocale: 'de', cookie: 'xx', acceptLanguage: 'es-MX' })).toBe('es')
+        expect(resolveLocale({ userLocale: 'it', cookie: 'xx', acceptLanguage: 'es-MX' })).toBe('es')
         expect(matchLocale('FR-ca')).toBe('fr')
+        expect(matchLocale('pt-PT')).toBe('pt')
+        expect(matchLocale('de-CH')).toBe('de')
         expect(parseAcceptLanguage('*, fr;q=0')).toBeNull()
     })
 
     it('names each language in its own words', () => {
         expect(localeNativeName('fr')).toBe('Français')
         expect(localeNativeName('es')).toBe('Español')
+        expect(localeNativeName('pt')).toBe('Português')
+        expect(localeNativeName('de')).toBe('Deutsch')
         expect(localeNativeName('en')).toBe('English')
     })
 })

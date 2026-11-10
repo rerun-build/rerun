@@ -63,6 +63,8 @@ describe('in the reader\'s language', () => {
         expect(cron('30 10 * * 1-5')).toBe('En semaine à 10:30')
         expect(cron('0 9-17 * * *')).toBe('Toutes les heures, de 09:00 à 17:00')
         expect(humanCron('0 9 * * *', 'es')).toBe('A las 09:00')
+        expect(humanCron('0 9 * * *', 'pt')).toBe('Às 09:00')
+        expect(humanCron('0 9 * * *', 'de')).toBe('Um 09:00')
     })
 
     it('keeps cronstrue in English for a language without a pack', () => {

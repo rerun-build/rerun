@@ -1,0 +1,122 @@
+{
+    "actions": {
+        "notNow": "Nicht jetzt",
+        "skip": "Überspringen",
+        "connect": "Verbinden",
+        "connecting": "Wird verbunden…",
+        "continue": "Weiter",
+        "loading": "Wird geladen…",
+        "openOnWeb": "Im Web öffnen",
+        "back": "Zurück",
+        "confirm": "Bestätigen",
+        "send": "Senden",
+        "next": "Weiter",
+        "save": "Speichern",
+        "saving": "Wird gespeichert…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {Frage offen} one {Frage offen} other {# Fragen offen}}",
+        "approval": "{count, plural, =0 {Freigabe nötig} one {Freigabe nötig} other {# Freigaben nötig}}",
+        "secret": "{count, plural, =0 {Zugangsdaten nötig} one {Zugangsdaten nötig} other {# Zugangsdaten nötig}}",
+        "mcpNamed": "Bei {name} anmelden",
+        "mcp": "Anmeldung nötig",
+        "service": "{count, plural, =0 {App zu verbinden} one {App zu verbinden} other {# Apps zu verbinden}}",
+        "takeover": "Du bist am Bildschirm dran",
+        "jumpTo": "{label}, hingehen"
+    },
+    "alert": {
+        "label": "Benachrichtigung",
+        "failed": "Konnte nicht als gelesen markiert werden. Versuch es noch einmal.",
+        "marking": "Wird markiert…",
+        "markAsRead": "Als gelesen markieren"
+    },
+    "approval": {
+        "label": "Freigabe erforderlich",
+        "approved": "Freigegeben",
+        "approve": "Freigeben"
+    },
+    "decline": {
+        "placeholder": "Warum nicht? (optional)",
+        "reason": "Grund"
+    },
+    "fallback": {
+        "replyBelow": "Antworte unten oder",
+        "needsYou": "{name} braucht dich"
+    },
+    "steps": {
+        "previous": "Vorheriger Schritt",
+        "next": "Nächster Schritt",
+        "goTo": "Zu Schritt {step} von {count}",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "Anmeldung nötig",
+        "connected": "Verbunden",
+        "signInNeeded": "Anmeldung nötig",
+        "unreachable": "Nicht erreichbar",
+        "customServer": "Eigener MCP-Server",
+        "customServerAt": "Eigener MCP-Server · {host}",
+        "signInTo": "Bei {name} anmelden",
+        "loadFailed": "Dieser Server konnte nicht geladen werden. Verbinde ihn im Web oder überspring ihn."
+    },
+    "question": {
+        "dismiss": "Fragen schließen",
+        "selectAll": "Wähle alle zutreffenden aus",
+        "typeAnswer": "Gib deine Antwort ein…",
+        "somethingElse": "Etwas anderes",
+        "yourAnswer": "Deine Antwort"
+    },
+    "secret": {
+        "labelOne": "Zugangsdaten nötig",
+        "labelMany": "Zugangsdaten nötig",
+        "dismiss": "Anfrage nach Zugangsdaten schließen",
+        "storedAs": "Gespeichert als {key}",
+        "alreadySaved": "Bereits gespeichert. Tippe, um es zu ersetzen",
+        "paste": "Wert einfügen",
+        "whereToFind": "Wo du ihn findest",
+        "storedNote": "Auf deiner Box als Coworker-Variable gespeichert. Wird nie an das Modell gesendet.",
+        "saveFailed": "Die Zugangsdaten konnten nicht gespeichert werden"
+    },
+    "service": {
+        "label": "App zu verbinden",
+        "loadFailed": "Die Apps konnten nicht geladen werden. Verbinde sie im Web oder überspring sie.",
+        "loading": "Apps werden geladen…",
+        "webOnly": "Bei dieser App wählst du das Konto im Web. Verbinde sie dort oder überspring sie.",
+        "connectFailed": "Die App konnte nicht verbunden werden",
+        "connected": "{name} verbunden",
+        "notFound": "Nicht im Katalog gefunden, übersprungen.",
+        "skipped": "Übersprungen."
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "Du hast die Fragen übersprungen",
+            "service": "Du hast die App-Einrichtung geschlossen",
+            "secret": "Du hast die Schlüssel nicht geteilt",
+            "mcp": "Du hast die Anmeldung übersprungen",
+            "takeover": "Du hast den Browser deinem Coworker überlassen"
+        },
+        "answer": "Antwort",
+        "answers": "Antworten",
+        "answeredCount": "{answered} von {total} beantwortet",
+        "skipped": "Übersprungen",
+        "approval": "Freigabe",
+        "approvals": "Freigaben",
+        "approvalCount": "{approved} freigegeben, {declined} nicht jetzt",
+        "approved": "Freigegeben",
+        "notNow": "Nicht jetzt",
+        "quotedNote": "„{note}“",
+        "connected": "Verbunden",
+        "notReconnected": "Nicht neu verbunden",
+        "notFound": "Nicht gefunden",
+        "apps": "Apps",
+        "appsConnected": "{connected} von {total} verbunden",
+        "instead": "{name} (statt {replaced})",
+        "keys": "Schlüssel",
+        "keysStored": "{stored} von {total} gespeichert",
+        "stored": "Gespeichert",
+        "storedOnBox": "Auf der Box gespeichert. Der Coworker sieht nur die Namen.",
+        "mcpServer": "MCP-Server",
+        "handedBackOn": "Du hast den Browser auf {url} zurückgegeben",
+        "handedBack": "Du hast den Browser zurückgegeben"
+    }
+}

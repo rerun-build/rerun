@@ -1,0 +1,57 @@
+{
+    "close": "Fechar",
+    "back": "Voltar",
+    "moreOptions": "Mais opções",
+    "deleteConfirmTitle": "{label}?",
+    "command": {
+        "title": "Paleta de comandos",
+        "description": "Pesquise um comando para executar..."
+    },
+    "combobox": {
+        "placeholder": "Selecione uma opção",
+        "placeholderMultiple": "Selecione opções",
+        "search": "Pesquisar…",
+        "empty": "Nenhum resultado encontrado",
+        "selected": "Selecionados",
+        "remove": "Remover {option}",
+        "reorder": "Reordenar {option}"
+    },
+    "filter": {
+        "search": "Pesquisar {label}…",
+        "empty": "Nenhum resultado",
+        "clear": "Limpar"
+    },
+    "phone": {
+        "code": "Código do país, digite um código ou um país",
+        "noCountry": "Nenhum país encontrado"
+    },
+    "powerBars": "Potência {filled} de {max}",
+    "markdown": {
+        "openEditor": "Abrir o editor completo",
+        "done": "Concluir"
+    },
+    "upload": {
+        "menu": "Enviar",
+        "files": "Enviar arquivos",
+        "folder": "Enviar pasta",
+        "failed": "Falha no envio",
+        "finishing": "Finalizando",
+        "waiting": "Aguardando · {size}",
+        "progress": "Progresso do envio",
+        "uploadingFile": "Enviando {name}",
+        "totalProgress": "Progresso total do envio",
+        "retry": "Tentar de novo",
+        "cancel": "Cancelar",
+        "cancelAll": "Cancelar tudo",
+        "dismiss": "Dispensar",
+        "headingFailed": "Falha no envio de {failed} de {total} arquivos",
+        "headingDone": "{count, plural, one {# arquivo enviado} other {# arquivos enviados}}",
+        "headingUploading": "Enviando {current} de {total}",
+        "more": "+ {count} a mais"
+    },
+    "waveform": {
+        "live": "Forma de onda do áudio ao vivo",
+        "processing": "Processando áudio",
+        "idle": "Forma de onda do áudio inativa"
+    }
+}

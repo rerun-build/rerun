@@ -1,0 +1,63 @@
+{
+    "generic": "Etwas ist schiefgelaufen. Versuch, deine Nachricht erneut zu senden.",
+    "modelAtCapacity": {
+        "title": "Modell ausgelastet",
+        "message": "Dieses Modell hat gerade keine Kapazität. Versuch es gleich noch einmal oder wähle ein anderes Modell."
+    },
+    "titles": {
+        "budget": "Rerun-Guthaben aufgebraucht",
+        "unauthorized": "Verbindung abgemeldet",
+        "overloaded": "Anbieter überlastet",
+        "context_window": "Unterhaltung zu lang",
+        "provider_error": "Das Modell konnte nicht antworten",
+        "thinking_replay": "Die Ausführung konnte nicht fortgesetzt werden",
+        "interrupted": "Ausführung unterbrochen",
+        "run_in_flight": "Diese Unterhaltung ist noch beschäftigt",
+        "session_gone": "Unterhaltung nicht verfügbar"
+    },
+    "messages": {
+        "budget": "Rerun-Guthaben für diesen Zeitraum aufgebraucht. Lade Guthaben auf oder warte auf die monatliche Erneuerung.",
+        "unauthorized": "Diese Verbindung muss neu angemeldet werden, bevor der Coworker arbeiten kann.",
+        "overloaded": "Der Anbieter ist gerade überlastet. Versuch es gleich noch einmal.",
+        "context_window": "Diese Unterhaltung passt nicht mehr ins Modell, und ein erneutes Senden stößt an dieselbe Grenze. Wechsle zu einem Modell mit größerem Kontextfenster oder starte eine neue Unterhaltung.",
+        "provider_error": "Der Modellanbieter hat diese Anfrage abgelehnt, und ein erneutes Senden bringt dieselbe Antwort. Wechsle zu einem anderen Modell, um weiterzumachen.",
+        "thinking_replay": "Die Engine hat diese Runde so wiederholt, dass der Modellanbieter sie ablehnt. Das ist ein Fehler der Engine, nicht des Modells: Ein Modellwechsel hilft nicht. Versuch es erneut und aktualisiere die Engine, falls es wieder passiert.",
+        "interrupted": "Die Ausführung wurde abgebrochen, bevor sie fertig war.",
+        "session_gone": "Dieser Coworker erreicht diese Unterhaltung nicht mehr, daher wurde die Nachricht nicht gesendet. Starte eine neue Unterhaltung, um weiterzumachen."
+    },
+    "limits": {
+        "titles": {
+            "usageLimit": "Nutzungslimit erreicht",
+            "modelUnavailable": "{model} nicht verfügbar",
+            "anyModelUnavailable": "Modell nicht verfügbar",
+            "modelNotInPlan": "{model} ist nicht in deinem {plan}-Tarif",
+            "anyModelNotInPlan": "Modell nicht in deinem {plan}-Tarif",
+            "credits": "{plan}-Nutzungsguthaben aufgebraucht",
+            "spend": "{plan}-Ausgabenlimit erreicht",
+            "window": "{plan}: {window, select, weekly {Wochenlimit} other {Monatslimit}} erreicht",
+            "model": "{plan}-Limit für {model} erreicht",
+            "claudeSession": "{plan}-Sitzungslimit erreicht",
+            "usage": "{plan}-Nutzungslimit erreicht",
+            "opencodeCredits": "OpenCode-Guthaben aufgebraucht",
+            "opencodeWindow": "OpenCode Go: {window, select, weekly {Wochenlimit} other {Monatslimit}} erreicht",
+            "opencode": "OpenCode-Go-Limit erreicht"
+        },
+        "messages": {
+            "opencodeCredits": "Kein Console-Guthaben mehr. Lade Guthaben auf opencode.ai auf oder wähle ein Go-Modell, um weiterzumachen.",
+            "opencodeWindowResets": "Dein OpenCode-Go-Tarif hat sein {window, select, weekly {Wochenlimit} monthly {Monatslimit} other {5-Stunden-Limit}} erreicht. Es wird {resetsAt} zurückgesetzt; wechsle bis dahin zu einem Console-Modell oder einem anderen Anbieter.",
+            "opencodeWindow": "Dein OpenCode-Go-Tarif hat sein {window, select, weekly {Wochenlimit} monthly {Monatslimit} other {5-Stunden-Limit}} erreicht. Wechsle zu einem Console-Modell oder einem anderen Anbieter, bis es zurückgesetzt wird.",
+            "modelUnavailable": "Diese Verbindung kann {model} nicht ausführen. Wähle ein anderes Modell, um weiterzumachen.",
+            "anyModelUnavailable": "Diese Verbindung kann dieses Modell nicht ausführen. Wähle ein anderes Modell, um weiterzumachen.",
+            "modelNotInPlan": "Dein {plan}-Tarif enthält {model} nicht. Wähle ein anderes Modell, um weiterzumachen.",
+            "anyModelNotInPlan": "Dein {plan}-Tarif enthält dieses Modell nicht. Wähle ein anderes Modell, um weiterzumachen.",
+            "usageLimit": "Dieses Abo hat sein Nutzungslimit erreicht. Wechsle zu einem anderen Modell oder warte, bis das Limit zurückgesetzt wird.",
+            "credits": "Dein {plan}-Tarif hat sein Nutzungsguthaben aufgebraucht. Wähle ein Modell aus deinem Tarif, um weiterzumachen.",
+            "spend": "Deine Organisation hat ihr monatliches {plan}-Ausgabenlimit erreicht. Ein Admin kann es erhöhen; stell diesen Coworker solange auf ein anderes Modell um.",
+            "weeklyResets": "Dein {plan}-Tarif hat sein Wochenlimit erreicht. Es wird {resetsAt} zurückgesetzt; stell diesen Coworker bis dahin auf ein anderes Modell um.",
+            "weekly": "Dein {plan}-Tarif hat sein Wochenlimit erreicht. Stell diesen Coworker auf ein anderes Modell um, bis die neue Woche beginnt.",
+            "model": "Dein {plan}-Tarif hat sein Limit für {model} erreicht. Die anderen {plan}-Modelle laufen weiter: Wechsle zu einem davon.",
+            "sessionResets": "Dein {plan}-Tarif hat sein aktuelles Nutzungsfenster aufgebraucht. Es füllt sich um {resetsAt} wieder auf; stell diesen Coworker solange auf ein anderes Modell um.",
+            "session": "Dein {plan}-Tarif hat sein aktuelles Nutzungsfenster aufgebraucht. Es füllt sich von selbst wieder auf; stell diesen Coworker solange auf ein anderes Modell um."
+        }
+    }
+}

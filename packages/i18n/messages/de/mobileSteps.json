@@ -1,0 +1,42 @@
+{
+    "group": {
+        "steps": "{count, plural, one {# Schritt} other {# Schritte}}",
+        "stepsWithFailures": "{count, plural, one {# Schritt} other {# Schritte}}, {failed} fehlgeschlagen",
+        "failed": "{failed} fehlgeschlagen"
+    },
+    "tool": {
+        "input": "Eingabe",
+        "error": "Fehler",
+        "output": "Ausgabe",
+        "completedInMs": "Fertig in {ms} ms",
+        "completedInSeconds": "Fertig in {seconds} s"
+    },
+    "reasoning": {
+        "thinking": "Denkt nach...",
+        "thought": "Gedanke"
+    },
+    "compaction": {
+        "running": "Kontext wird komprimiert…",
+        "failed": "Komprimierung fehlgeschlagen",
+        "done": "Kontext komprimiert",
+        "summarized": "{count} frühere Nachrichten zusammengefasst",
+        "recovered": "~{count} Tokens freigegeben"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {# Fehler} other {# Fehler}}",
+        "idle": "Seit {minutes} Min. inaktiv",
+        "stop": "Aufgabe stoppen",
+        "failed": "Fehlgeschlagen",
+        "stopped": "Gestoppt, Teilergebnis behalten",
+        "earlier": "+{count} frühere",
+        "verbs": {
+            "web_search": "Sucht {summary}",
+            "web_fetch": "Liest {summary}",
+            "browser_navigate": "Öffnet {summary}",
+            "shell_exec": "Führt {summary} aus",
+            "fs_read": "Liest {summary}",
+            "fs_write": "Schreibt {summary}",
+            "fs_edit": "Bearbeitet {summary}"
+        }
+    }
+}

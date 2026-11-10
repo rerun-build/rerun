@@ -1,0 +1,332 @@
+{
+    "hub": {
+        "eyebrow": "Branchen",
+        "title": "KI-Coworker für deine Branche",
+        "headline": "Finde die Coworker für dein Geschäft.",
+        "description": "Agenturen, Freelancer, E-Commerce, Immobilien, Startups, SaaS, Recht und Recruiting: die acht Coworker, die jede Branche zuerst einstellt, und warum.",
+        "gridLabel": "{count, plural, one {# Branche} other {# Branchen}}",
+        "gridTitle": "Fang bei dem an, was du wirklich tust.",
+        "gridLede": "Jede Seite zeigt die acht Coworker, die diese Branche zuerst einstellt."
+    },
+    "page": {
+        "breadcrumbLabel": "Brotkrümelnavigation",
+        "breadcrumbRoot": "Branchen",
+        "wallLabel": "Wen du einstellst",
+        "wallLede": "Jeder ist eine Vorlage aus der Bibliothek: installieren, Apps verbinden, und er legt los.",
+        "painsLabel": "Wo es wehtut",
+        "proofLabel": "Warum es funktioniert",
+        "proofTitle": "Was ein Coworker hat, das ein Chatfenster nicht hat.",
+        "faqLabel": "FAQ",
+        "faqTitle": "{industry} mit Rerun: deine Fragen.",
+        "othersLabel": "Andere Branchen",
+        "othersTitle": "Nicht ganz dein Geschäft?",
+        "othersLink": "Alle Branchen",
+        "notFoundTitle": "Branche nicht gefunden"
+    },
+    "industries": {
+        "agencies": {
+            "crumb": "Agenturen",
+            "title": "KI-Coworker für Agenturen.",
+            "lede": "Die Arbeit, die sich bei jedem Kunden wiederholt (Akquise, SEO-Audits, der wöchentliche Kundenbericht, das Nachhaken bei offenen Rechnungen), übernommen von Coworkern, die sie in deinen eigenen Tools erledigen und dir berichten.",
+            "metaTitle": "KI-Agenten für Agenturen: Akquise, SEO, Kundenberichte",
+            "metaDescription": "Agenturen wiederholen bei jedem Kunden dieselbe Arbeit. Stell KI-Coworker ein für Akquise, SEO-Audits, Social Posts, Kundenberichte und offene Rechnungen.",
+            "wallTitle": "Acht Coworker, die eine Agentur zuerst einstellen würde.",
+            "templatesLink": "Vorlagen für Agenturen",
+            "painsTitle": "Was eine Agentur nicht mehr von Hand macht.",
+            "pains": {
+                "1": {
+                    "title": "Neugeschäft zwischen zwei Lieferungen",
+                    "body": "Akquise fällt als Erstes weg, wenn ein Projekt in Verzug ist. Ein Coworker baut und schreibt die Liste weiter, ob die Woche ruhig ist oder nicht."
+                },
+                "2": {
+                    "title": "Derselbe Bericht, mal zwölf Kunden",
+                    "body": "Zahlen ziehen, kommentieren, verschicken, ein Deck pro Kunde. Die Arbeit ist jeden Monat gleich, und niemand will sie machen."
+                },
+                "3": {
+                    "title": "Rechnungen, bei denen sich keiner nachzuhaken traut",
+                    "body": "Die Mahnung, die an Tag 31 rausgehen sollte, geht an Tag 60 raus. Ein Coworker schickt sie an Tag 31, in deinen Worten."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Kann ich jeden Kunden getrennt halten?",
+                    "answer": "Ja, und das solltest du. Gib jedem Kunden einen eigenen Workspace: eigene Coworker, eigene verbundene Apps, eigenes Brain. Nichts wandert von einem Kunden zum anderen, und du wechselst über die Pille in der Ecke."
+                },
+                "2": {
+                    "question": "Klingt die Arbeit nach uns oder nach einem Roboter?",
+                    "answer": "Dein Tonfall, dein Angebot und deine Regeln stehen im Brain des Workspace, und jeder Coworker liest sie, bevor er schreibt. In einem Kunden-Workspace ist das der Ton des Kunden, nicht deiner."
+                },
+                "3": {
+                    "question": "Zahle ich pro Kunde oder pro Person?",
+                    "answer": "Weder noch. Der Tarif gilt für den Workspace, und Plätze sind kostenlos, also kann das ganze Team, und auch der Kunde, wenn du willst, lesen, was die Coworker getan haben, und antworten, wenn einer fragt."
+                }
+            }
+        },
+        "freelancers": {
+            "crumb": "Freelancer",
+            "title": "KI-Coworker für Freelancer.",
+            "lede": "Du bist Lieferung, Vertrieb und Buchhaltung in einem. Gib die letzten beiden an Coworker ab, die arbeiten, während du an einem Kundenprojekt sitzt.",
+            "metaTitle": "KI-Agenten für Freelancer: Vertrieb, Postfach, Rechnungen, Content",
+            "metaDescription": "Du bist Lieferung, Vertrieb und Buchhaltung in einem. Stell KI-Coworker ein für Akquise, Postfach-Sortierung, Nachfassen, Rechnungen und Content.",
+            "wallTitle": "Acht Coworker, die dir deine Abende zurückgeben.",
+            "templatesLink": "Vorlagen für Produktivität",
+            "painsTitle": "Was ein Ein-Personen-Unternehmen immer wieder fallen lässt.",
+            "pains": {
+                "1": {
+                    "title": "Der Vertrieb stoppt, wenn du viel zu tun hast",
+                    "body": "Die Pipeline leert sich genau dann, wenn das aktuelle Projekt endet, weil währenddessen niemand akquiriert hat. Ein Coworker akquiriert währenddessen."
+                },
+                "2": {
+                    "title": "Rechnungen, bei denen niemand nachhakt",
+                    "body": "Einen Kunden daran zu erinnern, dass er dir Geld schuldet, schiebst du immer auf morgen. Es kostet nichts, das einen Coworker pünktlich erledigen zu lassen."
+                },
+                "3": {
+                    "title": "Ein Postfach, das du fünfmal am Tag liest",
+                    "body": "Drei Nachrichten brauchen wirklich dich. Ein Coworker sagt dir, welche drei, und entwirft die Antworten für den Rest."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Lohnt sich das für eine Person?",
+                    "answer": "Genau dafür ist es gebaut: die Aufgaben, für die ein Freelancer jemanden einstellen würde, wenn es sich lohnte: ein halber Tag Akquise, eine Stunde Rechnungen, das Postfach. Ein Tarif deckt alles ab."
+                },
+                "2": {
+                    "question": "Funktioniert es, während mein Laptop zu ist?",
+                    "answer": "Ja. Deine Coworker laufen auf einer Maschine in der Cloud, in Europa. Die Ausführung am Montagmorgen findet statt, ob du am Schreibtisch sitzt, beim Kunden bist oder unterwegs."
+                },
+                "3": {
+                    "question": "Kann es ohne Nachfrage in meinem Namen etwas verschicken?",
+                    "answer": "Nur so weit, wie du es zulässt. Ein Coworker kann ohne Freigabe kein Geld ausgeben, und du legst in seinen Anweisungen fest, ob er selbst verschickt oder dir einen Entwurf gibt."
+                }
+            }
+        },
+        "ecommerce": {
+            "crumb": "E-Commerce",
+            "title": "KI-Coworker für E-Commerce.",
+            "lede": "Was dein Shop diese Woche gemacht hat, was bald ausverkauft ist, welche Warenkörbe noch zu retten sind und was deine Konkurrenz gerade geändert hat: jeden Tag gelesen, umgesetzt und dir in einer Nachricht berichtet.",
+            "metaTitle": "KI-Agenten für E-Commerce: Bestellungen, Lager, Warenkörbe, Konkurrenz",
+            "metaDescription": "Stell KI-Coworker ein, die deinen Shop jede Woche auswerten, knappen Bestand früh erkennen, Warenkörbe retten, Konkurrenzpreise beobachten und schwache Seiten verbessern.",
+            "wallTitle": "Acht Coworker für einen Shop, der nie schließt.",
+            "templatesLink": "Vorlagen für E-Commerce",
+            "painsTitle": "Was ein Shopbetreiber zu spät erfährt.",
+            "pains": {
+                "1": {
+                    "title": "Der Bestseller, der am Freitag ausverkauft war",
+                    "body": "Niemand hat auf den Bestand geschaut, bis die Bestellungen ausblieben. Ein Coworker schaut jeden Tag und sagt es dir eine Woche vorher."
+                },
+                "2": {
+                    "title": "Ein Konkurrenzpreis, von dem du durch einen Kunden erfährst",
+                    "body": "Ihre Aktion lief seit Montag, und du hast am Donnerstag davon gehört, in einer Bewertung. Ein Coworker liest ihre Seiten für dich."
+                },
+                "3": {
+                    "title": "Abgebrochene Warenkörbe ohne Nachfassen",
+                    "body": "Die Sequenz, die du bauen wolltest, ist immer noch eine Notiz. Ein Coworker segmentiert nach dem, was wirklich gekauft wurde, und schreibt die Nachricht."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Verbindet es sich mit Shopify und meinen anderen Tools?",
+                    "answer": "Shopify, Stripe, deine E-Mail-Plattform, deine Werbekonten, deine Tabellen und über 3.000 weitere Tools. Auch ein Backoffice ohne API ist erreichbar: Der Coworker öffnet es auf seinem eigenen Bildschirm und klickt sich durch."
+                },
+                "2": {
+                    "question": "Kann ein Coworker selbst Preise ändern oder eine Kampagne senden?",
+                    "answer": "Ausgaben sind gesperrt: Ohne ein Ja kann er weder Werbung noch sonst etwas kaufen. Den Rest entscheidest du: Lass ihn die Kampagne entwerfen, damit du sie sendest, oder lass ihn senden und berichten."
+                },
+                "3": {
+                    "question": "Wie schnell kennt er meinen Katalog?",
+                    "answer": "Er liest ihn bei der ersten Ausführung und behält das Wichtige im Brain des Workspace: dein Sortiment, deine Margen, deinen Ton. Jeder Coworker, den du danach einstellst, startet von denselben Seiten."
+                }
+            }
+        },
+        "real-estate": {
+            "crumb": "Immobilien",
+            "title": "KI-Coworker für Immobilien.",
+            "lede": "Eigentümer, die wahrscheinlich verkaufen, Anfragen in Minuten beantwortet, Exposés geschrieben, solange die Besichtigung frisch ist, Mieten, die sich selbst einfordern. Die Arbeit, die die Woche eines Maklers füllt, erledigt von Coworkern.",
+            "metaTitle": "KI-Agenten für Immobilien: Verkäufer, Leads, Exposés, Vermietung",
+            "metaDescription": "Stell KI-Coworker ein, die verkaufsbereite Eigentümer finden, jede Anfrage qualifizieren, das Exposé schreiben, mit echten Vergleichswerten bepreisen und Mieten nachhalten.",
+            "wallTitle": "Acht Coworker für ein Maklerbüro, das keinen Lead verpasst.",
+            "templatesLink": "Vorlagen für Immobilien",
+            "painsTitle": "Wo ein Maklerbüro den Auftrag verliert.",
+            "pains": {
+                "1": {
+                    "title": "Die Anfrage, drei Stunden zu spät beantwortet",
+                    "body": "Wer zuerst antwortet, bekommt die Besichtigung. Ein Coworker antwortet in Minuten, stellt die Qualifizierungsfragen und trägt den Termin ein."
+                },
+                "2": {
+                    "title": "Ein Preis aus dem Gedächtnis begründet",
+                    "body": "Der Eigentümer will eine Zahl und einen Grund. Ein Coworker baut den Vergleich vor dem Termin aus dem, was in der Nähe wirklich verkauft wurde."
+                },
+                "3": {
+                    "title": "Eine Pipeline von Eigentümern, die du nie kontaktiert hast",
+                    "body": "Die Signale sind öffentlich: abgelaufene Inserate, Erbfälle, lange Vermarktungszeit. Ein Coworker liest sie jede Woche und sortiert, wen du anrufen solltest."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Funktioniert es mit meinem CRM?",
+                    "answer": "Wenn dein CRM eine API oder einen MCP-Server hat, lässt es sich anbinden. Ist es ein altes Portal ohne beides, öffnet der Coworker es auf seinem eigenen Bildschirm und füllt es aus, wie du es tun würdest."
+                },
+                "2": {
+                    "question": "Kann es Leads in meinem Namen beantworten?",
+                    "answer": "Ja, und du legst fest, wie weit es geht: nur Entwürfe oder senden und Termine buchen. So oder so bleibt der Verlauf lesbar, und alles, wobei er unsicher war, kommt zu dir."
+                },
+                "3": {
+                    "question": "Sind die Marktdaten verlässlich?",
+                    "answer": "Ein Coworker nennt, was er verwendet hat. Er baut den Vergleich aus den Inseraten und Transaktionen, die er wirklich gelesen hat, und du siehst die Quellen neben der Zahl statt einer Zahl aus dem Nichts."
+                }
+            }
+        },
+        "startups": {
+            "crumb": "Startups",
+            "title": "KI-Coworker für Startups.",
+            "lede": "Fünf Leute machen die Arbeit von fünfzehn. Stell Coworker ein für die Aufgaben, für die du noch keine Stelle rechtfertigen kannst: Demos gebucht, Pipeline ausgewertet, Launch vorbereitet, Kennzahlen am Montag im Postfach.",
+            "metaTitle": "KI-Agenten für Startups: Pipeline, Launches, Kennzahlen, Support",
+            "metaDescription": "Ein kleines Team kann nicht für jede Aufgabe einstellen. Stell KI-Coworker ein, die Demos buchen, die Pipeline auswerten, den Launch vorbereiten und montags berichten.",
+            "wallTitle": "Acht Coworker für die Rollen, die du noch nicht besetzen kannst.",
+            "templatesLink": "Vorlagen für SaaS",
+            "painsTitle": "Wofür ein kleines Team keine Zeit hat.",
+            "pains": {
+                "1": {
+                    "title": "Rollen, für die niemand zuständig ist",
+                    "body": "Outbound, Release Notes, die Zahlen der Woche. Alle finden sie wichtig, und niemand hat den Tag dafür."
+                },
+                "2": {
+                    "title": "Zahlen, montags von Hand gezogen",
+                    "body": "Jemand exportiert, kopiert, kommentiert, postet. Vierzig Minuten pro Woche, die ein Coworker um 7 Uhr kostenlos erledigt."
+                },
+                "3": {
+                    "title": "Launches, die an Kleinigkeiten scheitern",
+                    "body": "Die Botschaft, das Changelog, die E-Mail, der Post. Ein Coworker entwirft alles aus der Spezifikation, während du baust."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Wie lange, bis ein Coworker nützlich ist?",
+                    "answer": "Minuten, wenn du mit einer Vorlage startest: Du verbindest die Apps, prüfst den Zeitplan, und er legt los. Einen aus deiner eigenen Beschreibung zu bauen, dauert etwa so lange, wie die Aufgabe aufzuschreiben."
+                },
+                "2": {
+                    "question": "Kann das ganze Team es nutzen?",
+                    "answer": "Ja, und es kostet nichts extra: Plätze sind kostenlos. Alle sehen dasselbe Board, können einem Coworker Arbeit geben und antworten, wenn einer um ein Ja bittet."
+                },
+                "3": {
+                    "question": "Ersetzt es unsere Automatisierungstools?",
+                    "answer": "Es ersetzt die, die du ständig pflegst. Einem Coworker beschreibst du die Aufgabe, statt einen Ablauf zu zeichnen, also bricht ihn ein neues Feld oder eine umbenannte Spalte nicht wie einen Knotengraphen."
+                }
+            }
+        },
+        "saas": {
+            "crumb": "SaaS",
+            "title": "KI-Coworker für SaaS-Teams.",
+            "lede": "Die Signale, die du nur liest, wenn etwas kaputtgeht (sinkende Nutzung bei einem Schlüsselkunden, dieselbe Anfrage in fünf Tickets, Bugs, die sich vor dem Standup stapeln), jeden Tag gelesen von Coworkern, die sie dir bringen.",
+            "metaTitle": "KI-Agenten für SaaS: Abwanderung, Feedback, Releases, Kennzahlen",
+            "metaDescription": "Stell KI-Coworker ein, die abwanderungsgefährdete Kunden aufzeigen, Feedback zu Themen bündeln, Bugs sortieren, Release Notes schreiben und Kennzahlen berichten.",
+            "wallTitle": "Acht Coworker für Produkt- und Umsatzarbeit.",
+            "templatesLink": "Vorlagen für SaaS",
+            "painsTitle": "Die Signale, die ein SaaS-Team zu spät liest.",
+            "pains": {
+                "1": {
+                    "title": "Abwanderung, die du am Verlängerungstag siehst",
+                    "body": "Die Nutzung ist vor acht Wochen gesunken, und niemand hat hingeschaut. Ein Coworker beobachtet die Kunden und sagt es dir, solange noch Zeit ist."
+                },
+                "2": {
+                    "title": "Feedback, verstreut über vier Tools",
+                    "body": "Tickets, Calls, die Community, die Bewertungen. Ein Coworker liest alles und bringt zurück, was immer wieder auftaucht, mit Zitaten."
+                },
+                "3": {
+                    "title": "Releases ohne Release Notes",
+                    "body": "Die Änderungen stehen in den PRs, und die Kunden erfahren nie davon. Ein Coworker schreibt die Notes aus dem, was wirklich ausgeliefert wurde."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Woher liest es unsere Nutzungs- und Abrechnungsdaten?",
+                    "answer": "Aus den Tools, die du schon nutzt: Stripe, deine Datenbank oder dein Warehouse, deine Produktanalyse, dein Support-Desk. Du verbindest sie einmal, und jeder Coworker im Workspace kann sie lesen."
+                },
+                "2": {
+                    "question": "Kann es in unseren Issue-Tracker schreiben?",
+                    "answer": "Ja. Einen Bug sortieren heißt: Duplikate entfernen, Kontext ergänzen und ihn dort ablegen, wo dein Team wirklich schaut: Linear, Jira, GitHub, Notion."
+                },
+                "3": {
+                    "question": "Werden unsere Daten zum Training eines Modells genutzt?",
+                    "answer": "Nein. Dein Workspace läuft auf einer eigenen Maschine in Europa, und was deine Coworker lesen, bleibt dort. Du kannst auch den Claude- oder ChatGPT-Tarif verbinden, den du schon bezahlst, und deine bestehende Modellbeziehung behalten."
+                }
+            }
+        },
+        "legal": {
+            "crumb": "Recht & Compliance",
+            "title": "KI-Coworker für Recht und Compliance.",
+            "lede": "Die Lektüre, für die niemand Zeit hat: Verträge gegen deine eigenen Regeln geprüft, Pflichten und Kündigungsfristen herausgezogen, regulatorische Änderungen erklärt, Audit-Nachweise gesammelt. Immer zur Freigabe durch einen Menschen.",
+            "metaTitle": "KI-Agenten für Recht und Compliance: Verträge und Audits",
+            "metaDescription": "Stell KI-Coworker ein, die Verträge gegen deine Regeln prüfen, Pflichten und Verlängerungsdaten herausziehen, Regulierung verfolgen und Audit-Nachweise sammeln.",
+            "wallTitle": "Acht Coworker für den Papierkram, den niemand rechtzeitig liest.",
+            "templatesLink": "Vorlagen für Recht & Compliance",
+            "painsTitle": "Wo das Risiko wirklich liegt.",
+            "pains": {
+                "1": {
+                    "title": "Eine Kündigungsfrist, um eine Woche verpasst",
+                    "body": "Die Klausel stand auf Seite neun, und das Datum war in niemandes Kalender. Ein Coworker zieht jedes Verlängerungsdatum heraus und warnt dich vor Fristende."
+                },
+                "2": {
+                    "title": "Verträge ohne zweiten Blick unterschrieben",
+                    "body": "Der Vertrieb brauchte ihn gestern. Ein Coworker liest ihn gegen deine eigenen Regeln und markiert nur, was deine Zeit verdient."
+                },
+                "3": {
+                    "title": "Ein Audit mit Dokumentensuche verbracht",
+                    "body": "Die Nachweise existieren, in sechs Laufwerken und einem Postfach. Ein Coworker findet sie, benennt sie und ordnet sie jeder Anforderung zu."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Gibt ein Coworker Rechtsberatung?",
+                    "answer": "Nein. Er liest, extrahiert und markiert, und jedes Ergebnis ist für die Prüfung durch eine qualifizierte Person geschrieben. Er zeigt dir, woher im Dokument jeder Punkt stammt, damit du ihn in Sekunden prüfen kannst."
+                },
+                "2": {
+                    "question": "Wo liegen die Dokumente?",
+                    "answer": "In deinen eigenen Laufwerken und Tools, die der Coworker mit dem Zugriff liest, den du ihm gibst. Seine Maschine steht in Europa, und die Dateien bleiben in deinem Workspace."
+                },
+                "3": {
+                    "question": "Können wir unsere eigenen Klauselstandards hinterlegen?",
+                    "answer": "Ja. Deine Positionen, deine roten Linien und deine Ausweichformulierungen kommen ins Brain des Workspace, und der Coworker prüft gegen sie statt gegen eine generische Checkliste."
+                }
+            }
+        },
+        "recruiting": {
+            "crumb": "Recruiting & HR",
+            "title": "KI-Coworker für Recruiting und HR.",
+            "lede": "Jede Bewerbung auf dieselbe Weise gegen die Stelle gelesen, Interviews aus dem Lebenslauf vorbereitet, Feedbackrunden in eine Entscheidung verwandelt, und kein Kandidat bleibt ohne Antwort.",
+            "metaTitle": "KI-Agenten für Recruiting: Screening, Interviews, Nachfassen",
+            "metaDescription": "Stell KI-Coworker ein, die jede Bewerbung gegen die Stelle prüfen, Lebensläufe mit Belegen zusammenfassen, Interviews vorbereiten und Kandidaten informiert halten.",
+            "wallTitle": "Acht Coworker für einen Einstellungsprozess, der seine Versprechen hält.",
+            "templatesLink": "Vorlagen für Recruiting",
+            "painsTitle": "Wo ein Einstellungsprozess verstummt.",
+            "pains": {
+                "1": {
+                    "title": "Zweihundert Bewerbungen, ein Nachmittag",
+                    "body": "Die letzten fünfzig bekommen je dreißig Sekunden. Ein Coworker liest alle nach denselben Kriterien und zeigt seine Belege."
+                },
+                "2": {
+                    "title": "Kandidaten, die nie etwas hören",
+                    "body": "Nicht aus Unhöflichkeit, sondern wegen der Menge. Ein Coworker hält jeden Kandidaten in jeder Phase auf dem Laufenden, in deinen Worten."
+                },
+                "3": {
+                    "title": "Feedbackrunden, aus denen nie eine Entscheidung wird",
+                    "body": "Vier Notizen in vier Formaten. Ein Coworker macht daraus Belege, offene Fragen und einen Vergleich mit der Stelle."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Entscheidet ein Coworker, wer eingestellt wird?",
+                    "answer": "Nein. Er liest nach den Kriterien, die du geschrieben hast, und zeigt die Belege hinter jedem Punkt, auch was er nicht prüfen konnte. Die Shortlist ist eine Einschätzung, und die Entscheidung bleibt bei deinem Team."
+                },
+                "2": {
+                    "question": "Wie geht es mit Bewerberdaten um?",
+                    "answer": "Er liest die Bewerbungen in den Tools, die du verbindest, und arbeitet auf einer Maschine in Europa, die deinem Workspace gehört. Nichts wird in einen gemeinsamen Pool kopiert."
+                },
+                "3": {
+                    "question": "Kann es in unser ATS schreiben?",
+                    "answer": "Wenn dein ATS eine API oder einen MCP-Server hat, ja. Wenn nicht, öffnet der Coworker es auf seinem eigenen Bildschirm und füllt es aus, wie eine Person es tun würde."
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,560 @@
+{
+    "jobs": {
+        "bookkeeper": "Buchhaltung",
+        "executiveAssistant": "Assistenz",
+        "contentMarketer": "Content-Marketing",
+        "outreach": "Outreach",
+        "sdr": "SDR",
+        "customerSupport": "Kundensupport",
+        "seoWriter": "SEO-Texter",
+        "cashController": "Cash-Controller",
+        "officeManager": "Office-Manager",
+        "salesRep": "Vertrieb",
+        "socialManager": "Social-Media-Manager",
+        "newsletterWriter": "Newsletter-Texter"
+    },
+    "heroSuggestions": {
+        "leads": {
+            "title": "Lead-Scraping",
+            "description": "Jeden Morgen eine frische Liste mit Leads.",
+            "name": "Lead-Finder",
+            "kickoff": "Finde jeden Morgen neue Leads und füge sie meiner Liste hinzu"
+        },
+        "ads": {
+            "title": "Anzeigen & Umsatz",
+            "description": "Was du kürzen und was du ausbauen solltest, aus deinen eigenen Zahlen.",
+            "name": "Ads-Wächter",
+            "kickoff": "Behalte Werbebudget und Umsatz im Blick und sag mir, was weg kann"
+        },
+        "inbound": {
+            "title": "Inbound-Antworten",
+            "description": "Neue Leads beantwortet, solange sie noch warm sind.",
+            "name": "Lead-Responder",
+            "kickoff": "Antworte neuen Leads in Minuten, nicht in Stunden"
+        },
+        "seo": {
+            "title": "SEO-Texter",
+            "description": "Ein Artikel pro Woche, recherchiert, geschrieben und veröffentlicht.",
+            "name": "SEO-Texter",
+            "kickoff": "Schreib und veröffentliche jeden Montag einen Artikel"
+        }
+    },
+    "boards": {
+        "crew": {
+            "label": "Workspaces",
+            "invite": "Teammitglieder einladen"
+        }
+    },
+    "plan": {
+        "cards": {
+            "model": {
+                "title": "Bring dein eigenes Modell mit",
+                "body": "Verbinde dein eigenes Claude- oder ChatGPT-Abo, deine API-Schlüssel oder das inklusive Rerun Guthaben."
+            },
+            "team": {
+                "title": "Für Teams gemacht",
+                "body": "Lade dein ganzes Team kostenlos ein, ohne Zusatzgebühren."
+            },
+            "runs": {
+                "title": "Aufgaben und Trigger planen",
+                "body": "Jeden Morgen, jeden Montag oder wenn eine App sich meldet."
+            }
+        },
+        "machine": {
+            "connected": "Verbunden",
+            "usage": "Sitzung zu 23 % genutzt, Reset in 2 Std.",
+            "subscriptions": "Deine Abos",
+            "keys": "Deine API-Schlüssel"
+        },
+        "sources": {
+            "claude": {
+                "name": "Claude Pro oder Max",
+                "hint": "Mit deinem Claude-Konto angemeldet"
+            },
+            "chatgpt": {
+                "name": "ChatGPT Plus oder Pro",
+                "hint": "Mit deinem ChatGPT-Konto angemeldet"
+            },
+            "anthropic": {
+                "name": "Anthropic",
+                "hint": "Claude-Modelle, pro Token abgerechnet"
+            },
+            "openai": {
+                "name": "OpenAI",
+                "hint": "GPT-Modelle, pro Token abgerechnet"
+            },
+            "google": {
+                "name": "Google",
+                "hint": "Gemini-Modelle, pro Token abgerechnet"
+            },
+            "openrouter": {
+                "name": "OpenRouter",
+                "hint": "Jedes Modell hinter einem Schlüssel"
+            }
+        },
+        "composer": "Finde 30 CFOs bei Logistikfirmen in Dubai.",
+        "members": {
+            "title": "Mitglieder",
+            "lead": "Lade Teammitglieder ein, um in diesem Workspace zusammenzuarbeiten.",
+            "field": "Per E-Mail einladen",
+            "action": "Einladen",
+            "owner": "Inhaber",
+            "pending": "Ausstehend"
+        },
+        "routines": {
+            "title": "Routinen",
+            "action": "Neu",
+            "items": {
+                "invoices": {
+                    "name": "Offene Rechnungen anmahnen",
+                    "when": "Werktags um 07:00 · Europe/Paris",
+                    "badge": "in 34 Min."
+                },
+                "payment": {
+                    "name": "Fehlgeschlagene Zahlung melden",
+                    "when": "Wenn Stripe den Webhook aufruft",
+                    "badge": "wartet"
+                },
+                "drafts": {
+                    "name": "Die drei Entwürfe von heute posten",
+                    "when": "Jeden Tag um 11:30",
+                    "badge": "11:30"
+                },
+                "welcome": {
+                    "name": "Neuen Kunden begrüßen",
+                    "when": "Wenn dein CRM den Webhook aufruft",
+                    "badge": "wartet"
+                },
+                "ranking": {
+                    "name": "Wöchentlicher Ranking-Bericht",
+                    "when": "Jeden Freitag um 09:00",
+                    "badge": "Fr 09:00"
+                },
+                "close": {
+                    "name": "Monatsabschluss",
+                    "when": "Am letzten Tag des Monats um 18:00",
+                    "badge": "31.10."
+                }
+            }
+        },
+        "schedule": {
+            "repeat": "Wiederholen",
+            "every": "Jeden Werktag",
+            "hook": "Webhook-URL",
+            "next": "Nächste Ausführung heute um 07:00",
+            "save": "Speichern"
+        }
+    },
+    "steps": {
+        "label": "So geht es los",
+        "title": "Drei einfache Schritte, <br></br>kostenlos starten.",
+        "items": {
+            "connect": {
+                "title": "Verbinde, wofür du schon zahlst",
+                "body": "Dein Claude- oder ChatGPT-Konto, eine Anmeldung. Oder ein Schlüssel oder das Guthaben, das im Plan enthalten ist."
+            },
+            "hire": {
+                "title": "Stell einen Coworker ein",
+                "body": "Wähle einen fertigen aus und beantworte seine Fragen. Oder beschreib den Job in einem Satz."
+            },
+            "run": {
+                "title": "Coworker erledigen den Job",
+                "body": "Nach Zeitplan, per Trigger oder auf Abruf, für jede Aufgabe, die du einem Kollegen geben würdest."
+            }
+        },
+        "rail": {
+            "board": "Board",
+            "hire": "Neuer Coworker",
+            "inbox": "Posteingang",
+            "brain": "Brain",
+            "providers": "KI-Anbieter"
+        },
+        "connect": {
+            "label": "KI-Anbieter",
+            "description": "Die Abos und API-Schlüssel, mit denen deine Coworker laufen.",
+            "subscriptions": "Deine Abos",
+            "keys": "Deine API-Schlüssel",
+            "ready": "Bereit",
+            "connect": "Verbinden",
+            "connecting": "Wird verbunden",
+            "sources": {
+                "chatgpt": {
+                    "name": "ChatGPT-Abo",
+                    "summary": "Codex, mit deinem eigenen Abo."
+                },
+                "claude": {
+                    "name": "Claude-Abo",
+                    "summary": "Claude Code, mit deinem eigenen Abo."
+                },
+                "google": {
+                    "name": "Google-API-Schlüssel",
+                    "summary": "Gemini-Modelle, pro Token abgerechnet."
+                },
+                "openrouter": {
+                    "name": "OpenRouter-API-Schlüssel",
+                    "summary": "Jedes Modell hinter einem Schlüssel."
+                },
+                "anthropic": {
+                    "name": "Anthropic-API-Schlüssel",
+                    "summary": "Claude-Modelle, pro Token abgerechnet."
+                }
+            }
+        },
+        "hire": {
+            "label": "Neuer Coworker",
+            "description": "Beschreib den Job oder starte mit einem, der für dich ausgewählt wurde.",
+            "job": "Mahne jede offene Rechnung an und sag mir am Montag, wie es gelaufen ist.",
+            "mark": "am Montag",
+            "schedule": "jeden Montag",
+            "title": "Was soll dein neuer Coworker tun?",
+            "titleNamed": "Was soll {name} tun?"
+        },
+        "board": {
+            "box": "Betrieb",
+            "beats": {
+                "chased": "Mo 7:00. 3 Rechnungen gemahnt",
+                "drafted": "Mail von Acme. Antwort entworfen",
+                "closed": "Acme hat gezahlt. Erledigt",
+                "followUp": "Nachfassen gesendet, wie gewünscht"
+            }
+        }
+    },
+    "layer": {
+        "eyebrows": {
+            "live": "Dein Workspace",
+            "gains": "Dein Workspace",
+            "week": "Eine typische Woche",
+            "anatomy": "Was ein Coworker ist",
+            "jobs": "Noch von Hand erledigt",
+            "steps": "So geht es los",
+            "cloud": "Was sie abdecken"
+        },
+        "gainTitles": {
+            "tidy": {
+                "lead": "Dein ganzes Unternehmen,",
+                "mid": "organisiert."
+            },
+            "organized": {
+                "lead": "Dein ganzes Unternehmen,",
+                "mid": "organisiert.",
+                "tail": "Und es bleibt von selbst so."
+            },
+            "never": {
+                "lead": "Verbring nie wieder",
+                "mid": "eine Stunde damit,",
+                "tail": "dein Business zu organisieren."
+            },
+            "once": {
+                "lead": "Räum dein Business",
+                "mid": "einmal auf.",
+                "tail": "Es fällt nie wieder auseinander."
+            },
+            "board": {
+                "lead": "Ein",
+                "mid": "Business, das du siehst,",
+                "tail": "kein Ordner zum Durchwühlen."
+            },
+            "mess": {
+                "lead": "Zwanzig",
+                "mid": "Coworker.",
+                "tail": "Null Chaos, das du hinterher aufräumen musst."
+            },
+            "files": {
+                "lead": "Alles",
+                "mid": "an seinem Platz,",
+                "tail": "ohne dass du je etwas abgelegt hast."
+            },
+            "brief": {
+                "lead": "Richte deinen",
+                "mid": "Workspace einmal ein.",
+                "tail": "Brief nie wieder einen Coworker zweimal."
+            },
+            "workspace": {
+                "lead": "Ein",
+                "mid": "Workspace, der",
+                "tail": "dein Business kennt."
+            },
+            "concretely": {
+                "lead": "Was bringt Rerun",
+                "mid": "konkret",
+                "tail": "für dein Business?"
+            },
+            "needs": {
+                "lead": "Rerun",
+                "mid": "ist alles, was dein",
+                "tail": "Business braucht."
+            }
+        },
+        "boxes": {
+            "marketing": "Marketing",
+            "sales": "Vertrieb",
+            "finance": "Finanzen",
+            "admin": "Verwaltung",
+            "support": "Support"
+        },
+        "says": {
+            "posts": "Sechs Posts für diese Woche geplant",
+            "founders": "Heute 40 Gründer angeschrieben",
+            "invoices": "Mahnt 3 überfällige Rechnungen",
+            "emails": "Sortiert 41 neue E-Mails",
+            "demos": "Diese Woche 12 Demos gebucht",
+            "inbox": "Posteingang wieder bei null"
+        },
+        "live": {
+            "tablist": "Workspace-Schritte",
+            "steps": {
+                "boxes": {
+                    "tab": "Boxes",
+                    "title": "Organisiere deine Arbeit in Boxes",
+                    "body": "Marketing, Vertrieb, Finanzen, Verwaltung. Eine Box pro Abteilung, Kunde oder Projekt."
+                },
+                "coworkers": {
+                    "tab": "Coworker",
+                    "title": "Stell die Coworker ein, die du brauchst",
+                    "body": "Outreach, Buchhaltung, Support: Jeder landet in seiner Box, mit eigenem Gedächtnis und eigenen Apps."
+                },
+                "brain": {
+                    "tab": "Firmen-Brain",
+                    "title": "Ein Brain für das ganze Unternehmen",
+                    "body": "Dein Angebot, dein Markt, dein Ton. Einmal geschrieben, und jeder Coworker liest es vor jeder Ausführung."
+                },
+                "workspaces": {
+                    "tab": "Workspaces",
+                    "title": "Führe mehrere Workspaces gleichzeitig",
+                    "body": "Ein Kunde, eine Marke, ein Nebenprojekt. Jeder behält seine eigenen Coworker und seine eigene Maschine."
+                }
+            },
+            "brain": "Firmen-Brain",
+            "workspaces": {
+                "company": "Dein Unternehmen",
+                "studio": "Dein zweites Unternehmen",
+                "spare": "Dein Nebenprojekt"
+            },
+            "plan": "{coworkers, plural, one {# Coworker} other {# Coworker}} · {seats, plural, one {# Platz} other {# Plätze}}",
+            "menu": {
+                "settings": "Einstellungen",
+                "invite": "Einladen",
+                "brain": "Brain",
+                "aiProviders": "KI-Anbieter",
+                "apiKeys": "API-Schlüssel & MCP",
+                "pro": "PRO",
+                "billing": "Abrechnung",
+                "newWorkspace": "Neuer Workspace"
+            }
+        },
+        "brain": {
+            "title": "Brain",
+            "search": "Suchen",
+            "company": "Unternehmen",
+            "lead": "Was jeder Coworker liest.",
+            "pages": {
+                "offering": "Angebot",
+                "market": "Markt",
+                "voice": "Tonalität",
+                "team": "Team",
+                "stack": "Stack"
+            },
+            "sources": {
+                "pricingPage": "Preisseite",
+                "webSearch": "Websuche",
+                "website": "Website"
+            }
+        },
+        "workspaces": {
+            "new": "Neuer Workspace",
+            "newHint": "Eigene Coworker, eigene Maschine, eigene Mitglieder"
+        }
+    },
+    "testimonials": {
+        "label": "Kunden",
+        "title": "<keep>Ihre <chip>Coworker</chip></keep> sind schon bei der Arbeit.",
+        "sub": "Echte Workspaces, in ihren eigenen Worten.",
+        "role": "{role} bei<org>{company}</org>",
+        "carousel": "Kundenstimmen",
+        "slide": "{index} von {total}",
+        "dots": "Kundenstimme wählen",
+        "dot": "{company}, Kundenstimme {index} von {total}"
+    },
+    "faq": {
+        "label": "Fragen",
+        "title": "Häufig gestellte <mark>Fragen</mark>.",
+        "sub": "Alles, was Leute fragen, bevor sie ihren ersten Coworker einstellen. Wenn deine Frage nicht dabei ist, die Gründer sind gleich darunter.",
+        "categories": {
+            "general": "Allgemein",
+            "how": "So funktioniert es",
+            "features": "Funktionen & Nutzung",
+            "billing": "Pläne & Abrechnung"
+        },
+        "migrate": {
+            "label": "Zieh dein ganzes Setup in fünf Minuten um.",
+            "aria": "Du kommst von einem anderen Tool"
+        },
+        "team": {
+            "role": "Mitgründer",
+            "title": "Noch eine Frage? <fade>Frag die Gründer.</fade>",
+            "sub": "Wir sind zu zweit und bauen Rerun selbst. Schreib uns eine E-Mail oder frag im Discord.",
+            "email": "Den Gründern schreiben",
+            "discord": "Dem Discord beitreten"
+        },
+        "items": {
+            "better": {
+                "question": "Warum ist ein Coworker bei derselben Aufgabe besser als Claude oder ChatGPT?",
+                "answer": "Weil ein Chatbot bei der Antwort aufhört. Er schreibt die E-Mail, und du öffnest trotzdem den Tab, kopierst den Text, loggst dich ins alte Portal ein und schickst sie ab. Ein Coworker hat seinen eigenen Computer und deine Apps, also erledigt er diese Schritte selbst, und er legt um 7 Uhr von allein los, ohne dass du etwas öffnest."
+            },
+            "start": {
+                "question": "Ich weiß nicht, was ich ihm zuerst geben soll. Wo fange ich an?",
+                "answer": "Nimm das, was du jede Woche wieder machst und ungern tust: das Anmahnen von Rechnungen, das Sortieren des Posteingangs, den Montagsbericht. Die Beispiele auf dieser Seite sind die, die Leute zuerst abgeben."
+            },
+            "readyMade": {
+                "question": "Kann ich mit etwas Fertigem anfangen?",
+                "answer": "Ja. Die Bibliothek hat Coworker, die schon für eine Branche gebaut sind: Agenturen, E-Commerce, SaaS, Vertrieb, Recruiting und mehr. Installier einen, verbinde ihn mit deinen eigenen Apps und ändere, was nicht zu deiner Arbeitsweise passt."
+            },
+            "experts": {
+                "question": "Kann jemand meine Coworker für mich einrichten?",
+                "answer": "Ja. Rerun Experten bauen und installieren Coworker beruflich, du kannst sie durchsehen und einen beauftragen. Wir zwei, die Rerun bauen, antworten auch im Discord, kostenlos.",
+                "link": "Experten"
+            },
+            "safe": {
+                "question": "Sind meine Daten sicher?",
+                "answer": "Dein Workspace hat seine eigene private Maschine, abgeschottet von allen anderen Kunden, und deine Daten bleiben darin. Wir trainieren keine Modelle mit deinen Inhalten, und den Modellanbietern, die wir nutzen, ist das vertraglich ebenfalls untersagt."
+            },
+            "setup": {
+                "question": "Was muss ich eigentlich einrichten?",
+                "answer": "Drei Dinge, einmal. Verbinde die Apps, die dein Business schon nutzt, stell einen Coworker ein und sag ihm seinen Job, dann leg fest, wann er laufen soll. Den Rest übernimmt er."
+            },
+            "howLong": {
+                "question": "Wie lange dauert es, bis mein erster Coworker arbeitet?",
+                "answer": "Ein paar Minuten. Wähle einen fertigen Coworker oder beschreib den Job in deinen eigenen Worten, verbinde ein, zwei Tools, und er legt los."
+            },
+            "where": {
+                "question": "Wo laufen meine Coworker eigentlich?",
+                "answer": "Auf ihrer eigenen Maschine in der Cloud, in Europa, eine pro Workspace und von allen anderen isoliert. Sie ist immer an, und ihre Dateien, ihr Gedächtnis und ihre Datenbanken bleiben darin."
+            },
+            "laptop": {
+                "question": "Läuft es weiter, wenn mein Laptop zu ist?",
+                "answer": "Ja. Deine Coworker leben auf ihrer eigenen Maschine in der Cloud, die nie schläft. Klapp deinen Laptop zu, geh ins Bett: Die Ausführung um 7 Uhr findet trotzdem statt, und das Ergebnis wartet auf dich, wenn du zurückkommst."
+            },
+            "memory": {
+                "question": "Erinnert sich ein Coworker zwischen den Ausführungen an mein Business?",
+                "answer": "Ja, und darin liegt der größte Teil seines Werts. Er behält seine eigenen Dateien, seine eigenen Notizen und das, was er über dein Angebot, deinen Markt und deine Kunden gelernt hat, also weiß er, dass Acme nach 60 Tagen zahlt, ohne dass du es zweimal sagst. Am Montag fängt ein Chatbot bei null an; dein Coworker öffnet die Akte, die er seit Wochen füllt."
+            },
+            "unwanted": {
+                "question": "Was, wenn ein Coworker etwas tut, das ich nicht wollte?",
+                "answer": "Er hält an und fragt vorher. Vor allem, was Folgen hat, etwa Geld ausgeben, einem Kunden schreiben oder etwas löschen, pausiert er und wartet auf dein Ja. Und jede Ausführung steht auf dem Board, also passiert nichts, was du hinterher nicht sehen kannst."
+            },
+            "tools": {
+                "question": "Welche Tools können meine Coworker nutzen?",
+                "answer": "Stripe, HubSpot, Notion, Linear, Google Drive und {connectors}+ weitere, dazu jeder MCP-Server, und dein Coworker bindet die Tools, die sein Job braucht, selbst an. Er nutzt sogar Tools ohne Connector: Er öffnet sie auf seinem eigenen Computer, so wie du es tun würdest."
+            },
+            "together": {
+                "question": "Können Coworker zusammenarbeiten?",
+                "answer": "Ja. Sie geben sich gegenseitig Arbeit weiter: Einer findet die Leads, der nächste schreibt sie an, ein dritter legt das Ergebnis ab. Du fragst einmal, und die Kette läuft, ohne dass du dazwischen stehst."
+            },
+            "watch": {
+                "question": "Kann ich ihnen live bei der Arbeit zusehen?",
+                "answer": "Ja, genau darum geht es. Jeder Coworker steht auf einem Board, das sich in Echtzeit aktualisiert, während er arbeitet, mit dem vollständigen Verlauf jeder Ausführung, wenn du die Details willst."
+            },
+            "takeOver": {
+                "question": "Kann ich mitten in einer Ausführung übernehmen?",
+                "answer": "Ja. Öffne seinen Bildschirm und nimm die Maus: Mach den Login selbst, korrigiere das Feld, das er falsch ausgefüllt hat, und gib dann zurück. Er macht auf dieser Seite weiter."
+            },
+            "wrong": {
+                "question": "Woher weiß ich, wenn etwas schiefgeht?",
+                "answer": "Er sagt es dir. Eine fehlgeschlagene Ausführung, eine Frage, eine wartende Freigabe, eine App, die ihre Verbindung verloren hat: Jedes davon hebt den Coworker auf dem Board hervor und erreicht dich per E-Mail oder als Benachrichtigung, je nachdem, worüber du informiert werden willst."
+            },
+            "stuck": {
+                "question": "Was, wenn ein Coworker hängen bleibt, während ich weg bin?",
+                "answer": "Er wartet, und jeder in deinem Team kann ihm antworten. Er macht Sekunden später genau dort weiter, wo er aufgehört hat. Du kannst ihm auch Regeln hinterlassen, nach denen er selbst antwortet, sodass er nur auf die Entscheidungen wartet, die du selbst treffen willst."
+            },
+            "phone": {
+                "question": "Kann ich Rerun auf meinem Handy nutzen?",
+                "answer": "Ja. Rerun läuft im Browser deines Handys und lässt sich wie eine App auf den Homescreen legen. Board, Unterhaltung und Freigaben sind alle für kleine Bildschirme gebaut, sodass du einen Coworker aus der Warteschlange heraus freigeben kannst."
+            },
+            "billing": {
+                "question": "Wie funktioniert die Abrechnung? Zahle ich pro Person?",
+                "answer": "Nie pro Person. Für {price} im Monat bekommst du unbegrenzt viele Coworker, ihre private Maschine und so viele Teammitglieder im Workspace, wie du willst, ohne Aufpreis. Das Einzige, was mit dir wächst, ist dein Rerun Guthaben. Dieses Guthaben gilt nicht nur für die Modelle, die wir hosten: Es bezahlt auch die Anfragen, die deine Coworker an die {connectors}+ Tools stellen."
+            },
+            "subscription": {
+                "question": "Brauche ich ein Claude- oder ChatGPT-Abo?",
+                "answer": "Nein. Jeder Plan enthält Guthaben für die Modelle, die wir hosten, sodass deine Coworker vom ersten Tag an arbeiten, ohne dass du etwas verbinden musst. Dein eigenes Claude- oder ChatGPT-Abo kannst du anschließen, wenn du schon eins bezahlst: Diese Ausführungen kosten dich dann bei uns nichts, und wir zählen sie nie."
+            },
+            "models": {
+                "question": "Welche KI-Modelle kann ich nutzen?",
+                "answer": "Claude, ChatGPT, Grok und mehr, und du wählst pro Coworker: das schnelle, günstige Modell zum Sortieren eines Posteingangs, das stärkste für den Job, der sitzen muss."
+            },
+            "data": {
+                "question": "Was kosten die E-Mails, Telefonnummern und anderen Daten?",
+                "answer": "Sie gehen von deinem Rerun Guthaben ab, und eine E-Mail oder Telefonnummer wird nur berechnet, wenn sie gefunden wird. Vor einer Suche sagt dir dein Coworker, was sie kostet, und wartet auf dein Ja. Du musst keinen Datenanbieter abonnieren."
+            }
+        }
+    },
+    "foreman": {
+        "role": "Dein Workspace-Manager",
+        "title": "Lerne deinen neuen Lieblingskollegen kennen.",
+        "powers": {
+            "voice": {
+                "title": "Steuere deine Coworker per Sprache",
+                "detail": "Halte <kbd>Leertaste</kbd> gedrückt und sag, was du brauchst. Er gibt es an den richtigen Coworker weiter."
+            },
+            "partner": {
+                "title": "Ein proaktiver Partner für dein Business",
+                "detail": "Er handelt, bevor du fragst, über dein ganzes Business und jeden Coworker hinweg."
+            },
+            "autopilot": {
+                "title": "Setz dein Business auf Autopilot",
+                "detail": "Wenn du weg bist, steuert er deine Coworker und antwortet ihnen nach deinen Regeln."
+            }
+        },
+        "voice": {
+            "listening": "Hört zu · Leertaste loslassen zum Senden",
+            "transcribing": "Transkribiert...",
+            "thinking": "Denkt nach...",
+            "running": "Führt Coworker schreiben aus",
+            "space": "Leertaste",
+            "prompts": {
+                "lastNight": "Was lief letzte Nacht?",
+                "failed": "Warum ist das fehlgeschlagen?",
+                "build": "Bau mir einen neuen Coworker"
+            },
+            "reply": "Bin dran! 🙌 Ich habe deinen Sales Development Rep nach den neuen Leads dieser Woche gefragt. Sie sind bis Mittag in deinem Posteingang.",
+            "open": "Unterhaltung öffnen"
+        },
+        "partner": {
+            "thinking": "Denkt nach...",
+            "pastDue": "12 Rechnungen sind diese Woche überfällig.",
+            "offer": "Soll ich eine Buchhaltung einstellen, die sie jeden Montag anmahnt?",
+            "yes": "Ja, mach das.",
+            "running": "Führt Coworker erstellen aus",
+            "steps": "{count, plural, one {# Schritt} other {# Schritte}}",
+            "done": "Erledigt! Deine Buchhaltung startet Montag um 9."
+        },
+        "autopilot": {
+            "name": "Autopilot",
+            "answering": "Antwort an {job}...",
+            "leftForYou": "Für dich übrig",
+            "answered": "Beantwortet",
+            "rules": "Antwortet nach deinen Regeln",
+            "now": "jetzt",
+            "waiting": "Wartet auf dich",
+            "byAutopilot": "Vom Autopilot beantwortet",
+            "to": "Autopilot · an {job}",
+            "asks": {
+                "reminder": {
+                    "topic": "Offene Rechnungen",
+                    "question": "Acmes dritte Mahnung heute senden?",
+                    "answer": "Ja, heute. Freundlich bleiben."
+                },
+                "leads": {
+                    "topic": "Neue Leads",
+                    "question": "Den 12 neuen Leads jetzt schreiben?",
+                    "answer": "Ja, mit der April-Vorlage."
+                },
+                "verify": {
+                    "topic": "Lead-Recherche",
+                    "question": "{amount} zahlen, um 50 Leads zu prüfen?",
+                    "answer": "Ausgaben warten auf dein Ja."
+                }
+            }
+        }
+    }
+}

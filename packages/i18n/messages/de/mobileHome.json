@@ -1,0 +1,122 @@
+{
+    "title": "Coworker",
+    "loadFailed": "Wir konnten deine Coworker nicht laden.",
+    "retry": "Erneut versuchen",
+    "empty": "Noch keine Coworker.",
+    "loadingCoworkers": "Coworker werden geladen",
+    "newCoworker": "Neuer Coworker",
+    "untitledBox": "Box ohne Namen",
+    "teammate": "Teammitglied",
+    "pinned": {
+        "dragToReorder": "Zum Sortieren ziehen",
+        "done": "Fertig",
+        "unpin": "Lösen",
+        "details": "Coworker-Details",
+        "edit": "Pins bearbeiten",
+        "unreadLabel": "{name}, ungelesen"
+    },
+    "row": {
+        "label": "{name}, {line}",
+        "opensConversation": "Öffnet die Unterhaltung",
+        "pin": "Anheften",
+        "unpin": "Lösen",
+        "pinToTop": "Oben anheften"
+    },
+    "line": {
+        "paused": "Pausiert",
+        "waiting": "Wartet auf dich",
+        "error": "Etwas ist schiefgelaufen",
+        "working": "Arbeitet",
+        "workingOn": "Arbeitet · {detail}",
+        "asleep": "Schläft",
+        "asleepAbout": "Schläft · {about}"
+    },
+    "foreman": {
+        "askAnything": "Frag mich alles"
+    },
+    "header": {
+        "account": "Konto"
+    },
+    "account": {
+        "preferences": "Einstellungen",
+        "contactSupport": "Support kontaktieren",
+        "signOut": "Abmelden",
+        "subscriptionTitle": "Kündige zuerst das Abo",
+        "subscriptionMessage": "{workspaces} verlängert sich noch. Kündige es unter Abrechnung auf rerun.build und lösche dann dein Konto.",
+        "deleteTitle": "Konto löschen?",
+        "deleteMessage": "Du verlässt die Workspaces, die du mit anderen teilst. Ein Workspace, in dem nur du bist, endet endgültig, mit seinen Coworkern und Dateien. Das kann nicht rückgängig gemacht werden.",
+        "delete": "Löschen",
+        "cancel": "Abbrechen",
+        "reauthTitle": "Melde dich erneut an, um dein Konto zu löschen",
+        "reauthMessage": "Zu deiner Sicherheit braucht das Löschen deines Kontos eine frische Anmeldung. Melde dich erneut an und lösche es dann hier.",
+        "deleteFailedTitle": "Konto konnte nicht gelöscht werden",
+        "deleteFailedMessage": "Versuch es gleich noch mal.",
+        "leaveServerTitle": "{host} verlassen?",
+        "leaveServerMessage": "Du wirst abgemeldet, und Rerun öffnet sich wieder mit Rerun Cloud.",
+        "leaveServer": "Verlassen"
+    },
+    "workspace": {
+        "untitled": "Mein Workspace",
+        "menuLabel": "Workspace {name}"
+    },
+    "section": {
+        "label": "{label}, {count}"
+    },
+    "search": {
+        "title": "Suche",
+        "back": "Zurück",
+        "placeholder": "Coworker und Unterhaltungen suchen",
+        "askRerun": "Rerun fragen",
+        "quotedAsk": "„{query}“",
+        "coworkers": "Coworker",
+        "conversations": "Unterhaltungen",
+        "noCoworker": "Kein Coworker mit diesem Namen.",
+        "newConversation": "Neue Unterhaltung",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "Benachrichtigungen",
+        "bellLabel": "Benachrichtigungen, {count}",
+        "close": "Schließen",
+        "settings": "Benachrichtigungseinstellungen",
+        "markAllRead": "Alle als gelesen markieren",
+        "markAllTitle": "Alles als gelesen markieren?",
+        "markAllMessage": "{count, plural, one {# Eintrag verschwindet} other {# Einträge verschwinden}} aus dieser Liste. Anfragen, die noch auf eine Antwort warten, werden ebenfalls entfernt, ohne beantwortet zu werden.",
+        "cancel": "Abbrechen",
+        "running": "{count, plural, one {# Aufgabe läuft} other {# Aufgaben laufen}}",
+        "loadFailed": "Wir konnten deine Benachrichtigungen nicht laden.",
+        "retry": "Erneut versuchen",
+        "emptyTitle": "Nichts zu erledigen",
+        "emptyDescription": "Wenn ein Coworker dich braucht oder eine Aufgabe abschließt, landet es hier.",
+        "undo": "Rückgängig",
+        "ok": "OK",
+        "sections": {
+            "needsYou": "Braucht dich",
+            "headsUps": "Hinweise",
+            "errors": "Fehler",
+            "done": "Erledigt"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} hat dir eine Frage gestellt",
+            "awaiting_approval": "{agent} braucht deine Freigabe",
+            "awaiting_connector": "{agent} braucht eine verbundene App",
+            "waiting_human": "{agent} wartet auf dich",
+            "awaiting_ack": "{agent} hat dich auf etwas hingewiesen",
+            "error": "{agent} hatte einen Fehler",
+            "done": "{agent} hat seine Ausführung beendet"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}, {detail}",
+            "read": "Gelesen",
+            "markRead": "Als gelesen markieren",
+            "opensConversation": "Öffnet die Unterhaltung",
+            "unfollow": "Geplanten Aufgaben nicht mehr folgen",
+            "unfollowed": "Du folgst den geplanten Aufgaben von {name} nicht mehr.",
+            "mute": "{name} stummschalten",
+            "muted": "{name} ist stummgeschaltet.",
+            "settings": "Benachrichtigungseinstellungen",
+            "cancel": "Abbrechen"
+        }
+    }
+}

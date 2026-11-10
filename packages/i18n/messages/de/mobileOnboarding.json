@@ -1,0 +1,127 @@
+{
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "Wie heißt die Website deiner Firma?",
+                "description": "Wir lesen sie, um zu verstehen, was du verkaufst und an wen."
+            },
+            "industry": {
+                "title": "In welcher Branche arbeitest du?",
+                "description": "Davon hängt ab, welche Teams wir auf dein Board setzen."
+            },
+            "role": {
+                "title": "Und was machst du dort?",
+                "description": "Davon hängt ab, wen wir zuerst für dich bauen."
+            },
+            "name": {
+                "title": "Zum Schluss: dein Vorname?",
+                "description": "Damit wir nicht mit einem Workspace reden."
+            }
+        },
+        "progress": "Frage {current} von {total}",
+        "website": {
+            "label": "Website des Unternehmens",
+            "placeholder": "acme.com",
+            "none": "Ich habe keine Website"
+        },
+        "industry": {
+            "placeholder": "Deine Branche"
+        },
+        "industries": {
+            "agencies": "Agenturen",
+            "ecommerce": "E-Commerce",
+            "saas": "SaaS",
+            "sales": "Vertrieb",
+            "recruiting": "Recruiting",
+            "real-estate": "Immobilien",
+            "legal": "Recht & Compliance",
+            "creators": "Creator",
+            "productivity": "Produktivität",
+            "other": "Sonstiges"
+        },
+        "role": {
+            "placeholder": "Head of Growth"
+        },
+        "name": {
+            "placeholder": "Max"
+        },
+        "back": "Zurück",
+        "next": "Weiter",
+        "continue": "Weiter",
+        "saveFailed": "Speichern fehlgeschlagen. Versuch es noch mal."
+    },
+    "setup": {
+        "loadFailed": "Laden der Einrichtung fehlgeschlagen.",
+        "retry": "Erneut versuchen"
+    },
+    "conversation": {
+        "foremanRole": "Dein Workspace-Assistent",
+        "failed": "Das hat nicht geklappt.",
+        "tryAgain": "Erneut versuchen",
+        "composerPlaceholder": "Rerun antworten"
+    },
+    "starter": {
+        "title": "Dein Starter-Team",
+        "full": "Bis zu {max} zum Start. Entferne einen, um diesen zu nehmen.",
+        "pickUpTo": "Wähle bis zu {max}. Jeder richtet sich mit dir ein.",
+        "hire": "{count, plural, =0 {Wähle mindestens einen} one {Diesen einstellen} other {Diese # einstellen}}",
+        "custom": "Keiner davon, ich sage dir, was ich brauche",
+        "customPlaceholder": "Was soll dein Coworker tun?",
+        "back": "Zurück",
+        "send": "Senden"
+    },
+    "plan": {
+        "defaultTitle": "Dein erster Coworker",
+        "confirmed": "Bestätigt",
+        "changesAsked": "Änderungen angefragt",
+        "skipped": "Übersprungen",
+        "build": "Meinen Coworker bauen",
+        "change": "Etwas ändern"
+    },
+    "question": {
+        "skip": "Frage überspringen",
+        "selectAll": "Alles Zutreffende auswählen",
+        "typeAnswer": "Deine Antwort…",
+        "somethingElse": "Etwas anderes",
+        "send": "Senden",
+        "neither": "Keins von beiden"
+    },
+    "team": {
+        "ready": "Workspace bereit",
+        "starting": {
+            "title": "Dein Workspace wird vorbereitet",
+            "body": "Dein Coworker wird direkt danach gebaut."
+        },
+        "failed": {
+            "title": "Das hat nicht geklappt",
+            "body": "Nichts ist verloren. Versuch es gleich noch mal."
+        },
+        "blocked": {
+            "title": "Dieser Workspace kann hier nicht starten",
+            "body": "Schließe die Einrichtung auf {host} ab."
+        },
+        "tryAgain": "Erneut versuchen"
+    },
+    "build": {
+        "building": "Dein Team wird gebaut",
+        "empty": "Dein Team konnte nicht gebaut werden",
+        "ready": "Dein Team ist bereit",
+        "nothingLost": "Nichts ist verloren. Versuch es gleich noch mal.",
+        "oneFailed": "{name} konnte noch nicht gebaut werden.",
+        "someFailed": "{count, plural, one {# Coworker konnte noch nicht gebaut werden.} other {# Coworker konnten noch nicht gebaut werden.}}",
+        "tryAgain": "Erneut versuchen",
+        "startLead": "{name} installieren"
+    },
+    "waitlist": {
+        "title": "Wir sind gerade voll ausgelastet",
+        "body": "Alle Maschinen sind belegt. Du stehst auf der Warteliste: Deine Antworten sind gespeichert, und es geht von selbst weiter, sobald eine frei wird."
+    },
+    "noPlan": {
+        "title": "Dieser Workspace ist pausiert",
+        "body": "Wechsle Workspace oder Konto über die Menüs oben."
+    },
+    "update": {
+        "title": "Update erforderlich",
+        "body": "Diese Version wird nicht mehr unterstützt."
+    }
+}

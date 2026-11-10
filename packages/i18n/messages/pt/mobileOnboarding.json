@@ -1,0 +1,127 @@
+{
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "Qual é o site da sua empresa?",
+                "description": "Lemos o site para entender o que você vende e para quem."
+            },
+            "industry": {
+                "title": "Em que área você trabalha?",
+                "description": "Isso define quais equipes desenhamos no seu quadro."
+            },
+            "role": {
+                "title": "E o que você faz lá?",
+                "description": "Isso define quem criamos para você primeiro."
+            },
+            "name": {
+                "title": "Última: seu primeiro nome?",
+                "description": "Para não estarmos falando com um workspace."
+            }
+        },
+        "progress": "Pergunta {current} de {total}",
+        "website": {
+            "label": "Site da empresa",
+            "placeholder": "acme.com",
+            "none": "Não tenho site"
+        },
+        "industry": {
+            "placeholder": "Sua área de atuação"
+        },
+        "industries": {
+            "agencies": "Agências",
+            "ecommerce": "E-commerce",
+            "saas": "SaaS",
+            "sales": "Vendas",
+            "recruiting": "Recrutamento",
+            "real-estate": "Imobiliário",
+            "legal": "Jurídico e compliance",
+            "creators": "Criadores",
+            "productivity": "Produtividade",
+            "other": "Outro"
+        },
+        "role": {
+            "placeholder": "Head de Growth"
+        },
+        "name": {
+            "placeholder": "João"
+        },
+        "back": "Voltar",
+        "next": "Próximo",
+        "continue": "Continuar",
+        "saveFailed": "Não conseguimos salvar. Tente de novo."
+    },
+    "setup": {
+        "loadFailed": "Não conseguimos carregar sua configuração.",
+        "retry": "Tentar de novo"
+    },
+    "conversation": {
+        "foremanRole": "Seu assistente do workspace",
+        "failed": "Não deu certo.",
+        "tryAgain": "Tentar de novo",
+        "composerPlaceholder": "Responda ao Rerun"
+    },
+    "starter": {
+        "title": "Sua equipe inicial",
+        "full": "Até {max} para começar. Tire um para escolher este.",
+        "pickUpTo": "Escolha até {max}. Cada um se configura com você.",
+        "hire": "{count, plural, =0 {Escolha pelo menos um} one {Contratar este} other {Contratar estes #}}",
+        "custom": "Nenhum destes, vou dizer do que preciso",
+        "customPlaceholder": "O que seu coworker deve fazer?",
+        "back": "Voltar",
+        "send": "Enviar"
+    },
+    "plan": {
+        "defaultTitle": "Seu primeiro coworker",
+        "confirmed": "Confirmado",
+        "changesAsked": "Alterações pedidas",
+        "skipped": "Ignorado",
+        "build": "Criar meu coworker",
+        "change": "Mudar algo"
+    },
+    "question": {
+        "skip": "Pular esta pergunta",
+        "selectAll": "Selecione todas que se aplicam",
+        "typeAnswer": "Digite sua resposta…",
+        "somethingElse": "Outra coisa",
+        "send": "Enviar",
+        "neither": "Nenhum"
+    },
+    "team": {
+        "ready": "Workspace pronto",
+        "starting": {
+            "title": "Preparando seu workspace",
+            "body": "Seu coworker é criado logo depois."
+        },
+        "failed": {
+            "title": "Não deu certo",
+            "body": "Nada foi perdido. Tente de novo daqui a pouco."
+        },
+        "blocked": {
+            "title": "Este workspace não pode começar aqui",
+            "body": "Termine a configuração em {host}."
+        },
+        "tryAgain": "Tentar de novo"
+    },
+    "build": {
+        "building": "Montando sua equipe",
+        "empty": "Não foi possível montar sua equipe",
+        "ready": "Sua equipe está pronta",
+        "nothingLost": "Nada foi perdido. Tente de novo daqui a pouco.",
+        "oneFailed": "Ainda não foi possível criar {name}.",
+        "someFailed": "{count, plural, one {Ainda não foi possível criar # coworker.} other {Ainda não foi possível criar # coworkers.}}",
+        "tryAgain": "Tentar de novo",
+        "startLead": "Começar a instalar {name}"
+    },
+    "waitlist": {
+        "title": "Estamos com capacidade máxima agora",
+        "body": "Todas as máquinas estão ocupadas. Você está na lista de espera: suas respostas estão salvas, e isto abre sozinho assim que uma for liberada."
+    },
+    "noPlan": {
+        "title": "Este workspace está pausado",
+        "body": "Troque de workspace ou de conta nos menus acima."
+    },
+    "update": {
+        "title": "Atualização necessária",
+        "body": "Esta versão não é mais suportada."
+    }
+}

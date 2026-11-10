@@ -1,8 +1,10 @@
 import { formatDate } from '@rerun/i18n/format'
 import { Cron } from 'croner'
 import cronstrue from 'cronstrue'
+import 'cronstrue/locales/de'
 import 'cronstrue/locales/es'
 import 'cronstrue/locales/fr'
+import 'cronstrue/locales/pt_BR'
 
 import type { EngineSchedule } from '@/lib/engine/types'
 
@@ -12,11 +14,11 @@ type ScheduleTiming = Pick<EngineSchedule, 'enabled' | 'cron' | 'runAt' | 'timez
 export type ScheduleCopy = (key: `schedule.${'once' | 'onceOn' | 'everyMinutes' | 'everyDay' | 'weekdays' | 'everyWeekday' | 'monthly'}`, values?: Record<string, string>) => string
 
 // Only the packs' languages are loaded: cronstrue/i18n would ship its 30 others to the browser.
-const CRONSTRUE_LOCALES = new Set(['fr', 'es'])
+const CRONSTRUE_LOCALES: Record<string, string> = { fr: 'fr', es: 'es', pt: 'pt_BR', de: 'de' }
 
 export function humanCron(cron: string, locale = 'en'): string | null {
     try {
-        return cronstrue.toString(cron, { throwExceptionOnParseError: true, verbose: false, locale: CRONSTRUE_LOCALES.has(locale) ? locale : 'en' })
+        return cronstrue.toString(cron, { throwExceptionOnParseError: true, verbose: false, locale: CRONSTRUE_LOCALES[locale] ?? 'en' })
     } catch {
         return null
     }

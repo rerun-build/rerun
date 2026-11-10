@@ -1,0 +1,196 @@
+{
+    "seo": {
+        "title": "Preise",
+        "headline": "Ein Tarif. Alles inklusive.",
+        "description": "Ein Rerun-Tarif ab {price} im Monat: unbegrenzt viele Agenten, unbegrenzt viele Plätze, deine eigene private Maschine, alle Apps und unbegrenzt viele Ausführungen. {trialDays} Tage kostenlos testen.",
+        "breadcrumbHome": "Startseite"
+    },
+    "hero": {
+        "eyebrow": "Preise",
+        "description": "Teste Rerun {trialDays} Tage kostenlos. Wähle dann, wie viele Coworker du brauchst, und lade dein ganzes Team ein."
+    },
+    "price": {
+        "perMonth": "/Monat",
+        "perMonthBilledYearly": "/Monat, jährlich {total}"
+    },
+    "billing": {
+        "label": "Abrechnungszeitraum",
+        "monthly": "Monatlich",
+        "yearly": "Jährlich",
+        "discount": "-{percent} %"
+    },
+    "tiers": {
+        "trial": {
+            "name": "Kostenloser Test",
+            "description": "Bring deine ersten Coworker an die Arbeit und sieh, was sie können.",
+            "control": "Eine Karte startet den Test, und {trialDays} Tage lang wird nichts abgebucht. Kündigst du vorher, zahlst du nichts.",
+            "cta": "{trialDays} Tage kostenlos testen",
+            "featuresLabel": "Der kostenlose Test enthält",
+            "features": {
+                "agents": "<b>Bis zu {agents} Coworker</b> für deine ersten Aufgaben",
+                "seats": "<b>Unbegrenzt viele Plätze</b>, um es mit deinem Team zu testen",
+                "credits": "<b>{credits, plural, one {# Credit} other {# Credits}} gratis</b> zum Ausprobieren",
+                "models": "Dieselben <b>smarten Modelle</b> wie Pro",
+                "privacy": "Deine Daten bleiben in einem <b>privaten, gesicherten Workspace</b>",
+                "apps": "<b>{connectors}+ Apps & MCPs</b>, in denen deine Coworker arbeiten",
+                "byom": "Verbinde dein <b>eigenes KI-Abo</b> oder deinen API-Schlüssel"
+            }
+        },
+        "pro": {
+            "name": "Pro",
+            "description": "Für Teams, deren Coworker jeden Tag arbeiten.",
+            "cta": "Loslegen",
+            "featuresLabel": "Alles aus dem kostenlosen Test, plus",
+            "features": {
+                "coworkers": "<b>Unbegrenzt viele Coworker</b>, die Seite an Seite für dich arbeiten",
+                "seats": "<b>Unbegrenzt viele Plätze</b>, keine Gebühr pro Nutzer",
+                "team": "Verwalte deine Coworker mit <b>deinem ganzen Team</b>",
+                "credits": "<b>{credits, plural, one {# Credit} other {# Credits}} von uns</b>, jeden Monat",
+                "models": "<b>Smarte Modelle</b> für deine schwierigsten Aufgaben",
+                "autopilot": "Stell dein Geschäft auf <b>Autopilot</b>"
+            },
+            "creditsNote": "Jederzeit aufladen"
+        }
+    },
+    "socialApps": {
+        "label": "Add-ons",
+        "caption": "Voller Zugriff auf dein Konto, genau wie du.",
+        "lede": "Alles, was du von Hand machst, können deine Coworker machen.",
+        "details": "Was {app} deinen Coworkern ermöglicht",
+        "add": "{app} hinzufügen",
+        "price": "<b>+{price}</b>/Monat",
+        "can": {
+            "linkedin_slot": {
+                "search": "Personen suchen, Profile lesen",
+                "invite": "Einladungen senden und annehmen",
+                "message": "Nachrichten senden, jede Unterhaltung lesen",
+                "post": "Posten, kommentieren und reagieren"
+            },
+            "whatsapp_slot": {
+                "send": "Nachrichten, Dateien, Sprachnachrichten senden",
+                "reply": "Jeden Chat lesen und beantworten",
+                "check": "Nummern auf WhatsApp prüfen"
+            }
+        }
+    },
+    "enterprise": {
+        "name": "Enterprise",
+        "description": "Für große Organisationen mit eigenen Anforderungen",
+        "features": {
+            "everything": "Alles aus Rerun",
+            "infrastructure": "Eigene Infrastruktur",
+            "infrastructureDetail": "Dediziert oder selbst gehostet: Deine Coworker laufen dort, wo deine Organisation sie braucht.",
+            "support": "Dedizierter Support",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "cta": "Vertrieb kontaktieren",
+        "ctaNote": "Individuelle Preise, auf deine Organisation zugeschnitten"
+    },
+    "plan": {
+        "tagline": "Alles, was du brauchst, um Coworker arbeiten zu lassen",
+        "from": "Ab",
+        "flexible": "Füge Coworker oder Guthaben hinzu, wann immer du sie brauchst.",
+        "cta": "Kostenlos testen",
+        "trialNote": "{trialDays} Tage kostenlos testen · Karte nötig, heute {free}",
+        "included": "Inklusive",
+        "alsoIncluded": "Ebenfalls inklusive",
+        "features": {
+            "coworkers": {
+                "label": "Unbegrenzt viele Coworker",
+                "caption": "So viele Coworker, wie du brauchst, Seite an Seite, jeder mit eigener Aufgabe und eigenen Tools."
+            },
+            "machine": {
+                "label": "Deine eigene Maschine",
+                "caption": "Ein privater Computer in der Cloud, auf dem jeder Coworker deines Workspace lebt und seine Dateien und Daten teilt. Nur deiner."
+            },
+            "seats": {
+                "label": "Unbegrenzt viele Plätze",
+                "caption": "Dein ganzes Team im selben Workspace, ohne Gebühr pro Platz."
+            },
+            "byoAi": {
+                "label": "Deine eigene KI",
+                "caption": "Optional: dein eigener Schlüssel, dein Abo oder ein lokales Modell."
+            },
+            "apps": {
+                "label": "{connectors}+ Apps",
+                "caption": "Alle deine Tools bereit zum Verbinden, dazu jedes MCP oder jede API."
+            },
+            "delegate": {
+                "label": "Jede Aufgabe abgeben",
+                "caption": "Gib die Routinearbeit ab. Deine Coworker erledigen sie rund um die Uhr."
+            },
+            "invite": {
+                "label": "Lade dein Team ein",
+                "caption": "Teile deinen Workspace und baut eure Coworker gemeinsam auf."
+            }
+        }
+    },
+    "addons": {
+        "label": "Add-ons",
+        "title": "Wachse Stück für Stück.",
+        "lede": "Add-ons sind Mengen in deinem bestehenden Tarif, kein weiterer Tarif. Nimm eins, wenn du es brauchst, und gib es ab, wenn nicht.",
+        "items": {
+            "credit_pack": {
+                "title": "Rerun-Guthaben",
+                "unit": "+{credits, plural, one {# Credit} other {# Credits}}/Monat",
+                "caption": "Mehr Guthaben für die Modelle, die wir hosten, zusätzlich zum Tarif."
+            }
+        }
+    },
+    "comparison": {
+        "badge": "Vergleich",
+        "title": "Warum Leute zu Rerun wechseln.",
+        "compareWith": "Vergleiche Rerun mit",
+        "fullComparison": "Den ganzen Vergleich Rerun vs. {competitor} lesen",
+        "allComparisons": "Alle Vergleiche",
+        "alsoCompared": "Ebenfalls verglichen",
+        "versus": "Rerun vs. {competitor}"
+    },
+    "faq": {
+        "label": "FAQ zu den Preisen",
+        "title": "Fragen zur Rechnung.",
+        "items": {
+            "basePlan": {
+                "question": "Was bekomme ich im Basistarif?",
+                "answer": "Unbegrenzt viele Coworker, deine eigene private Maschine in der Cloud, unbegrenzt viele Plätze und {credits, plural, one {# Credit} other {# Credits}} jeden Monat, dazu alle Apps, alle Vorlagen und unbegrenzt viele Ausführungen. Keine Funktion ist hinter einem höheren Tarif versteckt."
+            },
+            "trial": {
+                "question": "Gibt es einen kostenlosen Test?",
+                "answer": "Ja, {trialDays} Tage mit {agents} Coworkern und {trialCredits, plural, one {# Credit} other {# Credits}}. Eine Karte ist nötig, heute werden {free} abgebucht, und der Tarif beginnt an Tag {trialDays}. Du baust dein erstes Team auf, siehst ihm bei der Arbeit zu und entscheidest danach. Kündigst du vor Ende des Tests, wird nichts abgebucht."
+            },
+            "perTask": {
+                "question": "Rechnet ihr pro Aufgabe oder pro Ausführung ab?",
+                "answer": "Nein. Deine Coworker können jede Stunde jedes Tages zum selben Pauschalpreis arbeiten, egal wie viele du baust. Ausführungen werden nie gezählt."
+            },
+            "ownAi": {
+                "question": "Kann ich mein eigenes KI-Abo oder meine API-Schlüssel nutzen?",
+                "answer": "Ja. Verbinde dein Claude- oder ChatGPT-Abo, deine eigenen API-Schlüssel oder ein lokales Modell, und die Modelle kosten dich bei uns nichts. Das enthaltene Guthaben ist für den Fall da, dass du das lieber nicht willst."
+            },
+            "whereRun": {
+                "question": "Wo laufen meine Coworker eigentlich?",
+                "answer": "Auf deinem eigenen privaten Computer in der Cloud, einer pro Workspace, wo deine Coworker leben und deine Daten bleiben. Darin ordnest du sie in Boxes, nach Team, nach Kunde oder nach Projekt, so viele du willst."
+            },
+            "addons": {
+                "question": "Wie funktionieren Add-ons?",
+                "answer": "Sie sind Mengen in deinem bestehenden Abo, kein weiterer Tarif. Füge Guthaben hinzu, wann immer du es brauchst, und entferne es genauso."
+            },
+            "removeAddon": {
+                "question": "Was passiert, wenn ich ein Add-on entferne?",
+                "answer": "Du behältst, was du bezahlt hast, bis zum Ende des Abrechnungszeitraums, und der kleinere Betrag gilt ab der nächsten Rechnung. Nichts wird mitten im Monat abgeschaltet."
+            },
+            "cancel": {
+                "question": "Kann ich jederzeit kündigen?",
+                "answer": "Ja, mit einem Klick in deinen Abrechnungseinstellungen, ohne Kündigungsfrist und ohne jemandem schreiben zu müssen. Unsere Erstattungsrichtlinie regelt den Rest."
+            },
+            "taxes": {
+                "question": "Sind Steuern im Preis enthalten?",
+                "answer": "Die Preise verstehen sich ohne Steuern. Mehrwertsteuer oder Umsatzsteuer wird, wenn sie für dein Land gilt, an der Kasse berechnet und hinzugefügt."
+            },
+            "enterprise": {
+                "question": "Bietet ihr Enterprise-Preise an?",
+                "answer": "Ja. Dedizierte oder selbst gehostete Infrastruktur, SSO, ein SLA und dedizierter Support, mit Preisen für deine Organisation. Schreib uns an help@rerun.build."
+            }
+        }
+    }
+}

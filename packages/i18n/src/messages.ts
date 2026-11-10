@@ -9,6 +9,8 @@ const PACKS: Record<Locale, () => Promise<{ default: MessageTree }>> = {
     en: () => import('../messages/en/index'),
     fr: () => import('../messages/fr/index'),
     es: () => import('../messages/es/index'),
+    pt: () => import('../messages/pt/index'),
+    de: () => import('../messages/de/index'),
 }
 
 // Every key of the English source, with the pack's strings over it and then the extra namespaces

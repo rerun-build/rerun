@@ -1,0 +1,155 @@
+{
+    "toast": {
+        "close": "Fechar notificação",
+        "openConversation": "Abrir conversa",
+        "coworker": "Coworker",
+        "scheduledTask": "{name} · Tarefa agendada"
+    },
+    "inbox": {
+        "unknownCoworker": "Coworker",
+        "detail": {
+            "close": "Fechar",
+            "seeAll": "Ver tudo",
+            "seeAllCount": "Ver todos os {count}",
+            "markRead": "Marcar como lida",
+            "notInList": "Esta atualização ainda não está na sua lista",
+            "openConversation": "Abrir conversa",
+            "noCoworker": "Esta atualização não está ligada a um coworker",
+            "status": {
+                "error": "Erro",
+                "awaiting_question": "Pergunta",
+                "awaiting_approval": "Aprovação",
+                "awaiting_ack": "Não lida",
+                "done": "Concluída",
+                "waiting_human": "Aguardando"
+            }
+        },
+        "markAll": {
+            "title": "Marcar tudo como lido?",
+            "description": "{count, plural, one {# item vai sair} other {# itens vão sair}} desta lista. Pedidos ainda aguardando resposta também são removidos, sem resposta.",
+            "confirm": "Marcar tudo como lido"
+        },
+        "rowMenu": {
+            "options": "Opções de notificação",
+            "undo": "Desfazer",
+            "unfollow": "Deixar de seguir as tarefas agendadas",
+            "unfollowed": "Você não segue mais as tarefas agendadas de {name}.",
+            "mute": "Silenciar {name}",
+            "muted": "{name} foi silenciado.",
+            "settings": "Configurações de notificação"
+        },
+        "untitledSession": "Sessão sem título",
+        "reasons": {
+            "mine": "Você iniciou esta execução",
+            "participant": "Você está nesta conversa",
+            "followed": "Você segue as tarefas agendadas de {agentName}",
+            "allActivity": "Você recebe toda a atividade de {agentName}",
+            "everything": "Você recebe todas as execuções do workspace",
+            "workspace": "Isto é sobre o seu workspace"
+        }
+    },
+    "settings": {
+        "scopeTitle": "Notifique-me sobre",
+        "recommended": "Recomendado",
+        "notificationsFor": "Notificações de {name}",
+        "scopes": {
+            "everything": {
+                "label": "Tudo",
+                "detail": "Todas as execuções do workspace, de quem quer que seja."
+            },
+            "mine": {
+                "label": "Minhas execuções e o que eu sigo",
+                "detail": "Execuções que eu inicio, conversas em que estou, coworkers que eu sigo."
+            },
+            "needed": {
+                "label": "Só quando precisarem de mim",
+                "detail": "Perguntas, aprovações e erros nas minhas execuções. Uma execução concluída fica em silêncio."
+            },
+            "nothing": {
+                "label": "Nada",
+                "detail": "Eu mesmo confiro a caixa de entrada."
+            }
+        },
+        "modes": {
+            "default": {
+                "label": "Padrão",
+                "yourSetting": "Sua configuração: “{scope}”."
+            },
+            "everything": {
+                "label": "Toda a atividade",
+                "hint": "Todas as execuções, de quem quer que seja."
+            },
+            "muted": {
+                "label": "Silenciado",
+                "hint": "Nada. O quadro continua mostrando."
+            }
+        },
+        "bell": {
+            "title": "Notifique-me sobre {name}",
+            "follow": "Seguir as tarefas agendadas",
+            "noSchedule": "{name} ainda não tem tarefa agendada",
+            "nothingScheduled": "Nada agendado ainda.",
+            "scheduled": "{count} agendadas, chegam até você como suas próprias execuções.",
+            "allSettings": "Todas as configurações de notificação"
+        },
+        "perCoworker": {
+            "title": "Por coworker",
+            "detail": "Também dá para ajustar pelo sino de cada coworker.",
+            "add": "Adicionar",
+            "allListed": "Todos os coworkers já estão na lista",
+            "empty": "Todos os coworkers seguem a regra acima.",
+            "following": "Seguindo as tarefas agendadas",
+            "alreadyDefault": "{name} já segue a sua configuração",
+            "reset": "Redefinir {name}"
+        },
+        "channels": {
+            "title": "Como",
+            "toast": {
+                "label": "Aviso no app",
+                "description": "Aparece sobre a caixa de entrada com o Rerun aberto."
+            },
+            "sound": {
+                "label": "Som",
+                "description": "Só quando um coworker precisa de você ou algo quebra.",
+                "play": "Tocar som de notificação"
+            },
+            "email": {
+                "label": "E-mail",
+                "description": "Quando precisarem de você enquanto estiver fora. Um e-mail por incidente, nunca um por execução."
+            }
+        },
+        "accountEmails": {
+            "title": "E-mails da conta",
+            "billing": {
+                "label": "Teste e cobrança",
+                "description": "Lembretes do teste e avisos de cobrança sobre a sua assinatura."
+            },
+            "product": {
+                "label": "Novidades do produto",
+                "description": "Novos recursos, dicas e notícias do produto de vez em quando."
+            }
+        },
+        "saveFailed": "Não foi possível salvar suas configurações de notificação",
+        "networkError": "Erro de rede"
+    },
+    "emailPreferences": {
+        "coworkerTitle": "Notificações de coworkers",
+        "email": {
+            "label": "E-mail",
+            "description": "Quando um coworker precisa de você ou quebra enquanto você está fora. Um e-mail por incidente, nunca um por execução."
+        },
+        "saveFailed": "Falha ao salvar as preferências",
+        "saving": "Salvando…",
+        "saved": "Todas as alterações salvas"
+    },
+    "notices": {
+        "slotsPaused": "Seu plano agora tem {slots, plural, one {# vaga {provider}} other {# vagas {provider}}}, então {paused, plural, one {# conta conectada está pausada} other {# contas conectadas estão pausadas}}. Adicione uma vaga em Faturamento para {paused, plural, one {reativá-la} other {reativá-las}}.",
+        "workspaceBack": "Seu workspace está de volta. Reconecte sua conta {provider} em Configurações → Apps para que seus coworkers possam usá-la de novo.",
+        "trialEndsSoon": "Sua vaga {provider} gratuita termina em {endsAt, date, long}. Depois ela vira uma vaga paga no seu plano. Desconecte a conta em Configurações → Apps antes disso se não quiser mantê-la.",
+        "trialEndedPlanInactive": "Sua vaga {provider} gratuita terminou enquanto seu plano não está ativo, então {account, select, none {a conta} other {{account}}} está pausada. Adicione uma vaga em Faturamento em até uma semana para mantê-la, ou ela será desconectada.",
+        "trialEndedDeclined": "Sua vaga {provider} gratuita terminou e o cartão foi recusado, então {account, select, none {a conta} other {{account}}} está pausada. Adicione uma vaga em Faturamento em até uma semana para mantê-la, ou ela será desconectada.",
+        "rateLimited": "{provider} pediu que {account, select, none {uma das suas contas} other {{account}}} diminuísse o ritmo. Seus coworkers não vão usá-la por 24 horas, para manter a conta segura.",
+        "signedOut": "{provider} desconectou {account, select, none {uma das suas contas} other {{account}}}. Reconecte-a em Configurações → Apps para que seus coworkers possam usá-la de novo.",
+        "budgetExhausted": "Seus créditos Rerun deste mês acabaram. As execuções agendadas e acionadas nos modelos Rerun estão pausadas, e os coworkers não podem comprar leads nem dados de SEO ou redes sociais, até a renovação ou até você adicionar créditos."
+    }
+}

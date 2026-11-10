@@ -1,0 +1,57 @@
+{
+    "close": "Schließen",
+    "back": "Zurück",
+    "moreOptions": "Weitere Optionen",
+    "deleteConfirmTitle": "{label}?",
+    "command": {
+        "title": "Befehlspalette",
+        "description": "Suche nach einem Befehl..."
+    },
+    "combobox": {
+        "placeholder": "Option auswählen",
+        "placeholderMultiple": "Optionen auswählen",
+        "search": "Suchen…",
+        "empty": "Keine Ergebnisse",
+        "selected": "Ausgewählt",
+        "remove": "{option} entfernen",
+        "reorder": "{option} verschieben"
+    },
+    "filter": {
+        "search": "{label} suchen…",
+        "empty": "Kein Treffer",
+        "clear": "Zurücksetzen"
+    },
+    "phone": {
+        "code": "Ländervorwahl, gib eine Vorwahl oder ein Land ein",
+        "noCountry": "Kein Land gefunden"
+    },
+    "powerBars": "Leistung {filled} von {max}",
+    "markdown": {
+        "openEditor": "Vollständigen Editor öffnen",
+        "done": "Fertig"
+    },
+    "upload": {
+        "menu": "Hochladen",
+        "files": "Dateien hochladen",
+        "folder": "Ordner hochladen",
+        "failed": "Hochladen fehlgeschlagen",
+        "finishing": "Wird abgeschlossen",
+        "waiting": "Wartet · {size}",
+        "progress": "Upload-Fortschritt",
+        "uploadingFile": "{name} wird hochgeladen",
+        "totalProgress": "Gesamtfortschritt",
+        "retry": "Erneut versuchen",
+        "cancel": "Abbrechen",
+        "cancelAll": "Alle abbrechen",
+        "dismiss": "Ausblenden",
+        "headingFailed": "{failed} von {total} Dateien nicht hochgeladen",
+        "headingDone": "{count, plural, one {# Datei hochgeladen} other {# Dateien hochgeladen}}",
+        "headingUploading": "{current} von {total} wird hochgeladen",
+        "more": "+ {count} weitere"
+    },
+    "waveform": {
+        "live": "Live-Audiowellenform",
+        "processing": "Audio wird verarbeitet",
+        "idle": "Audiowellenform inaktiv"
+    }
+}

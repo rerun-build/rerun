@@ -1,0 +1,42 @@
+{
+    "group": {
+        "steps": "{count, plural, one {# etapa} other {# etapas}}",
+        "stepsWithFailures": "{count, plural, one {# etapa} other {# etapas}}, {failed} com falha",
+        "failed": "{failed} com falha"
+    },
+    "tool": {
+        "input": "Entrada",
+        "error": "Erro",
+        "output": "Saída",
+        "completedInMs": "Concluído em {ms}ms",
+        "completedInSeconds": "Concluído em {seconds}s"
+    },
+    "reasoning": {
+        "thinking": "Pensando...",
+        "thought": "Raciocínio"
+    },
+    "compaction": {
+        "running": "Compactando o contexto…",
+        "failed": "Falha ao compactar o contexto",
+        "done": "Contexto compactado",
+        "summarized": "{count} mensagens anteriores resumidas",
+        "recovered": "~{count} tokens recuperados"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {# falha} other {# falhas}}",
+        "idle": "Inativa há {minutes} min",
+        "stop": "Parar esta tarefa",
+        "failed": "Falhou",
+        "stopped": "Parada, trabalho parcial mantido",
+        "earlier": "+{count} anteriores",
+        "verbs": {
+            "web_search": "Pesquisando {summary}",
+            "web_fetch": "Lendo {summary}",
+            "browser_navigate": "Navegando {summary}",
+            "shell_exec": "Executando {summary}",
+            "fs_read": "Lendo {summary}",
+            "fs_write": "Escrevendo {summary}",
+            "fs_edit": "Editando {summary}"
+        }
+    }
+}

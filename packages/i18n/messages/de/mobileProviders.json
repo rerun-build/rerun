@@ -1,0 +1,168 @@
+{
+    "sheet": {
+        "back": "Zurück",
+        "close": "Schließen"
+    },
+    "badge": {
+        "creditsUsedUp": "Guthaben aufgebraucht",
+        "signInAgain": "Neu anmelden",
+        "keyRejected": "Schlüssel abgelehnt",
+        "keyMissing": "Schlüssel fehlt",
+        "ready": "Bereit"
+    },
+    "usage": {
+        "agentsFallBack": "{agents} fallen auf das Standardmodell des Workspace zurück.",
+        "automationsFallBack": "{count, plural, one {1 Automatisierung fällt} other {# Automatisierungen fallen}} auf das Standardmodell des Workspace zurück.",
+        "agentsAndAutomationsFallBack": "{agents} und {count, plural, one {1 Automatisierung} other {# Automatisierungen}} fallen auf das Standardmodell des Workspace zurück.",
+        "holdsDefault": "Es ist das Standardmodell des Workspace, das entfernt wird: Jeder Coworker ohne eigenes Modell fällt auf Rerun zurück.",
+        "nothingRuns": "Die Zugangsdaten werden entfernt. Nichts läuft darüber."
+    },
+    "list": {
+        "title": "KI-Anbieter",
+        "notAnswering": "Die Maschine dieses Workspace antwortet nicht. Versuch es gleich noch einmal.",
+        "defaultModel": "Standardmodell",
+        "included": "Inklusive",
+        "subscriptions": "Deine Abos",
+        "subscriptionsPitch": "Du nutzt schon Claude Code oder Codex? Deine Coworker können mit deinem Tarif arbeiten.",
+        "addSubscription": "Abo hinzufügen",
+        "apiKeys": "Deine API-Schlüssel",
+        "apiKeysPitch": "Bezahl deinen Anbieter direkt, pro Token.",
+        "addApiKey": "API-Schlüssel hinzufügen",
+        "via": "Über {name}",
+        "creditsUsedUpPickModel": "Das Rerun-Guthaben ist aufgebraucht, bis es {backOn} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
+        "creditsUsedUpAddSource": "Das Rerun-Guthaben ist aufgebraucht, bis es {backOn} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
+        "defaultBroken": "Coworker ohne eigenes Modell sind gestoppt. Repariere {name} oder wähle ein anderes Modell.",
+        "signInAgain": "Neu anmelden",
+        "addKey": "Schlüssel hinzufügen"
+    },
+    "add": {
+        "addSubscription": "Abo hinzufügen",
+        "addApiKey": "API-Schlüssel hinzufügen",
+        "addProvider": "Anbieter hinzufügen",
+        "subscriptions": "Abos",
+        "apiKeys": "API-Schlüssel"
+    },
+    "defaultModel": {
+        "title": "Standardmodell",
+        "changeFailed": "Das Standardmodell konnte nicht geändert werden"
+    },
+    "detail": {
+        "name": "Name",
+        "removeButton": "{name} entfernen",
+        "saveFailed": "Speichern fehlgeschlagen",
+        "renameTitle": "Umbenennen",
+        "renameMessage": "Wird in der Modellauswahl jedes Coworkers angezeigt.",
+        "keySaveFailed": "Zugangsdaten konnten nicht gespeichert werden",
+        "removeTitle": "{name} entfernen?",
+        "removeConfirm": "Entfernen",
+        "deleteFailed": "Verbindung konnte nicht gelöscht werden"
+    },
+    "credit": {
+        "title": "Guthaben diesen Monat",
+        "percent": "{percent} %",
+        "usedUp": "Coworker, die mit Rerun laufen, sind pausiert, bis das Guthaben {backOn} zurück ist. Wähle ein anderes Standardmodell, damit sie weiterarbeiten.",
+        "included": "In deinem Rerun-Tarif enthalten. Kein Schlüssel, nichts einzurichten."
+    },
+    "reconnect": {
+        "signInRejected": "Diese Anmeldung wurde abgelehnt. Coworker, die sie nutzen, sind gestoppt, bis du dich neu anmeldest.",
+        "signInExpired": "Diese Anmeldung ist abgelaufen. Coworker, die sie nutzen, sind gestoppt, bis du dich neu anmeldest.",
+        "signInAgain": "Neu anmelden",
+        "keyRejected": "Dieser Schlüssel wurde abgelehnt. Coworker, die ihn nutzen, sind gestoppt, bis du einen neuen einfügst.",
+        "keyMissing": "Kein Schlüssel hinterlegt. Coworker, die ihn nutzen, sind gestoppt, bis du einen einfügst.",
+        "keyLabel": "API-Schlüssel",
+        "keyPlaceholder": "Schlüssel einfügen",
+        "save": "Speichern"
+    },
+    "planUsage": {
+        "title": "Tarifnutzung",
+        "empty": "Die Nutzung erscheint hier nach der nächsten Ausführung mit diesem Tarif.",
+        "percent": "{percent} %"
+    },
+    "models": {
+        "title": "Deine Coworker können nutzen",
+        "enabledCount": "{enabled} von {total}",
+        "lockDefault": "Standardmodell",
+        "lockCustom": "Eigenes Modell. Unten entfernen.",
+        "lockLast": "Coworker brauchen mindestens ein Modell aus dieser Quelle."
+    },
+    "baseUrl": {
+        "label": "Eigene Basis-URL",
+        "help": "Anfragen an deinen eigenen OpenRouter-kompatiblen Router senden",
+        "save": "Speichern"
+    },
+    "customModels": {
+        "title": "Eigene Modelle",
+        "remove": "Entfernen",
+        "addLabel": "Modell hinzufügen",
+        "addHelp": "Jede OpenRouter-Modell-ID, z. B. x-ai/grok-4.",
+        "add": "Hinzufügen"
+    },
+    "apiKey": {
+        "name": "Name",
+        "keyLabel": "API-Schlüssel",
+        "keyPlaceholder": "Schlüssel einfügen",
+        "connect": "Verbinden"
+    },
+    "modelSheet": {
+        "close": "Schließen",
+        "title": "Modell auswählen",
+        "notAnswering": "Die Maschine dieses Workspace antwortet nicht. Versuch es gleich noch einmal.",
+        "workspaceDefault": "Workspace-Standard",
+        "addProvider": "Anbieter hinzufügen"
+    },
+    "ending": {
+        "coworkersStart": "Deine Coworker legen wieder los",
+        "nameIt": "Benennen",
+        "connectionName": "Name der Verbindung",
+        "nameHelp": "Wird in der Modellauswahl jedes Coworkers angezeigt.",
+        "saving": "Speichern…",
+        "done": "Fertig"
+    },
+    "claude": {
+        "claudeTokenIsApiKey": "Das ist ein Anthropic-API-Schlüssel. Füge ihn stattdessen als Anthropic-(API-)Verbindung hinzu.",
+        "claudeTokenIsCode": "Das ist der Code von Claude. Klick zuerst auf Get token und füge dann den Code hier ein.",
+        "approve": "Rerun bei Claude zulassen",
+        "open": "Claude öffnen",
+        "openAgain": "Claude erneut öffnen",
+        "pasteStep": "Code einfügen",
+        "codeLabel": "Code von Claude",
+        "checking": "Code wird geprüft…",
+        "paste": "Einfügen",
+        "connect": "Verbinden"
+    },
+    "chatgpt": {
+        "allowStep": "Anmeldung per Code in ChatGPT erlauben",
+        "openSettings": "ChatGPT-Einstellungen öffnen",
+        "alreadyOn": "Ist schon aktiv",
+        "adminSwitches": "Dein ChatGPT-Admin aktiviert es für den ganzen Workspace.",
+        "onPlusOrPro": "Ich habe Plus oder Pro",
+        "onBusiness": "Mit ChatGPT Business oder Enterprise?",
+        "enterStep": "Code bei OpenAI eingeben",
+        "copied": "Kopiert",
+        "copyAdminMessage": "Nachricht für den Admin kopieren",
+        "adminMessage": "Hallo! Könntest du \"Device code authorization for Codex\" in den Einstellungen unseres ChatGPT-Workspace aktivieren? Ich brauche das, um meinen ChatGPT-Tarif mit Rerun zu verbinden.",
+        "copyCode": "Code kopieren",
+        "openOpenAI": "OpenAI öffnen",
+        "enterHint": "Gib ihn auf der Seite von OpenAI ein und bestätige. Dieser Bildschirm erkennt es von selbst.",
+        "gettingCode": "Code wird geholt…",
+        "getNewCode": "Neuen Code holen",
+        "getCode": "Code holen",
+        "stuck": {
+            "expiredAdmin": "Der Code ist abgelaufen. Dein Admin hat die Anmeldung per Code wahrscheinlich noch nicht erlaubt.",
+            "errorAdmin": "Fehler auf der Seite von OpenAI? Dein Admin hat die Anmeldung per Code wahrscheinlich noch nicht erlaubt.",
+            "expiredSetting": "Der Code ist abgelaufen. Die Anmeldung per Code ist wohl noch aus: Aktiviere sie unter <link>Settings → Security</link> und hol dann einen neuen Code.",
+            "errorSetting": "Fehler auf der Seite von OpenAI? Die Anmeldung per Code ist wohl noch aus: Aktiviere sie unter <link>Settings → Security</link> und gib den Code dann erneut ein."
+        }
+    },
+    "connect": {
+        "renameFailed": "Verbindung konnte nicht umbenannt werden",
+        "startFailed": "Verbindung konnte nicht gestartet werden",
+        "notSignedIn": "Nicht angemeldet",
+        "createFailed": "Verbindung konnte nicht erstellt werden"
+    },
+    "oauth": {
+        "unfinished": "Die Anmeldung wurde nicht abgeschlossen. Versuch es erneut.",
+        "authorizationFailed": "Autorisierung fehlgeschlagen",
+        "startFailed": "Anmeldung konnte nicht gestartet werden"
+    }
+}

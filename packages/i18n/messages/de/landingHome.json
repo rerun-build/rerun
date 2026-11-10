@@ -1,0 +1,655 @@
+{
+    "hero": {
+        "title": {
+            "lead": "Hol dir <keep>KI-<chip>Coworker</chip></keep>",
+            "tail": "Sie arbeiten wie du."
+        },
+        "subtitle": "Chatbots sagen dir, was zu tun ist. KI-Coworker erledigen die Arbeit. Verbinde das LLM, für das du schon zahlst, mit Rerun und gib ihnen Aufgaben.",
+        "cta": "5 Tage testen für {price}",
+        "productHuntAlt": "Unterstütze Rerun auf Product Hunt",
+        "trust": "{count, number}+ Nutzer vertrauen Rerun für ihr Geschäft",
+        "pillLeads": {
+            "jobs": "Dein neuer",
+            "tasks": "Lass einen Coworker",
+            "sectors": "Rerun für"
+        },
+        "tiles": {
+            "tour-research": {
+                "job": "B2B-Vertriebler",
+                "pill": "Vertriebler",
+                "task": "Neue Kunden finden"
+            },
+            "tour-social": {
+                "job": "Community Manager",
+                "pill": "Community Manager",
+                "task": "Auf Social Media posten"
+            },
+            "tour-docs": {
+                "job": "Kundensupport",
+                "pill": "Support-Mitarbeiter",
+                "task": "Deine E-Mails beantworten"
+            },
+            "tour-invoices": {
+                "job": "Assistenz der GF",
+                "pill": "Assistent der Geschäftsführung",
+                "task": "Die Verwaltung erledigen"
+            },
+            "tour-watch": {
+                "job": "Marktanalyst",
+                "pill": "Marktanalyst",
+                "task": "Wettbewerber beobachten"
+            },
+            "tour-writer": {
+                "job": "Content-Marketer"
+            },
+            "tour-desk": {
+                "job": "Umsatzanalyst"
+            }
+        },
+        "boxes": {
+            "tour-marketing": "Marketing",
+            "tour-sales": "Vertrieb",
+            "tour-ops": "Verwaltung"
+        },
+        "handoffs": {
+            "handoff-marketing-sales": "Der Post von gestern brachte 14 Anfragen. Vier mit Firmen-E-Mail.",
+            "handoff-marketing-ops": "Die Fallstudie zu Acme geht Donnerstag live. Ist ihre Rechnung da?"
+        },
+        "sources": {
+            "lead": "Funktioniert mit dem Abo, für das du schon zahlst",
+            "router": "oder mit jedem anderen Modell, über<router></router>"
+        },
+        "tools": {
+            "title": "<chip>Coworker</chip> arbeiten mit deinen Tools.",
+            "count": "{count, number}+ Integrationen"
+        },
+        "screen": {
+            "hint": {
+                "tap": "Tipp einen Coworker an, um ihn zu sehen",
+                "click": "Klick einen Coworker an oder frag Rerun"
+            },
+            "inboxSettings": "Einstellungen: In deinem eigenen Workspace verfügbar",
+            "useCases": {
+                "find-leads": {
+                    "label": "Leads finden",
+                    "ask": "Finde SaaS-Firmen in Frankreich, die gerade Vertriebler einstellen.",
+                    "request": "26 Firmen bleiben, nachdem ich die schon in HubSpot entfernt habe. Wie soll ich sie sortieren?"
+                },
+                "post-on-social": {
+                    "label": "Social Media",
+                    "ask": "Mach aus dem Blogartikel dieser Woche Posts für X und Instagram.",
+                    "request": "Zwei Einstiege für den Thread. Welcher klingt nach dir?"
+                },
+                "reply-to-customers": {
+                    "label": "Kunden antworten",
+                    "ask": "Geh jeden Morgen das Support-Postfach durch und entwirf, was du kannst.",
+                    "request": "Die 31 entworfenen Antworten senden"
+                },
+                "handle-admin": {
+                    "label": "Verwaltung",
+                    "ask": "Gleiche jede Nacht die Rechnungen ab. Weck mich nur, wenn du nicht weiterkommst.",
+                    "request": "Drei Rechnungen ließen sich über Nacht nicht abgleichen, insgesamt 4.210 $. Bei Acme und Northwind sind die Karten abgelaufen, ohne neue Zahlungsmethode kann ich die Abbuchung nicht wiederholen."
+                },
+                "track-sales": {
+                    "label": "Umsatz verfolgen",
+                    "ask": "Behalte den Umsatz im Blick und sag mir, wenn sich wirklich etwas bewegt.",
+                    "request": "Die zwei abrutschenden Kunden in #sales posten"
+                },
+                "watch-competitors": {
+                    "label": "Wettbewerb",
+                    "ask": "Sag mir, wenn unsere drei Wettbewerber etwas Wichtiges ändern.",
+                    "request": "Willst du solche Änderungen sofort, oder gesammelt?"
+                },
+                "create-content": {
+                    "label": "Content erstellen",
+                    "ask": "Schreib den Artikel dieser Woche zu dem Keyword, bei dem wir am nächsten am Ranking sind.",
+                    "request": "„Agent Orchestration“ steht auf Position 11 mit 2.400 Suchen im Monat. Den bestehenden Post umschreiben oder einen neuen schreiben?"
+                }
+            },
+            "scripts": {
+                "find-leads": {
+                    "steps": {
+                        "1": "Lese LinkedIn-Stellenanzeigen",
+                        "2": "Gleiche sie mit deinem ICP ab",
+                        "3": "Prüfe dein CRM"
+                    },
+                    "say": "Aus 62 Stellenanzeigen wurden 26 Firmen, nachdem ich die aussortiert habe, mit denen du schon sprichst.",
+                    "checks": {
+                        "linkedin": "62 Stellenanzeigen gelesen",
+                        "apollo": "38 Firmen angereichert",
+                        "hubspot": "12 aussortiert · schon deine"
+                    },
+                    "found": "26 Firmen, Top 3 nach Passung",
+                    "cards": {
+                        "forma": {
+                            "name": "Forma",
+                            "meta": "Head of Sales",
+                            "line": "Stellt 2 Account Executives ein"
+                        },
+                        "northstar": {
+                            "name": "Northstar",
+                            "meta": "Sales Director",
+                            "line": "Baut ein Vertriebsteam in Paris auf"
+                        },
+                        "arc-labs": {
+                            "name": "Arc Labs",
+                            "meta": "VP Sales",
+                            "line": "Stellt 3 SDRs ein"
+                        }
+                    },
+                    "relay": "Northstar hat seinen Einstiegstarif vor zwei Stunden auf 59 $ gesenkt. Guter Aufhänger.",
+                    "reply": "Die Top 3 passen. Trag sie in HubSpot ein und mach das jeden Montag.",
+                    "routine": "Jeden Montag um 9:00, nur neue Namen"
+                },
+                "post-on-social": {
+                    "steps": {
+                        "1": "Lese den Artikel dieser Woche",
+                        "2": "Gestalte 5 Karussell-Folien",
+                        "3": "Plane beide Posts ein"
+                    },
+                    "say": "Ein Artikel, zwei Posts: ein Thread für X heute, ein Karussell mit fünf Folien morgen um 9:00.",
+                    "checks": {
+                        "canva": "5 Folien gestaltet",
+                        "buffer": "2 Posts geplant"
+                    },
+                    "found": "2 Posts, warten auf dein OK",
+                    "cards": {
+                        "x": {
+                            "name": "X-Thread",
+                            "meta": "Heute",
+                            "line": "Startet mit den 20 Tickets, die alle wiederholen"
+                        },
+                        "instagram": {
+                            "name": "Instagram",
+                            "meta": "Morgen, 9:00",
+                            "line": "5 Folien, je eine Idee"
+                        }
+                    },
+                    "relay": "Der Artikel ging vor einer Stunde live. Das Karussell habe ich direkt daraus gemacht.",
+                    "reply": "Beide gut. Mach das nach jedem Artikel.",
+                    "routine": "Nach jedem Artikel, den du veröffentlichst"
+                },
+                "reply-to-customers": {
+                    "steps": {
+                        "1": "Lese 34 ungelesene Threads",
+                        "2": "Suche in der Hilfe-Doku",
+                        "3": "Prüfe frühere Antworten"
+                    },
+                    "say": "31 der 34 sind aus früheren Antworten entworfen, und diese drei brauchen dich.",
+                    "checks": {
+                        "gmail": "34 Threads gelesen · 31 entworfen",
+                        "notion": "19 Hilfe-Artikel gefunden",
+                        "intercom": "7 frühere Gespräche genutzt"
+                    },
+                    "found": "3 Threads brauchen dich",
+                    "cards": {
+                        "refund": {
+                            "name": "Erstattung #1042",
+                            "meta": "Wartet seit 2 Tagen",
+                            "line": "Strittige Abbuchung, außerhalb der Regeln"
+                        },
+                        "renewal": {
+                            "name": "Vertragsverlängerung",
+                            "meta": "Wartet seit 1 Tag",
+                            "line": "Will ein individuelles SLA"
+                        },
+                        "export": {
+                            "name": "Datenexport",
+                            "meta": "Wartet seit 4 Stunden",
+                            "line": "Juristische Formulierung, da rate ich nicht"
+                        }
+                    },
+                    "relay": "Die Erstattung zu #1042 ist nie bei der Bank angekommen, halte die zurück, bis ich sie abschließe.",
+                    "reply": "Schick die 31. Die drei übernehme ich selbst.",
+                    "routine": "Jeden Morgen um 7:30, nur die schwierigen"
+                },
+                "handle-admin": {
+                    "steps": {
+                        "1": "Prüfe 148 bezahlte Rechnungen",
+                        "2": "Gleiche sie mit der Bank ab",
+                        "3": "Lege jeden Beleg ab"
+                    },
+                    "say": "Alle 148 Belege sind abgelegt, nur drei Rechnungen ließen sich nicht abgleichen, insgesamt 4.210 $.",
+                    "checks": {
+                        "stripe": "148 Rechnungen abgeglichen",
+                        "mercury": "141 Überweisungen zugeordnet",
+                        "gmail": "148 Belege abgelegt"
+                    },
+                    "found": "3 Rechnungen, 4.210 $ offen",
+                    "cards": {
+                        "acme": {
+                            "name": "Acme",
+                            "meta": "#1042",
+                            "line": "Karte abgelaufen, keine neue Abbuchung möglich"
+                        },
+                        "northwind": {
+                            "name": "Northwind",
+                            "meta": "#1057",
+                            "line": "Karte abgelaufen, neue Karte nötig"
+                        },
+                        "halden": {
+                            "name": "Halden Group",
+                            "meta": "#1061",
+                            "line": "Überweisung 120 $ zu niedrig"
+                        }
+                    },
+                    "relay": "Haldens Lücke von 120 $ ist eine Bankgebühr, keine Unterzahlung. Kann geschlossen werden.",
+                    "reply": "Dann schließ Halden. Hak bei den anderen zwei jede Nacht nach.",
+                    "routine": "Jede Nacht um 2:00, ich wecke dich nur bei Problemen"
+                },
+                "track-sales": {
+                    "steps": {
+                        "1": "Rechne die letzten 30 Tage zusammen",
+                        "2": "Lese 54 offene Deals",
+                        "3": "Aktualisiere die Umsatztabelle"
+                    },
+                    "say": "Umsatz +11 % im Monat, 482.000 $, aber zwei deiner fünf größten Deals sind zurückgefallen.",
+                    "checks": {
+                        "stripe": "482.000 $ in 30 Tagen",
+                        "hubspot": "54 offene Deals gelesen",
+                        "sheets": "3 Tabs aktualisiert"
+                    },
+                    "found": "3 Bewegungen, 2 negativ",
+                    "cards": {
+                        "halden": {
+                            "name": "Halden Group",
+                            "meta": "84.000 $",
+                            "line": "Zurück auf Angebot, Abschlussdatum verpasst"
+                        },
+                        "vessel": {
+                            "name": "Vessel",
+                            "meta": "61.500 $",
+                            "line": "Von Abschluss zurück in Verhandlung"
+                        },
+                        "petra": {
+                            "name": "Petra",
+                            "meta": "38.000 $",
+                            "line": "Vorgerückt, von Angebot zu Abschluss"
+                        }
+                    },
+                    "relay": "Petra ist vorgerückt, weil ihr VP Sales gestern geantwortet hat. Ich habe den Call gebucht.",
+                    "reply": "Gut. Meld dich werktags, wenn sich etwas bewegt.",
+                    "routine": "Jeden Werktag um 8:00, nur bei Bewegung"
+                },
+                "watch-competitors": {
+                    "steps": {
+                        "1": "Prüfe 3 Preisseiten erneut",
+                        "2": "Suche nach neuen Launches",
+                        "3": "Vergleiche 212 Keyword-Lücken"
+                    },
+                    "say": "Nur einer der drei hat sich bewegt, und zwar der, der dich etwas kostet: die Preise von Northstar.",
+                    "checks": {
+                        "firecrawl": "3 Preisseiten gecrawlt",
+                        "producthunt": "1 Launch gefunden",
+                        "semrush": "212 Keyword-Lücken verglichen"
+                    },
+                    "found": "3 Wettbewerber, 1 echte Änderung",
+                    "cards": {
+                        "northstar": {
+                            "name": "Northstar",
+                            "meta": "Vor 2 Stunden",
+                            "line": "Einstiegstarif 79 $ auf 59 $, Gratis-Stufe neu"
+                        },
+                        "cobalt": {
+                            "name": "Cobalt",
+                            "meta": "Gestern",
+                            "line": "Hat ein Integrationsverzeichnis gestartet"
+                        },
+                        "tenley": {
+                            "name": "Tenley",
+                            "meta": "Heute geprüft",
+                            "line": "Nichts bewegt, Preise unverändert"
+                        }
+                    },
+                    "relay": "Ich schreibe unsere Preisseite schon gegen ihre 59 $ um. Entwurf bis heute Abend.",
+                    "reply": "Sag mir binnen einer Stunde, wenn Preise sich ändern.",
+                    "routine": "Preise binnen einer Stunde, der Rest am Freitag"
+                },
+                "create-content": {
+                    "steps": {
+                        "1": "Lese 1.204 Suchanfragen",
+                        "2": "Öffne die Top 3 Ergebnisse",
+                        "3": "Schreibe den Post um"
+                    },
+                    "say": "Ich habe den bestehenden Post umgeschrieben, statt einen neuen zu starten, der dahinter ranken würde.",
+                    "checks": {
+                        "searchConsole": "1.204 Suchanfragen gelesen",
+                        "firecrawl": "Top 3 Ergebnisse geöffnet",
+                        "notion": "1.850 Wörter entworfen"
+                    },
+                    "found": "1 Entwurf, 1.850 Wörter",
+                    "cards": {
+                        "orchestration": {
+                            "name": "Orchestration",
+                            "meta": "Position 11",
+                            "line": "2.400 Suchen im Monat, heute auf Seite zwei"
+                        },
+                        "rewrite": {
+                            "name": "Die Neufassung",
+                            "meta": "1.850 Wörter",
+                            "line": "Baut auf den 3 Fragen auf, die Seite eins beantwortet"
+                        }
+                    },
+                    "relay": "Northstar rankt seit zwei Tagen auf dieses Keyword. Die Neufassung lohnt sich.",
+                    "reply": "Veröffentliche es. Dasselbe jeden Dienstag.",
+                    "routine": "Jeden Dienstag um 10:00, das nächstliegende Keyword"
+                }
+            },
+            "chat": {
+                "customer": "Kunde",
+                "routineCreated": "Routine erstellt · {routine}",
+                "relayFrom": "Nachricht von {agent}",
+                "wantTitle": "Willst du einen Coworker wie {name}?",
+                "wantBody": "Deiner, mit deinen eigenen Apps, 5 Tage testen für {price}.",
+                "start": "Mit diesem Coworker starten"
+            },
+            "panel": {
+                "chats": "Chats",
+                "card": "Coworker-Karte",
+                "close": "Coworker schließen",
+                "newConversation": "Neue Unterhaltung"
+            },
+            "foreman": {
+                "newTask": "Neue Aufgabe",
+                "unknown": "Unbekannter Coworker",
+                "running": {
+                    "prompt": "Was läuft gerade?",
+                    "tool": "Coworker auflisten",
+                    "toolResult": "{count} Coworker",
+                    "answer": "**3 Coworker** arbeiten gerade. Der {writer} entwirft den Artikel dieser Woche, der {research} reichert 40 neue Leads an, und der {invoices} geht überfällige Rechnungen durch."
+                },
+                "waiting": {
+                    "prompt": "Wer wartet auf mich?",
+                    "tool": "Posteingang lesen",
+                    "toolResult": "{count} offen",
+                    "answer": "**{count, plural, one {# Coworker wartet} other {# Coworker warten}}** auf dich. Am längsten wartet der {name}: {message}",
+                    "empty": "Gerade niemand. Der Posteingang ist leer und jeder Coworker arbeitet oder ist fertig."
+                },
+                "handoff": {
+                    "prompt": "Lass den {writer} den {social} briefen",
+                    "ask": "Lass den {writer} den {social} zum Artikel dieser Woche briefen.",
+                    "plan": "Der Artikel ist die Arbeit des {writer}, das Posten die des {social}. Ich übergebe ihn, statt ihn selbst umzuschreiben.",
+                    "tool": "{writer} schreiben",
+                    "toolResult": "gesendet",
+                    "answer": "Erledigt. Der {writer} gibt seinen Entwurf an den {social} weiter, der daraus einen LinkedIn-Post und einen Thread für X macht."
+                },
+                "routines": {
+                    "chase-overdue": {
+                        "name": "Überfällige Rechnungen nachfassen",
+                        "frequency": "Alle 4 Stunden"
+                    },
+                    "enrich-leads": {
+                        "name": "Neue Leads anreichern",
+                        "frequency": "Jede Stunde"
+                    },
+                    "overnight-tickets": {
+                        "name": "Nächtliche Tickets beantworten",
+                        "frequency": "Täglich um 7:00"
+                    },
+                    "competitor-digest": {
+                        "name": "Täglicher Wettbewerbsüberblick",
+                        "frequency": "Täglich um 8:00"
+                    },
+                    "morning-thread": {
+                        "name": "Morgen-Thread posten",
+                        "frequency": "Täglich um 9:00"
+                    },
+                    "pipeline-digest": {
+                        "name": "Pipeline-Überblick",
+                        "frequency": "Täglich um 17:00"
+                    },
+                    "weekly-seo": {
+                        "name": "Wöchentlicher SEO-Bericht",
+                        "frequency": "Wöchentlich um 8:00"
+                    },
+                    "churn-review": {
+                        "name": "Monatliche Churn-Analyse",
+                        "frequency": "Monatlich am 1. um 9:00"
+                    }
+                }
+            }
+        }
+    },
+    "cases": {
+        "title": "Stell <keep>KI-<chip>Coworker</chip></keep> ein",
+        "industriesLead": "Für",
+        "industries": {
+            "agency": "Agentur",
+            "freelancer": "Freelancer",
+            "ecommerce": "E-Commerce",
+            "real-estate": "Immobilien",
+            "startup": "Startup",
+            "other": "Sonstiges"
+        },
+        "create": "Erstelle deinen eigenen Coworker",
+        "quoteByline": "<author>{name}</author>, {role} bei {company}",
+        "quoted": "„{quote}“",
+        "card": {
+            "tasks": "· {count, plural, one {# Aufgabe} other {# Aufgaben}}",
+            "noApps": "Keine Apps nötig",
+            "apps": "Apps: {list}",
+            "run": "Coworker starten",
+            "priceMonthly": "{price}/Monat"
+        }
+    },
+    "coworker": {
+        "label": "Was sie so stark macht",
+        "title": "<keep><chip>Coworker</chip></keep> sind Teammitglieder mit Superkräften.",
+        "traits": {
+            "delivers": {
+                "title": "Sie erledigen echte Arbeit.",
+                "body": "Verbunden mit {count, number}+ Tools und den Daten, an die ChatGPT oder Claude von Haus aus nicht herankommen."
+            },
+            "tools": {
+                "title": "Er arbeitet am Computer, wie ein Mensch",
+                "body": "Er öffnet deine Apps auf seinem eigenen Bildschirm und klickt sich durch, auch durch solche ohne Schnittstelle."
+            },
+            "always": {
+                "title": "Rund um die Uhr, auf eigener Maschine",
+                "body": "Nachts, am Wochenende, Laptop zu: Er läuft weiter. Deiner ist aus, seine Maschine nie."
+            },
+            "asks": {
+                "title": "Autonom, bis er ein Ja braucht",
+                "body": "Er arbeitet allein und stoppt vor allem, was Folgen hat. Jeder im Team kann zustimmen."
+            },
+            "together": {
+                "title": "Coworker arbeiten zusammen",
+                "body": "Einer findet die Leads, der nächste schreibt ihnen, ein dritter trägt sie in dein CRM ein."
+            }
+        },
+        "subjectJob": "Buchhalter",
+        "delivers": {
+            "ask": "Finde 50 Leads, die unseren besten Kunden ähneln, und trag sie in HubSpot ein.",
+            "steps": {
+                "deals": {
+                    "label": "Deine 42 gewonnenen Deals gelesen",
+                    "elapsed": "6s"
+                },
+                "screen": {
+                    "label": "312 Firmen geprüft, die 50 ähnlichsten behalten",
+                    "elapsed": "1m 12s"
+                },
+                "verify": {
+                    "label": "47 Firmen-E-Mails verifiziert, keine geraten",
+                    "elapsed": "48s"
+                },
+                "create": {
+                    "label": "50 Leads erstellt, Owner: du",
+                    "elapsed": "19s"
+                }
+            },
+            "table": {
+                "name": "Leads",
+                "noun": "Leads",
+                "company": "Firma",
+                "contact": "Kontakt",
+                "fit": "Warum es passt",
+                "rows": {
+                    "alvera": {
+                        "company": "Alvera Logistics",
+                        "contact": "Camille Perrin · COO",
+                        "fit": "Deine Größe, dein Stack"
+                    },
+                    "northbay": {
+                        "company": "Northbay Freight",
+                        "contact": "Tom Vasquez · Head of Ops",
+                        "fit": "Gerade zu Shopify gewechselt"
+                    },
+                    "kerio": {
+                        "company": "Kerio Supply",
+                        "contact": "Lena Haas · Supply Lead",
+                        "fit": "4 Mio. € im Januar eingesammelt"
+                    },
+                    "portside": {
+                        "company": "Portside Group",
+                        "contact": "Marc Dubreuil · CFO",
+                        "fit": "Hat die Konkurrenz verlassen"
+                    },
+                    "mairon": {
+                        "company": "Mairon & Co",
+                        "contact": "Sofia Lindqvist · CEO",
+                        "fit": "Passt, keine E-Mail gefunden"
+                    }
+                }
+            },
+            "reply": "50 Leads in HubSpot, ausgewählt anhand deiner 42 gewonnenen Deals. 47 haben eine von mir geprüfte Firmen-E-Mail. Die drei, die ich nicht prüfen konnte, habe ich leer gelassen, statt zu raten."
+        },
+        "tools": {
+            "windowTitle": "Posteingang - Gmail - Chromium",
+            "tab": "Posteingang (12)",
+            "available": "<strong>{count, number}</strong> Apps verfügbar",
+            "gmail": {
+                "search": "In E-Mails suchen",
+                "compose": "Schreiben",
+                "folders": {
+                    "inbox": "Posteingang",
+                    "starred": "Markiert",
+                    "snoozed": "Zurückgestellt",
+                    "sent": "Gesendet",
+                    "drafts": "Entwürfe"
+                },
+                "threads": {
+                    "invoice4412": {
+                        "subject": "Rechnung #4412",
+                        "preview": "- seit 14 Tagen fällig, Zahlung nicht eingegangen",
+                        "at": "09:12"
+                    },
+                    "payment": {
+                        "subject": "Zahlung erhalten",
+                        "preview": "- danke, wir haben #4408 beglichen",
+                        "at": "08:40"
+                    },
+                    "summary": {
+                        "subject": "Deine Wochenübersicht",
+                        "preview": "- 14.208 € aus 62 Zahlungen eingenommen",
+                        "at": "07:55"
+                    },
+                    "statement": {
+                        "subject": "Kontoauszug bereit",
+                        "preview": "- September 2026 steht zum Download bereit",
+                        "at": "1. Okt."
+                    },
+                    "vat": {
+                        "subject": "Entwurf der USt-Voranmeldung",
+                        "preview": "- 3 Buchungen brauchen vor der Abgabe eine Kategorie",
+                        "at": "30. Sept."
+                    },
+                    "invoice4390": {
+                        "subject": "Rechnung #4390 bezahlt",
+                        "preview": "- Beleg anbei, danke für deinen Auftrag",
+                        "at": "28. Sept."
+                    },
+                    "payout": {
+                        "subject": "Auszahlung unterwegs",
+                        "preview": "- 3.912 € kommen am 3. Oktober an",
+                        "at": "27. Sept."
+                    },
+                    "card": {
+                        "subject": "Kreditkartenabrechnung",
+                        "preview": "- 48 Transaktionen im September abzugleichen",
+                        "at": "25. Sept."
+                    },
+                    "invoice4377": {
+                        "subject": "Rechnung #4377 beglichen",
+                        "preview": "- nichts zu tun, letzte Woche abgelegt",
+                        "at": "24. Sept."
+                    }
+                },
+                "newMessage": "Neue Nachricht",
+                "to": "An",
+                "subject": "Dritte Erinnerung: Rechnung #4412",
+                "typed1": "Hallo, #4412 ist seit 14 Tagen überfällig.",
+                "typed2": "Wann kommt die Zahlung?",
+                "send": "Senden",
+                "sent": "Nachricht gesendet",
+                "undo": "Rückgängig",
+                "view": "Nachricht ansehen"
+            }
+        },
+        "always": {
+            "box": "Betrieb",
+            "desks": {
+                "invoices": "Buchhalter",
+                "inbox": "Assistenz der GF",
+                "nova": "Support-Agent"
+            },
+            "lines": {
+                "prep": "Entwerfe dein Briefing für 9 Uhr",
+                "tickets": "12 Tickets beantwortet",
+                "ready": "Dein Briefing ist fertig"
+            },
+            "place": "box-4417 · Falkenstein, Deutschland",
+            "clock": "Ortszeit {time}",
+            "theme": "Design",
+            "themes": {
+                "system": "System",
+                "light": "Hell",
+                "dark": "Dunkel"
+            }
+        },
+        "asks": {
+            "box": "Finanzen",
+            "desk": "Buchhalter",
+            "requests": {
+                "figma": {
+                    "action": "Figma-Tarif verlängern, 144 $ pro Jahr",
+                    "resumes": "Verlängert. Weiter mit den Rechnungen"
+                },
+                "aws": {
+                    "action": "AWS-Rechnung bezahlen, 312 $",
+                    "resumes": "Bezahlt. Noch 11 Rechnungen"
+                }
+            }
+        },
+        "together": {
+            "desks": {
+                "scout": "Lead-Finder",
+                "quill": "Texter",
+                "ledger": "CRM-Manager"
+            },
+            "says": {
+                "scout": "50 neue Leads, alle deine.",
+                "quill": "50 E-Mails entworfen. Du bist dran.",
+                "ledger": "Erledigt. Alle 50 in HubSpot."
+            }
+        },
+        "apps": {
+            "caption": "{count, number}+ Apps und jeder MCP-Server",
+            "beyond": "+{count, number}"
+        }
+    },
+    "workspaces": {
+        "your-company": {
+            "name": "Deine Firma",
+            "crew": "6 Coworker · Marketing, Finanzen, Verwaltung"
+        },
+        "your-second-company": {
+            "name": "Deine zweite Firma",
+            "crew": "3 Coworker · Vertrieb, Support"
+        },
+        "your-side-project": {
+            "name": "Dein Nebenprojekt",
+            "crew": "1 Coworker · Content"
+        }
+    }
+}

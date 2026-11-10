@@ -42,15 +42,45 @@ import esMobileSettings from '@rerun/i18n/messages/es/mobileSettings.json'
 import esMobileSteps from '@rerun/i18n/messages/es/mobileSteps.json'
 import esSubRuns from '@rerun/i18n/messages/es/subRuns.json'
 import esTools from '@rerun/i18n/messages/es/tools.json'
+import ptChatErrors from '@rerun/i18n/messages/pt/chatErrors.json'
+import ptMobileAuth from '@rerun/i18n/messages/pt/mobileAuth.json'
+import ptMobileCards from '@rerun/i18n/messages/pt/mobileCards.json'
+import ptMobileChat from '@rerun/i18n/messages/pt/mobileChat.json'
+import ptMobileCommon from '@rerun/i18n/messages/pt/mobileCommon.json'
+import ptMobileCoworker from '@rerun/i18n/messages/pt/mobileCoworker.json'
+import ptMobileHitl from '@rerun/i18n/messages/pt/mobileHitl.json'
+import ptMobileHome from '@rerun/i18n/messages/pt/mobileHome.json'
+import ptMobileOnboarding from '@rerun/i18n/messages/pt/mobileOnboarding.json'
+import ptMobileProviders from '@rerun/i18n/messages/pt/mobileProviders.json'
+import ptMobileSettings from '@rerun/i18n/messages/pt/mobileSettings.json'
+import ptMobileSteps from '@rerun/i18n/messages/pt/mobileSteps.json'
+import ptSubRuns from '@rerun/i18n/messages/pt/subRuns.json'
+import ptTools from '@rerun/i18n/messages/pt/tools.json'
+import deChatErrors from '@rerun/i18n/messages/de/chatErrors.json'
+import deMobileAuth from '@rerun/i18n/messages/de/mobileAuth.json'
+import deMobileCards from '@rerun/i18n/messages/de/mobileCards.json'
+import deMobileChat from '@rerun/i18n/messages/de/mobileChat.json'
+import deMobileCommon from '@rerun/i18n/messages/de/mobileCommon.json'
+import deMobileCoworker from '@rerun/i18n/messages/de/mobileCoworker.json'
+import deMobileHitl from '@rerun/i18n/messages/de/mobileHitl.json'
+import deMobileHome from '@rerun/i18n/messages/de/mobileHome.json'
+import deMobileOnboarding from '@rerun/i18n/messages/de/mobileOnboarding.json'
+import deMobileProviders from '@rerun/i18n/messages/de/mobileProviders.json'
+import deMobileSettings from '@rerun/i18n/messages/de/mobileSettings.json'
+import deMobileSteps from '@rerun/i18n/messages/de/mobileSteps.json'
+import deSubRuns from '@rerun/i18n/messages/de/subRuns.json'
+import deTools from '@rerun/i18n/messages/de/tools.json'
 
 // Only the app's own namespaces ship in the bundle: the web's strings would weigh on every launch.
 const english = { chatErrors: enChatErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
 const french = { chatErrors: frChatErrors, mobileAuth: frMobileAuth, mobileCards: frMobileCards, mobileChat: frMobileChat, mobileCommon: frMobileCommon, mobileCoworker: frMobileCoworker, mobileHitl: frMobileHitl, mobileHome: frMobileHome, mobileOnboarding: frMobileOnboarding, mobileProviders: frMobileProviders, mobileSettings: frMobileSettings, mobileSteps: frMobileSteps, subRuns: frSubRuns, tools: frTools }
 const spanish = { chatErrors: esChatErrors, mobileAuth: esMobileAuth, mobileCards: esMobileCards, mobileChat: esMobileChat, mobileCommon: esMobileCommon, mobileCoworker: esMobileCoworker, mobileHitl: esMobileHitl, mobileHome: esMobileHome, mobileOnboarding: esMobileOnboarding, mobileProviders: esMobileProviders, mobileSettings: esMobileSettings, mobileSteps: esMobileSteps, subRuns: esSubRuns, tools: esTools }
+const portuguese = { chatErrors: ptChatErrors, mobileAuth: ptMobileAuth, mobileCards: ptMobileCards, mobileChat: ptMobileChat, mobileCommon: ptMobileCommon, mobileCoworker: ptMobileCoworker, mobileHitl: ptMobileHitl, mobileHome: ptMobileHome, mobileOnboarding: ptMobileOnboarding, mobileProviders: ptMobileProviders, mobileSettings: ptMobileSettings, mobileSteps: ptMobileSteps, subRuns: ptSubRuns, tools: ptTools }
+const german = { chatErrors: deChatErrors, mobileAuth: deMobileAuth, mobileCards: deMobileCards, mobileChat: deMobileChat, mobileCommon: deMobileCommon, mobileCoworker: deMobileCoworker, mobileHitl: deMobileHitl, mobileHome: deMobileHome, mobileOnboarding: deMobileOnboarding, mobileProviders: deMobileProviders, mobileSettings: deMobileSettings, mobileSteps: deMobileSteps, subRuns: deSubRuns, tools: deTools }
 
 export type MobileMessages = typeof english
 
-const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish }
+const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german }
 
 const merged = new Map<Locale, MobileMessages>()
 

@@ -2,16 +2,18 @@
     "_doc": "Terms the translation keeps fixed. `keep` stays as written in every language; `translations` imposes a word per language; `tone` is the register of each language.",
     "keep": ["Rerun", "Rerun Cloud", "Rerun Max", "Foreman", "Box", "Boxes", "Pro", "Max", "Google", "WhatsApp", "LinkedIn", "Slack", "Stripe"],
     "translations": {
-        "coworker": { "fr": "coworker", "es": "coworker" },
-        "coworkers": { "fr": "coworkers", "es": "coworkers" },
-        "workspace": { "fr": "workspace", "es": "workspace" },
-        "credit": { "fr": "crédit", "es": "crédito" },
-        "skill": { "fr": "skill", "es": "skill" },
-        "run": { "fr": "exécution", "es": "ejecución" }
+        "coworker": { "fr": "coworker", "es": "coworker", "pt": "coworker", "de": "Coworker" },
+        "coworkers": { "fr": "coworkers", "es": "coworkers", "pt": "coworkers", "de": "Coworker" },
+        "workspace": { "fr": "workspace", "es": "workspace", "pt": "workspace", "de": "Workspace" },
+        "credit": { "fr": "crédit", "es": "crédito", "pt": "crédito", "de": "Guthaben (a balance), Credit / Credits (a count: \"500 Credits\")" },
+        "skill": { "fr": "skill", "es": "skill", "pt": "skill", "de": "Skill" },
+        "run": { "fr": "exécution", "es": "ejecución", "pt": "execução", "de": "Ausführung" }
     },
     "tone": {
         "fr": "Vouvoiement. Short, plain product French as in a SaaS app. No anglicisms beyond the glossary.",
-        "es": "Tuteo (tú), as Spanish-language SaaS products do. Neutral Spanish, no regionalisms."
+        "es": "Tuteo (tú), as Spanish-language SaaS products do. Neutral Spanish, no regionalisms.",
+        "pt": "Brazilian Portuguese (pt-BR), você, as Brazilian SaaS products write. Never European Portuguese spelling or vocabulary.",
+        "de": "Duzen (du), as recent German SaaS products do. Short, plain product German; nouns capitalized. No anglicisms beyond the glossary."
     },
     "rules": [
         "Never use the em dash (—) nor the en dash as punctuation.",

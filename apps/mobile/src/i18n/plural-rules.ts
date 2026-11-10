@@ -1,8 +1,8 @@
 import { DEFAULT_LOCALE, matchLocale, type Locale } from '@rerun/i18n'
 
 // Hermes ships Intl.Collator, DateTimeFormat and NumberFormat, not PluralRules, and every `{count,
-// plural, ...}` message needs it. The packs are English, French and Spanish, whose cardinal rules fit in
-// a few lines (CLDR): this stands in for the platform until Hermes has its own.
+// plural, ...}` message needs it. The packs' languages have cardinal rules that fit in a few lines
+// (CLDR): this stands in for the platform until Hermes has its own.
 type PluralCategory = 'zero' | 'one' | 'two' | 'few' | 'many' | 'other'
 
 const MILLION = 1_000_000
@@ -11,7 +11,7 @@ function cardinal(locale: Locale, value: number): PluralCategory {
     const absolute = Math.abs(value)
     const integer = Number.isInteger(absolute)
     const largeRound = integer && absolute !== 0 && absolute % MILLION === 0
-    if (locale === 'fr') {
+    if (locale === 'fr' || locale === 'pt') {
         if (Math.floor(absolute) === 0 || Math.floor(absolute) === 1) return 'one'
         return largeRound ? 'many' : 'other'
     }

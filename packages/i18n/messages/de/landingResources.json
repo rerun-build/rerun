@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "Banner-Texturen",
+        "description": "Kostenlose Banner-Texturen für dein Rerun-Expertenprofil: Lade einen fertigen Hintergrund herunter und füge ihn in einer Minute zu deiner öffentlichen Expertenseite hinzu."
+    },
+    "banners": {
+        "eyebrow": "Für Experten",
+        "title": "Banner-Texturen",
+        "description": "Eine Auswahl an Fluid-Glass-Texturen, die wir für Rerun-Expertenprofile nutzen. Kostenlos herunterladen und beliebig verwenden.",
+        "download": "Herunterladen",
+        "downloadFile": "{file} herunterladen",
+        "alts": {
+            "lime-glass-crumple": "Leuchtend limettengrünes Glas, zerknitterte gefaltete Bögen",
+            "pastel-holographic-knot": "Holografische, verknotete Glasbänder in Pastell",
+            "blue-glass-crystal": "Elektrisch blaues, facettiertes Kristallglas",
+            "violet-lime-swirl": "Glaswirbel in Lila und Limettengrün",
+            "crimson-fluid-blob": "Glänzender flüssiger Klecks in Karmesin und Magenta",
+            "amber-droplet-blob": "Bernsteinorange Glastropfen, glänzende Wölbungen",
+            "amber-chrome-swirl": "Chromwirbel in Orange und Schwarz",
+            "dark-lime-crumple": "Zerknittertes schwarzes Glas mit säuregrünen Adern",
+            "pastel-iridescent-bloom": "Holografische, schillernde Glasblüte in Pastell",
+            "violet-lime-vortex": "Glaswirbeltunnel in Lila und Limettengrün",
+            "lavender-glass-vortex": "Wirbelnder Glasstrudel in Lavendel",
+            "violet-lime-crystal": "Kristalline Glasbrocken in Lila und Grün",
+            "pink-swirl-vortex": "Glaswirbel in Pink und Rot",
+            "violet-lime-knot": "Verknotete Torusschleifen in Lila und Limettengrün",
+            "lavender-glass-crystal": "Facettiertes Kristallglas in Lavendel",
+            "blue-chrome-knot": "Verknotete Torusschleifen aus blauem Chrom",
+            "blue-plasma-smoke": "Elektrisch blauer Plasmarauch über Glas",
+            "violet-iridescent-vortex": "Schillernder lila Wirbel",
+            "dark-lime-knot": "Schwarze Glasknoten mit säuregrünem Leuchten",
+            "pastel-holographic-vortex": "Holografischer Wirbel in Pastell",
+            "blue-liquid-ripple": "Schillerndes blaues, gewelltes Flüssigglas",
+            "blue-glass-bloom": "Glasblüte aus kobaltblauen, gerüschten Blättern",
+            "blue-chrome-vortex": "Wirbelnder Glasstrudel aus blauem Chrom",
+            "pastel-holographic-smoke": "Holografischer, rauchiger Glasschleier in Pastell",
+            "crimson-swirl-vortex": "Wirbel in Tiefrot und Magenta",
+            "amethyst-crystal-facets": "Kristalline Facetten in Amethystlila",
+            "violet-iridescent-crumple": "Schillernde, zerknitterte lila Kristallbrocken",
+            "violet-glossy-bloom": "Glänzende Blüte aus lila Glasblättern",
+            "violet-lime-fluid-blob": "Glänzende flüssige Kleckse in Lila und Säuregrün",
+            "dark-green-swirl-vortex": "Glänzender Wirbel in Dunkelgrün und Schwarz"
+        }
+    }
+}

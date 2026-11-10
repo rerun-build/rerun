@@ -1,0 +1,1960 @@
+{
+    "hub": {
+        "title": "Rerun vs Zapier, n8n, Lindy, Claude e mais: comparativos",
+        "headline": "Rerun vs as ferramentas que você já conhece.",
+        "description": "Como o Rerun se compara a Zapier, Make, n8n, Lindy, Manus, Claude Cowork e mais sete: facilidade de uso, trabalho em equipe, flexibilidade e custo, lado a lado.",
+        "eyebrow": "Comparar",
+        "faqLabel": "FAQ",
+        "faqTitle": "Escolhendo entre o Rerun e os outros.",
+        "faq": {
+            "1": {
+                "question": "O Rerun é uma alternativa a quê?",
+                "answer": "O Rerun substitui ferramentas de workflow como Zapier, Make e n8n em tarefas que exigem julgamento, plataformas de agentes cobradas por crédito como Lindy, Twin ou Dust, e agentes auto-hospedados como OpenClaw ou Hermes Agent para equipes que não querem manter um servidor. Cada agente vive na máquina privada do seu workspace e trabalha 24 horas por dia."
+            },
+            "2": {
+                "question": "O Rerun é uma ferramenta de automação ou uma plataforma de agentes de IA?",
+                "answer": "Uma plataforma de agentes de IA. Você descreve uma tarefa com suas palavras, conecta seus apps, e o agente planeja as etapas, lembra o que aprendeu e pergunta antes de qualquer ação arriscada. Não há fluxograma para montar."
+            },
+            "3": {
+                "question": "Posso usar o Rerun junto com as ferramentas que já tenho?",
+                "answer": "Sim. A maioria das equipes mantém suas automações simples e ferramentas de desenvolvimento, e entrega ao Rerun o trabalho recorrente que vive quebrando ou que precisa de alguém para pensar."
+            },
+            "4": {
+                "question": "Quanto custa o Rerun em comparação com essas ferramentas?",
+                "answer": "Um único plano a partir de {price} por mês com uma máquina privada segura, agentes ilimitados e crédito de modelo, e 5 dias de teste grátis. O Rerun nunca cobra por tarefa, por crédito ou por execução, e seus agentes podem rodar no plano do ChatGPT ou do Claude que você já paga."
+            }
+        }
+    },
+    "breadcrumb": {
+        "aria": "Trilha de navegação",
+        "home": "Início",
+        "compare": "Comparar"
+    },
+    "vs": "Rerun vs {competitor}",
+    "actions": {
+        "trial": "Comece seu teste grátis",
+        "browse": "Ver agentes prontos"
+    },
+    "card": {
+        "cta": "Ler o comparativo"
+    },
+    "page": {
+        "reviewed": "Revisado em <time>{date}</time>, com base nos preços e na documentação públicos de cada produto.",
+        "sideBySide": {
+            "badge": "Lado a lado",
+            "title": "Rerun vs {competitor} num relance."
+        },
+        "switching": {
+            "badge": "Migrar",
+            "title": "Saia do {competitor} em três passos.",
+            "subtitle": "Nenhum projeto de migração. Comece pela tarefa que mais custa para você e deixe que ela prove seu valor."
+        },
+        "pricing": {
+            "badge": "Preços",
+            "title": "O que você realmente paga."
+        },
+        "furtherReading": {
+            "label": "Leia mais",
+            "title": "Mais sobre {competitor} e suas alternativas."
+        },
+        "others": {
+            "label": "Outros comparativos",
+            "title": "Avaliando outra opção?"
+        },
+        "faq": {
+            "label": "FAQ",
+            "title": "Rerun vs {competitor}, suas perguntas."
+        }
+    },
+    "verdict": {
+        "shortAnswer": "A resposta curta",
+        "chooseThem": "Escolha {competitor} se",
+        "chooseRerun": "Escolha o Rerun se"
+    },
+    "grid": {
+        "rerunSubtitle": "Sua equipe de IA",
+        "caption": "{competitor} vs Rerun, comparados em: {criteria}"
+    },
+    "differences": {
+        "badge": "Principais diferenças",
+        "title": "Onde Rerun e {competitor} se separam.",
+        "subtitle": "Quatro diferenças que mudam o seu dia a dia, mostradas no produto real.",
+        "cta": {
+            "connect": "Conectar suas ferramentas",
+            "approvals": "Configurar aprovações",
+            "memory": "Ver como ele aprende",
+            "triggers": "Automatizar uma tarefa",
+            "computer": "Dar uma máquina a ele"
+        }
+    },
+    "families": {
+        "assistant": {
+            "badge": "Assistentes de IA",
+            "title": "Assistentes de IA que assumem tarefas",
+            "subtitle": "Assistentes que agora executam tarefas sozinhos. O Rerun adiciona uma equipe de agentes, qualquer modelo e uma máquina sempre ligada."
+        },
+        "developer-agent": {
+            "badge": "Open source",
+            "title": "Agentes open source",
+            "subtitle": "Gratuitos e abertos, mas você mesmo instala, hospeda e protege. Os agentes do Rerun rodam numa máquina privada segura, configurada no navegador."
+        },
+        "automation": {
+            "badge": "Automação",
+            "title": "Ferramentas de automação de workflows",
+            "subtitle": "Você desenha cada etapa e o fluxo faz exatamente isso. Os agentes do Rerun recebem o objetivo e descobrem as etapas."
+        },
+        "agent-platform": {
+            "badge": "Plataformas de agentes",
+            "title": "Plataformas de agentes de IA",
+            "subtitle": "Agentes hospedados que você orienta com palavras simples, como o Rerun. A diferença está na cobrança do uso, na IA que os executa e no que eles têm para trabalhar."
+        }
+    },
+    "criteria": {
+        "easeOfUse": "Facilidade de uso",
+        "getTheJobDone": "Entrega do trabalho",
+        "agentTeamwork": "Equipe de agentes",
+        "collaboration": "Colaboração",
+        "business": "Negócios",
+        "flexibility": "Flexibilidade",
+        "pricing": "Preços"
+    },
+    "competitors": {
+        "claude-cowork": {
+            "subtitle": "O agente de tarefas do Claude, agora integrado ao Claude",
+            "pitch": "O Claude assume as tarefas que você entrega, com modelos Claude. O Rerun executa seu trabalho recorrente com uma equipe de agentes, em qualquer modelo, incluindo seu plano do Claude.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você mesmo orienta cada tarefa e define o horário.",
+                    "rerun": "Instale um agente para cada tarefa, e ele roda sozinho desde o primeiro dia."
+                },
+                "getTheJobDone": {
+                    "them": "Uma tarefa que precisa de uma pasta ou de um app no seu computador só roda enquanto ele está ligado.",
+                    "rerun": "Continua trabalhando na sua ausência: o Autopilot responde aos seus agentes dentro das suas regras."
+                },
+                "agentTeamwork": {
+                    "them": "Um único assistente assume todas as tarefas.",
+                    "rerun": "Uma equipe de especialistas que conversam entre si, com cada tarefa encaminhada ao agente certo."
+                },
+                "collaboration": {
+                    "them": "Cada colega trabalha com o próprio Claude, a partir de $20 por assento.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Um assistente geral para tudo, de código a apresentações.",
+                    "rerun": "Feito para negócios: mais de {templates} agentes para vendas, caixa de entrada, faturas e relatórios, e especialistas para criar os seus."
+                },
+                "flexibility": {
+                    "them": "Somente modelos Claude.",
+                    "rerun": "Qualquer modelo por agente, incluindo seu plano do Claude."
+                },
+                "pricing": {
+                    "them": "Um plano por pessoa: $20 no Pro, $25 por assento no Team, cada um com limites de uso.",
+                    "rerun": "{price} por mês para agentes ilimitados e uma máquina segura, e eles podem rodar no seu plano do Claude."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Escolha do modelo",
+                    "them": "Somente modelos Claude.",
+                    "rerun": "Claude no plano do Claude que você já tem, ou GPT, Gemini e outros, escolhidos por agente."
+                },
+                "2": {
+                    "label": "Trabalho agendado",
+                    "them": "Tarefas agendadas rodam na nuvem em todos os planos pagos, no mínimo a cada hora. Uma que precisa de uma pasta ou de um app no seu computador só roda lá, enquanto ele está ligado.",
+                    "rerun": "Os agentes rodam na própria máquina sempre ligada, com precisão de minutos, onde ficam seus arquivos e bancos de dados."
+                },
+                "3": {
+                    "label": "Uma equipe de agentes",
+                    "them": "Seu Claude, organizado em projetos com arquivos, instruções e memória próprios.",
+                    "rerun": "Vários agentes, cada um com sua função. Diga ao Rerun o que você tem em mente e ele entrega cada tarefa ao agente certo."
+                },
+                "4": {
+                    "label": "Trabalho nos seus apps",
+                    "them": "Seus conectores, skills e projetos vêm do chat, e o Claude escreve Docs e Slides dentro da conversa.",
+                    "rerun": "Os agentes acessam mais de {connectors} apps e qualquer servidor MCP, e trabalham numa máquina onde rodam scripts, controlam um navegador e usam um app na tela como uma pessoa."
+                },
+                "5": {
+                    "label": "Preço",
+                    "them": "Incluído nos planos do Claude: Pro $20 por mês ($17 no plano anual), Max a partir de $100, Team $25 por assento ($20 no anual, mínimo de dois assentos), cada um com limites de uso.",
+                    "rerun": "{price} por mês para agentes ilimitados que sua equipe compartilha, e eles podem rodar num plano do Claude que você já paga."
+                }
+            }
+        },
+        "manus": {
+            "subtitle": "Agente de IA geral com computador próprio",
+            "pitch": "O Manus entrega pesquisas, slides e sites pontuais, cobrados em créditos. O Rerun executa seu trabalho recorrente todos os dias, por um preço fixo.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você descreve cada tarefa, e cada tentativa gasta créditos.",
+                    "rerun": "Instale um agente pronto e conecte seus apps pelo navegador."
+                },
+                "getTheJobDone": {
+                    "them": "20 tarefas agendadas e 20 ao mesmo tempo, em todos os planos individuais.",
+                    "rerun": "Quantos horários e webhooks o trabalho precisar, e o Autopilot responde na sua ausência."
+                },
+                "agentTeamwork": {
+                    "them": "Um agente geral, com Wide Research para trabalho em paralelo.",
+                    "rerun": "Uma equipe de especialistas que conversam entre si, com cada tarefa encaminhada ao agente certo."
+                },
+                "collaboration": {
+                    "them": "$20 por assento, e cada membro roda as próprias tarefas com os créditos compartilhados.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Um agente geral para pesquisas, slides e sites.",
+                    "rerun": "Feito para negócios: mais de {templates} agentes para vendas, caixa de entrada, faturas e relatórios, e especialistas para criar os seus."
+                },
+                "flexibility": {
+                    "them": "Conectores pré-definidos, e cada tarefa cobrada em créditos.",
+                    "rerun": "Seu próprio plano do ChatGPT ou do Claude, mais de {connectors} apps e qualquer servidor MCP."
+                },
+                "pricing": {
+                    "them": "Cada tarefa gasta créditos: $20 compram 4.000 por mês, mais 300 por dia.",
+                    "rerun": "{price} por mês, execuções nunca contadas: uma máquina segura, agentes ilimitados e crédito de modelo."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Como o uso é cobrado",
+                    "them": "Cada tarefa gasta créditos: $20 por mês compram 4,000, mais 300 renovados todo dia.",
+                    "rerun": "O Rerun nunca conta tarefas: {price} por mês, fixo."
+                },
+                "2": {
+                    "label": "Trabalho recorrente",
+                    "them": "20 tarefas agendadas e 20 rodando ao mesmo tempo, igual nos planos de $20, $40 e $200.",
+                    "rerun": "Quantos horários e webhooks o trabalho precisar, com precisão de minutos, tudo numa única lista de Routines."
+                },
+                "3": {
+                    "label": "Uma equipe de agentes",
+                    "them": "Um agente que recebe suas tarefas, até 20 ao mesmo tempo.",
+                    "rerun": "Vários agentes, cada um com sua função. Diga ao Rerun o que você tem em mente e ele entrega cada tarefa ao agente certo."
+                },
+                "4": {
+                    "label": "O que é mantido",
+                    "them": "Um agendamento pode rodar dentro da mesma tarefa e reutilizar seus arquivos e resultados, e um Project compartilha arquivos, skills e conectores.",
+                    "rerun": "Cada agente guarda memória, skills, arquivos e seu próprio banco de dados, e todos os agentes leem um único cérebro da empresa: sua oferta, seus preços, seu tom."
+                },
+                "5": {
+                    "label": "Sua equipe",
+                    "them": "Planos Team a partir de $20 por assento por mês, 4.000 créditos por assento, compartilhados.",
+                    "rerun": "Convide sua equipe para o mesmo workspace sem custo extra: todos veem e respondem aos agentes."
+                }
+            }
+        },
+        "grok-bot": {
+            "subtitle": "Agentes sempre ligados da xAI",
+            "pitch": "O Grok Bot vem dentro dos planos SuperGrok e Cursor, em beta. O Rerun é um plano próprio, com agentes prontos para instalar no modelo que você escolher.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você orienta cada Bot, ou mostra um workflow uma vez.",
+                    "rerun": "Mais de {templates} agentes prontos, ou um especialista cria o seu para você."
+                },
+                "getTheJobDone": {
+                    "them": "Os Bots trabalham 24 horas num computador na nuvem e voltam quando precisam de uma aprovação.",
+                    "rerun": "Continua trabalhando na sua ausência: o Autopilot responde aos seus agentes dentro das suas regras."
+                },
+                "agentTeamwork": {
+                    "them": "Os Bots trocam mensagens, e um Bot chefe de gabinete supervisiona os especialistas.",
+                    "rerun": "Seus agentes conversam entre si e passam o trabalho adiante: o agente da caixa de entrada entrega um novo lead para vendas."
+                },
+                "collaboration": {
+                    "them": "Vinculado à sua conta SuperGrok ou Cursor, no desktop e no iOS.",
+                    "rerun": "Convide toda a sua equipe para um único quadro, em qualquer navegador."
+                },
+                "business": {
+                    "them": "Um assistente geral dentro do Grok e do Cursor.",
+                    "rerun": "Feito para negócios: mais de {templates} agentes para vendas, caixa de entrada, faturas e relatórios, e especialistas para criar os seus."
+                },
+                "flexibility": {
+                    "them": "Somente modelos da xAI, e os Bots vivem dentro dos apps Grok e Cursor.",
+                    "rerun": "Claude, GPT, Gemini ou Grok por agente, mais de {connectors} apps."
+                },
+                "pricing": {
+                    "them": "Só com um plano SuperGrok ou Cursor, ainda em beta, com cota de uso própria.",
+                    "rerun": "Plano próprio: {price} por mês com uma máquina segura, 5 dias grátis."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Como você obtém",
+                    "them": "Incluído, em beta, em todos os planos SuperGrok e no Cursor Pro, Pro+, Ultra e Teams. O Enterprise ainda tem lista de espera.",
+                    "rerun": "Um plano próprio: {price} por mês, com 5 dias de teste grátis."
+                },
+                "2": {
+                    "label": "Onde você usa",
+                    "them": "O app para desktop e o iOS.",
+                    "rerun": "Qualquer navegador, num quadro ao vivo de toda a equipe."
+                },
+                "3": {
+                    "label": "Escolha do modelo",
+                    "them": "Somente modelos da xAI, com cota de uso própria, separada do seu plano Grok ou Cursor.",
+                    "rerun": "Você escolhe para cada agente: o modelo do Rerun incluído no plano, seu plano do ChatGPT ou do Claude, ou sua própria chave."
+                },
+                "4": {
+                    "label": "Enquanto você está fora",
+                    "them": "Os Bots voltam até você quando algo precisa da sua aprovação.",
+                    "rerun": "Com o Autopilot ligado, o Rerun responde aos seus agentes dentro das suas regras, nunca para gastar ou excluir, e deixa um resumo pronto quando você volta."
+                },
+                "5": {
+                    "label": "Acesso às suas ferramentas",
+                    "them": "Os Bots entram nos seus apps e operam os sites que não têm API nem MCP, como uma pessoa faria.",
+                    "rerun": "Mais de {connectors} apps pelas APIs, mais um navegador e um desktop para os sites que não têm."
+                },
+                "6": {
+                    "label": "Agentes prontos",
+                    "them": "Você orienta cada Bot no chat, ou mostra um workflow uma vez.",
+                    "rerun": "Mais de {templates} agentes prontos para instalar, ou um que um especialista cria para você."
+                }
+            }
+        },
+        "paperclip": {
+            "subtitle": "Organograma open source para agentes de IA",
+            "pitch": "O Paperclip dá aos agentes que você já roda um organograma, orçamentos e etapas de aprovação, num servidor que você hospeda. O Rerun entrega os próprios agentes, já rodando numa máquina que nós mantemos.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Um comando instala, depois você instala o Node 24 e um agente de código na mesma máquina antes da primeira contratação funcionar.",
+                    "rerun": "Nada para instalar: escolha um agente pronto, conecte o Gmail com um clique, e ele já está trabalhando."
+                },
+                "getTheJobDone": {
+                    "them": "Os agentes rodam onde você instalou, então essa máquina precisa ficar ligada, atualizada e com backup.",
+                    "rerun": "Continua trabalhando na sua ausência: o Autopilot responde aos seus agentes dentro das suas regras."
+                },
+                "agentTeamwork": {
+                    "them": "Um organograma de verdade com delegação, desde que você forneça um runtime para cada função.",
+                    "rerun": "Uma equipe de especialistas que conversam entre si, com cada tarefa encaminhada ao agente certo."
+                },
+                "collaboration": {
+                    "them": "Os colegas precisam do modo autenticado e de um servidor acessível, numa LAN, numa VPN ou na internet aberta.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "As equipes do catálogo são diretoria, engenharia, design e conteúdo, montadas em torno de agentes de código.",
+                    "rerun": "Feito para negócios: mais de {templates} agentes para vendas, caixa de entrada, faturas e relatórios, e especialistas para criar os seus."
+                },
+                "flexibility": {
+                    "them": "Qualquer harness e qualquer modelo, incluindo seu login do Claude ou do ChatGPT, cada um instalado no servidor.",
+                    "rerun": "Qualquer modelo por agente ou seu plano do ChatGPT ou do Claude, e mais de {connectors} apps conectados pelo navegador."
+                },
+                "pricing": {
+                    "them": "Gratuito e MIT, depois vêm a conta do modelo, o servidor e a manutenção: o próprio guia de início prevê de $20 a $100 por mês para uma empresa ativa.",
+                    "rerun": "{price} por mês: uma máquina segura, agentes ilimitados e crédito de modelo incluídos."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "O agente em si",
+                    "them": "O Paperclip é o gerente, não o trabalhador: para cada função você instala um harness no servidor, Claude Code, Codex ou Cursor, e fornece uma chave ou um login.",
+                    "rerun": "O agente vem com o produto. Você o cria no navegador e escolhe o modelo, ou conecta o plano do Claude ou do ChatGPT que você já paga."
+                },
+                "2": {
+                    "label": "Onde ele roda",
+                    "them": "Na máquina em que você instalou. Rodar agentes em outro lugar significa trazer e pagar um provedor de sandbox: E2B, Modal, Daytona, Cloudflare ou seu próprio Kubernetes.",
+                    "rerun": "Uma máquina virtual privada por workspace, mantida ligada e atualizada para você, com navegador, terminal e bancos de dados próprios."
+                },
+                "3": {
+                    "label": "Primeiros passos",
+                    "them": "Uma empresa vazia: você contrata um CEO, aprova a estratégia que ele escreve, e as tarefas que ele cria caem no quadro. As equipes prontas são diretoria, engenharia, design e conteúdo.",
+                    "rerun": "Mais de {templates} agentes prontos para instalar para vendas, caixa de entrada, faturas e relatórios, ou um especialista cria o seu e entrega pronto."
+                },
+                "4": {
+                    "label": "Sua equipe",
+                    "them": "Login multiusuário significa passar a instância para o modo autenticado e colocá-la num lugar que seus colegas alcancem, numa LAN, numa VPN ou na internet aberta.",
+                    "rerun": "Convide um colega por e-mail. Ele abre o mesmo quadro no navegador e pode responder a qualquer agente que faça uma pergunta."
+                },
+                "5": {
+                    "label": "Conexão de apps",
+                    "them": "62 conectores, e alguns param no meio do caminho de propósito: o Gmail deles lê e cria rascunhos, o envio fica desligado, e uma pessoa envia o rascunho pelo Gmail.",
+                    "rerun": "Um login do Google e o agente lê, rotula, responde e envia. Os outros mais de {connectors} apps se conectam pela mesma tela, por login, por chave ou por qualquer servidor MCP."
+                },
+                "6": {
+                    "label": "O que você paga",
+                    "them": "O software é gratuito. Você paga as chamadas ao modelo, e o próprio guia de início prevê de $20 a $100 por mês para uma empresa ativa, mais o servidor, o banco de dados e uma atualização para aplicar quase toda semana.",
+                    "rerun": "{price} por mês, tudo incluído: a máquina, agentes ilimitados, crédito de modelo e toda a sua equipe, sem nunca contar execuções."
+                }
+            }
+        },
+        "hermes": {
+            "subtitle": "Agente open source que se aprimora sozinho",
+            "pitch": "O Hermes é um agente que você instala e roda, ou hospeda no Hermes Cloud pagando por dia. O Rerun entrega uma equipe de agentes já fazendo o trabalho, numa máquina incluída no plano.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Um app para desktop ou uma instalação pelo terminal, e depois cada ferramenta e canal fica por sua conta.",
+                    "rerun": "Nada para instalar: escolha um agente pronto, conecte o Gmail com um clique, e ele já está trabalhando."
+                },
+                "getTheJobDone": {
+                    "them": "Auto-hospedado, roda enquanto sua máquina fica ligada; no Hermes Cloud, uma instância por agente fica ativa, cobrada por dia.",
+                    "rerun": "Roda 24/7 numa máquina que nós mantemos, e o Autopilot responde a ele na sua ausência."
+                },
+                "agentTeamwork": {
+                    "them": "Um agente que cria seus próprios subagentes.",
+                    "rerun": "Seus agentes conversam entre si e passam o trabalho adiante: o agente da caixa de entrada entrega um novo lead para vendas."
+                },
+                "collaboration": {
+                    "them": "Um agente por pessoa, acessado pelo Telegram, Discord, Slack ou e-mail.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Um agente de uso geral: não conhece nenhuma função de negócio de fábrica.",
+                    "rerun": "Feito para negócios: mais de {templates} agentes para vendas, caixa de entrada, faturas e relatórios, e especialistas para criar os seus."
+                },
+                "flexibility": {
+                    "them": "Qualquer modelo, qualquer servidor MCP e cinco sandboxes, depois que você configura.",
+                    "rerun": "Qualquer modelo ou seu plano do ChatGPT ou do Claude, e mais de {connectors} apps de negócios pelo navegador."
+                },
+                "pricing": {
+                    "them": "Gratuito para auto-hospedar; no Hermes Cloud a instância é cobrada por dia, com inferência e ferramentas à parte.",
+                    "rerun": "{price} por mês: uma máquina segura, agentes ilimitados e crédito de modelo incluídos."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Onde ele roda",
+                    "them": "Seu computador ou servidor, em cinco backends à sua escolha, ou no Hermes Cloud, onde cada agente ganha uma instância dedicada.",
+                    "rerun": "Uma máquina privada por workspace roda todos os seus agentes, incluída no plano."
+                },
+                "2": {
+                    "label": "Preço",
+                    "them": "Gratuito para auto-hospedar. O Hermes Cloud exige $2 de crédito antes de implantar, depois cobra a instância por dia, medida por segundo, com inferência e ferramentas à parte. Os planos do Nous Portal custam $20, $100 ou $200 de crédito por mês.",
+                    "rerun": "{price} por mês por uma máquina segura, agentes ilimitados e crédito de modelo."
+                },
+                "3": {
+                    "label": "Conexão de apps",
+                    "them": "Qualquer servidor MCP, configurado e filtrado por você.",
+                    "rerun": "Mais de {connectors} apps com login guiado, mais qualquer servidor MCP."
+                },
+                "4": {
+                    "label": "Onde você acompanha o trabalho",
+                    "them": "Telegram, Discord, Slack, WhatsApp, Signal, e-mail ou a CLI.",
+                    "rerun": "Um quadro no navegador onde cada execução, chamada de ferramenta e nova memória fica à vista, e qualquer colega pode responder ao agente."
+                },
+                "5": {
+                    "label": "Ponto de partida",
+                    "them": "Um agente em branco que escreve as próprias skills pelo caminho.",
+                    "rerun": "Mais de {templates} agentes prontos para instalar, ou um que um especialista cria para você."
+                }
+            }
+        },
+        "openclaw": {
+            "subtitle": "Assistente pessoal de IA open source",
+            "pitch": "O OpenClaw é um assistente que você instala, hospeda e protege, e a fundação por trás dele não vende nada. Os agentes do Rerun fazem as mesmas tarefas a partir de uma máquina isolada que nós operamos para você.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você instala, mantém uma máquina ligada e conecta o modelo e os canais.",
+                    "rerun": "Nada para instalar: escolha um agente pronto, conecte o Gmail com um clique, e ele já está trabalhando."
+                },
+                "getTheJobDone": {
+                    "them": "Para quando seu computador desliga, a menos que você rode um gateway num servidor.",
+                    "rerun": "Roda 24/7 na própria máquina isolada, e o Autopilot responde a ele na sua ausência."
+                },
+                "agentTeamwork": {
+                    "them": "Um assistente pessoal por padrão; um gateway compartilhado reúne várias pessoas e sessões num só lugar.",
+                    "rerun": "Seus agentes conversam entre si e passam o trabalho adiante: o agente da caixa de entrada entrega um novo lead para vendas."
+                },
+                "collaboration": {
+                    "them": "Uma equipe compartilha um gateway que alguém hospeda, e esse gateway é um único domínio de confiança.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Um assistente pessoal para tudo, não pensado para funções de negócio.",
+                    "rerun": "Feito para negócios: mais de {templates} agentes para vendas, caixa de entrada, faturas e relatórios, e especialistas para criar os seus."
+                },
+                "flexibility": {
+                    "them": "Muito aberto, com modelos locais incluídos, e cada skill e plugin fica por sua conta.",
+                    "rerun": "Seu plano do ChatGPT ou do Claude ou qualquer modelo, e mais de {connectors} apps de negócios pelo navegador."
+                },
+                "pricing": {
+                    "them": "Gratuito, e você mesmo cuida da segurança: sandbox e aprovações de execução vêm desligados por padrão.",
+                    "rerun": "{price} por mês: uma máquina segura, agentes ilimitados e crédito de modelo incluídos."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Onde ele roda",
+                    "them": "Uma máquina que você mantém ligada, seu computador ou um servidor. A fundação “não vende nada: nenhum plano pago, nenhum serviço hospedado, nenhum token”.",
+                    "rerun": "Numa máquina privada e isolada na nuvem, mantida ligada e atualizada para você."
+                },
+                "2": {
+                    "label": "Isolamento",
+                    "them": "Sandbox e aprovações de execução vêm incluídos, mas desligados por padrão, então até você reforçar a segurança, as ferramentas acessam os arquivos e o terminal da máquina onde ele roda.",
+                    "rerun": "Cada workspace ganha a própria máquina virtual, separada do seu notebook e dos outros clientes."
+                },
+                "3": {
+                    "label": "Manutenção",
+                    "them": "Atualizações, disponibilidade e alertas de segurança ficam por sua conta, com um comando de auditoria de segurança para detectar desvios.",
+                    "rerun": "Nada para corrigir, atualizar ou manter ligado."
+                },
+                "4": {
+                    "label": "Sua equipe",
+                    "them": "Pessoal por padrão. Uma equipe compartilha um gateway que alguém hospeda, e um gateway é um domínio de confiança: pessoas que não devem confiar umas nas outras precisam de um cada.",
+                    "rerun": "Um workspace no navegador: convide colegas sem custo extra, compartilhe agentes, responda às perguntas deles."
+                },
+                "5": {
+                    "label": "Apps",
+                    "them": "Skills e plugins que você instala e configura.",
+                    "rerun": "Mais de {connectors} apps pelo navegador, mais qualquer servidor MCP."
+                }
+            }
+        },
+        "zapier": {
+            "subtitle": "Automação entre apps",
+            "pitch": "Um Zap move dados entre apps. Um agente do Rerun organiza a caixa de entrada, responde ao lead e cobra a fatura.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você escolhe o gatilho, depois cada ação e cada mapeamento de campo, ou deixa o Copilot rascunhar e mantém tudo depois.",
+                    "rerun": "Descreva a tarefa numa frase e conecte seus apps. Nenhum fluxo para montar."
+                },
+                "getTheJobDone": {
+                    "them": "Executa sempre as mesmas etapas: um novo formato de e-mail ou um campo renomeado exige outro caminho.",
+                    "rerun": "Lida com casos que ninguém previu, pergunta quando tem dúvida e informa o que foi feito."
+                },
+                "agentTeamwork": {
+                    "them": "Os Zaps não conversam entre si: você conecta Tables ou sub-Zaps entre eles.",
+                    "rerun": "Seus agentes conversam entre si sozinhos e compartilham um único banco de dados. Nada para conectar."
+                },
+                "collaboration": {
+                    "them": "Zaps compartilhados começam no plano Team, $69 por mês para 2.000 tarefas.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Move dados entre apps; o que fazer com eles é o Zap que você desenha.",
+                    "rerun": "Agentes feitos para funções de negócio: mais de {templates} para vendas, caixa de entrada, faturas e relatórios, que aprendem com cada correção."
+                },
+                "flexibility": {
+                    "them": "Mais de 10.000 apps, e cada caso novo precisa do próprio caminho.",
+                    "rerun": "Lida com casos novos, roda scripts e um navegador na própria máquina, em qualquer modelo."
+                },
+                "pricing": {
+                    "them": "Cobrado por tarefa: 750 por mês por $19,99, com chamadas de IA, código e MCP na mesma cota.",
+                    "rerun": "{price} por mês, execuções nunca contadas: uma máquina segura, agentes ilimitados e crédito de modelo."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Configuração",
+                    "them": "Escolha um gatilho, depois adicione e mapeie cada etapa. O Copilot pode rascunhar o Zap, e você mantém cada etapa depois disso.",
+                    "rerun": "Descreva a tarefa numa frase, como “organize minha caixa de entrada toda manhã”. O agente planeja as etapas sozinho."
+                },
+                "2": {
+                    "label": "Um caso que ele nunca viu",
+                    "them": "O Zap executa as mesmas etapas toda vez, então um novo tipo de e-mail ou registro exige outro caminho ou filtro. Um Zapier Agent decide sozinho, dentro das 40 atividades permitidas por execução.",
+                    "rerun": "O agente lê cada caso, decide do que precisa e pergunta a você quando tem dúvida."
+                },
+                "3": {
+                    "label": "Arquivos, código, um navegador",
+                    "them": "O código roda como uma etapa dentro do Zap: 30 segundos incluídos por etapa no Pro, depois uma tarefa a cada bloco extra de 30 segundos. Nenhuma máquina guarda arquivos ou um navegador entre execuções.",
+                    "rerun": "A máquina privada do seu workspace: os agentes escrevem arquivos, rodam scripts, controlam um navegador e mantêm bancos de dados ali entre execuções."
+                },
+                "4": {
+                    "label": "O que ele lembra",
+                    "them": "Cada execução começa do zero. O que precisar ser mantido vai para uma Table ou uma etapa de armazenamento que você monta.",
+                    "rerun": "Ele anota o que você corrigiu e guarda seus arquivos e tabelas, então a execução 50 sabe o que a execução 1 aprendeu."
+                },
+                "5": {
+                    "label": "A IA por trás",
+                    "them": "As etapas de IA são cobradas em tarefas por nível de modelo, e o próprio exemplo do Zapier conta uma chamada de ferramenta MCP como 2 tarefas.",
+                    "rerun": "Rode no modelo do Rerun incluído no plano, entre com o plano do ChatGPT ou do Claude que você já paga, ou use uma chave de API."
+                },
+                "6": {
+                    "label": "Enquanto você está fora",
+                    "them": "Uma etapa Human in the Loop pausa o Zap até um revisor responder ou o prazo acabar.",
+                    "rerun": "Com o Autopilot ligado, o Rerun responde aos seus agentes dentro das suas regras, nunca para gastar ou excluir, e deixa um resumo pronto quando você volta."
+                },
+                "7": {
+                    "label": "Quanto custa rodar",
+                    "them": "Cada etapa de ação é uma tarefa: 750 por mês por $19,99 no plano anual. Os Zapier Agents são cobrados à parte, em atividades, 1.500 por mês no Pro, e uma execução para em 40 e pergunta a você.",
+                    "rerun": "{price} por mês para agentes ilimitados. O Rerun não conta execuções nem etapas."
+                }
+            }
+        },
+        "make": {
+            "subtitle": "Cenários de automação visuais",
+            "pitch": "Um cenário do Make passa dados de módulo em módulo. Um agente do Rerun responde ao lead, cobra a fatura e aprende com suas correções.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você posiciona cada módulo numa tela e mapeia os dados entre eles, ou deixa o assistente de IA rascunhar o primeiro.",
+                    "rerun": "Descreva a tarefa numa frase e conecte seus apps. Nenhum fluxo para montar."
+                },
+                "getTheJobDone": {
+                    "them": "Segue suas rotas: um novo tipo de entrada exige outro roteador.",
+                    "rerun": "Lida com casos que ninguém previu, pergunta quando tem dúvida e informa o que foi feito."
+                },
+                "agentTeamwork": {
+                    "them": "Os cenários compartilham data stores que você projeta, e um agente de IA só chama outro como uma ferramenta que você conectou.",
+                    "rerun": "Seus agentes conversam entre si sozinhos e compartilham um único banco de dados. Nada para conectar."
+                },
+                "collaboration": {
+                    "them": "Funções de equipe começam no plano Teams.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Encaminha dados entre apps; as decisões ficam nos módulos que você posiciona.",
+                    "rerun": "Agentes feitos para funções de negócio: mais de {templates} para vendas, caixa de entrada, faturas e relatórios, que aprendem com cada correção."
+                },
+                "flexibility": {
+                    "them": "Mais de 3.500 apps, e um crédito por ação de módulo.",
+                    "rerun": "Lida com casos novos, roda scripts e um navegador na própria máquina, em qualquer modelo."
+                },
+                "pricing": {
+                    "them": "Um crédito por ação de módulo, então os loops se acumulam, e o chat do agente de IA também gasta créditos.",
+                    "rerun": "{price} por mês, execuções nunca contadas: uma máquina segura, agentes ilimitados e crédito de modelo."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Configuração",
+                    "them": "Posicione cada módulo numa tela e mapeie os dados entre eles, ou deixe o assistente de IA rascunhar um primeiro cenário que você mantém depois.",
+                    "rerun": "Descreva o resultado numa frase e conecte seus apps. O agente planeja as etapas sozinho."
+                },
+                "2": {
+                    "label": "Um caso que ele nunca viu",
+                    "them": "O cenário segue suas rotas, então um novo tipo de entrada exige outro roteador ou filtro. Os agentes de IA escolhem as ferramentas na hora da execução, dentro do cenário que você montou em volta deles.",
+                    "rerun": "O agente lê cada entrada, decide o que fazer e pergunta a você quando tem dúvida."
+                },
+                "3": {
+                    "label": "Arquivos, código, um navegador",
+                    "them": "O código roda dentro de um módulo, e nada guarda arquivos ou um navegador entre execuções.",
+                    "rerun": "A máquina privada do seu workspace: arquivos, scripts, um navegador e bancos de dados, tudo mantido entre execuções."
+                },
+                "4": {
+                    "label": "O que ele lembra",
+                    "them": "Nada é mantido, a menos que você projete um data store e leia de volta.",
+                    "rerun": "Ele anota o que você corrigiu e guarda os próprios arquivos e tabelas entre execuções."
+                },
+                "5": {
+                    "label": "A IA por trás",
+                    "them": "O AI Provider do Make, cobrado em créditos que variam com os tokens, ou sua própria chave da OpenAI ou da Anthropic num plano pago, a um crédito por operação.",
+                    "rerun": "Rode no modelo do Rerun incluído no plano, entre com o plano do ChatGPT ou do Claude que você já paga, ou use uma chave de API."
+                },
+                "6": {
+                    "label": "Quanto custa rodar",
+                    "them": "Um crédito por ação de módulo por padrão, alguns recursos cobrados de forma dinâmica por tokens, tamanho de arquivo ou tempo de execução, e 1.000 créditos por mês no plano gratuito.",
+                    "rerun": "{price} por mês para agentes ilimitados. O Rerun não conta execuções nem etapas."
+                }
+            }
+        },
+        "n8n": {
+            "subtitle": "Automação de workflows, auto-hospedada ou na nuvem",
+            "pitch": "O n8n dá aos engenheiros workflows para montar e hospedar. O Rerun dá à sua equipe agentes que respondem leads e cobram faturas, sem nada para hospedar.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você conecta nós com expressões ou código, depois hospeda ou paga pelo n8n Cloud.",
+                    "rerun": "Descreva a tarefa com palavras simples. Nada para conectar, hospedar ou proteger."
+                },
+                "getTheJobDone": {
+                    "them": "Segue os ramos que você montou, e o nó AI Agent só decide dentro da própria etapa.",
+                    "rerun": "Lida com casos novos, pergunta quando tem dúvida, e o Autopilot responde a ele na sua ausência."
+                },
+                "agentTeamwork": {
+                    "them": "Os workflows só conversam por sub-workflows que você conecta.",
+                    "rerun": "Seus agentes conversam entre si sozinhos e compartilham um único banco de dados. Nada para conectar."
+                },
+                "collaboration": {
+                    "them": "Usuários ilimitados, e um projeto compartilhado no Starter, três no Pro.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Um motor de workflows para engenheiros: a tarefa é o grafo que você desenha.",
+                    "rerun": "Agentes feitos para funções de negócio: mais de {templates} para vendas, caixa de entrada, faturas e relatórios, que aprendem com cada correção."
+                },
+                "flexibility": {
+                    "them": "Qualquer API e qualquer código, depois que você escreve os nós.",
+                    "rerun": "Qualquer modelo, seu próprio plano de IA, mais de {connectors} apps, scripts e um navegador."
+                },
+                "pricing": {
+                    "them": "O n8n Cloud conta execuções: 2.500 por mês por €20 no Starter.",
+                    "rerun": "{price} por mês, execuções nunca contadas: uma máquina segura, agentes ilimitados e crédito de modelo."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Configuração",
+                    "them": "Conecte nós numa tela, muitas vezes com expressões JSON ou código. O AI Workflow Builder pode rascunhar uma primeira versão.",
+                    "rerun": "Descreva a tarefa com palavras simples. O agente planeja as etapas e configura o próprio agendamento."
+                },
+                "2": {
+                    "label": "Hospedagem",
+                    "them": "Auto-hospede e cuide de atualizações, backups e disponibilidade, ou pague pelo n8n Cloud. O plano Business é só auto-hospedado.",
+                    "rerun": "Hospedado para você numa máquina privada e isolada, sempre atualizada."
+                },
+                "3": {
+                    "label": "Um caso que ele nunca viu",
+                    "them": "O workflow segue seus nós. O nó AI Agent só decide dentro da etapa onde você o colocou.",
+                    "rerun": "A tarefa inteira é do agente: ele lê cada caso, escolhe as ferramentas e pergunta a você quando tem dúvida."
+                },
+                "4": {
+                    "label": "Enquanto você está fora",
+                    "them": "Uma etapa de revisão pausa o workflow antes de a ferramenta rodar e espera no Slack, Gmail, Teams ou no chat do n8n até alguém responder.",
+                    "rerun": "Com o Autopilot ligado, o Rerun responde aos seus agentes dentro das suas regras, nunca para gastar ou excluir, e deixa um resumo pronto quando você volta."
+                },
+                "5": {
+                    "label": "O que ele lembra",
+                    "them": "A memória é um nó que você adiciona, apoiado num banco de dados que você configura.",
+                    "rerun": "Memória, arquivos e bancos de dados ficam na máquina dele, e cada correção fica gravada."
+                },
+                "6": {
+                    "label": "Quanto custa rodar",
+                    "them": "O n8n Cloud conta execuções: 2.500 por mês por €20 no Starter com plano anual, 10.000 por €50 no Pro. Auto-hospedar é gratuito, o servidor é seu.",
+                    "rerun": "{price} por mês com a máquina incluída. O Rerun não conta execuções nem etapas."
+                }
+            }
+        },
+        "lindy": {
+            "subtitle": "Assistente de IA para sua equipe e suas ferramentas",
+            "pitch": "O Lindy cobra cada usuário ativo e depois cada tarefa em créditos. O Rerun faz as mesmas tarefas por um preço fixo, na IA que você já paga.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Construído em torno do Slack: um admin precisa conectá-lo antes que alguém comece.",
+                    "rerun": "O copiloto do Rerun planeja sua equipe a partir do seu site, ou instale um dos mais de {templates} agentes."
+                },
+                "getTheJobDone": {
+                    "them": "Ações com impacto externo esperam até você aprovar.",
+                    "rerun": "Continua trabalhando na sua ausência: o Autopilot responde aos seus agentes dentro das suas regras."
+                },
+                "agentTeamwork": {
+                    "them": "Um assistente faz tudo para todos.",
+                    "rerun": "Uma equipe de especialistas que conversam entre si, com cada tarefa encaminhada ao agente certo."
+                },
+                "collaboration": {
+                    "them": "Cada usuário ativo do workspace é cobrado, a partir de $49,99 por mês.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Mais de 40 skills integradas, as mesmas para todas as empresas.",
+                    "rerun": "Mais de {templates} agentes feitos para o seu setor e as suas funções, e especialistas para criar os seus."
+                },
+                "flexibility": {
+                    "them": "Mais de 1.500 integrações, e cada modelo cobrado em créditos a $0,01 cada.",
+                    "rerun": "Rode no seu próprio plano do ChatGPT ou do Claude, na sua própria chave, ou no modelo do Rerun incluído."
+                },
+                "pricing": {
+                    "them": "$49,99 por usuário ativo por 5.000 créditos; ao zerar, o Lindy pausa até o próximo ciclo.",
+                    "rerun": "{price} por mês para agentes ilimitados e uma máquina segura. As execuções nunca são contadas."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Preço para uma equipe de três",
+                    "them": "Cada usuário ativo é cobrado, a partir de $49,99 por mês cada por 5.000 créditos, ou seja, cerca de $150 para os três.",
+                    "rerun": "{price} por mês para os três, com agentes ilimitados."
+                },
+                "2": {
+                    "label": "Como o uso é cobrado",
+                    "them": "Um crédito custa $0,01 e cada tarefa gasta créditos: de 2 a 250 num pedido do dia a dia, de 1.000 a 2.500 numa construção grande. Ao zerar, o Lindy pausa até o próximo ciclo.",
+                    "rerun": "O Rerun nunca conta execuções, e agentes no seu próprio plano de IA ou chave nunca pausam por orçamento."
+                },
+                "3": {
+                    "label": "Usar sua própria IA",
+                    "them": "Você escolhe o modelo, e o Lindy cobra cada um deles nos próprios créditos. Usar sua própria chave ou plano de IA não está documentado.",
+                    "rerun": "Rode no modelo do Rerun incluído no plano, entre com o plano do ChatGPT ou do Claude que você já paga, ou use uma chave de API."
+                },
+                "4": {
+                    "label": "Enquanto você está fora",
+                    "them": "Ações com impacto externo esperam sua aprovação, com uma proteção por integração no Slack.",
+                    "rerun": "Com o Autopilot ligado, o Rerun responde aos seus agentes dentro das suas regras, nunca para gastar ou excluir, e deixa um resumo pronto quando você volta."
+                },
+                "5": {
+                    "label": "Agentes prontos",
+                    "them": "Mais de 40 skills integradas para começar.",
+                    "rerun": "Mais de {templates} agentes prontos, e especialistas que criam o seu e entregam pronto."
+                }
+            }
+        },
+        "twin": {
+            "subtitle": "Agentes de IA para um operador e seus clientes",
+            "pitch": "O Twin também tem preço fixo, mas o agente de navegador e os dados de leads ficam no plano de $149, e as pessoas que você convida são clientes, não colegas.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você conversa com o Twin e ele configura o trabalho, com a primeira tarefa pronta em minutos.",
+                    "rerun": "O copiloto do Rerun planeja sua equipe a partir do seu site, ou instale um dos mais de {templates} agentes."
+                },
+                "getTheJobDone": {
+                    "them": "Os rascunhos esperam numa fila de revisão: nada sai sem você.",
+                    "rerun": "Continua trabalhando na sua ausência: o Autopilot responde aos seus agentes dentro das suas regras."
+                },
+                "agentTeamwork": {
+                    "them": "Agentes ilimitados, cada um na sua tarefa.",
+                    "rerun": "Seus agentes conversam entre si e passam o trabalho adiante: o agente da caixa de entrada entrega um novo lead para vendas."
+                },
+                "collaboration": {
+                    "them": "Não há colegas para convidar: o Plus e o Pro convidam até 5 clientes, cada um com um painel.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Prospecção, outreach, conteúdo, anúncios e relatórios, configurados a partir da sua descrição.",
+                    "rerun": "Mais de {templates} agentes de negócios prontos, e especialistas que criam o seu e entregam pronto."
+                },
+                "flexibility": {
+                    "them": "O Twin escolhe o modelo, e não há opção de usar sua própria chave ou plano de IA.",
+                    "rerun": "Escolha o modelo: seu plano do ChatGPT ou do Claude, sua própria chave, ou o modelo do Rerun incluído."
+                },
+                "pricing": {
+                    "them": "$29 por mês, e $149 pelo agente de navegador e pelos dados de leads.",
+                    "rerun": "{price} por mês: uma máquina segura, agentes ilimitados e crédito de modelo incluídos."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "O que o plano de entrada oferece",
+                    "them": "$29 por mês dão agentes ilimitados, execuções agendadas e webhooks, e seus apps conectados. O agente de navegador, a prospecção de leads e a pesquisa aprofundada começam em $149.",
+                    "rerun": "{price} por mês dão a cada agente uma máquina privada com terminal, navegador e um desktop que ele usa como uma pessoa, desde o primeiro plano."
+                },
+                "2": {
+                    "label": "Sua equipe",
+                    "them": "Nada é cobrado por assento, mas também não dá para convidar um colega: você convida até 5 clientes, cada um com o próprio painel.",
+                    "rerun": "Convide toda a sua equipe sem custo extra. Todos acompanham o trabalho dos agentes, e qualquer colega pode responder a um que pare para perguntar."
+                },
+                "3": {
+                    "label": "Usar sua própria IA",
+                    "them": "O Twin encaminha cada tarefa para o modelo que ele escolhe, e nenhum plano permite usar sua própria chave ou assinatura de IA.",
+                    "rerun": "Você escolhe para cada agente: o modelo do Rerun incluído no plano, seu plano do ChatGPT ou do Claude, ou sua própria chave."
+                },
+                "4": {
+                    "label": "Encontrar leads",
+                    "them": "Prospecção de leads, enriquecimento e mapeamento de negócios locais vêm no plano de $149.",
+                    "rerun": "E-mails verificados, telefones, fichas do Google Maps e posições em buscas estão no produto, e o agente calcula o custo da consulta e pergunta antes de gastar um centavo."
+                },
+                "5": {
+                    "label": "O que ele lembra",
+                    "them": "O Twin aprende com as edições que você faz nos rascunhos dele.",
+                    "rerun": "Memória, skills, arquivos, seu próprio banco de dados e o que o workspace compartilha, mais um cérebro da empresa que todos os agentes leem: sua oferta, seus preços, seu tom."
+                }
+            }
+        },
+        "dust": {
+            "subtitle": "Agentes de IA sobre o conhecimento da sua empresa",
+            "pitch": "O Dust responde a partir dos documentos da sua empresa, com preço por assento. Os agentes do Rerun fazem o trabalho recorrente para toda a equipe, por um único preço.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Você cria agentes no builder dele, e o plano self-service conecta no máximo 3 fontes de dados.",
+                    "rerun": "Instale um agente pronto e conecte qualquer um dos mais de {connectors} apps pelo navegador."
+                },
+                "getTheJobDone": {
+                    "them": "Agendamentos e webhooks iniciam um agente, e um webhook dispara no máximo 42 vezes por dia.",
+                    "rerun": "Roda 24/7 na própria máquina, e o Autopilot responde a ele na sua ausência."
+                },
+                "agentTeamwork": {
+                    "them": "Workflows multiagente que você desenha no builder.",
+                    "rerun": "Seus agentes conversam entre si e passam o trabalho adiante: o agente da caixa de entrada entrega um novo lead para vendas."
+                },
+                "collaboration": {
+                    "them": "Um gatilho pertence a quem o criou, e as execuções caem no histórico dessa pessoa.",
+                    "rerun": "Convide toda a sua equipe: todos veem cada execução e podem responder ao agente."
+                },
+                "business": {
+                    "them": "Feito para responder com base nos documentos da empresa.",
+                    "rerun": "Feito para executar o trabalho: mais de {templates} agentes para vendas, caixa de entrada, faturas e relatórios."
+                },
+                "flexibility": {
+                    "them": "Só 3 conectores e 5 servidores MCP remotos no plano self-service.",
+                    "rerun": "Mais de {connectors} apps e qualquer servidor MCP, no seu próprio plano de IA se quiser."
+                },
+                "pricing": {
+                    "them": "De €24 a €30 por assento com 8.000 créditos cada, mais $0,01 por crédito no uso automatizado.",
+                    "rerun": "{price} por mês para agentes ilimitados e uma máquina segura. As automações não custam nada a mais."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Preço para uma equipe de três",
+                    "them": "€24 por assento por mês no plano anual, ou €30 no mensal: de €72 a €90, sem impostos.",
+                    "rerun": "{price} por mês para os três, com agentes ilimitados."
+                },
+                "2": {
+                    "label": "Adicionar um colega",
+                    "them": "Todo mundo que usa é um assento pago com cota de créditos própria, e os créditos não acumulam.",
+                    "rerun": "Os assentos são gratuitos e ilimitados: o colega que aprova o e-mail de um agente não custa nada."
+                },
+                "3": {
+                    "label": "Uso automatizado",
+                    "them": "O uso que ninguém digita, como uma chamada de API ou a execução de um gatilho, é cobrado a $0,01 por crédito, dos seus créditos ou dos do workspace.",
+                    "rerun": "Execuções agendadas e por webhook não custam nada a mais do lado do Rerun."
+                },
+                "4": {
+                    "label": "Apps no plano self-service",
+                    "them": "Até 3 conectores de dados e 5 servidores MCP remotos.",
+                    "rerun": "Todos os mais de {connectors} apps e qualquer servidor MCP, em todos os planos."
+                },
+                "5": {
+                    "label": "Execuções agendadas",
+                    "them": "“Os gatilhos pertencem ao membro que os criou”: a execução cai no histórico dessa pessoa, a menos que ela a arquive num Pod, e um gatilho de webhook dispara no máximo 42 vezes por dia.",
+                    "rerun": "Cada rotina de cada agente fica numa única lista de Routines que o workspace compartilha, com a próxima execução, e qualquer colega pode responder ao agente."
+                },
+                "6": {
+                    "label": "A IA por trás",
+                    "them": "Mais de 20 modelos, cobrados em créditos Dust por mensagem.",
+                    "rerun": "Rode no modelo do Rerun incluído no plano, entre com o plano do ChatGPT ou do Claude que você já paga, ou use uma chave de API."
+                }
+            }
+        },
+        "squad": {
+            "subtitle": "Colegas de IA no plano de IA que você traz",
+            "pitch": "O Squad custa $99 por mês além do plano de IA que você traz. O Rerun custa menos, inclui crédito de modelo e tem agentes prontos para instalar.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Um AI Chief of Staff desenha seu squad, e você compra um plano de IA antes que o primeiro colega rode.",
+                    "rerun": "Mais de {templates} agentes prontos, com IA incluída, ou um especialista cria o seu."
+                },
+                "getTheJobDone": {
+                    "them": "Aprovações com um toque esperam na fila até você chegar a elas.",
+                    "rerun": "Continua trabalhando na sua ausência: o Autopilot responde aos seus agentes dentro das suas regras."
+                },
+                "agentTeamwork": {
+                    "them": "Os colegas compartilham uma memória, uma biblioteca de documentos e um cofre de segredos.",
+                    "rerun": "Seus agentes conversam entre si e passam o trabalho adiante: o agente da caixa de entrada entrega um novo lead para vendas."
+                },
+                "collaboration": {
+                    "them": "Um workspace para o seu squad, com uma caixa de e-mail por colega a $10 por mês cada.",
+                    "rerun": "Convide toda a sua equipe sem custo extra: todos veem os agentes trabalhando e podem responder a eles."
+                },
+                "business": {
+                    "them": "Nenhum agente pronto: você orienta cada um como um novo contratado.",
+                    "rerun": "Mais de {templates} agentes de negócios prontos, e especialistas que criam o seu e entregam pronto."
+                },
+                "flexibility": {
+                    "them": "Roda só nos planos de IA que você traz, com mais de 70 integrações.",
+                    "rerun": "Seu plano de IA ou o nosso incluído, e mais de {connectors} apps pelo navegador."
+                },
+                "pricing": {
+                    "them": "$99 por mês, mais um plano de IA que ele recomenda de $100 a $200.",
+                    "rerun": "{price} por mês com crédito de modelo e uma máquina segura, e 5 dias grátis."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Preço",
+                    "them": "$99 por mês, mais o plano de IA que você traz, que o Squad recomenda de $100 a $200 por mês.",
+                    "rerun": "{price} por mês com crédito de modelo incluído. Usar seu próprio plano de IA é opcional."
+                },
+                "2": {
+                    "label": "Para experimentar",
+                    "them": "Sem teste grátis: você paga o primeiro mês, com garantia de reembolso de 7 dias.",
+                    "rerun": "5 dias de teste grátis: o cartão é obrigatório e $0 é cobrado hoje."
+                },
+                "3": {
+                    "label": "Apps",
+                    "them": "Mais de 70 integrações, com acesso definido por colega.",
+                    "rerun": "Mais de {connectors} apps pelo navegador, mais qualquer servidor MCP."
+                },
+                "4": {
+                    "label": "Enquanto você está fora",
+                    "them": "Aprovações com um toque esperam na fila de tickets até você chegar a elas.",
+                    "rerun": "Com o Autopilot ligado, o Rerun responde aos seus agentes dentro das suas regras, nunca para gastar ou excluir, e deixa um resumo pronto quando você volta."
+                },
+                "5": {
+                    "label": "Agentes prontos",
+                    "them": "Um AI Chief of Staff desenha seu squad com você.",
+                    "rerun": "Mais de {templates} agentes prontos para instalar, e o Foreman monta sua equipe a partir de um breve resumo."
+                },
+                "6": {
+                    "label": "Ajuda para montar",
+                    "them": "Onboarding e suporte da equipe do Squad.",
+                    "rerun": "Uma rede de especialistas que criam seu agente e entregam pronto para rodar."
+                }
+            }
+        }
+    },
+    "pages": {
+        "claude-cowork": {
+            "metaTitle": "Rerun vs Claude Cowork: uma equipe de agentes (2026)",
+            "metaDescription": "Rerun vs Claude Cowork em modelos, trabalho agendado e preço. Mantenha seu plano do Claude e rode nele uma equipe de agentes, ou em qualquer outro modelo.",
+            "headline": "Rerun vs Claude Cowork",
+            "intro": "O Cowork, incorporado ao app do Claude em setembro de 2026, permite que o Claude assuma tarefas por você, com modelos Claude. O Rerun roda uma equipe de agentes numa máquina sempre ligada, em qualquer modelo, incluindo o plano do Claude que você já paga.",
+            "verdict": "Escolha o Claude se você quer que ele assuma tarefas a partir do app em que você já conversa, com seus conectores, skills, agendamentos na nuvem e os Docs e Slides que ele agora escreve na conversa. Escolha o Rerun se você quer vários agentes, cada um com sua função, trabalhando para toda a equipe a partir de uma máquina sempre ligada, no modelo da sua escolha. Os dois se complementam: conecte um agente ao seu plano do Claude e o Rerun o executa no Claude.",
+            "chooseRerun": {
+                "1": "Você quer alguns agentes no GPT ou no Gemini, não só no Claude",
+                "2": "Vários agentes precisam compartilhar dados e passar trabalho uns aos outros",
+                "3": "Os agentes precisam de arquivos e bancos de dados que ficam numa máquina sempre ligada",
+                "4": "Toda a equipe deve ver os agentes e responder a eles, sem um assento para cada um"
+            },
+            "chooseThem": {
+                "1": "Você quer que o Claude cuide de tarefas dentro do app em que você já conversa",
+                "2": "Seu trabalho está em arquivos no seu próprio computador",
+                "3": "Você só precisa de modelos Claude"
+            },
+            "differences": {
+                "1": {
+                    "title": "Qualquer modelo, incluindo seu plano do Claude",
+                    "desc": "O Claude roda em modelos Claude. Cada agente do Rerun pode entrar com seu plano do Claude, ou rodar no GPT, no Gemini ou em outro modelo com sua chave, e você pode trocar por agente ou por tarefa agendada."
+                },
+                "2": {
+                    "title": "Uma máquina que fica ligada",
+                    "desc": "As tarefas agendadas do Claude rodam na nuvem em todos os planos pagos, no mínimo a cada hora, mas uma tarefa que precisa de uma pasta ou de um app no seu computador só roda lá, enquanto ele está ligado. Os agentes do Rerun rodam na máquina privada do seu workspace, com precisão de minutos, onde ficam seus arquivos, bancos de dados e navegador, dia e noite."
+                },
+                "3": {
+                    "title": "Uma equipe, não um único assistente",
+                    "desc": "Diga ao Foreman, o assistente que gerencia seus agentes, o que você tem em mente: ele entrega cada tarefa ao agente responsável por ela, ou propõe um novo. Os agentes compartilham uma pasta, um banco de dados e um cérebro da empresa, então o agente da caixa de entrada pode passar um novo lead para o agente de vendas."
+                },
+                "4": {
+                    "title": "Toda a equipe responde",
+                    "desc": "No Claude, cada pessoa trabalha com o próprio plano, a partir de $20 por assento. No Rerun, cada agente pertence ao workspace, os assentos são gratuitos e ilimitados, os colegas veem o que ele fez e qualquer um pode responder quando ele para para perguntar. Com o Autopilot ligado, o Foreman responde dentro das suas regras enquanto todos estão fora."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Mantenha seu plano do Claude",
+                    "desc": "Conecte um agente à sua conta do Claude, para que o trabalho rode na assinatura que você já paga."
+                },
+                "2": {
+                    "title": "Divida o trabalho em funções",
+                    "desc": "Entregue cada tarefa recorrente a um agente próprio, ou instale um pronto da biblioteca."
+                },
+                "3": {
+                    "title": "Agende e feche o notebook",
+                    "desc": "Os agentes rodam na máquina deles por horário ou por webhook, e consultam a equipe quando precisam de uma decisão."
+                }
+            },
+            "theirPricing": "O Cowork faz parte dos planos pagos do Claude: o Pro custa $20 por mês ($17 no plano anual), o Max a partir de $100 com $100 a $200 de crédito de API, o Team $25 por assento ($20 no plano anual, mínimo de dois assentos) com até $500 de crédito de API compartilhado, e o Enterprise $20 por assento com uso cobrado a preço de API. Cada um tem os próprios limites de uso. O Rerun é um único plano a partir de {price} por mês para agentes ilimitados que sua equipe compartilha, com assentos incluídos, e os agentes podem rodar num plano do Claude que você já tem.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Claude Cowork?",
+                    "answer": "Está mais para um complemento. O Claude assume tarefas para a pessoa que o usa, com modelos Claude. O Rerun roda uma equipe de agentes numa máquina sempre ligada, em qualquer modelo, e pode rodá-los no seu plano do Claude."
+                },
+                "2": {
+                    "question": "Posso usar meu plano do Claude com o Rerun?",
+                    "answer": "Sim. Conecte um agente à sua conta do Claude e ele roda no seu plano, dentro dos limites de uso desse plano. O Rerun não adiciona nenhum limite próprio."
+                },
+                "3": {
+                    "question": "Posso dar uma lista de tarefas ao Rerun?",
+                    "answer": "Sim. Escreva ou dite o que você tem em mente para o Foreman, o assistente que gerencia seus agentes, ou segure a barra de espaço e fale. Ele entrega cada tarefa ao agente certo, propõe um novo agente quando nenhum consegue fazer, e mantém na sua lista de tarefas o que só você pode fazer."
+                },
+                "4": {
+                    "question": "O Claude Cowork ainda existe?",
+                    "answer": "A Anthropic incorporou o Cowork ao app do Claude em 16 de setembro de 2026. O que o Cowork fazia agora está disponível em qualquer conversa do Claude: Pro e Max receberam primeiro, seguidos por Team e Free."
+                },
+                "5": {
+                    "question": "Os agentes do Rerun rodam com meu computador desligado?",
+                    "answer": "Sim. Eles rodam na máquina privada do seu workspace na nuvem, por horário ou por webhook, com seu notebook aberto ou não. No Claude, uma tarefa que precisa de uma pasta ou de um app local só roda no seu próprio computador."
+                }
+            }
+        },
+        "manus": {
+            "metaTitle": "Rerun vs Manus: preço fixo para trabalho recorrente (2026)",
+            "metaDescription": "Rerun vs Manus em créditos, agendamentos e equipes. O Manus cobra cada tarefa em créditos e limita você a 20 tarefas agendadas; o Rerun é um plano fixo, sem limite.",
+            "headline": "Rerun vs Manus",
+            "intro": "O Manus é um agente de IA geral que pesquisa, constrói e entrega, cobrado em créditos por tarefa. O Rerun roda uma equipe de agentes no trabalho recorrente da empresa, numa máquina privada, por um preço fixo.",
+            "verdict": "Escolha o Manus para entregas pontuais, como uma pesquisa aprofundada, uma apresentação ou um site, para as quais o agente geral dele foi feito, e para o Wide Research em várias fontes ao mesmo tempo. Escolha o Rerun para trabalho que se repete: quantos agendamentos e webhooks o trabalho precisar em vez de 20, agentes que compartilham dados e respondem a toda a sua equipe, por {price} por mês em vez de créditos por tarefa.",
+            "chooseRerun": {
+                "1": "O trabalho se repete todo dia ou a cada evento",
+                "2": "Você precisa de mais de 20 tarefas agendadas, ou de uma que rode a cada poucos minutos",
+                "3": "Você não quer que cada tarefa gaste créditos",
+                "4": "Vários agentes precisam compartilhar dados e passar trabalho uns aos outros"
+            },
+            "chooseThem": {
+                "1": "Você precisa de uma pesquisa, slides ou um site pontuais",
+                "2": "Você quer o Wide Research em várias fontes ao mesmo tempo",
+                "3": "Você roda poucas tarefas por mês e prefere pagar pelo uso"
+            },
+            "differences": {
+                "1": {
+                    "title": "Trabalho recorrente sem limite",
+                    "desc": "Todo plano do Manus para em 20 tarefas agendadas e 20 rodando ao mesmo tempo, seja no de $20, no de $40 ou no de $200. Os agentes do Rerun aceitam quantos agendamentos e webhooks o trabalho precisar, com precisão de minutos, no mesmo plano fixo, e uma única lista de Routines mostra o que roda em seguida, com pausar e executar agora."
+                },
+                "2": {
+                    "title": "Sua IA, não um saldo de créditos",
+                    "desc": "Cada tarefa do Manus gasta créditos: $20 por mês compram 4,000, mais 300 renovados todo dia. O Rerun nunca conta tarefas: os agentes rodam no seu plano do ChatGPT ou do Claude, na sua própria chave ou no crédito incluído."
+                },
+                "3": {
+                    "title": "Uma equipe de agentes",
+                    "desc": "O Manus mantém o contexto rodando um agendamento dentro da mesma tarefa, ou compartilhando os arquivos e conectores de um Project. No Rerun, vários agentes têm cada um sua função, guardam a própria memória e as próprias skills, e compartilham uma pasta, um banco de dados e um cérebro da empresa. Diga ao Foreman o que você tem em mente e ele entrega cada tarefa ao agente certo."
+                },
+                "4": {
+                    "title": "Um quadro para toda a equipe",
+                    "desc": "Num plano de equipe do Manus, cada membro roda as próprias tarefas com os créditos compartilhados, a partir de $20 por assento. No Rerun, os assentos são gratuitos e ilimitados, sua equipe compartilha os mesmos agentes, e qualquer colega pode responder a um que pare para perguntar."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha a tarefa que você mais agenda",
+                    "desc": "Descreva com palavras simples, ou instale um agente pronto que já faz isso."
+                },
+                "2": {
+                    "title": "Conecte seus apps e sua IA",
+                    "desc": "Um login por app, um token para os que pedem. Entre com seu plano do ChatGPT ou do Claude, ou use sua própria chave."
+                },
+                "3": {
+                    "title": "Coloque num agendamento",
+                    "desc": "Qualquer horário ou webhook, sem limite de 20. Ele roda na própria máquina e pergunta quando precisa de uma decisão."
+                }
+            },
+            "theirPricing": "O Manus cobra em créditos por tarefa: $20 por mês por 4.000 créditos, $40 por 8.000 e $200 por 40,000, cada um com 300 créditos renovados todo dia, 20 tarefas agendadas e 20 tarefas ao mesmo tempo. Os planos de equipe começam em $20 por assento por mês com 4.000 créditos por assento, compartilhados. O Rerun é um único plano a partir de {price} por mês para agentes ilimitados, com assentos ilimitados incluídos, e nunca conta tarefas.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Manus?",
+                    "answer": "Para trabalho recorrente, sim. O Manus se destaca em entregas pontuais. Os agentes do Rerun cuidam de tarefas que se repetem, por horário ou por webhook, por um preço fixo."
+                },
+                "2": {
+                    "question": "O Rerun usa créditos como o Manus?",
+                    "answer": "Não. O Rerun nunca conta tarefas. O plano inclui um pequeno crédito para os modelos que o Rerun hospeda, e agentes no seu próprio plano do ChatGPT ou do Claude ou na sua chave não custam nada a mais do lado do Rerun."
+                },
+                "3": {
+                    "question": "Posso dar uma lista de tarefas ao Rerun?",
+                    "answer": "Sim. Escreva ou dite o que você tem em mente para o Foreman, o assistente que gerencia seus agentes. Ele entrega cada tarefa ao agente certo, propõe um novo agente quando nenhum consegue fazer, e mantém na sua lista de tarefas o que só você pode fazer."
+                },
+                "4": {
+                    "question": "Quantas tarefas agendadas posso rodar no Rerun?",
+                    "answer": "Quantas o trabalho precisar: cada agente pode ter vários agendamentos e webhooks, com precisão de minutos. Todo plano do Manus para em 20 tarefas agendadas e 20 rodando ao mesmo tempo."
+                },
+                "5": {
+                    "question": "Os agentes do Rerun navegam na web e criam arquivos?",
+                    "answer": "Sim. Eles pesquisam, controlam um navegador, assumem um desktop para apps sem API e escrevem arquivos na máquina privada do seu workspace, e podem publicar um arquivo num link público."
+                }
+            }
+        },
+        "grok-bot": {
+            "metaTitle": "Rerun vs Grok Bot: qualquer modelo, visão completa (2026)",
+            "metaDescription": "Rerun vs Grok Bot da xAI comparados em acesso, modelos, visibilidade e custo. Os dois dão aos agentes um computador na nuvem. Veja qual combina com sua equipe.",
+            "headline": "Rerun vs Grok Bot",
+            "intro": "O Grok Bot, da xAI, dá a colegas de IA sempre ligados um computador compartilhado na nuvem. O Rerun também, no modelo que você escolher, com um quadro que toda a sua equipe pode ler.",
+            "verdict": "Os dois colocam agentes num computador na nuvem, deixam que eles entrem nas suas ferramentas e trabalhem 24 horas, e os dois fazem um agente passar trabalho para outro. Escolha o Grok Bot se você já paga o SuperGrok ou um plano do Cursor que o inclui e está satisfeito com um beta dentro dos apps deles. Escolha o Rerun se você quer escolher o modelo, começar com mais de {templates} agentes prontos, dar à equipe inteira um quadro para acompanhar e contratar agentes num plano próprio com preço publicado, hoje.",
+            "chooseRerun": {
+                "1": "Você quer rodar no Claude, no ChatGPT ou no seu próprio modelo",
+                "2": "Você quer um plano independente com preços publicados, não um pacote em beta",
+                "3": "Sua equipe precisa de um quadro compartilhado e assentos gratuitos, não uma conta por pessoa",
+                "4": "Você quer agentes prontos de uma biblioteca de templates"
+            },
+            "chooseThem": {
+                "1": "Você já paga o SuperGrok ou o Cursor Pro ou superior e quer agentes incluídos",
+                "2": "As ferramentas que você usa não têm API e precisam ser operadas pela interface",
+                "3": "Você quer que seus agentes vivam dentro dos apps Grok ou Cursor, no desktop e no iOS"
+            },
+            "differences": {
+                "1": {
+                    "title": "Seu modelo, não um único fornecedor",
+                    "desc": "O Grok Bot roda nos modelos da xAI, com cota de uso própria, separada do seu plano Grok ou Cursor. Os agentes do Rerun rodam no modelo incluído no plano, ou no Claude, ChatGPT, Gemini e outros com sua própria assinatura ou chave, e acessam mais de {connectors} apps ou qualquer servidor MCP."
+                },
+                "2": {
+                    "title": "Um quadro, não só um chat",
+                    "desc": "Cada execução, cada chamada de ferramenta e o que o agente passou a lembrar ficam à vista num quadro ao vivo, ao lado da conversa, em qualquer navegador. O Grok Bot vive nos apps para desktop e iOS."
+                },
+                "3": {
+                    "title": "Aprovações que toda a equipe pode responder",
+                    "desc": "Os Bots voltam para a pessoa dona deles quando precisam de uma aprovação. No Rerun, os agentes param antes de qualquer ação arriscada e perguntam no app, os assentos são gratuitos, e qualquer pessoa do workspace pode responder. Com o Autopilot ligado, o Foreman responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir."
+                },
+                "4": {
+                    "title": "Um plano próprio",
+                    "desc": "O Grok Bot ainda está em beta, incluído nos planos SuperGrok e Cursor, nunca vendido separadamente, e o acesso Enterprise tem lista de espera. O Rerun é um único plano a partir de {price} por mês com 5 dias de teste grátis."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Dê uma função ao agente",
+                    "desc": "Descreva pelo que ele é responsável, ou comece com um agente pronto da biblioteca."
+                },
+                "2": {
+                    "title": "Escolha o modelo e os apps",
+                    "desc": "Escolha Claude, ChatGPT ou seu próprio plano, depois entre nas suas ferramentas."
+                },
+                "3": {
+                    "title": "Acompanhe o trabalho",
+                    "desc": "Ele roda na própria máquina, por horário ou por gatilho, e cada ação aparece no seu quadro."
+                }
+            },
+            "theirPricing": "O Grok Bot não é vendido separadamente: ele vem incluído, em beta, em todos os níveis do SuperGrok e nos planos Cursor Pro, Pro+, Ultra e Teams, e o uso é contado à parte desses planos. O acesso Enterprise ainda tem lista de espera. O Rerun é um único plano a partir de {price} por mês, com assentos incluídos, e as execuções nunca são contadas.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Grok Bot?",
+                    "answer": "Sim. Como o Grok Bot, o Rerun roda seus agentes num computador na nuvem e deixa um passar trabalho para outro. O Rerun permite escolher o modelo, mostra cada ação num quadro que qualquer colega pode ler, e está disponível num plano próprio com preço publicado."
+                },
+                "2": {
+                    "question": "O Rerun pode usar modelos Grok?",
+                    "answer": "Sim, com uma chave do OpenRouter: o Grok fica ao lado de Claude, GPT, Gemini e outros no seletor de modelos."
+                },
+                "3": {
+                    "question": "Preciso de um plano SuperGrok ou Cursor para usar o Rerun?",
+                    "answer": "Não. O Rerun tem plano próprio a partir de {price} por mês com 5 dias de teste grátis."
+                },
+                "4": {
+                    "question": "Onde os agentes do Rerun rodam?",
+                    "answer": "No computador privado e isolado em que seu workspace roda, incluído em todos os planos, com um navegador e um desktop que eles podem controlar. Seus arquivos e dados ficam lá dentro."
+                }
+            }
+        },
+        "paperclip": {
+            "metaTitle": "Rerun vs Paperclip: agentes hospedados ou organograma auto-hospedado? (2026)",
+            "metaDescription": "Rerun vs Paperclip em hospedagem, runtimes de agentes, conectores e custo real: quando o organograma open source para agentes funciona, e quando uma alternativa hospedada ao Paperclip é mais simples.",
+            "headline": "Rerun vs Paperclip",
+            "intro": "O Paperclip é um painel de controle open source que você hospeda: ele dá aos agentes que você já roda um organograma, orçamentos e etapas de aprovação. O Rerun entrega os próprios agentes, já rodando numa máquina privada na nuvem.",
+            "verdict": "Escolha o Paperclip se você já roda vários agentes de código e quer um organograma, orçamentos por agente e etapas de aprovação sobre todos eles, e não se importa em hospedar um servidor Node e seu banco de dados. Escolha o Rerun se você quer os agentes, não o lugar para gerenciá-los: cada um roda na máquina privada do seu workspace, com mais de {connectors} apps em um clique e memória entre execuções, por {price} fixos por mês.",
+            "chooseRerun": {
+                "1": "Você quer agentes que já funcionam, não um painel de controle sobre agentes que você ainda precisa instalar",
+                "2": "Ninguém na equipe quer hospedar um servidor, um banco de dados e os backups",
+                "3": "Os colegas devem responder aos agentes pelo navegador, sem VPN",
+                "4": "Você quer um agente que envie o e-mail, não só que faça o rascunho"
+            },
+            "chooseThem": {
+                "1": "Você já roda vários agentes de código e quer um organograma sobre eles",
+                "2": "Você quer software gratuito, com licença MIT, que possa ler, fazer fork e estender com plugins",
+                "3": "Você quer orçamentos por agente e por projeto que param tudo em 100%",
+                "4": "Seu trabalho é feito de repositórios, pull requests e URLs de preview"
+            },
+            "differences": {
+                "1": {
+                    "title": "Os agentes vêm com a máquina",
+                    "desc": "O Paperclip contrata agentes que você depois precisa fornecer: um harness instalado no servidor para cada função, ou um provedor de sandbox que você traz e paga. Um agente do Rerun chega com a própria máquina, onde escreve arquivos, roda scripts, controla um navegador e mantém seus próprios bancos de dados."
+                },
+                "2": {
+                    "title": "Nada para instalar ou hospedar",
+                    "desc": "O Paperclip é um servidor Node que você instala, conecta a um Postgres e mantém atualizado, e deixar um colega entrar significa passá-lo para o modo autenticado num servidor que ele alcance, por uma LAN, uma VPN ou pela internet aberta. O Paperclip Cloud ainda tem lista de espera. Os agentes do Rerun já rodam na nuvem, nos horários definidos, com você online ou não."
+                },
+                "3": {
+                    "title": "Apps com que o agente pode agir",
+                    "desc": "O catálogo do Paperclip tem 62 conectores, e a configuração fica por sua conta: o Gmail dele se limita a ler e criar rascunhos, uma pessoa envia, e enquanto o Google analisa o app deles, os conectores do Google ficam ocultos da lista. O login gerenciado com um clique só funciona em instâncias inscritas no Paperclip Cloud. No Rerun, um login do Google dá ao agente um Gmail que ele lê, rotula, responde e de onde envia, e o resto do catálogo se conecta pela mesma tela ou por qualquer servidor MCP."
+                },
+                "4": {
+                    "title": "Uma memória que já está lá",
+                    "desc": "O Paperclip lista memória e conhecimento como direção para trabalho futuro, com conexões experimentais ao Mem0, Zep ou Supermemory atrás de uma configuração da instância. Os agentes do Rerun guardam memória, skills e um banco de dados privado entre execuções, e ficam mais precisos a cada correção sua."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha o agente que mais toma suas horas",
+                    "desc": "Descreva a função dele com palavras simples. O agente escreve as próprias instruções e skills, sem harness para instalar."
+                },
+                "2": {
+                    "title": "Conecte apps e seu modelo",
+                    "desc": "Um clique por app. Mantenha o login do Claude ou do ChatGPT que você já pagava, ou uma chave de API."
+                },
+                "3": {
+                    "title": "Desligue o servidor",
+                    "desc": "O agente agora roda na máquina do seu workspace, no próprio horário, e pergunta a qualquer colega antes de qualquer ação arriscada."
+                }
+            },
+            "theirPricing": "O Paperclip é gratuito, com licença MIT, e não há plano do Paperclip para comprar. O próprio guia de início prevê de $5 a $20 para experimentar e de $20 a $100 por mês para uma empresa ativa em chamadas ao modelo, além da máquina, do banco de dados e da manutenção, com uma nova versão quase toda semana. O Rerun é um único plano a partir de {price} por mês com uma máquina privada segura, agentes ilimitados e crédito de modelo incluídos, e as execuções nunca são contadas.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa hospedada ao Paperclip?",
+                    "answer": "Sim, com uma diferença que vale saber antes. O Paperclip organiza agentes que você mesmo instala e hospeda; os agentes do Rerun vêm com o produto, já rodando na máquina privada do seu workspace, com seus apps conectados pelo navegador e um quadro ao vivo que sua equipe pode ler."
+                },
+                "2": {
+                    "question": "O Paperclip roda os agentes sozinho?",
+                    "answer": "Não. O Paperclip é o painel de controle: “se pode receber um heartbeat, está contratado.” Você traz o runtime de cada função, Claude Code, Codex, Cursor, OpenCode, Hermes ou OpenClaw, e o instala no servidor. No Rerun, o agente é o produto, e você só escolhe em qual modelo ele roda."
+                },
+                "3": {
+                    "question": "Quanto o Paperclip custa de verdade?",
+                    "answer": "O software é gratuito, com licença MIT. Você paga a conta do modelo, e o guia de início deles prevê de $5 a $20 para experimentar e de $20 a $100 por mês para uma empresa ativa, mais o servidor, o Postgres e o tempo para manter os dois atualizados. O Rerun custa {price} por mês com a máquina, agentes ilimitados e crédito de modelo incluídos."
+                },
+                "4": {
+                    "question": "O Rerun pode rodar no meu plano do Claude ou do ChatGPT, como o Paperclip?",
+                    "answer": "Sim, e o Paperclip também, então a diferença não está aí. O Paperclip faz login com a CLI do provedor instalada no servidor; no Rerun você entra pelo navegador, e também pode usar uma chave de API ou o crédito incluído no plano."
+                },
+                "5": {
+                    "question": "O Rerun tem orçamentos e aprovações como o Paperclip?",
+                    "answer": "Aprovações, sim: os agentes param antes de qualquer ação importante e perguntam no app, e qualquer colega pode responder. Nos orçamentos o Paperclip está à frente, com políticas por empresa, agente e projeto que pausam o trabalho em 100%. O Rerun limita o crédito de modelo incluído e nunca conta execuções."
+                },
+                "6": {
+                    "question": "O Rerun é open source?",
+                    "answer": "Não. O Rerun é um produto hospedado. Infraestrutura dedicada ou auto-hospedada está disponível no Enterprise."
+                }
+            }
+        },
+        "hermes": {
+            "metaTitle": "Rerun vs Hermes Agent: uma equipe de agentes hospedada (2026)",
+            "metaDescription": "Rerun vs Hermes Agent (Nous Research) em hospedagem, custo e apps: quando rodar o Hermes por conta própria ou no Hermes Cloud, e quando uma equipe hospedada é mais simples.",
+            "headline": "Rerun vs Hermes Agent",
+            "intro": "O Hermes Agent, da Nous Research, é um agente open source que aprende skills pelo caminho, rodando na sua própria máquina em cinco sandboxes, ou hospedado no Hermes Cloud. O Rerun dá à sua equipe agentes que também aprendem, hospedados juntos numa máquina privada, com os apps e o quadro em volta.",
+            "verdict": "Escolha o Hermes Agent se você quer código com licença MIT, a escolha entre cinco backends do local ao Modal e controle total do runtime, ou um agente no Hermes Cloud que você acessa pelo Telegram, Discord ou WhatsApp. Escolha o Rerun se você quer vários agentes para uma equipe numa máquina incluída num plano fixo, mais de {connectors} apps conectados pelo navegador e agentes prontos para começar.",
+            "chooseRerun": {
+                "1": "Vários agentes devem rodar lado a lado num único plano, não uma instância para cada",
+                "2": "Colegas não técnicos precisam usar e orientar os agentes",
+                "3": "Você quer apps conectados pelo navegador, não configurados à mão",
+                "4": "Você quer começar com agentes prontos"
+            },
+            "chooseThem": {
+                "1": "Você quer código open source e controle total do runtime",
+                "2": "Você quer escolher seu próprio sandbox: local, Docker, SSH, Singularity ou Modal",
+                "3": "Você conversa com seu agente principalmente pelo Telegram, Discord, WhatsApp ou Signal"
+            },
+            "differences": {
+                "1": {
+                    "title": "Uma máquina para todos os seus agentes",
+                    "desc": "O Hermes roda onde você o instala, ou no Hermes Cloud, onde cada agente ganha uma instância dedicada cobrada por dia. No Rerun, uma máquina privada por workspace roda todos os seus agentes, e ela está incluída no plano."
+                },
+                "2": {
+                    "title": "Aprendizado que você pode ler",
+                    "desc": "O Hermes guarda conversas, memórias e skills entre sessões e escreve skills sozinho. Os agentes do Rerun também, e você vê o que aprenderam e cada ação que tomaram num quadro ao vivo, ao lado de um cérebro da empresa que todo o workspace compartilha."
+                },
+                "3": {
+                    "title": "Aprovações para toda a equipe",
+                    "desc": "Os agentes param antes de qualquer ação importante e perguntam no app, os assentos são gratuitos, e qualquer colega pode responder. Com o Autopilot ligado, o Foreman responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir."
+                },
+                "4": {
+                    "title": "Apps e modelos pelo navegador",
+                    "desc": "O Hermes acessa qualquer servidor MCP que você mesmo configura e filtra. No Rerun, mais de {connectors} apps se conectam pelo navegador com login guiado, qualquer servidor MCP continua funcionando, e cada agente roda no modelo do Rerun incluído no plano, no seu plano do ChatGPT ou do Claude, ou na sua própria chave."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Descreva o que o Hermes fazia",
+                    "desc": "Dê a função ao agente com palavras simples. Ele escreve as próprias instruções e skills."
+                },
+                "2": {
+                    "title": "Conecte apps e seu modelo",
+                    "desc": "Mantenha o provedor de modelo que você prefere e entre nas suas ferramentas pelo navegador."
+                },
+                "3": {
+                    "title": "Aposente a configuração antiga",
+                    "desc": "O agente agora roda na sua máquina privada com o próprio agendamento, e você para de pagar ou manter a instância em que o Hermes rodava."
+                }
+            },
+            "theirPricing": "O Hermes Agent é gratuito, com licença MIT, para rodar por conta própria, e você paga o modelo e a máquina. O Hermes Cloud exige pelo menos $2 de crédito antes de implantar um Cloud Agent, depois cobra cada instância por dia, medida por segundo de atividade mais armazenamento, com inferência e uso de ferramentas cobrados à parte; os tamanhos e preços das instâncias só aparecem dentro do Nous Portal, cujos planos custam $20, $100 ou $200 de crédito por mês. O Rerun é um único plano a partir de {price} por mês com uma máquina privada segura, agentes ilimitados, assentos ilimitados e crédito de modelo incluídos.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa hospedada ao Hermes Agent?",
+                    "answer": "Sim. A Nous também hospeda o Hermes, uma instância dedicada por agente no Hermes Cloud. O Rerun hospeda uma equipe de agentes numa máquina privada por workspace, com mais de {connectors} apps e um quadro que toda a sua equipe usa."
+                },
+                "2": {
+                    "question": "Os agentes do Rerun aprendem como o Hermes Agent?",
+                    "answer": "Sim. Os agentes do Rerun criam skills e guardam memória entre execuções, e ficam mais precisos a cada correção sua. Você pode ler o que eles aprenderam no quadro."
+                },
+                "3": {
+                    "question": "Quanto custa rodar o Hermes Agent?",
+                    "answer": "O software é gratuito. Auto-hospedado, você paga o modelo e a máquina. No Hermes Cloud, você precisa de $2 de crédito para implantar, cada instância em execução é cobrada por dia e medida por segundo, e inferência e ferramentas são cobradas à parte; os planos do Nous Portal custam $20, $100 ou $200 por mês. O Rerun reúne a máquina, agentes ilimitados, assentos ilimitados e crédito de modelo num único plano a partir de {price} por mês."
+                },
+                "4": {
+                    "question": "Posso usar modelos da Nous ou do OpenRouter no Rerun?",
+                    "answer": "O Rerun roda no Claude, no ChatGPT e em outros, e uma chave do OpenRouter, incluindo um endpoint personalizado, dá acesso a outros modelos."
+                },
+                "5": {
+                    "question": "Preciso de um terminal para usar o Rerun?",
+                    "answer": "Não. Você cria e gerencia os agentes no navegador."
+                }
+            }
+        },
+        "openclaw": {
+            "metaTitle": "Rerun vs OpenClaw: agentes de IA hospedados (2026)",
+            "metaDescription": "Rerun vs OpenClaw em configuração, hospedagem, segurança e custo: quando o assistente open source funciona, e quando uma alternativa hospedada ao OpenClaw é mais simples.",
+            "headline": "Rerun vs OpenClaw",
+            "intro": "O OpenClaw é um assistente pessoal de IA open source que você instala e roda na sua própria máquina ou servidor. O Rerun roda seus agentes por você, numa máquina privada e isolada na nuvem.",
+            "verdict": "Escolha o OpenClaw se você quer software gratuito, com licença MIT, que possa ler e modificar, modelos locais no seu próprio hardware, e não se importa em manter uma máquina ligada e reforçar a segurança dela: a fundação por trás dele “não vende nada: nenhum plano pago, nenhum serviço hospedado, nenhum token.” Escolha o Rerun se você quer a mesma autonomia sem hospedar nem proteger nada, com aprovações, agentes prontos e um quadro que sua equipe pode ler.",
+            "chooseRerun": {
+                "1": "Você não quer um agente com acesso ao terminal no seu próprio notebook",
+                "2": "Você não quer manter uma máquina ligada, atualizada e protegida para ele",
+                "3": "Os colegas devem usar os agentes sem que ninguém precise administrar um gateway",
+                "4": "Você quer apps conectados pelo navegador, não configurados à mão"
+            },
+            "chooseThem": {
+                "1": "Você quer software gratuito e open source que possa ler e modificar",
+                "2": "Você quer o assistente dentro dos seus apps de mensagens",
+                "3": "Você quer rodar modelos locais no seu próprio hardware, pelo Ollama ou LM Studio"
+            },
+            "differences": {
+                "1": {
+                    "title": "Nada para instalar ou hospedar",
+                    "desc": "O OpenClaw roda numa máquina que você mantém ligada, seu computador ou um servidor, e a fundação não oferece serviço hospedado. Os agentes do Rerun vivem numa máquina privada na nuvem e rodam nos horários definidos, com você online ou não."
+                },
+                "2": {
+                    "title": "Isolado, com proteções",
+                    "desc": "No OpenClaw, “sandbox e aprovações de execução vêm desligados por padrão”, então as ferramentas acessam os arquivos e o terminal da máquina onde ele roda até você reforçar a segurança. Cada workspace do Rerun roda na própria máquina virtual isolada, os agentes param antes de qualquer ação arriscada e esperam sua aprovação no app, e uma consulta de dados paga só roda depois que você aprova o custo."
+                },
+                "3": {
+                    "title": "Apps sem configuração",
+                    "desc": "Gmail, Google Calendar, Notion, Stripe e mais de {connectors} apps se conectam pelo navegador, a maioria com um único login, mais qualquer servidor MCP ou API. Traga seu próprio plano de modelo ou chave, ou use o nosso."
+                },
+                "4": {
+                    "title": "Uma equipe, sem gateway para manter",
+                    "desc": "Uma equipe no OpenClaw compartilha um gateway que alguém hospeda, e um gateway é um domínio de confiança: pessoas que não devem confiar umas nas outras precisam de um cada. No Rerun, convide colegas sem custo extra, compartilhe agentes e acompanhe cada execução num quadro ao vivo, com uma memória que deixa o agente mais preciso a cada correção."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha a tarefa que você deu ao OpenClaw",
+                    "desc": "Descreva com palavras simples. O agente configura as próprias instruções e skills."
+                },
+                "2": {
+                    "title": "Conecte apps e seu modelo",
+                    "desc": "Um login por app. Mantenha o modelo que você usava, com sua própria chave de API ou login."
+                },
+                "3": {
+                    "title": "Desligue o daemon local",
+                    "desc": "O agente agora roda na própria máquina, 24 horas por dia, e pergunta a você antes de qualquer ação arriscada."
+                }
+            },
+            "theirPricing": "O OpenClaw é gratuito, com licença MIT, e a OpenClaw Foundation não vende nada: nenhum plano pago, nenhum serviço hospedado, nenhum token. Você paga o modelo que conecta e a máquina em que ele roda, e cuida da disponibilidade, das atualizações e da segurança. O Rerun é um único plano a partir de {price} por mês com a máquina privada, crédito de modelo, agentes ilimitados e assentos ilimitados incluídos, e as execuções nunca são contadas.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa hospedada ao OpenClaw?",
+                    "answer": "Sim. O Rerun entrega agentes autônomos sem instalar nada: cada um roda na sua máquina privada na nuvem, com aprovações, memória e um quadro ao vivo."
+                },
+                "2": {
+                    "question": "É seguro rodar o OpenClaw no meu computador?",
+                    "answer": "Sandbox e aprovações de execução vêm desligados por padrão no OpenClaw, então, a menos que você os configure, as ferramentas têm acesso ao terminal e aos arquivos da máquina onde ele roda; há um comando de auditoria de segurança para detectar desvios, e o projeto publica alertas que você precisa acompanhar. Os agentes do Rerun rodam numa máquina isolada em vez do seu notebook e pausam para pedir aprovação antes de qualquer ação importante."
+                },
+                "3": {
+                    "question": "Posso usar meu próprio modelo no Rerun, como no OpenClaw?",
+                    "answer": "Sim. Traga sua própria chave de API ou seu login do Claude ou do ChatGPT, ou use os modelos que o Rerun hospeda. Modelos locais no seu próprio hardware, pelo Ollama ou LM Studio, são onde o OpenClaw leva vantagem."
+                },
+                "4": {
+                    "question": "O Rerun precisa de terminal?",
+                    "answer": "Não. Tudo acontece no navegador: crie o agente, descreva a função dele, conecte seus apps."
+                },
+                "5": {
+                    "question": "O Rerun é open source?",
+                    "answer": "Não. O Rerun é um produto hospedado. Infraestrutura dedicada ou auto-hospedada está disponível no Enterprise."
+                }
+            }
+        },
+        "zapier": {
+            "metaTitle": "Rerun vs Zapier: agentes de IA ou Zaps? (2026)",
+            "metaDescription": "Rerun vs Zapier em configuração, manutenção e custo: quando um Zap passo a passo basta, e quando um agente de IA que se adapta é a melhor alternativa ao Zapier.",
+            "headline": "Rerun vs Zapier",
+            "intro": "O Zapier conecta apps com Zaps que você monta passo a passo. O Rerun entrega agentes de IA que recebem um objetivo, escolhem as ferramentas e se adaptam quando algo muda.",
+            "verdict": "Escolha o Zapier para gatilhos fixos e de alto volume entre apps, como copiar uma resposta de formulário para uma planilha, ou quando você precisa de uma das mais de 10.000 integrações dele. Escolha o Rerun quando a tarefa exige julgamento: ler um e-mail, decidir o que fazer, dar seguimento, com arquivos e memória guardados na máquina do seu workspace. O Rerun custa {price} fixos por mês para agentes ilimitados, e nunca cobra por tarefa.",
+            "chooseRerun": {
+                "1": "A tarefa muda de forma a cada vez e o Zap vive precisando de novos caminhos",
+                "2": "Você quer descrever a tarefa com palavras simples em vez de mapear campos",
+                "3": "A tarefa precisa de arquivos, scripts ou um navegador, não só de chamadas entre apps",
+                "4": "Você não quer que a conta cresça a cada etapa"
+            },
+            "chooseThem": {
+                "1": "Você precisa de um gatilho e uma ação, sempre do mesmo jeito, milhares de vezes por dia",
+                "2": "Seu stack depende de um app de nicho entre as mais de 10.000 integrações do Zapier",
+                "3": "Sua equipe já roda centenas de Zaps que funcionam"
+            },
+            "differences": {
+                "1": {
+                    "title": "Um objetivo, não um fluxograma",
+                    "desc": "No Zapier você escolhe um gatilho, depois cada ação e mapeamento de campo, ou pede ao Copilot para rascunhar e continua mantendo tudo. No Rerun você diz ao agente qual é a tarefa, entra no Gmail, Notion ou Stripe, e ele descobre as etapas a cada execução."
+                },
+                "2": {
+                    "title": "Um computador, não só conectores",
+                    "desc": "Um Zap passa dados de um app para o próximo, e o código dentro dele tem 30 segundos por etapa antes de custar outra tarefa. Um agente do Rerun trabalha na máquina privada do seu workspace: escreve arquivos, roda scripts, controla um navegador e mantém seus próprios bancos de dados, então ele pode montar o relatório, não só mover os números."
+                },
+                "3": {
+                    "title": "Ele se adapta em vez de quebrar",
+                    "desc": "Uma coluna renomeada ou um novo formato de e-mail pode quebrar o mapeamento de campos de um Zap. Um agente do Rerun lê o que está na frente dele, lembra o que você corrigiu e lê um cérebro da empresa com sua oferta, seus preços e seu tom."
+                },
+                "4": {
+                    "title": "Preço fixo, execuções não contadas",
+                    "desc": "O Zapier conta cada etapa de ação como uma tarefa, com etapas de IA e de código na mesma cota, e cobra os Zapier Agents à parte em atividades: 1.500 por mês no Pro, e uma única execução para em 40 e volta para perguntar a você. O Rerun custa {price} por mês para agentes ilimitados, e um agente que trabalha a cada hora custa o mesmo que um que trabalha uma vez por dia."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha o Zap que mais quebra",
+                    "desc": "Descreva o que ele deve alcançar, não as etapas. Seu agente se configura a partir disso."
+                },
+                "2": {
+                    "title": "Conecte os mesmos apps",
+                    "desc": "Um login para Gmail, Sheets, Notion ou Stripe; Slack e HubSpot pedem um token que você cola uma vez. Rode na nossa IA, na sua própria chave ou no seu plano do ChatGPT."
+                },
+                "3": {
+                    "title": "Deixe rodar e depois desligue o Zap",
+                    "desc": "Agende ou dispare a partir de um evento. Quando uma semana de execuções estiver certa, você pode desligar o Zap."
+                }
+            },
+            "theirPricing": "O Zapier cobra por tarefa: 100 tarefas por mês no plano gratuito, e o Professional começa em $19,99 por mês no plano anual ($29,99 no mensal) por 750 tarefas. Etapas de IA, código além de 30 segundos e chamadas MCP saem da mesma cota, com o próprio exemplo do Zapier contando uma chamada de ferramenta MCP como 2 tarefas, e os Zapier Agents são cobrados à parte em atividades, 1.500 por mês no Pro. Se passar do limite, as tarefas extras custam 1.25× o preço base no plano anual e 2.5× no mensal. O Rerun é um único plano a partir de {price} por mês, e as execuções nunca são contadas.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Zapier?",
+                    "answer": "Sim, para trabalho que exige julgamento. O Zapier move dados entre apps por um caminho que você desenha. Os agentes do Rerun recebem um objetivo, escolhem as ferramentas e lidam com os casos que um caminho fixo não cobre. Muitas equipes mantêm os Zaps simples e passam os frágeis para o Rerun."
+                },
+                "2": {
+                    "question": "O Rerun cobra por tarefa como o Zapier?",
+                    "answer": "Não. O Rerun é um plano fixo a partir de {price} por mês e nunca conta execuções nem etapas. Você paga pela capacidade, ou seja, agentes e crédito de modelo, os assentos são gratuitos e ilimitados, e a IA pode rodar no seu próprio plano do ChatGPT ou do Claude ou na sua chave de API em vez do crédito incluído."
+                },
+                "3": {
+                    "question": "Qual é a diferença entre o Rerun e os Zapier Agents?",
+                    "answer": "Os Zapier Agents rodam dentro do Zapier e são cobrados por atividade: 1.500 por mês no Pro, e uma execução para em 40 atividades e pede sua opinião. Um agente do Rerun trabalha na máquina privada do seu workspace, guarda arquivos, bancos de dados e memória entre execuções, e nunca é contado por execução."
+                },
+                "4": {
+                    "question": "O Rerun pode usar os apps que conecto no Zapier?",
+                    "answer": "O Rerun acessa mais de {connectors} apps e qualquer servidor MCP. Os principais pedem um único login, Gmail, Google Calendar, Drive, Sheets, Notion, Stripe, Linear, Asana, Outlook; Slack e HubSpot pedem um token que você cria uma vez e cola. O Zapier ainda tem o catálogo maior, com mais de 10.000 apps, então verifique seus apps de nicho antes."
+                },
+                "5": {
+                    "question": "Preciso programar para trocar o Zapier pelo Rerun?",
+                    "answer": "Não. Você descreve a tarefa com palavras simples e conecta seus apps. Não há campos para mapear nem nada para instalar."
+                }
+            }
+        },
+        "make": {
+            "metaTitle": "Rerun vs Make: agentes de IA ou cenários? (2026)",
+            "metaDescription": "Rerun vs Make (Integromat) em configuração, manutenção e custo: quando um cenário visual basta, e quando um agente de IA é a melhor alternativa ao Make.",
+            "headline": "Rerun vs Make",
+            "intro": "O Make cria automações como cenários visuais, um módulo de cada vez. O Rerun entrega agentes de IA que recebem o objetivo e cuidam das etapas sozinhos.",
+            "verdict": "Escolha o Make quando você quer controle preciso sobre ramificações e mapeamento de dados numa tela, e um preço em créditos por ação difícil de bater em grande volume. Escolha o Rerun quando o trabalho exige julgamento e você prefere não remontar um cenário a cada mudança na entrada. O Rerun custa {price} fixos por mês, sem crédito gasto por módulo.",
+            "chooseRerun": {
+                "1": "Seus cenários não param de ganhar roteadores e tratamentos de erro",
+                "2": "Você quer o trabalho feito, não uma tela para manter",
+                "3": "Loops e polling estão consumindo seus créditos",
+                "4": "Você precisa de um agente que lembre o contexto entre execuções"
+            },
+            "chooseThem": {
+                "1": "Você gosta de desenhar você mesmo o caminho exato dos dados",
+                "2": "Seu volume é alto e cada execução segue o mesmo caminho",
+                "3": "Você precisa de um app específico do catálogo de mais de 3.500 deles"
+            },
+            "differences": {
+                "1": {
+                    "title": "Nenhuma tela para conectar",
+                    "desc": "Um cenário do Make é uma cadeia de módulos que você posiciona e mapeia, mesmo quando o assistente de IA rascunha o primeiro, e um agente de IA que você adiciona decide dentro do cenário que você montou em volta dele. Um agente do Rerun recebe a descrição da tarefa, entra no Gmail, Notion ou Stripe, acessa mais de {connectors} apps e qualquer servidor MCP, e planeja a tarefa inteira sozinho."
+                },
+                "2": {
+                    "title": "Memória sem montar data stores",
+                    "desc": "No Make, tudo o que um cenário deve lembrar vai para um data store que você projeta. Os agentes do Rerun guardam memória, arquivos e bancos de dados na própria máquina, e leem um cérebro da empresa com sua oferta e seu tom, então aprendem que esse cliente sempre paga atrasado sem você adicionar um filtro."
+                },
+                "3": {
+                    "title": "Arquivos e scripts, não só módulos",
+                    "desc": "No Make, tudo acontece dentro dos módulos que você posiciona, e nada sobrevive à execução. Um agente do Rerun trabalha na máquina privada do seu workspace: escreve arquivos, roda scripts, controla um navegador, usa um app na tela como uma pessoa e mantém seus próprios bancos de dados entre execuções."
+                },
+                "4": {
+                    "title": "Nenhum crédito por módulo",
+                    "desc": "O Make gasta um crédito em cada ação de módulo por padrão, cobra alguns recursos por tokens, tamanho de arquivo ou tempo de execução, e o chat do agente de IA também gasta créditos, então os loops se acumulam. O Rerun é um único plano a partir de {price} por mês, e as execuções nunca são contadas."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha o cenário que você mais remonta",
+                    "desc": "Escreva o que ele deve alcançar em uma ou duas frases. Essa é toda a configuração."
+                },
+                "2": {
+                    "title": "Conecte os mesmos apps",
+                    "desc": "Um login para Gmail, Sheets ou Notion, um token para os que pedem. Rode na nossa IA, no seu próprio plano do ChatGPT ou do Claude, ou numa chave de API."
+                },
+                "3": {
+                    "title": "Rode os dois e depois aposente o cenário",
+                    "desc": "Coloque o agente no mesmo horário ou gatilho, compare uma semana de resultados e pause o cenário."
+                }
+            },
+            "theirPricing": "O Make cobra em créditos: um por ação de módulo por padrão, com alguns recursos cobrados de forma dinâmica por tokens, tamanho de arquivo, páginas ou tempo de execução, e um agente de IA gastando um crédito por operação, mais créditos de tokens, a menos que você use sua própria chave da OpenAI ou da Anthropic. Roteadores e tratamentos de erro são gratuitos. O plano gratuito inclui 1.000 créditos por mês e os planos pagos são vendidos por faixa de créditos, a partir de 10.000 por mês. O Rerun é um único plano a partir de {price} por mês, e as execuções nunca são contadas.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Make?",
+                    "answer": "Sim, quando o trabalho exige julgamento em vez de um caminho fixo. O Make é excelente para roteamento preciso de dados. Os agentes do Rerun leem a entrada, decidem o que fazer e perguntam a você antes de qualquer ação arriscada."
+                },
+                "2": {
+                    "question": "O Rerun usa créditos ou operações como o Make?",
+                    "answer": "Não. O Rerun é um plano fixo a partir de {price} por mês e nunca conta execuções. Você só adiciona capacidade, como agentes ou crédito de modelo, quando precisa, e os assentos são gratuitos."
+                },
+                "3": {
+                    "question": "Qual é a diferença entre o Rerun e os Make AI Agents?",
+                    "answer": "Um agente do Make recebe um objetivo e escolhe as ferramentas, módulos, cenários ou ferramentas MCP, mas vive dentro do cenário que você montou em volta dele e gasta créditos em cada operação. Um agente do Rerun é o próprio produto: ele cuida da tarefa inteira, vive na máquina privada do seu workspace com seus arquivos, bancos de dados e memória, e você acompanha o trabalho dele num quadro ao vivo."
+                },
+                "4": {
+                    "question": "Posso manter o Make e o Rerun lado a lado?",
+                    "answer": "Sim. Muitas equipes mantêm cenários simples e de alto volume no Make e entregam as tarefas que exigem julgamento aos agentes do Rerun."
+                },
+                "5": {
+                    "question": "Preciso aprender um editor visual para usar o Rerun?",
+                    "answer": "Não. Não há editor visual. Você descreve a tarefa com palavras simples, conecta seus apps e o agente se configura sozinho."
+                }
+            }
+        },
+        "n8n": {
+            "metaTitle": "Rerun vs n8n: agentes de IA ou workflows? (2026)",
+            "metaDescription": "Rerun vs n8n em configuração, hospedagem e custo: quando um workflow do n8n faz sentido, e quando um agente de IA sem código é a melhor alternativa ao n8n.",
+            "headline": "Rerun vs n8n",
+            "intro": "O n8n é uma ferramenta de automação de workflows para equipes técnicas, auto-hospedada ou na nuvem deles. O Rerun entrega agentes de IA que rodam na sua própria máquina privada, sem nós para conectar.",
+            "verdict": "Escolha o n8n se você tem engenheiros que querem nós de código, Git e servidores próprios, e que vão cuidar das atualizações. Escolha o Rerun se você quer agentes que fazem o trabalho sem ninguém mantendo workflows ou infraestrutura. O Rerun custa {price} fixos por mês e inclui a máquina privada em que seus agentes rodam.",
+            "chooseRerun": {
+                "1": "Ninguém na equipe quer cuidar de um servidor e das atualizações dele",
+                "2": "Quem precisa da automação não escreve expressões",
+                "3": "Você quer agentes que se adaptam em vez de workflows que falham em casos extremos",
+                "4": "Você quer que toda a equipe veja o que os agentes fizeram, ao vivo"
+            },
+            "chooseThem": {
+                "1": "Você precisa rodar tudo na sua própria infraestrutura, de graça",
+                "2": "Sua equipe quer JavaScript ou Python dentro de cada workflow",
+                "3": "Você depende de controle de versão com Git para as automações"
+            },
+            "differences": {
+                "1": {
+                    "title": "Sem nós, sem expressões",
+                    "desc": "Os workflows do n8n são grafos de nós, muitas vezes com expressões JSON ou código, mesmo quando o AI Workflow Builder faz o rascunho. Um agente do Rerun recebe a tarefa com palavras simples, entra no Gmail, Notion ou Stripe, e acessa mais de {connectors} apps e qualquer servidor MCP."
+                },
+                "2": {
+                    "title": "Hospedado, isolado, mantido",
+                    "desc": "Auto-hospedar o n8n significa cuidar de atualizações, backups e disponibilidade, e o plano Business é só auto-hospedado, a €667 por mês. O n8n Cloud cobra por execução. Todo plano do Rerun inclui uma máquina privada, seu próprio computador isolado na nuvem onde os agentes guardam arquivos e bancos de dados, mantida atualizada para você."
+                },
+                "3": {
+                    "title": "Aprovações que não esperam por você",
+                    "desc": "O n8n pode pausar um agente antes de uma ferramenta rodar e esperar no Slack, Gmail, Teams ou no próprio chat até uma pessoa responder. O Rerun também para e pergunta no app, e com o Autopilot ligado, o Foreman, o assistente que gerencia seus agentes, responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir, e depois resume o trabalho e as horas que ele poupou."
+                },
+                "4": {
+                    "title": "Execuções não são contadas",
+                    "desc": "O n8n Cloud conta cada execução de workflow, 2.500 por mês no Starter e 10.000 no Pro. Um agente do Rerun pode rodar a cada poucos minutos ou a cada webhook, e o plano continua em {price} por mês."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha o workflow que você mais mantém",
+                    "desc": "Descreva o resultado dele com palavras simples. O agente escreve o próprio plano a partir daí."
+                },
+                "2": {
+                    "title": "Conecte seus apps e sua IA",
+                    "desc": "Um login por app, um token para os que pedem, mais qualquer servidor MCP ou API. Use nossos modelos ou suas próprias chaves."
+                },
+                "3": {
+                    "title": "Rode e depois aposente o workflow",
+                    "desc": "Agende ou dispare por um gatilho. Quando os resultados se mantiverem por uma semana, você tem um workflow a menos para manter."
+                }
+            },
+            "theirPricing": "O n8n Cloud cobra por execução de workflow, a partir de €20 por mês no plano anual por 2.500 execuções e um projeto compartilhado no Starter, ou €50 por 10.000 e três projetos no Pro. O Business, a €667, é só auto-hospedado. A Community Edition é gratuita para auto-hospedar, mas o servidor, as atualizações e a segurança ficam por sua conta. O Rerun é um único plano a partir de {price} por mês, com a máquina privada incluída, e as execuções nunca são contadas.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao n8n?",
+                    "answer": "Sim, para equipes que querem o resultado sem manter workflows. O n8n atende engenheiros que gostam de montar grafos e hospedá-los. Os agentes do Rerun recebem o objetivo com palavras simples e rodam numa máquina mantida para você."
+                },
+                "2": {
+                    "question": "Posso auto-hospedar o Rerun como o n8n?",
+                    "answer": "Todo plano já dá a você uma máquina privada e isolada. Infraestrutura dedicada ou auto-hospedada está disponível no Enterprise, fale com a gente em help@rerun.build."
+                },
+                "3": {
+                    "question": "Qual é a diferença entre o Rerun e o nó AI Agent do n8n?",
+                    "answer": "O nó do n8n é uma etapa dentro de um workflow que você desenha e hospeda. Um agente do Rerun é o trabalhador inteiro: ele planeja as etapas, guarda memória e arquivos, roda no próprio horário e pergunta a você antes de qualquer ação arriscada."
+                },
+                "4": {
+                    "question": "O Rerun cobra por execução?",
+                    "answer": "Não. O Rerun é um plano fixo a partir de {price} por mês e nunca conta execuções."
+                },
+                "5": {
+                    "question": "O que acontece quando um agente precisa de uma aprovação enquanto estou fora?",
+                    "answer": "Ele para e pergunta, você recebe um e-mail e responde no app. Nos planos pagos você também pode ligar o Autopilot: enquanto você está fora, o Foreman, o assistente que gerencia seus agentes, responde às perguntas deles e aprova ações de rotina dentro das suas regras. Gastar dinheiro e excluir sempre esperam por você, e cada decisão fica registrada."
+                },
+                "6": {
+                    "question": "Preciso escrever código com o Rerun?",
+                    "answer": "Não. Você descreve a tarefa, conecta seus apps e o agente se configura sozinho. Desenvolvedores ainda podem conectar qualquer servidor MCP ou API."
+                }
+            }
+        },
+        "lindy": {
+            "metaTitle": "Rerun vs Lindy: preço fixo, sua própria IA (2026)",
+            "metaDescription": "Rerun vs Lindy em preço, créditos e modelos. O Lindy cobra cada usuário ativo e cada tarefa em créditos; o Rerun é um plano fixo no plano do ChatGPT ou do Claude que você já paga.",
+            "headline": "Rerun vs Lindy",
+            "intro": "O Lindy é um assistente de IA que sua equipe acessa pelo Slack e pelos apps dele, cobrado por usuário ativo e em créditos. O Rerun dá à sua equipe agentes que rodam no seu próprio plano de IA, numa máquina privada, por um preço fixo.",
+            "verdict": "Escolha o Lindy se sua equipe vive no Slack e quer um assistente que todos possam mencionar com @, com mais de 1.500 integrações, anotações de reunião integradas e HIPAA com BAA assinado no Enterprise. Escolha o Rerun se você quer agentes cujo custo não sobe a cada tarefa nem a cada pessoa: um plano a partir de {price} por mês cobre agentes ilimitados, toda a sua equipe sem custo extra, e a IA roda no plano do ChatGPT ou do Claude que você já paga.",
+            "chooseRerun": {
+                "1": "Você não quer que cada tarefa consuma um saldo de créditos",
+                "2": "Você já paga o ChatGPT ou o Claude e quer que seus agentes usem isso",
+                "3": "Você quer começar com mais de {templates} agentes prontos, ou ter um especialista criando o seu",
+                "4": "Uma equipe de três não deveria custar três assinaturas"
+            },
+            "chooseThem": {
+                "1": "Sua equipe trabalha no Slack e quer mencionar com @ um assistente compartilhado",
+                "2": "Você precisa de HIPAA com BAA assinado",
+                "3": "Você quer gravação e anotações de reunião integradas"
+            },
+            "differences": {
+                "1": {
+                    "title": "Um plano fixo, não um medidor de créditos",
+                    "desc": "No Lindy um crédito custa $0,01 e cada tarefa gasta créditos, de 2 num pedido do dia a dia a 2.500 numa construção grande, e o Lindy pausa as ações que usam créditos quando eles acabam, até o próximo ciclo. O Rerun custa {price} por mês para agentes ilimitados, e nunca conta execuções."
+                },
+                "2": {
+                    "title": "A IA que você já paga",
+                    "desc": "O Lindy deixa você escolher o modelo, mas cobra cada um deles nos próprios créditos, sem forma documentada de usar sua chave. No Rerun, cada agente pode entrar com seu plano do ChatGPT ou do Claude, usar sua chave da Anthropic, OpenAI, Google ou OpenRouter, ou rodar o modelo do Rerun incluído no plano, e você pode trocar por agente."
+                },
+                "3": {
+                    "title": "Agentes que já chegam treinados",
+                    "desc": "Comece com mais de {templates} agentes prontos criados pela comunidade e por especialistas, ou peça a um especialista para criar o seu e entregar pronto. Cada um continua aprendendo com suas correções, e todos leem um cérebro da empresa: sua oferta, seus preços, seu tom."
+                },
+                "4": {
+                    "title": "Sua equipe está no preço",
+                    "desc": "O Lindy cobra cada usuário ativo do workspace, a partir de $49,99 por mês cada, então uma equipe de três começa em cerca de $150. No Rerun, os assentos são gratuitos e ilimitados, então o colega que aprova o e-mail de um agente não precisa de uma assinatura própria."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha a tarefa que o Lindy mais faz",
+                    "desc": "Descreva com palavras simples, ou instale o agente pronto que já faz isso."
+                },
+                "2": {
+                    "title": "Conecte seus apps e sua IA",
+                    "desc": "Um login por app, um token para os que pedem. Entre com seu plano do ChatGPT ou do Claude, ou use sua própria chave."
+                },
+                "3": {
+                    "title": "Rode os dois por uma semana",
+                    "desc": "Coloque o agente no mesmo horário ou gatilho, compare os resultados e depois desative o Lindy aos poucos."
+                }
+            },
+            "theirPricing": "O Lindy é cobrado por usuário ativo: o plano gratuito dá $50 em créditos que expiram após 7 dias, e o Team começa em $49,99 por mês por usuário ativo por 5.000 créditos cada, compartilhados no workspace, com faixas maiores de créditos acima disso. Um crédito custa $0,01, cada tarefa gasta créditos, e ao zerar o Lindy pausa as ações que usam créditos até o próximo ciclo; um admin pode recarregar a $10 por 1.000 créditos. O Rerun é um único plano a partir de {price} por mês para agentes ilimitados que toda a sua equipe usa, com assentos incluídos, e nunca conta execuções.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Lindy?",
+                    "answer": "Sim. Os dois oferecem agentes de IA que trabalham nas suas ferramentas. O Rerun cobra um plano fixo em vez de um assento mais créditos para cada usuário ativo, e roda seus agentes no plano do ChatGPT ou do Claude que você já paga, na sua própria chave ou no crédito incluído."
+                },
+                "2": {
+                    "question": "O Rerun usa créditos como o Lindy?",
+                    "answer": "O Rerun nunca conta execuções nem tarefas. O plano inclui um pequeno crédito para os modelos que o Rerun hospeda, e agentes no seu próprio plano do ChatGPT ou do Claude ou na sua chave de API não custam nada a mais do lado do Rerun."
+                },
+                "3": {
+                    "question": "Posso usar minha assinatura do ChatGPT ou do Claude com o Rerun?",
+                    "answer": "Sim. Conecte um agente ao seu plano do Claude ou do ChatGPT e ele roda nele, dentro dos limites de uso do próprio plano. Ou use uma chave da Anthropic, OpenAI, Google ou OpenRouter. O Lindy não documenta nada equivalente."
+                },
+                "4": {
+                    "question": "O que acontece quando um agente precisa de uma aprovação enquanto estou fora?",
+                    "answer": "Ele para e pergunta, você recebe um e-mail e responde no app. Nos planos pagos você também pode ligar o Autopilot: enquanto você está fora, o Foreman, o assistente que gerencia seus agentes, responde às perguntas deles e aprova ações de rotina dentro das suas regras. Gastar dinheiro e excluir sempre esperam por você, e cada decisão fica registrada."
+                },
+                "5": {
+                    "question": "O Rerun funciona dentro do Slack como o Lindy?",
+                    "answer": "Os agentes do Rerun leem e publicam no Slack por um app do Slack que você cria uma vez, mas você os orienta e responde às perguntas deles no app do Rerun. Se sua equipe quer um assistente para mencionar com @ dentro do Slack o dia todo, o Lindy foi feito para isso."
+                },
+                "6": {
+                    "question": "Existe teste grátis?",
+                    "answer": "O Rerun tem 5 dias de teste grátis, com cartão obrigatório e $0 cobrado hoje, depois um plano a partir de {price} por mês. O plano gratuito do Lindy dá $50 em créditos que expiram após 7 dias."
+                }
+            }
+        },
+        "twin": {
+            "metaTitle": "Rerun vs Twin: o que cada plano fixo realmente inclui (2026)",
+            "metaDescription": "Rerun vs Twin (twin.so): os dois agora têm preço fixo. Compare o que o plano de entrada inclui, o agente de navegador a $149, colegas versus clientes e o modelo em que você roda.",
+            "headline": "Rerun vs Twin",
+            "intro": "O Twin cria um agente a partir de um chat e o roda num plano fixo, sem créditos. O Rerun também, e dá a cada agente uma máquina privada, toda a sua equipe e o modelo da sua escolha.",
+            "verdict": "O Twin abandonou os créditos, então a questão já não é quanto custa uma execução, e sim o que o plano inclui. O Twin custa $29 por mês para agentes, agendamentos e conexões de apps, e $149 pelo agente de navegador, pela prospecção de leads e pela pesquisa aprofundada. O Rerun custa {price} por mês com uma máquina privada desde o primeiro plano, um navegador e um desktop que o agente usa como uma pessoa, dados pagos que ele pede para aprovar antes de gastar, e toda a sua equipe convidada sem custo extra. Escolha o Twin se você trabalha sozinho, atende clientes e quer o agente de navegador dele; o plano Store ajusta um agente por cliente.",
+            "chooseRerun": {
+                "1": "Seus colegas precisam usar os agentes, não só seus clientes",
+                "2": "Você quer escolher o modelo, ou rodar no plano do ChatGPT ou do Claude que você já paga",
+                "3": "Você quer um navegador e um computador de verdade no plano de entrada, não a $149",
+                "4": "Você prefere instalar um dos mais de {templates} agentes prontos a orientar um em branco"
+            },
+            "chooseThem": {
+                "1": "A maior parte do trabalho é clicar em sites que não têm API",
+                "2": "Você tem uma agência e quer um agente ajustado por cliente, com o próprio painel",
+                "3": "Você quer começar sem informar um cartão"
+            },
+            "differences": {
+                "1": {
+                    "title": "Uma máquina, não só um navegador",
+                    "desc": "O agente de navegador do Twin trabalha dentro de qualquer site, no plano de $149. No Rerun, cada agente tem uma máquina privada a partir de {price} por mês: terminal, arquivos, dois bancos de dados, um navegador e um desktop que ele usa como uma pessoa para os apps que não têm API."
+                },
+                "2": {
+                    "title": "Você escolhe o modelo",
+                    "desc": "O Twin encaminha cada tarefa para o modelo que ele escolhe, e nenhum plano permite usar sua própria chave ou plano de IA. No Rerun você escolhe por agente: o modelo do Rerun incluído no plano, seu plano do ChatGPT ou do Claude, ou uma chave da Anthropic, OpenAI, Google ou OpenRouter, e pode trocar quando quiser."
+                },
+                "3": {
+                    "title": "Sua equipe, não só seus clientes",
+                    "desc": "O Twin convida até 5 clientes, cada um com um painel, e diz que só você precisa usá-lo. No Rerun, os assentos são gratuitos e ilimitados: seus colegas compartilham o mesmo quadro, qualquer um pode responder a um agente que pare para perguntar, e com o Autopilot ligado, o Foreman responde dentro das suas regras quando não há ninguém por perto."
+                },
+                "4": {
+                    "title": "Dados de leads com um preço que você aprova",
+                    "desc": "A prospecção de leads, o enriquecimento e o mapeamento de negócios locais do Twin vêm no plano de $149. No Rerun, e-mails verificados, telefones, fichas do Google Maps e posições em buscas estão no produto: o agente calcula o custo do lote, mostra o custo linha a linha, e a consulta só roda depois que você aprova."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha o agente que você mais roda",
+                    "desc": "Descreva a função dele com palavras simples, ou instale o agente pronto que já faz isso."
+                },
+                "2": {
+                    "title": "Conecte os mesmos apps, escolha o modelo",
+                    "desc": "Um login para Gmail, Sheets ou Notion. Depois escolha o modelo: o nosso, sua própria chave, ou o plano do ChatGPT ou do Claude que você já paga."
+                },
+                "3": {
+                    "title": "Convide quem tinha ficado de fora",
+                    "desc": "Seus colegas entram no mesmo quadro sem custo extra, acompanham as execuções e respondem aos agentes quando eles perguntam."
+                }
+            },
+            "theirPricing": "O Twin tem preço fixo sem créditos: Plus a $29 por mês para agentes ilimitados, execuções agendadas, webhooks e conexões de apps, Pro a $149 pelo agente de navegador, prospecção de leads, pesquisa aprofundada, geração de imagens e vídeos e dados imobiliários, e Store a partir de $399 para um agente ajustado por cliente. O Plus e o Pro convidam até 5 clientes, cada um com um painel, e todos os planos têm 7 dias de teste grátis sem cartão. Observe que a própria documentação do Twin ainda descreve o antigo sistema de créditos. O Rerun é um único plano a partir de {price} por mês para agentes ilimitados, uma máquina privada, crédito de modelo e assentos ilimitados, com 5 dias de teste grátis.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Twin?",
+                    "answer": "Sim, e os dois estão mais próximos do que eram: ambos criam agentes a partir de uma descrição simples, rodam por horário ou por evento e cobram um preço fixo sem créditos. O Rerun adiciona uma máquina privada no plano de entrada, a escolha do modelo, assentos gratuitos ilimitados e mais de {templates} agentes prontos."
+                },
+                "2": {
+                    "question": "O Twin ainda cobra em créditos?",
+                    "answer": "Não na página de preços, que agora diz “Unlimited Plans. No Credits.” A documentação ainda descreve as antigas faixas de créditos, então o que vale são os planos: $29, $149 e a partir de $399 por mês."
+                },
+                "3": {
+                    "question": "Posso escolher o modelo no Rerun?",
+                    "answer": "Sim, por agente e até por tarefa agendada: o modelo do Rerun incluído no plano, ou Claude, GPT, Gemini e outros na sua própria assinatura ou chave. O Twin escolhe o modelo por você."
+                },
+                "4": {
+                    "question": "Os agentes do Rerun usam navegador?",
+                    "answer": "Sim, desde o primeiro plano. Os agentes controlam um navegador na própria máquina e podem assumir um desktop completo para apps sem API, além dos mais de {connectors} apps que acessam pelas APIs. O agente de navegador do Twin foi feito para muitos cliques em vários sites, no plano de $149."
+                },
+                "5": {
+                    "question": "Meus colegas podem usar o Rerun?",
+                    "answer": "Sim, e os assentos são gratuitos e ilimitados. Todos veem os agentes trabalhando e podem responder a um que pare para perguntar. Os convites do Twin são para clientes com o próprio painel, não para colegas."
+                }
+            }
+        },
+        "dust": {
+            "metaTitle": "Rerun vs Dust: preço fixo, todos os apps, assentos grátis (2026)",
+            "metaDescription": "Rerun vs Dust em assentos, créditos e conectores. O Dust cobra cada assento e mede o uso automatizado; o Rerun é um plano fixo com assentos ilimitados e todos os apps incluídos.",
+            "headline": "Rerun vs Dust",
+            "intro": "O Dust dá a cada pessoa agentes que conhecem os documentos da sua empresa, com preço por assento e em créditos. O Rerun dá à sua equipe agentes que executam o trabalho sozinhos, numa máquina privada, por um preço fixo.",
+            "verdict": "Escolha o Dust quando a tarefa é responder com base no conhecimento da empresa no Notion, Drive e Slack, para uma equipe grande que precisa de SSO, SOC 2 Type II e hospedagem na UE ou nos EUA. Escolha o Rerun quando os agentes devem executar operações sozinhos, por horário ou por webhook, em mais de {connectors} apps, com cada execução visível para uma equipe cujos assentos são gratuitos, por {price} por mês em vez de um assento e uma cota de créditos por pessoa.",
+            "chooseRerun": {
+                "1": "Os agentes devem agir por horário, e toda a equipe deve ver as execuções",
+                "2": "Você precisa de mais de 3 conectores sem um contrato enterprise",
+                "3": "As execuções automatizadas não devem ser medidas por crédito",
+                "4": "Você não quer pagar pelo colega que só responde a um agente duas vezes por semana"
+            },
+            "chooseThem": {
+                "1": "A tarefa principal é buscar e responder nos documentos da sua empresa",
+                "2": "Você precisa hoje de residência de dados na UE, SSO e SOC 2 Type II",
+                "3": "Você está implantando um assistente para a empresa inteira"
+            },
+            "differences": {
+                "1": {
+                    "title": "A automação não é medida",
+                    "desc": "O Dust cobra o uso que ninguém digita, como uma chamada de API ou a execução de um gatilho, a $0,01 por crédito, e um gatilho de webhook dispara no máximo 42 vezes por dia. No Rerun, execuções agendadas e por webhook não custam nada a mais: o plano custa {price} por mês, as execuções nunca são contadas e um agendamento pode disparar a cada minuto."
+                },
+                "2": {
+                    "title": "Todos os apps em todos os planos",
+                    "desc": "O plano self-service do Dust conecta até 3 fontes de dados e 5 servidores MCP remotos. Todo plano do Rerun acessa mais de {connectors} apps, um login para Gmail, Drive, Notion ou Stripe e um token para os demais, mais qualquer servidor MCP."
+                },
+                "3": {
+                    "title": "Execuções que toda a equipe pode ver",
+                    "desc": "No Dust, “os gatilhos pertencem ao membro que os criou” e a execução cai no histórico dessa pessoa, a menos que ela arquive a conversa num Pod. No Rerun, cada rotina de cada agente fica numa única lista de Routines que o workspace compartilha, com a próxima execução, e qualquer colega pode responder a um agente que pare para perguntar."
+                },
+                "4": {
+                    "title": "Assentos gratuitos e conhecimento compartilhado",
+                    "desc": "O Dust cobra cada pessoa que o usa, cada uma com a própria cota de créditos, que não acumula. No Rerun, os assentos são gratuitos e ilimitados, e todos os agentes leem o mesmo cérebro da empresa, com sua oferta, seus preços, seu mercado e seu tom, ao lado da própria memória e dos próprios arquivos."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Escolha o agente que sua equipe mais aciona",
+                    "desc": "Descreva a função dele com palavras simples, ou instale um agente pronto que já faz isso."
+                },
+                "2": {
+                    "title": "Conecte as mesmas fontes",
+                    "desc": "Notion, Drive, Gmail e mais de {connectors} outros apps, sem limite de conectores e sem medidor de créditos por cima."
+                },
+                "3": {
+                    "title": "Agende e convide todo mundo",
+                    "desc": "Defina um horário ou um webhook, depois convide toda a equipe sem custo extra para acompanhar as execuções e responder ao agente."
+                }
+            },
+            "theirPricing": "O Dust cobra cada assento: o Pro custa €24 por mês no plano anual ou €30 no mensal com 8.000 créditos, o Max €120 ou €150 com 40,000, sem impostos, e um assento gratuito recebe 500 créditos uma única vez. Os créditos não acumulam, o uso automatizado é cobrado a $0,01 por crédito, e o plano self-service conecta até 3 fontes de dados e 5 servidores MCP remotos. O Rerun é um único plano a partir de {price} por mês para agentes ilimitados, com assentos ilimitados e sem limite de conectores.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Dust?",
+                    "answer": "Para equipes que querem agentes executando o trabalho sozinhos, sim. O Dust é mais forte em responder com base no conhecimento da empresa em conversas. Os agentes do Rerun rodam por horário ou por webhook, em mais de {connectors} apps, numa máquina privada, por um preço fixo."
+                },
+                "2": {
+                    "question": "O Rerun cobra por assento como o Dust?",
+                    "answer": "Não. Os assentos são gratuitos e ilimitados num plano pago do Rerun, e não têm cota de créditos para controlar. Você paga por agentes e crédito de modelo, e as execuções nunca são contadas."
+                },
+                "3": {
+                    "question": "O Rerun consegue pesquisar nos documentos da empresa como o Dust?",
+                    "answer": "Os agentes leem Notion, Google Drive, Gmail e outros apps pelas conexões, e o workspace mantém um cérebro da empresa que todos os agentes leem, com as páginas que você validou sobre o seu negócio. Para busca em todos os documentos da empresa, com permissões, o Dust foi feito para isso."
+                },
+                "4": {
+                    "question": "Quantas vezes um agente do Rerun pode rodar?",
+                    "answer": "Com a frequência que o trabalho precisar: um agendamento pode disparar a cada minuto, e os webhooks não têm limite. Os gatilhos de webhook do Dust rodam no máximo 42 vezes a cada 24 horas por padrão."
+                },
+                "5": {
+                    "question": "Existe teste grátis?",
+                    "answer": "O Rerun tem 5 dias de teste grátis, com cartão obrigatório e $0 cobrado hoje, depois um plano a partir de {price} por mês."
+                }
+            }
+        },
+        "squad": {
+            "metaTitle": "Rerun vs Squad: um plano, IA incluída (2026)",
+            "metaDescription": "Rerun vs Squad (squad.so) em preço e modelos. O Squad custa $99 por mês além do plano de IA que você traz; o Rerun custa menos e inclui crédito de modelo.",
+            "headline": "Rerun vs Squad",
+            "intro": "O Squad aluga colegas de IA e pede que você traga a IA. O Rerun é o workspace inteiro onde eles vivem, com crédito de modelo incluído: uma biblioteca de agentes prontos para instalar, mais de {connectors} apps e um quadro onde você acompanha o trabalho acontecendo.",
+            "verdict": "Squad e Rerun parecem iguais: agentes num computador na nuvem, com aprovações e registros de execução. A diferença está na conta e no que vem em volta. O Squad custa $99 por mês além de um plano de IA que ele recomenda de $100 a $200, então o piso real fica perto de $200. O Rerun custa {price} por mês com crédito de modelo incluído, mais de {templates} agentes prontos, mais de {connectors} apps e especialistas que criam agentes para você. Escolha o Squad se você quer empilhar várias contas de IA com fallback, ou dar a cada colega uma caixa de e-mail própria.",
+            "chooseRerun": {
+                "1": "Você não quer comprar um plano de IA de $100 antes de o primeiro agente rodar",
+                "2": "Você prefere instalar um dos mais de {templates} agentes prontos a orientar um em branco",
+                "3": "Você precisa de mais de 70 integrações",
+                "4": "Você quer que um especialista crie seu agente e o entregue pronto para rodar"
+            },
+            "chooseThem": {
+                "1": "Você quer empilhar várias contas de IA e alternar quando uma atinge o limite",
+                "2": "Você quer que cada colega tenha o próprio endereço e caixa de e-mail",
+                "3": "Você quer um AI Chief of Staff para desenhar sua equipe com você"
+            },
+            "differences": {
+                "1": {
+                    "title": "Uma conta em vez de duas",
+                    "desc": "O Squad cobra $99 por mês pela plataforma, e o trabalho roda num plano de IA que você traz, que ele recomenda de $100 a $200. O Rerun custa {price} por mês com crédito de modelo incluído, e usar seu próprio plano continua sendo uma escolha, não uma condição."
+                },
+                "2": {
+                    "title": "Agentes que já chegam treinados",
+                    "desc": "O Rerun abre com mais de {templates} agentes prontos criados pela comunidade e pelos especialistas: instale um, aponte para suas ferramentas, mude o que é específico seu. Ele guarda os arquivos, os bancos de dados e as suas correções na própria máquina, e lê um cérebro da empresa que todo o workspace compartilha."
+                },
+                "3": {
+                    "title": "Mais do seu stack, pelo navegador",
+                    "desc": "O Squad conecta mais de 70 ferramentas. O Rerun acessa mais de {connectors} apps, um login para Gmail, Notion, Stripe ou Linear e um token para os demais, mais qualquer servidor MCP, e roda cada agente no modelo que você escolher: o modelo do Rerun incluído no plano, seu plano do Claude ou do ChatGPT, ou sua própria chave."
+                },
+                "4": {
+                    "title": "Sua equipe no mesmo quadro",
+                    "desc": "Convide sua equipe sem custo extra, divida os agentes por Box, e todos acompanham o mesmo quadro ao vivo. Quando um agente para e pergunta antes de algo importante, qualquer colega pode responder, e com o Autopilot ligado, o Foreman responde dentro das suas regras quando não há ninguém por perto."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Comece com um agente, não com uma página em branco",
+                    "desc": "Instale um agente pronto da biblioteca, ou descreva a tarefa com palavras simples e deixe que ele escreva as próprias instruções e skills."
+                },
+                "2": {
+                    "title": "Conecte os mesmos apps, escolha o modelo",
+                    "desc": "Um login para Gmail, Stripe ou Notion. Rode no crédito do Rerun, na sua própria chave de API, ou no plano do ChatGPT ou do Claude que você já usava no Squad."
+                },
+                "3": {
+                    "title": "Acompanhe no quadro e depois cancele",
+                    "desc": "Ele trabalha na própria máquina, por horário ou por gatilho, e cada execução aparece no quadro que sua equipe acompanha. Cancele o Squad quando uma semana de execuções estiver certa."
+                }
+            },
+            "theirPricing": "O Squad custa $99 por mês para colegas de IA ilimitados, um computador na nuvem dedicado para todo o squad e mais de 70 integrações, com uma caixa de e-mail por colega a $10 por mês cada. O trabalho roda num plano de IA que você traz, que o Squad recomenda de $100 a $200 por mês, então o piso real fica perto de $200. O Squad oferece garantia de reembolso de 7 dias em vez de teste grátis. O Rerun é um único plano a partir de {price} por mês com uma máquina privada, crédito de modelo, assentos ilimitados e mais de {templates} agentes prontos, com 5 dias de teste grátis.",
+            "faq": {
+                "1": {
+                    "question": "O Rerun é uma alternativa ao Squad?",
+                    "answer": "Sim, e ele traz mais em volta dos agentes: uma biblioteca de mais de {templates} agentes prontos, especialistas que criam um para você, mais de {connectors} apps e um quadro ao vivo. Começa em {price} por mês com crédito de modelo incluído, então não há mais nada para comprar antes que um agente possa trabalhar."
+                },
+                "2": {
+                    "question": "Quanto o Squad custa de verdade?",
+                    "answer": "O Squad custa $99 por mês, e o trabalho roda num plano de IA que você traz. O Squad recomenda o ChatGPT de $100 a $200 por mês, então o piso real fica perto de $200, mais $10 por mês para cada caixa de e-mail de colega."
+                },
+                "3": {
+                    "question": "O que eu ganho que o Squad não vende?",
+                    "answer": "Uma biblioteca de mais de {templates} agentes que você instala em vez de orientar, uma rede de especialistas que criam e entregam o agente para você, mais de {connectors} apps mais qualquer servidor MCP, e dados de leads verificados, telefones, fichas do Google Maps e posições em buscas, com o agente pedindo aprovação antes de gastar."
+                },
+                "4": {
+                    "question": "Posso trazer meu próprio plano do ChatGPT ou do Claude para o Rerun?",
+                    "answer": "Sim, e é opcional. Todo plano vem com crédito de modelo, então os agentes rodam desde o primeiro dia. Se você já paga o Claude ou o ChatGPT, pode conectar um agente a ele, ou usar sua própria chave de API, e cada agente pode rodar num modelo diferente."
+                },
+                "5": {
+                    "question": "O Rerun dá um computador aos agentes, como o Squad?",
+                    "answer": "Sim. Seu workspace recebe com o plano um computador privado e isolado na nuvem, onde os agentes guardam arquivos, bancos de dados e memória entre execuções, e vários agentes podem compartilhá-lo para trabalhar no mesmo projeto. O Squad também dá a cada squad um computador na nuvem, com um perfil de navegador separado por colega."
+                },
+                "6": {
+                    "question": "Existe teste grátis?",
+                    "answer": "O Rerun tem 5 dias de teste grátis, com cartão obrigatório e $0 cobrado hoje. O Squad pede que você pague o primeiro mês e oferece, em vez disso, garantia de reembolso de 7 dias."
+                }
+            }
+        }
+    },
+    "howItWorks": {
+        "step": "Passo {number}",
+        "steps": {
+            "job": {
+                "title": "Dê uma tarefa ao seu Coworker",
+                "desc": "Descreva a tarefa com suas palavras. Ele se configura sozinho."
+            },
+            "stack": {
+                "title": "Conecte suas ferramentas e sua IA",
+                "desc": "Gmail, Slack, Notion, um clique cada. Roda no Claude, no ChatGPT ou no seu próprio plano."
+            },
+            "work": {
+                "title": "Ele faz o trabalho por você",
+                "desc": "Ele roda num horário definido ou a partir de um gatilho. Você acorda com o trabalho feito."
+            }
+        },
+        "job": {
+            "chaseInvoices": {
+                "title": "Cobrar faturas",
+                "meta": "Toda segunda"
+            },
+            "replyToLeads": {
+                "title": "Responder leads",
+                "meta": "A cada novo e-mail"
+            },
+            "findLeads": {
+                "title": "Encontrar 20 novos leads",
+                "meta": "Todo dia, 8:00"
+            }
+        },
+        "work": {
+            "title": "Hoje de manhã",
+            "running": "Em execução",
+            "runs": {
+                "sortInbox": "Organizar e-mails",
+                "chaseInvoices": "Cobrar 2 faturas",
+                "weeklyReport": "Escrever o relatório semanal"
+            }
+        }
+    }
+}

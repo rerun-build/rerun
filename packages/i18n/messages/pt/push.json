@@ -1,0 +1,12 @@
+{
+    "states": {
+        "done": "Concluído",
+        "error": "Falhou",
+        "question": "Pergunta",
+        "approval": "Precisa de aprovação",
+        "connector": "Precisa de um app",
+        "info": "Atualização"
+    },
+    "subtitle": "{source} · {state}",
+    "fallbackAgent": "seu coworker"
+}

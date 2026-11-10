@@ -1,0 +1,89 @@
+{
+    "title": "Konto",
+    "tabs": {
+        "profile": {
+            "label": "Profil",
+            "description": "Dein Foto und dein Name, so wie dein Team sie sieht."
+        },
+        "signIn": {
+            "label": "Anmeldung",
+            "description": "Wie du dich bei diesem Konto anmelden kannst."
+        },
+        "language": {
+            "label": "Sprache",
+            "description": "Die Sprache, in der Rerun mit dir spricht."
+        },
+        "delete": {
+            "label": "Konto löschen",
+            "description": "Schließe dein Rerun-Konto endgültig."
+        }
+    },
+    "language": {
+        "field": "Sprache",
+        "automatic": "Automatisch",
+        "automaticHint": "Folgt deinem Browser: {language}.",
+        "failed": "Sprache konnte nicht geändert werden. Versuch es erneut."
+    },
+    "profile": {
+        "photo": "Foto",
+        "photoHelp": "Für dein Team sichtbar, neben deinen Nachrichten und deinem Cursor.",
+        "dropPhoto": "Foto hier ablegen",
+        "changePhoto": "Foto ändern",
+        "uploadPhoto": "Foto hochladen",
+        "removePhoto": "Entfernen",
+        "name": "Name",
+        "namePlaceholder": "z. B. Ada Lovelace",
+        "save": "Speichern",
+        "notAnImage": "Bitte wähle eine Bilddatei.",
+        "nameUpdated": "Name aktualisiert",
+        "failed": "Etwas ist schiefgelaufen. Bitte versuch es erneut."
+    },
+    "signIn": {
+        "email": {
+            "title": "E-Mail",
+            "empty": "Nicht verbunden. Füge eine hinzu, um dich mit einem Code per E-Mail anzumelden."
+        },
+        "phone": {
+            "title": "Telefon",
+            "empty": "Nicht verbunden. Füge eine Nummer hinzu, um dich mit einem Code per WhatsApp oder SMS anzumelden.",
+            "otherAccount": "Mit dieser Nummer meldest du dich bei einem anderen Rerun-Konto an. Ändere sie, um dich hier per Telefon anzumelden."
+        },
+        "change": "Ändern",
+        "add": "Hinzufügen",
+        "connect": "Verbinden",
+        "disconnect": "Trennen",
+        "connected": "Verbunden",
+        "notConnected": "Nicht verbunden.",
+        "onlyMethod": "{provider} ist die einzige verbundene Anmeldemethode dieses Kontos.",
+        "disconnectTitle": "{provider} trennen?",
+        "disconnectDescription": "Du kannst dich dann nicht mehr mit {provider} bei diesem Konto anmelden. Deine anderen Anmeldemethoden funktionieren weiter.",
+        "linkError": {
+            "identityTaken": "Dieses {provider}-Konto ist bereits mit einem anderen Rerun-Konto verbunden.",
+            "denied": "{provider} wurde nicht verbunden.",
+            "failed": "{provider} konnte nicht verbunden werden. Versuch es erneut."
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "Geteilte Workspaces",
+                "description": "Du verlässt jeden Workspace, den du mit anderen teilst. Sie behalten ihn mit seinen Coworkern und Dateien."
+            },
+            "own": {
+                "title": "Deine eigenen Workspaces",
+                "description": "Ein Workspace, in dem nur du bist, stoppt endgültig: Seine Coworker werden ausgeschaltet und seine Maschine wird mit allen Dateien gelöscht."
+            },
+            "signIn": {
+                "title": "Anmeldung",
+                "description": "Du wirst überall abgemeldet. Deine E-Mail, dein Google-Konto und deine Telefonnummer werden frei, sodass du dich später neu registrieren kannst."
+            }
+        },
+        "blocker": {
+            "current": "Sein Abo verlängert sich noch. Kündige es unter Abrechnung, bevor du dein Konto löschst.",
+            "other": "Sein Abo verlängert sich noch. Wechsle zu diesem Workspace und kündige es unter Abrechnung, bevor du dein Konto löschst.",
+            "openBilling": "Abrechnung öffnen"
+        },
+        "submit": "Konto löschen",
+        "failed": "Dein Konto konnte nicht gelöscht werden."
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "Desktop von {name}",
+        "titleFallback": "Desktop",
+        "description": "Der Bildschirm, auf dem dieser Coworker arbeitet. Was du hier tust, findet er danach wieder.",
+        "takeoverDescription": "Du bist im Browser deines Coworkers. Klicke auf Fertig, wenn er weitermachen kann.",
+        "takeoverHoldsBrowser": "Der Browser deines Coworkers ist für diese Anfrage bereits geöffnet.",
+        "clipboardDenied": "Dein Browser hat Rerun das Lesen der Zwischenablage verweigert.",
+        "disconnectedDescription": "Die Verbindung zur Maschine wurde getrennt. Dabei ging nichts verloren.",
+        "reconnect": "Neu verbinden",
+        "tryAgain": "Erneut versuchen"
+    },
+    "screen": {
+        "connecting": "Verbindung zum Bildschirm...",
+        "unavailable": "Der Bildschirm ist nicht verfügbar",
+        "wentAway": "Bildschirm getrennt",
+        "resize": "Bildschirmgröße anpassen"
+    },
+    "notch": {
+        "browser": "Browser",
+        "closeBrowser": "Browser schließen",
+        "files": "Dateien",
+        "terminal": "Terminal",
+        "paste": "Einfügen",
+        "done": "Fertig",
+        "close": "Schließen"
+    },
+    "screenCard": {
+        "openBrowser": "Browser öffnen",
+        "takeControl": "Steuerung übernehmen"
+    }
+}

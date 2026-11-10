@@ -1,0 +1,109 @@
+{
+    "preferences": {
+        "title": "Einstellungen",
+        "close": "Schließen",
+        "yourAccount": "Dein Konto",
+        "workspace": "Workspace",
+        "aiProviders": "KI-Anbieter",
+        "appearance": "Darstellung",
+        "appearanceSystem": "System",
+        "appearanceLight": "Hell",
+        "appearanceDark": "Dunkel",
+        "coworkers": "Coworker",
+        "groupRecent": "Zuletzt",
+        "groupByBox": "Nach Box",
+        "language": "Sprache",
+        "notifications": "Benachrichtigungen",
+        "pushOff": "Push aus",
+        "support": "Support",
+        "contactSupport": "Support kontaktieren",
+        "privacy": "Datenschutzerklärung",
+        "terms": "Nutzungsbedingungen",
+        "about": "Über",
+        "version": "Version",
+        "environment": "Umgebung",
+        "signOut": "Abmelden",
+        "deleteAccount": "Konto löschen",
+        "server": "Server"
+    },
+    "notifications": {
+        "title": "Benachrichtigungen",
+        "saveFailed": "Speichern fehlgeschlagen",
+        "tryAgainShortly": "Versuch es gleich noch einmal.",
+        "loadFailed": "Einstellungen nicht geladen. Versuch es gleich erneut.",
+        "push": {
+            "label": "Push-Benachrichtigungen",
+            "off": "Aus",
+            "turnOn": "Einschalten",
+            "openIosSettings": "iOS-Einstellungen öffnen",
+            "footnote": "Solange Push aus ist, kommt nichts davon auf diesem iPhone an."
+        },
+        "scopeTitle": "Benachrichtige mich über",
+        "recommended": "Empfohlen",
+        "scopes": {
+            "everything": {
+                "label": "Alles",
+                "detail": "Jede Ausführung im Workspace, egal wer sie gestartet hat."
+            },
+            "mine": {
+                "label": "Meins und was ich verfolge",
+                "detail": "Meine Ausführungen und Unterhaltungen, Coworker, denen ich folge."
+            },
+            "needed": {
+                "label": "Nur wenn ich gebraucht werde",
+                "detail": "Fragen, Freigaben und Fehler in meinen Ausführungen. Eine beendete Ausführung bleibt still."
+            },
+            "nothing": {
+                "label": "Nichts",
+                "detail": "Ich schaue selbst in den Posteingang."
+            }
+        },
+        "email": {
+            "label": "E-Mail",
+            "footnote": "Wenn du gebraucht wirst, während du weg bist. Eine E-Mail pro Vorfall, nie eine pro Ausführung."
+        },
+        "perCoworker": {
+            "title": "Pro Coworker",
+            "add": "Coworker hinzufügen",
+            "pickTitle": "Jede Ausführung dieses Coworkers erreicht dich",
+            "cancel": "Abbrechen",
+            "empty": "Jeder Coworker folgt der Regel oben.",
+            "detail": "Auch in den Details jedes Coworkers einstellbar.",
+            "rowLabel": "{name}, {value}",
+            "followsTasks": "Folgt Aufgaben",
+            "yourSetting": "Deine Einstellung"
+        },
+        "accountEmails": {
+            "title": "Konto-E-Mails",
+            "billing": "Testphase & Abrechnung",
+            "product": "Produkt-Updates"
+        },
+        "modes": {
+            "default": {
+                "label": "Standard",
+                "hint": "Folgt deiner Einstellung."
+            },
+            "everything": {
+                "label": "Alle Aktivitäten",
+                "hint": "Jede Ausführung, egal von wem."
+            },
+            "muted": {
+                "label": "Stumm",
+                "hint": "Nichts. Das Board zeigt es trotzdem."
+            }
+        },
+        "coworker": {
+            "title": "Benachrichtige mich über {name}",
+            "yourSetting": "Deine Einstellung",
+            "quotedScope": "„{scope}“",
+            "follow": "Seinen geplanten Aufgaben folgen",
+            "nothingScheduled": "Noch nichts geplant.",
+            "scheduled": "{count} geplant, sie erreichen dich wie deine eigenen Ausführungen.",
+            "reachYou": "Sie erreichen dich wie deine eigenen Ausführungen.",
+            "tasksTitle": "Geplante Aufgaben",
+            "tasksFailed": "Aufgaben nicht geladen. Versuch es gleich erneut.",
+            "taskSwitch": "Benachrichtige mich über {name}",
+            "muted": "{name} ist stummgeschaltet."
+        }
+    }
+}

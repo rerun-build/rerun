@@ -1,0 +1,155 @@
+{
+    "toast": {
+        "close": "Benachrichtigung schließen",
+        "openConversation": "Unterhaltung öffnen",
+        "coworker": "Coworker",
+        "scheduledTask": "{name} · Geplante Aufgabe"
+    },
+    "inbox": {
+        "unknownCoworker": "Coworker",
+        "detail": {
+            "close": "Schließen",
+            "seeAll": "Alle ansehen",
+            "seeAllCount": "Alle {count} ansehen",
+            "markRead": "Als gelesen markieren",
+            "notInList": "Dieses Update ist noch nicht in deiner Liste",
+            "openConversation": "Unterhaltung öffnen",
+            "noCoworker": "Dieses Update gehört zu keinem Coworker",
+            "status": {
+                "error": "Fehler",
+                "awaiting_question": "Frage",
+                "awaiting_approval": "Freigabe",
+                "awaiting_ack": "Ungelesen",
+                "done": "Fertig",
+                "waiting_human": "Wartet"
+            }
+        },
+        "markAll": {
+            "title": "Alles als gelesen markieren?",
+            "description": "{count, plural, one {# Eintrag verlässt} other {# Einträge verlassen}} diese Liste. Anfragen, die noch auf eine Antwort warten, werden ebenfalls entfernt, ohne beantwortet zu werden.",
+            "confirm": "Alle als gelesen markieren"
+        },
+        "rowMenu": {
+            "options": "Benachrichtigungsoptionen",
+            "undo": "Rückgängig",
+            "unfollow": "Geplanten Aufgaben nicht mehr folgen",
+            "unfollowed": "Du folgst den geplanten Aufgaben von {name} nicht mehr.",
+            "mute": "{name} stummschalten",
+            "muted": "{name} ist stummgeschaltet.",
+            "settings": "Benachrichtigungseinstellungen"
+        },
+        "untitledSession": "Unbenannte Sitzung",
+        "reasons": {
+            "mine": "Du hast diese Ausführung gestartet",
+            "participant": "Du bist in dieser Unterhaltung",
+            "followed": "Du folgst den geplanten Aufgaben von {agentName}",
+            "allActivity": "Du bekommst alle Aktivitäten von {agentName}",
+            "everything": "Du bekommst jede Ausführung im Workspace",
+            "workspace": "Es geht um deinen Workspace"
+        }
+    },
+    "settings": {
+        "scopeTitle": "Benachrichtige mich über",
+        "recommended": "Empfohlen",
+        "notificationsFor": "Benachrichtigungen für {name}",
+        "scopes": {
+            "everything": {
+                "label": "Alles",
+                "detail": "Jede Ausführung im Workspace, egal wer sie gestartet hat."
+            },
+            "mine": {
+                "label": "Meine Ausführungen und was ich verfolge",
+                "detail": "Ausführungen, die ich starte, Unterhaltungen, in denen ich bin, Coworker, denen ich folge."
+            },
+            "needed": {
+                "label": "Nur wenn ich gebraucht werde",
+                "detail": "Fragen, Freigaben und Fehler in meinen Ausführungen. Eine fertige Ausführung bleibt still."
+            },
+            "nothing": {
+                "label": "Nichts",
+                "detail": "Ich schaue selbst in den Posteingang."
+            }
+        },
+        "modes": {
+            "default": {
+                "label": "Standard",
+                "yourSetting": "Deine Einstellung: „{scope}“."
+            },
+            "everything": {
+                "label": "Alle Aktivitäten",
+                "hint": "Jede Ausführung, egal wer sie gestartet hat."
+            },
+            "muted": {
+                "label": "Stumm",
+                "hint": "Nichts. Das Board zeigt es trotzdem an."
+            }
+        },
+        "bell": {
+            "title": "Benachrichtige mich über {name}",
+            "follow": "Geplanten Aufgaben folgen",
+            "noSchedule": "{name} hat noch keine geplante Aufgabe",
+            "nothingScheduled": "Noch nichts geplant.",
+            "scheduled": "{count} geplant, sie erreichen dich wie deine eigenen Ausführungen.",
+            "allSettings": "Alle Benachrichtigungseinstellungen"
+        },
+        "perCoworker": {
+            "title": "Pro Coworker",
+            "detail": "Auch über die Glocke an jedem Coworker einstellbar.",
+            "add": "Hinzufügen",
+            "allListed": "Alle Coworker sind schon aufgeführt",
+            "empty": "Jeder Coworker folgt der Regel oben.",
+            "following": "Folgt den geplanten Aufgaben",
+            "alreadyDefault": "{name} folgt bereits deiner Einstellung",
+            "reset": "{name} zurücksetzen"
+        },
+        "channels": {
+            "title": "Wie",
+            "toast": {
+                "label": "Hinweis in der App",
+                "description": "Erscheint über deinem Posteingang, solange Rerun offen ist."
+            },
+            "sound": {
+                "label": "Ton",
+                "description": "Nur wenn ein Coworker dich braucht oder etwas kaputtgeht.",
+                "play": "Benachrichtigungston abspielen"
+            },
+            "email": {
+                "label": "E-Mail",
+                "description": "Wenn er dich braucht, während du weg bist. Eine E-Mail pro Vorfall, nie eine pro Ausführung."
+            }
+        },
+        "accountEmails": {
+            "title": "Konto-E-Mails",
+            "billing": {
+                "label": "Testphase & Abrechnung",
+                "description": "Erinnerungen zur Testphase und Abrechnungshinweise zu deinem Abo."
+            },
+            "product": {
+                "label": "Produkt-Updates",
+                "description": "Neue Funktionen, Tipps und gelegentlich Produktneuigkeiten."
+            }
+        },
+        "saveFailed": "Benachrichtigungen konnten nicht gespeichert werden",
+        "networkError": "Netzwerkfehler"
+    },
+    "emailPreferences": {
+        "coworkerTitle": "Coworker-Benachrichtigungen",
+        "email": {
+            "label": "E-Mail",
+            "description": "Wenn ein Coworker dich braucht oder ausfällt, während du weg bist. Eine E-Mail pro Vorfall, nie eine pro Ausführung."
+        },
+        "saveFailed": "Einstellungen konnten nicht gespeichert werden",
+        "saving": "Wird gespeichert…",
+        "saved": "Alle Änderungen gespeichert"
+    },
+    "notices": {
+        "slotsPaused": "Dein Plan hat jetzt {slots, plural, one {# {provider}-Platz} other {# {provider}-Plätze}}, daher {paused, plural, one {ist # verbundenes Konto} other {sind # verbundene Konten}} pausiert. Füg unter Abrechnung einen Platz hinzu, um {paused, plural, one {es} other {sie}} zurückzuholen.",
+        "workspaceBack": "Dein Workspace ist zurück. Verbinde dein {provider}-Konto unter Einstellungen → Apps neu, damit deine Coworker es wieder nutzen können.",
+        "trialEndsSoon": "Dein kostenloser {provider}-Platz endet am {endsAt, date, long}. Danach wird er ein bezahlter Platz in deinem Plan. Trenne das Konto vorher unter Einstellungen → Apps, wenn du es nicht behalten willst.",
+        "trialEndedPlanInactive": "Dein kostenloser {provider}-Platz ist abgelaufen, während dein Plan nicht aktiv ist, daher ist {account, select, none {das Konto} other {{account}}} pausiert. Füg innerhalb einer Woche unter Abrechnung einen Platz hinzu, um es zu behalten, sonst wird es getrennt.",
+        "trialEndedDeclined": "Dein kostenloser {provider}-Platz ist abgelaufen und die Karte wurde abgelehnt, daher ist {account, select, none {das Konto} other {{account}}} pausiert. Füg innerhalb einer Woche unter Abrechnung einen Platz hinzu, um es zu behalten, sonst wird es getrennt.",
+        "rateLimited": "{provider} hat {account, select, none {eines deiner Konten} other {{account}}} gebeten, langsamer zu machen. Deine Coworker nutzen es 24 Stunden lang nicht, damit das Konto sicher bleibt.",
+        "signedOut": "{provider} hat {account, select, none {eines deiner Konten} other {{account}}} abgemeldet. Verbinde es unter Einstellungen → Apps neu, damit deine Coworker es wieder nutzen können.",
+        "budgetExhausted": "Dein Rerun Guthaben für diesen Monat ist aufgebraucht. Geplante und ausgelöste Ausführungen mit Rerun Modellen sind pausiert, und Coworker können keine Leads, SEO- oder Social-Daten kaufen, bis es zurückgesetzt wird oder du Guthaben auflädst."
+    }
+}

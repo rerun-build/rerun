@@ -1,0 +1,561 @@
+{
+    "installFeedback": {
+        "noLongerAvailable": "\"{title}\" ist nicht mehr verfügbar",
+        "buyFailed": "\"{title}\" konnte nicht gekauft werden",
+        "alreadyOnBoard": "\"{title}\" ist bereits auf deinem Board",
+        "alreadyOnBoardHint": "Seine Coworker öffnen sich dort, wo du sie gelassen hast.",
+        "notImported": "{name} konnte nicht importiert werden.",
+        "inactiveCount": "{count, plural, one {# davon ist inaktiv: Dein Tarif hat keinen freien Coworker-Slot.} other {# davon sind inaktiv: Dein Tarif hat keinen freien Coworker-Slot.}}",
+        "landed": "{count, plural, one {# Coworker aus \"{title}\" ist auf deinem Board gelandet} other {# Coworker aus \"{title}\" sind auf deinem Board gelandet}}",
+        "openOne": "Öffne einen und starte seine Installation: Er verbindet mit dir, was er braucht.",
+        "landedInactive": "Er ist inaktiv gelandet: Dein Tarif hat keinen freien Coworker-Slot.",
+        "agentLanded": "\"{name}\" ist auf deinem Board gelandet",
+        "openIt": "Öffne ihn und starte seine Installation: Er verbindet mit dir, was er braucht.",
+        "webhooksMoved": "{count, plural, one {# Webhook hat eine neue URL bekommen: Richte deine Dienste auf die eigene Adresse der Kopie aus.} other {# Webhooks haben eine neue URL bekommen: Richte deine Dienste auf die eigene Adresse der Kopie aus.}}",
+        "schedulesDoubled": "{count, plural, one {# Zeitplan läuft auch auf der Kopie. Schalte ihn aus, wenn die Arbeit nicht doppelt passieren soll.} other {# Zeitpläne laufen auch auf der Kopie. Schalte sie aus, wenn die Arbeit nicht doppelt passieren soll.}}",
+        "copyReady": "Sie enthält alles, was das Original hatte, und ist startklar.",
+        "prepareBoxFailed": "Deine Box konnte nicht vorbereitet werden",
+        "settingUp": "\"{title}\" wird eingerichtet",
+        "settingUpHint": "Deine Coworker erscheinen gleich auf dem Board.",
+        "setUpFailed": "\"{title}\" konnte nicht eingerichtet werden"
+    },
+    "price": {
+        "free": "Kostenlos",
+        "monthly": "{amount}/Monat",
+        "useForFree": "Kostenlos nutzen",
+        "hire": "{count, plural, one {Diesen Coworker einstellen · {price}} other {Diese # Coworker einstellen · {price}}}",
+        "hireCard": "Einstellen · {price}",
+        "purchased": "Gekauft",
+        "expired": "Abgelaufen",
+        "install": "Installieren",
+        "renew": "Verlängern"
+    },
+    "connectors": {
+        "none": "Keine Apps nötig",
+        "label": "Apps: {names}"
+    },
+    "creator": {
+        "templateCount": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
+        "rerunTeam": "Rerun-Team",
+        "verified": "Verifizierter Creator"
+    },
+    "spotlight": {
+        "viewProfile": "Profil von {name} ansehen",
+        "workWith": "Mit {name} arbeiten",
+        "badge": "Creator der Woche",
+        "website": "Website",
+        "socialLabel": "{name} auf {network}",
+        "openTemplate": "Vorlage öffnen",
+        "recognizedFor": "Bekannt für"
+    },
+    "about": {
+        "showMore": "Mehr anzeigen",
+        "showLess": "Weniger anzeigen"
+    },
+    "agentCard": {
+        "comesWith": "Enthält",
+        "apps": "Apps",
+        "skills": "Skills",
+        "schedules": "Geplante Aufgaben",
+        "webhooks": "Webhooks",
+        "more": "+{count} weitere"
+    },
+    "detail": {
+        "price": "Preis",
+        "coworkers": "Coworker",
+        "apps": "Apps",
+        "setupTime": "Einrichtungszeit",
+        "minutes": "{minutes} Min.",
+        "category": "Kategorie",
+        "about": "Über",
+        "whatYouNeed": "Was du brauchst",
+        "carousel": "Coworker in dieser Vorlage",
+        "securityTitle": "Sicherheit",
+        "securityBody": "Zugangsdaten und private Daten wurden aus dieser Vorlage entfernt. Apps kommen getrennt an, du autorisierst sie nach dem Import.",
+        "cancelAnytime": "Jederzeit in deinen Abrechnungseinstellungen kündbar."
+    },
+    "library": {
+        "title": "Vorlagenbibliothek",
+        "templates": "Vorlagen",
+        "hideDetails": "Details ausblenden",
+        "newCoworker": "Neuer Coworker",
+        "createCoworker": "Neuen Coworker erstellen",
+        "viewProfile": "Profil ansehen",
+        "filters": {
+            "app": "App",
+            "status": "Status"
+        },
+        "search": {
+            "placeholder": "Vorlagen suchen",
+            "clear": "Suche löschen"
+        },
+        "nav": {
+            "discover": "Entdecken",
+            "forYou": "Für dich",
+            "all": "Alle",
+            "allTemplates": "Alle Vorlagen",
+            "mine": "Meine Bibliothek",
+            "stack": "Deine Tools",
+            "popularApps": "Beliebte Apps",
+            "categories": "Kategorien"
+        },
+        "heading": {
+            "count": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
+            "results": "Ergebnisse für „{query}“",
+            "discoverEmpty": "Die Vorlagen, die du erstellst, landen hier.",
+            "discover": "Fertige Coworker, gebaut von Leuten, die sie selbst nutzen.",
+            "forYou": "Passend zu deiner Branche und den Apps, die du zuerst nutzt.",
+            "mine": "Die Vorlagen, die diesem Workspace gehören.",
+            "app": "App",
+            "appSubtitle": "{total} mit {app}",
+            "thisApp": "dieser App",
+            "creator": "Creator"
+        },
+        "discover": {
+            "seeAll": "Alle ansehen",
+            "creators": "Creator",
+            "creatorsSubtitle": "Die Leute hinter den Vorlagen.",
+            "allCreators": "Alle Creator",
+            "forYou": "Für dich",
+            "forYouSubtitle": "Passend zu deiner Branche und deinen Apps.",
+            "featured": "Empfohlen",
+            "featuredSubtitle": "Handverlesene Setups, die einen ersten Blick wert sind.",
+            "justAdded": "Neu hinzugefügt",
+            "justAddedSubtitle": "Die neuesten auf Rerun veröffentlichten Vorlagen."
+        },
+        "empty": {
+            "filtered": "Keine Vorlage passt zu diesen Filtern",
+            "none": "Hier gibt es noch keine Vorlage",
+            "selfHosted": "Stell einen Coworker ein und speichere ihn dann als Vorlage.",
+            "cloud": "Bau sie selbst und verkauf sie auf Rerun.",
+            "become": "Werde Rerun-Experte"
+        }
+    },
+    "scratch": {
+        "title": "Bei null anfangen",
+        "description": "Keine Vorlage. Benenne deinen Coworker und setz ihn aufs Raster."
+    },
+    "section": {
+        "back": "Zurück zu allen Vorlagen",
+        "filterBy": "Nach {title} filtern"
+    },
+    "authoring": {
+        "prefill": "Magisch vorausfüllen",
+        "altText": "Alternativtext schreiben",
+        "content": {
+            "title": "Inhalt",
+            "tagline": "Slogan",
+            "taglineHelp": "{count}/{limit}, ein Satz.",
+            "taglinePlaceholder": "Findet Interessenten, schreibt die erste Nachricht und fasst nach, bis sie antworten.",
+            "longDescription": "Lange Beschreibung",
+            "longDescriptionPlaceholder": "Was diese Vorlage tut, für wen sie ist und was sie zum Laufen braucht."
+        },
+        "faq": {
+            "title": "FAQ",
+            "hint": "Wird auf der öffentlichen Seite angezeigt und als strukturierte FAQ-Daten an Suchmaschinen gesendet.",
+            "empty": "Noch keine Frage. Lass sie vorausfüllen oder füge eine von Hand hinzu.",
+            "question": "Frage",
+            "questionPlaceholder": "Welche Konten muss ich verbinden?",
+            "answer": "Antwort",
+            "answerPlaceholder": "Zwei oder drei Sätze, die sie für sich beantworten.",
+            "remove": "Diese Frage entfernen",
+            "add": "Frage hinzufügen"
+        },
+        "media": {
+            "title": "Medien",
+            "videoUrl": "Video-URL",
+            "videoPlaceholder": "https://youtube.com/watch?v=… oder ein Loom-Link",
+            "ogImage": "OG-Bild überschreiben",
+            "ogImagePlaceholder": "Leer lassen, um eines zu generieren",
+            "ogImageHelp": "Nur für eine individuelle Social Card setzen.",
+            "gallery": "Galerie",
+            "galleryHelp": "Optional: Karten zeigen sonst das Coworker-Board. Diese Bilder illustrieren die Detailseite, das erste vorne und ein generiertes dort, wo es landet. Speichern, um sie zu behalten. Alternativtext wird empfohlen: Die Bilder landen auf einer indexierten Seite.",
+            "altCover": "Alternativtext (Cover)",
+            "alt": "Alternativtext",
+            "cover": "Cover",
+            "remove": "Entfernen",
+            "dropOverlay": "Bilder ablegen",
+            "uploading": "Wird hochgeladen…",
+            "drop": "Bilder hier ablegen oder zum Auswählen klicken"
+        },
+        "meta": {
+            "title": "Metadaten",
+            "titleLabel": "Titel",
+            "titlePlaceholder": "Outbound-SDR",
+            "slug": "Slug",
+            "category": "Kategorie",
+            "setupTime": "Einrichtungszeit (Minuten)",
+            "setupTimeHelp": "Wird auf der öffentlichen Seite angezeigt. Sei ehrlich bei der Einrichtung der Apps.",
+            "tags": "Tags",
+            "tagsPlaceholder": "Outreach, Vertrieb, Automatisierung",
+            "tagsHelp": "Kommagetrennt. Zum Filtern auf der öffentlichen Seite.",
+            "metaTitle": "Meta-Titel",
+            "metaTitlePlaceholder": "{title}, Vorlage für KI-Coworker",
+            "metaTitleDefault": "Standardmäßig der Titel",
+            "metaDescription": "Meta-Beschreibung",
+            "metaDescriptionHelp": "{count}/{limit}, zwischen {min} und {limit} Zeichen zum Veröffentlichen.",
+            "metaDescriptionPlaceholder": "Ein oder zwei Sätze für die Suchergebnisse."
+        }
+    },
+    "capture": {
+        "failedRequest": "Die Anfrage ist nicht durchgegangen. Prüfe deine Verbindung und versuch es erneut.",
+        "steps": {
+            "select": {
+                "title": "Coworker erfassen",
+                "description": "Wähle die Coworker, deren Ordner zu dieser Vorlage werden soll."
+            },
+            "review": {
+                "title": "Sicherheitsprüfung",
+                "description": "Prüfe, was jeder Coworker mitbringt, und bestätige es vor dem Erfassen."
+            },
+            "done": {
+                "title": "Erfasst",
+                "description": "Die Archive sind gespeichert, und die Vorlage beschreibt jetzt diese Coworker."
+            }
+        },
+        "stages": {
+            "title": {
+                "title": "Benenne deine Vorlage",
+                "description": "Der Entwurf wird gespeichert, sobald du bestätigst.",
+                "points": {
+                    "private": "Privat bis zur Veröffentlichung",
+                    "signed": "Mit deinem Namen signiert"
+                }
+            },
+            "select": {
+                "title": "Wähle deine Coworker",
+                "description": "Der Coworker-Ordner wird so festgehalten, wie er gerade ist.",
+                "points": {
+                    "snapshot": "Ein Schnappschuss, keine Verknüpfung",
+                    "edits": "Spätere Änderungen bleiben bei dir"
+                }
+            },
+            "review": {
+                "title": "Sicherheitsprüfung",
+                "description": "Secrets werden entfernt, bevor irgendetwas die Box verlässt.",
+                "points": {
+                    "env": "Env-Werte geleert",
+                    "apps": "Apps zurückgesetzt",
+                    "scan": "Secret-Scan von Dateien und Pfaden",
+                    "memories": "Erinnerungen bleiben zurück"
+                }
+            },
+            "done": {
+                "title": "Erfassen",
+                "description": "Das Archiv wird privat gespeichert und beschreibt die Vorlage.",
+                "points": {
+                    "stored": "Unzugänglich gespeichert",
+                    "warnings": "Warnungen statt Überraschungen"
+                }
+            }
+        },
+        "select": {
+            "emptyTitle": "Kein Coworker zum Erfassen",
+            "emptyDescription": "Erstelle zuerst einen Coworker in einer Box und komm dann hierher zurück.",
+            "box": "Box",
+            "boxPlaceholder": "Wähle die Box mit den Coworkern",
+            "boxFallback": "Box",
+            "coworkers": "Coworker",
+            "coworkersIn": "Coworker in {box}",
+            "search": "Nach Name oder Handle suchen",
+            "selected": "{selected} von {total} ausgewählt",
+            "clear": "Leeren",
+            "selectAll": "Alle auswählen",
+            "noMatch": "Kein Coworker passt zu dieser Suche."
+        },
+        "review": {
+            "reviewed": "{approved} von {total, plural, one {# Coworker} other {# Coworkern}} geprüft",
+            "files": "{kept} von {total} Dateien, {size}",
+            "tools": "Tools",
+            "apps": "Apps",
+            "skills": "Skills",
+            "schedules": "Zeitpläne",
+            "oneShot": "Einmalig",
+            "webhooks": "Webhooks",
+            "memories": "Erinnerungen",
+            "memoriesNote": "{count} gespeichert, standardmäßig vom Archiv ausgeschlossen",
+            "removed": "Beim Verlassen entfernt",
+            "toProvide": "Bei einer Kopie erneut anzugeben",
+            "envKeys": "Env-Schlüssel",
+            "flagged": "Markierte Dateien",
+            "flaggedKept": "{kept} von {total} Dateien, die nach Zugangsdaten aussehen, sind noch enthalten. Sie reisen im Archiv mit.",
+            "flaggedOut": "{count, plural, one {# Datei sieht} other {# Dateien sehen}} nach Zugangsdaten aus. Sie bleiben außerhalb des Archivs.",
+            "install": "Installation",
+            "filesGroup": "Dateien",
+            "hideFolder": "Ordner ausblenden",
+            "showFolder": "Ordner anzeigen",
+            "kept": "{kept} von {total} behalten",
+            "confirm": "Ich habe geprüft, was dieser Coworker mitbringt",
+            "answerFirst": "Beantworte zuerst die Installationsfrage oben.",
+            "writeFirst": "Schreib zuerst die Installationsanweisungen oben.",
+            "flaggedTravel": "{count} markierte Datei(en) reisen im Archiv mit.",
+            "nothingSecret": "Nichts auf dieser Liste ist ein Secret, das nicht mitgehen sollte.",
+            "more": "+{count} weitere"
+        },
+        "tree": {
+            "collapse": "Einklappen",
+            "expand": "Ausklappen",
+            "flagged": "{count} markiert"
+        },
+        "done": "{count, plural, one {# Coworker erfasst} other {# Coworker erfasst}}. Ihre Skills, Zeitpläne und Apps beschreiben jetzt diese Vorlage.",
+        "panel": {
+            "inspect": "{count, plural, =0 {Coworker untersuchen} one {# Coworker untersuchen} other {# Coworker untersuchen}}",
+            "reviewEach": "Prüfe jeden Agenten, um das Erfassen freizuschalten ({approved}/{total})",
+            "back": "Zurück",
+            "capture": "Erfassen"
+        },
+        "dialog": {
+            "cancel": "Abbrechen",
+            "done": "Fertig"
+        }
+    },
+    "expert": {
+        "agents": {
+            "title": "Coworker ({count})",
+            "empty": "Noch kein Coworker erfasst. Erfasse einen aus deiner Sandbox, damit andere dieses Setup installieren können.",
+            "noRole": "Noch keine Rolle",
+            "connectors": "{count, plural, one {# Connector} other {# Connectors}}",
+            "setup": {
+                "guided": "Geführte Installation",
+                "none": "Keine Installation",
+                "missing": "Installationsantwort fehlt"
+            },
+            "removeTitle": "{name} entfernen?",
+            "removeDescription": "Das aus seinem Ordner erfasste Archiv wird ebenfalls gelöscht. Um den Coworker wieder hinzuzufügen, musst du ihn erneut erfassen.",
+            "removeConfirm": "Entfernen",
+            "removeLabel": "{name} entfernen",
+            "capture": "Aus deiner Sandbox erfassen",
+            "removeNote": "Wenn du einen Coworker entfernst, wird auch das aus seinem Ordner erfasste Archiv gelöscht. Um ihn wieder hinzuzufügen, musst du ihn erneut erfassen."
+        },
+        "list": {
+            "newTemplate": "Neue Vorlage",
+            "emptyTitle": "Noch keine Vorlagen",
+            "emptyDescription": "Beschreibe ein Coworker-Setup einmal, und wir prüfen es, bevor es in den Marketplace kommt."
+        },
+        "row": {
+            "agents": "{count, plural, one {# Agent} other {# Agenten}}"
+        },
+        "tabs": {
+            "details": "Details",
+            "pricing": "Preise",
+            "media": "Medien",
+            "faq": "FAQ",
+            "agents": "Coworker"
+        },
+        "dialog": {
+            "title": "Meine Vorlagen",
+            "description": "Entwirf eine Vorlage aus deiner Sandbox und reich sie dann ein. Wir prüfen sie, bevor sie live geht.",
+            "pickTitle": "Vorlage wählen",
+            "pickDescription": "Oder starte eine neue, um einen Coworker aus deiner Sandbox darin zu erfassen."
+        },
+        "toasts": {
+            "saved": "Vorlage gespeichert.",
+            "submitted": "Eingereicht. Wir melden uns bei dir."
+        },
+        "footer": {
+            "requirements": {
+                "title": "Ein Titel",
+                "tagline": "Ein Slogan",
+                "description": "Eine Beschreibung",
+                "metaDescription": "Eine Meta-Beschreibung mit {min} bis {max} Zeichen",
+                "agent": "Mindestens ein erfasster Coworker",
+                "installAnswers": "Eine Installationsantwort für jeden Coworker",
+                "payouts": "Ein Stripe-Konto, das Auszahlungen empfangen kann"
+            },
+            "live": "Diese Vorlage ist live im Marketplace. Wende dich an das Rerun-Team, um sie zu ändern.",
+            "inReview": "Wir prüfen diese Vorlage. Zieh sie zurück, um weiter zu bearbeiten.",
+            "withdraw": "Zurückziehen",
+            "completeChecklist": "Schließ zuerst die Checkliste ab",
+            "saveFirst": "Speichere zuerst deine Änderungen",
+            "sentBack": "Wir haben diese zurückgeschickt",
+            "deleteTitle": "Diese Vorlage endgültig löschen?",
+            "deleteDescription": "Die Vorlage, ihre Medien und jeder dafür erfasste Coworker werden entfernt. Das lässt sich nicht rückgängig machen.",
+            "deleteTooltip": "Diese Vorlage endgültig löschen",
+            "deleteLabel": "Vorlage löschen",
+            "checklistLabel": "Checkliste zum Einreichen: {met} von {total} erledigt",
+            "ready": "Bereit zum Einreichen",
+            "checklistHint": "Was eine Vorlage braucht, bevor wir sie prüfen.",
+            "setUpPayouts": "Auszahlungen einrichten",
+            "save": "Speichern",
+            "submit": "Zur Prüfung einreichen"
+        }
+    },
+    "pricing": {
+        "title": "Preise",
+        "models": {
+            "free": "Kostenlos",
+            "one_time": "Einmalkauf",
+            "recurring": "Monatsabo"
+        },
+        "helpers": {
+            "free": "Alle mit einem Rerun-Tarif können sie installieren.",
+            "one_time": "Einmal berechnet. Der Käufer behält sie dauerhaft.",
+            "recurring": "Jeden Monat berechnet. Der Zugriff endet, wenn der Käufer kündigt."
+        },
+        "modelHelp": "{helper} Käufer brauchen trotzdem einen aktiven Rerun-Tarif, um eine Vorlage zu installieren.",
+        "priceLabel": "Preis (USD)",
+        "priceHelp": "Mindestens {min}. Spätere Änderungen gelten nur für neue Käufer.",
+        "payoutsTitle": "Auszahlungen sind nicht aktiviert",
+        "payoutsBody": "Du kannst diesen Preis jetzt speichern, aber eine kostenpflichtige Vorlage kann erst zur Prüfung eingereicht werden, wenn Stripe-Auszahlungen aktiviert sind.",
+        "setUpPayouts": "Auszahlungen einrichten",
+        "payout": {
+            "yourPrice": "Dein Preis{recurring, select, true { pro Monat} other {}}",
+            "fee": "Rerun-Gebühr ({fee})",
+            "earn": "Du verdienst{recurring, select, true { pro Monat} other {}}",
+            "vat": "Die MwSt. kommt an der Kasse auf deinen Preis obendrauf und wird vom Käufer bezahlt, sie geht also nie von deinem Anteil ab. Was du verdienst, ist überall gleich."
+        }
+    },
+    "payouts": {
+        "expired": "Dein Einrichtungslink ist abgelaufen, Stripe wird erneut geöffnet.",
+        "title": "Auszahlungen",
+        "subtitle": "Wo das Geld aus deinen kostenpflichtigen Vorlagen landet.",
+        "yourPrice": "Dein Preis",
+        "yourPriceValue": "Du legst ihn pro Vorlage fest, ohne MwSt.",
+        "commission": "Rerun-Provision",
+        "schedule": "Auszahlungsrhythmus",
+        "scheduleValue": "Stripe-Standard",
+        "planNote": "Käufer brauchen trotzdem einen aktiven Rerun-Tarif, um eine Vorlage zu installieren, ein Kauf schaltet also nur die Vorlage frei.",
+        "states": {
+            "not_started": {
+                "headline": "Lass dich für deine Vorlagen bezahlen",
+                "body": "Rerun behält {fee} jedes Verkaufs. Der Rest landet über Stripe auf deinem Bankkonto.",
+                "cta": "Auszahlungen einrichten"
+            },
+            "incomplete": {
+                "headline": "Schließ deine Stripe-Einrichtung ab",
+                "body": "Stripe braucht noch ein paar Angaben, bevor es dich bezahlen kann.",
+                "cta": "Einrichtung abschließen"
+            },
+            "pending_verification": {
+                "headline": "Stripe prüft deine Angaben",
+                "body": "Das dauert meist ein paar Minuten. Du kannst solange weiter Vorlagen entwerfen.",
+                "cta": "Status prüfen"
+            },
+            "restricted": {
+                "headline": "Auszahlungen sind pausiert",
+                "body": "Stripe hat dieses Konto eingeschränkt. Deine veröffentlichten Vorlagen bleiben online, aber niemand kann sie kaufen, bis das geklärt ist.",
+                "cta": "Bei Stripe beheben"
+            },
+            "ready": {
+                "headline": "Du bist für Auszahlungen bereit",
+                "body": "Gib einer Vorlage einen Preis, und sie geht in den Verkauf, sobald wir sie geprüft haben. Rerun behält {fee} jedes Verkaufs.",
+                "cta": "Stripe-Dashboard öffnen"
+            }
+        },
+        "stripeReported": "Stripe meldet: {reason}",
+        "terms": "Wenn du fortfährst, akzeptierst du die <link>Marketplace Creator Terms</link>, einschließlich der Regeln für Erstattungen und Rückbuchungen.",
+        "sidebar": {
+            "payouts": "Auszahlungen",
+            "revenue": "Einnahmen"
+        },
+        "stateLabels": {
+            "not_started": "Nicht eingerichtet",
+            "incomplete": "Aktion nötig",
+            "pending_verification": "In Prüfung",
+            "restricted": "Eingeschränkt",
+            "ready": "Bereit"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "Eine Firmenwebsite",
+                "mcc": "Deine Branche"
+            },
+            "external_account": "Ein Bankkonto",
+            "individual": {
+                "verification": {
+                    "document": "Ein Ausweisdokument",
+                    "additional_document": "Ein Adressnachweis"
+                },
+                "id_number": "Deine Ausweisnummer",
+                "address": {
+                    "line1": "Deine Adresse"
+                },
+                "dob": {
+                    "day": "Dein Geburtsdatum"
+                }
+            },
+            "tos_acceptance": {
+                "date": "Zustimmung zu den Stripe-Bedingungen"
+            }
+        },
+        "saleKinds": {
+            "one_time": "Einmalig",
+            "recurring": "Monatlich",
+            "refund": "Erstattung"
+        }
+    },
+    "revenue": {
+        "ranges": {
+            "30d": "30 Tage",
+            "12m": "12 Monate",
+            "all": "Gesamt"
+        },
+        "noAccountTitle": "Noch kein Auszahlungskonto",
+        "noAccountDescription": "Richte Auszahlungen ein, um deine Vorlagen zu verkaufen.",
+        "setUpPayouts": "Auszahlungen einrichten",
+        "title": "Einnahmen",
+        "openDashboard": "Stripe-Dashboard öffnen",
+        "youEarned": "Du hast verdient",
+        "noSales": "Keine Verkäufe in diesem Zeitraum.",
+        "recentSales": "Letzte Verkäufe",
+        "date": "Datum",
+        "template": "Vorlage",
+        "type": "Art",
+        "sales": "Verkäufe",
+        "gross": "Brutto",
+        "fee": "Rerun-Gebühr",
+        "pending": "Ausstehende Auszahlung",
+        "available": "Jetzt verfügbar",
+        "subscriptions": "{count, plural, one {# aktives Abo} other {# aktive Abos}}",
+        "perMonth": "{amount}/Monat"
+    },
+    "categories": {
+        "agencies": "Agenturen",
+        "ecommerce": "E-Commerce",
+        "saas": "SaaS",
+        "sales": "Vertrieb",
+        "recruiting": "Recruiting",
+        "real-estate": "Immobilien",
+        "legal": "Recht & Compliance",
+        "creators": "Creator",
+        "productivity": "Produktivität",
+        "other": "Sonstiges"
+    },
+    "status": {
+        "draft": "Entwurf",
+        "in_review": "In Prüfung",
+        "published": "Veröffentlicht",
+        "unlisted": "Nicht gelistet",
+        "archived": "Archiviert"
+    },
+    "creatorKind": {
+        "studio": "Studio",
+        "freelancer": "Freelancer",
+        "expert": "Experte"
+    },
+    "cta": {
+        "place": "{count, plural, one {# Coworker platzieren} other {# Coworker platzieren}}",
+        "placeCaption": "{count, plural, one {Zieh ihn auf dein Board, startklar.} other {Zieh sie auf dein Board, startklar.}}",
+        "trialInstall": "Kostenlos testen & installieren",
+        "trialThenSubscribe": "Kostenlos testen, dann für {price}/Monat abonnieren",
+        "trialThenPay": "Kostenlos testen, dann {price} zahlen",
+        "planInstall": "Für {plan}/Monat abonnieren & installieren",
+        "planThenSubscribe": "Für {plan}/Monat abonnieren, dann für {price}/Monat abonnieren",
+        "planThenPay": "Für {plan}/Monat abonnieren, dann {price} zahlen",
+        "subscribe": "Für {price}/Monat abonnieren",
+        "pay": "{price} zahlen",
+        "payCaption": "Diese Vorlage, separat abgerechnet.",
+        "useTemplate": "Diese Vorlage nutzen",
+        "nothingCaptured": "In dieser Vorlage wurde noch kein Coworker erfasst.",
+        "open": "{name} öffnen",
+        "alreadyOnBoard": "Schon auf deinem Board.",
+        "installAgain": "Erneut installieren",
+        "sandboxCannotBuy": "Wechsle in einen Workspace, um Vorlagen zu kaufen.",
+        "trialBilledSeparately": "{terms} Diese Vorlage wird separat abgerechnet.",
+        "trialUsedBilledSeparately": "Dein kostenloser Test ist schon genutzt. Heute abgerechnet; diese Vorlage wird separat abgerechnet.",
+        "resubscribe": "Für {price}/Monat erneut abonnieren",
+        "lapsed": "Dein Abo ist beendet. Die Coworker, die diese Vorlage installiert hat, sind deaktiviert.",
+        "billedTo": "Abgerechnet an {workspace}. Dein Rerun-Tarif ist bereits aktiv.",
+        "yours": "Deine Vorlage, kostenlos."
+    }
+}

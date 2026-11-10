@@ -1,0 +1,5 @@
+{
+    "NSPhotoLibraryUsageDescription": "O Rerun usa sua biblioteca de fotos para anexar fotos a uma mensagem.",
+    "NSCameraUsageDescription": "O Rerun usa a câmera para anexar uma foto a uma mensagem.",
+    "NSMicrophoneUsageDescription": "O Rerun usa o microfone para gravar mensagens de voz."
+}

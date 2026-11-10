@@ -1,0 +1,29 @@
+{
+    "settings": {
+        "coworkersLanguage": "Idioma dos coworkers",
+        "coworkersLanguageHint": "O idioma em que seus coworkers escrevem quando trabalham sozinhos, por agendamento ou gatilho.",
+        "fallbackName": "Workspace",
+        "adminOnly": "Só um admin pode alterar as configurações do workspace",
+        "nameRequired": "O nome é obrigatório",
+        "nameTooLong": "Use menos de {max} caracteres",
+        "title": "Configurações do workspace",
+        "description": "O nome e o logo do seu workspace, como sua equipe e seus convites os veem.",
+        "uploadLogo": "Enviar um logo",
+        "name": "Nome",
+        "namePlaceholder": "ex.: Acme Inc.",
+        "logoLink": "Logo de um site ou link",
+        "noLogoFound": "Nenhum logo encontrado neste endereço",
+        "pickIllustration": "Ou escolha uma ilustração",
+        "showLess": "Mostrar menos",
+        "showAll": "Mostrar todas as {count}"
+    },
+    "access": {
+        "paused": "Assine para restaurar seu workspace primeiro",
+        "restoring": "Disponível assim que seu workspace for restaurado",
+        "paymentFailed": "Atualize seu pagamento para restaurar seu workspace primeiro",
+        "sandboxArchived": "Disponível assim que sua sandbox for reativada",
+        "sandboxNone": "A sandbox do expert não tem nada disso",
+        "adminsOnly": "Só admins",
+        "sandboxSingleBox": "Uma sandbox tem uma única Box"
+    }
+}

@@ -8,7 +8,7 @@
 //   pnpm verify:ui --engine --scenario …                     with a local engine behind the workspace
 //   pnpm verify:ui --fresh /                                 a brand new account, to walk the signup
 //   pnpm verify:ui --onboarded /                             an account past the onboarding
-//   pnpm verify:ui --locale fr /                             the app in a language pack (fr, es, or en-XA)
+//   pnpm verify:ui --locale fr /                             the app in a language pack (fr, es, pt, de, or en-XA)
 //
 // Local stack only. The hub has to run on the Docker Supabase (`pnpm db:start`, then `pnpm cloud env:local`):
 // a hub on production provisions a real user and a real workspace on every page load, and the

@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "Texturas de banner",
+        "description": "Texturas de banner grátis para o seu perfil de especialista no Rerun: baixe um fundo pronto e adicione à sua página pública de especialista em um minuto."
+    },
+    "banners": {
+        "eyebrow": "Para especialistas",
+        "title": "Texturas de banner",
+        "description": "Um conjunto de texturas de vidro fluido que usamos nos perfis de especialista do Rerun. Grátis para baixar e usar como quiser.",
+        "download": "Baixar",
+        "downloadFile": "Baixar {file}",
+        "alts": {
+            "lime-glass-crumple": "Vidro verde-limão brilhante, folhas amassadas e dobradas",
+            "pastel-holographic-knot": "Fitas de vidro pastel holográficas com nós",
+            "blue-glass-crystal": "Vidro cristalino facetado azul elétrico",
+            "violet-lime-swirl": "Vórtice de vidro roxo e verde-limão em espiral",
+            "crimson-fluid-blob": "Bolha fluida brilhante carmesim e magenta",
+            "amber-droplet-blob": "Gotas de vidro âmbar-laranja, relevos brilhantes",
+            "amber-chrome-swirl": "Espirais cromadas laranja e pretas",
+            "dark-lime-crumple": "Vidro preto amassado com veios verde-ácido",
+            "pastel-iridescent-bloom": "Flor de vidro pastel holográfica iridescente",
+            "violet-lime-vortex": "Túneis em vórtice de vidro roxo e verde-limão",
+            "lavender-glass-vortex": "Vórtice de vidro lavanda em espiral",
+            "violet-lime-crystal": "Blocos de vidro cristalino roxo e verde",
+            "pink-swirl-vortex": "Vórtice de vidro rosa-choque e vermelho",
+            "violet-lime-knot": "Laços de toro com nós roxo e verde-limão",
+            "lavender-glass-crystal": "Vidro cristalino facetado lavanda",
+            "blue-chrome-knot": "Laços de toro cromados azuis com nós",
+            "blue-plasma-smoke": "Fumaça de plasma azul elétrico sobre vidro",
+            "violet-iridescent-vortex": "Vórtice roxo iridescente em espiral",
+            "dark-lime-knot": "Nós de vidro preto brilhando em verde-ácido",
+            "pastel-holographic-vortex": "Vórtice em espiral pastel holográfico",
+            "blue-liquid-ripple": "Vidro líquido azul iridescente ondulado",
+            "blue-glass-bloom": "Flor de pétalas de vidro azul-cobalto franzidas",
+            "blue-chrome-vortex": "Vórtice de vidro cromado azul em espiral",
+            "pastel-holographic-smoke": "Vidro de fumaça leve pastel holográfico",
+            "crimson-swirl-vortex": "Vórtice em espiral vermelho-escuro e magenta",
+            "amethyst-crystal-facets": "Facetas cristalinas roxo-ametista",
+            "violet-iridescent-crumple": "Blocos de cristal amassado roxo iridescente",
+            "violet-glossy-bloom": "Flor de pétalas de vidro roxo brilhante",
+            "violet-lime-fluid-blob": "Bolhas fluidas brilhantes roxas e verde-ácido",
+            "dark-green-swirl-vortex": "Vórtice em espiral brilhante verde-escuro e preto"
+        }
+    }
+}

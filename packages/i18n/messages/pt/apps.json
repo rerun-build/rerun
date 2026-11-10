@@ -1,0 +1,199 @@
+{
+    "menu": {
+        "label": "Apps"
+    },
+    "linkedToRerun": "{provider} conectado ao Rerun",
+    "slotPrice": {
+        "monthly": "{price}/mês",
+        "yearly": "{price}/ano"
+    },
+    "blocked": {
+        "notSubscribed": "Assine o Rerun primeiro",
+        "paused": "Seu workspace está pausado",
+        "trialSlot": "Um teste inclui uma vaga {provider}. Mude de plano para adicionar mais.",
+        "adminOnly": "Só um admin pode gerenciar apps pagos"
+    },
+    "slots": {
+        "footer": "<b>{used} de {total, plural, one {# vaga usada} other {# vagas usadas}}</b>, {description}",
+        "subscriberTrial": "a primeira grátis até {date}, depois {price}",
+        "workspaceTrial": "US$ 0 durante o teste, cobrado com seu plano depois",
+        "paid": "{price} cada, cobrado com seu plano"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "Grátis por {days} dias",
+            "detail": "Depois {price} por conta, cobrado com seu plano"
+        },
+        "workspaceTrial": {
+            "headline": "US$ 0 durante o teste",
+            "detail": "Depois {price} por conta, cobrado com seu plano"
+        },
+        "freeSlot": {
+            "headline": "Uma vaga está esperando",
+            "detail": "Ela já está no seu plano"
+        },
+        "buySlot": {
+            "headline": "{price} por conta",
+            "detail": "Adicionado ao seu plano, cobrado hoje pelo resto do período"
+        }
+    },
+    "connectHint": {
+        "reconnect": "Entre de novo como {label}",
+        "subscriberTrial": "Grátis por {days} dias, depois {price}",
+        "workspaceTrial": "US$ 0 durante o teste, depois {price} com seu plano",
+        "default": "A conta com que seus coworkers agem"
+    },
+    "addSlot": {
+        "title": "Adicionar uma vaga {provider}?",
+        "description": "{price} é adicionado ao seu plano. Você paga hoje pelo que resta do período atual.",
+        "confirm": "Adicionar vaga",
+        "button": "Adicionar uma vaga"
+    },
+    "intro": {
+        "connect": "Conectar {provider}"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "Seus coworkers prospectam pela sua conta do LinkedIn. Eles escrevem, se conectam e fazem follow-up por você.",
+            "whatsapp": "Seus coworkers respondem pelo seu número do WhatsApp. Eles leem a conversa, respondem e fazem follow-up por você."
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "Mensagens e convites",
+                "text": "Escreve para prospects e faz follow-up, dentro dos limites diários do LinkedIn."
+            },
+            "linkedinSearch": {
+                "title": "Busca e leitura de perfis",
+                "text": "Encontra as pessoas certas e lê o perfil delas antes de escrever."
+            },
+            "linkedinReplies": {
+                "title": "Acorda com respostas",
+                "text": "Uma resposta ou um convite aceito inicia o coworker na hora."
+            },
+            "whatsappReplies": {
+                "title": "Respostas e follow-ups",
+                "text": "Responde a quem escreve para você, com texto, arquivos e mensagens de voz."
+            },
+            "whatsappMessages": {
+                "title": "Acorda com mensagens",
+                "text": "Uma nova mensagem inicia o coworker na hora."
+            },
+            "whatsappCareful": {
+                "title": "Cuidado com seu número",
+                "text": "Fica dentro dos limites diários do WhatsApp e nunca escreve para desconhecidos."
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "Seu workspace está pausado, então as contas {provider} dele foram desconectadas. Reative o workspace e depois reconecte-as.",
+        "freeSlot": "Vaga livre",
+        "freeSlotHint": {
+            "subscriberTrial": "Conecte uma conta, grátis por {days} dias",
+            "workspaceTrial": "Conecte uma conta, US$ 0 durante o teste",
+            "default": "Conecte uma conta {provider} para preenchê-la"
+        },
+        "addAnother": "Adicionar outra conta",
+        "addAnotherHint": "Adiciona uma vaga de {price} ao seu plano",
+        "status": {
+            "connected": "Pronta",
+            "needsReconnect": "Entrar de novo",
+            "paused": "Pausada",
+            "connecting": "Conectando",
+            "disconnected": "Desconectada"
+        },
+        "summary": {
+            "signedOutWhilePaused": "Desconectada enquanto o workspace estava pausado",
+            "signedOut": "{provider} desconectou esta conta",
+            "rateLimited": "Descansando por um dia, {provider} pediu para ir mais devagar",
+            "unpaid": "A vaga dela não está paga",
+            "unused": "Nenhum coworker a usa ainda. Escolha-a nos Serviços de um coworker.",
+            "usedBy": "Usada por {names}"
+        },
+        "defaultName": "Conta {provider}",
+        "reconnect": "Reconectar",
+        "disconnectLabel": "Desconectar {name}",
+        "disconnectTitle": "Desconectar {name}?",
+        "disconnectDescription": "Os coworkers dela perdem as ferramentas {provider} na hora. A vaga continua no seu plano até você removê-la em Cobrança.",
+        "disconnect": "Desconectar",
+        "disconnectTooltip": "Desconectar esta conta"
+    },
+    "success": {
+        "connectedIcon": "{provider} conectado",
+        "title": "{app} está ativo",
+        "body": "<b>{label}</b> está conectada. Escolha-a nos Serviços de um coworker para colocá-la para trabalhar.",
+        "yourAccount": "Sua conta",
+        "done": "Concluído"
+    },
+    "linkedin": {
+        "method": {
+            "password": "E-mail e senha",
+            "cookie": "Cookie de sessão"
+        },
+        "cookieLabel": "Cookie de sessão (li_at)",
+        "cookieHelp": "Para uma conta que você abre com Google ou Apple. Copie o cookie li_at de linkedin.com no seu navegador.",
+        "emailLabel": "E-mail do LinkedIn",
+        "emailPlaceholder": "maria@empresa.com",
+        "passwordLabel": "Senha do LinkedIn",
+        "passwordPlaceholder": "Sua senha do LinkedIn",
+        "signInFrom": "Entrar a partir de",
+        "signInFromHelp": "O LinkedIn confia em um login feito do país de onde você costuma trabalhar.",
+        "searchCountry": "Buscar um país",
+        "noCountry": "Nenhum país encontrado",
+        "neverStored": "O Rerun nunca guarda sua senha nem seu cookie.",
+        "connect": "Conectar",
+        "approval": {
+            "figureLabel": "Um celular mostrando o pedido de login, com o botão de aprovar aceso",
+            "title": "Aprove no seu celular",
+            "body": "O LinkedIn enviou um pedido de login para o seu celular. Abra o app do LinkedIn e toque em <b>Sim</b>.",
+            "approved": "Já aprovei",
+            "polling": "Aguardando sua aprovação",
+            "slow": "Nada ainda? Confira o app do LinkedIn e toque abaixo."
+        },
+        "code": {
+            "title": "Digite o código",
+            "description": "O código de {length} dígitos {where}.",
+            "where": {
+                "authenticator": "do seu app autenticador",
+                "sentTo": "que o LinkedIn enviou para o seu {sentTo}",
+                "sms": "que o LinkedIn enviou por SMS",
+                "email": "que o LinkedIn enviou por e-mail"
+            },
+            "resend": "Enviar um novo código",
+            "verify": "Verificar"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "Número do WhatsApp",
+            "invalidPhone": "Isso não parece um número de telefone completo.",
+            "linkBy": "Conectar por",
+            "linkByQr": "Você escaneia com o celular um código mostrado aqui.",
+            "linkByCode": "Para quando esta página está aberta nesse celular: você digita um código no WhatsApp.",
+            "method": {
+                "qr": "Escanear um QR code",
+                "code": "Digitar um código"
+            },
+            "linkedDevice": "O Rerun entra como dispositivo conectado, como o WhatsApp Web. Seu celular continua funcionando normalmente.",
+            "submit": "Gerar o código"
+        },
+        "link": {
+            "steps": {
+                "open": "Abra o WhatsApp no celular",
+                "settings": "Configurações, depois Dispositivos conectados, depois Conectar dispositivo",
+                "pointQr": "Aponte o celular para este código",
+                "typeCode": "Toque em Conectar com número de telefone e digite este código"
+            },
+            "expiredTitle": "Este código expirou",
+            "scanTitle": "Escaneie com o WhatsApp",
+            "typeTitle": "Digite este código no WhatsApp",
+            "expiredBody": "Os códigos duram três minutos. Peça um novo e conecte o celular na hora.",
+            "onPhone": "No celular de <b>{phone}</b>",
+            "waiting": "Aguardando o celular",
+            "switchToCode": "Digitar um código",
+            "switchToQr": "Escanear um QR code",
+            "newCode": "Novo código",
+            "codeLabel": "Código {code}",
+            "qrAlt": "QR code para conectar o WhatsApp"
+        }
+    }
+}

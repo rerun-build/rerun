@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "Tabela não encontrada",
+        "deleteRowsFailed": "Falha ao excluir as linhas",
+        "saveRowFailed": "Não foi possível salvar esta linha",
+        "deleteTableFailed": "Falha ao excluir a tabela",
+        "purgeTableFailed": "Falha ao esvaziar a tabela",
+        "addViewFailed": "Não foi possível adicionar esta visualização",
+        "deleteViewFailed": "Não foi possível excluir esta visualização",
+        "unavailable": "Banco de dados indisponível",
+        "tryAgain": "Tentar de novo",
+        "rowCount": "{count, plural, one {{total} linha} other {{total} linhas}}",
+        "rowCountFound": "{count, plural, one {{total} linha encontrada} other {{total} linhas encontradas}}",
+        "noRows": "Nenhuma linha",
+        "noSearchMatch": "Nenhuma linha corresponde a esta busca.",
+        "tableEmpty": "Esta tabela está vazia."
+    },
+    "pagination": {
+        "count": "Total <value>{count}</value>",
+        "rowsPerPage": "Linhas por página",
+        "perPage": "{size} por página",
+        "range": "{range} de {total}",
+        "firstPage": "Primeira página",
+        "previousPage": "Página anterior",
+        "nextPage": "Próxima página",
+        "lastPage": "Última página"
+    },
+    "toolbar": {
+        "selected": "{count, plural, one {# selecionada} other {# selecionadas}}",
+        "deleteRowTitle": "Excluir esta linha?",
+        "deleteRowsTitle": "Excluir {count} linhas?",
+        "deleteRowDescription": "A linha é removida da tabela de vez. Isso não pode ser desfeito.",
+        "deleteRowsDescription": "As linhas são removidas da tabela de vez. Isso não pode ser desfeito.",
+        "delete": "Excluir",
+        "clearSelection": "Limpar seleção",
+        "search": "Buscar",
+        "searchRows": "Buscar linhas",
+        "clearSearch": "Limpar busca",
+        "tableActions": "Ações da tabela",
+        "export": "Exportar",
+        "purgeTable": "Esvaziar tabela",
+        "deleteTable": "Excluir tabela"
+    },
+    "viewBar": {
+        "allRows": "Todas as linhas",
+        "viewOptions": "Opções de {name}",
+        "editView": "Editar visualização",
+        "deleteView": "Excluir visualização",
+        "addView": "Adicionar visualização",
+        "addNewView": "Adicionar uma nova visualização",
+        "expand": "Expandir",
+        "deleteViewTitle": "Excluir a visualização \"{name}\"?",
+        "deleteViewDescription": "Só a visualização é removida. As linhas da tabela continuam intactas."
+    },
+    "layouts": {
+        "table": "Tabela",
+        "list": "Lista",
+        "gallery": "Galeria",
+        "board": "Quadro"
+    },
+    "table": {
+        "selectAllRows": "Selecionar todas as linhas desta página",
+        "selectRow": "Selecionar linha",
+        "sources": "Fontes"
+    },
+    "cell": {
+        "yes": "Sim",
+        "no": "Não"
+    },
+    "board": {
+        "moveFailed": "Não foi possível mover esta linha",
+        "unavailable": "Quadro indisponível",
+        "showMore": "Mostrar mais {count}"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "Verificado",
+                "detail": "A caixa de e-mail existe"
+            },
+            "unconfirmed": {
+                "label": "Não confirmado",
+                "detail": "Caixa de e-mail não confirmada"
+            },
+            "invalid": {
+                "label": "Inválido",
+                "detail": "A caixa de e-mail não existe"
+            }
+        },
+        "openSource": "Abrir a fonte",
+        "verified": "Verificado",
+        "row": "Linha",
+        "cellLabel": "Fontes: {names}"
+    },
+    "shared": {
+        "emptyTitle": "Nenhuma tabela compartilhada ainda",
+        "emptyDescription": "Todo coworker do workspace lê e escreve neste banco de dados. Quando precisam de um registro comum (um catálogo, uma fila, uma lista que vários coworkers percorrem), eles criam tabelas aqui que você pode consultar quando quiser.",
+        "unreachable": "Não foi possível acessar a máquina deste workspace."
+    }
+}

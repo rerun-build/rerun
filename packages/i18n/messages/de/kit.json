@@ -1,0 +1,484 @@
+{
+    "close": "Schließen",
+    "chat": {
+        "actionApproval": {
+            "title": "Freigabe erforderlich",
+            "previous": "Vorherige Freigabe",
+            "next": "Nächste Freigabe",
+            "decline": "Nicht jetzt",
+            "approve": "Freigeben",
+            "approved": "Freigegeben"
+        },
+        "alert": {
+            "title": "Benachrichtigung",
+            "markAsRead": "Als gelesen markieren"
+        },
+        "approval": {
+            "title": "Freigabe erforderlich: {label}",
+            "responded": "Geantwortet: <b>{choice}</b>",
+            "choices": {
+                "once": "Einmal erlauben",
+                "session": "Diese Sitzung",
+                "always": "Immer",
+                "deny": "Ablehnen"
+            }
+        },
+        "decline": {
+            "placeholder": "Warum nicht? (optional)",
+            "back": "Zurück",
+            "confirm": "Bestätigen"
+        },
+        "question": {
+            "typeAnswer": "Gib deine Antwort ein…",
+            "somethingElse": "Etwas anderes",
+            "attachFiles": "Dateien anhängen",
+            "dropFiles": "Dateien zum Anhängen hier ablegen",
+            "selectAll": "Wähle alles Zutreffende",
+            "dismiss": "Fragen schließen",
+            "skip": "Überspringen",
+            "submit": "Antworten senden",
+            "next": "Nächste Frage"
+        },
+        "reasoning": {
+            "thinking": "Denkt nach...",
+            "thoughtFor": "{duration} nachgedacht",
+            "thought": "Nachgedacht"
+        },
+        "secret": {
+            "saveFailed": "Zugangsdaten konnten nicht gespeichert werden",
+            "titleOne": "Zugangsdaten benötigt",
+            "titleMany": "Zugangsdaten benötigt",
+            "dismiss": "Anfrage für Zugangsdaten schließen",
+            "storedAs": "Gespeichert als {key}",
+            "replacePlaceholder": "Bereits gespeichert. Gib einen Wert ein, um ihn zu ersetzen",
+            "placeholder": "Wert einfügen",
+            "whereToFind": "Wo du ihn findest",
+            "storageNote": "Auf deiner Engine als Coworker-Variable gespeichert. Wird nie an das Modell gesendet.",
+            "skip": "Überspringen",
+            "saving": "Wird gespeichert…",
+            "save": "Speichern"
+        },
+        "skillProposal": {
+            "remembering": "Wird gemerkt",
+            "remembered": "Gemerkt",
+            "failed": "Konnte nicht gemerkt werden",
+            "retry": "Erneut versuchen",
+            "dismiss": "Verwerfen",
+            "notRemembered": "Nicht gemerkt",
+            "question": "Das merken?",
+            "remember": "Merken",
+            "no": "Nein",
+            "view": "Ansehen",
+            "hideDetails": "Details ausblenden",
+            "showDetails": "Details anzeigen"
+        },
+        "steps": {
+            "previous": "Vorheriger Schritt",
+            "next": "Nächster Schritt",
+            "goTo": "Zu Schritt {step}"
+        },
+        "table": {
+            "boxDatabase": "Box-Datenbank",
+            "coworkerDatabase": "Coworker-Datenbank",
+            "rows": "{count, plural, one {# Zeile} other {# Zeilen}}",
+            "columnsHidden": "einige Spalten ausgeblendet",
+            "groupedBy": "gruppiert nach {column}",
+            "open": "Datenbank öffnen",
+            "empty": "Noch keine Zeilen.",
+            "more": "+ {count} weitere",
+            "rating": "{value} von 5"
+        }
+    },
+    "canvas": {
+        "zoomIn": "Vergrößern",
+        "zoomOut": "Verkleinern",
+        "recenter": "Zentrieren",
+        "recenterView": "Ansicht zentrieren"
+    },
+    "consent": {
+        "rejectAll": "Alle ablehnen",
+        "acceptAll": "Alle akzeptieren",
+        "region": "Cookie-Einwilligung",
+        "title": "Cookies",
+        "short": "Wir nutzen Analyse-Cookies. <policy>Cookie-Richtlinie</policy>",
+        "long": "Wir nutzen Analyse-Cookies, um zu verstehen, wie Rerun genutzt wird. Cookies, die für deine Anmeldung, den Support-Chat und deine Einstellungen nötig sind, sind immer aktiv. <policy>Cookie-Richtlinie</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "step": "Schritt {step}",
+            "steps": {
+                "identity": {
+                    "title": "Deine Identität",
+                    "description": "Dein Foto, Banner, Name und wie du arbeitest."
+                },
+                "about": {
+                    "title": "Über dich",
+                    "description": "Wo du bist und was du machst."
+                },
+                "pricing": {
+                    "title": "Preise & Verfügbarkeit",
+                    "description": "Deine Verfügbarkeit und ein Gefühl für deine Preise."
+                },
+                "expertise": {
+                    "title": "Deine Expertise",
+                    "description": "Die Skills und Sprachen, mit denen du arbeitest. Optional."
+                },
+                "links": {
+                    "title": "Links & Veröffentlichen",
+                    "description": "Füge deine Links hinzu und veröffentliche dann dein Profil."
+                }
+            },
+            "name": "Name",
+            "namePlaceholder": "z. B. Mira Labs",
+            "email": "E-Mail",
+            "emailHelper": "Privat. Nur das Rerun-Team kann sie sehen.",
+            "type": "Typ",
+            "location": "Standort",
+            "locationPlaceholder": "z. B. Berlin",
+            "bio": "Bio",
+            "bioPlaceholder": "Was du baust und wem du hilfst.",
+            "availability": "Verfügbarkeit",
+            "budget": "Budget",
+            "budgetPlaceholder": "Bereich wählen",
+            "skills": "Skills",
+            "skillsPlaceholder": "Skills wählen",
+            "languages": "Sprachen",
+            "languagesPlaceholder": "Sprachen wählen",
+            "website": "Website",
+            "back": "Zurück",
+            "continue": "Weiter"
+        },
+        "types": {
+            "studio": {
+                "title": "Studio",
+                "description": "Eine Agentur oder ein Team, das für Kunden baut"
+            },
+            "freelancer": {
+                "title": "Freelancer",
+                "description": "Selbstständig und allein unterwegs"
+            },
+            "expert": {
+                "title": "Experte",
+                "description": "Spezialist für Beratung und Begleitung"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}: {hint}",
+            "available": {
+                "label": "Verfügbar",
+                "hint": "Nimmt jetzt neue Aufträge an"
+            },
+            "soon": {
+                "label": "Bald verfügbar",
+                "hint": "Demnächst wieder frei"
+            },
+            "unavailable": {
+                "label": "Nicht verfügbar",
+                "hint": "Derzeit ausgebucht"
+            }
+        },
+        "validation": {
+            "nameRequired": "Name ist erforderlich",
+            "nameTooLong": "Name ist zu lang",
+            "nameInvalid": "Name darf kein < oder > enthalten",
+            "emailRequired": "E-Mail ist erforderlich",
+            "emailInvalid": "Ungültige E-Mail",
+            "bioTooLong": "Bio ist zu lang",
+            "budgetInvalid": "Ungültiges Budget",
+            "skillInvalid": "Ungültiger Skill",
+            "languageInvalid": "Ungültige Sprache"
+        },
+        "images": {
+            "title": "Foto & Banner",
+            "drop": "Ablegen",
+            "dropBanner": "Banner hier ablegen",
+            "dropPhoto": "Foto hier ablegen",
+            "upload": "Hochladen",
+            "uploading": "Wird hochgeladen…",
+            "changeBanner": "Banner ändern",
+            "uploadPhoto": "Foto hochladen",
+            "remove": "Entfernen",
+            "notAnImage": "Bitte wähle eine Bilddatei."
+        },
+        "card": {
+            "location": "Standort",
+            "status": "Status",
+            "links": "Links",
+            "namePlaceholder": "Dein Name",
+            "rolePlaceholder": "Rerun-Experte"
+        },
+        "preview": {
+            "hire": "Beauftragen"
+        }
+    },
+    "foreman": {
+        "orbLabel": "Rerun fragen",
+        "empty": {
+            "title": "Frag alles zu deinem Workspace",
+            "description": "Rerun baut und betreibt deine Coworker mit dir"
+        },
+        "header": {
+            "closeChat": "Chat schließen",
+            "resize": "Chatgröße ändern"
+        },
+        "tabs": {
+            "assistant": "Fragen",
+            "tasks": "Aufgaben",
+            "routines": "Routinen"
+        },
+        "periods": {
+            "running": "Läuft",
+            "morning": "Heute Morgen",
+            "afternoon": "Heute Nachmittag",
+            "tonight": "Heute Abend",
+            "tomorrow": "Morgen",
+            "week": "Diese Woche",
+            "later": "Später",
+            "paused": "Pausiert"
+        },
+        "routines": {
+            "setupFirst": "Schließe zuerst die Einrichtung ab",
+            "pause": "{name} pausieren",
+            "resume": "{name} fortsetzen",
+            "nameLabel": "Name der Routine",
+            "runningJustNow": "Läuft · <1m",
+            "runningMinutes": "Läuft · {minutes}m",
+            "runningHours": "Läuft · {hours}h",
+            "startsNow": "Startet jetzt",
+            "startsInMinutes": "Startet in {minutes}m",
+            "startsInHours": "Startet in {hours}h"
+        },
+        "agentPicker": {
+            "openTab": "{tab} von {name} öffnen"
+        }
+    },
+    "forms": {
+        "optional": "Optional",
+        "hidePassword": "Passwort verbergen",
+        "showPassword": "Passwort anzeigen",
+        "select": "Auswählen…",
+        "search": "Tippe zum Suchen…",
+        "noResults": "Keine Ergebnisse",
+        "dropFile": "Datei hier ablegen",
+        "remove": "{item} entfernen"
+    },
+    "primitives": {
+        "loading": "Wird geladen",
+        "scrollLeft": "Nach links scrollen",
+        "scrollRight": "Nach rechts scrollen",
+        "carousel": {
+            "previous": "Vorherige {label}",
+            "next": "Nächste {label}",
+            "goTo": "Zu {label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "Anzahl",
+            "totalTokens": "Tokens gesamt",
+            "inputTokens": "Eingabe-Tokens",
+            "outputTokens": "Ausgabe-Tokens",
+            "cachedInputTokens": "Gecachte Tokens",
+            "reasoningTokens": "Reasoning-Tokens",
+            "cost": "Kosten",
+            "avgDurationMs": "Ø Dauer",
+            "errorCount": "Fehler",
+            "errorRate": "Fehlerquote"
+        },
+        "live": "Live",
+        "runStatus": {
+            "running": "Läuft",
+            "done": "Fertig",
+            "error": "Fehler",
+            "cancelled": "Abgebrochen"
+        },
+        "runs": {
+            "emptyTitle": "Noch keine Ausführungen",
+            "emptyDescription": "Jede Ausführung des Coworkers wird hier festgehalten",
+            "steps": "{count, plural, one {# Schritt} other {# Schritte}}",
+            "tokens": "{tokens} Tokens"
+        },
+        "agentStatus": {
+            "idle": "Untätig",
+            "working": "Arbeitet",
+            "error": "Fehler",
+            "waiting_human": "Wartet auf Menschen",
+            "offline": "Offline",
+            "empty": "Keine Coworker zum Anzeigen."
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} Ausführungen",
+                "runSteps": "{count} Ausführungsschritte",
+                "toolCalls": "{count} Tool-Aufrufe",
+                "sessions": "{count} Sitzungen"
+            },
+            "other": "Sonstige",
+            "loading": "Wird geladen...",
+            "noData": "Keine Daten in diesem Zeitraum."
+        },
+        "usage": {
+            "input": "Eingabe",
+            "output": "Ausgabe",
+            "cached": "Gecacht",
+            "cost": "Kosten",
+            "tokens": "Tokens",
+            "totalCost": "Gesamtkosten",
+            "totalTokens": "Tokens gesamt",
+            "runs": "{count, plural, one {# Ausführung} other {# Ausführungen}}",
+            "noUsage": "Keine Nutzung in diesem Zeitraum."
+        }
+    },
+    "inbox": {
+        "title": "Benachrichtigungen",
+        "resize": "Größe der Benachrichtigungen ändern",
+        "close": "Benachrichtigungen schließen",
+        "preferences": "Einstellungen",
+        "preferencesUnavailable": "Einstellungen sind hier nicht verfügbar",
+        "markAllRead": "Alle als gelesen markieren",
+        "nothingToMark": "Nichts als gelesen zu markieren",
+        "markRead": "Als gelesen markieren",
+        "noUpdates": "Keine Neuigkeiten",
+        "pillLabel": "Benachrichtigungen: {summary}",
+        "pillLabelEmpty": "Benachrichtigungen: keine Neuigkeiten",
+        "needsYouCount": "{count, plural, one {# braucht dich} other {# brauchen dich}}",
+        "doneCount": "{count, plural, one {# fertig} other {# fertig}}",
+        "needsYouRich": "{count, plural, one {<b>#</b> braucht dich} other {<b>#</b> brauchen dich}}",
+        "doneRich": "{count, plural, one {<b>#</b> fertig} other {<b>#</b> fertig}}",
+        "newUpdates": "{count, plural, one {<b>#</b> neue Meldung} other {<b>#</b> neue Meldungen}}",
+        "running": "{count, plural, one {<n>#</n> Aufgabe läuft} other {<n>#</n> Aufgaben laufen}}",
+        "empty": {
+            "title": "Nichts zu erledigen",
+            "description": "Wenn ein Coworker dich braucht oder eine Aufgabe abschließt, landet es hier."
+        },
+        "sections": {
+            "needsYou": "Braucht dich",
+            "headsUps": "Hinweise",
+            "errors": "Fehler",
+            "done": "Fertig"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} hat dir eine Frage gestellt",
+            "awaiting_approval": "{agent} braucht deine Freigabe",
+            "awaiting_connector": "{agent} braucht eine verbundene App",
+            "waiting_human": "{agent} wartet auf dich",
+            "awaiting_ack": "{agent} hat etwas für dich markiert",
+            "error": "{agent} ist auf einen Fehler gestoßen",
+            "done": "{agent} hat seine Ausführung beendet"
+        }
+    },
+    "richText": {
+        "bold": "Fett",
+        "italic": "Kursiv",
+        "heading": "Überschrift",
+        "subheading": "Zwischenüberschrift",
+        "bulletList": "Aufzählung",
+        "numberedList": "Nummerierte Liste",
+        "quote": "Zitat",
+        "inlineCode": "Inline-Code",
+        "codeBlock": "Codeblock",
+        "link": "Link",
+        "linkPrompt": "Link-URL"
+    },
+    "theme": {
+        "label": "Design",
+        "options": {
+            "system": "System",
+            "light": "Hell",
+            "dark": "Dunkel"
+        }
+    },
+    "newAgent": {
+        "create": "{name} erstellen",
+        "createCoworker": "Coworker erstellen",
+        "apps": "Apps",
+        "pickedApps": "Apps: {apps}",
+        "or": "Oder",
+        "browseTemplates": "Templates durchsuchen",
+        "job": {
+            "placeholder": "Beschreibe die Aufgabe so, wie du ein Teammitglied briefen würdest.",
+            "label": "Was soll dein neuer Coworker tun?"
+        },
+        "name": {
+            "placeholder": "Gib deinem Coworker einen Namen",
+            "label": "Name des Coworkers"
+        },
+        "forYou": {
+            "heading": "Oder starte mit einem Vorschlag für dich",
+            "closeToIdea": "Nah an deiner Idee",
+            "otherIdeas": "Weitere Ideen"
+        },
+        "appsPicker": {
+            "search": "Apps suchen",
+            "all": "Alle",
+            "empty": "Keine App mit diesem Namen.",
+            "limit": "Bis zu {max} Apps zum Start. Dein Coworker kann später weitere verbinden.",
+            "categories": {
+                "payments": "Zahlungen",
+                "ecommerce": "E-Commerce",
+                "crm": "CRM",
+                "marketing": "Marketing",
+                "seo": "SEO",
+                "analytics": "Analyse",
+                "dev": "Entwicklung",
+                "productivity": "Produktivität",
+                "other": "Sonstige"
+            }
+        },
+        "schedule": {
+            "button": "Zeitplan",
+            "readFromDescription": "Aus deiner Beschreibung übernommen",
+            "onASchedule": "Nach Zeitplan",
+            "custom": "Eigener",
+            "noSchedule": "Kein Zeitplan",
+            "onDemand": "Nur wenn ich frage",
+            "timeOfDay": "Uhrzeit",
+            "presets": {
+                "weekday": {
+                    "label": "Jeden Werktag um 9:00",
+                    "detail": "Montag bis Freitag"
+                },
+                "monday": {
+                    "label": "Jeden Montag um 9:00",
+                    "detail": "Einmal pro Woche"
+                }
+            },
+            "everyDay": "Jeden Tag um {time}",
+            "everyWeekday": "Jeden Werktag um {time}",
+            "everyDays": "Jeden {days} um {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "Coworker-Board",
+        "addBlock": "Auf dieser Seite einen Block hinzufügen",
+        "status": {
+            "idle": "Untätig",
+            "working": "Arbeitet",
+            "error": "Fehler",
+            "offline": "Offline",
+            "waiting_human": "Wartet auf dich",
+            "disabled": "Inaktiv",
+            "paused": "Pausiert",
+            "restoring": "Wird wiederhergestellt"
+        },
+        "countdown": {
+            "seconds": "{count}s",
+            "minutes": "{count}m",
+            "hours": "{count}h",
+            "days": "{count}T"
+        },
+        "untitledBox": "Box ohne Titel",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} other {, # zu erledigen}}{results, plural, =0 {} one {, # neues Ergebnis} other {, # neue Ergebnisse}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "Läuft",
+            "approval": "Braucht dich",
+            "success": "Fertig",
+            "done": "Fertig"
+        },
+        "approve": "Freigeben",
+        "edit": "Bearbeiten"
+    }
+}

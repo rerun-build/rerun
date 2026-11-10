@@ -1,0 +1,86 @@
+{
+    "access": {
+        "boxManage": "Nur ein Admin oder ein Manager dieser Box kann das ändern.",
+        "aiProvidersAdminOnly": "Nur ein Admin kann die KI-Anbieter ändern.",
+        "noManagedBox": "Du brauchst eine Box, die du verwaltest, um einen Coworker hinzuzufügen. Erstelle eine auf {host} oder frag einen Admin.",
+        "boxesFailed": "Wir konnten deine Boxes nicht laden. Versuch es gleich noch einmal.",
+        "noBoxYet": "Dieser Workspace hat noch keine Box. Erstelle eine auf {host}."
+    },
+    "page": {
+        "loadFailed": "Konnte nicht geladen werden. Versuch es gleich noch einmal."
+    },
+    "details": {
+        "back": "Zurück",
+        "more": "Mehr",
+        "delete": "Coworker löschen",
+        "edit": "Bearbeiten",
+        "files": "Dateien",
+        "apps": "Apps",
+        "routines": "Routinen",
+        "computer": "Computer",
+        "notifications": "Benachrichtigungen",
+        "working": "Arbeitet",
+        "idle": "Bereit",
+        "off": "Aus",
+        "none": "Keine",
+        "appsToConnect": "{count} zu verbinden",
+        "appsConnected": "{count} verbunden",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count} aktiv",
+        "renameTitle": "Umbenennen",
+        "save": "Speichern",
+        "renameFailed": "Umbenennen fehlgeschlagen",
+        "deleteTitle": "{name} löschen?",
+        "deleteMessage": "Der Coworker und seine Daten werden dauerhaft gelöscht. Das lässt sich nicht rückgängig machen.",
+        "deleteConfirm": "Löschen",
+        "deleteFailed": "Löschen fehlgeschlagen"
+    },
+    "apps": {
+        "title": "Apps",
+        "status": {
+            "needsSignIn": "Anmeldung nötig",
+            "needsSetup": "Einrichtung nötig",
+            "error": "Fehler"
+        },
+        "connect": "Verbinden",
+        "empty": "Noch keine App.",
+        "askInChat": "Bitte {name} im Chat, eine App hinzuzufügen.",
+        "connectFailed": "{name} konnte nicht verbunden werden"
+    },
+    "files": {
+        "title": "Dateien",
+        "media": "Medien",
+        "docs": "Dokumente",
+        "earlier": "Früher",
+        "thisMonth": "Diesen Monat",
+        "open": "{name} öffnen",
+        "fileFallback": "datei",
+        "noMedia": "Keine Medien",
+        "noDocs": "Keine Dokumente",
+        "emptyHint": "Was {name} erstellt, erscheint hier.",
+        "truncated": "Nur die neuesten Dateien. Alle findest du im Web."
+    },
+    "routines": {
+        "title": "Routinen",
+        "once": "Einmalig, {date}",
+        "webhook": "Webhook",
+        "empty": "Noch keine Routine.",
+        "askInChat": "Bitte {name} im Chat, eine einzurichten.",
+        "turnOnFailed": "{name} konnte nicht aktiviert werden",
+        "turnOffFailed": "{name} konnte nicht deaktiviert werden"
+    },
+    "create": {
+        "title": "Neuer Coworker",
+        "nameLabel": "Name",
+        "namePlaceholder": "Scout",
+        "descriptionLabel": "Was soll er tun?",
+        "descriptionPlaceholder": "Finde Marketingagenturen in Lyon und entwirf eine erste E-Mail an jede",
+        "descriptionHelp": "Seine erste Aufgabe. Er legt sofort los.",
+        "boxLabel": "Box",
+        "submit": "Erstellen",
+        "pausedTitle": "{name} ist pausiert",
+        "pausedMessage": "Dein Plan hat keinen freien Coworker-Platz. Starte Pro auf rerun.build für unbegrenzt viele Coworker.",
+        "failed": "Der Coworker konnte nicht erstellt werden"
+    }
+}

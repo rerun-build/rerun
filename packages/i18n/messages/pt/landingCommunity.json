@@ -1,0 +1,510 @@
+{
+    "metadata": {
+        "layout": {
+            "title": "Especialistas",
+            "description": "Encontre criadores e estúdios de confiança para projetar, lançar e operar seus agentes de IA no Rerun."
+        },
+        "directory": {
+            "title": "Contrate os melhores especialistas em IA",
+            "description": "Trabalhe com criadores, freelancers e estúdios avaliados que projetam, lançam e operam agentes de IA que entregam de verdade. Encontre especialistas Rerun por skill e localização."
+        },
+        "program": {
+            "title": "Seja um especialista Rerun",
+            "description": "Entre no Rerun Expert Program: apareça no diretório, crie agentes para clientes em um sandbox grátis, fique com 95% das vendas de templates e ganhe 20% recorrentes."
+        }
+    },
+    "jsonLd": {
+        "home": "Início",
+        "experts": "Especialistas"
+    },
+    "directory": {
+        "eyebrow": "{count, plural, one {# especialista avaliado} other {# especialistas avaliados}}",
+        "title": "Encontre seu especialista em IA",
+        "description": "Criadores e estúdios avaliados que montam seus sistemas mais complexos, com Coworkers ligados a cada ferramenta e processo do seu negócio.",
+        "joinAside": "Junte-se aos especialistas já listados no Rerun",
+        "becomeExpert": "Seja um especialista",
+        "featured": {
+            "label": "Destaques",
+            "title": "Os especialistas que valem a primeira ligação.",
+            "carousel": "especialistas em destaque"
+        },
+        "grid": {
+            "allLabel": "Todos os especialistas",
+            "resultsLabel": "Resultados",
+            "title": "{count, plural, one {# criador avaliado.} other {# criadores e estúdios avaliados.}}",
+            "clear": "Limpar filtros",
+            "empty": "Nenhum especialista com esses filtros."
+        }
+    },
+    "filters": {
+        "facets": {
+            "type": {
+                "label": "Tipo",
+                "search": "Buscar tipos"
+            },
+            "availability": {
+                "label": "Disponibilidade",
+                "search": "Buscar disponibilidades"
+            },
+            "budget": {
+                "label": "Orçamento",
+                "search": "Buscar orçamentos"
+            },
+            "skill": {
+                "label": "Skill",
+                "search": "Buscar skills"
+            },
+            "language": {
+                "label": "Idioma",
+                "search": "Buscar idiomas"
+            }
+        },
+        "types": {
+            "studio": "Estúdio",
+            "freelancer": "Freelancer",
+            "expert": "Especialista"
+        },
+        "availabilities": {
+            "available": "Disponível",
+            "soon": "Disponível em breve",
+            "unavailable": "Indisponível"
+        },
+        "segment": "{label}: {value}",
+        "any": "qualquer",
+        "clear": "Limpar",
+        "noResults": "Nenhum resultado",
+        "skills": {
+            "agent-design": "Design de agentes",
+            "workflow-automation": "Automação de fluxos",
+            "rag-knowledge-bases": "RAG e bases de conhecimento",
+            "integrations-apis": "Integrações e APIs",
+            "mcp-servers": "Servidores MCP",
+            "prompt-engineering": "Engenharia de prompt",
+            "data-pipelines": "Pipelines de dados",
+            "chatbots-support": "Chatbots e suporte",
+            "voice-agents": "Agentes de voz",
+            "lead-gen-outreach": "Geração de leads e prospecção",
+            "crm-automation": "Automação de CRM",
+            "web-scraping": "Web scraping",
+            "e-commerce-automation": "Automação de e-commerce",
+            "analytics-reporting": "Análises e relatórios",
+            "fine-tuning": "Fine-tuning",
+            "no-code-automation": "Automação no-code"
+        }
+    },
+    "card": {
+        "hire": "Contratar"
+    },
+    "hire": {
+        "title": "Trabalhe com {name}",
+        "description": "Conte sobre seu projeto. A resposta vem direto por e-mail.",
+        "fields": {
+            "name": "Seu nome",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "E-mail",
+            "emailPlaceholder": "voce@empresa.com",
+            "website": "Site da empresa",
+            "message": "Mensagem",
+            "messagePlaceholder": "O que você está construindo e com o que precisa de ajuda?"
+        },
+        "submit": "Enviar pedido",
+        "sending": "Enviando...",
+        "sent": {
+            "title": "Pedido enviado",
+            "description": "{name} vai responder por e-mail. Geralmente em até 24 horas.",
+            "close": "Fechar"
+        },
+        "validation": {
+            "nameRequired": "O nome é obrigatório",
+            "emailRequired": "O e-mail é obrigatório",
+            "emailInvalid": "E-mail inválido",
+            "urlProtocol": "Deve começar com http:// ou https://",
+            "messageTooShort": "Conte um pouco mais sobre seu projeto",
+            "messageTooLong": "A mensagem é longa demais"
+        },
+        "errors": {
+            "unavailable": "Este especialista não está mais disponível.",
+            "invalid": "Confira o formulário e tente de novo.",
+            "failed": "Algo deu errado. Tente de novo."
+        }
+    },
+    "program": {
+        "hero": {
+            "eyebrow": "Programa de especialistas",
+            "title": "Entre no <mark></mark>Rerun Expert Program",
+            "promises": {
+                "listed": "Apareça no diretório de especialistas e seja indicado a clientes",
+                "workspace": "Ganhe um workspace grátis para criar tudo o que quiser",
+                "templates": "Crie ou importe Coworkers, venda-os como templates e fique com 95% de cada venda",
+                "revenue": "Ganhe 20% recorrentes em cada plano de cliente que você trouxer"
+            },
+            "findExpert": "Encontrar um especialista",
+            "joined": "Junte-se aos especialistas já listados no Rerun"
+        },
+        "showcase": {
+            "label": "O diretório",
+            "title": "Esteja entre os melhores talentos.",
+            "lede": "Quem já está listado no Rerun, e o perfil que os clientes veem antes de entrar em contato.",
+            "carousel": "Especialistas Rerun",
+            "browseAll": "Ver todos os especialistas"
+        },
+        "cta": {
+            "label": "Programa de especialistas",
+            "title": "Seja um especialista Rerun",
+            "subtitle": "Candidate-se uma vez. Analisamos cada candidatura à mão e respondemos por e-mail com o próximo passo."
+        },
+        "valueProps": {
+            "badge": "Por que o Rerun",
+            "title": "Por que freelancers e estúdios constroem no Rerun.",
+            "subtitle": "Você entrega o Coworker, o cliente o mantém rodando. Nenhuma infraestrutura para alugar, nenhum documento de passagem que ninguém lê.",
+            "cells": {
+                "ship": {
+                    "title": "Entregue em dias, não em meses",
+                    "desc": "Comece com Coworkers prontos para rodar e mais de {connectorCount} apps, um clique cada. Nada para provisionar antes da primeira demo."
+                },
+                "harness": {
+                    "title": "Construa o harness, não só o prompt",
+                    "desc": "Escolha exatamente o que o Coworker pode fazer: arquivos, shell, web, memória, seu próprio banco de dados, skills. Cada capacidade é um botão."
+                },
+                "board": {
+                    "title": "Entregue um quadro ao vivo, não um log de chat",
+                    "desc": "Execuções, custo, taxa de sucesso e o que precisa de uma pessoa, ao vivo no quadro. Seu cliente vê o trabalho acontecendo sem pedir status para você."
+                },
+                "handoff": {
+                    "title": "Entregue sem ficar segurando a mão",
+                    "desc": "Antes de qualquer ação sensível, o Coworker para e pergunta ao seu cliente. Ele aprova pelo app ou pelo Slack, então você não fica no circuito para sempre."
+                },
+                "running": {
+                    "title": "Continua rodando depois que você sai",
+                    "desc": "Os Coworkers rodam 24/7 na máquina do próprio cliente, por agenda ou por gatilho. Sem babá, sem ligação de emergência às 2h."
+                },
+                "improving": {
+                    "title": "O Coworker que você vendeu continua melhorando",
+                    "desc": "Ele anota o que aprende sobre o cliente, então o trabalho que você entregou fica mais afiado sozinho em vez de envelhecer mal."
+                }
+            }
+        },
+        "benefits": {
+            "badge": "O que você ganha",
+            "title": "Cresça mais rápido como especialista Rerun.",
+            "subtitle": "Uma candidatura, quatro formas de ser pago pelo trabalho que você já faz.",
+            "items": {
+                "listed": {
+                    "title": "Apareça no diretório de especialistas",
+                    "desc": "Um perfil público que os clientes navegam, filtram por skill e orçamento e contatam em um clique. Cada briefing que chega cai direto na sua caixa de entrada."
+                },
+                "sandbox": {
+                    "title": "Crie de graça no seu sandbox",
+                    "desc": "Contas de especialista ganham um sandbox sem limite de Coworkers e sem fatura. Prototipe, faça a demo e entregue o Coworker pronto ao cliente."
+                },
+                "templates": {
+                    "title": "Fique com 95% das vendas de templates",
+                    "desc": "Transforme um Coworker em template, publique no marketplace e receba a cada instalação. Você define o preço, fica com 95% de cada venda, e nós cuidamos do repasse."
+                },
+                "revenue": {
+                    "title": "Ganhe 20% de cada cliente que você trouxer",
+                    "desc": "Quando um cliente que você trouxe assina, você ganha 20% do plano Rerun dele, todo mês, enquanto ele ficar."
+                }
+            }
+        },
+        "perks": {
+            "badge": "Vantagem de especialista",
+            "title": "O que todo especialista Rerun ganha.",
+            "subtitle": "Um único nível, nada de pontos para acumular. Veja o que muda no dia em que sua candidatura é aceita.",
+            "regular": {
+                "title": "Conta comum",
+                "subtitle": "Qualquer usuário do Rerun"
+            },
+            "expert": {
+                "title": "Especialista Rerun",
+                "subtitle": "Aceito no programa"
+            },
+            "rows": {
+                "directory": {
+                    "label": "Presença no diretório",
+                    "regular": "Fora do diretório, clientes não encontram você",
+                    "expert": "Um perfil público, indexado e filtrável pelos clientes"
+                },
+                "matching": {
+                    "label": "Indicação de clientes",
+                    "regular": "Você mesmo busca seus leads",
+                    "expert": "Briefings recebidos e direcionados a você por skill e orçamento"
+                },
+                "sandbox": {
+                    "label": "Sandbox",
+                    "regular": "Limite de Coworkers e uma fatura em cada workspace",
+                    "expert": "Ilimitado e grátis, para criar e demonstrar Coworkers de clientes"
+                },
+                "marketplace": {
+                    "label": "Marketplace de templates",
+                    "regular": "Navegar e instalar templates",
+                    "expert": "Publique seus Coworkers e fique com 95% de cada venda"
+                },
+                "revenue": {
+                    "label": "Divisão de receita",
+                    "regular": "Nenhuma",
+                    "expert": "20% recorrentes nos planos dos clientes que você trouxer"
+                },
+                "community": {
+                    "label": "Comunidade",
+                    "regular": "Documentação e a caixa de suporte compartilhada",
+                    "expert": "Um canal privado e uma linha direta com a equipe"
+                },
+                "earlyAccess": {
+                    "label": "Acesso antecipado",
+                    "regular": "Recursos quando são lançados ao público",
+                    "expert": "Novos recursos e modelos antes do lançamento público"
+                },
+                "coMarketing": {
+                    "label": "Co-marketing",
+                    "regular": "Nenhum",
+                    "expert": "Perfis em destaque, estudos de caso e apoio nos lançamentos"
+                }
+            }
+        },
+        "apply": {
+            "button": "Quero ser especialista",
+            "sent": {
+                "title": "Candidatura recebida",
+                "description": "Analisamos cada candidatura à mão. Se combinar, você recebe um e-mail com um link para ativar sua conta de criador e seu sandbox.",
+                "close": "Fechar"
+            },
+            "title": "Candidate-se ao Expert Program",
+            "description": "Conte quem você é. Respondemos por e-mail com o próximo passo.",
+            "fields": {
+                "name": "Nome ou estúdio",
+                "namePlaceholder": "Ada Lovelace",
+                "email": "E-mail",
+                "emailPlaceholder": "voce@estudio.com",
+                "type": "Você trabalha como",
+                "location": "Localização",
+                "locationPlaceholder": "São Paulo, Brasil",
+                "website": "Site ou portfólio",
+                "linkedin": "LinkedIn",
+                "x": "X"
+            },
+            "types": {
+                "freelancer": "Freelancer",
+                "studio": "Estúdio"
+            },
+            "submit": "Enviar candidatura",
+            "sending": "Enviando...",
+            "validation": {
+                "nameRequired": "O nome é obrigatório",
+                "emailRequired": "O e-mail é obrigatório",
+                "emailInvalid": "E-mail inválido",
+                "locationTooLong": "A localização é longa demais",
+                "urlProtocol": "Deve começar com http:// ou https://"
+            },
+            "errors": {
+                "alreadyApplied": "Este e-mail já está registrado. Vamos responder em breve.",
+                "invalid": "Confira o formulário e tente de novo.",
+                "failed": "Algo deu errado. Tente de novo."
+            }
+        }
+    },
+    "visuals": {
+        "harness": {
+            "capabilities": {
+                "filesystem": {
+                    "label": "Ler e gravar arquivos",
+                    "blurb": "Trabalha com arquivos do seu workspace"
+                },
+                "shell": {
+                    "label": "Executar comandos",
+                    "blurb": "Executa comandos na sua Box"
+                },
+                "web": {
+                    "label": "Navegar na web",
+                    "blurb": "Busca e lê páginas da web"
+                },
+                "memory": {
+                    "label": "Lembrar das coisas",
+                    "blurb": "Salva e recupera informações"
+                },
+                "db": {
+                    "label": "Acessar dados",
+                    "blurb": "Consulta seu banco de dados"
+                },
+                "skills": {
+                    "label": "Usar skills",
+                    "blurb": "Executa as skills instaladas"
+                },
+                "self": {
+                    "label": "Melhorar a si mesmo",
+                    "blurb": "Ajusta a própria configuração"
+                },
+                "schedule": {
+                    "label": "Agendar tarefas",
+                    "blurb": "Planeja trabalho para depois"
+                },
+                "callAgent": {
+                    "label": "Trabalhar com outros coworkers",
+                    "blurb": "Delega a colegas"
+                },
+                "askUser": {
+                    "label": "Fazer perguntas a você",
+                    "blurb": "Pausa para perguntar com opções de resposta"
+                },
+                "requestApproval": {
+                    "label": "Pedir aprovação",
+                    "blurb": "Pausa até você dar o sinal verde"
+                }
+            }
+        },
+        "hitl": {
+            "agent": "Margo · Cobrança de faturas",
+            "question": "Duas faturas da acme.com estão 20 dias atrasadas. Como devo cobrá-las?",
+            "options": {
+                "remind": "Enviar um lembrete firme para billing@acme.com",
+                "call": "Ligar antes para o financeiro",
+                "escalate": "Escalar para o responsável pela conta"
+            },
+            "approval": {
+                "action": "Margo quer enviar um reembolso de $230 para acme.com",
+                "detail": "Fatura #1042 · cobrança contestada"
+            },
+            "permission": {
+                "label": "Enviar e-mail",
+                "message": "Enviar o lembrete de pagamento para billing@acme.com",
+                "preview": "Assunto: Fatura #1042: pagamento em atraso\n\nOlá, a fatura #1042 ($230) venceu em 20 de agosto."
+            },
+            "resume": {
+                "question": "Ligando para o contato do financeiro · lembrete na fila",
+                "approval": "Reembolso enviado · cliente avisado",
+                "permission": "E-mail enviado para billing@acme.com"
+            }
+        },
+        "monitor": {
+            "runs": {
+                "title": "Execuções hoje",
+                "subtitle": "Ao vivo"
+            },
+            "status": {
+                "title": "Status dos coworkers",
+                "subtitle": "{count} trabalhando agora"
+            },
+            "tokens": {
+                "title": "Tokens usados",
+                "subtitle": "Últimos 7 dias"
+            },
+            "success": {
+                "title": "Taxa de sucesso",
+                "subtitle": "Últimas 24h"
+            },
+            "logs": {
+                "title": "Logs de execução",
+                "subtitle": "Jules · Vendas inbound"
+            },
+            "revenue": {
+                "title": "Receita fechada",
+                "subtitle": "Este mês"
+            },
+            "agents": {
+                "a1": "Jules · Vendas inbound",
+                "a2": "Margo · Cobrança de faturas",
+                "a3": "Sam · Triagem do e-mail",
+                "a4": "Nora · Suporte",
+                "a5": "Leo · Relatórios"
+            }
+        },
+        "triggers": {
+            "listening": "ouvindo",
+            "status": {
+                "triggered": "acionado",
+                "running": "rodando",
+                "done": "concluído"
+            },
+            "events": {
+                "morning": {
+                    "source": "Toda manhã às 7:00",
+                    "action": "Sam organizou seu e-mail"
+                },
+                "lead": {
+                    "source": "Novo e-mail de um lead",
+                    "action": "Jules está escrevendo uma resposta"
+                },
+                "payment": {
+                    "source": "Um pagamento acabou de falhar",
+                    "action": "Margo está cobrando"
+                },
+                "signup": {
+                    "source": "Novo cadastro",
+                    "action": "Onboarding iniciado"
+                },
+                "meeting": {
+                    "source": "Uma reunião acabou de terminar",
+                    "action": "Sam está escrevendo o resumo"
+                }
+            }
+        },
+        "memory": {
+            "files": "{count, plural, one {arquivo} other {arquivos}}",
+            "updated": "atualizado agora",
+            "kinds": {
+                "skill": "skill",
+                "context": "contexto",
+                "preference": "preferência"
+            },
+            "cards": {
+                "invoiceChasing": {
+                    "name": "Cobrança de faturas",
+                    "description": "Cobrar faturas atrasadas sem desgastar o cliente.",
+                    "lines": {
+                        "1": "## Procedimento",
+                        "2": "1. Puxar as faturas em aberto do Stripe todo dia",
+                        "3": "2. Enviar um primeiro lembrete 7 dias após o vencimento",
+                        "4": "3. Escalar para o responsável pela conta após 2 tentativas",
+                        "5": "4. Registrar cada contato no histórico do CRM",
+                        "6": "## Exceções",
+                        "7": "- Nunca cobrar uma fatura abaixo de $50",
+                        "8": "- Ler references/tone.md antes de escalar"
+                    }
+                },
+                "acme": {
+                    "name": "Acme Corp",
+                    "description": "O que o coworker sabe sobre a conta.",
+                    "lines": {
+                        "1": "## Cobrança",
+                        "2": "- Paga por volta do dia 30, às vezes depois",
+                        "3": "- Toda fatura exige um número de pedido de compra",
+                        "4": "- As faturas vão para ap@acme.co, não para a Dana",
+                        "5": "## Pessoas",
+                        "6": "- Dana Reyes cuida das operações, responde em um dia",
+                        "7": "- Escalonamentos passam pelo COO"
+                    }
+                },
+                "emailTone": {
+                    "name": "Tom dos e-mails",
+                    "description": "Como o usuário quer que os leads sejam abordados.",
+                    "lines": {
+                        "1": "## Voz",
+                        "2": "- Inglês, formal, sem emoji",
+                        "3": "- Assinar como o fundador, não como assistente",
+                        "4": "- Menos de 120 palavras",
+                        "5": "## Momento",
+                        "6": "- Fazer follow-up duas vezes e parar",
+                        "7": "- Enviar assim que o rascunho estiver pronto"
+                    }
+                }
+            },
+            "rounds": {
+                "confirmed": {
+                    "label": "Confirmado",
+                    "text": "A Acme pagou no dia 44 de novo",
+                    "after": "- Paga em 45 dias, confirmado em 3 faturas"
+                },
+                "preference": {
+                    "label": "Preferência",
+                    "text": "Nunca mandar e-mail a um cliente antes das 9h",
+                    "after": "- Nunca enviar antes das 9h, no horário local dele"
+                },
+                "learned": {
+                    "label": "Aprendido",
+                    "text": "Escalonamentos da Acme passam pelo COO",
+                    "after": "3. Escalar para o COO após 2 tentativas"
+                }
+            }
+        }
+    }
+}

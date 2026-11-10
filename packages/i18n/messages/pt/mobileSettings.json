@@ -1,0 +1,109 @@
+{
+    "preferences": {
+        "title": "Preferências",
+        "close": "Fechar",
+        "yourAccount": "Sua conta",
+        "workspace": "Workspace",
+        "aiProviders": "Provedores de IA",
+        "appearance": "Aparência",
+        "appearanceSystem": "Sistema",
+        "appearanceLight": "Claro",
+        "appearanceDark": "Escuro",
+        "coworkers": "Coworkers",
+        "groupRecent": "Recentes",
+        "groupByBox": "Por Box",
+        "language": "Idioma",
+        "notifications": "Notificações",
+        "pushOff": "Push desativado",
+        "support": "Suporte",
+        "contactSupport": "Falar com o suporte",
+        "privacy": "Política de Privacidade",
+        "terms": "Termos de Serviço",
+        "about": "Sobre",
+        "version": "Versão",
+        "environment": "Ambiente",
+        "signOut": "Sair",
+        "deleteAccount": "Excluir conta",
+        "server": "Servidor"
+    },
+    "notifications": {
+        "title": "Notificações",
+        "saveFailed": "Não foi possível salvar",
+        "tryAgainShortly": "Tente de novo em instantes.",
+        "loadFailed": "Não foi possível carregar suas configurações. Tente de novo em instantes.",
+        "push": {
+            "label": "Notificações push",
+            "off": "Desativadas",
+            "turnOn": "Ativar",
+            "openIosSettings": "Abrir Ajustes do iOS",
+            "footnote": "Nada abaixo chega a este iPhone até o push ser ativado."
+        },
+        "scopeTitle": "Me avisar sobre",
+        "recommended": "Recomendado",
+        "scopes": {
+            "everything": {
+                "label": "Tudo",
+                "detail": "Cada execução do workspace, não importa quem a iniciou."
+            },
+            "mine": {
+                "label": "Minhas execuções e o que sigo",
+                "detail": "Execuções que inicio, conversas em que estou, coworkers que sigo."
+            },
+            "needed": {
+                "label": "Só quando precisam de mim",
+                "detail": "Perguntas, aprovações e erros nas minhas execuções. Uma execução concluída fica em silêncio."
+            },
+            "nothing": {
+                "label": "Nada",
+                "detail": "Eu mesmo confiro a caixa de entrada."
+            }
+        },
+        "email": {
+            "label": "E-mail",
+            "footnote": "Quando precisam de você enquanto está fora. Um e-mail por incidente, nunca um por execução."
+        },
+        "perCoworker": {
+            "title": "Por coworker",
+            "add": "Adicionar coworker",
+            "pickTitle": "Cada execução deste coworker chega até você",
+            "cancel": "Cancelar",
+            "empty": "Todos os coworkers seguem a regra acima.",
+            "detail": "Também ajustável nos detalhes de cada coworker.",
+            "rowLabel": "{name}, {value}",
+            "followsTasks": "Segue as tarefas",
+            "yourSetting": "Sua configuração"
+        },
+        "accountEmails": {
+            "title": "E-mails da conta",
+            "billing": "Teste e cobrança",
+            "product": "Novidades do produto"
+        },
+        "modes": {
+            "default": {
+                "label": "Padrão",
+                "hint": "Segue sua configuração."
+            },
+            "everything": {
+                "label": "Toda a atividade",
+                "hint": "Cada execução, não importa quem a iniciou."
+            },
+            "muted": {
+                "label": "Silenciado",
+                "hint": "Nada. O quadro continua mostrando."
+            }
+        },
+        "coworker": {
+            "title": "Me avisar sobre {name}",
+            "yourSetting": "Sua configuração",
+            "quotedScope": "“{scope}”",
+            "follow": "Seguir as tarefas agendadas",
+            "nothingScheduled": "Nada agendado ainda.",
+            "scheduled": "{count} agendadas, chegam até você como suas próprias execuções.",
+            "reachYou": "Chegam até você como suas próprias execuções.",
+            "tasksTitle": "Tarefas agendadas",
+            "tasksFailed": "Não foi possível carregar as tarefas. Tente de novo em instantes.",
+            "taskSwitch": "Me avisar sobre {name}",
+            "muted": "{name} está silenciado."
+        }
+    }
+}

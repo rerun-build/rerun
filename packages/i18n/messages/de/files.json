@@ -1,0 +1,96 @@
+{
+    "detail": {
+        "readOnly": "Diese Datei ist schreibgeschützt",
+        "stillLoading": "Datei wird noch geladen",
+        "previousFile": "Vorherige Datei",
+        "nextFile": "Nächste Datei",
+        "editNotText": "Hier lassen sich nur Textdateien bearbeiten.",
+        "editTruncated": "Diese Datei hat mehr als {limit} Zeichen und kann hier nicht bearbeitet werden. Lade sie herunter oder bitte den Coworker, sie zu bearbeiten.",
+        "editBinary": "Diese Datei ist kein Text, eine Bearbeitung hier würde sie beschädigen."
+    },
+    "actions": {
+        "truncated": "Gekürzt",
+        "edit": "Bearbeiten",
+        "download": "Herunterladen",
+        "deleteFile": "Datei löschen"
+    },
+    "delete": {
+        "title": "{name} löschen?",
+        "file": "Die Datei wird von der Box gelöscht. Das lässt sich nicht rückgängig machen.",
+        "folder": "Der Ordner und sein gesamter Inhalt werden von der Box gelöscht. Das lässt sich nicht rückgängig machen."
+    },
+    "editor": {
+        "unsaved": "Nicht gespeichert",
+        "close": "Editor schließen",
+        "cancel": "Abbrechen",
+        "noChanges": "Keine Änderungen zu speichern",
+        "save": "Änderungen speichern",
+        "conflictTitle": "{name} wurde auf der Box geändert",
+        "conflictDescription": "Jemand oder ein Coworker hat in diese Datei geschrieben, nachdem du sie geöffnet hast. Wenn du jetzt speicherst, ersetzt deine Version die andere.",
+        "overwrite": "Überschreiben",
+        "keepTheirs": "Andere behalten",
+        "discardTitle": "Änderungen verwerfen?",
+        "discardDescription": "Deine Änderungen an {name} sind noch nicht gespeichert. Wenn du den Editor schließt, gehen sie verloren.",
+        "discard": "Änderungen verwerfen",
+        "keepEditing": "Weiter bearbeiten"
+    },
+    "preview": {
+        "noPreview": "Für diesen Dateityp ist keine Vorschau verfügbar",
+        "download": "Herunterladen",
+        "readFailed": "Diese Datei konnte nicht gelesen werden"
+    },
+    "publish": {
+        "publish": "Veröffentlichen",
+        "publishPublicly": "Öffentlich teilen",
+        "publishedLink": "Veröffentlichter Link",
+        "publicLink": "Öffentlicher Link",
+        "open": "Öffnen",
+        "openPublicLink": "Öffentlichen Link öffnen",
+        "copyLink": "Link kopieren",
+        "copyPublicLink": "Öffentlichen Link kopieren",
+        "shareSettings": "Freigabe-Einstellungen",
+        "unpublish": "Zurückziehen",
+        "unshare": "Nicht mehr teilen",
+        "unpublishTitle": "{name} zurückziehen?",
+        "unshareTitle": "{name} nicht mehr teilen?",
+        "unpublishDescription": "Der Link funktioniert sofort nicht mehr, für alle, die ihn haben.",
+        "unshareDescription": "Der öffentliche Link funktioniert sofort nicht mehr. Wer ihn hat, bekommt einen 404."
+    },
+    "empty": {
+        "title": "Leerer Ordner",
+        "goUp": "Eine Ebene höher"
+    },
+    "grid": {
+        "parentDirectory": "Übergeordneter Ordner",
+        "openFolder": "Ordner öffnen",
+        "open": "Öffnen",
+        "download": "Herunterladen",
+        "rename": "Umbenennen",
+        "delete": "Löschen",
+        "published": "Veröffentlicht"
+    },
+    "list": {
+        "newName": "Neuer Name",
+        "dropHere": "Dateien oder Ordner zum Hochladen hier ablegen",
+        "name": "Name",
+        "size": "Größe",
+        "type": "Typ",
+        "empty": "Noch nichts hier. Alles, was ein Coworker für den ganzen Workspace herunterlädt, erstellt oder bearbeitet, landet in diesem Ordner, genau wie alles, was du auf dieser Seite ablegst.",
+        "actionsFor": "Aktionen für {name}",
+        "folder": "Ordner",
+        "file": "Datei"
+    },
+    "uploadOutcome": {
+        "allFailed": "Upload fehlgeschlagen",
+        "someFailed": "{failed} von {total, plural, one {# Datei} other {# Dateien}} konnten nicht hochgeladen werden",
+        "uploaded": "{count, plural, one {# Datei} other {# Dateien}} hochgeladen",
+        "sessionExpired": "Sitzung abgelaufen. Lade die Seite neu und versuch es erneut.",
+        "tooLarge": "Diese Datei ist zu groß zum Hochladen.",
+        "retryLater": "Upload fehlgeschlagen. Gleich erneut versuchen.",
+        "networkFailed": "Upload fehlgeschlagen. Prüfe deine Verbindung und versuch es erneut.",
+        "oversized": "{names}{more, plural, =0 {} one { und # weitere} other { und # weitere}} {count, plural, one {ist} other {sind}} größer als das Limit von {limit} MB.",
+        "machineUpdating": "Die Maschine dieses Workspace wurde gerade aktualisiert. Versuch den Upload erneut.",
+        "engineUpdateNeeded": "Dieser Workspace läuft auf einer Maschine, die ein Engine-Update braucht, um Dateien über {limit} MB anzunehmen. Sie aktualisiert sich selbst, versuch es also in ein paar Minuten noch einmal.",
+        "machineUnreachable": "{name} konnte nicht hochgeladen werden. Deine Maschine ist möglicherweise nicht erreichbar."
+    }
+}

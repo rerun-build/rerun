@@ -29,7 +29,7 @@ const personalTeam = process.env.RERUN_PERSONAL_TEAM === '1'
 
 // The languages iOS offers in the app's own settings, and the permission prompts in each of them. The
 // English prompts of app.json stay the default for any other language.
-const APP_LANGUAGES = ['en', 'fr', 'es'] as const
+const APP_LANGUAGES = ['en', 'fr', 'es', 'pt-BR', 'de'] as const
 
 function withLanguages(config: ConfigContext['config']): ConfigContext['config'] {
     return {

@@ -1,0 +1,21 @@
+{
+    "price": {
+        "free": "Kostenlos",
+        "monthly": "{amount}/Monat",
+        "useForFree": "Kostenlos nutzen",
+        "hire": "{count, plural, one {Diesen Coworker einstellen · {price}} other {Diese # Coworker einstellen · {price}}}",
+        "hireCard": "Einstellen · {price}"
+    },
+    "categories": {
+        "agencies": "Agenturen",
+        "ecommerce": "E-Commerce",
+        "saas": "SaaS",
+        "sales": "Vertrieb",
+        "recruiting": "Recruiting",
+        "real-estate": "Immobilien",
+        "legal": "Recht & Compliance",
+        "creators": "Creator",
+        "productivity": "Produktivität",
+        "other": "Sonstiges"
+    }
+}

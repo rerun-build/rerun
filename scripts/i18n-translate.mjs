@@ -34,7 +34,9 @@ const MODEL = 'claude-sonnet-5-5'
 const INPUT_USD_PER_TOKEN = 2 / 1_000_000
 const OUTPUT_USD_PER_TOKEN = 10 / 1_000_000
 const BATCH_SIZE = 60
-const LANGUAGE_NAMES = { fr: 'French', es: 'Spanish', de: 'German', it: 'Italian', pt: 'Portuguese', nl: 'Dutch' }
+// Pack files translated at once: a new language is ~160 calls, too long one after the other.
+const CONCURRENT_JOBS = 6
+const LANGUAGE_NAMES = { fr: 'French', es: 'Spanish', de: 'German', it: 'Italian', pt: 'Brazilian Portuguese', nl: 'Dutch' }
 
 function readArgs(argv) {
     const args = { locales: [], namespaces: [], accept: false, dryRun: false, maxUsd: 20 }
@@ -207,17 +209,24 @@ else {
     if (args.dryRun) process.exit(0)
 
     const client = new Anthropic()
-    for (const job of work) {
-        const translated = { ...job.translated }
-        for (const keys of chunk(job.keys, BATCH_SIZE)) Object.assign(translated, await translateBatch(client, job, keys))
-        const kept = Object.fromEntries(Object.entries(translated).filter(([key]) => job.source[key] !== undefined))
-        writeNamespace(job.locale, job.ns, unflattenLike(job.tree, kept))
-        lock[job.locale] ??= {}
-        for (const key of job.keys) lock[job.locale][`${job.ns}.${key}`] = hashOf(job.source[key])
-        console.log(`  wrote ${job.locale}/${job.ns}.json`)
+    const queue = [...work]
+    const translateNext = async () => {
+        for (let job = queue.shift(); job; job = queue.shift()) await translateJob(client, job)
     }
+    await Promise.all(Array.from({ length: CONCURRENT_JOBS }, translateNext))
     pruneLock()
     writeLock(lock)
     writeIndexes()
     console.log('Done. Run pnpm i18n:check.')
+}
+
+async function translateJob(client, job) {
+    const translated = { ...job.translated }
+    for (const keys of chunk(job.keys, BATCH_SIZE)) Object.assign(translated, await translateBatch(client, job, keys))
+    const kept = Object.fromEntries(Object.entries(translated).filter(([key]) => job.source[key] !== undefined))
+    writeNamespace(job.locale, job.ns, unflattenLike(job.tree, kept))
+    lock[job.locale] ??= {}
+    for (const key of job.keys) lock[job.locale][`${job.ns}.${key}`] = hashOf(job.source[key])
+    writeLock(lock)
+    console.log(`  wrote ${job.locale}/${job.ns}.json`)
 }

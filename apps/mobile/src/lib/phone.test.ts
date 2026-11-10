@@ -25,6 +25,15 @@ describe('phone helpers', () => {
     it('names the countries in the language of the app', () => {
         expect(countryByCode('DE', 'fr').name).toBe('Allemagne')
         expect(searchCountries('alema', 'es').map(country => country.code)).toContain('DE')
+        expect(searchCountries('alema', 'pt').map(country => country.code)).toContain('DE')
+        expect(countryByCode('FR', 'de').name).toBe('Frankreich')
+    })
+
+    it('names the countries the Brazilian way, not the European one the ISO table ships', () => {
+        expect(countryByCode('IR', 'pt').name).toBe('Irã')
+        expect(countryByCode('CD', 'pt').name).toBe('República Democrática do Congo')
+        expect(searchCountries('estôn', 'pt').map(country => country.code)).toContain('EE')
+        expect(searchCountries('irão', 'pt')).toHaveLength(0)
     })
 
     it('finds a country by name, by calling code or by its code', () => {

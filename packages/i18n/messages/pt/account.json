@@ -1,0 +1,89 @@
+{
+    "title": "Conta",
+    "tabs": {
+        "profile": {
+            "label": "Perfil",
+            "description": "Sua foto e seu nome, como seus colegas os veem."
+        },
+        "signIn": {
+            "label": "Login",
+            "description": "As formas de entrar nesta conta."
+        },
+        "language": {
+            "label": "Idioma",
+            "description": "O idioma que o Rerun usa com você."
+        },
+        "delete": {
+            "label": "Excluir conta",
+            "description": "Encerrar sua conta Rerun de vez."
+        }
+    },
+    "language": {
+        "field": "Idioma",
+        "automatic": "Automático",
+        "automaticHint": "Segue seu navegador: {language}.",
+        "failed": "Não foi possível mudar o idioma. Tente de novo."
+    },
+    "profile": {
+        "photo": "Foto",
+        "photoHelp": "Visível para seus colegas, ao lado das suas mensagens e do seu cursor.",
+        "dropPhoto": "Solte sua foto",
+        "changePhoto": "Trocar foto",
+        "uploadPhoto": "Enviar foto",
+        "removePhoto": "Remover",
+        "name": "Nome",
+        "namePlaceholder": "ex.: Ada Lovelace",
+        "save": "Salvar",
+        "notAnImage": "Escolha um arquivo de imagem.",
+        "nameUpdated": "Nome atualizado",
+        "failed": "Algo deu errado. Tente de novo."
+    },
+    "signIn": {
+        "email": {
+            "title": "E-mail",
+            "empty": "Não conectado. Adicione um para entrar com um código enviado à sua caixa de entrada."
+        },
+        "phone": {
+            "title": "Telefone",
+            "empty": "Não conectado. Adicione um número para entrar com um código por WhatsApp ou SMS.",
+            "otherAccount": "Este número entra em outra conta Rerun. Troque-o para entrar aqui por telefone."
+        },
+        "change": "Trocar",
+        "add": "Adicionar",
+        "connect": "Conectar",
+        "disconnect": "Desconectar",
+        "connected": "Conectado",
+        "notConnected": "Não conectado.",
+        "onlyMethod": "{provider} é o único método de login conectado a esta conta.",
+        "disconnectTitle": "Desconectar {provider}?",
+        "disconnectDescription": "Você não poderá mais entrar nesta conta com {provider}. Seus outros métodos de login continuam funcionando.",
+        "linkError": {
+            "identityTaken": "Esta conta {provider} já entra em outra conta Rerun.",
+            "denied": "{provider} não foi conectado.",
+            "failed": "Não foi possível conectar {provider}. Tente de novo."
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "Workspaces compartilhados",
+                "description": "Você sai de todo workspace que compartilha com colegas. Eles o mantêm, com seus coworkers e seus arquivos."
+            },
+            "own": {
+                "title": "Seus próprios workspaces",
+                "description": "Um workspace em que só você está para de vez: seus coworkers são desligados e a máquina dele é excluída com os arquivos."
+            },
+            "signIn": {
+                "title": "Login",
+                "description": "Você sai de todos os dispositivos. Seu e-mail, sua conta Google e seu número de telefone ficam livres, então você pode se cadastrar de novo depois."
+            }
+        },
+        "blocker": {
+            "current": "A assinatura dele ainda renova. Cancele-a em Cobrança antes de excluir sua conta.",
+            "other": "A assinatura dele ainda renova. Mude para este workspace e cancele-a em Cobrança antes de excluir sua conta.",
+            "openBilling": "Abrir cobrança"
+        },
+        "submit": "Excluir conta",
+        "failed": "Não foi possível excluir sua conta."
+    }
+}

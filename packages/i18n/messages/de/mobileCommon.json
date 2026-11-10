@@ -1,0 +1,29 @@
+{
+    "time": {
+        "today": "Heute",
+        "yesterday": "Gestern",
+        "now": "jetzt",
+        "minutesAgo": "{count} Min.",
+        "hoursAgo": "{count} Std.",
+        "daysAgo": "{count} T."
+    },
+    "actions": {
+        "close": "Schließen",
+        "cancel": "Abbrechen",
+        "done": "Fertig",
+        "share": "Teilen",
+        "update": "Aktualisieren"
+    },
+    "errors": {
+        "tryAgainShortly": "Versuch es gleich noch einmal.",
+        "generic": "Etwas ist schiefgelaufen. Versuch es erneut.",
+        "requestFailed": "Anfrage fehlgeschlagen mit {status}",
+        "uploadFailed": "Upload fehlgeschlagen mit {status}"
+    },
+    "unread": "Ungelesen",
+    "viewer": {
+        "shareFailed": "Datei konnte nicht geteilt werden",
+        "noPreview": "Keine Vorschau für diese Datei. Teile sie, um sie in einer anderen App zu öffnen.",
+        "position": "{index} / {total}"
+    }
+}

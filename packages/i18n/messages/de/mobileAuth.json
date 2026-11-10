@@ -1,0 +1,100 @@
+{
+    "start": {
+        "title": "Willkommen bei Rerun",
+        "continueWithApple": "Weiter mit Apple",
+        "continueWithGoogle": "Weiter mit Google",
+        "continueWithPhone": "Weiter mit Telefon",
+        "continueWithEmail": "Weiter mit E-Mail",
+        "or": "Oder",
+        "welcome": "Willkommen bei Rerun",
+        "ownServer": "Eigenen Server nutzen",
+        "useCloud": "Rerun Cloud nutzen"
+    },
+    "back": "Zurück",
+    "phone": {
+        "title": "Deine Telefonnummer",
+        "unsupportedCountry": "In dieses Land können wir noch keine Codes senden.",
+        "consent": "Wenn du fortfährst, stimmst du zu, dass Rerun dich per WhatsApp oder SMS kontaktiert.",
+        "sendByWhatsapp": "Per WhatsApp senden",
+        "sendBySms": "Per SMS senden",
+        "countryLabel": "Land, {name}",
+        "numberLabel": "Telefonnummer"
+    },
+    "email": {
+        "title": "Weiter mit E-Mail",
+        "label": "E-Mail",
+        "placeholder": "du@firma.de",
+        "send": "Code senden"
+    },
+    "code": {
+        "title": "Code eingeben",
+        "sentByPhone": "Per {channel} an {number} gesendet",
+        "sentByEmail": "An {email} gesendet",
+        "fieldLabel": "Bestätigungscode",
+        "continue": "Weiter",
+        "resendIn": "Code erneut senden in {seconds} s",
+        "resend": "Code erneut senden",
+        "switchChannel": "Stattdessen per {channel} senden",
+        "differentNumber": "Andere Nummer verwenden",
+        "differentEmail": "Andere E-Mail verwenden"
+    },
+    "country": {
+        "search": "Suchen",
+        "searchLabel": "Länder suchen"
+    },
+    "errors": {
+        "generic": "Etwas ist schiefgelaufen. Versuch es erneut.",
+        "offline": "Rerun ist nicht erreichbar. Prüfe deine Verbindung und versuch es erneut.",
+        "session": "Deine Sitzung konnte nicht geöffnet werden. Versuch es erneut.",
+        "apple": "Die Anmeldung mit Apple hat nicht geklappt. Versuch es erneut.",
+        "google": "Die Anmeldung mit Google hat nicht geklappt. Versuch es erneut.",
+        "phone": {
+            "taken": "Mit dieser Nummer meldet man sich bereits bei einem anderen Rerun-Konto an.",
+            "same_number": "Das ist bereits die Nummer deines Kontos.",
+            "not_required": "Deine Telefonnummer ist bereits bestätigt.",
+            "too_soon": "Ein Code ist schon unterwegs. Warte kurz, bevor du einen neuen anforderst.",
+            "too_many": "Zu viele Codes für diese Nummer angefordert. Versuch es später erneut.",
+            "invalid_number": "Gib eine gültige Mobilnummer ein.",
+            "unsupported_country": "In dieses Land können wir noch keine Codes senden. Nutze stattdessen E-Mail oder Google.",
+            "undeliverable": "Wir konnten keinen Code an diese Nummer zustellen. Versuch den anderen Kanal oder nutze E-Mail oder Google.",
+            "blocked": "An diese Nummer können wir keinen Code senden. Nutze stattdessen E-Mail oder Google.",
+            "rate_limited": "Zu viele Versuche mit dieser Nummer. Versuch es später erneut.",
+            "wrong_code": "Dieser Code ist falsch oder abgelaufen.",
+            "expired": "Dieser Code ist abgelaufen. Fordere einen neuen an.",
+            "unavailable": "Dein Telefon ist nicht erreichbar. Versuch es erneut oder nutze den anderen Kanal.",
+            "busy": "Die Anmeldung per Telefon ist gerade ausgelastet. Nutze stattdessen E-Mail oder Google.",
+            "captcha_failed": "Wir konnten nicht bestätigen, dass du kein Roboter bist. Versuch es erneut.",
+            "signed_out": "Erstelle zuerst dein Konto."
+        },
+        "email": {
+            "invalid_email": "Gib eine gültige E-Mail ein",
+            "captcha_failed": "Wir konnten nicht bestätigen, dass du kein Roboter bist. Versuch es erneut.",
+            "blocked_domain": "Diese E-Mail-Domain wird nicht akzeptiert. Nutze eine andere Adresse.",
+            "too_many": "Aus deinem Netzwerk wurden zu viele Konten erstellt. Versuch es später erneut.",
+            "too_many_codes": "Aus deinem Netzwerk wurden zu viele Codes angefordert. Versuch es später erneut.",
+            "unavailable": "Dein Code konnte nicht gesendet werden. Versuch es erneut.",
+            "rate_limited": "Zu viele Codes für diese Adresse angefordert. Versuch es später erneut.",
+            "wrong_code": "Dieser Code ist falsch oder abgelaufen."
+        }
+    },
+    "consent": {
+        "title": "Deine Coworker laufen mit KI",
+        "body": "Um deine Aufgaben zu erledigen, sendet Rerun deine Nachrichten, Fotos, Sprachnachrichten, Dateien und Website an KI-Anbieter: OpenAI, Anthropic und Google über OpenRouter sowie jeden Anbieter, den du selbst verbindest.",
+        "noTraining": "Die Anbieter von Rerun trainieren nicht mit deinen Daten.",
+        "privacy": "Datenschutzerklärung",
+        "notNow": "Nicht jetzt",
+        "agree": "Zustimmen und weiter"
+    },
+    "server": {
+        "title": "Dein Rerun-Server",
+        "address": "Serveradresse",
+        "connect": "Verbinden",
+        "problems": {
+            "invalid": "Gib die Adresse deines Rerun-Servers ein.",
+            "insecure": "Nutze https:// außerhalb deines lokalen Netzwerks.",
+            "unreachable": "Dieser Server ist nicht erreichbar.",
+            "not-rerun": "Diese Adresse ist kein Rerun-Server.",
+            "outdated": "Aktualisiere diesen Rerun-Server, um ihn mit der App zu nutzen."
+        }
+    }
+}

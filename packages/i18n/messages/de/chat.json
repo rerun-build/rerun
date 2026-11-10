@@ -1,0 +1,498 @@
+{
+    "actions": {
+        "copy": "Kopieren",
+        "copied": "Kopiert",
+        "connect": "Verbinden",
+        "cancel": "Abbrechen",
+        "continue": "Weiter",
+        "notNow": "Nicht jetzt",
+        "copiedExclaim": "Kopiert!"
+    },
+    "sources": {
+        "used": "{count, plural, one {# Quelle} other {# Quellen}} genutzt"
+    },
+    "draft": {
+        "label": "Entwurf"
+    },
+    "mcpServer": {
+        "failed": "{name} konnte nicht verbunden werden",
+        "notAdded": "Nicht hinzugefügt",
+        "added": "{name} hinzugefügt",
+        "custom": "Eigener MCP-Server",
+        "customWithHost": "Eigener MCP-Server · {host}"
+    },
+    "mcpSignIn": {
+        "title": "Bei {name} anmelden"
+    },
+    "mentions": {
+        "coworkers": "Coworker",
+        "skills": "Skills"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {# Quelle} other {# Quellen}}",
+        "emailsVerified": "{valid} von {checked} E-Mails verifiziert"
+    },
+    "tableCard": {
+        "openDisabledReason": "Öffne diesen Coworker über das Board, um seine Datenbank zu durchsuchen."
+    },
+    "conversation": {
+        "emptyTitle": "Noch keine Nachrichten",
+        "emptyDescription": "Starte eine Unterhaltung, um hier Nachrichten zu sehen",
+        "scrollToLatest": "Zur neuesten Nachricht scrollen"
+    },
+    "brainProposal": {
+        "create": "Neue Brain-Seite: {title}",
+        "edit": "Änderung am Brain: {title}",
+        "description": "Zur Prüfung vorgeschlagen. Nichts ändert sich, bis jemand zustimmt.",
+        "review": "Prüfen"
+    },
+    "attachments": {
+        "attach": "Dateien anhängen",
+        "open": "{name} öffnen",
+        "position": "{current} / {total}",
+        "previous": "Vorheriger Anhang",
+        "next": "Nächster Anhang",
+        "download": "Herunterladen",
+        "waiting": "Wartet",
+        "finishing": "Wird abgeschlossen",
+        "progress": "{percent} %",
+        "progressWithEta": "{percent} % · {eta}",
+        "fileFallback": "Datei",
+        "uploading": "{name} wird hochgeladen",
+        "retryUpload": "Upload wiederholen",
+        "cancelUpload": "Upload abbrechen",
+        "remove": "Anhang entfernen",
+        "openMore": "{count} weitere öffnen",
+        "uploadFailed": "Upload fehlgeschlagen",
+        "uploadingProgress": "Wird hochgeladen · {percent} %",
+        "retryUploading": "Upload von {name} wiederholen",
+        "removeNamed": "{name} entfernen"
+    },
+    "screen": {
+        "openBrowser": "Browser öffnen",
+        "takeControl": "Steuerung übernehmen"
+    },
+    "composer": {
+        "link": {
+            "open": "Öffnen",
+            "unlink": "Link entfernen"
+        },
+        "subscriptionCta": "Du zahlst schon für ein KI-Abo? Lass diesen Coworker darüber laufen.",
+        "placeholder": "Nachricht senden...",
+        "attachmentsMissing": "Einige Anhänge wurden nicht hochgeladen. Entferne sie und hänge sie vor dem Senden erneut an.",
+        "attachmentsFailed": "{count, plural, one {# Anhang wurde nicht hochgeladen. Wiederhole oder entferne ihn vor dem Senden.} other {# Anhänge wurden nicht hochgeladen. Wiederhole oder entferne sie vor dem Senden.}}",
+        "noFiles": "Dieser Chat kann noch keine Dateien annehmen.",
+        "sendFailed": "Deine Nachricht konnte nicht gesendet werden",
+        "openEditor": "Vollständigen Editor öffnen",
+        "stop": "Aktuelle Ausführung stoppen",
+        "editor": {
+            "title": "Schreib deine Nachricht",
+            "description": "Platz, um eine lange Nachricht zu gliedern. Enter beginnt eine neue Zeile.",
+            "hint": "Mit Cmd + Enter senden",
+            "cancel": "Abbrechen",
+            "send": "Senden"
+        }
+    },
+    "message": {
+        "showLess": "Weniger anzeigen",
+        "showMore": "Mehr anzeigen",
+        "openFile": "{path} öffnen",
+        "branch": {
+            "previous": "Vorherige Variante",
+            "next": "Nächste Variante",
+            "page": "{current} von {total}"
+        },
+        "goodResponse": "Gute Antwort",
+        "badResponse": "Schlechte Antwort",
+        "regenerate": "Neu generieren"
+    },
+    "installGate": {
+        "title": "{name} einrichten",
+        "inProgressTitle": "{name} wird eingerichtet",
+        "inProgressHint": "In einer anderen Unterhaltung",
+        "facts": "{apps, plural, =0 {~{minutes} Min.} one {# App · ~{minutes} Min.} other {# Apps · ~{minutes} Min.}}",
+        "continue": "Einrichtung fortsetzen",
+        "installing": "Wird installiert",
+        "install": "{name} installieren",
+        "skip": "Vorerst überspringen"
+    },
+    "activity": {
+        "thinking": "Denkt nach...",
+        "processing": "Deine Anfrage wird bearbeitet...",
+        "crafting": "Antwort wird formuliert...",
+        "writing": "Schreibt...",
+        "runningTool": "Führt {tool} aus",
+        "waitingOn": "Wartet auf {name}",
+        "building": "Baut {name}",
+        "buildingCoworkers": "Baut {count, plural, one {# Coworker} other {# Coworker}} · {done} fertig",
+        "waitingOnSubCoworkers": "Wartet auf {count, plural, one {# Sub-Coworker} other {# Sub-Coworker}} · {done} fertig"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {Frage offen} one {Frage offen} other {# Fragen offen}}",
+        "approval": "{count, plural, =0 {Freigabe nötig} one {Freigabe nötig} other {# Freigaben nötig}}",
+        "secret": "{count, plural, =0 {Zugangsdaten nötig} one {Zugangsdaten nötig} other {# Zugangsdaten nötig}}",
+        "mcpNamed": "Bei {name} anmelden",
+        "mcp": "Anmeldung nötig",
+        "service": "{count, plural, =0 {App zu verbinden} one {App zu verbinden} other {# Apps zu verbinden}}",
+        "takeover": "Du bist am Bildschirm dran"
+    },
+    "pendingHitl": {
+        "goTo": "{label}, dorthin springen"
+    },
+    "reasoning": {
+        "thinking": "Denkt nach...",
+        "thought": "Gedanke"
+    },
+    "secretRequest": {
+        "saveFailed": "Zugangsdaten konnten nicht gespeichert werden"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "Brain aktualisiert: {title}",
+            "created": "Neue Brain-Seite: {title}",
+            "deleted": "Aus dem Brain entfernt: {title}",
+            "accepted": "Änderung angenommen: {title}",
+            "acceptedBy": "Änderung von {name} angenommen: {title}",
+            "dismissed": "Änderung verworfen: {title}",
+            "dismissedBy": "Änderung von {name} verworfen: {title}"
+        },
+        "notes": {
+            "saved": "Gespeichert. Jeder Coworker liest es ab seiner nächsten Ausführung.",
+            "deleted": "Kein Coworker liest es mehr. Der Verlauf bleibt erhalten.",
+            "accepted": "Gespeichert. Jeder Coworker liest es ab seiner nächsten Ausführung.",
+            "dismissed": "Die Seite bleibt unverändert."
+        },
+        "undone": "Rückgängig gemacht: {title}",
+        "undoneNote": "Die vorherige Version ist wiederhergestellt.",
+        "undo": "Rückgängig",
+        "open": "Öffnen"
+    },
+    "compaction": {
+        "running": "Kontext wird komprimiert…",
+        "failed": "Komprimierung fehlgeschlagen",
+        "done": "Kontext komprimiert",
+        "summarized": "{count, plural, one {# frühere Nachricht zusammengefasst} other {# frühere Nachrichten zusammengefasst}}",
+        "recovered": "~{tokens} Tokens freigegeben"
+    },
+    "scheduledRun": {
+        "label": "Geplante Ausführung",
+        "viewPrompt": "Prompt ansehen",
+        "promptTitle": "Prompt von {name}"
+    },
+    "steps": {
+        "count": "{count, plural, one {# Schritt} other {# Schritte}}",
+        "countWithFailures": "{count, plural, one {# Schritt} other {# Schritte}}, {failed} fehlgeschlagen",
+        "failed": "{failed} fehlgeschlagen",
+        "thinking": "Denkt nach",
+        "compacting": "Komprimiert"
+    },
+    "subRun": {
+        "failuresInARow": "{count} Fehler in Folge",
+        "idle": "Seit {minutes} Min. inaktiv",
+        "stopTask": "Aufgabe stoppen",
+        "stopped": "Gestoppt, Teilergebnis behalten",
+        "failed": "Fehlgeschlagen",
+        "earlier": "+{count} frühere",
+        "verbs": {
+            "search": "Sucht {summary}",
+            "read": "Liest {summary}",
+            "browse": "Öffnet {summary}",
+            "run": "Führt {summary} aus",
+            "write": "Schreibt {summary}",
+            "edit": "Bearbeitet {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "gekürzt",
+        "empty": "Keine Nutzdaten",
+        "payload": "Nutzdaten"
+    },
+    "voice": {
+        "sendFailed": "Diese Aufnahme konnte nicht gesendet werden.",
+        "sendFailedHint": "Wiederholen oder verwerfen.",
+        "waitingForMicrophone": "Warte auf das Mikrofon...",
+        "hideTranscript": "Transkript ausblenden",
+        "transcript": "Transkript",
+        "copyTranscript": "Transkript kopieren",
+        "pause": "Pause",
+        "play": "Sprachnachricht abspielen",
+        "seek": "Springen",
+        "record": "Sprachnachricht aufnehmen",
+        "discard": "Verwerfen",
+        "discardLabel": "Aufnahme verwerfen",
+        "retry": "Erneut versuchen",
+        "send": "Senden",
+        "retryLabel": "Aufnahme erneut senden",
+        "sendLabel": "Aufnahme senden",
+        "unsupported": "Sprachnachrichten werden in diesem Browser nicht unterstützt.",
+        "microphoneBlocked": "Der Mikrofonzugriff ist blockiert. Erlaube ihn in deinen Browsereinstellungen, um aufzunehmen.",
+        "noMicrophone": "Kein Mikrofon verfügbar.",
+        "startFailed": "Aufnahme konnte nicht gestartet werden.",
+        "nothingHeard": "In dieser Aufnahme war nichts zu hören.",
+        "voiceMessageFailed": "Deine Sprachnachricht konnte nicht gesendet werden.",
+        "nothingRecorded": "Es wurde nichts aufgenommen."
+    },
+    "agentInstall": {
+        "started": "Installation gestartet",
+        "complete": "Installation abgeschlossen",
+        "viewGuide": "Anleitung ansehen",
+        "guideTitle": "Installationsanleitung für {name}"
+    },
+    "setupEvents": {
+        "notificationSent": "Hat dir eine Benachrichtigung gesendet",
+        "read": "Gelesen",
+        "schedulesOn": "{count, plural, one {# Zeitplan aktiv} other {# Zeitpläne aktiv}}",
+        "triggersOn": "{count, plural, one {# Trigger aktiv} other {# Trigger aktiv}}",
+        "setUp": "{name} ist eingerichtet",
+        "setupComplete": "Einrichtung abgeschlossen",
+        "connectedHint": "Verbunden, der Coworker kann es nutzen",
+        "signInHint": "Melde dich einmal an, damit der Coworker es nutzen kann",
+        "connected": "Verbunden",
+        "signIn": "Anmelden"
+    },
+    "takeover": {
+        "opened": "Der Browser ist auf dem Desktop deines Coworkers geöffnet. Komm hierher zurück, wenn du fertig bist.",
+        "opensSite": "Öffnet {site} im Browser deines Coworkers, damit du steuern kannst.",
+        "opens": "Öffnet den Browser deines Coworkers, damit du steuern kannst.",
+        "skipLabel": "Browser-Übernahme überspringen",
+        "privacy": "Worin du dich anmeldest, bleibt im Browser dieses Coworkers auf deiner Maschine.",
+        "openAgain": "Erneut öffnen",
+        "closing": "Wird geschlossen…",
+        "done": "Fertig",
+        "skip": "Überspringen",
+        "openBrowser": "Browser öffnen"
+    },
+    "video": {
+        "play": "{name} abspielen",
+        "pause": "{name} pausieren",
+        "previewUnavailable": "Vorschau nicht verfügbar",
+        "openFullScreen": "{name} im Vollbild öffnen"
+    },
+    "tool": {
+        "error": "Fehler",
+        "output": "Ausgabe",
+        "input": "Eingabe",
+        "completedIn": "Fertig in {duration}"
+    },
+    "webhookRun": {
+        "label": "Webhook empfangen",
+        "viewPrompt": "Prompt ansehen",
+        "viewPayload": "Nutzdaten ansehen",
+        "promptTitle": "Prompt von {name}",
+        "payloadTitle": "Nutzdaten von {name}"
+    },
+    "question": {
+        "tooManyFiles": "Du kannst bis zu {max} Dateien anhängen. {rejected} wurden nicht hinzugefügt.",
+        "uploadsFailed": "{count, plural, one {# Anhang konnte nicht hochgeladen werden. Wiederhole oder entferne ihn, bevor du antwortest.} other {# Anhänge konnten nicht hochgeladen werden. Wiederhole oder entferne sie, bevor du antwortest.}}"
+    },
+    "queued": {
+        "stopping": "Aktuelle Ausführung wird gestoppt",
+        "badge": "In Warteschlange",
+        "attachmentsOnly": "Nur Anhänge",
+        "sendNowStops": "Jetzt senden, stoppt die aktuelle Ausführung",
+        "sendNow": "Jetzt senden",
+        "sendNowLabel": "Wartende Nachricht jetzt senden",
+        "remove": "Entfernen",
+        "removeLabel": "Wartende Nachricht entfernen"
+    },
+    "context": {
+        "usedLabel": "Kontext genutzt: {percent} %",
+        "title": "Kontext",
+        "input": "Eingabe",
+        "cached": "Gecacht",
+        "reasoning": "Reasoning",
+        "output": "Ausgabe",
+        "total": "Gesamt"
+    },
+    "feedback": {
+        "negativeTitle": "Negatives Feedback geben",
+        "positiveTitle": "Positives Feedback geben",
+        "categoryLabel": "Welche Art von Problem möchtest du melden?",
+        "categoryPlaceholder": "Auswählen…",
+        "detailsLabel": "Bitte beschreibe die Details",
+        "negativePlaceholder": "Was war an dieser Antwort unbefriedigend?",
+        "positivePlaceholder": "Was war an dieser Antwort gut?",
+        "disclaimer": "Mit dieser Meldung teilst du diese Unterhaltung mit dem Rerun-Team, damit wir deine Coworker verbessern können.",
+        "cancel": "Abbrechen",
+        "submit": "Senden",
+        "categories": {
+            "ui_bug": "UI-Fehler",
+            "did_not_follow": "Hat meine Anfrage nicht befolgt",
+            "not_factual": "Sachlich nicht korrekt",
+            "incomplete": "Unvollständige Antwort",
+            "wrong_tool": "Falsches Tool oder falsche App",
+            "tool_error": "Tool- oder Verbindungsfehler",
+            "too_slow": "Zu langsam",
+            "memory": "Problem mit dem Gedächtnis",
+            "other": "Sonstiges"
+        },
+        "removeFailed": "Dein Feedback konnte nicht entfernt werden",
+        "saveFailed": "Dein Feedback konnte nicht gespeichert werden",
+        "thanks": "Danke für dein Feedback"
+    },
+    "providerError": {
+        "fallbackTitle": "Etwas ist schiefgelaufen",
+        "runInFlight": "Eine früher gestartete Ausführung blockiert diese Unterhaltung noch. Stoppe sie, um deine Nachricht zu senden.",
+        "stop": {
+            "title": "Diese Ausführung stoppen",
+            "cta": "Ausführung stoppen",
+            "description": "Gibt die Unterhaltung für deine Nachricht frei."
+        },
+        "newConversation": {
+            "title": "Neue Unterhaltung starten",
+            "cta": "Neue Unterhaltung",
+            "description": "Öffnet eine neue Unterhaltung mit diesem Coworker."
+        },
+        "continue": {
+            "title": "Ausführung fortsetzen",
+            "cta": "Weiter",
+            "description": "Macht dort weiter, wo der Coworker unterbrochen wurde."
+        },
+        "retry": {
+            "title": "Erneut versuchen",
+            "cta": "Wiederholen",
+            "description": "Sendet deine letzte Nachricht erneut."
+        },
+        "switch": {
+            "title": "Zu einem anderen Modell wechseln",
+            "cta": "Wechseln",
+            "descriptionModel": "Wähle ein anderes Modell für diese Unterhaltung.",
+            "descriptionConnection": "Wähle eine andere Verbindung dieses Workspace."
+        },
+        "reconnect": {
+            "title": "Neu verbinden",
+            "cta": "Neu verbinden",
+            "description": "Melde dich erneut bei der Verbindung an, über die dieser Coworker läuft."
+        }
+    },
+    "budget": {
+        "title": "Rerun-Guthaben",
+        "paused": {
+            "title": "Rerun-Guthaben pausiert",
+            "body": "Deine Coworker können keine Rerun-Modelle oder kostenpflichtigen Daten nutzen, bis jemand sie wieder aktiviert.",
+            "actionTitle": "Rerun-Guthaben wieder aktivieren",
+            "actionDescription": "Die Ausgaben laufen sofort wieder.",
+            "cta": "Fortsetzen"
+        },
+        "preTrial": {
+            "body": "Du hast die {credits} eines neuen Kontos aufgebraucht. Mit einem Abo geht es weiter.",
+            "actionDescription": "Deine Coworker arbeiten weiter, jederzeit kündbar."
+        },
+        "subscribe": {
+            "title": "Jetzt abonnieren",
+            "cta": "Abonnieren",
+            "descriptionTrial": "Beendet deine Testphase heute. {credits} jeden Monat inklusive.",
+            "description": "{credits} jeden Monat inklusive."
+        },
+        "topUp": {
+            "title": "Rerun-Guthaben aufladen",
+            "cta": "Aufladen",
+            "description": "Oder warte, es wird nächsten Monat zurückgesetzt."
+        },
+        "usedUp": {
+            "noCredit": "Dieser Workspace hat noch kein Rerun-Guthaben.",
+            "trial": "Du hast die {credits} deiner kostenlosen Testphase aufgebraucht.",
+            "period": "Du hast dein Rerun-Guthaben für diesen Zeitraum aufgebraucht."
+        },
+        "ownConnection": {
+            "body": "Diese Unterhaltung lief über Rerun, und dein {plan}-Abo ist verbunden."
+        },
+        "runOn": "Über {plan} ausführen",
+        "or": "Oder",
+        "connectProvider": {
+            "body": "Du zahlst schon für Claude oder ChatGPT? Lass deine Coworker über dieses Abo laufen, ohne Mehrkosten hier.",
+            "claude": "Claude verbinden",
+            "chatgpt": "ChatGPT verbinden"
+        },
+        "subscribeToKeepWorking": "Abonniere, damit deine Coworker weiterarbeiten.",
+        "resetsNextMonth": "Es wird nächsten Monat zurückgesetzt.",
+        "lifetime": {
+            "ownConnection": "Dein Lifetime-Tarif läuft mit deiner eigenen KI, und dein {plan}-Abo ist verbunden.",
+            "connectProvider": "Dein Lifetime-Tarif läuft mit deiner eigenen KI. Verbinde Claude oder ChatGPT, damit deine Coworker weiterarbeiten.",
+            "body": "Dein Lifetime-Tarif läuft mit deiner eigenen KI.",
+            "connectTitle": "Deine KI verbinden",
+            "connectDescription": "Claude, ChatGPT oder ein API-Schlüssel.",
+            "connectCta": "Verbinden"
+        },
+        "trial": {
+            "onPro": "Du nutzt jetzt Pro.",
+            "resuming": "Dein Coworker nimmt die Aufgabe wieder auf.",
+            "resumingNamed": "{name} nimmt die Aufgabe wieder auf.",
+            "title": "Testguthaben aufgebraucht",
+            "stopped": "{name} hat gestoppt.",
+            "continueWithPro": "Weiter mit Pro · {price}/Monat",
+            "useMyPlan": "Oder mein Abo nutzen:"
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "Verbunden",
+            "skipped": "Übersprungen",
+            "notReconnected": "Nicht neu verbunden",
+            "notFound": "Nicht gefunden",
+            "stored": "Gespeichert",
+            "approved": "Freigegeben",
+            "notNow": "Nicht jetzt"
+        },
+        "apps": {
+            "title": "Apps",
+            "meta": "{connected} von {total} verbunden",
+            "insteadOf": "Statt {name}"
+        },
+        "answers": {
+            "title": {
+                "one": "Antwort",
+                "other": "Antworten"
+            },
+            "meta": "{answered} von {total} beantwortet"
+        },
+        "keys": {
+            "title": "Schlüssel",
+            "meta": "{stored} von {total} gespeichert",
+            "note": "Auf der Box gespeichert. Der Coworker sieht nur die Namen."
+        },
+        "approvals": {
+            "title": {
+                "one": "Freigabe",
+                "other": "Freigaben"
+            },
+            "metaBoth": "{approved} freigegeben, {declined} nicht jetzt",
+            "metaApproved": "{approved} freigegeben",
+            "metaDeclined": "{declined} nicht jetzt"
+        },
+        "mcp": {
+            "title": "MCP-Server"
+        },
+        "takeover": {
+            "handedBackOn": "Du hast den Browser auf {url} zurückgegeben",
+            "handedBack": "Du hast den Browser zurückgegeben"
+        },
+        "dismissed": {
+            "service": "Du hast die App-Einrichtung geschlossen",
+            "question": "Du hast die Fragen übersprungen",
+            "secret": "Du hast die Schlüssel nicht geteilt",
+            "mcp": "Du hast die Anmeldung übersprungen",
+            "takeover": "Du hast den Browser deinem Coworker überlassen"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "Die aktuelle Ausführung konnte nicht gestoppt werden. Deine Nachricht wird gesendet, wenn sie endet.",
+        "selectModel": "Wähle ein Modell, um zu starten: Öffne das Modellmenü unten.",
+        "emptyTitle": "Starte eine Unterhaltung",
+        "emptyDescription": "Sende diesem Coworker eine Nachricht",
+        "runStoppedResponding": "Die Ausführung reagiert nicht mehr. Stoppe sie, um eine weitere Nachricht zu senden.",
+        "continueWhereLeftOff": "Mach da weiter, wo du aufgehört hast."
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, one {{names} ist zu groß zum Anhängen.} =2 {{names} sind zu groß zum Anhängen.} other {{names} und {more} weitere sind zu groß zum Anhängen.}}",
+        "addFiles": "Fotos oder Dateien hinzufügen",
+        "takeScreenshot": "Screenshot aufnehmen",
+        "noMatchingFiles": "Keine Dateien entsprechen den erlaubten Typen.",
+        "tooManyFiles": "Du kannst bis zu {max} Dateien anhängen. {rejected} wurden nicht hinzugefügt.",
+        "uploadFiles": "Dateien hochladen",
+        "dropFiles": "Dateien zum Anhängen ablegen",
+        "placeholder": "Was möchtest du wissen?",
+        "stop": "Stoppen",
+        "submit": "Senden"
+    }
+}

@@ -1,0 +1,358 @@
+{
+    "labels": {
+        "shell_exec": "Terminal",
+        "fs_read": "Datei lesen",
+        "fs_write": "Datei schreiben",
+        "fs_edit": "Datei bearbeiten",
+        "fs_list": "Dateien auflisten",
+        "fs_search": "Dateien durchsuchen",
+        "shared_read": "Geteilte Datei lesen",
+        "shared_write": "Geteilte Datei schreiben",
+        "shared_edit": "Geteilte Datei bearbeiten",
+        "shared_list": "Geteilte Dateien auflisten",
+        "shared_search": "Geteilte Dateien durchsuchen",
+        "browser_navigate": "Im Web surfen",
+        "computer": "Hat seinen Computer genutzt",
+        "computer_open_app": "Hat eine App geöffnet",
+        "web_fetch": "Seite abrufen",
+        "web_search": "Websuche",
+        "WebSearch": "Websuche",
+        "leads_people_search": "Personen finden",
+        "leads_email_find": "E-Mail finden",
+        "leads_email_verify": "E-Mail prüfen",
+        "leads_phone_find": "Telefonnummer finden",
+        "google_serp": "Google-Ergebnisse",
+        "google_maps_search": "Google Maps",
+        "paid_data": "Bezahlte Daten",
+        "paid_data_catalog": "Katalog bezahlter Daten",
+        "paid_data_read": "Bezahlte Daten lesen",
+        "download": "Herunterladen",
+        "memory_write": "Im Gedächtnis speichern",
+        "memory_recall": "Gedächtnis abrufen",
+        "brain_search": "Im Brain suchen",
+        "brain_read": "Brain lesen",
+        "brain_propose": "Dem Brain vorschlagen",
+        "brain_write": "Ins Brain schreiben",
+        "brain_delete": "Aus dem Brain entfernen",
+        "brain_proposals": "Brain-Änderungen prüfen",
+        "brain_decide": "Über Brain-Änderung entscheiden",
+        "vision_analyze": "Bild analysieren",
+        "delegate_tasks": "Aufgaben delegieren",
+        "call_agent": "Coworker aufrufen",
+        "team_status": "Teamstatus",
+        "team_list_schedules": "Zeitpläne eines Coworkers auflisten",
+        "team_list_triggers": "Trigger eines Coworkers auflisten",
+        "team_list_runs": "Ausführungen eines Coworkers auflisten",
+        "team_get_run": "Ausführung eines Coworkers lesen",
+        "schedule_list": "Zeitpläne auflisten",
+        "schedule_create": "Zeitplan erstellen",
+        "schedule_update": "Zeitplan aktualisieren",
+        "schedule_delete": "Zeitplan löschen",
+        "trigger_list": "Trigger auflisten",
+        "trigger_create": "Trigger erstellen",
+        "trigger_get": "Trigger lesen",
+        "trigger_update": "Trigger aktualisieren",
+        "trigger_rotate_token": "Trigger-Secret erneuern",
+        "trigger_delete": "Trigger löschen",
+        "skill_list": "Skills auflisten",
+        "skill_read": "Skill lesen",
+        "skill_read_file": "Skill-Datei lesen",
+        "skill_write_file": "Skill-Datei schreiben",
+        "skill_delete_file": "Skill-Datei löschen",
+        "skill_create": "Skill erstellen",
+        "skill_import": "Skill importieren",
+        "skill_edit": "Skill bearbeiten",
+        "skill_update": "Skill aktualisieren",
+        "skill_delete": "Skill löschen",
+        "skill_propose": "Skill-Vorschlag",
+        "soul_update": "Persönlichkeit ändern",
+        "verbosity_set": "Antwortlänge anpassen",
+        "tool_install": "Tool installieren",
+        "mcp_register": "Integration verbinden",
+        "mcp_login": "Bei Integration anmelden",
+        "mcp_login_complete": "Anmeldung abschließen",
+        "mcp_status": "Integrationsstatus",
+        "card_table": "Tabelle anzeigen",
+        "card_file": "Datei anzeigen",
+        "image_generation": "Bild generieren",
+        "table_view_save": "Tabellenansicht speichern",
+        "table_view_delete": "Tabellenansicht löschen",
+        "rerun_hub_service_search": "Apps suchen",
+        "rerun_hub_service_details": "App-Details",
+        "rerun_hub_service_install": "App installieren",
+        "rerun_hub_service_list_installed": "Apps auflisten",
+        "rerun_hub_service_uninstall": "App entfernen",
+        "rerun_hub_publish_file": "Datei veröffentlichen",
+        "rerun_hub_unpublish_file": "Veröffentlichung aufheben",
+        "rerun_hub_list_published": "Veröffentlichte Dateien auflisten",
+        "task_complete": "Aufgabe erledigt",
+        "list_spaces": "Boxes auflisten",
+        "list_agents": "Coworker auflisten",
+        "get_agent": "Coworker lesen",
+        "create_agent": "Coworker erstellen",
+        "update_agent": "Coworker aktualisieren",
+        "delete_agent": "Coworker löschen",
+        "list_ai_connections": "KI-Anbieter auflisten",
+        "set_default_model": "Standardmodell festlegen",
+        "list_skills": "Skills auflisten",
+        "get_skill": "Skill lesen",
+        "upsert_skill": "Skill schreiben",
+        "delete_skill": "Skill löschen",
+        "list_schedules": "Geplante Aufgaben auflisten",
+        "upsert_schedule": "Aufgabe planen",
+        "run_schedule_now": "Aufgabe jetzt ausführen",
+        "delete_schedule": "Geplante Aufgabe löschen",
+        "list_runs": "Ausführungen auflisten",
+        "get_run": "Ausführung lesen",
+        "search_connectors": "Apps suchen",
+        "list_agent_connectors": "Apps auflisten",
+        "attach_connector": "App hinzufügen",
+        "detach_connector": "App entfernen",
+        "send_message": "Coworker schreiben",
+        "create_boxes": "Boxes erstellen",
+        "build_team": "Team aufbauen",
+        "write_agent": "Schreibt seine SOUL und Installation",
+        "rename_box": "Box umbenennen",
+        "delete_box": "Box löschen",
+        "focus_agent": "Coworker öffnen",
+        "show_agents": "Coworker anzeigen",
+        "open_connector_setup": "App-Einrichtung öffnen",
+        "open_settings": "Einstellungen öffnen",
+        "recenter_board": "Board zentrieren",
+        "open_brain_page": "Brain öffnen",
+        "read_attachment": "Anhang lesen",
+        "search_docs": "Doku durchsuchen",
+        "analyze_website": "Website lesen",
+        "save_profile": "Profil speichern",
+        "save_needs": "Bedarf speichern",
+        "list_templates": "Vorlagen durchsuchen",
+        "propose_plan": "Plan schreiben",
+        "install_template": "Vorlage installieren",
+        "install_shared_agent": "Geteilten Coworker installieren",
+        "open_template_card": "Vorlage öffnen",
+        "start_agent_setup": "Einrichtung übergeben",
+        "open_checkout": "Testphase starten",
+        "open_template_purchase": "Vorlage kaufen",
+        "ask_choice": "Hat dich gefragt",
+        "ask_either": "Hat dich gefragt",
+        "ask_input": "Hat dich gefragt",
+        "show_templates": "Hat Vorlagen gezeigt",
+        "show_plan": "Hat den Plan gezeigt",
+        "show_starter_pack": "Hat das Starterpaket gezeigt",
+        "contact_team": "Hat das Team angeboten",
+        "ask_user": "Hat dich gefragt",
+        "request_approval": "Hat um Freigabe gebeten",
+        "suggest_service": "Hat eine App vorgeschlagen",
+        "request_secret": "Hat Zugangsdaten angefragt",
+        "request_mcp_sign_in": "Hat dich gebeten, dich bei einem MCP-Server anzumelden",
+        "request_takeover": "Hat dich gebeten, den Browser zu übernehmen",
+        "request_spend": "Hat gefragt, Guthaben auszugeben",
+        "notify_user": "Hat dich benachrichtigt",
+        "install_complete": "Hat die Einrichtung abgeschlossen"
+    },
+    "activities": {
+        "shell_exec": "Führt einen Befehl aus",
+        "fs_read": "Liest eine Datei",
+        "fs_write": "Schreibt eine Datei",
+        "fs_edit": "Bearbeitet eine Datei",
+        "fs_list": "Listet Dateien auf",
+        "fs_search": "Durchsucht Dateien",
+        "shared_read": "Liest eine geteilte Datei",
+        "shared_write": "Schreibt eine geteilte Datei",
+        "shared_edit": "Bearbeitet eine geteilte Datei",
+        "shared_list": "Listet geteilte Dateien auf",
+        "shared_search": "Durchsucht geteilte Dateien",
+        "browser_navigate": "Surft im Web",
+        "computer": "Nutzt seinen Computer",
+        "computer_open_app": "Öffnet eine App",
+        "web_fetch": "Liest eine Seite",
+        "web_search": "Sucht im Web",
+        "WebSearch": "Sucht im Web",
+        "leads_people_search": "Findet Personen",
+        "leads_email_find": "Findet eine E-Mail",
+        "leads_email_verify": "Prüft eine E-Mail",
+        "leads_phone_find": "Findet eine Telefonnummer",
+        "google_serp": "Sucht bei Google",
+        "google_maps_search": "Sucht in Google Maps",
+        "download": "Lädt herunter",
+        "memory_write": "Speichert im Gedächtnis",
+        "memory_recall": "Ruft das Gedächtnis ab",
+        "brain_search": "Durchsucht das Brain",
+        "brain_read": "Liest das Brain",
+        "brain_propose": "Schlägt eine Brain-Änderung vor",
+        "brain_write": "Schreibt ins Brain",
+        "vision_analyze": "Sieht sich ein Bild an",
+        "image_generation": "Generiert ein Bild",
+        "delegate_tasks": "Delegiert Aufgaben",
+        "call_agent": "Ruft einen Coworker auf",
+        "team_status": "Prüft das Team",
+        "team_list_runs": "Liest die Ausführungen eines Coworkers",
+        "team_get_run": "Liest die Ausführung eines Coworkers",
+        "skill_read": "Liest einen Skill",
+        "skill_read_file": "Liest einen Skill",
+        "skill_create": "Erstellt einen Skill",
+        "skill_edit": "Bearbeitet einen Skill",
+        "skill_update": "Aktualisiert einen Skill",
+        "rerun_hub_service_search": "Sucht Apps",
+        "rerun_hub_service_install": "Installiert eine App",
+        "list_agents": "Sieht sich das Team an",
+        "create_agent": "Erstellt einen Coworker",
+        "update_agent": "Aktualisiert einen Coworker",
+        "send_message": "Schreibt einem Coworker",
+        "build_team": "Baut das Team auf",
+        "search_docs": "Durchsucht die Doku",
+        "analyze_website": "Liest die Website",
+        "list_templates": "Durchsucht Vorlagen",
+        "propose_plan": "Schreibt den Plan",
+        "install_template": "Installiert eine Vorlage"
+    },
+    "paidData": {
+        "people": {
+            "search": "Findet Personen",
+            "email": {
+                "find": "Findet E-Mails",
+                "verify": "Prüft E-Mails"
+            },
+            "phone": {
+                "find": "Findet Telefonnummern"
+            },
+            "enrich": "Reichert Personen an",
+            "identity": {
+                "resolve": "Findet LinkedIn-Profile"
+            }
+        },
+        "companies": {
+            "search": "Findet Unternehmen",
+            "enrich": "Reichert Unternehmen an",
+            "similar": "Findet ähnliche Unternehmen",
+            "jobs": {
+                "search": "Liest Stellenanzeigen"
+            },
+            "news": "Liest Unternehmensnews"
+        },
+        "google": {
+            "serp": {
+                "organic": "Liest Google-Ergebnisse",
+                "maps": "Sucht in Google Maps",
+                "local": "Liest lokale Rankings",
+                "news": "Liest Google News"
+            },
+            "keywords": {
+                "volume": "Prüft Suchvolumen",
+                "ideas": "Findet Keyword-Ideen",
+                "trends": "Liest Google Trends"
+            }
+        },
+        "ai-search": {
+            "perplexity": {
+                "answer": "Fragt Perplexity"
+            }
+        },
+        "web": {
+            "backlinks": {
+                "summary": "Liest Backlinks",
+                "list": "Listet Backlinks auf"
+            },
+            "anchors": {
+                "list": "Liest Ankertexte"
+            },
+            "url": {
+                "metrics": "Prüft Domain-Autorität"
+            }
+        },
+        "linkedin": {
+            "user": {
+                "profile": "Liest LinkedIn",
+                "posts": "Liest LinkedIn-Posts"
+            },
+            "company": {
+                "profile": "Liest LinkedIn"
+            },
+            "post": {
+                "detail": "Liest LinkedIn-Posts",
+                "comments": "Liest LinkedIn-Kommentare",
+                "reactions": "Liest LinkedIn-Reaktionen"
+            }
+        },
+        "tiktok": {
+            "user": {
+                "profile": "Liest TikTok",
+                "videos": "Liest TikTok-Videos"
+            },
+            "search": {
+                "users": "Durchsucht TikTok",
+                "videos": "Durchsucht TikTok"
+            },
+            "video": {
+                "detail": "Liest TikTok-Videos",
+                "comments": "Liest TikTok-Kommentare"
+            },
+            "comment": {
+                "replies": "Liest TikTok-Kommentare"
+            }
+        },
+        "instagram": {
+            "user": {
+                "profile": "Liest Instagram",
+                "posts": "Liest Instagram-Posts",
+                "reels": "Liest Instagram-Reels"
+            },
+            "search": {
+                "users": "Durchsucht Instagram",
+                "reels": "Durchsucht Instagram"
+            },
+            "hashtag": {
+                "posts": "Liest Instagram-Hashtags"
+            },
+            "post": {
+                "detail": "Liest Instagram-Posts",
+                "comments": "Liest Instagram-Kommentare"
+            }
+        },
+        "x": {
+            "user": {
+                "profile": "Liest X",
+                "posts": "Liest X-Posts"
+            },
+            "search": {
+                "posts": "Durchsucht X"
+            },
+            "post": {
+                "comments": "Liest X-Antworten"
+            }
+        },
+        "youtube": {
+            "channel": {
+                "profile": "Liest YouTube",
+                "videos": "Liest YouTube-Videos"
+            },
+            "search": {
+                "videos": "Durchsucht YouTube"
+            },
+            "video": {
+                "detail": "Liest YouTube-Videos",
+                "comments": "Liest YouTube-Kommentare"
+            }
+        },
+        "facebook": {
+            "user": {
+                "profile": "Liest Facebook",
+                "posts": "Liest Facebook-Posts"
+            },
+            "post": {
+                "comments": "Liest Facebook-Kommentare"
+            }
+        },
+        "reddit": {
+            "subreddit": {
+                "posts": "Liest Reddit"
+            },
+            "post": {
+                "detail": "Liest Reddit"
+            }
+        }
+    },
+    "errors": {
+        "notFound": "Tool nicht gefunden"
+    }
+}
