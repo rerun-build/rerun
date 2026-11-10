@@ -172,25 +172,19 @@ export function brainChangeOf(toolName: string, output: unknown): BrainChange | 
     return change as BrainChange
 }
 
-export function brainChangeHeadline({ status, title, mode, agentName }: BrainChange): string {
-    const whose = agentName ? `${agentName}'s change` : 'the change'
+export type BrainChangeCopy = (key: 'created' | 'saved' | 'deleted' | 'accepted' | 'acceptedBy' | 'dismissed' | 'dismissedBy', values: { title: string; name?: string }) => string
+
+export function brainChangeHeadline({ status, title, mode, agentName }: BrainChange, t: BrainChangeCopy): string {
     switch (status) {
         case 'saved':
-            return mode === 'create' ? `New Brain page: ${title}` : `Brain updated: ${title}`
+            return mode === 'create' ? t('created', { title }) : t('saved', { title })
         case 'deleted':
-            return `Removed from the Brain: ${title}`
+            return t('deleted', { title })
         case 'accepted':
-            return `Accepted ${whose}: ${title}`
+            return agentName ? t('acceptedBy', { name: agentName, title }) : t('accepted', { title })
         case 'dismissed':
-            return `Dismissed ${whose}: ${title}`
+            return agentName ? t('dismissedBy', { name: agentName, title }) : t('dismissed', { title })
     }
-}
-
-export const BRAIN_CHANGE_NOTES: Record<BrainChangeStatus, string> = {
-    saved: 'Saved. Every coworker reads it from its next run.',
-    deleted: 'No coworker reads it anymore. Its history is kept.',
-    accepted: 'Saved. Every coworker reads it from its next run.',
-    dismissed: 'The page is unchanged.',
 }
 
 export const brainRevertRequestSchema = z.object({ revisionId: z.string().min(1), expectedHash: z.string().optional() })

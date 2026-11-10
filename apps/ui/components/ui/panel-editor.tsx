@@ -4,6 +4,7 @@ import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { ArrowLeftIcon, Trash2Icon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import type { ComponentProps, ReactNode } from 'react'
 
 export function PanelEditorShell({ children }: { children: ReactNode }) {
@@ -11,10 +12,11 @@ export function PanelEditorShell({ children }: { children: ReactNode }) {
 }
 
 export function PanelEditorHeader({ title, onBack, mono, children }: { title: string; onBack?: () => void; mono?: boolean; children?: ReactNode }) {
+    const t = useTranslations('ui')
     return (
         <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
             {onBack && (
-                <Button size="icon-sm" variant="ghost" onClick={onBack} aria-label="Back">
+                <Button size="icon-sm" variant="ghost" onClick={onBack} aria-label={t('back')}>
                     <ArrowLeftIcon className="size-4" />
                 </Button>
             )}
@@ -45,6 +47,7 @@ type PanelDeleteButtonProps = Omit<ComponentProps<typeof Button>, 'children' | '
 
 // La confirmation passe par une dialog, sauf quand l'appelant en fournit déjà une.
 export function PanelDeleteButton({ label, busy = false, confirm = true, confirmTitle, confirmDescription, confirmLabel, size = 'icon-sm', className, onClick, ...props }: PanelDeleteButtonProps) {
+    const t = useTranslations('ui')
     const button = (
         <Button size={size} variant="destructive" loading={busy} title={label} aria-label={label} className={cn('shrink-0', className)} onClick={confirm ? undefined : onClick} {...props}>
             <Trash2Icon />
@@ -54,7 +57,7 @@ export function PanelDeleteButton({ label, busy = false, confirm = true, confirm
     if (!confirm) return button
 
     return (
-        <ConfirmDialog title={confirmTitle ?? `${label}?`} description={confirmDescription} confirmLabel={confirmLabel} onConfirm={event => onClick?.(event)}>
+        <ConfirmDialog title={confirmTitle ?? t('deleteConfirmTitle', { label })} description={confirmDescription} confirmLabel={confirmLabel} onConfirm={event => onClick?.(event)}>
             {button}
         </ConfirmDialog>
     )

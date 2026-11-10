@@ -1,5 +1,6 @@
 import { SymbolView } from 'expo-symbols'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { AppText } from '@/components/ui/AppText'
@@ -53,10 +54,11 @@ function Agent({ agent }: { agent: PlanAgent }) {
 export function PlanCard({ input, answered, onAnswer }: { input: unknown; answered: PlanOutput | null; onAnswer: (output: PlanOutput) => void }) {
     const theme = useTheme()
     const { title, boxes } = readPlan(input)
+    const t = useTranslations('mobileOnboarding')
     return (
         <View style={{ gap: spacing.lg, padding: spacing.lg, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: theme.border, backgroundColor: theme.card }}>
             <AppText variant="caption" tone="muted" medium>
-                {title}
+                {title ?? t('plan.defaultTitle')}
             </AppText>
             {boxes.map(box => (
                 <View key={box.name ?? 'all'} style={{ gap: spacing.md }}>
@@ -77,13 +79,13 @@ export function PlanCard({ input, answered, onAnswer }: { input: unknown; answer
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
                     <SymbolView name={answered.answered && answered.confirmed ? 'checkmark.circle.fill' : 'pencil'} size={13} tintColor={theme.mutedForeground} />
                     <AppText variant="footnote" tone="muted">
-                        {answered.answered && answered.confirmed ? 'Confirmed' : answered.answered ? 'Asked for changes' : 'Skipped'}
+                        {answered.answered && answered.confirmed ? t('plan.confirmed') : answered.answered ? t('plan.changesAsked') : t('plan.skipped')}
                     </AppText>
                 </View>
             ) : (
                 <View style={{ gap: spacing.sm }}>
-                    <Button label="Build my coworker" size="lg" onPress={() => onAnswer({ answered: true, confirmed: true })} />
-                    <Button label="Change something" variant="outline" size="lg" onPress={() => onAnswer({ answered: true, confirmed: false })} />
+                    <Button label={t('plan.build')} size="lg" onPress={() => onAnswer({ answered: true, confirmed: true })} />
+                    <Button label={t('plan.change')} variant="outline" size="lg" onPress={() => onAnswer({ answered: true, confirmed: false })} />
                 </View>
             )}
         </View>

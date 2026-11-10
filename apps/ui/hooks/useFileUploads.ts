@@ -3,8 +3,9 @@
 import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
 import type { UploadEntry } from '@/lib/files/upload'
 import { uploadUrl, type UploadTarget } from '@/lib/files/upload-url'
-import { UploadAbortedError, UploadHttpError, xhrUpload, type XhrUploadHandle } from '@/lib/files/upload-client'
+import { UploadAbortedError, UploadHttpError, UploadNetworkError, xhrUpload, type XhrUploadHandle } from '@/lib/files/upload-client'
 import { nanoid } from 'nanoid'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 export type UploadStatus = 'queued' | 'uploading' | 'finishing' | 'done' | 'error'
@@ -59,7 +60,20 @@ function publicItem(job: Job): UploadItem {
  * ref and are published on a timer: progress events fire dozens of times a second per file, and a
  * setState on each one would re-render the whole surrounding panel continuously.
  */
+type UploadCopy = ReturnType<typeof useTranslations<'files.uploadOutcome'>>
+
+function uploadErrorText(err: unknown, t: UploadCopy): string {
+    if (err instanceof UploadHttpError) {
+        if (err.serverMessage) return err.serverMessage
+        if (err.status === 401 || err.status === 403) return t('sessionExpired')
+        return err.status === 413 ? t('tooLarge') : t('retryLater')
+    }
+    if (err instanceof UploadNetworkError) return t('networkFailed')
+    return t('allFailed')
+}
+
 export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, onRejected }: UseFileUploadsOptions) {
+    const t = useTranslations('files.uploadOutcome')
     const jobs = useRef(new Map<string, Job>())
     const handles = useRef(new Map<string, XhrUploadHandle>())
     const [items, setItems] = useState<UploadItem[]>([])
@@ -180,7 +194,7 @@ export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, o
                         return
                     }
                     job.status = 'error'
-                    job.error = err instanceof Error ? err.message : 'Upload failed'
+                    job.error = uploadErrorText(err, t)
                     publish(true)
                 })
                 .finally(() => {
@@ -191,7 +205,7 @@ export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, o
 
         publish(true)
         settleWaiters()
-    }, [concurrency, publish, settleWaiters])
+    }, [concurrency, publish, settleWaiters, t])
 
     useEffect(() => {
         pumpRef.current = pump
@@ -230,14 +244,13 @@ export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, o
 
             if (oversized.length) {
                 const names = oversized.slice(0, 2).join(', ')
-                const rest = oversized.length > 2 ? ` and ${oversized.length - 2} more` : ''
-                callbacks.current.onRejected?.(`${names}${rest} ${oversized.length > 1 ? 'are' : 'is'} over the ${MAX_UPLOAD_FILE_BYTES / MB} MB limit.`)
+                callbacks.current.onRejected?.(t('oversized', { names, more: Math.max(0, oversized.length - 2), count: oversized.length, limit: MAX_UPLOAD_FILE_BYTES / MB }))
             }
 
             pump()
             return accepted
         },
-        [nameFor, pump],
+        [nameFor, pump, t],
     )
 
     const cancel = useCallback(

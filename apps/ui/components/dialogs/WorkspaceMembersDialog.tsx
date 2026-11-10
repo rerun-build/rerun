@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import {
     inviteToWorkspaceAction,
     listWorkspaceMembersAction,
@@ -19,12 +20,15 @@ import { Dialog } from '@/components/ui/dialog'
 import { useMemberDirectory } from '@/hooks/useMemberProfiles'
 import { syncBoardGrant, syncBoardVisibility } from '@/lib/board/sync-space-access'
 import { useSession, type WorkspaceRole } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 type Result = { ok: true } | { ok: false; error: string }
 
 export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('dialogs.members')
+    const errorText = useErrorText()
     const [members, setMembers] = useState<WorkspaceMember[]>([])
     const [inviteLink, setInviteLink] = useState<{ email: string; url: string } | null>(null)
     const [invites, setInvites] = useState<WorkspaceInviteRow[]>([])
@@ -39,7 +43,7 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
     const refresh = useCallback(async () => {
         const result = await listWorkspaceMembersAction()
         if (!result.ok) {
-            toast.error(result.error)
+            toast.error(errorText(result))
             setLoading(false)
             return
         }
@@ -48,7 +52,7 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
         setCurrentUserId(result.currentUserId)
         setCurrentRole(result.currentRole)
         setLoading(false)
-    }, [])
+    }, [errorText])
 
     useEffect(() => {
         if (!open) return
@@ -58,12 +62,12 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
     const loadAccess = useCallback(async (member: WorkspaceMember) => {
         const result = await listMemberAccessAction(member.userId)
         if (!result.ok) {
-            toast.error(result.error)
+            toast.error(errorText(result))
             setOpened(current => (current?.member.userId === member.userId ? null : current))
             return
         }
         setOpened(current => (current?.member.userId === member.userId ? { member, access: result } : current))
-    }, [])
+    }, [errorText])
 
     const openMember = (member: WorkspaceMember) => {
         setOpened({ member, access: null })
@@ -76,7 +80,7 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
         if (busy) return
         setBusy(true)
         const result = await action()
-        if (!result.ok) toast.error(result.error)
+        if (!result.ok) toast.error(errorText(result))
         await loadAccess(member)
         setBusy(false)
     }
@@ -111,11 +115,11 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
     const invite = async (email: string, boxScope: BoxScope) => {
         const result = await inviteToWorkspaceAction(email, boxScope)
         if (!result.ok) {
-            toast.error(result.error)
+            toast.error(errorText(result))
             return false
         }
         if (result.inviteUrl) setInviteLink({ email, url: result.inviteUrl })
-        else toast.success(`Invitation sent to ${email}`)
+        else toast.success(t('invite.sent', { email }))
         refresh()
         return true
     }
@@ -125,12 +129,12 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
         setBusy(true)
         const result = await action()
         setBusy(false)
-        if (!result.ok) return toast.error(result.error)
+        if (!result.ok) return toast.error(errorText(result))
         if (success) toast.success(success)
         refresh()
     }
 
-    const label = (member: WorkspaceMember) => member.email ?? 'Member'
+    const label = (member: WorkspaceMember) => member.email ?? t('fallbackLabel')
 
     return (
         <Dialog
@@ -152,8 +156,8 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
                     busy={busy}
                     profileOf={profileOf}
                     onInvite={invite}
-                    onRoleChange={(member, role) => run(() => setMemberRoleAction(member.userId, role), role === 'admin' ? `${label(member)} is now an admin` : `${label(member)} is now a member`)}
-                    onRemove={member => run(() => removeMemberAction(member.userId), `${label(member)} removed from the workspace`)}
+                    onRoleChange={(member, role) => run(() => setMemberRoleAction(member.userId, role), role === 'admin' ? t('nowAdmin', { name: label(member) }) : t('nowMember', { name: label(member) }))}
+                    onRemove={member => run(() => removeMemberAction(member.userId), t('removed', { name: label(member) }))}
                     onRevoke={inv => run(() => revokeInvitationAction(inv.id))}
                     opened={opened}
                     onOpenMember={openMember}

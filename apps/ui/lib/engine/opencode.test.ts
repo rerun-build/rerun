@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DEFAULT_CONNECTION_MODELS, OPENCODE_SNAPSHOT, toProviderModel, type ProviderModel } from '@rerun/contracts'
 import type { BoxConnection } from '@/lib/engine/types'
 import { connectMethod, enabledModels, offeredModels, opencodeModelRows, pricePerMillion, sourceSummary } from './ai-sources'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 import { connectionMethod } from './ai-connection-analytics'
 import { connectionGroups } from './model-groups'
 
@@ -38,7 +39,7 @@ describe('connectMethod', () => {
 
 describe('the OpenCode model list of a connection', () => {
     it('reads the snapshot until the box reports its own catalog', () => {
-        const rows = opencodeModelRows(opencode())
+        const rows = opencodeModelRows(opencode(), englishTranslator('connections'))
         expect(rows).toHaveLength(OPENCODE_SNAPSHOT.length)
         expect(rows.filter(row => row.enabled).every(row => row.plan === 'go')).toBe(true)
         expect(rows.some(row => row.isNew)).toBe(false)
@@ -46,14 +47,14 @@ describe('the OpenCode model list of a connection', () => {
 
     it('marks a model newer than the snapshot as new, and keeps a retired one to be switched off', () => {
         const live = [...OPENCODE_SNAPSHOT.map(toProviderModel).filter(model => model.id !== 'go/glm-5.2'), fresh]
-        const rows = opencodeModelRows(opencode({ providerModels: live }))
+        const rows = opencodeModelRows(opencode({ providerModels: live }), englishTranslator('connections'))
         expect(rows.find(row => row.id === 'go/glm-6-preview')).toMatchObject({ isNew: true, enabled: false, plan: 'go' })
         expect(rows.find(row => row.id === 'go/glm-5.2')).toMatchObject({ info: null, enabled: true, unavailable: 'No longer offered by OpenCode' })
     })
 
     it('reads a Console price per million tokens', () => {
-        expect(pricePerMillion({ input: 2, output: 10, cacheRead: 0.2 })).toBe('$2 in · $10 out /M')
-        expect(pricePerMillion({ input: 0.834, output: 2.501, cacheRead: null })).toBe('$0.834 in · $2.501 out /M')
+        expect(pricePerMillion({ input: 2, output: 10, cacheRead: 0.2 }, englishTranslator('connections'), 'en')).toBe('$2 in · $10 out /M')
+        expect(pricePerMillion({ input: 0.834, output: 2.501, cacheRead: null }, englishTranslator('connections'), 'en')).toBe('$0.834 in · $2.501 out /M')
     })
 
     it('offers the live catalog in the pickers, the snapshot without one', () => {
@@ -67,7 +68,7 @@ describe('the OpenCode model list of a connection', () => {
             { kind: 'weekly' as const, label: null, usedPercent: 40, resetsAt: null },
             { kind: 'monthly' as const, label: null, usedPercent: 5, resetsAt: null },
         ]
-        expect(sourceSummary(opencode({ planLimits: { windows, capturedAt: '2026-11-04T00:00:00.000Z' } }), credit)).toBe('5-hour 12% · Weekly 40% · Monthly 5%')
+        expect(sourceSummary(opencode({ planLimits: { windows, capturedAt: '2026-11-04T00:00:00.000Z' } }), credit, englishTranslator('connections'), 'en')).toBe('5-hour 12% · Weekly 40% · Monthly 5%')
     })
 })
 
@@ -76,7 +77,7 @@ describe('OpenCode in the model pickers', () => {
 
     // One group for the connection, whatever its two catalogs: the iOS app keys the running model on it.
     it('lists one group, Go before Console, with what each costs as its description', () => {
-        const groups = connectionGroups([connection], true)
+        const groups = connectionGroups([connection], true, englishTranslator('connections'))
         expect(groups).toHaveLength(1)
         expect(groups[0].models.map(model => [model.id, model.description])).toEqual([
             ['go/deepseek-v4-pro', 'Included in Go'],
@@ -88,13 +89,13 @@ describe('OpenCode in the model pickers', () => {
 
     it('greys out a model OpenCode no longer offers, and does not default to it', () => {
         const live = OPENCODE_SNAPSHOT.map(toProviderModel).filter(model => model.id !== 'go/deepseek-v4-pro')
-        const [group] = connectionGroups([opencode({ models: ['go/deepseek-v4-pro', 'go/glm-5.3'], providerModels: live })], true)
+        const [group] = connectionGroups([opencode({ models: ['go/deepseek-v4-pro', 'go/glm-5.3'], providerModels: live })], true, englishTranslator('connections'))
         expect(group.models.find(model => model.id === 'go/deepseek-v4-pro')?.unavailable).toBe('No longer offered by OpenCode')
         expect(group.defaultModel).toBe('go/glm-5.3')
     })
 
     it('locks the premium Console models on a trial, never the Go ones', () => {
-        const [group] = connectionGroups([opencode({ models: ['go/deepseek-v4-pro', 'console/claude-opus-5-5', 'console/gpt-6-astra'] })], false)
+        const [group] = connectionGroups([opencode({ models: ['go/deepseek-v4-pro', 'console/claude-opus-5-5', 'console/gpt-6-astra'] })], false, englishTranslator('connections'))
         expect(group.models.filter(model => model.locked).map(model => model.id)).toEqual(['console/claude-opus-5-5', 'console/gpt-6-astra'])
     })
 })

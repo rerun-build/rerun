@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { MESSAGE_FEEDBACK_CATEGORIES, MESSAGE_FEEDBACK_CATEGORY_VALUES, type MessageFeedbackCategory, type MessageFeedbackRating } from '@rerun/contracts'
 import { Loader2Icon } from '@/lib/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -31,6 +32,7 @@ type MessageFeedbackDialogProps = {
 }
 
 export function MessageFeedbackDialog({ open, rating, onOpenChange, onSubmit }: MessageFeedbackDialogProps) {
+    const t = useTranslations('chat.feedback')
     const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { category: undefined, details: '' } })
     const {
         formState: { isSubmitting },
@@ -52,7 +54,7 @@ export function MessageFeedbackDialog({ open, rating, onOpenChange, onSubmit }: 
                 <Form {...form}>
                     <form onSubmit={submit} className="flex flex-col gap-4">
                         <DialogHeader>
-                            <DialogTitle>{negative ? 'Give negative feedback' : 'Give positive feedback'}</DialogTitle>
+                            <DialogTitle>{negative ? t('negativeTitle') : t('positiveTitle')}</DialogTitle>
                         </DialogHeader>
                         {negative && (
                             <FormField
@@ -60,17 +62,17 @@ export function MessageFeedbackDialog({ open, rating, onOpenChange, onSubmit }: 
                                 name="category"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <Field label="What type of issue do you wish to report?" optional>
+                                        <Field label={t('categoryLabel')} optional>
                                             <Select value={field.value} onValueChange={field.onChange}>
                                                 <FormControl>
                                                     <SelectTrigger className="w-full">
-                                                        <SelectValue placeholder="Select…" />
+                                                        <SelectValue placeholder={t('categoryPlaceholder')} />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
                                                     {MESSAGE_FEEDBACK_CATEGORIES.map(category => (
                                                         <SelectItem key={category.value} value={category.value}>
-                                                            {category.label}
+                                                            {t(`categories.${category.value}`)}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -86,23 +88,23 @@ export function MessageFeedbackDialog({ open, rating, onOpenChange, onSubmit }: 
                             name="details"
                             render={({ field }) => (
                                 <FormItem>
-                                    <Field label="Please provide details" optional>
+                                    <Field label={t('detailsLabel')} optional>
                                         <FormControl>
-                                            <Textarea autoFocus={!negative} placeholder={negative ? 'What was unsatisfying about this response?' : 'What was satisfying about this response?'} className="min-h-24" {...field} />
+                                            <Textarea autoFocus={!negative} placeholder={negative ? t('negativePlaceholder') : t('positivePlaceholder')} className="min-h-24" {...field} />
                                         </FormControl>
                                     </Field>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <p className="text-xs text-muted-foreground">Submitting this report shares this conversation with the Rerun team so we can improve your coworkers.</p>
+                        <p className="text-xs text-muted-foreground">{t('disclaimer')}</p>
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
-                                Cancel
+                                {t('cancel')}
                             </Button>
                             <Button type="submit" disabled={isSubmitting}>
                                 {isSubmitting && <Loader2Icon className="size-4 animate-spin" />}
-                                Submit
+                                {t('submit')}
                             </Button>
                         </DialogFooter>
                     </form>

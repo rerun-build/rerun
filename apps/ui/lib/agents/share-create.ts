@@ -10,7 +10,8 @@ import { selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 import { uploadPrivateFile } from '@/lib/storage/private'
 import { projectAgent } from '@/lib/templates/archives'
 import { resolveAgentConnectors } from '@/lib/templates/connectors'
-import { archiveWarnings, captureAgentArchive, isMissingRoute, STALE_EXPORT_HINT } from './capture-archive'
+import { AppError } from '@/lib/i18n/action-error'
+import { archiveWarnings, captureAgentArchive, isMissingRoute, staleExportError } from './capture-archive'
 
 // Sending an agent is not publishing one. A template is a page anyone installs in a loop, which is
 // why capturing for the marketplace is locked to the sandbox; a share is a transfer to one person
@@ -46,13 +47,13 @@ async function planFor(supabase: SupabaseClient<Database>, agentRowId: string, w
     // The engine id addresses a folder on a box, so it is resolved from the row rather than taken
     // from the caller: a forged one would archive an agent nothing here owns.
     const { data: agent } = await selectSingle(supabase, 'agents', ['name', 'space_id', 'engine_agent_id', 'workspace_id'] as const, { id: agentRowId })
-    if (!agent || agent.workspace_id !== workspaceId || !agent.engine_agent_id) throw new Error('Coworker not found')
+    if (!agent || agent.workspace_id !== workspaceId || !agent.engine_agent_id) throw new AppError('coworkerNotFound')
 
     const conn = await getSpaceConnection(agent.space_id)
     try {
         return { agent, conn, plan: await planAgentArchive(conn, agent.engine_agent_id) }
     } catch (err) {
-        throw isMissingRoute(err) ? new Error(STALE_EXPORT_HINT) : err
+        throw isMissingRoute(err) ? staleExportError() : err
     }
 }
 

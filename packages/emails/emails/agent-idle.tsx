@@ -3,6 +3,9 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { formatNumber } from "@rerun/i18n/format";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface AgentIdleProps {
@@ -14,6 +17,7 @@ export interface AgentIdleProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function AgentIdle({
@@ -23,37 +27,34 @@ export default function AgentIdle({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: AgentIdleProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`${agentName} is ready, but hasn't run yet`}
+      preview={t("agentIdle.preview", { agentName })}
       hero={{ scene: "agent-idle", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>{agentName} hasn&apos;t run yet</Heading>
-      <Text style={text.paragraph}>
-        You created <strong>{agentName}</strong> and it has never started a run.
-        Give it one small task first: a result you can read in a minute is what
-        tells you whether the setup is right before you put it on a schedule.
-      </Text>
+      <Heading style={text.heading}>{t("agentIdle.heading", { agentName })}</Heading>
+      <Text style={text.paragraph}>{t.rich("agentIdle.body", { agentName, strong })}</Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Coworker", value: agentName },
-            { label: "Created", value: createdLabel },
-            { label: "Runs", value: "0" },
+            { label: t("common.meta.coworker"), value: agentName },
+            { label: t("common.meta.created"), value: createdLabel },
+            { label: t("common.meta.runs"), value: formatNumber(0, locale) },
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={agentUrl}>Open {agentName}</Button>
+        <Button href={agentUrl}>{t("agentIdle.button", { agentName })}</Button>
       </Section>
-      <Text style={text.footnote}>
-        Opening this page does not start a run.
-      </Text>
+      <Text style={text.footnote}>{t("agentIdle.footnote")}</Text>
     </Layout>
   );
 }

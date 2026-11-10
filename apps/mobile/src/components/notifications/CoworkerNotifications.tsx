@@ -1,7 +1,8 @@
-import { COWORKER_MODE_COPY, COWORKER_MODES, NOTIFICATION_SCOPE_COPY, coworkerRuleOf, taskNotifies, type CoworkerMode, type CoworkerRule, type NotificationPrefs, type RoutineKind, type RoutineView } from '@rerun/contracts'
+import { COWORKER_MODES, coworkerRuleOf, taskNotifies, type CoworkerMode, type CoworkerRule, type NotificationPrefs, type RoutineKind, type RoutineView } from '@rerun/contracts'
 import type { SFSymbol } from 'expo-symbols'
 import { Fragment } from 'react'
 import { Switch, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { routineKey, whenOf } from '@/components/coworker/CoworkerRoutines'
 import { Footnote } from '@/components/notifications/NotificationCenter'
@@ -29,6 +30,7 @@ type CoworkerNotificationsProps = {
 
 function TaskRow({ routine, value, disabled, onChange }: { routine: RoutineView; value: boolean; disabled: boolean; onChange: (notify: boolean) => void }) {
     const when = whenOf(routine)
+    const t = useTranslations('mobileSettings.notifications.coworker')
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT + 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, opacity: disabled ? 0.45 : 1 }}>
             <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
@@ -41,7 +43,7 @@ function TaskRow({ routine, value, disabled, onChange }: { routine: RoutineView;
                     </AppText>
                 ) : null}
             </View>
-            <Switch value={value} disabled={disabled} onValueChange={onChange} accessibilityLabel={`Notify me about ${routine.name}`} />
+            <Switch value={value} disabled={disabled} onValueChange={onChange} accessibilityLabel={t('taskSwitch', { name: routine.name })} />
         </View>
     )
 }
@@ -49,6 +51,7 @@ function TaskRow({ routine, value, disabled, onChange }: { routine: RoutineView;
 // The web's bell on a coworker, as a page: whose runs of it reach you, and which of its scheduled
 // tasks do.
 export function CoworkerNotifications({ agentId, name, prefs, routines, routinesFailed, onRule, onTask }: CoworkerNotificationsProps) {
+    const t = useTranslations('mobileSettings.notifications')
     if (!prefs) {
         return (
             <Card>
@@ -64,34 +67,34 @@ export function CoworkerNotifications({ agentId, name, prefs, routines, routines
     const rule = coworkerRuleOf(prefs, agentId)
     const muted = rule.mode === 'muted'
     const noSchedule = routines !== null && routines.length === 0
-    const hintOf = (mode: CoworkerMode) => (mode === 'default' ? `“${NOTIFICATION_SCOPE_COPY[prefs.scope].label}”` : COWORKER_MODE_COPY[mode].hint)
+    const hintOf = (mode: CoworkerMode) => (mode === 'default' ? t('coworker.quotedScope', { scope: t(`scopes.${prefs.scope}.label`) }) : t(`modes.${mode}.hint`))
 
     return (
         <>
-            <Section title={`Notify me about ${name}`}>
+            <Section title={t('coworker.title', { name })}>
                 {COWORKER_MODES.map((mode, index) => (
                     <View key={mode}>
                         {index > 0 && <Separator inset={ICON_ROW_INSET} />}
-                        <CheckRow testID={`mode-${mode}`} icon={MODE_SYMBOLS[mode]} label={mode === 'default' ? 'Your setting' : COWORKER_MODE_COPY[mode].label} detail={hintOf(mode)} checked={rule.mode === mode} onPress={() => onRule({ ...rule, mode })} />
+                        <CheckRow testID={`mode-${mode}`} icon={MODE_SYMBOLS[mode]} label={mode === 'default' ? t('coworker.yourSetting') : t(`modes.${mode}.label`)} detail={hintOf(mode)} checked={rule.mode === mode} onPress={() => onRule({ ...rule, mode })} />
                     </View>
                 ))}
             </Section>
 
             <View style={{ gap: spacing.sm }}>
                 <Card>
-                    <SwitchRow testID="switch-follow" label="Follow its scheduled tasks" value={rule.follow === true} disabled={muted || noSchedule} onValueChange={follow => onRule({ ...rule, follow })} />
+                    <SwitchRow testID="switch-follow" label={t('coworker.follow')} value={rule.follow === true} disabled={muted || noSchedule} onValueChange={follow => onRule({ ...rule, follow })} />
                 </Card>
-                <Footnote>{noSchedule ? 'Nothing scheduled yet.' : routines ? `${routines.length} scheduled, they reach you like your own runs.` : 'They reach you like your own runs.'}</Footnote>
+                <Footnote>{noSchedule ? t('coworker.nothingScheduled') : routines ? t('coworker.scheduled', { count: routines.length }) : t('coworker.reachYou')}</Footnote>
             </View>
 
             {(routines === null || routines.length > 0) && (
                 <View style={{ gap: spacing.sm }}>
-                    <Section title="Scheduled tasks">
+                    <Section title={t('coworker.tasksTitle')}>
                         {routines === null ? (
                             routinesFailed ? (
                                 <View style={{ padding: spacing.lg }}>
                                     <AppText variant="footnote" tone="muted">
-                                        Could not load its tasks. Try again in a moment.
+                                        {t('coworker.tasksFailed')}
                                     </AppText>
                                 </View>
                             ) : (
@@ -108,7 +111,7 @@ export function CoworkerNotifications({ agentId, name, prefs, routines, routines
                             ))
                         )}
                     </Section>
-                    {muted && <Footnote>{`${name} is muted.`}</Footnote>}
+                    {muted && <Footnote>{t('coworker.muted', { name })}</Footnote>}
                 </View>
             )}
         </>

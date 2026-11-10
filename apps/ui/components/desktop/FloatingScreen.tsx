@@ -1,6 +1,7 @@
 'use client'
 
 import { animate, motion, useDragControls, useMotionValue, useReducedMotion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useLayoutEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 
 import { TakeControlOverlay } from '@/components/desktop/TakeControlOverlay'
@@ -52,6 +53,7 @@ type FloatingScreenProps = {
 // The screen the thread scrolled away from, kept at the top of the chat under its pills and tabs. It slides
 // along that edge only: let go, it lands on the nearer side and stays there. Its inner bottom corner resizes it.
 export function FloatingScreen({ takeControlLabel, children, onTakeControl, className }: FloatingScreenProps) {
+    const t = useTranslations('desktop.screen')
     const reducedMotion = useReducedMotion()
     const dragControls = useDragControls()
     const trackRef = useRef<HTMLDivElement>(null)
@@ -142,7 +144,7 @@ export function FloatingScreen({ takeControlLabel, children, onTakeControl, clas
                 <TakeControlOverlay label={takeControlLabel} onClick={takeControlUnlessDragged} />
                 <div
                     role="separator"
-                    aria-label="Resize the screen"
+                    aria-label={t('resize')}
                     onPointerDown={startResize}
                     onPointerMove={resize}
                     onPointerUp={endResize}

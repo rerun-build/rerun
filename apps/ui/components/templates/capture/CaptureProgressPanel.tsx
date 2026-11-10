@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import { Stripes } from '@rerun/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { IconBadge } from '@/components/ui/icon-badge'
@@ -17,8 +18,6 @@ type StageState = 'upcoming' | 'current' | 'done'
 type CaptureStage = {
     step: ProgressStep
     icon: LucideIcon
-    title: string
-    description: string
     points: readonly string[]
 }
 
@@ -26,34 +25,10 @@ type CaptureStage = {
 // `apps/engine/src/agents/archive.ts` applies, so this panel states them rather than promising
 // something the pipeline does not do.
 const CAPTURE_STAGES: readonly CaptureStage[] = [
-    {
-        step: 'title',
-        icon: PencilIcon,
-        title: 'Name your template',
-        description: 'The draft is saved as soon as you confirm.',
-        points: ['Private until published', 'Signed with your name'],
-    },
-    {
-        step: 'select',
-        icon: UsersIcon,
-        title: 'Pick your coworkers',
-        description: 'The coworker folder is snapshotted as it stands.',
-        points: ['A snapshot, not a link', 'Later edits stay on your side'],
-    },
-    {
-        step: 'review',
-        icon: ShieldCheckIcon,
-        title: 'Security review',
-        description: 'Secrets are stripped before anything leaves the box.',
-        points: ['Env values cleared', 'Apps reset', 'Secret scan on files and paths', 'Memories left behind'],
-    },
-    {
-        step: 'done',
-        icon: Package,
-        title: 'Capture',
-        description: 'The archive is stored privately and describes the template.',
-        points: ['Stored out of reach', 'Warnings, not surprises'],
-    },
+    { step: 'title', icon: PencilIcon, points: ['private', 'signed'] },
+    { step: 'select', icon: UsersIcon, points: ['snapshot', 'edits'] },
+    { step: 'review', icon: ShieldCheckIcon, points: ['env', 'apps', 'scan', 'memories'] },
+    { step: 'done', icon: Package, points: ['stored', 'warnings'] },
 ]
 
 const EDGE_FADE = 'linear-gradient(to bottom, transparent, black 12%, black 88%, transparent)'
@@ -118,6 +93,9 @@ type CaptureStageCardProps = {
 }
 
 function CaptureStageCard({ ref, stage, state, connected }: CaptureStageCardProps) {
+    const t = useTranslations('templates.capture.stages')
+    // The point keys differ per stage, which the typed lookup cannot follow through `stage.step`.
+    const point = (key: string) => t(`${stage.step}.points.${key}` as Parameters<typeof t>[0])
     return (
         <li className="flex flex-col">
             {connected && <span aria-hidden className="h-6 w-0.5 self-center rounded-full" style={{ background: CONNECTOR_FADE }} />}
@@ -133,17 +111,17 @@ function CaptureStageCard({ ref, stage, state, connected }: CaptureStageCardProp
                 <div className="relative flex items-center gap-3 overflow-hidden border-b px-4 py-3">
                     <StageStripes state={state} />
                     <Icon icon={state === 'done' ? CheckIcon : stage.icon} size="sm" className="relative" />
-                    <p className="relative text-sm font-medium">{stage.title}</p>
+                    <p className="relative text-sm font-medium">{t(`${stage.step}.title`)}</p>
                 </div>
 
                 <div className="flex flex-col gap-3 p-4">
-                    <p className="text-xs text-muted-foreground">{stage.description}</p>
+                    <p className="text-xs text-muted-foreground">{t(`${stage.step}.description`)}</p>
 
                     <ul className="flex flex-col gap-2">
-                        {stage.points.map(point => (
-                            <li key={point} className="flex items-center gap-2">
+                        {stage.points.map(key => (
+                            <li key={key} className="flex items-center gap-2">
                                 <IconBadge tone={state === 'done' ? 'green' : 'neutral'} icon={CheckIcon} glow={false} />
-                                <p className="min-w-0 text-xs font-medium">{point}</p>
+                                <p className="min-w-0 text-xs font-medium">{point(key)}</p>
                             </li>
                         ))}
                     </ul>

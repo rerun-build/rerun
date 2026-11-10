@@ -8,6 +8,7 @@ import { math } from '@streamdown/math'
 import { mermaid } from '@streamdown/mermaid'
 import { Streamdown } from 'streamdown'
 import { ArrowRight, XIcon, type LucideIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 const streamdownPlugins = { cjk, code, math, mermaid }
 
@@ -23,6 +24,7 @@ interface NotificationToastProps {
 }
 
 export function NotificationToast({ title, message, agentId, Icon, iconColor, beamTone, onDismiss, onOpen }: NotificationToastProps) {
+    const t = useTranslations('notifications.toast')
     const messageRef = useRef<HTMLDivElement>(null)
     const [isOverflowing, setIsOverflowing] = useState(false)
     useEffect(() => {
@@ -38,7 +40,7 @@ export function NotificationToast({ title, message, agentId, Icon, iconColor, be
             <button
                 type="button"
                 onClick={onDismiss}
-                aria-label="Close notification"
+                aria-label={t('close')}
                 className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-[var(--radius-sm)] text-muted-foreground transition-opacity hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100"
             >
                 <XIcon className="size-3.5" />
@@ -76,7 +78,7 @@ export function NotificationToast({ title, message, agentId, Icon, iconColor, be
                                 duration={2.5}
                                 className="[--shimmer-base:var(--muted-foreground)] [--shimmer-highlight:var(--foreground)]"
                             >
-                                Open conversation
+                                {t('openConversation')}
                             </TextShimmer>
                             <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
                         </button>

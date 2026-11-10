@@ -4,6 +4,7 @@ import { assertAgentAccess, assertSpaceAccess } from '@/app/api/_auth/access'
 import { createAgentWithSetup } from '@/app/api/_services/agent-setup.service'
 import { getCatalogServicesBySlugs, getServiceAlternatives, getServiceDetails, installService, listCatalogServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService } from '@/app/api/_services/services.service'
 import type { InstallResult, ResetConnectionResult, ServiceAlternative, ServiceChecklistItem, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
+import { failureOf, refusalOf, type ActionFailure, type SuccessResult } from '@/lib/i18n/action-error'
 
 // Install (or configure) a service on an agent. Used by both the chat config form and
 // the Services settings tab — the same compile path either way. Returns needs_config
@@ -15,13 +16,13 @@ export async function installServiceAction(
     values: Record<string, string>,
     authMethodId?: string,
     opts?: { newInstance?: boolean },
-): Promise<{ ok: true; result: InstallResult } | { ok: false; error: string }> {
+): Promise<{ ok: true; result: InstallResult } | ActionFailure> {
     try {
         const { actor } = await assertAgentAccess(agentId, 'manage')
         const result = await installService(agentId, key, values, authMethodId, actor, opts)
         return { ok: true, result }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to install service' }
+        return failureOf(err, 'installServiceFailed')
     }
 }
 
@@ -87,22 +88,22 @@ export async function markServiceAuthorizedAction(agentId: string, key: string):
 
 // Reset a connected service so the user can go through its sign-in (or its config) again.
 // Non-destructive: nothing the install compiled is removed, only the stored token.
-export async function resetServiceConnectionAction(agentId: string, key: string): Promise<{ ok: true; result: ResetConnectionResult } | { ok: false; error: string }> {
+export async function resetServiceConnectionAction(agentId: string, key: string): Promise<{ ok: true; result: ResetConnectionResult } | ActionFailure> {
     try {
         const { actor } = await assertAgentAccess(agentId, 'manage')
         return { ok: true, result: await resetServiceConnection(agentId, key, actor) }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to reset app' }
+        return failureOf(err, 'resetAppFailed')
     }
 }
 
-export async function uninstallServiceAction(agentId: string, key: string): Promise<{ success: boolean; error?: string }> {
+export async function uninstallServiceAction(agentId: string, key: string): Promise<SuccessResult> {
     try {
         const { actor } = await assertAgentAccess(agentId, 'manage')
         await uninstallService(agentId, key, actor)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to uninstall service' }
+        return { success: false, ...refusalOf(err, 'uninstallServiceFailed') }
     }
 }
 
@@ -110,12 +111,12 @@ export async function uninstallServiceAction(agentId: string, key: string): Prom
 
 // Create the agent and install the services the user picked, all at drop. Services that
 // need secrets come back in the checklist for the user to finish configuring.
-export async function createAgentWithSetupAction(params: { name: string; description?: string; serviceSlugs?: string[]; workspaceId: number; spaceId: string; col?: number; row?: number }): Promise<{ ok: true; agentId: string; active: boolean; checklist: ServiceChecklistItem[] } | { ok: false; error: string }> {
+export async function createAgentWithSetupAction(params: { name: string; description?: string; serviceSlugs?: string[]; workspaceId: number; spaceId: string; col?: number; row?: number }): Promise<{ ok: true; agentId: string; active: boolean; checklist: ServiceChecklistItem[] } | ActionFailure> {
     try {
         const { actor } = await assertSpaceAccess(params.spaceId, 'manage')
         const { agentId, active, checklist } = await createAgentWithSetup({ ...params, workspaceId: actor.workspaceId, actor })
         return { ok: true, agentId, active, checklist }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to create coworker' }
+        return failureOf(err, 'createCoworkerFailed')
     }
 }

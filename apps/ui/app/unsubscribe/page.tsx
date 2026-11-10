@@ -6,9 +6,11 @@ import { verifyUnsubscribeToken } from '@/lib/email/unsubscribeToken'
 import { normalizeEmailPrefs } from '@/lib/notifications/prefs'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectSingle } from '@/supabase/supabase-helpers'
+import { getTranslations } from 'next-intl/server'
 
-export const metadata: Metadata = {
-    title: 'Email preferences',
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('publicPages.unsubscribe')
+    return { title: t('title') }
 }
 
 export const dynamic = 'force-dynamic'
@@ -24,6 +26,7 @@ async function loadPrefs(token: string) {
 export default async function UnsubscribePage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
     const { token } = await searchParams
     const loaded = token ? await loadPrefs(token) : null
+    const t = await getTranslations('publicPages.unsubscribe')
 
     return (
         <main className="mx-auto flex min-h-screen w-full max-w-xl flex-col gap-8 px-4 py-16">
@@ -32,9 +35,9 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
             </div>
 
             <header className="flex flex-col gap-1 px-3">
-                <h1 className="text-xl font-semibold text-foreground">Email preferences</h1>
+                <h1 className="text-xl font-semibold text-foreground">{t('title')}</h1>
                 <p className="text-sm text-muted-foreground">
-                    {loaded?.scope === 'runs' ? 'Choose whether your coworkers can email you. No account login needed.' : 'Update which emails Rerun sends you. No account login needed.'}
+                    {loaded?.scope === 'runs' ? t('subtitleRuns') : t('subtitle')}
                 </p>
             </header>
 
@@ -42,9 +45,9 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
                 <EmailPreferencesForm initialPrefs={loaded.prefs} token={token} />
             ) : (
                 <div className="rounded-lg border border-border bg-card/50 p-6 text-sm text-muted-foreground">
-                    <p>This unsubscribe link is invalid or has expired.</p>
+                    <p>{t('invalid')}</p>
                     <Link href="/" className="mt-2 inline-block text-foreground underline">
-                        Log in to manage your preferences
+                        {t('logIn')}
                     </Link>
                 </div>
             )}

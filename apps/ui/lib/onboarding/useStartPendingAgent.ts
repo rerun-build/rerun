@@ -7,6 +7,8 @@ import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { toast } from 'sonner'
+import { useErrorText } from '@/hooks/useErrorText'
+import { useTranslations } from 'next-intl'
 
 // Claims a Space from the pool and creates the parked first-agent draft inside it. Shared by the
 // trial start (BillingDialog) and the post-payment return (PostPaymentDialog). Resolves to false
@@ -15,6 +17,8 @@ export function useStartPendingAgent() {
     const { workspace } = useSession()
     const finalizeAgentCreation = useBoardStore(s => s.finalizeAgentCreation)
     const setStartingFirstAgent = useBoardStore(s => s.setStartingFirstAgent)
+    const t = useTranslations('builder.boardToasts')
+    const errorText = useErrorText()
 
     return async function startPendingAgent(): Promise<boolean> {
         if (!workspace) return false
@@ -30,7 +34,7 @@ export function useStartPendingAgent() {
             // arrive par le realtime et a parfois un tour de retard sur la fin de la survey.
             const claim = await claimSpaceAction({ workspaceId: workspace.id })
             if (!claim.ok) {
-                toast.error('Could not prepare your Box', { description: claim.error })
+                toast.error(t('prepareBoxFailed'), { description: errorText(claim) })
                 throw new Error(claim.error)
             }
 
@@ -39,7 +43,7 @@ export function useStartPendingAgent() {
             const anchor = draft.offset ? rebaseOffset(draft.offset, claim) : undefined
             const res = await createAgentWithSetupAction({ name: draft.name, description: draft.description, serviceSlugs: draft.serviceSlugs, workspaceId: workspace.id, spaceId: claim.spaceId, col: anchor?.col, row: anchor?.row })
             if (!res.ok) {
-                toast.error('Could not start your coworker', { description: res.error })
+                toast.error(t('startCoworkerFailed'), { description: errorText(res) })
                 throw new Error(res.error)
             }
 

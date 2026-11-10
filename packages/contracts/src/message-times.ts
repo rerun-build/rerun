@@ -8,16 +8,6 @@ export function calendarDaysBetween(earlier: Date, later: Date): number {
     return Math.round((startOf(later) - startOf(earlier)) / DAY_MS)
 }
 
-export function messageDayLabel(iso: string, now: Date = new Date()): string {
-    const date = new Date(iso)
-    const daysAgo = calendarDaysBetween(date, now)
-    if (daysAgo <= 0) return 'Today'
-    if (daysAgo === 1) return 'Yesterday'
-    if (daysAgo < 7) return date.toLocaleDateString('en-US', { weekday: 'long' })
-    const sameYear = date.getFullYear() === now.getFullYear()
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) })
-}
-
 function opensStretch(previous: string, time: string): boolean {
     const before = new Date(previous)
     const current = new Date(time)

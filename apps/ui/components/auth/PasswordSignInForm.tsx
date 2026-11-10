@@ -6,17 +6,22 @@ import { Input } from '@/components/ui/input'
 import { normalizeEmail } from '@/lib/email'
 import { createClient } from '@/supabase/client'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
+import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const passwordSignInSchema = z.object({
-    email: z.string().trim().email('Enter a valid email'),
-    password: z.string().min(1, 'Enter your password'),
-})
+const passwordSignInSchemaFor = (t: ReturnType<typeof useTranslations<'auth.password'>>) =>
+    z.object({
+        email: z.string().trim().email(t('errors.invalidEmail')),
+        password: z.string().min(1, t('errors.passwordRequired')),
+    })
 
 // Reached only through /auth?method=password, which nothing links to. A password exists only on
 // the accounts an admin gave one in /admin/users, so this form never signs anyone up.
 export function PasswordSignInForm({ onSignedIn }: { onSignedIn: () => void }) {
+    const t = useTranslations('auth.password')
+    const passwordSignInSchema = useMemo(() => passwordSignInSchemaFor(t), [t])
     const form = useForm<z.infer<typeof passwordSignInSchema>>({
         resolver: zodResolver(passwordSignInSchema),
         defaultValues: { email: '', password: '' },
@@ -25,7 +30,7 @@ export function PasswordSignInForm({ onSignedIn }: { onSignedIn: () => void }) {
     const submit = form.handleSubmit(async ({ email, password }) => {
         const { error } = await createClient().auth.signInWithPassword({ email: normalizeEmail(email), password })
         if (error) {
-            form.setError('password', { message: error.status === 429 ? 'Too many attempts. Try again in a few minutes.' : 'Wrong email or password.' })
+            form.setError('password', { message: error.status === 429 ? t('errors.tooManyAttempts') : t('errors.wrongCredentials') })
             return
         }
         onSignedIn()
@@ -40,7 +45,7 @@ export function PasswordSignInForm({ onSignedIn }: { onSignedIn: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
-                                <Input type="email" label="Email" placeholder="you@rerun.build" autoComplete="email" {...field} />
+                                <Input type="email" label={t('email')} placeholder="you@rerun.build" autoComplete="email" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -52,14 +57,14 @@ export function PasswordSignInForm({ onSignedIn }: { onSignedIn: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
-                                <Input type="password" label="Password" autoComplete="current-password" {...field} />
+                                <Input type="password" label={t('password')} autoComplete="current-password" {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
                 <Button type="submit" className="w-full" loading={form.formState.isSubmitting}>
-                    Sign in
+                    {t('submit')}
                 </Button>
             </form>
         </Form>

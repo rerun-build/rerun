@@ -1,0 +1,132 @@
+{
+    "contextMenu": {
+        "openChat": "Ouvrir le chat",
+        "rename": "Renommer",
+        "settings": "Paramètres",
+        "share": "Partager",
+        "duplicate": "Dupliquer",
+        "moveToBox": "Déplacer vers une Box",
+        "noOtherBox": "Aucune autre Box que vous gérez",
+        "delete": "Supprimer",
+        "manageAccess": "Gérer l’accès",
+        "boxAccessAdminOnly": "Seul un admin peut modifier l’accès à une Box",
+        "manageReason": "Seul un admin ou un manager de cette Box peut faire ceci",
+        "untitledBox": "Box sans nom",
+        "thisCoworker": "ce coworker"
+    },
+    "toolbar": {
+        "placementPrompt": "Touchez une case pour placer {name}",
+        "placementPromptDefault": "Touchez une case pour placer votre coworker",
+        "placementProgress": "Coworker {current} sur {total}",
+        "newCoworker": "Nouveau coworker",
+        "template": "Template",
+        "create": "Créer",
+        "search": "Rechercher",
+        "unplaced": "{count} à placer"
+    },
+    "isoBoard": {
+        "boxCta": "Explorer les templates {name}",
+        "boxCtaFallback": "Explorer les templates",
+        "recruitFirst": "Cliquez pour recruter votre premier coworker",
+        "createBox": "Cliquez pour créer une Box",
+        "preparingSandbox": "Préparation de votre sandbox…",
+        "settingUpTemplate": "Installation de {title}…",
+        "settingUpCoworker": "Installation de votre coworker…",
+        "installTemplate": "Cliquez pour installer {title}",
+        "addBoxOnSide": "Ajouter une Box de ce côté"
+    },
+    "discoveries": {
+        "statusDigging": "On fait connaissance avec {name}",
+        "statusDone": "{name} en un coup d’œil",
+        "found": "{count} trouvés",
+        "sources": {
+            "website": "Votre site",
+            "domain": "Votre domaine",
+            "registry": "Registre public",
+            "web": "Le web"
+        },
+        "teasers": {
+            "profile": "Lecture de {domain}…",
+            "stack": "Coup d’œil sous le capot de {domain}…",
+            "dns": "Vérification de votre messagerie…",
+            "registry": "Recherche dans le registre public…",
+            "site": "Lecture de toutes les pages de {domain}…",
+            "search": "Recherche de {name} sur le web…",
+            "linkedinPerson": "Recherche de votre profil LinkedIn…",
+            "linkedinCompany": "Recherche de {name} sur LinkedIn…",
+            "googleBusiness": "Lecture de vos avis Google…",
+            "catalog": "Visite de la boutique {domain}…",
+            "synthesis": "On rassemble tout…"
+        },
+        "cards": {
+            "identity": {
+                "title": "On vous a trouvé"
+            },
+            "audience": {
+                "title": "À qui vous vendez"
+            },
+            "tools": {
+                "title": "Outils repérés"
+            },
+            "mail": {
+                "title": "Votre messagerie",
+                "runsOn": "Vos e-mails passent par <b>{provider}</b>"
+            },
+            "social": {
+                "title": "Où l’on vous voit"
+            },
+            "brand": {
+                "title": "Votre marque"
+            },
+            "registry": {
+                "title": "Sur le papier",
+                "since": "Depuis <b>{year}</b>",
+                "people": "<b>{headcount}</b> personnes"
+            },
+            "person": {
+                "title": "C’est vous, {firstName} ?"
+            },
+            "linkedin": {
+                "title": "Votre page LinkedIn",
+                "followers": "abonnés",
+                "team": "dans l’équipe"
+            },
+            "reviews": {
+                "title": "Ce que disent vos clients",
+                "count": "<n>{count}</n> avis Google"
+            },
+            "products": {
+                "title": "Ce que vous vendez"
+            },
+            "competitors": {
+                "title": "Vos concurrents"
+            },
+            "customers": {
+                "title": "Qui achète déjà"
+            },
+            "brain": {
+                "title": "Company Brain",
+                "pages": "{count, plural, one {# page} other {# pages}} que vos agents lisent avant de commencer",
+                "productsAndCompetitors": "+ {products, plural, one {# produit} other {# produits}}, {competitors, plural, one {# concurrent} other {# concurrents}}",
+                "productsOnly": "+ {products, plural, one {# produit} other {# produits}}",
+                "competitorsOnly": "+ {competitors, plural, one {# concurrent} other {# concurrents}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "« {name} » a été créé mais est inactif",
+        "createdInactiveHint": "Votre forfait n'a plus de place libre pour un coworker. Activez-le depuis le panneau du coworker.",
+        "addFailed": "Impossible d'ajouter ce coworker",
+        "duplicateFailed": "Impossible de dupliquer ce coworker",
+        "importFailed": "Impossible d'importer ce template",
+        "importInterrupted": "L'import a été interrompu",
+        "importInterruptedHint": "Vérifiez votre machine avant de relancer l'import.",
+        "moveAgentFailed": "Impossible de déplacer ce coworker",
+        "moveBoxFailed": "Impossible de déplacer cette Box",
+        "deleteBoxFailed": "Impossible de supprimer cette Box",
+        "checkConnection": "Vérifiez votre connexion et réessayez.",
+        "shareLinkGone": "Ce lien de partage n'est plus disponible",
+        "prepareBoxFailed": "Impossible de préparer votre Box",
+        "startCoworkerFailed": "Impossible de démarrer votre coworker"
+    }
+}

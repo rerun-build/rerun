@@ -6,6 +6,7 @@ import type { ConnectorCatalog } from './types'
 import type { AgentSuggestion } from './types'
 import type { CatalogEntry } from './types'
 import { cn } from '../cn'
+import { useKitTranslations } from '../locale'
 
 import { appCoins, CoinStack } from './coins'
 
@@ -13,11 +14,12 @@ import { appCoins, CoinStack } from './coins'
 // The one under the cursor is previewed in the field. A
 // picked chip stays lit; while a description of one's own is typed, only the suggestion close to it
 // stays lit and the others step back.
-export function ForYou({ suggestions, catalog, picked, closest, onPick, onPreview, heading = 'Or start from one picked for you', className }: { suggestions: AgentSuggestion[]; catalog: ConnectorCatalog | null; picked: string | null; closest: string | null; onPick: (suggestion: AgentSuggestion) => void; onPreview?: (suggestion: AgentSuggestion | null) => void; heading?: string; className?: string }) {
+export function ForYou({ suggestions, catalog, picked, closest, onPick, onPreview, heading, className }: { suggestions: AgentSuggestion[]; catalog: ConnectorCatalog | null; picked: string | null; closest: string | null; onPick: (suggestion: AgentSuggestion) => void; onPreview?: (suggestion: AgentSuggestion | null) => void; heading?: string; className?: string }) {
+    const t = useKitTranslations()
     const comparing = !picked && closest !== null
     return (
         <div className={className}>
-            <p className="flex h-7 items-center text-sm text-muted-foreground">{comparing ? 'Close to your idea' : heading}</p>
+            <p className="flex h-7 items-center text-sm text-muted-foreground">{comparing ? t('newAgent.forYou.closeToIdea') : (heading ?? t('newAgent.forYou.heading'))}</p>
             <div className="mt-3 flex flex-wrap gap-2">
                 {suggestions.map((suggestion, index) => {
                     const lit = picked ? suggestion.id === picked : comparing ? suggestion.id === closest : index === 0

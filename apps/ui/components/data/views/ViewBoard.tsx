@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { rowKey, type DbRow } from '@/components/data/DataBrowserTable'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils'
 import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
 import type { TableView } from '@rerun/contracts'
 import { BoardColumnHeader, BoardItem, type CellContext } from '@rerun/ui/chat'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -30,6 +32,8 @@ type ViewBoardProps = {
 }
 
 export function ViewBoard({ source, table, view, query, refreshKey, context, onOpenRow }: ViewBoardProps) {
+    const t = useTranslations('data')
+    const errorText = useErrorText()
     const { groupBy, where, sort, tones } = view
     const fields = view.fields ?? {}
     const formats = view.formats ?? {}
@@ -52,7 +56,7 @@ export function ViewBoard({ source, table, view, query, refreshKey, context, onO
             const result = await source.readGroups(table, { groupBy, sum: sumColumn, q: query || undefined, where })
             if (cancelled) return
             if (!result.success) {
-                setError(result.error)
+                setError(errorText(result))
                 setLanes([])
                 return
             }
@@ -65,7 +69,7 @@ export function ViewBoard({ source, table, view, query, refreshKey, context, onO
         return () => {
             cancelled = true
         }
-    }, [source, table, groupBy, sumColumn, query, where, tones, readLane, refreshKey])
+    }, [source, table, groupBy, sumColumn, query, where, tones, readLane, refreshKey, errorText])
 
     const showMore = async (lane: Lane) => {
         const limit = lane.limit + PER_COLUMN
@@ -90,7 +94,7 @@ export function ViewBoard({ source, table, view, query, refreshKey, context, onO
         const result = await source.updateRow(table, id, { [groupBy]: target.value })
         if (!result.success) {
             setLanes(previous)
-            toast.error('Could not move this row', { description: result.error })
+            toast.error(t('board.moveFailed'), { description: errorText(result) })
         }
     }
 
@@ -113,8 +117,8 @@ export function ViewBoard({ source, table, view, query, refreshKey, context, onO
         )
     }
 
-    if (error) return <EmptyState className="h-full" icon={DatabaseIcon} title="Board unavailable" description={error} />
-    if (lanes.length === 0) return <EmptyState className="h-full" icon={DatabaseIcon} title="No rows" description={query ? 'No row matches this search.' : 'This table is empty.'} />
+    if (error) return <EmptyState className="h-full" icon={DatabaseIcon} title={t('board.unavailable')} description={error} />
+    if (lanes.length === 0) return <EmptyState className="h-full" icon={DatabaseIcon} title={t('browser.noRows')} description={query ? t('browser.noSearchMatch') : t('browser.tableEmpty')} />
 
     return (
         <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setDragged(null)}>
@@ -135,6 +139,7 @@ export function ViewBoard({ source, table, view, query, refreshKey, context, onO
 }
 
 function BoardLane({ lane, valueFormat, context, onShowMore, children }: { lane: Lane; valueFormat?: string; context: CellContext; onShowMore: () => void; children: React.ReactNode }) {
+    const t = useTranslations('data.board')
     const { setNodeRef, isOver } = useDroppable({ id: lane.key })
     const hidden = lane.total - lane.rows.length
 
@@ -144,7 +149,7 @@ function BoardLane({ lane, valueFormat, context, onShowMore, children }: { lane:
             <div className="flex min-h-8 flex-col gap-1.5 overflow-y-auto">{children}</div>
             {hidden > 0 && (
                 <Button type="button" variant="ghost" size="xs" onClick={onShowMore} className="justify-start text-muted-foreground">
-                    Show {Math.min(hidden, PER_COLUMN)} more
+                    {t('showMore', { count: Math.min(hidden, PER_COLUMN) })}
                 </Button>
             )}
         </div>

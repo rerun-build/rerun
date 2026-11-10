@@ -1,5 +1,7 @@
 'use client'
 
+import { formatDate } from '@rerun/i18n/format'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { getAppsOverviewAction } from '@/app/api/_actions/apps.actions'
 import type { AppsOverview } from '@/app/api/_services/apps.service'
@@ -26,10 +28,12 @@ export function withAppSlots(quantities: AddonQuantities, slots: AppSlots): Addo
     return { ...quantities, ...Object.fromEntries(APP_SLUGS.map(slug => [APP_ADDON_KEYS[slug], slots[slug]])) }
 }
 
+type BillingTranslator = ReturnType<typeof useTranslations<'billing'>>
+
 // " + 2 LinkedIn slots + 1 WhatsApp slot", for the lines that name a whole plan.
-export function appSlotsLabel(slots: AppSlots): string {
+export function appSlotsLabel(slots: AppSlots, t: BillingTranslator): string {
     return APP_SLUGS.filter(slug => slots[slug] > 0)
-        .map(slug => ` + ${slots[slug]} ${appInfo(slug).providerLabel} slot${slots[slug] === 1 ? '' : 's'}`)
+        .map(slug => t('apps.slotsSuffix', { count: slots[slug], provider: appInfo(slug).providerLabel }))
         .join('')
 }
 
@@ -67,11 +71,12 @@ type AppsSectionProps = {
 // The paid apps of the workspace, billed on the plan but each shown as its own app: plain lines
 // under the plan and the credits, so they do not read as products of their own.
 export function AppsSection({ rows, interval, renewal, disabled = false, onChange }: AppsSectionProps) {
+    const t = useTranslations('billing.apps')
     return (
         <section className="@container flex flex-col gap-3">
             <div className="flex flex-col gap-1">
-                <h3 className="text-2xl font-semibold tracking-tight">Apps</h3>
-                <p className="text-sm text-muted-foreground">Extra superpowers for your coworkers, on the same invoice as your plan.</p>
+                <h3 className="text-2xl font-semibold tracking-tight">{t('title')}</h3>
+                <p className="text-sm text-muted-foreground">{t('description')}</p>
             </div>
             {rows.map(row => (
                 <AppSlotsLine key={row.slug} row={row} interval={interval} renewal={renewal} disabled={disabled} onChange={value => onChange(row.slug, value)} />
@@ -81,10 +86,12 @@ export function AppsSection({ rows, interval, renewal, disabled = false, onChang
 }
 
 function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: AppSlotsRow; interval: BillingInterval; renewal: string; disabled: boolean; onChange: (value: number) => void }) {
+    const locale = useLocale()
+    const t = useTranslations('billing.apps')
     const { slug, value, current, slotsState, onOpen } = row
     const { name, providerLabel } = appInfo(slug)
     const slotPrice = PLAN_PRICES_CENTS[interval][APP_ADDON_KEYS[slug]]
-    const per = interval === 'yearly' ? '/yr' : '/mo'
+    const per = interval === 'yearly' ? t('unit.yearly') : t('unit.monthly')
     const inUse = slotsState.loaded ? (slotsState.overview?.slotsInUse ?? 0) : null
     const floor = inUse ?? current
     const trialEndsAt = slotsState.overview?.subscriberTrialEndsAt ?? null
@@ -93,11 +100,11 @@ function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: App
     const lessReason = disabled
         ? undefined
         : onlyTrialSlot
-          ? `Free until ${trialUntil(trialEndsAt)}`
+          ? t('lessReason.freeUntil', { date: trialUntil(trialEndsAt, locale) })
           : inUse === null
-            ? 'Loading your accounts'
+            ? t('lessReason.loading')
             : value <= floor
-              ? `Disconnect an account in ${name} first`
+              ? t('lessReason.disconnectFirst', { app: name })
               : undefined
     const removed = current - value
 
@@ -112,10 +119,7 @@ function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: App
                             {trialEndsAt ? (
                                 <TrialSlotsCount value={value} inUse={inUse} trialEndsAt={trialEndsAt} price={`${usd(slotPrice)}${per}`} />
                             ) : (
-                                <>
-                                    <SlotsCount value={value} inUse={inUse} />, {usd(slotPrice)}
-                                    {per} each
-                                </>
+                                t.rich(interval === 'yearly' ? 'slots.lineYearly' : 'slots.lineMonthly', { price: usd(slotPrice), slots: () => <SlotsCount value={value} inUse={inUse} /> })
                             )}
                         </p>
                     </div>
@@ -123,7 +127,7 @@ function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: App
                 <div className="flex items-center justify-between gap-3 pl-11 @md:justify-end @md:pl-0">
                     <span className="text-sm tabular-nums">
                         {onlyTrialSlot ? (
-                            'Free'
+                            t('free')
                         ) : (
                             <>
                                 <UsdFlow cents={value * slotPrice} />
@@ -150,61 +154,54 @@ function AppName({ name, onOpen }: { name: string; onOpen?: () => void }) {
 }
 
 function SlotsCount({ value, inUse }: { value: number; inUse: number | null }) {
-    if (value === 0) return <>No slot yet</>
+    const t = useTranslations('billing.apps')
+    if (value === 0) return <>{t('slots.none')}</>
+    const n = () => <CountFlow value={value} />
+    if (inUse === null) return <>{t.rich('slots.count', { total: value, n })}</>
     return (
         <>
-            {inUse !== null && (
-                <>
+            {t.rich('slots.used', {
+                total: value,
+                n,
+                used: () => (
                     <span className="font-medium text-foreground">
                         <CountFlow value={inUse} />
-                    </span>{' '}
-                    of{' '}
-                </>
-            )}
-            <CountFlow value={value} /> slot{value === 1 ? '' : 's'}
-            {inUse !== null && ' used'}
+                    </span>
+                ),
+            })}
         </>
     )
 }
 
-function trialUntil(trialEndsAt: string): string {
-    return new Date(trialEndsAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+function trialUntil(trialEndsAt: string, locale: string): string {
+    return formatDate(trialEndsAt, locale, { month: 'long', day: 'numeric' })
 }
 
 // The subscriber trial's slot is not on Stripe: the stepper shows it on top of the paid ones but never
 // sends it back as a quantity, and the line says apart the day it turns into a paid one.
 function TrialSlotsCount({ value, inUse, trialEndsAt, price }: { value: number; inUse: number | null; trialEndsAt: string; price: string }) {
-    const trial = (
-        <>
-            <span className="font-medium text-foreground">1 slot free until {trialUntil(trialEndsAt)}</span>, then {price}
-        </>
-    )
-    if (value === 0) return trial
-    return (
-        <>
-            {trial}, plus <CountFlow value={value} /> paid slot{value === 1 ? '' : 's'}
-            {inUse !== null && (
-                <>
-                    {' '}
-                    (<CountFlow value={inUse} /> in use)
-                </>
-            )}
-        </>
-    )
+    const locale = useLocale()
+    const t = useTranslations('billing.apps')
+    const trial = () => t.rich('trial.free', { date: trialUntil(trialEndsAt, locale), price, b: chunks => <span className="font-medium text-foreground">{chunks}</span> })
+    if (value === 0) return trial()
+    const n = () => <CountFlow value={value} />
+    if (inUse === null) return t.rich('trial.withPaid', { count: value, trial, n })
+    return t.rich('trial.withPaidInUse', { count: value, trial, n, inUse: () => <CountFlow value={inUse} /> })
 }
 
 function SlotStepper({ label, value, lessReason, disabled, onChange }: { label: string; value: number; lessReason?: string; disabled: boolean; onChange: (value: number) => void }) {
+    const t = useTranslations('billing.apps')
     return (
         <div className="flex shrink-0 items-center gap-2">
             <TooltipDisabledReason reason={lessReason}>
-                <Button variant="outline" size="icon-sm" aria-label={`One ${label} slot less`} disabled={disabled || !!lessReason || value === 0} onClick={() => onChange(value - 1)}>
+                <Button variant="outline" size="icon-sm" aria-label={t('lessAria', { provider: label })} disabled={disabled || !!lessReason || value === 0} onClick={() => onChange(value - 1)}>
                     <MinusIcon />
                 </Button>
             </TooltipDisabledReason>
             <span className="min-w-6 text-center text-sm font-medium tabular-nums">
                 <CountFlow value={value} />
             </span>
-            <Button variant="outline" size="icon-sm" aria-label={`One ${label} slot more`} disabled={disabled} onClick={() => onChange(value + 1)}>
+            <Button variant="outline" size="icon-sm" aria-label={t('moreAria', { provider: label })} disabled={disabled} onClick={() => onChange(value + 1)}>
                 <PlusIcon />
             </Button>
         </div>
@@ -212,6 +209,7 @@ function SlotStepper({ label, value, lessReason, disabled, onChange }: { label: 
 }
 
 function LeavingNote({ removed, renewal }: { removed: number; renewal: string }) {
+    const t = useTranslations('billing.apps')
     return (
         <AnimatePresence mode="popLayout" initial={false}>
             {removed > 0 && (
@@ -223,7 +221,7 @@ function LeavingNote({ removed, renewal }: { removed: number; renewal: string })
                     transition={{ duration: 0.18, ease: 'easeOut' }}
                     className="text-xs text-destructive"
                 >
-                    {removed} slot{removed === 1 ? '' : 's'} leaving on {renewal}
+                    {t('leaving', { count: removed, date: renewal })}
                 </motion.span>
             )}
         </AnimatePresence>

@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Img, Link, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
 // One email for the whole program. `outreach` writes to someone whose listing we prefilled from
@@ -16,6 +17,7 @@ export interface CreatorInviteProps {
   context: CreatorInviteContext;
   cardImageUrl?: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 // This one keeps the expert card as its visual: a portrait of the recipient's own listing beats
@@ -27,36 +29,28 @@ export default function CreatorInvite({
   context,
   cardImageUrl,
   unsubscribeUrl,
+  locale,
 }: CreatorInviteProps) {
+  const t = emailTranslator(locale);
   const outreach = context === "outreach";
 
   return (
     <Layout
-      preview={
-        outreach
-          ? "Built from your public work. Claim your profile and your sandbox."
-          : "You are in. Claim your sandbox and start building templates."
-      }
+      preview={outreach ? t("creatorInvite.previewOutreach") : t("creatorInvite.previewApplication")}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
-      unsubscribeLabel={unsubscribeUrl ? "Remove my profile" : undefined}
+      unsubscribeLabel={unsubscribeUrl ? t("creatorInvite.unsubscribe") : undefined}
+      locale={locale}
     >
       <Heading style={text.heading}>
-        {outreach ? `Congratulations, ${firstName}` : `You are in, ${firstName}`}
+        {outreach
+          ? t("creatorInvite.headingOutreach", { firstName })
+          : t("creatorInvite.headingApplication", { firstName })}
       </Heading>
 
-      {outreach ? (
-        <Text style={text.paragraph}>
-          Your profile was just added to our directory of professionals who
-          design and deploy AI coworkers. We pre-filled your listing from your
-          public work.
-        </Text>
-      ) : (
-        <Text style={text.paragraph}>
-          We reviewed your application to the Rerun Creator program and we would
-          love to have you on board.
-        </Text>
-      )}
+      <Text style={text.paragraph}>
+        {outreach ? t("creatorInvite.introOutreach") : t("creatorInvite.introApplication")}
+      </Text>
 
       {cardImageUrl ? (
         <Section style={cardWrap}>
@@ -64,37 +58,32 @@ export default function CreatorInvite({
             <Img
               src={cardImageUrl}
               width="340"
-              alt={`${firstName}'s Rerun Expert card`}
+              alt={t("creatorInvite.cardAlt", { firstName })}
               style={card}
             />
           </Link>
         </Section>
       ) : null}
 
-      <Text style={text.paragraph}>
-        The link below creates your creator account and hands you a sandbox: an
-        unlimited workspace where you build coworkers, capture them as templates, and
-        publish them to the marketplace. Creators keep the revenue on every paid
-        template they ship.
-      </Text>
+      <Text style={text.paragraph}>{t("creatorInvite.sandbox")}</Text>
 
       <Section style={cta}>
-        <Button href={joinUrl}>Claim my box</Button>
+        <Button href={joinUrl}>{t("creatorInvite.button")}</Button>
       </Section>
 
-      <Text style={text.paragraph}>
-        You will be asked to accept the program conditions before the sandbox
-        opens. It takes a minute. Your public listing stays yours to edit from
-        the app, whenever you want.
-      </Text>
+      <Text style={text.paragraph}>{t("creatorInvite.conditions")}</Text>
       <Text style={small}>
-        If the button does not work, paste this into your browser:{" "}
-        <Link href={joinUrl} style={inlineLink}>
-          {joinUrl}
-        </Link>
+        {t.rich("creatorInvite.fallbackLink", {
+          url: joinUrl,
+          link: (chunks) => (
+            <Link href={joinUrl} style={inlineLink}>
+              {chunks}
+            </Link>
+          ),
+        })}
       </Text>
 
-      <Text style={signoff}>— The Rerun Team</Text>
+      <Text style={signoff}>{t("creatorInvite.signoff")}</Text>
     </Layout>
   );
 }

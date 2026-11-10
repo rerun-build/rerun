@@ -7,6 +7,7 @@ import { PauseIcon, Play } from '@/lib/icons'
 import { formatVoiceDuration } from '@/lib/voice/duration'
 import { PEAK_COUNT } from '@/lib/voice/peaks'
 import { BorderBeam } from '@rerun/ui'
+import { useTranslations } from 'next-intl'
 
 type VoiceMessageBubbleProps = {
     playback: VoicePlayback
@@ -16,6 +17,7 @@ type VoiceMessageBubbleProps = {
 
 /** The player drawn inside the user bubble: play, the waveform to seek on, the timer. */
 export function VoiceMessageBubble({ playback, durationMs, peaks }: VoiceMessageBubbleProps) {
+    const t = useTranslations('chat.voice')
     const { available, loading, playing, elapsedMs, progress, toggle, seekAt, audioProps } = playback
     const levels = peaks.length > 0 ? peaks : Array.from({ length: PEAK_COUNT }, () => 0.25)
 
@@ -25,7 +27,7 @@ export function VoiceMessageBubble({ playback, durationMs, peaks }: VoiceMessage
                 type="button"
                 onClick={toggle}
                 disabled={!available || loading}
-                aria-label={playing ? 'Pause' : 'Play voice message'}
+                aria-label={playing ? t('pause') : t('play')}
                 className="relative flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground/10 text-foreground transition-colors hover:bg-foreground/20 disabled:opacity-50 in-data-ink:bg-white/15 in-data-ink:text-white in-data-ink:hover:bg-white/25"
             >
                 {loading ? <Spinner /> : playing ? <PauseIcon className="size-4" /> : <Play className="size-4" />}
@@ -38,7 +40,7 @@ export function VoiceMessageBubble({ playback, durationMs, peaks }: VoiceMessage
                     const bounds = event.currentTarget.getBoundingClientRect()
                     seekAt((event.clientX - bounds.left) / bounds.width)
                 }}
-                aria-label="Seek"
+                aria-label={t('seek')}
                 className="flex w-32 shrink-0 cursor-pointer items-center text-foreground in-data-ink:text-white sm:w-40"
             >
                 <VoiceWaveform peaks={levels} progress={progress} />

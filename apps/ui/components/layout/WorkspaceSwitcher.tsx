@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { accountLabel } from '@/lib/auth/placeholder-email'
 import { enterSandboxAction, switchWorkspaceAction } from '@/app/api/_actions/workspace.actions'
 import { AccountDialog } from '@/components/dialogs/AccountDialog'
@@ -19,6 +20,7 @@ import { WorkspaceMembersDialog } from '@/components/dialogs/WorkspaceMembersDia
 import { WorkspaceSettingsDialog } from '@/components/dialogs/WorkspaceSettingsDialog'
 import { SignInPillButton } from '@/components/layout/SignInPill'
 import { ThemeMenuRow } from '@/components/layout/ThemeMenuRow'
+import { LanguageMenuRow } from '@/components/layout/LanguageMenuRow'
 import { HelpButton } from '@/components/layout/HelpButton'
 import { WeeklyRewindMenuItem, WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
 import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from '@/components/layout/WorkspacePowerControl'
@@ -46,6 +48,7 @@ import Link from 'next/link'
 import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 const PRICING_ICONS = ['/pricing/solo.png', '/pricing/team.png', '/pricing/scale.png']
 
@@ -61,16 +64,20 @@ function AdminOnly({ allowed, reason, className = 'flex w-full', children }: { a
     )
 }
 
-function workspaceSummary(workspace: SessionWorkspace): string {
-    if (workspace.is_sandbox) return 'Expert sandbox'
+type WorkspaceMenuTranslator = ReturnType<typeof useTranslations<'layout.workspaceMenu'>>
+
+function workspaceSummary(workspace: SessionWorkspace, t: WorkspaceMenuTranslator): string {
+    if (workspace.is_sandbox) return t('summary.sandbox')
     const trialing = workspace.subscription_status === 'trialing'
     const agents = trialing ? activeAgentLimitFor(workspace.max_agents, workspace.subscription_status) : workspace.max_agents
-    const seats = workspace.max_seats == null ? 'unlimited seats' : `${workspace.max_seats} ${workspace.max_seats === 1 ? 'seat' : 'seats'}`
-    const limits = `${agents ?? 'unlimited'} coworkers · ${seats}`
-    return trialing ? `Trial · ${limits}` : limits
+    const seats = workspace.max_seats == null ? t('summary.unlimitedSeats') : t('summary.seats', { count: workspace.max_seats })
+    const limits = agents == null ? t('summary.limitsUnlimited', { seats }) : t('summary.limits', { agents, seats })
+    return trialing ? t('summary.trial', { limits }) : limits
 }
 
 export function WorkspaceSwitcher() {
+    const t = useTranslations('layout.workspaceMenu')
+    const errorText = useErrorText()
     const { user, workspace, workspaces, session, isAnonymous, signOut } = useSession()
     const openBilling = useBillingStore(s => s.openBilling)
     const paidApps = useEnabledPaidApps()
@@ -148,7 +155,7 @@ export function WorkspaceSwitcher() {
         const result = await switchWorkspaceAction(workspaceId)
         if (result.ok) return enterActiveWorkspace()
         abortWorkspaceSwitch()
-        toast.error(result.error)
+        toast.error(errorText(result))
         setBusy(false)
     }
 
@@ -162,7 +169,7 @@ export function WorkspaceSwitcher() {
         const result = await enterSandboxAction()
         if (result.ok) return enterActiveWorkspace()
         abortWorkspaceSwitch()
-        toast.error(result.error)
+        toast.error(errorText(result))
         setEntering(false)
     }
 
@@ -170,10 +177,10 @@ export function WorkspaceSwitcher() {
     const showCredit = !workspace.is_sandbox && credit.budgetMicros > 0 && workspace.subscription_status !== 'past_due'
 
     const apiKeysItem = (
-        <AdminOnly allowed={workspaceAdmin} reason="Only an admin can manage API keys">
+        <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.apiKeys')}>
             <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => (apiEntitled ? openWorkspacePanel('api_keys') : openBilling(undefined, 'api_keys'))} className="gap-2 text-muted-foreground">
                 <KeyIcon className="size-4" />
-                API keys & MCP
+                {t('apiKeys')}
                 {!apiEntitled && (
                     <Badge size="xs" tone="brand" glow={false} className="ml-auto font-medium">
                         PRO
@@ -190,8 +197,8 @@ export function WorkspaceSwitcher() {
             <div className="flex items-center gap-2.5">
                 <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-8 shrink-0 rounded-full object-cover" />
                 <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-foreground">{workspace.name || 'Workspace'}</div>
-                    <div className="truncate text-xs text-muted-foreground">{workspaceSummary(workspace)}</div>
+                    <div className="truncate text-sm font-medium text-foreground">{workspace.name || t('defaultName')}</div>
+                    <div className="truncate text-xs text-muted-foreground">{workspaceSummary(workspace, t)}</div>
                 </div>
             </div>
             {showCredit && (
@@ -205,15 +212,15 @@ export function WorkspaceSwitcher() {
             )}
             {!workspace.is_sandbox && (
                 <div className="flex gap-1.5">
-                    <AdminOnly allowed={workspaceAdmin} reason="Only an admin can change the workspace settings" className="flex flex-1">
+                    <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.settings')} className="flex flex-1">
                         <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openWorkspacePanel('workspace')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
                             <SettingsIcon className="size-3.5" />
-                            Settings
+                            {t('settings')}
                         </DropdownMenuItem>
                     </AdminOnly>
                     <DropdownMenuItem onSelect={() => openWorkspacePanel('members')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
                         <UsersIcon className="size-3.5" />
-                        Members
+                        {t('members')}
                     </DropdownMenuItem>
                 </div>
             )}
@@ -224,31 +231,31 @@ export function WorkspaceSwitcher() {
         <>
             <DropdownMenuItem onSelect={() => openWorkspacePanel('knowledge_base')} className="gap-2 text-muted-foreground">
                 <BrainIcon className="size-4" />
-                Brain
+                {t('brain')}
                 {brainProposals > 0 && (
-                    <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white tabular-nums" aria-label={`${brainProposals} proposals to review`}>
+                    <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white tabular-nums" aria-label={t('brainProposals', { count: brainProposals })}>
                         {brainProposals}
                     </span>
                 )}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => openWorkspacePanel('ai_providers')} className="gap-2 text-muted-foreground">
                 <LockKeyholeIcon className="size-4" />
-                AI providers
+                {t('aiProviders')}
             </DropdownMenuItem>
             {apiKeysItem}
             {SERVERS_ENABLED && (
-                <AdminOnly allowed={workspaceAdmin} reason="Only an admin can manage servers">
+                <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.servers')}>
                     <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => setServersOpen(true)} className="gap-2 text-muted-foreground">
                         <ServerIcon className="size-4" />
-                        Servers
+                        {t('servers')}
                     </DropdownMenuItem>
                 </AdminOnly>
             )}
             {BILLING_ENABLED && !workspace.is_sandbox && (
-                <AdminOnly allowed={workspaceAdmin} reason="Only an admin can manage billing">
+                <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.billing')}>
                     <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openBilling()} className="gap-2 text-muted-foreground">
                         <CreditCardIcon className="size-4" />
-                        Billing
+                        {t('billing')}
                     </DropdownMenuItem>
                 </AdminOnly>
             )}
@@ -267,14 +274,14 @@ export function WorkspaceSwitcher() {
                 return (
                     <DropdownMenuItem key={w.id} disabled={busy} onSelect={() => handleSwitch(w.id)} className={cn('gap-2', !active && 'text-muted-foreground')}>
                         <WorkspaceLogoImage src={w.icon_url || fallbackIcon} fallbackSrc={fallbackIcon} className="size-5 shrink-0 rounded-full object-cover" />
-                        <span className="flex-1 truncate">{w.name || 'Workspace'}</span>
+                        <span className="flex-1 truncate">{w.name || t('defaultName')}</span>
                         {active && <CheckIcon className="size-4" />}
                     </DropdownMenuItem>
                 )
             })}
             <DropdownMenuItem onSelect={() => setCreateOpen(true)} className="gap-2 text-muted-foreground">
                 <PlusIcon className="size-4" />
-                New workspace
+                {t('newWorkspace')}
             </DropdownMenuItem>
         </>
     )
@@ -283,16 +290,16 @@ export function WorkspaceSwitcher() {
         <DropdownMenuSub>
             <DropdownMenuSubTrigger className="gap-2 text-muted-foreground">
                 <LayersIcon className="size-4" />
-                Templates
+                {t('templates')}
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="min-w-48">
                 <DropdownMenuItem onSelect={() => openCreator()} className="gap-2 text-muted-foreground">
                     <GridIcon className="size-4" />
-                    My templates
+                    {t('myTemplates')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setCreateTemplateOpen(true)} className="gap-2 text-muted-foreground">
                     <PlusIcon className="size-4" />
-                    New template
+                    {t('newTemplate')}
                 </DropdownMenuItem>
             </DropdownMenuSubContent>
         </DropdownMenuSub>
@@ -302,7 +309,7 @@ export function WorkspaceSwitcher() {
         <DropdownMenuSub>
             <DropdownMenuSubTrigger className={cn('gap-2', workspace.is_sandbox ? 'text-primary' : 'text-muted-foreground')}>
                 <BadgeCheck className="size-4" />
-                Expert
+                {t('expert')}
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="min-w-48">
                 <DropdownMenuItem
@@ -311,12 +318,12 @@ export function WorkspaceSwitcher() {
                     className={cn('gap-2', workspace.is_sandbox ? 'text-primary' : 'text-primary/90 focus:text-primary')}
                 >
                     {entering ? <Loader2Icon className="size-4 animate-spin" /> : <FlaskConical className="size-4" />}
-                    <span className="flex-1">{entering ? 'Preparing sandbox…' : 'Sandbox'}</span>
+                    <span className="flex-1">{entering ? t('preparingSandbox') : t('sandbox')}</span>
                 </DropdownMenuItem>
                 {user?.expert_profile_id && (
                     <DropdownMenuItem onSelect={() => setProfileOpen(true)} className="gap-2 text-muted-foreground">
                         <IdCardIcon className="size-4" />
-                        Public profile
+                        {t('publicProfile')}
                     </DropdownMenuItem>
                 )}
             </DropdownMenuSubContent>
@@ -328,13 +335,13 @@ export function WorkspaceSwitcher() {
         <DropdownMenuSub>
             <DropdownMenuSubTrigger className="gap-2 text-muted-foreground">
                 <ShieldCheckIcon className="size-4" />
-                Admin
+                {t('admin')}
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="min-w-48">
                 <DropdownMenuItem asChild className="gap-2 text-muted-foreground">
                     <Link href={`${ADMIN_URL}/admin`}>
                         <GaugeIcon className="size-4" />
-                        Admin panel
+                        {t('adminPanel')}
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -354,17 +361,18 @@ export function WorkspaceSwitcher() {
     const footerSection = (
         <>
             <ThemeMenuRow />
+            <LanguageMenuRow />
             <DropdownMenuItem onSelect={() => useNotificationsStore.getState().openNotifications()} className="gap-2 text-muted-foreground">
                 <BellIcon className="size-4" />
-                Notifications
+                {t('notifications')}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => openAccount()} className="gap-2 text-muted-foreground">
                 <UserRoundIcon className="size-4" />
-                Account
+                {t('account')}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={signOut} className="gap-2 text-muted-foreground">
                 <LogOutIcon className="size-4" />
-                Sign out
+                {t('signOut')}
             </DropdownMenuItem>
         </>
     )
@@ -385,7 +393,7 @@ export function WorkspaceSwitcher() {
             >
                 <div className="relative min-w-0">
                     <DropdownMenuTrigger asChild>
-                        <WorkspacePill className="max-w-full shrink" name={workspace.name || 'Workspace'} iconUrl={workspace.icon_url || activeIcon} fallbackIconUrl={activeIcon} stripes={workspace.is_sandbox} />
+                        <WorkspacePill className="max-w-full shrink" name={workspace.name || t('defaultName')} iconUrl={workspace.icon_url || activeIcon} fallbackIconUrl={activeIcon} stripes={workspace.is_sandbox} />
                     </DropdownMenuTrigger>
                     {brainProposals > 0 && <span className="pointer-events-none absolute top-0.5 right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
                 </div>

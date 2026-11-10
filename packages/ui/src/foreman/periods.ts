@@ -1,3 +1,5 @@
+import { formatDate } from '@rerun/i18n/format'
+
 const MINUTE = 60_000
 const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
@@ -21,8 +23,8 @@ function startOfDay(at: number): number {
     return new Date(at).setHours(0, 0, 0, 0)
 }
 
-function clockOf(at: Date): string {
-    return at.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+function clockOf(at: Date, locale: string): string {
+    return formatDate(at, locale, { hour: 'numeric', minute: '2-digit' })
 }
 
 export function periodOf(routine: PeriodTiming, now: number): PeriodKey {
@@ -49,11 +51,11 @@ export function groupByPeriod<T extends PeriodTiming>(routines: T[], now: number
     return (Object.keys(PERIOD_LABELS) as PeriodKey[]).filter(key => byPeriod.has(key)).map(key => ({ key, routines: byPeriod.get(key) ?? [] }))
 }
 
-export function timeIn(period: PeriodKey, iso: string): string {
+export function timeIn(period: PeriodKey, iso: string, locale: string): string {
     const at = new Date(iso)
-    if (period === 'week') return `${at.toLocaleDateString('en-US', { weekday: 'short' })} ${clockOf(at)}`
-    if (period === 'later') return at.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    return clockOf(at)
+    if (period === 'week') return `${formatDate(at, locale, { weekday: 'short' })} ${clockOf(at, locale)}`
+    if (period === 'later') return formatDate(at, locale, { month: 'short', day: 'numeric' })
+    return clockOf(at, locale)
 }
 
 export function isWithinTheHour(iso: string, now: number): boolean {

@@ -1,0 +1,42 @@
+{
+    "group": {
+        "steps": "{count, plural, one {# étape} other {# étapes}}",
+        "stepsWithFailures": "{count, plural, one {# étape} other {# étapes}}, {failed, plural, one {# en échec} other {# en échec}}",
+        "failed": "{failed, plural, one {# en échec} other {# en échec}}"
+    },
+    "tool": {
+        "input": "Entrée",
+        "error": "Erreur",
+        "output": "Sortie",
+        "completedInMs": "Terminé en {ms} ms",
+        "completedInSeconds": "Terminé en {seconds} s"
+    },
+    "reasoning": {
+        "thinking": "Réflexion...",
+        "thought": "Réflexion"
+    },
+    "compaction": {
+        "running": "Compactage du contexte…",
+        "failed": "Échec du compactage du contexte",
+        "done": "Contexte compacté",
+        "summarized": "{count} messages précédents résumés",
+        "recovered": "~{count} tokens récupérés"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {# échec} other {# échecs}}",
+        "idle": "Inactif depuis {minutes} min",
+        "stop": "Arrêter cette tâche",
+        "failed": "Échec",
+        "stopped": "Arrêtée, travail partiel conservé",
+        "earlier": "+{count} plus tôt",
+        "verbs": {
+            "web_search": "Recherche {summary}",
+            "web_fetch": "Lecture {summary}",
+            "browser_navigate": "Navigation {summary}",
+            "shell_exec": "Exécution {summary}",
+            "fs_read": "Lecture {summary}",
+            "fs_write": "Écriture {summary}",
+            "fs_edit": "Modification {summary}"
+        }
+    }
+}

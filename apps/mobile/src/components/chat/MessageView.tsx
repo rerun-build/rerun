@@ -1,6 +1,7 @@
 import { hitlKindOf, isSubRunLive, pairSubRuns, parseHitlReply, parseInstallMessage, parseScheduledRun, parseTriggerPayload, QUICK_REPLIES_TOOL, skillProposalIdOf, stripBridgePrefix, SUB_RUN_TOOL_NAMES, toolActivityOf, toolLabelOf, type ConversationMessageMetadata, type MessageFeedbackRating, type PaidTurnSources, type TriggerPayload } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { ownedFileUrl, type FileOwner } from '@/api/files'
 import type { MessageFeedback } from '@/chat/useMessageFeedback'
@@ -90,6 +91,8 @@ type MessageViewProps = {
 type Block = { key: string; node: React.ReactNode }
 
 export function MessageView({ message, isLastAssistant, running, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, feedback, stamp, paidSources }: MessageViewProps) {
+    const t = useTranslations('mobileChat.messages')
+    const tTools = useTranslations('tools')
     if (message.role === 'user') {
         const origin = originOf(message)
         if (origin?.kind === 'install') return <InstallDivider agentName={origin.agentName} guide={origin.guide} installing={running} owner={fileOwner} />
@@ -106,7 +109,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
         if (reply?.kind === 'cancelled') return <CancelledReceipt of={reply.of} />
         // The files of a message just sent are still on the phone; once read back, the ones it
         // carried are on the Box, behind the hub.
-        const local = message.parts.flatMap(part => (part.type === 'file' ? [{ url: part.url, name: part.filename ?? 'Photo', image: part.mediaType.startsWith('image/') }] : []))
+        const local = message.parts.flatMap(part => (part.type === 'file' ? [{ url: part.url, name: part.filename ?? t('photo'), image: part.mediaType.startsWith('image/') }] : []))
         const stored = fileOwner ? attachmentsOf(message).map(({ name, path }) => ({ url: ownedFileUrl(fileOwner, path), name })) : []
         const media: ViewerItem[] = local.length > 0 ? local : stored
         const voice = voiceOf(message)
@@ -158,7 +161,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
             const text = (part as { text: string }).text.trim()
             const streaming = isLastAssistant && running && index === lastPart
             if (!text && !streaming) return
-            addStep({ key: `r${index}`, symbol: 'brain', status: streaming ? 'running' : 'done', runningLabel: 'Thinking', node: <ReasoningStep text={text} streaming={streaming} /> }, index)
+            addStep({ key: `r${index}`, symbol: 'brain', status: streaming ? 'running' : 'done', runningLabel: t('thinking'), node: <ReasoningStep text={text} streaming={streaming} /> }, index)
             return
         }
         if (part.type === 'data-delegate' || part.type === 'data-call-agent') {
@@ -173,7 +176,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
         }
         if (part.type === 'data-compaction') {
             const data = (part as unknown as { data: CompactionData }).data
-            addStep({ key: `k${index}`, symbol: 'arrow.down.right.and.arrow.up.left', status: data.status, runningLabel: 'Compacting', node: <CompactionStep data={data} /> }, index)
+            addStep({ key: `k${index}`, symbol: 'arrow.down.right.and.arrow.up.left', status: data.status, runningLabel: t('compacting'), node: <CompactionStep data={data} /> }, index)
             return
         }
         if (!isToolPart(part)) return
@@ -214,7 +217,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
             else addStep({ key: part.toolCallId ?? `s${index}`, symbol: toolSymbolOf(toolName), status, node }, index)
             return
         }
-        addStep({ key: part.toolCallId ?? `s${index}`, symbol: toolSymbolOf(toolName), status: toolStatusOf(part.state), runningLabel: toolActivityOf(toolName, part.input) ?? `Running ${toolLabelOf(toolName, part.input)}`, node: <ToolCallStep toolName={toolName} state={part.state} input={part.input} inputText={part.inputText} output={part.output} errorText={part.errorText} /> }, index)
+        addStep({ key: part.toolCallId ?? `s${index}`, symbol: toolSymbolOf(toolName), status: toolStatusOf(part.state), runningLabel: toolActivityOf(toolName, part.input, tTools) ?? t('runningTool', { tool: toolLabelOf(toolName, part.input, tTools) }), node: <ToolCallStep toolName={toolName} state={part.state} input={part.input} inputText={part.inputText} output={part.output} errorText={part.errorText} /> }, index)
     })
     flushSteps()
     // The coworker stands once in the thread, beside the last steps it took.

@@ -5,6 +5,7 @@ import type { Database } from '@/app/api/database.types'
 import { findRadialRect, rectOnSide, type SpaceSide } from '@/lib/board/space-layout'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany } from '@/supabase/supabase-helpers'
+import { AppError, failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
 // Creating, renaming and deleting a Box, with the workspace handed in rather than read from a
 // session. The board's server actions are the browser's door onto these; the foreman, which
@@ -19,7 +20,7 @@ const SPACE_RECT_COLUMNS = ['id', 'name', 'col_start', 'row_start', 'col_end', '
 // workspace, et `findRadialRect` lit ce cœur en tête de liste.
 const OLDEST_FIRST = { column: 'created_at', ascending: true } as const
 
-export type ClaimedBox = { ok: true; spaceId: string; name: string; colStart: number; rowStart: number; colEnd: number; rowEnd: number } | { ok: false; error: string }
+export type ClaimedBox = { ok: true; spaceId: string; name: string; colStart: number; rowStart: number; colEnd: number; rowEnd: number } | ActionFailure
 
 // The names already on the board, so the fallback ladder does not hand out a second "Marketing".
 function takenNames(spaces: { name: string | null }[] | null): string[] {
@@ -37,7 +38,7 @@ async function grantCreatorManage(actor: Actor, spaceIds: string[]): Promise<voi
 
 export async function createBox(params: { workspaceId: number; userId: string; actor: Actor; name?: string | null; from?: { spaceId: string; side: SpaceSide } }): Promise<ClaimedBox> {
     const { workspaceId, userId, actor } = params
-    if (actor.workspaceId !== workspaceId) return { ok: false, error: 'This Box does not belong to your workspace' }
+    if (actor.workspaceId !== workspaceId) return failure('boxNotInWorkspace')
 
     // Créée depuis une face d'une Box existante : l'appartenance de la source au workspace se
     // vérifie avant tout le reste.
@@ -45,11 +46,11 @@ export async function createBox(params: { workspaceId: number; userId: string; a
         try {
             await assertSpaceAccess(params.from.spaceId, 'use', actor)
         } catch (err) {
-            return { ok: false, error: err instanceof Error ? err.message : BOX_NOT_FOUND }
+            return failureOf(err, BOX_NOT_FOUND)
         }
     }
 
-    const engine = await ensureWorkspaceEngine(workspaceId).catch(err => ({ ok: false as const, error: err instanceof Error ? err.message : 'This workspace has no active plan.' }))
+    const engine = await ensureWorkspaceEngine(workspaceId).catch(err => failureOf(err, 'noActivePlan'))
     if (!engine.ok) return engine
 
     const supabase = createServiceRoleClient()
@@ -79,7 +80,7 @@ export async function createBox(params: { workspaceId: number; userId: string; a
         await grantCreatorManage(actor, [spaceId])
     } catch (err) {
         await supabase.from('spaces').delete().eq('id', spaceId)
-        return { ok: false, error: err instanceof Error ? err.message : 'The Box could not be created.' }
+        return failureOf(err, 'boxCreateFailed')
     }
 
     // For most callers this is the workspace's first Box, and the last chance to name the workspace
@@ -114,9 +115,9 @@ export async function createBoxes(params: { workspaceId: number; userId: string;
 export async function createBoxesBatch(params: { workspaceId: number; userId: string; actor: Actor; names: string[] }): Promise<ClaimedBox[]> {
     const { workspaceId, userId, actor, names } = params
     if (!names.length) return []
-    if (actor.workspaceId !== workspaceId) return names.map(() => ({ ok: false as const, error: 'This Box does not belong to your workspace' }))
+    if (actor.workspaceId !== workspaceId) return names.map(() => failure('boxNotInWorkspace'))
 
-    const engine = await ensureWorkspaceEngine(workspaceId).catch(err => ({ ok: false as const, error: err instanceof Error ? err.message : 'This workspace has no active plan.' }))
+    const engine = await ensureWorkspaceEngine(workspaceId).catch(err => failureOf(err, 'noActivePlan'))
     if (!engine.ok) return names.map(() => engine)
 
     const supabase = createServiceRoleClient()
@@ -132,12 +133,12 @@ export async function createBoxesBatch(params: { workspaceId: number; userId: st
     }
 
     const { data, error } = await supabase.from('spaces').insert<Database['public']['Tables']['spaces']['Insert']>(rows).select('id, name, col_start, row_start, col_end, row_end')
-    if (error || !data) return names.map(() => ({ ok: false as const, error: error?.message ?? 'The Boxes could not be created.' }))
+    if (error || !data) return names.map(() => (error ? { ok: false as const, error: error.message } : failure('boxesCreateFailed')))
     try {
         await grantCreatorManage(actor, data.map(space => space.id))
     } catch (err) {
         await supabase.from('spaces').delete().in('id', data.map(space => space.id))
-        return names.map(() => ({ ok: false as const, error: err instanceof Error ? err.message : 'The Boxes could not be created.' }))
+        return names.map(() => failureOf(err, 'boxesCreateFailed'))
     }
 
     await ensureWorkspaceNamed({ workspaceId, userId })
@@ -146,7 +147,7 @@ export async function createBoxesBatch(params: { workspaceId: number; userId: st
     // rows in the order it was given them, and two Boxes never share a corner.
     return rows.map(row => {
         const created = data.find(space => space.col_start === row.col_start && space.row_start === row.row_start)
-        if (!created) return { ok: false as const, error: 'The Box could not be created.' }
+        if (!created) return failure('boxCreateFailed')
         return { ok: true as const, spaceId: created.id, name: created.name ?? row.name ?? '', colStart: created.col_start, rowStart: created.row_start, colEnd: created.col_end, rowEnd: created.row_end }
     })
 }
@@ -166,7 +167,7 @@ export async function deleteBox(actor: Actor, spaceId: string): Promise<void> {
 
     const supabase = createServiceRoleClient()
     const { data: agents } = await selectCount(supabase, 'agents', { space_id: spaceId })
-    if ((agents ?? 0) > 0) throw new Error(`This Box still holds ${agents} coworker${agents === 1 ? '' : 's'}. Move or delete ${agents === 1 ? 'it' : 'them'} first.`)
+    if (agents) throw new AppError('boxStillHoldsCoworkers', { count: agents })
 
     const { error } = await supabase.from('spaces').delete().eq('id', spaceId)
     if (error) throw new Error(`Failed to delete the Box: ${error.message}`)

@@ -27,8 +27,20 @@ function withEasProject(config: ConfigContext['config']): ConfigContext['config'
 // the notifications plugin out: the app runs, it just never gets a push token.
 const personalTeam = process.env.RERUN_PERSONAL_TEAM === '1'
 
+// The languages iOS offers in the app's own settings, and the permission prompts in each of them. The
+// English prompts of app.json stay the default for any other language.
+const APP_LANGUAGES = ['en', 'fr', 'es'] as const
+
+function withLanguages(config: ConfigContext['config']): ConfigContext['config'] {
+    return {
+        ...config,
+        locales: Object.fromEntries(APP_LANGUAGES.map(language => [language, `./locales/${language}.json`])),
+        ios: { ...config.ios, infoPlist: { ...config.ios?.infoPlist, CFBundleLocalizations: [...APP_LANGUAGES] } },
+    }
+}
+
 export default ({ config: base }: ConfigContext): ExpoConfig => {
-    const config = withEasProject(base)
+    const config = withLanguages(withEasProject(base))
     if (!personalTeam) return config as ExpoConfig
 
     return {

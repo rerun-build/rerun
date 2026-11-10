@@ -1,0 +1,100 @@
+{
+    "start": {
+        "title": "Bienvenue sur Rerun",
+        "continueWithApple": "Continuer avec Apple",
+        "continueWithGoogle": "Continuer avec Google",
+        "continueWithPhone": "Continuer avec un téléphone",
+        "continueWithEmail": "Continuer avec un e-mail",
+        "or": "Ou",
+        "welcome": "Bienvenue sur Rerun",
+        "ownServer": "Utiliser votre propre serveur",
+        "useCloud": "Utiliser Rerun Cloud"
+    },
+    "back": "Retour",
+    "phone": {
+        "title": "Votre numéro de téléphone",
+        "unsupportedCountry": "Nous ne pouvons pas encore envoyer de codes dans ce pays.",
+        "consent": "En continuant, vous acceptez d'être contacté par Rerun sur WhatsApp ou par SMS.",
+        "sendByWhatsapp": "Envoyer par WhatsApp",
+        "sendBySms": "Envoyer par SMS",
+        "countryLabel": "Pays, {name}",
+        "numberLabel": "Numéro de téléphone"
+    },
+    "email": {
+        "title": "Continuer avec un e-mail",
+        "label": "E-mail",
+        "placeholder": "vous@entreprise.com",
+        "send": "Envoyer le code"
+    },
+    "code": {
+        "title": "Saisissez le code",
+        "sentByPhone": "Envoyé par {channel} au {number}",
+        "sentByEmail": "Envoyé à {email}",
+        "fieldLabel": "Code de vérification",
+        "continue": "Continuer",
+        "resendIn": "Renvoyer le code dans {seconds} s",
+        "resend": "Renvoyer le code",
+        "switchChannel": "Envoyer plutôt par {channel}",
+        "differentNumber": "Utiliser un autre numéro",
+        "differentEmail": "Utiliser un autre e-mail"
+    },
+    "country": {
+        "search": "Rechercher",
+        "searchLabel": "Rechercher un pays"
+    },
+    "errors": {
+        "generic": "Une erreur est survenue. Réessayez.",
+        "offline": "Impossible de joindre Rerun. Vérifiez votre connexion et réessayez.",
+        "session": "Impossible d'ouvrir votre session. Réessayez.",
+        "apple": "Impossible de vous connecter avec Apple. Réessayez.",
+        "google": "Impossible de vous connecter avec Google. Réessayez.",
+        "phone": {
+            "taken": "Ce numéro sert déjà à se connecter à un autre compte Rerun.",
+            "same_number": "C'est déjà le numéro de votre compte.",
+            "not_required": "Votre numéro de téléphone est déjà vérifié.",
+            "too_soon": "Un code est déjà en route. Patientez un instant avant d'en demander un nouveau.",
+            "too_many": "Trop de codes demandés pour ce numéro. Réessayez plus tard.",
+            "invalid_number": "Saisissez un numéro de mobile valide.",
+            "unsupported_country": "Nous ne pouvons pas encore envoyer de codes dans ce pays. Utilisez plutôt un e-mail ou Google.",
+            "undeliverable": "Nous n'avons pas pu envoyer de code à ce numéro. Essayez l'autre canal, ou utilisez un e-mail ou Google.",
+            "blocked": "Nous ne pouvons pas envoyer de code à ce numéro. Utilisez plutôt un e-mail ou Google.",
+            "rate_limited": "Trop de tentatives sur ce numéro. Réessayez plus tard.",
+            "wrong_code": "Ce code est erroné ou a expiré.",
+            "expired": "Ce code a expiré. Demandez-en un nouveau.",
+            "unavailable": "Impossible de joindre votre téléphone. Réessayez, ou utilisez l'autre canal.",
+            "busy": "La connexion par téléphone est saturée pour le moment. Utilisez plutôt un e-mail ou Google.",
+            "captcha_failed": "Impossible de confirmer que vous n'êtes pas un robot. Réessayez.",
+            "signed_out": "Créez d'abord votre compte."
+        },
+        "email": {
+            "invalid_email": "Saisissez un e-mail valide",
+            "captcha_failed": "Impossible de confirmer que vous n'êtes pas un robot. Réessayez.",
+            "blocked_domain": "Ce domaine d'e-mail n'est pas accepté. Utilisez une autre adresse.",
+            "too_many": "Trop de comptes ont été créés depuis votre réseau. Réessayez plus tard.",
+            "too_many_codes": "Trop de codes ont été demandés depuis votre réseau. Réessayez plus tard.",
+            "unavailable": "Impossible d'envoyer votre code. Réessayez.",
+            "rate_limited": "Trop de codes demandés pour cette adresse. Réessayez plus tard.",
+            "wrong_code": "Ce code est erroné ou a expiré."
+        }
+    },
+    "consent": {
+        "title": "Vos coworkers fonctionnent avec l'IA",
+        "body": "Pour réaliser vos tâches, Rerun envoie vos messages, photos, messages vocaux, fichiers et site web à des fournisseurs d'IA : OpenAI, Anthropic et Google via OpenRouter, ainsi qu'à tout fournisseur que vous connectez vous-même.",
+        "noTraining": "Les fournisseurs de Rerun ne s'entraînent pas sur vos données.",
+        "privacy": "Politique de confidentialité",
+        "notNow": "Plus tard",
+        "agree": "Accepter et continuer"
+    },
+    "server": {
+        "title": "Votre serveur Rerun",
+        "address": "Adresse du serveur",
+        "connect": "Se connecter",
+        "problems": {
+            "invalid": "Saisissez l'adresse de votre serveur Rerun.",
+            "insecure": "Utilisez https:// en dehors de votre réseau local.",
+            "unreachable": "Impossible de joindre ce serveur.",
+            "not-rerun": "Cette adresse n'est pas un serveur Rerun.",
+            "outdated": "Mettez à jour ce serveur Rerun pour l'utiliser depuis l'app."
+        }
+    }
+}

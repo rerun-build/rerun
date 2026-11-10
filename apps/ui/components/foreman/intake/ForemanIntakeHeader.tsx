@@ -1,11 +1,11 @@
 'use client'
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 
 import { Orb } from '@/components/foreman/Orb'
 import { WELCOME_ORB_SIZE } from '@/components/foreman/constants'
 import type { ForemanArrival } from '@/lib/foreman/phase'
-import { INTAKE_COPY } from './copy'
 import type { ForemanIntakeController } from './useForemanIntake'
 
 /**
@@ -20,8 +20,8 @@ import type { ForemanIntakeController } from './useForemanIntake'
 const EASE = [0.22, 1, 0.36, 1] as const
 
 export function ForemanIntakeHeader({ intake, arrival = null }: { intake: ForemanIntakeController; arrival?: ForemanArrival | null }) {
+    const t = useTranslations('foreman.intake')
     const still = useReducedMotion()
-    const copy = INTAKE_COPY[intake.step]
 
     const enter = (delay: number) => ({
         initial: still ? { opacity: 0 } : { opacity: 0, y: 10, filter: 'blur(8px)' },
@@ -43,7 +43,7 @@ export function ForemanIntakeHeader({ intake, arrival = null }: { intake: Forema
                 réservée que rien ne doit faire bouger entre deux étapes. */}
             {arrival && (
                 <motion.p {...enter(0.04)} className="text-muted-foreground text-xs">
-                    Setting up <span className="text-foreground">{arrival.title}</span>
+                    {t.rich('settingUp', { title: arrival.title, highlight: chunks => <span className="text-foreground">{chunks}</span> })}
                 </motion.p>
             )}
 
@@ -54,8 +54,8 @@ export function ForemanIntakeHeader({ intake, arrival = null }: { intake: Forema
             <div className="grid min-h-[5.25rem] w-full max-w-[22rem] items-start">
                 <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div key={intake.step} {...enter(0.08)} exit={still ? { opacity: 0 } : { opacity: 0, y: -8, filter: 'blur(6px)' }} className="col-start-1 row-start-1 space-y-1.5">
-                        <h3 className="font-medium text-base">{copy.title}</h3>
-                        <p className="text-muted-foreground text-sm">{copy.description}</p>
+                        <h3 className="font-medium text-base">{t(`steps.${intake.step}.title`)}</h3>
+                        <p className="text-muted-foreground text-sm">{t(`steps.${intake.step}.description`)}</p>
                     </motion.div>
                 </AnimatePresence>
             </div>

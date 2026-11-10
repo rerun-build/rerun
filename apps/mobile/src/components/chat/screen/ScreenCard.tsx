@@ -1,6 +1,7 @@
 import { SymbolView } from 'expo-symbols'
 import type { ReactNode } from 'react'
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { BorderBeam } from '@/components/ui/BorderBeam'
@@ -38,8 +39,9 @@ type ScreenCardProps = {
 // stays written on the screen.
 export function ScreenCard({ live, site, screen, takeover, onTakeControl, onLayout }: ScreenCardProps) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.pane')
     const surface = takeover ? mix(theme.card, theme.muted, 0.3) : theme.card
-    const label = takeover ? 'Open browser' : 'Take control'
+    const label = takeover ? t('openBrowser') : t('takeControl')
     return (
         <View onLayout={onLayout} style={{ width: '95%', borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: theme.border, backgroundColor: surface }}>
             {takeover && <BorderBeam tone="brand" radius={radius.lg} surface={surface} />}

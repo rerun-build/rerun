@@ -1,4 +1,4 @@
-import { pendingHitlLabel, type HitlKind } from '@rerun/contracts'
+import { pendingHitlLabel, type HitlCueCopy, type HitlKind } from '@rerun/contracts'
 import { LockIcon, MessageCircleQuestionIcon, MonitorIcon, PlugIcon, PlugSparkleIcon, ShieldAlertIcon, type LucideIcon } from '@/lib/icons'
 
 export type PendingHitlSummary = {
@@ -21,8 +21,8 @@ const ICONS: Record<HitlKind, { icon: LucideIcon; tone: string }> = {
 }
 
 // What the scroll cue says is waiting at the end of the thread, once the block is out of sight.
-export function summarizePendingHitl(kind: HitlKind, input: Record<string, unknown>): PendingHitlSummary {
-    return { ...ICONS[kind], label: pendingHitlLabel(kind, input) }
+export function summarizePendingHitl(kind: HitlKind, input: Record<string, unknown>, t: HitlCueCopy): PendingHitlSummary {
+    return { ...ICONS[kind], label: pendingHitlLabel(kind, input, t) }
 }
 
 export { scrollCueOf, type ScrollCue } from '@rerun/contracts'

@@ -38,8 +38,8 @@ describe('access', () => {
         expect(newCoworkerBlocker({ failed: false, manageable: null, admin: false })).toBeNull()
         expect(newCoworkerBlocker({ failed: false, manageable: [box('ops')], admin: false })).toBeNull()
         expect(newCoworkerBlocker({ failed: false, manageable: [], admin: false })).toBe(NO_MANAGED_BOX)
-        expect(newCoworkerBlocker({ failed: false, manageable: [], admin: true })).toMatch(/no Box yet/)
-        expect(newCoworkerBlocker({ failed: true, manageable: null, admin: true })).toMatch(/could not load/)
+        expect(newCoworkerBlocker({ failed: false, manageable: [], admin: true })).toBe('noBoxYet')
+        expect(newCoworkerBlocker({ failed: true, manageable: null, admin: true })).toBe('boxesFailed')
     })
 
     it('reads a coworker access from the board first, then from its copies in order, and says when none knows it', () => {

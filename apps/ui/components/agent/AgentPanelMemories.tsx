@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineMemory } from '@/lib/engine/types'
 import { BrainIcon, PlusIcon, SearchIcon, Trash2Icon, XIcon } from '@/lib/icons'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -16,6 +16,7 @@ import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel
 import { PanelRow } from '@/components/ui/panel-row'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
 import { Badge } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 type AgentPanelMemoriesProps = {
@@ -23,6 +24,7 @@ type AgentPanelMemoriesProps = {
 }
 
 function MemoryRow({ memory, deleteDisabledReason, onDelete }: { memory: EngineMemory; deleteDisabledReason?: string; onDelete?: () => void }) {
+    const t = useTranslations('agent.agentPanelMemories')
     return (
         <PanelRow
             className="items-start gap-2"
@@ -35,12 +37,12 @@ function MemoryRow({ memory, deleteDisabledReason, onDelete }: { memory: EngineM
                     )}
                     {memory.status === 'dormant' && (
                         <Badge size="xs" tone="neutral" glow={false} fill="outline" className="uppercase tracking-wider">
-                            dormant
+                            {t('dormant')}
                         </Badge>
                     )}
                     {memory.strength !== undefined && <span className="text-[10px] tabular-nums text-muted-foreground">{Math.round(memory.strength * 100)}%</span>}
-                    {(memory.tags ?? []).map(t => (
-                        <span key={t} className="text-[10px] text-muted-foreground">#{t}</span>
+                    {(memory.tags ?? []).map(tag => (
+                        <span key={tag} className="text-[10px] text-muted-foreground">#{tag}</span>
                     ))}
                 </>
             }
@@ -48,12 +50,12 @@ function MemoryRow({ memory, deleteDisabledReason, onDelete }: { memory: EngineM
                 onDelete && (
                     <TooltipDisabledReason reason={deleteDisabledReason}>
                         <PanelDeleteButton
-                            label="Delete memory"
+                            label={t('delete.label')}
                             size="icon-xs"
                             disabled={!!deleteDisabledReason}
                             onClick={onDelete}
-                            confirmTitle="Delete this memory?"
-                            confirmDescription="The coworker forgets it for good. This cannot be undone."
+                            confirmTitle={t('delete.confirmTitle')}
+                            confirmDescription={t('delete.confirmDescription')}
                             className="opacity-0 transition-opacity group-hover:opacity-100"
                         />
                     </TooltipDisabledReason>
@@ -66,6 +68,8 @@ function MemoryRow({ memory, deleteDisabledReason, onDelete }: { memory: EngineM
 }
 
 export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelMemories')
     const [memories, setMemories] = useState<EngineMemory[]>([])
     const [loading, setLoading] = useState(true)
     const [creating, setCreating] = useState(false)
@@ -79,7 +83,7 @@ export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
     const [searching, setSearching] = useState(false)
     const [confirmClear, setConfirmClear] = useState(false)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
 
     const load = useCallback(async () => {
         setLoading(true)
@@ -97,7 +101,7 @@ export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
         const result = await createMemoryAction(agentId, {
             content: content.trim(),
             kind: kind.trim() || undefined,
-            tags: tags.trim() ? tags.split(',').map(t => t.trim()).filter(Boolean) : undefined,
+            tags: tags.trim() ? tags.split(',').map(tag => tag.trim()).filter(Boolean) : undefined,
         })
         setSaving(false)
         if (result.success) {
@@ -148,7 +152,7 @@ export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
                             value={query}
                             onChange={e => setQuery(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                            placeholder="Recall memories..."
+                            placeholder={t('recallPlaceholder')}
                             className="h-8 pl-7 text-xs"
                         />
                         {recall !== null && (
@@ -159,29 +163,29 @@ export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
                     </div>
                     <TooltipDisabledReason reason={manageReason}>
                         <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setCreating(c => !c)}>
-                            <PlusIcon className="size-3.5 mr-1" /> New
+                            <PlusIcon className="size-3.5 mr-1" /> {t('new')}
                         </Button>
                     </TooltipDisabledReason>
                     {memories.length > 0 && (
                         <TooltipDisabledReason reason={manageReason}>
-                            <Button size="icon-sm" variant="destructive" disabled={!canManage} onClick={() => setConfirmClear(true)} title="Clear all memories" aria-label="Clear all memories">
+                            <Button size="icon-sm" variant="destructive" disabled={!canManage} onClick={() => setConfirmClear(true)} title={t('clearAll')} aria-label={t('clearAll')}>
                                 <Trash2Icon />
                             </Button>
                         </TooltipDisabledReason>
                     )}
                 </div>
-                {recall !== null && <p className="text-[11px] text-muted-foreground">{searching ? 'Searching…' : `${recall.length} recalled for "${query}"`}</p>}
+                {recall !== null && <p className="text-[11px] text-muted-foreground">{searching ? t('searching') : t('recalled', { count: recall.length, query })}</p>}
             </PanelListHeader>
 
             {creating && canManage && (
                 <div className="flex flex-col gap-2 p-3 border-b border-border bg-muted/30">
-                    <Textarea value={content} onChange={e => setContent(e.target.value)} placeholder="The user prefers concise answers." className="text-xs min-h-20" />
+                    <Textarea value={content} onChange={e => setContent(e.target.value)} placeholder={t('form.contentPlaceholder')} className="text-xs min-h-20" />
                     <div className="flex gap-2">
-                        <Input hideRequired value={kind} onChange={e => setKind(e.target.value)} placeholder="kind (e.g. preference)" className="h-8 text-xs" />
-                        <Input hideRequired value={tags} onChange={e => setTags(e.target.value)} placeholder="tags, comma,sep" className="h-8 text-xs" />
+                        <Input hideRequired value={kind} onChange={e => setKind(e.target.value)} placeholder={t('form.kindPlaceholder')} className="h-8 text-xs" />
+                        <Input hideRequired value={tags} onChange={e => setTags(e.target.value)} placeholder={t('form.tagsPlaceholder')} className="h-8 text-xs" />
                     </div>
                     <Button size="sm" loading={saving} onClick={handleCreate} disabled={!content.trim()}>
-                        Save memory
+                        {t('form.save')}
                     </Button>
                 </div>
             )}
@@ -191,13 +195,13 @@ export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
             ) : shown.length === 0 ? (
                 <EmptyState
                     icon={BrainIcon}
-                    title={recall !== null ? 'No matches' : 'No memories yet'}
-                    description={recall !== null ? undefined : 'Your coworker saves long-term facts about you and its work here, so it keeps context across conversations.'}
+                    title={recall !== null ? t('empty.noMatches') : t('empty.title')}
+                    description={recall !== null ? undefined : t('empty.description')}
                     action={
                         recall === null ? (
                             <TooltipDisabledReason reason={manageReason}>
                                 <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setCreating(true)}>
-                                    <PlusIcon className="size-3.5 mr-1" /> Add memory
+                                    <PlusIcon className="size-3.5 mr-1" /> {t('empty.add')}
                                 </Button>
                             </TooltipDisabledReason>
                         ) : undefined

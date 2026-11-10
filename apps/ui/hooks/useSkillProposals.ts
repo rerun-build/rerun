@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { decideSkillProposalAction, listSkillProposalsAction } from '@/app/api/_actions/skill-proposal.actions'
@@ -48,6 +49,7 @@ function reload(current: Loaded, sessionId: string, proposals: Map<string, Engin
 export function useSkillProposals(sessionId: string | null, runStatus: string) {
     const [loaded, setLoaded] = useState<Loaded>(EMPTY)
     const [pendingId, setPendingId] = useState<string | null>(null)
+    const errorText = useErrorText()
     const releaseTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
     const current = loaded.sessionId === sessionId ? loaded : EMPTY
     const { proposals, pinnedIds } = current
@@ -134,7 +136,7 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
             setPendingId(proposalId)
             try {
                 const result = await decideSkillProposalAction(sessionId, proposalId, decision)
-                if (result.error) toast.error(result.error)
+                if (result.error) toast.error(errorText(result))
                 if (!result.proposal) return void refresh()
                 const proposal = result.proposal
                 setLoaded(previous => (previous.sessionId === sessionId ? reload(previous, sessionId, new Map(previous.proposals).set(proposal.id, proposal)) : previous))
@@ -142,7 +144,7 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
                 setPendingId(null)
             }
         },
-        [sessionId, refresh]
+        [sessionId, refresh, errorText]
     )
 
     return { proposals, pinned, pinnedIds, decide, pendingId, refresh, seed }

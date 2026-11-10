@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { RequestConnectorDialog } from '@/components/services/RequestConnectorDialog'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -28,18 +29,19 @@ type ServiceListProps = {
 }
 
 export function ServiceList({ services, onInstall, onUninstall, onAddAccount, disabledReason }: ServiceListProps) {
+    const t = useTranslations('services.list')
     const disabled = !!disabledReason
     if (services.length === 0) {
         return (
             <EmptyState
                 className="py-8"
                 icon={UnplugIcon}
-                title="No apps found"
-                description="We could not find an app matching your search."
+                title={t('emptyTitle')}
+                description={t('emptyDescription')}
                 action={
                     <RequestConnectorDialog>
                         <Button size="sm" variant="outline">
-                            Request an app
+                            {t('request')}
                         </Button>
                     </RequestConnectorDialog>
                 }
@@ -70,12 +72,12 @@ export function ServiceList({ services, onInstall, onUninstall, onAddAccount, di
                         s.installStatus === 'active' ? (
                             <>
                                 <Badge size="xs" tone="green" glow={false}>
-                                    Installed
+                                    {t('installed')}
                                 </Badge>
                                 {onAddAccount && s.multiInstance && (
                                     <TooltipDisabledReason reason={disabledReason}>
                                         <Button size="sm" variant="outline" disabled={disabled} onClick={() => onAddAccount(s.slug)}>
-                                            Add account
+                                            {t('addAccount')}
                                         </Button>
                                     </TooltipDisabledReason>
                                 )}
@@ -83,17 +85,17 @@ export function ServiceList({ services, onInstall, onUninstall, onAddAccount, di
                         ) : s.installStatus ? (
                             <>
                                 <Badge size="xs" tone="orange" glow={false}>
-                                    {s.installStatus === 'needs_auth' ? 'Needs sign-in' : 'Needs setup'}
+                                    {s.installStatus === 'needs_auth' ? t('needsSignIn') : t('needsSetup')}
                                 </Badge>
                                 {onInstall && (
                                     <TooltipDisabledReason reason={disabledReason}>
                                         {onUninstall ? (
-                                            <SplitButton size="sm" variant="outline" disabled={disabled} onClick={() => onInstall(s.slug)} actions={[{ label: 'Remove app', icon: Trash2Icon, destructive: true, onSelect: () => onUninstall(s.slug) }]}>
-                                                Finish setup
+                                            <SplitButton size="sm" variant="outline" disabled={disabled} onClick={() => onInstall(s.slug)} actions={[{ label: t('removeApp'), icon: Trash2Icon, destructive: true, onSelect: () => onUninstall(s.slug) }]}>
+                                                {t('finishSetup')}
                                             </SplitButton>
                                         ) : (
                                             <Button size="sm" variant="outline" disabled={disabled} onClick={() => onInstall(s.slug)}>
-                                                Finish setup
+                                                {t('finishSetup')}
                                             </Button>
                                         )}
                                     </TooltipDisabledReason>
@@ -103,7 +105,7 @@ export function ServiceList({ services, onInstall, onUninstall, onAddAccount, di
                             onInstall && (
                                 <TooltipDisabledReason reason={disabledReason}>
                                     <Button size="sm" variant="outline" disabled={disabled} onClick={() => onInstall(s.slug)}>
-                                        Install
+                                        {t('install')}
                                     </Button>
                                 </TooltipDisabledReason>
                             )

@@ -21,11 +21,8 @@ import { publishWithThumbnail } from '@/lib/services/publish-thumbnail'
 import type { PublishedFile } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { failure, failureOf, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
-
-function failure(err: unknown, fallback: string): { ok: false; error: string } {
-    return { ok: false, error: err instanceof Error ? err.message : fallback }
-}
 
 // A link is the coworker's that published it: reaching the link by its slug takes reaching that
 // coworker's Box, the way the coworker's Published tab does. An admin reaches them all.
@@ -69,24 +66,24 @@ export async function getPublishedAction(slug: string): Promise<PublishedFile | 
 
 // Publish a workspace file by hand from the Files tab. It starts with the access the workspace
 // gives a new link, and the share dialog opens right after to change it.
-export async function publishFileAction(agentId: string, path: string): Promise<{ success: boolean; url?: string; slug?: string; error?: string }> {
+export async function publishFileAction(agentId: string, path: string): Promise<{ success: boolean; url?: string; slug?: string } & Partial<ActionRefusal>> {
     try {
         await assertAgentInWorkspace(agentId)
         const result = await publishWithThumbnail(agentId, path)
         return { success: true, url: result.url, slug: result.slug }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to publish' }
+        return { success: false, ...refusalOf(err, 'publishFailed') }
     }
 }
 
 // Revoke a published file by its slug: deletes the copy and makes its URL stop working.
-export async function unpublishFileAction(agentId: string, slug: string): Promise<{ success: boolean; error?: string }> {
+export async function unpublishFileAction(agentId: string, slug: string): Promise<{ success: boolean } & Partial<ActionRefusal>> {
     try {
         await assertAgentInWorkspace(agentId)
         await unpublishFile(agentId, { slug })
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to unpublish' }
+        return { success: false, ...refusalOf(err, 'unpublishFailed') }
     }
 }
 
@@ -95,18 +92,18 @@ export async function unpublishLinkAction(slug: string): Promise<ActionResult> {
         await unpublishInWorkspace(await reachablePublishedWorkspaceId(slug), slug)
         return { ok: true }
     } catch (err) {
-        return failure(err, 'Failed to unpublish')
+        return failureOf(err, 'unpublishFailed')
     }
 }
 
 export async function updatePublishedAccessAction(slug: string, change: AccessChange): Promise<ActionResult<{ file: PublishedFile }>> {
     try {
-        if (!isPublishedAccess(change.access)) return { ok: false, error: 'Unknown access' }
-        if (change.access === 'invited' && !EMAIL_DELIVERY) return { ok: false, error: 'This server sends no email, so invites cannot get their code.' }
+        if (!isPublishedAccess(change.access)) return failure('unknownAccess')
+        if (change.access === 'invited' && !EMAIL_DELIVERY) return failure('noEmailForInvites')
         const file = await updatePublishedAccess(await reachablePublishedWorkspaceId(slug), slug, change)
         return { ok: true, file }
     } catch (err) {
-        return failure(err, 'Failed to update the link')
+        return failureOf(err, 'updateLinkFailed')
     }
 }
 
@@ -115,7 +112,7 @@ export async function dismissAccessRequestAction(slug: string): Promise<ActionRe
         await dismissAccessRequest(await reachablePublishedWorkspaceId(slug), slug)
         return { ok: true }
     } catch (err) {
-        return failure(err, 'Failed to update the link')
+        return failureOf(err, 'updateLinkFailed')
     }
 }
 
@@ -137,8 +134,8 @@ export async function getPublishSettingsAction(): Promise<PublishSettings | null
 // An admin's to change. "Nothing goes public" closes the links already public on the way.
 export async function updatePublishPolicyAction(policy: PublishPolicy): Promise<ActionResult<{ closed: number }>> {
     try {
-        if (!isPublishPolicy(policy)) return { ok: false, error: 'Unknown policy' }
-        const { workspace, supabase } = await requireAdminContext('Only an admin can change the publishing policy')
+        if (!isPublishPolicy(policy)) return failure('unknownPolicy')
+        const { workspace, supabase } = await requireAdminContext('adminOnlyPublishing')
         const { error } = await supabase
             .from('workspaces')
             .update<Database['public']['Tables']['workspaces']['Update']>({ publish_policy: policy })
@@ -147,6 +144,6 @@ export async function updatePublishPolicyAction(policy: PublishPolicy): Promise<
         const closed = policy === 'never' ? await closePublicLinks(workspace.id) : 0
         return { ok: true, closed }
     } catch (err) {
-        return failure(err, 'Failed to save the policy')
+        return failureOf(err, 'savePolicyFailed')
     }
 }

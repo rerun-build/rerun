@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { CredentialGuide, CredentialHint } from '@/components/services/CredentialGuide'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -14,6 +15,7 @@ type ServiceFieldsProps = {
 // Presentational credential inputs shared by the inline ServiceConfigForm (chat + Services tab).
 // Renders a select or input per field based on its type.
 export function ServiceFields({ inputs, values, onChange }: ServiceFieldsProps) {
+    const t = useTranslations('services.fields')
     return (
         <div className="space-y-2.5">
             {inputs.map(field => (
@@ -25,7 +27,7 @@ export function ServiceFields({ inputs, values, onChange }: ServiceFieldsProps) 
                     {field.type === 'select' ? (
                         <Select value={values[field.key] ?? ''} onValueChange={v => onChange(field.key, v)}>
                             <SelectTrigger className="h-8 w-full text-sm">
-                                <SelectValue placeholder={field.placeholder ?? 'Select…'} />
+                                <SelectValue placeholder={field.placeholder ?? t('selectPlaceholder')} />
                             </SelectTrigger>
                             <SelectContent>
                                 {(field.options ?? []).map(opt => (

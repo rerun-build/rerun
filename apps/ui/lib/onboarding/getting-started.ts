@@ -11,8 +11,6 @@ export const GETTING_STARTED_REWARD_DAYS = 3
 
 export type GettingStartedStep = {
     id: 'phone' | 'first_agent' | 'ai_provider' | 'invite' | 'schedule' | 'payment_method'
-    title: string
-    description: string
     prompt?: string
     panel?: WorkspaceDialogPanel
     // Catalog provider ids, drawn with ProviderIcon.
@@ -30,43 +28,27 @@ export type GettingStartedReward = 'available' | 'granted' | null
 export type GettingStartedState = { progress: GettingStartedProgress; reward: GettingStartedReward }
 
 export const GETTING_STARTED_STEPS: readonly GettingStartedStep[] = [
-    {
-        id: 'phone',
-        title: 'Verify your phone number',
-        description: 'Secure your account and hear from your coworkers on WhatsApp or SMS.',
-    },
+    { id: 'phone' },
     {
         id: 'first_agent',
-        title: 'Create your first coworker',
-        description: 'A teammate that works while you are away.',
         prompt: 'Help me create my first coworker',
     },
     {
         id: 'ai_provider',
-        title: 'Plug in your AI subscription',
-        description: 'Claude, ChatGPT, Gemini or your own API key.',
         prompt: 'Help me connect my Claude or ChatGPT subscription, or an API key',
         panel: 'ai_providers',
         providers: ['anthropic', 'openai', 'google', 'openrouter'],
     },
     {
         id: 'invite',
-        title: 'Invite a teammate',
-        description: 'Share your coworkers with the people you work with.',
         prompt: 'Help me invite a teammate to my workspace',
         panel: 'members',
     },
     {
         id: 'schedule',
-        title: 'Schedule a recurring task',
-        description: 'Put one of your coworkers on autopilot.',
         prompt: 'Schedule a recurring task for one of my coworkers',
     },
-    {
-        id: 'payment_method',
-        title: 'Add a payment method',
-        description: 'Keep your coworkers running when your trial ends. Nothing is charged today.',
-    },
+    { id: 'payment_method' },
 ]
 
 export const NO_PROGRESS: GettingStartedProgress = { phone: null, first_agent: false, ai_provider: false, invite: false, schedule: false, payment_method: false }

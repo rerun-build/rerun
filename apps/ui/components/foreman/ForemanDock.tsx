@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { type CSSProperties, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { CHROME_SIZE } from '@rerun/ui/chrome'
 import type { OrbGaze } from '@rerun/ui/foreman'
@@ -44,8 +45,6 @@ const CORNER_CLASSES: Record<ForemanCorner, string> = {
 // Foreman stays the ball it was.
 const PILL_TOO_NARROW_QUERY = '(max-width: 1023.98px)'
 
-const FAILED_REPLY = 'Something went wrong on that one.'
-
 export function ForemanDock() {
     const open = useForemanStore(selectForemanOpen)
     const activity = useForemanStore(state => state.activity)
@@ -64,6 +63,7 @@ export function ForemanDock() {
     const centerOpen = useControlCenterStore(state => state.open)
     const { workspace, isAnonymous } = useSession()
     const mod = useModKeyLabel()
+    const t = useTranslations('foreman.dock')
 
     // `size` pilote la boîte du svg et la taille des yeux, donc aucune classe responsive ne peut le
     // faire à notre place. La variante `resolved` rend `null` tant que la media query n'a pas été
@@ -140,7 +140,7 @@ export function ForemanDock() {
 
     const nudge = useMemo(() => (dock.pending ? foremanNudge(dock.pending) : null), [dock.pending])
     const [laterNudgeId, setLaterNudgeId] = useState<string | null>(null)
-    const reply = dock.failed ? { id: 'failed', text: FAILED_REPLY } : dock.reply
+    const reply = dock.failed ? { id: 'failed', text: t('failedReply') } : dock.reply
     const [dismissedReplyId, setDismissedReplyId] = useState<string | null>(null)
     // The next turn's failure is a new one, even though every failure reads the same.
     if (working && dismissedReplyId !== null) setDismissedReplyId(null)
@@ -218,11 +218,7 @@ export function ForemanDock() {
                 <TooltipLabeled
                     side={corner.startsWith('bottom') ? 'top' : 'bottom'}
                     hidden={!announcesShortcut}
-                    label={
-                        <>
-                            Search or ask Rerun <span className="opacity-60">{mod}F</span>
-                        </>
-                    }
+                    label={t.rich('tooltip', { shortcut: `${mod}F`, key: chunks => <span className="opacity-60">{chunks}</span> })}
                 >
                     <span className="block">
                         <Orb

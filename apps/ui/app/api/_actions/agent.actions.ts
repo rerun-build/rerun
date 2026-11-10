@@ -78,9 +78,10 @@ import { findPendingHitl, pendingSecrets } from '@/lib/chat-hitl'
 import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
 import type { StatsQuery, UsageTimeRange } from '@rerun/contracts'
 import { FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
-import { LOCKED_DOWNLOAD_ERROR, LOCKED_WRITE_ERROR, sealAgentDetail, sealSchedule, sealSkill, sealSkillFile, sealTrigger } from '@/app/api/_services/agent-content.service'
+import { sealAgentDetail, sealSchedule, sealSkill, sealSkillFile, sealTrigger } from '@/app/api/_services/agent-content.service'
 import { connectorMcpServerNames, connectorSkillOwners, connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
-import { TEXT_FILE_PAGE_CHARS, connectorSkillReadOnlyError } from '@rerun/contracts'
+import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
+import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal, type ErrorCode, type SuccessResult } from '@/lib/i18n/action-error'
 import { nextRunAt } from '@/lib/schedules/cron'
 import { latestOutcomes, type TaskOutcome } from '@/lib/schedules/outcomes'
 import { selectMany } from '@/supabase/supabase-helpers'
@@ -97,7 +98,7 @@ const duplicateInputSchema = z.object({
     position: z.object({ col: z.number().int(), row: z.number().int() }).optional(),
 })
 
-export type DuplicateAgentResult = { ok: true; agentId: string; agentName: string; inactive: boolean; schedules: string[]; triggers: string[] } | { ok: false; error: string }
+export type DuplicateAgentResult = { ok: true; agentId: string; agentName: string; inactive: boolean; schedules: string[]; triggers: string[] } | ActionFailure
 
 // Both ends are checked against the session rather than trusted, by duplicateAgent itself: the
 // source has to be reachable, and the Box the copy lands in managed. Any Box of the workspace is a
@@ -109,13 +110,13 @@ export async function duplicateAgentAction(input: unknown): Promise<DuplicateAge
         const { agent, schedules, triggers } = await duplicateAgent({ actor, agentRowId: agentId, workspaceId: actor.workspaceId, spaceId, position })
         return { ok: true, agentId: agent.id, agentName: agent.name, inactive: Boolean(agent.disabled_at), schedules, triggers }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Could not duplicate this coworker' }
+        return failureOf(err, 'duplicateCoworkerFailed')
     }
 }
 
 const moveInputSchema = z.object({ agentId: z.string().uuid(), spaceId: z.string().uuid() })
 
-export type MoveAgentResult = { ok: true; position: { col: number; row: number } } | { ok: false; error: string }
+export type MoveAgentResult = { ok: true; position: { col: number; row: number } } | ActionFailure
 
 // Both ends are checked by moveAgentToBox: `manage` on the Box it leaves and on the one it joins.
 // Nothing moves on the engine, only the rectangle the agent is drawn in.
@@ -124,19 +125,19 @@ export async function moveAgentAction(input: unknown): Promise<MoveAgentResult> 
         const { agentId, spaceId } = moveInputSchema.parse(input)
         return await moveAgentToBox(agentId, spaceId, await requireLightSessionActor())
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Could not move this coworker' }
+        return failureOf(err, 'moveCoworkerFailed')
     }
 }
 
 // Ownership goes through assertAgentInWorkspace rather than the usual chat target: that one throws
 // on a disabled agent, which is precisely the agent this acts on.
-export async function activateAgentAction(agentId: string): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function activateAgentAction(agentId: string): Promise<{ ok: true } | ActionFailure> {
     try {
         await assertAgentInWorkspace(agentId, 'manage')
         await activateAgent(agentId)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to activate this coworker' }
+        return failureOf(err, 'activateCoworkerFailed')
     }
 }
 
@@ -175,7 +176,7 @@ export async function activateAgentAutomationsAction(agentId: string): Promise<v
     } catch {}
 }
 
-export async function updateAgentConfigAction(agentId: string, patch: EngineAgentConfigPatch & { soul?: string; install?: string }): Promise<{ success: boolean; error?: string }> {
+export async function updateAgentConfigAction(agentId: string, patch: EngineAgentConfigPatch & { soul?: string; install?: string }): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId, contentLocked } = await resolveRunTarget(agentId, 'manage')
         await assertModelEntitled(patch.model)
@@ -183,24 +184,24 @@ export async function updateAgentConfigAction(agentId: string, patch: EngineAgen
         await enginePatchAgent(conn, engineAgentId, contentLocked ? { ...patch, soul: undefined } : patch)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to update coworker' }
+        return { success: false, ...refusalOf(err, 'updateCoworkerFailed') }
     }
 }
 
 // A connector owns its MCP servers: install and uninstall write them through the compiler, which
 // calls the engine directly. Editing one from the panel would leave the registry describing a
 // footprint that no longer exists, so this path refuses to touch them.
-export async function patchAgentMcpServersAction(agentId: string, body: { upsert?: EngineMcpServer[]; remove?: string[] }): Promise<{ success: boolean; error?: string; detail?: EngineAgentDetail }> {
+export async function patchAgentMcpServersAction(agentId: string, body: { upsert?: EngineMcpServer[]; remove?: string[] }): Promise<SuccessResult & { detail?: EngineAgentDetail }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const owned = connectorMcpServerNames(await readRegistry(conn, engineAgentId))
         const touched = [...(body.upsert ?? []).map(s => s.name), ...(body.remove ?? [])]
         const claimed = touched.find(name => owned.has(name))
-        if (claimed) return { success: false, error: `"${claimed}" belongs to an app. Manage it from the Apps tab.` }
+        if (claimed) return { success: false, ...refusal('mcpServerOwnedByApp', { name: claimed }) }
         const detail = await enginePatchMcpServers(conn, engineAgentId, body)
         return { success: true, detail }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to update MCP servers' }
+        return { success: false, ...refusalOf(err, 'updateMcpServersFailed') }
     }
 }
 
@@ -258,23 +259,21 @@ export async function getAgentContextAction(agentId: string): Promise<AgentConte
     }
 }
 
-export async function updateAgentKeysAction(agentId: string, body: { set?: Record<string, string>; remove?: string[] }): Promise<{ success: boolean; error?: string }> {
+export async function updateAgentKeysAction(agentId: string, body: { set?: Record<string, string>; remove?: string[] }): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await engineUpdateAgentKeys(conn, engineAgentId, body)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to update coworker variables' }
+        return { success: false, ...refusalOf(err, 'updateCoworkerVariablesFailed') }
     }
 }
-
-const SECRET_NOT_REQUESTED = 'This coworker did not ask for these credentials'
 
 // A coworker asking for a credential in the chat is answered by whoever can talk to it, so this path
 // takes `use` only. What makes that safe is that it writes nothing but the keys the pending request
 // of that conversation names, read back from the engine rather than from the caller. Any other key
 // goes through updateAgentKeysAction, which takes `manage`.
-export async function answerSecretRequestAction(sessionId: string, values: Record<string, string>): Promise<{ success: boolean; error?: string }> {
+export async function answerSecretRequestAction(sessionId: string, values: Record<string, string>): Promise<SuccessResult> {
     try {
         const session = await assertSessionInWorkspace(sessionId)
         const { conn, engineAgentId } = await getAgentChatTarget(session.agent_id)
@@ -282,17 +281,15 @@ export async function answerSecretRequestAction(sessionId: string, values: Recor
         const pending = findPendingHitl(messages)
         const requested = new Set(pending?.kind === 'secret' ? pendingSecrets(pending.input).map(secret => secret.key) : [])
         const keys = Object.keys(values)
-        if (keys.length === 0 || keys.some(key => !requested.has(key))) throw new AccessDeniedError(SECRET_NOT_REQUESTED)
+        if (keys.length === 0 || keys.some(key => !requested.has(key))) throw new AccessDeniedError('secretNotRequested')
         await engineUpdateAgentKeys(conn, engineAgentId, { set: values })
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Could not save the credentials' }
+        return { success: false, ...refusalOf(err, 'saveCredentialsFailed') }
     }
 }
 
 // --- Data tab (agent's private SQLite database, read-only) ---
-
-const AGENT_DB_UNREACHABLE = 'Could not reach the engine for this coworker.'
 
 // Resolving the coworker fails with messages written for the user (inactive, not found); the engine
 // call fails with transport details that are not.
@@ -302,12 +299,12 @@ export async function listAgentTablesAction(agentId: string): Promise<TableListR
         target = await getAgentChatTarget(agentId)
     } catch (err) {
         if (err instanceof NoEngineError) return { success: true, tables: [] }
-        return { success: false, error: err instanceof Error && err.message ? err.message : AGENT_DB_UNREACHABLE }
+        return { success: false, ...(err instanceof Error && err.message ? refusalOf(err) : refusal('agentDbUnreachable')) }
     }
     try {
         return { success: true, tables: await engineListDbTables(target.conn, agentDataBase(target.engineAgentId)) }
     } catch {
-        return { success: false, error: AGENT_DB_UNREACHABLE }
+        return { success: false, ...refusal('agentDbUnreachable') }
     }
 }
 
@@ -320,41 +317,41 @@ export async function readAgentTableRowsAction(agentId: string, table: string, p
     }
 }
 
-export async function deleteAgentTableRowsAction(agentId: string, table: string, rowids: (number | string)[]): Promise<{ success: boolean; error?: string; deleted?: number }> {
+export async function deleteAgentTableRowsAction(agentId: string, table: string, rowids: (number | string)[]): Promise<SuccessResult & { deleted?: number }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const { deleted } = await engineDeleteDbTableRows(conn, agentDataBase(engineAgentId), table, rowids)
         return { success: true, deleted }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to delete rows' }
+        return { success: false, ...refusalOf(err, 'deleteRowsFailed') }
     }
 }
 
-export async function dropAgentTableAction(agentId: string, table: string): Promise<{ success: boolean; error?: string }> {
+export async function dropAgentTableAction(agentId: string, table: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await engineDropDbTable(conn, agentDataBase(engineAgentId), table)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to delete table' }
+        return { success: false, ...refusalOf(err, 'deleteTableFailed') }
     }
 }
 
 // An engine that predates the purge route answers a bare 404, which reads as a broken agent
 // unless we name it: the agent is fine, the machine it runs on is just behind.
-function describeDataError(err: unknown, fallback: string): string {
+function describeDataError(err: unknown, fallback: ErrorCode): ActionRefusal {
     const message = err instanceof Error ? err.message : ''
-    if (/failed: 404\b/.test(message)) return 'This workspace runs on a machine that needs an engine update before it can purge a table.'
-    return message || fallback
+    if (/failed: 404\b/.test(message)) return refusal('purgeNeedsEngineUpdate')
+    return message ? refusalOf(err) : refusal(fallback)
 }
 
-export async function purgeAgentTableAction(agentId: string, table: string): Promise<{ success: boolean; error?: string; deleted?: number }> {
+export async function purgeAgentTableAction(agentId: string, table: string): Promise<SuccessResult & { deleted?: number }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const { deleted } = await enginePurgeDbTable(conn, agentDataBase(engineAgentId), table)
         return { success: true, deleted }
     } catch (err) {
-        return { success: false, error: describeDataError(err, 'Failed to purge table') }
+        return { success: false, ...describeDataError(err, 'purgeTableFailed') }
     }
 }
 
@@ -378,9 +375,9 @@ export async function readAgentMonitoringAction(agentId: string, usageRange: Usa
 
 // A connector's skill is the connector's: the panels open it read-only, and every write path has
 // to say the same thing, since the client flag is only a flag.
-async function connectorSkillError(conn: EngineConnection, engineAgentId: string, slug: string): Promise<string | null> {
+async function connectorSkillError(conn: EngineConnection, engineAgentId: string, slug: string): Promise<ActionRefusal | null> {
     const owner = connectorSkillOwners(await readRegistry(conn, engineAgentId)).get(slug)
-    return owner ? connectorSkillReadOnlyError(slug, owner) : null
+    return owner ? refusal('connectorSkillReadOnly', { slug, service: owner }) : null
 }
 
 export async function listSkillsAction(agentId: string): Promise<EngineSkillWithSource[]> {
@@ -416,23 +413,23 @@ export async function getSkillAction(agentId: string, slug: string): Promise<(En
     }
 }
 
-export async function createSkillAction(agentId: string, params: { name: string; description: string; body: string }): Promise<{ success: boolean; error?: string; skill?: EngineSkill }> {
+export async function createSkillAction(agentId: string, params: { name: string; description: string; body: string }): Promise<SuccessResult & { skill?: EngineSkill }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const skill = await engineCreateSkill(conn, engineAgentId, params)
         return { success: true, skill }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to create skill' }
+        return { success: false, ...refusalOf(err, 'createSkillFailed') }
     }
 }
 
-export async function importSkillAction(agentId: string, content: string, files: EngineSkillFilePayload[] = []): Promise<{ success: boolean; error?: string; skill?: EngineSkill }> {
+export async function importSkillAction(agentId: string, content: string, files: EngineSkillFilePayload[] = []): Promise<SuccessResult & { skill?: EngineSkill }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const skill = await engineImportSkill(conn, engineAgentId, content, files)
         return { success: true, skill }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to import skill' }
+        return { success: false, ...refusalOf(err, 'importSkillFailed') }
     }
 }
 
@@ -446,67 +443,67 @@ export async function readSkillFileAction(agentId: string, slug: string, path: s
     }
 }
 
-export async function writeSkillFileAction(agentId: string, slug: string, path: string, content: string): Promise<{ success: boolean; error?: string }> {
+export async function writeSkillFileAction(agentId: string, slug: string, path: string, content: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
         // The editor showed filler, so a save here would write that filler over the real file.
         // Deleting is left alone: it destroys nothing the user could not already destroy.
-        if (contentLocked) return { success: false, error: LOCKED_WRITE_ERROR }
+        if (contentLocked) return { success: false, ...refusal('lockedWrite') }
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
-        if (readOnly) return { success: false, error: readOnly }
+        if (readOnly) return { success: false, ...readOnly }
         await engineWriteFileText(conn, skillFilesBase(engineAgentId, slug), path, content)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to save file' }
+        return { success: false, ...refusalOf(err, 'saveFileFailed') }
     }
 }
 
-export async function deleteSkillFileAction(agentId: string, slug: string, path: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteSkillFileAction(agentId: string, slug: string, path: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
-        if (readOnly) return { success: false, error: readOnly }
+        if (readOnly) return { success: false, ...readOnly }
         await engineDeleteFile(conn, skillFilesBase(engineAgentId, slug), path)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to delete file' }
+        return { success: false, ...refusalOf(err, 'deleteFileFailed') }
     }
 }
 
-export async function downloadSkillArchiveAction(agentId: string, slug: string): Promise<{ success: boolean; error?: string; base64?: string }> {
+export async function downloadSkillArchiveAction(agentId: string, slug: string): Promise<SuccessResult & { base64?: string }> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId)
-        if (contentLocked) return { success: false, error: LOCKED_DOWNLOAD_ERROR }
+        if (contentLocked) return { success: false, ...refusal('lockedDownload') }
         const buffer = await engineFetchSkillArchive(conn, engineAgentId, slug)
         return { success: true, base64: Buffer.from(buffer).toString('base64') }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to download skill' }
+        return { success: false, ...refusalOf(err, 'downloadSkillFailed') }
     }
 }
 
-export async function updateSkillAction(agentId: string, slug: string, patch: { description?: string; body?: string }): Promise<{ success: boolean; error?: string; skill?: EngineSkill }> {
+export async function updateSkillAction(agentId: string, slug: string, patch: { description?: string; body?: string }): Promise<SuccessResult & { skill?: EngineSkill }> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
-        if (readOnly) return { success: false, error: readOnly }
+        if (readOnly) return { success: false, ...readOnly }
         // The body in a sealed form is the filler the server sent, so it is dropped rather than
         // saved back over the real procedure. Everything else about the skill stays editable.
         const skill = await engineUpdateSkill(conn, engineAgentId, slug, contentLocked ? { ...patch, body: undefined } : patch)
         return { success: true, skill }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to update skill' }
+        return { success: false, ...refusalOf(err, 'updateSkillFailed') }
     }
 }
 
-export async function deleteSkillAction(agentId: string, slug: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteSkillAction(agentId: string, slug: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
-        if (readOnly) return { success: false, error: readOnly }
+        if (readOnly) return { success: false, ...readOnly }
         await engineDeleteSkill(conn, engineAgentId, slug)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to delete skill' }
+        return { success: false, ...refusalOf(err, 'deleteSkillFailed') }
     }
 }
 
@@ -521,13 +518,13 @@ export async function listMemoriesAction(agentId: string): Promise<EngineMemory[
     }
 }
 
-export async function createMemoryAction(agentId: string, params: { content: string; kind?: string; tags?: string[] }): Promise<{ success: boolean; error?: string }> {
+export async function createMemoryAction(agentId: string, params: { content: string; kind?: string; tags?: string[] }): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await engineCreateMemory(conn, engineAgentId, params)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to create memory' }
+        return { success: false, ...refusalOf(err, 'createMemoryFailed') }
     }
 }
 
@@ -540,23 +537,23 @@ export async function recallMemoriesAction(agentId: string, query: string, limit
     }
 }
 
-export async function deleteMemoryAction(agentId: string, memoryId: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteMemoryAction(agentId: string, memoryId: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await engineDeleteMemory(conn, engineAgentId, memoryId)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to delete memory' }
+        return { success: false, ...refusalOf(err, 'deleteMemoryFailed') }
     }
 }
 
-export async function clearMemoriesAction(agentId: string): Promise<{ success: boolean; error?: string }> {
+export async function clearMemoriesAction(agentId: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await engineClearMemories(conn, engineAgentId)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to clear memories' }
+        return { success: false, ...refusalOf(err, 'clearMemoriesFailed') }
     }
 }
 
@@ -644,7 +641,7 @@ export async function getScheduleAction(agentId: string, slug: string): Promise<
     }
 }
 
-export async function createScheduleAction(agentId: string, params: ScheduleCreateParams): Promise<{ success: boolean; error?: string; schedule?: EngineSchedule }> {
+export async function createScheduleAction(agentId: string, params: ScheduleCreateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await assertModelEntitled(params.model)
@@ -652,50 +649,50 @@ export async function createScheduleAction(agentId: string, params: ScheduleCrea
         await followCoworker((await getServerSession()).user?.id, agentId)
         return { success: true, schedule }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to create schedule' }
+        return { success: false, ...refusalOf(err, 'createScheduleFailed') }
     }
 }
 
-export async function updateScheduleAction(agentId: string, slug: string, patch: ScheduleUpdateParams): Promise<{ success: boolean; error?: string; schedule?: EngineSchedule }> {
+export async function updateScheduleAction(agentId: string, slug: string, patch: ScheduleUpdateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
         await assertModelEntitled(patch.model)
         // Pausing or rescheduling a sealed task is ordinary use; only its prompt is held back.
         const schedule = await engineUpdateSchedule(conn, engineAgentId, slug, contentLocked ? { ...patch, body: undefined } : patch)
         // A box that predates renaming drops the unknown field and still answers 200.
-        if (patch.name !== undefined && schedule.name !== patch.name.trim()) return { success: false, error: 'Update this coworker to rename its routines' }
+        if (patch.name !== undefined && schedule.name !== patch.name.trim()) return { success: false, ...refusal('renameRoutineNeedsUpdate') }
         return { success: true, schedule }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to update schedule' }
+        return { success: false, ...refusalOf(err, 'updateScheduleFailed') }
     }
 }
 
-export async function parseScheduleAction(input: string, ctx: { nowIso: string; timezone: string }): Promise<{ success: true; data: ParsedSchedule } | { success: false; error: string }> {
+export async function parseScheduleAction(input: string, ctx: { nowIso: string; timezone: string }): Promise<{ success: true; data: ParsedSchedule } | ({ success: false } & ActionRefusal)> {
     await requireWorkspaceId()
     const trimmed = input.trim().slice(0, 500)
-    if (!trimmed) return { success: false, error: 'Describe when the task should run' }
+    if (!trimmed) return { success: false, ...refusal('describeSchedule') }
     const data = await parseSchedule(trimmed, ctx)
-    if (!data) return { success: false, error: "Couldn't understand that schedule. Try rephrasing." }
+    if (!data) return { success: false, ...refusal('scheduleNotUnderstood') }
     return { success: true, data }
 }
 
-export async function testScheduleAction(agentId: string, slug: string): Promise<{ success: boolean; runId?: string; sessionId?: string; error?: string }> {
+export async function testScheduleAction(agentId: string, slug: string): Promise<SuccessResult & { runId?: string; sessionId?: string }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId)
         const { runId, sessionId } = await engineRunScheduleNow(conn, engineAgentId, slug)
         return { success: true, runId, sessionId }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to run schedule' }
+        return { success: false, ...refusalOf(err, 'runScheduleFailed') }
     }
 }
 
-export async function deleteScheduleAction(agentId: string, slug: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteScheduleAction(agentId: string, slug: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await engineDeleteSchedule(conn, engineAgentId, slug)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to delete schedule' }
+        return { success: false, ...refusalOf(err, 'deleteScheduleFailed') }
     }
 }
 
@@ -733,7 +730,7 @@ export async function getTriggerAction(agentId: string, slug: string): Promise<E
     }
 }
 
-export async function createTriggerAction(agentId: string, params: TriggerCreateParams): Promise<{ success: boolean; error?: string; trigger?: EngineTrigger }> {
+export async function createTriggerAction(agentId: string, params: TriggerCreateParams): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await assertModelEntitled(params.model)
@@ -741,38 +738,38 @@ export async function createTriggerAction(agentId: string, params: TriggerCreate
         await followCoworker((await getServerSession()).user?.id, agentId)
         return { success: true, trigger }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to create trigger' }
+        return { success: false, ...refusalOf(err, 'createTriggerFailed') }
     }
 }
 
-export async function updateTriggerAction(agentId: string, slug: string, patch: TriggerUpdateParams): Promise<{ success: boolean; error?: string; trigger?: EngineTrigger }> {
+export async function updateTriggerAction(agentId: string, slug: string, patch: TriggerUpdateParams): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
         await assertModelEntitled(patch.model)
         const trigger = await engineUpdateTrigger(conn, engineAgentId, slug, contentLocked ? { ...patch, body: undefined } : patch)
         return { success: true, trigger }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to update trigger' }
+        return { success: false, ...refusalOf(err, 'updateTriggerFailed') }
     }
 }
 
-export async function rotateTriggerTokenAction(agentId: string, slug: string): Promise<{ success: boolean; error?: string; trigger?: EngineTrigger }> {
+export async function rotateTriggerTokenAction(agentId: string, slug: string): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         const trigger = await engineRotateTriggerToken(conn, engineAgentId, slug)
         return { success: true, trigger }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to rotate the trigger secret' }
+        return { success: false, ...refusalOf(err, 'rotateTriggerSecretFailed') }
     }
 }
 
-export async function deleteTriggerAction(agentId: string, slug: string): Promise<{ success: boolean; error?: string }> {
+export async function deleteTriggerAction(agentId: string, slug: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
         await engineDeleteTrigger(conn, engineAgentId, slug)
         return { success: true }
     } catch (err) {
-        return { success: false, error: err instanceof Error ? err.message : 'Failed to delete trigger' }
+        return { success: false, ...refusalOf(err, 'deleteTriggerFailed') }
     }
 }
 

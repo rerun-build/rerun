@@ -5,6 +5,7 @@ import { GlassView } from 'expo-glass-effect'
 import * as ImagePicker from 'expo-image-picker'
 import { type Ref, useEffect, useEffectEvent, useImperativeHandle, useRef, useState } from 'react'
 import { Alert, Text, TextInput, View, type TextInputInstance } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { addPasteImagesListener } from '@/chat/composer-paste'
 import { useGlassStyle } from '@/components/ui/GlassButton'
@@ -57,6 +58,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     const [caret, setCaret] = useState(value.length)
     // Where the caret goes once the text a menu just wrote is on screen.
     const pendingCaret = useRef<number | null>(null)
+    const t = useTranslations('mobileChat.composer')
     const recorder = useVoiceMessage(voice)
     const recording = recorder.status !== 'idle'
     const canRecord = Boolean(voice)
@@ -93,8 +95,8 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
 
     const add = (added: ComposerAttachment[]) => {
         const { attachments: next, tooBig, noRoom } = fitAttachments(attachments, added)
-        if (tooBig.length > 0) Alert.alert(tooBig.length === 1 ? 'This file is too large' : 'These files are too large', `${tooBig.map(file => file.name).join(', ')}: ${MAX_UPLOAD_FILE_BYTES / 1024 / 1024} MB at most.`)
-        if (noRoom.length > 0) Alert.alert('Too many files', `${MAX_ATTACHMENTS} at most: ${noRoom.map(file => file.name).join(', ')} left out.`)
+        if (tooBig.length > 0) Alert.alert(t('tooLargeTitle', { count: tooBig.length }), t('tooLargeBody', { files: tooBig.map(file => file.name).join(', '), megabytes: MAX_UPLOAD_FILE_BYTES / 1024 / 1024 }))
+        if (noRoom.length > 0) Alert.alert(t('tooManyTitle'), t('tooManyBody', { max: MAX_ATTACHMENTS, files: noRoom.map(file => file.name).join(', ') }))
         onAttachmentsChange(next)
     }
 
@@ -141,22 +143,22 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     const actions = running ? (
         canSend ? (
             <>
-                <RoundButton symbol="stop.fill" label="Stop" onPress={stop} />
-                <RoundButton symbol="arrow.up" label="Send" tone="primary" onPress={() => onSend()} />
+                <RoundButton symbol="stop.fill" label={t('stop')} onPress={stop} />
+                <RoundButton symbol="arrow.up" label={t('send')} tone="primary" onPress={() => onSend()} />
             </>
         ) : (
-            <RoundButton symbol="stop.fill" label="Stop" tone="primary" onPress={stop} />
+            <RoundButton symbol="stop.fill" label={t('stop')} tone="primary" onPress={stop} />
         )
     ) : !canSend ? (
         canRecord ? (
-            <RoundButton symbol="mic" label="Record a voice message" tone="primary" onPress={startRecording} />
+            <RoundButton symbol="mic" label={t('recordVoice')} tone="primary" onPress={startRecording} />
         ) : (
-            <RoundButton symbol="arrow.up" label="Send" tone="primary" disabled onPress={() => onSend()} />
+            <RoundButton symbol="arrow.up" label={t('send')} tone="primary" disabled onPress={() => onSend()} />
         )
     ) : (
         <>
-            {!hasText && canRecord && <RoundButton symbol="mic" label="Record a voice message" onPress={startRecording} />}
-            <RoundButton symbol="arrow.up" label="Send" tone="primary" onPress={() => onSend()} />
+            {!hasText && canRecord && <RoundButton symbol="mic" label={t('recordVoice')} onPress={startRecording} />}
+            <RoundButton symbol="arrow.up" label={t('send')} tone="primary" onPress={() => onSend()} />
         </>
     )
 
@@ -191,9 +193,9 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                         {recording ? (
                             <>
-                                <RoundButton symbol="xmark" label="Discard recording" tone="plain" disabled={recorder.status === 'processing'} onPress={() => void recorder.discard()} />
+                                <RoundButton symbol="xmark" label={t('discardRecording')} tone="plain" disabled={recorder.status === 'processing'} onPress={() => void recorder.discard()} />
                                 <View style={{ flex: 1 }} />
-                                {recorder.status === 'failed' ? <RoundButton symbol="arrow.clockwise" label="Retry sending the recording" tone="primary" onPress={recorder.retry} /> : <RoundButton symbol="arrow.up" label="Send the recording" tone="primary" busy={recorder.status !== 'recording'} onPress={() => void recorder.finish()} />}
+                                {recorder.status === 'failed' ? <RoundButton symbol="arrow.clockwise" label={t('retryRecording')} tone="primary" onPress={recorder.retry} /> : <RoundButton symbol="arrow.up" label={t('sendRecording')} tone="primary" busy={recorder.status !== 'recording'} onPress={() => void recorder.finish()} />}
                             </>
                         ) : (
                             <>

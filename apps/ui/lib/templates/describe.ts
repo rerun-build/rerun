@@ -14,7 +14,7 @@ const briefAgentSchema = z.object({
 })
 
 export const templateBriefSchema = z.object({
-    title: z.string().min(1, 'Give the template a title first.'),
+    title: z.string().min(1, 'templateTitleFirst'),
     tagline: z.string().default(''),
     category: z.string().default(''),
     tags: z.array(z.string()).default([]),

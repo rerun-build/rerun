@@ -11,6 +11,7 @@ import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { EngineProvider } from '@/lib/engine/types'
 import { cn } from '@/lib/utils'
 import { useBillingStore } from '@/stores/billing.store'
+import { useTranslations } from 'next-intl'
 import { useCallback, useMemo, useState } from 'react'
 
 // A model id alone no longer identifies a choice: two Claude subscriptions both serve `opus`. The
@@ -63,6 +64,7 @@ type RunModelFieldProps = {
 }
 
 export function RunModelField({ id, value, onChange, availableGroups, helperText, agentModel, disabled }: RunModelFieldProps) {
+    const t = useTranslations('agent.runModelField')
     // Keep a pair that is no longer available (connection deleted, model switched off) selectable,
     // so the routine stays editable instead of silently losing it.
     const orphan = useMemo(
@@ -70,7 +72,7 @@ export function RunModelField({ id, value, onChange, availableGroups, helperText
         [availableGroups, value]
     )
 
-    const agentDefaultLabel = agentModel ? `Coworker default · ${modelLabel(agentModel)}` : 'Coworker default'
+    const agentDefaultLabel = agentModel ? t('coworkerDefaultWithModel', { model: modelLabel(agentModel) }) : t('coworkerDefault')
     // Spelled out rather than mirrored from the picked item: a tier's item is a two-line row.
     const triggerLabel = value.model ? modelName(value.connectionId ?? '', value.model) : agentDefaultLabel
 
@@ -82,10 +84,10 @@ export function RunModelField({ id, value, onChange, availableGroups, helperText
     }
 
     return (
-        <Field label="Model" htmlFor={id} helperText={helperText}>
+        <Field label={t('label')} htmlFor={id} helperText={helperText}>
             <Select value={encode(value)} onValueChange={pick} disabled={disabled}>
                 <SelectTrigger id={id} className="h-8 w-full text-sm">
-                    <SelectValue placeholder="Select a model">{triggerLabel}</SelectValue>
+                    <SelectValue placeholder={t('placeholder')}>{triggerLabel}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                     <SelectGroup>
@@ -112,7 +114,7 @@ export function RunModelField({ id, value, onChange, availableGroups, helperText
                     ))}
                     {orphan && (
                         <SelectGroup>
-                            <SelectLabel>Current</SelectLabel>
+                            <SelectLabel>{t('current')}</SelectLabel>
                             <SelectItem value={encode(orphan)}>{modelLabel(orphan.model)}</SelectItem>
                         </SelectGroup>
                     )}

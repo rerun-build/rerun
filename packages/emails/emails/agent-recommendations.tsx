@@ -3,6 +3,9 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { TemplateCard } from "../components/TemplateCard";
+import { strong } from "../components/rich";
+import { formatDuration } from "@rerun/i18n/format";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface RecommendedTemplate {
@@ -23,6 +26,7 @@ export interface AgentRecommendationsProps {
   browseUrl: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function AgentRecommendations({
@@ -32,30 +36,24 @@ export default function AgentRecommendations({
   browseUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: AgentRecommendationsProps) {
-  const subject = companyName ?? "your company";
+  const t = emailTranslator(locale);
+  const company = companyName ?? t("agentRecommendations.yourCompany");
 
   return (
     <Layout
-      preview={`${templates.length} Rerun coworkers that fit ${subject}`}
+      preview={t("agentRecommendations.preview", { count: templates.length, company })}
       hero={{ scene: "agent-recommendations" }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Where to start at {subject}</Heading>
+      <Heading style={text.heading}>{t("agentRecommendations.heading", { company })}</Heading>
       <Text style={text.paragraph}>
-        {websiteDomain ? (
-          <>
-            You shared <strong>{websiteDomain}</strong> during setup. From the
-            recurring work described there and the tools you told us you use,
-            these are the clearest setups to start with.
-          </>
-        ) : (
-          <>
-            From the tools you told us you use, these are the clearest setups to
-            start with.
-          </>
-        )}
+        {websiteDomain
+          ? t.rich("agentRecommendations.bodyWithSite", { domain: websiteDomain, strong })
+          : t("agentRecommendations.bodyWithoutSite")}
       </Text>
 
       {templates.map((template) => (
@@ -64,17 +62,16 @@ export default function AgentRecommendations({
           title={template.title}
           href={template.url}
           imageUrl={template.imageUrl}
-          meta={`${template.setupMinutes} min`}
+          meta={formatDuration(template.setupMinutes * 60_000, locale)}
           line={template.line}
+          locale={locale}
         />
       ))}
 
       <Section style={cta}>
-        <Button href={browseUrl}>Browse the library</Button>
+        <Button href={browseUrl}>{t("agentRecommendations.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        Nothing runs until you pick one and review its setup.
-      </Text>
+      <Text style={text.footnote}>{t("agentRecommendations.footnote")}</Text>
     </Layout>
   );
 }

@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface TrialEndingProps {
@@ -17,6 +19,7 @@ export interface TrialEndingProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -33,47 +36,40 @@ export default function TrialEnding({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: TrialEndingProps) {
-  const workspace = workspaceName ?? "your workspace";
+  const t = emailTranslator(locale);
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
-      preview={`Your Rerun trial ends on ${trialEndsLabel}`}
+      preview={t("trialEnding.preview", { date: trialEndsLabel })}
       hero={{ scene: "trial-ending", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>
-        Your trial ends in {daysLeft === 1 ? "a day" : `${daysLeft} days`}
-      </Heading>
+      <Heading style={text.heading}>{t("trialEnding.heading", { daysLeft })}</Heading>
       <Text style={text.paragraph}>
-        The trial for <strong>{workspace}</strong> ends on{" "}
-        <strong>{trialEndsLabel}</strong>. From then on your plan bills to the
-        card on file every month. Without a card on file, your coworkers stop
-        running and your workspace is paused 2 hours after your trial ends.
+        {t.rich("trialEnding.endsOn", { workspace, date: trialEndsLabel, strong })}
       </Text>
       <Text style={text.paragraph}>
-        Nothing is deleted: your coworkers and everything they know are saved
-        until {keptUntilLabel}, and subscribing brings it all back exactly as
-        you left it.
+        {t("trialEnding.nothingDeleted", { keptUntil: keptUntilLabel })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Workspace", value: workspace },
-            { label: "Trial ends", value: trialEndsLabel },
+            { label: t("common.meta.workspace"), value: workspace },
+            { label: t("common.meta.trialEnds"), value: trialEndsLabel },
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={billingUrl}>Start my plan</Button>
+        <Button href={billingUrl}>{t("trialEnding.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        Not planning to continue? Cancel before {trialEndsLabel} from Billing,
-        in your workspace menu, and nothing is charged.
-      </Text>
+      <Text style={text.footnote}>{t("trialEnding.footnote", { date: trialEndsLabel })}</Text>
     </Layout>
   );
 }

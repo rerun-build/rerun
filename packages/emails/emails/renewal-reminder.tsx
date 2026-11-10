@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface RenewalReminderProps {
@@ -17,6 +19,7 @@ export interface RenewalReminderProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -33,43 +36,38 @@ export default function RenewalReminder({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: RenewalReminderProps) {
-  const workspace = workspaceName ?? "your workspace";
+  const t = emailTranslator(locale);
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
-      preview={`Your Rerun plan renews on ${renewsLabel}`}
+      preview={t("renewalReminder.preview", { date: renewsLabel })}
       hero={{ scene: "trial-ending", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>
-        Your plan renews in {daysLeft === 1 ? "a day" : `${daysLeft} days`}
-      </Heading>
+      <Heading style={text.heading}>{t("renewalReminder.heading", { daysLeft })}</Heading>
       <Text style={text.paragraph}>
-        You asked us to remind you before the plan for{" "}
-        <strong>{workspace}</strong> renews. It renews on{" "}
-        <strong>{renewsLabel}</strong>, and the card on file is charged then.
-        Until that date your coworkers keep running as they are.
+        {t.rich("renewalReminder.body", { workspace, date: renewsLabel, strong })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Workspace", value: workspace },
-            { label: "Renews on", value: renewsLabel },
-            ...(amountLabel ? [{ label: "Amount", value: amountLabel }] : []),
+            { label: t("common.meta.workspace"), value: workspace },
+            { label: t("common.meta.renewsOn"), value: renewsLabel },
+            ...(amountLabel ? [{ label: t("common.meta.amount"), value: amountLabel }] : []),
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={billingUrl}>Review my plan</Button>
+        <Button href={billingUrl}>{t("renewalReminder.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        Want to cancel? Do it before {renewsLabel} from Billing, in your
-        workspace menu, and your card is not charged again.
-      </Text>
+      <Text style={text.footnote}>{t("renewalReminder.footnote", { date: renewsLabel })}</Text>
     </Layout>
   );
 }

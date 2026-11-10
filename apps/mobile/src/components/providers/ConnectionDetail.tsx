@@ -1,6 +1,9 @@
 import type { AiConnectionView, AiConnectionsView } from '@rerun/contracts'
 import { Fragment, useState, type ReactNode } from 'react'
 import { Switch, View } from 'react-native'
+import { useTranslations } from 'use-intl'
+
+import type { AccessReason } from '@/auth/access'
 
 import { AppText } from '@/components/ui/AppText'
 import { TONES } from '@/components/ui/Badge'
@@ -26,12 +29,13 @@ type ConnectionDetailProps = {
     replacement: { key: string; onKey: (key: string) => void; busy: boolean; error: string | null; onSave: () => void }
     onRemove: () => void
     // Why the caller can only read the connection (a member), or null when they run it.
-    readOnlyReason?: string | null
+    readOnlyReason?: AccessReason | null
 }
 
 // The web's ConnectionDetail: what is wrong first, then the plan's usage, the models, OpenRouter's
 // router, and the delete at the very bottom. Every edit persists at once.
 export function ConnectionDetail({ connection, view, error, onBack, onRename, onModels, onBaseUrl, onExtraModels, onSignInAgain, replacement, onRemove, readOnlyReason }: ConnectionDetailProps) {
+    const t = useTranslations('mobileProviders.detail')
     const readOnly = !!readOnlyReason
     const isRerun = connection.kind === 'included'
     const isOpenRouter = connection.provider === 'openrouter'
@@ -56,7 +60,7 @@ export function ConnectionDetail({ connection, view, error, onBack, onRename, on
 
             {!isRerun && (
                 <Section>
-                    <SettingsRow label="Name" value={connection.name} disabled={readOnly} onPress={onRename} />
+                    <SettingsRow label={t('name')} value={connection.name} disabled={readOnly} onPress={onRename} />
                 </Section>
             )}
 
@@ -65,7 +69,7 @@ export function ConnectionDetail({ connection, view, error, onBack, onRename, on
             {isOpenRouter && <BaseUrl baseUrl={connection.baseUrl} readOnly={readOnly} onCommit={onBaseUrl} />}
             {isOpenRouter && connection.credentialOnFile && <CustomModels connection={connection} readOnly={readOnly} onChange={onExtraModels} />}
 
-            {!isRerun && <Button label={`Remove ${connection.name}`} symbol="trash" variant="destructive" disabled={readOnly} onPress={onRemove} />}
+            {!isRerun && <Button label={t('removeButton', { name: connection.name })} symbol="trash" variant="destructive" disabled={readOnly} onPress={onRemove} />}
         </SheetFrame>
     )
 }
@@ -78,19 +82,20 @@ function Notice({ tone, children }: { tone: 'orange' | 'red'; children: ReactNod
 
 // No Top up here: the app sells nothing.
 function CreditBlock({ view }: { view: AiConnectionsView }) {
+    const t = useTranslations('mobileProviders.credit')
     const body = (
         <>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
                 <AppText variant="callout" medium>
-                    This month's credits
+                    {t('title')}
                 </AppText>
                 <AppText variant="footnote" tone="muted">
-                    {view.credit.percent}%
+                    {t('percent', { percent: view.credit.percent })}
                 </AppText>
             </View>
             <UsageBar percent={view.credit.percent} />
             <AppText variant="footnote" tone="muted">
-                {view.credit.usedUp ? `Coworkers running on Rerun are paused until the credits are back ${view.credit.backOn}. Pick another default model to keep them going.` : 'Comes with your Rerun plan. No key, nothing to set up.'}
+                {view.credit.usedUp ? t('usedUp', { backOn: view.credit.backOn }) : t('included')}
             </AppText>
         </>
     )
@@ -103,22 +108,23 @@ function CreditBlock({ view }: { view: AiConnectionsView }) {
 }
 
 function ReconnectBlock({ connection, readOnly, onSignInAgain, replacement }: { connection: AiConnectionView; readOnly: boolean; onSignInAgain: () => void; replacement: ConnectionDetailProps['replacement'] }) {
+    const t = useTranslations('mobileProviders.reconnect')
     if (signsIn(connection.provider)) {
         return (
             <Notice tone="orange">
-                <AppText variant="callout">{connection.credentialOnFile ? 'This sign-in was rejected. Coworkers using it are stopped until you sign in again.' : 'This sign-in expired. Coworkers using it are stopped until you sign in again.'}</AppText>
+                <AppText variant="callout">{connection.credentialOnFile ? t('signInRejected') : t('signInExpired')}</AppText>
                 <View style={{ alignSelf: 'flex-start' }}>
-                    <Button label="Sign in again" disabled={readOnly} onPress={onSignInAgain} />
+                    <Button label={t('signInAgain')} disabled={readOnly} onPress={onSignInAgain} />
                 </View>
             </Notice>
         )
     }
     return (
         <Notice tone="orange">
-            <AppText variant="callout">{connection.credentialOnFile ? 'This key was rejected. Coworkers using it are stopped until you paste a new one.' : 'No key on file. Coworkers using it are stopped until you paste one.'}</AppText>
-            <TextField id="replace-key" label="API key" value={replacement.key} onChangeText={replacement.onKey} placeholder="Paste your key" secret disabled={readOnly} />
+            <AppText variant="callout">{connection.credentialOnFile ? t('keyRejected') : t('keyMissing')}</AppText>
+            <TextField id="replace-key" label={t('keyLabel')} value={replacement.key} onChangeText={replacement.onKey} placeholder={t('keyPlaceholder')} secret disabled={readOnly} />
             <View style={{ alignSelf: 'flex-start' }}>
-                <Button label="Save" onPress={replacement.onSave} disabled={readOnly || !replacement.key.trim()} loading={replacement.busy} />
+                <Button label={t('save')} onPress={replacement.onSave} disabled={readOnly || !replacement.key.trim()} loading={replacement.busy} />
             </View>
             <ErrorLine error={replacement.error} />
         </Notice>
@@ -126,13 +132,14 @@ function ReconnectBlock({ connection, readOnly, onSignInAgain, replacement }: { 
 }
 
 function PlanUsage({ connection }: { connection: AiConnectionView }) {
+    const t = useTranslations('mobileProviders.planUsage')
     return (
         <View style={{ gap: spacing.sm }}>
-            <SectionTitle>Plan usage</SectionTitle>
+            <SectionTitle>{t('title')}</SectionTitle>
             <Card>
                 {connection.planWindows.length === 0 ? (
                     <AppText variant="footnote" tone="muted" style={{ padding: spacing.lg }}>
-                        Usage shows up here after the next run on this plan.
+                        {t('empty')}
                     </AppText>
                 ) : (
                     connection.planWindows.map((window, index) => (
@@ -144,7 +151,7 @@ function PlanUsage({ connection }: { connection: AiConnectionView }) {
                                         {window.name}
                                     </AppText>
                                     <AppText variant="footnote" tone="muted" numberOfLines={1}>
-                                        {[`${Math.round(window.usedPercent)}%`, window.reset].filter(Boolean).join(' · ')}
+                                        {[t('percent', { percent: Math.round(window.usedPercent) }), window.reset].filter(Boolean).join(' · ')}
                                     </AppText>
                                 </View>
                                 <UsageBar percent={window.usedPercent} />
@@ -161,14 +168,15 @@ function PlanUsage({ connection }: { connection: AiConnectionView }) {
 // below), and the last one left on.
 function Models({ connection, defaultModel, readOnly, onModels }: { connection: AiConnectionView; defaultModel: string | null; readOnly: boolean; onModels: (models: string[]) => void }) {
     const theme = useTheme()
+    const t = useTranslations('mobileProviders.models')
     const enabled = connection.models.filter(model => model.enabled)
     const switchable = connection.kind !== 'included' && connection.models.length > 1
     if (!switchable && enabled.length <= 1) return null
 
     const lockReason = (id: string) => {
-        if (id === defaultModel) return 'Default model'
-        if (connection.extraModels.includes(id)) return 'Custom model. Remove it below.'
-        if (enabled.length === 1) return 'Coworkers need at least one model from this source.'
+        if (id === defaultModel) return t('lockDefault')
+        if (connection.extraModels.includes(id)) return t('lockCustom')
+        if (enabled.length === 1) return t('lockLast')
         return undefined
     }
     const catalogEnabled = connection.models.filter(model => model.enabled && !connection.extraModels.includes(model.id)).map(model => model.id)
@@ -178,11 +186,11 @@ function Models({ connection, defaultModel, readOnly, onModels }: { connection: 
         <View style={{ gap: spacing.sm }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: spacing.lg }}>
                 <AppText variant="footnote" tone="muted" medium>
-                    Your coworkers can use
+                    {t('title')}
                 </AppText>
                 {switchable && (
                     <AppText variant="footnote" tone="muted">
-                        {enabled.length} of {connection.models.length}
+                        {t('enabledCount', { enabled: enabled.length, total: connection.models.length })}
                     </AppText>
                 )}
             </View>
@@ -216,12 +224,13 @@ function Models({ connection, defaultModel, readOnly, onModels }: { connection: 
 function BaseUrl({ baseUrl, readOnly, onCommit }: { baseUrl: string; readOnly: boolean; onCommit: (baseUrl: string) => void }) {
     const [value, setValue] = useState(baseUrl)
     const changed = value.trim() !== baseUrl
+    const t = useTranslations('mobileProviders.baseUrl')
     return (
         <View style={{ gap: spacing.sm }}>
-            <TextField id="base-url" label="Custom base URL" help="Send requests to your own OpenRouter-compatible router" value={value} onChangeText={setValue} placeholder="https://router.example.com/api/v1" verbatim disabled={readOnly} />
+            <TextField id="base-url" label={t('label')} help={t('help')} value={value} onChangeText={setValue} placeholder="https://router.example.com/api/v1" verbatim disabled={readOnly} />
             {changed && (
                 <View style={{ alignSelf: 'flex-start' }}>
-                    <Button label="Save" size="sm" onPress={() => onCommit(value.trim())} />
+                    <Button label={t('save')} size="sm" onPress={() => onCommit(value.trim())} />
                 </View>
             )}
         </View>
@@ -230,6 +239,7 @@ function BaseUrl({ baseUrl, readOnly, onCommit }: { baseUrl: string; readOnly: b
 
 function CustomModels({ connection, readOnly, onChange }: { connection: AiConnectionView; readOnly: boolean; onChange: (extraModels: string[]) => void }) {
     const [draft, setDraft] = useState('')
+    const t = useTranslations('mobileProviders.customModels')
     const reserved = connection.models.filter(model => !connection.extraModels.includes(model.id)).map(model => model.id)
     const value = draft.trim()
     const add = () => {
@@ -239,7 +249,7 @@ function CustomModels({ connection, readOnly, onChange }: { connection: AiConnec
     }
     return (
         <View style={{ gap: spacing.sm }}>
-            <SectionTitle>Custom models</SectionTitle>
+            <SectionTitle>{t('title')}</SectionTitle>
             {connection.extraModels.length > 0 && (
                 <Card>
                     {connection.extraModels.map((id, index) => (
@@ -249,16 +259,16 @@ function CustomModels({ connection, readOnly, onChange }: { connection: AiConnec
                                 <AppText numberOfLines={1} style={{ flex: 1, fontFamily: fonts.mono, fontSize: 14 }}>
                                     {id}
                                 </AppText>
-                                <Button label="Remove" size="sm" variant="ghost" disabled={readOnly} onPress={() => onChange(connection.extraModels.filter(model => model !== id))} />
+                                <Button label={t('remove')} size="sm" variant="ghost" disabled={readOnly} onPress={() => onChange(connection.extraModels.filter(model => model !== id))} />
                             </View>
                         </Fragment>
                     ))}
                 </Card>
             )}
-            <TextField id="custom-model" label="Add a model" help="Any OpenRouter model id, e.g. x-ai/grok-4." value={draft} onChangeText={setDraft} placeholder="vendor/model" verbatim disabled={readOnly} />
+            <TextField id="custom-model" label={t('addLabel')} help={t('addHelp')} value={draft} onChangeText={setDraft} placeholder="vendor/model" verbatim disabled={readOnly} />
             {value !== '' && (
                 <View style={{ alignSelf: 'flex-start' }}>
-                    <Button label="Add" size="sm" variant="outline" onPress={add} />
+                    <Button label={t('add')} size="sm" variant="outline" onPress={add} />
                 </View>
             )}
         </View>

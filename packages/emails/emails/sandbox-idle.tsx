@@ -3,6 +3,9 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { formatNumber } from "@rerun/i18n/format";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface SandboxIdleProps {
@@ -16,6 +19,7 @@ export interface SandboxIdleProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -31,42 +35,39 @@ export default function SandboxIdle({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: SandboxIdleProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`Your Rerun sandbox is archived on ${archiveLabel} unless you open it`}
+      preview={t("sandboxIdle.preview", { date: archiveLabel })}
       hero={{ scene: "trial-ended", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>
-        Your sandbox is archived on {archiveLabel}
-      </Heading>
+      <Heading style={text.heading}>{t("sandboxIdle.heading", { date: archiveLabel })}</Heading>
       <Text style={text.paragraph}>
-        Your Rerun sandbox has not been opened since{" "}
-        <strong>{lastActiveLabel}</strong>. A sandbox keeps a machine running
-        for you, so one that sits unused for 30 days is archived to free it.
+        {t.rich("sandboxIdle.unused", { lastActive: lastActiveLabel, strong })}
       </Text>
       <Text style={text.paragraph}>
-        Open your sandbox before <strong>{archiveLabel}</strong> and nothing
-        changes. After that date its coworkers and their data are saved, but
-        getting it back means asking us to reactivate it.
+        {t.rich("sandboxIdle.openBefore", { date: archiveLabel, strong })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Last opened", value: lastActiveLabel },
+            { label: t("common.meta.lastOpened"), value: lastActiveLabel },
             ...(agentCount > 0
-              ? [{ label: "Coworkers", value: String(agentCount) }]
+              ? [{ label: t("common.meta.coworkers"), value: formatNumber(agentCount, locale) }]
               : []),
-            { label: "Archived on", value: archiveLabel },
+            { label: t("common.meta.archivedOn"), value: archiveLabel },
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={sandboxUrl}>Open my sandbox</Button>
+        <Button href={sandboxUrl}>{t("sandboxIdle.button")}</Button>
       </Section>
     </Layout>
   );

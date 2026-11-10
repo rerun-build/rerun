@@ -2,28 +2,20 @@ import type { InboxItem, InboxStatus } from '@rerun/contracts'
 
 import type { CoworkerStatus } from '@/mocks/data'
 
-export type InboxSection = { title: string; items: InboxItem[] }
+export type InboxSectionKey = 'needsYou' | 'headsUps' | 'errors' | 'done'
+
+export type InboxSection = { key: InboxSectionKey; items: InboxItem[] }
 
 // The web's sections, in its order.
-const SECTIONS: { title: string; statuses: InboxStatus[] }[] = [
-    { title: 'Needs you', statuses: ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human'] },
-    { title: 'Heads-ups', statuses: ['awaiting_ack'] },
-    { title: 'Errors', statuses: ['error'] },
-    { title: 'Done', statuses: ['done'] },
+const SECTIONS: { key: InboxSectionKey; statuses: InboxStatus[] }[] = [
+    { key: 'needsYou', statuses: ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human'] },
+    { key: 'headsUps', statuses: ['awaiting_ack'] },
+    { key: 'errors', statuses: ['error'] },
+    { key: 'done', statuses: ['done'] },
 ]
 
-export const STATUS_SENTENCE: Record<InboxStatus, string> = {
-    awaiting_question: 'asked you a question',
-    awaiting_approval: 'needs your approval',
-    awaiting_connector: 'needs an app connected',
-    waiting_human: 'is waiting on you',
-    awaiting_ack: 'flagged something for you',
-    error: 'hit an error',
-    done: 'finished its run',
-}
-
 export function inboxSections(items: InboxItem[]): InboxSection[] {
-    return SECTIONS.map(section => ({ title: section.title, items: items.filter(item => section.statuses.includes(item.status)) })).filter(section => section.items.length > 0)
+    return SECTIONS.map(section => ({ key: section.key, items: items.filter(item => section.statuses.includes(item.status)) })).filter(section => section.items.length > 0)
 }
 
 // What the bell counts: every run a row stands for, as the web's tab title does.

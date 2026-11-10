@@ -120,8 +120,13 @@ export type TileResultItem = {
     at: number
 }
 
+// The status words of the presets, which the board reads in the reader's language. A label a caller
+// writes itself (a paused workspace, a lab) has no key and shows as it is.
+export type TileStatusLabelKey = 'idle' | 'working' | 'error' | 'offline' | 'waiting_human' | 'disabled' | 'paused' | 'restoring'
+
 export type TileStatus = {
     label: string
+    labelKey?: TileStatusLabelKey
     // Ton de la pastille de survol. À accorder à `TileStyle.color` : c'est ce qui relie la couleur
     // du bloc au mot qui la dit.
     tone: BadgeTone
@@ -135,6 +140,7 @@ export type TileStatusIcon = 'hand' | 'warning'
 // phrase tronquée.
 export type TilePinnedStatus = {
     label?: string
+    labelKey?: TileStatusLabelKey
     icon?: TileStatusIcon
     count?: number
     spinner?: boolean

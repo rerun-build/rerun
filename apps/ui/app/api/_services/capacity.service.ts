@@ -1,6 +1,7 @@
 import { activeAgentLimitFor, isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectSingle } from '@/supabase/supabase-helpers'
+import { AppError } from '@/lib/i18n/action-error'
 
 // The plan caps how many agents can be *active*, not how many exist: a workspace may hold as many
 // agents as it likes, and the ones beyond the limit sit disabled until a slot frees up. So the
@@ -45,9 +46,9 @@ export async function freeAgentSlots(workspaceId: number): Promise<number> {
     return Math.max(0, limit - (await countActiveAgents(workspaceId)))
 }
 
-export class NoPlanError extends Error {
+export class NoPlanError extends AppError {
     constructor() {
-        super('This workspace has no active plan.')
+        super('noActivePlan')
         this.name = 'NoPlanError'
     }
 }

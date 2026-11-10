@@ -52,7 +52,8 @@ function digestOf(agents: ReportedAgent[]): string {
 }
 
 // A failure here costs the story one slide, never the whole Rewind.
-export async function writeHighlights(agents: ReportedAgent[]): Promise<RewindHighlight[]> {
+// `language` is the English name of the workspace's language: the slide is read by its members.
+export async function writeHighlights(agents: ReportedAgent[], language = 'English'): Promise<RewindHighlight[]> {
     const model = highlightsModel()
     const digest = digestOf(agents)
     if (!model || !digest) return []
@@ -70,7 +71,7 @@ For each one:
 - "headline": 2 to 6 punchy words, like "Shipped 4 SEO articles". No trailing period, no emoji.
 - "detail": one short sentence with the specifics.
 
-Write in English. Respond with ONLY a JSON object, no prose, no code fences:
+Write the headlines and details in ${language}, keeping the coworker names exactly as written. Respond with ONLY a JSON object, no prose, no code fences:
 { "highlights": [{ "agent": "...", "headline": "...", "detail": "..." }] }`
 
     try {

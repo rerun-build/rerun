@@ -8,10 +8,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } f
 import { Icon } from '@/components/ui/icon'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
 import { formatBytes } from '@/lib/files/format'
 import { Link2 } from '@/lib/icons'
 import { Stripes } from '@rerun/ui/primitives'
+import { useLocale, useTranslations } from 'next-intl'
 import { ShareAgentLink } from './ShareAgentLink'
 import { ShareAgentOptions, ShareAgentOptionsSkeleton } from './ShareAgentOptions'
 import { ShareAgentSafety } from './ShareAgentSafety'
@@ -43,6 +43,7 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
         [agentId],
     )
     const flow = useShareAgentFlow(actions)
+    const t = useTranslations('agent.shareAgentDialog')
 
     return (
         <>
@@ -52,11 +53,9 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
                 <Stripes />
                 <Icon icon={Link2} className="relative" />
                 <div className="relative flex flex-col gap-1.5">
-                    <DialogTitle>{flow.step === 'link' ? 'Your share link' : `Share ${agentName}`}</DialogTitle>
+                    <DialogTitle>{flow.step === 'link' ? t('titleLink') : t('titleShare', { name: agentName })}</DialogTitle>
                     <DialogDescription>
-                        {flow.step === 'link'
-                            ? 'Send it to whoever should have a copy. They do not need an account yet.'
-                            : 'Pick what travels with the copy. Everything that makes it a coworker already does.'}
+                        {flow.step === 'link' ? t('descriptionLink') : t('descriptionShare')}
                     </DialogDescription>
                 </div>
             </div>
@@ -88,12 +87,12 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
             <DialogFooter className="m-0 px-6 py-4">
                 {flow.step === 'link' ? (
                     <Button type="button" onClick={onClose}>
-                        Done
+                        {t('done')}
                     </Button>
                 ) : (
                     <>
                         <Button type="button" variant="outline" onClick={onClose}>
-                            Cancel
+                            {t('cancel')}
                         </Button>
                         <CreateLinkButton flow={flow} agentId={agentId} agentName={agentName} />
                     </>
@@ -106,19 +105,22 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
 // Sending the agent alone needs no ceremony. Sending someone's memories, database or files out of
 // the workspace does, and the confirmation spells out what that means rather than asking twice.
 function CreateLinkButton({ flow, agentId, agentName }: { flow: ShareFlow; agentId: string; agentName: string }) {
+    const locale = useLocale()
+    const t = useTranslations('agent.shareAgentDialog')
+    const tShared = useTranslations('agent.modelsShared')
     const canManage = useCanManageAgent(agentId)
     const button = (
         <Button type="button" disabled={!canManage || flow.busy || flow.loading || !flow.plan} onClick={flow.carriesData ? undefined : () => void flow.create()}>
-            {flow.busy ? 'Packing the coworker…' : 'Create link'}
+            {flow.busy ? t('packing') : t('createLink')}
         </Button>
     )
-    if (!canManage) return <TooltipDisabledReason reason={BOX_MANAGE_REASON}>{button}</TooltipDisabledReason>
+    if (!canManage) return <TooltipDisabledReason reason={tShared('boxManageReason')}>{button}</TooltipDisabledReason>
     if (!flow.carriesData || !flow.plan) return button
 
     const carried = [
-        flow.include.memories && flow.plan.contents.memories.count > 0 ? `${flow.plan.contents.memories.count} memories` : null,
-        flow.include.database && flow.plan.contents.database.count > 0 ? `its database (${formatBytes(flow.plan.contents.database.bytes)}, not scanned for secrets)` : null,
-        flow.include.files && flow.plan.contents.files.count > 0 ? `${flow.plan.contents.files.count} workspace files` : null,
+        flow.include.memories && flow.plan.contents.memories.count > 0 ? t('carried.memories', { count: flow.plan.contents.memories.count }) : null,
+        flow.include.database && flow.plan.contents.database.count > 0 ? t('carried.database', { size: formatBytes(flow.plan.contents.database.bytes, locale) }) : null,
+        flow.include.files && flow.plan.contents.files.count > 0 ? t('carried.files', { count: flow.plan.contents.files.count }) : null,
     ].filter((entry): entry is string => entry !== null)
 
     // A switch turned on over an empty bucket carries nothing, so there is nothing to confirm.
@@ -126,10 +128,10 @@ function CreateLinkButton({ flow, agentId, agentName }: { flow: ShareFlow; agent
 
     return (
         <ConfirmDialog
-            title={`Send ${agentName} with its data?`}
-            description={`The copy will carry ${carried.join(', ')}. Anyone holding the link can read all of it until you revoke it.`}
+            title={t('confirmTitle', { name: agentName })}
+            description={t('confirmDescription', { items: new Intl.ListFormat(locale, { style: 'short', type: 'unit' }).format(carried) })}
             confirmVariant="default"
-            confirmLabel="Create link"
+            confirmLabel={t('createLink')}
             pending={flow.busy}
             onConfirm={() => void flow.create()}
         >

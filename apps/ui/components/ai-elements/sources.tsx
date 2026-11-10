@@ -3,6 +3,7 @@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { cn } from '@/lib/utils'
 import { BookIcon, ChevronDownIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import type { ComponentProps } from 'react'
 
 export type SourcesProps = ComponentProps<typeof Collapsible>
@@ -13,16 +14,19 @@ export type SourcesTriggerProps = ComponentProps<typeof CollapsibleTrigger> & {
     count: number
 }
 
-export const SourcesTrigger = ({ className, count, children, ...props }: SourcesTriggerProps) => (
+export const SourcesTrigger = ({ className, count, children, ...props }: SourcesTriggerProps) => {
+    const t = useTranslations('chat.sources')
+    return (
     <CollapsibleTrigger className={cn('group flex items-center gap-2', className)} {...props}>
         {children ?? (
             <>
-                <p className="font-medium">Used {count} sources</p>
+                <p className="font-medium">{t('used', { count })}</p>
                 <ChevronDownIcon className="size-4 transition-transform group-data-[state=open]:rotate-180" />
             </>
         )}
     </CollapsibleTrigger>
-)
+    )
+}
 
 export type SourcesContentProps = ComponentProps<typeof CollapsibleContent>
 

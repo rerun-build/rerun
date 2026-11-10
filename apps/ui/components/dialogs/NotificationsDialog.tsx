@@ -8,19 +8,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useNotificationPrefs } from '@/hooks/useNotificationPrefs'
 import { useBoardStore } from '@/stores/board.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 type NotificationTab = 'coworkers' | 'account'
 
-const TABS = [
-    { value: 'coworkers', label: 'Coworkers' },
-    { value: 'account', label: 'Account' },
-] as const
-
-const TAB_DESCRIPTIONS: Record<NotificationTab, string> = {
-    coworkers: 'What is worth interrupting you for. Saved as you go.',
-    account: 'Choose which account emails you receive.',
-}
+const TAB_VALUES = ['coworkers', 'account'] as const satisfies readonly NotificationTab[]
 
 // The sheet's own safe-area padding is dropped by the p-0 of DIALOG_TABS_CONTENT, so the scrolling
 // body carries it itself.
@@ -40,22 +33,24 @@ export function NotificationsDialog() {
 }
 
 function NotificationsDialogBody() {
+    const t = useTranslations('dialogs.notifications')
     const targetAgentId = useNotificationsStore(s => s.targetAgentId)
     const agents = useBoardStore(s => s.agents)
     const { prefs, update, setCoworkerRule } = useNotificationPrefs()
     const [activeTab, setActiveTab] = useState<NotificationTab>('coworkers')
 
+    const tabs = TAB_VALUES.map(value => ({ value, label: t(`tabs.${value}`) }))
     const coworkers = useMemo(() => agents.map(agent => ({ id: agent.id, name: agent.name })), [agents])
 
     return (
         <DialogTabs
-            tabs={TABS}
+            tabs={tabs}
             tab={activeTab}
             onTabChange={setActiveTab}
             header={
                 <DialogHeader className={DIALOG_TABS_HEADER}>
-                    <DialogTitle>Notifications</DialogTitle>
-                    <DialogDescription>{TAB_DESCRIPTIONS[activeTab]}</DialogDescription>
+                    <DialogTitle>{t('title')}</DialogTitle>
+                    <DialogDescription>{t(`descriptions.${activeTab}`)}</DialogDescription>
                 </DialogHeader>
             }
         >
@@ -67,7 +62,7 @@ function NotificationsDialogBody() {
                         onUpdate={update}
                         onSetCoworkerRule={setCoworkerRule}
                         pinnedCoworkerId={targetAgentId}
-                        renderPicker={({ exclude, onPick }) => <AgentCombobox value={undefined} onChange={onPick} exclude={exclude} placeholder="Choose a coworker" className="w-full" />}
+                        renderPicker={({ exclude, onPick }) => <AgentCombobox value={undefined} onChange={onPick} exclude={exclude} placeholder={t('pickCoworker')} className="w-full" />}
                     />
                 </div>
             )}

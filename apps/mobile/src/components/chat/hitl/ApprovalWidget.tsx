@@ -2,6 +2,7 @@ import { pendingApprovals, serializeApprovalDecisions, type ApprovalDecision } f
 import * as Haptics from 'expo-haptics'
 import { useRef, useState } from 'react'
 import { ScrollView } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { useTheme } from '@/theme/theme'
@@ -15,6 +16,7 @@ import type { HitlWidgetProps } from './registry'
 // What a coworker asks leave to do, item by item. The reply leaves on its own once every item has an
 // answer, written as the web writes it.
 export function ApprovalWidget({ pending, onAnswer }: HitlWidgetProps) {
+    const t = useTranslations('mobileHitl')
     const theme = useTheme()
     const approvals = pendingApprovals(pending.input)
     const [index, setIndex] = useState(0)
@@ -53,7 +55,7 @@ export function ApprovalWidget({ pending, onAnswer }: HitlWidgetProps) {
     if (!item) return null
 
     return (
-        <HitlCard symbol="checkmark.shield" beam="orange" label="Approval required">
+        <HitlCard symbol="checkmark.shield" beam="orange" label={t('approval.label')}>
             <HitlSteps
                 count={approvals.length}
                 index={index}
@@ -77,8 +79,8 @@ export function ApprovalWidget({ pending, onAnswer }: HitlWidgetProps) {
                 actions={
                     declining ? undefined : (
                         <>
-                            <HitlAction label="Not now" tone="destructive" onPress={startDeclining} />
-                            <HitlAction label={decisions[index]?.decision === 'approved' ? 'Approved' : 'Approve'} primary onPress={() => decide('approved')} />
+                            <HitlAction label={t('actions.notNow')} tone="destructive" onPress={startDeclining} />
+                            <HitlAction label={decisions[index]?.decision === 'approved' ? t('approval.approved') : t('approval.approve')} primary onPress={() => decide('approved')} />
                         </>
                     )
                 }

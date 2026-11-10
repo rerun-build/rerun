@@ -1,0 +1,36 @@
+{
+    "time": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "now": "now",
+        "minutesAgo": "{count}m",
+        "hoursAgo": "{count}h",
+        "daysAgo": "{count}d"
+    },
+    "actions": {
+        "close": "Close",
+        "cancel": "Cancel",
+        "done": "Done",
+        "share": "Share",
+        "update": "Update"
+    },
+    "errors": {
+        "tryAgainShortly": "Try again in a moment.",
+        "generic": "Something went wrong. Please try again.",
+        "requestFailed": "Request failed with {status}",
+        "uploadFailed": "Upload failed with {status}"
+    },
+    "unread": "Unread",
+    "viewer": {
+        "shareFailed": "Could not share the file",
+        "noPreview": "No preview for this file. Share it to open it in another app.",
+        "position": "{index} / {total}"
+    },
+    "_context": {
+        "time.now": "Very short, shown next to a row of a list: the item changed less than a minute ago.",
+        "time.minutesAgo": "As short as possible: minutes since the last activity, next to a row.",
+        "time.hoursAgo": "As short as possible: hours since the last activity, next to a row.",
+        "time.daysAgo": "As short as possible: days since the last activity, next to a row.",
+        "errors.requestFailed": "Shown when the server answered an error without a message of its own. {status} is the HTTP status code, like 502. Same for errors.uploadFailed, after sending a file."
+    }
+}

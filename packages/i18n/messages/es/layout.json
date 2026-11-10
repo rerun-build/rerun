@@ -1,0 +1,211 @@
+{
+    "loading": "Cargando...",
+    "theme": "Tema",
+    "language": "Idioma",
+    "signIn": "Iniciar sesión",
+    "purchaseCancelled": "Compra cancelada",
+    "help": {
+        "label": "Ayuda",
+        "contactSupport": "Contactar con soporte"
+    },
+    "menu": {
+        "weeklyRewind": "Rewind semanal",
+        "whatsNew": "Novedades",
+        "gettingStarted": "Primeros pasos",
+        "docs": "Documentación",
+        "community": "Comunidad",
+        "shortcuts": "Atajos",
+        "installApp": "Instalar app",
+        "hireExpert": "Contratar a un experto"
+    },
+    "power": {
+        "menuItem": "Reiniciar máquina",
+        "cancel": "Cancelar",
+        "failed": "Algo salió mal",
+        "restart": {
+            "title": "¿Reiniciar la máquina?",
+            "description": "Ningún coworker de este workspace estará disponible durante unos minutos.",
+            "confirmLabel": "Reiniciar",
+            "pending": "Reiniciando la máquina…",
+            "success": "Reinicio en marcha, la máquina volverá en unos minutos."
+        }
+    },
+    "providerStatus": {
+        "headline": {
+            "one": "{providers} tiene problemas.",
+            "many": "{providers} tienen problemas."
+        },
+        "headlineLong": {
+            "one": "{providers} tiene problemas. Tus coworkers pueden ir más lentos o fallar.",
+            "many": "{providers} tienen problemas. Tus coworkers pueden ir más lentos o fallar."
+        },
+        "viewStatus": "Ver estado",
+        "dismiss": "Ocultar estado del proveedor"
+    },
+    "sidePanel": {
+        "close": "Cerrar panel",
+        "resize": "Cambiar tamaño del panel"
+    },
+    "paused": {
+        "title": "Workspace en pausa.",
+        "paymentFailed": "Pago fallido, workspace en pausa.",
+        "saved": "Tus coworkers y sus datos están guardados.",
+        "savedUntil": "Tus coworkers y sus datos están guardados hasta el {date}.",
+        "updatePayment": "Actualizar pago",
+        "subscribe": "Suscríbete para restaurar"
+    },
+    "sandboxArchived": {
+        "title": "Sandbox archivado tras 30 días sin uso.",
+        "requested": "Reactivación solicitada.",
+        "declined": "Reactivación rechazada.",
+        "declinedHint": "Contáctanos si crees que es un error.",
+        "savedUntil": "Tus coworkers y sus datos están guardados hasta el {date}.",
+        "expired": "Sus datos guardados caducaron, una reactivación empieza con un sandbox vacío.",
+        "requestedReason": "Estamos revisando tu solicitud",
+        "request": "Solicitar reactivación"
+    },
+    "restoring": {
+        "title": "Restaurando tu workspace…",
+        "waitingApproved": "Reactivación aprobada, eres el siguiente.",
+        "waitingPaid": "Pago recibido, eres el siguiente.",
+        "waitingHint": "Vuelve solo en unos minutos.",
+        "failed": "Tu restauración necesita una revisión de nuestra parte.",
+        "failedApproved": "Ya nos avisaron y estamos recuperando tu sandbox a mano.",
+        "failedPaid": "Pago recibido. Ya nos avisaron y estamos recuperando tu workspace a mano.",
+        "steps": {
+            "machine": "Máquina asignada",
+            "machineActive": "Asignando una máquina",
+            "data": "Restaurando tus datos",
+            "agents": "Despertando a tus coworkers"
+        }
+    },
+    "workspaceMenu": {
+        "defaultName": "Workspace",
+        "summary": {
+            "sandbox": "Sandbox de experto",
+            "seats": "{count, plural, one {# puesto} other {# puestos}}",
+            "unlimitedSeats": "puestos ilimitados",
+            "limits": "{agents} coworkers · {seats}",
+            "trial": "Prueba · {limits}",
+            "limitsUnlimited": "coworkers ilimitados · {seats}"
+        },
+        "adminOnly": {
+            "apiKeys": "Solo un admin puede gestionar las claves API",
+            "settings": "Solo un admin puede cambiar los ajustes del workspace",
+            "servers": "Solo un admin puede gestionar los servidores",
+            "billing": "Solo un admin puede gestionar la facturación"
+        },
+        "apiKeys": "Claves API y MCP",
+        "settings": "Ajustes",
+        "members": "Miembros",
+        "brain": "Brain",
+        "brainProposals": "{count, plural, one {# propuesta por revisar} other {# propuestas por revisar}}",
+        "aiProviders": "Proveedores de IA",
+        "servers": "Servidores",
+        "billing": "Facturación",
+        "newWorkspace": "Nuevo workspace",
+        "templates": "Templates",
+        "myTemplates": "Mis templates",
+        "newTemplate": "Nuevo template",
+        "expert": "Experto",
+        "sandbox": "Sandbox",
+        "preparingSandbox": "Preparando el sandbox…",
+        "publicProfile": "Perfil público",
+        "admin": "Admin",
+        "adminPanel": "Panel de admin",
+        "notifications": "Notificaciones",
+        "account": "Cuenta",
+        "signOut": "Cerrar sesión"
+    },
+    "update": {
+        "reload": "Recargar",
+        "available": {
+            "title": "Nueva versión disponible",
+            "description": "Recarga para tener la última versión de Rerun."
+        },
+        "required": {
+            "title": "Rerun se actualizó",
+            "description": "Hay una nueva versión disponible. Recarga para continuar."
+        }
+    },
+    "controlCenter": {
+        "title": "Centro de control",
+        "description": "Ve a un agente, un ajuste o una conversación, o pregúntale a Rerun.",
+        "back": "Atrás",
+        "askRerun": "Preguntar a Rerun",
+        "quotedQuery": "“{query}”",
+        "unnamedBox": "Box sin nombre",
+        "pro": "Pro",
+        "boxAgents": "{count, plural, one {# agente} other {# agentes}}",
+        "status": {
+            "off": "Apagado",
+            "waiting_human": "Te necesita",
+            "working": "Trabajando",
+            "error": "Error",
+            "offline": "Sin conexión"
+        },
+        "headings": {
+            "actions": "Acciones",
+            "settings": "Ajustes",
+            "agents": "Agentes",
+            "needsYou": "Te necesitan",
+            "recent": "Recientes",
+            "boxes": "Boxes",
+            "conversations": "Conversaciones",
+            "recentConversations": "Conversaciones recientes",
+            "assistant": "Asistente",
+            "open": "Abrir",
+            "moveTo": "Mover a"
+        },
+        "agent": {
+            "desktop": "Escritorio",
+            "desktopDetail": "Toma el control de la pantalla de este coworker",
+            "move": "Mover a otra Box",
+            "notifications": "Notificaciones",
+            "notificationsDetail": "Cuándo te contacta este agente"
+        },
+        "placeholder": {
+            "rootAssistant": "Busca o pregúntale a Rerun…",
+            "root": "Busca agentes, ajustes, conversaciones…",
+            "agent": "Buscar en {name}…",
+            "agentUnknown": "Buscar en este agente…",
+            "box": "Busca agentes en esta Box…",
+            "move": "Elige una Box…"
+        },
+        "empty": {
+            "box": "Todavía no hay agentes en esta Box.",
+            "noMatch": "Sin resultados."
+        },
+        "hints": {
+            "open": "Abrir",
+            "more": "Más",
+            "searchPage": "<keys></keys> otra vez para buscar en la página"
+        },
+        "commands": {
+            "new_agent": "Nuevo agente",
+            "browse_templates": "Explorar templates",
+            "new_box": "Nueva Box",
+            "ask_assistant": "Preguntar al asistente",
+            "contact_support": "Contactar con soporte",
+            "recenter_board": "Centrar el board",
+            "toggle_theme_light": "Cambiar a tema claro",
+            "toggle_theme_dark": "Cambiar a tema oscuro",
+            "workspace": "Ajustes del workspace",
+            "members": "Miembros",
+            "billing": "Facturación",
+            "ai_providers": "Proveedores de IA",
+            "api_keys": "Claves API y MCP",
+            "company_brain": "Brain de la empresa",
+            "shared_files": "Archivos compartidos",
+            "account": "Cuenta",
+            "notifications": "Notificaciones",
+            "shortcuts": "Atajos de teclado",
+            "whats_new": "Novedades"
+        }
+    },
+    "boxNameSuggestions": "O elige un nombre",
+    "dashboard": {
+        "metaTitle": "Panel",
+        "metaDescription": "Tus Boxes y coworkers en Rerun."
+    }
+}

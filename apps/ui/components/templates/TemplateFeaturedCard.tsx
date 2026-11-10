@@ -1,6 +1,6 @@
 'use client'
 
-import { TEMPLATE_CATEGORY_LABELS } from '@rerun/contracts'
+import { templateCategoryLabel } from '@rerun/contracts'
 import { BorderBeam } from '@rerun/ui'
 import { TemplateCardBoard, useBoardOnHover } from '@rerun/ui/iso-grid'
 import { Badge } from '@rerun/ui/primitives'
@@ -12,13 +12,17 @@ import type { LibraryTemplate } from '@/lib/templates/library'
 import { cn } from '@/lib/utils'
 import { ClockIcon } from '@/lib/icons'
 import { AnimatePresence } from 'motion/react'
+import { useTranslations } from 'next-intl'
 
 // The wide sibling of TemplateCard, for the Featured row: cover on the left, editorial on the
 // right. Same props, so a click feeds the detail panel exactly like a grid card does, and the same
 // three lines under the title, with the tagline in between as the one thing the extra room buys.
 export function TemplateFeaturedCard({ template, selected, showStatus, onSelect }: { template: LibraryTemplate; selected: boolean; showStatus: boolean; onSelect: () => void }) {
+    const t = useTranslations('templates.detail')
+    const tCategory = useTranslations('templates.categories')
+    const tStatus = useTranslations('templates.status')
     const image = templateCardImage(template)
-    const category = TEMPLATE_CATEGORY_LABELS[template.category] ?? TEMPLATE_CATEGORY_LABELS.other
+    const category = templateCategoryLabel(template.category, tCategory)
     const { live, handlers } = useBoardOnHover(template.agents.length > 0)
 
     return (
@@ -59,7 +63,7 @@ export function TemplateFeaturedCard({ template, selected, showStatus, onSelect 
                     // Le fond soft du Badge seul ne tient pas au-dessus d'une cover : le wrapper opacifie.
                     <span className="absolute left-3 top-3 flex rounded-full bg-background/70 backdrop-blur">
                         <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
-                            {templateStatusLabel(template.status)}
+                            {templateStatusLabel(template.status, tStatus)}
                         </Badge>
                     </span>
                 )}
@@ -79,7 +83,7 @@ export function TemplateFeaturedCard({ template, selected, showStatus, onSelect 
                         <span aria-hidden className="size-0.5 shrink-0 rounded-full bg-current opacity-50" />
                         <span className="flex shrink-0 items-center gap-1.5">
                             <ClockIcon className="size-3" />
-                            {template.setupMinutes} min
+                            {t('minutes', { minutes: template.setupMinutes })}
                         </span>
                     </span>
                     <TemplateCardPrice pricing={template.pricing} access={template.access} />

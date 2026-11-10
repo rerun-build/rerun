@@ -2,6 +2,7 @@
 
 import type { RewindPayload } from '@rerun/contracts'
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentType, type CSSProperties, type PointerEvent } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -68,6 +69,7 @@ export function RewindViewer() {
 // `rewindId` is null for a story with no stored week behind it; it then has no history to pick from.
 export function RewindStory({ rewindId = null, payload, onClose, startAt = 0 }: { rewindId?: string | null; payload: RewindPayload; onClose: () => void; startAt?: number }) {
     useCoverBoard()
+    const t = useTranslations('rewind.viewer')
     const slides = useMemo(() => rewindSlides(payload), [payload])
     const player = useStoryPlayer(slides.length, SLIDE_DURATION_MS, startAt)
     const [replays, setReplays] = useState(0)
@@ -85,7 +87,7 @@ export function RewindStory({ rewindId = null, payload, onClose, startAt = 0 }: 
     }, [])
 
     const names = useMemo(() => new Map(payload.agents.map(agent => [agent.agentId, agent.name])), [payload.agents])
-    const agentName = useCallback((agentId: string) => names.get(agentId) ?? 'A coworker', [names])
+    const agentName = useCallback((agentId: string) => names.get(agentId) ?? t('fallbackAgentName'), [names, t])
     const replay = useCallback(() => {
         setReplays(count => count + 1)
         goTo(0)
@@ -138,7 +140,7 @@ export function RewindStory({ rewindId = null, payload, onClose, startAt = 0 }: 
         <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label="Your weekly Rewind"
+            aria-label={t('label')}
             className="dark fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 bg-black/85 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -148,7 +150,7 @@ export function RewindStory({ rewindId = null, payload, onClose, startAt = 0 }: 
             {pickableId && <RewindWeekPicker currentId={pickableId} onOpenChange={onPickerOpenChange} className="hidden sm:flex story-landscape:hidden" />}
 
             <div className="flex h-full w-full items-center justify-center sm:h-auto sm:w-auto">
-                <button type="button" aria-label="Previous" onClick={prev} className="mr-6 hidden size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:flex">
+                <button type="button" aria-label={t('previous')} onClick={prev} className="mr-6 hidden size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:flex">
                     <ChevronLeft className="size-5" />
                 </button>
 
@@ -198,14 +200,14 @@ export function RewindStory({ rewindId = null, payload, onClose, startAt = 0 }: 
                                     )}
                                 </AnimatePresence>
                             </span>
-                            <button type="button" aria-label="Close" onClick={onClose} className="pointer-events-auto flex size-8 items-center justify-center rounded-full bg-black/30 transition-colors hover:bg-black/50">
+                            <button type="button" aria-label={t('close')} onClick={onClose} className="pointer-events-auto flex size-8 items-center justify-center rounded-full bg-black/30 transition-colors hover:bg-black/50">
                                 <XIcon className="size-4" />
                             </button>
                         </div>
                     </div>
                 </motion.div>
 
-                <button type="button" aria-label="Next" onClick={next} className="ml-6 hidden size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:flex">
+                <button type="button" aria-label={t('next')} onClick={next} className="ml-6 hidden size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:flex">
                     <ChevronRight className="size-5" />
                 </button>
             </div>

@@ -4,6 +4,7 @@ import { Alert, AppState } from 'react-native'
 
 import { decideSkillProposal, fetchSkillProposals } from '@/api/chat'
 import { useAuth } from '@/auth/AuthProvider'
+import { translatorFor } from '@/i18n/translator'
 
 // The writing job is bounded on the engine, so the poll can follow it to the end: quick at first,
 // then relaxed for the minutes a CLI provider can take. The web's values.
@@ -125,7 +126,7 @@ export function useSkillProposals(sessionId: string | null, busy: boolean) {
                 const proposal = await decideSkillProposal(caller, sessionId, proposalId, decision)
                 setLoaded(previous => (previous.sessionId === sessionId ? reload(previous, sessionId, new Map(previous.proposals).set(proposal.id, proposal)) : previous))
             } catch (error) {
-                Alert.alert('Could not update the skill', error instanceof Error ? error.message : 'Try again in a moment.')
+                Alert.alert(translatorFor('mobileChat')('skillUpdateFailed'), error instanceof Error ? error.message : translatorFor('mobileCommon')('errors.tryAgainShortly'))
                 refresh().catch(() => {})
             } finally {
                 setPendingId(null)

@@ -14,9 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton, SkeletonPanelRows } from '@/components/ui/skeleton'
 import type { AuthorProfile } from '@/lib/chat/message-author'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
-const VISIBILITY_LABELS: Record<SpaceVisibility, string> = { workspace: 'Everyone in the workspace', restricted: 'Only selected people' }
 const AVATARS_SHOWN = 8
 
 export type BoxAccessViewProps = {
@@ -34,6 +34,7 @@ export type BoxAccessViewProps = {
 }
 
 export function BoxAccessView({ boxName, loading, access, busy, profileOf, onVisibilityChange, onAccessChange, onRemove, onAdd, initialPage = 'list' }: BoxAccessViewProps) {
+    const t = useTranslations('dialogs.boxAccess')
     const [page, setPage] = useState<'list' | 'add'>(initialPage)
     const [confirmingRestrict, setConfirmingRestrict] = useState(false)
     const listedUserIds = useMemo(() => new Set(access?.people.map(person => person.userId) ?? []), [access])
@@ -48,9 +49,9 @@ export function BoxAccessView({ boxName, loading, access, busy, profileOf, onVis
     return (
         <>
             <DialogHeader className="border-b px-4 py-4">
-                <DialogTitle className="truncate pr-6">Access to {boxName}</DialogTitle>
+                <DialogTitle className="truncate pr-6">{t('title', { box: boxName })}</DialogTitle>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                    <DialogDescription>Access applies to every coworker in this Box</DialogDescription>
+                    <DialogDescription>{t('description')}</DialogDescription>
                     {access && <CoworkerAvatars coworkers={access.coworkers} />}
                 </div>
             </DialogHeader>
@@ -62,23 +63,23 @@ export function BoxAccessView({ boxName, loading, access, busy, profileOf, onVis
                     <BoxAccessAddPeople boxName={boxName} members={access.members} listedUserIds={listedUserIds} profileOf={profileOf} onBack={() => setPage('list')} onAdd={onAdd} />
                 ) : (
                     <PanelScroller className="space-y-6 p-4">
-                        <Field label="Who can use this Box" htmlFor="box-visibility">
+                        <Field label={t('visibilityField')} htmlFor="box-visibility">
                             <Select value={access.visibility} onValueChange={value => pickVisibility(value as SpaceVisibility)} disabled={busy}>
                                 <SelectTrigger id="box-visibility" className="w-full">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
-                                    <SelectItem value="workspace">{VISIBILITY_LABELS.workspace}</SelectItem>
-                                    <SelectItem value="restricted">{VISIBILITY_LABELS.restricted}</SelectItem>
+                                    <SelectItem value="workspace">{t('visibility.workspace')}</SelectItem>
+                                    <SelectItem value="restricted">{t('visibility.restricted')}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </Field>
 
-                        <Group title="People" addMenu={access.people.length > 0 ? <AddButton label="Add people" disabled={busy} onClick={() => setPage('add')} /> : undefined}>
+                        <Group title={t('people')} addMenu={access.people.length > 0 ? <AddButton label={t('addPeople')} disabled={busy} onClick={() => setPage('add')} /> : undefined}>
                             {access.people.length === 0 ? (
                                 <EmptyPitch
-                                    text={access.visibility === 'restricted' ? 'Only admins can use this Box for now.' : 'Name people to let them manage this Box.'}
-                                    actions={<AddButton label="Add people" disabled={busy} onClick={() => setPage('add')} />}
+                                    text={access.visibility === 'restricted' ? t('emptyRestricted') : t('emptyOpen')}
+                                    actions={<AddButton label={t('addPeople')} disabled={busy} onClick={() => setPage('add')} />}
                                 />
                             ) : (
                                 access.people.map(person => (
@@ -102,9 +103,9 @@ export function BoxAccessView({ boxName, loading, access, busy, profileOf, onVis
             <ConfirmDialog
                 open={confirmingRestrict}
                 onOpenChange={setConfirmingRestrict}
-                title={`Restrict ${boxName}?`}
-                description={access?.people.length ? 'Only the people listed here and admins keep access.' : 'Only admins keep access until you add people.'}
-                confirmLabel="Restrict"
+                title={t('restrict.title', { box: boxName })}
+                description={access?.people.length ? t('restrict.descriptionWithPeople') : t('restrict.descriptionEmpty')}
+                confirmLabel={t('restrict.confirm')}
                 confirmVariant="default"
                 onConfirm={() => onVisibilityChange('restricted')}
             />

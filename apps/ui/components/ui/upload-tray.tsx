@@ -8,6 +8,7 @@ import { CheckIcon, ChevronDownIcon, RefreshCwIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { Stripes } from '@rerun/ui/primitives'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useLocale, useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
 type UploadTrayProps = {
@@ -21,17 +22,19 @@ type UploadTrayProps = {
 const COLLAPSED_ROWS = 6
 const COLLAPSE_TRANSITION = { duration: 0.28, ease: [0.4, 0, 0.2, 1] } as const
 
-function statusLine(item: UploadItem): string {
-    if (item.status === 'error') return item.error ?? 'Upload failed'
-    if (item.status === 'done') return formatBytes(item.size)
-    if (item.status === 'finishing') return 'Finishing'
-    if (item.status === 'queued') return `Waiting · ${formatBytes(item.size)}`
+function statusLine(item: UploadItem, locale: string, t: ReturnType<typeof useTranslations<'ui.upload'>>): string {
+    if (item.status === 'error') return item.error ?? t('failed')
+    if (item.status === 'done') return formatBytes(item.size, locale)
+    if (item.status === 'finishing') return t('finishing')
+    if (item.status === 'queued') return t('waiting', { size: formatBytes(item.size, locale) })
     const parts = [`${Math.round(item.progress * 100)}%`]
     if (item.etaMs != null) parts.push(formatEta(item.etaMs))
     return parts.join(' · ')
 }
 
 function UploadRow({ item, onCancel, onRetry }: { item: UploadItem; onCancel: (id: string) => void; onRetry: (id: string) => void }) {
+    const t = useTranslations('ui.upload')
+    const locale = useLocale()
     return (
         <div className="flex items-center gap-2 px-3 py-1.5">
             <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -40,22 +43,22 @@ function UploadRow({ item, onCancel, onRetry }: { item: UploadItem; onCancel: (i
                     {item.dir && <span className="shrink-0 truncate text-[10px] text-muted-foreground">{item.dir}</span>}
                 </div>
                 {item.status === 'done' ? (
-                    <span className="text-[10px] text-muted-foreground">{statusLine(item)}</span>
+                    <span className="text-[10px] text-muted-foreground">{statusLine(item, locale, t)}</span>
                 ) : (
                     <>
-                        <Progress value={item.status === 'finishing' ? null : item.progress * 100} size="sm" tone={item.status === 'error' ? 'destructive' : 'brand'} label={`Uploading ${item.name}`} />
-                        <span className={item.status === 'error' ? 'text-[10px] text-destructive' : 'text-[10px] text-muted-foreground'}>{statusLine(item)}</span>
+                        <Progress value={item.status === 'finishing' ? null : item.progress * 100} size="sm" tone={item.status === 'error' ? 'destructive' : 'brand'} label={t('uploadingFile', { name: item.name })} />
+                        <span className={item.status === 'error' ? 'text-[10px] text-destructive' : 'text-[10px] text-muted-foreground'}>{statusLine(item, locale, t)}</span>
                     </>
                 )}
             </div>
             {item.status === 'done' ? (
                 <IconBadge tone="green" icon={CheckIcon} />
             ) : item.status === 'error' ? (
-                <button type="button" onClick={() => onRetry(item.id)} title="Retry" className="shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <button type="button" onClick={() => onRetry(item.id)} title={t('retry')} className="shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
                     <RefreshCwIcon className="size-3.5" />
                 </button>
             ) : (
-                <button type="button" onClick={() => onCancel(item.id)} title="Cancel" className="shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                <button type="button" onClick={() => onCancel(item.id)} title={t('cancel')} className="shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
                     <XIcon className="size-3.5" />
                 </button>
             )}
@@ -64,6 +67,7 @@ function UploadRow({ item, onCancel, onRetry }: { item: UploadItem; onCancel: (i
 }
 
 export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss }: UploadTrayProps) {
+    const t = useTranslations('ui.upload')
     const [expanded, setExpanded] = useState(false)
     // `null` = personne n'a touché au chevron, le tray suit la règle automatique.
     const [open, setOpen] = useState<boolean | null>(null)
@@ -84,7 +88,7 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
     const visible = expanded ? ordered : ordered.slice(0, COLLAPSED_ROWS)
     const hidden = ordered.length - visible.length
 
-    const heading = settled ? (failed ? `${failed} of ${items.length} files failed to upload` : `${done} ${done > 1 ? 'files' : 'file'} uploaded`) : `Uploading ${done + 1} of ${items.length}`
+    const heading = settled ? (failed ? t('headingFailed', { failed, total: items.length }) : t('headingDone', { count: done })) : t('headingUploading', { current: done + 1, total: items.length })
 
     return (
         <div className="absolute inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur">
@@ -98,11 +102,11 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
                     </button>
                     {!settled && (
                         <button type="button" onClick={onDismiss} className="shrink-0 text-[10px] text-muted-foreground transition-colors hover:text-foreground">
-                            Cancel all
+                            {t('cancelAll')}
                         </button>
                     )}
                     {settled && (
-                        <button type="button" onClick={onDismiss} title="Dismiss" className="shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                        <button type="button" onClick={onDismiss} title={t('dismiss')} className="shrink-0 rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
                             <XIcon className="size-3.5" />
                         </button>
                     )}
@@ -110,7 +114,7 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
                 {/* Le total reste hors du repli : c'est le résumé, il doit survivre à la fermeture. */}
                 {!settled && (
                     <div className="relative px-3 pb-2">
-                        <Progress value={totalProgress * 100} size="md" label="Total upload progress" />
+                        <Progress value={totalProgress * 100} size="md" label={t('totalProgress')} />
                     </div>
                 )}
             </div>
@@ -133,7 +137,7 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
                             ))}
                             {hidden > 0 && (
                                 <button type="button" onClick={() => setExpanded(true)} className="w-full px-3 py-1.5 text-left text-[10px] text-muted-foreground transition-colors hover:text-foreground">
-                                    + {hidden} more
+                                    {t('more', { count: hidden })}
                                 </button>
                             )}
                         </div>

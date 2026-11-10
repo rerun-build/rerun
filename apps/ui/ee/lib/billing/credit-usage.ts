@@ -1,4 +1,5 @@
 import { isPaidDataCapability, paidDataEntry, RERUN_TIERS, type PaidDataCapability, type RerunTier } from '@rerun/contracts'
+import { formatDate } from '@rerun/i18n/format'
 
 export type CreditKind = 'ai' | 'data'
 
@@ -130,8 +131,8 @@ export function runsOutOn(balance: CreditBalance, period: { start: string; end: 
 }
 
 // The days are UTC days, as rerun_credit_usage buckets them: shown as such, whatever the browser's zone.
-export function dayLabel(day: string): string {
-    return new Date(`${day}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+export function dayLabel(day: string, locale: string): string {
+    return formatDate(`${day}T00:00:00Z`, locale, { month: 'short', day: 'numeric', timeZone: 'UTC' })
 }
 
 // How many day slots the period spans, at least the days already gone.

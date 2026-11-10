@@ -5,8 +5,9 @@ import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { PLAIN_KICKOFF } from '@/lib/foreman/build-team'
 import { startAgentSetup, type HandoffResult } from '@/lib/foreman/setup-handoff'
 import { selectMany } from '@/supabase/supabase-helpers'
+import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
-export type StartLeadSetupResult = { ok: true; conversationId: string; runId: string | null } | { ok: false; error: string; inactive?: boolean }
+export type StartLeadSetupResult = { ok: true; conversationId: string; runId: string | null } | (ActionFailure & { inactive?: boolean })
 
 type WorkspaceContext = Awaited<ReturnType<typeof requireWorkspaceContext>>
 
@@ -40,10 +41,10 @@ export async function startLeadSetupAction(agentId: string): Promise<StartLeadSe
 
         const handoff = (await startAgentSetup(ctx, { agents: [{ agentId, message: PLAIN_KICKOFF }] })) as { agents: HandoffResult[] }
         const result = handoff.agents[0]
-        if (result?.inactive) return { ok: false, inactive: true, error: 'This coworker has no free slot on your plan.' }
-        if (!result?.started || !result.conversationId) return { ok: false, error: result?.error ?? 'The coworker could not be started.' }
+        if (result?.inactive) return { ...failure('noFreeSlot'), inactive: true }
+        if (!result?.started || !result.conversationId) return result?.error ? { ok: false, error: result.error } : failure('startCoworkerFailed')
         return { ok: true, conversationId: result.conversationId, runId: result.runId ?? null }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'The coworker could not be started.' }
+        return failureOf(err, 'startCoworkerFailed')
     }
 }

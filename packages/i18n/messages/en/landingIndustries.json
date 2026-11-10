@@ -1,0 +1,337 @@
+{
+    "_context": {
+        "page.faqTitle": "{industry} is the industry name as in its breadcrumb (e.g. Agencies, Legal & compliance).",
+        "page.breadcrumbLabel": "aria-label of the breadcrumb navigation.",
+        "industries.agencies.templatesLink": "Link to the English-only template library category; the category name may be translated."
+    },
+    "hub": {
+        "eyebrow": "Industries",
+        "title": "AI Coworkers for your industry",
+        "headline": "Find the Coworkers for your trade.",
+        "description": "Agencies, freelancers, e-commerce, real estate, startups, SaaS, legal and recruiting: the eight Coworkers each one hires first, and why.",
+        "gridLabel": "{count, plural, one {# industry} other {# industries}}",
+        "gridTitle": "Start from what you actually do.",
+        "gridLede": "Each page opens on the eight Coworkers that line of business hires first."
+    },
+    "page": {
+        "breadcrumbLabel": "Breadcrumb",
+        "breadcrumbRoot": "Industries",
+        "wallLabel": "Who you hire",
+        "wallLede": "Each one is a template from the library: install it, connect its apps, and it runs.",
+        "painsLabel": "Why it hurts",
+        "proofLabel": "Why it works",
+        "proofTitle": "What a Coworker has that a chat window doesn’t.",
+        "faqLabel": "FAQ",
+        "faqTitle": "{industry} on Rerun, your questions.",
+        "othersLabel": "Other industries",
+        "othersTitle": "Not quite your trade?",
+        "othersLink": "All industries",
+        "notFoundTitle": "Industry not found"
+    },
+    "industries": {
+        "agencies": {
+            "crumb": "Agencies",
+            "title": "AI Coworkers for agencies.",
+            "lede": "The work that repeats on every account (the prospecting, the SEO audits, the weekly client report, the chase for an unpaid invoice), handed to Coworkers that do it in your own tools and report back.",
+            "metaTitle": "AI agents for agencies: prospecting, SEO, client reporting",
+            "metaDescription": "Agencies repeat the same work on every account. Hire AI Coworkers for prospecting, SEO audits, social posting, client reports and unpaid invoices.",
+            "wallTitle": "Eight Coworkers an agency would hire first.",
+            "templatesLink": "Agencies templates",
+            "painsTitle": "What an agency stops doing by hand.",
+            "pains": {
+                "1": {
+                    "title": "New business between two deliveries",
+                    "body": "Prospecting is the first thing to slip when a project is late. A Coworker keeps building and writing the list whether the week is calm or not."
+                },
+                "2": {
+                    "title": "The same report, times twelve clients",
+                    "body": "Numbers pulled, commented and sent, one deck per account. The work is identical every month and nobody wants to do it."
+                },
+                "3": {
+                    "title": "Invoices nobody dares chase",
+                    "body": "The reminder that should have gone out on day 31 goes out on day 60. A Coworker sends it on day 31, in your words."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Can I keep each client separate?",
+                    "answer": "Yes, and you should. Give each client its own workspace: its own Coworkers, its own connected apps, its own brain. Nothing crosses from one account to another, and you switch from the pill in the corner."
+                },
+                "2": {
+                    "question": "Will the work sound like us, or like a robot?",
+                    "answer": "Your tone of voice, your offer and your rules live in the workspace brain, and every Coworker reads them before it writes. On a client workspace, that is the client’s tone, not yours."
+                },
+                "3": {
+                    "question": "Do I pay per client or per person?",
+                    "answer": "Neither. The plan covers the workspace and seats are free, so the whole team, and the client if you want them in, can read what the Coworkers did and answer when one asks."
+                }
+            }
+        },
+        "freelancers": {
+            "crumb": "Freelancers",
+            "title": "AI Coworkers for freelancers.",
+            "lede": "You are the delivery, the sales team and the accounts department. Hand the last two to Coworkers that work while you are on a client project.",
+            "metaTitle": "AI agents for freelancers: sales, inbox, invoices, content",
+            "metaDescription": "You are the delivery, the sales team and the accounts department. Hire AI Coworkers for prospecting, inbox triage, follow-ups, invoices and content.",
+            "wallTitle": "Eight Coworkers that give you your evenings back.",
+            "templatesLink": "Productivity templates",
+            "painsTitle": "What a one-person business keeps dropping.",
+            "pains": {
+                "1": {
+                    "title": "Sales stop the week you are busy",
+                    "body": "The pipeline empties exactly when the current project ends, because nobody prospected during it. A Coworker prospects during it."
+                },
+                "2": {
+                    "title": "Invoices that go unchased",
+                    "body": "Reminding a client they owe you money is the task you keep pushing to tomorrow. It costs nothing to let a Coworker send it on time."
+                },
+                "3": {
+                    "title": "An inbox you read five times a day",
+                    "body": "Three messages actually need you. A Coworker tells you which three, and drafts the replies for the rest."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Is this worth it for one person?",
+                    "answer": "That is the case it was built for: the jobs a freelancer would hire for if hiring made sense: a half-day of prospecting, an hour of invoicing, the inbox. One plan covers all of them."
+                },
+                "2": {
+                    "question": "Does it work while my laptop is shut?",
+                    "answer": "Yes. Your Coworkers run on a machine in the cloud, in Europe. The Monday morning run happens whether you are at your desk, with a client, or away."
+                },
+                "3": {
+                    "question": "Can it send things in my name without asking?",
+                    "answer": "Only as far as you let it. A Coworker cannot spend money without an approval, and you decide in its instructions whether it sends on its own or hands you a draft."
+                }
+            }
+        },
+        "ecommerce": {
+            "crumb": "E-commerce",
+            "title": "AI Coworkers for e-commerce.",
+            "lede": "What your store did this week, what is about to run out, which carts are recoverable and what your competitors just changed: read every day, acted on, and reported to you in one message.",
+            "metaTitle": "AI agents for e-commerce: orders, stock, carts, competitors",
+            "metaDescription": "Hire AI Coworkers that read your store every week, catch low stock early, recover abandoned carts, watch competitor prices and fix the pages losing sales.",
+            "wallTitle": "Eight Coworkers for a store that never closes.",
+            "templatesLink": "E-commerce templates",
+            "painsTitle": "What a store owner finds out too late.",
+            "pains": {
+                "1": {
+                    "title": "The bestseller that ran out on Friday",
+                    "body": "Nobody looked at stock until the orders stopped. A Coworker looks every day and tells you a week ahead."
+                },
+                "2": {
+                    "title": "A competitor’s price you learn from a customer",
+                    "body": "Their promotion went live on Monday and you heard about it on Thursday, in a review. A Coworker reads their pages for you."
+                },
+                "3": {
+                    "title": "Carts abandoned and never followed",
+                    "body": "The sequence you meant to build is still a note. A Coworker segments on what they actually bought and writes the follow-up."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Does it connect to Shopify and the rest of my stack?",
+                    "answer": "Shopify, Stripe, your email platform, your ads accounts, your sheets, and 3,000+ other tools. A back office with no API is still reachable: the Coworker opens it on its own screen and clicks through it."
+                },
+                "2": {
+                    "question": "Can a Coworker change prices or send a campaign on its own?",
+                    "answer": "Spending is locked: it cannot buy ads or anything else without a yes. For the rest, you decide: have it draft the campaign for you to send, or let it send and report."
+                },
+                "3": {
+                    "question": "How fast will it know my catalogue?",
+                    "answer": "It reads it on the first run and keeps what matters in the workspace brain: your range, your margins, your tone. Every Coworker you hire afterwards starts from the same pages."
+                }
+            }
+        },
+        "real-estate": {
+            "crumb": "Real estate",
+            "title": "AI Coworkers for real estate.",
+            "lede": "Owners likely to sell, enquiries answered in minutes, listings written while the visit is fresh, rentals that chase themselves. The work that fills an agent’s week, done by Coworkers.",
+            "metaTitle": "AI agents for real estate: sellers, leads, listings, rentals",
+            "metaDescription": "Hire AI Coworkers that find owners likely to sell, qualify every enquiry, write the listing, price against real comps and chase your rentals for you.",
+            "wallTitle": "Eight Coworkers for an agency that never misses a lead.",
+            "templatesLink": "Real estate templates",
+            "painsTitle": "Where an agency loses the mandate.",
+            "pains": {
+                "1": {
+                    "title": "The enquiry answered three hours late",
+                    "body": "The first agent to reply gets the viewing. A Coworker answers in minutes, asks the qualifying questions and puts it in the diary."
+                },
+                "2": {
+                    "title": "A price argued from memory",
+                    "body": "The owner wants a number and a reason. A Coworker builds the comparison from what actually sold nearby, before the appointment."
+                },
+                "3": {
+                    "title": "A pipeline of owners you never contacted",
+                    "body": "The signals are public: expired listings, probate, long time on market. A Coworker reads them every week and ranks who to call."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Does it work with my CRM?",
+                    "answer": "If your CRM has an API or an MCP server, it plugs in. If it is an old portal with neither, the Coworker opens it on its own screen and fills it in the way you would."
+                },
+                "2": {
+                    "question": "Can it answer leads in my name?",
+                    "answer": "Yes, and you set how far it goes: draft only, or send and book. Either way the thread stays readable, and anything it was unsure about comes to you."
+                },
+                "3": {
+                    "question": "Is the market data reliable?",
+                    "answer": "A Coworker cites what it used. It builds the comparison from the listings and transactions it actually read, and you see the sources next to the number rather than a figure out of nowhere."
+                }
+            }
+        },
+        "startups": {
+            "crumb": "Startups",
+            "title": "AI Coworkers for startups.",
+            "lede": "Five people doing the work of fifteen. Hire Coworkers for the jobs you cannot justify a headcount for yet: demos booked, pipeline read, launch prepared, metrics in your inbox on Monday.",
+            "metaTitle": "AI agents for startups: pipeline, launches, metrics, support",
+            "metaDescription": "A small team cannot hire for every job. Hire AI Coworkers that book demos, read the pipeline, prepare the launch and report your metrics on Monday.",
+            "wallTitle": "Eight Coworkers for the roles you cannot hire yet.",
+            "templatesLink": "SaaS templates",
+            "painsTitle": "What a small team cannot get to.",
+            "pains": {
+                "1": {
+                    "title": "Roles nobody owns",
+                    "body": "Outbound, release notes, the weekly numbers. Everyone agrees they matter and nobody has the day for them."
+                },
+                "2": {
+                    "title": "Numbers pulled by hand on Monday",
+                    "body": "Someone exports, pastes, comments, posts. Forty minutes a week that a Coworker does at 7am for free."
+                },
+                "3": {
+                    "title": "Launches that slip on the small stuff",
+                    "body": "The messaging, the changelog, the email, the post. A Coworker drafts the lot from the spec while you build."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "How long before a Coworker is useful?",
+                    "answer": "Minutes, if you start from a template: you connect its apps, check its schedule and it runs. Building one from your own description takes about as long as writing the job down."
+                },
+                "2": {
+                    "question": "Can the whole team use it?",
+                    "answer": "Yes, and it costs nothing extra: seats are free. Everyone sees the same board, can give a Coworker work and can answer when one asks for a yes."
+                },
+                "3": {
+                    "question": "Does it replace our automation tools?",
+                    "answer": "It replaces the ones you keep maintaining. A Coworker is told the job, not drawn as a flow, so a new field or a renamed column does not break it the way a node graph does."
+                }
+            }
+        },
+        "saas": {
+            "crumb": "SaaS",
+            "title": "AI Coworkers for SaaS teams.",
+            "lede": "The signals you only read when something breaks (usage dropping on a key account, the same request in five tickets, bugs piling up before standup), read every day by Coworkers that bring them to you.",
+            "metaTitle": "AI agents for SaaS: churn risk, feedback, releases, metrics",
+            "metaDescription": "Hire AI Coworkers that surface accounts at churn risk, turn feedback into themes, triage bug reports, write release notes and report your metrics.",
+            "wallTitle": "Eight Coworkers for the product and revenue work.",
+            "templatesLink": "SaaS templates",
+            "painsTitle": "The signals a SaaS team reads too late.",
+            "pains": {
+                "1": {
+                    "title": "Churn you see on the renewal date",
+                    "body": "Usage dropped eight weeks ago and nobody looked. A Coworker watches the accounts and tells you while there is still time."
+                },
+                "2": {
+                    "title": "Feedback scattered across four tools",
+                    "body": "Tickets, calls, the community, the reviews. A Coworker reads all of them and brings back what keeps coming up, with the quotes."
+                },
+                "3": {
+                    "title": "Releases shipped without their notes",
+                    "body": "The changes are in the PRs and the customers never hear about them. A Coworker writes the notes from what actually shipped."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Where does it read our usage and billing data from?",
+                    "answer": "From the tools you already use: Stripe, your database or warehouse, your product analytics, your support desk. You connect them once and every Coworker in the workspace can read them."
+                },
+                "2": {
+                    "question": "Can it write into our issue tracker?",
+                    "answer": "Yes. Triaging a bug means deduplicating it, adding the context and filing it where your team actually looks: Linear, Jira, GitHub, Notion."
+                },
+                "3": {
+                    "question": "Is our data used to train a model?",
+                    "answer": "No. Your workspace runs on its own machine in Europe, and what your Coworkers read stays in it. You can also plug in the Claude or ChatGPT plan you already pay for and keep the model relationship you have."
+                }
+            }
+        },
+        "legal": {
+            "crumb": "Legal & compliance",
+            "title": "AI Coworkers for legal and compliance.",
+            "lede": "The reading nobody has time for: contracts checked against your own rules, obligations and notice dates extracted, regulatory changes explained, audit evidence gathered. Always for a human to sign off.",
+            "metaTitle": "AI agents for legal and compliance: contracts and audits",
+            "metaDescription": "Hire AI Coworkers that review contracts against your rules, pull out obligations and renewal dates, track regulatory changes and gather audit evidence.",
+            "wallTitle": "Eight Coworkers for the paperwork nobody reads in time.",
+            "templatesLink": "Legal & compliance templates",
+            "painsTitle": "Where the risk actually sits.",
+            "pains": {
+                "1": {
+                    "title": "A notice period you missed by a week",
+                    "body": "The clause was on page nine and the date was in nobody’s calendar. A Coworker pulls every renewal date and warns you before the window."
+                },
+                "2": {
+                    "title": "Contracts signed without a second read",
+                    "body": "The commercial team needed it yesterday. A Coworker reads it against your own rules and flags only what deserves your time."
+                },
+                "3": {
+                    "title": "An audit spent hunting for documents",
+                    "body": "The evidence exists, in six drives and an inbox. A Coworker finds it, names it and files it against each requirement."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Does a Coworker give legal advice?",
+                    "answer": "No. It reads, extracts and flags, and every output is written for a qualified human to review. It tells you where in the document each point came from so you can check it in seconds."
+                },
+                "2": {
+                    "question": "Where do the documents live?",
+                    "answer": "In your own drives and tools, which the Coworker reads with the access you give it. Its machine is in Europe, and the files stay inside your workspace."
+                },
+                "3": {
+                    "question": "Can we encode our own clause standards?",
+                    "answer": "Yes. Your positions, your red lines and your fallback wording go in the workspace brain, and the Coworker reviews against them rather than against a generic checklist."
+                }
+            }
+        },
+        "recruiting": {
+            "crumb": "Recruiting & HR",
+            "title": "AI Coworkers for recruiting and HR.",
+            "lede": "Every application read against the role the same way, interviews prepared from the CV, debriefs turned into a decision, and no candidate left without an answer.",
+            "metaTitle": "AI agents for recruiting: screening, interviews, follow-up",
+            "metaDescription": "Hire AI Coworkers that screen every application against the role, summarise CVs with their evidence, prepare interviews and keep candidates updated.",
+            "wallTitle": "Eight Coworkers for a hiring process that keeps its promises.",
+            "templatesLink": "Recruiting templates",
+            "painsTitle": "Where a hiring process goes quiet.",
+            "pains": {
+                "1": {
+                    "title": "Two hundred applications, one afternoon",
+                    "body": "The last fifty get thirty seconds each. A Coworker reads all of them against the same criteria and shows its evidence."
+                },
+                "2": {
+                    "title": "Candidates who never hear back",
+                    "body": "Not out of rudeness, out of volume. A Coworker keeps every candidate updated at every stage, in your words."
+                },
+                "3": {
+                    "title": "Debriefs that never become a decision",
+                    "body": "Four sets of notes in four formats. A Coworker turns them into evidence, open questions and a comparison against the role."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Does a Coworker decide who gets hired?",
+                    "answer": "No. It reads against the criteria you wrote and shows the evidence behind every point, including what it could not verify. The shortlist is a reading, and the decision stays with your team."
+                },
+                "2": {
+                    "question": "How does it handle candidate data?",
+                    "answer": "It reads the applications in the tools you connect, and it works on a machine in Europe that belongs to your workspace. Nothing is copied into a shared pool."
+                },
+                "3": {
+                    "question": "Can it write to our ATS?",
+                    "answer": "If your ATS has an API or an MCP server, yes. If it does not, the Coworker opens it on its own screen and fills it in the way a person would."
+                }
+            }
+        }
+    }
+}

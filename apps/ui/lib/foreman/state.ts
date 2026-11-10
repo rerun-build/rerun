@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import { isPaid, priceLabel, type ForemanClient } from '@rerun/contracts'
+import { isPaid, type ForemanClient } from '@rerun/contracts'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { readAgentShare } from '@/lib/agents/share-read'
 import { isSubscriptionEntitled, parsePriceArm, trialArm } from '@rerun/cloud/billing'
@@ -15,7 +15,7 @@ import { actorFromContext, isAdminActor, spaceAccessMap } from '@/app/api/_auth/
 import { AGENT_COLUMNS, SPACE_COLUMNS } from './board-map'
 import { foremanHubApiKey } from './hub-api-key'
 import type { KickoffIntent } from './kickoff-marker'
-import { preferredLanguage } from './language'
+import { accountLanguage, preferredLanguage } from './language'
 import { stampWorkspaceOnboarded } from './profile'
 import { foremanPhase, isNamedReadyMade, type ArrivingIntent, type ForemanAnswers, type ForemanState } from './phase'
 
@@ -45,7 +45,7 @@ async function describeIntent(ctx: WorkspaceContext, intent: KickoffIntent): Pro
         if (!template) return intent
         const connectors = template.connectors.map(connector => connector.slug).join(', ')
         const [coworker, ...others] = template.archiveAgentNames
-        return { ...intent, title: template.title, ...(coworker && !others.length ? { coworker } : {}), ...(isPaid(template.pricing) && !template.owned ? { paid: priceLabel(template.pricing) } : {}), description: `the template "${template.title}" (${template.tagline}), ${template.archiveAgentNames.length} coworkers${connectors ? `, apps: ${connectors}` : ''}` }
+        return { ...intent, title: template.title, ...(coworker && !others.length ? { coworker } : {}), ...(isPaid(template.pricing) && !template.owned ? { paid: template.pricing } : {}), description: `the template "${template.title}" (${template.tagline}), ${template.archiveAgentNames.length} coworkers${connectors ? `, apps: ${connectors}` : ''}` }
     }
 
     // A share link is read with the service role, as the card that shows it is: the token is the
@@ -98,7 +98,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         foreman,
         onboardingCompletedAt,
         firstName: readFirstName(ctx.authUser.user_metadata),
-        language: foreman.language ?? preferredLanguage(acceptLanguage),
+        language: accountLanguage((await selectMaybeSingle(ctx.supabase, 'users', ['locale'] as const, { id: ctx.userId })).data?.locale) ?? foreman.language ?? preferredLanguage(acceptLanguage),
         entitled,
         trialing,
         trialSpent: !!ctx.workspace.trial_ends_at,

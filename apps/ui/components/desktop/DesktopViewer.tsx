@@ -1,9 +1,10 @@
 'use client'
 
 import type RFB from '@novnc/novnc/lib/rfb'
+import { useTranslations } from 'next-intl'
 import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react'
 
-import { DESKTOP_CONNECTING_LABEL, DesktopScreenLoader } from '@/components/desktop/DesktopScreenLoader'
+import { DesktopScreenLoader } from '@/components/desktop/DesktopScreenLoader'
 import { cn } from '@/lib/utils'
 
 const KEYSYM_CONTROL_LEFT = 0xffe3
@@ -40,6 +41,7 @@ type DesktopViewerProps = {
 }
 
 export function DesktopViewer({ socketUrl, onDisconnect, viewOnly = false, ref, onCanvas, className }: DesktopViewerProps) {
+    const t = useTranslations('desktop.screen')
     const screenRef = useRef<HTMLDivElement>(null)
     const rfbRef = useRef<RFB | null>(null)
     const [connected, setConnected] = useState(false)
@@ -104,7 +106,7 @@ export function DesktopViewer({ socketUrl, onDisconnect, viewOnly = false, ref, 
 
     return (
         <div className={cn('relative min-h-0 flex-1 bg-muted/40', className)}>
-            <DesktopScreenLoader fading={connected} compact={viewOnly} label={viewOnly ? undefined : DESKTOP_CONNECTING_LABEL} />
+            <DesktopScreenLoader fading={connected} compact={viewOnly} label={viewOnly ? undefined : t('connecting')} />
             <div ref={screenRef} className={cn('absolute inset-0 transition-opacity duration-300', connected ? 'opacity-100' : 'opacity-0', viewOnly && 'pointer-events-none')} />
         </div>
     )

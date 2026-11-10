@@ -1,3 +1,5 @@
+'use client'
+
 import type { ReactNode } from 'react'
 
 import { Badge, Button, ScrollFade } from '../primitives'
@@ -7,6 +9,7 @@ import { ExpertAvailability } from './ExpertAvailability'
 import { ChipList, SocialLinks } from './expert-profile-parts'
 import { badgeTone } from './options'
 import type { Expert } from './types'
+import { useKitTranslations } from '../locale'
 
 const HIRE_CLASSNAME = 'w-full rounded-lg dark:bg-white dark:text-black dark:hover:bg-white/90 dark:hover:text-black'
 
@@ -14,6 +17,7 @@ const HIRE_CLASSNAME = 'w-full rounded-lg dark:bg-white dark:text-black dark:hov
 // profile; in an edit wizard nothing is passed and the inert default is only there to show what the
 // card will look like.
 export function ExpertProfilePreview({ expert, action }: { expert: Expert; action?: ReactNode }) {
+    const t = useKitTranslations()
     const subtitle = expert.location ?? ''
 
     return (
@@ -44,12 +48,12 @@ export function ExpertProfilePreview({ expert, action }: { expert: Expert; actio
 
                     {expert.bio && <Markdown content={expert.bio} className="text-sm text-foreground/70" />}
 
-                    <ChipList title="Skills" items={expert.skills} />
-                    <ChipList title="Languages" items={expert.languages} />
+                    <ChipList title={t('experts.wizard.skills')} items={expert.skills} />
+                    <ChipList title={t('experts.wizard.languages')} items={expert.languages} />
 
                     {expert.budget && (
                         <div>
-                            <h4 className="text-xs font-medium tracking-wide text-foreground/40 uppercase">Budget</h4>
+                            <h4 className="text-xs font-medium tracking-wide text-foreground/40 uppercase">{t('experts.wizard.budget')}</h4>
                             <p className="mt-2 text-sm text-foreground/70">{expert.budget}</p>
                         </div>
                     )}
@@ -58,7 +62,7 @@ export function ExpertProfilePreview({ expert, action }: { expert: Expert; actio
 
             <div className="flex flex-col gap-4 border-t border-foreground/5 px-6 py-4">
                 <SocialLinks expert={expert} />
-                {action ?? <Button className={HIRE_CLASSNAME}>Hire</Button>}
+                {action ?? <Button className={HIRE_CLASSNAME}>{t('experts.preview.hire')}</Button>}
             </div>
         </div>
     )

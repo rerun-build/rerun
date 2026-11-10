@@ -13,21 +13,19 @@ import { cn } from '@/lib/utils'
 import { useBillingStore } from '@/stores/billing.store'
 import { useSandboxArchiveStore } from '@/stores/sandbox-archive.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { formatDate } from '@rerun/i18n/format'
 import { ChromeBar } from '@rerun/ui/chrome'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 
-const RESTORE_STEPS: readonly { stage: Exclude<RestoreStage, 'waiting' | 'failed'>; label: string; activeLabel?: string }[] = [
-    { stage: 'machine', label: 'Machine assigned', activeLabel: 'Assigning a machine' },
-    { stage: 'data', label: 'Restoring your data' },
-    { stage: 'agents', label: 'Waking your coworkers' },
-]
+const RESTORE_STEPS: readonly Exclude<RestoreStage, 'waiting' | 'failed'>[] = ['machine', 'data', 'agents']
 
 const STAGE_POLL_MS = 4000
 // An approval is a human's doing: nothing here changes by the second.
 const SANDBOX_ARCHIVE_POLL_MS = 15_000
 
-export function formatKeptUntil(date: Date): string {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+export function formatKeptUntil(date: Date, locale: string): string {
+    return formatDate(date, locale, { month: 'short', day: 'numeric' })
 }
 
 // The board of a workspace whose machine was archived when its plan ended, and of one coming back
@@ -49,15 +47,17 @@ export function WorkspacePausedBanner() {
 }
 
 export function PausedContent({ keptUntil, paymentFailed = false }: { keptUntil: Date | null; paymentFailed?: boolean }) {
+    const t = useTranslations('layout.paused')
+    const locale = useLocale()
     return (
         <>
             <ArchiveIcon className="relative size-4 shrink-0 text-muted-foreground" />
             <p className="relative min-w-0 truncate text-sm">
-                <span className="font-medium">{paymentFailed ? 'Payment failed, workspace paused.' : 'Workspace paused.'}</span>{' '}
-                <span className="text-muted-foreground max-sm:hidden">Your coworkers and their data are saved{keptUntil ? ` until ${formatKeptUntil(keptUntil)}` : ''}.</span>
+                <span className="font-medium">{paymentFailed ? t('paymentFailed') : t('title')}</span>{' '}
+                <span className="text-muted-foreground max-sm:hidden">{keptUntil ? t('savedUntil', { date: formatKeptUntil(keptUntil, locale) }) : t('saved')}</span>
             </p>
             <Button className="shrink-0 rounded-full px-3" onClick={() => useBillingStore.getState().openBilling(undefined, 'paused_banner')}>
-                {paymentFailed ? 'Update payment' : 'Subscribe to restore'}
+                {paymentFailed ? t('updatePayment') : t('subscribe')}
             </Button>
         </>
     )
@@ -74,8 +74,6 @@ function SandboxArchiveSync({ workspaceId }: { workspaceId: number }) {
     useVisibleInterval(refresh, SANDBOX_ARCHIVE_POLL_MS)
     return null
 }
-
-const SANDBOX_REQUESTED_REASON = 'We are reviewing your request'
 
 // The connected half: reads what the server said, and owns the request dialog.
 function SandboxArchivedBanner({ keptUntil }: { keptUntil: Date | null }) {
@@ -95,23 +93,25 @@ function SandboxArchivedBanner({ keptUntil }: { keptUntil: Date | null }) {
 }
 
 export function SandboxArchivedContent({ keptUntil, status, onRequest }: { keptUntil: Date | null; status: SandboxArchiveState['status']; onRequest?: () => void }) {
+    const t = useTranslations('layout.sandboxArchived')
+    const locale = useLocale()
     return (
         <>
             <ArchiveIcon className="relative size-4 shrink-0 text-muted-foreground" />
             <p className="relative min-w-0 truncate text-sm">
-                <span className="font-medium">{status === 'rejected' ? 'Reactivation declined.' : status === 'requested' ? 'Reactivation requested.' : 'Sandbox archived after 30 days unused.'}</span>{' '}
+                <span className="font-medium">{status === 'rejected' ? t('declined') : status === 'requested' ? t('requested') : t('title')}</span>{' '}
                 <span className="text-muted-foreground max-sm:hidden">
                     {status === 'rejected'
-                        ? 'Contact us if you think this is a mistake.'
+                        ? t('declinedHint')
                         : keptUntil
-                          ? `Your coworkers and their data are saved until ${formatKeptUntil(keptUntil)}.`
-                          : 'Its saved data has expired, a reactivation starts from an empty sandbox.'}
+                          ? t('savedUntil', { date: formatKeptUntil(keptUntil, locale) })
+                          : t('expired')}
                 </span>
             </p>
             {status !== 'rejected' && (
-                <TooltipDisabledReason reason={status === 'requested' ? SANDBOX_REQUESTED_REASON : undefined} className="shrink-0 rounded-full">
+                <TooltipDisabledReason reason={status === 'requested' ? t('requestedReason') : undefined} className="shrink-0 rounded-full">
                     <Button className="shrink-0 rounded-full px-3" disabled={status === 'requested'} onClick={onRequest}>
-                        Request reactivation
+                        {t('request')}
                     </Button>
                 </TooltipDisabledReason>
             )}
@@ -122,6 +122,7 @@ export function SandboxArchivedContent({ keptUntil, status, onRequest }: { keptU
 // `approved`: a sandbox coming back on an approval rather than a payment, which changes what the
 // two stalled states have to say.
 function RestoringContent({ approved = false }: { approved?: boolean }) {
+    const t = useTranslations('layout.restoring')
     const [stage, setStage] = useState<RestoreStage>('machine')
     const poll = useCallback(() => {
         getWorkspaceRestoreStageAction()
@@ -135,7 +136,7 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
             <div className="relative flex min-w-0 items-center gap-2 pr-3">
                 <ClockIcon className="size-4 shrink-0 text-muted-foreground" />
                 <p className="min-w-0 truncate text-sm">
-                    <span className="font-medium">{approved ? "Reactivation approved, you're first in line." : "Payment received, you're first in line."}</span> <span className="text-muted-foreground max-sm:hidden">It comes back on its own within minutes.</span>
+                    <span className="font-medium">{approved ? t('waitingApproved') : t('waitingPaid')}</span> <span className="text-muted-foreground max-sm:hidden">{t('waitingHint')}</span>
                 </p>
             </div>
         )
@@ -147,26 +148,26 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
             <div className="relative flex min-w-0 items-center gap-2 pr-3">
                 <AlertCircleIcon className="size-4 shrink-0 text-muted-foreground" />
                 <p className="min-w-0 truncate text-sm">
-                    <span className="font-medium">Your restore needs a check on our side.</span> <span className="text-muted-foreground max-sm:hidden">{approved ? "We've been alerted and are bringing your sandbox back by hand." : "Payment received. We've been alerted and are bringing your workspace back by hand."}</span>
+                    <span className="font-medium">{t('failed')}</span> <span className="text-muted-foreground max-sm:hidden">{approved ? t('failedApproved') : t('failedPaid')}</span>
                 </p>
             </div>
         )
     }
 
-    const current = RESTORE_STEPS.findIndex(step => step.stage === stage)
+    const current = RESTORE_STEPS.indexOf(stage)
     return (
         <div className="relative flex min-w-0 items-center gap-4 pr-3 pl-1">
             <Shimmer as="span" duration={1.6} className="text-sm font-medium whitespace-nowrap">
-                Restoring your workspace…
+                {t('title')}
             </Shimmer>
             <div className="flex items-center gap-3 max-md:hidden">
                 {RESTORE_STEPS.map((step, index) => {
                     const done = index < current
                     const active = index === current
                     return (
-                        <span key={step.stage} className={cn('flex items-center gap-1.5 text-xs whitespace-nowrap', done || active ? 'text-foreground' : 'text-muted-foreground')}>
+                        <span key={step} className={cn('flex items-center gap-1.5 text-xs whitespace-nowrap', done || active ? 'text-foreground' : 'text-muted-foreground')}>
                             {done ? <CircleCheckIcon className="size-3.5 text-emerald-500" /> : active ? <LoaderIcon className="size-3.5 animate-spin" /> : <span className="size-3.5 rounded-full border border-border" />}
-                            {active ? (step.activeLabel ?? step.label) : step.label}
+                            {active && step === 'machine' ? t('steps.machineActive') : t(`steps.${step}`)}
                         </span>
                     )
                 })}

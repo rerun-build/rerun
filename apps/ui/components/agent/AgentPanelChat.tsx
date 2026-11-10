@@ -9,6 +9,7 @@ import { installSessionTitle } from '@/lib/chat/install-marker'
 import { useBoardStore } from '@/stores/board.store'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 import { AnimatePresence } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { AgentSheetChat } from '@/components/agent/AgentSheetChat'
 import { AgentChatsList, type ChatsFilter } from '@/components/agent/sheet/AgentChatsList'
@@ -47,6 +48,7 @@ type AgentPanelChatProps = {
 }
 
 export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats }: AgentPanelChatProps) {
+    const t = useTranslations('agent.agentPanelChat')
     const { tabs, activeIndex, createNew, selectTab, closeTab, openTab, updateTabByUid, updateTabTitle, setGeneralSessionId } = useSessionTabs(agentId)
     const { threads, refresh: refreshThreads } = useAgentThreads(agentId)
 
@@ -210,7 +212,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
             {setup.pending && setup.skipped && (
                 <div className="flex shrink-0 items-center gap-2 border-b border-border bg-muted/40 py-1 pr-1.5 pl-3 text-xs text-muted-foreground">
                     <WrenchIcon className="size-3.5 shrink-0" />
-                    <span className="min-w-0 flex-1 truncate">This coworker has not been set up yet</span>
+                    <span className="min-w-0 flex-1 truncate">{t('notSetUp')}</span>
                     <Button
                         size="xs"
                         variant="outline"
@@ -221,7 +223,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                             if (tabs[activeIndex]?.id) createNew()
                         }}
                     >
-                        Set it up
+                        {t('setUp')}
                         <ArrowRightIcon className="size-3" />
                     </Button>
                 </div>

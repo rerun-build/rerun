@@ -1,4 +1,5 @@
 import { Keyframe } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { GlassButton } from '@/components/ui/GlassButton'
 
@@ -11,5 +12,6 @@ export const SINK_OUT = new Keyframe({ 0: { transform: [{ translateY: 0 }, { sca
 // The web's round arrow (ConversationScrollButton): the thread was scrolled up, the latest message is
 // one tap away.
 export function ScrollToEndButton({ onPress }: { onPress: () => void }) {
-    return <GlassButton symbol="arrow.down" label="Scroll to the latest message" size={SIZE} onPress={onPress} />
+    const t = useTranslations('mobileChat.messages')
+    return <GlassButton symbol="arrow.down" label={t('scrollToLatest')} size={SIZE} onPress={onPress} />
 }

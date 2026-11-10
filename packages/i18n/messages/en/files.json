@@ -1,0 +1,113 @@
+{
+    "_context": {
+        "detail.stillLoading": "Tooltip of the disabled Edit button while the file is loading.",
+        "actions.truncated": "Badge: only the beginning of a large file is shown.",
+        "editor.unsaved": "Badge in the file editor when the draft has changes not saved yet.",
+        "editor.conflictTitle": "{name} is a file name. The Box is the AI coworker's machine where the file lives.",
+        "editor.keepTheirs": "Button: keep the version someone else saved, drop my edits.",
+        "publish.unshare": "Verb: stop sharing the file through its public link.",
+        "empty.title": "Title shown when a folder holds no file.",
+        "list.type": "Column header: the kind of file (its extension, or Folder).",
+        "list.folder": "Value of the Type column for a folder.",
+        "list.file": "Value of the Type column for a file without extension.",
+        "grid.published": "Accessible label of a globe icon on a file that has a public link.",
+        "uploadOutcome.someFailed": "Toast after a batch upload. {failed} files failed out of {total}.",
+        "uploadOutcome.oversized": "Toast when files are refused before uploading. {names} is one or two file names joined by a comma, {more} how many more files were refused beyond those, {count} the total refused, {limit} the size limit in MB.",
+        "detail.editTruncated": "Tooltip of the disabled Edit button. {limit} is a formatted number of characters.",
+        "uploadOutcome.machineUnreachable": "Upload error. {name} is the file name; the machine is the server running the workspace's coworkers."
+    },
+    "detail": {
+        "readOnly": "This file is read-only",
+        "stillLoading": "Still loading this file",
+        "previousFile": "Previous file",
+        "nextFile": "Next file",
+        "editNotText": "Only text files can be edited here.",
+        "editTruncated": "This file is over {limit} characters and cannot be edited here. Download it, or ask the coworker to edit it.",
+        "editBinary": "This file is not text, so editing it here would corrupt it."
+    },
+    "actions": {
+        "truncated": "Truncated",
+        "edit": "Edit",
+        "download": "Download",
+        "deleteFile": "Delete file"
+    },
+    "delete": {
+        "title": "Delete {name}?",
+        "file": "The file is deleted from the box. This cannot be undone.",
+        "folder": "The folder and everything inside it are deleted from the box. This cannot be undone."
+    },
+    "editor": {
+        "unsaved": "Unsaved",
+        "close": "Close editor",
+        "cancel": "Cancel",
+        "noChanges": "No changes to save",
+        "save": "Save changes",
+        "conflictTitle": "{name} changed on the Box",
+        "conflictDescription": "Someone, or a coworker, wrote to this file after you opened it. Saving now replaces their version with yours.",
+        "overwrite": "Overwrite",
+        "keepTheirs": "Keep theirs",
+        "discardTitle": "Discard your changes?",
+        "discardDescription": "Your edits to {name} are not saved yet. Closing the editor throws them away.",
+        "discard": "Discard changes",
+        "keepEditing": "Keep editing"
+    },
+    "preview": {
+        "noPreview": "No preview available for this file type",
+        "download": "Download",
+        "readFailed": "This file could not be read"
+    },
+    "publish": {
+        "publish": "Publish",
+        "publishPublicly": "Publish publicly",
+        "publishedLink": "Published link",
+        "publicLink": "Public link",
+        "open": "Open",
+        "openPublicLink": "Open public link",
+        "copyLink": "Copy link",
+        "copyPublicLink": "Copy public link",
+        "shareSettings": "Share settings",
+        "unpublish": "Unpublish",
+        "unshare": "Unshare",
+        "unpublishTitle": "Unpublish {name}?",
+        "unshareTitle": "Unshare {name}?",
+        "unpublishDescription": "The link stops working right away, for everyone who has it.",
+        "unshareDescription": "The public link stops working right away. Anyone holding it gets a 404."
+    },
+    "empty": {
+        "title": "Empty directory",
+        "goUp": "Up one level"
+    },
+    "grid": {
+        "parentDirectory": "Parent directory",
+        "openFolder": "Open folder",
+        "open": "Open",
+        "download": "Download",
+        "rename": "Rename",
+        "delete": "Delete",
+        "published": "Published"
+    },
+    "list": {
+        "newName": "New name",
+        "dropHere": "Drop files or folders to upload here",
+        "name": "Name",
+        "size": "Size",
+        "type": "Type",
+        "empty": "Nothing here yet. Anything a coworker downloads, creates or edits for the whole workspace lands in this folder, and so does what you drop on this page.",
+        "actionsFor": "Actions for {name}",
+        "folder": "Folder",
+        "file": "File"
+    },
+    "uploadOutcome": {
+        "allFailed": "Upload failed",
+        "someFailed": "{failed} of {total, plural, one {# file} other {# files}} failed to upload",
+        "uploaded": "{count, plural, one {# file} other {# files}} uploaded",
+        "sessionExpired": "Your session expired. Reload the page and try again.",
+        "tooLarge": "This file is too large to upload.",
+        "retryLater": "Upload failed. Retry in a moment.",
+        "networkFailed": "Upload failed. Check your connection and retry.",
+        "oversized": "{names}{more, plural, =0 {} one { and # more} other { and # more}} {count, plural, one {is} other {are}} over the {limit} MB limit.",
+        "machineUpdating": "The machine of this workspace was updating. Retry the upload.",
+        "engineUpdateNeeded": "This workspace runs on a machine that needs an engine update to accept files over {limit} MB. It updates itself, so try again in a few minutes.",
+        "machineUnreachable": "Could not upload {name}. Your machine may be unreachable."
+    }
+}

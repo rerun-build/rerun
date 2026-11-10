@@ -3,6 +3,7 @@ import { Image } from 'expo-image'
 import * as WebBrowser from 'expo-web-browser'
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { installService, resolveServices } from '@/api/services'
 import { useAuth } from '@/auth/AuthProvider'
@@ -54,6 +55,7 @@ function ServiceHeader({ service }: { service: ResolvedService }) {
 // comes back to the app; a key is typed here and goes onto the Box. The reply leaves once every app
 // is connected or skipped.
 export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidgetProps) {
+    const t = useTranslations('mobileHitl')
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     const [services, setServices] = useState<ResolvedService[] | null>(null)
@@ -87,22 +89,22 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
 
     if (failed) {
         return (
-            <HitlCard symbol="link" label="App to connect">
+            <HitlCard symbol="link" label={t('service.label')}>
                 <AppText variant="callout" tone="muted">
-                    The apps could not be loaded. Connect them on the web, or skip them.
+                    {t('service.loadFailed')}
                 </AppText>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: spacing.sm }}>
-                    <HitlAction label="Not now" onPress={() => onAnswer(HITL_CANCELLED.service)} />
-                    <HitlAction label="Open on the web" primary onPress={() => WebBrowser.openBrowserAsync(webUrl)} />
+                    <HitlAction label={t('actions.notNow')} onPress={() => onAnswer(HITL_CANCELLED.service)} />
+                    <HitlAction label={t('actions.openOnWeb')} primary onPress={() => WebBrowser.openBrowserAsync(webUrl)} />
                 </View>
             </HitlCard>
         )
     }
     if (!services) {
         return (
-            <HitlCard symbol="link" label="App to connect">
+            <HitlCard symbol="link" label={t('service.label')}>
                 <AppText variant="callout" tone="muted">
-                    Loading the apps…
+                    {t('service.loading')}
                 </AppText>
             </HitlCard>
         )
@@ -135,12 +137,12 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
             const result = await installService(caller, agentId, service.slug, typed, method.id)
             if (result.status === 'installed') return settle('connected')
             if (result.status === 'needs_config') return setError(result.message)
-            if (result.pendingAuth === APP_ONLY_ON_WEB) return setError('This app picks its account on the web. Connect it there, or skip it.')
+            if (result.pendingAuth === APP_ONLY_ON_WEB) return setError(t('service.webOnly'))
             const outcome = await runConnect(caller, agentId, service.slug)
             if (outcome.status === 'connected') settle('connected')
             else if (outcome.status === 'error') setError(outcome.message)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Could not connect the app')
+            setError(err instanceof Error ? err.message : t('service.connectFailed'))
         } finally {
             setBusy(false)
         }
@@ -150,7 +152,7 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
     const decided = entries[index]
 
     return (
-        <HitlCard symbol="link" label="App to connect">
+        <HitlCard symbol="link" label={t('service.label')}>
             <HitlSteps
                 count={services.length}
                 index={index}
@@ -165,7 +167,7 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
                             <ServiceHeader service={step} />
                             {outcome ? (
                                 <AppText variant="callout" tone="muted">
-                                    {outcome === 'connected' ? `${step.name} connected` : outcome === 'not-found' ? 'Not found in the catalog, skipped.' : 'Skipped.'}
+                                    {outcome === 'connected' ? t('service.connected', { name: step.name }) : outcome === 'not-found' ? t('service.notFound') : t('service.skipped')}
                                 </AppText>
                             ) : (
                                 (methodOf(step)?.inputs ?? []).map(input => (
@@ -193,8 +195,8 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
                 actions={
                     !decided && (
                         <>
-                            <HitlAction label={services.length > 1 ? 'Skip' : 'Not now'} onPress={() => settle('skipped')} disabled={busy} />
-                            <HitlAction label={busy ? 'Connecting…' : 'Connect'} primary disabled={busy || missing || !method} onPress={connect} />
+                            <HitlAction label={services.length > 1 ? t('actions.skip') : t('actions.notNow')} onPress={() => settle('skipped')} disabled={busy} />
+                            <HitlAction label={busy ? t('actions.connecting') : t('actions.connect')} primary disabled={busy || missing || !method} onPress={connect} />
                         </>
                     )
                 }

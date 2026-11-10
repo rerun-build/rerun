@@ -24,7 +24,7 @@ describe('/api/v1/brain/pages/:slug/revert', () => {
     })
 
     it('says the page changed since', async () => {
-        revertBrainPageAction.mockResolvedValue({ ok: false, conflict: true, error: 'This page changed since. Open it and restore a version from its history.' })
+        revertBrainPageAction.mockResolvedValue({ ok: false, conflict: true, error: 'This page changed since. Open it and restore a version from its history.', code: 'brainPageChangedSince' })
         const res = await revert.POST(request({ revisionId: 'rev-1' }), { params: Promise.resolve({ slug: 'pricing' }) })
         expect(res.status).toBe(409)
         expect(await res.json()).toMatchObject({ error: 'This page changed since. Open it and restore a version from its history.' })

@@ -1,8 +1,10 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { formatAmount, isPaid, priceLabel, type TemplatePricing } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
 import { Badge } from '@rerun/ui/primitives'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import { getTemplateAccessAction, startTemplateCheckoutAction } from '@/ee/actions/template-purchase.actions'
@@ -31,6 +33,8 @@ function readInput(input: unknown): PurchaseInput | null {
 }
 
 export function TemplatePurchaseWidget({ input, output, onDone }: { input: unknown; output?: unknown; onDone: (result: TemplatePurchaseResult) => void }) {
+    const t = useTranslations('foreman.purchase')
+    const errorText = useErrorText()
     const { workspace } = useSession()
     const purchase = readInput(input)
     const bought = (output as TemplatePurchaseResult | null | undefined)?.ok === true
@@ -76,7 +80,7 @@ export function TemplatePurchaseWidget({ input, output, onDone }: { input: unkno
         return (
             <div className="mb-2 flex items-center gap-2 rounded-lg border border-border bg-muted/20 px-3 py-2 text-sm">
                 <Icon icon={CircleCheckIcon} className="text-emerald-500" />
-                <span>{`${purchase.title} is yours`}</span>
+                <span>{t('owned', { title: purchase.title })}</span>
             </div>
         )
     }
@@ -88,7 +92,7 @@ export function TemplatePurchaseWidget({ input, output, onDone }: { input: unkno
         const result = await startTemplateCheckoutAction(purchase.slug)
         if (!result.ok) {
             setOpening(false)
-            setError(result.error)
+            setError(errorText(result))
             return
         }
         if (result.outcome.kind === 'checkout') {
@@ -99,34 +103,38 @@ export function TemplatePurchaseWidget({ input, output, onDone }: { input: unkno
         setOwned(true)
     }
 
-    return <TemplatePurchaseCard purchase={purchase} billedTo={workspace?.name ?? 'your workspace'} opening={opening} error={error} onBuy={() => void buy()} />
+    return <TemplatePurchaseCard purchase={purchase} billedTo={workspace?.name ?? null} opening={opening} error={error} onBuy={() => void buy()} />
 }
 
-export function TemplatePurchaseCard({ purchase, billedTo, opening, error, onBuy }: { purchase: TemplatePurchaseOffer; billedTo: string; opening: boolean; error: string | null; onBuy: () => void }) {
+export function TemplatePurchaseCard({ purchase, billedTo, opening, error, onBuy }: { purchase: TemplatePurchaseOffer; billedTo: string | null; opening: boolean; error: string | null; onBuy: () => void }) {
+    const t = useTranslations('foreman.purchase')
+    const tPrice = useTranslations('templates.price')
+    const locale = useLocale()
+    const price = priceLabel(purchase.pricing, tPrice, locale)
     const recurring = purchase.pricing.model === 'recurring'
 
     return (
         <div className="mb-2 flex flex-col gap-4 rounded-xl border border-border bg-background p-4">
             <div className="flex flex-col gap-2">
                 <Badge size="xs" className="self-start">
-                    {recurring ? 'Billed monthly' : 'One-time purchase'}
+                    {recurring ? t('recurring') : t('oneTime')}
                 </Badge>
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">{purchase.title}</h3>
-                <p className="text-sm text-muted-foreground">{`Billed to ${billedTo}, apart from your Rerun plan. It is installed the moment the payment goes through.`}</p>
+                <p className="text-sm text-muted-foreground">{billedTo ? t('billedTo', { name: billedTo }) : t('billedToWorkspace')}</p>
             </div>
 
             <dl className="rounded-lg border border-border bg-muted/20 p-3">
-                <dt className="text-xs text-muted-foreground">Due today</dt>
+                <dt className="text-xs text-muted-foreground">{t('dueToday')}</dt>
                 <dd className="text-2xl font-semibold leading-none text-foreground">
-                    {isPaid(purchase.pricing) ? formatAmount(purchase.pricing.amountCents, purchase.pricing.currency) : priceLabel(purchase.pricing)}
-                    {recurring && <span className="text-xs font-normal text-muted-foreground">/month</span>}
+                    {isPaid(purchase.pricing) ? formatAmount(purchase.pricing.amountCents, purchase.pricing.currency, locale) : price}
+                    {recurring && <span className="text-xs font-normal text-muted-foreground">{t('perMonth')}</span>}
                 </dd>
             </dl>
 
             {error && <p className="text-sm text-destructive">{error}</p>}
 
             <Button size="lg" className="h-11 w-full rounded-xl text-base" onClick={onBuy} disabled={opening}>
-                {opening ? 'Opening…' : recurring ? `Subscribe ${priceLabel(purchase.pricing)}` : `Pay ${priceLabel(purchase.pricing)}`}
+                {opening ? t('opening') : recurring ? t('subscribe', { price }) : t('pay', { price })}
             </Button>
         </div>
     )

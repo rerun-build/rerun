@@ -36,6 +36,17 @@ export const LINKUP_COUNTRIES: readonly { code: string; name: string }[] = [
 
 const FALLBACK_COUNTRY = 'US'
 
+// English keeps the names above; another language asks the browser for its own, under the ISO code
+// (Linkup's UK is GB there).
+export function linkupCountryName(country: { code: string; name: string }, locale: string): string {
+    if (locale.startsWith('en')) return country.name
+    try {
+        return new Intl.DisplayNames([locale], { type: 'region' }).of(country.code === 'UK' ? 'GB' : country.code) ?? country.name
+    } catch {
+        return country.name
+    }
+}
+
 // Linkup says UK where the locale says GB.
 export function countryFromLocale(locale: string | undefined): string {
     const region = locale?.split(/[-_]/)[1]?.toUpperCase()

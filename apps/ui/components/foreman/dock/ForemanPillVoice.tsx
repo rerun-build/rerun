@@ -1,6 +1,7 @@
 'use client'
 
 import { TextShimmer } from '@rerun/ui'
+import { useTranslations } from 'next-intl'
 
 import { LiveWaveform } from '@/components/ui/live-waveform'
 
@@ -14,6 +15,7 @@ type ForemanPillVoiceProps = {
 
 /** Space held down: the field turns into the voice being recorded, then into its transcription. */
 export function ForemanPillVoice({ phase, stream }: ForemanPillVoiceProps) {
+    const t = useTranslations('foreman.voice')
     const hearing = phase === 'listening' && stream !== null
     return (
         <span role="status" className="flex h-full min-w-0 flex-1 items-center gap-3">
@@ -21,10 +23,10 @@ export function ForemanPillVoice({ phase, stream }: ForemanPillVoiceProps) {
             {phase === 'listening' ? (
                 <span className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
                     <span className="size-1.5 shrink-0 animate-pulse rounded-full bg-destructive" />
-                    <span className="truncate">Listening · release Space to send</span>
+                    <span className="truncate">{t('listening')}</span>
                 </span>
             ) : (
-                <TextShimmer className="max-w-full truncate text-sm">Transcribing...</TextShimmer>
+                <TextShimmer className="max-w-full truncate text-sm">{t('transcribing')}</TextShimmer>
             )}
         </span>
     )

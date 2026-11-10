@@ -131,7 +131,7 @@ export function paidCallReceipt(capability: PaidDataCapability, params: Record<s
     return { status, servedBy, found: Math.min(found, asked), asked, verdict }
 }
 
-export type PaidSourceLine = { source: PaidSource; capability: PaidDataCapability; activity: string; label: string; found: number; asked: number }
+export type PaidSourceLine = { source: PaidSource; capability: PaidDataCapability; label: string; found: number; asked: number }
 
 export type PaidTurnSources = {
     // Each source once, in the order the coworker first used it.
@@ -179,7 +179,7 @@ function sourcesOfParts(parts: readonly PartLike[]): PaidTurnSources | null {
         if (!sources.has(source.id)) sources.set(source.id, source)
         const key = `${source.id}|${capability}`
         const entry = paidDataEntry(capability)
-        const line = lines.get(key) ?? { source, capability, activity: entry.activity, label: entry.label, found: 0, asked: 0 }
+        const line = lines.get(key) ?? { source, capability, label: entry.label, found: 0, asked: 0 }
         lines.set(key, { ...line, found: line.found + receipt.found, asked: line.asked + receipt.asked })
         if (receipt.verdict) {
             emails.checked += 1

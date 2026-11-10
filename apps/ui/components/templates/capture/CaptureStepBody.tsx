@@ -1,18 +1,23 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { CaptureReviewStep } from './CaptureReviewStep'
 import { CaptureSelectStep } from './CaptureSelectStep'
 import type { CaptureFlow, CaptureStep } from './useCaptureFlow'
 
 // Titles and bodies live together so the two shells that mount this flow cannot describe the same
 // step differently.
-export const CAPTURE_STEP_COPY: Record<CaptureStep, { title: string; description: string }> = {
-    select: { title: 'Capture coworkers', description: 'Pick the coworkers whose folder should become this template.' },
-    review: { title: 'Security review', description: 'Check what each coworker carries, then confirm it before capturing.' },
-    done: { title: 'Captured', description: 'The archives are stored and the template now describes these coworkers.' },
+export function useCaptureStepCopy(): Record<CaptureStep, { title: string; description: string }> {
+    const t = useTranslations('templates.capture.steps')
+    return {
+        select: { title: t('select.title'), description: t('select.description') },
+        review: { title: t('review.title'), description: t('review.description') },
+        done: { title: t('done.title'), description: t('done.description') },
+    }
 }
 
 export function CaptureStepBody({ step, flow }: { step: CaptureStep; flow: CaptureFlow }) {
+    const t = useTranslations('templates.capture')
     if (step === 'select') {
         return (
             <CaptureSelectStep
@@ -45,10 +50,7 @@ export function CaptureStepBody({ step, flow }: { step: CaptureStep; flow: Captu
 
     return (
         <div className="flex flex-col gap-2">
-            <p className="text-sm">
-                {flow.plans.length} coworker{flow.plans.length === 1 ? '' : 's'} captured. Their skills, schedules and apps now describe this
-                template.
-            </p>
+            <p className="text-sm">{t('done', { count: flow.plans.length })}</p>
             {flow.warnings.map(warning => (
                 <p key={warning} className="text-xs text-amber-500">
                     {warning}

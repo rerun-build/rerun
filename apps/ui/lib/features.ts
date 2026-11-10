@@ -17,3 +17,6 @@ export const PUBLISHED_ACCESS_RELEASED = true
 // whose engine reports the `connections.opencode` capability. Off by default; `NEXT_PUBLIC_OPENCODE_ENABLED=1`
 // turns it on for a local stack or a deploy.
 export const OPENCODE_ENABLED = process.env.NEXT_PUBLIC_OPENCODE_ENABLED === '1'
+// Gates the language packs: until it flips, everyone outside the early access reads English and the
+// language pickers stay hidden, whatever their browser or their saved choice asks for.
+export const I18N_RELEASED = false

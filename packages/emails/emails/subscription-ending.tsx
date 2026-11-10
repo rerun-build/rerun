@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface SubscriptionEndingProps {
@@ -17,6 +19,7 @@ export interface SubscriptionEndingProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -36,49 +39,43 @@ export default function SubscriptionEnding({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: SubscriptionEndingProps) {
-  const workspace = workspaceName ?? "your workspace";
-  const heading =
-    daysLeft <= 1
-      ? "Your subscription ends tomorrow"
-      : `Your subscription ends in ${daysLeft} days`;
+  const t = emailTranslator(locale);
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
-      preview={`Your Rerun subscription ends on ${endsLabel}`}
+      preview={t("subscriptionEnding.preview", { date: endsLabel })}
       hero={{ scene: "subscription-ending", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>{heading}</Heading>
+      <Heading style={text.heading}>
+        {t("subscriptionEnding.heading", { daysLeft: Math.max(daysLeft, 1) })}
+      </Heading>
       <Text style={text.paragraph}>
-        The subscription for <strong>{workspace}</strong> was cancelled and ends
-        on <strong>{endsLabel}</strong>. On that date your coworkers stop and your
-        workspace is paused.
+        {t.rich("subscriptionEnding.cancelled", { workspace, date: endsLabel, strong })}
       </Text>
       <Text style={text.paragraph}>
-        Nothing is deleted. Your coworkers, their memories, files and history are
-        saved until <strong>{keptUntilLabel}</strong>, and subscribing again
-        brings it all back exactly as you left it.
+        {t.rich("subscriptionEnding.nothingDeleted", { keptUntil: keptUntilLabel, strong })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Workspace", value: workspace },
-            { label: "Access ends", value: endsLabel },
-            { label: "Saved until", value: keptUntilLabel },
+            { label: t("common.meta.workspace"), value: workspace },
+            { label: t("common.meta.accessEnds"), value: endsLabel },
+            { label: t("common.meta.savedUntil"), value: keptUntilLabel },
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={billingUrl}>Keep my subscription</Button>
+        <Button href={billingUrl}>{t("subscriptionEnding.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        Changed your mind? Reactivating before {endsLabel} leaves everything
-        running, with nothing to restore.
-      </Text>
+      <Text style={text.footnote}>{t("subscriptionEnding.footnote", { date: endsLabel })}</Text>
     </Layout>
   );
 }

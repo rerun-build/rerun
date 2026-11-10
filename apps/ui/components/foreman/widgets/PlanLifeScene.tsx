@@ -3,6 +3,7 @@
 import { TextShimmer } from '@rerun/ui'
 import { IsoGrid, agentTileStyle } from '@rerun/ui/iso-grid'
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { planCardScene } from '@/lib/foreman/plan-scene'
@@ -21,6 +22,7 @@ const STAGE_LOOK: Record<Exclude<PlanLifeStage, 'rest'>, { icon: LucideIcon; cla
 // What the tile is doing, said under the board rather than in a bubble over it: at the card's zoom a
 // bubble is too small to read, and it stands on the Box's own name.
 function ActivityLine({ beat, tick }: { beat: PlanLifeBeat; tick: number }) {
+    const t = useTranslations('foreman.plan')
     const look = beat.stage === 'rest' ? null : STAGE_LOOK[beat.stage]
 
     return (
@@ -40,7 +42,7 @@ function ActivityLine({ beat, tick }: { beat: PlanLifeBeat; tick: number }) {
                     </motion.span>
                 ) : (
                     <motion.span key="rest" className="text-muted-foreground/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.28 }}>
-                        Standing by
+                        {t('standingBy')}
                     </motion.span>
                 )}
             </AnimatePresence>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
+import { useTranslations } from 'next-intl'
 import type { CountryCode } from 'libphonenumber-js/min'
 import type { LinkupLinkCode } from '@/lib/apps/linkup/client'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -22,18 +23,14 @@ export type WhatsappConnectInput = { phoneNumber: string; method: WhatsappLinkMe
 
 export const WHATSAPP_PRESENTATION: AppPresentation = {
     slug: 'whatsapp',
-    pitch: 'Your coworkers answer from your WhatsApp number. They read the conversation, reply and follow up for you.',
     capabilities: [
-        { icon: SendIcon, title: 'Replies and follow-ups', text: 'Answers the people who write to you, with text, files and voice notes.' },
-        { icon: BellRing, title: 'Wakes up on messages', text: 'A new message starts the coworker right away.' },
-        { icon: ShieldCheckIcon, title: 'Careful with your number', text: 'Stays inside WhatsApp’s daily limits and never writes to strangers.' },
+        { icon: SendIcon, key: 'whatsappReplies' },
+        { icon: BellRing, key: 'whatsappMessages' },
+        { icon: ShieldCheckIcon, key: 'whatsappCareful' },
     ],
 }
 
-const METHOD_OPTIONS: { value: WhatsappLinkMethod; label: string }[] = [
-    { value: 'qr', label: 'Scan a QR code' },
-    { value: 'code', label: 'Type a code' },
-]
+const METHODS: WhatsappLinkMethod[] = ['qr', 'code']
 
 type ConnectScreenProps = {
     defaultCountry: CountryCode
@@ -50,6 +47,7 @@ export function WhatsappConnectScreen({ defaultCountry, defaultMethod, initialPh
     const [country, setCountry] = useState<CountryCode>(defaultCountry)
     const [method, setMethod] = useState<WhatsappLinkMethod>(defaultMethod)
     const [invalid, setInvalid] = useState(false)
+    const t = useTranslations('apps.whatsapp.connect')
 
     const submit = (event: FormEvent) => {
         event.preventDefault()
@@ -63,7 +61,7 @@ export function WhatsappConnectScreen({ defaultCountry, defaultMethod, initialPh
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
             <PanelScroller className="space-y-4 p-4">
                 <PhoneNumberInput
-                    label="WhatsApp number"
+                    label={t('phoneLabel')}
                     autoFocus
                     value={phone}
                     onChange={value => {
@@ -73,13 +71,13 @@ export function WhatsappConnectScreen({ defaultCountry, defaultMethod, initialPh
                     country={country}
                     onCountryChange={setCountry}
                 />
-                {invalid && <p className="-mt-2 text-[11px] text-destructive">This does not look like a full phone number.</p>}
-                <Field label="Link it by" helperText={method === 'qr' ? 'You scan a code shown here with the phone.' : 'For when this page is open on that phone: you type a code in WhatsApp instead.'}>
-                    <Segmented options={METHOD_OPTIONS} value={method} onChange={setMethod} />
+                {invalid && <p className="-mt-2 text-[11px] text-destructive">{t('invalidPhone')}</p>}
+                <Field label={t('linkBy')} helperText={method === 'qr' ? t('linkByQr') : t('linkByCode')}>
+                    <Segmented options={METHODS.map(value => ({ value, label: t(`method.${value}`) }))} value={method} onChange={setMethod} />
                 </Field>
                 <p className="flex items-start gap-1.5 text-xs text-pretty text-muted-foreground">
                     <LockIcon className="mt-px size-3.5 shrink-0" />
-                    Rerun joins as a linked device, the way WhatsApp Web does. Your phone keeps working as usual.
+                    {t('linkedDevice')}
                 </p>
                 {error && (
                     <Alert variant="danger">
@@ -90,7 +88,7 @@ export function WhatsappConnectScreen({ defaultCountry, defaultMethod, initialPh
             </PanelScroller>
             <footer className="flex justify-end border-t px-4 py-3">
                 <Button type="submit" loading={pending} className="max-sm:w-full">
-                    Get the code
+                    {t('submit')}
                 </Button>
             </footer>
         </form>
@@ -111,22 +109,14 @@ type LinkScreenProps = {
 // The code is shown until the phone links it, checked every few seconds; the QR code renews on its
 // own while it waits. Past its three minutes, a new one is asked for.
 export function WhatsappLinkScreen({ method, phoneNumber, link, expired, pending, error, onNewCode, onSwitchMethod }: LinkScreenProps) {
-    const steps =
-        method === 'qr'
-            ? ['Open WhatsApp on the phone', 'Settings, then Linked devices, then Link a device', 'Point the phone at this code']
-            : ['Open WhatsApp on the phone', 'Settings, then Linked devices, then Link a device', 'Tap Link with phone number instead, then type this code']
+    const t = useTranslations('apps.whatsapp.link')
+    const steps = [t('steps.open'), t('steps.settings'), method === 'qr' ? t('steps.pointQr') : t('steps.typeCode')]
 
     return (
         <>
             <PanelScroller className="flex flex-col items-center px-5 pt-6 pb-6">
-                <StepHero visual={<LinkCode method={method} link={link} expired={expired} />} title={expired ? 'This code expired' : method === 'qr' ? 'Scan with WhatsApp' : 'Type this code in WhatsApp'}>
-                    {expired ? (
-                        'Codes last three minutes. Ask for a new one, then link the phone right away.'
-                    ) : (
-                        <>
-                            On the phone of <span className="font-medium whitespace-nowrap text-foreground">{phoneNumber}</span>
-                        </>
-                    )}
+                <StepHero visual={<LinkCode method={method} link={link} expired={expired} />} title={expired ? t('expiredTitle') : method === 'qr' ? t('scanTitle') : t('typeTitle')}>
+                    {expired ? t('expiredBody') : t.rich('onPhone', { phone: phoneNumber, b: chunks => <span className="font-medium whitespace-nowrap text-foreground">{chunks}</span> })}
                 </StepHero>
                 {!expired && (
                     <ol className="mt-5 w-full max-w-sm space-y-2">
@@ -141,7 +131,7 @@ export function WhatsappLinkScreen({ method, phoneNumber, link, expired, pending
                 {!expired && (
                     <span className="mt-5 inline-flex items-center gap-2 rounded-full border bg-muted/30 px-3 py-1 text-xs text-muted-foreground">
                         <span className="size-1.5 animate-pulse rounded-full bg-primary" />
-                        Waiting for the phone
+                        {t('waiting')}
                     </span>
                 )}
             </PanelScroller>
@@ -150,12 +140,12 @@ export function WhatsappLinkScreen({ method, phoneNumber, link, expired, pending
                     <p className="min-w-0 flex-1 text-[11px] text-destructive">{error}</p>
                 ) : (
                     <Button variant="ghost" size="sm" className="text-muted-foreground max-sm:w-full" disabled={pending} onClick={onSwitchMethod}>
-                        {method === 'qr' ? 'Type a code instead' : 'Scan a QR code instead'}
+                        {method === 'qr' ? t('switchToCode') : t('switchToQr')}
                     </Button>
                 )}
                 <Button variant={expired || error ? 'default' : 'outline'} loading={pending} onClick={onNewCode} className="max-sm:w-full">
                     <RefreshCw />
-                    New code
+                    {t('newCode')}
                 </Button>
             </footer>
         </>
@@ -163,12 +153,13 @@ export function WhatsappLinkScreen({ method, phoneNumber, link, expired, pending
 }
 
 function LinkCode({ method, link, expired }: { method: WhatsappLinkMethod; link: LinkupLinkCode | null; expired: boolean }) {
+    const t = useTranslations('apps.whatsapp.link')
     if (method === 'code') {
         const code = link?.pairingCode ?? null
         return (
             <div className={cn('mb-4 rounded-xl border bg-muted/30 px-5 py-4', expired && 'opacity-40')}>
                 {code ? (
-                    <span aria-label={`Code ${code.split('').join(' ')}`} className="font-mono text-2xl font-semibold tracking-[0.3em] tabular-nums sm:text-3xl">
+                    <span aria-label={t('codeLabel', { code: code.split('').join(' ') })} className="font-mono text-2xl font-semibold tracking-[0.3em] tabular-nums sm:text-3xl">
                         {code.length === 8 ? `${code.slice(0, 4)}-${code.slice(4)}` : code}
                     </span>
                 ) : (
@@ -180,7 +171,7 @@ function LinkCode({ method, link, expired }: { method: WhatsappLinkMethod; link:
     // A QR code is read on a white ground whatever the theme: the phone's camera needs the contrast.
     return (
         <div className={cn('mb-4 rounded-xl border bg-white p-3', expired && 'opacity-30')}>
-            {link?.qrCodeImage ? <img src={link.qrCodeImage} alt="QR code to link WhatsApp" className="size-44 sm:size-52" /> : <Skeleton className="size-44 bg-neutral-200 sm:size-52" />}
+            {link?.qrCodeImage ? <img src={link.qrCodeImage} alt={t('qrAlt')} className="size-44 sm:size-52" /> : <Skeleton className="size-44 bg-neutral-200 sm:size-52" />}
         </div>
     )
 }

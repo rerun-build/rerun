@@ -1,12 +1,13 @@
 import type { PhoneChannel } from '@rerun/contracts'
 import { useState } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { CodeField } from '@/components/auth/CodeField'
 import { useSignInFlow, type SignInStep } from '@/components/auth/SignInFlow'
 import { StepTitle } from '@/components/auth/steps/StepTitle'
 import { TextLink } from '@/components/auth/TextLink'
-import { messageOf } from '@/components/auth/useSignInActions'
+import { useSignInErrorText } from '@/components/auth/useSignInActions'
 import { useSecondsSince } from '@/components/auth/useSecondsSince'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
@@ -22,6 +23,8 @@ const CHANNEL_NAMES: Record<PhoneChannel, string> = { whatsapp: 'WhatsApp', sms:
 
 export function CodeStep({ step }: { step: Extract<SignInStep, { name: 'code' }> }) {
     const { country, phone, email, back, setThinking } = useSignInFlow()
+    const t = useTranslations('mobileAuth')
+    const errorText = useSignInErrorText()
     const byPhone = step.method === 'phone'
     const [channel, setChannel] = useState<PhoneChannel>(step.method === 'phone' ? step.channel : 'sms')
     // Opened on a code sent earlier, the wait before a new one is what the hub said is left of it.
@@ -48,7 +51,7 @@ export function CodeStep({ step }: { step: Extract<SignInStep, { name: 'code' }>
                 await signInWithEmail(email.trim(), value)
             }
         } catch (failure) {
-            setError(messageOf(failure))
+            setError(errorText(failure))
             setCode('')
             setVerifying(false)
             setThinking(false)
@@ -64,7 +67,7 @@ export function CodeStep({ step }: { step: Extract<SignInStep, { name: 'code' }>
             else await sendEmailCode(email.trim())
             setSentAt(Date.now())
         } catch (failure) {
-            setError(messageOf(failure))
+            setError(errorText(failure))
         } finally {
             setResending(false)
             setThinking(false)
@@ -73,18 +76,18 @@ export function CodeStep({ step }: { step: Extract<SignInStep, { name: 'code' }>
 
     return (
         <>
-            <StepTitle title="Enter the code" subtitle={byPhone ? `Sent by ${CHANNEL_NAMES[channel]} to ${internationalNumber(phone, country)}` : `Sent to ${email.trim()}`} />
+            <StepTitle title={t('code.title')} subtitle={byPhone ? t('code.sentByPhone', { channel: CHANNEL_NAMES[channel], number: internationalNumber(phone, country) }) : t('code.sentByEmail', { email: email.trim() })} />
             <CodeField length={CODE_LENGTH} value={code} onChangeText={setCode} onComplete={verify} disabled={verifying} invalid={Boolean(error)} />
             {error && (
                 <AppText variant="footnote" tone="destructive" style={{ textAlign: 'center' }}>
                     {error}
                 </AppText>
             )}
-            <Button label="Continue" size="lg" loading={verifying} disabled={code.length < CODE_LENGTH} onPress={() => verify(code)} />
+            <Button label={t('code.continue')} size="lg" loading={verifying} disabled={code.length < CODE_LENGTH} onPress={() => verify(code)} />
             <View style={{ alignItems: 'center', gap: spacing.lg, marginTop: spacing.xs }}>
-                <TextLink label={resendIn > 0 ? `Resend code in ${resendIn}s` : 'Resend code'} disabled={resendIn > 0 || resending} onPress={() => resend(channel)} />
-                {byPhone && elapsed >= SWITCH_AFTER_SECONDS && <TextLink label={`Send by ${CHANNEL_NAMES[otherChannel]} instead`} disabled={resending} onPress={() => resend(otherChannel)} />}
-                <TextLink label={byPhone ? 'Use a different number' : 'Use a different email'} onPress={back} />
+                <TextLink label={resendIn > 0 ? t('code.resendIn', { seconds: resendIn }) : t('code.resend')} disabled={resendIn > 0 || resending} onPress={() => resend(channel)} />
+                {byPhone && elapsed >= SWITCH_AFTER_SECONDS && <TextLink label={t('code.switchChannel', { channel: CHANNEL_NAMES[otherChannel] })} disabled={resending} onPress={() => resend(otherChannel)} />}
+                <TextLink label={byPhone ? t('code.differentNumber') : t('code.differentEmail')} onPress={back} />
             </View>
         </>
     )

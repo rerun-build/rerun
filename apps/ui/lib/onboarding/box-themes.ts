@@ -171,15 +171,17 @@ export function boxIdeas(boxName: string | null | undefined, ideas: StoredIdea[]
     return ideas.filter(idea => !recruited.has(nameKey(idea.name)) && (!theme || THEME_LENSES[theme].includes(idea.lens)))
 }
 
-// The pill is one unbroken line across the Box.
+// The pill is one unbroken line across the Box, in whatever language it is written.
 const CTA_MAX_CHARS = 34
-const CTA_FALLBACK = 'Explore templates'
+
+// The `builder.isoBoard` catalog.
+export type BoxCtaCopy = (key: 'boxCta' | 'boxCtaFallback', values?: Record<string, string>) => string
 
 // What the pill of an empty Box says once hovered: what the click opens, in the Box's own name.
-export function boxCtaLabel(boxName: string | null | undefined): string {
+export function boxCtaLabel(boxName: string | null | undefined, t: BoxCtaCopy): string {
     const name = boxName?.trim()
-    const named = name ? `Explore ${name} templates` : CTA_FALLBACK
-    return named.length <= CTA_MAX_CHARS ? named : CTA_FALLBACK
+    const named = name ? t('boxCta', { name }) : null
+    return named && named.length <= CTA_MAX_CHARS ? named : t('boxCtaFallback')
 }
 
 const CTA_EXAMPLE_MAX_CHARS = 28
@@ -187,9 +189,9 @@ const MAX_CTA_EXAMPLES = 5
 
 // What the pill of an empty Box rolls through while nobody hovers it: the first titles the dialog
 // will open on, so the pill never promises a job the click does not show.
-export function boxCtaExamples(input: Parameters<typeof boxSuggestions>[0]): string[] {
+export function boxCtaExamples(input: Parameters<typeof boxSuggestions>[0], localize: (suggestion: AgentSuggestion) => AgentSuggestion = suggestion => suggestion): string[] {
     return boxSuggestions(input)
-        .map(suggestion => suggestion.title)
+        .map(suggestion => localize(suggestion).title)
         .filter(title => title.length <= CTA_EXAMPLE_MAX_CHARS)
         .slice(0, MAX_CTA_EXAMPLES)
 }

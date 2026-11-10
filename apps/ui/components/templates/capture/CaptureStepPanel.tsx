@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { ScrollFade } from '@rerun/ui/primitives'
 import { StepTransition } from '@rerun/ui/steps'
 import { Button } from '@/components/ui/button'
@@ -22,6 +23,7 @@ type CaptureStepPanelProps = {
 // differ between capturing into a fresh draft and capturing into a template that already exists, so
 // they are props rather than a second copy of this file.
 export function CaptureStepPanel({ flow, step, direction, onStepChange, onClose, cancelLabel, doneLabel }: CaptureStepPanelProps) {
+    const t = useTranslations('templates.capture.panel')
     const selectedCount = flow.selectedIds.length
 
     return (
@@ -50,7 +52,7 @@ export function CaptureStepPanel({ flow, step, direction, onStepChange, onClose,
                                 if (await flow.inspect()) onStepChange('review')
                             }}
                         >
-                            Inspect {selectedCount || ''} coworker{selectedCount === 1 ? '' : 's'}
+                            {t('inspect', { count: selectedCount })}
                         </Button>
                     </>
                 )}
@@ -59,11 +61,11 @@ export function CaptureStepPanel({ flow, step, direction, onStepChange, onClose,
                     <>
                         {!flow.allApproved && (
                             <p className="text-xs text-amber-500 sm:mr-auto sm:self-center">
-                                Review each agent to enable the capture ({flow.approvedCount}/{flow.plans.length})
+                                {t('reviewEach', { approved: flow.approvedCount, total: flow.plans.length })}
                             </p>
                         )}
                         <Button type="button" variant="ghost" onClick={() => onStepChange('select')}>
-                            Back
+                            {t('back')}
                         </Button>
                         <Button
                             type="button"
@@ -73,7 +75,7 @@ export function CaptureStepPanel({ flow, step, direction, onStepChange, onClose,
                                 if (await flow.capture()) onStepChange('done')
                             }}
                         >
-                            Capture
+                            {t('capture')}
                         </Button>
                     </>
                 )}

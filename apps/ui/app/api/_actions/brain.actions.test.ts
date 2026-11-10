@@ -68,6 +68,7 @@ describe('a workspace with a machine', () => {
         await expect(listWorkspaceTablesAction()).resolves.toEqual({
             success: false,
             error: 'This workspace runs on a machine that needs an engine update before it can host a shared database.',
+            code: 'sharedDbNeedsEngineUpdate',
         })
     })
 
@@ -83,7 +84,7 @@ describe('a workspace with a machine', () => {
         vi.mocked(engine.listDbTables).mockRejectedValue(new Error('fetch failed'))
         vi.mocked(engine.listFiles).mockRejectedValue(new Error('fetch failed'))
         await expect(loadBrainAction()).rejects.toThrow('fetch failed')
-        await expect(listWorkspaceTablesAction()).resolves.toEqual({ success: false, error: 'Could not reach the machine of this workspace.' })
+        await expect(listWorkspaceTablesAction()).resolves.toEqual({ success: false, error: 'Could not reach the machine of this workspace.', code: 'workspaceMachineUnreachable' })
         await expect(listWorkspaceFilesAction()).rejects.toThrow('fetch failed')
     })
 })

@@ -8,6 +8,7 @@ import { ExternalLinkIcon, LockIcon, X } from '../icons'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import type { SecretRequestItem } from '@rerun/contracts'
+import { useKitTranslations } from '../locale'
 
 export type { SecretRequestItem }
 
@@ -26,6 +27,7 @@ export type SecretRequestBlockProps = {
 }
 
 export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmit, onSkip, onDismiss, disabled, inline, className }: SecretRequestBlockProps) {
+    const t = useKitTranslations()
     const blankValues = Object.fromEntries(secrets.map(item => [item.key, '']))
     const form = useForm<Record<string, string>>({ defaultValues: blankValues })
     const values = form.watch()
@@ -54,7 +56,7 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
         } catch (err) {
             // The credentials were not stored, so the block has to stay answerable.
             busyRef.current = false
-            setError(err instanceof Error ? err.message : 'Could not save the credentials')
+            setError(err instanceof Error ? err.message : t('chat.secret.saveFailed'))
         } finally {
             setSaving(false)
         }
@@ -79,11 +81,11 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
             <div className="flex items-start gap-2.5">
                 <Icon size="sm" icon={LockIcon} className="bg-background text-foreground" />
                 <div className="min-w-0 flex-1 space-y-0.5">
-                    <p className="text-sm font-medium leading-snug">{secrets.length > 1 ? 'Credentials needed' : 'Credential needed'}</p>
+                    <p className="text-sm font-medium leading-snug">{secrets.length > 1 ? t('chat.secret.titleMany') : t('chat.secret.titleOne')}</p>
                     {reason && <p className="text-xs leading-snug text-muted-foreground">{reason}</p>}
                 </div>
                 {(onDismiss || onSkip) && (
-                    <Button size="icon-sm" variant="ghost" disabled={locked} onClick={dismiss} aria-label="Dismiss credential request" data-hitl="dismiss" className="-my-1 shrink-0 text-muted-foreground">
+                    <Button size="icon-sm" variant="ghost" disabled={locked} onClick={dismiss} aria-label={t('chat.secret.dismiss')} data-hitl="dismiss" className="-my-1 shrink-0 text-muted-foreground">
                         <X className="size-4" />
                     </Button>
                 )}
@@ -99,8 +101,8 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
                                     {...form.register(item.key)}
                                     type="password"
                                     label={item.label}
-                                    helperText={[item.help, `Stored as ${item.key}`].filter(Boolean).join(' · ')}
-                                    placeholder={alreadySet ? 'Already saved. Enter a value to replace it' : 'Paste the value'}
+                                    helperText={[item.help, t('chat.secret.storedAs', { key: item.key })].filter(Boolean).join(' · ')}
+                                    placeholder={alreadySet ? t('chat.secret.replacePlaceholder') : t('chat.secret.placeholder')}
                                     autoComplete="off"
                                     spellCheck={false}
                                     disabled={locked}
@@ -108,7 +110,7 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
                                 />
                                 {item.docsUrl && (
                                     <a href={item.docsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline">
-                                        Where to find it
+                                        {t('chat.secret.whereToFind')}
                                         <ExternalLinkIcon className="size-3" />
                                     </a>
                                 )}
@@ -121,15 +123,15 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
             {error && <p className="text-xs text-destructive">{error}</p>}
 
             <div className="flex items-center justify-between gap-3">
-                <p className="text-xs leading-snug text-muted-foreground/70">Stored on your engine as a coworker variable. Never sent to the model.</p>
+                <p className="text-xs leading-snug text-muted-foreground/70">{t('chat.secret.storageNote')}</p>
                 <div className="flex shrink-0 items-center gap-2">
                     {onSkip && (
                         <Button size="sm" variant="outline" disabled={locked} onClick={skip} data-hitl="skip">
-                            Skip
+                            {t('chat.secret.skip')}
                         </Button>
                     )}
                     <Button size="sm" disabled={locked || filled.length === 0} onClick={save} data-hitl="save">
-                        {saving ? 'Saving…' : 'Save'}
+                        {saving ? t('chat.secret.saving') : t('chat.secret.save')}
                     </Button>
                 </div>
             </div>

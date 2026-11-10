@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { attachServerManuallyAction, createPairingTokenAction, detachServerAction, getWorkspaceServerAction } from '@/app/api/_actions/servers.actions'
 import type { WorkspaceServer } from '@/app/api/_services/servers.service'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
@@ -12,6 +13,7 @@ import { SkeletonList } from '@/components/ui/skeleton'
 import { APP_URL } from '@/lib/app-url'
 import { Loader2Icon, ServerIcon } from '@/lib/icons'
 import { Badge, ScrollFade } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
@@ -34,28 +36,36 @@ function pairCommand(token: string, address: string): string {
     return lines.join('\n')
 }
 
+function serverDescription(server: WorkspaceServer, t: ReturnType<typeof useTranslations<'dialogs.servers'>>): string {
+    const { address, health } = server
+    if (!health.reachable) return t('unreachableSummary', { address })
+    if (health.commit) return t('runningSummaryWithCommit', { address, count: health.activeAgents, commit: health.commit.slice(0, 7) })
+    return t('runningSummary', { address, count: health.activeAgents })
+}
+
 function ServerRow({ server, onRemove }: { server: WorkspaceServer; onRemove: () => void }) {
+    const t = useTranslations('dialogs.servers')
     const meta = server.health.reachable ? (
         <Badge tone="green" size="xs" glow={false}>
-            Connected
+            {t('connected')}
         </Badge>
     ) : (
         <Badge tone="red" size="xs" glow={false}>
-            Unreachable
+            {t('unreachable')}
         </Badge>
     )
-    const description = server.health.reachable ? `${server.address} · ${server.health.activeAgents} coworkers running${server.health.commit ? ` · ${server.health.commit.slice(0, 7)}` : ''}` : `${server.address} · the app cannot reach it right now`
+    const description = serverDescription(server, t)
 
     return (
         <PanelRow
             leading={<ServerIcon className="size-4 shrink-0 text-muted-foreground" />}
-            title="This workspace's server"
+            title={t('thisWorkspace')}
             meta={meta}
             description={description}
             actions={
                 server.removable && (
                     <Button variant="outline" size="sm" onClick={onRemove}>
-                        Remove
+                        {t('remove')}
                     </Button>
                 )
             }
@@ -64,6 +74,8 @@ function ServerRow({ server, onRemove }: { server: WorkspaceServer; onRemove: ()
 }
 
 function Pairing({ onConnected }: { onConnected: () => void }) {
+    const t = useTranslations('dialogs.servers')
+    const errorText = useErrorText()
     const [token, setToken] = useState<string | null>(null)
     const [address, setAddress] = useState('')
     const [creating, setCreating] = useState(false)
@@ -76,7 +88,7 @@ function Pairing({ onConnected }: { onConnected: () => void }) {
         setCreating(true)
         const result = await createPairingTokenAction()
         setCreating(false)
-        if (!result.ok) return toast.error(result.error)
+        if (!result.ok) return toast.error(errorText(result))
         setToken(result.token)
     }
 
@@ -84,23 +96,23 @@ function Pairing({ onConnected }: { onConnected: () => void }) {
         setAttaching(true)
         const result = await attachServerManuallyAction({ url: manualUrl, apiKey: manualKey })
         setAttaching(false)
-        if (!result.ok) return toast.error(result.error)
+        if (!result.ok) return toast.error(errorText(result))
         onConnected()
     }
 
     if (manual) {
         return (
             <section className="min-w-0 space-y-3">
-                <SectionTitle>Enter a server by hand</SectionTitle>
-                <Input label="Address" placeholder="http://192.168.1.20:3000" value={manualUrl} onChange={e => setManualUrl(e.target.value)} />
-                <Input label="API key" placeholder="RERUN_API_KEY of the engine" value={manualKey} onChange={e => setManualKey(e.target.value)} type="password" />
+                <SectionTitle>{t('manualSection')}</SectionTitle>
+                <Input label={t('address')} placeholder="http://192.168.1.20:3000" value={manualUrl} onChange={e => setManualUrl(e.target.value)} />
+                <Input label={t('apiKey')} placeholder={t('apiKeyPlaceholder')} value={manualKey} onChange={e => setManualKey(e.target.value)} type="password" />
                 <div className="flex flex-wrap justify-end gap-2">
                     <Button variant="ghost" onClick={() => setManual(false)}>
-                        Back
+                        {t('back')}
                     </Button>
                     <Button onClick={attach} disabled={attaching || !manualUrl.trim() || !manualKey.trim()}>
                         {attaching && <Loader2Icon className="animate-spin" />}
-                        Connect
+                        {t('connect')}
                     </Button>
                 </div>
             </section>
@@ -109,30 +121,30 @@ function Pairing({ onConnected }: { onConnected: () => void }) {
 
     return (
         <section className="min-w-0 space-y-3">
-            <SectionTitle>Add a server</SectionTitle>
-            <p className="px-1 text-sm text-muted-foreground">Your coworkers run on a machine you own. Run this on it, with Docker installed. It connects by itself.</p>
+            <SectionTitle>{t('addSection')}</SectionTitle>
+            <p className="px-1 text-sm text-muted-foreground">{t('addIntro')}</p>
             {token ? (
                 <>
                     <Input
-                        label="Address the app reaches it at (optional)"
+                        label={t('publicAddress')}
                         placeholder="http://192.168.1.20:3000"
                         value={address}
                         onChange={e => setAddress(e.target.value)}
                     />
-                    <CopyBlock value={pairCommand(token, address)} label="Copy the command" />
+                    <CopyBlock value={pairCommand(token, address)} label={t('copyCommand')} />
                     <p className="flex items-center gap-2 px-1 text-xs text-muted-foreground">
                         <Loader2Icon className="size-3.5 animate-spin" />
-                        Waiting for the server. The command works once, for 15 minutes.
+                        {t('waiting')}
                     </p>
                 </>
             ) : (
                 <div className="flex flex-wrap justify-end gap-2">
                     <Button variant="ghost" onClick={() => setManual(true)}>
-                        Enter address and key
+                        {t('enterManually')}
                     </Button>
                     <Button onClick={create} disabled={creating}>
                         {creating && <Loader2Icon className="animate-spin" />}
-                        Add server
+                        {t('add')}
                     </Button>
                 </div>
             )}
@@ -141,6 +153,8 @@ function Pairing({ onConnected }: { onConnected: () => void }) {
 }
 
 export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('dialogs.servers')
+    const errorText = useErrorText()
     const [server, setServer] = useState<WorkspaceServer | null>(null)
     const [loading, setLoading] = useState(true)
     const [removing, setRemoving] = useState(false)
@@ -149,9 +163,9 @@ export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     const refresh = useCallback(async () => {
         const result = await getWorkspaceServerAction()
         setLoading(false)
-        if (!result.ok) return toast.error(result.error)
+        if (!result.ok) return toast.error(errorText(result))
         setServer(result.server)
-    }, [])
+    }, [errorText])
 
     useEffect(() => {
         if (!open) return
@@ -166,8 +180,8 @@ export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenCha
         const result = await detachServerAction()
         setRemoving(false)
         setConfirmRemove(false)
-        if (!result.ok) return toast.error(result.error)
-        toast.success('Server removed')
+        if (!result.ok) return toast.error(errorText(result))
+        toast.success(t('removed'))
         void refresh()
     }
 
@@ -180,8 +194,8 @@ export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenCha
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="flex flex-col sm:max-h-[85dvh] sm:max-w-lg sm:overflow-hidden">
                 <DialogHeader>
-                    <DialogTitle>Servers</DialogTitle>
-                    <p className="text-sm text-muted-foreground">The machine your coworkers run on. One per workspace.</p>
+                    <DialogTitle>{t('title')}</DialogTitle>
+                    <p className="text-sm text-muted-foreground">{t('description')}</p>
                 </DialogHeader>
                 <ScrollFade className="-mx-1 min-h-0 flex-1 px-1 py-1">
                     <div className="space-y-4">{body}</div>
@@ -189,9 +203,9 @@ export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenCha
                 <ConfirmDialog
                     open={confirmRemove}
                     onOpenChange={setConfirmRemove}
-                    title="Remove this server?"
-                    description="Your coworkers stop answering until a server is attached again. Everything they know stays on the machine: attach it again to get them back."
-                    confirmLabel="Remove"
+                    title={t('confirmRemove.title')}
+                    description={t('confirmRemove.description')}
+                    confirmLabel={t('confirmRemove.confirm')}
                     pending={removing}
                     onConfirm={event => {
                         event.preventDefault()

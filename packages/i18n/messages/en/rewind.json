@@ -1,0 +1,173 @@
+{
+    "_context": {
+        "viewer.fallbackAgentName": "Stands in for a coworker whose name is unknown, inside sentences like award cards.",
+        "weekPicker.new": "Badge on the newest week the user has not watched yet.",
+        "intro.headline": "Title of the first slide of the weekly recap story. \"rerun\" plays on the product name Rerun: the week replayed.",
+        "intro.clockedInOne": "Under the title: exactly one coworker worked this week.",
+        "intro.clockedInOther": "Under the title: {count} coworkers worked this week.",
+        "hours.units.hours": "Unit shown in big type right after an animated number of hours.",
+        "hours.units.minutes": "Unit shown in big type right after an animated number of minutes.",
+        "hours.workdays": "{days} can be a decimal (1.5). The <b> part is bold.",
+        "hours.vsLastWeek": "{change} is a signed percentage, like +12% or -8%.",
+        "rhythm.headline": "<value></value> is an animated number of runs. {day} is a weekday name, like Tuesday.",
+        "rhythm.finished": "Runs that ended well this week.",
+        "rhythm.errors": "Runs that failed and reported it to the user.",
+        "clock.eyebrow": "Small caps label above the slide showing activity at every hour of the week.",
+        "clock.headline": "<value></value> is an animated percentage, like 42%.",
+        "clock.hourMark": "Short label of an hour on a 24 hour axis, like 6h or 18h.",
+        "clock.less": "Left end of a heatmap legend going from less to more activity.",
+        "clock.more": "Right end of a heatmap legend going from less to more activity.",
+        "mvp.eyebrow": "The coworker who did the most work this week.",
+        "mvp.badge": "Most valuable player.",
+        "mvp.stats.runs": "Caption under a number of runs.",
+        "mvp.stats.share": "Caption under a percentage: the share of all the runs this coworker did.",
+        "mvp.stats.onTheClock": "Caption under a duration: how long this coworker worked.",
+        "mvp.goToMoves": "{tools} is a comma separated list of the coworker's most used tools.",
+        "mvp.inSpace": "{space} is the name of the space (a group of coworkers) the coworker belongs to.",
+        "connectors.eyebrow": "The apps the coworkers called the most.",
+        "connectors.headline": "{name} is an app, like Gmail.",
+        "connectors.calls": "<value></value> is an animated number of calls to the app.",
+        "awards.headline": "Title of the slide that hands out playful awards to coworkers.",
+        "memory.recalled": "{name} is the coworker who read this memory the most.",
+        "memory.headline": "<value></value> is an animated number of memories the coworkers wrote.",
+        "outro.eyebrow": "Small caps label of the last slide of the story.",
+        "outro.mvp": "Line at the bottom of the recap card. {name} is the coworker of the week.",
+        "outro.watchAgain": "Button that replays the story from the start.",
+        "outro.backToBoard": "Button that closes the story and goes back to the board of coworkers.",
+        "tools": "Short names of the tools a coworker used, shown in a list of its go-to moves."
+    },
+    "viewer": {
+        "label": "Your weekly Rewind",
+        "previous": "Previous",
+        "next": "Next",
+        "close": "Close",
+        "fallbackAgentName": "A coworker"
+    },
+    "weekPicker": {
+        "label": "Choose a week",
+        "new": "New"
+    },
+    "intro": {
+        "headline": "Your week,<br></br>rerun.",
+        "clockedInOne": "One coworker clocked in while you got on with everything else.",
+        "clockedInOther": "{count} coworkers clocked in while you got on with everything else."
+    },
+    "hours": {
+        "eyebrow": "Time on the clock",
+        "headline": "Your coworkers put in",
+        "units": {
+            "hours": "hours",
+            "minutes": "minutes"
+        },
+        "workdays": "That is about <b>{days, plural, one {# workday} other {# workdays}}</b> of focus, without a single coffee break.",
+        "vsLastWeek": "{change} vs last week"
+    },
+    "rhythm": {
+        "eyebrow": "The rhythm",
+        "headline": "{count, plural, one {<value></value> run.} other {<value></value> runs.}}<br></br>{day} was the big one.",
+        "finished": "{count, plural, other {# finished without a hitch}}",
+        "errors": "{count, plural, other {# hit a wall and told you about it.}}",
+        "noErrors": "Not a single run went wrong."
+    },
+    "clock": {
+        "eyebrow": "Round the clock",
+        "headline": "<value></value> of the work<br></br>happened while you were off.",
+        "subtitle": "Nights, early mornings and weekends included.",
+        "hourMark": "{hour}h",
+        "less": "Less",
+        "more": "More"
+    },
+    "mvp": {
+        "eyebrow": "Coworker of the week",
+        "badge": "MVP",
+        "stats": {
+            "runs": "runs",
+            "share": "of all work",
+            "onTheClock": "on the clock"
+        },
+        "goToMoves": "Go-to moves: {tools}.",
+        "inSpace": "in {space}"
+    },
+    "connectors": {
+        "eyebrow": "Top apps",
+        "headline": "{name} was<br></br>on heavy rotation.",
+        "calls": "{count, plural, one {<value></value> call} other {<value></value> calls}}",
+        "shareOfCalls": "Share of calls"
+    },
+    "highlights": {
+        "eyebrow": "Highlights",
+        "headline": "What got done."
+    },
+    "memory": {
+        "eyebrow": "Getting smarter",
+        "recalled": "Most recalled, {count, plural, one {# time} other {# times}} by {name}",
+        "headline": "{count, plural, one {<value></value> new thing learned about how you work.} other {<value></value> new things learned about how you work.}}",
+        "empty": "Your coworkers kept their notes close."
+    },
+    "awards": {
+        "eyebrow": "The awards",
+        "headline": "And the trophies go to…",
+        "night-owl": {
+            "title": "Night Owl",
+            "caption": "{count, plural, one {# run after dark} other {# runs after dark}}"
+        },
+        "marathon": {
+            "title": "Marathoner",
+            "caption": "{duration} in one go"
+        },
+        "flawless": {
+            "title": "Flawless",
+            "caption": "{count, plural, one {# run, zero errors} other {# runs, zero errors}}"
+        },
+        "toolsmith": {
+            "title": "Toolsmith",
+            "caption": "{count, plural, one {# tool call} other {# tool calls}}"
+        },
+        "connector-hub": {
+            "title": "Connector Hub",
+            "caption": "{count, plural, one {# app juggled} other {# apps juggled}}"
+        },
+        "team-player": {
+            "title": "Team Player",
+            "caption": "{count, plural, one {# handoff} other {# handoffs}}"
+        }
+    },
+    "outro": {
+        "eyebrow": "That's a wrap",
+        "stats": {
+            "runs": "runs",
+            "hoursWorked": "hours worked",
+            "minutesWorked": "minutes worked",
+            "toolCalls": "tool calls",
+            "appsUsed": "apps used"
+        },
+        "mvp": "MVP <b>{name}</b>",
+        "headline": "See you next Monday.",
+        "watchAgain": "Watch again",
+        "backToBoard": "Back to the board"
+    },
+    "tools": {
+        "web_search": "Web search",
+        "web_fetch": "Web reading",
+        "leads_people_search": "Finding people",
+        "leads_email_find": "Finding emails",
+        "leads_email_verify": "Verifying emails",
+        "leads_phone_find": "Finding phone numbers",
+        "google_serp": "Google results",
+        "google_maps_search": "Google Maps",
+        "paid_data": "Paid data",
+        "paid_data_catalog": "Reading the paid data catalog",
+        "browser_navigate": "Browsing",
+        "shell_exec": "Shell",
+        "fs_read": "Reading files",
+        "fs_write": "Writing files",
+        "fs_edit": "Editing files",
+        "memory_write": "Taking notes",
+        "memory_search": "Remembering",
+        "call_agent": "Calling coworkers",
+        "delegate_tasks": "Delegating",
+        "notify_user": "Pinging you",
+        "publish_file": "Publishing",
+        "download": "Downloading"
+    }
+}

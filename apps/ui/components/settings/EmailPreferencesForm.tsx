@@ -1,11 +1,13 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { updateNotificationPrefsAction, updateNotificationPrefsByTokenAction } from '@/app/api/_actions/notifications.actions'
 import { Field } from '@/components/ui/field'
 import { Icon } from '@/components/ui/icon'
 import { Switch } from '@/components/ui/switch'
-import { EMAIL_CATEGORIES, EMAIL_CATEGORY_DESCRIPTIONS, EMAIL_CATEGORY_LABELS, type EmailCategory, type EmailPrefs, type NotificationPrefsPatch } from '@/lib/notifications/prefs'
+import { EMAIL_CATEGORIES, type EmailCategory, type EmailPrefs, type NotificationPrefsPatch } from '@/lib/notifications/prefs'
 import { Check, CreditCard, Loader2, MailIcon, Package, type LucideIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -29,6 +31,9 @@ function SwitchRow({ icon, label, description, checked, onChange }: { icon: Luci
 type SaveState = 'idle' | 'saving' | 'saved'
 
 export function EmailPreferencesForm({ initialPrefs, token }: { initialPrefs: EmailPrefs; token?: string }) {
+    const t = useTranslations('notifications.emailPreferences')
+    const tCategories = useTranslations('notifications.settings.accountEmails')
+    const errorText = useErrorText()
     const form = useForm<EmailPrefs>({ defaultValues: initialPrefs })
     const prefs = form.watch()
     const [saveState, setSaveState] = useState<SaveState>('idle')
@@ -43,7 +48,7 @@ export function EmailPreferencesForm({ initialPrefs, token }: { initialPrefs: Em
             savedTimer.current = setTimeout(() => setSaveState('idle'), 2000)
         } else {
             setSaveState('idle')
-            toast.error('Could not save preferences', { description: res.error })
+            toast.error(t('saveFailed'), { description: errorText(res) })
         }
     }
 
@@ -60,14 +65,14 @@ export function EmailPreferencesForm({ initialPrefs, token }: { initialPrefs: Em
     return (
         <div className="flex flex-col gap-6">
             <section className="flex flex-col gap-1">
-                <h2 className="px-3 text-sm font-semibold text-foreground">Coworker notifications</h2>
-                <SwitchRow icon={MailIcon} label="Email" description="When a coworker needs you or breaks while you are away. One email per incident, never one per run." checked={prefs.email} onChange={toggleRunEmails} />
+                <h2 className="px-3 text-sm font-semibold text-foreground">{t('coworkerTitle')}</h2>
+                <SwitchRow icon={MailIcon} label={t('email.label')} description={t('email.description')} checked={prefs.email} onChange={toggleRunEmails} />
             </section>
 
             <section className="flex flex-col gap-1">
-                <h2 className="px-3 text-sm font-semibold text-foreground">Account emails</h2>
+                <h2 className="px-3 text-sm font-semibold text-foreground">{tCategories('title')}</h2>
                 {EMAIL_CATEGORIES.map(category => (
-                    <SwitchRow key={category} icon={CATEGORY_ICONS[category]} label={EMAIL_CATEGORY_LABELS[category]} description={EMAIL_CATEGORY_DESCRIPTIONS[category]} checked={prefs.categories[category]} onChange={v => toggleCategory(category, v)} />
+                    <SwitchRow key={category} icon={CATEGORY_ICONS[category]} label={tCategories(`${category}.label`)} description={tCategories(`${category}.description`)} checked={prefs.categories[category]} onChange={v => toggleCategory(category, v)} />
                 ))}
             </section>
 
@@ -75,13 +80,13 @@ export function EmailPreferencesForm({ initialPrefs, token }: { initialPrefs: Em
                 {saveState === 'saving' && (
                     <>
                         <Loader2 className="size-3.5 animate-spin" />
-                        <span>Saving…</span>
+                        <span>{t('saving')}</span>
                     </>
                 )}
                 {saveState === 'saved' && (
                     <>
                         <Check className="size-3.5 text-emerald-400" />
-                        <span>All changes saved</span>
+                        <span>{t('saved')}</span>
                     </>
                 )}
             </div>

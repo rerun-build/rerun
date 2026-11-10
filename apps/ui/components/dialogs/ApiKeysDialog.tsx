@@ -1,7 +1,8 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { createApiKeyAction, listApiKeysAction, revokeApiKeyAction, type ApiKeyView } from '@/app/api/_actions/api-keys.actions'
-import { API_KEYS_ADMIN_ONLY, ApiKeyList } from '@/components/dialogs/ApiKeyList'
+import { ApiKeyList } from '@/components/dialogs/ApiKeyList'
 import { CreatedApiKey } from '@/components/dialogs/CreatedApiKey'
 import { McpSnippets } from '@/components/dialogs/McpSnippets'
 import { RevokeApiKeyDialog } from '@/components/dialogs/RevokeApiKeyDialog'
@@ -15,6 +16,7 @@ import { Loader2Icon } from '@/lib/icons'
 import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 import { track } from '@rerun/analytics/client'
 import { ScrollFade } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
@@ -28,6 +30,8 @@ function SectionTitle({ children, action }: { children: string; action?: ReactNo
 }
 
 export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('dialogs.apiKeys')
+    const errorText = useErrorText()
     const [keys, setKeys] = useState<ApiKeyView[]>([])
     const [mcpUrl, setMcpUrl] = useState('')
     const [loading, setLoading] = useState(true)
@@ -36,19 +40,19 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     const [busy, setBusy] = useState(false)
     const [createdKey, setCreatedKey] = useState<string | null>(null)
     const [revoking, setRevoking] = useState<ApiKeyView | null>(null)
-    const adminReason = useIsWorkspaceAdmin() ? undefined : API_KEYS_ADMIN_ONLY
+    const adminReason = useIsWorkspaceAdmin() ? undefined : t('adminOnly')
 
     const refresh = useCallback(async () => {
         const result = await listApiKeysAction()
         if (!result.ok) {
-            toast.error(result.error)
+            toast.error(errorText(result))
             setLoading(false)
             return
         }
         setKeys(result.keys)
         setMcpUrl(result.mcpUrl)
         setLoading(false)
-    }, [])
+    }, [errorText])
 
     useEffect(() => {
         if (!open) return
@@ -69,7 +73,7 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
         const result = await createApiKeyAction(name)
         setCreating(false)
         if (!result.ok) {
-            toast.error(result.error)
+            toast.error(errorText(result))
             return
         }
         track('api_key_created', {})
@@ -86,8 +90,8 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
         setBusy(true)
         const result = await revokeApiKeyAction(key.id)
         setBusy(false)
-        if (!result.ok) return toast.error(result.error)
-        toast.success(`${key.name} revoked`)
+        if (!result.ok) return toast.error(errorText(result))
+        toast.success(t('revoked', { name: key.name }))
         setRevoking(null)
         refresh()
     }
@@ -99,8 +103,8 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
                 against the cookie bar inset, and overriding that would push it off screen. */}
             <DialogContent className="flex flex-col sm:max-h-[85dvh] sm:max-w-lg sm:overflow-hidden">
                 <DialogHeader>
-                    <DialogTitle>API keys</DialogTitle>
-                    <p className="text-sm text-muted-foreground">Connect Claude Code or any MCP client to this workspace.</p>
+                    <DialogTitle>{t('title')}</DialogTitle>
+                    <p className="text-sm text-muted-foreground">{t('description')}</p>
                 </DialogHeader>
 
                 <ScrollFade className="-mx-1 min-h-0 flex-1 px-1 py-1">
@@ -110,19 +114,19 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
                         ) : (
                             <>
                                 <section className="min-w-0 space-y-2">
-                                    <SectionTitle>Connect a client</SectionTitle>
+                                    <SectionTitle>{t('connectSection')}</SectionTitle>
                                     {/* The fresh key takes the snippets' place rather than sitting under the fold:
                                         it is the one thing on screen that cannot be recovered by reopening the dialog. */}
                                     {createdKey ? <CreatedApiKey value={createdKey} mcpUrl={mcpUrl} onDismiss={() => setCreatedKey(null)} /> : <McpSnippets mcpUrl={mcpUrl} />}
                                 </section>
 
                                 <section className="min-w-0 space-y-2">
-                                    <SectionTitle action={<DocsLink path="/api/authentication">API keys</DocsLink>}>Keys</SectionTitle>
+                                    <SectionTitle action={<DocsLink path="/api/authentication">{t('docsLink')}</DocsLink>}>{t('keysSection')}</SectionTitle>
                                     <ApiKeyList keys={keys} busy={busy} disabledReason={adminReason} onRevoke={setRevoking} />
 
                                     <Input
-                                        label="New key name"
-                                        placeholder="Claude Code, MacBook"
+                                        label={t('newKeyName')}
+                                        placeholder={t('newKeyPlaceholder')}
                                         value={draft}
                                         onChange={e => setDraft(e.target.value)}
                                         onKeyDown={e => {
@@ -136,7 +140,7 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
                                         <TooltipDisabledReason reason={adminReason}>
                                             <Button onClick={create} disabled={!draft.trim() || creating || !!adminReason}>
                                                 {creating && <Loader2Icon className="animate-spin" />}
-                                                Create key
+                                                {t('create')}
                                             </Button>
                                         </TooltipDisabledReason>
                                     </div>

@@ -1,4 +1,5 @@
 import { getMe, login, type LinkupLoginResult } from '@/lib/apps/linkup/client'
+import type { ErrorCode, ErrorParams } from '@/lib/i18n/action-error'
 
 // How a LinkedIn account is signed in at Linkup, and what it is known by once it is.
 
@@ -22,7 +23,7 @@ export async function linkedinProfile(accountId: string): Promise<{ label: strin
 
 export const LINKEDIN_WEBHOOK_EVENTS = ['message_received', 'accepted_invitation', 'invitation_received'] as const
 
-export function linkedinSignInRefusal(message: string): string {
-    if (/username|password|credential/i.test(message)) return 'Wrong email or password. Check them on linkedin.com, then try again.'
-    return `LinkedIn refused the sign-in: ${message}`
+export function linkedinSignInRefusal(message: string): { code: ErrorCode; params?: ErrorParams } {
+    if (/username|password|credential/i.test(message)) return { code: 'linkedinWrongCredentials' }
+    return { code: 'linkedinSignInRefused', params: { message } }
 }

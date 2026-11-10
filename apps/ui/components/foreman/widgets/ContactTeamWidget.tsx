@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Button } from '@/components/ui/button'
 import { PANEL_CARD } from '@/components/ui/panel-row'
 import { realEmail } from '@/lib/auth/placeholder-email'
@@ -20,16 +22,17 @@ type ContactTeamWidgetProps = {
     onAnswer: (result: ContactTeamResult) => void
 }
 
-function readSummary(input: unknown): string {
+function readSummary(input: unknown): string | null {
     const summary = input && typeof input === 'object' ? (input as { summary?: unknown }).summary : undefined
-    return typeof summary === 'string' && summary.trim() ? summary.trim() : 'I am stuck while setting up my first coworker and need a hand.'
+    return typeof summary === 'string' && summary.trim() ? summary.trim() : null
 }
 
 export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidgetProps) {
+    const t = useTranslations('foreman.contact')
     const { session, workspace } = useSession()
     const email = session?.user?.email
     const replyAddress = realEmail(email)
-    const summary = readSummary(input)
+    const summary = readSummary(input) ?? t('defaultSummary')
     const send = () => sendToCrisp({ email, workspaceId: workspace?.id, text: summary })
 
     if ((output as { sent?: unknown } | undefined)?.sent === true) {
@@ -38,10 +41,10 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
                 className="mb-2"
                 icon={CircleCheckIcon}
                 tone="text-emerald-500"
-                text={replyAddress ? `Sent to the Rerun team. They answer in the chat and at ${replyAddress}.` : 'Sent to the Rerun team. They answer in the chat.'}
+                text={replyAddress ? t('sentWithEmail', { email: replyAddress }) : t('sent')}
                 action={
                     <Button variant="ghost" size="sm" onClick={() => openCrisp(email)}>
-                        Open the chat
+                        {t('openChat')}
                     </Button>
                 }
             />
@@ -54,10 +57,10 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
             <ForemanOutcomeRow
                 className="mb-2"
                 icon={LifeBuoyIcon}
-                text="Still stuck? Someone from the team can help."
+                text={t('stillStuck')}
                 action={
                     <Button variant="secondary" size="sm" onClick={send}>
-                        Send to the team
+                        {t('send')}
                     </Button>
                 }
             />
@@ -67,13 +70,13 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
     return (
         <div className={cn('mb-2 flex flex-col gap-3 p-4', PANEL_CARD)}>
             <div className="flex flex-col gap-0.5">
-                <p className="text-sm font-medium">Talk to someone at Rerun</p>
-                <p className="text-xs text-muted-foreground">This goes to the team with your account, and they answer you in the chat.</p>
+                <p className="text-sm font-medium">{t('title')}</p>
+                <p className="text-xs text-muted-foreground">{t('description')}</p>
             </div>
             <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground">{summary}</blockquote>
             <div className="flex items-center justify-end gap-2">
                 <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => onAnswer({ answered: false })}>
-                    Not now
+                    {t('notNow')}
                 </Button>
                 <Button
                     size="sm"
@@ -82,7 +85,7 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
                         onAnswer({ sent: true })
                     }}
                 >
-                    Send to the team
+                    {t('send')}
                 </Button>
             </div>
         </div>

@@ -1,4 +1,7 @@
 import { CUSTOM_PRESETS, type CustomPreset, type CustomProbeResult } from '@rerun/contracts'
+import type { useTranslations } from 'next-intl'
+
+type ConnectionsT = ReturnType<typeof useTranslations<'connections'>>
 
 // A server like Together lists hundreds of models: switching them all on would flood every model
 // picker. The rest stay one click away in the connection's hidden list.
@@ -19,18 +22,19 @@ function hostOf(baseUrl: string): string {
 }
 
 // What the form says under the button when the endpoint did not take the connection. Null when it did.
-export function probeProblemMessage(result: CustomProbeResult, model: string | undefined, cloud: boolean): string | null {
+export function probeProblemMessage(t: ConnectionsT, result: CustomProbeResult, model: string | undefined, cloud: boolean): string | null {
     switch (result.problem) {
         case null:
             return null
         case 'unreachable':
-            return cloud ? `Could not reach ${hostOf(result.baseUrl)}. It has to be a public address that answers.` : `Could not reach ${hostOf(result.baseUrl)}. Check the server is running and reachable from the engine.`
+            return t(cloud ? 'custom.probe.unreachableCloud' : 'custom.probe.unreachableLocal', { host: hostOf(result.baseUrl) })
         case 'unauthorized':
-            return 'The server turned this key down. Check it was copied in full.'
+            return t('custom.probe.unauthorized')
         case 'not_listed':
-            return 'This server does not list its models. Type the id of the one to run.'
+            return t('custom.probe.notListed')
         case 'model_refused':
-            return `The server refused ${model ?? 'this model'}${result.detail ? `: ${result.detail}` : '.'}`
+            if (model) return result.detail ? t('custom.probe.refused', { model, detail: result.detail }) : t('custom.probe.refusedPlain', { model })
+            return result.detail ? t('custom.probe.refusedUnnamedDetail', { detail: result.detail }) : t('custom.probe.refusedUnnamed')
     }
 }
 

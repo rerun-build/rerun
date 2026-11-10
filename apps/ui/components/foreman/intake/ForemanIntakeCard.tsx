@@ -2,6 +2,7 @@
 
 import { StepDots } from '@rerun/ui/chat'
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
@@ -35,6 +36,7 @@ const STEP_MOTION = {
 // `autoFocus` n'est faux que dans le labo, où deux cartes cohabitent sur une page : elles se
 // disputeraient le focus, et la seconde ferait défiler la page jusqu'à elle au chargement.
 export function ForemanIntakeCard({ intake, autoFocus = true, className }: { intake: ForemanIntakeController; autoFocus?: boolean; className?: string }) {
+    const t = useTranslations('foreman.intake')
     const { step, draft, index, steps, answered, reachable, canAdvance, submitting, error, industry, siteRead, set, chooseIndustry, chooseRole, skipWebsite, goTo, next } = intake
     // Seule la sauvegarde verrouille la carte. La classification de l'industrie, elle, tourne
     // pendant qu'on répond à la question suivante : la seule chose qu'elle décide est ce que le
@@ -54,8 +56,8 @@ export function ForemanIntakeCard({ intake, autoFocus = true, className }: { int
                     <motion.div key={step} {...STEP_MOTION}>
                         {step === 'company' && <IntakeCompanyStep draft={draft} siteRead={siteRead} disabled={busy} autoFocus={autoFocus} onChange={set} onEnter={next} />}
                         {step === 'industry' && <IntakeIndustryStep draft={draft} disabled={busy} onChange={set} onChoose={chooseIndustry} onEnter={next} />}
-                        {step === 'role' && <IntakeChoiceStep label="Your role" options={rolesForIndustry(industry)} value={draft.position} placeholder="Head of Growth" disabled={busy} onChange={position => set({ position })} onChoose={chooseRole} onEnter={next} />}
-                        {step === 'name' && <IntakeTextStep label="First name" value={draft.firstName} placeholder="John" disabled={busy} onChange={firstName => set({ firstName })} onEnter={next} />}
+                        {step === 'role' && <IntakeChoiceStep label={t('role.label')} options={rolesForIndustry(industry)} value={draft.position} placeholder={t('role.placeholder')} disabled={busy} onChange={position => set({ position })} onChoose={chooseRole} onEnter={next} />}
+                        {step === 'name' && <IntakeTextStep label={t('name.label')} value={draft.firstName} placeholder={t('name.placeholder')} disabled={busy} onChange={firstName => set({ firstName })} onEnter={next} />}
                     </motion.div>
                 </AnimatePresence>
             </AnimatedHeight>
@@ -66,12 +68,12 @@ export function ForemanIntakeCard({ intake, autoFocus = true, className }: { int
                 <StepDots count={steps.length} current={index} answered={answered} reachable={reachable} onSelect={goTo} disabled={busy} />
                 {skippable ? (
                     <Button size="sm" disabled={busy} onClick={skipWebsite} data-intake="skip" className="max-sm:h-9 max-sm:px-3 max-sm:text-sm">
-                        Skip
+                        {t('skip')}
                     </Button>
                 ) : (
-                    <TooltipDisabledReason reason={!busy && !canAdvance ? 'Answer this step to continue' : undefined}>
+                    <TooltipDisabledReason reason={!busy && !canAdvance ? t('answerToContinue') : undefined}>
                         <Button size="sm" disabled={busy || !canAdvance} onClick={next} data-intake="next" className="max-sm:h-9 max-sm:px-3 max-sm:text-sm">
-                            Next
+                            {t('next')}
                             <ArrowRight data-icon="inline-end" className="size-4" />
                         </Button>
                     </TooltipDisabledReason>

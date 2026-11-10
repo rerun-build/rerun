@@ -3,6 +3,7 @@
 import { AnimatePresence } from 'motion/react'
 import { useCallback, useState, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslations } from 'next-intl'
 
 import type { TakeoverRequestState } from '@/components/chat/TakeoverAsk'
 import { DesktopScreenLoader } from '@/components/desktop/DesktopScreenLoader'
@@ -44,6 +45,7 @@ export function ChatScreen({ agentId, active, takeoverAsk, onTakeoverDone, onTak
 type ScreenBlockProps = Pick<ChatScreenProps, 'agentId' | 'site' | 'scroller' | 'floatingHost' | 'arriveRef' | 'fallback'> & { takeover: TakeoverRequestState | undefined }
 
 function ScreenBlock({ agentId, site, takeover, scroller, floatingHost, arriveRef, fallback }: ScreenBlockProps) {
+    const t = useTranslations('chat.screen')
     const { screen, onDisconnect } = useAgentScreen(agentId)
     const openDesktop = useDesktopStore(s => s.openDesktop)
     const driving = useDesktopStore(s => s.agentId === agentId)
@@ -78,7 +80,7 @@ function ScreenBlock({ agentId, site, takeover, scroller, floatingHost, arriveRe
                 createPortal(
                     <AnimatePresence>
                         {!cardSeen && !driving && (
-                            <FloatingScreen key="mini" className="top-1" takeControlLabel={takeover ? 'Open browser' : 'Take control'} onTakeControl={takeControl}>
+                            <FloatingScreen key="mini" className="top-1" takeControlLabel={takeover ? t('openBrowser') : t('takeControl')} onTakeControl={takeControl}>
                                 <ScreenFace status={screen.status}>{canvas ? <ScreenMirror source={canvas} /> : <DesktopScreenLoader compact className="bg-muted/40" />}</ScreenFace>
                             </FloatingScreen>
                         )}

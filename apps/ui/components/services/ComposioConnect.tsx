@@ -8,6 +8,7 @@ import { useOAuthPopupResult } from '@/hooks/useOAuthPopupResult'
 import { usePopupClosePoll } from '@/hooks/usePopupClosePoll'
 import { CheckCircle2Icon, ExternalLinkIcon, Loader2Icon, ShieldCheck, XCircleIcon } from '@/lib/icons'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 const RESULT_TYPES = ['composio-oauth-success', 'composio-oauth-error'] as const
 
@@ -28,6 +29,7 @@ type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 // the connected account server-side, and here we only drive the popup and react to its result
 // over a same-origin BroadcastChannel (survives COOP-severed openers).
 export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, autoStart, pendingPopup }: ComposioConnectProps) {
+    const t = useTranslations('services.connect')
     const [state, setState] = useState<ConnectState>('idle')
     const [accountLabel, setAccountLabel] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
@@ -39,7 +41,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
             setState('authorized')
             onAuthorized(data.accountLabel)
         } else {
-            setError(data.error || 'Authorization failed')
+            setError(data.error || t('authorizationFailed'))
             setState('error')
         }
         popupRef.current?.close()
@@ -58,7 +60,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
                 body: JSON.stringify({ agentId, key: instanceKey }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to start the connection')
+            if (!res.ok) throw new Error(data.error || t('startFailed'))
 
             const w = 500
             const h = 640
@@ -68,7 +70,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
             watchPopup(popupRef.current)
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : 'Failed to start the connection')
+            setError(err instanceof Error ? err.message : t('startFailed'))
             setState('error')
         }
     }
@@ -85,7 +87,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
         return (
             <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 py-1">
                 <CheckCircle2Icon className="size-3.5" />
-                <span>{accountLabel ? `Connected as ${accountLabel}` : 'Connected'}</span>
+                <span>{accountLabel ? t('connectedAs', { account: accountLabel }) : t('connected')}</span>
             </div>
         )
     }
@@ -98,7 +100,7 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
                     <span className="truncate">{error}</span>
                 </div>
                 <Button variant="outline" size="sm" onClick={startAuth}>
-                    Retry
+                    {t('retry')}
                 </Button>
             </div>
         )
@@ -108,12 +110,12 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
         <div className="space-y-2">
             <Alert variant="warning" stripes className="grid-cols-[auto_1fr] gap-x-3 gap-y-0">
                 <Icon icon={ShieldCheck} size="sm" className="row-span-2 self-center" />
-                <AlertTitle className="col-start-2 leading-tight">Secure connection</AlertTitle>
-                <AlertDescription className="col-start-2 leading-snug">This connection is handled by one of our trusted partners.</AlertDescription>
+                <AlertTitle className="col-start-2 leading-tight">{t('secureTitle')}</AlertTitle>
+                <AlertDescription className="col-start-2 leading-snug">{t('secureBody')}</AlertDescription>
             </Alert>
             <Button variant="outline" size="sm" onClick={startAuth} disabled={state === 'authorizing'} className="w-full">
                 {state === 'authorizing' ? <Loader2Icon className="size-3.5 animate-spin mr-1.5" /> : <ExternalLinkIcon className="size-3.5 mr-1.5" />}
-                {state === 'authorizing' ? `Waiting for authorization…` : 'Connect'}
+                {state === 'authorizing' ? t('waiting') : t('connect')}
             </Button>
         </div>
     )

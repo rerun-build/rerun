@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { AddProviderPage } from '@/components/connections/AddProviderPage'
 import { AddCustomProviderPage } from '@/components/connections/custom/AddCustomProviderPage'
 import { ConnectionDetail } from '@/components/connections/ConnectionDetail'
@@ -21,8 +22,7 @@ import {
     PLAN_LABELS,
     connectMethod,
     planProviders,
-    PROVIDER_PITCH,
-    creditResetPhrase,
+    providerPitch,
     effectiveDefault,
     isCreditExhausted,
     isRerunPaused,
@@ -44,12 +44,13 @@ import { cn } from '@/lib/utils'
 import { RERUN_CONNECTION_ID } from '@rerun/contracts'
 import { BorderBeam } from '@rerun/ui'
 import { Stripes } from '@rerun/ui/primitives'
+import { shortDate } from '@rerun/i18n/format'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type ComponentProps, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
 const BRAND_STRIPES = 'color-mix(in oklab, var(--color-brand) 6%, transparent)'
 const ORANGE_STRIPES = 'color-mix(in oklab, var(--color-orange-500) 6%, transparent)'
-export const AI_PROVIDERS_ADMIN_ONLY = 'Only an admin can change the AI providers'
 
 type ConnectionsPage = { kind: 'list' } | { kind: 'add'; provider: AddableProvider } | { kind: 'detail'; connectionId: string; reconnect?: boolean }
 
@@ -72,11 +73,13 @@ export function AiProvidersPanel({
     initialAddProvider?: AddableProvider | null
     onInitialAddProviderConsumed?: () => void
 }) {
+    const t = useTranslations('connections')
+    const errorText = useErrorText()
     const { connections, boxDefault, opencodeOffered, customOffered, loading, create, update, updateKeys, remove, setDefault } = useWorkspaceConnections({ revalidate: true })
     const credit = useRerunCredit()
     const needsPlan = useNeedsPlanToConnect()
     const workspaceAdmin = useIsWorkspaceAdmin()
-    const readOnlyReason = workspaceAdmin ? undefined : AI_PROVIDERS_ADMIN_ONLY
+    const readOnlyReason = workspaceAdmin ? undefined : t('panel.adminOnly')
     const [page, setPage] = useState<ConnectionsPage>({ kind: 'list' })
 
     useEffect(() => {
@@ -110,7 +113,7 @@ export function AiProvidersPanel({
 
     const pickDefault = (pick: BoxDefault) =>
         void setDefault(pick).then(result => {
-            if (!result.success) toast.error(result.error ?? 'Failed to change the default model')
+            if (!result.success) toast.error(errorText(result, t('errors.defaultFailed')))
         })
 
     const byKind = (kind: SourceKind) => connections.filter(c => sourceKind(c.provider) === kind)
@@ -139,11 +142,11 @@ export function AiProvidersPanel({
                 <ConnectionsSkeleton />
             ) : (
                 <PanelScroller className="space-y-6 p-4">
-                    <Group title="Default model">
+                    <Group title={t('panel.groups.default')}>
                         <DefaultRow connections={connections} current={current} credit={credit} onPick={pickDefault} onFix={open} readOnlyReason={readOnlyReason} />
                     </Group>
 
-                    <Group title="Included">
+                    <Group title={t('panel.groups.included')}>
                         {byKind('included').map(source => (
                             <SourceRow key={source.id} source={source} credit={credit} onClick={() => open(source.id)}>
                                 <CreditMeter percent={credit.percent} className="mt-1.5 max-w-56" />
@@ -152,7 +155,7 @@ export function AiProvidersPanel({
                     </Group>
 
                     <SourceGroup
-                        title="Your subscriptions"
+                        title={t('panel.groups.plans')}
                         only="plan"
                         sources={byKind('plan')}
                         credit={credit}
@@ -160,12 +163,12 @@ export function AiProvidersPanel({
                         onOpen={open}
                         onAdd={needsPlan ? undefined : add}
                         addDisabledReason={readOnlyReason}
-                        pitch={opencodeOffered ? 'Already use Claude Code, Codex or OpenCode? Your coworkers can run on your plan.' : 'Already use Claude Code or Codex? Your coworkers can run on your plan.'}
+                        pitch={opencodeOffered ? t('panel.pitch.plansWithOpencode') : t('panel.pitch.plans')}
                         providers={planProviders(opencodeOffered)}
                     />
 
                     <SourceGroup
-                        title="Your API keys"
+                        title={t('panel.groups.keys')}
                         only="key"
                         sources={byKind('key')}
                         credit={credit}
@@ -173,12 +176,12 @@ export function AiProvidersPanel({
                         onOpen={open}
                         onAdd={needsPlan ? undefined : add}
                         addDisabledReason={readOnlyReason}
-                        pitch={customOffered ? 'Pay your provider directly, per token, or run your own model.' : 'Pay your provider directly, per token.'}
+                        pitch={customOffered ? t('panel.pitch.keysWithCustom') : t('panel.pitch.keys')}
                         providers={keyProviders(customOffered)}
                     />
 
                     {needsPlan && (
-                        <Group title="Your subscriptions and API keys">
+                        <Group title={t('panel.groups.noPlan')}>
                             <NoPlanNotice />
                         </Group>
                     )}
@@ -210,6 +213,8 @@ type DefaultRowProps = {
 }
 
 function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReason }: DefaultRowProps) {
+    const t = useTranslations('connections')
+    const locale = useLocale()
     const source = connections.find(c => c.id === current.connectionId)
     const broken = source && !isUsable(source, credit)
     const creditGone = source && isCreditExhausted(source, credit)
@@ -217,12 +222,16 @@ function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReaso
     const canChange = connections.some(c => isUsable(c, credit))
 
     const description = !broken
-        ? `Via ${source?.name ?? 'Rerun'}. Coworkers with no model of their own run on it.`
+        ? t('panel.default.via', { source: source?.name ?? 'Rerun' })
         : creditPaused
-          ? `Rerun credits are paused, so coworkers with no model of their own are paused too. ${canChange ? 'Pick another model' : 'Add a plan or an API key'} to keep them going.`
+          ? canChange
+              ? t('panel.default.pausedPick')
+              : t('panel.default.pausedAdd')
           : creditGone
-          ? `Rerun credits are used up until they are back ${creditResetPhrase(credit)}, so coworkers with no model of their own are paused. ${canChange ? 'Pick another model' : 'Add a plan or an API key'} to keep them going.`
-          : `Coworkers with no model of their own are stopped. Fix ${source.name} or pick another model.`
+            ? credit.resetAt
+                ? t(canChange ? 'panel.default.usedUpOnPick' : 'panel.default.usedUpOnAdd', { date: shortDate(credit.resetAt, locale) })
+                : t(canChange ? 'panel.default.usedUpNextMonthPick' : 'panel.default.usedUpNextMonthAdd')
+            : t('panel.default.stopped', { source: source.name })
 
     return (
         <div className="relative overflow-hidden rounded-md">
@@ -237,14 +246,14 @@ function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReaso
                         {broken && !creditGone && (
                             <TooltipDisabledReason reason={readOnlyReason}>
                                 <Button size="xs" variant="outline" disabled={!!readOnlyReason} onClick={() => onFix(source.id)}>
-                                    {connectMethod(source.provider) === 'key' ? 'Add key' : 'Sign in again'}
+                                    {connectMethod(source.provider) === 'key' ? t('addProvider.addKey') : t('status.signInAgain')}
                                 </Button>
                             </TooltipDisabledReason>
                         )}
-                        <TooltipDisabledReason reason={readOnlyReason ?? (canChange ? undefined : 'No other model is ready. Add a plan or an API key first.')}>
+                        <TooltipDisabledReason reason={readOnlyReason ?? (canChange ? undefined : t('panel.default.noOtherModel'))}>
                             <DefaultModelPicker connections={connections} current={current} credit={credit} onPick={onPick}>
                                 <Button size="xs" variant={broken && canChange ? 'default' : 'outline'} disabled={!canChange || !!readOnlyReason}>
-                                    Change
+                                    {t('panel.default.change')}
                                     <ChevronDownIcon className="size-3" />
                                 </Button>
                             </DefaultModelPicker>
@@ -273,10 +282,11 @@ type SourceGroupProps = {
 }
 
 export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd, addDisabledReason, pitch, providers }: SourceGroupProps) {
+    const t = useTranslations('connections')
     if (!onAdd && sources.length === 0) return null
 
     // The pitch already offers every provider, so the header's Add only shows once the group has entries.
-    const addLabel = only === 'plan' ? 'Add subscription' : 'Add API key'
+    const addLabel = only === 'plan' ? t('panel.addSubscription') : t('panel.addApiKey')
     const addMenu =
         onAdd && sources.length > 0 ? (
             addDisabledReason ? (
@@ -296,7 +306,7 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
                 const tightest = source.connected ? tightestPlanWindow(livePlanWindows(source)) : null
                 return (
                     <SourceRow key={source.id} source={source} credit={credit} onClick={() => onOpen(source.id)}>
-                        {tightest && <PlanLimitMeter percent={tightest.usedPercent} label={`${planWindowName(tightest, source.provider)} limit used`} className="mt-1.5 max-w-56" />}
+                        {tightest && <PlanLimitMeter percent={tightest.usedPercent} label={t('meter.planLimit', { name: planWindowName(tightest, t, source.provider) })} className="mt-1.5 max-w-56" />}
                     </SourceRow>
                 )
             })}
@@ -307,7 +317,7 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
                         <TooltipDisabledReason key={provider} reason={addDisabledReason}>
                             <Button variant="outline" disabled={!!addDisabledReason} onClick={() => onAdd(provider)}>
                                 <ProviderIcon provider={provider} className="size-4" />
-                                {only === 'plan' ? PLAN_LABELS[provider] : PROVIDER_PITCH[provider].title}
+                                {only === 'plan' ? PLAN_LABELS[provider] : providerPitch(provider, t).title}
                             </Button>
                         </TooltipDisabledReason>
                     ))}
@@ -318,12 +328,14 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
 }
 
 function SourceRow({ source, credit, onClick, children }: { source: BoxConnection; credit: RerunCredit; onClick: () => void; children?: ReactNode }) {
+    const t = useTranslations('connections')
+    const locale = useLocale()
     return (
         <PanelRow
             onClick={onClick}
             leading={<SourceAvatar provider={source.provider} />}
             title={source.name}
-            description={sourceSummary(source, credit)}
+            description={sourceSummary(source, credit, t, locale)}
             actions={
                 <>
                     <SourceStatus source={source} credit={credit} />

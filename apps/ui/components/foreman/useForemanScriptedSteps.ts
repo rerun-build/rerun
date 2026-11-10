@@ -1,6 +1,8 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import type { ChatStatus, UIMessage } from 'ai'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 
 import { startLeadInstall } from '@/components/foreman/ForemanNextSteps'
@@ -66,6 +68,15 @@ function checkoutAwaitingBuild(messages: UIMessage[]): boolean {
 
 export function useForemanScriptedSteps({ messages, status, guided, restoreDone, send }: { messages: UIMessage[]; status: ChatStatus; guided: boolean; restoreDone: boolean; send: (text: string) => boolean }) {
     const { workspace } = useSession()
+    const t = useTranslations('foreman.nextSteps')
+    const installFailedText = t('installFailed')
+    const installFailedRef = useRef(installFailedText)
+    const errorText = useErrorText()
+    const errorTextRef = useRef(errorText)
+    useEffect(() => {
+        installFailedRef.current = installFailedText
+        errorTextRef.current = errorText
+    })
 
     // Seeded once the transcript is back, so a build already on screen from a previous visit does
     // not move the camera on every reload.
@@ -108,7 +119,7 @@ export function useForemanScriptedSteps({ messages, status, guided, restoreDone,
         void settleBuiltFunnel().then(next => {
             const lead = freshLead.current
             freshLead.current = null
-            if (next === 'skipped' && lead) void startLeadInstall(lead)
+            if (next === 'skipped' && lead) void startLeadInstall(lead, installFailedRef.current, errorTextRef.current)
         })
     }, [finished])
 

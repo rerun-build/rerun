@@ -1,0 +1,136 @@
+{
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "What is your company website?",
+                "description": "We read it to learn what you sell and who you sell to."
+            },
+            "industry": {
+                "title": "What line of work are you in?",
+                "description": "It decides which teams we draw on your board."
+            },
+            "role": {
+                "title": "And what do you do there?",
+                "description": "It decides who gets built for you first."
+            },
+            "name": {
+                "title": "Last one: your first name?",
+                "description": "So we are not talking to a workspace."
+            }
+        },
+        "progress": "Question {current} of {total}",
+        "website": {
+            "label": "Company website",
+            "placeholder": "acme.com",
+            "none": "I don't have a website"
+        },
+        "industry": {
+            "placeholder": "Your line of work"
+        },
+        "industries": {
+            "agencies": "Agencies",
+            "ecommerce": "E-commerce",
+            "saas": "SaaS",
+            "sales": "Sales",
+            "recruiting": "Recruiting",
+            "real-estate": "Real estate",
+            "legal": "Legal & compliance",
+            "creators": "Creators",
+            "productivity": "Productivity",
+            "other": "Other"
+        },
+        "role": {
+            "placeholder": "Head of Growth"
+        },
+        "name": {
+            "placeholder": "John"
+        },
+        "back": "Back",
+        "next": "Next",
+        "continue": "Continue",
+        "saveFailed": "We could not save that. Try again."
+    },
+    "setup": {
+        "loadFailed": "We could not load your setup.",
+        "retry": "Retry"
+    },
+    "conversation": {
+        "foremanRole": "Your workspace assistant",
+        "failed": "That did not go through.",
+        "tryAgain": "Try again",
+        "composerPlaceholder": "Answer Rerun"
+    },
+    "starter": {
+        "title": "Your starter team",
+        "full": "Up to {max} to start. Drop one to take this one.",
+        "pickUpTo": "Pick up to {max}. Each one sets itself up with you.",
+        "hire": "{count, plural, =0 {Pick at least one} one {Hire this one} other {Hire these #}}",
+        "custom": "None of these, tell me what you need",
+        "customPlaceholder": "What should your coworker do?",
+        "back": "Back",
+        "send": "Send"
+    },
+    "plan": {
+        "defaultTitle": "Your first coworker",
+        "confirmed": "Confirmed",
+        "changesAsked": "Asked for changes",
+        "skipped": "Skipped",
+        "build": "Build my coworker",
+        "change": "Change something"
+    },
+    "question": {
+        "skip": "Skip this question",
+        "selectAll": "Select all that apply",
+        "typeAnswer": "Type your answer…",
+        "somethingElse": "Something else",
+        "send": "Send",
+        "neither": "Neither"
+    },
+    "team": {
+        "ready": "Workspace ready",
+        "starting": {
+            "title": "Getting your workspace ready",
+            "body": "Your coworker is built right after."
+        },
+        "failed": {
+            "title": "That did not go through",
+            "body": "Nothing was lost. Try again in a moment."
+        },
+        "blocked": {
+            "title": "This workspace cannot start here",
+            "body": "Finish setting it up at {host}."
+        },
+        "tryAgain": "Try again"
+    },
+    "build": {
+        "building": "Building your team",
+        "empty": "Your team could not be built",
+        "ready": "Your team is ready",
+        "nothingLost": "Nothing was lost. Try again in a moment.",
+        "oneFailed": "{name} could not be built yet.",
+        "someFailed": "{count, plural, one {# coworker could not be built yet.} other {# coworkers could not be built yet.}}",
+        "tryAgain": "Try again",
+        "startLead": "Start installing {name}"
+    },
+    "waitlist": {
+        "title": "We're at full capacity right now",
+        "body": "Every machine is taken. You're on the waitlist: your answers are saved, and this opens on its own as soon as one frees up."
+    },
+    "noPlan": {
+        "title": "This workspace is paused",
+        "body": "Switch workspace or account from the menus above."
+    },
+    "update": {
+        "title": "Update required",
+        "body": "This version is no longer supported."
+    },
+    "_context": {
+        "team.blocked.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "intake.progress": "VoiceOver label of the step dots of the welcome questions.",
+        "starter.hire": "Button under a rail of coworker cards: how many are picked.",
+        "build.oneFailed": "{name} is the name of a coworker the build could not create.",
+        "build.startLead": "{name} is the name of the first coworker, installed when the button is tapped.",
+        "intake.role.placeholder": "Example job title in an empty field.",
+        "intake.name.placeholder": "Example first name in an empty field."
+    }
+}

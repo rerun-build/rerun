@@ -2,6 +2,7 @@ import type { AiConnectionsView } from '@rerun/contracts'
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
@@ -31,6 +32,8 @@ type ApiKeyFormProps = {
 export function ApiKeyForm({ entry, name, onName, apiKey, onApiKey, baseUrl, onBaseUrl, busy, error, onConnect, onBack }: ApiKeyFormProps) {
     const theme = useTheme()
     const [guideOpen, setGuideOpen] = useState(false)
+    const t = useTranslations('mobileProviders.apiKey')
+    const tBaseUrl = useTranslations('mobileProviders.baseUrl')
     return (
         <SheetFrame title={entry.title} onBack={onBack}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
@@ -41,9 +44,9 @@ export function ApiKeyForm({ entry, name, onName, apiKey, onApiKey, baseUrl, onB
             </View>
 
             <View style={{ gap: spacing.lg }}>
-                <TextField id="connection-name" label="Name" value={name} onChangeText={onName} placeholder={entry.suggestedName} />
-                <TextField id="api-key" label="API key" value={apiKey} onChangeText={onApiKey} placeholder="Paste your key" secret />
-                {entry.provider === 'openrouter' && <TextField id="base-url" label="Custom base URL" help="Send requests to your own OpenRouter-compatible router" value={baseUrl} onChangeText={onBaseUrl} placeholder="https://router.example.com/api/v1" verbatim />}
+                <TextField id="connection-name" label={t('name')} value={name} onChangeText={onName} placeholder={entry.suggestedName} />
+                <TextField id="api-key" label={t('keyLabel')} value={apiKey} onChangeText={onApiKey} placeholder={t('keyPlaceholder')} secret />
+                {entry.provider === 'openrouter' && <TextField id="base-url" label={tBaseUrl('label')} help={tBaseUrl('help')} value={baseUrl} onChangeText={onBaseUrl} placeholder="https://router.example.com/api/v1" verbatim />}
             </View>
 
             {entry.guide && (
@@ -63,7 +66,7 @@ export function ApiKeyForm({ entry, name, onName, apiKey, onApiKey, baseUrl, onB
             )}
 
             <View style={{ gap: spacing.sm }}>
-                <Button label="Connect" size="lg" onPress={onConnect} disabled={!apiKey.trim() || !name.trim()} loading={busy} />
+                <Button label={t('connect')} size="lg" onPress={onConnect} disabled={!apiKey.trim() || !name.trim()} loading={busy} />
                 <ErrorLine error={error} />
             </View>
         </SheetFrame>

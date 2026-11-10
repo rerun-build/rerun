@@ -6,6 +6,7 @@ import { formatBytes } from '@/lib/files/format'
 import { FileIcon, RefreshCwIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { FileUIPart } from 'ai'
+import { useLocale, useTranslations } from 'next-intl'
 
 export type StackedAttachment = { file: FileUIPart & { id: string }; upload: UploadItem | undefined }
 
@@ -18,12 +19,12 @@ type QuestionAttachmentStackProps = {
 const VISIBLE = 3
 const TILTS = ['-rotate-6', 'rotate-4', '-rotate-3']
 
-function statusLine(upload: UploadItem | undefined): string {
-    if (!upload) return 'Waiting'
-    if (upload.status === 'error') return upload.error ?? 'Upload failed'
-    if (upload.status === 'done') return formatBytes(upload.size)
-    if (upload.status === 'uploading') return `Uploading · ${Math.round(upload.progress * 100)}%`
-    return upload.status === 'finishing' ? 'Finishing' : 'Waiting'
+function statusLine(upload: UploadItem | undefined, locale: string, t: ReturnType<typeof useTranslations<'chat.attachments'>>): string {
+    if (!upload) return t('waiting')
+    if (upload.status === 'error') return upload.error ?? t('uploadFailed')
+    if (upload.status === 'done') return formatBytes(upload.size, locale)
+    if (upload.status === 'uploading') return t('uploadingProgress', { percent: Math.round(upload.progress * 100) })
+    return upload.status === 'finishing' ? t('finishing') : t('waiting')
 }
 
 export function QuestionAttachmentStack({ items, onRemove, onRetry }: QuestionAttachmentStackProps) {
@@ -49,7 +50,10 @@ export function QuestionAttachmentStack({ items, onRemove, onRetry }: QuestionAt
 }
 
 function Thumb({ item, tilt, onRemove, onRetry }: { item: StackedAttachment; tilt: string; onRemove: (id: string) => void; onRetry: (id: string) => void }) {
+    const t = useTranslations('chat.attachments')
+    const locale = useLocale()
     const { file, upload } = item
+    const fileName = file.filename ?? t('fileFallback')
     const failed = upload?.status === 'error'
     const pending = !failed && upload?.status !== 'done'
     const isImage = file.mediaType?.startsWith('image/') && file.url
@@ -78,7 +82,7 @@ function Thumb({ item, tilt, onRemove, onRetry }: { item: StackedAttachment; til
                             <button
                                 type="button"
                                 onClick={() => onRetry(file.id)}
-                                aria-label={`Retry uploading ${file.filename ?? 'file'}`}
+                                aria-label={t('retryUploading', { name: fileName })}
                                 className="absolute inset-0 flex items-center justify-center bg-background/70 text-destructive"
                             >
                                 <RefreshCwIcon className="size-3" />
@@ -89,7 +93,7 @@ function Thumb({ item, tilt, onRemove, onRetry }: { item: StackedAttachment; til
                     <button
                         type="button"
                         onClick={() => onRemove(file.id)}
-                        aria-label={`Remove ${file.filename ?? 'file'}`}
+                        aria-label={t('removeNamed', { name: fileName })}
                         className="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-foreground text-background opacity-0 transition-opacity group-hover/thumb:opacity-100 focus-visible:opacity-100"
                     >
                         <XIcon className="size-2.5" />
@@ -97,8 +101,8 @@ function Thumb({ item, tilt, onRemove, onRetry }: { item: StackedAttachment; til
                 </div>
             </TooltipTrigger>
             <TooltipContent>
-                <span className="font-medium">{file.filename ?? 'file'}</span>
-                <span className="ml-1.5 opacity-70">{statusLine(upload)}</span>
+                <span className="font-medium">{fileName}</span>
+                <span className="ml-1.5 opacity-70">{statusLine(upload, locale, t)}</span>
             </TooltipContent>
         </Tooltip>
     )

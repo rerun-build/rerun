@@ -1,0 +1,99 @@
+{
+    "_context": {
+        "language.automatic": "Option of the language picker: the app follows the browser's language.",
+        "language.automaticHint": "Under the picker when Automatic is selected. {language} is the name of the language the browser asks for, in that language.",
+        "tabs.signIn.label": "Tab of the account dialog listing the ways to sign in (email, Google, phone).",
+        "signIn.onlyMethod": "Tooltip on a disabled Disconnect button. {provider} is Google or Apple.",
+        "profile.photo": "Field label: the profile photo.",
+        "delete.consequences.signIn.title": "Heading of what happens to sign-in once the account is deleted.",
+        "delete.submit": "Button that opens the final confirmation.",
+        "signIn.linkError.failed": "Toast after linking a sign-in provider to the account failed. {provider} is Google or Apple."
+    },
+    "title": "Account",
+    "tabs": {
+        "profile": {
+            "label": "Profile",
+            "description": "Your photo and your name, as your teammates see them."
+        },
+        "signIn": {
+            "label": "Sign-in",
+            "description": "The ways you can sign into this account."
+        },
+        "language": {
+            "label": "Language",
+            "description": "The language Rerun uses with you."
+        },
+        "delete": {
+            "label": "Delete account",
+            "description": "Close your Rerun account for good."
+        }
+    },
+    "language": {
+        "field": "Language",
+        "automatic": "Automatic",
+        "automaticHint": "Follows your browser: {language}.",
+        "failed": "Could not change the language. Try again."
+    },
+    "profile": {
+        "photo": "Photo",
+        "photoHelp": "Shown to your teammates, next to your messages and your cursor.",
+        "dropPhoto": "Drop your photo",
+        "changePhoto": "Change photo",
+        "uploadPhoto": "Upload photo",
+        "removePhoto": "Remove",
+        "name": "Name",
+        "namePlaceholder": "e.g. Ada Lovelace",
+        "save": "Save",
+        "notAnImage": "Please choose an image file.",
+        "nameUpdated": "Name updated",
+        "failed": "Something went wrong. Please try again."
+    },
+    "signIn": {
+        "email": {
+            "title": "Email",
+            "empty": "Not connected. Add one to sign in with a code sent to your inbox."
+        },
+        "phone": {
+            "title": "Phone",
+            "empty": "Not connected. Add a number to sign in with a code by WhatsApp or SMS.",
+            "otherAccount": "This number signs into another Rerun account. Change it to sign in here by phone."
+        },
+        "change": "Change",
+        "add": "Add",
+        "connect": "Connect",
+        "disconnect": "Disconnect",
+        "connected": "Connected",
+        "notConnected": "Not connected.",
+        "onlyMethod": "{provider} is the only sign-in method connected to this account.",
+        "disconnectTitle": "Disconnect {provider}?",
+        "disconnectDescription": "You will no longer be able to sign into this account with {provider}. Your other sign-in methods keep working.",
+        "linkError": {
+            "identityTaken": "This {provider} account already signs into another Rerun account.",
+            "denied": "{provider} was not connected.",
+            "failed": "Could not connect {provider}. Try again."
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "Shared workspaces",
+                "description": "You leave every workspace you share with teammates. They keep it, with its coworkers and its files."
+            },
+            "own": {
+                "title": "Your own workspaces",
+                "description": "A workspace only you are in stops for good: its coworkers are turned off and its machine is deleted with its files."
+            },
+            "signIn": {
+                "title": "Signing in",
+                "description": "You are signed out everywhere. Your email, Google account and phone number are freed, so you can sign up again later."
+            }
+        },
+        "blocker": {
+            "current": "Its subscription still renews. Cancel it from Billing before deleting your account.",
+            "other": "Its subscription still renews. Switch to this workspace and cancel it from Billing before deleting your account.",
+            "openBilling": "Open billing"
+        },
+        "submit": "Delete account",
+        "failed": "Could not delete your account."
+    }
+}

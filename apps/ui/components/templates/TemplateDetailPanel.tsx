@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Icon } from '@/components/ui/icon'
 import { ShieldCheck } from '@/lib/icons'
@@ -10,10 +11,14 @@ import { TemplateDetailMedia } from '@/components/templates/TemplateDetailMedia'
 import { CardCarousel, ScrollFade, Stripes } from '@rerun/ui/primitives'
 import { serviceIconProps } from '@/lib/services/icons'
 import { type LibraryTemplate } from '@/lib/templates/library'
-import { priceLabel, TEMPLATE_CATEGORY_LABELS } from '@rerun/contracts'
+import { priceLabel, templateCategoryLabel } from '@rerun/contracts'
 import { cn } from '@/lib/utils'
 
 export function TemplateDetailPanel({ template, showStatus, onImported }: { template: LibraryTemplate; showStatus: boolean; onImported: () => void }) {
+    const t = useTranslations('templates.detail')
+    const tPrice = useTranslations('templates.price')
+    const tCategory = useTranslations('templates.categories')
+    const locale = useLocale()
     return (
         // w-full min-w-0 : la dialog qui accueille ce panneau est une grille, et une piste `auto`
         // s'élargit jusqu'à la min-content de son contenu. Sans ça, une URL dans la description
@@ -31,21 +36,21 @@ export function TemplateDetailPanel({ template, showStatus, onImported }: { temp
 
                     <div className="relative flex flex-col gap-2.5 overflow-hidden rounded-lg border border-border/60 bg-muted/30 p-3">
                         <Stripes />
-                        <MetaRow label="Price" value={priceLabel(template.pricing)} />
-                        <MetaRow label="Coworkers" value={String(template.agentCount)} />
-                        {template.connectors.length > 0 && <MetaRow label="Apps" value={String(template.connectors.length)} />}
-                        <MetaRow label="Setup time" value={`${template.setupMinutes} min`} />
-                        <MetaRow label="Category" value={TEMPLATE_CATEGORY_LABELS[template.category]} />
+                        <MetaRow label={t('price')} value={priceLabel(template.pricing, tPrice, locale)} />
+                        <MetaRow label={t('coworkers')} value={String(template.agentCount)} />
+                        {template.connectors.length > 0 && <MetaRow label={t('apps')} value={String(template.connectors.length)} />}
+                        <MetaRow label={t('setupTime')} value={t('minutes', { minutes: template.setupMinutes })} />
+                        <MetaRow label={t('category')} value={templateCategoryLabel(template.category, tCategory)} />
                     </div>
 
                     {template.longDescription && (
-                        <Section title="About">
+                        <Section title={t('about')}>
                             <TemplateDetailAbout key={template.slug} content={template.longDescription} />
                         </Section>
                     )}
 
                     {template.connectors.length > 0 && (
-                        <Section title="What you'll need">
+                        <Section title={t('whatYouNeed')}>
                             <ul className="grid grid-cols-2 gap-1.5">
                                 {template.connectors.map(connector => (
                                     <li key={connector.slug} className="flex items-center gap-2.5 rounded-lg border border-border/60 bg-muted/20 px-2.5 py-2">
@@ -58,11 +63,11 @@ export function TemplateDetailPanel({ template, showStatus, onImported }: { temp
                     )}
 
                     {template.agents.length > 0 && (
-                        <Section title="Coworkers" count={template.agents.length}>
+                        <Section title={t('coworkers')} count={template.agents.length}>
                             {/* A lone agent takes the full width; from two on, cards leave the next one peeking
                                 out to hint at the scroll. */}
                             <CardCarousel
-                                label="coworkers in this template"
+                                label={t('carousel')}
                                 fadeClassName="from-popover"
                                 className="gap-3"
                                 itemClassName={cn('shrink-0 snap-center', template.agents.length > 1 ? 'w-[85%]' : 'w-full')}
@@ -86,9 +91,9 @@ export function TemplateDetailPanel({ template, showStatus, onImported }: { temp
 
                     <Alert variant="warning" stripes className="grid-cols-[auto_1fr] gap-x-3 gap-y-0">
                         <Icon icon={ShieldCheck} size="sm" className="row-span-2 self-center" />
-                        <AlertTitle className="col-start-2 leading-tight">Security</AlertTitle>
+                        <AlertTitle className="col-start-2 leading-tight">{t('securityTitle')}</AlertTitle>
                         <AlertDescription className="col-start-2 leading-snug">
-                            Credentials and private data were stripped from this template. Apps arrive disconnected, you authorize them after the import.
+                            {t('securityBody')}
                         </AlertDescription>
                     </Alert>
                 </div>

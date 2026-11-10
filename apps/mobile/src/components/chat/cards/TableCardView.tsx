@@ -1,7 +1,9 @@
 import { cellText, formatText, isNumericFormat, isTruthyCell, type TableCard } from '@rerun/contracts'
+import { formatNumber } from '@rerun/i18n/format'
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { View } from 'react-native'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { mediaUrl } from '@/api/files'
 import { HorizontalScroll } from '@/components/chat/HorizontalScroll'
@@ -116,8 +118,10 @@ function Grid({ card, agentId }: { card: TableCard; agentId: string }) {
 // Rows a coworker filled, frozen in the message as it sent them. A layout with named fields reads as a
 // list; a plain table keeps its columns and scrolls sideways.
 export function TableCardView({ card, agentId }: { card: TableCard; agentId: string }) {
+    const t = useTranslations('mobileCards.table')
+    const locale = useLocale()
     const asList = card.layout !== undefined && card.layout !== 'table' && Boolean(card.fields?.title)
-    const meta = card.rows.length < card.total ? `${card.rows.length} of ${card.total}` : `${card.total}`
+    const meta = card.rows.length < card.total ? t('partial', { shown: card.rows.length, total: card.total }) : formatNumber(card.total, locale)
     return (
         <CardFrame symbol="tablecells" title={titleOf(card.table)} meta={meta}>
             {asList ? <ListRows card={card} agentId={agentId} /> : <Grid card={card} agentId={agentId} />}

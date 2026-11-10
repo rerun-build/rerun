@@ -7,6 +7,7 @@ import { useLastSignInMethod, type LastSignInMethod } from '@/lib/auth/last-sign
 import { MailIcon, Smartphone } from '@/lib/icons'
 import { detectMobileOs } from '@/lib/in-app-browser'
 import { StepTransition } from '@rerun/ui/steps'
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 function Divider({ children }: { children: ReactNode }) {
@@ -47,6 +48,7 @@ export function AuthMethods({
     // Forced by the lab; read from this browser everywhere else. The provider buttons read it themselves.
     lastUsed?: LastSignInMethod | null
 }) {
+    const t = useTranslations('auth.methods')
     const remembered = useLastSignInMethod()
     const usedLast = lastUsed === undefined ? remembered : lastUsed
     const [method, setMethodState] = useState<AuthMethod>(phone ? initialMethod : 'email')
@@ -59,7 +61,7 @@ export function AuthMethods({
     const emailButton = (
         <Button variant="outline" className="w-full gap-2" onClick={() => setMethod('email')}>
             <MailIcon className="size-4" />
-            Continue with email
+            {t('email')}
             {usedLast === 'email' && <LastUsedBadge />}
         </Button>
     )
@@ -73,7 +75,7 @@ export function AuthMethods({
                                 phoneLastUsed: usedLast === 'phone',
                                 afterPhone: (
                                     <>
-                                        <Divider>Or</Divider>
+                                        <Divider>{t('or')}</Divider>
                                         {oauth}
                                         {emailButton}
                                     </>
@@ -85,7 +87,7 @@ export function AuthMethods({
                                     <>
                                         {oauth}
                                         {emailButton}
-                                        <Divider>Or continue with</Divider>
+                                        <Divider>{t('orContinueWith')}</Divider>
                                     </>
                                 ),
                             }
@@ -96,11 +98,11 @@ export function AuthMethods({
                           {phone && (
                               <Button variant="outline" className="w-full gap-2" onClick={() => setMethod('phone')}>
                                   <Smartphone className="size-4" />
-                                  Continue with phone number
+                                  {t('phone')}
                                   {usedLast === 'phone' && <LastUsedBadge />}
                               </Button>
                           )}
-                          {(oauth || phone) && <Divider>Or continue with</Divider>}
+                          {(oauth || phone) && <Divider>{t('orContinueWith')}</Divider>}
                       </>
                   )}
         </StepTransition>

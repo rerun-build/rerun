@@ -10,6 +10,7 @@ vi.mock('@/app/api/_services/chat.service', () => ({
 }))
 vi.mock('@/app/api/_services/engine-plan.service', () => ({ assertModelEntitled: mocks.assertModelEntitled }))
 vi.mock('@/lib/engine/client', () => ({ getAgent: mocks.getAgent, listConnections: mocks.listConnections, patchAgent: mocks.patchAgent }))
+vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
 
 const { readAgentModels, setAgentModel } = await import('./agent-model.service')
 

@@ -22,6 +22,11 @@ describe('phone helpers', () => {
         expect(countryByCode('AC').name).toBe('Ascension Island')
     })
 
+    it('names the countries in the language of the app', () => {
+        expect(countryByCode('DE', 'fr').name).toBe('Allemagne')
+        expect(searchCountries('alema', 'es').map(country => country.code)).toContain('DE')
+    })
+
     it('finds a country by name, by calling code or by its code', () => {
         expect(searchCountries('franc').map(country => country.code)).toContain('FR')
         expect(searchCountries('+44').map(country => country.code)).toContain('GB')

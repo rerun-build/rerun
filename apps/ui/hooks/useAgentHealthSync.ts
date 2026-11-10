@@ -2,7 +2,7 @@
 
 import type { AgentHealthResult } from '@/app/api/_services/gateway.service'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
-import { ACCESS_LOST_MESSAGE } from '@/lib/board/box-access'
+import { translated } from '@/lib/i18n/toast-text'
 import { useBoardStore } from '@/stores/board.store'
 import { useCallback, useRef } from 'react'
 import { toast } from 'sonner'
@@ -78,5 +78,5 @@ function dropUnreachableSpaces(reachable: Set<string>, strikes: Record<string, n
     }
     if (!gone.length) return
     for (const id of gone) delete strikes[id]
-    if (dropSpaces(gone)) toast(ACCESS_LOST_MESSAGE)
+    if (dropSpaces(gone)) toast(translated('errors.boxAccessLost'))
 }

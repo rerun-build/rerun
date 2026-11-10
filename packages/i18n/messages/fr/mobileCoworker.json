@@ -1,0 +1,86 @@
+{
+    "access": {
+        "boxManage": "Seul un admin ou un gestionnaire de cette Box peut modifier ceci.",
+        "aiProvidersAdminOnly": "Seul un admin peut modifier les fournisseurs d'IA.",
+        "noManagedBox": "Il vous faut une Box que vous gérez pour ajouter un coworker. Créez-en une sur {host}, ou demandez à un admin.",
+        "boxesFailed": "Impossible de charger vos Boxes. Réessayez dans un instant.",
+        "noBoxYet": "Ce workspace n'a pas encore de Box. Créez-en une sur {host}."
+    },
+    "page": {
+        "loadFailed": "Impossible de charger ceci. Réessayez dans un instant."
+    },
+    "details": {
+        "back": "Retour",
+        "more": "Plus",
+        "delete": "Supprimer le coworker",
+        "edit": "Modifier",
+        "files": "Fichiers",
+        "apps": "Apps",
+        "routines": "Routines",
+        "computer": "Ordinateur",
+        "notifications": "Notifications",
+        "working": "Au travail",
+        "idle": "Inactif",
+        "off": "Éteint",
+        "none": "Aucune",
+        "appsToConnect": "{count} à connecter",
+        "appsConnected": "{count, plural, one {# connectée} other {# connectées}}",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count, plural, one {# active} other {# actives}}",
+        "renameTitle": "Renommer",
+        "save": "Enregistrer",
+        "renameFailed": "Impossible de renommer",
+        "deleteTitle": "Supprimer {name} ?",
+        "deleteMessage": "Cela supprime définitivement le coworker et ses données. Cette action est irréversible.",
+        "deleteConfirm": "Supprimer",
+        "deleteFailed": "Impossible de supprimer"
+    },
+    "apps": {
+        "title": "Apps",
+        "status": {
+            "needsSignIn": "Connexion requise",
+            "needsSetup": "Configuration requise",
+            "error": "Erreur"
+        },
+        "connect": "Connecter",
+        "empty": "Aucune app pour l'instant.",
+        "askInChat": "Demandez à {name} dans le chat d'ajouter une app.",
+        "connectFailed": "Impossible de connecter {name}"
+    },
+    "files": {
+        "title": "Fichiers",
+        "media": "Médias",
+        "docs": "Docs",
+        "earlier": "Plus ancien",
+        "thisMonth": "Ce mois-ci",
+        "open": "Ouvrir {name}",
+        "fileFallback": "fichier",
+        "noMedia": "Aucun média",
+        "noDocs": "Aucun doc",
+        "emptyHint": "Ce que {name} produit apparaîtra ici.",
+        "truncated": "Seulement les fichiers les plus récents. Tous sont sur le web."
+    },
+    "routines": {
+        "title": "Routines",
+        "once": "Une fois, {date}",
+        "webhook": "Webhook",
+        "empty": "Aucune routine pour l'instant.",
+        "askInChat": "Demandez à {name} dans le chat d'en créer une.",
+        "turnOnFailed": "Impossible d'activer {name}",
+        "turnOffFailed": "Impossible de désactiver {name}"
+    },
+    "create": {
+        "title": "Nouveau coworker",
+        "nameLabel": "Nom",
+        "namePlaceholder": "Scout",
+        "descriptionLabel": "Que doit-il faire ?",
+        "descriptionPlaceholder": "Trouver des agences marketing à Lyon et rédiger un premier e-mail pour chacune",
+        "descriptionHelp": "Sa première tâche. Il s'y met tout de suite.",
+        "boxLabel": "Box",
+        "submit": "Créer",
+        "pausedTitle": "{name} est en pause",
+        "pausedMessage": "Votre forfait n'a plus de place libre pour un coworker. Passez à Pro sur rerun.build pour des coworkers illimités.",
+        "failed": "Impossible de créer le coworker"
+    }
+}

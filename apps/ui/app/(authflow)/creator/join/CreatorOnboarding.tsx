@@ -1,6 +1,8 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import { StepTransition, StepperBar, useStepper } from '@rerun/ui/steps'
 
@@ -21,6 +23,7 @@ export function CreatorOnboarding({ invite, token }: { invite: CreatorInvite; to
     const firstName = invite.name.trim().split(/\s+/)[0]
 
     const [claimError, setClaimError] = useState<string | null>(null)
+    const errorText = useErrorText()
     const [claiming, startClaim] = useTransition()
 
     const claim = useCallback(() => {
@@ -28,9 +31,9 @@ export function CreatorOnboarding({ invite, token }: { invite: CreatorInvite; to
         startClaim(async () => {
             const result = await claimCreatorSandboxAction(token)
             if (result.ok) goTo(2)
-            else setClaimError(result.error)
+            else setClaimError(errorText(result))
         })
-    }, [token, goTo])
+    }, [token, goTo, errorText])
 
     // The claim runs on arrival at its own step rather than on the button, so a failed pool grab is
     // retried from where it failed instead of sending people back to the welcome screen.
@@ -56,33 +59,34 @@ export function CreatorOnboarding({ invite, token }: { invite: CreatorInvite; to
 }
 
 function WelcomeStep({ firstName, onContinue }: { firstName: string; onContinue: () => void }) {
+    const t = useTranslations('auth.creatorOnboarding')
     return (
         <>
             <div className="space-y-2">
                 <p className="text-xs font-medium uppercase tracking-[0.16em] text-brand">Rerun Creators</p>
-                <h1 className="text-xl font-semibold tracking-tight">Welcome to Rerun Creator, {firstName}</h1>
+                <h1 className="text-xl font-semibold tracking-tight">{t('welcome.title', { name: firstName })}</h1>
                 <p className="text-sm text-muted-foreground">
-                    You get a sandbox: an unlimited Box where you build coworkers, capture them as templates, and publish them to the marketplace. Creators keep
-                    the revenue on every paid template they ship.
+                    {t('welcome.message')}
                 </p>
             </div>
             <Button size="lg" className="w-full" onClick={onContinue}>
-                Claim my workspace
+                {t('welcome.claim')}
             </Button>
         </>
     )
 }
 
 function ClaimStep({ error, onRetry }: { error: string | null; onRetry: () => void }) {
+    const t = useTranslations('auth.creatorOnboarding')
     if (error) {
         return (
             <>
                 <div className="space-y-2">
-                    <h1 className="text-xl font-semibold tracking-tight">Your workspace is not ready yet</h1>
+                    <h1 className="text-xl font-semibold tracking-tight">{t('claim.notReady')}</h1>
                     <p className="text-sm text-muted-foreground">{error}</p>
                 </div>
                 <Button size="lg" className="w-full" onClick={onRetry}>
-                    Try again
+                    {t('claim.retry')}
                 </Button>
             </>
         )
@@ -95,15 +99,17 @@ function ClaimStep({ error, onRetry }: { error: string | null; onRetry: () => vo
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-4/5" />
             </div>
-            <p className="text-sm text-muted-foreground">Preparing your sandbox…</p>
+            <p className="text-sm text-muted-foreground">{t('claim.preparing')}</p>
             <Skeleton className="h-11 w-full" />
         </>
     )
 }
 
 function TermsStep({ onDone }: { onDone: () => void }) {
+    const t = useTranslations('auth.creatorOnboarding')
     const [checked, setChecked] = useState<Set<string>>(new Set())
     const [error, setError] = useState<string | null>(null)
+    const errorText = useErrorText()
     const [pending, startTransition] = useTransition()
     const allChecked = CREATOR_TERMS.every(term => checked.has(term.id))
 
@@ -121,15 +127,15 @@ function TermsStep({ onDone }: { onDone: () => void }) {
         startTransition(async () => {
             const result = await acceptCreatorTermsAction()
             if (result.ok) onDone()
-            else setError(result.error)
+            else setError(errorText(result))
         })
     }
 
     return (
         <>
             <div className="space-y-2">
-                <h1 className="text-xl font-semibold tracking-tight">Your workspace is ready</h1>
-                <p className="text-sm text-muted-foreground">One last thing: the program only works if everyone plays by the same rules.</p>
+                <h1 className="text-xl font-semibold tracking-tight">{t('terms.title')}</h1>
+                <p className="text-sm text-muted-foreground">{t('terms.message')}</p>
             </div>
 
             <ul className="flex flex-col gap-3">
@@ -139,10 +145,10 @@ function TermsStep({ onDone }: { onDone: () => void }) {
                         <label htmlFor={`term-${term.id}`} className="text-sm leading-5 text-muted-foreground">
                             {term.href ? (
                                 <a href={term.href} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
-                                    {term.label}
+                                    {t(`terms.items.${term.id}`)}
                                 </a>
                             ) : (
-                                term.label
+                                t(`terms.items.${term.id}`)
                             )}
                         </label>
                     </li>
@@ -152,7 +158,7 @@ function TermsStep({ onDone }: { onDone: () => void }) {
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
             <Button size="lg" className="w-full" disabled={!allChecked} loading={pending} onClick={submit}>
-                Accept and enter my sandbox
+                {t('terms.accept')}
             </Button>
         </>
     )

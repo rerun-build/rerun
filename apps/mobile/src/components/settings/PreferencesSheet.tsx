@@ -1,10 +1,12 @@
 import { Host, Picker, Text } from '@expo/ui/swift-ui'
 import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers'
+import type { Locale } from '@rerun/i18n'
 import * as Application from 'expo-application'
 import { router } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
-import { Pressable, ScrollView, View } from 'react-native'
+import { Linking, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { appBuild } from '@/api/client'
 import { useAuth } from '@/auth/AuthProvider'
@@ -21,16 +23,19 @@ import { useAppearancePreference, type AppearancePreference } from '@/theme/appe
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
-const APPEARANCES: { value: AppearancePreference; label: string }[] = [
-    { value: 'system', label: 'System' },
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' },
+const APPEARANCES: { value: AppearancePreference; label: 'appearanceSystem' | 'appearanceLight' | 'appearanceDark' }[] = [
+    { value: 'system', label: 'appearanceSystem' },
+    { value: 'light', label: 'appearanceLight' },
+    { value: 'dark', label: 'appearanceDark' },
 ]
 
-const GROUPINGS: { value: GroupMode; label: string }[] = [
-    { value: 'recent', label: 'Recent' },
-    { value: 'box', label: 'By box' },
+const GROUPINGS: { value: GroupMode; label: 'groupRecent' | 'groupByBox' }[] = [
+    { value: 'recent', label: 'groupRecent' },
+    { value: 'box', label: 'groupByBox' },
 ]
+
+// Each language in its own words, whatever the current one: Hermes has no Intl.DisplayNames.
+const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', fr: 'Français', es: 'Español' }
 
 const AVATAR_SIZE = 44
 
@@ -43,6 +48,8 @@ export function PreferencesSheet() {
     const [appearance, chooseAppearance] = useAppearancePreference()
     const [group, chooseGroup] = useGroupMode()
     const push = usePushPermission().status
+    const t = useTranslations('mobileSettings.preferences')
+    const locale = useLocale()
 
     const user = me?.user
     const email = user?.email && !isPhoneAlias(user.email) ? user.email : null
@@ -57,9 +64,9 @@ export function PreferencesSheet() {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <GlassButton symbol="xmark" label="Close" onPress={() => router.back()} />
+                <GlassButton symbol="xmark" label={t('close')} onPress={() => router.back()} />
                 <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
-                    Preferences
+                    {t('title')}
                 </AppText>
                 <View style={{ width: GLASS_BUTTON_SIZE }} />
             </View>
@@ -73,7 +80,7 @@ export function PreferencesSheet() {
                     </View>
                     <View style={{ flex: 1 }}>
                         <AppText variant="headline" numberOfLines={1}>
-                            {user?.name?.trim() || email || 'Your account'}
+                            {user?.name?.trim() || email || t('yourAccount')}
                         </AppText>
                         {email && user?.name?.trim() ? (
                             <AppText variant="footnote" tone="muted" numberOfLines={1}>
@@ -83,18 +90,18 @@ export function PreferencesSheet() {
                     </View>
                 </View>
                 <Separator />
-                <SettingsRow label="Workspace" value={workspaceLabel(me?.workspace)} />
+                <SettingsRow label={t('workspace')} value={workspaceLabel(me?.workspace)} />
                 <Separator />
-                <SettingsRow label="AI providers" onPress={openAiProviders} />
+                <SettingsRow label={t('aiProviders')} onPress={openAiProviders} />
             </Card>
 
             <View style={{ gap: spacing.sm }}>
-                <SectionTitle>Appearance</SectionTitle>
+                <SectionTitle>{t('appearance')}</SectionTitle>
                 <Host matchContents={{ vertical: true }} colorScheme={theme.scheme} style={{ alignSelf: 'stretch' }}>
                     <Picker selection={appearance} onSelectionChange={chooseAppearance} modifiers={[pickerStyle('segmented')]}>
                         {APPEARANCES.map(option => (
                             <Text key={option.value} modifiers={[tag(option.value)]}>
-                                {option.label}
+                                {t(option.label)}
                             </Text>
                         ))}
                     </Picker>
@@ -102,12 +109,12 @@ export function PreferencesSheet() {
             </View>
 
             <View style={{ gap: spacing.sm }}>
-                <SectionTitle>Coworkers</SectionTitle>
+                <SectionTitle>{t('coworkers')}</SectionTitle>
                 <Host matchContents={{ vertical: true }} colorScheme={theme.scheme} style={{ alignSelf: 'stretch' }}>
                     <Picker selection={group} onSelectionChange={chooseGroup} modifiers={[pickerStyle('segmented')]}>
                         {GROUPINGS.map(option => (
                             <Text key={option.value} modifiers={[tag(option.value)]}>
-                                {option.label}
+                                {t(option.label)}
                             </Text>
                         ))}
                     </Picker>
@@ -115,45 +122,49 @@ export function PreferencesSheet() {
             </View>
 
             <Section>
-                <SettingsRow testID="row-notifications" label="Notifications" value={push !== null && push !== 'granted' ? 'Push off' : undefined} accessory="chevron" onPress={() => router.push('/settings/notifications')} />
+                <SettingsRow testID="row-language" label={t('language')} value={LANGUAGE_NAMES[locale]} accessory="external" onPress={() => Linking.openSettings()} />
             </Section>
 
-            <Section title="Support">
+            <Section>
+                <SettingsRow testID="row-notifications" label={t('notifications')} value={push !== null && push !== 'granted' ? t('pushOff') : undefined} accessory="chevron" onPress={() => router.push('/settings/notifications')} />
+            </Section>
+
+            <Section title={t('support')}>
                 {!onCustomServer && (
                     <>
-                        <SettingsRow label="Contact support" onPress={() => contactSupport(user)} />
+                        <SettingsRow label={t('contactSupport')} onPress={() => contactSupport(user)} />
                         <Separator />
                     </>
                 )}
-                <SettingsRow label="Privacy Policy" accessory="external" onPress={() => WebBrowser.openBrowserAsync('https://rerun.build/privacy')} />
+                <SettingsRow label={t('privacy')} accessory="external" onPress={() => WebBrowser.openBrowserAsync('https://rerun.build/privacy')} />
                 <Separator />
-                <SettingsRow label="Terms of Service" accessory="external" onPress={() => WebBrowser.openBrowserAsync('https://rerun.build/terms')} />
+                <SettingsRow label={t('terms')} accessory="external" onPress={() => WebBrowser.openBrowserAsync('https://rerun.build/terms')} />
             </Section>
 
-            <Section title="About">
-                <SettingsRow label="Version" value={version} />
+            <Section title={t('about')}>
+                <SettingsRow label={t('version')} value={version} />
                 {onCustomServer ? (
                     <>
                         <Separator />
-                        <SettingsRow testID="row-server" label="Server" value={webHost} onPress={() => askToLeaveServer(signOut)} />
+                        <SettingsRow testID="row-server" label={t('server')} value={webHost} onPress={() => askToLeaveServer(signOut)} />
                     </>
                 ) : (
                     environment.name !== 'production' && (
                         <>
                             <Separator />
-                            <SettingsRow label="Environment" value={environment.name} />
+                            <SettingsRow label={t('environment')} value={environment.name} />
                         </>
                     )
                 )}
             </Section>
 
             <Section>
-                <SettingsRow label="Sign out" onPress={signOut} />
+                <SettingsRow label={t('signOut')} onPress={signOut} />
             </Section>
 
             <Pressable onPress={() => session && askToDeleteAccount(session.access_token, signOut)} accessibilityRole="button" hitSlop={spacing.md} style={({ pressed }) => ({ alignSelf: 'center', opacity: pressed ? 0.5 : 1 })}>
                 <AppText variant="footnote" tone="destructive">
-                    Delete account
+                    {t('deleteAccount')}
                 </AppText>
             </Pressable>
         </ScrollView>

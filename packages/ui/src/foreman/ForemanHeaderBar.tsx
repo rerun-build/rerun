@@ -8,6 +8,7 @@ import { Button } from '../primitives'
 import { TooltipDisabledReason, TooltipLabeled } from '../Tooltip'
 import { HEADER_ORB_SIZE } from './constants'
 import { Orb, type OrbActivity } from './Orb'
+import { useKitTranslations } from '../locale'
 
 // Le voile déborde sous la barre et s'évanouit : une coupure nette redeviendrait une barre.
 const VEIL_MASK = 'linear-gradient(to bottom, black 55%, transparent)'
@@ -40,10 +41,11 @@ export type ForemanHeaderBarProps = {
  * opaque : les vieux messages continuent de se dissoudre dessous, mais les contrôles se détachent.
  */
 export function ForemanHeaderBar({ anchor, orbState, orbPaused = false, onClose, closeDisabledReason, orbHiddenOnSheet = false, onGutter = false, actions, tabs, onDragPointerDown, onToggleSheetDetent }: ForemanHeaderBarProps) {
+    const t = useKitTranslations()
     const DesktopCloseIcon = CLOSE_ICONS[anchor]
     const draggable = Boolean(onDragPointerDown)
     const closeButton = (
-        <Button variant="ghost" size="icon-sm" aria-label="Close the chat" disabled={Boolean(closeDisabledReason)} onClick={onClose}>
+        <Button variant="ghost" size="icon-sm" aria-label={t('foreman.header.closeChat')} disabled={Boolean(closeDisabledReason)} onClick={onClose}>
             {/* Replier un panneau latéral ne veut rien dire quand la conversation est
                 une sheet, ni quand elle flotte : là c'est une croix. */}
             <DesktopCloseIcon className="size-3.5 max-md:hidden" />
@@ -67,7 +69,7 @@ export function ForemanHeaderBar({ anchor, orbState, orbPaused = false, onClose,
                 <button
                     type="button"
                     data-sheet-grabber
-                    aria-label="Resize chat"
+                    aria-label={t('foreman.header.resize')}
                     onClick={onToggleSheetDetent}
                     className="absolute top-0 left-1/2 flex h-5 w-12 -translate-x-1/2 justify-center pt-1 outline-none focus-visible:[&>span]:bg-ring md:hidden"
                 >
@@ -85,7 +87,7 @@ export function ForemanHeaderBar({ anchor, orbState, orbPaused = false, onClose,
                             </TooltipDisabledReason>
                         </div>
                     ) : (
-                        <TooltipLabeled label="Close" side="bottom">
+                        <TooltipLabeled label={t('close')} side="bottom">
                             {closeButton}
                         </TooltipLabeled>
                     )}

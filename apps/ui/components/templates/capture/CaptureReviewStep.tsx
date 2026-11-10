@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { AgentSetupDraft } from '@/components/agent/AgentSetupFields'
 import type { AgentCapturePlan } from '@/lib/templates/capture'
 import { CaptureAgentReviewSection } from './CaptureAgentReviewSection'
@@ -26,11 +27,10 @@ export function CaptureReviewStep({
     onApprove: (agentRowId: string, next: boolean) => void
     onSetupChange: (agentRowId: string, next: AgentSetupDraft) => void
 }) {
+    const t = useTranslations('templates.capture.review')
     return (
         <div className="flex flex-col gap-4">
-            <p className="text-xs text-muted-foreground">
-                {approvedCount} of {plans.length} coworker{plans.length === 1 ? '' : 's'} reviewed
-            </p>
+            <p className="text-xs text-muted-foreground">{t('reviewed', { approved: approvedCount, total: plans.length })}</p>
 
             {plans.map(plan => (
                 <CaptureAgentReviewSection

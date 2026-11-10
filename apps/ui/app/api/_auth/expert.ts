@@ -1,6 +1,7 @@
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import type { ErrorCode } from '@/lib/i18n/action-error'
 import { AuthorizationError, requireWorkspaceId, workspaceFounderUserId } from './ownership'
 
 // Same reason to exist as ownership.ts: the expert surfaces write through the service-role client,
@@ -37,8 +38,8 @@ export async function hasPendingCreatorTerms(userId: string): Promise<boolean> {
 
 export async function requireExpertUserId(): Promise<string> {
     const { user } = await getServerSession()
-    if (!user?.id) throw new AuthorizationError('Not authenticated')
-    if (!(await isExpertAccount(user.id))) throw new AuthorizationError('Reserved for expert accounts')
+    if (!user?.id) throw new AuthorizationError('notAuthenticated')
+    if (!(await isExpertAccount(user.id))) throw new AuthorizationError('expertOnly')
     return user.id
 }
 
@@ -48,10 +49,10 @@ export type TemplateAuthorScope = { userId: string; workspaceId: number }
 
 // A capture ships a whole agent folder to a page anyone can install from, so it may only source
 // from the sandbox: doing it from a real workspace would put a client's memories on the internet.
-async function assertSandboxWorkspace(workspaceId: number, message: string): Promise<void> {
+async function assertSandboxWorkspace(workspaceId: number, code: ErrorCode): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['is_sandbox'] as const, { id: workspaceId })
-    if (!workspace?.is_sandbox) throw new AuthorizationError(message)
+    if (!workspace?.is_sandbox) throw new AuthorizationError(code)
 }
 
 // The browser half of the useIsTemplateAuthor gate: the session knows both the user and the
@@ -59,7 +60,7 @@ async function assertSandboxWorkspace(workspaceId: number, message: string): Pro
 export async function requireSandboxAuthorSession(): Promise<TemplateAuthorScope> {
     const userId = await requireExpertUserId()
     const workspaceId = await requireWorkspaceId()
-    await assertSandboxWorkspace(workspaceId, 'Coworkers can only be captured from your sandbox')
+    await assertSandboxWorkspace(workspaceId, 'captureSandboxOnly')
     return { userId, workspaceId }
 }
 
@@ -71,15 +72,12 @@ export async function requireSandboxWorkspaceId(): Promise<number> {
 // the browser path enforces still have to hold. Anything else fails here rather than filing a
 // template under someone who never asked for one.
 export async function requireSandboxAuthorKey(workspaceId: number): Promise<TemplateAuthorScope> {
-    await assertSandboxWorkspace(
-        workspaceId,
-        'Template tools need a key issued on your sandbox workspace: capturing from a real workspace would publish its coworkers memories.',
-    )
+    await assertSandboxWorkspace(workspaceId, 'templateKeyNotSandbox')
 
     const userId = await workspaceFounderUserId(workspaceId)
-    if (!userId) throw new AuthorizationError('This workspace has no member, so no template author can be resolved from this key.')
+    if (!userId) throw new AuthorizationError('templateKeyNoMember')
 
-    if (!(await isExpertAccount(userId))) throw new AuthorizationError('Authoring templates is reserved for expert accounts. Ask Rerun to enable it on this account.')
+    if (!(await isExpertAccount(userId))) throw new AuthorizationError('templateAuthoringExpertOnly')
 
     return { userId, workspaceId }
 }
@@ -92,7 +90,7 @@ export type OwnedTemplate = { id: string; slug: string; status: string }
 export async function assertTemplateOwnedBy(userId: string, id: string): Promise<OwnedTemplate> {
     const supabase = createServiceRoleClient()
     const { data: template } = await selectMaybeSingle(supabase, 'templates', ['id', 'slug', 'status'] as const, { id, creator_id: userId })
-    if (!template) throw new AuthorizationError('Template not found')
+    if (!template) throw new AuthorizationError('templateNotFound')
     return template
 }
 

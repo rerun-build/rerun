@@ -1,11 +1,13 @@
 'use client'
 
+import { formatNumber } from '@rerun/i18n/format'
 import { BorderBeam } from '@rerun/ui'
 import { animate, motion } from 'motion/react'
+import { useLocale, useTranslations } from 'next-intl'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { Icon } from '@/components/ui/icon'
-import { DISCOVERY_SOURCE_LABELS, type CompanyFinding, type DiscoverySource } from '@/lib/company/explore/findings'
+import type { CompanyFinding, DiscoverySource } from '@/lib/company/explore/findings'
 import {
     BrainIcon,
     Building2,
@@ -32,14 +34,39 @@ const BEAMED_KINDS = new Set<CompanyFinding['kind']>(['identity', 'brain'])
 
 export const DISCOVERY_CARD_CLASS = 'relative w-full rounded-xl border border-border bg-card p-3 shadow-lg shadow-black/15'
 
+type DescribedSourceKey = 'website' | 'domain' | 'registry' | 'web'
+
+const SOURCE_LABEL: Record<DiscoverySource, { brand: string } | { key: DescribedSourceKey }> = {
+    profile: { key: 'website' },
+    stack: { key: 'website' },
+    site: { key: 'website' },
+    catalog: { key: 'website' },
+    dns: { key: 'domain' },
+    registry: { key: 'registry' },
+    search: { key: 'web' },
+    linkedinPerson: { brand: 'LinkedIn' },
+    linkedinCompany: { brand: 'LinkedIn' },
+    googleBusiness: { brand: 'Google' },
+    synthesis: { brand: 'Rerun' },
+}
+
+export function useDiscoverySourceLabel() {
+    const t = useTranslations('builder.discoveries.sources')
+    return (source: DiscoverySource) => {
+        const label = SOURCE_LABEL[source]
+        return 'brand' in label ? label.brand : t(label.key)
+    }
+}
+
 export function DiscoveryCardShell({ icon, label, source, beam, children }: { icon: LucideIcon; label: string; source: DiscoverySource; beam?: boolean; children: ReactNode }) {
+    const sourceLabel = useDiscoverySourceLabel()
     return (
         <div className={DISCOVERY_CARD_CLASS}>
             {beam && <BorderBeam animated pattern="arcs" tone="brand" glow width={1} outset={1} />}
             <div className="mb-2 flex items-center gap-2">
                 <Icon icon={icon} size="xs" />
                 <span className="text-[11px] font-medium text-muted-foreground">{label}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground/70">{DISCOVERY_SOURCE_LABELS[source]}</span>
+                <span className="ml-auto text-[10px] text-muted-foreground/70">{sourceLabel(source)}</span>
             </div>
             {children}
         </div>
@@ -56,21 +83,22 @@ function useArrivalBeam(enabled: boolean): boolean {
     return enabled && lit
 }
 
-function formatCount(value: number, decimals: number): string {
-    return value.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+function formatCount(value: number, decimals: number, locale: string): string {
+    return formatNumber(value, locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
 }
 
 function CountUp({ value, decimals = 0, still }: { value: number; decimals?: number; still?: boolean }) {
+    const locale = useLocale()
     const ref = useRef<HTMLSpanElement>(null)
     useEffect(() => {
         const node = ref.current
         if (!node || still) return
-        const controls = animate(0, value, { duration: 1.4, ease: [0.16, 1, 0.3, 1], onUpdate: latest => (node.textContent = formatCount(latest, decimals)) })
+        const controls = animate(0, value, { duration: 1.4, ease: [0.16, 1, 0.3, 1], onUpdate: latest => (node.textContent = formatCount(latest, decimals, locale)) })
         return () => controls.stop()
-    }, [value, decimals, still])
+    }, [value, decimals, still, locale])
     return (
         <span ref={ref} className="tabular-nums">
-            {formatCount(value, decimals)}
+            {formatCount(value, decimals, locale)}
         </span>
     )
 }
@@ -115,9 +143,10 @@ function ItemList({ items }: { items: string[] }) {
 }
 
 function BrainEntityCounts({ products, competitors }: { products: number; competitors: number }) {
-    const counts = [products && `${products} ${products === 1 ? 'product' : 'products'}`, competitors && `${competitors} ${competitors === 1 ? 'competitor' : 'competitors'}`].filter(Boolean)
-    if (!counts.length) return null
-    return <p className="text-xs text-muted-foreground">+ {counts.join(', ')}</p>
+    const t = useTranslations('builder.discoveries.cards.brain')
+    if (!products && !competitors) return null
+    const line = products && competitors ? t('productsAndCompetitors', { products, competitors }) : products ? t('productsOnly', { products }) : t('competitorsOnly', { competitors })
+    return <p className="text-xs text-muted-foreground">{line}</p>
 }
 
 function ToolRow({ name, iconUrl }: { name: string; iconUrl: string | null }) {
@@ -137,13 +166,15 @@ function Logo({ src, name }: { src: string | null; name: string }) {
 }
 
 export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; still?: boolean }) {
+    const t = useTranslations('builder.discoveries.cards')
     const beam = useArrivalBeam(!still && BEAMED_KINDS.has(finding.kind))
+    const bold = (chunks: ReactNode) => <span className="font-medium">{chunks}</span>
     const { source } = finding
 
     switch (finding.kind) {
         case 'identity':
             return (
-                <DiscoveryCardShell icon={GlobeIcon} label="Found you" source={source} beam={beam}>
+                <DiscoveryCardShell icon={GlobeIcon} label={t('identity.title')} source={source} beam={beam}>
                     <div className="flex items-center gap-3">
                         <Logo src={finding.logoUrl} name={finding.name} />
                         <div className="min-w-0">
@@ -155,13 +186,13 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
             )
         case 'audience':
             return (
-                <DiscoveryCardShell icon={UsersIcon} label="Who you sell to" source={source}>
+                <DiscoveryCardShell icon={UsersIcon} label={t('audience.title')} source={source}>
                     <p className="text-xs leading-relaxed">{finding.text}</p>
                 </DiscoveryCardShell>
             )
         case 'tools':
             return (
-                <DiscoveryCardShell icon={Wrench} label="Tools we spotted" source={source}>
+                <DiscoveryCardShell icon={Wrench} label={t('tools.title')} source={source}>
                     <div className="flex flex-wrap gap-x-3 gap-y-1">
                         {finding.tools.map(tool => (
                             <ToolRow key={tool.name} name={tool.name} iconUrl={tool.iconUrl} />
@@ -171,18 +202,16 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
             )
         case 'mail':
             return (
-                <DiscoveryCardShell icon={Mail} label="Your inbox" source={source}>
+                <DiscoveryCardShell icon={Mail} label={t('mail.title')} source={source}>
                     <div className="flex items-center gap-2">
                         {finding.iconUrl && <Icon src={finding.iconUrl} size="sm" />}
-                        <p className="text-xs">
-                            Email runs on <span className="font-medium">{finding.provider}</span>
-                        </p>
+                        <p className="text-xs">{t.rich('mail.runsOn', { provider: finding.provider, b: bold })}</p>
                     </div>
                 </DiscoveryCardShell>
             )
         case 'social':
             return (
-                <DiscoveryCardShell icon={Megaphone} label="Where you show up" source={source}>
+                <DiscoveryCardShell icon={Megaphone} label={t('social.title')} source={source}>
                     <div className="flex flex-wrap gap-x-3 gap-y-1">
                         {finding.networks.map(network => (
                             <div key={network.name} className="flex items-center gap-1.5">
@@ -196,7 +225,7 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
             )
         case 'brand':
             return (
-                <DiscoveryCardShell icon={Palette} label="Your brand" source={source}>
+                <DiscoveryCardShell icon={Palette} label={t('brand.title')} source={source}>
                     <div className="flex items-center gap-1.5">
                         {finding.colors.map((color, index) => (
                             <motion.span
@@ -214,25 +243,17 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
             )
         case 'registry':
             return (
-                <DiscoveryCardShell icon={Building2} label="On paper" source={source}>
+                <DiscoveryCardShell icon={Building2} label={t('registry.title')} source={source}>
                     <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
-                        {finding.founded && (
-                            <span>
-                                Since <span className="font-medium">{finding.founded}</span>
-                            </span>
-                        )}
-                        {finding.headcount && (
-                            <span>
-                                <span className="font-medium">{finding.headcount}</span> people
-                            </span>
-                        )}
+                        {finding.founded && <span>{t.rich('registry.since', { year: finding.founded, b: bold })}</span>}
+                        {finding.headcount && <span>{t.rich('registry.people', { headcount: finding.headcount, b: bold })}</span>}
                         {finding.city && <span className="text-muted-foreground">{finding.city}</span>}
                     </div>
                 </DiscoveryCardShell>
             )
         case 'person':
             return (
-                <DiscoveryCardShell icon={UserRoundIcon} label={`Is this you, ${finding.name.split(' ')[0]}?`} source={source}>
+                <DiscoveryCardShell icon={UserRoundIcon} label={t('person.title', { firstName: finding.name.split(' ')[0] })} source={source}>
                     <div className="flex items-center gap-3">
                         {finding.photoUrl ? (
                             <div className="relative shrink-0">
@@ -259,14 +280,14 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
             )
         case 'linkedin':
             return (
-                <DiscoveryCardShell icon={UsersIcon} label="Your LinkedIn page" source={source}>
+                <DiscoveryCardShell icon={UsersIcon} label={t('linkedin.title')} source={source}>
                     <div className="flex items-baseline gap-4">
                         {finding.followers !== null && (
                             <div>
                                 <p className="font-heading text-xl font-medium">
                                     <CountUp value={finding.followers} still={still} />
                                 </p>
-                                <p className="text-[10px] text-muted-foreground">followers</p>
+                                <p className="text-[10px] text-muted-foreground">{t('linkedin.followers')}</p>
                             </div>
                         )}
                         {finding.employees !== null && (
@@ -274,7 +295,7 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
                                 <p className="font-heading text-xl font-medium">
                                     <CountUp value={finding.employees} still={still} />
                                 </p>
-                                <p className="text-[10px] text-muted-foreground">on the team</p>
+                                <p className="text-[10px] text-muted-foreground">{t('linkedin.team')}</p>
                             </div>
                         )}
                     </div>
@@ -282,7 +303,7 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
             )
         case 'reviews':
             return (
-                <DiscoveryCardShell icon={StarIcon} label="What customers say" source={source}>
+                <DiscoveryCardShell icon={StarIcon} label={t('reviews.title')} source={source}>
                     <div className="flex items-center gap-3">
                         <p className="font-heading text-2xl font-medium">
                             <CountUp value={finding.rating} decimals={1} still={still} />
@@ -290,7 +311,7 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
                         <div className="flex flex-col gap-1">
                             <Stars rating={finding.rating} still={still} />
                             <p className="text-[10px] text-muted-foreground">
-                                <CountUp value={finding.count} still={still} /> Google reviews
+                                {t.rich('reviews.count', { count: finding.count, n: () => <CountUp value={finding.count} still={still} /> })}
                             </p>
                         </div>
                     </div>
@@ -298,28 +319,26 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
             )
         case 'products':
             return (
-                <DiscoveryCardShell icon={Package} label="What you sell" source={source}>
+                <DiscoveryCardShell icon={Package} label={t('products.title')} source={source}>
                     <ItemList items={finding.items} />
                 </DiscoveryCardShell>
             )
         case 'competitors':
             return (
-                <DiscoveryCardShell icon={TargetIcon} label="Who you're up against" source={source}>
+                <DiscoveryCardShell icon={TargetIcon} label={t('competitors.title')} source={source}>
                     <ItemList items={finding.items} />
                 </DiscoveryCardShell>
             )
         case 'customers':
             return (
-                <DiscoveryCardShell icon={HandshakeIcon} label="Who already buys" source={source}>
+                <DiscoveryCardShell icon={HandshakeIcon} label={t('customers.title')} source={source}>
                     <ItemList items={finding.items} />
                 </DiscoveryCardShell>
             )
         case 'brain':
             return (
-                <DiscoveryCardShell icon={BrainIcon} label="Company Brain" source={source} beam={beam}>
-                    <p className="text-sm font-medium">
-                        {finding.pages} {finding.pages === 1 ? 'page' : 'pages'} your agents read before they start
-                    </p>
+                <DiscoveryCardShell icon={BrainIcon} label={t('brain.title')} source={source} beam={beam}>
+                    <p className="text-sm font-medium">{t('brain.pages', { count: finding.pages })}</p>
                     {finding.topics?.length ? <ItemList items={finding.topics} /> : null}
                     <BrainEntityCounts products={finding.products ?? 0} competitors={finding.competitors ?? 0} />
                 </DiscoveryCardShell>

@@ -1,0 +1,22 @@
+{
+    "_doc": "Terms the translation keeps fixed. `keep` stays as written in every language; `translations` imposes a word per language; `tone` is the register of each language.",
+    "keep": ["Rerun", "Rerun Cloud", "Rerun Max", "Foreman", "Box", "Boxes", "Pro", "Max", "Google", "WhatsApp", "LinkedIn", "Slack", "Stripe"],
+    "translations": {
+        "coworker": { "fr": "coworker", "es": "coworker" },
+        "coworkers": { "fr": "coworkers", "es": "coworkers" },
+        "workspace": { "fr": "workspace", "es": "workspace" },
+        "credit": { "fr": "crédit", "es": "crédito" },
+        "skill": { "fr": "skill", "es": "skill" },
+        "run": { "fr": "exécution", "es": "ejecución" }
+    },
+    "tone": {
+        "fr": "Vouvoiement. Short, plain product French as in a SaaS app. No anglicisms beyond the glossary.",
+        "es": "Tuteo (tú), as Spanish-language SaaS products do. Neutral Spanish, no regionalisms."
+    },
+    "rules": [
+        "Never use the em dash (—) nor the en dash as punctuation.",
+        "Keep every ICU argument ({name}, {count, plural, ...}) and every rich text tag (<link>...</link>) exactly as in the source.",
+        "Translate the words inside plural and select branches, and give every plural category the target language needs.",
+        "Stay as short as the English: a button label stays a button label."
+    ]
+}

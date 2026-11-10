@@ -11,6 +11,7 @@ import { loadCreatorDirectory, loadLibraryCreators } from '@/lib/templates/libra
 import { LIBRARY_COLUMNS, toLibraryTemplates, type LibraryCreator, type LibraryRow, type LibraryTemplate } from '@/lib/templates/library'
 import { installTemplate, type TemplateInstallOutcome } from '@/lib/templates/install'
 import type { GridPosition } from '@/lib/board/types'
+import { AppError, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -96,7 +97,7 @@ const installInputSchema = z.object({
     again: z.boolean().optional(),
 })
 
-export type InstallTemplateResult = ({ ok: true } & TemplateInstallOutcome) | { ok: false; error: string }
+export type InstallTemplateResult = ({ ok: true } & TemplateInstallOutcome) | ActionFailure
 
 // The target space comes from the client but its workspace never does: assertSpaceAccess resolves
 // it from the session, so an id from somewhere else resolves to "Box not found". That check, at
@@ -110,7 +111,7 @@ export async function installTemplateAction(input: { slug: string; spaceId: stri
         const supabase = createServiceRoleClient()
 
         const { data: template } = await selectMaybeSingle(supabase, 'templates', ['id', 'status', 'creator_id', 'pricing_model'] as const, { slug })
-        if (!template) throw new Error(`No template found with slug "${slug}"`)
+        if (!template) throw new AppError('templateSlugNotFound', { slug })
 
         // A live template installs for any member of the workspace; anything not yet public is a
         // preview, reserved for the admin and the author who is testing their own submission.
@@ -123,17 +124,17 @@ export async function installTemplateAction(input: { slug: string; spaceId: stri
         } else if ((await getAdminEmail()) === null) {
             const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status'] as const, { id: workspace_id })
             const status = workspace?.subscription_status
-            if (status !== 'active' && status !== 'trialing') throw new Error('This workspace has no active plan.')
+            if (status !== 'active' && status !== 'trialing') throw new AppError('noActivePlan')
 
             // The plan gate stays first: buying a template unlocks the template, not the compute
             // it needs to run.
             const { user } = await getServerSession()
-            if (!(await hasTemplateEntitlement(supabase, workspace_id, template, user?.id))) throw new Error('This template requires a purchase.')
+            if (!(await hasTemplateEntitlement(supabase, workspace_id, template, user?.id))) throw new AppError('templateNeedsPurchase')
         }
 
         const outcome = await installTemplate(supabase, slug, { workspaceId: workspace_id, spaceId, actor, positions, again })
         return { ok: true, ...outcome }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to import this template' }
+        return failureOf(err, 'importTemplateFailed')
     }
 }

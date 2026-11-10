@@ -3,13 +3,13 @@
 import { deleteWorkspaceTableRowsAction, dropWorkspaceTableAction, listWorkspaceTablesAction, purgeWorkspaceTableAction, readWorkspaceTableRowsAction } from '@/app/api/_actions/workspace-db.actions'
 import { DataBrowser } from '@/components/data/DataBrowser'
 import { tablesOrThrow, viewActions, type DataFocus, type DataSource } from '@/lib/data/source'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 import { withTabWorkspace } from '@/lib/workspace/tab-workspace'
 
-export const SHARED_TABLES_EMPTY = {
-    title: 'No shared tables yet',
-    description:
-        'Every coworker of the workspace reads and writes this database. When they need a common record (a catalog, a queue, a list several coworkers work through), they create tables here that you can browse anytime.',
+export function useSharedTablesEmpty() {
+    const t = useTranslations('data.shared')
+    return { title: t('emptyTitle'), description: t('emptyDescription') }
 }
 
 type SharedDataPanelProps = {
@@ -22,6 +22,9 @@ type SharedDataPanelProps = {
 // The database every agent of the workspace reads and writes, as opposed to the private one each
 // agent keeps to itself.
 export function SharedDataPanel({ initial, onInitialConsumed, table, onTableDropped }: SharedDataPanelProps) {
+    const t = useTranslations('data.shared')
+    const { title: emptyTitle, description: emptyDescription } = useSharedTablesEmpty()
+    const unreachableMessage = t('unreachable')
     const source = useMemo<DataSource>(
         () => ({
             scope: 'shared',
@@ -40,11 +43,11 @@ export function SharedDataPanel({ initial, onInitialConsumed, table, onTableDrop
                 return withTabWorkspace(`/api/data/export?${qs.toString()}`)
             },
             ...viewActions({ kind: 'shared' }),
-            unreachableMessage: 'Could not reach the machine of this workspace.',
-            emptyTitle: SHARED_TABLES_EMPTY.title,
-            emptyDescription: SHARED_TABLES_EMPTY.description,
+            unreachableMessage,
+            emptyTitle,
+            emptyDescription,
         }),
-        []
+        [unreachableMessage, emptyTitle, emptyDescription]
     )
 
     return <DataBrowser source={source} initial={initial} onInitialConsumed={onInitialConsumed} table={table} onTableDropped={onTableDropped} />

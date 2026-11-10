@@ -4,10 +4,11 @@ import { type ReactNode, useState } from 'react'
 
 import { CalendarIcon, CheckIcon, GlobeIcon, MessageSquareTextIcon } from '../icons'
 import type { JobSchedule } from './reading'
-import { DAY_INITIALS, DEFAULT_CUSTOM, DESCRIBED, ON_DEMAND_LABEL, SCHEDULE_PRESETS, type ScheduleChoice, toggleDay } from './schedule'
+import { dayInitials, DEFAULT_CUSTOM, DESCRIBED, SCHEDULE_PRESETS, type ScheduleChoice, toggleDay } from './schedule'
 import { timeZoneOffset, useTimeZone } from './useTimeZone'
 import type { CatalogEntry } from './types'
 import { cn } from '../cn'
+import { useKitTranslations, useUiLocale } from '../locale'
 
 import { AppLogo } from './marks'
 
@@ -16,6 +17,7 @@ import { AppLogo } from './marks'
 // The time zone closes it, quiet, since every hour above depends on it. Picking the ticked option
 // again gives the timing back to the description.
 export function SchedulePlanner({ read, app, choice, onChoice }: { read: JobSchedule | null; app?: CatalogEntry; choice: ScheduleChoice; onChoice: (choice: ScheduleChoice) => void }) {
+    const t = useKitTranslations()
     const [lastCustom, setLastCustom] = useState(DEFAULT_CUSTOM)
     const custom = choice.kind === 'custom' ? choice : lastCustom
     const timeZone = useTimeZone()
@@ -37,7 +39,7 @@ export function SchedulePlanner({ read, app, choice, onChoice }: { read: JobSche
                         {app ? <AppLogo app={app} className="mt-px" /> : <span className="size-4 shrink-0" />}
                         <span className="min-w-0 flex-1">
                             <span className="block leading-[18px] text-foreground">{read.label}</span>
-                            <span className="mt-0.5 block text-xs text-muted-foreground">Read from your description</span>
+                            <span className="mt-0.5 block text-xs text-muted-foreground">{t('newAgent.schedule.readFromDescription')}</span>
                         </span>
                         {choice.kind === 'described' && <CheckIcon className="mt-px size-4 shrink-0 text-foreground" />}
                     </button>
@@ -46,27 +48,27 @@ export function SchedulePlanner({ read, app, choice, onChoice }: { read: JobSche
             )}
             <p className="flex h-7 items-center gap-2.5 px-2 text-xs font-medium text-muted-foreground">
                 <CalendarIcon className="size-4" />
-                On a schedule
+                {t('newAgent.schedule.onASchedule')}
             </p>
             {SCHEDULE_PRESETS.map(preset => {
                 const selected = choice.kind === 'preset' && choice.id === preset.id
                 return (
-                    <Option key={preset.id} aim={preset.id} selected={selected} detail={preset.detail} onClick={() => pick({ kind: 'preset', id: preset.id }, selected)}>
-                        {preset.label}
+                    <Option key={preset.id} aim={preset.id} selected={selected} detail={t(`newAgent.schedule.presets.${preset.id}.detail`)} onClick={() => pick({ kind: 'preset', id: preset.id }, selected)}>
+                        {t(`newAgent.schedule.presets.${preset.id}.label`)}
                     </Option>
                 )
             })}
             <div className={cn('flex h-8 items-center gap-2.5 rounded-md pr-2 transition-colors', choice.kind === 'custom' ? 'bg-muted/60' : 'hover:bg-muted/40')}>
                 <button type="button" aria-pressed={choice.kind === 'custom'} onClick={() => pick(custom, choice.kind === 'custom')} className="flex h-full flex-1 items-center gap-2.5 pl-2 text-left">
                     <Tick selected={choice.kind === 'custom'} />
-                    <span className="text-foreground/90">Custom</span>
+                    <span className="text-foreground/90">{t('newAgent.schedule.custom')}</span>
                 </button>
                 <CustomWeek days={custom.days} time={custom.time} onDays={days => setCustom({ ...custom, days })} onTime={time => setCustom({ ...custom, time })} />
             </div>
 
             <Divider />
-            <Option icon={<MessageSquareTextIcon className="size-4 text-muted-foreground" />} selected={choice.kind === 'on-demand'} detail="No schedule" onClick={() => pick({ kind: 'on-demand' }, choice.kind === 'on-demand')}>
-                {ON_DEMAND_LABEL}
+            <Option icon={<MessageSquareTextIcon className="size-4 text-muted-foreground" />} selected={choice.kind === 'on-demand'} detail={t('newAgent.schedule.noSchedule')} onClick={() => pick({ kind: 'on-demand' }, choice.kind === 'on-demand')}>
+                {t('newAgent.schedule.onDemand')}
             </Option>
 
             {timeZone && (
@@ -97,16 +99,18 @@ function Option({ icon, aim, selected, detail, onClick, children }: { icon?: Rea
 }
 
 function CustomWeek({ days, time, onDays, onTime }: { days: boolean[]; time: string; onDays: (days: boolean[]) => void; onTime: (time: string) => void }) {
+    const t = useKitTranslations()
+    const locale = useUiLocale()
     return (
         <span className="flex items-center gap-2">
             <span className="flex items-center gap-[3px]">
-                {DAY_INITIALS.map((day, index) => (
+                {dayInitials(locale).map((day, index) => (
                     <button key={index} type="button" aria-pressed={days[index]} onClick={() => onDays(toggleDay(days, index))} className={cn('flex size-5 items-center justify-center rounded-[5px] text-[10px] font-medium transition-colors', days[index] ? 'bg-black/[0.07] text-foreground/85 dark:bg-white/[0.09]' : 'text-muted-foreground/50 inset-ring inset-ring-black/[0.08] hover:text-foreground dark:inset-ring-white/[0.06]')}>
                         {day}
                     </button>
                 ))}
             </span>
-            <input type="time" value={time} onChange={event => event.target.value && onTime(event.target.value)} aria-label="Time of day" className="h-5 rounded-[5px] bg-black/[0.05] px-1.5 text-xs text-foreground/85 tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring/40 dark:bg-white/[0.06] [&::-webkit-calendar-picker-indicator]:hidden" />
+            <input type="time" value={time} onChange={event => event.target.value && onTime(event.target.value)} aria-label={t('newAgent.schedule.timeOfDay')} className="h-5 rounded-[5px] bg-black/[0.05] px-1.5 text-xs text-foreground/85 tabular-nums outline-none focus-visible:ring-2 focus-visible:ring-ring/40 dark:bg-white/[0.06] [&::-webkit-calendar-picker-indicator]:hidden" />
         </span>
     )
 }

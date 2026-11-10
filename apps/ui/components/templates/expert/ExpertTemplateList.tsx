@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,12 +20,13 @@ export function ExpertTemplateList({
     onRequestCreate: () => void
     onSelect: (id: string) => void
 }) {
+    const t = useTranslations('templates.expert.list')
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <div className="border-b border-border px-4 pb-3">
                 <Button size="sm" variant="outline" className="w-full" onClick={onRequestCreate}>
                     <PlusIcon className="size-3.5" />
-                    New template
+                    {t('newTemplate')}
                 </Button>
             </div>
 
@@ -33,8 +35,8 @@ export function ExpertTemplateList({
             ) : templates.length === 0 ? (
                 <EmptyState
                     icon={LayersIcon}
-                    title="No templates yet"
-                    description="Describe a coworker setup once, and we review it before it reaches the marketplace."
+                    title={t('emptyTitle')}
+                    description={t('emptyDescription')}
                 />
             ) : (
                 <div className="min-h-0 flex-1 overflow-y-auto">

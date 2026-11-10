@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useCallback, useId, useState } from 'react'
 
 import { cn } from '../cn'
+import { useKitTranslations } from '../locale'
 
 type FileDropzoneRenderProps = { dragOver: boolean; inputId: string }
 
@@ -17,7 +18,8 @@ interface FileDropzoneProps {
     children: React.ReactNode | ((state: FileDropzoneRenderProps) => React.ReactNode)
 }
 
-export function FileDropzone({ onFiles, accept, multiple = false, disabled, overlayLabel = 'Drop your file here', className, children }: FileDropzoneProps) {
+export function FileDropzone({ onFiles, accept, multiple = false, disabled, overlayLabel, className, children }: FileDropzoneProps) {
+    const t = useKitTranslations()
     const inputId = useId()
     const [dragOver, setDragOver] = useState(false)
 
@@ -67,7 +69,7 @@ export function FileDropzone({ onFiles, accept, multiple = false, disabled, over
             {typeof children === 'function' ? (children as (state: FileDropzoneRenderProps) => React.ReactNode)({ dragOver, inputId }) : children}
             {dragOver && (
                 <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-primary/5">
-                    <p className="text-sm font-medium text-primary">{overlayLabel}</p>
+                    <p className="text-sm font-medium text-primary">{overlayLabel ?? t('forms.dropFile')}</p>
                 </div>
             )}
         </div>

@@ -1,4 +1,5 @@
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AccountMenu } from '@/components/home/AccountMenu'
 import { HOME_GUTTER } from '@/components/home/CoworkerRow'
@@ -13,6 +14,7 @@ type HomeHeaderProps = {
 }
 
 export function HomeHeader({ inboxCount, onInbox, onNewCoworker }: HomeHeaderProps) {
+    const t = useTranslations('mobileHome')
     return (
         <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: HOME_GUTTER }}>
             <AccountMenu />
@@ -20,7 +22,7 @@ export function HomeHeader({ inboxCount, onInbox, onNewCoworker }: HomeHeaderPro
             <View style={{ flex: 1 }} />
 
             <InboxButton count={inboxCount} onPress={onInbox} />
-            <GlassButton symbol="plus" label="New coworker" onPress={onNewCoworker} />
+            <GlassButton symbol="plus" label={t('newCoworker')} onPress={onNewCoworker} />
         </View>
     )
 }

@@ -1,6 +1,7 @@
 import type { DimensionValue } from 'react-native'
 import { View } from 'react-native'
 import Animated, { FadeOut } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { Skeleton } from '@/components/ui/Skeleton'
 import { MOTION } from '@/theme/motion'
@@ -34,8 +35,9 @@ const TURNS: Turn[] = [
 // paragraph of the reply in a grey bubble of its own on the left.
 export function ConversationSkeleton() {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.pane')
     return (
-        <Animated.View exiting={FadeOut.duration(MOTION.fast)} accessible accessibilityLabel="Loading the conversation" style={{ gap: spacing.xl }}>
+        <Animated.View exiting={FadeOut.duration(MOTION.fast)} accessible accessibilityLabel={t('loading')} style={{ gap: spacing.xl }}>
             {TURNS.map((turn, index) =>
                 turn.role === 'user' ? (
                     <Skeleton key={index} style={{ alignSelf: 'flex-end', width: turn.width, height: USER_BUBBLE_HEIGHT, borderRadius: radius.xl, borderBottomRightRadius: 6 }} />

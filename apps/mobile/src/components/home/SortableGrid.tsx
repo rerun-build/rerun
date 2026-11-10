@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { cancelAnimation, runOnJS, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, type SharedValue } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { hashUnit } from '@/components/buddy/look'
 
@@ -17,6 +18,7 @@ function placeOf(index: number, columns: number, cell: Size) {
 }
 
 function Cell({ id, count, columns, cell, order, onDrop, children }: { id: string; count: number; columns: number; cell: Size; order: SharedValue<string[]>; onDrop: (ids: string[]) => void; children: ReactNode }) {
+    const t = useTranslations('mobileHome')
     const dragging = useSharedValue(false)
     const x = useSharedValue(0)
     const y = useSharedValue(0)
@@ -70,7 +72,7 @@ function Cell({ id, count, columns, cell, order, onDrop, children }: { id: strin
 
     return (
         <GestureDetector gesture={pan}>
-            <Animated.View accessible accessibilityRole="adjustable" accessibilityHint="Drag to reorder" style={[{ position: 'absolute', width: cell.width, height: cell.height }, style]}>
+            <Animated.View accessible accessibilityRole="adjustable" accessibilityHint={t('pinned.dragToReorder')} style={[{ position: 'absolute', width: cell.width, height: cell.height }, style]}>
                 <View pointerEvents="none">{children}</View>
             </Animated.View>
         </GestureDetector>

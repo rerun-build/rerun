@@ -41,12 +41,12 @@ describe('updateNotificationPrefsByTokenAction', () => {
     it('refuses a tampered token without writing', async () => {
         const token = `token-of-${RECIPIENT}`
 
-        await expect(updateNotificationPrefsByTokenAction(`${token}x`, { sound: false })).resolves.toEqual({ ok: false, error: 'Invalid or expired link' })
+        await expect(updateNotificationPrefsByTokenAction(`${token}x`, { sound: false })).resolves.toEqual({ ok: false, error: 'Invalid or expired link', code: 'linkInvalidOrExpired' })
         expect(db.writes('users')).toHaveLength(0)
     })
 
     it('refuses a patch that does not match the preferences schema', async () => {
-        await expect(updateNotificationPrefsByTokenAction(`token-of-${RECIPIENT}`, { sound: 'loud' } as never)).resolves.toEqual({ ok: false, error: 'Invalid preferences' })
+        await expect(updateNotificationPrefsByTokenAction(`token-of-${RECIPIENT}`, { sound: 'loud' } as never)).resolves.toEqual({ ok: false, error: 'Invalid preferences', code: 'invalidPreferences' })
         expect(db.writes('users')).toHaveLength(0)
     })
 })
@@ -63,12 +63,12 @@ describe('updateNotificationPrefsAction', () => {
     it('refuses a visitor who is not signed in', async () => {
         mocks.getServerSession.mockResolvedValue({ user: null })
 
-        await expect(updateNotificationPrefsAction({ sound: false })).resolves.toEqual({ ok: false, error: 'Not authenticated' })
+        await expect(updateNotificationPrefsAction({ sound: false })).resolves.toEqual({ ok: false, error: 'Not authenticated', code: 'notAuthenticated' })
         expect(db.writes('users')).toHaveLength(0)
     })
 
     it('refuses an invalid patch before reading the session', async () => {
-        await expect(updateNotificationPrefsAction({ scope: 'loud' } as never)).resolves.toEqual({ ok: false, error: 'Invalid preferences' })
+        await expect(updateNotificationPrefsAction({ scope: 'loud' } as never)).resolves.toEqual({ ok: false, error: 'Invalid preferences', code: 'invalidPreferences' })
         expect(mocks.getServerSession).not.toHaveBeenCalled()
     })
 })

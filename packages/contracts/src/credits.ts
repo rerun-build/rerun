@@ -11,10 +11,12 @@ export const creditsFromMicros = (micros: number) => Math.round(micros / MICROS_
 
 // A balance or a cost as a bare figure, "1,250". A cost under one credit reads "<1" rather than "0",
 // so a paid call never looks free.
-export function formatCredits(micros: number): string {
+// `locale` only changes the digit grouping ("1,250", "1 250", "1.250"); the word "credits" goes
+// through the app's translations.
+export function formatCredits(micros: number, locale = 'en'): string {
     const value = micros / MICROS_PER_CREDIT
     if (value > 0 && value < 1) return '<1'
-    return Math.round(value).toLocaleString('en-US')
+    return Math.round(value).toLocaleString(locale === 'en' ? 'en-US' : locale)
 }
 
 export function creditsLabel(credits: number): string {

@@ -1,0 +1,240 @@
+{
+    "_context": {
+        "theme": "Row of the workspace menu holding the light/dark/system theme switch.",
+        "language": "Row of the workspace menu opening the list of languages the app can speak.",
+        "signIn": "Button for an anonymous visitor to sign in.",
+        "power.menuItem": "Admin menu item: restart the machine (server) the workspace runs on.",
+        "paused.savedUntil": "{date} is a short date (\"Nov 12\").",
+        "sandboxArchived.savedUntil": "{date} is a short date (\"Nov 12\").",
+        "restoring.steps.machine": "Step of a workspace restore, done.",
+        "restoring.steps.machineActive": "Same step, in progress.",
+        "workspaceMenu.summary.trial": "{limits} is the summary.limits text.",
+        "workspaceMenu.brain": "Name of the workspace knowledge base feature.",
+        "menu.weeklyRewind": "Name of a weekly recap feature (Rewind).",
+        "controlCenter.title": "Command palette of the app (search agents, settings, conversations).",
+        "controlCenter.quotedQuery": "What the person typed, quoted, beside \"Ask Rerun\".",
+        "controlCenter.hints.searchPage": "Footer hint. <keys></keys> is replaced by the keyboard keys (⌘ F): pressing them again opens the browser's own find in page.",
+        "controlCenter.hints.open": "Footer hint next to the Enter key: opens the selected row.",
+        "controlCenter.hints.more": "Footer hint next to the Tab key: opens more options for the selected row.",
+        "controlCenter.headings.open": "Section heading listing the tabs of a coworker's panel that can be opened.",
+        "controlCenter.status.off": "Badge of a coworker that is turned off.",
+        "controlCenter.pro": "Badge: feature of the paid plan.",
+        "controlCenter.boxAgents": "Detail of a Box row: how many agents it holds.",
+        "boxNameSuggestions": "Above a row of suggested names for a new Box.",
+        "providerStatus.headline.one": "Banner when one AI provider has an incident. {providers} is its name.",
+        "providerStatus.headline.many": "Banner when several AI providers have an incident. {providers} is a list of names already joined (\"Anthropic and OpenAI\").",
+        "providerStatus.headlineLong.one": "Same as headline.one, with a second sentence, on wide screens.",
+        "providerStatus.headlineLong.many": "Same as headline.many, with a second sentence, on wide screens.",
+        "workspaceMenu.summary.limits": "Under the workspace name. {agents} is a number. {seats} is already translated (\"3 seats\").",
+        "workspaceMenu.summary.limitsUnlimited": "Under the workspace name, when the plan has no coworker limit. {seats} is already translated (\"3 seats\")."
+    },
+    "loading": "Loading...",
+    "theme": "Theme",
+    "language": "Language",
+    "signIn": "Sign in",
+    "purchaseCancelled": "Purchase cancelled",
+    "help": {
+        "label": "Help",
+        "contactSupport": "Contact support"
+    },
+    "menu": {
+        "weeklyRewind": "Weekly Rewind",
+        "whatsNew": "What's new",
+        "gettingStarted": "Getting started",
+        "docs": "Docs",
+        "community": "Community",
+        "shortcuts": "Shortcuts",
+        "installApp": "Install app",
+        "hireExpert": "Hire an expert"
+    },
+    "power": {
+        "menuItem": "Restart machine",
+        "cancel": "Cancel",
+        "failed": "Something went wrong",
+        "restart": {
+            "title": "Restart the machine?",
+            "description": "Every coworker of this workspace will be unreachable for a few minutes.",
+            "confirmLabel": "Restart",
+            "pending": "Restarting the machine…",
+            "success": "Restart started, the machine will be back in a few minutes."
+        }
+    },
+    "providerStatus": {
+        "headline": {
+            "one": "{providers} is having issues.",
+            "many": "{providers} are having issues."
+        },
+        "headlineLong": {
+            "one": "{providers} is having issues. Your coworkers may be slower or fail.",
+            "many": "{providers} are having issues. Your coworkers may be slower or fail."
+        },
+        "viewStatus": "View status",
+        "dismiss": "Dismiss provider status"
+    },
+    "sidePanel": {
+        "close": "Close panel",
+        "resize": "Resize panel"
+    },
+    "paused": {
+        "title": "Workspace paused.",
+        "paymentFailed": "Payment failed, workspace paused.",
+        "saved": "Your coworkers and their data are saved.",
+        "savedUntil": "Your coworkers and their data are saved until {date}.",
+        "updatePayment": "Update payment",
+        "subscribe": "Subscribe to restore"
+    },
+    "sandboxArchived": {
+        "title": "Sandbox archived after 30 days unused.",
+        "requested": "Reactivation requested.",
+        "declined": "Reactivation declined.",
+        "declinedHint": "Contact us if you think this is a mistake.",
+        "savedUntil": "Your coworkers and their data are saved until {date}.",
+        "expired": "Its saved data has expired, a reactivation starts from an empty sandbox.",
+        "requestedReason": "We are reviewing your request",
+        "request": "Request reactivation"
+    },
+    "restoring": {
+        "title": "Restoring your workspace…",
+        "waitingApproved": "Reactivation approved, you're first in line.",
+        "waitingPaid": "Payment received, you're first in line.",
+        "waitingHint": "It comes back on its own within minutes.",
+        "failed": "Your restore needs a check on our side.",
+        "failedApproved": "We've been alerted and are bringing your sandbox back by hand.",
+        "failedPaid": "Payment received. We've been alerted and are bringing your workspace back by hand.",
+        "steps": {
+            "machine": "Machine assigned",
+            "machineActive": "Assigning a machine",
+            "data": "Restoring your data",
+            "agents": "Waking your coworkers"
+        }
+    },
+    "workspaceMenu": {
+        "defaultName": "Workspace",
+        "summary": {
+            "sandbox": "Expert sandbox",
+            "seats": "{count, plural, one {# seat} other {# seats}}",
+            "unlimitedSeats": "unlimited seats",
+            "limits": "{agents} coworkers · {seats}",
+            "trial": "Trial · {limits}",
+            "limitsUnlimited": "unlimited coworkers · {seats}"
+        },
+        "adminOnly": {
+            "apiKeys": "Only an admin can manage API keys",
+            "settings": "Only an admin can change the workspace settings",
+            "servers": "Only an admin can manage servers",
+            "billing": "Only an admin can manage billing"
+        },
+        "apiKeys": "API keys & MCP",
+        "settings": "Settings",
+        "members": "Members",
+        "brain": "Brain",
+        "brainProposals": "{count, plural, one {# proposal to review} other {# proposals to review}}",
+        "aiProviders": "AI providers",
+        "servers": "Servers",
+        "billing": "Billing",
+        "newWorkspace": "New workspace",
+        "templates": "Templates",
+        "myTemplates": "My templates",
+        "newTemplate": "New template",
+        "expert": "Expert",
+        "sandbox": "Sandbox",
+        "preparingSandbox": "Preparing sandbox…",
+        "publicProfile": "Public profile",
+        "admin": "Admin",
+        "adminPanel": "Admin panel",
+        "notifications": "Notifications",
+        "account": "Account",
+        "signOut": "Sign out"
+    },
+    "update": {
+        "reload": "Reload",
+        "available": {
+            "title": "New version available",
+            "description": "Reload to get the latest Rerun."
+        },
+        "required": {
+            "title": "Rerun was updated",
+            "description": "A new version is live. Reload to continue."
+        }
+    },
+    "controlCenter": {
+        "title": "Control center",
+        "description": "Jump to an agent, a setting or a conversation, or ask Rerun.",
+        "back": "Back",
+        "askRerun": "Ask Rerun",
+        "quotedQuery": "“{query}”",
+        "unnamedBox": "Untitled Box",
+        "pro": "Pro",
+        "boxAgents": "{count, plural, one {# agent} other {# agents}}",
+        "status": {
+            "off": "Off",
+            "waiting_human": "Needs you",
+            "working": "Working",
+            "error": "Error",
+            "offline": "Offline"
+        },
+        "headings": {
+            "actions": "Actions",
+            "settings": "Settings",
+            "agents": "Agents",
+            "needsYou": "Needs you",
+            "recent": "Recent",
+            "boxes": "Boxes",
+            "conversations": "Conversations",
+            "recentConversations": "Recent conversations",
+            "assistant": "Assistant",
+            "open": "Open",
+            "moveTo": "Move to"
+        },
+        "agent": {
+            "desktop": "Desktop",
+            "desktopDetail": "Take control of this coworker's screen",
+            "move": "Move to another Box",
+            "notifications": "Notifications",
+            "notificationsDetail": "When this agent reaches you"
+        },
+        "placeholder": {
+            "rootAssistant": "Search or ask Rerun…",
+            "root": "Search agents, settings, conversations…",
+            "agent": "Search in {name}…",
+            "agentUnknown": "Search in this agent…",
+            "box": "Search agents in this Box…",
+            "move": "Pick a Box…"
+        },
+        "empty": {
+            "box": "No agents in this Box yet.",
+            "noMatch": "Nothing matches."
+        },
+        "hints": {
+            "open": "Open",
+            "more": "More",
+            "searchPage": "<keys></keys> again to search in the page"
+        },
+        "commands": {
+            "new_agent": "New agent",
+            "browse_templates": "Browse templates",
+            "new_box": "New Box",
+            "ask_assistant": "Ask the assistant",
+            "contact_support": "Contact Support",
+            "recenter_board": "Recenter the board",
+            "toggle_theme_light": "Switch to light theme",
+            "toggle_theme_dark": "Switch to dark theme",
+            "workspace": "Workspace settings",
+            "members": "Members",
+            "billing": "Billing",
+            "ai_providers": "AI providers",
+            "api_keys": "API keys & MCP",
+            "company_brain": "Company Brain",
+            "shared_files": "Shared files",
+            "account": "Account",
+            "notifications": "Notifications",
+            "shortcuts": "Keyboard shortcuts",
+            "whats_new": "What's new"
+        }
+    },
+    "boxNameSuggestions": "Or pick a name",
+    "dashboard": {
+        "metaTitle": "Dashboard",
+        "metaDescription": "Your Boxes and coworkers on Rerun."
+    }
+}

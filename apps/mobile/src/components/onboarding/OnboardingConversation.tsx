@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { QuestionReceipt } from '@/components/chat/hitl/Receipts'
 import { Composer } from '@/components/chat/Composer'
@@ -22,7 +23,6 @@ import { StarterPackCard } from './widgets/StarterPackCard'
 import { BuildCard, TeamStartCard, type TeamStartState } from './widgets/TeamCards'
 
 const BLUR_ABOVE_FOOTER = 32
-const FOREMAN = { id: 'foreman', kind: 'foreman' as const, name: 'Rerun', role: 'Your workspace assistant', status: 'working' as const }
 
 export type OnboardingConversationProps = {
     messages: UIMessage[]
@@ -62,6 +62,7 @@ function segmentsOf(message: UIMessage): Segment[] {
 }
 
 function Answered({ widget }: { widget: WidgetPart }) {
+    const t = useTranslations('mobileOnboarding')
     if (widget.widget === 'ask_choice' || widget.widget === 'ask_input' || widget.widget === 'ask_either') {
         const answer = readQuestionOutput(widget.output)
         if (!answer?.answered) return null
@@ -72,7 +73,7 @@ function Answered({ widget }: { widget: WidgetPart }) {
         if (!answer?.answered) return null
         const cards = readStarterPack(widget.input)
         const hired = 'custom' in answer ? [answer.custom] : cards.filter(card => answer.chosen.includes(card.slug)).map(card => card.promise)
-        return <QuestionReceipt answers={[{ question: 'Your starter team', answers: hired }]} />
+        return <QuestionReceipt answers={[{ question: t('starter.title'), answers: hired }]} />
     }
     return null
 }
@@ -85,6 +86,8 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
     const [draft, setDraft] = useState('')
     const [footerHeight, setFooterHeight] = useState(0)
     const keyboard = useAnimatedKeyboard()
+    const t = useTranslations('mobileOnboarding')
+    const foreman = { id: 'foreman', kind: 'foreman' as const, name: 'Rerun', role: t('conversation.foremanRole'), status: 'working' as const }
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
 
     const pending = busy ? null : pendingWidget(messages)
@@ -137,19 +140,19 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
                     {failed && !busy && (
                         <View style={{ alignItems: 'flex-start', gap: spacing.sm }}>
                             <AppText variant="callout" tone="muted">
-                                That did not go through.
+                                {t('conversation.failed')}
                             </AppText>
-                            <PillButton label="Try again" variant="secondary" onPress={onRetry} />
+                            <PillButton label={t('conversation.tryAgain')} variant="secondary" onPress={onRetry} />
                         </View>
                     )}
-                    {busy && !building && <RunStatus coworker={FOREMAN} phase="working" />}
+                    {busy && !building && <RunStatus coworker={foreman} phase="working" />}
                 </ScrollView>
                 <EdgeFade edge="top" height={spacing.xl} />
                 <ProgressiveBlur height={footerHeight + BLUR_ABOVE_FOOTER} veiled={false} />
                 <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ paddingTop: composer ? spacing.sm : 0 }}>
                     {composer && (
                         <Animated.View entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                            <Composer value={draft} onChangeText={setDraft} onSend={send} onStop={onStop} running={busy} placeholder="Answer Rerun" canAttach={false} />
+                            <Composer value={draft} onChangeText={setDraft} onSend={send} onStop={onStop} running={busy} placeholder={t('conversation.composerPlaceholder')} canAttach={false} />
                         </Animated.View>
                     )}
                 </View>

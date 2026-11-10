@@ -2,6 +2,7 @@ import { taskKey, type RoutineView } from '@rerun/contracts'
 import { router, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router'
 import { useCallback, useState, type ReactNode } from 'react'
 import { Linking } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { fetchRoutines } from '@/api/coworker'
 import { useAuth } from '@/auth/AuthProvider'
@@ -28,8 +29,9 @@ export function NotificationCenterScreen() {
     const { prefs, failed, update } = useNotificationPrefs()
     const agents = useWorkspaceAgents()
     const push = usePushPermission()
+    const t = useTranslations('mobileSettings.notifications')
     return (
-        <SettingsSheet title="Notifications">
+        <SettingsSheet title={t('title')}>
             <NotificationCenter prefs={prefs} failed={failed} coworkers={agents?.map(agent => ({ id: agent.id, name: agent.name })) ?? null} push={push.status} onEnablePush={push.enable} onOpenIosSettings={() => Linking.openSettings()} onPatch={update} onOpenCoworker={coworker => router.push({ pathname: '/settings/coworker/[id]', params: { id: coworker.id, name: coworker.name } })} />
         </SettingsSheet>
     )
@@ -64,13 +66,14 @@ export function CoworkerNotificationsScreen({ frame }: { frame: 'sheet' | 'page'
     const { id: agentId, name = '' } = useLocalSearchParams<{ id: string; name?: string }>()
     const { prefs, update, setCoworkerRule } = useNotificationPrefs()
     const { routines, failed } = useCoworkerRoutines(agentId)
+    const t = useTranslations('mobileSettings.notifications')
     const content = <CoworkerNotifications agentId={agentId} name={name} prefs={prefs} routines={routines} routinesFailed={failed} onRule={rule => setCoworkerRule(agentId, rule)} onTask={(kind, slug, notify) => update({ tasks: { [taskKey(agentId, kind, slug)]: notify } })} />
     if (frame === 'page') {
         return (
-            <CoworkerPage title="Notifications" onBack={() => router.back()}>
+            <CoworkerPage title={t('title')} onBack={() => router.back()}>
                 {content}
             </CoworkerPage>
         )
     }
-    return <SettingsSheet title="Notifications">{content}</SettingsSheet>
+    return <SettingsSheet title={t('title')}>{content}</SettingsSheet>
 }

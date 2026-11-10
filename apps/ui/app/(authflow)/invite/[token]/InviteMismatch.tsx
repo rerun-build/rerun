@@ -3,9 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { createClient } from '@/supabase/client'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 export function InviteMismatch({ inviteEmail, currentEmail, workspaceName }: { inviteEmail: string; currentEmail: string; workspaceName: string }) {
+    const t = useTranslations('auth.invite')
     const [loading, setLoading] = useState(false)
     const supabase = createClient()
 
@@ -18,13 +20,13 @@ export function InviteMismatch({ inviteEmail, currentEmail, workspaceName }: { i
     return (
         <Card className="space-y-4 p-8">
             <div className="space-y-2">
-                <h1 className="text-xl font-semibold tracking-tight">Wrong account</h1>
+                <h1 className="text-xl font-semibold tracking-tight">{t('mismatch.title')}</h1>
                 <p className="text-sm text-muted-foreground">
-                    This invitation to <strong>{workspaceName}</strong> is for <strong>{inviteEmail}</strong>, but you are signed in as <strong>{currentEmail}</strong>.
+                    {t.rich('mismatch.message', { workspace: workspaceName, inviteEmail, currentEmail, strong: chunks => <strong>{chunks}</strong> })}
                 </p>
             </div>
             <Button className="w-full" onClick={switchAccount} loading={loading}>
-                Sign in as {inviteEmail}
+                {t('mismatch.switch', { email: inviteEmail })}
             </Button>
         </Card>
     )

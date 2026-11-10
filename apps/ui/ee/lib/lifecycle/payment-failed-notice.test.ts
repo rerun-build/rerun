@@ -42,7 +42,7 @@ describe('sendPaymentFailedNotice', () => {
         await sendPaymentFailedNotice(db.client, 1, INVOICE, NOW)
 
         expect(sendPaymentFailedEmail).toHaveBeenCalledWith(
-            { to: 'owner@example.com', unsubscribeUrl: null },
+            { to: 'owner@example.com', unsubscribeUrl: null, locale: 'en' },
             { workspaceName: 'Acme', amountLabel: '$17.62', declinedLabel: '5 October', pausedLabel: '6 October, 06:10 UTC', keptUntilLabel: '4 January', billingUrl: 'https://pay.stripe.test/in_1', boardUrl: 'https://app.rerun.build/og/board?sig=banner' },
         )
         expect(db.writes('lifecycle_emails')[0].payload).toMatchObject({ user_id: 'owner', workspace_id: 1, sequence_key: 'payment_failed', status: 'sent', metadata: { invoice_id: 'in_1' } })

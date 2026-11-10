@@ -277,38 +277,3 @@ export function mergeNotificationPrefs(
     categories: { ...base.categories, ...patch.categories },
   };
 }
-
-// The words of the web settings, shared so the phone says exactly the same thing.
-export const NOTIFICATION_SCOPE_COPY: Record<
-  NotificationScope,
-  { label: string; detail: string }
-> = {
-  everything: {
-    label: "Everything",
-    detail: "Every run in the workspace, whoever started it.",
-  },
-  mine: {
-    label: "My runs and what I follow",
-    detail: "Runs I start, conversations I am in, coworkers I follow.",
-  },
-  needed: {
-    label: "Only when I am needed",
-    detail:
-      "Questions, approvals and errors in my runs. A finished run stays quiet.",
-  },
-  nothing: { label: "Nothing", detail: "I check the inbox myself." },
-};
-
-export const COWORKER_MODE_COPY: Record<
-  CoworkerMode,
-  { label: string; hint: string }
-> = {
-  default: { label: "Default", hint: "Follows your setting." },
-  everything: { label: "All activity", hint: "Every run, whoever started it." },
-  muted: { label: "Muted", hint: "Nothing. The board still shows it." },
-};
-
-export const EMAIL_CATEGORY_LABELS: Record<EmailCategory, string> = {
-  billing: "Trial & billing",
-  product: "Product updates",
-};

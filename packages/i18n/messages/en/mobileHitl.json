@@ -1,0 +1,129 @@
+{
+    "actions": {
+        "notNow": "Not now",
+        "skip": "Skip",
+        "connect": "Connect",
+        "connecting": "Connecting…",
+        "continue": "Continue",
+        "loading": "Loading…",
+        "openOnWeb": "Open on the web",
+        "back": "Back",
+        "confirm": "Confirm",
+        "send": "Send",
+        "next": "Next",
+        "save": "Save",
+        "saving": "Saving…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {Question waiting} one {Question waiting} other {# questions waiting}}",
+        "approval": "{count, plural, =0 {Approval needed} one {Approval needed} other {# approvals needed}}",
+        "secret": "{count, plural, =0 {Credential needed} one {Credential needed} other {# credentials needed}}",
+        "mcpNamed": "Sign in to {name}",
+        "mcp": "Sign-in needed",
+        "service": "{count, plural, =0 {App to connect} one {App to connect} other {# apps to connect}}",
+        "takeover": "Your turn on the screen",
+        "jumpTo": "{label}, go to it"
+    },
+    "alert": {
+        "label": "Notification",
+        "failed": "Could not mark it as read. Try again.",
+        "marking": "Marking…",
+        "markAsRead": "Mark as read"
+    },
+    "approval": {
+        "label": "Approval required",
+        "approved": "Approved",
+        "approve": "Approve"
+    },
+    "decline": {
+        "placeholder": "Why not? (optional)",
+        "reason": "Reason"
+    },
+    "fallback": {
+        "replyBelow": "Reply below, or",
+        "needsYou": "{name} needs you"
+    },
+    "steps": {
+        "previous": "Previous step",
+        "next": "Next step",
+        "goTo": "Go to step {step} of {count}",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "Sign-in needed",
+        "connected": "Connected",
+        "signInNeeded": "Sign-in needed",
+        "unreachable": "Unreachable",
+        "customServer": "Custom MCP server",
+        "customServerAt": "Custom MCP server · {host}",
+        "signInTo": "Sign in to {name}",
+        "loadFailed": "This server could not be loaded. Connect it on the web, or skip it."
+    },
+    "question": {
+        "dismiss": "Dismiss questions",
+        "selectAll": "Select all that apply",
+        "typeAnswer": "Type your answer…",
+        "somethingElse": "Something else",
+        "yourAnswer": "Your answer"
+    },
+    "secret": {
+        "labelOne": "Credential needed",
+        "labelMany": "Credentials needed",
+        "dismiss": "Dismiss credential request",
+        "storedAs": "Stored as {key}",
+        "alreadySaved": "Already saved. Type to replace it",
+        "paste": "Paste the value",
+        "whereToFind": "Where to find it",
+        "storedNote": "Stored on your Box as a coworker variable. Never sent to the model.",
+        "saveFailed": "Could not save the credentials"
+    },
+    "service": {
+        "label": "App to connect",
+        "loadFailed": "The apps could not be loaded. Connect them on the web, or skip them.",
+        "loading": "Loading the apps…",
+        "webOnly": "This app picks its account on the web. Connect it there, or skip it.",
+        "connectFailed": "Could not connect the app",
+        "connected": "{name} connected",
+        "notFound": "Not found in the catalog, skipped.",
+        "skipped": "Skipped."
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "You skipped the questions",
+            "service": "You closed the app setup",
+            "secret": "You declined to share the keys",
+            "mcp": "You skipped signing in",
+            "takeover": "You left the browser to your coworker"
+        },
+        "answer": "Answer",
+        "answers": "Answers",
+        "answeredCount": "{answered} of {total} answered",
+        "skipped": "Skipped",
+        "approval": "Approval",
+        "approvals": "Approvals",
+        "approvalCount": "{approved} approved, {declined} not now",
+        "approved": "Approved",
+        "notNow": "Not now",
+        "quotedNote": "“{note}”",
+        "connected": "Connected",
+        "notReconnected": "Not reconnected",
+        "notFound": "Not found",
+        "apps": "Apps",
+        "appsConnected": "{connected} of {total} connected",
+        "instead": "{name} (instead of {replaced})",
+        "keys": "Keys",
+        "keysStored": "{stored} of {total} stored",
+        "stored": "Stored",
+        "storedOnBox": "Stored on the Box. The coworker only sees the names.",
+        "mcpServer": "MCP server",
+        "handedBackOn": "You handed the browser back on {url}",
+        "handedBack": "You handed the browser back"
+    },
+    "_context": {
+        "actions.notNow": "Declines an ask of a coworker for now (an approval, a sign-in, an app to connect).",
+        "steps.position": "Which step of a multi-step card is shown, e.g. 3 / 8.",
+        "receipts.approvalCount": "Summary of approval decisions: how many were approved and how many were declined ('not now').",
+        "receipts.cancelled.takeover": "The person gave the remote browser back to the coworker without doing anything.",
+        "fallback.replyBelow": "Followed by a button 'Open on the web': reply in the composer below, or open the conversation on the web."
+    }
+}

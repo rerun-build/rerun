@@ -10,6 +10,7 @@ import { TextShimmer } from '../TextShimmer'
 import { Badge } from '../primitives/badge'
 import { R_PATH } from '../logo'
 import { SOCIAL_LINK_REL } from './expert-profile-parts'
+import { useKitTranslations } from '../locale'
 
 export type HoloExpertData = {
     name: string
@@ -120,6 +121,7 @@ const SCANLINES = [
 ] as const
 
 export function HoloExpertCard({ data, className, revealed = true }: { data: HoloExpertData; className?: string; revealed?: boolean }) {
+    const t = useKitTranslations()
     const reduceMotion = useReducedMotion()
     const ref = useRef<HTMLDivElement>(null)
 
@@ -209,8 +211,8 @@ export function HoloExpertCard({ data, className, revealed = true }: { data: Hol
         }
     }, [handleOrientation])
 
-    const name = data.name.trim() || 'Your name'
-    const role = data.role.trim() || 'Rerun Expert'
+    const name = data.name.trim() || t('experts.card.namePlaceholder')
+    const role = data.role.trim() || t('experts.card.rolePlaceholder')
     const location = data.location?.trim() ?? ''
     const description = data.description?.trim() ?? ''
     const photo = data.photoUrl?.trim() ?? ''
@@ -322,13 +324,13 @@ export function HoloExpertCard({ data, className, revealed = true }: { data: Hol
                 <div className="mt-6 space-y-2.5 px-6">
                     {location && (
                         <motion.div className="flex items-center gap-3" {...item}>
-                            <DataLabel>Location</DataLabel>
+                            <DataLabel>{t('experts.card.location')}</DataLabel>
                             <span className="font-mono text-[11px] text-white/25">&gt;</span>
                             <span className="min-w-0 truncate font-mono text-xs text-white/85">{location}</span>
                         </motion.div>
                     )}
                     <motion.div className="flex items-center gap-3" {...item}>
-                        <DataLabel>Status</DataLabel>
+                        <DataLabel>{t('experts.card.status')}</DataLabel>
                         <span className="font-mono text-[11px] text-white/25">&gt;</span>
                         <Badge tone="brand" size="xs" className="relative overflow-hidden tracking-wider uppercase shadow-[0_0_16px_-3px_rgba(183,168,255,0.7)]">
                             <span className="relative z-[1]">{data.badgeLabel}</span>
@@ -337,7 +339,7 @@ export function HoloExpertCard({ data, className, revealed = true }: { data: Hol
                     </motion.div>
                     {hasSocials && (
                         <motion.div className="flex items-center gap-3 pt-0.5" {...item}>
-                            <DataLabel>Links</DataLabel>
+                            <DataLabel>{t('experts.card.links')}</DataLabel>
                             <span className="font-mono text-[11px] text-white/25">&gt;</span>
                             <div className="flex items-center gap-1.5">
                                 {x && (
@@ -356,7 +358,7 @@ export function HoloExpertCard({ data, className, revealed = true }: { data: Hol
                                     </SocialLink>
                                 )}
                                 {website && (
-                                    <SocialLink href={website} label="Website">
+                                    <SocialLink href={website} label={t('experts.wizard.website')}>
                                         <GlobeIcon className="size-3.5" />
                                     </SocialLink>
                                 )}

@@ -1,5 +1,6 @@
 import { router } from 'expo-router'
 import { Pressable, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { AppText } from '@/components/ui/AppText'
@@ -7,7 +8,8 @@ import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
-// The web's tab names (apps/ui/lib/board/types.ts) a pick may ask for; the phone opens the ones it has.
+// The web's tab names (apps/ui/lib/board/types.ts) a pick may ask for, in English as the model writes
+// them; the phone opens the ones it has.
 const TAB_LABELS: Record<string, string> = { chat: 'Chat', actions: 'To handle', services: 'Apps', mcp: 'MCP', skills: 'Skills', data: 'Database', memories: 'Knowledge', files: 'Files', scheduled: 'Routines', triggers: 'Triggers' }
 const PHONE_SCREENS: Record<string, 'apps' | 'files' | 'routines'> = { services: 'apps', mcp: 'apps', files: 'files', scheduled: 'routines', triggers: 'routines' }
 
@@ -49,6 +51,7 @@ function open({ agentId, tab, conversationId }: AgentPick) {
  * deleted coworker drops out.
  */
 export function AgentPickerCard({ picks }: { picks: AgentPick[] }) {
+    const t = useTranslations('mobileCards')
     const theme = useTheme()
     const agents = useWorkspaceAgents()
 
@@ -69,7 +72,7 @@ export function AgentPickerCard({ picks }: { picks: AgentPick[] }) {
                 >
                     <AgentBuddy agentId={agent.id} size={20} mood={agent.disabledAt ? 'asleep' : 'idle'} animated={false} facing="right" />
                     <AppText variant="footnote" medium numberOfLines={1} style={{ flexShrink: 1, color: agent.disabledAt ? theme.mutedForeground : theme.foreground }}>
-                        {pick.tab ? `Open ${TAB_LABELS[pick.tab]} for ${agent.name}` : agent.name}
+                        {pick.tab ? t('agentPicker.open', { tab: pick.tab, name: agent.name }) : agent.name}
                     </AppText>
                 </Pressable>
             ))}

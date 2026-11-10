@@ -17,23 +17,35 @@ import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { track } from '@rerun/analytics/client'
 import { formatAmount } from '@rerun/contracts'
+import { formatNumber } from '@rerun/i18n/format'
 import { OptionRow } from '@rerun/ui/chat'
 import { Icon } from '@rerun/ui/primitives'
 import { TemplateBoardPreview, type BoardAgent } from '@rerun/ui/iso-grid'
 import { StepTransition, useStepper } from '@rerun/ui/steps'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { CancelNote, DaysLeftCard, OfferCard, SunkCard, type IconType, type SunkStat } from './CancelFlowCards'
 import { CancelTimeline, type CancelMilestone } from './CancelTimeline'
-import { CANCEL_STEPS, COMEBACK_COPY, OFFER_TITLE, daysBetween, shortDate, type CancelOutcome, type CancelStep } from './cancel-flow-copy'
+import { CANCEL_STEPS, COMEBACK_OPTIONS, daysBetween, shortDate, type CancelOutcome, type CancelStep } from './cancel-flow-copy'
 
-const reasonSchema = z.object({
-    comment: cancelReasonTextSchema,
-    comeback: z.enum(CANCEL_COMEBACKS),
-})
+type BillingT = ReturnType<typeof useTranslations<'billing'>>
 
-type ReasonValues = z.infer<typeof reasonSchema>
+const REASON_MAX_LENGTH = cancelReasonTextSchema.maxLength ?? 1000
+
+function reasonSchemaOf(t: BillingT) {
+    return z.object({
+        comment: z
+            .string()
+            .trim()
+            .min(1, t('cancel.reason.required'))
+            .max(REASON_MAX_LENGTH, t('cancel.reason.tooLong', { max: REASON_MAX_LENGTH })),
+        comeback: z.enum(CANCEL_COMEBACKS),
+    })
+}
+
+type ReasonValues = z.infer<ReturnType<typeof reasonSchemaOf>>
 
 // An answer that does not read as a reason is turned down this many times, then let through: the
 // check is there to get a real answer, never to keep someone from cancelling.
@@ -63,6 +75,8 @@ export type CancelFlowProps = {
 type Header = { icon: IconType; title: string; description: string }
 
 export function CancelFlow({ state, activity, activityLoading, agentCount, creditLeftLabel, onRemind, onClaim, onCancel, onCheckReason, onResume, onClose, onStepChange }: CancelFlowProps) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
     const firstStep: CancelStep = state.reminderAt ? 'goodbye' : 'sunk'
     const stepper = useStepper(CANCEL_STEPS.length, CANCEL_STEPS.indexOf(firstStep))
     const step = CANCEL_STEPS[stepper.index]
@@ -72,18 +86,19 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
     const [accepted, setAccepted] = useState<{ text: string; reason: CancelReason } | null>(null)
     const [refusals, setRefusals] = useState(0)
 
+    const reasonSchema = useMemo(() => reasonSchemaOf(t), [t])
     const form = useForm<ReasonValues>({ resolver: zodResolver(reasonSchema), mode: 'onChange', defaultValues: { comment: '' } })
     const comment = useWatch({ control: form.control, name: 'comment' })
     const comeback = useWatch({ control: form.control, name: 'comeback' })
     const reason = accepted?.reason
-    const reasonMissing = !comment.trim() ? 'Tell us in a few words why you are leaving' : !comeback ? "Tell us if you'll be back" : undefined
+    const reasonMissing = !comment.trim() ? t('cancel.reason.missingComment') : !comeback ? t('cancel.reason.missingComeback') : undefined
 
     const trial = state.phase === 'trial'
-    const endsOn = shortDate(state.endsAt)
-    const keptUntil = shortDate(state.keptUntil)
-    const reminderOn = state.reminderAt ? shortDate(state.reminderAt) : null
+    const endsOn = shortDate(state.endsAt, locale)
+    const keptUntil = shortDate(state.keptUntil, locale)
+    const reminderOn = state.reminderAt ? shortDate(state.reminderAt, locale) : null
     const offer = state.offer
-    const offerCopy = offer ? offerCopyOf(offer, endsOn) : null
+    const offerCopy = offer ? offerCopyOf(t, offer, endsOn, locale) : null
 
     useEffect(() => onStepChange(step), [step, onStepChange])
 
@@ -143,7 +158,7 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
             setBusy(false)
             if (check && !check.genuine && refusals < MAX_REASON_REFUSALS) {
                 setRefusals(count => count + 1)
-                form.setError('comment', { message: "That doesn't read like a reason. What made you decide to leave?" })
+                form.setError('comment', { message: t('cancel.reason.notAReason') })
                 return
             }
             setAccepted({ text, reason: check?.genuine ? check.reason : 'other' })
@@ -159,23 +174,21 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
 
     const header = ((): Header => {
         if (step === 'goodbye') {
-            return trial
-                ? { icon: BellIcon, title: `Not sure yet? Decide on ${reminderOn}`, description: "Keep your trial running. We'll email you the day before your first charge." }
-                : { icon: BellIcon, title: `Not sure yet? Decide on ${reminderOn}`, description: "Keep your coworkers running. We'll email you a week before you're charged, so you can still cancel then." }
+            return { icon: BellIcon, title: t('cancel.header.goodbyeTitle', { date: reminderOn ?? '' }), description: trial ? t('cancel.header.goodbyeTrialDescription') : t('cancel.header.goodbyePaidDescription') }
         }
         if (step === 'sunk') {
             return trial
-                ? { icon: LockIcon, title: 'Your coworkers are already set up', description: 'The hard part is done. Leave now and they stop working with it.' }
-                : { icon: LockIcon, title: "You've already paid for this", description: `It's yours until ${endsOn} either way. The credits you don't use go with it.` }
+                ? { icon: LockIcon, title: t('cancel.header.sunkTrialTitle'), description: t('cancel.header.sunkTrialDescription') }
+                : { icon: LockIcon, title: t('cancel.header.sunkPaidTitle'), description: t('cancel.header.sunkPaidDescription', { date: endsOn }) }
         }
-        if (step === 'reason') return { icon: HeartIcon, title: 'Why are you leaving?', description: 'In your own words. It tells us what to fix first.' }
-        if (step === 'offer') return { icon: HeartIcon, title: OFFER_TITLE[reason ?? 'other'], description: 'Your plan and your coworkers stay exactly as they are.' }
+        if (step === 'reason') return { icon: HeartIcon, title: t('cancel.header.reasonTitle'), description: t('cancel.header.reasonDescription') }
+        if (step === 'offer') return { icon: HeartIcon, title: t(`cancel.offerTitle.${reason ?? 'other'}`), description: t('cancel.header.offerDescription') }
         if (step === 'farewell') {
-            return { icon: LockIcon, title: `Your coworkers will go quiet on ${endsOn}`, description: 'Schedules stop firing and your workspace is paused.' }
+            return { icon: LockIcon, title: t('cancel.header.farewellTitle', { date: endsOn }), description: t('cancel.header.farewellDescription') }
         }
-        if (outcome === 'claimed') return { icon: CircleCheckIcon, title: 'Thanks for staying', description: 'Your coworkers never stopped working.' }
-        if (outcome === 'reminded') return { icon: BellIcon, title: `We'll remind you on ${reminderOn}`, description: 'Nothing changes until then. Your coworkers keep working.' }
-        return { icon: CircleCheckIcon, title: 'Cancellation confirmed', description: `You won't be billed again. Your coworkers work until ${endsOn}.` }
+        if (outcome === 'claimed') return { icon: CircleCheckIcon, title: t('cancel.header.claimedTitle'), description: t('cancel.header.claimedDescription') }
+        if (outcome === 'reminded') return { icon: BellIcon, title: t('cancel.header.remindedTitle', { date: reminderOn ?? '' }), description: t('cancel.header.remindedDescription') }
+        return { icon: CircleCheckIcon, title: t('cancel.header.cancelledTitle'), description: t('cancel.header.cancelledDescription', { date: endsOn }) }
     })()
 
     const milestones = useMemo((): CancelMilestone[] => {
@@ -183,15 +196,15 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
         const now = Date.parse(state.now)
         const end = Date.parse(state.endsAt)
         return [
-            { at: 0, label: 'You stay', date: new Date(now) },
-            { at: (Date.parse(state.reminderAt) - now) / (end - now), label: trial ? 'Email' : 'Reminder', date: new Date(state.reminderAt), highlighted: true },
-            { at: 1, label: trial ? 'First charge' : 'Renewal', date: new Date(end) },
+            { at: 0, label: t('cancel.milestones.youStay'), date: new Date(now) },
+            { at: (Date.parse(state.reminderAt) - now) / (end - now), label: trial ? t('cancel.milestones.email') : t('cancel.milestones.reminder'), date: new Date(state.reminderAt), highlighted: true },
+            { at: 1, label: trial ? t('cancel.milestones.firstCharge') : t('cancel.milestones.renewal'), date: new Date(end) },
         ]
-    }, [state.now, state.reminderAt, state.endsAt, trial])
+    }, [state.now, state.reminderAt, state.endsAt, trial, t])
 
     const boardAgents = useMemo((): BoardAgent[] => (activity?.agents ?? []).map(({ key, name, connectorSlugs }) => ({ key, name, connectorSlugs })), [activity])
 
-    const sunk = sunkFigures({ trial, state, activity, agentCount, creditLeftLabel })
+    const sunk = sunkFigures({ t, trial, state, activity, agentCount, creditLeftLabel, locale })
     const contentKey = `${step}-${outcome}`
 
     return (
@@ -212,7 +225,7 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                             <CancelTimeline milestones={milestones} />
                             <Button size="lg" highlight className="w-full" disabled={busy} onClick={remind}>
                                 <BellIcon />
-                                Remind me on {reminderOn}
+                                {t('cancel.remindMe', { date: reminderOn ?? '' })}
                             </Button>
                         </div>
                     )}
@@ -220,7 +233,7 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                         <div className="flex flex-col gap-5">
                             <SunkCard value={sunk.value} caption={sunk.caption} stats={sunk.stats} loading={activityLoading} />
                             <Button size="lg" highlight className="w-full" onClick={onClose}>
-                                Keep my coworkers running
+                                {t('cancel.keepRunning')}
                             </Button>
                         </div>
                     )}
@@ -232,19 +245,19 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                                     name="comment"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <Field label="What made you decide to leave?">
+                                            <Field label={t('cancel.reason.field')}>
                                                 <FormControl>
-                                                    <Textarea rows={4} placeholder="A sentence is plenty" disabled={busy} {...field} />
+                                                    <Textarea rows={4} placeholder={t('cancel.reason.placeholder')} disabled={busy} {...field} />
                                                 </FormControl>
                                             </Field>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                                <Field label="Will you use Rerun again?">
+                                <Field label={t('cancel.reason.comebackField')}>
                                     <div className="-mx-2 space-y-0.5">
-                                        {COMEBACK_COPY.map((option, index) => (
-                                            <OptionRow key={option.value} index={index} label={option.label} selected={comeback === option.value} onChoose={() => form.setValue('comeback', option.value, { shouldValidate: true })} />
+                                        {COMEBACK_OPTIONS.map((option, index) => (
+                                            <OptionRow key={option} index={index} label={t(`cancel.comeback.${option}`)} selected={comeback === option} onChoose={() => form.setValue('comeback', option, { shouldValidate: true })} />
                                         ))}
                                     </div>
                                 </Field>
@@ -253,7 +266,7 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                     )}
                     {step === 'offer' && offer && offerCopy && (
                         <div className="flex flex-col gap-5">
-                            <OfferCard headline={offerCopy.headline} priceLabel={offerCopy.priceLabel} fullPriceLabel={offerCopy.fullPriceLabel} billedOnLabel={shortDate(offer.billedOn)} terms={offerCopy.terms} />
+                            <OfferCard headline={offerCopy.headline} priceLabel={offerCopy.priceLabel} fullPriceLabel={offerCopy.fullPriceLabel} billedOnLabel={shortDate(offer.billedOn, locale)} terms={offerCopy.terms} />
                             <Button size="lg" highlight className="w-full" disabled={busy} onClick={claim}>
                                 {offerCopy.claimLabel}
                             </Button>
@@ -270,9 +283,9 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                                     </div>
                                 )
                             )}
-                            <CancelNote icon={ShieldCheckIcon} title={`Saved until ${keptUntil}`} description="Memories, files and skills are kept. Subscribe again before then and it all comes back." />
+                            <CancelNote icon={ShieldCheckIcon} title={t('cancel.saved.title', { date: keptUntil })} description={t('cancel.saved.description')} />
                             <Button size="lg" highlight className="w-full" onClick={onClose}>
-                                Keep my coworkers
+                                {t('cancel.keepCoworkers')}
                             </Button>
                         </div>
                     )}
@@ -285,36 +298,36 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                     <>
                         {outcome === 'cancelled' && (
                             <Button variant="outline" disabled={busy} onClick={resume}>
-                                {trial ? 'Resume trial' : 'Resume subscription'}
+                                {trial ? t('cancel.buttons.resumeTrial') : t('cancel.buttons.resumeSubscription')}
                             </Button>
                         )}
-                        <Button onClick={onClose}>Done</Button>
+                        <Button onClick={onClose}>{t('cancel.buttons.done')}</Button>
                     </>
                 ) : (
                     <>
                         <Button variant="ghost" disabled={busy} onClick={goBack}>
-                            Go back
+                            {t('cancel.buttons.goBack')}
                         </Button>
                         {step === 'goodbye' && (
                             <Button variant="outline" disabled={busy} onClick={stepper.goForward}>
-                                Continue to cancel
+                                {t('cancel.buttons.continueToCancel')}
                             </Button>
                         )}
                         {step === 'sunk' && (
                             <Button variant="outline" onClick={stepper.goForward}>
-                                Continue
+                                {t('cancel.buttons.continue')}
                             </Button>
                         )}
                         {step === 'reason' && (
                             <TooltipDisabledReason reason={reasonMissing}>
                                 <Button variant="outline" disabled={!!reasonMissing || busy} onClick={() => void continueFromReason()}>
-                                    Continue
+                                    {t('cancel.buttons.continue')}
                                 </Button>
                             </TooltipDisabledReason>
                         )}
                         {step === 'offer' && (
                             <Button variant="outline" disabled={busy} onClick={declineOffer}>
-                                No thanks
+                                {t('cancel.buttons.noThanks')}
                             </Button>
                         )}
                         {step === 'farewell' && (
@@ -327,7 +340,7 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                                 onBlur={() => setBoardQuiet(false)}
                                 onClick={() => void cancel()}
                             >
-                                {trial ? 'Cancel trial' : 'Cancel subscription'}
+                                {trial ? t('cancel.buttons.cancelTrial') : t('cancel.buttons.cancelSubscription')}
                             </Button>
                         )}
                     </>
@@ -339,19 +352,19 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
 
 type OfferCopy = { headline: string; priceLabel: string; fullPriceLabel: string; terms: string; claimLabel: string; claimedDescription: string }
 
-function offerCopyOf(offer: NonNullable<CancelFlowState['offer']>, endsOn: string): OfferCopy {
+function offerCopyOf(t: BillingT, offer: NonNullable<CancelFlowState['offer']>, endsOn: string, locale: string): OfferCopy {
     const price = formatAmount(offer.priceCents, PLAN_CURRENCY)
     const full = formatAmount(offer.fullPriceCents, PLAN_CURRENCY)
-    const fullFrom = shortDate(offer.fullPriceFrom)
+    const fullFrom = shortDate(offer.fullPriceFrom, locale)
 
     if (offer.kind === 'trial_half') {
         return {
-            headline: '50% off your first month',
+            headline: t('cancel.offer.trialHalf.headline'),
             priceLabel: price,
             fullPriceLabel: full,
-            terms: `Then ${full}/mo from ${fullFrom}. We email you before ${endsOn}, and you can still cancel for free until then.`,
-            claimLabel: 'Claim 50% off',
-            claimedDescription: `Your first invoice is ${price} on ${endsOn}, then ${full}/mo.`,
+            terms: t('cancel.offer.trialHalf.terms', { full, fullFrom, endsOn }),
+            claimLabel: t('cancel.offer.trialHalf.claim'),
+            claimedDescription: t('cancel.offer.trialHalf.claimed', { price, endsOn, full }),
         }
     }
 
@@ -359,39 +372,39 @@ function offerCopyOf(offer: NonNullable<CancelFlowState['offer']>, endsOn: strin
     // price, and the add-ons, billed as usual, are spelled out underneath.
     const addonsCents = offer.fullPriceCents - offer.basePriceCents
     return {
-        headline: 'Next month for $1',
+        headline: t('cancel.offer.nextMonth.headline'),
         priceLabel: formatAmount(offer.priceCents - addonsCents, PLAN_CURRENCY),
         fullPriceLabel: formatAmount(offer.basePriceCents, PLAN_CURRENCY),
-        terms: addonsCents > 0 ? `Your add-ons stay at ${formatAmount(addonsCents, PLAN_CURRENCY)}/mo. Then ${full}/mo from ${fullFrom}.` : `Then ${full}/mo from ${fullFrom}.`,
-        claimLabel: 'Get next month for $1',
-        claimedDescription: `Your next invoice is ${price}. Billing goes back to ${full}/mo on ${fullFrom}.`,
+        terms: addonsCents > 0 ? t('cancel.offer.nextMonth.termsWithAddons', { addons: formatAmount(addonsCents, PLAN_CURRENCY), full, fullFrom }) : t('cancel.offer.nextMonth.terms', { full, fullFrom }),
+        claimLabel: t('cancel.offer.nextMonth.claim'),
+        claimedDescription: t('cancel.offer.nextMonth.claimed', { price, full, fullFrom }),
     }
 }
 
-function sunkFigures({ trial, state, activity, agentCount, creditLeftLabel }: { trial: boolean; state: CancelFlowState; activity: CancelFlowActivity | null; agentCount: number; creditLeftLabel: string }): {
+function sunkFigures({ t, trial, state, activity, agentCount, creditLeftLabel, locale }: { t: BillingT; trial: boolean; state: CancelFlowState; activity: CancelFlowActivity | null; agentCount: number; creditLeftLabel: string; locale: string }): {
     value: string
     caption: string
     stats: SunkStat[]
 } {
-    const runs = activity ? activity.runsMonth.toLocaleString() : null
+    const runs = activity ? formatNumber(activity.runsMonth, locale) : null
 
     if (!trial) {
         return {
             value: formatAmount(state.paidLeftCents, PLAN_CURRENCY),
-            caption: 'of this month, already paid',
+            caption: t('cancel.sunk.paidCaption'),
             stats: [
-                { icon: CoinsIcon, label: 'Credits left', value: creditLeftLabel },
-                { icon: ActivityIcon, label: 'Runs this month', value: runs },
+                { icon: CoinsIcon, label: t('cancel.sunk.creditsLeft'), value: creditLeftLabel },
+                { icon: ActivityIcon, label: t('cancel.sunk.runsThisMonth'), value: runs },
             ],
         }
     }
 
     return {
-        value: agentCount > 0 ? `${agentCount} ${agentCount === 1 ? 'agent' : 'agents'}` : creditLeftLabel,
-        caption: agentCount > 0 ? 'set up, connected and working' : 'Rerun credits left',
+        value: agentCount > 0 ? t('cancel.sunk.agents', { count: agentCount }) : creditLeftLabel,
+        caption: agentCount > 0 ? t('cancel.sunk.agentsCaption') : t('cancel.sunk.creditsCaption'),
         stats: [
-            { icon: ActivityIcon, label: 'Runs so far', value: runs },
-            { icon: CalendarIcon, label: 'Schedules', value: activity ? activity.schedules.toLocaleString() : null },
+            { icon: ActivityIcon, label: t('cancel.sunk.runsSoFar'), value: runs },
+            { icon: CalendarIcon, label: t('cancel.sunk.schedules'), value: activity ? formatNumber(activity.schedules, locale) : null },
         ],
     }
 }
@@ -413,16 +426,17 @@ function DoneBody({
     claimedTitle: string | null
     claimedDescription: string | null
 }) {
+    const t = useTranslations('billing')
     if (outcome === 'reminded') {
-        return <CancelNote icon={BellIcon} title={`Email on ${reminderOn}`} description={trial ? 'The day before your first charge. Cancel from that email if you want to.' : `A week before your plan renews on ${endsOn}.`} />
+        return <CancelNote icon={BellIcon} title={t('cancel.done.emailTitle', { date: reminderOn ?? '' })} description={trial ? t('cancel.done.emailTrialDescription') : t('cancel.done.emailPaidDescription', { date: endsOn })} />
     }
 
     if (outcome === 'claimed' && claimedTitle && claimedDescription) return <CancelNote icon={CircleCheckIcon} title={claimedTitle} description={claimedDescription} />
 
     return (
         <div className="flex flex-col gap-3">
-            <CancelNote icon={CalendarIcon} title={`Active until ${endsOn}`} description={trial ? 'Your trial runs to its end. Nothing is charged.' : 'Everything keeps working until then.'} />
-            <CancelNote icon={ShieldCheckIcon} title="Changed your mind?" description={`Resume before ${endsOn} and nothing stops. After that, your workspace is saved until ${keptUntil}.`} />
+            <CancelNote icon={CalendarIcon} title={t('cancel.done.activeTitle', { date: endsOn })} description={trial ? t('cancel.done.activeTrialDescription') : t('cancel.done.activePaidDescription')} />
+            <CancelNote icon={ShieldCheckIcon} title={t('cancel.done.changedMindTitle')} description={t('cancel.done.changedMindDescription', { endsOn, keptUntil })} />
         </div>
     )
 }

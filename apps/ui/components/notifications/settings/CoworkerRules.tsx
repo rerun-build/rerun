@@ -7,9 +7,9 @@ import { CalendarClock, Plus, XIcon } from '@/lib/icons'
 import { COWORKER_MODES, DEFAULT_COWORKER_RULE, hasOwnRule, resetRule, type CoworkerMode, type CoworkerRule } from '@/lib/notifications/prefs'
 import { cn } from '@/lib/utils'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
-import { COWORKER_MODE_META } from './scope-meta'
 import { SETTINGS_CARD, SettingsSection } from './SettingsSection'
 
 export type CoworkerOption = { id: string; name: string }
@@ -34,6 +34,7 @@ type CoworkerRulesProps = {
 }
 
 export function CoworkerRules({ coworkers, rules, onChange, pinnedId, renderPicker }: CoworkerRulesProps) {
+    const t = useTranslations('notifications.settings')
     const [adding, setAdding] = useState(false)
     const pinnedRow = useRef<HTMLDivElement>(null)
     const ruleOf = (id: string) => rules[id] ?? DEFAULT_COWORKER_RULE
@@ -47,13 +48,13 @@ export function CoworkerRules({ coworkers, rules, onChange, pinnedId, renderPick
 
     return (
         <SettingsSection
-            title="Per coworker"
-            detail="Also set from the bell on each coworker."
+            title={t('perCoworker.title')}
+            detail={t('perCoworker.detail')}
             action={
-                <TooltipDisabledReason reason={nothingToAdd ? 'Every coworker is already listed' : undefined}>
+                <TooltipDisabledReason reason={nothingToAdd ? t('perCoworker.allListed') : undefined}>
                     <Button type="button" variant="ghost" size="sm" disabled={nothingToAdd} aria-expanded={adding} onClick={() => setAdding(a => !a)}>
                         <Plus />
-                        Add
+                        {t('perCoworker.add')}
                     </Button>
                 </TooltipDisabledReason>
             }
@@ -70,7 +71,7 @@ export function CoworkerRules({ coworkers, rules, onChange, pinnedId, renderPick
                 </div>
             )}
             <div className={SETTINGS_CARD}>
-                {listed.length === 0 && <p className="px-3 py-3 text-xs text-muted-foreground">Every coworker follows the rule above.</p>}
+                {listed.length === 0 && <p className="px-3 py-3 text-xs text-muted-foreground">{t('perCoworker.empty')}</p>}
                 {listed.map(c => {
                     const rule = ruleOf(c.id)
                     return (
@@ -81,25 +82,25 @@ export function CoworkerRules({ coworkers, rules, onChange, pinnedId, renderPick
                                 {rule.follow && (
                                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                         <CalendarClock className="size-3 shrink-0" />
-                                        Following its scheduled tasks
+                                        {t('perCoworker.following')}
                                     </span>
                                 )}
                             </span>
                             <div className="ml-auto flex items-center gap-1">
                                 <Select value={rule.mode} onValueChange={mode => onChange(c.id, { ...rule, mode: mode as CoworkerMode })}>
-                                    <SelectTrigger size="sm" className="w-32" aria-label={`Notifications for ${c.name}`}>
+                                    <SelectTrigger size="sm" className="w-32" aria-label={t('notificationsFor', { name: c.name })}>
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {COWORKER_MODES.map(mode => (
                                             <SelectItem key={mode} value={mode}>
-                                                {COWORKER_MODE_META[mode].label}
+                                                {t(`modes.${mode}.label`)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <TooltipDisabledReason reason={hasOwnRule(rule) ? undefined : `${c.name} already follows your setting`}>
-                                    <Button type="button" variant="ghost" size="icon-sm" aria-label={`Reset ${c.name}`} disabled={!hasOwnRule(rule)} onClick={() => onChange(c.id, resetRule(rule))} className="text-muted-foreground">
+                                <TooltipDisabledReason reason={hasOwnRule(rule) ? undefined : t('perCoworker.alreadyDefault', { name: c.name })}>
+                                    <Button type="button" variant="ghost" size="icon-sm" aria-label={t('perCoworker.reset', { name: c.name })} disabled={!hasOwnRule(rule)} onClick={() => onChange(c.id, resetRule(rule))} className="text-muted-foreground">
                                         <XIcon />
                                     </Button>
                                 </TooltipDisabledReason>

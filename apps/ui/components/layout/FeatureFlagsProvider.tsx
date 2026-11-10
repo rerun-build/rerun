@@ -3,14 +3,14 @@
 import { createContext, useContext, useMemo, type PropsWithChildren } from 'react'
 import { APP_SLUGS, type AppSlug } from '@rerun/cloud/apps'
 
-export type FeatureFlags = { rewind: boolean; computer: boolean; published: boolean; apps: Partial<Record<AppSlug, boolean>> }
+export type FeatureFlags = { rewind: boolean; computer: boolean; published: boolean; i18n?: boolean; apps: Partial<Record<AppSlug, boolean>> }
 
 // Tout à `false` par défaut : un composant rendu hors du provider, comme les menus de toolbar
 // repris par le kit de marque, tombe du côté masqué sans avoir à le dire.
 const FeatureFlagsContext = createContext<FeatureFlags>({ rewind: false, computer: false, published: false, apps: {} })
 
-export function FeatureFlagsProvider({ rewind, computer, published, apps, children }: PropsWithChildren<FeatureFlags>) {
-    const value = useMemo(() => ({ rewind, computer, published, apps }), [rewind, computer, published, apps])
+export function FeatureFlagsProvider({ rewind, computer, published, i18n = false, apps, children }: PropsWithChildren<FeatureFlags>) {
+    const value = useMemo(() => ({ rewind, computer, published, i18n, apps }), [rewind, computer, published, i18n, apps])
     return <FeatureFlagsContext.Provider value={value}>{children}</FeatureFlagsContext.Provider>
 }
 
@@ -24,6 +24,10 @@ export function useComputerEnabled() {
 
 export function usePublishedAccessEnabled() {
     return useContext(FeatureFlagsContext).published
+}
+
+export function useLanguagePacksEnabled() {
+    return useContext(FeatureFlagsContext).i18n ?? false
 }
 
 export function usePaidAppEnabled(slug: AppSlug) {

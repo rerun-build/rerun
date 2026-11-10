@@ -43,7 +43,9 @@ export function divisionExamples(industry: string | null | undefined): string[] 
     return industry && isTemplateCategory(industry) && INDUSTRY_BOX_NAMES[industry].length > 0 ? INDUSTRY_BOX_NAMES[industry] : null
 }
 
-export function boxNameSuggestions(industry: string | null | undefined, taken: string[]): string[] {
+// `localize` writes the English name in the reader's language before it is compared with the Boxes
+// already there, which carry whatever language they were named in.
+export function boxNameSuggestions(industry: string | null | undefined, taken: string[], localize: (name: string) => string = name => name): string[] {
     const used = new Set(taken.map(name => name.trim().toLowerCase()))
-    return (divisionExamples(industry) ?? DEFAULT_BOX_NAMES).filter(name => !used.has(name.toLowerCase())).slice(0, MAX_SUGGESTIONS)
+    return (divisionExamples(industry) ?? DEFAULT_BOX_NAMES).map(localize).filter(name => !used.has(name.toLowerCase())).slice(0, MAX_SUGGESTIONS)
 }

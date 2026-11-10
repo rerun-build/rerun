@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { useAuth } from '@/auth/AuthProvider'
 import { coworkerEndpoints } from '@/chat/endpoints'
@@ -45,6 +46,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const [group] = useGroupMode()
     const [collapsed, setCollapsed] = useState<string[]>([])
     const fill = useBootFill(board.state === 'ready')
+    const t = useTranslations('mobileHome')
 
     const pathname = usePathname()
     const { to } = useGlobalSearchParams<{ to?: string }>()
@@ -62,7 +64,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const cell = usePinnedCell()
     const [reordering, setReordering] = useState(false)
     const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned)
-    const sections = board.state === 'ready' && group === 'box' ? sectionsByBox(others, board.boxes) : []
+    const sections = board.state === 'ready' && group === 'box' ? sectionsByBox(others, board.boxes, t('untitledBox')) : []
     const recent = board.state === 'ready' && group === 'recent' ? recentCoworkers(others) : []
 
     // The app icon shows the bell's count, never off the copy kept from the last visit.
@@ -82,7 +84,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
 
     const togglePin = (coworker: HomeCoworker) => (pins.pinned.includes(coworker.id) ? pins.unpin(coworker.id) : pins.pin(coworker.id))
 
-    const coworkerRow = (coworker: HomeCoworker) => <CoworkerRow coworker={{ id: coworker.id, kind: 'coworker', name: coworker.name, status: moodStatus(coworker) }} line={lineOf(coworker)} minutesAgo={minutesSince(coworker.latest?.updatedAt)} unread={coworker.pending > 0} selected={openAgentId === coworker.id} onPress={() => open(coworker)} onPressIn={() => warmUp(coworker)} pin={{ pinned: pins.pinned.includes(coworker.id), onToggle: () => togglePin(coworker) }} />
+    const coworkerRow = (coworker: HomeCoworker) => <CoworkerRow coworker={{ id: coworker.id, kind: 'coworker', name: coworker.name, status: moodStatus(coworker) }} line={lineOf(coworker, t)} minutesAgo={minutesSince(coworker.latest?.updatedAt)} unread={coworker.pending > 0} selected={openAgentId === coworker.id} onPress={() => open(coworker)} onPressIn={() => warmUp(coworker)} pin={{ pinned: pins.pinned.includes(coworker.id), onToggle: () => togglePin(coworker) }} />
 
     const toggle = (key: string) => setCollapsed(current => (current.includes(key) ? current.filter(entry => entry !== key) : [...current, key]))
     const headerHeight = insets.top + spacing.sm + GLASS_BUTTON_SIZE
@@ -95,9 +97,9 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
                 {board.state === 'error' && (
                     <View style={{ alignItems: 'flex-start', gap: spacing.md, paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
                         <AppText variant="callout" tone="muted">
-                            We could not load your coworkers.
+                            {t('loadFailed')}
                         </AppText>
-                        <PillButton label="Retry" variant="secondary" onPress={board.reload} />
+                        <PillButton label={t('retry')} variant="secondary" onPress={board.reload} />
                     </View>
                 )}
 
@@ -110,7 +112,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
 
                     {board.state === 'ready' && board.coworkers.length === 0 && (
                         <AppText variant="callout" tone="muted" style={{ paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
-                            No coworkers yet.
+                            {t('empty')}
                         </AppText>
                     )}
 
@@ -119,11 +121,11 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
                             {reordering && (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: HOME_GUTTER, paddingVertical: spacing.sm }}>
                                     <AppText variant="footnote" tone="muted" medium style={{ flex: 1 }}>
-                                        Drag to reorder
+                                        {t('pinned.dragToReorder')}
                                     </AppText>
                                     <Pressable onPress={() => setReordering(false)} accessibilityRole="button" hitSlop={10}>
                                         <AppText variant="footnote" medium style={{ color: theme.foreground }}>
-                                            Done
+                                            {t('pinned.done')}
                                         </AppText>
                                     </Pressable>
                                 </View>

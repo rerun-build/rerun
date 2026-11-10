@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { CheckIcon, CopyIcon, Loader2Icon, RotateCwIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 // Built client-side rather than fetched: the token already came down with the trigger, and the
@@ -31,6 +32,7 @@ type TriggerUrlFieldProps = {
 }
 
 export function TriggerUrlField({ agentId, slug, token, rotating, onRotate, rotateDisabledReason }: TriggerUrlFieldProps) {
+    const t = useTranslations('agent.triggerUrlField')
     const [copied, setCopied] = useState(false)
     const url = useTriggerUrl(agentId, slug, token)
 
@@ -48,12 +50,12 @@ export function TriggerUrlField({ agentId, slug, token, rotating, onRotate, rota
     // segment that answers 404 to every caller, so none is shown until a rotation issues one.
     if (!token) {
         return (
-            <Field label="Webhook URL" helperText="Rotating issues a new secret and the URL that goes with it.">
+            <Field label={t('label')} helperText={t('noSecretHelper')}>
                 <div className="flex items-center gap-1.5">
-                    <p className="flex min-h-8 min-w-0 flex-1 items-center rounded-md border border-dashed border-input px-3 py-1.5 text-xs text-muted-foreground">This trigger has no secret yet, so it has no URL.</p>
+                    <p className="flex min-h-8 min-w-0 flex-1 items-center rounded-md border border-dashed border-input px-3 py-1.5 text-xs text-muted-foreground">{t('noSecret')}</p>
                     <TooltipDisabledReason reason={rotateDisabledReason}>
                         <Button size="sm" variant="outline" onClick={onRotate} disabled={rotating || !!rotateDisabledReason}>
-                            {rotating ? <Loader2Icon className="size-3.5 animate-spin" /> : 'Get URL'}
+                            {rotating ? <Loader2Icon className="size-3.5 animate-spin" /> : t('getUrl')}
                         </Button>
                     </TooltipDisabledReason>
                 </div>
@@ -62,21 +64,21 @@ export function TriggerUrlField({ agentId, slug, token, rotating, onRotate, rota
     }
 
     return (
-        <Field label="Webhook URL" helperText="Anyone holding this URL can start a run. Treat it as a secret. Copying it, previewing it in a chat or opening it in a browser starts nothing.">
+        <Field label={t('label')} helperText={t('helper')}>
             <div className="flex items-center gap-1.5">
                 <code className="flex h-8 min-w-0 flex-1 items-center truncate rounded-md border border-input bg-muted/40 px-3 font-mono text-xs">{url}</code>
-                <Button size="icon-sm" variant="outline" aria-label="Copy the webhook URL" onClick={copy}>
+                <Button size="icon-sm" variant="outline" aria-label={t('copy')} onClick={copy}>
                     {copied ? <CheckIcon className="size-3.5 text-emerald-500" /> : <CopyIcon className="size-3.5" />}
                 </Button>
                 <TooltipDisabledReason reason={rotateDisabledReason}>
                     <ConfirmDialog
-                        title="Rotate the webhook secret?"
-                        description="The current URL stops working right away. You have to paste the new one wherever this trigger is called from."
+                        title={t('rotateConfirm')}
+                        description={t('rotateDescription')}
                         confirmVariant="default"
-                        confirmLabel="Rotate"
+                        confirmLabel={t('rotateAction')}
                         onConfirm={onRotate}
                     >
-                        <Button size="icon-sm" variant="outline" aria-label="Rotate the secret" title={rotateDisabledReason ? undefined : 'Rotate the secret'} disabled={rotating || !!rotateDisabledReason}>
+                        <Button size="icon-sm" variant="outline" aria-label={t('rotate')} title={rotateDisabledReason ? undefined : t('rotate')} disabled={rotating || !!rotateDisabledReason}>
                             {rotating ? <Loader2Icon className="size-3.5 animate-spin" /> : <RotateCwIcon className="size-3.5" />}
                         </Button>
                     </ConfirmDialog>

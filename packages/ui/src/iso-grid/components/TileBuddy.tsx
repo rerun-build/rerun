@@ -4,6 +4,8 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } f
 import { HandIcon, TriangleAlertIcon } from '../../icons'
 import { buddyFootprintShare, hashUnit } from '../iso'
 import type { TileStyle } from '../types'
+import { useKitTranslations } from '../../locale'
+import { tileStatusLabel } from '../status-label'
 import { BUDDY_GEOMETRY, BUDDY_VIEW, BuddyArt } from './buddy/BuddyArt'
 import { BUDDY_STATE_COLOR, buddyColor, buddyLook, buddyMood, type BuddyMood } from './buddy/buddy-look'
 
@@ -59,6 +61,7 @@ type TileBuddyProps = {
 }
 
 export function TileBuddy({ id, style, width, height, floorOffset, active, stretched, ghost, reducedMotion, paused }: TileBuddyProps) {
+    const t = useKitTranslations()
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
     const look = buddyLook(style)
     const mood = ghost ? 'asleep' : buddyMood(style)
@@ -93,7 +96,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
             )}
             {PinnedIcon && <PinnedIcon className="size-[8px] shrink-0" style={{ color: stateColor }} />}
             {pinned.count != null && <span className="tabular-nums">{pinned.count}</span>}
-            {pinned.label}
+            {tileStatusLabel(pinned, t)}
         </span>
     ) : null
     return (

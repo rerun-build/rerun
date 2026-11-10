@@ -3,11 +3,10 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../cn'
+import { useKitTranslations } from '../locale'
 import { ScrollFade } from '../primitives/scroll-fade'
 
 import { Caret } from './marks'
-
-const PLACEHOLDER = 'Describe the job, the way you would brief a teammate.'
 
 // Under 16px, iOS zooms the page in when the field takes the focus.
 const TYPE = 'px-1 text-base leading-relaxed whitespace-pre-wrap break-words sm:text-[15px]'
@@ -20,13 +19,14 @@ const TYPE = 'px-1 text-base leading-relaxed whitespace-pre-wrap break-words sm:
 //
 // Enter creates the agent, the way it sends a message everywhere else in the app; Shift+Enter breaks
 // the line.
-export function JobField({ text, onText, onSubmit, mark, preview, drawnCaret, placeholder = PLACEHOLDER, maxLength, className }: { text: string; onText: (text: string) => void; onSubmit: () => void; mark?: string | null; preview?: string | null; drawnCaret: boolean; placeholder?: ReactNode; maxLength?: number; className?: string }) {
+export function JobField({ text, onText, onSubmit, mark, preview, drawnCaret, placeholder, maxLength, className }: { text: string; onText: (text: string) => void; onSubmit: () => void; mark?: string | null; preview?: string | null; drawnCaret: boolean; placeholder?: ReactNode; maxLength?: number; className?: string }) {
+    const t = useKitTranslations()
     return (
         <ScrollFade className="max-h-[min(12rem,30dvh)] overscroll-contain">
             {/* The scroll lives outside: inside it, the textarea stays as tall as the mirror and both scroll as one. */}
             <div className={cn('relative', className)}>
                 <p aria-hidden className={cn(TYPE, 'pointer-events-none')}>
-                    {preview ? <span className="text-muted-foreground/70">{preview}</span> : <Mirror text={text} mark={mark} caret={drawnCaret} placeholder={placeholder} />}
+                    {preview ? <span className="text-muted-foreground/70">{preview}</span> : <Mirror text={text} mark={mark} caret={drawnCaret} placeholder={placeholder ?? t('newAgent.job.placeholder')} />}
                 </p>
                 <textarea
                     value={text}
@@ -36,7 +36,7 @@ export function JobField({ text, onText, onSubmit, mark, preview, drawnCaret, pl
                         event.preventDefault()
                         onSubmit()
                     }}
-                    aria-label="What should your new coworker do?"
+                    aria-label={t('newAgent.job.label')}
                     spellCheck={false}
                     maxLength={maxLength}
                     className={cn(TYPE, 'absolute inset-0 size-full resize-none overflow-hidden bg-transparent text-transparent outline-none selection:bg-foreground/20', drawnCaret || preview ? 'caret-transparent' : 'caret-foreground')}

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 import type { CodexDeviceAuth } from '@/components/connections/use-codex-device-auth'
@@ -9,7 +10,7 @@ import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { CheckIcon, ChevronRightIcon, CopyIcon, ExternalLinkIcon, TriangleAlertIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-import { ADMIN_MESSAGE, CHATGPT_SECURITY_URL, DEVICE_CODE_SETTING, STUCK_AFTER_MS } from './chatgpt-setup'
+import { CHATGPT_SECURITY_URL, STUCK_AFTER_MS } from './chatgpt-setup'
 import { ForemanTrack, type TrackStep } from './ForemanTrack'
 import { StepError } from './step-bits'
 
@@ -18,6 +19,7 @@ import { StepError } from './step-bits'
 // approval just never comes. So the switch is the first step, one click away for whoever already
 // flipped it ("It's already on" goes straight for the code), and the wait brings it back up.
 export function ChatGptPlanSteps({ auth, lastStep }: { auth: CodexDeviceAuth; lastStep: (linked: boolean) => TrackStep }) {
+    const t = useTranslations('connections.chatgpt')
     const [settingsOpened, setSettingsOpened] = useState(false)
     const [workspacePlan, setWorkspacePlan] = useState(false)
     const { phase } = auth
@@ -31,30 +33,30 @@ export function ChatGptPlanSteps({ auth, lastStep }: { auth: CodexDeviceAuth; la
             at={linked ? 2 : onCode ? 1 : 0}
             done={linked ? 3 : onCode ? 1 : 0}
             orb={phase === 'starting' || phase === 'waiting' ? 'thinking' : linked ? 'speaking' : 'listening'}
-            remark={(linked && last.remark) || remarkFor(auth, onCode, stuck)}
+            remark={(linked && last.remark) || t(`remarks.${remarkFor(auth, onCode, stuck)}`)}
             thinking={phase === 'starting' || (phase === 'waiting' && !stuck)}
             steps={[
                 {
-                    title: 'Allow sign-in by code in ChatGPT',
+                    title: t('allowStep'),
                     body: !onCode && (
                         <div className="flex flex-col items-start gap-2">
                             <div className="flex flex-wrap gap-2">
                                 <Button asChild className="gap-1.5">
                                     <a href={CHATGPT_SECURITY_URL} target="_blank" rel="noopener noreferrer" onClick={() => setSettingsOpened(true)}>
-                                        Open ChatGPT settings
+                                        {t('openSettings')}
                                         <ExternalLinkIcon className="size-3" />
                                     </a>
                                 </Button>
                                 <Button type="button" variant="outline" onClick={auth.start} className="gap-1.5">
                                     <CheckIcon />
-                                    It&apos;s already on
+                                    {t('alreadyOn')}
                                 </Button>
                             </div>
                             <SettingHint workspacePlan={workspacePlan} onToggle={() => setWorkspacePlan(value => !value)} />
                         </div>
                     ),
                 },
-                { title: 'Enter the code on OpenAI', body: <CodeStep auth={auth} primary={onCode} stuck={stuck} workspacePlan={workspacePlan} /> },
+                { title: t('codeStep'), body: <CodeStep auth={auth} primary={onCode} stuck={stuck} workspacePlan={workspacePlan} /> },
                 last,
             ]}
         />
@@ -62,39 +64,35 @@ export function ChatGptPlanSteps({ auth, lastStep }: { auth: CodexDeviceAuth; la
 }
 
 function remarkFor(auth: CodexDeviceAuth, onCode: boolean, stuck: boolean) {
-    if (auth.phase === 'connected') return 'All set!'
-    if (auth.phase === 'starting') return 'Getting a code'
-    if (auth.expired) return 'That code ran out.'
-    if (auth.phase === 'waiting') return stuck ? 'Still nothing from OpenAI.' : 'Waiting for OpenAI'
-    return onCode ? 'Now grab a code.' : 'Turn this on once.'
+    if (auth.phase === 'connected') return 'connected'
+    if (auth.phase === 'starting') return 'starting'
+    if (auth.expired) return 'expired'
+    if (auth.phase === 'waiting') return stuck ? 'stuck' : 'waiting'
+    return onCode ? 'grabCode' : 'turnOn'
 }
 
-const SETTING_PATH = ['Settings', 'Security', DEVICE_CODE_SETTING]
+const SETTING_PATH = ['settings', 'security', 'deviceCode'] as const
 
 function SettingHint({ workspacePlan, onToggle }: { workspacePlan: boolean; onToggle: () => void }) {
+    const t = useTranslations('connections.chatgpt')
     return (
         <div className="flex flex-col gap-2 text-xs text-muted-foreground">
-            {workspacePlan ? (
-                <p className="leading-relaxed">
-                    Your ChatGPT admin switches it on for the whole workspace. <CopyAdminMessage />
-                </p>
-            ) : (
-                <SettingPath />
-            )}
+            {workspacePlan ? <p className="leading-relaxed">{t.rich('adminSwitches', { copy: () => <CopyAdminMessage /> })}</p> : <SettingPath />}
             <button type="button" onClick={onToggle} className="w-fit underline decoration-muted-foreground/40 underline-offset-2 hover:text-foreground">
-                {workspacePlan ? 'I’m on Plus or Pro' : 'On ChatGPT Business or Enterprise?'}
+                {workspacePlan ? t('plusOrPro') : t('businessQuestion')}
             </button>
         </div>
     )
 }
 
 function SettingPath() {
+    const t = useTranslations('connections.chatgpt.setting')
     return (
-        <ol aria-label="Where the setting is in ChatGPT" className="flex flex-wrap items-center gap-1">
+        <ol aria-label={t('path')} className="flex flex-wrap items-center gap-1">
             {SETTING_PATH.map((segment, index) => (
                 <li key={segment} className="flex min-w-0 items-center gap-1">
                     {index > 0 && <ChevronRightIcon className="size-3 shrink-0" />}
-                    <span className={cn('rounded-md bg-muted px-1.5 py-0.5', index === SETTING_PATH.length - 1 && 'font-medium text-foreground')}>{segment}</span>
+                    <span className={cn('rounded-md bg-muted px-1.5 py-0.5', index === SETTING_PATH.length - 1 && 'font-medium text-foreground')}>{t(segment)}</span>
                 </li>
             ))}
         </ol>
@@ -102,27 +100,29 @@ function SettingPath() {
 }
 
 function CodeStep({ auth, primary, stuck, workspacePlan }: { auth: CodexDeviceAuth; primary: boolean; stuck: boolean; workspacePlan: boolean }) {
+    const t = useTranslations('connections.chatgpt')
+    const pending = auth.pending
     if (auth.phase === 'connected') return null
 
     return (
         <div className="flex flex-col gap-2">
-            {auth.pending ? (
+            {pending ? (
                 <>
                     <div className="flex items-center gap-2 rounded-lg bg-muted/60 p-1.5 pl-4">
-                        <code className="min-w-0 flex-1 truncate font-mono text-lg font-medium tracking-[0.2em]">{auth.pending.userCode}</code>
-                        <Button type="button" size="icon" variant="ghost" onClick={auth.copy} aria-label="Copy code">
+                        <code className="min-w-0 flex-1 truncate font-mono text-lg font-medium tracking-[0.2em]">{pending.userCode}</code>
+                        <Button type="button" size="icon" variant="ghost" onClick={auth.copy} aria-label={t('copyCode')}>
                             {auth.copied ? <CheckIcon className="size-4" /> : <CopyIcon className="size-4" />}
                         </Button>
                     </div>
                     <p className="text-xs leading-relaxed text-muted-foreground">
-                        Enter it on <InlineLink href={auth.pending.verificationUrl}>OpenAI&apos;s page</InlineLink> and approve. This window picks it up on its own.
+                        {t.rich('enterCode', { link: chunks => <InlineLink href={pending.verificationUrl}>{chunks}</InlineLink> })}
                     </p>
                 </>
             ) : (
-                <TooltipDisabledReason reason={auth.opening && auth.phase !== 'starting' ? 'OpenAI is opening in a new tab' : undefined} className="self-start">
+                <TooltipDisabledReason reason={auth.opening && auth.phase !== 'starting' ? t('opening') : undefined} className="self-start">
                     <Button type="button" variant={primary ? 'default' : 'outline'} onClick={auth.start} disabled={auth.phase === 'starting' || auth.opening} className="gap-1.5 self-start">
                         <ProviderIcon provider="codex" className="size-3.5" />
-                        {auth.phase === 'starting' ? 'Getting code…' : auth.expired ? 'Get a new code' : 'Get code'}
+                        {auth.phase === 'starting' ? t('gettingCode') : auth.expired ? t('newCode') : t('getCode')}
                     </Button>
                 </TooltipDisabledReason>
             )}
@@ -132,20 +132,16 @@ function CodeStep({ auth, primary, stuck, workspacePlan }: { auth: CodexDeviceAu
 }
 
 function StuckHint({ expired, workspacePlan }: { expired: boolean; workspacePlan: boolean }) {
+    const t = useTranslations('connections.chatgpt.stuck')
+    const key = `${expired ? 'expired' : 'error'}${workspacePlan ? 'Admin' : 'Self'}` as const
     return (
         <p className="flex gap-2 text-xs leading-relaxed text-muted-foreground">
             <TriangleAlertIcon className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
             <span className="min-w-0">
-                {expired ? 'The code expired. ' : 'Error on OpenAI’s page? '}
-                {workspacePlan ? (
-                    <>
-                        Your admin has probably not allowed sign-in by code yet. <CopyAdminMessage />
-                    </>
-                ) : (
-                    <>
-                        Sign-in by code is probably still off: turn it on in <InlineLink href={CHATGPT_SECURITY_URL}>Settings → Security</InlineLink>, then {expired ? 'get a new code' : 'enter the code again'}.
-                    </>
-                )}
+                {t.rich(key, {
+                    copy: () => <CopyAdminMessage />,
+                    link: chunks => <InlineLink href={CHATGPT_SECURITY_URL}>{chunks}</InlineLink>,
+                })}
             </span>
         </p>
     )
@@ -161,16 +157,17 @@ function InlineLink({ href, children }: { href: string; children: ReactNode }) {
 }
 
 function CopyAdminMessage() {
+    const t = useTranslations('connections.chatgpt')
     const [copied, setCopied] = useState(false)
     const copy = () => {
-        void navigator.clipboard.writeText(ADMIN_MESSAGE)
+        void navigator.clipboard.writeText(t('adminMessage'))
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
     }
     return (
         <button type="button" onClick={copy} className="inline-flex items-center gap-1 font-medium text-foreground underline-offset-2 hover:underline">
             {copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
-            {copied ? 'Copied' : 'Copy a message for them'}
+            {copied ? t('copied') : t('copyMessage')}
         </button>
     )
 }

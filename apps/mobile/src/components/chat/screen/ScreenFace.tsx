@@ -1,6 +1,7 @@
 import { SymbolView } from 'expo-symbols'
 import { View } from 'react-native'
 import Animated, { FadeOut } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { useTheme } from '@/theme/theme'
@@ -9,12 +10,11 @@ import { mix, spacing } from '@/theme/tokens'
 import { ScreenLoader } from './ScreenLoader'
 import type { ScreenStatus } from './useAgentScreen'
 
-const UNAVAILABLE_LABELS = { error: 'The screen is not available', disconnected: 'The screen went away' } as const
-
 // What covers a 16:9 box until the screen paints, whatever its size: the block in the thread, the
 // floating thumbnail. The live screen under it is the caller's.
 export function ScreenFace({ status }: { status: ScreenStatus }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.screen')
     if (status === 'live') return null
     const surface = mix(theme.card, theme.muted, 0.4)
     return (
@@ -25,7 +25,7 @@ export function ScreenFace({ status }: { status: ScreenStatus }) {
                 <View style={{ alignItems: 'center', gap: 6 }}>
                     <SymbolView name="display" size={20} tintColor={theme.mutedForeground} />
                     <AppText variant="footnote" tone="muted" style={{ textAlign: 'center' }}>
-                        {UNAVAILABLE_LABELS[status]}
+                        {t(status)}
                     </AppText>
                 </View>
             )}

@@ -1,5 +1,6 @@
 import { chatErrorTitle, classifyChatError, friendlyError } from '@rerun/contracts'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { PillButton } from '@/components/ui/PillButton'
@@ -20,6 +21,8 @@ export type ErrorCardActions = {
 // offer falls back to Try again.
 export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConnect }: { message: string } & ErrorCardActions) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.error')
+    const tErrors = useTranslations('chatErrors')
     const kind = classifyChatError(message)
     const budget = kind === 'budget' && onConnect
     const reconnect = kind === 'unauthorized' && onReconnect
@@ -29,20 +32,20 @@ export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConn
 
     return (
         <View style={{ gap: spacing.sm, padding: spacing.lg, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: withAlpha(theme.destructive, 0.35), backgroundColor: withAlpha(theme.destructive, theme.scheme === 'dark' ? 0.1 : 0.05) }}>
-            <AppText variant="headline">{budget ? 'Rerun credits' : (chatErrorTitle(kind, message) ?? 'Something went wrong')}</AppText>
+            <AppText variant="headline">{budget ? t('creditsTitle') : (chatErrorTitle(kind, message, tErrors) ?? t('fallbackTitle'))}</AppText>
             <AppText variant="callout" tone="muted">
-                {budget ? "You've used up your Rerun credits for this period. Already paying for Claude or ChatGPT? Run your coworkers on that plan, at no extra cost here." : friendlyError(message)}
+                {budget ? t('creditsBody') : friendlyError(message, tErrors)}
             </AppText>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
                 {budget && (
                     <>
-                        <PillButton label="Connect Claude" icon={<ProviderLogo provider="claude" size={14} />} onPress={() => onConnect('claude')} />
-                        <PillButton label="Connect ChatGPT" icon={<ProviderLogo provider="openai" size={14} color={theme.primaryForeground} />} onPress={() => onConnect('codex')} />
+                        <PillButton label={t('connectClaude')} icon={<ProviderLogo provider="claude" size={14} />} onPress={() => onConnect('claude')} />
+                        <PillButton label={t('connectChatGpt')} icon={<ProviderLogo provider="openai" size={14} color={theme.primaryForeground} />} onPress={() => onConnect('codex')} />
                     </>
                 )}
-                {reconnect && <PillButton label="Reconnect" onPress={onReconnect} />}
-                {retry && <PillButton label="Try again" variant="secondary" onPress={onRetry} />}
-                {switchable && <PillButton label="Switch model" variant={retry ? 'secondary' : 'primary'} onPress={onSwitchModel} />}
+                {reconnect && <PillButton label={t('reconnect')} onPress={onReconnect} />}
+                {retry && <PillButton label={t('tryAgain')} variant="secondary" onPress={onRetry} />}
+                {switchable && <PillButton label={t('switchModel')} variant={retry ? 'secondary' : 'primary'} onPress={onSwitchModel} />}
             </View>
         </View>
     )

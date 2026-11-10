@@ -1,6 +1,6 @@
 'use client'
 
-import { AGENT_TABS } from '@/components/agent/agent-tabs'
+import { useAgentTabs } from '@/components/agent/agent-tabs'
 import { useComputerEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { useBoxViewer, useManageableSpaceIds } from '@/hooks/useBoxAccess'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
@@ -8,7 +8,7 @@ import { useModKeyLabel } from '@/hooks/useModKeyLabel'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
-import { UNNAMED_BOX_LABEL, type AgentStatus, type IsoAgent } from '@/lib/board/types'
+import type { AgentStatus, IsoAgent } from '@/lib/board/types'
 import { buildControlCommands, type ControlCommand, type ControlCommandId } from '@/lib/control-center/commands'
 import { openCrisp } from '@/lib/crisp'
 import { parseQuery, searchItems } from '@/lib/control-center/search'
@@ -26,6 +26,7 @@ import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
 import type { BadgeTone } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { useEffect, useState, type ComponentType } from 'react'
 
@@ -62,11 +63,12 @@ const COMMAND_ICONS: Record<ControlCommandId, ComponentType<{ className?: string
     whats_new: MegaphoneIcon,
 }
 
-const STATUS_BADGES: Partial<Record<AgentStatus, { label: string; tone: BadgeTone }>> = {
-    waiting_human: { label: 'Needs you', tone: 'orange' },
-    working: { label: 'Working', tone: 'cyan' },
-    error: { label: 'Error', tone: 'red' },
-    offline: { label: 'Offline', tone: 'neutral' },
+const STATUS_BADGE_TONES = { waiting_human: 'orange', working: 'cyan', error: 'red', offline: 'neutral' } as const satisfies Partial<Record<AgentStatus, BadgeTone>>
+
+type BadgedStatus = keyof typeof STATUS_BADGE_TONES
+
+function isBadgedStatus(status: AgentStatus): status is BadgedStatus {
+    return status in STATUS_BADGE_TONES
 }
 
 function pageKey(page: Page): string {
@@ -79,6 +81,9 @@ function isMacPlatform(): boolean {
 }
 
 export function ControlCenter() {
+    const t = useTranslations('layout.controlCenter')
+    const tReasons = useTranslations('workspace.access')
+    const agentTabs = useAgentTabs()
     const open = useControlCenterStore(s => s.open)
     const setOpen = useControlCenterStore(s => s.setOpen)
     const recentAgentIds = useControlCenterStore(s => s.recentAgentIds)
@@ -166,7 +171,8 @@ export function ControlCenter() {
 
     if (!available) return null
 
-    const boxName = (spaceId: string) => spaces.find(space => space.id === spaceId)?.name || UNNAMED_BOX_LABEL
+    const unnamedBox = t('unnamedBox')
+    const boxName = (spaceId: string) => spaces.find(space => space.id === spaceId)?.name || unnamedBox
 
     const run = (action: () => void) => () => {
         setOpen(false)
@@ -188,7 +194,7 @@ export function ControlCenter() {
         label: agent.name,
         detail: boxName(agent.spaceId),
         leading: { kind: 'agent', agentId: agent.id },
-        badge: agent.disabledAt ? { label: 'Off', tone: 'neutral' } : STATUS_BADGES[agent.status],
+        badge: agent.disabledAt ? { label: t('status.off'), tone: 'neutral' } : isBadgedStatus(agent.status) ? { label: t(`status.${agent.status}`), tone: STATUS_BADGE_TONES[agent.status] } : undefined,
         onSelect: run(() => useBoardStore.getState().focusAgentOnBoard(agent.id, 'chat')),
         onDrill: drill({ kind: 'agent', agentId: agent.id }),
     })
@@ -237,23 +243,26 @@ export function ControlCenter() {
         id: `command-${command.id}`,
         label: command.label,
         leading: { kind: 'icon', icon: command.id === 'toggle_theme' && !darkTheme ? MoonIcon : COMMAND_ICONS[command.id] },
-        badge: command.paid ? { label: 'Pro', tone: 'brand' } : undefined,
+        badge: command.paid ? { label: t('pro'), tone: 'brand' } : undefined,
         disabledReason: command.disabledReason,
         onSelect: run(command.paid ? () => useBillingStore.getState().openBilling(undefined, command.id) : commandActions[command.id]),
     })
 
     function rootSections(): ControlSection[] {
-        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme })
+        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox') }).map(command => ({
+            ...command,
+            label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`),
+        }))
         // "Ask the assistant" with a query is the last row of the list, not an action among others.
         const listed = text ? commands.filter(command => command.id !== 'ask_assistant') : commands
         const commandSections: ControlSection[] = [
-            { id: 'actions', heading: 'Actions', rows: searchItems(listed.filter(command => command.group === 'actions'), text).map(commandRow) },
-            { id: 'settings', heading: 'Settings', rows: searchItems(listed.filter(command => command.group === 'settings'), text).map(commandRow) },
+            { id: 'actions', heading: t('headings.actions'), rows: searchItems(listed.filter(command => command.group === 'actions'), text).map(commandRow) },
+            { id: 'settings', heading: t('headings.settings'), rows: searchItems(listed.filter(command => command.group === 'settings'), text).map(commandRow) },
         ]
         const searchableAgents = agents.map(agent => ({ agent, label: agent.name, keywords: [agent.handle ?? '', boxName(agent.spaceId)] }))
 
         if (scope === 'commands') return commandSections
-        if (scope === 'agents') return [{ id: 'agents', heading: 'Agents', rows: searchItems(searchableAgents, text).map(entry => agentRow(entry.agent, 'agents')) }]
+        if (scope === 'agents') return [{ id: 'agents', heading: t('headings.agents'), rows: searchItems(searchableAgents, text).map(entry => agentRow(entry.agent, 'agents')) }]
 
         if (!text) {
             const waiting = agents.filter(agent => agent.status === 'waiting_human' && !agent.disabledAt)
@@ -261,31 +270,31 @@ export function ControlCenter() {
             const recent = recentAgentIds.map(id => agents.find(agent => agent.id === id)).filter((agent): agent is IsoAgent => !!agent && !waitingIds.has(agent.id))
             const others = agents.filter(agent => !waitingIds.has(agent.id)).slice(0, AGENT_RESULTS)
             return [
-                { id: 'needs-you', heading: 'Needs you', rows: waiting.map(agent => agentRow(agent, 'needs-you')) },
-                recent.length > 0 ? { id: 'recent', heading: 'Recent', rows: recent.map(agent => agentRow(agent, 'recent')) } : { id: 'agents', heading: 'Agents', rows: others.map(agent => agentRow(agent, 'agents')) },
+                { id: 'needs-you', heading: t('headings.needsYou'), rows: waiting.map(agent => agentRow(agent, 'needs-you')) },
+                recent.length > 0 ? { id: 'recent', heading: t('headings.recent'), rows: recent.map(agent => agentRow(agent, 'recent')) } : { id: 'agents', heading: t('headings.agents'), rows: others.map(agent => agentRow(agent, 'agents')) },
                 ...commandSections,
             ]
         }
 
         const boxes = searchItems(
-            spaces.map(space => ({ space, label: space.name || UNNAMED_BOX_LABEL })),
+            spaces.map(space => ({ space, label: space.name || unnamedBox })),
             text,
             BOX_RESULTS
         ).map(({ space, label }): ControlRow => {
             const count = agents.filter(agent => agent.spaceId === space.id).length
             const enter = drill({ kind: 'box', spaceId: space.id })
-            return { id: `box-${space.id}`, label, detail: count === 1 ? '1 agent' : `${count} agents`, leading: { kind: 'icon', icon: BoxIcon }, onSelect: enter, onDrill: enter }
+            return { id: `box-${space.id}`, label, detail: t('boxAgents', { count }), leading: { kind: 'icon', icon: BoxIcon }, onSelect: enter, onDrill: enter }
         })
 
         const askAssistant: ControlSection[] = assistantReady
-            ? [{ id: 'assistant', heading: 'Assistant', rows: [{ id: 'ask-assistant', label: 'Ask Rerun', detail: `“${query.trim()}”`, leading: { kind: 'assistant' }, onSelect: run(commandActions.ask_assistant) }] }]
+            ? [{ id: 'assistant', heading: t('headings.assistant'), rows: [{ id: 'ask-assistant', label: t('askRerun'), detail: t('quotedQuery', { query: query.trim() }), leading: { kind: 'assistant' }, onSelect: run(commandActions.ask_assistant) }] }]
             : []
 
         return [
-            { id: 'agents', heading: 'Agents', rows: searchItems(searchableAgents, text, AGENT_RESULTS).map(entry => agentRow(entry.agent, 'agents')) },
-            { id: 'boxes', heading: 'Boxes', rows: boxes },
+            { id: 'agents', heading: t('headings.agents'), rows: searchItems(searchableAgents, text, AGENT_RESULTS).map(entry => agentRow(entry.agent, 'agents')) },
+            { id: 'boxes', heading: t('headings.boxes'), rows: boxes },
             ...commandSections,
-            ...conversationSection('conversations', 'Conversations', true),
+            ...conversationSection('conversations', t('headings.conversations'), true),
             ...askAssistant,
         ]
     }
@@ -294,15 +303,15 @@ export function ControlCenter() {
         const board = useBoardStore.getState()
         // Same gate as the panel's rail: the agent's own status ranks `working` above what waits on a human.
         const hasToHandle = sessions.some(session => session.agentId === agent.id && ATTENTION_STATUSES.has(session.status))
-        const tabs = AGENT_TABS.filter(tab => (tab.id !== 'actions' || hasToHandle) && (tab.id !== 'setup' || isTemplateAuthor))
+        const tabs = agentTabs.filter(tab => (tab.id !== 'actions' || hasToHandle) && (tab.id !== 'setup' || isTemplateAuthor))
         const tabRows = searchItems(tabs, text).map((tab): ControlRow => ({ id: `tab-${tab.id}`, label: tab.label, detail: tab.description, leading: { kind: 'icon', icon: tab.icon }, onSelect: run(() => board.focusAgentOnBoard(agent.id, tab.id)) }))
 
         const actions: (ControlRow & { keywords?: string[] })[] = []
         if (desktopEnabled) {
             actions.push({
                 id: 'agent-desktop',
-                label: 'Desktop',
-                detail: "Take control of this coworker's screen",
+                label: t('agent.desktop'),
+                detail: t('agent.desktopDetail'),
                 keywords: ['screen', 'browser', 'computer'],
                 leading: { kind: 'icon', icon: MonitorIcon },
                 disabledReason: needsMachineReason,
@@ -314,34 +323,45 @@ export function ControlCenter() {
         }
         if (spaces.length > 1) {
             const enter = drill({ kind: 'move', agentId: agent.id })
-            actions.push({ id: 'agent-move', label: 'Move to another Box', detail: boxName(agent.spaceId), keywords: ['box', 'team'], leading: { kind: 'icon', icon: BoxIcon }, onSelect: enter, onDrill: enter })
+            actions.push({ id: 'agent-move', label: t('agent.move'), detail: boxName(agent.spaceId), keywords: ['box', 'team'], leading: { kind: 'icon', icon: BoxIcon }, onSelect: enter, onDrill: enter })
         }
-        actions.push({ id: 'agent-notifications', label: 'Notifications', detail: 'When this agent reaches you', keywords: ['alerts'], leading: { kind: 'icon', icon: BellIcon }, onSelect: run(() => useNotificationsStore.getState().openNotifications(agent.id)) })
+        actions.push({ id: 'agent-notifications', label: t('agent.notifications'), detail: t('agent.notificationsDetail'), keywords: ['alerts'], leading: { kind: 'icon', icon: BellIcon }, onSelect: run(() => useNotificationsStore.getState().openNotifications(agent.id)) })
 
-        return [{ id: 'tabs', heading: 'Open', rows: tabRows }, { id: 'agent-actions', heading: 'Actions', rows: searchItems(actions, text) }, ...conversationSection('agent-conversations', text ? 'Conversations' : 'Recent conversations', false)]
+        return [{ id: 'tabs', heading: t('headings.open'), rows: tabRows }, { id: 'agent-actions', heading: t('headings.actions'), rows: searchItems(actions, text) }, ...conversationSection('agent-conversations', text ? t('headings.conversations') : t('headings.recentConversations'), false)]
     }
 
     function sections(): ControlSection[] {
         if (page.kind === 'root') return rootSections()
         if (page.kind === 'box') {
             const inBox = agents.filter(agent => agent.spaceId === page.spaceId).map(agent => ({ agent, label: agent.name, keywords: [agent.handle ?? ''] }))
-            return [{ id: 'box-agents', heading: 'Agents', rows: searchItems(inBox, text).map(entry => agentRow(entry.agent, 'box')) }]
+            return [{ id: 'box-agents', heading: t('headings.agents'), rows: searchItems(inBox, text).map(entry => agentRow(entry.agent, 'box')) }]
         }
         if (!pageAgent) return []
         if (page.kind === 'agent') return agentSections(pageAgent)
-        const destinations = spaces.filter(space => space.id !== pageAgent.spaceId && manageableSpaceIds.has(space.id)).map(space => ({ space, label: space.name || UNNAMED_BOX_LABEL }))
+        const destinations = spaces.filter(space => space.id !== pageAgent.spaceId && manageableSpaceIds.has(space.id)).map(space => ({ space, label: space.name || unnamedBox }))
         return [
             {
                 id: 'move',
-                heading: 'Move to',
+                heading: t('headings.moveTo'),
                 rows: searchItems(destinations, text).map(({ space, label }) => ({ id: `move-${space.id}`, label, leading: { kind: 'icon', icon: BoxIcon }, onSelect: run(() => useBoardStore.getState().moveAgentToBox(pageAgent.id, space.id, boxViewer)) })),
             },
         ]
     }
 
-    const crumbs = page.kind === 'root' ? [] : page.kind === 'box' ? [pageSpace?.name || UNNAMED_BOX_LABEL] : page.kind === 'move' ? [pageAgent?.name ?? '', 'Move to another Box'] : [pageAgent?.name ?? '']
-    const placeholder = page.kind === 'root' ? (assistantReady ? 'Search or ask Rerun…' : 'Search agents, settings, conversations…') : page.kind === 'agent' ? `Search in ${pageAgent?.name ?? 'this agent'}…` : page.kind === 'box' ? 'Search agents in this Box…' : 'Pick a Box…'
-    const emptyLabel = page.kind === 'box' && !text ? 'No agents in this Box yet.' : 'Nothing matches.'
+    const crumbs = page.kind === 'root' ? [] : page.kind === 'box' ? [pageSpace?.name || unnamedBox] : page.kind === 'move' ? [pageAgent?.name ?? '', t('agent.move')] : [pageAgent?.name ?? '']
+    const placeholder =
+        page.kind === 'root'
+            ? assistantReady
+                ? t('placeholder.rootAssistant')
+                : t('placeholder.root')
+            : page.kind === 'agent'
+              ? pageAgent
+                  ? t('placeholder.agent', { name: pageAgent.name })
+                  : t('placeholder.agentUnknown')
+              : page.kind === 'box'
+                ? t('placeholder.box')
+                : t('placeholder.move')
+    const emptyLabel = page.kind === 'box' && !text ? t('empty.box') : t('empty.noMatch')
 
     return (
         <ControlCenterView

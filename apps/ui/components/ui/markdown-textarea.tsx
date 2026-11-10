@@ -5,6 +5,7 @@ import { MarkdownEditorDialog } from '@/components/ui/markdown-editor-dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { Maximize2Icon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { useCallback, useId, useState, type ComponentProps } from 'react'
 
 type MarkdownTextareaProps = Omit<ComponentProps<'textarea'>, 'value' | 'onChange'> & {
@@ -37,6 +38,7 @@ export function MarkdownTextarea({
     disabled,
     ...props
 }: MarkdownTextareaProps) {
+    const t = useTranslations('ui.markdown')
     const generatedId = useId()
     const textareaId = id ?? generatedId
 
@@ -58,8 +60,8 @@ export function MarkdownTextarea({
                     <button
                         type="button"
                         onClick={handleExpand}
-                        aria-label="Open the full editor"
-                        title="Open the full editor"
+                        aria-label={t('openEditor')}
+                        title={t('openEditor')}
                         className="absolute top-1.5 right-1.5 z-10 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
                     >
                         <Maximize2Icon className="size-3.5" />

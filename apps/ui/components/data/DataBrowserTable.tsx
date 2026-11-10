@@ -11,6 +11,7 @@ import { ArrowDownIcon, ArrowUpIcon, DatabaseIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { CellContext } from '@rerun/ui/chat'
 import { type Table } from '@tanstack/react-table'
+import { useTranslations } from 'next-intl'
 
 export type DbRow = Record<string, unknown>
 
@@ -54,6 +55,7 @@ export function DataBrowserTable({
     showSources = false,
     onOpenSources,
 }: DataBrowserTableProps) {
+    const t = useTranslations('data.table')
     const selecting = selectedRowIds.size > 0
     const columnOf = (id: string): FriendlyColumn => friendly.get(id) ?? { key: id, label: columnLabel(id), kind: 'text' }
     const gutter = 'w-8 min-w-8 border-b border-border/70 pl-3 pr-1'
@@ -67,7 +69,7 @@ export function DataBrowserTable({
                         {canSelectRows && (
                             <th className={cn(gutter, 'h-9 border-border')}>
                                 <span className={cn('flex transition-opacity', selecting || allPageSelected ? 'opacity-100' : 'opacity-0 hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100')}>
-                                    <Checkbox size="sm" checked={allPageSelected} onCheckedChange={onToggleAllPage} aria-label="Select all rows on this page" />
+                                    <Checkbox size="sm" checked={allPageSelected} onCheckedChange={onToggleAllPage} aria-label={t('selectAllRows')} />
                                 </span>
                             </th>
                         )}
@@ -102,7 +104,7 @@ export function DataBrowserTable({
                             <th className="h-9 w-0 border-b border-l border-border border-l-border/70 px-2 text-left font-normal whitespace-nowrap text-muted-foreground">
                                 <span className="inline-flex items-center gap-1.5">
                                     <DatabaseIcon className="size-3.5 shrink-0 opacity-70" />
-                                    Sources
+                                    {t('sources')}
                                 </span>
                             </th>
                         )}
@@ -126,7 +128,7 @@ export function DataBrowserTable({
                                                 selecting ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:opacity-100',
                                             )}
                                         >
-                                            <Checkbox size="sm" checked={checked} onCheckedChange={() => onToggleRow(key)} aria-label="Select row" />
+                                            <Checkbox size="sm" checked={checked} onCheckedChange={() => onToggleRow(key)} aria-label={t('selectRow')} />
                                         </span>
                                     )}
                                 </td>

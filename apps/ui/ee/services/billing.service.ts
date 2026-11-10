@@ -1,3 +1,5 @@
+import { requestLocale } from '@/lib/i18n/request-locale'
+import { DEFAULT_LOCALE, PSEUDO_LOCALE } from '@rerun/i18n'
 import { realEmail } from '@/lib/auth/placeholder-email'
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { Database } from '@/app/api/database.types'
@@ -67,7 +69,7 @@ import { SLOT_PAUSE_REASONS, subscriberTrialOpen, syncWorkspaceAppSlots } from '
 import { APP_ADDON_KEYS, APP_SLUGS, SLOT_HOLDING_STATUSES } from '@/lib/apps/types'
 import { APP_INFO } from '@/lib/apps/catalog'
 import { isPhoneStepPending } from '@/app/api/_services/phone-gate.service'
-import { PHONE_REQUIRED_MESSAGE } from '@/lib/phone/verification'
+import { AppError } from '@/lib/i18n/action-error'
 import { requestAgentActivationSync } from '@/trigger/sync-agent-activation'
 import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 import { sendPaymentFailedNotice } from '@/ee/lib/lifecycle/payment-failed-notice'
@@ -104,10 +106,14 @@ export async function ensureStripeCustomer(): Promise<{ workspaceId: number; cus
     const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'stripe_customer_id'] as const, { id: workspaceId })
     if (workspace?.stripe_customer_id) return { workspaceId, customerId: workspace.stripe_customer_id }
 
+    // Outside a request (a job) there is no browser to ask: English.
+    const locale = await requestLocale().catch(() => DEFAULT_LOCALE)
     const customer = await stripe.customers.create({
         email: realEmail(session?.email) ?? undefined,
         name: workspace?.name ?? undefined,
         metadata: { workspace_id: String(workspaceId) },
+        // Stripe writes the invoices and the receipts it emails in this language. Prices stay in USD.
+        preferred_locales: [locale === PSEUDO_LOCALE ? DEFAULT_LOCALE : locale],
     })
 
     const { error } = await supabase.from('workspaces').update<WorkspaceUpdate>({ stripe_customer_id: customer.id }).eq('id', workspaceId)
@@ -153,10 +159,10 @@ async function ensureCustomerEmail(customerId: string): Promise<void> {
 async function basePlanCheckoutParams(): Promise<{ params: Omit<Stripe.Checkout.SessionCreateParams, 'line_items'>; priceArm: PriceArm }> {
     // Before the customer: a refused account leaves no orphan behind in Stripe.
     const { session } = await getServerSession()
-    if (session && (await isPhoneStepPending(createServiceRoleClient(), session.id))) throw new Error(PHONE_REQUIRED_MESSAGE)
+    if (session && (await isPhoneStepPending(createServiceRoleClient(), session.id))) throw new AppError('phoneRequired')
 
     const { workspaceId, customerId } = await ensureStripeCustomer()
-    if (await resolveEngineWaitlist(workspaceId)) throw new Error(ENGINE_WAITLIST_MESSAGE)
+    if (await resolveEngineWaitlist(workspaceId)) throw new AppError('engineWaitlist')
 
     await refuseSecondPlanSubscription(workspaceId, customerId)
     await ensureCustomerEmail(customerId)
@@ -227,8 +233,8 @@ export async function startCardlessTrial(client: ForemanClient = 'web'): Promise
     if (isSubscriptionEntitled(workspace.subscription_status)) return true
     if (workspace.trial_ends_at) return false
     if (client === 'web' && trialArm(workspaceId) === 'card') return false
-    if (await isPhoneStepPending(supabase, session.id)) throw new Error(PHONE_REQUIRED_MESSAGE)
-    if (await resolveEngineWaitlist(workspaceId)) throw new Error(ENGINE_WAITLIST_MESSAGE)
+    if (await isPhoneStepPending(supabase, session.id)) throw new AppError('phoneRequired')
+    if (await resolveEngineWaitlist(workspaceId)) throw new AppError('engineWaitlist')
 
     const { customerId } = await ensureStripeCustomer()
     await refuseSecondPlanSubscription(workspaceId, customerId)
@@ -270,7 +276,7 @@ const TERMS_ACCEPTED_METADATA_KEY = 'terms_accepted_at'
 
 function assertValidSelection(selection: PlanSelection): void {
     assertValidQuantities(selection.quantities)
-    if (!BILLING_INTERVALS.includes(selection.interval)) throw new Error('Invalid billing interval.')
+    if (!BILLING_INTERVALS.includes(selection.interval)) throw new AppError('invalidBillingInterval')
 }
 
 function planLineItems({ quantities, interval }: PlanSelection, priceArm: PriceArm): { price: string; quantity: number }[] {
@@ -313,8 +319,8 @@ export async function createPlanCheckoutSession(selection: PlanSelection): Promi
 async function requireOpenPlanSession(sessionId: string): Promise<Stripe.Checkout.Session> {
     const workspaceId = await requireWorkspaceId()
     const session = await stripe.checkout.sessions.retrieve(sessionId)
-    if (session.metadata?.workspace_id !== String(workspaceId)) throw new Error('This checkout belongs to another workspace')
-    if (session.status !== 'open') throw new Error('This checkout is already closed.')
+    if (session.metadata?.workspace_id !== String(workspaceId)) throw new AppError('checkoutOtherWorkspace')
+    if (session.status !== 'open') throw new AppError('checkoutClosed')
     return session
 }
 
@@ -324,8 +330,8 @@ async function requireOpenPlanSession(sessionId: string): Promise<Stripe.Checkou
 export async function updatePlanCheckoutSession(sessionId: string, selection: PlanSelection): Promise<void> {
     assertValidSelection(selection)
     const session = await requireOpenPlanSession(sessionId)
-    if (session.mode !== 'subscription') throw new Error('This checkout does not sell a plan.')
-    if (session.metadata?.[CARD_TRIAL_METADATA_KEY]) throw new Error('The trial plan cannot be changed.')
+    if (session.mode !== 'subscription') throw new AppError('checkoutNotPlan')
+    if (session.metadata?.[CARD_TRIAL_METADATA_KEY]) throw new AppError('trialPlanLocked')
 
     const { data: workspace } = await selectSingle(createServiceRoleClient(), 'workspaces', ['price_arm'] as const, { id: Number(session.metadata?.workspace_id) })
     await stripe.checkout.sessions.update(sessionId, { line_items: planLineItems(selection, parsePriceArm(workspace?.price_arm)) })
@@ -347,7 +353,7 @@ export type CheckoutOutcome = { state: 'entitled' | 'trial_refused' | 'pending' 
 export async function readCheckoutOutcome(sessionId: string): Promise<CheckoutOutcome> {
     const workspaceId = await requireWorkspaceId()
     const session = await stripe.checkout.sessions.retrieve(sessionId)
-    if (session.metadata?.workspace_id !== String(workspaceId)) throw new Error('This checkout belongs to another workspace')
+    if (session.metadata?.workspace_id !== String(workspaceId)) throw new AppError('checkoutOtherWorkspace')
 
     const supabase = createServiceRoleClient()
     const { data: workspace } = await selectSingle(supabase, 'workspaces', ['subscription_status', 'trial_ends_at'] as const, { id: workspaceId })
@@ -362,7 +368,6 @@ export async function readCheckoutOutcome(sessionId: string): Promise<CheckoutOu
 
 // A subscription in any of these is still being billed, so a second one is a second bill.
 const LIVE_SUBSCRIPTION_STATUSES = new Set<Stripe.Subscription.Status>(['active', 'trialing', 'past_due', 'unpaid'])
-const ALREADY_SUBSCRIBED = 'Your workspace already has a subscription. Manage it from Billing.'
 
 // Checkout mints a brand new subscription every time it completes, so a workspace that already has
 // one and reaches this again pays twice for the same month. It is reachable: a failed renewal
@@ -378,12 +383,12 @@ async function refuseSecondPlanSubscription(workspaceId: number, customerId: str
 
     if (workspace?.stripe_subscription_id) {
         const current = await stripe.subscriptions.retrieve(workspace.stripe_subscription_id).catch(() => null)
-        if (current && LIVE_SUBSCRIPTION_STATUSES.has(current.status)) throw new Error(ALREADY_SUBSCRIBED)
+        if (current && LIVE_SUBSCRIPTION_STATUSES.has(current.status)) throw new AppError('alreadySubscribed')
     }
 
     const { data: subscriptions } = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 100 })
     if (subscriptions.some(subscription => !isTemplateSubscription(subscription) && LIVE_SUBSCRIPTION_STATUSES.has(subscription.status))) {
-        throw new Error(ALREADY_SUBSCRIBED)
+        throw new AppError('alreadySubscribed')
     }
 }
 
@@ -661,9 +666,9 @@ function businessDetailsOf(customer: Stripe.Customer | null): BusinessDetails {
 async function requireBillingCustomer(): Promise<Stripe.Customer> {
     const workspaceId = await requireWorkspaceId()
     const { data: workspace } = await selectSingle(createServiceRoleClient(), 'workspaces', ['stripe_customer_id'] as const, { id: workspaceId })
-    if (!workspace?.stripe_customer_id) throw new Error('Your workspace has no billing account yet.')
+    if (!workspace?.stripe_customer_id) throw new AppError('noBillingAccount')
     const customer = await stripe.customers.retrieve(workspace.stripe_customer_id, { expand: ['tax_ids'] })
-    if (customer.deleted) throw new Error('Your billing account was closed.')
+    if (customer.deleted) throw new AppError('billingAccountClosed')
     return customer
 }
 
@@ -683,8 +688,8 @@ export type BusinessDetailsInput = { name: string; type: TaxIdType; value: strin
 export async function saveBusinessDetails(input: BusinessDetailsInput): Promise<BusinessDetails> {
     const customer = await requireBillingCustomer()
     const country = customer.address?.country
-    if (!country) throw new Error('Add a card first: the number is checked against its billing address.')
-    if (!taxIdTypesFor(country).includes(input.type)) throw new Error(`This kind of number does not match your billing country, ${countryName(country)}.`)
+    if (!country) throw new AppError('addCardBeforeTaxId')
+    if (!taxIdTypesFor(country).includes(input.type)) throw new AppError('taxIdTypeMismatch', { country: countryName(country) })
 
     const value = normalizeTaxIdValue(input.type, input.value, country)
     const existing = customerTaxIds(customer)
@@ -693,7 +698,7 @@ export async function saveBusinessDetails(input: BusinessDetailsInput): Promise<
         try {
             kept = await stripe.customers.createTaxId(customer.id, { type: input.type, value })
         } catch (err) {
-            if (isInvalidTaxIdError(err)) throw new Error(`This number is not valid for ${countryName(country)}.`)
+            if (isInvalidTaxIdError(err)) throw new AppError('taxIdInvalid', { country: countryName(country) })
             throw err
         }
     }
@@ -769,21 +774,21 @@ async function requireEditablePlanSubscription({ allowPastDue = false }: { allow
     const supabase = createServiceRoleClient()
     const { data: workspace } = await selectSingle(supabase, 'workspaces', ['stripe_subscription_id', 'subscription_status'] as const, { id: workspaceId })
 
-    if (!workspace?.stripe_subscription_id) throw new Error('No active subscription. Subscribe first.')
+    if (!workspace?.stripe_subscription_id) throw new AppError('noActiveSubscription')
     const editable = workspace.subscription_status === 'active' || workspace.subscription_status === 'trialing' || (allowPastDue && workspace.subscription_status === 'past_due')
-    if (!editable) throw new Error('Your subscription is not active.')
+    if (!editable) throw new AppError('subscriptionNotActive')
 
     const subscription = await stripe.subscriptions.retrieve(workspace.stripe_subscription_id)
-    if (isTemplateSubscription(subscription)) throw new Error('No plan subscription found.')
+    if (isTemplateSubscription(subscription)) throw new AppError('noPlanSubscription')
     const { hasBase } = quantitiesFromItems(subscription.items.data)
-    if (!hasBase) throw new Error('No plan subscription found.')
+    if (!hasBase) throw new AppError('noPlanSubscription')
 
     return { workspaceId, subscription }
 }
 
 function assertValidQuantities(target: AddonQuantities): void {
     for (const key of ADDON_KEYS) {
-        if (!Number.isInteger(target[key]) || target[key] < 0) throw new Error('Invalid add-on quantity.')
+        if (!Number.isInteger(target[key]) || target[key] < 0) throw new AppError('invalidAddonQuantity')
     }
 }
 
@@ -914,10 +919,10 @@ type CancellableSubscription = { workspaceId: number; subscription: Stripe.Subsc
 async function requireCancellableSubscription(): Promise<CancellableSubscription> {
     const { workspaceId, subscription } = await requireEditablePlanSubscription()
     const phase = cancelFlowPhase(subscription.status, await subscriptionHasPaymentMethod(subscription))
-    if (!phase) throw new Error('Your trial ends on its own, there is nothing to cancel.')
+    if (!phase) throw new AppError('trialNothingToCancel')
 
     const endsAtIso = phase === 'trial' ? stripeTimestampIso(subscription.trial_end) : subscriptionPeriodEndIso(subscription)
-    if (!endsAtIso) throw new Error('Could not read your billing period.')
+    if (!endsAtIso) throw new AppError('readBillingPeriodFailed')
     return { workspaceId, subscription, phase, endsAt: new Date(endsAtIso) }
 }
 
@@ -945,7 +950,7 @@ function periodStartOf(subscription: Stripe.Subscription): Date | null {
 export async function getCancelFlowState(): Promise<CancelFlowState> {
     const cancellable = await requireCancellableSubscription()
     const { subscription, phase, endsAt } = cancellable
-    if (subscription.cancel_at_period_end) throw new Error('Your subscription is already set to cancel.')
+    if (subscription.cancel_at_period_end) throw new AppError('alreadyCancelling')
 
     const now = new Date()
     const monthlyCents = planPeriodCents(subscription)
@@ -1011,7 +1016,7 @@ async function ensureRetentionCoupon(kind: RetentionOfferKind, subscription: Str
     if (kind === 'trial_half') return (await stripe.coupons.create({ id, ...retentionCouponParams(kind, priceArm) })).id
 
     const product = subscription.items.data.find(item => isBasePriceId(item.price?.id))?.price.product
-    if (!product) throw new Error('No plan subscription found.')
+    if (!product) throw new AppError('noPlanSubscription')
     const productId = typeof product === 'string' ? product : product.id
     return (await stripe.coupons.create({ id, ...retentionCouponParams(kind, priceArm), applies_to: { products: [productId] } })).id
 }
@@ -1022,7 +1027,7 @@ export async function claimRetentionOffer(): Promise<RetentionOfferKind> {
     const cancellable = await requireCancellableSubscription()
     const { subscription } = cancellable
     const kind = retentionOfferOf(cancellable)
-    if (!kind) throw new Error('This offer is no longer available.')
+    if (!kind) throw new AppError('offerUnavailable')
 
     const coupon = await ensureRetentionCoupon(kind, subscription)
     await stripe.subscriptions.update(
@@ -1040,13 +1045,13 @@ export async function claimRetentionOffer(): Promise<RetentionOfferKind> {
 // day before its first charge goes out to every trial already.
 export async function requestRenewalReminder(): Promise<string> {
     const { workspaceId, phase, endsAt } = await requireCancellableSubscription()
-    if (phase !== 'paid') throw new Error('Only a paid plan renews.')
+    if (phase !== 'paid') throw new AppError('onlyPaidPlanRenews')
 
     const at = reminderDate(phase, endsAt, new Date())
-    if (!at) throw new Error('Your plan renews too soon for a reminder.')
+    if (!at) throw new AppError('renewsTooSoon')
 
     const { user } = await getSessionWorkspace()
-    if (!user?.id) throw new Error('Not authenticated')
+    if (!user?.id) throw new AppError('notAuthenticated')
 
     const supabase = createServiceRoleClient()
     const { error } = await supabase
@@ -1103,8 +1108,6 @@ export function planChangeKind(status: string, current: BillingInterval, target:
 // pending update until the browser completes the payment with it, and lapses untouched otherwise.
 export type PlanChangeResult = { trialEnded: boolean; switchAt: string | null; paymentClientSecret: string | null }
 
-export const CHARGE_REFUSED_MESSAGE = "We couldn't charge your card. Nothing was charged, try again or change your card."
-
 // The selection a pending update finishes once the bank confirms it, carried in the update's own
 // metadata: Stripe writes it on the subscription at the very moment the paid increase lands, and
 // drops it with the update if nobody pays. `finishPendingPlanChange` reads it from the webhook.
@@ -1124,7 +1127,7 @@ async function updateWithPayment(subscriptionId: string, params: Stripe.Subscrip
     if (!updated.pending_update) return null
     const invoice = typeof updated.latest_invoice === 'object' ? updated.latest_invoice : null
     const clientSecret = invoice?.confirmation_secret?.client_secret
-    if (!clientSecret) throw new Error(CHARGE_REFUSED_MESSAGE)
+    if (!clientSecret) throw new AppError('chargeRefused')
     await assertPaymentAwaitsConfirmation(clientSecret)
     return clientSecret
 }
@@ -1135,7 +1138,7 @@ async function assertPaymentAwaitsConfirmation(clientSecret: string): Promise<vo
     const intent = await stripe.paymentIntents.retrieve(clientSecret.split('_secret_')[0]!)
     if (intent.status === 'requires_action') return
     const refusal = intent.last_payment_error
-    throw new Error(refusal?.type === 'card_error' && refusal.message ? refusal.message : CHARGE_REFUSED_MESSAGE)
+    throw refusal?.type === 'card_error' && refusal.message ? new Error(refusal.message) : new AppError('chargeRefused')
 }
 
 // An app slot can only go once no account fills it: the billing dialog greys the button out, and
@@ -1154,7 +1157,7 @@ async function assertSlotRemovalLeavesConnections(workspaceId: number, subscript
         ])
         const onPaidSlots = (connections ?? []).filter(connection => !(connection.status === 'paused' && (SLOT_PAUSE_REASONS as readonly string[]).includes(connection.pause_reason ?? ''))).length - (subscriberTrialOpen(app) ? 1 : 0)
         const { name, providerLabel } = APP_INFO[slug]
-        if (target[addonKey] < onPaidSlots) throw new Error(`Disconnect a ${providerLabel} account in ${name} before removing its slot.`)
+        if (target[addonKey] < onPaidSlots) throw new AppError('disconnectBeforeSlotRemoval', { provider: providerLabel, app: name })
     }
 }
 
@@ -1234,15 +1237,15 @@ export async function finishPendingPlanChange(subscription: Stripe.Subscription)
 }
 
 async function assertPaymentMethod(subscription: Stripe.Subscription): Promise<void> {
-    if (!(await subscriptionHasPaymentMethod(subscription))) throw new Error('Add a payment method first.')
+    if (!(await subscriptionHasPaymentMethod(subscription))) throw new AppError('addPaymentMethodFirst')
 }
 
 async function assertTrialConvertible(subscription: Stripe.Subscription): Promise<void> {
     const state = trialConversionState(subscription, await subscriptionHasPaymentMethod(subscription))
     if (canEndTrialNow(state)) return
-    if (state.status !== 'trialing') throw new Error('Your subscription is already active.')
-    if (state.cancelAtPeriodEnd) throw new Error('Your subscription is set to cancel. Resume it first.')
-    throw new Error('Add a payment method first.')
+    if (state.status !== 'trialing') throw new AppError('subscriptionAlreadyActive')
+    if (state.cancelAtPeriodEnd) throw new AppError('resumeBeforeConverting')
+    throw new AppError('addPaymentMethodFirst')
 }
 
 // A phase discount is written with exactly one reference: Stripe refuses a coupon and a promotion
@@ -1265,7 +1268,7 @@ function scheduleDiscountParam(discount: Stripe.SubscriptionSchedule.Phase.Disco
 async function scheduleIntervalSwitch(subscription: Stripe.Subscription, selection: PlanSelection): Promise<string> {
     const schedule = await stripe.subscriptionSchedules.create({ from_subscription: subscription.id })
     const current = schedule.phases[0]
-    if (!current) throw new Error('Could not read the current billing period.')
+    if (!current) throw new AppError('readCurrentBillingPeriodFailed')
 
     await stripe.subscriptionSchedules.update(schedule.id, {
         end_behavior: 'release',

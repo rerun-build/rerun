@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type VoiceMessageStatus = 'idle' | 'starting' | 'recording' | 'processing' | 'failed'
 
+export type VoiceMessageError = 'silent' | 'sendFailed'
+
 // What a recording needs from its conversation to leave: a place for the audio, what was said, the send.
 export type VoiceSender = {
     upload: (uri: string) => Promise<string>
@@ -31,7 +33,7 @@ function levelOf(metering: number | undefined) {
 export function useVoiceMessage(sender: VoiceSender | undefined) {
     const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true })
     const [status, setStatus] = useState<VoiceMessageStatus>('idle')
-    const [error, setError] = useState<string | null>(null)
+    const [error, setError] = useState<VoiceMessageError | null>(null)
     const levelsRef = useRef<number[]>([])
     const liveRef = useRef<VoiceLiveState>({ level: 0, durationMs: 0 })
     const pendingRef = useRef<Recording | null>(null)
@@ -57,7 +59,7 @@ export function useVoiceMessage(sender: VoiceSender | undefined) {
                 current.transcribe(recording.uri),
             ])
             if (!transcript.trim()) {
-                setError("Couldn't hear anything in that recording.")
+                setError('silent')
                 setStatus('failed')
                 return
             }
@@ -65,7 +67,7 @@ export function useVoiceMessage(sender: VoiceSender | undefined) {
             pendingRef.current = null
             setStatus('idle')
         } catch {
-            setError('Could not send that recording.')
+            setError('sendFailed')
             setStatus('failed')
         }
     }, [])

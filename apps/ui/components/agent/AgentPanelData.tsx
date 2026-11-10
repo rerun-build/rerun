@@ -5,9 +5,10 @@ import { DataBrowser } from '@/components/data/DataBrowser'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { tablesOrThrow, viewActions, type DataFocus, type DataSource } from '@/lib/data/source'
 import { agentFileRawUrl } from '@/lib/files/raw-url'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 import { withTabWorkspace } from '@/lib/workspace/tab-workspace'
 
@@ -18,6 +19,8 @@ type AgentPanelDataProps = {
 }
 
 export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPanelDataProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelData')
     const [expanded, setExpanded] = useState<DataFocus | null>(null)
     const canManage = useCanManageAgent(agentId)
     const source = useMemo<DataSource>(
@@ -29,7 +32,7 @@ export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPan
             deleteRows: (table, rowids) => deleteAgentTableRowsAction(agentId, table, rowids),
             dropTable: table => dropAgentTableAction(agentId, table),
             purgeTable: table => purgeAgentTableAction(agentId, table),
-            tableActionsReason: canManage ? undefined : BOX_MANAGE_REASON,
+            tableActionsReason: canManage ? undefined : boxManageReason,
             exportUrl: (table, params) => {
                 const qs = new URLSearchParams({ agentId, table, format: params.format })
                 if (params.sort) qs.set('sort', params.sort)
@@ -40,12 +43,11 @@ export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPan
             },
             ...viewActions({ kind: 'agent', agentId }),
             fileUrl: path => agentFileRawUrl(agentId, path),
-            unreachableMessage: 'Could not reach the engine for this coworker.',
-            emptyTitle: 'No tables yet',
-            emptyDescription:
-                'Your coworker has its own private database. When it needs to store structured data (contacts, results, tracking lists), it creates tables here that you can browse anytime.',
+            unreachableMessage: t('unreachable'),
+            emptyTitle: t('emptyTitle'),
+            emptyDescription: t('emptyDescription'),
         }),
-        [agentId, canManage],
+        [agentId, canManage, t],
     )
 
     return (
@@ -56,8 +58,8 @@ export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPan
             <Dialog open={expanded !== null} onOpenChange={open => !open && setExpanded(null)}>
                 <PanelDialogContent className="sm:h-[92dvh] sm:max-w-[min(100rem,95vw)]">
                     <DialogHeader className="border-b px-4 py-3">
-                        <DialogTitle>Coworker database</DialogTitle>
-                        <DialogDescription className="sr-only">The private database of this coworker, at full size.</DialogDescription>
+                        <DialogTitle>{t('dialogTitle')}</DialogTitle>
+                        <DialogDescription className="sr-only">{t('dialogDescription')}</DialogDescription>
                     </DialogHeader>
                     {expanded && <DataBrowser source={source} initial={expanded} />}
                 </PanelDialogContent>

@@ -1,5 +1,7 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { ExpertProfileWizard, type OwnerExpert } from '@rerun/ui/experts'
@@ -16,6 +18,8 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 type Loaded = { expert: OwnerExpert; bannerOptions: string[] }
 
 export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('dialogs.expertProfile')
+    const errorText = useErrorText()
     const [loaded, setLoaded] = useState<Loaded | null>(null)
     const [error, setError] = useState<string | null>(null)
 
@@ -25,12 +29,12 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
         getMyExpertProfileAction().then(result => {
             if (cancelled) return
             if (result.ok) setLoaded({ expert: result.expert, bannerOptions: result.bannerOptions })
-            else setError(result.error)
+            else setError(errorText(result))
         })
         return () => {
             cancelled = true
         }
-    }, [open, loaded, error])
+    }, [open, loaded, error, errorText])
 
     // Dropped on close so the next open refetches: a save rewrites the row, and a cached copy would
     // come back stale.
@@ -45,19 +49,19 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent showCloseButton={false} aria-describedby={undefined} className="gap-0 overflow-hidden p-0 sm:max-w-5xl">
-                <DialogTitle className="sr-only">Your public profile</DialogTitle>
+                <DialogTitle className="sr-only">{t('title')}</DialogTitle>
                 {loaded ? (
                     <ExpertProfileWizard
                         expert={loaded.expert}
                         bannerOptions={loaded.bannerOptions}
                         uploadAvatar={uploadMyExpertAvatarAction}
                         uploadBanner={uploadMyExpertBannerAction}
-                        submitLabel="Save & publish"
-                        submittingLabel="Saving…"
+                        submitLabel={t('submit')}
+                        submittingLabel={t('submitting')}
                         onSubmit={async values => {
                             const result = await updateMyExpertProfileAction(values)
                             if (result.ok) {
-                                toast.success('Your public profile has been updated.')
+                                toast.success(t('saved'))
                                 handleOpenChange(false)
                             }
                             return result

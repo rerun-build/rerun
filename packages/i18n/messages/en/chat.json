@@ -1,0 +1,582 @@
+{
+    "_context": {
+        "activity.buildingCoworkers": "What the onboarding is doing right now: building several AI coworkers, and how many are done.",
+        "activity.runningTool": "What the coworker is doing right now. {tool} is the name of a step, e.g. 'Web Search'.",
+        "activity.waitingOn": "The coworker waits for another coworker it called. {name} is that coworker's name.",
+        "activity.waitingOnSubCoworkers": "The coworker waits for the sub-tasks it delegated, and how many are done.",
+        "agentChat.selectModel": "Shown under the message box when the user tries to send before an AI model is picked. The model menu sits under the message box.",
+        "agentInstall.guideTitle": "{name} is the coworker's name.",
+        "attachments.fileFallback": "Stands for an attachment with no file name.",
+        "attachments.openMore": "Accessible label of the last tile of an album: {count} more images or videos that did not fit.",
+        "attachments.position": "Position of the file shown among the message's files, e.g. '2 / 5'.",
+        "attachments.progressWithEta": "Upload progress. {eta} is an already formatted time left, e.g. '12s left'.",
+        "brainChange.open": "Verb, button.",
+        "brainChange.undone": "{title} is the title of a Brain page whose change was undone.",
+        "brainProposal.create": "{title} is the title of a page an agent proposes to add to the company Brain (the shared knowledge base).",
+        "brainProposal.edit": "{title} is the title of the Brain page an agent proposes to change.",
+        "brainProposal.review": "Verb, button.",
+        "budget.connectProvider.body": "Follows another sentence saying the credits ran out.",
+        "budget.or": "Separator between two ways out, shown in uppercase.",
+        "budget.ownConnection.body": "{plan} is the name of an AI subscription the user connected, e.g. 'Claude' or 'ChatGPT'. Follows another sentence.",
+        "budget.paused.cta": "Verb, button.",
+        "budget.preTrial.body": "{credits} is an already formatted amount of credit, e.g. '$5 of credit'.",
+        "budget.runOn": "Button. {plan} is the name of an AI subscription, e.g. 'Claude'.",
+        "budget.subscribe.description": "{credits} is an already formatted amount of credit included in the plan.",
+        "budget.title": "Header of the notice shown when the workspace's Rerun credits (prepaid AI usage) ran out.",
+        "budget.trial.continueWithPro": "{price} is an already formatted monthly price, e.g. '$49'. 'Pro' is the plan's name.",
+        "budget.trial.useMyPlan": "Followed by two buttons: Claude and ChatGPT.",
+        "budget.usedUp.trial": "{credits} is an already formatted amount of credit.",
+        "compaction.recovered": "{tokens} is an already formatted number of AI tokens freed.",
+        "compaction.running": "The AI is summarizing the older part of the conversation to free room in its memory.",
+        "composer.editor.hint": "Keyboard shortcut hint in the full-screen message editor. Keep 'Cmd + Enter' as is.",
+        "composer.editor.send": "Verb, button.",
+        "composer.link.open": "Verb: opens a link typed in the message box, in a new tab.",
+        "composer.placeholder": "Empty message box of the chat.",
+        "context.cached": "AI input tokens read from the cache.",
+        "context.reasoning": "AI tokens spent thinking.",
+        "context.title": "Header of a hover card: how much of the AI model's context window (memory) the conversation uses.",
+        "draft.label": "Header of a block holding a text the user will copy and send elsewhere (an email, a post).",
+        "feedback.submit": "Verb, button.",
+        "hitlCue.question": "Pill at the bottom of the chat when the coworker waits for an answer further up the thread.",
+        "installGate.facts": "Under the coworker's name before its setup: {apps} is the number of apps to connect, {minutes} a rough setup duration in minutes.",
+        "installGate.inProgressHint": "The coworker's setup already runs in another conversation.",
+        "mcpServer.customWithHost": "{host} is the domain of a custom MCP server.",
+        "mentions.coworkers": "Header of the autocomplete list after typing @.",
+        "mentions.skills": "Header of the autocomplete list after typing /.",
+        "message.branch.page": "Position among alternative answers, e.g. '2 of 3'.",
+        "message.regenerate": "Tooltip: write this AI answer again.",
+        "paidSources.count": "Pill under a reply that used paid data sources.",
+        "pendingHitl.goTo": "Accessible label of a pill that scrolls to what the coworker is waiting for. {label} says what it waits for (e.g. 'Approval needed').",
+        "promptInput.stop": "Accessible label: stops the AI answer being written.",
+        "promptInput.submit": "Accessible label of the send button of the message box.",
+        "promptInput.tooLarge": "Error when attaching files. {names} lists the first one or two file names, {more} how many others were rejected (only used when {count} is above 2).",
+        "providerError.fallbackTitle": "Title of an error notice in the chat when the error has no specific title.",
+        "providerError.switch.cta": "Verb, button: switch to another AI model.",
+        "question.tooManyFiles": "Toast. {rejected} is the number of files left out.",
+        "queued.attachmentsOnly": "A queued message with files and no text.",
+        "queued.badge": "Badge on a message waiting to be sent after the current run.",
+        "reasoning.thought": "Noun: a settled reasoning step of the AI, in the list of its steps.",
+        "receipt.apps.insteadOf": "{name} is the app the coworker asked for; the user picked another one instead.",
+        "receipt.keys.title": "Header of a card listing the API keys (credentials) the user gave the coworker.",
+        "receipt.status.notNow": "Badge: the user declined an action the coworker asked to approve, for now.",
+        "receipt.status.stored": "Badge: the key (credential) was saved.",
+        "receipt.takeover.handedBackOn": "The user gave control of the remote browser back to the AI coworker. {url} is the page it was on.",
+        "scheduledRun.label": "Divider in the thread where a scheduled (recurring) run started.",
+        "scheduledRun.promptTitle": "{name} is the name of the scheduled routine.",
+        "screen.takeControl": "Button on a mini view of the coworker's live computer screen: lets the user drive it.",
+        "setupEvents.read": "Badge: the notification has been read (past participle).",
+        "setupEvents.schedulesOn": "Badge: number of recurring schedules switched on by the setup.",
+        "setupEvents.triggersOn": "Badge: number of triggers (webhooks, events) switched on by the setup.",
+        "steps.compacting": "What the coworker is doing right now: summarizing the older conversation.",
+        "steps.failed": "{failed} is a number of steps that failed.",
+        "steps.thinking": "What the coworker is doing right now, shown animated while it reasons.",
+        "subRun.earlier": "Count of earlier steps hidden above the last ones.",
+        "subRun.idle": "Badge: the task has done nothing for {minutes} minutes.",
+        "subRun.verbs.read": "{summary} is the page or file read, can be empty.",
+        "subRun.verbs.run": "Running a shell command. {summary} is the command, can be empty.",
+        "subRun.verbs.search": "One step of a delegated task. {summary} is what it searches, can be empty.",
+        "takeover.opened": "The user took control of the browser on the AI coworker's remote computer.",
+        "takeover.opensSite": "{site} is a website domain.",
+        "tool.completedIn": "{duration} is an already formatted duration, e.g. '1.2s' or '300ms'.",
+        "tool.error": "Section header in the details of a tool call: the error it returned.",
+        "tool.input": "Section header in the details of a tool call: what it was called with.",
+        "tool.output": "Section header in the details of a tool call: what it returned.",
+        "triggerPayload.payload": "Header above the body a webhook received.",
+        "triggerPayload.truncated": "Badge: the webhook body was cut because it was too long.",
+        "video.play": "Accessible label. {name} is the video's file name.",
+        "voice.discard": "Verb, tooltip: throws away the voice message being recorded.",
+        "voice.seek": "Accessible label of the waveform: clicking it jumps to that point of the recording.",
+        "voice.transcript": "Tooltip of a button that shows the text transcribed from a voice message.",
+        "webhookRun.label": "Divider in the thread where an incoming webhook started a run.",
+        "webhookRun.promptTitle": "{name} is the webhook's slug.",
+        "agentChat.continueWhereLeftOff": "Message sent to the coworker in the user's name when they resume a run that was cut off. The user speaking to the coworker."
+    },
+    "actions": {
+        "copy": "Copy",
+        "copied": "Copied",
+        "connect": "Connect",
+        "cancel": "Cancel",
+        "continue": "Continue",
+        "notNow": "Not now",
+        "copiedExclaim": "Copied!"
+    },
+    "sources": {
+        "used": "Used {count, plural, one {# source} other {# sources}}"
+    },
+    "draft": {
+        "label": "Draft"
+    },
+    "mcpServer": {
+        "failed": "Couldn't connect {name}",
+        "notAdded": "Not added",
+        "added": "{name} added",
+        "custom": "Custom MCP server",
+        "customWithHost": "Custom MCP server · {host}"
+    },
+    "mcpSignIn": {
+        "title": "Sign in to {name}"
+    },
+    "mentions": {
+        "coworkers": "Coworkers",
+        "skills": "Skills"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {# source} other {# sources}}",
+        "emailsVerified": "{valid} of {checked} emails verified"
+    },
+    "tableCard": {
+        "openDisabledReason": "Open this coworker from the board to browse its database."
+    },
+    "conversation": {
+        "emptyTitle": "No messages yet",
+        "emptyDescription": "Start a conversation to see messages here",
+        "scrollToLatest": "Scroll to the latest message"
+    },
+    "brainProposal": {
+        "create": "New Brain page: {title}",
+        "edit": "Change to the Brain: {title}",
+        "description": "Proposed for review. Nothing changes until someone accepts it.",
+        "review": "Review"
+    },
+    "attachments": {
+        "attach": "Attach files",
+        "open": "Open {name}",
+        "position": "{current} / {total}",
+        "previous": "Previous attachment",
+        "next": "Next attachment",
+        "download": "Download",
+        "waiting": "Waiting",
+        "finishing": "Finishing",
+        "progress": "{percent}%",
+        "progressWithEta": "{percent}% · {eta}",
+        "fileFallback": "file",
+        "uploading": "Uploading {name}",
+        "retryUpload": "Retry upload",
+        "cancelUpload": "Cancel upload",
+        "remove": "Remove attachment",
+        "openMore": "Open {count} more",
+        "uploadFailed": "Upload failed",
+        "uploadingProgress": "Uploading · {percent}%",
+        "retryUploading": "Retry uploading {name}",
+        "removeNamed": "Remove {name}"
+    },
+    "screen": {
+        "openBrowser": "Open browser",
+        "takeControl": "Take control"
+    },
+    "composer": {
+        "link": {
+            "open": "Open",
+            "unlink": "Unlink"
+        },
+        "subscriptionCta": "Already paying for an AI subscription? Run this coworker on it.",
+        "placeholder": "Send a message...",
+        "attachmentsMissing": "Some attachments were not uploaded. Remove them and attach them again before sending.",
+        "attachmentsFailed": "{count, plural, one {# attachment failed to upload. Retry or remove it before sending.} other {# attachments failed to upload. Retry or remove them before sending.}}",
+        "noFiles": "This chat cannot take files yet.",
+        "sendFailed": "Could not send your message",
+        "openEditor": "Open the full editor",
+        "stop": "Stop the current run",
+        "editor": {
+            "title": "Write your message",
+            "description": "Room to structure a long message. Enter starts a new line.",
+            "hint": "Send with Cmd + Enter",
+            "cancel": "Cancel",
+            "send": "Send"
+        }
+    },
+    "message": {
+        "showLess": "Show less",
+        "showMore": "Show more",
+        "openFile": "Open {path}",
+        "branch": {
+            "previous": "Previous branch",
+            "next": "Next branch",
+            "page": "{current} of {total}"
+        },
+        "goodResponse": "Good response",
+        "badResponse": "Bad response",
+        "regenerate": "Regenerate"
+    },
+    "installGate": {
+        "title": "Set up {name}",
+        "inProgressTitle": "{name} is being set up",
+        "inProgressHint": "In another conversation",
+        "facts": "{apps, plural, =0 {~{minutes} min} one {# app · ~{minutes} min} other {# apps · ~{minutes} min}}",
+        "continue": "Continue setup",
+        "installing": "Installing",
+        "install": "Install {name}",
+        "skip": "Skip for now"
+    },
+    "activity": {
+        "thinking": "Thinking...",
+        "processing": "Processing your request...",
+        "crafting": "Crafting a response...",
+        "writing": "Writing...",
+        "runningTool": "Running {tool}",
+        "waitingOn": "Waiting on {name}",
+        "building": "Building {name}",
+        "buildingCoworkers": "Building {count, plural, one {# coworker} other {# coworkers}} · {done} done",
+        "waitingOnSubCoworkers": "Waiting on {count, plural, one {# sub-coworker} other {# sub-coworkers}} · {done} done"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {Question waiting} one {Question waiting} other {# questions waiting}}",
+        "approval": "{count, plural, =0 {Approval needed} one {Approval needed} other {# approvals needed}}",
+        "secret": "{count, plural, =0 {Credential needed} one {Credential needed} other {# credentials needed}}",
+        "mcpNamed": "Sign in to {name}",
+        "mcp": "Sign-in needed",
+        "service": "{count, plural, =0 {App to connect} one {App to connect} other {# apps to connect}}",
+        "takeover": "Your turn on the screen"
+    },
+    "pendingHitl": {
+        "goTo": "{label}, go to it"
+    },
+    "reasoning": {
+        "thinking": "Thinking...",
+        "thought": "Thought"
+    },
+    "secretRequest": {
+        "saveFailed": "Could not save the credentials"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "Brain updated: {title}",
+            "created": "New Brain page: {title}",
+            "deleted": "Removed from the Brain: {title}",
+            "accepted": "Accepted the change: {title}",
+            "acceptedBy": "Accepted {name}'s change: {title}",
+            "dismissed": "Dismissed the change: {title}",
+            "dismissedBy": "Dismissed {name}'s change: {title}"
+        },
+        "notes": {
+            "saved": "Saved. Every coworker reads it from its next run.",
+            "deleted": "No coworker reads it anymore. Its history is kept.",
+            "accepted": "Saved. Every coworker reads it from its next run.",
+            "dismissed": "The page is unchanged."
+        },
+        "undone": "Undone: {title}",
+        "undoneNote": "The previous version is back.",
+        "undo": "Undo",
+        "open": "Open"
+    },
+    "compaction": {
+        "running": "Compacting context…",
+        "failed": "Context compaction failed",
+        "done": "Context compacted",
+        "summarized": "{count, plural, one {# earlier message summarized} other {# earlier messages summarized}}",
+        "recovered": "~{tokens} tokens recovered"
+    },
+    "scheduledRun": {
+        "label": "Scheduled run",
+        "viewPrompt": "View prompt",
+        "promptTitle": "{name} prompt"
+    },
+    "steps": {
+        "count": "{count, plural, one {# step} other {# steps}}",
+        "countWithFailures": "{count, plural, one {# step} other {# steps}}, {failed} failed",
+        "failed": "{failed} failed",
+        "thinking": "Thinking",
+        "compacting": "Compacting"
+    },
+    "subRun": {
+        "failuresInARow": "{count} failures in a row",
+        "idle": "Idle {minutes} min",
+        "stopTask": "Stop this task",
+        "stopped": "Stopped, partial work kept",
+        "failed": "Failed",
+        "earlier": "+{count} earlier",
+        "verbs": {
+            "search": "Searching {summary}",
+            "read": "Reading {summary}",
+            "browse": "Browsing {summary}",
+            "run": "Running {summary}",
+            "write": "Writing {summary}",
+            "edit": "Editing {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "truncated",
+        "empty": "No payload",
+        "payload": "Payload"
+    },
+    "voice": {
+        "sendFailed": "Could not send that recording.",
+        "sendFailedHint": "Retry, or discard it.",
+        "waitingForMicrophone": "Waiting for the microphone...",
+        "hideTranscript": "Hide transcript",
+        "transcript": "Transcript",
+        "copyTranscript": "Copy transcript",
+        "pause": "Pause",
+        "play": "Play voice message",
+        "seek": "Seek",
+        "record": "Record a voice message",
+        "discard": "Discard",
+        "discardLabel": "Discard recording",
+        "retry": "Retry",
+        "send": "Send",
+        "retryLabel": "Retry sending the recording",
+        "sendLabel": "Send the recording",
+        "unsupported": "Voice messages are not supported in this browser.",
+        "microphoneBlocked": "Microphone access is blocked. Allow it in your browser settings to record.",
+        "noMicrophone": "No microphone available.",
+        "startFailed": "Could not start recording.",
+        "nothingHeard": "Couldn't hear anything in that recording.",
+        "voiceMessageFailed": "Could not send your voice message.",
+        "nothingRecorded": "Nothing was recorded."
+    },
+    "agentInstall": {
+        "started": "Install started",
+        "complete": "Install complete",
+        "viewGuide": "View guide",
+        "guideTitle": "{name} install guide"
+    },
+    "setupEvents": {
+        "notificationSent": "Sent you a notification",
+        "read": "Read",
+        "schedulesOn": "{count, plural, one {# schedule on} other {# schedules on}}",
+        "triggersOn": "{count, plural, one {# trigger on} other {# triggers on}}",
+        "setUp": "{name} is set up",
+        "setupComplete": "Setup complete",
+        "connectedHint": "Connected, the coworker can use it",
+        "signInHint": "Sign in once so the coworker can use it",
+        "connected": "Connected",
+        "signIn": "Sign in"
+    },
+    "takeover": {
+        "opened": "The browser is open on your coworker’s desktop. Come back here once you are through.",
+        "opensSite": "Opens {site} in your coworker’s browser, for you to drive.",
+        "opens": "Opens your coworker’s browser, for you to drive.",
+        "skipLabel": "Skip the browser takeover",
+        "privacy": "What you sign in to stays in this coworker’s browser on your machine.",
+        "openAgain": "Open again",
+        "closing": "Closing…",
+        "done": "Done",
+        "skip": "Skip",
+        "openBrowser": "Open browser"
+    },
+    "video": {
+        "play": "Play {name}",
+        "pause": "Pause {name}",
+        "previewUnavailable": "Preview unavailable",
+        "openFullScreen": "Open {name} full screen"
+    },
+    "tool": {
+        "error": "Error",
+        "output": "Output",
+        "input": "Input",
+        "completedIn": "Completed in {duration}"
+    },
+    "webhookRun": {
+        "label": "Webhook received",
+        "viewPrompt": "View prompt",
+        "viewPayload": "View payload",
+        "promptTitle": "{name} prompt",
+        "payloadTitle": "{name} payload"
+    },
+    "question": {
+        "tooManyFiles": "You can attach up to {max} files. {rejected} were not added.",
+        "uploadsFailed": "{count, plural, one {# attachment could not be uploaded. Retry or remove it before answering.} other {# attachments could not be uploaded. Retry or remove them before answering.}}"
+    },
+    "queued": {
+        "stopping": "Stopping the current run",
+        "badge": "Queued",
+        "attachmentsOnly": "Attachments only",
+        "sendNowStops": "Send now, stops the current run",
+        "sendNow": "Send now",
+        "sendNowLabel": "Send queued message now",
+        "remove": "Remove",
+        "removeLabel": "Remove queued message"
+    },
+    "context": {
+        "usedLabel": "Context used: {percent}%",
+        "title": "Context",
+        "input": "Input",
+        "cached": "Cached",
+        "reasoning": "Reasoning",
+        "output": "Output",
+        "total": "Total"
+    },
+    "feedback": {
+        "negativeTitle": "Give negative feedback",
+        "positiveTitle": "Give positive feedback",
+        "categoryLabel": "What type of issue do you wish to report?",
+        "categoryPlaceholder": "Select…",
+        "detailsLabel": "Please provide details",
+        "negativePlaceholder": "What was unsatisfying about this response?",
+        "positivePlaceholder": "What was satisfying about this response?",
+        "disclaimer": "Submitting this report shares this conversation with the Rerun team so we can improve your coworkers.",
+        "cancel": "Cancel",
+        "submit": "Submit",
+        "categories": {
+            "ui_bug": "UI bug",
+            "did_not_follow": "Did not follow my request",
+            "not_factual": "Not factually correct",
+            "incomplete": "Incomplete response",
+            "wrong_tool": "Wrong tool or app used",
+            "tool_error": "Tool or connection error",
+            "too_slow": "Too slow",
+            "memory": "Issue with memory",
+            "other": "Other"
+        },
+        "removeFailed": "Could not remove your feedback",
+        "saveFailed": "Could not save your feedback",
+        "thanks": "Thanks for your feedback"
+    },
+    "providerError": {
+        "fallbackTitle": "Something went wrong",
+        "runInFlight": "A run started earlier is still holding this conversation. Stop it to send your message.",
+        "stop": {
+            "title": "Stop this run",
+            "cta": "Stop run",
+            "description": "Frees the conversation for your message."
+        },
+        "newConversation": {
+            "title": "Start a new conversation",
+            "cta": "New conversation",
+            "description": "Opens a fresh conversation with this coworker."
+        },
+        "continue": {
+            "title": "Continue the run",
+            "cta": "Continue",
+            "description": "Picks up where the coworker was cut off."
+        },
+        "retry": {
+            "title": "Try again",
+            "cta": "Retry",
+            "description": "Sends your last message again."
+        },
+        "switch": {
+            "title": "Switch to another model",
+            "cta": "Switch",
+            "descriptionModel": "Pick another model for this conversation.",
+            "descriptionConnection": "Pick another connection of this workspace."
+        },
+        "reconnect": {
+            "title": "Reconnect",
+            "cta": "Reconnect",
+            "description": "Sign in again on the connection this coworker runs on."
+        }
+    },
+    "budget": {
+        "title": "Rerun credits",
+        "paused": {
+            "title": "Rerun credits paused",
+            "body": "Your coworkers can't use Rerun models or paid data until someone resumes them.",
+            "actionTitle": "Resume Rerun credits",
+            "actionDescription": "Spending starts again right away.",
+            "cta": "Resume"
+        },
+        "preTrial": {
+            "body": "You've used up the {credits} that come with a new account. Subscribing is what opens the rest.",
+            "actionDescription": "Your coworkers keep working, cancel any time."
+        },
+        "subscribe": {
+            "title": "Subscribe now",
+            "cta": "Subscribe",
+            "descriptionTrial": "Ends your trial today. {credits} included every month.",
+            "description": "{credits} included every month."
+        },
+        "topUp": {
+            "title": "Top up your Rerun credits",
+            "cta": "Top up",
+            "description": "Or wait, it resets next month."
+        },
+        "usedUp": {
+            "noCredit": "This workspace has no Rerun credits yet.",
+            "trial": "You've used up the {credits} of your free trial.",
+            "period": "You've used up your Rerun credits for this period."
+        },
+        "ownConnection": {
+            "body": "This conversation ran on Rerun, and your {plan} plan is connected."
+        },
+        "runOn": "Run on {plan}",
+        "or": "Or",
+        "connectProvider": {
+            "body": "Already paying for Claude or ChatGPT? Run your coworkers on that plan, at no extra cost here.",
+            "claude": "Connect Claude",
+            "chatgpt": "Connect ChatGPT"
+        },
+        "subscribeToKeepWorking": "Subscribe to keep your coworkers working.",
+        "resetsNextMonth": "It resets next month.",
+        "trial": {
+            "onPro": "You're on Pro.",
+            "resuming": "Your coworker picks the task back up.",
+            "resumingNamed": "{name} picks the task back up.",
+            "title": "Trial credits used up",
+            "stopped": "{name} stopped.",
+            "continueWithPro": "Continue with Pro · {price}/mo",
+            "useMyPlan": "Or use my plan:"
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "Connected",
+            "skipped": "Skipped",
+            "notReconnected": "Not reconnected",
+            "notFound": "Not found",
+            "stored": "Stored",
+            "approved": "Approved",
+            "notNow": "Not now"
+        },
+        "apps": {
+            "title": "Apps",
+            "meta": "{connected} of {total} connected",
+            "insteadOf": "Instead of {name}"
+        },
+        "answers": {
+            "title": {
+                "one": "Answer",
+                "other": "Answers"
+            },
+            "meta": "{answered} of {total} answered"
+        },
+        "keys": {
+            "title": "Keys",
+            "meta": "{stored} of {total} stored",
+            "note": "Stored on the Box. The coworker only sees the names."
+        },
+        "approvals": {
+            "title": {
+                "one": "Approval",
+                "other": "Approvals"
+            },
+            "metaBoth": "{approved} approved, {declined} not now",
+            "metaApproved": "{approved} approved",
+            "metaDeclined": "{declined} not now"
+        },
+        "mcp": {
+            "title": "MCP server"
+        },
+        "takeover": {
+            "handedBackOn": "You handed the browser back on {url}",
+            "handedBack": "You handed the browser back"
+        },
+        "dismissed": {
+            "service": "You closed the app setup",
+            "question": "You skipped the questions",
+            "secret": "You declined to share the keys",
+            "mcp": "You skipped signing in",
+            "takeover": "You left the browser to your coworker"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "Could not stop the current run. Your message will be sent when it ends.",
+        "selectModel": "Select a model to start: open the model menu below.",
+        "emptyTitle": "Start a conversation",
+        "emptyDescription": "Send a message to this coworker",
+        "runStoppedResponding": "The run stopped responding. Stop it to send another message.",
+        "continueWhereLeftOff": "Continue where you left off."
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, one {{names} is too large to attach.} =2 {{names} are too large to attach.} other {{names} and {more} more are too large to attach.}}",
+        "addFiles": "Add photos or files",
+        "takeScreenshot": "Take screenshot",
+        "noMatchingFiles": "No files match the accepted types.",
+        "tooManyFiles": "You can attach up to {max} files. {rejected} were not added.",
+        "uploadFiles": "Upload files",
+        "dropFiles": "Drop files to attach",
+        "placeholder": "What would you like to know?",
+        "stop": "Stop",
+        "submit": "Submit"
+    }
+}

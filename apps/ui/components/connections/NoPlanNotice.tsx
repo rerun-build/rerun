@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useTransition } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ export function useNeedsPlanToConnect(): boolean {
 }
 
 export function NoPlanNotice({ className }: { className?: string }) {
+    const t = useTranslations('connections.noPlan')
     const { workspace } = useSession()
     const trialEligible = trialOffer(workspace) !== 'paid'
     const [pending, startTransition] = useTransition()
@@ -23,10 +25,10 @@ export function NoPlanNotice({ className }: { className?: string }) {
     return (
         <div className={cn('flex flex-col gap-3 rounded-md border border-dashed px-3 py-4 sm:flex-row sm:items-center', className)}>
             <p className="min-w-0 flex-1 text-xs text-muted-foreground">
-                {trialEligible ? 'Start your free trial to connect your own Claude plan, ChatGPT plan or API key.' : 'Subscribe to connect your own Claude plan, ChatGPT plan or API key.'}
+                {trialEligible ? t('trialText') : t('subscribeText')}
             </p>
             <Button size="sm" className="shrink-0 self-start sm:self-auto" disabled={pending} onClick={() => startTransition(() => startPlan('ai_providers'))}>
-                {trialEligible ? 'Start free trial' : 'Subscribe'}
+                {trialEligible ? t('startTrial') : t('subscribe')}
             </Button>
         </div>
     )

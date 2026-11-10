@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { ChevronRightIcon, PanelLeftIcon, XIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { createContext, Fragment, useContext, type ReactNode } from 'react'
 
 type BrainChrome = { onClose: () => void; onToggleSidebar: (() => void) | null }
@@ -14,16 +15,17 @@ export type BrainCrumb = { label: string; icon?: LucideIcon; onClick?: () => voi
 // The bar on top of whatever the sidebar opened: where it sits, how its save is going, what can be
 // done with it, and the way out of the dialog.
 export function BrainTopBar({ crumbs, status, children }: { crumbs: BrainCrumb[]; status?: ReactNode; children?: ReactNode }) {
+    const t = useTranslations('brain.topBar')
     const { onClose, onToggleSidebar } = useContext(BrainChromeContext)
 
     return (
         <div className="flex h-12 shrink-0 items-center gap-2 px-3">
             {onToggleSidebar && (
-                <Button size="icon-sm" variant="ghost" onClick={onToggleSidebar} aria-label="Show sidebar" title="Show sidebar">
+                <Button size="icon-sm" variant="ghost" onClick={onToggleSidebar} aria-label={t('showSidebar')} title={t('showSidebar')}>
                     <PanelLeftIcon />
                 </Button>
             )}
-            <nav aria-label="Breadcrumb" className="flex min-w-0 flex-1 items-center gap-1 text-sm">
+            <nav aria-label={t('breadcrumb')} className="flex min-w-0 flex-1 items-center gap-1 text-sm">
                 {crumbs.map((crumb, index) => {
                     const last = index === crumbs.length - 1
                     const Glyph = crumb.icon
@@ -49,7 +51,7 @@ export function BrainTopBar({ crumbs, status, children }: { crumbs: BrainCrumb[]
             </nav>
             {status && <div className="shrink-0 text-xs text-muted-foreground max-sm:hidden">{status}</div>}
             {children && <div className="flex shrink-0 items-center gap-0.5">{children}</div>}
-            <Button size="icon-sm" variant="ghost" onClick={onClose} aria-label="Close" title="Close">
+            <Button size="icon-sm" variant="ghost" onClick={onClose} aria-label={t('close')} title={t('close')}>
                 <XIcon />
             </Button>
         </div>

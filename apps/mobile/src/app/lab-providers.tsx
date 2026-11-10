@@ -2,8 +2,9 @@ import type { AddableProvider, AiConnectionsView } from '@rerun/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Alert, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
-import { AI_PROVIDERS_ADMIN_ONLY } from '@/auth/access'
+import { AI_PROVIDERS_ADMIN_ONLY, type AccessReason } from '@/auth/access'
 import { ErrorCard } from '@/components/chat/ErrorCard'
 import { AddProvider } from '@/components/providers/AddProvider'
 import { ApiKeyForm } from '@/components/providers/ApiKeyForm'
@@ -52,12 +53,13 @@ function KeyLab({ provider, state }: { provider?: string; state?: string }) {
     return <ApiKeyForm entry={entry} name={name} onName={setName} apiKey={apiKey} onApiKey={setApiKey} baseUrl={baseUrl} onBaseUrl={setBaseUrl} busy={state === 'busy'} error={state === 'error' ? `${entry.title} turned this key down.` : null} onConnect={noop} onBack={back} />
 }
 
-function DetailLab({ id, state, readOnlyReason }: { id?: string; state?: string; readOnlyReason: string | null }) {
+function DetailLab({ id, state, readOnlyReason }: { id?: string; state?: string; readOnlyReason: AccessReason | null }) {
+    const tUsage = useTranslations('mobileProviders.usage')
     const view = VIEWS[state ?? 'full'] ?? AI_CONNECTIONS_FULL
     const connection = view.connections.find(candidate => candidate.id === id) ?? view.connections[0]
     const [key, setKey] = useState('')
     const remove = () =>
-        Alert.alert(`Remove ${connection.name}?`, describeUsage(MOCK_USAGE), [
+        Alert.alert(`Remove ${connection.name}?`, describeUsage(MOCK_USAGE, tUsage), [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Remove', style: 'destructive' },
         ])

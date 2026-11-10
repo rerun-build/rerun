@@ -11,8 +11,7 @@ import { cn } from '@/lib/utils'
 import { CardAvatar } from '@rerun/ui/chat'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : 'Something went wrong. Please try again.')
+import { useTranslations } from 'next-intl'
 
 export type ProfilePanelProps = {
     name: string
@@ -26,6 +25,8 @@ export type ProfilePanelProps = {
 }
 
 export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, removeAvatar, saveName }: ProfilePanelProps) {
+    const t = useTranslations('account.profile')
+    const errorMessage = (error: unknown) => (error instanceof Error ? error.message : t('failed'))
     const [draft, setDraft] = useState(name)
     const [savedName, setSavedName] = useState(name)
     const [saving, setSaving] = useState(false)
@@ -55,7 +56,7 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
         const file = files[0]
         if (!file) return
         if (!file.type.startsWith('image/')) {
-            toast.error('Please choose an image file.')
+            toast.error(t('notAnImage'))
             return
         }
         void changePhoto(() => uploadAvatar(file))
@@ -67,7 +68,7 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
         setSaving(true)
         try {
             await saveName(trimmed)
-            toast.success('Name updated')
+            toast.success(t('nameUpdated'))
         } catch (error) {
             toast.error(errorMessage(error))
         } finally {
@@ -78,12 +79,12 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
     return (
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
             <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-5 sm:px-6">
-                <Field label="Photo" helperText="Shown to your teammates, next to your messages and your cursor.">
-                    <FileDropzone accept="image/*" onFiles={handleFiles} disabled={photoBusy} overlayLabel="Drop your photo" className="w-fit rounded-full">
+                <Field label={t('photo')} helperText={t('photoHelp')}>
+                    <FileDropzone accept="image/*" onFiles={handleFiles} disabled={photoBusy} overlayLabel={t('dropPhoto')} className="w-fit rounded-full">
                         {({ inputId, dragOver }) => (
                             <Popover open={photoMenuOpen} onOpenChange={setPhotoMenuOpen}>
                                 <PopoverTrigger asChild>
-                                    <button type="button" aria-label="Change photo" className="group relative block size-20 rounded-full">
+                                    <button type="button" aria-label={t('changePhoto')} className="group relative block size-20 rounded-full">
                                         {avatarUrl || name || fallbackLabel ? (
                                             <CardAvatar src={avatarUrl} name={name || fallbackLabel || ''} className="size-20 text-2xl" />
                                         ) : (
@@ -104,7 +105,7 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
                                 <PopoverContent align="start" sideOffset={8} className="w-44 gap-0.5 p-1">
                                     <label htmlFor={inputId} onClick={() => setPhotoMenuOpen(false)} className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                                         <Upload className="size-4" />
-                                        Upload photo
+                                        {t('uploadPhoto')}
                                     </label>
                                     {avatarUrl && (
                                         <button
@@ -116,7 +117,7 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
                                             className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                         >
                                             <Trash2 className="size-4" />
-                                            Remove
+                                            {t('removePhoto')}
                                         </button>
                                     )}
                                 </PopoverContent>
@@ -125,12 +126,12 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
                     </FileDropzone>
                 </Field>
 
-                <Input label="Name" placeholder="e.g. Ada Lovelace" autoComplete="name" maxLength={PROFILE_NAME_MAX} value={draft} onChange={event => setDraft(event.target.value)} />
+                <Input label={t('name')} placeholder={t('namePlaceholder')} autoComplete="name" maxLength={PROFILE_NAME_MAX} value={draft} onChange={event => setDraft(event.target.value)} />
             </div>
 
             <div className="flex justify-end border-t px-4 py-3 max-sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-6">
                 <Button type="submit" disabled={!dirty || !trimmed} loading={saving}>
-                    Save
+                    {t('save')}
                 </Button>
             </div>
         </form>

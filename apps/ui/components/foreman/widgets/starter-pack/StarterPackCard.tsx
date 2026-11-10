@@ -1,6 +1,7 @@
 'use client'
 
 import { BorderBeam } from '@rerun/ui'
+import { useTranslations } from 'next-intl'
 
 import { ServiceIconRow } from '@/components/services/ServiceIconRow'
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'
@@ -25,6 +26,7 @@ type StarterPackCardProps = {
 }
 
 export function StarterPackCard({ card, picked, locked, onToggle, className }: StarterPackCardProps) {
+    const t = useTranslations('foreman.starterPack')
     return (
         <div
             role="button"
@@ -69,7 +71,7 @@ export function StarterPackCard({ card, picked, locked, onToggle, className }: S
                         className="ml-auto shrink-0"
                     >
                         {picked ? <CheckIcon data-icon="inline-start" className="size-3.5" /> : locked ? <LockIcon data-icon="inline-start" className="size-3.5" /> : null}
-                        {picked ? 'Picked' : locked ? 'Trial full' : 'Pick'}
+                        {picked ? t('picked') : locked ? t('trialFull') : t('pick')}
                     </Button>
                 </div>
             </div>

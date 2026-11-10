@@ -49,6 +49,8 @@ function ChipBadge({ count }: { count: number }) {
     )
 }
 
+const SECTION_TITLES = { 'needs-you': 'Needs you', running: 'Running', new: 'Unread' } as const
+
 export default function ConversationsLab() {
     const theme = useTheme()
     const glass = useGlassStyle()
@@ -77,7 +79,7 @@ export default function ConversationsLab() {
                                     const conversations = LAB_CONVERSATIONS.filter(conversation => stateOf(conversation) === section.state)
                                     if (conversations.length === 0) return null
                                     return (
-                                        <Section key={section.state} title={section.label}>
+                                        <Section key={section.state} title={SECTION_TITLES[section.state]}>
                                             {conversations.map(conversation => (
                                                 <MenuRow key={conversation.id} conversation={conversation} />
                                             ))}

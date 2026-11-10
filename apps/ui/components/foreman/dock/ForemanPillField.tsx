@@ -1,15 +1,14 @@
 'use client'
 
 import { useReducedMotion } from 'motion/react'
-import { useEffect, type RefObject } from 'react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, type RefObject } from 'react'
 import { ChromeButton } from '@rerun/ui/chrome'
 
 import { Kbd } from '@/components/ui/kbd'
 import { MicIcon, SendIcon } from '@/lib/icons'
 
 import { useTypewriter } from './useTypewriter'
-
-const PROMPTS = ['What ran last night?', 'Why did that run fail?', 'Build me a new coworker'] as const
 
 const KEY = 'min-w-5 gap-1 px-1 py-0 text-[10px] font-normal text-muted-foreground shadow-none'
 
@@ -36,8 +35,10 @@ type ForemanPillFieldProps = {
 
 /** What is typed here is sent from here and answered above the ball. Only the ball opens the column. */
 export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange, onFocusChange, onEngage, onSubmit }: ForemanPillFieldProps) {
+    const t = useTranslations('foreman.pill')
     const reducedMotion = useReducedMotion()
-    const suggestion = useTypewriter(PROMPTS, { paused: !!reducedMotion || focused })
+    const prompts = useMemo(() => [t('prompts.lastNight'), t('prompts.failedRun'), t('prompts.newCoworker')], [t])
+    const suggestion = useTypewriter(prompts, { paused: !!reducedMotion || focused })
     const writing = focused || draft.length > 0
 
     useEffect(() => {
@@ -75,7 +76,7 @@ export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange,
                         if (event.key === 'Escape') event.currentTarget.blur()
                     }}
                     placeholder={suggestion}
-                    aria-label="Ask Rerun"
+                    aria-label={t('ask')}
                     autoComplete="off"
                     className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 />
@@ -89,7 +90,7 @@ export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange,
                     </span>
                 )}
             </label>
-            {draft.trim() && <ChromeButton type="submit" icon={SendIcon} aria-label="Send" />}
+            {draft.trim() && <ChromeButton type="submit" icon={SendIcon} aria-label={t('send')} />}
         </form>
     )
 }

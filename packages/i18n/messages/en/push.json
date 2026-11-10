@@ -1,0 +1,16 @@
+{
+    "_context": {
+        "states.connector": "A coworker needs an app (a connector) to be connected before it can go on.",
+        "subtitle": "Second line of a push notification on a phone lock screen: the routine's name, then what happened to it."
+    },
+    "states": {
+        "done": "Done",
+        "error": "Failed",
+        "question": "Question",
+        "approval": "Needs approval",
+        "connector": "Needs an app",
+        "info": "Update"
+    },
+    "subtitle": "{source} · {state}",
+    "fallbackAgent": "your coworker"
+}

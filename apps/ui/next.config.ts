@@ -1,5 +1,6 @@
 import { withPostHogConfig } from "@posthog/nextjs-config";
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 // Dokploy builds without .git, so a production build stamps itself. Written back to process.env so
 // every process of the same build inlines one value.
@@ -10,7 +11,7 @@ const nextConfig: NextConfig = {
   // scripts to unless it is listed here. A Conductor cloud workspace serves it behind
   // *.conductor.show: without that origin the page arrives but never hydrates, so every click dies.
   allowedDevOrigins: [...(process.env.ALLOWED_DEV_ORIGINS?.split(",") ?? []), "*.conductor.show"],
-  transpilePackages: ["@rerun/ui", "@rerun/emails", "@rerun/db", "@rerun/analytics"],
+  transpilePackages: ["@rerun/ui", "@rerun/emails", "@rerun/db", "@rerun/analytics", "@rerun/i18n"],
   // ssh2 (the Incus hosts transport) loads an optional native crypto binding; bundled, Turbopack
   // cannot place the .node asset in an ESM chunk. Left external, Node requires it at runtime and
   // falls back to pure JS when the binding is missing.
@@ -47,7 +48,10 @@ const posthogApiKey = process.env.POSTHOG_PERSONAL_API_KEY;
 const posthogProjectId = process.env.POSTHOG_PROJECT_ID;
 const reportsErrorsToPostHog = Boolean(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN);
 
-export default withPostHogConfig(nextConfig, {
+// The app picks its language per request (lib/i18n/request-locale.ts), never from the URL.
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+export default withPostHogConfig(withNextIntl(nextConfig), {
   personalApiKey: posthogApiKey ?? "",
   projectId: posthogProjectId,
   host: "https://eu.posthog.com",

@@ -1,6 +1,7 @@
 'use client'
 
 import { track } from '@rerun/analytics/client'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getSubscriptionStateAction } from '@/ee/actions/billing.actions'
@@ -127,16 +128,17 @@ export function BillingDialog() {
 // Every upgrade, top-up and trial button of the app lands here, so a member is told once, in place,
 // rather than refused by the server after a click.
 function AdminOnlyShell({ onClose }: { onClose: () => void }) {
+    const t = useTranslations('billing.dialog')
     return (
         <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
-            <DialogTitle className="sr-only">Billing</DialogTitle>
+            <DialogTitle className="sr-only">{t('title')}</DialogTitle>
             <EmptyState
                 icon={CreditCardIcon}
-                title="Billing is managed by an admin"
-                description="Ask an admin of this workspace to change the plan or add credits."
+                title={t('adminOnly.title')}
+                description={t('adminOnly.description')}
                 action={
                     <Button size="sm" variant="outline" onClick={onClose}>
-                        Got it
+                        {t('adminOnly.gotIt')}
                     </Button>
                 }
             />
@@ -145,16 +147,17 @@ function AdminOnlyShell({ onClose }: { onClose: () => void }) {
 }
 
 function ErrorShell({ onRetry }: { onRetry: () => void }) {
+    const t = useTranslations('billing.dialog')
     return (
         <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
-            <DialogTitle className="sr-only">Billing</DialogTitle>
+            <DialogTitle className="sr-only">{t('title')}</DialogTitle>
             <EmptyState
                 icon={CreditCardIcon}
-                title="Your plan could not be loaded"
-                description="Stripe did not answer. Your subscription is untouched, try again in a moment."
+                title={t('error.title')}
+                description={t('error.description')}
                 action={
                     <Button size="sm" variant="outline" onClick={onRetry}>
-                        <RefreshCwIcon className="size-3.5" /> Retry
+                        <RefreshCwIcon className="size-3.5" /> {t('error.retry')}
                     </Button>
                 }
             />
@@ -163,9 +166,10 @@ function ErrorShell({ onRetry }: { onRetry: () => void }) {
 }
 
 function LoadingShell() {
+    const t = useTranslations('billing.dialog')
     return (
         <BillingDialogShell
-            title="Billing"
+            title={t('title')}
             left={
                 <div className="flex flex-col gap-4">
                     <Skeleton className="h-5 w-28" />

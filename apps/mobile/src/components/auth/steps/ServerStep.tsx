@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TextInput } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { FIELD_HEIGHT, FIELD_RADIUS } from '@/components/auth/PhoneField'
 import { StepTitle } from '@/components/auth/steps/StepTitle'
@@ -12,12 +13,13 @@ import { fonts, spacing } from '@/theme/tokens'
 
 export function ServerStep() {
     const theme = useTheme()
+    const t = useTranslations('mobileAuth.server')
     const [focused, setFocused] = useState(false)
     const { address, type, connect, connecting, error } = useServerConnect()
 
     return (
         <>
-            <StepTitle title="Your Rerun server" />
+            <StepTitle title={t('title')} />
             <TextInput
                 testID="server-address"
                 value={address}
@@ -31,7 +33,7 @@ export function ServerStep() {
                 autoCorrect={false}
                 autoFocus
                 returnKeyType="go"
-                accessibilityLabel="Server address"
+                accessibilityLabel={t('address')}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 maxFontSizeMultiplier={1.3}
@@ -39,10 +41,10 @@ export function ServerStep() {
             />
             {error && (
                 <AppText variant="footnote" tone="destructive">
-                    {error}
+                    {t(`problems.${error}`)}
                 </AppText>
             )}
-            <Button label="Connect" size="lg" loading={connecting} disabled={!address.trim()} onPress={connect} />
+            <Button label={t('connect')} size="lg" loading={connecting} disabled={!address.trim()} onPress={connect} />
         </>
     )
 }

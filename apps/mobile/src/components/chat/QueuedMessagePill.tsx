@@ -4,6 +4,7 @@ import { queuedPreview } from '@rerun/contracts'
 import { GlassView } from 'expo-glass-effect'
 import { SymbolView } from 'expo-symbols'
 import { StyleSheet, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { useGlassStyle } from '@/components/ui/GlassButton'
@@ -31,16 +32,17 @@ function StripButton({ symbol, label, disabled, onPress }: { symbol: 'arrow.up' 
 export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }: { text: string; busy: boolean; pending: boolean; onSendNow: () => void; onDiscard: () => void }) {
     const theme = useTheme()
     const glass = useGlassStyle()
+    const t = useTranslations('mobileChat.queued')
     const preview = queuedPreview(text)
     const accent = theme.scheme === 'dark' ? brand.soft : brand.base
     return (
         <GlassView key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingLeft: spacing.md, paddingRight: spacing.xs, paddingVertical: 4, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme] }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 1, borderRadius: radius.pill, borderWidth: 1, borderColor: withAlpha(accent, 0.3), backgroundColor: withAlpha(accent, 0.1) }}>
                 <SymbolView name="clock" size={10} weight="semibold" tintColor={accent} />
-                <AppText style={{ fontSize: 11, lineHeight: 15, color: accent }}>Queued</AppText>
+                <AppText style={{ fontSize: 11, lineHeight: 15, color: accent }}>{t('badge')}</AppText>
             </View>
             <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
-                {preview.text || 'Attachments only'}
+                {preview.text || t('attachmentsOnly')}
             </AppText>
             {preview.attachments.length > 0 && (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
@@ -50,8 +52,8 @@ export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }:
                     </AppText>
                 </View>
             )}
-            <StripButton symbol="arrow.up" label={busy ? 'Send now, stops the current run' : 'Send now'} disabled={pending} onPress={onSendNow} />
-            <StripButton symbol="xmark" label="Remove queued message" disabled={pending} onPress={onDiscard} />
+            <StripButton symbol="arrow.up" label={busy ? t('sendNowStops') : t('sendNow')} disabled={pending} onPress={onSendNow} />
+            <StripButton symbol="xmark" label={t('remove')} disabled={pending} onPress={onDiscard} />
         </GlassView>
     )
 }

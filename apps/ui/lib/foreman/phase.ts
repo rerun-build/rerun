@@ -1,4 +1,4 @@
-import { FOREMAN_PHASES, type ForemanClient, type ForemanPhase } from '@rerun/contracts'
+import { FOREMAN_PHASES, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
 
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
 import type { PriceArm } from '@rerun/cloud/billing'
@@ -146,10 +146,11 @@ export function foremanPhase({ foreman, onboardingCompletedAt, entitled, trialin
 // An intent the server has been able to put a name on, so the prompt can say what the user arrived
 // with rather than repeating a slug back at them. `description` is the sentence the model reads;
 // `title` is the short one, for the surfaces that only have a line to say it in.
-// `paid` is the price of a template the workspace still has to buy before it can be installed.
+// `paid` is the pricing of a template the workspace still has to buy before it can be installed,
+// written out by the card that shows it, in the reader's language.
 // `coworker` is the one coworker a template installs, when it installs exactly one: the name the
 // arrival speaks of, where a template's title reads as a sentence.
-export type ArrivingIntent = KickoffIntent & { description?: string; title?: string; paid?: string; coworker?: string }
+export type ArrivingIntent = KickoffIntent & { description?: string; title?: string; paid?: TemplatePricing; coworker?: string }
 
 export function isReadyMade(intent: KickoffIntent | null): boolean {
     return intent?.kind === 'template' || intent?.kind === 'share'
@@ -171,7 +172,7 @@ export function installedArrival(foreman: ForemanProfile): ForemanArrival | null
 
 /** What the welcome card names above its first question. Only the arrivals that carry a ready-made thing. */
 // `installed` once it is on the board and the card is the last thing left to answer.
-export type ForemanArrival = { kind: 'template' | 'share'; title: string; installed?: boolean; paid?: string; coworker?: string }
+export type ForemanArrival = { kind: 'template' | 'share'; title: string; installed?: boolean; paid?: TemplatePricing; coworker?: string }
 
 // Which loop serves a conversation: the hub's own for the onboarding, or the foreman agent on the
 // workspace's engine for everything after. Fixed when the conversation starts.

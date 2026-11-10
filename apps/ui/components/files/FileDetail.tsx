@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { editDisabledTooltip, fileEditBlockReason } from '@/lib/files/editable'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/lib/icons'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { FileDetailActions } from './FileDetailActions'
@@ -35,6 +36,8 @@ type FileDetailProps = {
 }
 
 export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onDownload, onDelete, writeFile, onSaved, publicUrl, onPublish, onUnpublish, onShareSettings, openUrl }: FileDetailProps) {
+    const locale = useLocale()
+    const t = useTranslations('files.detail')
     const { content, truncated, loading, error, replaceContent } = useFileContent({ path, name, read: readFile })
     // Keyed on the path rather than a boolean, so opening another file leaves the editor by itself.
     const [editingPath, setEditingPath] = useState<string | null>(null)
@@ -56,10 +59,10 @@ export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onD
 
     const save = useCallback(
         async (next: string, baseHash: string | null): Promise<SaveFileResult> => {
-            if (!writeFile) return { success: false, error: 'This file is read-only' }
+            if (!writeFile) return { success: false, error: t('readOnly') }
             return writeFile(path, next, baseHash)
         },
-        [writeFile, path],
+        [writeFile, path, t],
     )
 
     const saved = useCallback(
@@ -72,20 +75,20 @@ export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onD
     )
 
     const blocked = loading ? null : fileEditBlockReason({ name, truncated, content })
-    const editDisabledReason = loading ? 'Still loading this file' : blocked ? editDisabledTooltip(blocked) : undefined
+    const editDisabledReason = loading ? t('stillLoading') : blocked ? editDisabledTooltip(blocked, locale, t) : undefined
 
     return (
         <PanelEditorShell>
             <PanelEditorHeader title={name} onBack={onBack} mono>
                 {siblings && (
                     <>
-                        <Button size="icon-sm" variant="ghost" onClick={siblings.previous} title="Previous file" aria-label="Previous file">
+                        <Button size="icon-sm" variant="ghost" onClick={siblings.previous} title={t('previousFile')} aria-label={t('previousFile')}>
                             <ChevronLeftIcon className="size-4" />
                         </Button>
                         <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
                             {siblings.index + 1} / {siblings.total}
                         </span>
-                        <Button size="icon-sm" variant="ghost" onClick={siblings.next} title="Next file" aria-label="Next file">
+                        <Button size="icon-sm" variant="ghost" onClick={siblings.next} title={t('nextFile')} aria-label={t('nextFile')}>
                             <ChevronRightIcon className="size-4" />
                         </Button>
                     </>

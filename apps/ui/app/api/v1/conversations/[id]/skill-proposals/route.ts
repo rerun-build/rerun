@@ -10,6 +10,6 @@ export const GET = apiRoute({ auth: 'member' }, async ({ params }): Promise<{ pr
 // Accepting only starts the writing: the row reads `accepted` until a later GET finds it settled.
 export const POST = apiRoute({ auth: 'member', body: skillProposalDecideRequestSchema }, async ({ params, body }): Promise<{ proposal: SkillProposal }> => {
     const decided = await decideSkillProposalAction(params.id, body.proposalId, body.decision)
-    if (!decided.success || !decided.proposal) throw new ApiError(deniedStatus(decided.code, 503), decided.error ?? 'Failed to update the proposal')
+    if (!decided.success || !decided.proposal) throw new ApiError(deniedStatus(decided.denied, 503), decided.error ?? 'Failed to update the proposal')
     return { proposal: decided.proposal }
 })

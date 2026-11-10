@@ -72,21 +72,21 @@ describe('quickViewInput', () => {
     const columns = ['id', 'company_name', 'logo_url', 'tier']
 
     it('names the view after its layout, skipping names already taken', () => {
-        expect(quickViewInput('table', { columns, rows, takenNames: [] })?.name).toBe('Table')
-        expect(quickViewInput('table', { columns, rows, takenNames: ['table', 'Table 2'] })?.name).toBe('Table 3')
+        expect(quickViewInput('table', { columns, rows, takenNames: [], baseName: 'Table' })?.name).toBe('Table')
+        expect(quickViewInput('table', { columns, rows, takenNames: ['table', 'Table 2'], baseName: 'Table' })?.name).toBe('Table 3')
     })
 
     it('titles cards by a name column and pictures a gallery by an image column', () => {
-        const gallery = quickViewInput('gallery', { columns, rows, takenNames: [] })
+        const gallery = quickViewInput('gallery', { columns, rows, takenNames: [], baseName: 'Gallery' })
         expect(gallery?.fields).toEqual({ title: 'company_name', image: 'logo_url' })
     })
 
     it('groups a board by a status-like column, else by the column whose values repeat most', () => {
-        expect(quickViewInput('board', { columns: [...columns, 'deal_stage'], rows, takenNames: [] })?.groupBy).toBe('deal_stage')
-        expect(quickViewInput('board', { columns, rows, takenNames: [] })?.groupBy).toBe('tier')
+        expect(quickViewInput('board', { columns: [...columns, 'deal_stage'], rows, takenNames: [], baseName: 'Board' })?.groupBy).toBe('deal_stage')
+        expect(quickViewInput('board', { columns, rows, takenNames: [], baseName: 'Board' })?.groupBy).toBe('tier')
     })
 
     it('gives up on a board when nothing repeats', () => {
-        expect(quickViewInput('board', { columns: ['id', 'company_name'], rows, takenNames: [] })).toBeNull()
+        expect(quickViewInput('board', { columns: ['id', 'company_name'], rows, takenNames: [], baseName: 'Board' })).toBeNull()
     })
 })

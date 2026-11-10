@@ -20,7 +20,6 @@ vi.mock('@/lib/agents/share-read', () => ({ listWorkspaceShares: mocks.listWorks
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
 const { createAgentShareAction, installSharedAgentAction, listAgentSharesAction, revokeAgentShareAction } = await import('./agent-share.actions')
-const { BOX_MANAGE_ONLY } = await import('@/app/api/_auth/access')
 
 const WORKSPACE_ID = 7
 const AGENT_ID = '11111111-1111-4111-8111-111111111111'
@@ -75,7 +74,7 @@ describe('createAgentShareAction', () => {
     it('refuses an agent of another workspace without creating a share', async () => {
         database({ agentWorkspace: 99 })
 
-        await expect(createAgentShareAction({ agentId: AGENT_ID, include: {} })).resolves.toEqual({ ok: false, error: 'Coworker not found' })
+        await expect(createAgentShareAction({ agentId: AGENT_ID, include: {} })).resolves.toEqual({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound' })
         expect(mocks.createAgentShare).not.toHaveBeenCalled()
     })
 
@@ -89,7 +88,7 @@ describe('createAgentShareAction', () => {
     it('refuses a member who only uses the Box: a link exports the whole coworker', async () => {
         database({ role: 'member' })
 
-        await expect(createAgentShareAction({ agentId: AGENT_ID, include: {} })).resolves.toEqual({ ok: false, error: BOX_MANAGE_ONLY })
+        await expect(createAgentShareAction({ agentId: AGENT_ID, include: {} })).resolves.toEqual({ ok: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(mocks.createAgentShare).not.toHaveBeenCalled()
     })
 
@@ -126,21 +125,21 @@ describe('installSharedAgentAction', () => {
     it('refuses a Box of another workspace', async () => {
         database({ spaceWorkspace: 99 })
 
-        await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'Box not found' })
+        await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'Box not found', code: 'boxNotFound' })
         expect(mocks.installAgentShare).not.toHaveBeenCalled()
     })
 
     it('refuses a member who only uses the Box', async () => {
         database({ role: 'member' })
 
-        await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: BOX_MANAGE_ONLY })
+        await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(mocks.installAgentShare).not.toHaveBeenCalled()
     })
 
     it('refuses a workspace with no active plan', async () => {
         database({ subscriptionStatus: 'canceled' })
 
-        await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'This workspace has no active plan.' })
+        await expect(installSharedAgentAction({ token: 'tok', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'This workspace has no active plan.', code: 'noActivePlan' })
         expect(mocks.installAgentShare).not.toHaveBeenCalled()
     })
 
@@ -171,14 +170,14 @@ describe('revokeAgentShareAction', () => {
     it('refuses a member who only uses the Box of the shared coworker', async () => {
         database({ role: 'member' })
 
-        await expect(revokeAgentShareAction(SHARE_ID)).resolves.toEqual({ ok: false, error: BOX_MANAGE_ONLY })
+        await expect(revokeAgentShareAction(SHARE_ID)).resolves.toEqual({ ok: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(mocks.revokeAgentShare).not.toHaveBeenCalled()
     })
 
     it('leaves the link of a deleted coworker to the admins', async () => {
         database({ role: 'member', grant: 'manage', shareAgentId: null })
 
-        await expect(revokeAgentShareAction(SHARE_ID)).resolves.toEqual({ ok: false, error: BOX_MANAGE_ONLY })
+        await expect(revokeAgentShareAction(SHARE_ID)).resolves.toEqual({ ok: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(mocks.revokeAgentShare).not.toHaveBeenCalled()
     })
 

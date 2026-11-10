@@ -1,3 +1,4 @@
+import { AuthorizationError } from '@/app/api/_auth/errors'
 import { requireAdminContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { NoPlanError } from '@/app/api/_services/capacity.service'
 import { ensureWorkspaceEngine, findWorkspaceEngine, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
@@ -43,8 +44,8 @@ beforeEach(() => {
 
 describe('createAiConnectionAction', () => {
     it('refuses a member who is not an admin, before reaching the machine', async () => {
-        vi.mocked(requireAdminContext).mockRejectedValue(new Error('Only an admin can manage AI providers'))
-        await expect(createAiConnectionAction(params)).resolves.toEqual({ success: false, error: 'Only an admin can manage AI providers' })
+        vi.mocked(requireAdminContext).mockRejectedValue(new AuthorizationError('adminOnlyAiProviders'))
+        await expect(createAiConnectionAction(params)).resolves.toEqual({ success: false, error: 'Only an admin can manage AI providers', code: 'adminOnlyAiProviders' })
         expect(findWorkspaceEngine).not.toHaveBeenCalled()
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
@@ -68,7 +69,7 @@ describe('createAiConnectionAction', () => {
     it('offers the trial to a workspace with no plan, instead of a machine error', async () => {
         vi.mocked(findWorkspaceEngine).mockResolvedValue(null)
         vi.mocked(ensureWorkspaceEngine).mockRejectedValue(new NoPlanError())
-        await expect(createAiConnectionAction(params)).resolves.toEqual({ success: false, error: 'Start your free trial to connect your own Claude plan or API key.', reason: 'no_plan' })
+        await expect(createAiConnectionAction(params)).resolves.toEqual({ success: false, error: 'Start your free trial to connect your own Claude plan or API key.', code: 'trialToConnectClaude', reason: 'no_plan' })
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
 
@@ -80,8 +81,8 @@ describe('createAiConnectionAction', () => {
 
     it('stores nothing when the provider turns the key down', async () => {
         vi.mocked(findWorkspaceEngine).mockResolvedValue({ instanceId: 'i', conn, managed: true })
-        vi.mocked(providerKeyProblem).mockResolvedValue('Anthropic turned this key down.')
-        await expect(createAiConnectionAction(params)).resolves.toEqual({ success: false, error: 'Anthropic turned this key down.' })
+        vi.mocked(providerKeyProblem).mockResolvedValue({ code: 'providerKeyRejected', params: { provider: 'Anthropic' } })
+        await expect(createAiConnectionAction(params)).resolves.toEqual({ success: false, error: 'Anthropic turned this key down. Check it was copied in full and is still active.', code: 'providerKeyRejected', params: { provider: 'Anthropic' } })
         expect(providerKeyProblem).toHaveBeenCalledWith('anthropic', params.keys, undefined)
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
@@ -94,8 +95,8 @@ describe('updateAiConnectionKeysAction', () => {
     })
 
     it('checks the new key against the provider of the connection it replaces', async () => {
-        vi.mocked(providerKeyProblem).mockResolvedValue('OpenRouter turned this key down.')
-        await expect(updateAiConnectionKeysAction('cnx', { set: { OPENROUTER_API_KEY: 'bad' } })).resolves.toEqual({ success: false, error: 'OpenRouter turned this key down.' })
+        vi.mocked(providerKeyProblem).mockResolvedValue({ code: 'providerKeyRejected', params: { provider: 'OpenRouter' } })
+        await expect(updateAiConnectionKeysAction('cnx', { set: { OPENROUTER_API_KEY: 'bad' } })).resolves.toEqual({ success: false, error: 'OpenRouter turned this key down. Check it was copied in full and is still active.', code: 'providerKeyRejected', params: { provider: 'OpenRouter' } })
         expect(providerKeyProblem).toHaveBeenCalledWith('openrouter', { OPENROUTER_API_KEY: 'bad' }, 'https://router.example.com')
         expect(engine.updateConnectionKeys).not.toHaveBeenCalled()
     })

@@ -4,13 +4,14 @@ import { SymbolView } from 'expo-symbols'
 import { useRef } from 'react'
 import { ActionSheetIOS, Pressable, View } from 'react-native'
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
+import { useTranslations } from 'use-intl'
 
 import { AVATAR } from '@/components/home/CoworkerRow'
 import { minutesSince } from '@/components/home/board'
-import { moodOfInbox, STATUS_SENTENCE } from '@/components/inbox/inbox'
+import { moodOfInbox } from '@/components/inbox/inbox'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
-import { timeAgo } from '@/components/ui/status'
+import { useTimeAgo } from '@/lib/time'
 import { useTheme } from '@/theme/theme'
 import { brand, spacing } from '@/theme/tokens'
 
@@ -31,9 +32,11 @@ type InboxRowProps = {
 export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }: InboxRowProps) {
     const theme = useTheme()
     const swipeable = useRef<SwipeableMethods>(null)
+    const timeAgo = useTimeAgo()
+    const t = useTranslations('mobileHome.inbox')
     const minutes = minutesSince(item.updatedAt)
     const headline = item.message ?? item.title
-    const detail = item.message ? `${item.agentName} · ${item.title}` : `${item.agentName} ${STATUS_SENTENCE[item.status]}`
+    const detail = item.message ? t('row.detail', { agent: item.agentName, title: item.title }) : t(`sentences.${item.status}`, { agent: item.agentName })
 
     const markRead = () => {
         Haptics.selectionAsync()
@@ -41,11 +44,11 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
     }
 
     const askWhatToDo = () => {
-        const actions: { label: string; run: () => void }[] = [{ label: 'Mark as read', run: markRead }]
-        if (rule?.follow) actions.push({ label: 'Stop following its scheduled tasks', run: () => onRule(item, { ...rule, follow: false }, `You no longer follow ${item.agentName}'s scheduled tasks.`) })
-        if (rule && rule.mode !== 'muted') actions.push({ label: `Mute ${item.agentName}`, run: () => onRule(item, { ...rule, mode: 'muted' }, `${item.agentName} is muted.`) })
-        actions.push({ label: 'Notification settings', run: () => onSettings(item) })
-        ActionSheetIOS.showActionSheetWithOptions({ options: [...actions.map(action => action.label), 'Cancel'], cancelButtonIndex: actions.length }, index => actions[index]?.run())
+        const actions: { label: string; run: () => void }[] = [{ label: t('row.markRead'), run: markRead }]
+        if (rule?.follow) actions.push({ label: t('row.unfollow'), run: () => onRule(item, { ...rule, follow: false }, t('row.unfollowed', { name: item.agentName })) })
+        if (rule && rule.mode !== 'muted') actions.push({ label: t('row.mute', { name: item.agentName }), run: () => onRule(item, { ...rule, mode: 'muted' }, t('row.muted', { name: item.agentName })) })
+        actions.push({ label: t('row.settings'), run: () => onSettings(item) })
+        ActionSheetIOS.showActionSheetWithOptions({ options: [...actions.map(action => action.label), t('row.cancel')], cancelButtonIndex: actions.length }, index => actions[index]?.run())
     }
 
     return (
@@ -59,7 +62,7 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
                 <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden style={{ width: ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
                     <SymbolView name="checkmark" size={18} weight="semibold" tintColor="#ffffff" />
                     <AppText variant="caption" medium maxFontSizeMultiplier={1.2} style={{ color: '#ffffff' }}>
-                        Read
+                        {t('row.read')}
                     </AppText>
                 </Pressable>
             )}
@@ -68,9 +71,9 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
                 onPress={() => onOpen(item)}
                 onLongPress={askWhatToDo}
                 accessibilityRole="button"
-                accessibilityLabel={[headline, detail].join(', ')}
-                accessibilityHint="Opens the conversation"
-                accessibilityActions={[{ name: 'markRead', label: 'Mark as read' }]}
+                accessibilityLabel={t('row.label', { headline, detail })}
+                accessibilityHint={t('row.opensConversation')}
+                accessibilityActions={[{ name: 'markRead', label: t('row.markRead') }]}
                 onAccessibilityAction={event => event.nativeEvent.actionName === 'markRead' && markRead()}
                 style={({ pressed }) => ({ backgroundColor: pressed ? theme.muted : theme.background })}
             >

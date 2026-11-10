@@ -7,12 +7,14 @@ import { usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvi
 import { Dialog, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 // Everything the whole workspace shares: the pages every agent reads about the company, the changes
 // agents propose to them, the folder its agents pass files through, and the database they keep
 // common records in.
 export function KnowledgeBaseDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('dialogs.knowledgeBase')
     const focus = useWorkspaceSettingsStore(s => s.focus)
     const clearFocus = useWorkspaceSettingsStore(s => s.clearFocus)
     const { workspace } = useSession()
@@ -44,8 +46,8 @@ export function KnowledgeBaseDialog({ open, onOpenChange }: { open: boolean; onO
                     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) event.preventDefault()
                 }}
             >
-                <DialogTitle className="sr-only">Brain</DialogTitle>
-                <DialogDescription className="sr-only">What every coworker of this workspace knows about your company, and the files and tables they share.</DialogDescription>
+                <DialogTitle className="sr-only">{t('title')}</DialogTitle>
+                <DialogDescription className="sr-only">{t('description')}</DialogDescription>
                 <BrainWorkspace request={request} publishedEnabled={publishedEnabled} onRequestConsumed={consumeRequest} onClose={close} />
             </PanelDialogContent>
         </Dialog>

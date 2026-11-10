@@ -1,0 +1,217 @@
+{
+    "_context": {
+        "menu.label": "Heading of the section of the workspace menu that lists the paid apps (LinkedIn, WhatsApp).",
+        "linkedToRerun": "Accessible label of a picture of the app's logo linked to Rerun's. {provider} is the app's brand (LinkedIn, WhatsApp).",
+        "slots.footer": "Footer of the list of accounts. {description} is one of the slots.* sentences, starting lower case.",
+        "slots.subscriberTrial": "Starts lower case: it follows a comma in slots.footer.",
+        "slots.workspaceTrial": "Starts lower case: it follows a comma in slots.footer.",
+        "slots.paid": "Starts lower case: it follows a comma in slots.footer.",
+        "accounts.status.needsReconnect": "Badge of an account the app signed out.",
+        "accounts.freeSlot": "Title of an empty, already paid place for one more account.",
+        "accounts.summary.usedBy": "{names} is the list of the coworkers' names, separated by commas.",
+        "success.title": "{app} is the app's name (LinkedIn Pro, WhatsApp Pro).",
+        "success.body": "{label} is the account's name, or success.yourAccount.",
+        "linkedin.signInFrom": "Field title: the country the LinkedIn sign-in comes from.",
+        "linkedin.code.where.sentTo": "{sentTo} is where LinkedIn sent the code, as LinkedIn words it (\"email\", \"phone\").",
+        "linkedin.code.description": "{where} is one of the linkedin.code.where.* phrases.",
+        "whatsapp.link.onPhone": "{phone} is the phone number being linked.",
+        "slotPrice.monthly": "Price of one account slot per month. {price} is already formatted (\"$9\")."
+    },
+    "menu": {
+        "label": "Apps"
+    },
+    "linkedToRerun": "{provider} linked to Rerun",
+    "slotPrice": {
+        "monthly": "{price}/mo",
+        "yearly": "{price}/yr"
+    },
+    "blocked": {
+        "notSubscribed": "Subscribe to Rerun first",
+        "paused": "Your workspace is paused",
+        "trialSlot": "A trial holds one {provider} slot. Upgrade your plan to add more.",
+        "adminOnly": "Only an admin can manage paid apps"
+    },
+    "slots": {
+        "footer": "<b>{used} of {total, plural, one {# slot} other {# slots}} used</b>, {description}",
+        "subscriberTrial": "first one free until {date}, then {price}",
+        "workspaceTrial": "$0 during your trial, billed with your plan after",
+        "paid": "{price} each, billed with your plan"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "Free for {days} days",
+            "detail": "Then {price} per account, billed with your plan"
+        },
+        "workspaceTrial": {
+            "headline": "$0 during your trial",
+            "detail": "Then {price} per account, billed with your plan"
+        },
+        "freeSlot": {
+            "headline": "A slot is waiting",
+            "detail": "It is already on your plan"
+        },
+        "buySlot": {
+            "headline": "{price} per account",
+            "detail": "Added to your plan, billed today for the rest of the period"
+        }
+    },
+    "connectHint": {
+        "reconnect": "Sign in again as {label}",
+        "subscriberTrial": "Free for {days} days, then {price}",
+        "workspaceTrial": "$0 during your trial, then {price} with your plan",
+        "default": "The account your coworkers act with"
+    },
+    "addSlot": {
+        "title": "Add a {provider} slot?",
+        "description": "{price} is added to your plan. You are charged today for what is left of the current period.",
+        "confirm": "Add slot",
+        "button": "Add a slot"
+    },
+    "intro": {
+        "connect": "Connect {provider}"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "Your coworkers prospect from your LinkedIn account. They write, connect and follow up for you.",
+            "whatsapp": "Your coworkers answer from your WhatsApp number. They read the conversation, reply and follow up for you."
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "Messages and invitations",
+                "text": "Writes to prospects and follows up, inside LinkedIn’s daily limits."
+            },
+            "linkedinSearch": {
+                "title": "Search and read profiles",
+                "text": "Finds the right people and reads their profile before writing."
+            },
+            "linkedinReplies": {
+                "title": "Wakes up on replies",
+                "text": "A reply or an accepted invitation starts the coworker right away."
+            },
+            "whatsappReplies": {
+                "title": "Replies and follow-ups",
+                "text": "Answers the people who write to you, with text, files and voice notes."
+            },
+            "whatsappMessages": {
+                "title": "Wakes up on messages",
+                "text": "A new message starts the coworker right away."
+            },
+            "whatsappCareful": {
+                "title": "Careful with your number",
+                "text": "Stays inside WhatsApp’s daily limits and never writes to strangers."
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "Your workspace is paused, so its {provider} accounts are signed out. Bring the workspace back, then reconnect them.",
+        "freeSlot": "Free slot",
+        "freeSlotHint": {
+            "subscriberTrial": "Connect an account, free for {days} days",
+            "workspaceTrial": "Connect an account, $0 during your trial",
+            "default": "Connect a {provider} account to fill it"
+        },
+        "addAnother": "Add another account",
+        "addAnotherHint": "Adds a slot at {price} to your plan",
+        "status": {
+            "connected": "Ready",
+            "needsReconnect": "Sign in again",
+            "paused": "Paused",
+            "connecting": "Connecting",
+            "disconnected": "Disconnected"
+        },
+        "summary": {
+            "signedOutWhilePaused": "Signed out while the workspace was paused",
+            "signedOut": "{provider} signed this account out",
+            "rateLimited": "Resting for a day, {provider} asked it to slow down",
+            "unpaid": "Its slot is not paid for",
+            "unused": "No coworker uses it yet. Pick it in a coworker’s Services.",
+            "usedBy": "Used by {names}"
+        },
+        "defaultName": "{provider} account",
+        "reconnect": "Reconnect",
+        "disconnectLabel": "Disconnect {name}",
+        "disconnectTitle": "Disconnect {name}?",
+        "disconnectDescription": "Its coworkers lose their {provider} tools right away. The slot stays on your plan until you remove it from Billing.",
+        "disconnect": "Disconnect",
+        "disconnectTooltip": "Disconnect this account"
+    },
+    "success": {
+        "connectedIcon": "{provider} connected",
+        "title": "{app} is on",
+        "body": "<b>{label}</b> is connected. Pick it in a coworker’s Services to put it to work.",
+        "yourAccount": "Your account",
+        "done": "Done"
+    },
+    "linkedin": {
+        "method": {
+            "password": "Email and password",
+            "cookie": "Session cookie"
+        },
+        "cookieLabel": "Session cookie (li_at)",
+        "cookieHelp": "For an account you open with Google or Apple. Copy the li_at cookie of linkedin.com from your browser.",
+        "emailLabel": "LinkedIn email",
+        "emailPlaceholder": "jane@company.com",
+        "passwordLabel": "LinkedIn password",
+        "passwordPlaceholder": "Your LinkedIn password",
+        "signInFrom": "Sign in from",
+        "signInFromHelp": "LinkedIn trusts a sign-in from the country you usually work from.",
+        "searchCountry": "Search a country",
+        "noCountry": "No country found",
+        "neverStored": "Rerun never stores your password or your cookie.",
+        "connect": "Connect",
+        "approval": {
+            "figureLabel": "A phone showing the sign-in request, its approve key lit",
+            "title": "Approve on your phone",
+            "body": "LinkedIn sent a sign-in request to your phone. Open the LinkedIn app and tap <b>Yes</b>.",
+            "approved": "I approved it",
+            "polling": "Waiting for your approval",
+            "slow": "Still nothing? Check the LinkedIn app, then tap below."
+        },
+        "code": {
+            "title": "Enter the code",
+            "description": "The {length}-digit code {where}.",
+            "where": {
+                "authenticator": "from your authenticator app",
+                "sentTo": "LinkedIn sent to your {sentTo}",
+                "sms": "LinkedIn sent by text message",
+                "email": "LinkedIn sent by email"
+            },
+            "resend": "Send a new code",
+            "verify": "Verify"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "WhatsApp number",
+            "invalidPhone": "This does not look like a full phone number.",
+            "linkBy": "Link it by",
+            "linkByQr": "You scan a code shown here with the phone.",
+            "linkByCode": "For when this page is open on that phone: you type a code in WhatsApp instead.",
+            "method": {
+                "qr": "Scan a QR code",
+                "code": "Type a code"
+            },
+            "linkedDevice": "Rerun joins as a linked device, the way WhatsApp Web does. Your phone keeps working as usual.",
+            "submit": "Get the code"
+        },
+        "link": {
+            "steps": {
+                "open": "Open WhatsApp on the phone",
+                "settings": "Settings, then Linked devices, then Link a device",
+                "pointQr": "Point the phone at this code",
+                "typeCode": "Tap Link with phone number instead, then type this code"
+            },
+            "expiredTitle": "This code expired",
+            "scanTitle": "Scan with WhatsApp",
+            "typeTitle": "Type this code in WhatsApp",
+            "expiredBody": "Codes last three minutes. Ask for a new one, then link the phone right away.",
+            "onPhone": "On the phone of <b>{phone}</b>",
+            "waiting": "Waiting for the phone",
+            "switchToCode": "Type a code instead",
+            "switchToQr": "Scan a QR code instead",
+            "newCode": "New code",
+            "codeLabel": "Code {code}",
+            "qrAlt": "QR code to link WhatsApp"
+        }
+    }
+}

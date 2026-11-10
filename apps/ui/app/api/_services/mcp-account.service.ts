@@ -496,7 +496,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         }
 
         case 'set_default_model': {
-            if (!isAdminActor(actor)) throw new AccessDeniedError('Only an admin can change the default model of the workspace.')
+            if (!isAdminActor(actor)) throw new AccessDeniedError('adminOnlyDefaultModel')
             const conn = await getWorkspaceConnection(workspaceId)
             const { connections } = await engineListConnections(conn)
             const pin = readModelPin({ connectionId: requireString(args.connectionId, 'connectionId'), model: requireString(args.model, 'model') }, connections)

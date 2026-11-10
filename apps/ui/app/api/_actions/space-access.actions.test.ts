@@ -14,7 +14,7 @@ type Row = Record<string, unknown>
 
 const WORKSPACE_ID = 7
 const ME = 'user-me'
-const ADMIN_ONLY = { ok: false, error: 'Only an admin can change who can access a Box' }
+const ADMIN_ONLY = { ok: false, error: 'Only an admin can change who can access a Box', code: 'adminOnlyBoxAccess' }
 
 function tableResolver(rows: Record<string, Row[]>) {
     return (table: string, calls: readonly SupabaseCall[]) => {
@@ -107,7 +107,7 @@ describe('getSpaceAccessAction', () => {
     it('answers not found for a Box of another workspace', async () => {
         database({ workspace_members: [member(ME, 'admin')], spaces: [space('box-1', 'workspace', 99)] })
 
-        await expect(getSpaceAccessAction('box-1')).resolves.toEqual({ ok: false, error: 'Box not found' })
+        await expect(getSpaceAccessAction('box-1')).resolves.toEqual({ ok: false, error: 'Box not found', code: 'boxNotFound' })
     })
 })
 
@@ -128,14 +128,14 @@ describe('setSpaceVisibilityAction', () => {
     it('leaves a Box of another workspace alone', async () => {
         const db = database({ workspace_members: [member(ME, 'admin')], spaces: [space('box-1', 'workspace', 99)] })
 
-        await expect(setSpaceVisibilityAction('box-1', 'restricted')).resolves.toEqual({ ok: false, error: 'Box not found' })
+        await expect(setSpaceVisibilityAction('box-1', 'restricted')).resolves.toEqual({ ok: false, error: 'Box not found', code: 'boxNotFound' })
         expect(db.writes('spaces')).toHaveLength(0)
     })
 
     it('refuses a visibility it does not know', async () => {
         const db = database({ workspace_members: [member(ME, 'admin')], spaces: [space('box-1')] })
 
-        await expect(setSpaceVisibilityAction('box-1', 'public' as never)).resolves.toEqual({ ok: false, error: 'Unknown visibility' })
+        await expect(setSpaceVisibilityAction('box-1', 'public' as never)).resolves.toEqual({ ok: false, error: 'Unknown visibility', code: 'unknownVisibility' })
         expect(db.writes('spaces')).toHaveLength(0)
     })
 })
@@ -165,22 +165,22 @@ describe('grantSpaceAccessAction', () => {
     it('refuses an admin, who already reaches every Box', async () => {
         const db = database({ workspace_members: [member(ME, 'admin'), member('user-2', 'admin'), member('user-3')], spaces: [space('box-1')] })
 
-        await expect(grantSpaceAccessAction('box-1', ['user-3', 'user-2'], 'manage')).resolves.toEqual({ ok: false, error: 'Admins always have access to every Box' })
+        await expect(grantSpaceAccessAction('box-1', ['user-3', 'user-2'], 'manage')).resolves.toEqual({ ok: false, error: 'Admins always have access to every Box', code: 'adminsAlwaysReachBoxes' })
         expect(db.writes('space_members')).toHaveLength(0)
     })
 
     it('refuses someone outside the workspace', async () => {
         const db = database({ workspace_members: [member(ME, 'admin'), member('user-2', 'member', 'all', 99)], spaces: [space('box-1')] })
 
-        await expect(grantSpaceAccessAction('box-1', ['user-2'], 'use')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.' })
+        await expect(grantSpaceAccessAction('box-1', ['user-2'], 'use')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.', code: 'userNotMember' })
         expect(db.writes('space_members')).toHaveLength(0)
     })
 
     it('refuses a Box of another workspace and a level it does not know', async () => {
         const db = database({ workspace_members: [member(ME, 'admin'), member('user-2')], spaces: [space('box-1', 'workspace', 99), space('box-2')] })
 
-        await expect(grantSpaceAccessAction('box-1', ['user-2'], 'use')).resolves.toEqual({ ok: false, error: 'Box not found' })
-        await expect(grantSpaceAccessAction('box-2', ['user-2'], 'owner' as never)).resolves.toEqual({ ok: false, error: 'Unknown access level' })
+        await expect(grantSpaceAccessAction('box-1', ['user-2'], 'use')).resolves.toEqual({ ok: false, error: 'Box not found', code: 'boxNotFound' })
+        await expect(grantSpaceAccessAction('box-2', ['user-2'], 'owner' as never)).resolves.toEqual({ ok: false, error: 'Unknown access level', code: 'unknownAccessLevel' })
         expect(db.writes('space_members')).toHaveLength(0)
     })
 })
@@ -203,7 +203,7 @@ describe('revokeSpaceAccessAction', () => {
     it('leaves a Box of another workspace alone', async () => {
         const db = database({ workspace_members: [member(ME, 'admin')], spaces: [space('box-1', 'workspace', 99)] })
 
-        await expect(revokeSpaceAccessAction('box-1', 'user-2')).resolves.toEqual({ ok: false, error: 'Box not found' })
+        await expect(revokeSpaceAccessAction('box-1', 'user-2')).resolves.toEqual({ ok: false, error: 'Box not found', code: 'boxNotFound' })
         expect(db.writes('space_members')).toHaveLength(0)
     })
 })
@@ -263,12 +263,12 @@ describe('listMemberAccessAction', () => {
     it('refuses a member reading someone else', async () => {
         database({ workspace_members: [member(ME), member('user-2')], spaces: boxes })
 
-        await expect(listMemberAccessAction('user-2')).resolves.toEqual({ ok: false, error: 'Only an admin can see the Boxes of another member' })
+        await expect(listMemberAccessAction('user-2')).resolves.toEqual({ ok: false, error: 'Only an admin can see the Boxes of another member', code: 'adminOnlyMemberBoxes' })
     })
 
     it('refuses someone outside the workspace', async () => {
         database({ workspace_members: [member(ME, 'admin'), member('user-2', 'member', 'all', 99)], spaces: boxes })
 
-        await expect(listMemberAccessAction('user-2')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.' })
+        await expect(listMemberAccessAction('user-2')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.', code: 'userNotMember' })
     })
 })

@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import { updateAgentKeysAction } from '@/app/api/_actions/agent.actions'
 import { McpVarTextarea } from '@/components/agent/McpVarTextarea'
 import { Button } from '@/components/ui/button'
@@ -9,11 +10,14 @@ import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeade
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useAgentVariables } from '@/hooks/useAgentVariables'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { argsHaveSecret, externalizeArgs, externalizePairs, externalizeUrl, sanitize, urlHasSecret } from '@/lib/engine/mcp-secrets'
 import type { EngineMcpServer } from '@/lib/engine/types'
 import { MCP_SERVER_NAME_RE } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useCallback, useMemo, useState } from 'react'
+
+const VARIABLE_TOKEN = '${NAME}'
 
 const parseArgs = (text: string): string[] => text.split('\n').map(a => a.trim()).filter(Boolean)
 
@@ -28,8 +32,6 @@ function parsePairs(text: string): Record<string, string> {
     return out
 }
 
-const SECRET_WARNING = 'A secret was detected here. It moves to the engine and becomes a ${NAME} when you save.'
-
 export function McpServerEditor({
     agentId,
     server,
@@ -42,11 +44,14 @@ export function McpServerEditor({
     agentId: string
     server?: EngineMcpServer
     readOnly?: boolean
-    onSave: (server: EngineMcpServer) => Promise<{ success: boolean; error?: string }>
-    onDelete?: () => Promise<{ success: boolean; error?: string }>
+    onSave: (server: EngineMcpServer) => Promise<{ success: boolean } & Refusal>
+    onDelete?: () => Promise<{ success: boolean } & Refusal>
     onDone: () => void
     onBack: () => void
 }) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.mcpServerEditor')
+    const errorText = useErrorText()
     const isEdit = !!server
     const [name, setName] = useState(server?.name ?? '')
     const [transport, setTransport] = useState<'stdio' | 'sse' | 'http'>(server?.transport ?? 'stdio')
@@ -68,7 +73,7 @@ export function McpServerEditor({
     const [error, setError] = useState<string | null>(null)
     const vars = useAgentVariables(agentId)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
     // `readOnly` is a server an app owns, with no footer at all. A use-only member keeps the footer, disabled, to read why.
     const fieldsLocked = readOnly || !canManage
 
@@ -79,7 +84,7 @@ export function McpServerEditor({
         const serverName = name.trim()
         if (!MCP_SERVER_NAME_RE.test(serverName)) {
             setSaving(false)
-            setError('Name must be 1-64 characters: letters, digits, underscores, or hyphens.')
+            setError(t('invalidName'))
             return
         }
         const isStdio = transport === 'stdio'
@@ -102,7 +107,7 @@ export function McpServerEditor({
             const keysResult = await updateAgentKeysAction(agentId, { set: keysSet })
             if (!keysResult.success) {
                 setSaving(false)
-                setError(keysResult.error ?? 'Failed to store credentials')
+                setError(errorText(keysResult, t('storeCredentialsFailed')))
                 return
             }
             vars.markDefined(Object.keys(keysSet))
@@ -111,8 +116,8 @@ export function McpServerEditor({
         const result = await onSave(next)
         setSaving(false)
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to save')
-    }, [agentId, name, transport, command, argsText, url, envText, headersText, server, vars, onSave, onDone])
+        else setError(errorText(result, t('saveFailed')))
+    }, [agentId, name, transport, command, argsText, url, envText, headersText, server, vars, onSave, onDone, t, errorText])
 
     const handleDelete = useCallback(async () => {
         if (!onDelete) return
@@ -120,22 +125,23 @@ export function McpServerEditor({
         const result = await onDelete()
         setDeleting(false)
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to delete')
-    }, [onDelete, onDone])
+        else setError(errorText(result, t('deleteFailed')))
+    }, [onDelete, onDone, t, errorText])
 
     const canSave = name.trim() && (transport === 'stdio' ? command.trim() : url.trim())
-    const argsWarning = useMemo(() => (argsHaveSecret(parseArgs(argsText)) ? SECRET_WARNING : null), [argsText])
-    const urlWarning = useMemo(() => (urlHasSecret(url.trim()) ? SECRET_WARNING : null), [url])
+    const secretWarning = t('secretWarning', { token: VARIABLE_TOKEN })
+    const argsWarning = useMemo(() => (argsHaveSecret(parseArgs(argsText)) ? secretWarning : null), [argsText, secretWarning])
+    const urlWarning = useMemo(() => (urlHasSecret(url.trim()) ? secretWarning : null), [url, secretWarning])
 
     return (
         <PanelEditorShell>
-            <PanelEditorHeader title={fieldsLocked ? 'MCP server' : isEdit ? 'Edit MCP server' : 'New MCP server'} onBack={onBack} />
+            <PanelEditorHeader title={fieldsLocked ? t('titleReadOnly') : isEdit ? t('titleEdit') : t('titleNew')} onBack={onBack} />
             <PanelEditorBody>
                 {error && <p className="text-xs text-destructive">{error}</p>}
-                {readOnly && <p className="text-xs text-muted-foreground">This MCP server is provided by an app and is managed automatically.</p>}
-                <Input label="Name" helperText={`Tools are merged as "${name.trim() || 'name'}_<tool>".`} hideRequired disabled={fieldsLocked} value={name} onChange={e => setName(e.target.value)} placeholder="filesystem" className="h-8 text-sm" />
+                {readOnly && <p className="text-xs text-muted-foreground">{t('providedByApp')}</p>}
+                <Input label={t('name')} helperText={t('nameHelper', { prefix: name.trim() || t('namePrefixFallback'), tool: '<tool>' })} hideRequired disabled={fieldsLocked} value={name} onChange={e => setName(e.target.value)} placeholder="filesystem" className="h-8 text-sm" />
 
-                <Field label="Transport">
+                <Field label={t('transport')}>
                     <div className="flex gap-1 rounded-md border border-border p-0.5">
                         <button type="button" disabled={fieldsLocked} onClick={() => setTransport('stdio')} className={`flex-1 rounded px-2 py-1 text-xs transition-colors ${transport === 'stdio' ? 'bg-accent text-foreground' : 'text-muted-foreground'}`}>
                             stdio
@@ -151,10 +157,10 @@ export function McpServerEditor({
 
                 {transport === 'stdio' ? (
                     <>
-                        <Input label="Command" hideRequired disabled={fieldsLocked} value={command} onChange={e => setCommand(e.target.value)} placeholder="npx" className="h-8 text-sm font-mono" />
+                        <Input label={t('command')} hideRequired disabled={fieldsLocked} value={command} onChange={e => setCommand(e.target.value)} placeholder="npx" className="h-8 text-sm font-mono" />
                         <McpVarTextarea
-                            label="Arguments"
-                            helperText={fieldsLocked ? 'One argument per line.' : 'One argument per line. Click a highlighted ${NAME} to change the value behind it.'}
+                            label={t('arguments')}
+                            helperText={fieldsLocked ? t('argumentsHelper') : t('argumentsHelperEditable', { token: VARIABLE_TOKEN })}
                             warning={argsWarning}
                             value={argsText}
                             onChange={setArgsText}
@@ -166,8 +172,8 @@ export function McpServerEditor({
                     </>
                 ) : (
                     <McpVarTextarea
-                        label="URL"
-                        helperText={fieldsLocked ? undefined : 'Click a highlighted ${NAME} to change the value behind it.'}
+                        label={t('url')}
+                        helperText={fieldsLocked ? undefined : t('urlHelper', { token: VARIABLE_TOKEN })}
                         warning={urlWarning}
                         value={url}
                         onChange={setUrl}
@@ -179,10 +185,10 @@ export function McpServerEditor({
                     />
                 )}
 
-                <McpVarTextarea label="Environment" helperText={fieldsLocked ? 'One KEY=value per line. Values are stored on the engine.' : 'One KEY=value per line. Values are stored on the engine; click a highlighted ${NAME} to change the value behind it.'} value={envText} onChange={setEnvText} placeholder={'API_KEY=...\nOTHER=value'} vars={vars} disabled={fieldsLocked} />
+                <McpVarTextarea label={t('environment')} helperText={fieldsLocked ? t('environmentHelper') : t('environmentHelperEditable', { token: VARIABLE_TOKEN })} value={envText} onChange={setEnvText} placeholder={'API_KEY=...\nOTHER=value'} vars={vars} disabled={fieldsLocked} />
 
                 {transport !== 'stdio' && (
-                    <McpVarTextarea label="Headers" helperText={fieldsLocked ? 'One Header=value per line. Sent with each request (use for auth).' : 'One Header=value per line. Sent with each request (use for auth). Click a highlighted ${NAME} to change the value behind it.'} value={headersText} onChange={setHeadersText} placeholder={'Authorization=Bearer ...\nx-auth-token=...'} vars={vars} disabled={fieldsLocked} />
+                    <McpVarTextarea label={t('headers')} helperText={fieldsLocked ? t('headersHelper') : t('headersHelperEditable', { token: VARIABLE_TOKEN })} value={headersText} onChange={setHeadersText} placeholder={'Authorization=Bearer ...\nx-auth-token=...'} vars={vars} disabled={fieldsLocked} />
                 )}
 
             </PanelEditorBody>
@@ -191,18 +197,18 @@ export function McpServerEditor({
                     {isEdit && onDelete && (
                         <TooltipDisabledReason reason={manageReason}>
                             <PanelDeleteButton
-                                label="Delete server"
+                                label={t('deleteServer')}
                                 busy={deleting}
                                 disabled={saving || !canManage}
                                 onClick={handleDelete}
-                                confirmTitle={`Delete ${name || 'this server'}?`}
-                                confirmDescription="The coworker loses every tool this server exposes. Its stored variables go with it."
+                                confirmTitle={name ? t('deleteConfirm', { name }) : t('deleteConfirmUnnamed')}
+                                confirmDescription={t('deleteDescription')}
                             />
                         </TooltipDisabledReason>
                     )}
                     <TooltipDisabledReason reason={manageReason} className="flex-1">
                         <Button size="sm" className="flex-1" loading={saving} onClick={handleSave} disabled={deleting || !canSave || !canManage}>
-                            {isEdit ? 'Save changes' : 'Create server'}
+                            {isEdit ? t('saveChanges') : t('createServer')}
                         </Button>
                     </TooltipDisabledReason>
                 </PanelEditorFooter>

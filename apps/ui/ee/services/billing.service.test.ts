@@ -1211,7 +1211,7 @@ describe('createPlanCheckoutSession', () => {
         const db = useDb({ row: { ...FRESH_WORKSPACE, stripe_customer_id: null } })
         vi.mocked(stripe.customers.create).mockResolvedValue({ id: 'cus_new' } as never)
         await createPlanCheckoutSession(BASE_SELECTION)
-        expect(stripe.customers.create).toHaveBeenCalledWith({ email: 'a@b.co', name: 'Acme', metadata: { workspace_id: String(WORKSPACE_ID) } })
+        expect(stripe.customers.create).toHaveBeenCalledWith({ email: 'a@b.co', name: 'Acme', metadata: { workspace_id: String(WORKSPACE_ID) }, preferred_locales: ['en'] })
         expect(db.updates()[0]).toEqual({ stripe_customer_id: 'cus_new' })
         expect(vi.mocked(stripe.checkout.sessions.create).mock.calls[0][0]).toMatchObject({ customer: 'cus_new' })
     })

@@ -4,10 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { fetchMemberProfiles } from '@/api/members'
 import { useAuth } from '@/auth/AuthProvider'
 import { cachedMembers } from '@/data/local-cache'
+import { translatorFor } from '@/i18n/translator'
 
 type Directory = Map<string, AuthorProfile>
 
-const UNNAMED = 'Teammate'
 // Someone who joined after the directory was read is missing from it, and so is someone who left:
 // only a fresh read tells them apart, and it is not worth more than one a minute.
 const REFRESH_AFTER_MS = 60_000
@@ -24,7 +24,10 @@ export function forgetMemberReads() {
 
 type Caller = { accessToken: string; workspaceId: number }
 
-const directoryOf = (members: MemberProfile[]): Directory => new Map(members.map(member => [member.id, { id: member.id, name: member.name ?? UNNAMED, photo: member.avatarUrl ?? undefined }]))
+const directoryOf = (members: MemberProfile[]): Directory => {
+    const unnamed = translatorFor('mobileHome')('teammate')
+    return new Map(members.map(member => [member.id, { id: member.id, name: member.name ?? unnamed, photo: member.avatarUrl ?? undefined }]))
+}
 
 function keptDirectory(workspaceId: number): { directory: Directory; readAt: number } | null {
     const kept = cachedMembers(workspaceId).read()

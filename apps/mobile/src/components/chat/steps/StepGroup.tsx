@@ -1,8 +1,10 @@
 import { agentIdOf, argsOf, readableToolError, toolHeadline, toolLabelOf } from '@rerun/contracts'
+import { formatNumber } from '@rerun/i18n/format'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewInstance } from 'react-native'
 import Animated, { Easing, FadeIn, FadeInUp, FadeOut, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { AppText } from '@/components/ui/AppText'
@@ -132,12 +134,13 @@ function StepList({ items }: { items: StepItem[] }) {
  * doing while it works, beside a pill with every tool used so far. The pill opens on the full list.
  */
 export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: string | null }) {
+    const t = useTranslations('mobileSteps.group')
     const theme = useTheme()
     const [open, setOpen] = useState(false)
     const running = items.find(item => item.status === 'running')
     const live = !!running
     const failed = items.filter(item => item.status === 'error').length
-    const count = `${items.length} ${items.length > 1 ? 'steps' : 'step'}`
+    const count = t('steps', { count: items.length })
     return (
         <View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: ROW_HEIGHT }}>
@@ -148,7 +151,7 @@ export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: stri
                     hitSlop={8}
                     accessibilityRole="button"
                     accessibilityState={{ expanded: open }}
-                    accessibilityLabel={failed > 0 ? `${count}, ${failed} failed` : count}
+                    accessibilityLabel={failed > 0 ? t('stepsWithFailures', { count: items.length, failed }) : count}
                     style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 6, height: PILL_HEIGHT, paddingLeft: 4, paddingRight: spacing.sm, borderRadius: radius.pill, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, backgroundColor: pressed ? theme.muted : withAlpha(theme.muted, 0.4) })}
                 >
                     <ToolStack items={items} />
@@ -157,7 +160,7 @@ export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: stri
                     </AppText>
                     {failed > 0 && (
                         <AppText variant="caption" tone="destructive">
-                            {`${failed} failed`}
+                            {t('failed', { failed })}
                         </AppText>
                     )}
                     <SymbolView name="chevron.right" size={10} weight="semibold" tintColor={theme.mutedForeground} style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }} />
@@ -246,10 +249,12 @@ function argsText(toolName: string, args: Record<string, unknown>): string {
     return JSON.stringify(args, null, 2)
 }
 
-function outputText(output: unknown): string {
+type ToolTranslator = ReturnType<typeof useTranslations<'mobileSteps.tool'>>
+
+function outputText(output: unknown, t: ToolTranslator, locale: string): string {
     if (output && typeof output === 'object' && 'duration' in output && Object.keys(output).length === 1) {
         const duration = (output as { duration?: number }).duration
-        if (typeof duration === 'number') return `Completed in ${duration < 1 ? `${Math.round(duration * 1000)}ms` : `${duration.toFixed(1)}s`}`
+        if (typeof duration === 'number') return duration < 1 ? t('completedInMs', { ms: formatNumber(Math.round(duration * 1000), locale) }) : t('completedInSeconds', { seconds: formatNumber(duration, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) })
     }
     const text = typeof output === 'string' ? output : JSON.stringify(output, null, 2)
     return text.length > OUTPUT_MAX ? `${text.slice(0, OUTPUT_MAX)}…` : text
@@ -259,19 +264,22 @@ type ToolCallStepProps = { toolName: string; state: string | undefined; input?: 
 
 /** A tool call on one line of the folded steps: what it was called with, and the full exchange on a tap. */
 export function ToolCallStep({ toolName, state, input, inputText, output, errorText, agentName }: ToolCallStepProps) {
+    const t = useTranslations('mobileSteps.tool')
+    const tTools = useTranslations('tools')
+    const locale = useLocale()
     const status = toolStatusOf(state)
     const args = argsOf(input)
     const targetAgentId = agentIdOf(input)
-    const detail = status === 'error' && errorText ? readableToolError(errorText) : toolHeadline(input, targetAgentId ? agentName?.(targetAgentId) : undefined)
+    const detail = status === 'error' && errorText ? readableToolError(errorText, tTools) : toolHeadline(input, targetAgentId ? agentName?.(targetAgentId) : undefined)
     const hasDetails = Object.keys(args ?? {}).length > 0 || output !== undefined || !!inputText || !!errorText
     return (
-        <StepRow symbol={toolSymbolOf(toolName)} label={toolLabelOf(toolName, input)} detail={detail} status={status} elapsed={<Elapsed active={status === 'running'} />}>
+        <StepRow symbol={toolSymbolOf(toolName)} label={toolLabelOf(toolName, input, tTools)} detail={detail} status={status} elapsed={<Elapsed active={status === 'running'} />}>
             {hasDetails ? (
                 <>
-                    {state === 'input-streaming' && inputText ? <Section label="Input">{<Mono text={inputText} />}</Section> : null}
-                    {args && Object.keys(args).length > 0 ? <Section label="Input">{<Mono text={argsText(toolName, args)} />}</Section> : null}
-                    {errorText ? <Section label="Error">{<Mono text={readableToolError(errorText)} tone="destructive" />}</Section> : null}
-                    {output !== undefined ? <Section label="Output">{<Mono text={outputText(output)} maxHeight={240} />}</Section> : null}
+                    {state === 'input-streaming' && inputText ? <Section label={t('input')}>{<Mono text={inputText} />}</Section> : null}
+                    {args && Object.keys(args).length > 0 ? <Section label={t('input')}>{<Mono text={argsText(toolName, args)} />}</Section> : null}
+                    {errorText ? <Section label={t('error')}>{<Mono text={readableToolError(errorText, tTools)} tone="destructive" />}</Section> : null}
+                    {output !== undefined ? <Section label={t('output')}>{<Mono text={outputText(output, t, locale)} maxHeight={240} />}</Section> : null}
                 </>
             ) : null}
         </StepRow>
@@ -280,9 +288,10 @@ export function ToolCallStep({ toolName, state, input, inputText, output, errorT
 
 /** A settled or running thought on one line of the folded steps. */
 export function ReasoningStep({ text, streaming }: { text: string; streaming: boolean }) {
+    const t = useTranslations('mobileSteps.reasoning')
     const theme = useTheme()
     return (
-        <StepRow symbol="brain" label={streaming ? 'Thinking...' : 'Thought'} detail={text.replace(/\s+/g, ' ')} status={streaming ? 'running' : 'done'}>
+        <StepRow symbol="brain" label={streaming ? t('thinking') : t('thought')} detail={text.replace(/\s+/g, ' ')} status={streaming ? 'running' : 'done'}>
             {text ? (
                 <View style={{ borderLeftWidth: StyleSheet.hairlineWidth * 2, borderLeftColor: theme.border, paddingLeft: spacing.md }}>
                     <AppText variant="footnote" tone="muted" selectable>
@@ -298,9 +307,11 @@ export type CompactionData = { status: 'running' | 'done' | 'error'; messagesCom
 
 /** The compaction of the conversation's context on one line of the folded steps. */
 export function CompactionStep({ data }: { data: CompactionData }) {
+    const t = useTranslations('mobileSteps.compaction')
+    const locale = useLocale()
     const settled = data.status === 'done'
-    const summarized = settled && typeof data.messagesCompacted === 'number' ? `${data.messagesCompacted} earlier messages summarized` : undefined
-    const recovered = settled && typeof data.tokensRecovered === 'number' ? `~${data.tokensRecovered.toLocaleString('en-US')} tokens recovered` : undefined
-    const label = data.status === 'running' ? 'Compacting context…' : data.status === 'error' ? 'Context compaction failed' : 'Context compacted'
+    const summarized = settled && typeof data.messagesCompacted === 'number' ? t('summarized', { count: formatNumber(data.messagesCompacted, locale) }) : undefined
+    const recovered = settled && typeof data.tokensRecovered === 'number' ? t('recovered', { count: formatNumber(data.tokensRecovered, locale) }) : undefined
+    const label = data.status === 'running' ? t('running') : data.status === 'error' ? t('failed') : t('done')
     return <StepRow symbol="arrow.down.right.and.arrow.up.left" label={label} detail={[summarized, recovered].filter(Boolean).join(' · ')} status={data.status} />
 }

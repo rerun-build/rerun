@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -12,15 +13,16 @@ import { landingUrl } from '@/lib/site'
 // catalogue does not have it, which is the best moment to offer them the other side of it.
 // A self-hosted install has no marketplace and starts with no template: it creates its own.
 export function TemplateLibraryEmpty({ filtered, onScratch }: { filtered: boolean; onScratch?: () => void }) {
+    const t = useTranslations('templates.library')
     if (!RERUN_CLOUD) {
         return (
             <EmptyState
                 icon={HammerIcon}
-                title={filtered ? 'No template matches these filters' : 'No template here yet'}
-                description="Recruit a coworker, then save it as a template."
+                title={filtered ? t('empty.filtered') : t('empty.none')}
+                description={t('empty.selfHosted')}
                 action={
                     <Button variant="outline" size="sm" onClick={onScratch}>
-                        Create New Coworker
+                        {t('createCoworker')}
                     </Button>
                 }
                 className="pt-8"
@@ -31,14 +33,14 @@ export function TemplateLibraryEmpty({ filtered, onScratch }: { filtered: boolea
     return (
         <EmptyState
             icon={HammerIcon}
-            title={filtered ? 'No template matches these filters' : 'No template here yet'}
-            description="Build it yourself and sell it on Rerun."
+            title={filtered ? t('empty.filtered') : t('empty.none')}
+            description={t('empty.cloud')}
             action={
                 <Button asChild variant="outline" size="sm">
                     {/* The glyph stays raw rather than going through Icon: its decorative box is
                         size-8 and would tower over a sm button. */}
                     <a href={landingUrl('/community/experts/program')} target="_blank" rel="noreferrer">
-                        Become a Rerun expert
+                        {t('empty.become')}
                         <ExternalLinkIcon className="size-4" />
                     </a>
                 </Button>

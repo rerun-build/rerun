@@ -1,16 +1,18 @@
 'use client'
 
+import { formatDate, formatNumber } from '@rerun/i18n/format'
 import { useMemo } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, XAxis, YAxis } from 'recharts'
-import { STATS_DATASETS, STATS_METRIC_META } from '@rerun/contracts'
+import { STATS_METRIC_META } from '@rerun/contracts'
 import type { StatsChartType, StatsDataset, StatsGroupBy, StatsMetric, StatsPoint } from '@rerun/contracts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../primitives/chart'
 import { CHART_FALLBACK_COLOR, CHART_PALETTE, chartColorAt } from './chart-palette'
 import { cn } from '../cn'
+import { useKitTranslations, useUiLocale } from '../locale'
 
 const MAX_SERIES = 8
 
-const compactFmt = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })
+const compact = (n: number, locale: string) => formatNumber(n, locale, { notation: 'compact', maximumFractionDigits: 1 })
 
 function formatDuration(ms: number): string {
     if (ms < 1000) return `${Math.round(ms)}ms`
@@ -20,7 +22,7 @@ function formatDuration(ms: number): string {
     return `${minutes}m ${seconds}s`
 }
 
-function makeFormatter(metric: StatsMetric): (n: number) => string {
+function makeFormatter(metric: StatsMetric, locale: string): (n: number) => string {
     const unit = STATS_METRIC_META[metric].unit
     if (unit === 'costMicros') {
         return n => {
@@ -30,16 +32,16 @@ function makeFormatter(metric: StatsMetric): (n: number) => string {
     }
     if (unit === 'ms') return formatDuration
     if (unit === 'ratio') return n => `${(n * 100).toFixed(1)}%`
-    return n => compactFmt.format(n)
+    return n => compact(n, locale)
 }
 
-function bucketLabel(bucket: string): string {
+function bucketLabel(bucket: string, locale: string): string {
     if (bucket.includes('T')) {
         const d = new Date(`${bucket}:00Z`)
-        return Number.isNaN(d.getTime()) ? bucket : d.toLocaleTimeString('en-US', { hour: 'numeric' })
+        return Number.isNaN(d.getTime()) ? bucket : formatDate(d, locale, { hour: 'numeric' })
     }
     const d = new Date(`${bucket}T00:00:00`)
-    return Number.isNaN(d.getTime()) ? bucket : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    return Number.isNaN(d.getTime()) ? bucket : formatDate(d, locale, { month: 'short', day: 'numeric' })
 }
 
 type Series = { key: string; label: string; color: string }
@@ -61,8 +63,12 @@ export type StatsChartProps = {
 }
 
 export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'area', points, className }: StatsChartProps) {
+    const locale = useUiLocale()
+    const t = useKitTranslations()
+    const otherLabel = t('monitoring.chart.other')
+    const metricLabel = t(`monitoring.metrics.${metric}`)
     const agg = STATS_METRIC_META[metric].agg
-    const formatValue = useMemo(() => makeFormatter(metric), [metric])
+    const formatValue = useMemo(() => makeFormatter(metric, locale), [metric, locale])
 
     const groups = useMemo(() => {
         const totals = new Map<string, { weight: number; entries: { value: number; count: number }[] }>()
@@ -84,18 +90,18 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
     const { rows, series } = useMemo(() => {
         const buckets = [...new Set((points ?? []).map(p => p.bucket))].sort()
         if (groupBy === 'none') {
-            const s: Series[] = [{ key: 'value', label: STATS_METRIC_META[metric].label, color: CHART_PALETTE[0] }]
+            const s: Series[] = [{ key: 'value', label: metricLabel, color: CHART_PALETTE[0] }]
             const r = buckets.map(b => {
                 const entries = (points ?? []).filter(p => p.bucket === b)
-                return { bucket: bucketLabel(b), value: combine(agg, entries) }
+                return { bucket: bucketLabel(b, locale), value: combine(agg, entries) }
             })
             return { rows: r, series: s }
         }
         const s: Series[] = groups.kept.map(g => ({ key: g.key, label: g.name, color: g.color }))
-        if (hasOther) s.push({ key: 'g_other', label: 'Other', color: CHART_FALLBACK_COLOR })
+        if (hasOther) s.push({ key: 'g_other', label: otherLabel, color: CHART_FALLBACK_COLOR })
         const r = buckets.map(b => {
             const inBucket = (points ?? []).filter(p => p.bucket === b)
-            const row: Record<string, number | string> = { bucket: bucketLabel(b) }
+            const row: Record<string, number | string> = { bucket: bucketLabel(b, locale) }
             for (const g of groups.kept) {
                 row[g.key] = combine(agg, inBucket.filter(p => (p.group ?? 'unknown') === g.name))
             }
@@ -103,14 +109,14 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
             return row
         })
         return { rows: r, series: s }
-    }, [points, groups, hasOther, groupBy, metric, agg])
+    }, [points, groups, hasOther, groupBy, agg, locale, otherLabel, metricLabel])
 
     const chartConfig = useMemo<ChartConfig>(() => Object.fromEntries(series.map(s => [s.key, { label: s.label, color: s.color }])), [series])
 
     const donutData = useMemo(() => {
         const perGroup = new Map<string, { value: number; count: number }[]>()
         for (const p of points ?? []) {
-            const name = groups.folded.has(p.group ?? 'unknown') ? 'Other' : p.group ?? 'unknown'
+            const name = groups.folded.has(p.group ?? 'unknown') ? otherLabel : p.group ?? 'unknown'
             const list = perGroup.get(name) ?? []
             list.push({ value: p.value, count: p.count })
             perGroup.set(name, list)
@@ -120,7 +126,7 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
             .map(([name, entries]) => ({ name, value: combine(agg, entries), fill: colorByName.get(name) ?? CHART_FALLBACK_COLOR }))
             .filter(d => d.value > 0)
             .sort((a, b) => b.value - a.value)
-    }, [points, groups, agg])
+    }, [points, groups, agg, otherLabel])
 
     const stat = useMemo(() => {
         const all = (points ?? []).map(p => ({ value: p.value, count: p.count }))
@@ -144,17 +150,17 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
     return (
         <div className={cn('h-full w-full p-1', className)}>
             {isEmpty ? (
-                <div className="flex h-full items-center justify-center text-center text-[12px] text-muted-foreground">{points === null ? 'Loading...' : 'No data in this period.'}</div>
+                <div className="flex h-full items-center justify-center text-center text-[12px] text-muted-foreground">{points === null ? t('monitoring.chart.loading') : t('monitoring.chart.noData')}</div>
             ) : effectiveChart === 'stat' ? (
                 <div className="flex h-full flex-col justify-center gap-1 px-2">
                     <div className="text-3xl font-semibold leading-none text-foreground">{formatValue(stat.total)}</div>
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                        <span>{STATS_METRIC_META[metric].label}</span>
+                        <span>{metricLabel}</span>
                         <span>·</span>
-                        <span>{compactFmt.format(stat.rowCount)} {STATS_DATASETS[dataset].label.toLowerCase()}</span>
+                        <span>{t(`monitoring.chart.rowCount.${dataset}`, { count: compact(stat.rowCount, locale) })}</span>
                         {stat.delta !== null && <span className={stat.delta >= 0 ? 'text-emerald-500' : 'text-rose-500'}>{stat.delta >= 0 ? '▲' : '▼'} {Math.abs(stat.delta).toFixed(0)}%</span>}
                     </div>
-                    <ChartContainer config={{ v: { label: STATS_METRIC_META[metric].label, color: CHART_PALETTE[0] } }} className="mt-2 h-16 w-full aspect-auto">
+                    <ChartContainer config={{ v: { label: metricLabel, color: CHART_PALETTE[0] } }} className="mt-2 h-16 w-full aspect-auto">
                         <AreaChart data={stat.sparkRows} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
                             <Area dataKey="v" type="monotone" stroke="var(--color-v)" fill="var(--color-v)" fillOpacity={0.15} strokeWidth={1.5} dot={false} />
                         </AreaChart>

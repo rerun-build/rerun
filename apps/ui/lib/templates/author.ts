@@ -2,13 +2,14 @@ import { templateDocumentSchema, type TemplateDocument } from '@rerun/contracts'
 import { assertTemplateOwnedBy } from '@/app/api/_auth/expert'
 import { isPayoutReady } from '@rerun/cloud/marketplace.server'
 import { slugify } from '@/lib/slugify'
+import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { rowToDocument, TEMPLATE_DOC_COLUMNS, type TemplateRow } from './document'
 import {
     EXPERT_TEMPLATE_COLUMNS,
     mergeAuthorDocument,
-    templateEditBlockReason,
+    templateEditBlockCode,
     toExpertTemplateAgents,
     toExpertTemplates,
     type ExpertTemplate,
@@ -20,6 +21,7 @@ import { storeTemplateImageFromUrl } from './images'
 import { IMAGE_ALT_LIMIT, MAX_TEMPLATE_GALLERY_IMAGES, MAX_TEMPLATES_PER_AUTHOR } from './limits'
 import { describeSecretHit, scanDocumentForSecrets } from './secret-scan'
 import { templateSubmitBlockers } from './submit'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 import { createTemplate, uniqueTemplateSlug, updateTemplateBySlug, type TemplateReviewPatch } from './write'
 
 // Authoring a template is the same job whoever asks: a signed-in expert in the app, or an MCP key
@@ -41,7 +43,7 @@ export async function loadAuthorTemplate(userId: string, id: string): Promise<Ex
     const supabase = createServiceRoleClient()
 
     const { data: row } = await selectMaybeSingle(supabase, 'templates', [...TEMPLATE_DOC_COLUMNS, 'submitted_at', 'review_note'] as const, { id: owned.id })
-    if (!row) throw new Error('Template not found.')
+    if (!row) throw new AppError('templateNotFoundDot')
 
     return {
         id: owned.id,
@@ -55,21 +57,21 @@ export async function loadAuthorTemplate(userId: string, id: string): Promise<Ex
 
 export async function createAuthorTemplateDraft(userId: string, title: string): Promise<{ id: string; slug: string }> {
     const trimmed = title.trim()
-    if (!trimmed) throw new Error('A title is required.')
+    if (!trimmed) throw new AppError('titleRequired')
 
     const base = slugify(trimmed)
-    if (!base) throw new Error('This title does not produce a usable slug.')
+    if (!base) throw new AppError('titleUnusableSlug')
 
     const supabase = createServiceRoleClient()
     const { data: owned } = await selectCount(supabase, 'templates', { creator_id: userId })
-    if ((owned ?? 0) >= MAX_TEMPLATES_PER_AUTHOR) throw new Error(`You have reached the limit of ${MAX_TEMPLATES_PER_AUTHOR} templates.`)
+    if ((owned ?? 0) >= MAX_TEMPLATES_PER_AUTHOR) throw new AppError('templateLimitReached', { max: MAX_TEMPLATES_PER_AUTHOR })
 
     const slug = await uniqueTemplateSlug(supabase, base)
     const result = await createTemplate(supabase, templateDocumentSchema.parse({ slug, title: trimmed, creatorId: userId }))
     if (!result.ok) throw new Error(result.error)
 
     const { data: created } = await selectMaybeSingle(supabase, 'templates', ['id'] as const, { slug: result.slug })
-    if (!created) throw new Error('The template was created but could not be reloaded.')
+    if (!created) throw new AppError('templateCreatedNotReloaded')
 
     return { id: created.id, slug: result.slug }
 }
@@ -80,12 +82,12 @@ export async function createAuthorTemplateDraft(userId: string, title: string): 
 export async function loadEditableAuthorDocument(userId: string, id: string): Promise<{ id: string; slug: string; document: TemplateDocument }> {
     const owned = await assertTemplateOwnedBy(userId, id)
 
-    const blocked = templateEditBlockReason(owned.status)
-    if (blocked) throw new Error(blocked)
+    const blocked = templateEditBlockCode(owned.status)
+    if (blocked) throw new AppError(blocked)
 
     const supabase = createServiceRoleClient()
     const { data: row } = await selectMaybeSingle(supabase, 'templates', TEMPLATE_DOC_COLUMNS, { id: owned.id })
-    if (!row) throw new Error('Template not found.')
+    if (!row) throw new AppError('templateNotFoundDot')
 
     return { id: owned.id, slug: owned.slug, document: rowToDocument(row as TemplateRow) }
 }
@@ -114,8 +116,8 @@ export async function submitAuthorTemplate(userId: string, id: string): Promise<
     // Resolved here rather than trusted from the caller: the checklist is what a panel renders,
     // this is what decides.
     const payoutsReady = await isPayoutReady(stored.document.creatorId)
-    const missing = templateSubmitBlockers(stored.document, { payoutsReady })
-    if (missing.length > 0) throw new Error(`Add ${missing.join(', ')} before submitting.`)
+    const missing = templateSubmitBlockers(stored.document, englishTranslator('templates.expert.footer'), { payoutsReady })
+    if (missing.length > 0) throw new AppError('addBeforeSubmitting', { fields: missing.join(', ') })
 
     const secrets = scanDocumentForSecrets(stored.document).map(describeSecretHit)
     if (secrets.length > 0) throw new Error(secrets.join('. '))
@@ -125,11 +127,11 @@ export async function submitAuthorTemplate(userId: string, id: string): Promise<
 
 export async function withdrawAuthorTemplate(userId: string, id: string): Promise<AuthorWrite> {
     const owned = await assertTemplateOwnedBy(userId, id)
-    if (owned.status !== 'in_review') throw new Error('This template is not waiting for review.')
+    if (owned.status !== 'in_review') throw new AppError('templateNotInReview')
 
     const supabase = createServiceRoleClient()
     const { data: row } = await selectMaybeSingle(supabase, 'templates', TEMPLATE_DOC_COLUMNS, { id: owned.id })
-    if (!row) throw new Error('Template not found.')
+    if (!row) throw new AppError('templateNotFoundDot')
 
     return writeAuthorDocument(owned.slug, { ...rowToDocument(row as TemplateRow), status: 'draft' }, { submitted_at: null })
 }
@@ -137,8 +139,8 @@ export async function withdrawAuthorTemplate(userId: string, id: string): Promis
 export async function deleteAuthorTemplate(userId: string, id: string): Promise<void> {
     const owned = await assertTemplateOwnedBy(userId, id)
 
-    const blocked = templateEditBlockReason(owned.status)
-    if (blocked) throw new Error(blocked)
+    const blocked = templateEditBlockCode(owned.status)
+    if (blocked) throw new AppError(blocked)
 
     const supabase = createServiceRoleClient()
     const { error } = await supabase.from('templates').delete().eq('id', owned.id)
@@ -153,7 +155,7 @@ export type AddedAuthorImage = AuthorWrite & { url: string; position: number; ga
 // the same author boundary as any other field.
 export async function addAuthorTemplateImage(userId: string, id: string, input: AddAuthorImageInput): Promise<AddedAuthorImage> {
     const stored = await loadEditableAuthorDocument(userId, id)
-    if (stored.document.gallery.length >= MAX_TEMPLATE_GALLERY_IMAGES) throw new Error(`A template shows at most ${MAX_TEMPLATE_GALLERY_IMAGES} images.`)
+    if (stored.document.gallery.length >= MAX_TEMPLATE_GALLERY_IMAGES) throw new AppError('galleryLimit', { max: MAX_TEMPLATE_GALLERY_IMAGES })
 
     const url = await storeTemplateImageFromUrl(createServiceRoleClient(), input.imageUrl)
     const image = { url, alt: (input.alt ?? '').slice(0, IMAGE_ALT_LIMIT) }

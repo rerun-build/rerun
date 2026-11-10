@@ -1,5 +1,7 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 import { openDesktopAction } from '@/app/api/_actions/desktop.actions'
@@ -23,20 +25,22 @@ type AgentComputerThumbnailProps = {
  * drive it. Key it on the agent and the reason: it connects once per mount.
  */
 export function AgentComputerThumbnail({ agentId, working, disabledReason, onOpen }: AgentComputerThumbnailProps) {
+    const t = useTranslations('agent.agentComputerThumbnail')
+    const errorText = useErrorText()
     const [screen, setScreen] = useState<Screen>(disabledReason ? { status: 'unavailable', reason: disabledReason } : { status: 'loading' })
 
     useEffect(() => {
         if (disabledReason) return
         let alive = true
         void openDesktopAction(agentId, 'watch', Intl.DateTimeFormat().resolvedOptions().timeZone).then(opened => {
-            if (alive) setScreen(opened.ok ? { status: 'live', socketUrl: opened.socketUrl } : { status: 'unavailable', reason: opened.error })
+            if (alive) setScreen(opened.ok ? { status: 'live', socketUrl: opened.socketUrl } : { status: 'unavailable', reason: errorText(opened) })
         })
         return () => {
             alive = false
         }
-    }, [agentId, disabledReason])
+    }, [agentId, disabledReason, errorText])
 
-    const onDisconnect = useCallback(() => setScreen({ status: 'unavailable', reason: 'The screen went away' }), [])
+    const onDisconnect = useCallback(() => setScreen({ status: 'unavailable', reason: t('wentAway') }), [t])
     const live = screen.status === 'live'
 
     return (
@@ -44,7 +48,7 @@ export function AgentComputerThumbnail({ agentId, working, disabledReason, onOpe
             <span className="flex items-center justify-between px-1">
                 <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                     <span className={cn('size-1.5 rounded-full', live && working ? 'bg-emerald-500' : 'bg-muted-foreground/40')} />
-                    {live ? (working ? 'Working on its computer' : 'Its computer') : 'Computer'}
+                    {live ? (working ? t('working') : t('live')) : t('computer')}
                 </span>
                 {!disabledReason && <ChevronRightIcon className="size-3.5 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5" />}
             </span>

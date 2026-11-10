@@ -2,6 +2,7 @@ import type { AgentView, Box, CoworkerFiles, InstalledServiceView, RoutineView }
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Alert } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { fetchBoxes } from '@/api/board'
 import { fetchAgentView } from '@/api/chat'
@@ -16,13 +17,14 @@ import { setPendingDesktopOpen } from '@/desktop/pending-open'
 
 type Unavailable = Partial<Record<'files' | 'apps' | 'routines', boolean>>
 
-const errorText = (err: unknown) => (err instanceof Error ? err.message : 'Try again in a moment.')
-
 // The coworker's details, opened from its conversation. Every value is read again when the page comes
 // back on screen, so a routine switched off or an app connected one level down shows at once.
 export default function CoworkerDetailsScreen() {
     const { id: agentId, name: nameParam } = useLocalSearchParams<{ id: string; name?: string }>()
     const { session, me } = useAuth()
+    const t = useTranslations('mobileCoworker.details')
+    const tCommon = useTranslations('mobileCommon')
+    const errorText = (err: unknown) => (err instanceof Error ? err.message : tCommon('errors.tryAgainShortly'))
     const rule = useNotificationPrefs().ruleOf(agentId)
     // Opens on what the last visit read, every value is replaced as the hub answers.
     const [kept] = useState(() => (me ? readCoworkerDetails(me.workspace.id, agentId) : {}))
@@ -75,12 +77,12 @@ export default function CoworkerDetailsScreen() {
     const rename = () => {
         if (!caller || lock.locked) return
         Alert.prompt(
-            'Rename',
+            t('renameTitle'),
             undefined,
             [
-                { text: 'Cancel', style: 'cancel' },
+                { text: tCommon('actions.cancel'), style: 'cancel' },
                 {
-                    text: 'Save',
+                    text: t('save'),
                     onPress: (value?: string) => {
                         const next = value?.trim()
                         if (!next || next === name) return
@@ -88,7 +90,7 @@ export default function CoworkerDetailsScreen() {
                         setName(next)
                         renameCoworker(caller, agentId, next).catch(err => {
                             setName(previous)
-                            Alert.alert('Could not rename', errorText(err))
+                            Alert.alert(t('renameFailed'), errorText(err))
                         })
                     },
                 },
@@ -100,15 +102,15 @@ export default function CoworkerDetailsScreen() {
 
     const remove = () => {
         if (!caller || lock.locked) return
-        Alert.alert(`Delete ${name}?`, 'This permanently deletes the coworker and its data. This cannot be undone.', [
-            { text: 'Cancel', style: 'cancel' },
+        Alert.alert(t('deleteTitle', { name }), t('deleteMessage'), [
+            { text: tCommon('actions.cancel'), style: 'cancel' },
             {
-                text: 'Delete',
+                text: t('deleteConfirm'),
                 style: 'destructive',
                 onPress: () =>
                     deleteCoworker(caller, agentId)
                         .then(() => router.dismissTo('/'))
-                        .catch(err => Alert.alert('Could not delete', errorText(err))),
+                        .catch(err => Alert.alert(t('deleteFailed'), errorText(err))),
             },
         ])
     }
@@ -123,7 +125,7 @@ export default function CoworkerDetailsScreen() {
             routines={routines}
             notifications={rule ? ruleValue(rule) : null}
             unavailable={unavailable}
-            computerUnavailable={switchedOff ? 'Off' : null}
+            computerUnavailable={switchedOff ? t('off') : null}
             canDelete={!!caller}
             lock={lock}
             onBack={() => router.back()}

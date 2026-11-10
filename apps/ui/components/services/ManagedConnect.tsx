@@ -6,6 +6,7 @@ import { useOAuthPopupResult } from '@/hooks/useOAuthPopupResult'
 import { usePopupClosePoll } from '@/hooks/usePopupClosePoll'
 import { CheckCircle2Icon, ExternalLinkIcon, Loader2Icon, XCircleIcon } from '@/lib/icons'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 const RESULT_TYPES = ['managed-oauth-success', 'managed-oauth-error'] as const
 
@@ -28,6 +29,7 @@ type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 // provider's API calls itself. The token lands on the engine; here we only drive the popup and
 // react to its result over a same-origin BroadcastChannel (survives COOP-severed openers).
 export function ManagedConnect({ agentId, instanceKey, provider, serverName, name, onAuthorized, autoStart, pendingPopup }: ManagedConnectProps) {
+    const t = useTranslations('services.connect')
     const [state, setState] = useState<ConnectState>('idle')
     const [email, setEmail] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
@@ -39,7 +41,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
             setState('authorized')
             onAuthorized(data.email)
         } else {
-            setError(data.error || 'Authorization failed')
+            setError(data.error || t('authorizationFailed'))
             setState('error')
         }
         popupRef.current?.close()
@@ -58,7 +60,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
                 body: JSON.stringify({ agentId, key: instanceKey, serverName }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to start OAuth')
+            if (!res.ok) throw new Error(data.error || t('startOAuthFailed'))
 
             const w = 500
             const h = 640
@@ -68,7 +70,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
             watchPopup(popupRef.current)
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : 'Failed to start OAuth')
+            setError(err instanceof Error ? err.message : t('startOAuthFailed'))
             setState('error')
         }
     }
@@ -85,7 +87,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
         return (
             <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 py-1">
                 <CheckCircle2Icon className="size-3.5" />
-                <span>{email ? `Connected as ${email}` : 'Connected'}</span>
+                <span>{email ? t('connectedAs', { account: email }) : t('connected')}</span>
             </div>
         )
     }
@@ -98,7 +100,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
                     <span className="truncate">{error}</span>
                 </div>
                 <Button variant="outline" size="sm" onClick={startAuth}>
-                    Retry
+                    {t('retry')}
                 </Button>
             </div>
         )
@@ -107,7 +109,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
     return (
         <Button variant="outline" size="sm" onClick={startAuth} disabled={state === 'authorizing'} className="w-full">
             {state === 'authorizing' ? <Loader2Icon className="size-3.5 animate-spin mr-1.5" /> : <ExternalLinkIcon className="size-3.5 mr-1.5" />}
-            {state === 'authorizing' ? `Waiting for authorization…` : 'Connect'}
+            {state === 'authorizing' ? t('waiting') : t('connect')}
         </Button>
     )
 }

@@ -1,0 +1,27 @@
+{
+    "_context": {
+        "price.monthly": "{amount} is a price in its currency, like \"$29\". /mo = per month.",
+        "price.hire": "Button on a paid template's page. {count} is the number of coworkers it installs, {price} its price like \"$29\" or \"$29/mo\".",
+        "price.hireCard": "Short button revealed on a paid template card. {price} is its price like \"$29\" or \"$29/mo\".",
+        "categories.legal": "A template category: the businesses it serves."
+    },
+    "price": {
+        "free": "Free",
+        "monthly": "{amount}/mo",
+        "useForFree": "Use for free",
+        "hire": "{count, plural, one {Hire this coworker · {price}} other {Hire these # coworkers · {price}}}",
+        "hireCard": "Hire · {price}"
+    },
+    "categories": {
+        "agencies": "Agencies",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Sales",
+        "recruiting": "Recruiting",
+        "real-estate": "Real estate",
+        "legal": "Legal & compliance",
+        "creators": "Creators",
+        "productivity": "Productivity",
+        "other": "Other"
+    }
+}

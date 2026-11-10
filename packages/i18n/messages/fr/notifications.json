@@ -1,0 +1,155 @@
+{
+    "toast": {
+        "close": "Fermer la notification",
+        "openConversation": "Ouvrir la conversation",
+        "coworker": "Coworker",
+        "scheduledTask": "{name} · Tâche planifiée"
+    },
+    "inbox": {
+        "unknownCoworker": "Coworker",
+        "detail": {
+            "close": "Fermer",
+            "seeAll": "Tout voir",
+            "seeAllCount": "Tout voir ({count})",
+            "markRead": "Marquer comme lu",
+            "notInList": "Cette mise à jour n'est pas encore dans votre liste",
+            "openConversation": "Ouvrir la conversation",
+            "noCoworker": "Cette mise à jour n'est liée à aucun coworker",
+            "status": {
+                "error": "Erreur",
+                "awaiting_question": "Question",
+                "awaiting_approval": "Approbation",
+                "awaiting_ack": "Non lu",
+                "done": "Terminé",
+                "waiting_human": "En attente"
+            }
+        },
+        "markAll": {
+            "title": "Tout marquer comme lu ?",
+            "description": "{count, plural, one {# élément quittera} other {# éléments quitteront}} cette liste. Les demandes encore en attente de réponse sont aussi effacées, sans réponse.",
+            "confirm": "Tout marquer comme lu"
+        },
+        "rowMenu": {
+            "options": "Options de notification",
+            "undo": "Annuler",
+            "unfollow": "Ne plus suivre ses tâches planifiées",
+            "unfollowed": "Vous ne suivez plus les tâches planifiées de {name}.",
+            "mute": "Mettre {name} en sourdine",
+            "muted": "{name} est en sourdine.",
+            "settings": "Paramètres de notification"
+        },
+        "untitledSession": "Session sans titre",
+        "reasons": {
+            "mine": "Vous avez lancé cette exécution",
+            "participant": "Vous participez à cette conversation",
+            "followed": "Vous suivez les tâches planifiées de {agentName}",
+            "allActivity": "Vous recevez toute l'activité de {agentName}",
+            "everything": "Vous recevez toutes les exécutions du workspace",
+            "workspace": "Cela concerne votre workspace"
+        }
+    },
+    "settings": {
+        "scopeTitle": "Me notifier pour",
+        "recommended": "Recommandé",
+        "notificationsFor": "Notifications pour {name}",
+        "scopes": {
+            "everything": {
+                "label": "Tout",
+                "detail": "Chaque exécution du workspace, quel que soit son auteur."
+            },
+            "mine": {
+                "label": "Mes exécutions et ce que je suis",
+                "detail": "Les exécutions que je lance, les conversations où je suis, les coworkers que je suis."
+            },
+            "needed": {
+                "label": "Seulement quand on a besoin de moi",
+                "detail": "Questions, validations et erreurs dans mes exécutions. Une exécution terminée reste silencieuse."
+            },
+            "nothing": {
+                "label": "Rien",
+                "detail": "Je consulte la boîte de réception moi-même."
+            }
+        },
+        "modes": {
+            "default": {
+                "label": "Par défaut",
+                "yourSetting": "Votre réglage : « {scope} »."
+            },
+            "everything": {
+                "label": "Toute l'activité",
+                "hint": "Chaque exécution, quel que soit son auteur."
+            },
+            "muted": {
+                "label": "En sourdine",
+                "hint": "Rien. Le board l'affiche toujours."
+            }
+        },
+        "bell": {
+            "title": "Me notifier pour {name}",
+            "follow": "Suivre ses tâches planifiées",
+            "noSchedule": "{name} n'a pas encore de tâche planifiée",
+            "nothingScheduled": "Rien de planifié pour l'instant.",
+            "scheduled": "{count} planifiées, elles vous parviennent comme vos propres exécutions.",
+            "allSettings": "Tous les paramètres de notification"
+        },
+        "perCoworker": {
+            "title": "Par coworker",
+            "detail": "Se règle aussi depuis la cloche de chaque coworker.",
+            "add": "Ajouter",
+            "allListed": "Tous les coworkers sont déjà listés",
+            "empty": "Chaque coworker suit la règle ci-dessus.",
+            "following": "Suit ses tâches planifiées",
+            "alreadyDefault": "{name} suit déjà votre réglage",
+            "reset": "Réinitialiser {name}"
+        },
+        "channels": {
+            "title": "Comment",
+            "toast": {
+                "label": "Toast dans l'app",
+                "description": "S'affiche au-dessus de votre boîte de réception quand Rerun est ouvert."
+            },
+            "sound": {
+                "label": "Son",
+                "description": "Seulement quand un coworker a besoin de vous ou qu'un problème survient.",
+                "play": "Écouter le son de notification"
+            },
+            "email": {
+                "label": "E-mail",
+                "description": "Quand on a besoin de vous pendant votre absence. Un e-mail par incident, jamais un par exécution."
+            }
+        },
+        "accountEmails": {
+            "title": "E-mails du compte",
+            "billing": {
+                "label": "Essai et facturation",
+                "description": "Rappels d'essai et avis de facturation concernant votre abonnement."
+            },
+            "product": {
+                "label": "Nouveautés produit",
+                "description": "Nouvelles fonctionnalités, conseils et actualités produit occasionnelles."
+            }
+        },
+        "saveFailed": "Impossible d'enregistrer vos paramètres de notification",
+        "networkError": "Erreur réseau"
+    },
+    "emailPreferences": {
+        "coworkerTitle": "Notifications des coworkers",
+        "email": {
+            "label": "E-mail",
+            "description": "Quand un coworker a besoin de vous ou tombe en panne pendant votre absence. Un e-mail par incident, jamais un par exécution."
+        },
+        "saveFailed": "Impossible d'enregistrer les préférences",
+        "saving": "Enregistrement…",
+        "saved": "Toutes les modifications sont enregistrées"
+    },
+    "notices": {
+        "slotsPaused": "Votre plan compte maintenant {slots, plural, one {# emplacement {provider}} other {# emplacements {provider}}}, donc {paused, plural, one {# compte connecté est en pause} other {# comptes connectés sont en pause}}. Ajoutez un emplacement dans Facturation pour {paused, plural, one {le réactiver} other {les réactiver}}.",
+        "workspaceBack": "Votre workspace est de retour. Reconnectez votre compte {provider} depuis Paramètres → Apps pour que vos coworkers puissent de nouveau l'utiliser.",
+        "trialEndsSoon": "Votre emplacement {provider} gratuit prend fin le {endsAt, date, long}. Il devient ensuite un emplacement payant sur votre plan. Déconnectez le compte depuis Paramètres → Apps avant cette date si vous ne voulez pas le garder.",
+        "trialEndedPlanInactive": "Votre emplacement {provider} gratuit a pris fin alors que votre plan n'est pas actif, donc {account, select, none {le compte} other {{account}}} est en pause. Ajoutez un emplacement dans Facturation sous une semaine pour le garder, sinon il sera déconnecté.",
+        "trialEndedDeclined": "Votre emplacement {provider} gratuit a pris fin et la carte a été refusée, donc {account, select, none {le compte} other {{account}}} est en pause. Ajoutez un emplacement dans Facturation sous une semaine pour le garder, sinon il sera déconnecté.",
+        "rateLimited": "{provider} a demandé à {account, select, none {l'un de vos comptes} other {{account}}} de ralentir. Vos coworkers ne l'utiliseront pas pendant 24 heures, pour que le compte reste protégé.",
+        "signedOut": "{provider} a déconnecté {account, select, none {l'un de vos comptes} other {{account}}}. Reconnectez-le depuis Paramètres → Apps pour que vos coworkers puissent de nouveau l'utiliser.",
+        "budgetExhausted": "Vos crédits Rerun de ce mois sont épuisés. Les exécutions planifiées et déclenchées sur les modèles Rerun sont en pause, et les coworkers ne peuvent plus acheter de prospects ni de données SEO ou réseaux sociaux, jusqu'à la remise à zéro ou jusqu'à ce que vous ajoutiez des crédits."
+    }
+}

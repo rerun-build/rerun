@@ -1,11 +1,34 @@
-import { pendingApprovals, pendingHitlLabel, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingTakeover, type HitlKind } from '@rerun/contracts'
+import { pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingTakeover, type HitlKind } from '@rerun/contracts'
 import type { SFSymbol } from 'expo-symbols'
+import type { useTranslations } from 'use-intl'
+
+type HitlTranslator = ReturnType<typeof useTranslations<'mobileHitl'>>
 
 const SYMBOLS: Record<HitlKind, SFSymbol> = { question: 'questionmark.bubble', approval: 'checkmark.shield', secret: 'lock', mcp: 'link', service: 'link', takeover: 'display' }
 
+// What is waiting at the end of the thread, the web's words (`pendingHitlLabel`) in the app's language.
+function pendingLabel(kind: HitlKind, input: Record<string, unknown>, t: HitlTranslator): string {
+    switch (kind) {
+        case 'question':
+            return t('pending.question', { count: pendingQuestions(input).length })
+        case 'approval':
+            return t('pending.approval', { count: pendingApprovals(input).length })
+        case 'secret':
+            return t('pending.secret', { count: pendingSecrets(input).length })
+        case 'mcp': {
+            const { name } = pendingMcpSignIn(input)
+            return name ? t('pending.mcpNamed', { name }) : t('pending.mcp')
+        }
+        case 'service':
+            return t('pending.service', { count: pendingServices(input).length })
+        case 'takeover':
+            return t('pending.takeover')
+    }
+}
+
 // The web's cue for a pending block, with the system's symbols.
-export function summarizePendingHitl(kind: HitlKind, input: Record<string, unknown>): { symbol: SFSymbol; label: string } {
-    return { symbol: SYMBOLS[kind], label: pendingHitlLabel(kind, input) }
+export function summarizePendingHitl(kind: HitlKind, input: Record<string, unknown>, t: HitlTranslator): { symbol: SFSymbol; label: string } {
+    return { symbol: SYMBOLS[kind], label: pendingLabel(kind, input, t) }
 }
 
 const textOf = (value: unknown) => (typeof value === 'string' && value.trim() ? value.trim() : null)

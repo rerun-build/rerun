@@ -3,8 +3,8 @@
 import type { AccessLevel } from '@/app/api/_auth/access'
 import type { SpaceAccessMember } from '@/app/api/_actions/space-access.actions'
 import { AccessDrillHeader } from '@/components/dialogs/AccessDrillHeader'
-import { ADMINS_ALWAYS, asIs, personLabel } from '@/components/dialogs/access-person'
-import { ACCESS_OPTIONS, OptionWithDescription } from '@/components/dialogs/AccessLevelOption'
+import { asIs, personLabel, useBoxAccessCopy } from '@/components/dialogs/access-person'
+import { OptionWithDescription, useAccessOptions } from '@/components/dialogs/AccessLevelOption'
 import { Button } from '@/components/ui/button'
 import { Combobox, type ComboboxOption } from '@/components/ui/combobox'
 import { Field } from '@/components/ui/field'
@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { AuthorProfile } from '@/lib/chat/message-author'
 import { Loader2Icon } from '@/lib/icons'
 import { CardAvatar } from '@rerun/ui/chat'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 type BoxAccessAddPeopleProps = {
@@ -27,6 +28,10 @@ type BoxAccessAddPeopleProps = {
 }
 
 export function BoxAccessAddPeople({ boxName, members, listedUserIds, profileOf, onBack, onAdd }: BoxAccessAddPeopleProps) {
+    const t = useTranslations('dialogs.boxAccess')
+    const tCommon = useTranslations('common')
+    const copy = useBoxAccessCopy()
+    const accessOptions = useAccessOptions()
     const [picked, setPicked] = useState<string[]>([])
     const [access, setAccess] = useState<AccessLevel>('use')
     const [adding, setAdding] = useState(false)
@@ -37,7 +42,7 @@ export function BoxAccessAddPeople({ boxName, members, listedUserIds, profileOf,
                 .filter(member => !listedUserIds.has(member.userId))
                 .map((member): ComboboxOption => {
                     const profile = profileOf(member.userId)
-                    const { title, email } = personLabel(profile, member.email)
+                    const { title, email } = personLabel(profile, member.email, copy.teammate)
                     const isAdmin = member.role === 'admin'
                     return {
                         value: member.userId,
@@ -45,11 +50,11 @@ export function BoxAccessAddPeople({ boxName, members, listedUserIds, profileOf,
                         keywords: [title, email ?? ''],
                         leading: <CardAvatar src={profile?.photo} fileUrl={asIs} name={title} className="size-5" />,
                         disabled: isAdmin,
-                        hint: isAdmin ? ADMINS_ALWAYS : undefined,
+                        hint: isAdmin ? copy.adminsAlways : undefined,
                     }
                 })
                 .sort((a, b) => Number(!!a.disabled) - Number(!!b.disabled)),
-        [members, listedUserIds, profileOf],
+        [members, listedUserIds, profileOf, copy.teammate, copy.adminsAlways],
     )
 
     const add = async () => {
@@ -62,33 +67,33 @@ export function BoxAccessAddPeople({ boxName, members, listedUserIds, profileOf,
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <AccessDrillHeader title="Add people" hint={boxName} backLabel="Back to access" onBack={onBack} />
+            <AccessDrillHeader title={t('add.title')} hint={boxName} backLabel={t('add.back')} onBack={onBack} />
             <PanelScroller className="space-y-4 p-4">
-                <Field label="People">
-                    <Combobox multiple groups={[{ id: 'members', options }]} value={picked} onChange={setPicked} placeholder="Pick teammates" searchPlaceholder="Search by name or email" emptyText="Nobody left to add" />
+                <Field label={t('add.peopleField')}>
+                    <Combobox multiple groups={[{ id: 'members', options }]} value={picked} onChange={setPicked} placeholder={t('add.placeholder')} searchPlaceholder={t('add.search')} emptyText={t('add.empty')} />
                 </Field>
-                <Field label="Access" htmlFor="box-access-level">
+                <Field label={t('add.accessField')} htmlFor="box-access-level">
                     <Select value={access} onValueChange={value => setAccess(value as AccessLevel)}>
                         <SelectTrigger id="box-access-level" className="w-full">
-                            <SelectValue>{ACCESS_OPTIONS[access].label}</SelectValue>
+                            <SelectValue>{accessOptions[access].label}</SelectValue>
                         </SelectTrigger>
                         <SelectContent position="popper">
                             <SelectItem value="use">
-                                <OptionWithDescription {...ACCESS_OPTIONS.use} />
+                                <OptionWithDescription {...accessOptions.use} />
                             </SelectItem>
                             <SelectItem value="manage">
-                                <OptionWithDescription {...ACCESS_OPTIONS.manage} />
+                                <OptionWithDescription {...accessOptions.manage} />
                             </SelectItem>
                         </SelectContent>
                     </Select>
                 </Field>
                 <div className="flex flex-wrap justify-end gap-2">
                     <Button variant="outline" onClick={onBack} className="max-sm:flex-1">
-                        Cancel
+                        {tCommon('cancel')}
                     </Button>
                     <Button onClick={add} disabled={picked.length === 0 || adding} className="max-sm:flex-1">
                         {adding && <Loader2Icon className="animate-spin" />}
-                        {picked.length > 1 ? `Add ${picked.length} people` : 'Add'}
+                        {picked.length > 1 ? t('add.submitMany', { count: picked.length }) : t('add.submit')}
                     </Button>
                 </div>
             </PanelScroller>

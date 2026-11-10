@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 
 import { Icon } from '@/components/ui/icon'
 import { BrainIcon } from '@/lib/icons'
@@ -9,6 +10,7 @@ import { RewindHeadline, RewindReveal, RewindSlideFrame } from '../RewindSlideFr
 import type { RewindSlideProps } from './types'
 
 export function MemorySlide({ payload, agentName }: RewindSlideProps) {
+    const t = useTranslations('rewind.memory')
     const { memoriesCreated } = payload.totals
     const memory = payload.topMemory
     const words = memory?.content.split(' ') ?? []
@@ -16,12 +18,12 @@ export function MemorySlide({ payload, agentName }: RewindSlideProps) {
     return (
         <RewindSlideFrame
             tone="blue"
-            eyebrow="Getting smarter"
+            eyebrow={t('eyebrow')}
             visual={
                 memory && (
                     <>
                         <RewindReveal delay={1} className="mb-2 text-xs font-medium tracking-wider text-white/70 uppercase">
-                            Most recalled, {memory.accessCount} times by {agentName(memory.agentId)}
+                            {t('recalled', { count: memory.accessCount, name: agentName(memory.agentId) })}
                         </RewindReveal>
                         <blockquote className="rounded-2xl bg-black/25 p-5 text-xl leading-snug font-medium backdrop-blur-sm rewind-wide:p-8 rewind-wide:text-[min(1.875rem,5.5cqh)]">
                             {words.map((word, i) => (
@@ -43,11 +45,9 @@ export function MemorySlide({ payload, agentName }: RewindSlideProps) {
                 <Icon icon={BrainIcon} size="xl" tone="white" />
             </motion.div>
             {memoriesCreated > 0 ? (
-                <RewindHeadline>
-                    <RewindCount value={memoriesCreated} delay={0.4} /> new {memoriesCreated === 1 ? 'thing' : 'things'} learned about how you work.
-                </RewindHeadline>
+                <RewindHeadline>{t.rich('headline', { count: memoriesCreated, value: () => <RewindCount value={memoriesCreated} delay={0.4} /> })}</RewindHeadline>
             ) : (
-                <RewindHeadline>Your coworkers kept their notes close.</RewindHeadline>
+                <RewindHeadline>{t('empty')}</RewindHeadline>
             )}
         </RewindSlideFrame>
     )

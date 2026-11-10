@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -26,10 +27,11 @@ export function TopVeil({ tall = false }: { tall?: boolean }) {
 }
 
 export function Scrim({ onClose }: { onClose: () => void }) {
+    const t = useTranslations('agent.floating')
     return (
         <motion.button
             type="button"
-            aria-label="Back to the chat"
+            aria-label={t('backToChat')}
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

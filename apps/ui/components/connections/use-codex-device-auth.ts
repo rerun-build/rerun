@@ -1,8 +1,10 @@
 'use client'
 
+import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import { pollCodexDeviceAuthAction, startCodexDeviceAuthAction } from '@/app/api/_actions/workspace-connection.actions'
 import { trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
 import type { AiConnectionSurface } from '@rerun/analytics'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type PendingCodexAuth = { deviceAuthId: string; userCode: string; verificationUrl: string; pollIntervalMs: number; expiresAt: number }
@@ -22,7 +24,7 @@ export type CodexDeviceAuth = {
     copy: () => void
 }
 
-type KeysHandler = (keys: Record<string, string>) => Promise<{ success: boolean; error?: string }>
+type KeysHandler = (keys: Record<string, string>) => Promise<{ success: boolean } & Refusal>
 
 // A second click asks OpenAI for a second code and opens a second tab, the first code then goes
 // nowhere.
@@ -32,6 +34,9 @@ const OPEN_LOCK_MS = 5000
 // the approval. The direction of the code is the reverse of Claude's — we hand one out instead of
 // taking one in.
 export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSurface): CodexDeviceAuth {
+    const t = useTranslations('connections.errors')
+    const tCommon = useTranslations('common')
+    const errorText = useErrorText()
     const [pending, setPending] = useState<PendingCodexAuth | null>(null)
     const [busy, setBusy] = useState(false)
     const [connected, setConnected] = useState(false)
@@ -64,16 +69,15 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
             setNow(Date.now())
             window.open(next.verificationUrl, '_blank', 'noopener,noreferrer')
         } catch (err) {
-            const message = err instanceof Error ? err.message : 'Could not start the connection'
-            setError(message)
-            trackAiConnectionFailed('codex', 'oauth', surface, 'start_failed', message)
+            setError(err instanceof Error ? err.message : t('startFailed'))
+            trackAiConnectionFailed('codex', 'oauth', surface, 'start_failed', err instanceof Error ? err.message : 'Could not start the connection')
         } finally {
             setBusy(false)
             await lock
             openingRef.current = false
             setOpening(false)
         }
-    }, [surface])
+    }, [surface, t])
 
     const copy = useCallback(() => {
         if (!pending) return
@@ -100,7 +104,7 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
                 if (!cancelled) {
                     setPending(null)
                     setExpired(true)
-                    setError('The code expired, start again')
+                    setError(t('codeExpired'))
                     trackAiConnectionFailed('codex', 'oauth', surface, 'code_expired')
                 }
                 return
@@ -111,22 +115,22 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
             clearInterval(timer)
             if (res.status === 'error') {
                 setPending(null)
-                setError(res.error)
+                setError(errorText(res))
                 trackAiConnectionFailed('codex', 'oauth', surface, 'device_auth_failed', res.error)
                 return
             }
-            const applied = await onKeysRef.current(res.keys).catch(() => ({ success: false, error: 'Something went wrong. Please try again.' }))
+            const applied = await onKeysRef.current(res.keys).catch(() => ({ success: false, error: tCommon('somethingWentWrong') }))
             if (cancelled) return
             setPending(null)
             if (applied.success) setConnected(true)
-            else setError(applied.error ?? 'Failed to save the connection')
+            else setError(errorText(applied, t('saveConnectionFailed')))
         }, pending.pollIntervalMs)
 
         return () => {
             cancelled = true
             clearInterval(timer)
         }
-    }, [pending, surface])
+    }, [pending, surface, t, tCommon, errorText])
 
     const phase: CodexDeviceAuthPhase = connected ? 'connected' : pending ? 'waiting' : busy ? 'starting' : 'idle'
 

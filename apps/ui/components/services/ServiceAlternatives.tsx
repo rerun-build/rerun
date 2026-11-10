@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { WaveDivider } from '@/components/ui/wave-divider'
 import { serviceIconProps } from '@/lib/services/icons'
@@ -17,10 +18,11 @@ type ServiceAlternativesProps = {
 }
 
 export function ServiceAlternatives({ alternatives, swapping, disabled, error, onPick }: ServiceAlternativesProps) {
+    const t = useTranslations('services.alternatives')
     if (alternatives.length === 0) return null
     return (
         <div className="space-y-2">
-            <WaveDivider label="Also works with" />
+            <WaveDivider label={t('label')} />
             <div className="grid grid-cols-3 gap-2">
                 {alternatives.map(alternative => (
                     <Button key={alternative.slug} size="sm" variant="outline" disabled={disabled || swapping !== null} onClick={() => onPick(alternative)} className="min-w-0 justify-start gap-2">
