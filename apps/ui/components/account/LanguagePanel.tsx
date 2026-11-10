@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 const AUTOMATIC = 'auto'
-const SHOW_PSEUDO = process.env.NODE_ENV !== 'production'
+export const SHOW_PSEUDO = process.env.NODE_ENV !== 'production'
 
 export type LanguageChoice = Locale | typeof PSEUDO_LOCALE | null
 

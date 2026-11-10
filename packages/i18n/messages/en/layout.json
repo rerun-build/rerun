@@ -1,6 +1,7 @@
 {
     "_context": {
         "theme": "Row of the workspace menu holding the light/dark/system theme switch.",
+        "language": "Row of the workspace menu opening the list of languages the app can speak.",
         "signIn": "Button for an anonymous visitor to sign in.",
         "power.menuItem": "Admin menu item: restart the machine (server) the workspace runs on.",
         "paused.savedUntil": "{date} is a short date (\"Nov 12\").",
@@ -29,6 +30,7 @@
     },
     "loading": "Loading...",
     "theme": "Theme",
+    "language": "Language",
     "signIn": "Sign in",
     "purchaseCancelled": "Purchase cancelled",
     "help": {

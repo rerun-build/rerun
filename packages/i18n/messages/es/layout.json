@@ -1,6 +1,7 @@
 {
     "loading": "Cargando...",
     "theme": "Tema",
+    "language": "Idioma",
     "signIn": "Iniciar sesión",
     "purchaseCancelled": "Compra cancelada",
     "help": {

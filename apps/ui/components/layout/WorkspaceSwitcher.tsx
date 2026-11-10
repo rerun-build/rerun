@@ -20,6 +20,7 @@ import { WorkspaceMembersDialog } from '@/components/dialogs/WorkspaceMembersDia
 import { WorkspaceSettingsDialog } from '@/components/dialogs/WorkspaceSettingsDialog'
 import { SignInPillButton } from '@/components/layout/SignInPill'
 import { ThemeMenuRow } from '@/components/layout/ThemeMenuRow'
+import { LanguageMenuRow } from '@/components/layout/LanguageMenuRow'
 import { HelpButton } from '@/components/layout/HelpButton'
 import { WeeklyRewindMenuItem, WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
 import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from '@/components/layout/WorkspacePowerControl'
@@ -360,6 +361,7 @@ export function WorkspaceSwitcher() {
     const footerSection = (
         <>
             <ThemeMenuRow />
+            <LanguageMenuRow />
             <DropdownMenuItem onSelect={() => useNotificationsStore.getState().openNotifications()} className="gap-2 text-muted-foreground">
                 <BellIcon className="size-4" />
                 {t('notifications')}

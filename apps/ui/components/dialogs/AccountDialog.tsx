@@ -11,13 +11,13 @@ import {
     syncAccountEmailAction,
     updateMyNameAction,
     uploadMyAvatarAction,
-    updateMyLocaleAction,
     type SignInMethods,
 } from '@/app/api/_actions/account.actions'
 import type { ActionResult } from '@/app/api/_actions/space.actions'
 import { AccountTabs, useAccountTabText } from '@/components/account/AccountTabs'
 import { DeleteAccountPanel } from '@/components/account/DeleteAccountPanel'
-import { LanguagePanel, type LanguageChoice } from '@/components/account/LanguagePanel'
+import { LanguagePanel } from '@/components/account/LanguagePanel'
+import { useLanguageChoice } from '@/components/account/useLanguageChoice'
 import { ProfilePanel } from '@/components/account/ProfilePanel'
 import { SignInMethodsPanel } from '@/components/account/SignInMethodsPanel'
 import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
@@ -39,9 +39,7 @@ import { useAccountStore, type AccountTab } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'
-import { isStableLocale, PSEUDO_LOCALE } from '@rerun/i18n'
-import { useLocale, useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
@@ -251,26 +249,8 @@ function DeleteAccountTab() {
     return <DeleteAccountPanel blockers={blockers} currentWorkspaceId={workspace?.id ?? null} onOpenBilling={openBillingPanel} deleteAccount={deleteAccount} />
 }
 
-// The pseudo-locale lives in the cookie alone, so it is read back from the page's locale.
 function LanguageTab() {
-    const t = useTranslations('account.language')
-    const { user, refreshUser } = useSession()
-    const locale = useLocale()
-    const router = useRouter()
-    const stored = user?.locale
-    const value: LanguageChoice = locale === PSEUDO_LOCALE ? PSEUDO_LOCALE : isStableLocale(stored) ? stored : null
-
-    const change = async (choice: LanguageChoice) => {
-        const result = await updateMyLocaleAction({ locale: choice })
-        if (!result.ok) {
-            toast.error(t('failed'))
-            return
-        }
-        // No success toast: it would speak the language being left, and the screen switching says it.
-        await refreshUser()
-        router.refresh()
-    }
-
+    const { value, change } = useLanguageChoice()
     return <LanguagePanel value={value} onChange={change} />
 }
 
