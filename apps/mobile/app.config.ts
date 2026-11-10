@@ -90,7 +90,7 @@ export default ({ config: base }: ConfigContext): ExpoConfig => {
         ...config,
         name: config.name!,
         slug: config.slug!,
-        plugins: config.plugins?.filter(plugin => plugin !== 'expo-notifications'),
+        plugins: config.plugins?.filter(plugin => (Array.isArray(plugin) ? plugin[0] : plugin) !== 'expo-notifications'),
         ios: {
             ...config.ios,
             bundleIdentifier: process.env.RERUN_IOS_BUNDLE_ID ?? `${config.ios?.bundleIdentifier}.dev`,

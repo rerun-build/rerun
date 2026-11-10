@@ -8,5 +8,6 @@
         "info": "Novedad"
     },
     "subtitle": "{source} · {state}",
+    "androidTitle": "{agent} · {subtitle}",
     "fallbackAgent": "tu coworker"
 }

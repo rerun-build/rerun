@@ -35,8 +35,18 @@
             "label": "Push notifications",
             "off": "Off",
             "turnOn": "Turn on",
-            "openIosSettings": "Open iOS Settings",
-            "footnote": "Nothing below reaches this iPhone until push is on."
+            "openSettings": "{platform, select, android {Open Android settings} other {Open iOS Settings}}",
+            "footnote": "{platform, select, android {Nothing below reaches this phone until push is on.} other {Nothing below reaches this iPhone until push is on.}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "Coworker messages",
+                "description": "When a coworker needs you or has something to say."
+            },
+            "silent": {
+                "name": "Finished tasks",
+                "description": "When a coworker finishes a task, without a sound."
+            }
         },
         "scopeTitle": "Notify me about",
         "recommended": "Recommended",
@@ -113,6 +123,8 @@
         "notifications.coworker.quotedScope": "Hint under the 'Your setting' option: the label of the global setting, quoted.",
         "notifications.coworker.scheduled": "{count} is the number of scheduled tasks of the coworker.",
         "preferences.server": "Settings row showing the self-hosted Rerun server the app is connected to.",
-        "preferences.groupByBox": "Option of the Coworkers picker: the Home lists the coworkers grouped by Box."
+        "preferences.groupByBox": "Option of the Coworkers picker: the Home lists the coworkers grouped by Box.",
+        "notifications.channels.messages.name": "Name of an Android notification channel, shown in the Android settings of the app: the pushes that ring.",
+        "notifications.channels.silent.name": "Name of an Android notification channel, shown in the Android settings of the app: the quiet pushes about a finished task."
     }
 }

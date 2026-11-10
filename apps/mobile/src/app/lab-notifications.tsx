@@ -47,7 +47,7 @@ function CenterLab({ state }: { state: LabState }) {
     const empty = state === 'loading' || state === 'failed'
     return (
         <CoworkerPage title="Notifications" onBack={back}>
-            <NotificationCenter prefs={empty ? null : prefs} failed={state === 'failed'} coworkers={state === 'loading' ? null : COWORKERS} push={push} onEnablePush={() => setPush('granted' as PermissionStatus)} onOpenIosSettings={() => {}} onPatch={patch} onOpenCoworker={coworker => router.push(`/lab-notifications?screen=coworker&state=${prefs.coworkers[coworker.id]?.mode === 'muted' ? 'muted' : 'normal'}`)} />
+            <NotificationCenter prefs={empty ? null : prefs} failed={state === 'failed'} coworkers={state === 'loading' ? null : COWORKERS} push={push} onEnablePush={() => setPush('granted' as PermissionStatus)} onOpenSettings={() => {}} onPatch={patch} onOpenCoworker={coworker => router.push(`/lab-notifications?screen=coworker&state=${prefs.coworkers[coworker.id]?.mode === 'muted' ? 'muted' : 'normal'}`)} />
         </CoworkerPage>
     )
 }

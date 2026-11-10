@@ -1,6 +1,6 @@
 import { EMAIL_CATEGORIES, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@rerun/contracts'
 import type { PermissionStatus } from 'expo-notifications'
-import { ActionSheetIOS, Pressable, View } from 'react-native'
+import { ActionSheetIOS, Platform, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
@@ -34,7 +34,7 @@ type NotificationCenterProps = {
     coworkers: CoworkerOption[] | null
     push: PermissionStatus | null
     onEnablePush: () => void
-    onOpenIosSettings: () => void
+    onOpenSettings: () => void
     onPatch: (patch: NotificationPrefsPatch) => void
     onOpenCoworker: (coworker: CoworkerOption) => void
 }
@@ -47,16 +47,16 @@ export function Footnote({ children }: { children: string }) {
     )
 }
 
-function PushOff({ push, onEnablePush, onOpenIosSettings }: Pick<NotificationCenterProps, 'onEnablePush' | 'onOpenIosSettings'> & { push: PermissionStatus }) {
+function PushOff({ push, onEnablePush, onOpenSettings }: Pick<NotificationCenterProps, 'onEnablePush' | 'onOpenSettings'> & { push: PermissionStatus }) {
     const t = useTranslations('mobileSettings.notifications.push')
     return (
         <View style={{ gap: spacing.sm }}>
             <Card>
                 <SettingsRow icon="bell-off" label={t('label')} value={t('off')} />
                 <Separator inset={ICON_ROW_INSET} />
-                {push === 'undetermined' ? <SettingsRow label={t('turnOn')} onPress={onEnablePush} /> : <SettingsRow label={t('openIosSettings')} accessory="external" onPress={onOpenIosSettings} />}
+                {push === 'undetermined' ? <SettingsRow label={t('turnOn')} onPress={onEnablePush} /> : <SettingsRow label={t('openSettings', { platform: Platform.OS })} accessory="external" onPress={onOpenSettings} />}
             </Card>
-            <Footnote>{t('footnote')}</Footnote>
+            <Footnote>{t('footnote', { platform: Platform.OS })}</Footnote>
         </View>
     )
 }
@@ -99,10 +99,10 @@ function CenterSkeleton() {
 
 // The web's notification settings: which runs are worth hearing about, the email, a rule for a
 // coworker apart, and the account emails. Toast and sound live in the browser, so they stay there.
-export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePush, onOpenIosSettings, onPatch, onOpenCoworker }: NotificationCenterProps) {
+export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePush, onOpenSettings, onPatch, onOpenCoworker }: NotificationCenterProps) {
     const t = useTranslations('mobileSettings.notifications')
     const tSettings = useTranslations('mobileSettings')
-    const pushOff = push !== null && push !== 'granted' && <PushOff push={push} onEnablePush={onEnablePush} onOpenIosSettings={onOpenIosSettings} />
+    const pushOff = push !== null && push !== 'granted' && <PushOff push={push} onEnablePush={onEnablePush} onOpenSettings={onOpenSettings} />
 
     if (!prefs) {
         return (
