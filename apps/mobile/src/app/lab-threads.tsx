@@ -1,20 +1,23 @@
+import { threadsByMessage } from '@rerun/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Fragment, useRef, useState } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import { useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useMessageTimes } from '@/chat/useMessageTimes'
 import { CHAT_HEADER_HEIGHT, ChatHeader, type ChatTab } from '@/components/chat/ChatHeader'
 import { Composer } from '@/components/chat/Composer'
 import { activePageIndex, conversationPages } from '@/components/chat/conversation-pages'
 import { ConversationPager } from '@/components/chat/ConversationPager'
 import { MessageView } from '@/components/chat/MessageView'
-import { ThreadBranch, type ThreadItem } from '@/components/chat/threads/ThreadBranch'
+import type { ThreadItem } from '@/components/chat/threads/general-threads'
+import { ThreadBranch } from '@/components/chat/threads/ThreadBranch'
 import { TimedTurns } from '@/components/chat/TimedTurns'
 import { CHAT_COLUMN_MAX_WIDTH } from '@/components/layout/split'
 import { ProgressiveBlur } from '@/components/ui/ProgressiveBlur'
 import { coworkers } from '@/mocks/data'
-import { GENERAL_MESSAGES, GENERAL_THREADS, placeThreads } from '@/mocks/threads'
+import { GENERAL_MESSAGES, GENERAL_THREADS } from '@/mocks/threads'
 import { ThemeScope, useTheme } from '@/theme/theme'
 import { spacing, type ColorScheme } from '@/theme/tokens'
 
@@ -33,7 +36,7 @@ function GeneralPane({ empty, threads, coworkerName, topInset, onOpenThread }: {
     const [footerHeight, setFooterHeight] = useState(0)
     const scroll = useRef<ScrollViewInstance>(null)
     const messages = empty ? [] : GENERAL_MESSAGES
-    const { leading, after } = placeThreads(messages, threads)
+    const { leading, after } = threadsByMessage(useMessageTimes(messages), threads)
     const branch = (thread: ThreadItem) => <ThreadBranch key={thread.id} thread={thread} onOpen={() => onOpenThread(thread)} />
     return (
         <View style={{ flex: 1, paddingBottom: insets.bottom, justifyContent: 'flex-end' }}>

@@ -254,6 +254,19 @@
         "skip": "Pular",
         "skipTakeover": "Pular o controle do navegador"
     },
+    "threadBranch": {
+        "needs": "Precisa de você",
+        "error": "Erro",
+        "running": "Em execução",
+        "open": "Abrir o tópico {title}",
+        "opener": {
+            "schedule": "Execução agendada · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "Pedido de {name}",
+            "askedByUnknown": "Pedido de outro coworker",
+            "started": "Iniciou um tópico"
+        }
+    },
     "voice": {
         "copyTranscript": "Copiar transcrição",
         "hideTranscript": "Ocultar transcrição",

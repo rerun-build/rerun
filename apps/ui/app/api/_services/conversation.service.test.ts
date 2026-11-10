@@ -428,4 +428,14 @@ describe('listAgentThreads', () => {
 
         expect(conversations.map(c => [c.id, c.kind, c.createdAt])).toEqual([['g', 'general', '2026-11-08T10:00:00Z']])
     })
+
+    it('gives the app what a thread opened with, so General shows it as the web does', async () => {
+        vi.mocked(resolveAgentTarget).mockRejectedValue(new Error('no box'))
+        vi.mocked(selectMany).mockResolvedValueOnce({ data: [{ ...session('a', 't', '2026-11-08T10:00:00Z'), first_message: 'Plan the posts' }], error: null } as never)
+        vi.mocked(createClient).mockResolvedValue({ rpc: vi.fn().mockResolvedValue({ data: [], error: null }) } as never)
+
+        const conversations = await listAgentConversations({ ...ctx, userId: 'me' } as WorkspaceContext, 'a')
+
+        expect(conversations.map(c => c.firstMessage)).toEqual(['Plan the posts'])
+    })
 })

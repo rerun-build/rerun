@@ -254,6 +254,19 @@
         "skip": "Skip",
         "skipTakeover": "Skip the browser takeover"
     },
+    "threadBranch": {
+        "needs": "Needs you",
+        "error": "Error",
+        "running": "Running",
+        "open": "Open thread {title}",
+        "opener": {
+            "schedule": "Scheduled run · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "Asked by {name}",
+            "askedByUnknown": "Asked by another coworker",
+            "started": "Started a thread"
+        }
+    },
     "voice": {
         "copyTranscript": "Copy transcript",
         "hideTranscript": "Hide transcript",
@@ -283,6 +296,10 @@
         "empty.team.buildPrompt": "Prefilled in the composer: the start of the user's own sentence to the assistant, completed by them. Keep the trailing space.",
         "empty.team.handOff.prefill": "Prefilled in the composer: the start of the user's own sentence to the assistant. {mention} is a coworker's handle, like @scout. Keep the trailing space.",
         "empty.team.checkWorking.send": "Sent as the user's own message to the assistant. {mention} is a coworker's handle, like @scout. Same for checkIdle.send.",
-        "empty.team.template.send": "Sent as the user's own message to the assistant when the row is tapped. Same for guide.send."
+        "empty.team.template.send": "Sent as the user's own message to the assistant when the row is tapped. Same for guide.send.",
+        "threadBranch.open": "Accessibility label of a thread row in the coworker's General conversation. {title} is the thread's title.",
+        "threadBranch.opener.askedBy": "Stands in for the first message of a thread another coworker asked for. {name} is that coworker's name.",
+        "threadBranch.opener.schedule": "Stands in for the first message of a thread a schedule started. {name} is the routine's name.",
+        "threadBranch.opener.trigger": "Stands in for the first message of a thread a webhook started. {name} is the trigger's name."
     }
 }

@@ -254,6 +254,19 @@
         "skip": "Passer",
         "skipTakeover": "Passer la prise en main du navigateur"
     },
+    "threadBranch": {
+        "needs": "Pour vous",
+        "error": "Erreur",
+        "running": "En cours",
+        "open": "Ouvrir le fil {title}",
+        "opener": {
+            "schedule": "Exécution planifiée · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "Demandé par {name}",
+            "askedByUnknown": "Demandé par un autre coworker",
+            "started": "A lancé un fil"
+        }
+    },
     "voice": {
         "copyTranscript": "Copier la transcription",
         "hideTranscript": "Masquer la transcription",

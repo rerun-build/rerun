@@ -1,7 +1,7 @@
-import { RERUN_CONNECTION_ID, appendAttachmentsRef, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Keyboard, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -16,6 +16,7 @@ import { track } from '@/lib/analytics'
 import { askForPushOnce, setConversationOnScreen } from '@/notifications/push'
 import type { ChatEndpoints } from '@/chat/endpoints'
 import { useCoworkerChat } from '@/chat/useCoworkerChat'
+import { useMessageTimes } from '@/chat/useMessageTimes'
 import { useMessageFeedback } from '@/chat/useMessageFeedback'
 import { useQueuedMessage } from '@/chat/useQueuedMessage'
 import { useSkillProposals } from '@/chat/useSkillProposals'
@@ -57,6 +58,8 @@ import { FloatingScreen, ScreenMirror } from './screen/FloatingScreen'
 import { useAgentScreen } from './screen/useAgentScreen'
 import { useTakeoverRequest } from './screen/useTakeoverRequest'
 import { Suggestions } from './Suggestions'
+import type { ThreadItem } from './threads/general-threads'
+import { ThreadBranch } from './threads/ThreadBranch'
 import { TimedTurns } from './TimedTurns'
 
 // The transcript scrolls under the suggestions and the composer, going out of focus this far above
@@ -90,10 +93,13 @@ type ConversationPaneProps = {
     initialMessage?: string
     // False where the machine would refuse the upload: the Foreman of a box that predates its files.
     canAttach?: boolean
+    // General only: the coworker's threads, each hung under the message it was opened after.
+    threads?: ThreadItem[]
+    onOpenThread?: (sessionId: string) => void
 }
 
 // One conversation on screen: the transcript, what waits on an answer, and the composer.
-export function ConversationPane({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true }: ConversationPaneProps) {
+export function ConversationPane({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     const insets = useSafeAreaInsets()
@@ -150,6 +156,9 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
 
     const lastAssistant = chat.messages.findLastIndex(message => message.role === 'assistant')
+    const messageTimes = useMessageTimes(chat.messages)
+    const threadRows = useMemo(() => threadsByMessage(messageTimes, threads ?? []), [messageTimes, threads])
+    const threadBranches = (rows: ThreadItem[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} onOpen={() => onOpenThread?.(thread.id)} />)
     // The Foreman is the person's own assistant: nobody else writes there, so nothing is signed.
     const authorIds = coworker.kind === 'foreman' ? [] : [...new Set(chat.messages.flatMap(message => authorIdOf(message) ?? []))]
     const profileOf = useMemberProfiles(authorIds)
@@ -171,7 +180,8 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const alert = pendingAlert && (pendingAlert.toolCallId ?? pendingAlert.message) !== acknowledged ? pendingAlert : null
     const unknownCall = pending || alert || !settled || !waitingOnHuman ? null : findUnknownPendingCall(chat.messages)
     const replies = !settled || pending || unknownCall || lastAssistant < 0 || lastAssistant !== chat.messages.length - 1 ? [] : quickRepliesOf(chat.messages[lastAssistant])
-    const empty = chat.history === 'ready' && chat.messages.length === 0 && !chat.busy
+    // A General with no message yet but threads already opened shows them, not the empty state, as on the web.
+    const empty = chat.history === 'ready' && chat.messages.length === 0 && !chat.busy && threadRows.leading.length === 0
     // A takeover the app can draw is asked on the screen it is about, not in a block of its own.
     const takeoverPending = pending?.kind === 'takeover' && replacesComposer ? pending : null
     const runOnScreen = useMemo(() => runUsesScreen(chat.messages), [chat.messages])
@@ -410,10 +420,16 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                         <LayoutAnimationConfig skipEntering={!chat.busy}>
                             <View style={{ gap: spacing.xl }} onLayout={event => setThreadTop(event.nativeEvent.layout.y)}>
                                 {startedBy && <StartedByBanner startedBy={startedBy} />}
+                                {threadBranches(threadRows.leading)}
                                 <TimedTurns
                                     messages={chat.messages}
                                     authorOf={authorId => (isForeman ? undefined : profileOf(authorId))}
-                                    renderMessage={(message, index, stamp) => <MessageView key={message.id} message={message} isLastAssistant={index === lastAssistant} running={chat.busy} agentId={isForeman ? null : coworker.id} fileOwner={endpoints.fileOwner(chat.sessionId)} coworkerName={coworker.name} hiddenCallId={alert?.toolCallId ?? null} skillProposals={skillProposals} onStopTask={stopTask} onRegenerate={pending ? undefined : () => void chat.regenerate()} feedback={feedback} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />}
+                                    renderMessage={(message, index, stamp) => (
+                                        <Fragment key={message.id}>
+                                            <MessageView message={message} isLastAssistant={index === lastAssistant} running={chat.busy} agentId={isForeman ? null : coworker.id} fileOwner={endpoints.fileOwner(chat.sessionId)} coworkerName={coworker.name} hiddenCallId={alert?.toolCallId ?? null} skillProposals={skillProposals} onStopTask={stopTask} onRegenerate={pending ? undefined : () => void chat.regenerate()} feedback={feedback} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />
+                                            {threadBranches(threadRows.after.get(index))}
+                                        </Fragment>
+                                    )}
                                 />
                                 {pending && !takeoverPending && (
                                     <Animated.View key={pending.toolCallId} entering={FadeInDown.duration(280)} onLayout={event => setBlockHeight(event.nativeEvent.layout.height)}>

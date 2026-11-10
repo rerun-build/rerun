@@ -254,6 +254,19 @@
         "skip": "Überspringen",
         "skipTakeover": "Browser-Übernahme überspringen"
     },
+    "threadBranch": {
+        "needs": "Braucht dich",
+        "error": "Fehler",
+        "running": "Läuft",
+        "open": "Thread {title} öffnen",
+        "opener": {
+            "schedule": "Geplante Ausführung · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "Angefragt von {name}",
+            "askedByUnknown": "Von einem anderen Coworker angefragt",
+            "started": "Hat einen Thread gestartet"
+        }
+    },
     "voice": {
         "copyTranscript": "Transkript kopieren",
         "hideTranscript": "Transkript ausblenden",

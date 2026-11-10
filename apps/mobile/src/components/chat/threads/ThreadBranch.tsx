@@ -1,8 +1,9 @@
-import { needsHuman, type Conversation, type SessionStatus } from '@rerun/contracts'
+import { needsHuman, type SessionStatus } from '@rerun/contracts'
 import { SymbolView } from 'expo-symbols'
 import { useId } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import Svg, { Defs, LinearGradient, Mask, Path, Pattern, Rect, Stop } from 'react-native-svg'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge, TONES } from '@/components/ui/Badge'
@@ -10,9 +11,9 @@ import { useTimeAgo } from '@/lib/time'
 import { useTheme } from '@/theme/theme'
 import { brand, fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
-export type ThreadState = 'live' | 'needs' | 'error' | 'done'
+import type { ThreadItem } from './general-threads'
 
-export type ThreadItem = Pick<Conversation, 'title' | 'status' | 'source' | 'automationName' | 'outcome' | 'originAgentName'> & { id: string; createdAt: string; firstMessage?: string | null }
+export type ThreadState = 'live' | 'needs' | 'error' | 'done'
 
 export function threadStateOf(status: SessionStatus): ThreadState {
     if (status === 'working') return 'live'
@@ -21,7 +22,7 @@ export function threadStateOf(status: SessionStatus): ThreadState {
     return 'done'
 }
 
-const STATE_BADGE = { needs: { label: 'Needs you', tone: 'orange' }, error: { label: 'Error', tone: 'red' } } as const
+const STATE_BADGE_TONE = { needs: 'orange', error: 'red' } as const
 
 const ROW_HEIGHT = 40
 const CONNECTOR_INSET = 14
@@ -30,11 +31,11 @@ const isAutomated = (thread: ThreadItem) => thread.source === 'schedule' || thre
 
 // What stands in for the opening message when the hub never saw one: a run the engine started, a
 // coworker's request, or a thread older than the column that keeps it.
-function genericOpener(thread: ThreadItem): string {
-    if (thread.source === 'schedule') return `Scheduled run · ${thread.automationName ?? thread.title}`
-    if (thread.source === 'trigger') return `Webhook · ${thread.automationName ?? thread.title}`
-    if (thread.source === 'agent' || thread.source === 'delegate') return `Asked by ${thread.originAgentName ?? 'another coworker'}`
-    return 'Started a thread'
+function genericOpener(thread: ThreadItem, t: ReturnType<typeof useTranslations<'mobileChat.threadBranch.opener'>>): string {
+    if (thread.source === 'schedule') return t('schedule', { name: thread.automationName ?? thread.title })
+    if (thread.source === 'trigger') return t('trigger', { name: thread.automationName ?? thread.title })
+    if (thread.source === 'agent' || thread.source === 'delegate') return thread.originAgentName ? t('askedBy', { name: thread.originAgentName }) : t('askedByUnknown')
+    return t('started')
 }
 
 const minutesSince = (iso: string) => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60_000))
@@ -70,10 +71,12 @@ function Hatch() {
  */
 export function ThreadBranch({ thread, onOpen }: { thread: ThreadItem; onOpen: () => void }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.threadBranch')
+    const tOpener = useTranslations('mobileChat.threadBranch.opener')
     const timeAgo = useTimeAgo()
     const state = threadStateOf(thread.status)
-    const badge = state === 'needs' || state === 'error' ? STATE_BADGE[state] : null
-    const opener = thread.firstMessage?.trim() || genericOpener(thread)
+    const badge = state === 'needs' || state === 'error' ? { label: t(state), tone: STATE_BADGE_TONE[state] } : null
+    const opener = thread.firstMessage?.trim() || genericOpener(thread, tOpener)
     const live = theme.scheme === 'dark' ? brand.soft : brand.base
     const branchTone = { live: withAlpha(live, 0.7), needs: withAlpha(TONES.orange[theme.scheme], 0.7), error: withAlpha(TONES.red[theme.scheme], 0.7), done: theme.border }[state]
     const titleColor = thread.outcome === 'failed' ? theme.destructive : thread.outcome === 'nothing' ? theme.mutedForeground : theme.foreground
@@ -89,10 +92,10 @@ export function ThreadBranch({ thread, onOpen }: { thread: ThreadItem; onOpen: (
                 <Pressable
                     onPress={onOpen}
                     accessibilityRole="button"
-                    accessibilityLabel={`Open thread ${thread.title}`}
+                    accessibilityLabel={t('open', { title: thread.title })}
                     style={({ pressed }) => ({ alignSelf: 'flex-start', maxWidth: '100%', height: ROW_HEIGHT, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.sm + 2, borderWidth: 1, borderColor: theme.border, overflow: 'hidden', opacity: pressed ? 0.6 : 1 })}>
                     <Hatch />
-                    {state === 'live' && <View accessibilityLabel="Running" style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: live }} />}
+                    {state === 'live' && <View accessibilityLabel={t('running')} style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: live }} />}
                     {isAutomated(thread) && <SymbolView name={thread.source === 'trigger' ? 'point.3.connected.trianglepath.dotted' : 'calendar.badge.clock'} size={13} tintColor={theme.mutedForeground} />}
                     <AppText variant="callout" medium numberOfLines={1} style={{ flexShrink: 1, color: titleColor }}>
                         {thread.title}

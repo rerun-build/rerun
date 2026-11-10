@@ -254,6 +254,19 @@
         "skip": "Omitir",
         "skipTakeover": "Omitir el control del navegador"
     },
+    "threadBranch": {
+        "needs": "Te necesita",
+        "error": "Error",
+        "running": "En curso",
+        "open": "Abrir el hilo {title}",
+        "opener": {
+            "schedule": "Ejecución programada · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "Pedido por {name}",
+            "askedByUnknown": "Pedido por otro coworker",
+            "started": "Inició un hilo"
+        }
+    },
     "voice": {
         "copyTranscript": "Copiar la transcripción",
         "hideTranscript": "Ocultar la transcripción",

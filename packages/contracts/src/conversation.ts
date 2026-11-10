@@ -49,6 +49,9 @@ export const conversationSchema = z.object({
     // `createdAt` is where a thread sits in General.
     kind: sessionKindSchema.optional(),
     createdAt: z.string().optional(),
+    // Optional for a hub older than it. What a thread opened with, when a person typed it; null
+    // for a run the engine started.
+    firstMessage: z.string().nullable().optional(),
 })
 export type Conversation = z.infer<typeof conversationSchema>
 

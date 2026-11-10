@@ -28,6 +28,7 @@ export type SessionHistoryEntry = {
     outcome: SessionOutcome | null
     kind: SessionKind
     createdAt: string
+    firstMessage: string | null
 }
 
 // Session history for an agent: Supabase-mirrored sessions merged with
@@ -39,7 +40,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor): Promise
     const supabase = createServiceRoleClient()
 
     const [{ data: rows }, target] = await Promise.all([
-        selectMany(supabase, 'sessions', ['id', 'title', 'status', 'updated_at', 'created_at', 'engine_session_id', 'origin_agent_id', 'source', 'automation_name', 'outcome', 'kind'] as const, { agent_id: agentId }),
+        selectMany(supabase, 'sessions', ['id', 'title', 'status', 'updated_at', 'created_at', 'engine_session_id', 'origin_agent_id', 'source', 'automation_name', 'outcome', 'kind', 'first_message'] as const, { agent_id: agentId }),
         resolveAgentTarget(agentId, caller).catch(() => null),
     ])
     const supabaseRows = rows ?? []
@@ -79,6 +80,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor): Promise
             outcome: r.outcome,
             kind: r.kind,
             createdAt: r.created_at,
+            firstMessage: r.first_message,
         })),
         ...unmirrored.map(s => ({
             id: null,
@@ -96,6 +98,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor): Promise
             outcome: null,
             kind: 'thread' as const,
             createdAt: s.createdAt,
+            firstMessage: null,
         })),
     ]
 

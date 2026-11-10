@@ -1,6 +1,6 @@
 import type { UIMessage } from 'ai'
 
-import type { ThreadItem } from '@/components/chat/threads/ThreadBranch'
+import type { ThreadItem } from '@/components/chat/threads/general-threads'
 
 const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString()
 
@@ -26,16 +26,3 @@ export const GENERAL_THREADS: ThreadItem[] = [
     { id: 'th-webhook', title: 'No new lead from the form', status: 'idle', source: 'trigger', automationName: 'Typeform lead', outcome: 'nothing', originAgentName: null, createdAt: minutesAgo(12) },
 ]
 
-// Where each thread hangs in General: under the last message that was there when it opened.
-export function placeThreads(messages: UIMessage[], threads: ThreadItem[]) {
-    const times = messages.map(item => new Date((item.metadata as { createdAt: string }).createdAt).getTime())
-    const leading: ThreadItem[] = []
-    const after = new Map<number, ThreadItem[]>()
-    for (const thread of [...threads].sort((a, b) => a.createdAt.localeCompare(b.createdAt))) {
-        const opened = new Date(thread.createdAt).getTime()
-        const anchor = times.findLastIndex(time => time <= opened)
-        if (anchor === -1) leading.push(thread)
-        else after.set(anchor, [...(after.get(anchor) ?? []), thread])
-    }
-    return { leading, after }
-}
