@@ -1,6 +1,7 @@
 import type { PhoneChannel } from '@rerun/contracts'
 import type { CountryCode } from 'libphonenumber-js/min'
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { BackHandler } from 'react-native'
 
 import { deviceCountry } from '@/lib/phone'
 
@@ -49,6 +50,17 @@ export function SignInFlowProvider({ initialStep = { name: 'start' }, children }
         setDirection('back')
         setHistory(previous => (previous.length > 1 ? previous.slice(0, -1) : previous))
     }
+
+    // Android's back gesture walks the steps back as the sheet's own back button does, rather than leave the app.
+    const canGoBack = history.length > 1
+    useEffect(() => {
+        if (!canGoBack) return
+        const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+            back()
+            return true
+        })
+        return () => subscription.remove()
+    }, [canGoBack])
 
     const step = history[history.length - 1]
     return <SignInFlowContext.Provider value={{ country, setCountry, phone, setPhone, email, setEmail, step, direction, goTo, back, thinking, setThinking }}>{children}</SignInFlowContext.Provider>
