@@ -1,8 +1,8 @@
 import { Column, DropdownMenu, DropdownMenuItem, Host, HorizontalDivider, RNHostView, Text } from '@expo/ui/jetpack-compose'
 import { height, padding } from '@expo/ui/jetpack-compose/modifiers'
 import { Image } from 'expo-image'
-import { Children, createContext, Fragment, isValidElement, use, useState, type ReactElement, type ReactNode } from 'react'
-import { Pressable, View } from 'react-native'
+import { Children, createContext, Fragment, isValidElement, use, useEffect, useState, type ReactElement, type ReactNode } from 'react'
+import { BackHandler, Pressable, View } from 'react-native'
 
 import { AppText } from '@/components/ui/AppText'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
@@ -44,10 +44,19 @@ function useRowModifiers({ singleLine }: { singleLine: boolean }) {
     return [...(singleLine ? [height(ROW_HEIGHT)] : []), ...(depth > 0 ? [padding(NESTED_INDENT * depth, 0, 0, 0)] : [])]
 }
 
-// Each opening mounts the rows afresh, so a submenu unfolded last time is folded again.
+// Each opening mounts the rows afresh, so a submenu unfolded last time is folded again. The popup does
+// not take the focus (see AnchoredMenu), so the back gesture reaches the app, which closes the menu.
 function useMenuState() {
     const [open, setOpen] = useState(false)
     const [openings, setOpenings] = useState(0)
+    useEffect(() => {
+        if (!open) return
+        const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+            setOpen(false)
+            return true
+        })
+        return () => subscription.remove()
+    }, [open])
     return {
         open,
         openings,
@@ -62,12 +71,14 @@ function useMenuState() {
 type MenuState = ReturnType<typeof useMenuState>
 
 // The menu itself, anchored under `children` (above when the screen has no room below): Compose's
-// DropdownMenu on the theme's card, the app's font and icons, no Material look.
+// DropdownMenu on the theme's card, the app's font and icons, no Material look. A focusable popup would
+// take the focus from a text field and close the keyboard without the screen hearing of it: the
+// composer stayed lifted over an empty space.
 function AnchoredMenu({ menu, items, children }: { menu: MenuState; items: ReactNode; children: ReactElement }) {
     const theme = useTheme()
     return (
         <Host matchContents colorScheme={theme.scheme} style={{ margin: -SHADOW_ROOM }}>
-            <DropdownMenu expanded={menu.open} onDismissRequest={menu.hide} color={theme.card} cornerRadius={radius.lg} shadowElevation={6}>
+            <DropdownMenu expanded={menu.open} onDismissRequest={menu.hide} properties={{ focusable: false }} color={theme.card} cornerRadius={radius.lg} shadowElevation={6}>
                 <DropdownMenu.Trigger>
                     <RNHostView matchContents>
                         <View style={{ padding: SHADOW_ROOM }}>{children}</View>

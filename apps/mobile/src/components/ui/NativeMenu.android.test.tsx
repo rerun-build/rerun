@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react-native'
-import { Platform, Text } from 'react-native'
+import { act, fireEvent, render, screen } from '@testing-library/react-native'
+import { BackHandler, Platform, Text } from 'react-native'
 
 import { LongPressMenu, MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 
@@ -31,9 +31,11 @@ jest.mock('@expo/ui/jetpack-compose', () => {
         HorizontalDivider: () => <View testID="divider" />,
         Text: ({ children }: { children: React.ReactNode }) => <RNText>{children}</RNText>,
         DropdownMenu: Object.assign(
-            ({ expanded, children }: { expanded: boolean; children: React.ReactNode }) => (
+            ({ expanded, properties, children }: { expanded: boolean; properties?: { focusable?: boolean }; children: React.ReactNode }) => (
                 <Expanded value={expanded}>
-                    <DropdownMenu expanded={expanded}>{children}</DropdownMenu>
+                    <View testID={properties?.focusable === false ? 'popup-keeps-focus-away' : 'popup-takes-focus'}>
+                        <DropdownMenu expanded={expanded}>{children}</DropdownMenu>
+                    </View>
                 </Expanded>
             ),
             { Trigger: passThrough, Items },
@@ -119,6 +121,36 @@ describeOnAndroid('NativeMenu on Android', () => {
         await fireEvent.press(screen.getByText('Acme'))
         await fireEvent.press(trigger)
         expect(screen.queryByText('Acme')).toBeNull()
+    })
+})
+
+describeOnAndroid('NativeMenu and the keyboard on Android', () => {
+    afterEach(() => jest.restoreAllMocks())
+
+    it('leaves the focus to the text field, and closes on the back gesture', async () => {
+        type BackListener = Parameters<typeof BackHandler.addEventListener>[1]
+        let listeners: BackListener[] = []
+        jest.spyOn(BackHandler, 'addEventListener').mockImplementation((_event, listener) => {
+            listeners.push(listener)
+            return { remove: () => (listeners = listeners.filter(registered => registered !== listener)) }
+        })
+        await render(
+            <NativeMenu label="Attach" trigger={<Text>+</Text>}>
+                <MenuItem label="Photos" icon="images" onPress={() => {}} />
+            </NativeMenu>,
+        )
+        expect(screen.getByTestId('popup-keeps-focus-away')).toBeTruthy()
+        expect(listeners).toHaveLength(0)
+
+        await fireEvent.press(screen.getByRole('button', { name: 'Attach' }))
+        expect(screen.getByTestId('menu-open')).toBeTruthy()
+        let handled = false
+        await act(async () => {
+            handled = listeners.toReversed().some(listener => listener({} as Parameters<BackListener>[0]))
+        })
+        expect(handled).toBe(true)
+        expect(screen.getByTestId('menu-closed')).toBeTruthy()
+        expect(listeners).toHaveLength(0)
     })
 })
 
