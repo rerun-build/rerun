@@ -1,9 +1,10 @@
-import { useTranslations } from 'next-intl'
 import { describe, expect, it } from 'vitest'
+import { ENGLISH_MESSAGES } from '@rerun/i18n/messages/en'
+import { createTranslator } from 'use-intl'
 import { coworkerAccessSummary } from './access-summary'
 
 const base = { boxName: 'Marketing', grantCount: 0 }
-const t = useTranslations('agent.accessSummary')
+const t = createTranslator({ locale: 'en', messages: ENGLISH_MESSAGES, namespace: 'agent.accessSummary' })
 
 describe('coworkerAccessSummary', () => {
     it('reads the same open Box for everyone, a member also hears their own level', () => {
