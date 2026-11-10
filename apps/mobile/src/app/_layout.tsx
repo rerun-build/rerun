@@ -127,6 +127,7 @@ function App() {
                                     <Stack.Protected guard={__DEV__}>
                                         <Stack.Screen name="lab" />
                                         <Stack.Screen name="lab-chat" />
+                                        <Stack.Screen name="lab-threads" />
                                         <Stack.Screen name="lab-message-times" />
                                         <Stack.Screen name="lab-sign-in" />
                                         <Stack.Screen name="lab-hitl" />

@@ -26,18 +26,21 @@ type ConversationPagerProps = {
 export function ConversationPager({ pages, activeIndex, progress, onSettle, renderPage }: ConversationPagerProps) {
     const scroll = useAnimatedRef<Animated.ScrollView>()
     const reduceMotion = useReducedMotion()
-    const [size, setSize] = useState({ width: 0, height: 0 })
+    // `offset` is where the row sits when it mounts or resizes. Fabric moves the native view the
+    // moment the `contentOffset` prop changes, so it only follows the layout: a tab picked scrolls on its own.
+    const [size, setSize] = useState({ width: 0, height: 0, offset: 0 })
     const pageWidth = useSharedValue(0)
     const dragging = useSharedValue(false)
     const restingIndex = useRef(activeIndex)
-    const pageCount = useRef(pages.length)
+    const restingKey = useRef(pages[activeIndex]?.key)
     const lastIndex = pages.length - 1
 
-    // A tab picked in the header slides there; tabs read late from the device shift the index, and the
-    // pager jumps to stay on the same conversation.
+    // A tab picked in the header slides there, even one just added before the draft. Tabs read late
+    // from the device shift the row under the resting page, and the pager jumps to stay on the same
+    // conversation.
     useEffect(() => {
-        const sameRow = pageCount.current === pages.length
-        pageCount.current = pages.length
+        const rowStable = pages[restingIndex.current]?.key === restingKey.current
+        restingKey.current = pages[activeIndex]?.key
         if (!size.width) {
             restingIndex.current = activeIndex
             progress.set(activeIndex)
@@ -45,14 +48,15 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
         }
         if (restingIndex.current === activeIndex) return
         restingIndex.current = activeIndex
-        const slides = sameRow && !reduceMotion
+        const slides = rowStable && !reduceMotion
         if (!slides) progress.set(activeIndex)
         scroll.current?.scrollTo({ x: activeIndex * size.width, animated: slides })
-    }, [activeIndex, pages.length, size.width, reduceMotion, progress, scroll])
+    }, [activeIndex, pages, size.width, reduceMotion, progress, scroll])
 
     const settle = (offset: number) => {
         const index = Math.round(offset / size.width)
         restingIndex.current = index
+        restingKey.current = pages[index]?.key
         if (index !== activeIndex) onSettle(index)
     }
 
@@ -92,7 +96,7 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
             style={{ flex: 1 }}
             onLayout={({ nativeEvent: { layout } }) => {
                 pageWidth.value = layout.width
-                setSize(known => (known.width === layout.width && known.height === layout.height ? known : { width: layout.width, height: layout.height }))
+                setSize(known => (known.width === layout.width && known.height === layout.height ? known : { width: layout.width, height: layout.height, offset: restingIndex.current * layout.width }))
             }}
         >
             {size.width > 0 && (
@@ -105,7 +109,7 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
                     keyboardShouldPersistTaps="handled"
                     scrollsToTop={false}
                     scrollEventThrottle={16}
-                    contentOffset={{ x: activeIndex * size.width, y: 0 }}
+                    contentOffset={{ x: size.offset, y: 0 }}
                     onScroll={onScroll}
                 >
                     {pages.map((page, index) => {
