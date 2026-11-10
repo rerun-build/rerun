@@ -58,7 +58,7 @@ export function PinSwipe({ pin, children }: { pin: PinControl; children: ReactNo
             overshootRight={false}
             onSwipeableOpen={toggle}
             renderRightActions={() => (
-                <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden style={{ width: PIN_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
+                <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ width: PIN_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
                     <Icon name={pin.pinned ? 'pin-off' : 'pin'} size={18} bold color="#ffffff" />
                     <AppText variant="caption" medium maxFontSizeMultiplier={1.2} style={{ color: '#ffffff' }}>
                         {label}

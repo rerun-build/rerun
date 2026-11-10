@@ -60,7 +60,7 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
             overshootRight={false}
             onSwipeableOpen={markRead}
             renderRightActions={() => (
-                <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden style={{ width: ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
+                <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ width: ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
                     <Icon name="check" size={18} bold color="#ffffff" />
                     <AppText variant="caption" medium maxFontSizeMultiplier={1.2} style={{ color: '#ffffff' }}>
                         {t('row.read')}

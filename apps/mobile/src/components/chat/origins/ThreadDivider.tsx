@@ -71,7 +71,7 @@ export function ThreadDivider({ symbol, symbolTint, flowing = false, pieces, acc
                 {pieces.map((piece, i) => (
                     <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: piece.kind === 'name' ? 1 : 0, minWidth: piece.kind === 'name' ? 64 : undefined }}>
                         {i > 0 && (
-                            <AppText variant="caption" tone="muted" accessibilityElementsHidden>
+                            <AppText variant="caption" tone="muted" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
                                 ·
                             </AppText>
                         )}
