@@ -4,7 +4,7 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { formatAmount, isPaid, priceLabel, type TemplatePricing } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
 import { Badge } from '@rerun/ui/primitives'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import { getTemplateAccessAction, startTemplateCheckoutAction } from '@/ee/actions/template-purchase.actions'
@@ -108,6 +108,9 @@ export function TemplatePurchaseWidget({ input, output, onDone }: { input: unkno
 
 export function TemplatePurchaseCard({ purchase, billedTo, opening, error, onBuy }: { purchase: TemplatePurchaseOffer; billedTo: string | null; opening: boolean; error: string | null; onBuy: () => void }) {
     const t = useTranslations('foreman.purchase')
+    const tPrice = useTranslations('templates.price')
+    const locale = useLocale()
+    const price = priceLabel(purchase.pricing, tPrice, locale)
     const recurring = purchase.pricing.model === 'recurring'
 
     return (
@@ -123,7 +126,7 @@ export function TemplatePurchaseCard({ purchase, billedTo, opening, error, onBuy
             <dl className="rounded-lg border border-border bg-muted/20 p-3">
                 <dt className="text-xs text-muted-foreground">{t('dueToday')}</dt>
                 <dd className="text-2xl font-semibold leading-none text-foreground">
-                    {isPaid(purchase.pricing) ? formatAmount(purchase.pricing.amountCents, purchase.pricing.currency) : priceLabel(purchase.pricing)}
+                    {isPaid(purchase.pricing) ? formatAmount(purchase.pricing.amountCents, purchase.pricing.currency, locale) : price}
                     {recurring && <span className="text-xs font-normal text-muted-foreground">{t('perMonth')}</span>}
                 </dd>
             </dl>
@@ -131,7 +134,7 @@ export function TemplatePurchaseCard({ purchase, billedTo, opening, error, onBuy
             {error && <p className="text-sm text-destructive">{error}</p>}
 
             <Button size="lg" className="h-11 w-full rounded-xl text-base" onClick={onBuy} disabled={opening}>
-                {opening ? t('opening') : recurring ? t('subscribe', { price: priceLabel(purchase.pricing) }) : t('pay', { price: priceLabel(purchase.pricing) })}
+                {opening ? t('opening') : recurring ? t('subscribe', { price }) : t('pay', { price })}
             </Button>
         </div>
     )

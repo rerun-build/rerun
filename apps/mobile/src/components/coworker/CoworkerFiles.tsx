@@ -7,7 +7,7 @@ import { Pressable, View, useWindowDimensions } from 'react-native'
 import { useLocale, useTranslations } from 'use-intl'
 
 import { AuthedImage } from '@/components/chat/cards/CardParts'
-import { formatBytes } from '@/components/chat/cards/cards'
+import { useFileSize } from '@/components/chat/cards/FileCardView'
 import { AppText } from '@/components/ui/AppText'
 import { Card, GROUPED_ROW_HEIGHT, Separator } from '@/components/ui/GroupedList'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -86,8 +86,9 @@ function DocTile({ name }: { name: string }) {
 function DocRow({ file, onOpen }: FileProps) {
     const theme = useTheme()
     const t = useTranslations('mobileCoworker.files')
+    const fileSize = useFileSize()
     const extension = extensionOf(file.name)
-    const detail = [formatBytes(file.size), extension.toUpperCase()].filter(Boolean).join(' · ')
+    const detail = [fileSize(file.size), extension.toUpperCase()].filter(Boolean).join(' · ')
     return (
         <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={t('open', { name: file.name })} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT + 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <DocTile name={file.name} />

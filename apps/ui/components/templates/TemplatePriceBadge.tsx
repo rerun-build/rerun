@@ -2,7 +2,7 @@
 
 import { isPaid, priceLabel, type TemplatePricing } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import type { PurchaseAccess } from '@/lib/templates/entitlement'
 import { cn } from '@/lib/utils'
 
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 // states it in its meta rows instead.
 export function TemplatePriceBadge({ pricing, access, className }: { pricing: TemplatePricing; access?: PurchaseAccess; className?: string }) {
     const t = useTranslations('templates.price')
+    const locale = useLocale()
     if (!isPaid(pricing)) return null
 
     const shared = cn('font-medium', className)
@@ -33,7 +34,7 @@ export function TemplatePriceBadge({ pricing, access, className }: { pricing: Te
 
     return (
         <Badge tone={pricing.model === 'recurring' ? 'cyan' : 'brand'} size="xs" glow={false} className={shared}>
-            {priceLabel(pricing)}
+            {priceLabel(pricing, t, locale)}
         </Badge>
     )
 }

@@ -11,7 +11,8 @@
         "installed.nextTurn": "{tools} is the list of tool names, separated by commas.",
         "list.needsSetup": "Badge of an app installed but not configured yet.",
         "suggestion.notNow": "Button that skips connecting this app for now.",
-        "suggestion.skipped": "State of an app the user chose not to connect."
+        "suggestion.skipped": "State of an app the user chose not to connect.",
+        "categories": "Filter chips over the catalog of apps a coworker can connect: the kind of app."
     },
     "appAccount": {
         "addAccount": "Add account",
@@ -140,5 +141,16 @@
     },
     "signInPopup": {
         "connecting": "Connecting to {name}…"
+    },
+    "categories": {
+        "payments": "Payments",
+        "ecommerce": "E-commerce",
+        "crm": "CRM",
+        "marketing": "Marketing",
+        "seo": "SEO",
+        "analytics": "Analytics",
+        "dev": "Developer",
+        "productivity": "Productivity",
+        "other": "Other"
     }
 }

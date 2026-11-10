@@ -35,6 +35,7 @@ type View = null | 'hub' | { notification: AnnouncedNotification }
 /** Every agent's « To handle » list in one place, parked in the board's bottom-left corner. */
 export function WorkspaceInbox() {
     const t = useTranslations('notifications.inbox')
+    const tReasons = useTranslations('notifications.inbox.reasons')
     const { isAnonymous } = useSession()
     const onEngine = useForemanStore(state => state.surface === 'engine')
     const agents = useBoardStore(s => s.agents)
@@ -156,7 +157,7 @@ export function WorkspaceInbox() {
         useNotificationsStore.getState().openNotifications()
     }, [])
     const [rowMenuOpen, setRowMenuOpen] = useState(false)
-    const rowReason = useCallback((item: InboxItem) => (item.reason && item.reason !== 'legacy' ? reasonSentence(item.reason, item.agentName) : null), [])
+    const rowReason = useCallback((item: InboxItem) => (item.reason && item.reason !== 'legacy' ? reasonSentence(item.reason, item.agentName, tReasons) : null), [tReasons])
 
     if (!shown) return null
 

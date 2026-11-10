@@ -1,4 +1,5 @@
 {
+    "untitledBox": "Box sans nom",
     "agentCard": {
         "destinations": {
             "services": "Apps",
@@ -944,5 +945,21 @@
         "hideHidden": "Masquer les fichiers cachés",
         "showHidden": "Afficher les fichiers cachés",
         "emptyDescription": "C'est l'espace de travail de votre coworker. Les fichiers qu'il télécharge, crée ou modifie pendant ses exécutions sont rangés ici."
+    },
+    "shareCta": {
+        "placeLabel": "Placer le coworker",
+        "placeCaption": "Déposez-le sur votre board, prêt à tourner.",
+        "trialAdd": "Démarrer l'essai et l'ajouter",
+        "planAdd": "S'abonner à {price}/mois et l'ajouter",
+        "add": "Ajouter à mon board"
+    },
+    "schedule": {
+        "once": "une fois · {date}",
+        "onceOn": "Une fois, {date}",
+        "everyMinutes": "Toutes les {count} minutes",
+        "everyDay": "Tous les jours à {time}",
+        "weekdays": "En semaine à {time}",
+        "everyWeekday": "Chaque {day} à {time}",
+        "monthly": "Tous les mois le {day} à {time}"
     }
 }

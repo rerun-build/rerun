@@ -7,7 +7,7 @@ import type { Messages } from '@rerun/i18n/messages'
 import { useLocale, useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
-import { formatDuration, toolLabel } from '@/lib/rewind/format'
+import { formatDuration, rawToolLabel } from '@/lib/rewind/format'
 import { TrophyIcon } from '@/lib/icons'
 import { RewindCount } from '../RewindCount'
 import { RewindHeadline, RewindReveal, RewindSlideFrame } from '../RewindSlideFrame'
@@ -20,7 +20,7 @@ export function MvpSlide({ payload, wide }: RewindSlideProps) {
     const t = useTranslations('rewind.mvp')
     const tools = useTranslations('rewind.tools')
     const isToolKey = (name: string): name is RewindToolKey => tools.has(name as RewindToolKey)
-    const goToMove = (name: string) => (isToolKey(name) ? tools(name) : toolLabel(name))
+    const goToMove = (name: string) => (isToolKey(name) ? tools(name) : rawToolLabel(name))
     const mvp = payload.agents.find(agent => agent.agentId === payload.mvpAgentId)
     const board = useMemo(() => {
         if (!mvp) return null

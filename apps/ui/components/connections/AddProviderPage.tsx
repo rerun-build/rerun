@@ -9,7 +9,7 @@ import { CredentialGuide } from '@/components/services/CredentialGuide'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { PROVIDER_GUIDE, PROVIDER_PITCH, connectMethod, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
+import { connectMethod, providerGuide, providerPitch, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
 import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
@@ -92,7 +92,7 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
                     <>
                         <Input label={t('name.label')} value={name} onChange={e => setName(e.target.value)} helperText={t('name.helper')} className="h-8" />
                         <Input hideRequired label={t('key.label')} type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder={t('key.placeholder')} className="h-8 font-mono text-xs" />
-                        <CredentialGuide label={PROVIDER_PITCH[provider].title} title={PROVIDER_GUIDE[provider as GuidedProvider].title} guide={PROVIDER_GUIDE[provider as GuidedProvider].steps} />
+                        <CredentialGuide label={providerPitch(provider, t).title} title={providerGuide(provider as GuidedProvider, t).title} guide={providerGuide(provider as GuidedProvider, t).steps} />
                     </>
                 )}
 

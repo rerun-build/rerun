@@ -202,7 +202,10 @@ function refusal(slug: AppSlug, err: unknown): AppActionError {
     if (err instanceof AppActionError) return err
     const app = appDefinition(slug)
     if (err instanceof LinkupError) {
-        if (err.code === 'CHANNEL_ERROR' || err.code === 'INVALID_PARAMS') return new AppActionError('refused', 'appSignInRefused', { message: app.signInRefusal(err.message) })
+        if (err.code === 'CHANNEL_ERROR' || err.code === 'INVALID_PARAMS') {
+            const signIn = app.signInRefusal(err.message)
+            return new AppActionError('refused', signIn.code, signIn.params)
+        }
         console.error(`[apps:${slug}] Linkup refused`, err.code, err.message)
         return new AppActionError('unknown', 'appUnavailable', { provider: app.providerLabel })
     }

@@ -5,7 +5,7 @@ import { DataBrowser } from '@/components/data/DataBrowser'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { tablesOrThrow, viewActions, type DataFocus, type DataSource } from '@/lib/data/source'
 import { agentFileRawUrl } from '@/lib/files/raw-url'
 import { useTranslations } from 'next-intl'
@@ -19,6 +19,7 @@ type AgentPanelDataProps = {
 }
 
 export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPanelDataProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelData')
     const [expanded, setExpanded] = useState<DataFocus | null>(null)
     const canManage = useCanManageAgent(agentId)
@@ -31,7 +32,7 @@ export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPan
             deleteRows: (table, rowids) => deleteAgentTableRowsAction(agentId, table, rowids),
             dropTable: table => dropAgentTableAction(agentId, table),
             purgeTable: table => purgeAgentTableAction(agentId, table),
-            tableActionsReason: canManage ? undefined : BOX_MANAGE_REASON,
+            tableActionsReason: canManage ? undefined : boxManageReason,
             exportUrl: (table, params) => {
                 const qs = new URLSearchParams({ agentId, table, format: params.format })
                 if (params.sort) qs.set('sort', params.sort)

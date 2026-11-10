@@ -423,6 +423,7 @@
         },
         "create": "Crea tu propio Coworker",
         "quoteByline": "<author>{name}</author>, {role} en {company}",
+        "quoted": "«{quote}»",
         "card": {
             "tasks": "· {count, plural, one {# tarea} other {# tareas}}",
             "noApps": "No necesita apps",

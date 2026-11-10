@@ -67,12 +67,30 @@
             "keys": "Vos clés d’API"
         },
         "sources": {
-            "claude": { "name": "Claude Pro ou Max", "hint": "Connecté avec votre compte Claude" },
-            "chatgpt": { "name": "ChatGPT Plus ou Pro", "hint": "Connecté avec votre compte ChatGPT" },
-            "anthropic": { "name": "Anthropic", "hint": "Modèles Claude, facturés au token" },
-            "openai": { "name": "OpenAI", "hint": "Modèles GPT, facturés au token" },
-            "google": { "name": "Google", "hint": "Modèles Gemini, facturés au token" },
-            "openrouter": { "name": "OpenRouter", "hint": "Tous les modèles derrière une clé" }
+            "claude": {
+                "name": "Claude Pro ou Max",
+                "hint": "Connecté avec votre compte Claude"
+            },
+            "chatgpt": {
+                "name": "ChatGPT Plus ou Pro",
+                "hint": "Connecté avec votre compte ChatGPT"
+            },
+            "anthropic": {
+                "name": "Anthropic",
+                "hint": "Modèles Claude, facturés au token"
+            },
+            "openai": {
+                "name": "OpenAI",
+                "hint": "Modèles GPT, facturés au token"
+            },
+            "google": {
+                "name": "Google",
+                "hint": "Modèles Gemini, facturés au token"
+            },
+            "openrouter": {
+                "name": "OpenRouter",
+                "hint": "Tous les modèles derrière une clé"
+            }
         },
         "composer": "Trouve 30 DAF d’entreprises de logistique à Dubaï.",
         "members": {
@@ -87,12 +105,36 @@
             "title": "Routines",
             "action": "Nouvelle",
             "items": {
-                "invoices": { "name": "Relancer les factures impayées", "when": "Chaque jour ouvré à 07:00 · Europe/Paris", "badge": "dans 34 min" },
-                "payment": { "name": "Signaler un paiement échoué", "when": "Quand Stripe appelle le webhook", "badge": "en écoute" },
-                "drafts": { "name": "Publier les trois brouillons du jour", "when": "Chaque jour à 11:30", "badge": "11:30" },
-                "welcome": { "name": "Accueillir un nouveau client", "when": "Quand votre CRM appelle le webhook", "badge": "en écoute" },
-                "ranking": { "name": "Rapport de positions hebdo", "when": "Chaque vendredi à 09:00", "badge": "ven. 09:00" },
-                "close": { "name": "Clôturer le mois", "when": "Le dernier jour du mois à 18:00", "badge": "31/10" }
+                "invoices": {
+                    "name": "Relancer les factures impayées",
+                    "when": "Chaque jour ouvré à 07:00 · Europe/Paris",
+                    "badge": "dans 34 min"
+                },
+                "payment": {
+                    "name": "Signaler un paiement échoué",
+                    "when": "Quand Stripe appelle le webhook",
+                    "badge": "en écoute"
+                },
+                "drafts": {
+                    "name": "Publier les trois brouillons du jour",
+                    "when": "Chaque jour à 11:30",
+                    "badge": "11:30"
+                },
+                "welcome": {
+                    "name": "Accueillir un nouveau client",
+                    "when": "Quand votre CRM appelle le webhook",
+                    "badge": "en écoute"
+                },
+                "ranking": {
+                    "name": "Rapport de positions hebdo",
+                    "when": "Chaque vendredi à 09:00",
+                    "badge": "ven. 09:00"
+                },
+                "close": {
+                    "name": "Clôturer le mois",
+                    "when": "Le dernier jour du mois à 18:00",
+                    "badge": "31/10"
+                }
             }
         },
         "schedule": {
@@ -136,11 +178,26 @@
             "connect": "Connecter",
             "connecting": "Connexion",
             "sources": {
-                "chatgpt": { "name": "Abonnement ChatGPT", "summary": "Codex, sur votre propre abonnement." },
-                "claude": { "name": "Abonnement Claude", "summary": "Claude Code, sur votre propre abonnement." },
-                "google": { "name": "Clé d’API Google", "summary": "Modèles Gemini, facturés au token." },
-                "openrouter": { "name": "Clé d’API OpenRouter", "summary": "Tous les modèles derrière une clé." },
-                "anthropic": { "name": "Clé d’API Anthropic", "summary": "Modèles Claude, facturés au token." }
+                "chatgpt": {
+                    "name": "Abonnement ChatGPT",
+                    "summary": "Codex, sur votre propre abonnement."
+                },
+                "claude": {
+                    "name": "Abonnement Claude",
+                    "summary": "Claude Code, sur votre propre abonnement."
+                },
+                "google": {
+                    "name": "Clé d’API Google",
+                    "summary": "Modèles Gemini, facturés au token."
+                },
+                "openrouter": {
+                    "name": "Clé d’API OpenRouter",
+                    "summary": "Tous les modèles derrière une clé."
+                },
+                "anthropic": {
+                    "name": "Clé d’API Anthropic",
+                    "summary": "Modèles Claude, facturés au token."
+                }
             }
         },
         "hire": {
@@ -173,17 +230,60 @@
             "cloud": "Ce qu’ils couvrent"
         },
         "gainTitles": {
-            "tidy": { "lead": "Toute votre entreprise,", "mid": "organisée." },
-            "organized": { "lead": "Toute votre entreprise,", "mid": "organisée.", "tail": "Et elle le reste toute seule." },
-            "never": { "lead": "Ne passez plus", "mid": "une heure", "tail": "à organiser votre entreprise." },
-            "once": { "lead": "Rangez votre entreprise", "mid": "une fois.", "tail": "Elle ne se défait plus jamais." },
-            "board": { "lead": "Une", "mid": "entreprise que vous voyez,", "tail": "pas un dossier où fouiller." },
-            "mess": { "lead": "Vingt", "mid": "Coworkers.", "tail": "Zéro désordre à ranger derrière eux." },
-            "files": { "lead": "Tout", "mid": "à sa place,", "tail": "sans jamais rien classer." },
-            "brief": { "lead": "Configurez votre", "mid": "workspace une fois.", "tail": "Ne briefez jamais un Coworker deux fois." },
-            "workspace": { "lead": "Un", "mid": "workspace qui", "tail": "connaît votre entreprise." },
-            "concretely": { "lead": "Qu’apporte Rerun", "mid": "concrètement", "tail": "à votre entreprise ?" },
-            "needs": { "lead": "Rerun", "mid": "est tout ce dont votre", "tail": "entreprise a besoin." }
+            "tidy": {
+                "lead": "Toute votre entreprise,",
+                "mid": "organisée."
+            },
+            "organized": {
+                "lead": "Toute votre entreprise,",
+                "mid": "organisée.",
+                "tail": "Et elle le reste toute seule."
+            },
+            "never": {
+                "lead": "Ne passez plus",
+                "mid": "une heure",
+                "tail": "à organiser votre entreprise."
+            },
+            "once": {
+                "lead": "Rangez votre entreprise",
+                "mid": "une fois.",
+                "tail": "Elle ne se défait plus jamais."
+            },
+            "board": {
+                "lead": "Une",
+                "mid": "entreprise que vous voyez,",
+                "tail": "pas un dossier où fouiller."
+            },
+            "mess": {
+                "lead": "Vingt",
+                "mid": "Coworkers.",
+                "tail": "Zéro désordre à ranger derrière eux."
+            },
+            "files": {
+                "lead": "Tout",
+                "mid": "à sa place,",
+                "tail": "sans jamais rien classer."
+            },
+            "brief": {
+                "lead": "Configurez votre",
+                "mid": "workspace une fois.",
+                "tail": "Ne briefez jamais un Coworker deux fois."
+            },
+            "workspace": {
+                "lead": "Un",
+                "mid": "workspace qui",
+                "tail": "connaît votre entreprise."
+            },
+            "concretely": {
+                "lead": "Qu’apporte Rerun",
+                "mid": "concrètement",
+                "tail": "à votre entreprise ?"
+            },
+            "needs": {
+                "lead": "Rerun",
+                "mid": "est tout ce dont votre",
+                "tail": "entreprise a besoin."
+            }
         },
         "boxes": {
             "marketing": "Marketing",

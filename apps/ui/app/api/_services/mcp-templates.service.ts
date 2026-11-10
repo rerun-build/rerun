@@ -17,6 +17,7 @@ import { captureAuthorAgents, listAuthorCaptureSources, planAuthorCapture, remov
 import { captureSetupSchema, type AgentCapturePlan } from '@/lib/templates/capture'
 import { pickSentFields, templateAuthorPatchSchema, templateEditBlockReason } from '@/lib/templates/expert'
 import { templateSubmitChecklist } from '@/lib/templates/submit'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 
 // The template-authoring half of the account MCP server (app/api/mcp/account/route.ts). The key
 // names a workspace, so the author is resolved from it once, here, and every handler below is
@@ -123,7 +124,7 @@ async function runTemplateTool(workspaceId: number, name: string, args: Record<s
             const doc = detail.document
             // The one thing the checklist cannot answer on its own, and the one that decides
             // whether a paid submission goes through.
-            const checklist = templateSubmitChecklist(doc, { payoutsReady: await isPayoutReady(doc.creatorId) })
+            const checklist = templateSubmitChecklist(doc, englishTranslator('templates.expert.footer'), { payoutsReady: await isPayoutReady(doc.creatorId) })
 
             return {
                 templateId: detail.id,
@@ -148,7 +149,7 @@ async function runTemplateTool(workspaceId: number, name: string, args: Record<s
                     priceAmountCents: doc.priceAmountCents,
                 },
                 agents: detail.agents,
-                submitChecklist: checklist,
+                submitChecklist: checklist.map(({ label, met }) => ({ label, met })),
                 readyToSubmit: checklist.every(requirement => requirement.met),
                 missing: checklist.filter(requirement => !requirement.met).map(requirement => requirement.label),
             }

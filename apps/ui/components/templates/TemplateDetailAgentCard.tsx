@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Icon } from '@/components/ui/icon'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { Stripes } from '@rerun/ui/primitives'
@@ -24,6 +24,7 @@ export type AgentCardNotes = { connectors?: string; triggers?: string }
 
 export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }: { agent: TemplateAgent; connectors: TemplateConnector[]; comesWith?: AgentCardEntry[]; notes?: AgentCardNotes }) {
     const t = useTranslations('templates.agentCard')
+    const locale = useLocale()
     const agentConnectors = connectors.filter(connector => agent.connectorSlugs.includes(connector.slug))
     const shownConnectors = agentConnectors.slice(0, MAX_CONNECTORS)
     const hiddenConnectors = agentConnectors.slice(MAX_CONNECTORS)
@@ -87,7 +88,7 @@ export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }:
             {agent.schedules.length > 0 && (
                 <CardSection title={t('schedules')} count={agent.schedules.length}>
                     {shownSchedules.map(schedule => (
-                        <AgentListRow key={schedule.name} icon={CalendarClock} title={schedule.name} subtitle={scheduleLabel(schedule.cron)} />
+                        <AgentListRow key={schedule.name} icon={CalendarClock} title={schedule.name} subtitle={scheduleLabel(schedule.cron, locale)} />
                     ))}
                     {agent.schedules.length > shownSchedules.length && <MoreRow count={agent.schedules.length - shownSchedules.length} />}
                 </CardSection>

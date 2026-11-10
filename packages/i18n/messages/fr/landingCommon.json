@@ -159,7 +159,19 @@
         "menu": "Menu",
         "main": "Principal",
         "starOnGithub": "Étoile sur GitHub",
-        "login": "Se connecter"
+        "login": "Se connecter",
+        "browseAll": {
+            "label": "Voir tous les templates",
+            "description": "Toute la bibliothèque, chaque catégorie sur une seule page."
+        },
+        "becomeExpert": "Devenir expert",
+        "startFree": "Commencer gratuitement",
+        "goToApp": "Ouvrir l'app",
+        "logo": {
+            "brandKit": "Voir le kit de marque",
+            "copy": "Copier le logo (SVG)",
+            "download": "Télécharger le logo"
+        }
     },
     "github": {
         "star": "Star",

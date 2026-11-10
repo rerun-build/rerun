@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { PlanLimitWindow } from '@rerun/contracts'
-import { isUsable, livePlanWindows, planLimitTone, planWindowName, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
+import { isUsable, livePlanWindows, planLimitTone, planWindowName, providerPitch, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 import type { BoxConnection } from './types'
 
 const NOW = Date.parse('2026-10-05T12:00:00.000Z')
@@ -63,21 +64,34 @@ describe('planLimitTone', () => {
 
 describe('planWindowName', () => {
     it('names a per-model window after its model', () => {
-        expect(planWindowName({ ...weekly, kind: 'model', label: 'Opus' })).toBe('Opus weekly')
-        expect(planWindowName(session)).toBe('Session')
+        expect(planWindowName({ ...weekly, kind: 'model', label: 'Opus' }, englishTranslator('connections'))).toBe('Opus weekly')
+        expect(planWindowName(session, englishTranslator('connections'))).toBe('Session')
     })
 
     it("names OpenCode Go's windows the way its plan does", () => {
-        expect(planWindowName(session, 'opencode')).toBe('5-hour')
-        expect(planWindowName({ ...weekly, kind: 'monthly' }, 'opencode')).toBe('Monthly')
-        expect(planWindowName(weekly, 'opencode')).toBe('Weekly')
+        expect(planWindowName(session, englishTranslator('connections'), 'opencode')).toBe('5-hour')
+        expect(planWindowName({ ...weekly, kind: 'monthly' }, englishTranslator('connections'), 'opencode')).toBe('Monthly')
+        expect(planWindowName(weekly, englishTranslator('connections'), 'opencode')).toBe('Weekly')
     })
 })
 
 describe('sourceSummary of a plan', () => {
     it('reads the plan windows once there is a reading, the model count before', () => {
         const future = (window: PlanLimitWindow) => ({ ...window, resetsAt: new Date(Date.now() + 3_600_000).toISOString() })
-        expect(sourceSummary(plan([future(session), future(weekly), { ...future(weekly), kind: 'model', label: 'Opus' }]), credit)).toBe('Session 42% · Weekly 81%')
-        expect(sourceSummary(plan(null), credit)).toBe('Plan · 2 models')
+        expect(sourceSummary(plan([future(session), future(weekly), { ...future(weekly), kind: 'model', label: 'Opus' }]), credit, englishTranslator('connections'), 'en')).toBe('Session 42% · Weekly 81%')
+        expect(sourceSummary(plan(null), credit, englishTranslator('connections'), 'en')).toBe('Plan · 2 models')
+    })
+})
+
+describe('sourceSummary of an API key', () => {
+    it('names the kind and counts the models in English as before', () => {
+        const key = (provider: BoxConnection['provider'], models: string[]): BoxConnection => ({ ...plan(null), provider, models })
+        expect(sourceSummary(key('anthropic', ['claude-opus-5-5']), credit, englishTranslator('connections'), 'en')).toBe('API key · 1 model')
+        expect(sourceSummary(key('custom', []), credit, englishTranslator('connections'), 'en')).toBe('Custom endpoint · 0 models')
+    })
+
+    it('pitches every provider the way the picker always did', () => {
+        expect(providerPitch('claude', englishTranslator('connections'))).toEqual({ title: 'Claude Pro or Max', hint: 'Sign in with your Claude account' })
+        expect(providerPitch('custom', englishTranslator('connections')).hint).toBe('Ollama, LM Studio, vLLM or any OpenAI-compatible server')
     })
 })

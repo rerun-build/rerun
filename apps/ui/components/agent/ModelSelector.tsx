@@ -92,7 +92,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     // A pick the subscription refuses is kept, not swapped behind the user's back: the message is
     // held and the picker offers the models the plan does serve.
     const refusedReason = refusedModelReason(active, model)
-    const refusedMessage = refusedReason ? t('refused', { model: modelLabel(model), reason: refusedReason }) : null
+    const modelText = model ? modelLabel(model) : t('select')
+    const refusedMessage = refusedReason ? t('refused', { model: modelText, reason: refusedReason }) : null
 
     // A pin or an override that no longer resolves (a template just imported, a connection removed)
     // is repointed at whatever the Box can actually run, the Box default first: Rerun only heads the
@@ -172,7 +173,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         [addProvider]
     )
 
-    const label = !hasAvailable ? t('setUp') : engineResolvesModel ? t('defaultLabel', { model: modelLabel(model) }) : !active ? t('select') : modelLabel(model)
+    const label = !hasAvailable ? t('setUp') : engineResolvesModel ? t('defaultLabel', { model: modelText }) : !active ? t('select') : modelText
 
     if (loading) {
         return (

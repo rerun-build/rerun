@@ -31,8 +31,8 @@ type InboxDetailCardProps = {
 export function InboxDetailCard({ entry, message, total, onClose, onSeeAll, onOpenConversation, onMarkRead }: InboxDetailCardProps) {
     const t = useTranslations('notifications.inbox.detail')
     const locale = useLocale()
-    const meta = ATTENTION_STATUS_META[entry.status] ?? ATTENTION_STATUS_META.waiting_human
-    const subtitle = [entry.title || meta.label, entry.updatedAt && shortRelativeTime(entry.updatedAt, locale)].filter(Boolean).join(' · ')
+    const status = (Object.hasOwn(ATTENTION_STATUS_META, entry.status) ? entry.status : 'waiting_human') as 'error' | 'awaiting_question' | 'awaiting_approval' | 'awaiting_ack' | 'done' | 'waiting_human'
+    const subtitle = [entry.title || t(`status.${status}`), entry.updatedAt && shortRelativeTime(entry.updatedAt, locale)].filter(Boolean).join(' · ')
 
     return (
         <div className="flex flex-col gap-3 p-3">

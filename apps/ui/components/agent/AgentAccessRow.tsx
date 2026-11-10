@@ -8,7 +8,7 @@ import { Field } from '@/components/ui/field'
 import { PanelRow } from '@/components/ui/panel-row'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useAgentAccess } from '@/hooks/useBoxAccess'
-import { type IsoAgent, UNNAMED_BOX_LABEL } from '@/lib/board/types'
+import type { IsoAgent } from '@/lib/board/types'
 import { useBoardStore } from '@/stores/board.store'
 import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
@@ -26,7 +26,7 @@ export function AgentAccessRow({ agent }: { agent: Pick<IsoAgent, 'id' | 'spaceI
 
     if (!space) return null
 
-    const { title, detail } = coworkerAccessSummary({ isAdmin, visibility: space.visibility, access, grantCount, boxName: space.name || UNNAMED_BOX_LABEL }, tSummary)
+    const { title, detail } = coworkerAccessSummary({ isAdmin, visibility: space.visibility, access, grantCount, boxName: space.name || t('untitledBox') }, tSummary)
 
     return (
         <Field label={t('agentAccessRow.label')}>

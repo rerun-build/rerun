@@ -6,7 +6,7 @@ import { Icon } from '@/components/ui/icon'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipDisabledReason, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { ENGINE_SELF_IMPROVEMENT_KEYS } from '@/lib/engine/constants'
 import type { EngineSelfImprovement, EngineToolFamily } from '@/lib/engine/types'
 import { ActivityIcon, BrainIcon, CalendarClockIcon, CardsIcon, CircleCheckIcon, CoinsIcon, DatabaseIcon, FolderIcon, GlobeIcon, InfoIcon, LayersIcon, Loader2Icon, LockIcon, type LucideIcon, MessageCircleQuestionIcon, MonitorIcon, QuickReplyIcon, TerminalIcon, UsersIcon, WandSparklesIcon, WebhookIcon, WrenchIcon } from '@/lib/icons'
@@ -78,6 +78,7 @@ function metaFor(family: EngineToolFamily, capabilities: Record<string, Capabili
 }
 
 export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelTools')
     const errorText = useErrorText()
     const capabilities = useCapabilityMeta()
@@ -87,7 +88,7 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
     const [pending, setPending] = useState<Set<string>>(new Set())
     const [error, setError] = useState<string | null>(null)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
 
     useEffect(() => {
         setLoading(true)

@@ -1,0 +1,356 @@
+{
+    "labels": {
+        "shell_exec": "Terminal",
+        "fs_read": "Lire un fichier",
+        "fs_write": "Écrire un fichier",
+        "fs_edit": "Modifier un fichier",
+        "fs_list": "Lister les fichiers",
+        "fs_search": "Chercher dans les fichiers",
+        "shared_read": "Lire un fichier partagé",
+        "shared_write": "Écrire un fichier partagé",
+        "shared_edit": "Modifier un fichier partagé",
+        "shared_list": "Lister les fichiers partagés",
+        "shared_search": "Chercher dans les fichiers partagés",
+        "browser_navigate": "Naviguer sur le web",
+        "computer": "A utilisé son ordinateur",
+        "computer_open_app": "A ouvert une app",
+        "web_fetch": "Lire une page",
+        "web_search": "Recherche web",
+        "WebSearch": "Recherche web",
+        "leads_people_search": "Trouver des personnes",
+        "leads_email_find": "Trouver un e-mail",
+        "leads_email_verify": "Vérifier un e-mail",
+        "leads_phone_find": "Trouver un téléphone",
+        "google_serp": "Résultats Google",
+        "google_maps_search": "Google Maps",
+        "paid_data": "Données payantes",
+        "paid_data_catalog": "Catalogue de données payantes",
+        "paid_data_read": "Lire des données payantes",
+        "download": "Télécharger",
+        "memory_write": "Enregistrer en mémoire",
+        "memory_recall": "Consulter la mémoire",
+        "brain_search": "Chercher dans le Brain",
+        "brain_read": "Lire le Brain",
+        "brain_propose": "Proposer au Brain",
+        "brain_write": "Écrire dans le Brain",
+        "brain_delete": "Retirer du Brain",
+        "brain_proposals": "Relire les changements du Brain",
+        "brain_decide": "Trancher un changement du Brain",
+        "vision_analyze": "Analyser une image",
+        "delegate_tasks": "Déléguer des tâches",
+        "call_agent": "Appeler un coworker",
+        "team_status": "État de l'équipe",
+        "team_list_schedules": "Lister les planifications d'un coworker",
+        "team_list_triggers": "Lister les déclencheurs d'un coworker",
+        "team_list_runs": "Lister les exécutions d'un coworker",
+        "team_get_run": "Lire une exécution d'un coworker",
+        "schedule_list": "Lister les planifications",
+        "schedule_create": "Créer une planification",
+        "schedule_update": "Modifier une planification",
+        "schedule_delete": "Supprimer une planification",
+        "trigger_list": "Lister les déclencheurs",
+        "trigger_create": "Créer un déclencheur",
+        "trigger_get": "Lire un déclencheur",
+        "trigger_update": "Modifier un déclencheur",
+        "trigger_rotate_token": "Renouveler le secret du déclencheur",
+        "trigger_delete": "Supprimer un déclencheur",
+        "skill_list": "Lister les skills",
+        "skill_read": "Lire un skill",
+        "skill_read_file": "Lire un fichier de skill",
+        "skill_write_file": "Écrire un fichier de skill",
+        "skill_delete_file": "Supprimer un fichier de skill",
+        "skill_create": "Créer un skill",
+        "skill_import": "Importer un skill",
+        "skill_edit": "Modifier un skill",
+        "skill_update": "Mettre à jour un skill",
+        "skill_delete": "Supprimer un skill",
+        "skill_propose": "Proposition de skill",
+        "soul_update": "Modifier la personnalité",
+        "verbosity_set": "Ajuster la longueur des réponses",
+        "tool_install": "Installer un outil",
+        "mcp_register": "Connecter une intégration",
+        "mcp_login": "Se connecter à une intégration",
+        "mcp_login_complete": "Terminer la connexion",
+        "mcp_status": "État de l'intégration",
+        "card_table": "Afficher un tableau",
+        "card_file": "Afficher un fichier",
+        "table_view_save": "Enregistrer une vue de tableau",
+        "table_view_delete": "Supprimer une vue de tableau",
+        "rerun_hub_service_search": "Chercher des apps",
+        "rerun_hub_service_details": "Détails de l'app",
+        "rerun_hub_service_install": "Installer une app",
+        "rerun_hub_service_list_installed": "Lister les apps",
+        "rerun_hub_service_uninstall": "Retirer une app",
+        "rerun_hub_publish_file": "Publier un fichier",
+        "rerun_hub_unpublish_file": "Dépublier un fichier",
+        "rerun_hub_list_published": "Lister les fichiers publiés",
+        "task_complete": "Tâche terminée",
+        "list_spaces": "Lister les Boxes",
+        "list_agents": "Lister les coworkers",
+        "get_agent": "Lire un coworker",
+        "create_agent": "Créer un coworker",
+        "update_agent": "Modifier un coworker",
+        "delete_agent": "Supprimer un coworker",
+        "list_ai_connections": "Lister les fournisseurs d'IA",
+        "set_default_model": "Définir le modèle par défaut",
+        "list_skills": "Lister les skills",
+        "get_skill": "Lire un skill",
+        "upsert_skill": "Écrire un skill",
+        "delete_skill": "Supprimer un skill",
+        "list_schedules": "Lister les tâches planifiées",
+        "upsert_schedule": "Planifier une tâche",
+        "run_schedule_now": "Lancer la tâche maintenant",
+        "delete_schedule": "Supprimer une tâche planifiée",
+        "list_runs": "Lister les exécutions",
+        "get_run": "Lire une exécution",
+        "search_connectors": "Chercher des apps",
+        "list_agent_connectors": "Lister les apps",
+        "attach_connector": "Ajouter une app",
+        "detach_connector": "Retirer une app",
+        "send_message": "Écrire à un coworker",
+        "create_boxes": "Créer des Boxes",
+        "build_team": "Constituer l'équipe",
+        "write_agent": "Rédaction de son SOUL et de son installation",
+        "rename_box": "Renommer la Box",
+        "delete_box": "Supprimer la Box",
+        "focus_agent": "Ouvrir un coworker",
+        "show_agents": "Afficher les coworkers",
+        "open_connector_setup": "Ouvrir la configuration de l'app",
+        "open_settings": "Ouvrir les réglages",
+        "recenter_board": "Recentrer le plateau",
+        "open_brain_page": "Ouvrir le Brain",
+        "read_attachment": "Lire une pièce jointe",
+        "search_docs": "Chercher dans la doc",
+        "analyze_website": "Lire le site web",
+        "save_profile": "Enregistrer le profil",
+        "save_needs": "Enregistrer les besoins",
+        "list_templates": "Parcourir les templates",
+        "propose_plan": "Rédiger le plan",
+        "install_template": "Installer un template",
+        "install_shared_agent": "Installer un coworker partagé",
+        "open_template_card": "Ouvrir le template",
+        "start_agent_setup": "Confier la configuration",
+        "open_checkout": "Démarrer l'essai",
+        "open_template_purchase": "Acheter le template",
+        "ask_choice": "Vous a posé une question",
+        "ask_either": "Vous a posé une question",
+        "ask_input": "Vous a posé une question",
+        "show_templates": "A montré des templates",
+        "show_plan": "A montré le plan",
+        "show_starter_pack": "A montré le pack de départ",
+        "contact_team": "A proposé de contacter l'équipe",
+        "ask_user": "Vous a posé une question",
+        "request_approval": "A demandé une validation",
+        "suggest_service": "A suggéré une app",
+        "request_secret": "A demandé un identifiant",
+        "request_mcp_sign_in": "Vous a demandé de vous connecter à un serveur MCP",
+        "request_takeover": "Vous a demandé de prendre la main sur le navigateur",
+        "request_spend": "A demandé à dépenser des crédits",
+        "notify_user": "Vous a prévenu",
+        "install_complete": "A terminé la configuration"
+    },
+    "activities": {
+        "shell_exec": "Exécution d'une commande",
+        "fs_read": "Lecture d'un fichier",
+        "fs_write": "Écriture d'un fichier",
+        "fs_edit": "Modification d'un fichier",
+        "fs_list": "Liste des fichiers",
+        "fs_search": "Recherche dans les fichiers",
+        "shared_read": "Lecture d'un fichier partagé",
+        "shared_write": "Écriture d'un fichier partagé",
+        "shared_edit": "Modification d'un fichier partagé",
+        "shared_list": "Liste des fichiers partagés",
+        "shared_search": "Recherche dans les fichiers partagés",
+        "browser_navigate": "Navigation sur le web",
+        "computer": "Utilise son ordinateur",
+        "computer_open_app": "Ouverture d'une app",
+        "web_fetch": "Lecture d'une page",
+        "web_search": "Recherche sur le web",
+        "WebSearch": "Recherche sur le web",
+        "leads_people_search": "Recherche de personnes",
+        "leads_email_find": "Recherche d'un e-mail",
+        "leads_email_verify": "Vérification d'un e-mail",
+        "leads_phone_find": "Recherche d'un numéro de téléphone",
+        "google_serp": "Recherche sur Google",
+        "google_maps_search": "Recherche sur Google Maps",
+        "download": "Téléchargement",
+        "memory_write": "Enregistrement en mémoire",
+        "memory_recall": "Consultation de la mémoire",
+        "brain_search": "Recherche dans le Brain",
+        "brain_read": "Lecture du Brain",
+        "brain_propose": "Proposition d'un changement au Brain",
+        "brain_write": "Écriture dans le Brain",
+        "vision_analyze": "Analyse d'une image",
+        "delegate_tasks": "Délégation de tâches",
+        "call_agent": "Appel d'un coworker",
+        "team_status": "Point sur l'équipe",
+        "team_list_runs": "Lecture des exécutions d'un coworker",
+        "team_get_run": "Lecture d'une exécution d'un coworker",
+        "skill_read": "Lecture d'un skill",
+        "skill_read_file": "Lecture d'un skill",
+        "skill_create": "Création d'un skill",
+        "skill_edit": "Modification d'un skill",
+        "skill_update": "Mise à jour d'un skill",
+        "rerun_hub_service_search": "Recherche d'apps",
+        "rerun_hub_service_install": "Installation d'une app",
+        "list_agents": "Coup d'œil sur l'équipe",
+        "create_agent": "Création d'un coworker",
+        "update_agent": "Modification d'un coworker",
+        "send_message": "Message à un coworker",
+        "build_team": "Constitution de l'équipe",
+        "search_docs": "Recherche dans la doc",
+        "analyze_website": "Lecture du site web",
+        "list_templates": "Parcours des templates",
+        "propose_plan": "Rédaction du plan",
+        "install_template": "Installation d'un template"
+    },
+    "paidData": {
+        "people": {
+            "search": "Recherche de personnes",
+            "email": {
+                "find": "Recherche d'e-mails",
+                "verify": "Vérification d'e-mails"
+            },
+            "phone": {
+                "find": "Recherche de numéros de téléphone"
+            },
+            "enrich": "Enrichissement de profils",
+            "identity": {
+                "resolve": "Recherche de profils LinkedIn"
+            }
+        },
+        "companies": {
+            "search": "Recherche d'entreprises",
+            "enrich": "Enrichissement d'entreprises",
+            "similar": "Recherche d'entreprises similaires",
+            "jobs": {
+                "search": "Lecture d'offres d'emploi"
+            },
+            "news": "Lecture de l'actualité d'entreprises"
+        },
+        "google": {
+            "serp": {
+                "organic": "Lecture des résultats Google",
+                "maps": "Recherche sur Google Maps",
+                "local": "Lecture des classements locaux",
+                "news": "Lecture de Google Actualités"
+            },
+            "keywords": {
+                "volume": "Vérification des volumes de recherche",
+                "ideas": "Recherche d'idées de mots-clés",
+                "trends": "Lecture de Google Trends"
+            }
+        },
+        "ai-search": {
+            "perplexity": {
+                "answer": "Question à Perplexity"
+            }
+        },
+        "web": {
+            "backlinks": {
+                "summary": "Lecture des backlinks",
+                "list": "Liste des backlinks"
+            },
+            "anchors": {
+                "list": "Lecture des textes d'ancre"
+            },
+            "url": {
+                "metrics": "Vérification de l'autorité du domaine"
+            }
+        },
+        "linkedin": {
+            "user": {
+                "profile": "Lecture de LinkedIn",
+                "posts": "Lecture de posts LinkedIn"
+            },
+            "company": {
+                "profile": "Lecture de LinkedIn"
+            },
+            "post": {
+                "detail": "Lecture de posts LinkedIn",
+                "comments": "Lecture de commentaires LinkedIn",
+                "reactions": "Lecture de réactions LinkedIn"
+            }
+        },
+        "tiktok": {
+            "user": {
+                "profile": "Lecture de TikTok",
+                "videos": "Lecture de vidéos TikTok"
+            },
+            "search": {
+                "users": "Recherche sur TikTok",
+                "videos": "Recherche sur TikTok"
+            },
+            "video": {
+                "detail": "Lecture de vidéos TikTok",
+                "comments": "Lecture de commentaires TikTok"
+            },
+            "comment": {
+                "replies": "Lecture de commentaires TikTok"
+            }
+        },
+        "instagram": {
+            "user": {
+                "profile": "Lecture d'Instagram",
+                "posts": "Lecture de posts Instagram",
+                "reels": "Lecture de reels Instagram"
+            },
+            "search": {
+                "users": "Recherche sur Instagram",
+                "reels": "Recherche sur Instagram"
+            },
+            "hashtag": {
+                "posts": "Lecture de hashtags Instagram"
+            },
+            "post": {
+                "detail": "Lecture de posts Instagram",
+                "comments": "Lecture de commentaires Instagram"
+            }
+        },
+        "x": {
+            "user": {
+                "profile": "Lecture de X",
+                "posts": "Lecture de posts X"
+            },
+            "search": {
+                "posts": "Recherche sur X"
+            },
+            "post": {
+                "comments": "Lecture de réponses X"
+            }
+        },
+        "youtube": {
+            "channel": {
+                "profile": "Lecture de YouTube",
+                "videos": "Lecture de vidéos YouTube"
+            },
+            "search": {
+                "videos": "Recherche sur YouTube"
+            },
+            "video": {
+                "detail": "Lecture de vidéos YouTube",
+                "comments": "Lecture de commentaires YouTube"
+            }
+        },
+        "facebook": {
+            "user": {
+                "profile": "Lecture de Facebook",
+                "posts": "Lecture de posts Facebook"
+            },
+            "post": {
+                "comments": "Lecture de commentaires Facebook"
+            }
+        },
+        "reddit": {
+            "subreddit": {
+                "posts": "Lecture de Reddit"
+            },
+            "post": {
+                "detail": "Lecture de Reddit"
+            }
+        }
+    },
+    "errors": {
+        "notFound": "Outil introuvable"
+    }
+}

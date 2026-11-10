@@ -11,6 +11,7 @@ import { paidDataIcon } from '@/lib/paid-data/spend'
 import { ShieldCheckIcon } from '@/lib/icons'
 
 function SourceLineRow({ line }: { line: PaidSourceLine }) {
+    const t = useTranslations('tools')
     return (
         <div className="flex items-center gap-2.5 py-1.5">
             <SourceLogo source={line.source} size="md" />
@@ -18,7 +19,7 @@ function SourceLineRow({ line }: { line: PaidSourceLine }) {
                 <p className="truncate text-sm text-foreground">{line.source.name}</p>
                 <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
                     {createElement(paidDataIcon(line.capability), { className: 'size-3 shrink-0' })}
-                    {line.activity}
+                    {t(`paidData.${line.capability}`)}
                 </p>
             </div>
             <div className="w-24 shrink-0 text-right">

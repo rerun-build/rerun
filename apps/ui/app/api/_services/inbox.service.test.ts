@@ -10,6 +10,7 @@ import { listWorkspaceInbox, markInboxRead } from './inbox.service'
 
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectCount: vi.fn() }))
 vi.mock('@/supabase/server', () => ({ createClient: vi.fn() }))
+vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
 vi.mock('@/app/api/_services/conversation.service', () => ({ markSessionsHandled: vi.fn() }))
 vi.mock('@/app/api/_auth/access', async importOriginal => {
     const actual = await importOriginal<typeof import('@/app/api/_auth/access')>()

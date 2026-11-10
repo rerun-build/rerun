@@ -1,6 +1,6 @@
 'use client'
 
-import { TEMPLATE_CATEGORY_LABELS, type TemplateStatus } from '@rerun/contracts'
+import { templateCategoryLabel, type TemplateCategoryCopy, type TemplateStatus } from '@rerun/contracts'
 import { brandIconFilter } from '@rerun/ui/brand-icon'
 import { HScrollFade, ScrollFade } from '@rerun/ui/primitives'
 import { type ComponentProps, type ReactNode, useMemo, useRef, useState } from 'react'
@@ -28,7 +28,6 @@ import { cn } from '@/lib/utils'
 
 // The statuses the library read actually returns to an admin: `archived` is never fetched.
 const LIBRARY_STATUSES: TemplateStatus[] = ['published', 'unlisted', 'in_review', 'draft']
-const statusOptions: FilterOption<TemplateStatus>[] = LIBRARY_STATUSES.map(status => ({ value: status, label: templateStatusLabel(status) }))
 
 // The library's browsing side: the rail on the left, the page it points at on the right. It knows
 // nothing of the dialog or of the detail panel, which is what lets the render lab mount it alone.
@@ -53,6 +52,9 @@ export function TemplateLibraryBrowser({
     onScratch: () => void
 }) {
     const t = useTranslations('templates.library')
+    const tCategory = useTranslations('templates.categories')
+    const tStatus = useTranslations('templates.status')
+    const statusOptions: FilterOption<TemplateStatus>[] = LIBRARY_STATUSES.map(status => ({ value: status, label: templateStatusLabel(status, tStatus) }))
     const [view, setView] = useState<LibraryView>(DISCOVER_VIEW)
     const [query, setQuery] = useState('')
     const [connectorSlugs, setConnectorSlugs] = useState<string[]>([])
@@ -89,7 +91,7 @@ export function TemplateLibraryBrowser({
         scrollerRef.current?.scrollTo({ top: 0 })
     }
 
-    const heading = headingFor(t, { view, query, count: listed?.length ?? null, creatorName: creator?.name, appName: app?.name })
+    const heading = headingFor(t, tCategory, { view, query, count: listed?.length ?? null, creatorName: creator?.name, appName: app?.name })
 
     return (
         <div className="flex min-h-0 w-full min-w-0 flex-1">
@@ -168,7 +170,7 @@ export function TemplateLibraryBrowser({
 
 type LibraryTranslator = ReturnType<typeof useTranslations<'templates.library'>>
 
-function headingFor(t: LibraryTranslator, { view, query, count, creatorName, appName }: { view: LibraryView; query: string; count: number | null; creatorName?: string; appName?: string }): { title: string; subtitle: string } {
+function headingFor(t: LibraryTranslator, tCategory: TemplateCategoryCopy, { view, query, count, creatorName, appName }: { view: LibraryView; query: string; count: number | null; creatorName?: string; appName?: string }): { title: string; subtitle: string } {
     const total = count === null ? '' : t('heading.count', { count })
     if (query.trim()) return { title: t('heading.results', { query: query.trim() }), subtitle: total }
     switch (view.kind) {
@@ -181,7 +183,7 @@ function headingFor(t: LibraryTranslator, { view, query, count, creatorName, app
         case 'mine':
             return { title: t('nav.mine'), subtitle: t('heading.mine') }
         case 'category':
-            return { title: TEMPLATE_CATEGORY_LABELS[view.category] ?? TEMPLATE_CATEGORY_LABELS.other, subtitle: total }
+            return { title: templateCategoryLabel(view.category, tCategory), subtitle: total }
         case 'app':
             return { title: appName ?? t('heading.app'), subtitle: t('heading.appSubtitle', { total, app: appName ?? t('heading.thisApp') }) }
         case 'creator':
@@ -208,6 +210,7 @@ type CompactNavGroup = 'apps' | 'categories'
 
 function CompactNav({ view, query, counts, onView, onQuery, onScratch }: { view: LibraryView; query: string; counts: LibraryRailCounts; onView: (view: LibraryView) => void; onQuery: (query: string) => void; onScratch: () => void }) {
     const t = useTranslations('templates.library')
+    const tCategory = useTranslations('templates.categories')
     const [openGroup, setOpenGroup] = useState<CompactNavGroup | null>(null)
     const searching = query.trim() !== ''
     const isActive = (target: LibraryView) => !searching && isSameView(view, target)
@@ -263,7 +266,7 @@ function CompactNav({ view, query, counts, onView, onQuery, onScratch }: { view:
                     )}
                     {categories.length > 0 && (
                         <NavChip active={activeCategory !== null} aria-expanded={openGroup === 'categories'} onClick={() => toggle('categories')}>
-                            {activeCategory ? (TEMPLATE_CATEGORY_LABELS[activeCategory] ?? TEMPLATE_CATEGORY_LABELS.other) : t('nav.categories')}
+                            {activeCategory ? templateCategoryLabel(activeCategory, tCategory) : t('nav.categories')}
                             <ChevronDownIcon className={cn('size-3.5 transition-transform', openGroup === 'categories' && 'rotate-180')} />
                         </NavChip>
                     )}
@@ -284,7 +287,7 @@ function CompactNav({ view, query, counts, onView, onQuery, onScratch }: { view:
                         return (
                             <NavChip key={category} quiet active={activeCategory === category} aria-current={activeCategory === category ? 'page' : undefined} onClick={() => go({ kind: 'category', category })}>
                                 <Glyph className="size-3.5 shrink-0" />
-                                {TEMPLATE_CATEGORY_LABELS[category] ?? TEMPLATE_CATEGORY_LABELS.other}
+                                {templateCategoryLabel(category, tCategory)}
                                 <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
                             </NavChip>
                         )

@@ -20,10 +20,6 @@ export type HomeCoworker = {
 
 export type SectionKey = 'needs' | 'working' | 'coworkers'
 
-// Same label as the web for a Box nobody named. Kept for the screens that still read it; the Home and
-// the search say it in the app's language.
-export const UNNAMED_BOX_LABEL = 'Untitled Box'
-
 export type HomeSection = { key: string; label: string; members: HomeCoworker[] }
 
 export function toHomeCoworkers(agents: BoardAgent[], overview: AgentConversationsOverview): HomeCoworker[] {
@@ -76,7 +72,7 @@ export function recentCoworkers(coworkers: HomeCoworker[]): HomeCoworker[] {
 
 // The coworkers by Box, in the order the Boxes were made, as on the web board. A Box without a
 // coworker left is left out.
-export function sectionsByBox(coworkers: HomeCoworker[], boxes: Box[], unnamedLabel: string = UNNAMED_BOX_LABEL): HomeSection[] {
+export function sectionsByBox(coworkers: HomeCoworker[], boxes: Box[], unnamedLabel: string): HomeSection[] {
     const ordered = [...coworkers].sort(byRecency)
     return boxes.map(box => ({ key: box.id, label: box.name?.trim() || unnamedLabel, members: ordered.filter(coworker => coworker.spaceId === box.id) })).filter(section => section.members.length > 0)
 }

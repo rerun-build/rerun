@@ -42,7 +42,53 @@
         "pulseCoworkers": "{count, plural, one {# coworker} other {# coworkers}}",
         "pulseWorking": "{count} trabajando ahora",
         "sendToCoworker": "Envía un mensaje a este coworker",
-        "startTitle": "Empieza una conversación"
+        "startTitle": "Empieza una conversación",
+        "starters": {
+            "capabilities": "¿En qué me puedes ayudar?",
+            "recentWork": "Resume tu trabajo reciente",
+            "projectFiles": "Revisa los archivos de mi proyecto",
+            "tools": "¿A qué herramientas tienes acceso?"
+        },
+        "team": {
+            "greeting": "Hola, soy Rerun",
+            "greetingNamed": "Hola {firstName}, soy Rerun",
+            "greetingWithTeam": "{greeting}. Este es tu equipo.",
+            "emptySubtitle": "Aún no tienes coworkers. Cuéntame un trabajo que delegarías y crearé el primero.",
+            "buildPrompt": "Créame un coworker que ",
+            "buildFirst": {
+                "title": "Crear mi primer coworker",
+                "description": "Describe el trabajo en una frase"
+            },
+            "template": {
+                "title": "Empezar con una plantilla",
+                "description": "Coworkers listos para tu tipo de negocio",
+                "send": "Muéstrame plantillas que encajen con mi negocio"
+            },
+            "guide": {
+                "title": "¿Cómo funciona esto?",
+                "description": "Coworkers, Boxes, rutinas, en dos minutos",
+                "send": "¿Cómo funciona Rerun?"
+            },
+            "checkWorking": {
+                "title": "¿Qué está haciendo {name}?",
+                "description": "Trabajando ahora",
+                "send": "¿Qué está haciendo {mention} ahora mismo?"
+            },
+            "checkIdle": {
+                "title": "¿Qué hizo {name} hoy?",
+                "description": "Ponte al día con sus últimas ejecuciones",
+                "send": "¿Qué hizo {mention} hoy?"
+            },
+            "handOff": {
+                "title": "Dale una tarea a {name}",
+                "description": "Le doy las instrucciones y hago el seguimiento",
+                "prefill": "Pídele a {mention} que "
+            },
+            "build": {
+                "title": "Crear un nuevo coworker",
+                "description": "Para un trabajo que nadie del equipo hace todavía"
+            }
+        }
     },
     "error": {
         "connectChatGpt": "Conectar ChatGPT",

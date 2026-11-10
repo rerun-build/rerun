@@ -1,7 +1,9 @@
 {
     "toast": {
         "close": "Cerrar notificación",
-        "openConversation": "Abrir conversación"
+        "openConversation": "Abrir conversación",
+        "coworker": "Coworker",
+        "scheduledTask": "{name} · Tarea programada"
     },
     "inbox": {
         "unknownCoworker": "Coworker",
@@ -12,7 +14,15 @@
             "markRead": "Marcar como leído",
             "notInList": "Esta actualización todavía no está en tu lista",
             "openConversation": "Abrir conversación",
-            "noCoworker": "Esta actualización no está vinculada a ningún coworker"
+            "noCoworker": "Esta actualización no está vinculada a ningún coworker",
+            "status": {
+                "error": "Error",
+                "awaiting_question": "Pregunta",
+                "awaiting_approval": "Aprobación",
+                "awaiting_ack": "Sin leer",
+                "done": "Terminado",
+                "waiting_human": "En espera"
+            }
         },
         "markAll": {
             "title": "¿Marcar todo como leído?",
@@ -27,6 +37,15 @@
             "mute": "Silenciar a {name}",
             "muted": "{name} está silenciado.",
             "settings": "Ajustes de notificaciones"
+        },
+        "untitledSession": "Sesión sin título",
+        "reasons": {
+            "mine": "Iniciaste esta ejecución",
+            "participant": "Participas en esta conversación",
+            "followed": "Sigues las tareas programadas de {agentName}",
+            "allActivity": "Recibes toda la actividad de {agentName}",
+            "everything": "Recibes todas las ejecuciones del workspace",
+            "workspace": "Esto tiene que ver con tu workspace"
         }
     },
     "settings": {
@@ -109,7 +128,9 @@
                 "label": "Novedades del producto",
                 "description": "Nuevas funciones, consejos y noticias ocasionales del producto."
             }
-        }
+        },
+        "saveFailed": "No se pudieron guardar tus ajustes de notificaciones",
+        "networkError": "Error de red"
     },
     "emailPreferences": {
         "coworkerTitle": "Notificaciones de coworkers",
@@ -120,5 +141,15 @@
         "saveFailed": "No se pudieron guardar las preferencias",
         "saving": "Guardando…",
         "saved": "Todos los cambios guardados"
+    },
+    "notices": {
+        "slotsPaused": "Tu plan ahora tiene {slots, plural, one {# espacio de {provider}} other {# espacios de {provider}}}, así que {paused, plural, one {# cuenta conectada está en pausa} other {# cuentas conectadas están en pausa}}. Añade un espacio en Facturación para {paused, plural, one {recuperarla} other {recuperarlas}}.",
+        "workspaceBack": "Tu workspace está de vuelta. Vuelve a conectar tu cuenta de {provider} desde Ajustes → Apps para que tus coworkers puedan usarla de nuevo.",
+        "trialEndsSoon": "Tu espacio gratuito de {provider} termina el {endsAt, date, long}. Después pasa a ser un espacio de pago en tu plan. Desconecta la cuenta desde Ajustes → Apps antes de esa fecha si no quieres conservarla.",
+        "trialEndedPlanInactive": "Tu espacio gratuito de {provider} terminó mientras tu plan no está activo, así que {account, select, none {la cuenta} other {{account}}} está en pausa. Añade un espacio en Facturación en menos de una semana para conservarla o se desconectará.",
+        "trialEndedDeclined": "Tu espacio gratuito de {provider} terminó y se rechazó la tarjeta, así que {account, select, none {la cuenta} other {{account}}} está en pausa. Añade un espacio en Facturación en menos de una semana para conservarla o se desconectará.",
+        "rateLimited": "{provider} pidió a {account, select, none {una de tus cuentas} other {{account}}} que bajara el ritmo. Tus coworkers no la usarán durante 24 horas, para que la cuenta siga a salvo.",
+        "signedOut": "{provider} cerró la sesión de {account, select, none {una de tus cuentas} other {{account}}}. Vuelve a conectarla desde Ajustes → Apps para que tus coworkers puedan usarla de nuevo.",
+        "budgetExhausted": "Tus créditos de Rerun de este mes se agotaron. Las ejecuciones programadas y activadas con modelos de Rerun están en pausa, y los coworkers no pueden comprar leads ni datos de SEO o redes sociales hasta que se reinicien o añadas créditos."
     }
 }

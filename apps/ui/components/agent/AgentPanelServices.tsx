@@ -26,9 +26,9 @@ import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { serviceIconProps } from '@/lib/services/icons'
-import { SERVICE_CATEGORIES, SERVICE_CATEGORY_LABELS, type ServiceCategory } from '@/lib/services/manifest'
+import { SERVICE_CATEGORIES, type ServiceCategory } from '@/lib/services/manifest'
 import { MAX_OFFERED_ALTERNATIVES } from '@/lib/services/alternatives'
 import type { AppTarget, AuthMethodSummary, ComposioTarget, CustomMcpServer, InstalledService, ManagedTarget, OAuthTarget, ServiceAlternative, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
 import { AlertTriangleIcon, Loader2Icon, RefreshCwIcon } from '@/lib/icons'
@@ -99,7 +99,9 @@ const BROWSE_PAGE_SIZE = 60
 // Services tab: browse the library and manage installed services. Reuses the exact
 // same ServiceConfigForm shown inline in chat, so config is identical on both sides.
 export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelServices')
+    const tServices = useTranslations('services')
     const errorText = useErrorText()
     const [installed, setInstalled] = useState<InstalledService[]>([])
     const [custom, setCustom] = useState<CustomMcpServer[]>([])
@@ -115,7 +117,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const [error, setError] = useState<string | null>(null)
     const [reconnecting, setReconnecting] = useState<string | null>(null)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
 
     // Paginated browse accumulation (empty query). A ref tracks server rows fetched so
     // client-side dedup can't drift the offset, and a ref guard blocks the concurrent calls a
@@ -434,7 +436,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                         </Chip>
                         {SERVICE_CATEGORIES.filter(c => c !== 'other').map(c => (
                             <Chip key={c} selected={selectedCategory === c} onClick={() => setSelectedCategory(c)}>
-                                {SERVICE_CATEGORY_LABELS[c]}
+                                {tServices(`categories.${c}`)}
                             </Chip>
                         ))}
                     </HScrollFade>
@@ -507,7 +509,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 server={server}
                                                 status={customStatuses.get(server.name)}
                                                 statusLoading={customStatusesLoading}
-                                                onConnect={() => setCustomStep({ kind: 'connect', server, popup: openPendingSignInPopup(server.displayName) })}
+                                                onConnect={() => setCustomStep({ kind: 'connect', server, popup: openPendingSignInPopup(server.displayName, tServices('signInPopup.connecting', { name: server.displayName })) })}
                                                 onEdit={() => onEditCustom(server.name)}
                                                 onRemove={() => onRemoveCustom(server.name)}
                                                 disabledReason={manageReason}

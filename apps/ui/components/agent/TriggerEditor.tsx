@@ -17,7 +17,7 @@ import { Switch } from '@/components/ui/switch'
 import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineTrigger, EngineTriggerMethod } from '@/lib/engine/types'
 import { HistoryIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
@@ -35,6 +35,7 @@ type TriggerEditorProps = {
 }
 
 export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: TriggerEditorProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.triggerEditor')
     const errorText = useErrorText()
     const isEdit = !!slug
@@ -42,7 +43,7 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
     // Only the prompt is sealed: the URL, the methods and the on/off switch stay available.
     const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
     const [loading, setLoading] = useState(isEdit)
     const [trigger, setTrigger] = useState<EngineTrigger | null>(null)
     const [name, setName] = useState('')

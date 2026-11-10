@@ -119,6 +119,8 @@
         "done": "Done"
     },
     "claude": {
+        "claudeTokenIsApiKey": "This is an Anthropic API key. Add it as an Anthropic (API) connection instead.",
+        "claudeTokenIsCode": "That's the code from Claude. Click Get token first, then paste the code here.",
         "approve": "Approve Rerun on Claude",
         "open": "Open Claude",
         "openAgain": "Open Claude again",

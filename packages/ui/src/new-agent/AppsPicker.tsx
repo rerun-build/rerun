@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { SERVICE_CATEGORIES, SERVICE_CATEGORY_LABELS, type ServiceCategory } from '@rerun/contracts'
+import { SERVICE_CATEGORIES, type ServiceCategory } from '@rerun/contracts'
 
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '../forms/command'
 import { Chip } from '../primitives/chip'
@@ -42,7 +42,7 @@ export function AppsPicker({ catalog, selected, onToggle }: { catalog: Connector
                         </Chip>
                         {categories.map(slug => (
                             <Chip key={slug} selected={category === slug} onClick={() => setCategory(slug)}>
-                                {SERVICE_CATEGORY_LABELS[slug]}
+                                {t(`newAgent.appsPicker.categories.${slug}`)}
                             </Chip>
                         ))}
                     </HScrollFade>

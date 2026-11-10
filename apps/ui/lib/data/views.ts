@@ -3,11 +3,11 @@ import type { EngineDbColumn } from '@/lib/engine/types'
 import { ImagesIcon, KanbanIcon, ListIcon, TableIcon, type LucideIcon } from '@/lib/icons'
 import type { SqlValue } from '@/lib/data/source'
 
-export const LAYOUT_META: Record<CardLayout, { label: string; icon: LucideIcon; description: string }> = {
-    table: { label: 'Table', icon: TableIcon, description: 'Compare values across columns.' },
-    list: { label: 'List', icon: ListIcon, description: 'Rows read by a name: people, companies, messages.' },
-    gallery: { label: 'Gallery', icon: ImagesIcon, description: 'Rows recognised by a picture: products, listings.' },
-    board: { label: 'Board', icon: KanbanIcon, description: 'Rows moving through statuses: a pipeline, tasks.' },
+export const LAYOUT_ICONS: Record<CardLayout, LucideIcon> = {
+    table: TableIcon,
+    list: ListIcon,
+    gallery: ImagesIcon,
+    board: KanbanIcon,
 }
 
 /** The id under which the plain grid of every column is remembered, next to the saved views. */

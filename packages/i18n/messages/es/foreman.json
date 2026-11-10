@@ -35,6 +35,13 @@
         "prompt": "¿Ya tienes una cuenta? <link>Inicia sesión</link>"
     },
     "nextSteps": {
+        "turnOn": "Activar mi coworker",
+        "yourInstallStarted": "La instalación de tu coworker ha empezado",
+        "installStarted": "La instalación de {name} ha empezado",
+        "startInstallingMine": "Empezar a instalar mi coworker",
+        "startInstalling": "Empezar a instalar a {name}",
+        "startTrial": "Empezar la prueba gratis",
+        "startPlan": "Iniciar mi plan",
         "starting": "Iniciando…",
         "openChat": "Abrir chat",
         "installFailed": "No se pudo iniciar la instalación"
@@ -181,6 +188,12 @@
             "doneDescription": "Tus coworkers ya pueden funcionar solos.",
             "lockedTitle": "Consigue {days} días más de prueba gratis",
             "lockedDescription": "Completa los {total} pasos de arriba. Faltan {remaining}."
+        },
+        "prompts": {
+            "first_agent": "Ayúdame a crear mi primer coworker",
+            "ai_provider": "Ayúdame a conectar mi suscripción de Claude o ChatGPT, o una clave de API",
+            "invite": "Ayúdame a invitar a un compañero a mi workspace",
+            "schedule": "Programa una tarea recurrente para uno de mis coworkers"
         }
     },
     "contact": {
@@ -223,7 +236,9 @@
         "nextBox": "Box siguiente",
         "build": "Crear mi coworker",
         "change": "Cambiar algo",
-        "standingBy": "En espera"
+        "standingBy": "En espera",
+        "lifeWorking": "Trabajando en ello",
+        "lifeDelivered": "En tus manos"
     },
     "starterPack": {
         "title": "Tu equipo inicial",

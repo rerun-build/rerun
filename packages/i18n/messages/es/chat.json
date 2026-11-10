@@ -116,6 +116,26 @@
         "install": "Instalar {name}",
         "skip": "Omitir por ahora"
     },
+    "activity": {
+        "thinking": "Pensando...",
+        "processing": "Procesando tu solicitud...",
+        "crafting": "Preparando una respuesta...",
+        "writing": "Escribiendo...",
+        "runningTool": "Ejecutando {tool}",
+        "waitingOn": "Esperando a {name}",
+        "building": "Creando {name}",
+        "buildingCoworkers": "Creando {count, plural, one {# coworker} other {# coworkers}} · {done} listos",
+        "waitingOnSubCoworkers": "Esperando a {count, plural, one {# sub-coworker} other {# sub-coworkers}} · {done} listos"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {Pregunta pendiente} one {Pregunta pendiente} other {# preguntas pendientes}}",
+        "approval": "{count, plural, =0 {Aprobación necesaria} one {Aprobación necesaria} other {# aprobaciones necesarias}}",
+        "secret": "{count, plural, =0 {Credencial necesaria} one {Credencial necesaria} other {# credenciales necesarias}}",
+        "mcpNamed": "Inicia sesión en {name}",
+        "mcp": "Inicio de sesión necesario",
+        "service": "{count, plural, =0 {App por conectar} one {App por conectar} other {# apps por conectar}}",
+        "takeover": "Tu turno en la pantalla"
+    },
     "pendingHitl": {
         "goTo": "{label}, ir allí"
     },
@@ -127,6 +147,21 @@
         "saveFailed": "No se pudieron guardar las credenciales"
     },
     "brainChange": {
+        "headline": {
+            "saved": "Brain actualizado: {title}",
+            "created": "Nueva página del Brain: {title}",
+            "deleted": "Eliminado del Brain: {title}",
+            "accepted": "Cambio aceptado: {title}",
+            "acceptedBy": "Cambio de {name} aceptado: {title}",
+            "dismissed": "Cambio descartado: {title}",
+            "dismissedBy": "Cambio de {name} descartado: {title}"
+        },
+        "notes": {
+            "saved": "Guardado. Cada coworker lo lee desde su próxima ejecución.",
+            "deleted": "Ningún coworker la lee ya. Su historial se conserva.",
+            "accepted": "Guardado. Cada coworker lo lee desde su próxima ejecución.",
+            "dismissed": "La página no ha cambiado."
+        },
         "undone": "Deshecho: {title}",
         "undoneNote": "La versión anterior ha vuelto.",
         "undo": "Deshacer",
@@ -188,7 +223,14 @@
         "retry": "Reintentar",
         "send": "Enviar",
         "retryLabel": "Reintentar el envío de la grabación",
-        "sendLabel": "Enviar la grabación"
+        "sendLabel": "Enviar la grabación",
+        "unsupported": "Este navegador no admite mensajes de voz.",
+        "microphoneBlocked": "El acceso al micrófono está bloqueado. Permítelo en la configuración de tu navegador para grabar.",
+        "noMicrophone": "No hay ningún micrófono disponible.",
+        "startFailed": "No se pudo iniciar la grabación.",
+        "nothingHeard": "No se oyó nada en esa grabación.",
+        "voiceMessageFailed": "No se pudo enviar tu mensaje de voz.",
+        "nothingRecorded": "No se grabó nada."
     },
     "agentInstall": {
         "started": "Instalación iniciada",
@@ -283,7 +325,10 @@
             "too_slow": "Demasiado lento",
             "memory": "Problema con la memoria",
             "other": "Otro"
-        }
+        },
+        "removeFailed": "No se pudo quitar tu opinión",
+        "saveFailed": "No se pudo guardar tu opinión",
+        "thanks": "Gracias por tu opinión"
     },
     "providerError": {
         "fallbackTitle": "Algo salió mal",
@@ -426,7 +471,9 @@
         "stopFailed": "No se pudo detener la ejecución en curso. Tu mensaje se enviará cuando termine.",
         "selectModel": "Elige un modelo para empezar: abre el menú de modelos de abajo.",
         "emptyTitle": "Inicia una conversación",
-        "emptyDescription": "Envía un mensaje a este coworker"
+        "emptyDescription": "Envía un mensaje a este coworker",
+        "runStoppedResponding": "La ejecución dejó de responder. Detenla para enviar otro mensaje.",
+        "continueWhereLeftOff": "Sigue donde lo dejaste."
     },
     "promptInput": {
         "tooLarge": "{count, plural, one {{names} es demasiado grande para adjuntarlo.} =2 {{names} son demasiado grandes para adjuntarlos.} other {{names} y {more} más son demasiado grandes para adjuntarlos.}}",

@@ -26,6 +26,7 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => {
         },
     }
 })
+vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
 vi.mock('@/app/api/_services/capacity.service', () => ({
     NoPlanError: class NoPlanError extends Error {
         constructor() {

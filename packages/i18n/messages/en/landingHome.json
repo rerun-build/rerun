@@ -1,5 +1,6 @@
 {
     "_context": {
+        "cases.quoted": "A customer quote wrapped in this language's quotation marks (French: « {quote} »).",
         "hero.title.lead": "First line of the home H1. <chip> wraps the word drawn as a rotating avatar pill; <keep> keeps its content on one line. Keep both tags around the same words.",
         "hero.pillLeads.jobs": "Read glued to a job title on a pill: \"Hire a | Sales\". The job pills (hero.tiles.*.pill) must read naturally after it.",
         "hero.pillLeads.tasks": "Read glued to a task on a pill: \"Hire a Coworker to | Find new clients\".",
@@ -437,6 +438,7 @@
         },
         "create": "Create your own Coworker",
         "quoteByline": "<author>{name}</author>, {role} at {company}",
+        "quoted": "“{quote}”",
         "card": {
             "tasks": "· {count, plural, one {# task} other {# tasks}}",
             "noApps": "No apps needed",

@@ -47,33 +47,7 @@ export function percentChange(current: number, previous: number): number | null 
     return Math.round(((current - previous) / previous) * 100)
 }
 
-const TOOL_LABELS: Record<string, string> = {
-    web_search: 'Web search',
-    web_fetch: 'Web reading',
-    leads_people_search: 'Finding people',
-    leads_email_find: 'Finding emails',
-    leads_email_verify: 'Verifying emails',
-    leads_phone_find: 'Finding phone numbers',
-    google_serp: 'Google results',
-    google_maps_search: 'Google Maps',
-    paid_data: 'Paid data',
-    paid_data_catalog: 'Reading the paid data catalog',
-    browser_navigate: 'Browsing',
-    shell_exec: 'Shell',
-    fs_read: 'Reading files',
-    fs_write: 'Writing files',
-    fs_edit: 'Editing files',
-    memory_write: 'Taking notes',
-    memory_search: 'Remembering',
-    call_agent: 'Calling coworkers',
-    delegate_tasks: 'Delegating',
-    notify_user: 'Pinging you',
-    publish_file: 'Publishing',
-    download: 'Downloading',
-}
-
-export function toolLabel(name: string): string {
-    if (TOOL_LABELS[name]) return TOOL_LABELS[name]
+export function rawToolLabel(name: string): string {
     const words = name.replace(/[_-]+/g, ' ').trim()
     return words.charAt(0).toUpperCase() + words.slice(1)
 }

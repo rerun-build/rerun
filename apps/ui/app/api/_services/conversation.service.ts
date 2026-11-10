@@ -2,6 +2,8 @@ import { actorFromContext, assertAgentAccess, assertSessionInWorkspace, keepVisi
 import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget, type SessionUsageSeed, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { type HistoryMessage, transformEngineMessages } from '@/lib/chat/engine-history'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { translatorFor } from '@/lib/i18n/server-translator'
 import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificationsFilter } from '@/lib/notifications/attention-details'
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
@@ -151,12 +153,13 @@ export async function listAgentConversations(ctx: WorkspaceContext, agentId: str
 
     // `unseen_runs` answers for `auth.uid()`: it runs as the caller, not through the service role.
     const asCaller = await createClient()
-    const [unseen, notifications] = await Promise.all([
+    const [unseen, notifications, tErrors] = await Promise.all([
         asCaller.rpc('unseen_runs', { p_workspace_id: ctx.workspace.id }),
         filter ? selectMany(ctx.supabase, 'notifications', ATTENTION_NOTIFICATION_COLUMNS, filter, { column: 'created_at', ascending: false }) : { data: [], error: null },
+        recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'chatErrors')),
     ])
     const unseenIds = unseen.error ? null : new Set((unseen.data ?? []).filter(run => run.agent_id === agentId).map(run => run.session_id))
-    const details = notifications.error ? {} : attentionDetailsOf(waiting, notifications.data ?? [], ctx.userId)
+    const details = notifications.error ? {} : attentionDetailsOf(waiting, notifications.data ?? [], ctx.userId, tErrors)
 
     return entries.map(entry => ({
         ...entry,

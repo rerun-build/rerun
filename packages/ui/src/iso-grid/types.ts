@@ -122,7 +122,7 @@ export type TileResultItem = {
 
 // The status words of the presets, which the board reads in the reader's language. A label a caller
 // writes itself (a paused workspace, a lab) has no key and shows as it is.
-export type TileStatusLabelKey = 'idle' | 'working' | 'error' | 'offline' | 'waiting_human' | 'disabled'
+export type TileStatusLabelKey = 'idle' | 'working' | 'error' | 'offline' | 'waiting_human' | 'disabled' | 'paused' | 'restoring'
 
 export type TileStatus = {
     label: string

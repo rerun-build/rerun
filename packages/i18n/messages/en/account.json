@@ -6,7 +6,8 @@
         "signIn.onlyMethod": "Tooltip on a disabled Disconnect button. {provider} is Google or Apple.",
         "profile.photo": "Field label: the profile photo.",
         "delete.consequences.signIn.title": "Heading of what happens to sign-in once the account is deleted.",
-        "delete.submit": "Button that opens the final confirmation."
+        "delete.submit": "Button that opens the final confirmation.",
+        "signIn.linkError.failed": "Toast after linking a sign-in provider to the account failed. {provider} is Google or Apple."
     },
     "title": "Account",
     "tabs": {
@@ -65,7 +66,12 @@
         "notConnected": "Not connected.",
         "onlyMethod": "{provider} is the only sign-in method connected to this account.",
         "disconnectTitle": "Disconnect {provider}?",
-        "disconnectDescription": "You will no longer be able to sign into this account with {provider}. Your other sign-in methods keep working."
+        "disconnectDescription": "You will no longer be able to sign into this account with {provider}. Your other sign-in methods keep working.",
+        "linkError": {
+            "identityTaken": "This {provider} account already signs into another Rerun account.",
+            "denied": "{provider} was not connected.",
+            "failed": "Could not connect {provider}. Try again."
+        }
     },
     "delete": {
         "consequences": {

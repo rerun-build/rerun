@@ -34,8 +34,8 @@ export function PlanLimitsBlock({ connection }: { connection: Pick<BoxConnection
         <DetailBlock title={t('planLimits.title')} aside={<span className="text-[11px] text-muted-foreground">{readingAge}</span>}>
             <div className="space-y-3 rounded-md border bg-muted/20 p-3">
                 {windows.map(window => {
-                    const name = planWindowName(window, connection.provider)
-                    const reset = planWindowReset(window)
+                    const name = planWindowName(window, t, connection.provider)
+                    const reset = planWindowReset(window, t, locale)
                     const percent = planWindowPercent(window)
                     return (
                         <div key={`${window.kind}:${window.label ?? ''}`} className="space-y-1.5">

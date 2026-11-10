@@ -2,7 +2,7 @@ import type { TemplateCategory, TemplateFaqItem } from '@rerun/contracts'
 import { z } from 'zod'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { slugify } from '@/lib/slugify'
-import type { ActionFailure } from '@/lib/i18n/action-error'
+import { failure, isErrorCode, type ActionFailure } from '@/lib/i18n/action-error'
 import { loadServiceCatalog } from './catalog'
 import { templateBriefSchema, withConnectorNames } from './describe'
 import { uploadTemplateImageBytes, type TemplateImageFolder } from './images'
@@ -31,19 +31,20 @@ export const faqPrefillInputSchema = z.object({
 
 export const altTextInputSchema = z.object({
     brief: templateBriefSchema,
-    imageUrl: z.string().url('Upload the image before writing its alt text.'),
+    imageUrl: z.string().url('uploadImageBeforeAltText'),
     isCover: z.boolean().default(false),
 })
 
-function issues(error: z.ZodError): string {
-    return error.issues.map(i => i.message).join('\n')
+function issues(error: z.ZodError): ActionFailure {
+    const code = error.issues.map(issue => issue.message).find(isErrorCode)
+    return code ? failure(code) : { ok: false, error: error.issues.map(issue => issue.message).join('\n') }
 }
 
 export async function runImageUpload(formData: FormData, folder: TemplateImageFolder): Promise<UploadResult> {
     const file = formData.get('file')
-    if (!(file instanceof File)) return { ok: false, error: 'No file provided.' }
-    if (!file.type.startsWith('image/')) return { ok: false, error: 'Please choose an image file.' }
-    if (file.size > MAX_IMAGE_BYTES) return { ok: false, error: 'Image is too large (max 8MB).' }
+    if (!(file instanceof File)) return failure('noFileProvided')
+    if (!file.type.startsWith('image/')) return failure('chooseImage')
+    if (file.size > MAX_IMAGE_BYTES) return failure('imageTooLarge', { max: MAX_IMAGE_BYTES / 1024 / 1024 })
 
     const url = await uploadTemplateImageBytes(createServiceRoleClient(), await file.arrayBuffer(), folder)
     return { ok: true, url }
@@ -51,7 +52,7 @@ export async function runImageUpload(formData: FormData, folder: TemplateImageFo
 
 export async function runContentPrefill(input: unknown): Promise<ContentPrefillResult> {
     const parsed = templateBriefSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: issues(parsed.error) }
+    if (!parsed.success) return issues(parsed.error)
 
     const { tagline, longDescription } = await generateTemplateContent(parsed.data)
     return { ok: true, tagline, longDescription }
@@ -61,7 +62,7 @@ export async function runContentPrefill(input: unknown): Promise<ContentPrefillR
 // given none, the caller has no say over the URL and only the copy comes back.
 export async function runMetaPrefill(input: unknown, currentSlug?: string): Promise<MetaPrefillResult> {
     const parsed = templateBriefSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: issues(parsed.error) }
+    if (!parsed.success) return issues(parsed.error)
 
     const supabase = createServiceRoleClient()
     const catalog = await loadServiceCatalog(supabase, parsed.data.connectors)
@@ -75,14 +76,14 @@ export async function runMetaPrefill(input: unknown, currentSlug?: string): Prom
 
 export async function runFaqPrefill(input: unknown): Promise<FaqPrefillResult> {
     const parsed = faqPrefillInputSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: issues(parsed.error) }
+    if (!parsed.success) return issues(parsed.error)
 
     return { ok: true, faq: await generateTemplateFaq(parsed.data) }
 }
 
 export async function runAltTextPrefill(input: unknown): Promise<AltTextResult> {
     const parsed = altTextInputSchema.safeParse(input)
-    if (!parsed.success) return { ok: false, error: issues(parsed.error) }
+    if (!parsed.success) return issues(parsed.error)
 
     return { ok: true, alt: await generateImageAltText(parsed.data) }
 }

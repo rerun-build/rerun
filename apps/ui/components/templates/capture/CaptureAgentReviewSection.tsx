@@ -80,7 +80,7 @@ export function CaptureAgentReviewSection({
                     )}
                     {plan.schedules.length > 0 && (
                         <CaptureReviewRow label={t('schedules')}>
-                            <CaptureReviewChips items={plan.schedules.map(s => `${s.name}: ${s.cron ? scheduleLabel(s.cron) : t('oneShot')}`)} max={4} />
+                            <CaptureReviewChips items={plan.schedules.map(s => `${s.name}: ${s.cron ? scheduleLabel(s.cron, locale) : t('oneShot')}`)} max={4} />
                         </CaptureReviewRow>
                     )}
                     {plan.triggers.length > 0 && (

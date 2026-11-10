@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 // the same panel as pricing a template, not behind a separate entry point.
 export function CreatorSidebarFooter({ pane, account, onSelect }: { pane: CreatorPane; account: CreatorAccountState | null; onSelect: (pane: CreatorPane) => void }) {
     const t = useTranslations('templates.payouts.sidebar')
+    const tPayouts = useTranslations('templates.payouts')
     return (
         <div className="shrink-0 border-t border-border">
             <Row icon={WalletIcon} label={t('payouts')} selected={pane.kind === 'payouts'} onSelect={() => onSelect({ kind: 'payouts' })}>
@@ -20,7 +21,7 @@ export function CreatorSidebarFooter({ pane, account, onSelect }: { pane: Creato
                     <Skeleton className="h-4 w-16 rounded-full" />
                 ) : (
                     <Badge tone={payoutStateTone(account.state)} size="xs" glow={false} className="font-medium">
-                        {payoutStateLabel(account.state)}
+                        {payoutStateLabel(account.state, tPayouts)}
                     </Badge>
                 )}
             </Row>

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 
 export function ExpertTemplateRow({ template, selected, onSelect }: { template: ExpertTemplate; selected: boolean; onSelect: () => void }) {
     const t = useTranslations('templates.expert.row')
+    const tStatus = useTranslations('templates.status')
     return (
         <button
             type="button"
@@ -26,7 +27,7 @@ export function ExpertTemplateRow({ template, selected, onSelect }: { template: 
                 <span className="truncate text-sm font-medium">{template.title}</span>
                 <div className="flex items-center gap-1.5">
                     <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
-                        {templateStatusLabel(template.status)}
+                        {templateStatusLabel(template.status, tStatus)}
                     </Badge>
                     <TemplatePriceBadge pricing={template.pricing} />
                     <span className="text-[10px] text-muted-foreground">

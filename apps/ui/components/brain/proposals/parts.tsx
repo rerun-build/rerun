@@ -50,8 +50,9 @@ export function When({ proposal }: { proposal: BrainProposal }) {
 
 function Sources({ proposal }: { proposal: BrainProposal }) {
     const t = useTranslations('brain.proposals')
+    const tBrain = useTranslations('brain')
     if (!proposal.sources.length) return null
-    return <p className="text-xs text-muted-foreground">{t('basedOn', { sources: brainSourceLabels(proposal.sources).join(', ') })}</p>
+    return <p className="text-xs text-muted-foreground">{t('basedOn', { sources: brainSourceLabels(proposal.sources, tBrain).join(', ') })}</p>
 }
 
 export function AllCaughtUp() {

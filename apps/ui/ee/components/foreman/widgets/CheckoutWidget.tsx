@@ -2,7 +2,8 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { track } from '@rerun/analytics/client'
-import { useTranslations } from 'next-intl'
+import { priceLabel } from '@rerun/contracts'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { startTrialAction } from '@/ee/actions/billing.actions'
@@ -103,6 +104,8 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
     const cardless = offer === 'cardless'
     const priceArm = usePriceArm()
     const arrival = useForemanStore(state => state.arrival)
+    const tPrice = useTranslations('templates.price')
+    const locale = useLocale()
 
     // Answering twice throws inside the AI SDK, and both the realtime row and the poll can land in
     // the same tick. Taking the trial back up after a refusal lands here too, one turn too late to
@@ -163,5 +166,5 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
 
     // No way to turn it down: nothing can be built without a plan. Closing the card form lands back
     // here with the button still live.
-    return <TrialOfferCard offer={offer} priceArm={priceArm} submitting={submitting || (stage === 'checkout' && billingOpen)} error={trialError} onStart={cardless ? startTrial : openCheckout} subject={arrival?.coworker ?? arrival?.title} thenPay={arrival?.paid} />
+    return <TrialOfferCard offer={offer} priceArm={priceArm} submitting={submitting || (stage === 'checkout' && billingOpen)} error={trialError} onStart={cardless ? startTrial : openCheckout} subject={arrival?.coworker ?? arrival?.title} thenPay={arrival?.paid ? priceLabel(arrival.paid, tPrice, locale) : undefined} />
 }

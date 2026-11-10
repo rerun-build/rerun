@@ -1,7 +1,8 @@
 'use client'
 
 import { SkillProposalBlock as SkillProposalBlockBase } from '@rerun/ui/chat'
-import { BOX_MANAGE_REASON, boxAccessFor } from '@/lib/board/box-access'
+import { boxAccessFor } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { useBoardStore } from '@/stores/board.store'
 import { useOptionalSession } from '@/supabase/session/SessionProvider'
 import type { EngineSkillProposal } from '@/lib/engine/types'
@@ -15,6 +16,7 @@ export type SkillProposalBlockProps = {
 }
 
 export function SkillProposalBlock({ agentId, proposal, pending, pinned, onDecide }: SkillProposalBlockProps) {
+    const boxManageReason = useBoxManageReason()
     const openAgentSkill = useBoardStore(s => s.openAgentSkill)
     const canManage = useCanDecide(agentId)
     const decidable = Boolean(onDecide)
@@ -33,7 +35,7 @@ export function SkillProposalBlock({ agentId, proposal, pending, pinned, onDecid
             pinned={pinned}
             onAccept={decidable ? () => onDecide?.(proposal.id, 'accept') : undefined}
             onDismiss={decidable ? () => onDecide?.(proposal.id, 'dismiss') : undefined}
-            decisionDisabledReason={canManage ? undefined : BOX_MANAGE_REASON}
+            decisionDisabledReason={canManage ? undefined : boxManageReason}
             onOpenSkill={agentId && appliedSlug ? () => openAgentSkill(agentId, appliedSlug) : undefined}
         />
     )

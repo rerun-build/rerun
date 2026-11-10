@@ -13,7 +13,7 @@ import type { WorkspaceScene } from '@/lib/scenes/workspace-scene'
 // sort d'ici est ce que l'app dessine — statuts, Box, liens compris.
 export function WorkspaceSceneStage({ scene, stageRef }: { scene: WorkspaceScene; stageRef?: Ref<HTMLDivElement> }) {
     const tiles = useMemo(() => scene.agents.map(agent => tileFromAgent(agent)), [scene.agents])
-    const containers = useMemo(() => scene.spaces.map(containerFromSpace), [scene.spaces])
+    const containers = useMemo(() => scene.spaces.map(space => containerFromSpace(space)), [scene.spaces])
 
     return (
         <div

@@ -21,6 +21,7 @@ import { storeTemplateImageFromUrl } from './images'
 import { IMAGE_ALT_LIMIT, MAX_TEMPLATE_GALLERY_IMAGES, MAX_TEMPLATES_PER_AUTHOR } from './limits'
 import { describeSecretHit, scanDocumentForSecrets } from './secret-scan'
 import { templateSubmitBlockers } from './submit'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 import { createTemplate, uniqueTemplateSlug, updateTemplateBySlug, type TemplateReviewPatch } from './write'
 
 // Authoring a template is the same job whoever asks: a signed-in expert in the app, or an MCP key
@@ -115,7 +116,7 @@ export async function submitAuthorTemplate(userId: string, id: string): Promise<
     // Resolved here rather than trusted from the caller: the checklist is what a panel renders,
     // this is what decides.
     const payoutsReady = await isPayoutReady(stored.document.creatorId)
-    const missing = templateSubmitBlockers(stored.document, { payoutsReady })
+    const missing = templateSubmitBlockers(stored.document, englishTranslator('templates.expert.footer'), { payoutsReady })
     if (missing.length > 0) throw new AppError('addBeforeSubmitting', { fields: missing.join(', ') })
 
     const secrets = scanDocumentForSecrets(stored.document).map(describeSecretHit)

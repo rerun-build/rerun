@@ -4,7 +4,7 @@ import { SymbolView } from 'expo-symbols'
 import { useMemo, useState } from 'react'
 import { FlatList, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useTranslations } from 'use-intl'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { useSignInFlow } from '@/components/auth/SignInFlow'
 import { AppText } from '@/components/ui/AppText'
@@ -19,8 +19,9 @@ export default function PickCountry() {
     const insets = useSafeAreaInsets()
     const { country, setCountry } = useSignInFlow()
     const t = useTranslations('mobileAuth')
+    const locale = useLocale()
     const [query, setQuery] = useState('')
-    const results = useMemo(() => searchCountries(query), [query])
+    const results = useMemo(() => searchCountries(query, locale), [query, locale])
 
     const pick = (picked: PhoneCountry) => {
         Haptics.selectionAsync()

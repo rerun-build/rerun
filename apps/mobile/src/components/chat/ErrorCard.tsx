@@ -22,6 +22,7 @@ export type ErrorCardActions = {
 export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConnect }: { message: string } & ErrorCardActions) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.error')
+    const tErrors = useTranslations('chatErrors')
     const kind = classifyChatError(message)
     const budget = kind === 'budget' && onConnect
     const reconnect = kind === 'unauthorized' && onReconnect
@@ -31,9 +32,9 @@ export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConn
 
     return (
         <View style={{ gap: spacing.sm, padding: spacing.lg, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: withAlpha(theme.destructive, 0.35), backgroundColor: withAlpha(theme.destructive, theme.scheme === 'dark' ? 0.1 : 0.05) }}>
-            <AppText variant="headline">{budget ? t('creditsTitle') : (chatErrorTitle(kind, message) ?? t('fallbackTitle'))}</AppText>
+            <AppText variant="headline">{budget ? t('creditsTitle') : (chatErrorTitle(kind, message, tErrors) ?? t('fallbackTitle'))}</AppText>
             <AppText variant="callout" tone="muted">
-                {budget ? t('creditsBody') : friendlyError(message)}
+                {budget ? t('creditsBody') : friendlyError(message, tErrors)}
             </AppText>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
                 {budget && (

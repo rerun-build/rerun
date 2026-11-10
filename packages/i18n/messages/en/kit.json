@@ -68,7 +68,12 @@
         "foreman.agentPicker.openTab": "{tab} is the name of a coworker panel tab (Skills, Schedules), {name} the coworker's name.",
         "experts.card.namePlaceholder": "Shown on a profile card before a name is typed.",
         "experts.card.rolePlaceholder": "Shown on a profile card before a role is typed. Rerun is the brand.",
-        "isoGrid.countdown.minutes": "Very short countdown to a coworker's next run, on a tiny badge: keep the one-letter unit (m for minutes)."
+        "isoGrid.countdown.minutes": "Very short countdown to a coworker's next run, on a tiny badge: keep the one-letter unit (m for minutes).",
+        "isoGrid.status.paused": "Status of a coworker whose workspace is paused (unsubscribed): its machine is archived.",
+        "isoGrid.status.restoring": "Status of a coworker while its paused workspace is being brought back.",
+        "isoGrid.untitledBox": "Name shown on a Box (a group of coworkers on the board) that has no name.",
+        "isoGrid.tileAria": "Screen reader label of a coworker block on the board. {name} is the coworker, {state} its status word, {toHandle} how many conversations wait on the user, {results} how many finished results are unread.",
+        "newAgent.appsPicker.categories": "Filter chips over a list of apps a coworker can use: the kind of app."
     },
     "close": "Close",
     "chat": {
@@ -344,6 +349,18 @@
         }
     },
     "monitoring": {
+        "metrics": {
+            "count": "Count",
+            "totalTokens": "Total tokens",
+            "inputTokens": "Input tokens",
+            "outputTokens": "Output tokens",
+            "cachedInputTokens": "Cached tokens",
+            "reasoningTokens": "Reasoning tokens",
+            "cost": "Cost",
+            "avgDurationMs": "Avg duration",
+            "errorCount": "Errors",
+            "errorRate": "Error rate"
+        },
         "live": "Live",
         "runStatus": {
             "running": "Running",
@@ -366,6 +383,12 @@
             "empty": "No coworkers to display."
         },
         "chart": {
+            "rowCount": {
+                "runs": "{count} runs",
+                "runSteps": "{count} run steps",
+                "toolCalls": "{count} tool calls",
+                "sessions": "{count} sessions"
+            },
             "other": "Other",
             "loading": "Loading...",
             "noData": "No data in this period."
@@ -465,7 +488,18 @@
             "search": "Search apps",
             "all": "All",
             "empty": "No app by that name.",
-            "limit": "Up to {max} apps to start with. Your agent can connect more later."
+            "limit": "Up to {max} apps to start with. Your agent can connect more later.",
+            "categories": {
+                "payments": "Payments",
+                "ecommerce": "E-commerce",
+                "crm": "CRM",
+                "marketing": "Marketing",
+                "seo": "SEO",
+                "analytics": "Analytics",
+                "dev": "Developer",
+                "productivity": "Productivity",
+                "other": "Other"
+            }
         },
         "schedule": {
             "button": "Schedule",
@@ -499,14 +533,19 @@
             "error": "Error",
             "offline": "Offline",
             "waiting_human": "Waiting for you",
-            "disabled": "Inactive"
+            "disabled": "Inactive",
+            "paused": "Paused",
+            "restoring": "Restoring"
         },
         "countdown": {
             "seconds": "{count}s",
             "minutes": "{count}m",
             "hours": "{count}h",
             "days": "{count}d"
-        }
+        },
+        "untitledBox": "Untitled Box",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} other {, # to handle}}{results, plural, =0 {} one {, # new result} other {, # new results}}"
     },
     "templateStory": {
         "states": {

@@ -2,7 +2,7 @@ import type { CountryCode } from 'libphonenumber-js/min'
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
-import { useTranslations } from 'use-intl'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { countryByCode, examplePlaceholder, formatAsTyped } from '@/lib/phone'
@@ -27,7 +27,8 @@ export function PhoneField({ country, value, onChangeText, onPickCountry, onSubm
     const theme = useTheme()
     const [focused, setFocused] = useState(false)
     const t = useTranslations('mobileAuth')
-    const { flag, callingCode, name } = countryByCode(country)
+    const locale = useLocale()
+    const { flag, callingCode, name } = countryByCode(country, locale)
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', height: FIELD_HEIGHT, borderRadius: FIELD_RADIUS, borderCurve: 'continuous', ...fieldOutline(theme, { focused, invalid }), backgroundColor: theme.card }}>
             <Pressable onPress={onPickCountry} accessibilityRole="button" accessibilityLabel={t('phone.countryLabel', { name })} hitSlop={4} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, height: '100%', paddingLeft: spacing.lg, paddingRight: spacing.md, opacity: pressed ? 0.6 : 1 })}>

@@ -1,5 +1,8 @@
 {
     "_context": {
+        "trialOffer.limitsDuringTrial": "{agents} is how many coworkers can run during the trial, {credits} the credit it comes with.",
+        "trialOffer.chargeLine": "{price} is the monthly plan price like \"$49\", {date} a short date.",
+        "trialOffer.cardlessLine": "{price} is the monthly plan price like \"$49\", {date} a short date.",
         "apps.leaving": "Slots removed at the next renewal. {date} is a short date or \"your renewal\".",
         "apps.lessReason.disconnectFirst": "Tooltip of a disabled minus button. {app} is the name of the app.",
         "apps.slots.lineMonthly": "The <slots> tag is replaced by the slot count sentence. {price} is a dollar amount.",
@@ -56,6 +59,7 @@
         "parts.interval.perYear": "<amount></amount> is replaced by the animated price in dollars.",
         "parts.plan.billedYearly": "<amount></amount> is replaced by the yearly price in dollars.",
         "parts.showTestimonial": "Accessible label of the button showing a customer quote. {company} is the customer's company.",
+        "parts.quoted": "A customer quote in the quotation marks of the language. {quote} is the quote, already translated.",
         "perks.feature": "Hidden column heading for screen readers.",
         "perks.rows.coworkers.trial": "{count} is how many coworkers can be switched on during the trial.",
         "plan.billed.monthly": "A price per month. {price} is a dollar amount like \"$29\".",
@@ -85,7 +89,9 @@
         "usage.pace.runsOutBeforeReset": "{days} is how many days before the monthly reset the credit runs out.",
         "usage.pane.creditsUsed": "Big figure then a small muted label: '1,250 credits used'.",
         "usage.pane.pace": "Toggle of the chart: the cumulative view, spent so far against the credit.",
-        "usage.pane.periodLeft": "{start} and {end} are short dates of the billing period, {left} the credits left."
+        "usage.pane.periodLeft": "{start} and {end} are short dates of the billing period, {left} the credits left.",
+        "usage.paidData": "Names of the paid data sources a coworker can buy, as rows of the credit usage breakdown (plural nouns: what was bought).",
+        "perks.headlines.credits": "Short perk of the paid plan, in a row of checkmarks: the monthly credit allowance."
     },
     "credits": "{count, plural, one {# credit} other {# credits}}",
     "plan": {
@@ -555,6 +561,7 @@
             "perMonth": "per month"
         },
         "showTestimonial": "Show {company}",
+        "quoted": "“{quote}”",
         "cardOnFile": "Card on file",
         "promo": {
             "add": "Add promo code",
@@ -600,6 +607,11 @@
                 "trial": "Not available",
                 "pro": "+{credits, plural, one {# credit} other {# credits}} when you need them"
             }
+        },
+        "headlines": {
+            "credits": "{credits, plural, one {# credit/mo} other {# credits/mo}}",
+            "models": "Premium models",
+            "coworkers": "Unlimited coworkers"
         }
     },
     "cancel": {
@@ -800,6 +812,152 @@
             "today": "Today",
             "trialEnds": "Trial ends {date}",
             "resets": "Resets {date}"
+        },
+        "paidData": {
+            "people": {
+                "search": "Profiles",
+                "email": {
+                    "find": "Work emails",
+                    "verify": "Email checks"
+                },
+                "phone": {
+                    "find": "Phone numbers"
+                },
+                "enrich": "Person profiles",
+                "identity": {
+                    "resolve": "LinkedIn lookups"
+                }
+            },
+            "companies": {
+                "search": "Companies",
+                "enrich": "Company profiles",
+                "similar": "Lookalike searches",
+                "jobs": {
+                    "search": "Job listing searches"
+                },
+                "news": "Company news searches"
+            },
+            "google": {
+                "serp": {
+                    "organic": "Google rankings",
+                    "maps": "Google Maps searches",
+                    "local": "Local rankings",
+                    "news": "Google News searches"
+                },
+                "keywords": {
+                    "volume": "Keyword volume checks",
+                    "ideas": "Keyword idea lists",
+                    "trends": "Trend charts"
+                }
+            },
+            "ai-search": {
+                "perplexity": {
+                    "answer": "Perplexity answers"
+                }
+            },
+            "web": {
+                "backlinks": {
+                    "summary": "Backlink reports",
+                    "list": "Backlink lists"
+                },
+                "anchors": {
+                    "list": "Anchor text lists"
+                },
+                "url": {
+                    "metrics": "Authority checks"
+                }
+            },
+            "linkedin": {
+                "user": {
+                    "profile": "LinkedIn profiles",
+                    "posts": "LinkedIn post lists"
+                },
+                "company": {
+                    "profile": "LinkedIn company pages"
+                },
+                "post": {
+                    "detail": "LinkedIn posts",
+                    "comments": "LinkedIn comment lists",
+                    "reactions": "LinkedIn reaction lists"
+                }
+            },
+            "tiktok": {
+                "user": {
+                    "profile": "TikTok profiles",
+                    "videos": "TikTok video lists"
+                },
+                "search": {
+                    "users": "TikTok account searches",
+                    "videos": "TikTok video searches"
+                },
+                "video": {
+                    "detail": "TikTok videos",
+                    "comments": "TikTok comment lists"
+                },
+                "comment": {
+                    "replies": "TikTok reply lists"
+                }
+            },
+            "instagram": {
+                "user": {
+                    "profile": "Instagram profiles",
+                    "posts": "Instagram post lists",
+                    "reels": "Instagram reel lists"
+                },
+                "search": {
+                    "users": "Instagram account searches",
+                    "reels": "Instagram reel searches"
+                },
+                "hashtag": {
+                    "posts": "Instagram hashtag searches"
+                },
+                "post": {
+                    "detail": "Instagram posts",
+                    "comments": "Instagram comment lists"
+                }
+            },
+            "x": {
+                "user": {
+                    "profile": "X profiles",
+                    "posts": "X post lists"
+                },
+                "search": {
+                    "posts": "X searches"
+                },
+                "post": {
+                    "comments": "X reply lists"
+                }
+            },
+            "youtube": {
+                "channel": {
+                    "profile": "YouTube channels",
+                    "videos": "YouTube video lists"
+                },
+                "search": {
+                    "videos": "YouTube searches"
+                },
+                "video": {
+                    "detail": "YouTube videos",
+                    "comments": "YouTube comment lists"
+                }
+            },
+            "facebook": {
+                "user": {
+                    "profile": "Facebook pages",
+                    "posts": "Facebook post lists"
+                },
+                "post": {
+                    "comments": "Facebook comment lists"
+                }
+            },
+            "reddit": {
+                "subreddit": {
+                    "posts": "Subreddit feeds"
+                },
+                "post": {
+                    "detail": "Reddit posts"
+                }
+            }
         }
     },
     "layout": {
@@ -822,5 +980,18 @@
     "creditsBar": {
         "used": "Credits used",
         "resetsOn": "Resets on {date}"
+    },
+    "trialOffer": {
+        "limitsDuringTrial": "{agents} coworkers and {credits, plural, one {# credit} other {# credits}} during the trial.",
+        "chargeLine": "Card required, $0 today. {price} charged on {date} unless you cancel before.",
+        "cardlessLine": "No card needed, $0 today. Add one before {date} to keep going at {price}/month.",
+        "startTrial": "Start your {days}-day free trial",
+        "subscribe": "Subscribe {price}/mo",
+        "billedToday": "Billed today. Cancel anytime.",
+        "trialUsed": "Your free trial has been used. Billed today, cancel anytime."
+    },
+    "startPlan": {
+        "trialFailed": "Could not start your trial",
+        "trialStarted": "Trial started"
     }
 }

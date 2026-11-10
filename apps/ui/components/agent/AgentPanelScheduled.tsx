@@ -20,7 +20,7 @@ import { Switch } from '@/components/ui/switch'
 import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineRun, EngineSchedule } from '@/lib/engine/types'
 import { humanCron, scheduleSummary } from '@/lib/schedules/cron'
 import { outcomeKey, type TaskOutcome } from '@/lib/schedules/outcomes'
@@ -47,7 +47,9 @@ type AgentPanelScheduledProps = {
 type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string } | { mode: 'runs'; slug: string }
 
 export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSlug, onFocusConsumed }: AgentPanelScheduledProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelScheduled')
+    const tAgent = useTranslations('agent')
     const locale = useLocale()
     const [schedules, setSchedules] = useState<EngineSchedule[]>([])
     const [outcomes, setOutcomes] = useState<Record<string, TaskOutcome>>({})
@@ -119,7 +121,7 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     }
 
     const newButton = (
-        <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON}>
+        <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
                 <PlusIcon className="size-3.5 mr-1" /> {t('new')}
             </Button>
@@ -148,7 +150,7 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
                                     key={s.slug}
                                     onClick={() => setView({ mode: 'edit', slug: s.slug })}
                                     title={s.name}
-                                    description={scheduleSummary(s, locale)}
+                                    description={scheduleSummary(s, tAgent, locale)}
                                     footer={<TaskOutcomeFooter outcome={outcomes[outcomeKey('schedule', s.slug)]} lastStartedAt={s.lastRunAt} />}
                                     meta={
                                         !s.enabled && (
@@ -191,7 +193,7 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
     const [error, setError] = useState<string | null>(null)
     const errorText = useErrorText()
 
-    const summary = mode === 'cron' ? (cron.trim() ? (humanCron(cron) ?? cron) : '') : runAtLocal ? formatDate(localInputToIso(runAtLocal), locale) : ''
+    const summary = mode === 'cron' ? (cron.trim() ? (humanCron(cron, locale) ?? cron) : '') : runAtLocal ? formatDate(localInputToIso(runAtLocal), locale) : ''
 
     const handleGenerate = useCallback(async () => {
         if (!input.trim()) return
@@ -252,6 +254,7 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
 }
 
 function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistory, onOpenSession }: { agentId: string; agentName: string; slug?: string; onDone: () => void; onBack: () => void; onShowHistory?: () => void; onOpenSession?: (sessionId: string, title: string, runId: string | null) => void }) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelScheduled.editor')
     const errorText = useErrorText()
     const isEdit = !!slug
@@ -259,7 +262,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
     // Only the prompt is sealed: pausing a task or moving its hour stays available.
     const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
     const [loading, setLoading] = useState(isEdit)
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')

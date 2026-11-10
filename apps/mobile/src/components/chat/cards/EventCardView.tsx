@@ -1,4 +1,4 @@
-import type { BrainChange } from '@rerun/contracts'
+import { brainChangeHeadline, type BrainChange } from '@rerun/contracts'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useState, type ReactNode } from 'react'
 import { Alert, View } from 'react-native'
@@ -42,26 +42,11 @@ export function EventRow({ symbol, icon, title, note, trailing, children }: { sy
 
 type Undo = 'idle' | 'pending' | 'done'
 
-type CardsTranslator = ReturnType<typeof useTranslations<'mobileCards'>>
-
-// The headline of `brainChangeHeadline`, in the app's language.
-function brainHeadline({ status, title, mode, agentName }: BrainChange, t: CardsTranslator): string {
-    switch (status) {
-        case 'saved':
-            return mode === 'create' ? t('brain.created', { title }) : t('brain.saved', { title })
-        case 'deleted':
-            return t('brain.deleted', { title })
-        case 'accepted':
-            return agentName ? t('brain.acceptedBy', { name: agentName, title }) : t('brain.accepted', { title })
-        case 'dismissed':
-            return agentName ? t('brain.dismissedBy', { name: agentName, title }) : t('brain.dismissed', { title })
-    }
-}
-
 // A change the Rerun agent made to the Brain itself, already landed: an edit can still be undone from
 // here, as on the web. Opening the page stays on the web, which has the Brain.
 function BrainChangeRow({ change }: { change: BrainChange }) {
     const t = useTranslations('mobileCards')
+    const tBrain = useTranslations('mobileCards.brain')
     const { session, me } = useAuth()
     const [undo, setUndo] = useState<Undo>('idle')
     const undoRevisionId = change.status === 'saved' && change.mode === 'edit' ? change.undoRevisionId : null
@@ -77,7 +62,7 @@ function BrainChangeRow({ change }: { change: BrainChange }) {
         }
     }
     if (undo === 'done') return <EventRow symbol="brain" title={t('event.undone', { title: change.title })} note={t('event.undoneNote')} />
-    return <EventRow symbol="brain" title={brainHeadline(change, t)} note={t(`brain.notes.${change.status}`)} trailing={undoRevisionId ? <Button size="sm" variant="ghost" label={t('event.undo')} loading={undo === 'pending'} onPress={() => void undoChange()} /> : undefined} />
+    return <EventRow symbol="brain" title={brainChangeHeadline(change, tBrain)} note={t(`brain.notes.${change.status}`)} trailing={undoRevisionId ? <Button size="sm" variant="ghost" label={t('event.undo')} loading={undo === 'pending'} onPress={() => void undoChange()} /> : undefined} />
 }
 
 export function EventCardView({ card, coworkerName }: { card: EventCard; coworkerName: string }) {

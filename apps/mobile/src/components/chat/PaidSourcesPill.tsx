@@ -46,6 +46,7 @@ function Facepile({ sources }: { sources: PaidSource[] }) {
 }
 
 function SourceRow({ line }: { line: PaidSourceLine }) {
+    const t = useTranslations('tools')
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.md }}>
             <SourceLogo source={line.source} size={ROW_LOGO_SIZE} />
@@ -54,7 +55,7 @@ function SourceRow({ line }: { line: PaidSourceLine }) {
                     {line.source.name}
                 </AppText>
                 <AppText variant="caption" tone="muted" numberOfLines={1}>
-                    {line.activity}
+                    {t(`paidData.${line.capability}`)}
                 </AppText>
             </View>
             <View style={{ alignItems: 'flex-end', flexShrink: 0 }}>

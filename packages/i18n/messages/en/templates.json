@@ -1,5 +1,40 @@
 {
+    "installFeedback": {
+        "noLongerAvailable": "\"{title}\" is no longer available",
+        "buyFailed": "Could not buy \"{title}\"",
+        "alreadyOnBoard": "\"{title}\" is already on your board",
+        "alreadyOnBoardHint": "Its coworkers are opening where you left them.",
+        "notImported": "{name} could not be imported.",
+        "inactiveCount": "{count, plural, one {# of them are inactive: your plan has no free coworker slot.} other {# of them are inactive: your plan has no free coworker slot.}}",
+        "landed": "{count, plural, one {# coworker from \"{title}\" landed on your board} other {# coworkers from \"{title}\" landed on your board}}",
+        "openOne": "Open one and start its installation: it connects what it needs with you.",
+        "landedInactive": "It landed inactive: your plan has no free coworker slot.",
+        "agentLanded": "\"{name}\" landed on your board",
+        "openIt": "Open it and start its installation: it connects what it needs with you.",
+        "webhooksMoved": "{count, plural, one {# webhook got a new URL: point your services at the copy's own address.} other {# webhooks got a new URL: point your services at the copy's own address.}}",
+        "schedulesDoubled": "{count, plural, one {# schedule runs on the copy too. Turn it off if the work should not happen twice.} other {# schedules run on the copy too. Turn them off if the work should not happen twice.}}",
+        "copyReady": "It carries everything the original had and is ready to run.",
+        "prepareBoxFailed": "Could not prepare your Box",
+        "settingUp": "Setting up \"{title}\"",
+        "settingUpHint": "Your coworkers will appear on the board in a moment.",
+        "setUpFailed": "Could not set up \"{title}\""
+    },
     "_context": {
+        "price.free": "Price of a template that costs nothing.",
+        "price.monthly": "{amount} is a price in its currency, like \"$29\". /mo = per month.",
+        "price.useForFree": "Button on a free template.",
+        "price.hire": "Button on a paid template's page. {count} is the number of coworkers it installs, {price} its price like \"$29\" or \"$29/mo\".",
+        "price.hireCard": "Short button revealed on a paid template card. {price} is its price like \"$29\" or \"$29/mo\".",
+        "status.in_review": "A template its author submitted to the Rerun team, not published yet.",
+        "status.unlisted": "A template reachable by its link but shown in no listing.",
+        "creatorKind.studio": "The kind of creator who sells templates: a small agency.",
+        "cta.place": "Button: drop the template's coworkers on the board.",
+        "cta.trialThenSubscribe": "Button. {price} is the template's monthly price like \"$29\".",
+        "cta.planInstall": "Button. {plan} is the plan's monthly price like \"$49\".",
+        "cta.planThenSubscribe": "Button. {plan} is the plan's monthly price, {price} the template's.",
+        "cta.planThenPay": "Button. {plan} is the plan's monthly price, {price} the template's one-time price.",
+        "cta.trialBilledSeparately": "{terms} is the trial sentence, like \"Card required, $0 today. $49 charged on 12/11 unless you cancel before.\"",
+        "cta.billedTo": "{workspace} is the name of the workspace paying for the template.",
         "price.renew": "Call to action on a card of a paid template whose subscription lapsed.",
         "price.install": "Call to action on a card of a template the workspace already bought.",
         "connectors.label": "Accessible label of the row of app logos on a template card. {names} is the list of app names, separated by commas.",
@@ -41,9 +76,17 @@
         "revenue.ranges.30d": "Revenue period: the last 30 days.",
         "pricing.payout.earn": "Same as pricing.payout.yourPrice, for what the creator earns.",
         "payouts.states.not_started.body": "{fee} is the marketplace fee, already formatted (\"10%\").",
-        "expert.row.agents": "How many coworkers the template holds (\"agent\" is the word this screen uses)."
+        "expert.row.agents": "How many coworkers the template holds (\"agent\" is the word this screen uses).",
+        "payouts.stateLabels.not_started": "Badge of a creator's Stripe payout account: payouts not configured yet.",
+        "payouts.requirements": "What Stripe still needs from a template creator before paying them, one item of a list.",
+        "payouts.saleKinds.recurring": "Badge of a sale in the creator's revenue table: a monthly subscription payment."
     },
     "price": {
+        "free": "Free",
+        "monthly": "{amount}/mo",
+        "useForFree": "Use for free",
+        "hire": "{count, plural, one {Hire this coworker · {price}} other {Hire these # coworkers · {price}}}",
+        "hireCard": "Hire · {price}",
         "purchased": "Purchased",
         "expired": "Expired",
         "install": "Install",
@@ -372,6 +415,15 @@
             "submitted": "Submitted. We will get back to you."
         },
         "footer": {
+            "requirements": {
+                "title": "A title",
+                "tagline": "A tagline",
+                "description": "A description",
+                "metaDescription": "A meta description of {min} to {max} characters",
+                "agent": "At least one captured coworker",
+                "installAnswers": "An install answer for every coworker",
+                "payouts": "A Stripe account that can receive payouts"
+            },
             "live": "This template is live on the marketplace. Reach out to the Rerun team to change it.",
             "inReview": "We are reviewing this template. Withdraw it to keep editing.",
             "withdraw": "Withdraw",
@@ -457,6 +509,41 @@
         "sidebar": {
             "payouts": "Payouts",
             "revenue": "Revenue"
+        },
+        "stateLabels": {
+            "not_started": "Not set up",
+            "incomplete": "Action needed",
+            "pending_verification": "In review",
+            "restricted": "Restricted",
+            "ready": "Ready"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "A business website",
+                "mcc": "Your line of business"
+            },
+            "external_account": "A bank account",
+            "individual": {
+                "verification": {
+                    "document": "An identity document",
+                    "additional_document": "A proof of address"
+                },
+                "id_number": "Your national ID number",
+                "address": {
+                    "line1": "Your address"
+                },
+                "dob": {
+                    "day": "Your date of birth"
+                }
+            },
+            "tos_acceptance": {
+                "date": "Accepting the Stripe terms"
+            }
+        },
+        "saleKinds": {
+            "one_time": "One-time",
+            "recurring": "Monthly",
+            "refund": "Refund"
         }
     },
     "revenue": {
@@ -483,5 +570,54 @@
         "available": "Available now",
         "subscriptions": "{count, plural, one {# active subscription} other {# active subscriptions}}",
         "perMonth": "{amount}/mo"
+    },
+    "categories": {
+        "agencies": "Agencies",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Sales",
+        "recruiting": "Recruiting",
+        "real-estate": "Real estate",
+        "legal": "Legal & compliance",
+        "creators": "Creators",
+        "productivity": "Productivity",
+        "other": "Other"
+    },
+    "status": {
+        "draft": "Draft",
+        "in_review": "In review",
+        "published": "Published",
+        "unlisted": "Unlisted",
+        "archived": "Archived"
+    },
+    "creatorKind": {
+        "studio": "Studio",
+        "freelancer": "Freelancer",
+        "expert": "Expert"
+    },
+    "cta": {
+        "place": "{count, plural, one {Place # coworker} other {Place # coworkers}}",
+        "placeCaption": "{count, plural, one {Drag it onto your board, ready to run.} other {Drag them onto your board, ready to run.}}",
+        "trialInstall": "Start free trial & install",
+        "trialThenSubscribe": "Start free trial, then subscribe {price}/mo",
+        "trialThenPay": "Start free trial, then pay {price}",
+        "planInstall": "Subscribe {plan}/mo & install",
+        "planThenSubscribe": "Subscribe {plan}/mo, then subscribe {price}/mo",
+        "planThenPay": "Subscribe {plan}/mo, then pay {price}",
+        "subscribe": "Subscribe {price}/mo",
+        "pay": "Pay {price}",
+        "payCaption": "This template, billed separately.",
+        "useTemplate": "Use this template",
+        "nothingCaptured": "No coworker has been captured into this template yet.",
+        "open": "Open {name}",
+        "alreadyOnBoard": "Already on your board.",
+        "installAgain": "Install again",
+        "sandboxCannotBuy": "Switch to a workspace to buy templates.",
+        "trialBilledSeparately": "{terms} This template is billed separately.",
+        "trialUsedBilledSeparately": "Your free trial has been used. Billed today; this template is billed separately.",
+        "resubscribe": "Resubscribe {price}/mo",
+        "lapsed": "Your subscription ended. The coworkers this template installed are disabled.",
+        "billedTo": "Billed to {workspace}. Your Rerun plan is already active.",
+        "yours": "Your template, no charge."
     }
 }

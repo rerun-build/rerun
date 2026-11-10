@@ -11,7 +11,7 @@ import { CredentialGuide } from '@/components/services/CredentialGuide'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
-import { KEY_PROVIDERS, PROVIDER_GUIDE, PROVIDER_PITCH, type AddableProvider, type GuidedProvider, type KeyProvider } from '@/lib/engine/ai-sources'
+import { KEY_PROVIDERS, providerGuide, providerPitch, type AddableProvider, type GuidedProvider, type KeyProvider } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { KeyIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -32,6 +32,7 @@ type KeyConnectStepProps = {
 // recommendation, and none of the four is one.
 export function KeyConnectStep({ onPick, onBack, onSkip, onKeys, only }: KeyConnectStepProps) {
     const t = useTranslations('dialogs.subscriptionOffer.key')
+    const tConnections = useTranslations('connections')
     const errorText = useErrorText()
     const [provider, setProvider] = useState<GuidedProvider | null>(only ?? null)
     const headline = only === 'opencode' ? { title: t('opencodeTitle'), detail: t('opencodeDetail') } : { title: t('title'), detail: t('detail') }
@@ -79,8 +80,8 @@ export function KeyConnectStep({ onPick, onBack, onSkip, onKeys, only }: KeyConn
                                 <button key={id} type="button" onClick={() => pick(id)} className={cn('flex items-center gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors hover:bg-accent/30', provider === id ? 'border-foreground ring-1 ring-foreground' : 'bg-muted/20')}>
                                     <ProviderIcon provider={id} className="size-4" />
                                     <span className="flex min-w-0 flex-1 flex-col">
-                                        <span className="truncate text-sm">{PROVIDER_PITCH[id].title}</span>
-                                        <span className="truncate text-[11px] text-muted-foreground">{PROVIDER_PITCH[id].hint}</span>
+                                        <span className="truncate text-sm">{providerPitch(id, tConnections).title}</span>
+                                        <span className="truncate text-[11px] text-muted-foreground">{providerPitch(id, tConnections).hint}</span>
                                     </span>
                                 </button>
                             ))}
@@ -90,7 +91,7 @@ export function KeyConnectStep({ onPick, onBack, onSkip, onKeys, only }: KeyConn
                     {provider && (
                         <div className="flex flex-col gap-3">
                             <Input hideRequired label={t('field')} type="password" value={apiKey} onChange={event => setApiKey(event.target.value)} placeholder={t('placeholder')} className="font-mono text-xs" />
-                            <CredentialGuide label={PROVIDER_PITCH[provider].title} title={PROVIDER_GUIDE[provider].title} guide={PROVIDER_GUIDE[provider].steps} />
+                            <CredentialGuide label={providerPitch(provider, tConnections).title} title={providerGuide(provider, tConnections).title} guide={providerGuide(provider, tConnections).steps} />
                             {needsPlan && <NoPlanNotice />}
                             <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
                                 {error && !needsPlan && <p className="min-w-0 flex-1 text-xs text-destructive">{error}</p>}

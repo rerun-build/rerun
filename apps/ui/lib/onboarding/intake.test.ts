@@ -6,7 +6,6 @@ import { DEFAULT_ROLES, INTAKE_INDUSTRIES, intakeBoxes, intakePreviewPlan, roles
 describe('INTAKE_INDUSTRIES', () => {
     it('offers every bucket but the one nobody recognises themselves in', () => {
         expect(INTAKE_INDUSTRIES.map(option => option.value)).toEqual(TEMPLATE_CATEGORIES.filter(category => category !== 'other'))
-        expect(INTAKE_INDUSTRIES.every(option => option.label.length > 0)).toBe(true)
     })
 })
 

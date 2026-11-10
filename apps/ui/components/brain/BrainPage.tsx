@@ -150,7 +150,7 @@ export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, 
                 <div className="flex flex-wrap items-center gap-2 border-y border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm">
                     <span className="min-w-0 flex-1">
                         {tPage.rich('conflict', {
-                            name: autosave.conflictWith ? brainAuthorLabel(autosave.conflictWith.updatedBy) : tPage('someone'),
+                            name: autosave.conflictWith ? brainAuthorLabel(autosave.conflictWith.updatedBy, t) : tPage('someone'),
                             b: chunks => <span className="font-medium">{chunks}</span>,
                         })}
                     </span>
@@ -203,7 +203,7 @@ export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, 
                         </PageProperty>
                         {page.sources.length > 0 && (
                             <PageProperty label={tPage('sources')}>
-                                {brainSourceLabels(page.sources).map(source => (
+                                {brainSourceLabels(page.sources, t).map(source => (
                                     <Badge key={source} size="xs" tone="neutral" glow={false} fill="outline">
                                         {source}
                                     </Badge>
@@ -214,7 +214,7 @@ export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, 
                         {page.updatedAt && (
                             <PageProperty label={tPage('lastEdited')}>
                                 <span className="text-foreground/80">
-                                    {tPage('lastEditedValue', { time: shortRelativeTime(page.updatedAt, locale), author: brainAuthorLabel(page.updatedBy) })}
+                                    {tPage('lastEditedValue', { time: shortRelativeTime(page.updatedAt, locale), author: brainAuthorLabel(page.updatedBy, t) })}
                                 </span>
                             </PageProperty>
                         )}

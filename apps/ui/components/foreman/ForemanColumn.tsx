@@ -53,6 +53,7 @@ import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 
 const TRANSITION_MS = 300
 
@@ -200,7 +201,8 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     useForemanFunnelAnalytics({ messages, guided, restoreDone, entitled })
     useForemanScriptedSteps({ messages, status, guided, restoreDone, send })
     useForemanTurnNotification({ messages, status, guided })
-    const nextSteps = useMemo(() => foremanNextSteps(messages, { entitled }), [messages, entitled])
+    const tNextSteps = useTranslations('foreman.nextSteps')
+    const nextSteps = useMemo(() => foremanNextSteps(messages, { entitled, t: tNextSteps }), [messages, entitled, tNextSteps])
     const trialGate = useMemo(() => (guided ? trialStep(messages, { entitled }) : null), [guided, messages, entitled])
 
     // Une étape de la checklist du board, confiée depuis l'extérieur de la colonne. Elle attend la

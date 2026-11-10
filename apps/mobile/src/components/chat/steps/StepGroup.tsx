@@ -265,19 +265,20 @@ type ToolCallStepProps = { toolName: string; state: string | undefined; input?: 
 /** A tool call on one line of the folded steps: what it was called with, and the full exchange on a tap. */
 export function ToolCallStep({ toolName, state, input, inputText, output, errorText, agentName }: ToolCallStepProps) {
     const t = useTranslations('mobileSteps.tool')
+    const tTools = useTranslations('tools')
     const locale = useLocale()
     const status = toolStatusOf(state)
     const args = argsOf(input)
     const targetAgentId = agentIdOf(input)
-    const detail = status === 'error' && errorText ? readableToolError(errorText) : toolHeadline(input, targetAgentId ? agentName?.(targetAgentId) : undefined)
+    const detail = status === 'error' && errorText ? readableToolError(errorText, tTools) : toolHeadline(input, targetAgentId ? agentName?.(targetAgentId) : undefined)
     const hasDetails = Object.keys(args ?? {}).length > 0 || output !== undefined || !!inputText || !!errorText
     return (
-        <StepRow symbol={toolSymbolOf(toolName)} label={toolLabelOf(toolName, input)} detail={detail} status={status} elapsed={<Elapsed active={status === 'running'} />}>
+        <StepRow symbol={toolSymbolOf(toolName)} label={toolLabelOf(toolName, input, tTools)} detail={detail} status={status} elapsed={<Elapsed active={status === 'running'} />}>
             {hasDetails ? (
                 <>
                     {state === 'input-streaming' && inputText ? <Section label={t('input')}>{<Mono text={inputText} />}</Section> : null}
                     {args && Object.keys(args).length > 0 ? <Section label={t('input')}>{<Mono text={argsText(toolName, args)} />}</Section> : null}
-                    {errorText ? <Section label={t('error')}>{<Mono text={readableToolError(errorText)} tone="destructive" />}</Section> : null}
+                    {errorText ? <Section label={t('error')}>{<Mono text={readableToolError(errorText, tTools)} tone="destructive" />}</Section> : null}
                     {output !== undefined ? <Section label={t('output')}>{<Mono text={outputText(output, t, locale)} maxHeight={240} />}</Section> : null}
                 </>
             ) : null}

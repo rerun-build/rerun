@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { oauthErrorCode, oauthRetryCopy, withoutOAuthError } from './oauth-error'
+import { englishTranslator } from '@/lib/i18n/english-translator'
+
+const t = englishTranslator('auth.oauthRetry')
 
 const FAILED = 'https://app.rerun.build/?error=invalid_request&error_code=bad_oauth_state&error_description=OAuth+state+not+found+or+expired'
 
@@ -31,18 +34,18 @@ describe('withoutOAuthError', () => {
 
 describe('oauthRetryCopy', () => {
     it('says the provider took too long when the state expired', () => {
-        expect(oauthRetryCopy('bad_oauth_state', 'Google')).toEqual({
+        expect(oauthRetryCopy('bad_oauth_state', 'Google', t)).toEqual({
             title: "Let's try that again",
             subtitle: 'Google took more than 5 minutes to send you back, so it expired. Your answers are kept.',
         })
     })
 
     it('falls back on a neutral subject when the provider is unknown', () => {
-        expect(oauthRetryCopy('bad_oauth_state', null).subtitle).toBe('Signing in took more than 5 minutes, so it expired. Your answers are kept.')
+        expect(oauthRetryCopy('bad_oauth_state', null, t).subtitle).toBe('Signing in took more than 5 minutes, so it expired. Your answers are kept.')
     })
 
     it('tells a cancel from a failure', () => {
-        expect(oauthRetryCopy('access_denied', 'Apple').title).toBe('Sign-in was cancelled')
-        expect(oauthRetryCopy('server_error', 'Google').title).toBe("Sign-in didn't go through")
+        expect(oauthRetryCopy('access_denied', 'Apple', t).title).toBe('Sign-in was cancelled')
+        expect(oauthRetryCopy('server_error', 'Google', t).title).toBe("Sign-in didn't go through")
     })
 })

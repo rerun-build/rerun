@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { isPaid, priceLabel, templateCardCtaLabel, type TemplatePricing } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
@@ -38,6 +38,7 @@ type PriceState = { owned: boolean; lapsed: boolean; pricing: TemplatePricing }
 
 function PriceFace({ owned, lapsed, pricing }: PriceState) {
     const t = useTranslations('templates.price')
+    const locale = useLocale()
     if (owned) {
         return (
             <Badge tone="green" size="xs" glow={false} className="font-medium">
@@ -52,11 +53,12 @@ function PriceFace({ owned, lapsed, pricing }: PriceState) {
             </Badge>
         )
     }
-    return <span className="text-sm font-semibold text-foreground">{priceLabel(pricing)}</span>
+    return <span className="text-sm font-semibold text-foreground">{priceLabel(pricing, t, locale)}</span>
 }
 
 function FlippingPrice({ owned, lapsed, pricing }: PriceState) {
     const t = useTranslations('templates.price')
+    const locale = useLocale()
     const { ref, active } = useCardActive<HTMLSpanElement>()
     const reduceMotion = useReducedMotion()
 
@@ -90,7 +92,7 @@ function FlippingPrice({ owned, lapsed, pricing }: PriceState) {
                         reduceMotion && !active && 'opacity-0',
                     )}
                 >
-                    {owned ? t('install') : lapsed ? t('renew') : templateCardCtaLabel(pricing)}
+                    {owned ? t('install') : lapsed ? t('renew') : templateCardCtaLabel(pricing, t, locale)}
                 </span>
             </motion.span>
         </span>

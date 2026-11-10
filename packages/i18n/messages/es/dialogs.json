@@ -264,7 +264,35 @@
         "create": "Crear Box",
         "nameLabel": "Nombre de la Box",
         "failed": "No se pudo crear la Box",
-        "placeholderName": "Marketing"
+        "placeholderName": "Marketing",
+        "suggestedNames": {
+            "clients": "Clientes",
+            "marketing": "Marketing",
+            "newBusiness": "Nuevos negocios",
+            "operations": "Operaciones",
+            "finance": "Finanzas",
+            "personal": "Personal",
+            "store": "Tienda",
+            "customerCare": "Atención al cliente",
+            "supplyChain": "Cadena de suministro",
+            "product": "Producto",
+            "engineering": "Ingeniería",
+            "support": "Soporte",
+            "sales": "Ventas",
+            "accounts": "Cuentas",
+            "recruiting": "Reclutamiento",
+            "listings": "Anuncios",
+            "legal": "Legal",
+            "compliance": "Cumplimiento",
+            "content": "Contenido",
+            "business": "Negocio",
+            "community": "Comunidad",
+            "sponsors": "Patrocinadores",
+            "work": "Trabajo",
+            "projects": "Proyectos",
+            "admin": "Admin",
+            "ops": "Ops"
+        }
     },
     "renameBox": {
         "title": "Renombrar Box",
@@ -279,7 +307,8 @@
         "title": "Nuevo coworker",
         "description": "Describe el trabajo, o empieza desde una sugerencia o un template.",
         "headingNamed": "¿Qué debe hacer {name}?",
-        "heading": "¿Qué debe hacer tu nuevo coworker?"
+        "heading": "¿Qué debe hacer tu nuevo coworker?",
+        "suggestionsForBox": "O empieza con uno elegido para {boxName}"
     },
     "renameAgent": {
         "title": "Renombrar coworker",
@@ -471,6 +500,12 @@
         }
     },
     "viewSettings": {
+        "layoutDescriptions": {
+            "table": "Compara valores entre columnas.",
+            "list": "Filas que se leen por un nombre: personas, empresas, mensajes.",
+            "gallery": "Filas que se reconocen por una imagen: productos, anuncios.",
+            "board": "Filas que avanzan por estados: un pipeline, tareas."
+        },
         "editTitle": "Editar vista",
         "newTitle": "Nueva vista",
         "description": "Una vista de <mono>{table}</mono>. Todos los que abren esta tabla la ven, y el coworker puede mostrarla en el chat.",
@@ -511,7 +546,10 @@
         "create": "Crear vista",
         "none": "Ninguno",
         "pickColumn": "Elige una columna",
-        "preview": "Vista previa"
+        "preview": "Vista previa",
+        "nameRequired": "Ponle nombre a la vista",
+        "titleColumnRequired": "Elige la columna que da nombre a cada elemento",
+        "groupByRequired": "Elige la columna cuyos valores se convierten en columnas"
     },
     "engineWaitlist": {
         "title": "Ahora mismo estamos al máximo de capacidad",

@@ -131,9 +131,9 @@ describe('relativeDate', () => {
     const now = Date.parse('2026-10-14T10:00:00.000Z')
 
     it('says how long ago, and reads SQLite UTC timestamps as UTC', () => {
-        expect(relativeDate('2026-10-14T09:59:30.000Z', 'en', now)).toBe('Just now')
-        expect(relativeDate('2026-10-14 08:00:00', 'en', now)).toBe('2h ago')
-        expect(relativeDate('2026-10-13T09:00:00.000Z', 'en', now)).toBe('Yesterday')
+        expect(relativeDate('2026-10-14T09:59:30.000Z', 'en', now)).toBe('now')
+        expect(relativeDate('2026-10-14 08:00:00', 'en', now)).toBe('2 hr. ago')
+        expect(relativeDate('2026-10-13T09:00:00.000Z', 'en', now)).toBe('yesterday')
         expect(relativeDate('2026-10-10T10:00:00.000Z', 'en', now)).toBe('4 days ago')
     })
 

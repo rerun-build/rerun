@@ -42,7 +42,53 @@
         "pulseCoworkers": "{count, plural, one {# coworker} other {# coworkers}}",
         "pulseWorking": "{count} working now",
         "sendToCoworker": "Send a message to this coworker",
-        "startTitle": "Start a conversation"
+        "startTitle": "Start a conversation",
+        "starters": {
+            "capabilities": "What can you help me with?",
+            "recentWork": "Summarize your recent work",
+            "projectFiles": "Review my project files",
+            "tools": "What tools do you have access to?"
+        },
+        "team": {
+            "greeting": "Hi, I'm Rerun",
+            "greetingNamed": "Hi {firstName}, I'm Rerun",
+            "greetingWithTeam": "{greeting}. Here is your team.",
+            "emptySubtitle": "You have no coworkers yet. Tell me a job you would hand off and I'll build the first one.",
+            "buildPrompt": "Build me a coworker that ",
+            "buildFirst": {
+                "title": "Build my first coworker",
+                "description": "Describe the job in a sentence"
+            },
+            "template": {
+                "title": "Start from a template",
+                "description": "Ready-made coworkers for your kind of business",
+                "send": "Show me templates that fit my business"
+            },
+            "guide": {
+                "title": "How does this work?",
+                "description": "Coworkers, Boxes, routines, in two minutes",
+                "send": "How does Rerun work?"
+            },
+            "checkWorking": {
+                "title": "What is {name} doing?",
+                "description": "Working now",
+                "send": "What is {mention} doing right now?"
+            },
+            "checkIdle": {
+                "title": "What did {name} do today?",
+                "description": "Catch up on its latest runs",
+                "send": "What did {mention} do today?"
+            },
+            "handOff": {
+                "title": "Give {name} a task",
+                "description": "I brief it and follow it through",
+                "prefill": "Ask {mention} to "
+            },
+            "build": {
+                "title": "Build a new coworker",
+                "description": "For a job nobody on the team does yet"
+            }
+        }
     },
     "error": {
         "connectChatGpt": "Connect ChatGPT",
@@ -225,6 +271,12 @@
         "messages.compacting": "Status shown while the conversation history is being summarized to save context.",
         "markdown.code": "Fallback label over a code block whose language is unknown.",
         "origins.payload": "The body of an HTTP request a webhook received.",
-        "takeover.done": "Button: the person has finished using the coworker's browser and hands it back."
+        "takeover.done": "Button: the person has finished using the coworker's browser and hands it back.",
+        "empty.starters.capabilities": "One of four chips on an empty conversation with a coworker: tapped, it is sent as the user's own message to the coworker. Same for the other empty.starters keys.",
+        "empty.team.greetingWithTeam": "Title of the workspace assistant's empty conversation. {greeting} is the greeting sentence, for example \"Hi Alex, I'm Rerun\".",
+        "empty.team.buildPrompt": "Prefilled in the composer: the start of the user's own sentence to the assistant, completed by them. Keep the trailing space.",
+        "empty.team.handOff.prefill": "Prefilled in the composer: the start of the user's own sentence to the assistant. {mention} is a coworker's handle, like @scout. Keep the trailing space.",
+        "empty.team.checkWorking.send": "Sent as the user's own message to the assistant. {mention} is a coworker's handle, like @scout. Same for checkIdle.send.",
+        "empty.team.template.send": "Sent as the user's own message to the assistant when the row is tapped. Same for guide.send."
     }
 }

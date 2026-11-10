@@ -23,6 +23,7 @@ const WORK_WITH_HASH = '#work-with'
 // its own column and its own action.
 export function TemplateCreatorSpotlight({ creator, template, selected, onSelectTemplate }: { creator: LibraryCreatorSummary; template: LibraryTemplate; selected: boolean; onSelectTemplate: () => void }) {
     const t = useTranslations('templates.spotlight')
+    const tKind = useTranslations('templates.creatorKind')
     const profileUrl = landingUrl(`/community/experts/${creator.slug}`)
 
     return (
@@ -54,7 +55,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                                 {creator.verified && <TemplateVerifiedBadge className="size-[1.1rem]" />}
                             </h3>
                         </div>
-                        <p className="mt-0.5 truncate text-sm text-muted-foreground">{[creatorKindLabel(creator.kind), creator.location].filter(Boolean).join(' · ')}</p>
+                        <p className="mt-0.5 truncate text-sm text-muted-foreground">{[creatorKindLabel(creator.kind, tKind), creator.location].filter(Boolean).join(' · ')}</p>
                         {creator.bio && (
                             <blockquote className="mt-3 border-l-2 border-primary/50 pl-3 text-sm leading-relaxed text-foreground/80">
                                 <p className="line-clamp-2">{creator.bio}</p>

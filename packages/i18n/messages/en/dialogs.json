@@ -1,5 +1,6 @@
 {
     "_context": {
+        "newAgent.suggestionsForBox": "Heading above the ready-made coworker suggestions chosen for one Box. {boxName} is the name the user gave the Box, like Marketing.",
         "account.connectFailed": "Toast. {provider} is a sign-in provider name, like Google.",
         "account.onlySignInMethod": "Error toast when the user tries to disconnect their last way to sign in. {provider} is a provider name, like Google.",
         "members.description": "\"Members\" here is the role name: people who are not admins.",
@@ -70,7 +71,9 @@
         "subscriptionOffer.decline.cloud": "Button that declines the offer and keeps the coworkers on Rerun's own paid credits.",
         "subscriptionOffer.decline.selfHosted": "Button that declines the offer and keeps the coworkers on the OpenRouter key already set up.",
         "subscriptionOffer.arguments.unplug.label": "Selling point: the subscription can be disconnected at any time.",
-        "subscriptionOffer.key.add": "Button: save the pasted API key."
+        "subscriptionOffer.key.add": "Button: save the pasted API key.",
+        "viewSettings.groupByRequired": "Form error of a board view: the user must pick the column whose distinct values become the board's columns.",
+        "newBox.suggestedNames": "Box names offered as chips under the Box name field: a Box groups coworkers by company division. Short, one or two words, title case where the language uses it."
     },
     "account": {
         "emailChangeNeedsCurrentAddress": "This change still has to be confirmed from your current address.",
@@ -337,7 +340,35 @@
         "create": "Create Box",
         "nameLabel": "Box name",
         "failed": "Failed to create the Box",
-        "placeholderName": "Marketing"
+        "placeholderName": "Marketing",
+        "suggestedNames": {
+            "clients": "Clients",
+            "marketing": "Marketing",
+            "newBusiness": "New Business",
+            "operations": "Operations",
+            "finance": "Finance",
+            "personal": "Personal",
+            "store": "Store",
+            "customerCare": "Customer Care",
+            "supplyChain": "Supply Chain",
+            "product": "Product",
+            "engineering": "Engineering",
+            "support": "Support",
+            "sales": "Sales",
+            "accounts": "Accounts",
+            "recruiting": "Recruiting",
+            "listings": "Listings",
+            "legal": "Legal",
+            "compliance": "Compliance",
+            "content": "Content",
+            "business": "Business",
+            "community": "Community",
+            "sponsors": "Sponsors",
+            "work": "Work",
+            "projects": "Projects",
+            "admin": "Admin",
+            "ops": "Ops"
+        }
     },
     "renameBox": {
         "title": "Rename Box",
@@ -352,7 +383,8 @@
         "title": "New coworker",
         "description": "Describe the job, or start from a suggestion or a template.",
         "headingNamed": "What should {name} do?",
-        "heading": "What should your new coworker do?"
+        "heading": "What should your new coworker do?",
+        "suggestionsForBox": "Or start from one picked for {boxName}"
     },
     "renameAgent": {
         "title": "Rename coworker",
@@ -544,6 +576,12 @@
         }
     },
     "viewSettings": {
+        "layoutDescriptions": {
+            "table": "Compare values across columns.",
+            "list": "Rows read by a name: people, companies, messages.",
+            "gallery": "Rows recognised by a picture: products, listings.",
+            "board": "Rows moving through statuses: a pipeline, tasks."
+        },
         "editTitle": "Edit view",
         "newTitle": "New view",
         "description": "A view of <mono>{table}</mono>. Everyone who opens this table sees it, and the coworker can draw it in chat.",
@@ -584,7 +622,10 @@
         "create": "Create view",
         "none": "None",
         "pickColumn": "Pick a column",
-        "preview": "Preview"
+        "preview": "Preview",
+        "nameRequired": "Name the view",
+        "titleColumnRequired": "Pick the column each item is named by",
+        "groupByRequired": "Pick the column whose values become the columns"
     },
     "engineWaitlist": {
         "title": "We're at full capacity right now",

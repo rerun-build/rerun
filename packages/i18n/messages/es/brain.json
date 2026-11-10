@@ -46,7 +46,9 @@
         "after": "Después",
         "removed": "Eliminado",
         "outdatedCreate": "Esta página se creó mientras la propuesta esperaba. Lo que sigue se compara con lo que dice ahora.",
-        "outdatedEdit": "La página cambió desde que el coworker la leyó. Lo que sigue se compara con lo que dice ahora: revisa que no se pierda nada."
+        "outdatedEdit": "La página cambió desde que el coworker la leyó. Lo que sigue se compara con lo que dice ahora: revisa que no se pierda nada.",
+        "headlineCreate": "Página nueva: {title}",
+        "headlineEdit": "Actualización de {title}"
     },
     "pageTypes": {
         "company": "Empresa",
@@ -200,5 +202,34 @@
         "databaseUnavailable": "Base de datos no disponible",
         "missingTableTitle": "No hay tabla \"{name}\"",
         "missingTableDescription": "Puede que se haya eliminado, o que el coworker que la mencionó aún no la haya creado."
+    },
+    "sources": {
+        "website": "Sitio web",
+        "sitePages": {
+            "about": "Página Acerca de",
+            "team": "Página del equipo",
+            "pricing": "Página de precios",
+            "customers": "Página de clientes",
+            "product": "Página de producto",
+            "legal": "Aviso legal",
+            "careers": "Página de empleo",
+            "contact": "Página de contacto",
+            "privacy": "Política de privacidad",
+            "blog": "Blog"
+        },
+        "dns": "Configuración de correo",
+        "stack": "Herramientas del sitio",
+        "search": "Búsqueda web",
+        "catalog": "Catálogo de productos",
+        "registry": "Registro mercantil",
+        "linkedin": "LinkedIn",
+        "linkedinCompany": "Página de LinkedIn",
+        "linkedinPerson": "Tu LinkedIn",
+        "google": "Google",
+        "googleBusiness": "Perfil de Empresa de Google"
+    },
+    "authors": {
+        "seed": "Rerun, a partir de tu sitio web",
+        "foreman": "Coworker de Rerun"
     }
 }

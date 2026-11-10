@@ -5,7 +5,7 @@ import { Icon } from '@/components/ui/icon'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { BorderBeam } from '@rerun/ui'
 import { AlertTriangleIcon, GaugeIcon, MessagePlusIcon, MessageSquareIcon, PlugIcon, RotateCwIcon, ScrollTextIcon, ServerIcon, SquareIcon, UnplugIcon } from '@/lib/icons'
-import { chatErrorTitle, describeSubscriptionLimit, friendlyError, type ChatErrorKind } from '@/lib/chat-error'
+import { chatErrorTitle, describeSubscriptionLimit, friendlyError, type ChatErrorCopy, type ChatErrorKind } from '@/lib/chat-error'
 import { useTranslations } from 'next-intl'
 import type { ComponentType } from 'react'
 
@@ -32,8 +32,8 @@ const ICONS: Record<NoticeKind, ComponentType<{ className?: string }>> = {
 // Claude plan and a ChatGPT plan at once, and only one of them is out. The brand mark carries that
 // faster than any wording, and the title names the window (session, week, Opus) rather than
 // repeating "usage limit".
-function header(kind: NoticeKind, message: string, fallbackTitle: string): { title: string; icon: ComponentType<{ className?: string }> } {
-    const title = chatErrorTitle(kind, message) ?? fallbackTitle
+function header(kind: NoticeKind, message: string, fallbackTitle: string, tErrors: ChatErrorCopy): { title: string; icon: ComponentType<{ className?: string }> } {
+    const title = chatErrorTitle(kind, message, tErrors) ?? fallbackTitle
     if (kind !== 'usage_limit') return { title, icon: ICONS[kind] }
     const plan = describeSubscriptionLimit(message).plan
     if (!plan) return { title, icon: ICONS.usage_limit }
@@ -45,7 +45,8 @@ function header(kind: NoticeKind, message: string, fallbackTitle: string): { tit
 // offers the move that fixes it.
 export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnections, onReconnect, onStopRun, onContinue, onRetry, onNewConversation }: { kind: NoticeKind; message: string; onSwitchModel?: () => void; onOpenConnections?: () => void; onReconnect?: () => void; onStopRun?: () => void; onContinue?: () => void; onRetry?: () => void; onNewConversation?: () => void }) {
     const t = useTranslations('chat.providerError')
-    const { title, icon } = header(kind, message, t('fallbackTitle'))
+    const tErrors = useTranslations('chatErrors')
+    const { title, icon } = header(kind, message, t('fallbackTitle'), tErrors)
 
     const actions: NoticeAction[] = []
     if (kind === 'run_in_flight' && onStopRun) {
@@ -119,7 +120,7 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
                 <Icon size="sm" tone="red" icon={icon} className="bg-red-500/10 text-foreground" />
                 <span className="font-medium">{title}</span>
             </div>
-            <p className="text-sm">{kind === 'run_in_flight' ? t('runInFlight') : friendlyError(message)}</p>
+            <p className="text-sm">{kind === 'run_in_flight' ? t('runInFlight') : friendlyError(message, tErrors)}</p>
             <NoticeActions actions={actions} />
         </div>
     )

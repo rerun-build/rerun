@@ -84,7 +84,7 @@ export function TemplateSubmitFooter({
         )
     }
 
-    const checklist = templateSubmitChecklist(values, { payoutsReady })
+    const checklist = templateSubmitChecklist(values, t, { payoutsReady })
     const metCount = checklist.filter(requirement => requirement.met).length
     const ready = metCount === checklist.length
     const readyTone = ready ? 'text-emerald-500' : 'text-muted-foreground'
@@ -141,12 +141,12 @@ export function TemplateSubmitFooter({
                         <p className="mb-2 text-xs text-muted-foreground">{t('checklistHint')}</p>
                         <ul className="flex flex-col gap-1.5">
                             {checklist.map(requirement => (
-                                <li key={requirement.label} className={cn('flex flex-col gap-0.5 text-xs', requirement.met ? 'text-foreground' : 'text-muted-foreground')}>
+                                <li key={requirement.id} className={cn('flex flex-col gap-0.5 text-xs', requirement.met ? 'text-foreground' : 'text-muted-foreground')}>
                                     <span className="flex items-center gap-2">
                                         {requirement.met ? <CircleCheckIcon className="size-3.5 text-emerald-500" /> : <CircleIcon className="size-3.5" />}
                                         {requirement.label}
                                     </span>
-                                    {!requirement.met && requirement.label.includes('payouts') && (
+                                    {!requirement.met && requirement.id === 'payouts' && (
                                         <button type="button" className="ml-5 w-fit text-left underline" onClick={() => setPane({ kind: 'payouts' })}>
                                             {t('setUpPayouts')}
                                         </button>

@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import { isPaid, priceLabel, type ForemanClient } from '@rerun/contracts'
+import { isPaid, type ForemanClient } from '@rerun/contracts'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { readAgentShare } from '@/lib/agents/share-read'
 import { isSubscriptionEntitled, parsePriceArm, trialArm } from '@rerun/cloud/billing'
@@ -45,7 +45,7 @@ async function describeIntent(ctx: WorkspaceContext, intent: KickoffIntent): Pro
         if (!template) return intent
         const connectors = template.connectors.map(connector => connector.slug).join(', ')
         const [coworker, ...others] = template.archiveAgentNames
-        return { ...intent, title: template.title, ...(coworker && !others.length ? { coworker } : {}), ...(isPaid(template.pricing) && !template.owned ? { paid: priceLabel(template.pricing) } : {}), description: `the template "${template.title}" (${template.tagline}), ${template.archiveAgentNames.length} coworkers${connectors ? `, apps: ${connectors}` : ''}` }
+        return { ...intent, title: template.title, ...(coworker && !others.length ? { coworker } : {}), ...(isPaid(template.pricing) && !template.owned ? { paid: template.pricing } : {}), description: `the template "${template.title}" (${template.tagline}), ${template.archiveAgentNames.length} coworkers${connectors ? `, apps: ${connectors}` : ''}` }
     }
 
     // A share link is read with the service role, as the card that shows it is: the token is the

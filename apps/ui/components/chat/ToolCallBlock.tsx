@@ -38,6 +38,7 @@ const hasDetails = ({ input, inputText, output, errorText }: ToolCallBlockProps)
 
 /** A tool call on one line of the folded steps: what it was called with, and the full exchange on click. */
 export function ToolCallStep(props: ToolCallBlockProps) {
+    const tTools = useTranslations('tools')
     const { label, iconProps } = useToolDisplay(props.agentId)(props.toolName, props.input)
     const status = toolStatusOf(props.state)
     const targetAgentId = agentIdOf(props.input)
@@ -46,7 +47,7 @@ export function ToolCallStep(props: ToolCallBlockProps) {
         <StepRow
             iconProps={iconProps}
             label={label}
-            detail={status === 'error' && props.errorText ? readableToolError(props.errorText) : toolHeadline(props.input, targetAgentName)}
+            detail={status === 'error' && props.errorText ? readableToolError(props.errorText, tTools) : toolHeadline(props.input, targetAgentName)}
             status={status}
             elapsed={<ElapsedTime active={status === 'running'} className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground/70" />}
         >
@@ -74,6 +75,7 @@ export function ToolCallBlock(props: ToolCallBlockProps) {
 
 function ToolCallDetails({ toolName, state, input, inputText, output, errorText }: ToolCallBlockProps) {
     const t = useTranslations('chat.tool')
+    const tTools = useTranslations('tools')
     const args = argsOf(input)
     return (
         <>
@@ -89,7 +91,7 @@ function ToolCallDetails({ toolName, state, input, inputText, output, errorText 
             )}
             {errorText && (
                 <ToolSection label={t('error')}>
-                    <p className="rounded bg-red-950/20 px-2 py-1.5 text-xs text-red-400">{readableToolError(errorText)}</p>
+                    <p className="rounded bg-red-950/20 px-2 py-1.5 text-xs text-red-400">{readableToolError(errorText, tTools)}</p>
                 </ToolSection>
             )}
             {output !== undefined && (

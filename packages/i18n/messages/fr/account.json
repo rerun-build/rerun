@@ -56,7 +56,12 @@
         "notConnected": "Non connecté.",
         "onlyMethod": "{provider} est le seul moyen de connexion lié à ce compte.",
         "disconnectTitle": "Déconnecter {provider} ?",
-        "disconnectDescription": "Vous ne pourrez plus vous connecter à ce compte avec {provider}. Vos autres moyens de connexion continuent de fonctionner."
+        "disconnectDescription": "Vous ne pourrez plus vous connecter à ce compte avec {provider}. Vos autres moyens de connexion continuent de fonctionner.",
+        "linkError": {
+            "identityTaken": "Ce compte {provider} sert déjà à se connecter à un autre compte Rerun.",
+            "denied": "{provider} n'a pas été connecté.",
+            "failed": "Impossible de connecter {provider}. Réessayez."
+        }
     },
     "delete": {
         "consequences": {

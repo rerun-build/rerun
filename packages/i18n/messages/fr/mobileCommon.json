@@ -16,7 +16,9 @@
     },
     "errors": {
         "tryAgainShortly": "Réessayez dans un instant.",
-        "generic": "Une erreur est survenue. Veuillez réessayer."
+        "generic": "Une erreur est survenue. Veuillez réessayer.",
+        "requestFailed": "La requête a échoué avec le code {status}",
+        "uploadFailed": "L'envoi a échoué avec le code {status}"
     },
     "unread": "Non lu",
     "viewer": {

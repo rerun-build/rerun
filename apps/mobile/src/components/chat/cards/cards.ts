@@ -24,13 +24,6 @@ export function sizeParts(size: number): { unit: SizeUnit; value: number; fracti
     return { unit: 'mb', value: size / (1024 * 1024), fractionDigits: 1 }
 }
 
-const ENGLISH_UNITS: Record<SizeUnit, string> = { b: 'B', kb: 'KB', mb: 'MB' }
-
-export function formatBytes(size: number): string {
-    const { unit, value, fractionDigits } = sizeParts(size)
-    return `${value.toFixed(fractionDigits)} ${ENGLISH_UNITS[unit]}`
-}
-
 const HASHED_TONES = ['brand', 'cyan', 'green', 'orange', 'yellow', 'neutral'] as const
 
 // The tone the agent gave a value, or a stable one hashed from it, as the web card picks it.

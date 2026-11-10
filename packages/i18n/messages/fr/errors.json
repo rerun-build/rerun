@@ -420,5 +420,22 @@
     "purchaseOtherWorkspace": "Cet achat appartient à un autre workspace.",
     "changePlanFailed": "Impossible de changer votre abonnement",
     "updateBrainProposalFailed": "Impossible de mettre à jour la proposition",
-    "prepareSandboxFailed": "Impossible de préparer votre sandbox"
+    "prepareSandboxFailed": "Impossible de préparer votre sandbox",
+    "templateTitleFirst": "Donnez d'abord un titre au template.",
+    "uploadImageBeforeAltText": "Importez l'image avant d'écrire son texte alternatif.",
+    "boxManagerOnlyChange": "Seul un admin ou un manager de cette Box peut modifier ceci",
+    "boxAccessLost": "Vous n'avez plus accès à cette Box",
+    "whatsappCodeExpired": "Le code a expiré avant que le téléphone soit lié. Demandez-en un nouveau et scannez-le dans les trois minutes.",
+    "whatsappLinkRefused": "WhatsApp a refusé de lier ce numéro. Vérifiez-le sur le téléphone, puis réessayez.",
+    "whatsappNumberRefused": "WhatsApp a refusé ce numéro : {message}",
+    "whatsappLinkRefusedBecause": "WhatsApp a refusé la liaison : {message}",
+    "linkedinWrongCredentials": "E-mail ou mot de passe incorrect. Vérifiez-les sur linkedin.com, puis réessayez.",
+    "linkedinSignInRefused": "LinkedIn a refusé la connexion : {message}",
+    "bankNotConfirmed": "Votre banque n'a pas confirmé le paiement. Rien n'a été débité, réessayez.",
+    "fileTooLongToSave": "Ce fichier dépasse {max, number} caractères et ne peut pas être enregistré ici.",
+    "fileNotTextSave": "Ce fichier n'est pas du texte : l'enregistrer ici le corromprait.",
+    "fileChangedOnBox": "Ce fichier a changé sur la Box depuis que vous l'avez ouvert.",
+    "saveThisFileFailed": "Impossible d'enregistrer ce fichier",
+    "templateSubscriptionEnded": "Ce coworker vient d'un abonnement à un template qui a pris fin. Rachetez le template pour le récupérer.",
+    "noFreeCoworkerSlot": "Plus d'emplacement de coworker libre sur votre plan. Passez à Pro pour des coworkers illimités, ou supprimez un coworker pour faire de la place."
 }

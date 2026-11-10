@@ -273,6 +273,18 @@
         }
     },
     "monitoring": {
+        "metrics": {
+            "count": "Recuento",
+            "totalTokens": "Tokens totales",
+            "inputTokens": "Tokens de entrada",
+            "outputTokens": "Tokens de salida",
+            "cachedInputTokens": "Tokens en caché",
+            "reasoningTokens": "Tokens de razonamiento",
+            "cost": "Coste",
+            "avgDurationMs": "Duración media",
+            "errorCount": "Errores",
+            "errorRate": "Tasa de errores"
+        },
         "live": "En vivo",
         "runStatus": {
             "running": "En curso",
@@ -295,6 +307,12 @@
             "empty": "No hay coworkers que mostrar."
         },
         "chart": {
+            "rowCount": {
+                "runs": "{count} ejecuciones",
+                "runSteps": "{count} pasos",
+                "toolCalls": "{count} llamadas a herramientas",
+                "sessions": "{count} sesiones"
+            },
             "other": "Otros",
             "loading": "Cargando...",
             "noData": "No hay datos en este periodo."
@@ -394,7 +412,18 @@
             "search": "Buscar apps",
             "all": "Todas",
             "empty": "No hay ninguna app con ese nombre.",
-            "limit": "Hasta {max} apps para empezar. Tu coworker podrá conectar más después."
+            "limit": "Hasta {max} apps para empezar. Tu coworker podrá conectar más después.",
+            "categories": {
+                "payments": "Pagos",
+                "ecommerce": "E-commerce",
+                "crm": "CRM",
+                "marketing": "Marketing",
+                "seo": "SEO",
+                "analytics": "Analítica",
+                "dev": "Desarrollo",
+                "productivity": "Productividad",
+                "other": "Otros"
+            }
         },
         "schedule": {
             "button": "Programar",
@@ -428,14 +457,19 @@
             "error": "Error",
             "offline": "Desconectado",
             "waiting_human": "Te espera",
-            "disabled": "Desactivado"
+            "disabled": "Desactivado",
+            "paused": "En pausa",
+            "restoring": "Restaurando"
         },
         "countdown": {
             "seconds": "{count} s",
             "minutes": "{count} min",
             "hours": "{count} h",
             "days": "{count} d"
-        }
+        },
+        "untitledBox": "Box sin nombre",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} one {, # pendiente} other {, # pendientes}}{results, plural, =0 {} one {, # resultado nuevo} other {, # resultados nuevos}}"
     },
     "templateStory": {
         "states": {

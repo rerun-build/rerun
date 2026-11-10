@@ -264,7 +264,35 @@
         "create": "Créer la Box",
         "nameLabel": "Nom de la Box",
         "failed": "Impossible de créer la Box",
-        "placeholderName": "Marketing"
+        "placeholderName": "Marketing",
+        "suggestedNames": {
+            "clients": "Clients",
+            "marketing": "Marketing",
+            "newBusiness": "Prospection",
+            "operations": "Opérations",
+            "finance": "Finance",
+            "personal": "Perso",
+            "store": "Boutique",
+            "customerCare": "Service client",
+            "supplyChain": "Logistique",
+            "product": "Produit",
+            "engineering": "Ingénierie",
+            "support": "Support",
+            "sales": "Ventes",
+            "accounts": "Comptes",
+            "recruiting": "Recrutement",
+            "listings": "Annonces",
+            "legal": "Juridique",
+            "compliance": "Conformité",
+            "content": "Contenu",
+            "business": "Activité",
+            "community": "Communauté",
+            "sponsors": "Sponsors",
+            "work": "Travail",
+            "projects": "Projets",
+            "admin": "Admin",
+            "ops": "Ops"
+        }
     },
     "renameBox": {
         "title": "Renommer la Box",
@@ -279,7 +307,8 @@
         "title": "Nouveau coworker",
         "description": "Décrivez la mission, ou partez d’une suggestion ou d’un template.",
         "headingNamed": "Que doit faire {name} ?",
-        "heading": "Que doit faire votre nouveau coworker ?"
+        "heading": "Que doit faire votre nouveau coworker ?",
+        "suggestionsForBox": "Ou partez d'une suggestion pour {boxName}"
     },
     "renameAgent": {
         "title": "Renommer le coworker",
@@ -471,6 +500,12 @@
         }
     },
     "viewSettings": {
+        "layoutDescriptions": {
+            "table": "Comparez des valeurs entre colonnes.",
+            "list": "Des lignes repérées par un nom : personnes, entreprises, messages.",
+            "gallery": "Des lignes reconnues par une image : produits, annonces.",
+            "board": "Des lignes qui passent d'un statut à l'autre : un pipeline, des tâches."
+        },
         "editTitle": "Modifier la vue",
         "newTitle": "Nouvelle vue",
         "description": "Une vue de <mono>{table}</mono>. Tous ceux qui ouvrent cette table la voient, et le coworker peut l'afficher dans le chat.",
@@ -511,7 +546,10 @@
         "create": "Créer la vue",
         "none": "Aucun",
         "pickColumn": "Choisir une colonne",
-        "preview": "Aperçu"
+        "preview": "Aperçu",
+        "nameRequired": "Nommez la vue",
+        "titleColumnRequired": "Choisissez la colonne qui donne son nom à chaque élément",
+        "groupByRequired": "Choisissez la colonne dont les valeurs deviennent les colonnes"
     },
     "engineWaitlist": {
         "title": "Nous sommes complets pour le moment",

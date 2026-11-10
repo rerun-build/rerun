@@ -92,6 +92,7 @@ type Block = { key: string; node: React.ReactNode }
 
 export function MessageView({ message, isLastAssistant, running, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, feedback, stamp, paidSources }: MessageViewProps) {
     const t = useTranslations('mobileChat.messages')
+    const tTools = useTranslations('tools')
     if (message.role === 'user') {
         const origin = originOf(message)
         if (origin?.kind === 'install') return <InstallDivider agentName={origin.agentName} guide={origin.guide} installing={running} owner={fileOwner} />
@@ -216,7 +217,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
             else addStep({ key: part.toolCallId ?? `s${index}`, symbol: toolSymbolOf(toolName), status, node }, index)
             return
         }
-        addStep({ key: part.toolCallId ?? `s${index}`, symbol: toolSymbolOf(toolName), status: toolStatusOf(part.state), runningLabel: toolActivityOf(toolName, part.input) ?? t('runningTool', { tool: toolLabelOf(toolName, part.input) }), node: <ToolCallStep toolName={toolName} state={part.state} input={part.input} inputText={part.inputText} output={part.output} errorText={part.errorText} /> }, index)
+        addStep({ key: part.toolCallId ?? `s${index}`, symbol: toolSymbolOf(toolName), status: toolStatusOf(part.state), runningLabel: toolActivityOf(toolName, part.input, tTools) ?? t('runningTool', { tool: toolLabelOf(toolName, part.input, tTools) }), node: <ToolCallStep toolName={toolName} state={part.state} input={part.input} inputText={part.inputText} output={part.output} errorText={part.errorText} /> }, index)
     })
     flushSteps()
     // The coworker stands once in the thread, beside the last steps it took.

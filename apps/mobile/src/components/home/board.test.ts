@@ -60,7 +60,7 @@ describe('home sections', () => {
     })
 
     it('groups by Box in the order the Boxes were made, names an unnamed one like the web, and leaves out an empty one', () => {
-        const sections = sectionsByBox(coworkers, [box('support', null), box('empty', 'Empty'), box('sales', 'Sales')])
+        const sections = sectionsByBox(coworkers, [box('support', null), box('empty', 'Empty'), box('sales', 'Sales')], 'Untitled Box')
         expect(sections.map(section => [section.label, section.members.map(member => member.id)])).toEqual([
             ['Untitled Box', ['ledger']],
             ['Sales', ['pulse', 'scout']],

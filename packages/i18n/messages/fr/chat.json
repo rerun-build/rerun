@@ -116,6 +116,26 @@
         "install": "Installer {name}",
         "skip": "Passer pour l'instant"
     },
+    "activity": {
+        "thinking": "Réflexion...",
+        "processing": "Traitement de votre demande...",
+        "crafting": "Rédaction d'une réponse...",
+        "writing": "Rédaction...",
+        "runningTool": "Exécution de {tool}",
+        "waitingOn": "En attente de {name}",
+        "building": "Création de {name}",
+        "buildingCoworkers": "Création de {count, plural, one {# coworker} other {# coworkers}} · {done} terminés",
+        "waitingOnSubCoworkers": "En attente de {count, plural, one {# sous-coworker} other {# sous-coworkers}} · {done} terminés"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {Question en attente} one {Question en attente} other {# questions en attente}}",
+        "approval": "{count, plural, =0 {Validation requise} one {Validation requise} other {# validations requises}}",
+        "secret": "{count, plural, =0 {Identifiant requis} one {Identifiant requis} other {# identifiants requis}}",
+        "mcpNamed": "Se connecter à {name}",
+        "mcp": "Connexion requise",
+        "service": "{count, plural, =0 {App à connecter} one {App à connecter} other {# apps à connecter}}",
+        "takeover": "À vous de prendre l'écran"
+    },
     "pendingHitl": {
         "goTo": "{label}, y aller"
     },
@@ -127,6 +147,21 @@
         "saveFailed": "Impossible d'enregistrer les identifiants"
     },
     "brainChange": {
+        "headline": {
+            "saved": "Brain mis à jour : {title}",
+            "created": "Nouvelle page du Brain : {title}",
+            "deleted": "Retiré du Brain : {title}",
+            "accepted": "Modification acceptée : {title}",
+            "acceptedBy": "Modification de {name} acceptée : {title}",
+            "dismissed": "Modification écartée : {title}",
+            "dismissedBy": "Modification de {name} écartée : {title}"
+        },
+        "notes": {
+            "saved": "Enregistré. Chaque coworker le lit dès sa prochaine exécution.",
+            "deleted": "Plus aucun coworker ne la lit. Son historique est conservé.",
+            "accepted": "Enregistré. Chaque coworker le lit dès sa prochaine exécution.",
+            "dismissed": "La page est inchangée."
+        },
         "undone": "Annulé : {title}",
         "undoneNote": "La version précédente est revenue.",
         "undo": "Annuler",
@@ -188,7 +223,14 @@
         "retry": "Réessayer",
         "send": "Envoyer",
         "retryLabel": "Réessayer d'envoyer l'enregistrement",
-        "sendLabel": "Envoyer l'enregistrement"
+        "sendLabel": "Envoyer l'enregistrement",
+        "unsupported": "Les messages vocaux ne sont pas pris en charge par ce navigateur.",
+        "microphoneBlocked": "L'accès au micro est bloqué. Autorisez-le dans les réglages de votre navigateur pour enregistrer.",
+        "noMicrophone": "Aucun micro disponible.",
+        "startFailed": "Impossible de démarrer l'enregistrement.",
+        "nothingHeard": "Rien n'a été entendu dans cet enregistrement.",
+        "voiceMessageFailed": "Impossible d'envoyer votre message vocal.",
+        "nothingRecorded": "Rien n'a été enregistré."
     },
     "agentInstall": {
         "started": "Installation lancée",
@@ -283,7 +325,10 @@
             "too_slow": "Trop lent",
             "memory": "Problème de mémoire",
             "other": "Autre"
-        }
+        },
+        "removeFailed": "Impossible de retirer votre avis",
+        "saveFailed": "Impossible d'enregistrer votre avis",
+        "thanks": "Merci pour votre avis"
     },
     "providerError": {
         "fallbackTitle": "Une erreur est survenue",
@@ -426,7 +471,9 @@
         "stopFailed": "Impossible d'arrêter l'exécution en cours. Votre message partira à la fin de celle-ci.",
         "selectModel": "Choisissez un modèle pour commencer : ouvrez le menu des modèles ci-dessous.",
         "emptyTitle": "Démarrer une conversation",
-        "emptyDescription": "Envoyez un message à ce coworker"
+        "emptyDescription": "Envoyez un message à ce coworker",
+        "runStoppedResponding": "L'exécution ne répond plus. Arrêtez-la pour envoyer un autre message.",
+        "continueWhereLeftOff": "Reprends là où tu t'es arrêté."
     },
     "promptInput": {
         "tooLarge": "{count, plural, one {{names} est trop volumineux pour être joint.} =2 {{names} sont trop volumineux pour être joints.} other {{names} et {more} autres sont trop volumineux pour être joints.}}",

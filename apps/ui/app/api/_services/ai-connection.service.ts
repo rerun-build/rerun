@@ -8,8 +8,8 @@ import {
     KEY_PROVIDERS,
     keyProviders,
     planProviders,
-    PROVIDER_GUIDE,
-    PROVIDER_PITCH,
+    providerGuide,
+    providerPitch,
     creditResetPhrase,
     effectiveDefault,
     isCreditExhausted,
@@ -29,6 +29,7 @@ import {
     type GuidedProvider,
     type KeyProvider,
     type RerunCredit,
+    type SourceCopy,
 } from '@/lib/engine/ai-sources'
 import { type ClaudeOAuthStart, buildClaudeAuthorize, exchangeClaudeCode } from '@/lib/engine/claude-oauth'
 import {
@@ -50,7 +51,9 @@ import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { assertPublicUrl } from '@/lib/net/public-fetch'
 import { OPENCODE_ENABLED } from '@/lib/features'
 import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
-import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenProblem, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { translatorFor } from '@/lib/i18n/server-translator'
+import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
 
 // The AI providers of a workspace, for both the web dialog's server actions and the app's /api/v1
 // routes. They live at the root of the engine's data dir, never under a Box: the workspace is the
@@ -110,8 +113,8 @@ export async function setWorkspaceDefaultModel(workspaceId: number, pick: BoxDef
 // The widget already refuses these; this is the guard for every other caller.
 function assertValidClaudeToken(keys: Record<string, string> | undefined): void {
     const token = keys?.[CONNECTION_TOKEN_KEY.claude]
-    if (token === undefined || !claudeTokenProblem(token)) return
-    throw new ConnectionInputError(token.trim().startsWith('sk-ant-api') ? 'claudeTokenIsApiKey' : 'claudeTokenIsCode')
+    const issue = token === undefined ? null : claudeTokenIssue(token)
+    if (issue) throw new ConnectionInputError(issue)
 }
 
 // The machine sends the user's key to this address: on Rerun Cloud a private one would turn the Box
@@ -260,7 +263,7 @@ async function takenNames(workspaceId: number): Promise<string[]> {
     return (await engineListConnections(engine.conn)).connections.map(connection => connection.name)
 }
 
-function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: RerunCredit, premiumAllowed: boolean): AiConnectionView {
+function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: RerunCredit, premiumAllowed: boolean, t: SourceCopy, locale: string): AiConnectionView {
     const status = !source.connected || source.credentialRejected ? 'reconnect' : isCreditExhausted(source, credit) ? 'credit_used_up' : 'connected'
     return {
         id: source.id,
@@ -269,18 +272,18 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
         kind: sourceKind(source.provider),
         status,
         credentialOnFile: source.connected,
-        summary: sourceSummary(source, credit),
+        summary: sourceSummary(source, credit, t, locale),
         isDefault: effectiveDefault(list.default).connectionId === source.id,
         models: offeredModels(source).map(model => ({
             id: model.id,
             label: model.label,
-            description: modelDescription(source, model.id),
+            description: modelDescription(source, model.id, t),
             enabled: isModelEnabled(source, model.id),
             locked: isModelLocked(source.id, model.id, premiumAllowed),
         })),
         baseUrl: source.baseUrl ?? '',
         extraModels: source.extraModels,
-        planWindows: livePlanWindows(source).map(window => ({ name: planWindowName(window, source.provider), usedPercent: window.usedPercent, reset: planWindowReset(window) })),
+        planWindows: livePlanWindows(source).map(window => ({ name: planWindowName(window, t, source.provider), usedPercent: window.usedPercent, reset: planWindowReset(window, t, locale) })),
     }
 }
 
@@ -293,16 +296,18 @@ export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiCo
     const premiumAllowed = isPremiumModelEntitled(ctx.workspace)
     const pick = effectiveDefault(list.default)
     const taken = list.connections.map(connection => connection.name)
+    const locale = await recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id)
+    const t = await translatorFor(locale, 'connections')
     return {
-        connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, premiumAllowed)),
+        connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, premiumAllowed, t, locale)),
         default: { ...pick, label: modelName(pick.connectionId, pick.model) },
-        credit: { percent: credit.percent, usedUp: isCreditUsedUp(credit), backOn: creditResetPhrase(credit) },
+        credit: { percent: credit.percent, usedUp: isCreditUsedUp(credit), backOn: creditResetPhrase(credit, t, locale) },
         addable: [...planProviders(await isOpencodeOffered(engine?.conn)), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
             provider,
             kind: sourceKind(provider),
-            ...PROVIDER_PITCH[provider],
+            ...providerPitch(provider, t),
             suggestedName: suggestName(provider, taken),
-            guide: provider === 'opencode' || KEY_PROVIDERS.includes(provider as KeyProvider) ? PROVIDER_GUIDE[provider as GuidedProvider] : null,
+            guide: provider === 'opencode' || KEY_PROVIDERS.includes(provider as KeyProvider) ? providerGuide(provider as GuidedProvider, t) : null,
         })),
     }
 }

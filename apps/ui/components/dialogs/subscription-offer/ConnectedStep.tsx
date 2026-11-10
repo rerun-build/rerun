@@ -3,7 +3,7 @@
 import { ExplainerCheck } from '@/components/dialogs/ExplainerPanel'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { PROVIDER_PITCH, type AddableProvider } from '@/lib/engine/ai-sources'
+import { providerPitch, type AddableProvider, type SourceCopy } from '@/lib/engine/ai-sources'
 import { useTranslations } from 'next-intl'
 
 import { OfferFooter } from './offer-footer'
@@ -11,18 +11,19 @@ import { PLANS, PROVIDER_GLYPH } from './offer-plans'
 
 type ConnectedTranslator = ReturnType<typeof useTranslations<'dialogs.subscriptionOffer'>>
 
-function connectedCopy(provider: AddableProvider, t: ConnectedTranslator) {
+function connectedCopy(provider: AddableProvider, t: ConnectedTranslator, tConnections: SourceCopy) {
     if (provider === 'claude' || provider === 'codex') {
         const { name } = PLANS[provider]
         return { title: t('connected.title', { name }), detail: t('connected.planDetail', { name }) }
     }
     if (provider === 'opencode') return { title: t('connected.title', { name: 'OpenCode' }), detail: t('connected.opencodeDetail') }
-    return { title: t('connected.title', { name: PROVIDER_PITCH[provider].title }), detail: t('connected.keyDetail') }
+    return { title: t('connected.title', { name: providerPitch(provider, tConnections).title }), detail: t('connected.keyDetail') }
 }
 
 export function ConnectedStep({ provider, onDone }: { provider: AddableProvider; onDone: () => void }) {
     const t = useTranslations('dialogs.subscriptionOffer')
-    const { title, detail } = connectedCopy(provider, t)
+    const tConnections = useTranslations('connections')
+    const { title, detail } = connectedCopy(provider, t, tConnections)
 
     return (
         <>

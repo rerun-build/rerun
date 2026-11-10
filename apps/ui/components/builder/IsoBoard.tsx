@@ -35,8 +35,10 @@ import { useNextRuns } from '@/hooks/useNextRuns'
 import { useUnseenGroups } from '@/hooks/useUnseenGroups'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { containerFromSpace, linksFromSessions, tileFromAgent } from '@/lib/board/iso-adapter'
+import { useKitTranslations } from '@rerun/ui/locale'
 import { useAgentIdeas } from '@/lib/agent-ideas/useAgentIdeas'
 import { boxCtaExamples, boxCtaLabel } from '@/lib/onboarding/box-themes'
+import { localizeSuggestion } from '@/lib/onboarding/localize-suggestion'
 import { useOnboardingIndustry } from '@/lib/onboarding/useOnboardingIndustry'
 import { AGENT_SPAN } from '@/lib/board/iso'
 import { freeRectOnSide } from '@/lib/board/space-layout'
@@ -66,6 +68,8 @@ function clampLabel(title: string): string {
 
 export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpaces = [] }: { onRequestRecruitAgent?: () => void; onRequestBoxAgent?: (spaceId: string) => void; initialSpaces?: SpacePublic[] }) {
     const t = useTranslations('builder.isoBoard')
+    const tKit = useKitTranslations()
+    const tErrors = useTranslations('errors')
     const { workspace, isAnonymous } = useSession()
     const { access: workspaceAccess, needsMachineReason } = useWorkspaceAccess()
     const { cursors, onPointerWorldMove } = useTeamCursors(workspace?.id)
@@ -172,6 +176,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     // toolbar est lui-même fermé.
     const agentIdeas = useAgentIdeas()
     const industry = useOnboardingIndustry()
+    const tSuggestions = useTranslations('agentSuggestions')
     const invitesAgents = hydrated && !!workspace && !isSandbox && !isAnonymous && !needsMachineReason && !guidedByForeman && !startingFirstAgent && !placement && !placingAgentId && !previewing && mode !== 'space'
     const boxInvites = useMemo(() => {
         const invites = new Map<string, Pick<Container, 'cta' | 'ctaExamples'>>()
@@ -180,12 +185,12 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         for (const space of realSpaces) {
             if (agents.some(a => a.spaceId === space.id)) continue
             invites.set(space.id, {
-                cta: boxCtaLabel(space.name),
-                ctaExamples: boxCtaExamples({ boxName: space.name, industry, ideas: agentIdeas, agentNames }),
+                cta: boxCtaLabel(space.name, t),
+                ctaExamples: boxCtaExamples({ boxName: space.name, industry, ideas: agentIdeas, agentNames }, suggestion => localizeSuggestion(suggestion, tSuggestions)),
             })
         }
         return invites
-    }, [invitesAgents, agents, realSpaces, agentIdeas, industry])
+    }, [invitesAgents, agents, realSpaces, agentIdeas, industry, t, tSuggestions])
 
     const boardContainers = useMemo<Container[]>(
         () =>
@@ -209,9 +214,9 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                       ]
                 : realSpaces.map(space => {
                       const invite = boxInvites.get(space.id)
-                      return boxContainerFor(invite ? { ...containerFromSpace(space), ...invite } : containerFromSpace(space), manageableSpaceIds.has(space.id))
+                      return boxContainerFor(invite ? { ...containerFromSpace(space, tKit), ...invite } : containerFromSpace(space, tKit), manageableSpaceIds.has(space.id), tErrors('boxManagerOnly'))
                   }),
-        [showPlaceholder, emptyOnboardingBoard, isSandbox, workspaceAccess, startingFirstAgent, placing, parkedTitle, memberWithoutBox, realSpaces, boxInvites, manageableSpaceIds, t]
+        [showPlaceholder, emptyOnboardingBoard, isSandbox, workspaceAccess, startingFirstAgent, placing, parkedTitle, memberWithoutBox, realSpaces, boxInvites, manageableSpaceIds, t, tKit, tErrors]
     )
     const containers = useMemo(() => (planPreview ? [...boardContainers, ...planPreview.containers] : boardContainers), [planPreview, boardContainers])
 
@@ -397,7 +402,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         return byAgent
     }, [unseenGroups])
     const boardTiles = useMemo(() => {
-        const placed = agents.map(a => boxTileFor(tileFromAgent(a, a.id === justPlacedAgentId, attentionCounts[a.id] ?? 0, workspaceAccess, nextRuns[a.id], resultsByAgent[a.id]), manageableSpaceIds.has(a.spaceId)))
+        const placed = agents.map(a => boxTileFor(tileFromAgent(a, a.id === justPlacedAgentId, attentionCounts[a.id] ?? 0, workspaceAccess, nextRuns[a.id], resultsByAgent[a.id], tKit), manageableSpaceIds.has(a.spaceId)))
         if (!placement) return placed
 
         const reserved = placement.placed
@@ -405,7 +410,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
             .filter(({ position }) => !agents.some(a => a.position.col === position.col && a.position.row === position.row))
             .map(({ position, index }) => ({ id: `__reserved__${index}`, position, span: AGENT_SPAN, style: { ...agentTileStyle('idle', placement.labels[index]), opacity: 0.6 }, selectable: false, draggable: false }))
         return [...placed, ...reserved]
-    }, [agents, attentionCounts, justPlacedAgentId, placement, workspaceAccess, nextRuns, resultsByAgent, manageableSpaceIds])
+    }, [agents, attentionCounts, justPlacedAgentId, placement, workspaceAccess, nextRuns, resultsByAgent, manageableSpaceIds, tKit])
     const tiles = useMemo(() => (planPreview ? [...boardTiles, ...planPreview.tiles] : boardTiles), [planPreview, boardTiles])
     const computedLinks = useMemo(() => linksFromSessions(sessions, liveLinks), [sessions, liveLinks])
     const placingTile = useMemo(() => (placement ? { span: AGENT_SPAN, style: agentTileStyle('idle', placementLabel(placement)) } : undefined), [placement])

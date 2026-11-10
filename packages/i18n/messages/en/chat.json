@@ -1,5 +1,9 @@
 {
     "_context": {
+        "activity.buildingCoworkers": "What the onboarding is doing right now: building several AI coworkers, and how many are done.",
+        "activity.runningTool": "What the coworker is doing right now. {tool} is the name of a step, e.g. 'Web Search'.",
+        "activity.waitingOn": "The coworker waits for another coworker it called. {name} is that coworker's name.",
+        "activity.waitingOnSubCoworkers": "The coworker waits for the sub-tasks it delegated, and how many are done.",
         "agentChat.selectModel": "Shown under the message box when the user tries to send before an AI model is picked. The model menu sits under the message box.",
         "agentInstall.guideTitle": "{name} is the coworker's name.",
         "attachments.fileFallback": "Stands for an attachment with no file name.",
@@ -33,6 +37,7 @@
         "context.title": "Header of a hover card: how much of the AI model's context window (memory) the conversation uses.",
         "draft.label": "Header of a block holding a text the user will copy and send elsewhere (an email, a post).",
         "feedback.submit": "Verb, button.",
+        "hitlCue.question": "Pill at the bottom of the chat when the coworker waits for an answer further up the thread.",
         "installGate.facts": "Under the coworker's name before its setup: {apps} is the number of apps to connect, {minutes} a rough setup duration in minutes.",
         "installGate.inProgressHint": "The coworker's setup already runs in another conversation.",
         "mcpServer.customWithHost": "{host} is the domain of a custom MCP server.",
@@ -83,7 +88,8 @@
         "voice.seek": "Accessible label of the waveform: clicking it jumps to that point of the recording.",
         "voice.transcript": "Tooltip of a button that shows the text transcribed from a voice message.",
         "webhookRun.label": "Divider in the thread where an incoming webhook started a run.",
-        "webhookRun.promptTitle": "{name} is the webhook's slug."
+        "webhookRun.promptTitle": "{name} is the webhook's slug.",
+        "agentChat.continueWhereLeftOff": "Message sent to the coworker in the user's name when they resume a run that was cut off. The user speaking to the coworker."
     },
     "actions": {
         "copy": "Copy",
@@ -202,6 +208,26 @@
         "install": "Install {name}",
         "skip": "Skip for now"
     },
+    "activity": {
+        "thinking": "Thinking...",
+        "processing": "Processing your request...",
+        "crafting": "Crafting a response...",
+        "writing": "Writing...",
+        "runningTool": "Running {tool}",
+        "waitingOn": "Waiting on {name}",
+        "building": "Building {name}",
+        "buildingCoworkers": "Building {count, plural, one {# coworker} other {# coworkers}} · {done} done",
+        "waitingOnSubCoworkers": "Waiting on {count, plural, one {# sub-coworker} other {# sub-coworkers}} · {done} done"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {Question waiting} one {Question waiting} other {# questions waiting}}",
+        "approval": "{count, plural, =0 {Approval needed} one {Approval needed} other {# approvals needed}}",
+        "secret": "{count, plural, =0 {Credential needed} one {Credential needed} other {# credentials needed}}",
+        "mcpNamed": "Sign in to {name}",
+        "mcp": "Sign-in needed",
+        "service": "{count, plural, =0 {App to connect} one {App to connect} other {# apps to connect}}",
+        "takeover": "Your turn on the screen"
+    },
     "pendingHitl": {
         "goTo": "{label}, go to it"
     },
@@ -213,6 +239,21 @@
         "saveFailed": "Could not save the credentials"
     },
     "brainChange": {
+        "headline": {
+            "saved": "Brain updated: {title}",
+            "created": "New Brain page: {title}",
+            "deleted": "Removed from the Brain: {title}",
+            "accepted": "Accepted the change: {title}",
+            "acceptedBy": "Accepted {name}'s change: {title}",
+            "dismissed": "Dismissed the change: {title}",
+            "dismissedBy": "Dismissed {name}'s change: {title}"
+        },
+        "notes": {
+            "saved": "Saved. Every coworker reads it from its next run.",
+            "deleted": "No coworker reads it anymore. Its history is kept.",
+            "accepted": "Saved. Every coworker reads it from its next run.",
+            "dismissed": "The page is unchanged."
+        },
         "undone": "Undone: {title}",
         "undoneNote": "The previous version is back.",
         "undo": "Undo",
@@ -274,7 +315,14 @@
         "retry": "Retry",
         "send": "Send",
         "retryLabel": "Retry sending the recording",
-        "sendLabel": "Send the recording"
+        "sendLabel": "Send the recording",
+        "unsupported": "Voice messages are not supported in this browser.",
+        "microphoneBlocked": "Microphone access is blocked. Allow it in your browser settings to record.",
+        "noMicrophone": "No microphone available.",
+        "startFailed": "Could not start recording.",
+        "nothingHeard": "Couldn't hear anything in that recording.",
+        "voiceMessageFailed": "Could not send your voice message.",
+        "nothingRecorded": "Nothing was recorded."
     },
     "agentInstall": {
         "started": "Install started",
@@ -369,7 +417,10 @@
             "too_slow": "Too slow",
             "memory": "Issue with memory",
             "other": "Other"
-        }
+        },
+        "removeFailed": "Could not remove your feedback",
+        "saveFailed": "Could not save your feedback",
+        "thanks": "Thanks for your feedback"
     },
     "providerError": {
         "fallbackTitle": "Something went wrong",
@@ -512,7 +563,9 @@
         "stopFailed": "Could not stop the current run. Your message will be sent when it ends.",
         "selectModel": "Select a model to start: open the model menu below.",
         "emptyTitle": "Start a conversation",
-        "emptyDescription": "Send a message to this coworker"
+        "emptyDescription": "Send a message to this coworker",
+        "runStoppedResponding": "The run stopped responding. Stop it to send another message.",
+        "continueWhereLeftOff": "Continue where you left off."
     },
     "promptInput": {
         "tooLarge": "{count, plural, one {{names} is too large to attach.} =2 {{names} are too large to attach.} other {{names} and {more} more are too large to attach.}}",

@@ -137,13 +137,13 @@ export function relativeDate(value: string, locale: string = DEFAULT_LOCALE, now
     if (Number.isNaN(time)) return value
     const diff = now - time
     if (diff < 0) return absoluteDate(value, locale)
+    const relative = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' })
     const minutes = Math.round(diff / 60_000)
-    if (minutes < 60) return minutes <= 1 ? 'Just now' : `${minutes} min ago`
+    if (minutes < 60) return minutes <= 1 ? relative.format(0, 'second') : relative.format(-minutes, 'minute')
     const hours = Math.round(minutes / 60)
-    if (hours < 24) return `${hours}h ago`
+    if (hours < 24) return relative.format(-hours, 'hour')
     const days = Math.round(diff / DAY)
-    if (days === 1) return 'Yesterday'
-    if (days < 7) return `${days} days ago`
+    if (days < 7) return relative.format(-days, 'day')
     const sameYear = new Date(time).getFullYear() === new Date(now).getFullYear()
     return formatDate(time, locale, { month: 'short', day: 'numeric', year: sameYear ? undefined : 'numeric' })
 }

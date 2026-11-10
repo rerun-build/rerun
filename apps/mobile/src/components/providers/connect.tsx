@@ -1,5 +1,5 @@
 import type { AiConnectionMethod } from '@rerun/analytics'
-import { claudeTokenProblem, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart } from '@rerun/contracts'
+import { claudeTokenIssue, type AddableProvider, type AiConnectionsView, type ClaudeSignInStart, type CodexSignInStart } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
 import * as Haptics from 'expo-haptics'
 import * as WebBrowser from 'expo-web-browser'
@@ -66,6 +66,7 @@ export function ClaudeConnect({ reconnectId }: { reconnectId: string | null }) {
     const [connectionId, setConnectionId] = useState<string | null>(null)
     const ending = useEnding('claude', connectionId, Boolean(reconnectId), view, caller)
     const t = useTranslations('mobileProviders.connect')
+    const tClaude = useTranslations('mobileProviders.claude')
 
     const open = async () => {
         if (!caller) return
@@ -88,10 +89,10 @@ export function ClaudeConnect({ reconnectId }: { reconnectId: string | null }) {
         if (!text || !caller || phase === 'checking') return
         const asToken = text.startsWith('sk-ant') || !pkce
         if (asToken) {
-            const problem = claudeTokenProblem(text)
-            if (problem) {
-                setError(problem)
-                track('ai_connection_failed', { provider: 'claude', method: 'token', surface, reason: 'invalid_token', error: problem })
+            const issue = claudeTokenIssue(text)
+            if (issue) {
+                setError(tClaude(issue))
+                track('ai_connection_failed', { provider: 'claude', method: 'token', surface, reason: 'invalid_token', error: issue })
                 return
             }
         }

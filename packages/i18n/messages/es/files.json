@@ -3,7 +3,10 @@
         "readOnly": "Este archivo es de solo lectura",
         "stillLoading": "Todavía se está cargando este archivo",
         "previousFile": "Archivo anterior",
-        "nextFile": "Archivo siguiente"
+        "nextFile": "Archivo siguiente",
+        "editNotText": "Aquí solo se pueden editar archivos de texto.",
+        "editTruncated": "Este archivo supera los {limit} caracteres y no se puede editar aquí. Descárgalo o pídele al coworker que lo edite.",
+        "editBinary": "Este archivo no es de texto, así que editarlo aquí lo dañaría."
     },
     "actions": {
         "truncated": "Truncado",
@@ -76,5 +79,18 @@
         "actionsFor": "Acciones de {name}",
         "folder": "Carpeta",
         "file": "Archivo"
+    },
+    "uploadOutcome": {
+        "allFailed": "Error al subir",
+        "someFailed": "No se pudieron subir {failed} de {total, plural, one {# archivo} other {# archivos}}",
+        "uploaded": "{count, plural, one {# archivo subido} other {# archivos subidos}}",
+        "sessionExpired": "Tu sesión caducó. Recarga la página y vuelve a intentarlo.",
+        "tooLarge": "Este archivo es demasiado grande para subirlo.",
+        "retryLater": "Error al subir. Vuelve a intentarlo en un momento.",
+        "networkFailed": "Error al subir. Revisa tu conexión y vuelve a intentarlo.",
+        "oversized": "{names}{more, plural, =0 {} one { y # más} other { y # más}} {count, plural, one {supera} other {superan}} el límite de {limit} MB.",
+        "machineUpdating": "La máquina de este workspace se estaba actualizando. Vuelve a intentar la subida.",
+        "engineUpdateNeeded": "Este workspace funciona en una máquina que necesita actualizar su motor para aceptar archivos de más de {limit} MB. Se actualiza sola, así que vuelve a intentarlo en unos minutos.",
+        "machineUnreachable": "No se pudo subir {name}. Puede que tu máquina no esté accesible."
     }
 }

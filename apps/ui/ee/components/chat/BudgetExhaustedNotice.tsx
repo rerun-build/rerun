@@ -168,6 +168,7 @@ export function BudgetExhaustedNotice({
 
 function TrialUpgradeNotice({ coworker, priceArm = DEFAULT_PRICE_ARM, onPaid, resuming, onResumeNow, onConnectProvider, ownConnection }: TrialUpgrade & { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection }) {
     const t = useTranslations('chat.budget')
+    const tPerks = useTranslations('billing.perks.headlines')
     const openBilling = useBillingStore(s => s.openBilling)
 
     if (resuming) {
@@ -207,7 +208,7 @@ function TrialUpgradeNotice({ coworker, priceArm = DEFAULT_PRICE_ARM, onPaid, re
                 {NOTICE_PERKS.map(perk => (
                     <li key={perk.id} className="flex items-center gap-1.5 text-xs">
                         <CheckIcon className="size-3.5 shrink-0 text-green-500" />
-                        {perk.headline}
+                        {tPerks(perk.id as 'credits' | 'models' | 'coworkers', { credits: BASE_PLAN_CREDITS })}
                     </li>
                 ))}
             </ul>

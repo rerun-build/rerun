@@ -72,10 +72,61 @@
         "segment": "{label}: {value}",
         "any": "cualquiera",
         "clear": "Borrar",
-        "noResults": "Sin resultados"
+        "noResults": "Sin resultados",
+        "skills": {
+            "agent-design": "Diseño de agentes",
+            "workflow-automation": "Automatización de flujos de trabajo",
+            "rag-knowledge-bases": "RAG y bases de conocimiento",
+            "integrations-apis": "Integraciones y API",
+            "mcp-servers": "Servidores MCP",
+            "prompt-engineering": "Ingeniería de prompts",
+            "data-pipelines": "Pipelines de datos",
+            "chatbots-support": "Chatbots y soporte",
+            "voice-agents": "Agentes de voz",
+            "lead-gen-outreach": "Generación de leads y prospección",
+            "crm-automation": "Automatización de CRM",
+            "web-scraping": "Web scraping",
+            "e-commerce-automation": "Automatización de e-commerce",
+            "analytics-reporting": "Analítica e informes",
+            "fine-tuning": "Fine-tuning",
+            "no-code-automation": "Automatización no-code"
+        }
     },
     "card": {
         "hire": "Contratar"
+    },
+    "hire": {
+        "title": "Trabaja con {name}",
+        "description": "Cuéntale tu proyecto. Te responde directamente por email.",
+        "fields": {
+            "name": "Tu nombre",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "Email",
+            "emailPlaceholder": "tu@empresa.com",
+            "website": "Sitio web de la empresa",
+            "message": "Mensaje",
+            "messagePlaceholder": "¿Qué estás creando y en qué necesitas ayuda?"
+        },
+        "submit": "Enviar solicitud",
+        "sending": "Enviando...",
+        "sent": {
+            "title": "Solicitud enviada",
+            "description": "{name} te responderá por email. Normalmente en menos de 24 horas.",
+            "close": "Cerrar"
+        },
+        "validation": {
+            "nameRequired": "El nombre es obligatorio",
+            "emailRequired": "El email es obligatorio",
+            "emailInvalid": "Email no válido",
+            "urlProtocol": "Debe empezar por http:// o https://",
+            "messageTooShort": "Cuéntale al experto un poco más sobre tu proyecto",
+            "messageTooLong": "El mensaje es demasiado largo"
+        },
+        "errors": {
+            "unavailable": "Este experto ya no está disponible.",
+            "invalid": "Revisa el formulario e inténtalo de nuevo.",
+            "failed": "Algo salió mal. Inténtalo de nuevo."
+        }
     },
     "program": {
         "hero": {

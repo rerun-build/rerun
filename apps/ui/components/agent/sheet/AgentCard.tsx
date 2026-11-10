@@ -11,9 +11,9 @@ import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useAgentBuddyMood } from '@/hooks/useAgentBuddyMood'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { AgentViewTab } from '@/lib/board/agent-sheet-views'
-import { type IsoAgent, UNNAMED_BOX_LABEL } from '@/lib/board/types'
+import type { IsoAgent } from '@/lib/board/types'
 import { BlocksIcon, BrainIcon, CalendarClockIcon, ChevronRightIcon, FolderIcon, GaugeIcon, Layers, Link2, SettingsIcon, TableIcon, Trash2Icon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
@@ -66,9 +66,10 @@ type AgentCardProps = {
  * screen: a destination picked here grows out of its button to fill the panel, the card waiting behind.
  */
 export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, computerEnabled, working, servicesNeedConfig, needsMachineReason }: AgentCardProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
     const canManage = useCanManageAgent(agent.id)
-    const manageDisabledReason = needsMachineReason ?? (canManage ? null : BOX_MANAGE_REASON)
+    const manageDisabledReason = needsMachineReason ?? (canManage ? null : boxManageReason)
     return (
         <div className="flex min-h-0 flex-col overflow-y-auto">
             <CardIdentity agent={agent} canRename={canManage} onClose={onClose} onShare={onShare} shareDisabledReason={manageDisabledReason} />
@@ -122,9 +123,11 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
 
 /** The name is the field that renames it: one click, Enter or a click away keeps it, Escape drops it. */
 function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason }: { agent: IsoAgent; canRename: boolean; onClose: () => void; onShare: () => void; shareDisabledReason: string | null }) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
+    const tAgent = useTranslations('agent')
     const renameAgent = useBoardStore(s => s.renameAgent)
-    const boxName = useBoardStore(s => s.spaces.find(space => space.id === agent.spaceId)?.name) || UNNAMED_BOX_LABEL
+    const boxName = useBoardStore(s => s.spaces.find(space => space.id === agent.spaceId)?.name) || tAgent('untitledBox')
     const mood = useAgentBuddyMood(agent.id)
     const [editing, setEditing] = useState(false)
     const [name, setName] = useState(agent.name)
@@ -176,7 +179,7 @@ function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason 
                     className="-mt-1 h-8 w-48 text-center text-base font-semibold"
                 />
             ) : (
-                <TooltipDisabledReason reason={canRename ? undefined : BOX_MANAGE_REASON} className="-mt-1 max-w-full">
+                <TooltipDisabledReason reason={canRename ? undefined : boxManageReason} className="-mt-1 max-w-full">
                     <button
                         type="button"
                         aria-label={t('rename', { name: agent.name })}

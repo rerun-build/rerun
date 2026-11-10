@@ -56,7 +56,12 @@
         "notConnected": "Sin conectar.",
         "onlyMethod": "{provider} es el único método de inicio de sesión conectado a esta cuenta.",
         "disconnectTitle": "¿Desconectar {provider}?",
-        "disconnectDescription": "Ya no podrás iniciar sesión en esta cuenta con {provider}. Tus otros métodos de inicio de sesión siguen funcionando."
+        "disconnectDescription": "Ya no podrás iniciar sesión en esta cuenta con {provider}. Tus otros métodos de inicio de sesión siguen funcionando.",
+        "linkError": {
+            "identityTaken": "Esta cuenta de {provider} ya se usa para iniciar sesión en otra cuenta de Rerun.",
+            "denied": "{provider} no se conectó.",
+            "failed": "No se pudo conectar {provider}. Inténtalo de nuevo."
+        }
     },
     "delete": {
         "consequences": {

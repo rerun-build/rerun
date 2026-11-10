@@ -1,6 +1,6 @@
 import { pendingApprovals, pendingQuestions } from '@rerun/contracts'
 
-import { liveActivityLabel } from '@/lib/agent-chat-loader'
+import { liveActivityLabel, type LiveActivityCopy } from '@/lib/agent-chat-loader'
 
 import { isEngineHitl, type PendingWidget } from './pending-widget'
 
@@ -26,7 +26,7 @@ type FeedInput = {
     busy: boolean
     pending: PendingWidget | null
     failed: boolean
-    toolLabel: (toolName: string) => string
+    copy: LiveActivityCopy
 }
 
 // The bubble shows a few lines of plain text: the marks of the markdown it does not render would
@@ -45,8 +45,8 @@ function lastReply(messages: readonly MessageLike[]): ForemanDockReply | null {
     return text ? { id: last.id, text } : null
 }
 
-export function foremanDockFeed({ messages, busy, pending, failed, toolLabel }: FeedInput): ForemanDockFeed {
-    if (busy) return { ...IDLE_DOCK_FEED, busy: true, label: liveActivityLabel(messages.at(-1), toolLabel) }
+export function foremanDockFeed({ messages, busy, pending, failed, copy }: FeedInput): ForemanDockFeed {
+    if (busy) return { ...IDLE_DOCK_FEED, busy: true, label: liveActivityLabel(messages.at(-1), copy) }
     const question = pending && isEngineHitl(pending.toolName) ? pending : null
     // A turn stopped on a question has said nothing yet: the question is the reply.
     return { busy: false, label: null, pending: question, reply: question || failed ? null : lastReply(messages), failed }

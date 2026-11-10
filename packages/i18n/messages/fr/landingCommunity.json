@@ -72,10 +72,61 @@
         "segment": "{label} : {value}",
         "any": "tous",
         "clear": "Effacer",
-        "noResults": "Aucun résultat"
+        "noResults": "Aucun résultat",
+        "skills": {
+            "agent-design": "Conception d'agents",
+            "workflow-automation": "Automatisation de workflows",
+            "rag-knowledge-bases": "RAG et bases de connaissances",
+            "integrations-apis": "Intégrations et API",
+            "mcp-servers": "Serveurs MCP",
+            "prompt-engineering": "Ingénierie de prompts",
+            "data-pipelines": "Pipelines de données",
+            "chatbots-support": "Chatbots et support",
+            "voice-agents": "Agents vocaux",
+            "lead-gen-outreach": "Génération de leads et prospection",
+            "crm-automation": "Automatisation CRM",
+            "web-scraping": "Scraping web",
+            "e-commerce-automation": "Automatisation e-commerce",
+            "analytics-reporting": "Analyse et reporting",
+            "fine-tuning": "Fine-tuning",
+            "no-code-automation": "Automatisation no-code"
+        }
     },
     "card": {
         "hire": "Engager"
+    },
+    "hire": {
+        "title": "Travailler avec {name}",
+        "description": "Présentez votre projet. La réponse arrive directement par e-mail.",
+        "fields": {
+            "name": "Votre nom",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "E-mail",
+            "emailPlaceholder": "vous@entreprise.com",
+            "website": "Site de l'entreprise",
+            "message": "Message",
+            "messagePlaceholder": "Que construisez-vous, et sur quoi avez-vous besoin d'aide ?"
+        },
+        "submit": "Envoyer la demande",
+        "sending": "Envoi...",
+        "sent": {
+            "title": "Demande envoyée",
+            "description": "{name} vous répondra par e-mail. En général sous 24 heures.",
+            "close": "Fermer"
+        },
+        "validation": {
+            "nameRequired": "Le nom est obligatoire",
+            "emailRequired": "L'e-mail est obligatoire",
+            "emailInvalid": "E-mail invalide",
+            "urlProtocol": "Doit commencer par http:// ou https://",
+            "messageTooShort": "Dites-en un peu plus à l'expert sur votre projet",
+            "messageTooLong": "Message trop long"
+        },
+        "errors": {
+            "unavailable": "Cet expert n'est plus disponible.",
+            "invalid": "Vérifiez le formulaire et réessayez.",
+            "failed": "Une erreur est survenue. Réessayez."
+        }
     },
     "program": {
         "hero": {

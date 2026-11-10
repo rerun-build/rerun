@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState, type ReactNode } from 'react'
 
 import { AMOUNT_LOCALE, amountFormat, formatAmount } from '@rerun/contracts'
@@ -19,7 +19,7 @@ import { Progress } from '@/components/ui/progress'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
 import { ArrowLeft, BrainIcon, CheckIcon, CoinsIcon, CpuIcon, CreditCardIcon, Loader2Icon, Package, Repeat, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
-import { TESTIMONIALS } from '@rerun/cloud/testimonials'
+import { TESTIMONIALS, testimonialCopy } from '@rerun/cloud/testimonials'
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -203,6 +203,7 @@ export function TestimonialStrip() {
 
 function TestimonialRotation() {
     const t = useTranslations('billing.parts')
+    const locale = useLocale()
     const [index, setIndex] = useState(0)
     const [elapsed, setElapsed] = useState(0)
 
@@ -223,6 +224,7 @@ function TestimonialRotation() {
     }
 
     const testimonial = TESTIMONIALS[index]
+    const copy = testimonialCopy(testimonial, locale)
 
     return (
         <figure className="mt-auto flex flex-col gap-4 rounded-2xl bg-background/40 p-4 ring-1 ring-border">
@@ -235,11 +237,11 @@ function TestimonialRotation() {
             </div>
             <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={testimonial.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
-                    <blockquote className="line-clamp-2 min-h-12 text-[15px] leading-6">{`“${testimonial.quote}”`}</blockquote>
+                    <blockquote className="line-clamp-2 min-h-12 text-[15px] leading-6">{t('quoted', { quote: copy.quote })}</blockquote>
                     <figcaption className="flex items-center gap-2.5 text-sm">
                         <ExpertAvatar initials={initialsFromName(testimonial.author)} src={testimonial.avatar} alt={testimonial.author} rounded="rounded-full" className="size-7 shrink-0 text-[10px]" />
                         <span className="font-medium">{testimonial.author}</span>
-                        <span className="truncate text-muted-foreground">· {testimonial.role}</span>
+                        <span className="truncate text-muted-foreground">· {copy.role}</span>
                         {testimonial.companyLogo ? (
                             // eslint-disable-next-line @next/next/no-img-element -- a company mark from public/, sized by CSS
                             <img src={testimonial.companyLogo} alt={testimonial.company} className="ml-auto size-5 object-contain" />

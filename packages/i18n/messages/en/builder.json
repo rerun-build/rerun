@@ -1,5 +1,8 @@
 {
     "_context": {
+        "boardToasts.createdInactive": "Toast after a coworker was created on the board. {name} is the coworker's name.",
+        "boardToasts.importInterruptedHint": "Under 'The import was interrupted' (a template import): the user's machine (the server running their coworkers) may hold a partial import.",
+        "isoBoard.boxCta": "Pill on an empty Box of the board. {name} is the Box's name. Keep it under 34 characters with a short name.",
         "contextMenu.moveToBox": "Submenu of a coworker on the board: move it into another Box (a group of coworkers on the board).",
         "contextMenu.duplicate": "Menu item (verb): make a copy of this coworker.",
         "contextMenu.share": "Menu item (verb): share this coworker through a link.",
@@ -43,6 +46,8 @@
         "unplaced": "{count} unplaced"
     },
     "isoBoard": {
+        "boxCta": "Explore {name} templates",
+        "boxCtaFallback": "Explore templates",
         "recruitFirst": "Click to recruit your first coworker",
         "createBox": "Click to create a Box",
         "preparingSandbox": "Preparing your sandbox…",
@@ -110,5 +115,21 @@
                 "competitorsOnly": "+ {competitors, plural, one {# competitor} other {# competitors}}"
             }
         }
+    },
+    "boardToasts": {
+        "createdInactive": "\"{name}\" was created but is inactive",
+        "createdInactiveHint": "Your plan has no free coworker slot. Activate it from the coworker panel.",
+        "addFailed": "Could not add this coworker",
+        "duplicateFailed": "Could not duplicate this coworker",
+        "importFailed": "Could not import this template",
+        "importInterrupted": "The import was interrupted",
+        "importInterruptedHint": "Check your machine before importing again.",
+        "moveAgentFailed": "Could not move this coworker",
+        "moveBoxFailed": "Could not move this Box",
+        "deleteBoxFailed": "Could not delete this Box",
+        "checkConnection": "Check your connection and try again.",
+        "shareLinkGone": "This share link is no longer available",
+        "prepareBoxFailed": "Could not prepare your Box",
+        "startCoworkerFailed": "Could not start your coworker"
     }
 }

@@ -101,6 +101,7 @@ type ForemanChatLayerProps = {
  */
 export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, nextSteps, onSuggestion, onPrefill, onStop, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onStackElement, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
+    const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
     const priceArm = usePriceArm()
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
@@ -119,8 +120,8 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
     const engineHitl = onWidgetAnswer && pending && isEngineHitl(pending.toolName) ? pending : null
     const engineHitlKind = engineHitl && hitlKindOf(engineHitl.toolName)
     const pendingCue = useMemo(
-        () => (engineHitl && engineHitlKind ? { key: engineHitl.toolCallId, summary: summarizePendingHitl(engineHitlKind, (engineHitl.input ?? {}) as Record<string, unknown>), blockRef: pendingRef } : null),
-        [engineHitl, engineHitlKind, pendingRef]
+        () => (engineHitl && engineHitlKind ? { key: engineHitl.toolCallId, summary: summarizePendingHitl(engineHitlKind, (engineHitl.input ?? {}) as Record<string, unknown>, tHitlCue), blockRef: pendingRef } : null),
+        [engineHitl, engineHitlKind, pendingRef, tHitlCue]
     )
     // `null` fait disparaître la part, `undefined` la rend à son étape d'outil normale : la question
     // de l'engine se dessine après le dernier message et sort donc de la pile. Le littéral compte :

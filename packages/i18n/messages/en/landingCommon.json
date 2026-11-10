@@ -36,7 +36,7 @@
             },
             "runs-24-7": {
                 "label": "Runs 24/7, in Europe",
-                "description": "Nights, weekends, laptop shut — it still runs."
+                "description": "Nights, weekends, laptop shut: it still runs."
             },
             "second-brain": {
                 "label": "Second brain",
@@ -159,7 +159,19 @@
         "menu": "Menu",
         "main": "Main",
         "starOnGithub": "Star on GitHub",
-        "login": "Log in"
+        "login": "Log in",
+        "browseAll": {
+            "label": "Browse all templates",
+            "description": "The whole library, every category in one page."
+        },
+        "becomeExpert": "Become an expert",
+        "startFree": "Start for free",
+        "goToApp": "Go to app",
+        "logo": {
+            "brandKit": "View brand kit",
+            "copy": "Copy logo (SVG)",
+            "download": "Download logo"
+        }
     },
     "github": {
         "star": "Star",
@@ -298,6 +310,8 @@
     },
     "composerPlaceholder": "Send a message...",
     "_context": {
+        "nav.logo": "Menu opened by a right click on the Rerun logo of the top bar.",
+        "nav.goToApp": "Top bar button shown instead of the sign-up button to a visitor who is already signed in to the app.",
         "nav.trialCta": "The price stays in US dollars in every language.",
         "finalCta.titleLead": "<switch></switch> is a rotating pill naming the AI provider (ChatGPT, Claude...). The title is split in two lines: titleLead then titleTail.",
         "openSource.announce": "<wide> wraps the part hidden on small screens.",

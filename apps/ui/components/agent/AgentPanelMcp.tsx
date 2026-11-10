@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { invalidateConnectorServices, useConnectorServices } from '@/hooks/useConnectorServices'
 import { refreshMcpServerStatuses } from '@/hooks/useMcpServerStatuses'
 import type { EngineMcpServer } from '@/lib/engine/types'
@@ -34,6 +34,7 @@ function serverSummary(s: EngineMcpServer): string {
 }
 
 export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelMcp')
     const [servers, setServers] = useState<EngineMcpServer[]>([])
     // The connector store already joins every server name to the app or custom entry that owns it.
@@ -115,7 +116,7 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
     }
 
     const newButton = (
-        <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON}>
+        <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
                 <PlusIcon className="size-3.5 mr-1" /> {t('new')}
             </Button>

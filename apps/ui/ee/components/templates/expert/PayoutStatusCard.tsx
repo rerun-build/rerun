@@ -42,7 +42,7 @@ export function PayoutStatusCard({
                     <p className="max-w-[46ch] text-xs text-muted-foreground">{copy.body}</p>
                 </div>
                 <Badge tone={payoutStateTone(account.state)} size="xs" glow={false} className="shrink-0 font-medium">
-                    {payoutStateLabel(account.state)}
+                    {payoutStateLabel(account.state, t)}
                 </Badge>
             </div>
 
@@ -52,7 +52,7 @@ export function PayoutStatusCard({
                 <ul className="relative flex flex-col gap-1">
                     {account.requirementsDue.map(requirement => (
                         <li key={requirement} className="text-xs text-muted-foreground">
-                            {requirementLabel(requirement)}
+                            {requirementLabel(requirement, t)}
                         </li>
                     ))}
                 </ul>

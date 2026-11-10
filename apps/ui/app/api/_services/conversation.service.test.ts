@@ -13,6 +13,7 @@ import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, listAgen
 
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybeSingle: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
+vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
 vi.mock('@/supabase/server', () => ({ createClient: vi.fn() }))
 vi.mock('@/app/api/_auth/access', async importOriginal => {
     const actual = await importOriginal<typeof import('@/app/api/_auth/access')>()

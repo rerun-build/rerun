@@ -1,0 +1,63 @@
+{
+    "generic": "Une erreur est survenue. Essayez de renvoyer votre message.",
+    "modelAtCapacity": {
+        "title": "Modèle saturé",
+        "message": "Ce modèle n'a plus de place pour le moment. Réessayez dans un instant ou choisissez un autre modèle."
+    },
+    "titles": {
+        "budget": "Crédits Rerun épuisés",
+        "unauthorized": "Reconnexion nécessaire",
+        "overloaded": "Fournisseur surchargé",
+        "context_window": "Conversation trop longue",
+        "provider_error": "Le modèle n'a pas pu répondre",
+        "thinking_replay": "L'exécution n'a pas pu continuer",
+        "interrupted": "Exécution interrompue",
+        "run_in_flight": "Cette conversation est encore occupée",
+        "session_gone": "Conversation indisponible"
+    },
+    "messages": {
+        "budget": "Crédits Rerun épuisés pour cette période. Ajoutez des crédits ou attendez la remise à zéro mensuelle.",
+        "unauthorized": "Cette connexion doit être reconnectée avant que le coworker puisse travailler.",
+        "overloaded": "Le fournisseur est surchargé pour le moment. Réessayez dans un instant.",
+        "context_window": "Cette conversation ne tient plus dans le modèle, et la renvoyer se heurtera à la même limite. Passez à un modèle avec une fenêtre de contexte plus grande, ou démarrez une nouvelle conversation.",
+        "provider_error": "Le fournisseur du modèle a refusé cette demande, et la renvoyer donnera la même réponse. Passez à un autre modèle pour continuer.",
+        "thinking_replay": "Le moteur a rejoué ce tour d'une façon que le fournisseur du modèle refuse. C'est un bug du moteur, pas du modèle : changer de modèle n'y changera rien. Réessayez, et mettez à jour le moteur si cela se reproduit.",
+        "interrupted": "L'exécution a été coupée avant de pouvoir se terminer.",
+        "session_gone": "Ce coworker n'a plus accès à cette conversation, le message n'a donc pas été envoyé. Démarrez une nouvelle conversation pour continuer."
+    },
+    "limits": {
+        "titles": {
+            "usageLimit": "Limite d'utilisation atteinte",
+            "modelUnavailable": "{model} indisponible",
+            "anyModelUnavailable": "Modèle indisponible",
+            "modelNotInPlan": "{model} n'est pas inclus dans votre forfait {plan}",
+            "anyModelNotInPlan": "Modèle non inclus dans votre forfait {plan}",
+            "credits": "Crédits d'utilisation {plan} épuisés",
+            "spend": "Plafond de dépenses {plan} atteint",
+            "window": "Limite {window, select, weekly {hebdomadaire} other {mensuelle}} {plan} atteinte",
+            "model": "Limite {model} de {plan} atteinte",
+            "claudeSession": "Limite de session {plan} atteinte",
+            "usage": "Limite d'utilisation {plan} atteinte",
+            "opencodeCredits": "Crédits OpenCode épuisés",
+            "opencodeWindow": "Limite {window, select, weekly {hebdomadaire} other {mensuelle}} OpenCode Go atteinte",
+            "opencode": "Limite OpenCode Go atteinte"
+        },
+        "messages": {
+            "opencodeCredits": "Plus aucun crédit Console. Ajoutez des crédits sur opencode.ai, ou choisissez un modèle Go pour continuer.",
+            "opencodeWindowResets": "Votre forfait OpenCode Go a atteint sa limite {window, select, weekly {hebdomadaire} monthly {mensuelle} other {de 5 heures}}. Réinitialisation : {resetsAt}. D'ici là, passez à un modèle Console ou à un autre fournisseur.",
+            "opencodeWindow": "Votre forfait OpenCode Go a atteint sa limite {window, select, weekly {hebdomadaire} monthly {mensuelle} other {de 5 heures}}. Passez à un modèle Console ou à un autre fournisseur jusqu'à sa réinitialisation.",
+            "modelUnavailable": "Cette connexion ne peut pas utiliser {model}. Choisissez un autre modèle pour continuer.",
+            "anyModelUnavailable": "Cette connexion ne peut pas utiliser ce modèle. Choisissez un autre modèle pour continuer.",
+            "modelNotInPlan": "Votre forfait {plan} n'inclut pas {model}. Choisissez un autre modèle pour continuer.",
+            "anyModelNotInPlan": "Votre forfait {plan} n'inclut pas ce modèle. Choisissez un autre modèle pour continuer.",
+            "usageLimit": "Cet abonnement a atteint sa limite d'utilisation. Passez à un autre modèle, ou attendez que la limite se réinitialise.",
+            "credits": "Votre forfait {plan} a épuisé ses crédits d'utilisation. Choisissez un modèle inclus dans votre forfait pour continuer.",
+            "spend": "Votre organisation a atteint son plafond de dépenses mensuel {plan}. Un administrateur peut le relever ; en attendant, passez ce coworker sur un autre modèle.",
+            "weeklyResets": "Votre forfait {plan} a atteint sa limite hebdomadaire. Réinitialisation : {resetsAt}. D'ici là, passez ce coworker sur un autre modèle.",
+            "weekly": "Votre forfait {plan} a atteint sa limite hebdomadaire. Passez ce coworker sur un autre modèle jusqu'à la semaine prochaine.",
+            "model": "Votre forfait {plan} a atteint sa limite {model}. Les autres modèles {plan} fonctionnent toujours : passez à l'un d'eux.",
+            "sessionResets": "Votre forfait {plan} a épuisé sa fenêtre d'utilisation actuelle. Elle se recharge à {resetsAt} ; en attendant, passez ce coworker sur un autre modèle.",
+            "session": "Votre forfait {plan} a épuisé sa fenêtre d'utilisation actuelle. Elle se recharge d'elle-même ; en attendant, passez ce coworker sur un autre modèle."
+        }
+    }
+}

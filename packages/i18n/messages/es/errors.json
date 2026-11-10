@@ -420,5 +420,22 @@
     "purchaseOtherWorkspace": "Esta compra pertenece a otro workspace.",
     "changePlanFailed": "No se pudo cambiar tu plan",
     "updateBrainProposalFailed": "No se pudo actualizar la propuesta",
-    "prepareSandboxFailed": "No se pudo preparar tu sandbox"
+    "prepareSandboxFailed": "No se pudo preparar tu sandbox",
+    "templateTitleFirst": "Primero ponle un título a la plantilla.",
+    "uploadImageBeforeAltText": "Sube la imagen antes de escribir su texto alternativo.",
+    "boxManagerOnlyChange": "Solo un admin o un manager de esta Box puede cambiar esto",
+    "boxAccessLost": "Ya no tienes acceso a esta Box",
+    "whatsappCodeExpired": "El código caducó antes de que se vinculara el teléfono. Pide uno nuevo y escanéalo en menos de tres minutos.",
+    "whatsappLinkRefused": "WhatsApp no quiso vincular este número. Revísalo en el teléfono y vuelve a intentarlo.",
+    "whatsappNumberRefused": "WhatsApp rechazó este número: {message}",
+    "whatsappLinkRefusedBecause": "WhatsApp rechazó la vinculación: {message}",
+    "linkedinWrongCredentials": "Correo o contraseña incorrectos. Revísalos en linkedin.com y vuelve a intentarlo.",
+    "linkedinSignInRefused": "LinkedIn rechazó el inicio de sesión: {message}",
+    "bankNotConfirmed": "Tu banco no confirmó el pago. No se cobró nada, vuelve a intentarlo.",
+    "fileTooLongToSave": "Este archivo supera los {max, number} caracteres y no se puede guardar desde aquí.",
+    "fileNotTextSave": "Este archivo no es de texto, así que guardarlo aquí lo dañaría.",
+    "fileChangedOnBox": "Este archivo cambió en la Box desde que lo abriste.",
+    "saveThisFileFailed": "No se pudo guardar este archivo",
+    "templateSubscriptionEnded": "Este coworker venía de una suscripción a una plantilla que terminó. Vuelve a comprar la plantilla para recuperarlo.",
+    "noFreeCoworkerSlot": "No queda ningún espacio libre para coworkers en tu plan. Activa Pro para tener coworkers ilimitados o elimina un coworker para hacer sitio."
 }

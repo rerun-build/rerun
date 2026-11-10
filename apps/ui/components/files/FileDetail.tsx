@@ -75,7 +75,7 @@ export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onD
     )
 
     const blocked = loading ? null : fileEditBlockReason({ name, truncated, content })
-    const editDisabledReason = loading ? t('stillLoading') : blocked ? editDisabledTooltip(blocked, locale) : undefined
+    const editDisabledReason = loading ? t('stillLoading') : blocked ? editDisabledTooltip(blocked, locale, t) : undefined
 
     return (
         <PanelEditorShell>

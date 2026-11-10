@@ -18,7 +18,7 @@ import { Segmented } from '@/components/ui/segmented'
 import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { VERBOSITY_LEVELS } from '@rerun/contracts'
 import type { IsoAgent } from '@/lib/board/types'
 import type { EngineVerbosity } from '@/lib/engine/types'
@@ -39,6 +39,7 @@ type ConfigValues = { soul: string; verbosity: EngineVerbosity }
 const SETTINGS_FORM_ID = 'agent-settings-form'
 
 export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelSettings')
     const errorText = useErrorText()
     const verbosityOptions = useMemo(() => VERBOSITY_LEVELS.map((value: EngineVerbosity) => ({ value, label: t(`verbosity.${value}`) })), [t])
@@ -46,7 +47,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
     const openNotifications = useNotificationsStore(s => s.openNotifications)
     const soulLocked = useTemplateContentLock(agent.id)
     const canManage = useCanManageAgent(agent.id)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
     const [name, setName] = useState(agent.name)
     const [loading, setLoading] = useState(true)
     const [saved, setSaved] = useState(false)

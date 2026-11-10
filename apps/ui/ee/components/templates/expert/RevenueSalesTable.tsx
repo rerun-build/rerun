@@ -13,6 +13,7 @@ function dateLabel(iso: string, locale: string): string {
 
 export function RevenueSalesTable({ revenue }: { revenue: CreatorRevenue }) {
     const t = useTranslations('templates.revenue')
+    const tPayouts = useTranslations('templates.payouts')
     const locale = useLocale()
     if (revenue.recent.length === 0) return null
 
@@ -35,7 +36,7 @@ export function RevenueSalesTable({ revenue }: { revenue: CreatorRevenue }) {
                             <TableCell className="max-w-40 truncate">{sale.title}</TableCell>
                             <TableCell>
                                 <Badge tone={saleKindTone(sale.kind)} size="xs" glow={false} className="font-medium">
-                                    {saleKindLabel(sale.kind)}
+                                    {saleKindLabel(sale.kind, tPayouts)}
                                 </Badge>
                             </TableCell>
                             <TableCell className="text-right tabular-nums">{formatAmount(sale.netCents, revenue.currency)}</TableCell>

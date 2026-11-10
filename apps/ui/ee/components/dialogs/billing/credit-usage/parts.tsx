@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { createElement } from 'react'
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { sourceLabel, type CreditBalance, type CreditCoworker, type CreditKind, type CreditSource } from '@/ee/lib/billing/credit-usage'
+import { type CreditBalance, type CreditCoworker, type CreditKind, type CreditSource } from '@/ee/lib/billing/credit-usage'
 import { formatCredits } from '@/ee/lib/billing/plans'
 import { BrainIcon, CpuIcon, UsersIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
 import { paidDataIcon } from '@/lib/paid-data/spend'
@@ -24,10 +24,10 @@ function sourceIcon(source: CreditSource): LucideIcon {
     return source.kind === 'ai' ? TIER_ICON[source.tier] : paidDataIcon(source.capability)
 }
 
-// A Rerun model reads by its tier; a paid data source keeps the catalog's own label.
+// A Rerun model reads by its tier, a paid data source by its capability.
 export function useSourceLabel(): (source: CreditSource) => string {
     const t = useTranslations('billing')
-    return source => (source.kind === 'ai' ? t(`usage.tier.${source.tier}`) : sourceLabel(source))
+    return source => (source.kind === 'ai' ? t(`usage.tier.${source.tier}`) : t(`usage.paidData.${source.capability}`))
 }
 
 export function Swatch({ kind, className }: { kind: CreditKind; className?: string }) {

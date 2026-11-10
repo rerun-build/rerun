@@ -273,6 +273,18 @@
         }
     },
     "monitoring": {
+        "metrics": {
+            "count": "Nombre",
+            "totalTokens": "Tokens au total",
+            "inputTokens": "Tokens d'entrée",
+            "outputTokens": "Tokens de sortie",
+            "cachedInputTokens": "Tokens en cache",
+            "reasoningTokens": "Tokens de raisonnement",
+            "cost": "Coût",
+            "avgDurationMs": "Durée moyenne",
+            "errorCount": "Erreurs",
+            "errorRate": "Taux d'erreur"
+        },
         "live": "En direct",
         "runStatus": {
             "running": "En cours",
@@ -295,6 +307,12 @@
             "empty": "Aucun coworker à afficher."
         },
         "chart": {
+            "rowCount": {
+                "runs": "{count} exécutions",
+                "runSteps": "{count} étapes",
+                "toolCalls": "{count} appels d'outils",
+                "sessions": "{count} sessions"
+            },
             "other": "Autre",
             "loading": "Chargement...",
             "noData": "Aucune donnée sur cette période."
@@ -394,7 +412,18 @@
             "search": "Rechercher des apps",
             "all": "Toutes",
             "empty": "Aucune app de ce nom.",
-            "limit": "Jusqu'à {max} apps pour commencer. Votre coworker pourra en connecter d'autres ensuite."
+            "limit": "Jusqu'à {max} apps pour commencer. Votre coworker pourra en connecter d'autres ensuite.",
+            "categories": {
+                "payments": "Paiements",
+                "ecommerce": "E-commerce",
+                "crm": "CRM",
+                "marketing": "Marketing",
+                "seo": "SEO",
+                "analytics": "Analytique",
+                "dev": "Développement",
+                "productivity": "Productivité",
+                "other": "Autre"
+            }
         },
         "schedule": {
             "button": "Planifier",
@@ -428,14 +457,19 @@
             "error": "Erreur",
             "offline": "Hors ligne",
             "waiting_human": "Vous attend",
-            "disabled": "Désactivé"
+            "disabled": "Désactivé",
+            "paused": "En pause",
+            "restoring": "Restauration"
         },
         "countdown": {
             "seconds": "{count} s",
             "minutes": "{count} min",
             "hours": "{count} h",
             "days": "{count} j"
-        }
+        },
+        "untitledBox": "Box sans nom",
+        "boxAria": "Box : {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} one {, # à traiter} other {, # à traiter}}{results, plural, =0 {} one {, # nouveau résultat} other {, # nouveaux résultats}}"
     },
     "templateStory": {
         "states": {

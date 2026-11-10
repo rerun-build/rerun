@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 // they do not let anyone pick.
 export function TemplateTile({ template, selected = false, showStatus = false, onSelect, className }: { template: LibraryTemplate; selected?: boolean; showStatus?: boolean; onSelect?: () => void; className?: string }) {
     const t = useTranslations('templates.creator')
+    const tStatus = useTranslations('templates.status')
     const { live, handlers } = useBoardOnHover(template.agents.length > 0)
     const { headline, subline } = templateHeadline(template)
 
@@ -41,7 +42,7 @@ export function TemplateTile({ template, selected = false, showStatus = false, o
                 {showStatus && template.status !== 'published' && (
                     <span className="absolute top-2 left-2 flex rounded-full bg-background/70 backdrop-blur">
                         <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
-                            {templateStatusLabel(template.status)}
+                            {templateStatusLabel(template.status, tStatus)}
                         </Badge>
                     </span>
                 )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { track } from '@rerun/analytics/client'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import { GettingStartedPopover } from '@/components/foreman/getting-started/GettingStartedPopover'
@@ -18,6 +19,7 @@ import { useSession } from '@/supabase/session/SessionProvider'
  * would talk over, and never for a workspace with no machine, which has no Foreman to hand them to.
  */
 export function GettingStartedPill() {
+    const t = useTranslations('foreman.gettingStarted.prompts')
     const { isAnonymous, workspace } = useSession()
     const companion = useForemanStore(state => state.funnel === 'companion' && state.surface === 'engine')
     const enabled = companion && !isAnonymous && !workspace?.is_sandbox
@@ -52,7 +54,7 @@ export function GettingStartedPill() {
         if (step.id === 'phone') useAccountStore.getState().openAccount('sign-in', 'phone')
         else if (step.id === 'payment_method') useBillingStore.getState().openBilling(undefined, 'getting_started')
         else if (step.panel) useWorkspaceSettingsStore.getState().openWorkspacePanel(step.panel)
-        else if (step.prompt) useForemanStore.getState().askForeman(step.prompt)
+        else if (step.prompt) useForemanStore.getState().askForeman(t.has(step.id as never) ? t(step.id as never) : step.prompt)
     }
 
     return <GettingStartedPopover {...state} open={open} onOpenChange={setOpen} onStep={handleStep} onHide={dismiss} pulse={pulse} />

@@ -25,6 +25,8 @@
         "unplaced": "{count} sin colocar"
     },
     "isoBoard": {
+        "boxCta": "Explorar plantillas de {name}",
+        "boxCtaFallback": "Explorar plantillas",
         "recruitFirst": "Haz clic para reclutar a tu primer coworker",
         "createBox": "Haz clic para crear una Box",
         "preparingSandbox": "Preparando tu sandbox…",
@@ -57,21 +59,33 @@
             "synthesis": "Juntando todas las piezas…"
         },
         "cards": {
-            "identity": { "title": "Te encontramos" },
-            "audience": { "title": "A quién le vendes" },
-            "tools": { "title": "Herramientas detectadas" },
+            "identity": {
+                "title": "Te encontramos"
+            },
+            "audience": {
+                "title": "A quién le vendes"
+            },
+            "tools": {
+                "title": "Herramientas detectadas"
+            },
             "mail": {
                 "title": "Tu correo",
                 "runsOn": "Tu correo funciona con <b>{provider}</b>"
             },
-            "social": { "title": "Dónde apareces" },
-            "brand": { "title": "Tu marca" },
+            "social": {
+                "title": "Dónde apareces"
+            },
+            "brand": {
+                "title": "Tu marca"
+            },
             "registry": {
                 "title": "Sobre el papel",
                 "since": "Desde <b>{year}</b>",
                 "people": "<b>{headcount}</b> personas"
             },
-            "person": { "title": "¿Eres tú, {firstName}?" },
+            "person": {
+                "title": "¿Eres tú, {firstName}?"
+            },
             "linkedin": {
                 "title": "Tu página de LinkedIn",
                 "followers": "seguidores",
@@ -81,9 +95,15 @@
                 "title": "Lo que dicen tus clientes",
                 "count": "<n>{count}</n> reseñas de Google"
             },
-            "products": { "title": "Lo que vendes" },
-            "competitors": { "title": "Tu competencia" },
-            "customers": { "title": "Quién ya compra" },
+            "products": {
+                "title": "Lo que vendes"
+            },
+            "competitors": {
+                "title": "Tu competencia"
+            },
+            "customers": {
+                "title": "Quién ya compra"
+            },
             "brain": {
                 "title": "Company Brain",
                 "pages": "{count, plural, one {# página} other {# páginas}} que tus agentes leen antes de empezar",
@@ -92,5 +112,21 @@
                 "competitorsOnly": "+ {competitors, plural, one {# competidor} other {# competidores}}"
             }
         }
+    },
+    "boardToasts": {
+        "createdInactive": "\"{name}\" se creó, pero está inactivo",
+        "createdInactiveHint": "Tu plan no tiene ningún hueco libre para coworkers. Actívalo desde el panel del coworker.",
+        "addFailed": "No se pudo añadir este coworker",
+        "duplicateFailed": "No se pudo duplicar este coworker",
+        "importFailed": "No se pudo importar esta plantilla",
+        "importInterrupted": "La importación se interrumpió",
+        "importInterruptedHint": "Revisa tu máquina antes de volver a importar.",
+        "moveAgentFailed": "No se pudo mover este coworker",
+        "moveBoxFailed": "No se pudo mover esta Box",
+        "deleteBoxFailed": "No se pudo eliminar esta Box",
+        "checkConnection": "Revisa tu conexión e inténtalo de nuevo.",
+        "shareLinkGone": "Este enlace para compartir ya no está disponible",
+        "prepareBoxFailed": "No se pudo preparar tu Box",
+        "startCoworkerFailed": "No se pudo iniciar tu coworker"
     }
 }

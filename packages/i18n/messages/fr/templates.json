@@ -1,5 +1,30 @@
 {
+    "installFeedback": {
+        "noLongerAvailable": "« {title} » n'est plus disponible",
+        "buyFailed": "Impossible d'acheter « {title} »",
+        "alreadyOnBoard": "« {title} » est déjà sur votre board",
+        "alreadyOnBoardHint": "Ses coworkers s'ouvrent là où vous les avez laissés.",
+        "notImported": "{name} n'a pas pu être importé.",
+        "inactiveCount": "{count, plural, one {# d'entre eux est inactif : votre forfait n'a plus de place de coworker libre.} other {# d'entre eux sont inactifs : votre forfait n'a plus de place de coworker libre.}}",
+        "landed": "{count, plural, one {# coworker de « {title} » est arrivé sur votre board} other {# coworkers de « {title} » sont arrivés sur votre board}}",
+        "openOne": "Ouvrez-en un et lancez son installation : il connecte avec vous ce dont il a besoin.",
+        "landedInactive": "Il est arrivé inactif : votre forfait n'a plus de place de coworker libre.",
+        "agentLanded": "« {name} » est arrivé sur votre board",
+        "openIt": "Ouvrez-le et lancez son installation : il connecte avec vous ce dont il a besoin.",
+        "webhooksMoved": "{count, plural, one {# webhook a une nouvelle URL : pointez vos services vers l'adresse de la copie.} other {# webhooks ont une nouvelle URL : pointez vos services vers l'adresse de la copie.}}",
+        "schedulesDoubled": "{count, plural, one {# planification tourne aussi sur la copie. Désactivez-la si le travail ne doit pas être fait deux fois.} other {# planifications tournent aussi sur la copie. Désactivez-les si le travail ne doit pas être fait deux fois.}}",
+        "copyReady": "Elle reprend tout ce qu'avait l'original et peut tourner tout de suite.",
+        "prepareBoxFailed": "Impossible de préparer votre Box",
+        "settingUp": "Installation de « {title} »",
+        "settingUpHint": "Vos coworkers vont apparaître sur le board dans un instant.",
+        "setUpFailed": "Impossible d'installer « {title} »"
+    },
     "price": {
+        "free": "Gratuit",
+        "monthly": "{amount}/mois",
+        "useForFree": "Utiliser gratuitement",
+        "hire": "{count, plural, one {Recruter ce coworker · {price}} other {Recruter ces # coworkers · {price}}}",
+        "hireCard": "Recruter · {price}",
         "purchased": "Acheté",
         "expired": "Expiré",
         "install": "Installer",
@@ -328,6 +353,15 @@
             "submitted": "Envoyé. Nous revenons vers vous."
         },
         "footer": {
+            "requirements": {
+                "title": "Un titre",
+                "tagline": "Une accroche",
+                "description": "Une description",
+                "metaDescription": "Une méta-description de {min} à {max} caractères",
+                "agent": "Au moins un coworker capturé",
+                "installAnswers": "Une réponse d'installation pour chaque coworker",
+                "payouts": "Un compte Stripe qui peut recevoir des virements"
+            },
             "live": "Ce template est en ligne sur la marketplace. Contactez l’équipe Rerun pour le modifier.",
             "inReview": "Nous examinons ce template. Retirez-le pour continuer à le modifier.",
             "withdraw": "Retirer",
@@ -413,6 +447,41 @@
         "sidebar": {
             "payouts": "Versements",
             "revenue": "Revenus"
+        },
+        "stateLabels": {
+            "not_started": "Non configuré",
+            "incomplete": "Action requise",
+            "pending_verification": "En vérification",
+            "restricted": "Restreint",
+            "ready": "Prêt"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "Un site web professionnel",
+                "mcc": "Votre secteur d'activité"
+            },
+            "external_account": "Un compte bancaire",
+            "individual": {
+                "verification": {
+                    "document": "Une pièce d'identité",
+                    "additional_document": "Un justificatif de domicile"
+                },
+                "id_number": "Votre numéro d'identification national",
+                "address": {
+                    "line1": "Votre adresse"
+                },
+                "dob": {
+                    "day": "Votre date de naissance"
+                }
+            },
+            "tos_acceptance": {
+                "date": "Accepter les conditions de Stripe"
+            }
+        },
+        "saleKinds": {
+            "one_time": "Ponctuel",
+            "recurring": "Mensuel",
+            "refund": "Remboursement"
         }
     },
     "revenue": {
@@ -439,5 +508,54 @@
         "available": "Disponible maintenant",
         "subscriptions": "{count, plural, one {# abonnement actif} other {# abonnements actifs}}",
         "perMonth": "{amount}/mois"
+    },
+    "categories": {
+        "agencies": "Agences",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Ventes",
+        "recruiting": "Recrutement",
+        "real-estate": "Immobilier",
+        "legal": "Juridique et conformité",
+        "creators": "Créateurs",
+        "productivity": "Productivité",
+        "other": "Autre"
+    },
+    "status": {
+        "draft": "Brouillon",
+        "in_review": "En revue",
+        "published": "Publié",
+        "unlisted": "Non répertorié",
+        "archived": "Archivé"
+    },
+    "creatorKind": {
+        "studio": "Studio",
+        "freelancer": "Freelance",
+        "expert": "Expert"
+    },
+    "cta": {
+        "place": "{count, plural, one {Placer # coworker} other {Placer # coworkers}}",
+        "placeCaption": "{count, plural, one {Glissez-le sur votre board, prêt à tourner.} other {Glissez-les sur votre board, prêts à tourner.}}",
+        "trialInstall": "Démarrer l'essai et installer",
+        "trialThenSubscribe": "Démarrer l'essai, puis s'abonner à {price}/mois",
+        "trialThenPay": "Démarrer l'essai, puis payer {price}",
+        "planInstall": "S'abonner à {plan}/mois et installer",
+        "planThenSubscribe": "S'abonner à {plan}/mois, puis à {price}/mois",
+        "planThenPay": "S'abonner à {plan}/mois, puis payer {price}",
+        "subscribe": "S'abonner à {price}/mois",
+        "pay": "Payer {price}",
+        "payCaption": "Ce template, facturé à part.",
+        "useTemplate": "Utiliser ce template",
+        "nothingCaptured": "Aucun coworker n'a encore été capturé dans ce template.",
+        "open": "Ouvrir {name}",
+        "alreadyOnBoard": "Déjà sur votre board.",
+        "installAgain": "Installer à nouveau",
+        "sandboxCannotBuy": "Passez sur un workspace pour acheter des templates.",
+        "trialBilledSeparately": "{terms} Ce template est facturé à part.",
+        "trialUsedBilledSeparately": "Votre essai gratuit a déjà été utilisé. Facturé aujourd'hui. Ce template est facturé à part.",
+        "resubscribe": "Se réabonner à {price}/mois",
+        "lapsed": "Votre abonnement a pris fin. Les coworkers installés par ce template sont désactivés.",
+        "billedTo": "Facturé à {workspace}. Votre plan Rerun est déjà actif.",
+        "yours": "Votre template, sans frais."
     }
 }

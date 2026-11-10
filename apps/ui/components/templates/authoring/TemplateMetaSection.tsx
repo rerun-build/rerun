@@ -1,6 +1,6 @@
 'use client'
 
-import { TEMPLATE_CATEGORIES, TEMPLATE_CATEGORY_LABELS } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES } from '@rerun/contracts'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@rerun/ui/primitives'
 import { Controller, useFormContext } from 'react-hook-form'
 import { useTranslations } from 'next-intl'
@@ -16,6 +16,8 @@ import { PrefillButton } from './PrefillButton'
 
 export function TemplateMetaSection() {
     const t = useTranslations('templates.authoring.meta')
+    const tCategory = useTranslations('templates.categories')
+    const categoryLabels = Object.fromEntries(TEMPLATE_CATEGORIES.map(category => [category, tCategory(category)]))
     const { control, setValue, watch } = useFormContext<TemplateFormValues>()
     const { scope, actions } = useTemplateAuthoring()
     const title = watch('title')
@@ -79,7 +81,7 @@ export function TemplateMetaSection() {
                         control={control}
                         name="category"
                         render={({ field }) => (
-                            <EnumSelect label={t('category')} value={field.value} onChange={field.onChange} options={TEMPLATE_CATEGORIES} labels={TEMPLATE_CATEGORY_LABELS} />
+                            <EnumSelect label={t('category')} value={field.value} onChange={field.onChange} options={TEMPLATE_CATEGORIES} labels={categoryLabels} />
                         )}
                     />
                     <Controller

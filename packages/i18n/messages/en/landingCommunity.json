@@ -2,8 +2,10 @@
     "_context": {
         "directory.eyebrow": "Shown next to a row of expert faces at the top of the experts directory.",
         "directory.featured.carousel": "Accessible name of the carousel, read by screen readers inside the carousel arrow buttons (Previous / Next).",
+        "filters.skills": "Options of the Skill filter of the experts directory: the fields an AI automation expert works in. Keep RAG, MCP, APIs and CRM as they are.",
         "filters.segment": "Screen reader label of a filter button: the filter name, then the value picked or the word for 'any'.",
         "card.hire": "Button on an expert card that opens a form to contact the expert.",
+        "hire": "Dialog where a visitor sends a project request to an expert. {name} is the expert's name or studio name.",
         "program.hero.title": "The empty mark tag is replaced by the Rerun logo, placed right before the word Rerun.",
         "program.showcase.carousel": "Accessible name of the carousel, read by screen readers inside the carousel arrow buttons (Previous / Next).",
         "program.valueProps.cells.ship.desc": "connectorCount is an already formatted number such as 1,000.",
@@ -86,10 +88,61 @@
         "segment": "{label}: {value}",
         "any": "any",
         "clear": "Clear",
-        "noResults": "No results"
+        "noResults": "No results",
+        "skills": {
+            "agent-design": "Agent Design",
+            "workflow-automation": "Workflow Automation",
+            "rag-knowledge-bases": "RAG & Knowledge Bases",
+            "integrations-apis": "Integrations & APIs",
+            "mcp-servers": "MCP Servers",
+            "prompt-engineering": "Prompt Engineering",
+            "data-pipelines": "Data Pipelines",
+            "chatbots-support": "Chatbots & Support",
+            "voice-agents": "Voice Agents",
+            "lead-gen-outreach": "Lead Gen & Outreach",
+            "crm-automation": "CRM Automation",
+            "web-scraping": "Web Scraping",
+            "e-commerce-automation": "E-commerce Automation",
+            "analytics-reporting": "Analytics & Reporting",
+            "fine-tuning": "Fine-tuning",
+            "no-code-automation": "No-code Automation"
+        }
     },
     "card": {
         "hire": "Hire"
+    },
+    "hire": {
+        "title": "Work with {name}",
+        "description": "Tell them about your project. They reply directly by email.",
+        "fields": {
+            "name": "Your name",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "Email",
+            "emailPlaceholder": "you@company.com",
+            "website": "Company website",
+            "message": "Message",
+            "messagePlaceholder": "What are you building, and what do you need help with?"
+        },
+        "submit": "Send request",
+        "sending": "Sending...",
+        "sent": {
+            "title": "Request sent",
+            "description": "{name} will get back to you by email. Usually within 24 hours.",
+            "close": "Close"
+        },
+        "validation": {
+            "nameRequired": "Name is required",
+            "emailRequired": "Email is required",
+            "emailInvalid": "Invalid email",
+            "urlProtocol": "Must start with http:// or https://",
+            "messageTooShort": "Tell the expert a bit more about your project",
+            "messageTooLong": "Message is too long"
+        },
+        "errors": {
+            "unavailable": "This expert is no longer available.",
+            "invalid": "Please check the form and try again.",
+            "failed": "Something went wrong. Please try again."
+        }
     },
     "program": {
         "hero": {
@@ -330,7 +383,7 @@
             "permission": {
                 "label": "Send email",
                 "message": "Send the payment reminder to billing@acme.com",
-                "preview": "Subject: Invoice #1042 — payment overdue\n\nHi, invoice #1042 ($230) was due on Aug 20."
+                "preview": "Subject: Invoice #1042: payment overdue\n\nHi, invoice #1042 ($230) was due on Aug 20."
             },
             "resume": {
                 "question": "Calling their AP contact · reminder queued",

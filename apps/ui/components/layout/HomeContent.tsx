@@ -71,6 +71,8 @@ function clearTemplateParam() {
 
 export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: { initialSpaces?: SpacePublic[]; initialWorkspaceId?: number | null }) {
     const t = useTranslations('layout')
+    const tOAuthRetry = useTranslations('auth.oauthRetry')
+    const tLinkError = useTranslations('account.signIn.linkError')
     const { user, workspace, loading, isAnonymous, phoneStep } = useSession()
     const foremanVisible = useForemanStore(selectForemanVisible)
     const foremanFunnel = useForemanStore(state => state.funnel)
@@ -101,7 +103,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     const readyMadeParked = useOnboardingStore(s => s.pendingTemplateLink !== null || s.pendingShareLink !== null)
     const arrivalHoldsTheWall = foremanArrival ? foremanFunnel === 'guided' && !foremanArrival.installed && foremanOpen !== false : foremanFunnel === 'unknown' && readyMadeParked && !workspace?.onboarded_at
     const accountWallOpen = isAnonymous && !accountClaimed && !foremanHoldsTheWall && !arrivalHoldsTheWall
-    const retryCopy = signInRetry ? oauthRetryCopy(signInRetry.code, signInRetry.provider ? OAUTH_PROVIDER_CONFIG[signInRetry.provider].label : null) : null
+    const retryCopy = signInRetry ? oauthRetryCopy(signInRetry.code, signInRetry.provider ? OAUTH_PROVIDER_CONFIG[signInRetry.provider].label : null, tOAuthRetry) : null
     const phoneWallOpen = phoneStep === 'pending' && !arrivalHoldsTheWall
     const templateLinkSlug = useTemplateFlowStore(s => s.linkSlug)
     const shareLinkToken = useAgentShareStore(s => s.token)
@@ -161,9 +163,9 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         const linkError = searchParams.get(ACCOUNT_LINK_ERROR_PARAM)
         const linkProvider = searchParams.get(ACCOUNT_LINK_PROVIDER_PARAM)
         useAccountStore.getState().openAccount('sign-in')
-        if (linkError) toast.error(linkErrorMessage(linkError, isOAuthProvider(linkProvider) ? linkProvider : 'google'))
+        if (linkError) toast.error(linkErrorMessage(linkError, isOAuthProvider(linkProvider) ? linkProvider : 'google', tLinkError))
         clearSearchParams(ACCOUNT_PARAM, ACCOUNT_LINK_ERROR_PARAM, ACCOUNT_LINK_PROVIDER_PARAM)
-    }, [searchParams, loading, isAnonymous])
+    }, [searchParams, loading, isAnonymous, tLinkError])
 
     // A provider sign-in that failed upstream lands here with the error in the URL, where it would
     // otherwise stay for the whole session. Only someone still anonymous needs to hear about it: an

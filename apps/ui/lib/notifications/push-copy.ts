@@ -1,4 +1,4 @@
-import { friendlyError } from '@/lib/chat-error'
+import { friendlyError, type ChatErrorCopy } from '@/lib/chat-error'
 import type { NotificationKind } from '@/lib/engine/types'
 import type { StoredNotification } from '@/lib/notifications/inbound'
 
@@ -32,8 +32,8 @@ function errorOf(notification: StoredNotification): string {
     return typeof error === 'string' && error ? error : notification.message.replace(RUN_PREFIX, '')
 }
 
-function bodyOf(notification: StoredNotification): string | undefined {
-    if (notification.kind === 'error') return friendlyError(errorOf(notification))
+function bodyOf(notification: StoredNotification, tErrors: ChatErrorCopy): string | undefined {
+    if (notification.kind === 'error') return friendlyError(errorOf(notification), tErrors)
     // A finished schedule only says "completed", which the subtitle already does.
     if (notification.kind === 'done' && isScheduledEvent(notification.event)) return undefined
     return notification.message
@@ -46,13 +46,13 @@ function oneLine(text: string | undefined): string | undefined {
 }
 
 // Every push reads the same way on a lock screen: who, then where and what, then the detail.
-export function pushCopyOf({ agentName, notification, t }: { agentName: string; notification: StoredNotification; t: PushTranslator }): PushCopy {
+export function pushCopyOf({ agentName, notification, t, tErrors }: { agentName: string; notification: StoredNotification; t: PushTranslator; tErrors: ChatErrorCopy }): PushCopy {
     const sourceName = sourceNameOf(notification)
     const state = t(`states.${notification.kind}`)
     return {
         title: agentName,
         subtitle: sourceName ? t('subtitle', { source: sourceName, state }) : state,
-        body: oneLine(bodyOf(notification)),
+        body: oneLine(bodyOf(notification, tErrors)),
         silent: notification.kind === 'done',
     }
 }

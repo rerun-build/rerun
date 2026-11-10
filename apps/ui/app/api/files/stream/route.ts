@@ -6,6 +6,7 @@ import * as engine from '@/lib/engine/client'
 import { invalidDir, invalidName } from '@/lib/files/path-guards'
 import type { EngineConnection } from '@/lib/engine/types'
 import { withQueryWorkspace } from '@/lib/workspace/query-workspace'
+import { getTranslations } from 'next-intl/server'
 
 export const runtime = 'nodejs'
 
@@ -32,8 +33,9 @@ async function upload(req: Request) {
 
     if (invalidName(name)) return Response.json({ error: 'Invalid file name' }, { status: 400 })
     if (invalidDir(dir)) return Response.json({ error: 'Invalid directory' }, { status: 400 })
+    const t = await getTranslations('files.uploadOutcome')
     if (size > MAX_UPLOAD_FILE_BYTES) {
-        return Response.json({ error: `${name} is over the ${MAX_UPLOAD_FILE_BYTES / MB} MB limit.` }, { status: 413 })
+        return Response.json({ error: t('oversized', { names: name, more: 0, count: 1, limit: MAX_UPLOAD_FILE_BYTES / MB }) }, { status: 413 })
     }
     if (!req.body) return Response.json({ error: 'Expected the file bytes as the request body' }, { status: 400 })
 
@@ -41,7 +43,7 @@ async function upload(req: Request) {
         const { conn, base } = await resolveTarget(agentId, shared)
 
         if (!(await engine.supportsStreamedUploads(conn))) {
-            return await uploadThroughLegacyRoute(conn, base, { dir, name, size, req })
+            return await uploadThroughLegacyRoute(conn, base, { dir, name, size, req }, t)
         }
 
         try {
@@ -52,21 +54,23 @@ async function upload(req: Request) {
             // failing an upload the old route could still have carried.
             if (err instanceof engine.EngineUploadError && (err.status === 404 || err.status === 405)) {
                 engine.forgetEngineCapabilities(conn)
-                return Response.json({ error: 'The machine of this workspace was updating. Retry the upload.' }, { status: 409 })
+                return Response.json({ error: t('machineUpdating') }, { status: 409 })
             }
             throw err
         }
     } catch (err) {
-        return errorResponse(err, name)
+        return errorResponse(err, name, t)
     }
 }
 
 // A machine whose engine predates the streamed route can still take the multipart one, as long as the
 // file is small enough for it to hold in memory twice.
-async function uploadThroughLegacyRoute(conn: EngineConnection, base: string, input: { dir: string; name: string; size: number; req: Request }): Promise<Response> {
+type UploadCopy = Awaited<ReturnType<typeof getTranslations<'files.uploadOutcome'>>>
+
+async function uploadThroughLegacyRoute(conn: EngineConnection, base: string, input: { dir: string; name: string; size: number; req: Request }, t: UploadCopy): Promise<Response> {
     if (input.size > LEGACY_UPLOAD_MAX_BYTES) {
         return Response.json(
-            { error: `This workspace runs on a machine that needs an engine update to accept files over ${LEGACY_UPLOAD_MAX_BYTES / MB} MB. It updates itself, so try again in a few minutes.` },
+            { error: t('engineUpdateNeeded', { limit: LEGACY_UPLOAD_MAX_BYTES / MB }) },
             { status: 409 },
         )
     }
@@ -75,14 +79,14 @@ async function uploadThroughLegacyRoute(conn: EngineConnection, base: string, in
     return Response.json({ path: [input.dir, input.name].filter(Boolean).join('/'), bytes: blob.size }, { status: 201 })
 }
 
-function errorResponse(err: unknown, name: string): Response {
+function errorResponse(err: unknown, name: string, t: UploadCopy): Response {
     if (err instanceof AuthorizationError) return Response.json({ error: err.message }, { status: 403 })
     if (err instanceof engine.EngineUploadError) {
         const status = err.status === 400 || err.status === 507 ? err.status : 502
         return Response.json({ error: err.message }, { status })
     }
     if (err instanceof Error && err.name === 'AbortError') return new Response(null, { status: 499 })
-    return Response.json({ error: `Could not upload ${name}. Your machine may be unreachable.` }, { status: 502 })
+    return Response.json({ error: t('machineUnreachable', { name }) }, { status: 502 })
 }
 
 export const POST = withQueryWorkspace(upload)

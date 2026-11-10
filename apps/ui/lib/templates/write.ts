@@ -6,7 +6,8 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { resolveAgentConnectors } from './connectors'
 import { documentToRow } from './document'
 import { describeSecretHit, scanDocumentForSecrets } from './secret-scan'
-import { META_DESCRIPTION_REQUIREMENT } from './submit'
+import { submitRequirementLabel } from './submit'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 import { renderTemplateCard } from './card-render'
 
 export type TemplateWriteResult = { ok: true; slug: string; warnings: string[] } | { ok: false; status: number; error: string }
@@ -31,7 +32,7 @@ function publishGate(doc: TemplateDocument): string[] {
     if (!isPublicStatus(doc.status)) return []
     const missing: string[] = []
     if (!doc.tagline.trim()) missing.push('a tagline')
-    if (!isSeoDescriptionLength(doc.metaDescription)) missing.push(META_DESCRIPTION_REQUIREMENT.toLowerCase())
+    if (!isSeoDescriptionLength(doc.metaDescription)) missing.push(submitRequirementLabel('metaDescription', englishTranslator('templates.expert.footer')).toLowerCase())
     // The cards draw the board of a captured agent, so an image is only the fallback thumbnail of a
     // template that has none.
     if (doc.gallery.length === 0 && doc.agents.length === 0) missing.push('at least one image or captured coworker')

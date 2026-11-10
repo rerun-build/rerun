@@ -14,12 +14,11 @@ import { Segmented } from '@/components/ui/segmented'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { DataSource } from '@/lib/data/source'
 import { columnsInUse, formValuesToInput, NONE, previewCard, toneColumn, viewFormSchema, viewToFormValues, type ViewFormValues } from '@/lib/data/view-form'
-import { LAYOUT_META } from '@/lib/data/views'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CARD_FIELD_ROLES, CARD_FORMATS, CARD_GALLERY_SHAPES, CARD_LAYOUTS, CARD_TONES, type CardLayout, type TableView } from '@rerun/contracts'
 import { ScrollFade } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm, type Control, type FieldPath } from 'react-hook-form'
 
 const FORMAT_OPTIONS = [...CARD_FORMATS, 'currency:USD', 'currency:EUR', 'currency:GBP']
@@ -44,7 +43,8 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
     const t = useTranslations('dialogs.viewSettings')
     const tCommon = useTranslations('common')
     const errorText = useErrorText()
-    const form = useForm<ViewFormValues>({ resolver: zodResolver(viewFormSchema), defaultValues: viewToFormValues(view, columns) })
+    const schema = useMemo(() => viewFormSchema(t), [t])
+    const form = useForm<ViewFormValues>({ resolver: zodResolver(schema), defaultValues: viewToFormValues(view, columns) })
 
     useEffect(() => {
         if (!open) return
@@ -109,7 +109,7 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                             />
                                         ))}
                                     </div>
-                                    <p className="text-xs text-muted-foreground/70">{LAYOUT_META[layout].description}</p>
+                                    <p className="text-xs text-muted-foreground/70">{t(`layoutDescriptions.${layout}`)}</p>
                                 </Field>
 
                                 {layout === 'table' ? (

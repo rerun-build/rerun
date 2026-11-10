@@ -1,6 +1,19 @@
 {
+    "_context": {
+        "crash.body": "Full-page error screen after the app crashed."
+    },
     "save": "Save",
     "saving": "Saving",
     "cancel": "Cancel",
-    "somethingWentWrong": "Something went wrong. Please try again."
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "backToDashboard": "Back to dashboard",
+    "notFound": {
+        "title": "Page not found",
+        "body": "This page does not exist or has moved. Let's get you back on track."
+    },
+    "crash": {
+        "title": "Something went wrong",
+        "body": "This page hit an unexpected error. Your coworkers and their work are safe. Reload to pick up where you left off.",
+        "reload": "Reload"
+    }
 }

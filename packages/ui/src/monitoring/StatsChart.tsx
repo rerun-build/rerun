@@ -3,7 +3,7 @@
 import { formatDate, formatNumber } from '@rerun/i18n/format'
 import { useMemo } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, XAxis, YAxis } from 'recharts'
-import { STATS_DATASETS, STATS_METRIC_META } from '@rerun/contracts'
+import { STATS_METRIC_META } from '@rerun/contracts'
 import type { StatsChartType, StatsDataset, StatsGroupBy, StatsMetric, StatsPoint } from '@rerun/contracts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../primitives/chart'
 import { CHART_FALLBACK_COLOR, CHART_PALETTE, chartColorAt } from './chart-palette'
@@ -66,6 +66,7 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
     const locale = useUiLocale()
     const t = useKitTranslations()
     const otherLabel = t('monitoring.chart.other')
+    const metricLabel = t(`monitoring.metrics.${metric}`)
     const agg = STATS_METRIC_META[metric].agg
     const formatValue = useMemo(() => makeFormatter(metric, locale), [metric, locale])
 
@@ -89,7 +90,7 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
     const { rows, series } = useMemo(() => {
         const buckets = [...new Set((points ?? []).map(p => p.bucket))].sort()
         if (groupBy === 'none') {
-            const s: Series[] = [{ key: 'value', label: STATS_METRIC_META[metric].label, color: CHART_PALETTE[0] }]
+            const s: Series[] = [{ key: 'value', label: metricLabel, color: CHART_PALETTE[0] }]
             const r = buckets.map(b => {
                 const entries = (points ?? []).filter(p => p.bucket === b)
                 return { bucket: bucketLabel(b, locale), value: combine(agg, entries) }
@@ -108,7 +109,7 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
             return row
         })
         return { rows: r, series: s }
-    }, [points, groups, hasOther, groupBy, metric, agg, locale, otherLabel])
+    }, [points, groups, hasOther, groupBy, agg, locale, otherLabel, metricLabel])
 
     const chartConfig = useMemo<ChartConfig>(() => Object.fromEntries(series.map(s => [s.key, { label: s.label, color: s.color }])), [series])
 
@@ -154,12 +155,12 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
                 <div className="flex h-full flex-col justify-center gap-1 px-2">
                     <div className="text-3xl font-semibold leading-none text-foreground">{formatValue(stat.total)}</div>
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                        <span>{STATS_METRIC_META[metric].label}</span>
+                        <span>{metricLabel}</span>
                         <span>·</span>
-                        <span>{compact(stat.rowCount, locale)} {STATS_DATASETS[dataset].label.toLowerCase()}</span>
+                        <span>{t(`monitoring.chart.rowCount.${dataset}`, { count: compact(stat.rowCount, locale) })}</span>
                         {stat.delta !== null && <span className={stat.delta >= 0 ? 'text-emerald-500' : 'text-rose-500'}>{stat.delta >= 0 ? '▲' : '▼'} {Math.abs(stat.delta).toFixed(0)}%</span>}
                     </div>
-                    <ChartContainer config={{ v: { label: STATS_METRIC_META[metric].label, color: CHART_PALETTE[0] } }} className="mt-2 h-16 w-full aspect-auto">
+                    <ChartContainer config={{ v: { label: metricLabel, color: CHART_PALETTE[0] } }} className="mt-2 h-16 w-full aspect-auto">
                         <AreaChart data={stat.sparkRows} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
                             <Area dataKey="v" type="monotone" stroke="var(--color-v)" fill="var(--color-v)" fillOpacity={0.15} strokeWidth={1.5} dot={false} />
                         </AreaChart>

@@ -30,7 +30,7 @@ export function ProposalCard({ proposal, busy, onAccept, onDismiss, onOpenPage }
                 <CoworkerBuddy proposal={proposal} />
                 <div className="min-w-0 flex-1">
                     <div className="flex items-start gap-2">
-                        <h3 className="flex-1 text-[22px] leading-snug font-bold tracking-tight">{proposalHeadline(proposal)}</h3>
+                        <h3 className="flex-1 text-[22px] leading-snug font-bold tracking-tight">{proposalHeadline(proposal, t)}</h3>
                         <When proposal={proposal} />
                     </div>
                     <div className="mt-1.5">

@@ -136,12 +136,13 @@ function PlanAgent({ item }: { item: PlanItem }) {
 // A lone Box has no neighbour to be told apart from: it sits straight in the widget's card, and only
 // the carousel frames each of its Boxes.
 function PlanBoxCard({ group, answered, streaming, framed }: { group: PlanGroup; answered: boolean; streaming: boolean; framed: boolean }) {
+    const t = useTranslations('foreman.plan')
     // One agent alone on its card plays its day; several at once would be a board that blinks.
     const alive = !framed && !answered && group.items.length === 1
 
     return (
         <div className={cn('flex shrink-0 flex-col', framed ? 'w-[min(340px,85%)] snap-center overflow-hidden rounded-lg border border-border bg-card first:snap-start last:snap-end' : 'w-full')}>
-            {alive ? <PlanLifeScene group={group} script={planLifeScript(group.items[0])} waiting={streaming} /> : <PlanBoxScene group={group} animated={!answered} framed={framed} />}
+            {alive ? <PlanLifeScene group={group} script={planLifeScript(group.items[0], { working: t('lifeWorking'), delivered: t('lifeDelivered') })} waiting={streaming} /> : <PlanBoxScene group={group} animated={!answered} framed={framed} />}
             <div className={cn('flex flex-1 flex-col gap-3', framed ? 'p-3' : 'pt-3')}>
                 {group.items.map(item => (
                     <PlanAgent key={item.key} item={item} />

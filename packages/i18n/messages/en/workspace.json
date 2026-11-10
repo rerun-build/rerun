@@ -2,7 +2,9 @@
     "_context": {
         "settings.coworkersLanguage": "Label of a setting: the language AI coworkers write in when they work alone (schedules, triggers), with nobody talking to them.",
         "settings.fallbackName": "Shown in place of the workspace's name when it has none.",
-        "settings.showAll": "Button expanding the grid of illustrations. {count} is how many there are."
+        "settings.showAll": "Button expanding the grid of illustrations. {count} is how many there are.",
+        "access.paused": "Tooltip of a disabled control while the workspace is paused (its plan ended and its machine was archived).",
+        "access.sandboxNone": "Why a settings command is disabled in an expert's sandbox workspace: it has no settings, members or billing of its own."
     },
     "settings": {
         "coworkersLanguage": "Coworkers' language",
@@ -21,5 +23,14 @@
         "pickIllustration": "Or pick an illustration",
         "showLess": "Show less",
         "showAll": "Show all {count}"
+    },
+    "access": {
+        "paused": "Subscribe to restore your workspace first",
+        "restoring": "Available once your workspace is restored",
+        "paymentFailed": "Update your payment to restore your workspace first",
+        "sandboxArchived": "Available once your sandbox is reactivated",
+        "sandboxNone": "The expert sandbox has none of its own",
+        "adminsOnly": "Admins only",
+        "sandboxSingleBox": "A sandbox has a single Box"
     }
 }

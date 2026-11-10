@@ -3,7 +3,10 @@
         "readOnly": "Ce fichier est en lecture seule",
         "stillLoading": "Chargement du fichier en cours",
         "previousFile": "Fichier précédent",
-        "nextFile": "Fichier suivant"
+        "nextFile": "Fichier suivant",
+        "editNotText": "Seuls les fichiers texte peuvent être modifiés ici.",
+        "editTruncated": "Ce fichier dépasse {limit} caractères et ne peut pas être modifié ici. Téléchargez-le, ou demandez au coworker de le modifier.",
+        "editBinary": "Ce fichier n'est pas du texte : le modifier ici le corromprait."
     },
     "actions": {
         "truncated": "Tronqué",
@@ -76,5 +79,18 @@
         "actionsFor": "Actions pour {name}",
         "folder": "Dossier",
         "file": "Fichier"
+    },
+    "uploadOutcome": {
+        "allFailed": "Échec de l'envoi",
+        "someFailed": "Échec de l'envoi pour {failed} sur {total, plural, one {# fichier} other {# fichiers}}",
+        "uploaded": "{count, plural, one {# fichier envoyé} other {# fichiers envoyés}}",
+        "sessionExpired": "Votre session a expiré. Rechargez la page et réessayez.",
+        "tooLarge": "Ce fichier est trop volumineux pour être envoyé.",
+        "retryLater": "Échec de l'envoi. Réessayez dans un instant.",
+        "networkFailed": "Échec de l'envoi. Vérifiez votre connexion et réessayez.",
+        "oversized": "{names}{more, plural, =0 {} one { et # autre} other { et # autres}} {count, plural, one {dépasse} other {dépassent}} la limite de {limit} Mo.",
+        "machineUpdating": "La machine de ce workspace était en cours de mise à jour. Relancez l'envoi.",
+        "engineUpdateNeeded": "Ce workspace tourne sur une machine dont le moteur doit être mis à jour pour accepter les fichiers de plus de {limit} Mo. La mise à jour est automatique, réessayez dans quelques minutes.",
+        "machineUnreachable": "Impossible d'envoyer {name}. Votre machine est peut-être injoignable."
     }
 }

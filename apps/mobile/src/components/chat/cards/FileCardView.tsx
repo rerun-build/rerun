@@ -48,7 +48,7 @@ function Album({ items }: { items: ViewerItem[] }) {
 
 // The files a coworker hands over: photos as an album, anything else as a list. A tap opens the
 // full-screen viewer, which pages through the card and shares a file on.
-function useFileSize(): (size: number) => string {
+export function useFileSize(): (size: number) => string {
     const t = useTranslations('mobileCards.file')
     const locale = useLocale()
     return size => {

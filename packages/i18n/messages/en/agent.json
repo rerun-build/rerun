@@ -1,5 +1,7 @@
 {
+    "untitledBox": "Untitled Box",
     "_context": {
+        "shareCta.planAdd": "Button adding a coworker shared through a link. {price} is the monthly plan price like \"$49\".",
         "accessSummary.viaBox": "A Box is a group of coworkers; {box} is its name.",
         "agentCard.destinations.memories": "Card button opening what the coworker knows (its memories).",
         "agentCard.destinations.monitoring": "Card button opening the coworker's activity and usage.",
@@ -71,7 +73,11 @@
         "templateContentLock.title": "Over content of a coworker installed from a template, hidden until the workspace pays.",
         "threadBranch.opener.askedBy": "Stands in for the first message of a thread another coworker asked for. {name} is that coworker's name.",
         "threadBranch.opener.schedule": "Stands in for the first message of a thread a schedule started. {name} is the routine's name.",
-        "threadBranch.opener.trigger": "Stands in for the first message of a thread a webhook started. {name} is the trigger's name."
+        "threadBranch.opener.trigger": "Stands in for the first message of a thread a webhook started. {name} is the trigger's name.",
+        "schedule.once": "Description of a task that runs a single time. {date} is a formatted date and time.",
+        "schedule.everyMinutes": "{count} is a number of minutes, such as 15.",
+        "schedule.everyWeekday": "{day} is a weekday name such as Monday; {time} a clock time such as 9:00 AM.",
+        "schedule.monthly": "{day} is a day of the month, a number such as 1 or 15; {time} a clock time."
     },
     "agentCard": {
         "destinations": {
@@ -1018,5 +1024,21 @@
         "hideHidden": "Hide hidden files",
         "showHidden": "Show hidden files",
         "emptyDescription": "This is your coworker's workspace. Files it downloads, creates or edits during its runs are stored here."
+    },
+    "shareCta": {
+        "placeLabel": "Place the coworker",
+        "placeCaption": "Drop it on your board, ready to run.",
+        "trialAdd": "Start free trial & add it",
+        "planAdd": "Subscribe {price}/mo & add it",
+        "add": "Add to my board"
+    },
+    "schedule": {
+        "once": "once · {date}",
+        "onceOn": "Once, {date}",
+        "everyMinutes": "Every {count} minutes",
+        "everyDay": "Every day at {time}",
+        "weekdays": "Weekdays at {time}",
+        "everyWeekday": "Every {day} at {time}",
+        "monthly": "Monthly on day {day} at {time}"
     }
 }

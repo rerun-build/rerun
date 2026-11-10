@@ -10,7 +10,7 @@ import { SearchIcon, StarIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { OpencodePlan } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 
 const SECTIONS = [
@@ -26,6 +26,7 @@ function matches(row: OpencodeModelRow, query: string): boolean {
 
 function ModelRow({ row, isDefault, lockReason, onToggle }: { row: OpencodeModelRow; isDefault: boolean; lockReason?: string; onToggle: (on: boolean) => void }) {
     const t = useTranslations('connections')
+    const locale = useLocale()
     const toggle = <Switch checked={row.enabled} disabled={!!lockReason} onCheckedChange={onToggle} aria-label={row.enabled ? t('models.turnOff', { model: row.label }) : t('models.turnOn', { model: row.label })} />
     return (
         <li className={cn('flex min-h-11 items-center gap-3 px-3 py-2', !row.enabled && 'text-muted-foreground')}>
@@ -47,7 +48,7 @@ function ModelRow({ row, isDefault, lockReason, onToggle }: { row: OpencodeModel
                         </Badge>
                     )}
                 </div>
-                {(row.unavailable || (row.plan === 'console' && row.info)) && <span className="truncate text-[11px] text-muted-foreground">{row.unavailable ?? pricePerMillion(row.info!.price)}</span>}
+                {(row.unavailable || (row.plan === 'console' && row.info)) && <span className="truncate text-[11px] text-muted-foreground">{row.unavailable ?? pricePerMillion(row.info!.price, t, locale)}</span>}
             </div>
             {lockReason ? <TooltipLabeled label={lockReason}>{toggle}</TooltipLabeled> : toggle}
         </li>
@@ -66,7 +67,7 @@ type OpencodeModelsProps = {
 export function OpencodeModels({ connection, defaultModel, onModelsChange }: OpencodeModelsProps) {
     const t = useTranslations('connections')
     const [query, setQuery] = useState('')
-    const rows = useMemo(() => opencodeModelRows(connection), [connection])
+    const rows = useMemo(() => opencodeModelRows(connection, t), [connection, t])
     const enabledCount = rows.filter(row => row.enabled).length
     const trimmed = query.trim()
 

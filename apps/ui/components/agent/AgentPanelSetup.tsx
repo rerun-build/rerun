@@ -9,12 +9,13 @@ import { Button } from '@/components/ui/button'
 import { SkeletonForm } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { CheckIcon, Loader2Icon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 export function AgentPanelSetup({ agentId }: { agentId: string }) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelSetup')
     const errorText = useErrorText()
     const [draft, setDraft] = useState<AgentSetupDraft>({ required: null, prompt: '' })
@@ -80,7 +81,7 @@ export function AgentPanelSetup({ agentId }: { agentId: string }) {
 
             <AgentSetupFields value={draft} onChange={setDraft} disabled={saving || !canManage} />
 
-            <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON} className="flex w-full">
+            <TooltipDisabledReason reason={canManage ? undefined : boxManageReason} className="flex w-full">
                 <Button type="button" size="sm" onClick={save} disabled={saving || !canManage || !isSetupAnswered(draft)} className="w-full">
                     {saved ? (
                         <>

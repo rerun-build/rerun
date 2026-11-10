@@ -32,7 +32,7 @@
         "agencies": {
             "crumb": "Agencies",
             "title": "AI Coworkers for agencies.",
-            "lede": "The work that repeats on every account — the prospecting, the SEO audits, the weekly client report, the chase for an unpaid invoice — handed to Coworkers that do it in your own tools and report back.",
+            "lede": "The work that repeats on every account (the prospecting, the SEO audits, the weekly client report, the chase for an unpaid invoice), handed to Coworkers that do it in your own tools and report back.",
             "metaTitle": "AI agents for agencies: prospecting, SEO, client reporting",
             "metaDescription": "Agencies repeat the same work on every account. Hire AI Coworkers for prospecting, SEO audits, social posting, client reports and unpaid invoices.",
             "wallTitle": "Eight Coworkers an agency would hire first.",
@@ -63,7 +63,7 @@
                 },
                 "3": {
                     "question": "Do I pay per client or per person?",
-                    "answer": "Neither. The plan covers the workspace and seats are free, so the whole team — and the client, if you want them in — can read what the Coworkers did and answer when one asks."
+                    "answer": "Neither. The plan covers the workspace and seats are free, so the whole team, and the client if you want them in, can read what the Coworkers did and answer when one asks."
                 }
             }
         },
@@ -93,7 +93,7 @@
             "faq": {
                 "1": {
                     "question": "Is this worth it for one person?",
-                    "answer": "That is the case it was built for: the jobs a freelancer would hire for if hiring made sense — a half-day of prospecting, an hour of invoicing, the inbox. One plan covers all of them."
+                    "answer": "That is the case it was built for: the jobs a freelancer would hire for if hiring made sense: a half-day of prospecting, an hour of invoicing, the inbox. One plan covers all of them."
                 },
                 "2": {
                     "question": "Does it work while my laptop is shut?",
@@ -108,7 +108,7 @@
         "ecommerce": {
             "crumb": "E-commerce",
             "title": "AI Coworkers for e-commerce.",
-            "lede": "What your store did this week, what is about to run out, which carts are recoverable and what your competitors just changed — read every day, acted on, and reported to you in one message.",
+            "lede": "What your store did this week, what is about to run out, which carts are recoverable and what your competitors just changed: read every day, acted on, and reported to you in one message.",
             "metaTitle": "AI agents for e-commerce: orders, stock, carts, competitors",
             "metaDescription": "Hire AI Coworkers that read your store every week, catch low stock early, recover abandoned carts, watch competitor prices and fix the pages losing sales.",
             "wallTitle": "Eight Coworkers for a store that never closes.",
@@ -131,11 +131,11 @@
             "faq": {
                 "1": {
                     "question": "Does it connect to Shopify and the rest of my stack?",
-                    "answer": "Shopify, Stripe, your email platform, your ads accounts, your sheets — and 3,000+ other tools. A back office with no API is still reachable: the Coworker opens it on its own screen and clicks through it."
+                    "answer": "Shopify, Stripe, your email platform, your ads accounts, your sheets, and 3,000+ other tools. A back office with no API is still reachable: the Coworker opens it on its own screen and clicks through it."
                 },
                 "2": {
                     "question": "Can a Coworker change prices or send a campaign on its own?",
-                    "answer": "Spending is locked: it cannot buy ads or anything else without a yes. For the rest, you decide — have it draft the campaign for you to send, or let it send and report."
+                    "answer": "Spending is locked: it cannot buy ads or anything else without a yes. For the rest, you decide: have it draft the campaign for you to send, or let it send and report."
                 },
                 "3": {
                     "question": "How fast will it know my catalogue?",
@@ -184,7 +184,7 @@
         "startups": {
             "crumb": "Startups",
             "title": "AI Coworkers for startups.",
-            "lede": "Five people doing the work of fifteen. Hire Coworkers for the jobs you cannot justify a headcount for yet — demos booked, pipeline read, launch prepared, metrics in your inbox on Monday.",
+            "lede": "Five people doing the work of fifteen. Hire Coworkers for the jobs you cannot justify a headcount for yet: demos booked, pipeline read, launch prepared, metrics in your inbox on Monday.",
             "metaTitle": "AI agents for startups: pipeline, launches, metrics, support",
             "metaDescription": "A small team cannot hire for every job. Hire AI Coworkers that book demos, read the pipeline, prepare the launch and report your metrics on Monday.",
             "wallTitle": "Eight Coworkers for the roles you cannot hire yet.",
@@ -222,7 +222,7 @@
         "saas": {
             "crumb": "SaaS",
             "title": "AI Coworkers for SaaS teams.",
-            "lede": "The signals you only read when something breaks — usage dropping on a key account, the same request in five tickets, bugs piling up before standup — read every day by Coworkers that bring them to you.",
+            "lede": "The signals you only read when something breaks (usage dropping on a key account, the same request in five tickets, bugs piling up before standup), read every day by Coworkers that bring them to you.",
             "metaTitle": "AI agents for SaaS: churn risk, feedback, releases, metrics",
             "metaDescription": "Hire AI Coworkers that surface accounts at churn risk, turn feedback into themes, triage bug reports, write release notes and report your metrics.",
             "wallTitle": "Eight Coworkers for the product and revenue work.",
@@ -249,7 +249,7 @@
                 },
                 "2": {
                     "question": "Can it write into our issue tracker?",
-                    "answer": "Yes. Triaging a bug means deduplicating it, adding the context and filing it where your team actually looks — Linear, Jira, GitHub, Notion."
+                    "answer": "Yes. Triaging a bug means deduplicating it, adding the context and filing it where your team actually looks: Linear, Jira, GitHub, Notion."
                 },
                 "3": {
                     "question": "Is our data used to train a model?",
@@ -311,7 +311,7 @@
                 },
                 "2": {
                     "title": "Candidates who never hear back",
-                    "body": "Not out of rudeness — out of volume. A Coworker keeps every candidate updated at every stage, in your words."
+                    "body": "Not out of rudeness, out of volume. A Coworker keeps every candidate updated at every stage, in your words."
                 },
                 "3": {
                     "title": "Debriefs that never become a decision",

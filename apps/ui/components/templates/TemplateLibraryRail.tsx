@@ -1,7 +1,7 @@
 'use client'
 
 import type { TemplateCategory } from '@rerun/contracts'
-import { TEMPLATE_CATEGORY_LABELS } from '@rerun/contracts'
+import { templateCategoryLabel } from '@rerun/contracts'
 import type { ComponentType, ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { ConnectorLogo } from '@/components/templates/TemplateConnectorLogos'
@@ -31,6 +31,7 @@ export function TemplateLibraryRail({
     onScratch: () => void
 }) {
     const t = useTranslations('templates.library')
+    const tCategory = useTranslations('templates.categories')
     const searching = query.trim() !== ''
     const isActive = (target: LibraryView) => !searching && isSameView(view, target)
 
@@ -73,7 +74,7 @@ export function TemplateLibraryRail({
                             <RailItem
                                 key={category}
                                 icon={TEMPLATE_CATEGORY_ICONS[category] ?? TEMPLATE_CATEGORY_ICONS.other}
-                                label={TEMPLATE_CATEGORY_LABELS[category] ?? TEMPLATE_CATEGORY_LABELS.other}
+                                label={templateCategoryLabel(category, tCategory)}
                                 count={count}
                                 active={isActive({ kind: 'category', category })}
                                 onClick={() => onView({ kind: 'category', category })}

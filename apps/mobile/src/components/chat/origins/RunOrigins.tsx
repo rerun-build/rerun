@@ -14,7 +14,7 @@ import { GlassButton } from '@/components/ui/GlassButton'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'
 
-import { formatBytes } from '../cards/cards'
+import { useFileSize } from '../cards/FileCardView'
 import { Markdown } from '../Markdown'
 import { ThreadDivider } from './ThreadDivider'
 
@@ -57,12 +57,13 @@ function prettyBody(payload: TriggerPayload): string {
 
 function PayloadSummary({ payload }: { payload: TriggerPayload }) {
     const t = useTranslations('mobileChat.origins')
+    const fileSize = useFileSize()
     return (
         <>
             <Badge size="xs" tone={METHOD_TONES[payload.method] ?? 'neutral'} label={payload.method} />
             {payload.truncated && <Badge size="xs" tone="orange" label={t('truncated')} />}
             <AppText variant="caption" tone="muted" style={{ fontFamily: payload.body ? fonts.mono : fonts.regular, fontVariant: ['tabular-nums'] }}>
-                {payload.body ? formatBytes(payload.bytes) : t('noPayload')}
+                {payload.body ? fileSize(payload.bytes) : t('noPayload')}
             </AppText>
         </>
     )

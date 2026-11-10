@@ -16,5 +16,14 @@
         "pickIllustration": "O elige una ilustración",
         "showLess": "Ver menos",
         "showAll": "Ver las {count}"
+    },
+    "access": {
+        "paused": "Suscríbete primero para restaurar tu workspace",
+        "restoring": "Disponible cuando se restaure tu workspace",
+        "paymentFailed": "Actualiza primero tu pago para restaurar tu workspace",
+        "sandboxArchived": "Disponible cuando se reactive tu sandbox",
+        "sandboxNone": "El sandbox de experto no tiene",
+        "adminsOnly": "Solo para admins",
+        "sandboxSingleBox": "Un sandbox tiene una sola Box"
     }
 }

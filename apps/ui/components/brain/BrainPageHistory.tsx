@@ -137,7 +137,7 @@ export function BrainPageHistory({ page, revisions, titles, onBack, onOpenPage, 
                                     {index === 0 && revision.hash === page.hash ? t('history.currentShort') : shortRelativeTime(revision.createdAt, locale)}
                                 </span>
                                 <span className="block truncate text-xs text-muted-foreground">
-                                    {revision.proposalId ? t('history.authorFromProposal', { author: brainAuthorLabel(revision.author) }) : brainAuthorLabel(revision.author)}
+                                    {revision.proposalId ? t('history.authorFromProposal', { author: brainAuthorLabel(revision.author, t) }) : brainAuthorLabel(revision.author, t)}
                                 </span>
                             </button>
                         ))}

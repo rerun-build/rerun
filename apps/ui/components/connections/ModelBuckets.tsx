@@ -121,6 +121,7 @@ type ModelBucketsProps = {
 // button each chip shows on hover.
 export function ModelBuckets({ connection, defaultModel, onModelsChange }: ModelBucketsProps) {
     const t = useTranslations('connections.models')
+    const tConnections = useTranslations('connections')
     const [dragging, setDragging] = useState<CatalogModel | null>(null)
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }), useSensor(KeyboardSensor))
     const offered = offeredModels(connection)
@@ -181,14 +182,14 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
                             bucket="available"
                             isDefault={model.id === defaultModel}
                             lockReason={lockReason(model)}
-                            unavailable={cliUnavailableReason(connection, model.id)}
+                            unavailable={cliUnavailableReason(connection, model.id, tConnections)}
                             onMove={() => move(model.id, 'hidden')}
                         />
                     ))}
                 </ModelZone>
                 <ModelZone bucket="hidden" title={t('hidden')} empty={t('hiddenEmpty')} count={hidden.length}>
                     {hidden.map(model => (
-                        <ModelChip key={model.id} model={model} bucket="hidden" isDefault={false} unavailable={cliUnavailableReason(connection, model.id)} onMove={() => move(model.id, 'available')} />
+                        <ModelChip key={model.id} model={model} bucket="hidden" isDefault={false} unavailable={cliUnavailableReason(connection, model.id, tConnections)} onMove={() => move(model.id, 'available')} />
                     ))}
                 </ModelZone>
             </div>

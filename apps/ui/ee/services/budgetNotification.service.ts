@@ -10,6 +10,7 @@ import type { NotificationReason } from '@/lib/notifications/routing'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { sendBudgetExhaustedEmail } from '@/app/api/_services/email.service'
+import type { NoticeCopy } from '@/lib/notifications/notice-copy'
 
 type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
 
@@ -52,7 +53,7 @@ export async function notifyBudgetExhausted(workspaceId: number): Promise<void> 
             event: BUDGET_EXHAUSTED_EVENT,
             kind: 'error',
             message: 'Your Rerun credits for this month are used up. Scheduled and triggered runs on Rerun models are paused, and coworkers cannot buy leads, SEO or social data, until they reset or you add credits.',
-            metadata: { errorCode: RERUN_BUDGET_ERROR_CODE } as unknown as NotificationInsert['metadata'],
+            metadata: { errorCode: RERUN_BUDGET_ERROR_CODE, notice: { key: 'budgetExhausted' } satisfies NoticeCopy } as unknown as NotificationInsert['metadata'],
             recipients,
             notified_at: new Date().toISOString(),
         })

@@ -2,6 +2,9 @@ import type { UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
 import { foremanNextSteps, trialStep } from './next-steps'
+import { englishTranslator } from '@/lib/i18n/english-translator'
+
+const t = englishTranslator('foreman.nextSteps')
 
 function assistant(...parts: unknown[]): UIMessage {
     return { id: 'a', role: 'assistant', parts } as UIMessage
@@ -14,13 +17,13 @@ function user(text: string): UIMessage {
 const agent = (id: string, patch: Record<string, unknown> = {}) => ({ agentId: id, name: id, boxId: 'box', active: true, lead: true, ...patch })
 const build = (agents: unknown[]) => ({ type: 'tool-build_team', toolCallId: 'build-1', state: 'output-available', input: {}, output: { boxes: [], agents, failed: [] } })
 
-const labels = (messages: UIMessage[]) => foremanNextSteps(messages, { entitled: true }).map(step => step.label)
+const labels = (messages: UIMessage[]) => foremanNextSteps(messages, { entitled: true, t }).map(step => step.label)
 
 describe('foremanNextSteps', () => {
     const waiting = (id: string, patch: Record<string, unknown> = {}) => agent(id, { lead: undefined, ...patch })
 
     it('hands over one button: the one that starts the agent', () => {
-        const steps = foremanNextSteps([assistant(build([agent('closer')]))], { entitled: true })
+        const steps = foremanNextSteps([assistant(build([agent('closer')]))], { entitled: true, t })
         expect(steps).toEqual([{ kind: 'start_lead', label: 'Start installing closer', startedLabel: "closer's install has started", agentId: 'closer' }])
     })
 
@@ -32,32 +35,32 @@ describe('foremanNextSteps', () => {
     })
 
     it('names the coworker generically when the build did not', () => {
-        const [step] = foremanNextSteps([assistant(build([agent('closer', { name: undefined })]))], { entitled: true })
+        const [step] = foremanNextSteps([assistant(build([agent('closer', { name: undefined })]))], { entitled: true, t })
         expect(step).toMatchObject({ label: 'Start installing my coworker', startedLabel: "Your coworker's install has started" })
     })
 
     it('offers the slot instead of a start for an agent left without one', () => {
         const messages = [assistant(build([agent('closer', { active: false })]))]
-        expect(foremanNextSteps(messages, { entitled: true })).toEqual([{ kind: 'billing', label: 'Turn on my coworker' }])
+        expect(foremanNextSteps(messages, { entitled: true, t })).toEqual([{ kind: 'billing', label: 'Turn on my coworker' }])
     })
 
     it('goes away as soon as anything is said after the build', () => {
-        expect(foremanNextSteps([assistant(build([agent('closer')])), user('What does it cost after the trial?')], { entitled: true })).toEqual([])
+        expect(foremanNextSteps([assistant(build([agent('closer')])), user('What does it cost after the trial?')], { entitled: true, t })).toEqual([])
     })
 
     it('offers nothing for a build that landed no agent', () => {
-        expect(foremanNextSteps([assistant(build([]))], { entitled: true })).toEqual([])
+        expect(foremanNextSteps([assistant(build([]))], { entitled: true, t })).toEqual([])
     })
 
     it('offers nothing on an empty conversation', () => {
-        expect(foremanNextSteps([], { entitled: true })).toEqual([])
+        expect(foremanNextSteps([], { entitled: true, t })).toEqual([])
     })
 
     describe('past the trial card', () => {
         const checkout = (output?: unknown) => ({ type: 'tool-open_checkout', toolCallId: 'trial-1', state: output === undefined ? 'input-available' : 'output-available', input: {}, output })
         const dismissed = checkout({ ok: false, reason: 'dismissed' })
         const reply = assistant({ type: 'text', text: 'The button right below starts your trial.' })
-        const preTrial = (messages: UIMessage[]) => foremanNextSteps(messages, { entitled: false })
+        const preTrial = (messages: UIMessage[]) => foremanNextSteps(messages, { entitled: false, t })
 
         it('puts the trial back under the foreman answer to a card they typed over', () => {
             expect(preTrial([assistant(dismissed), user('Und nun?'), reply])).toEqual([{ kind: 'checkout', label: 'Start free trial', trigger: 'foreman' }])
@@ -68,7 +71,7 @@ describe('foremanNextSteps', () => {
         })
 
         it('offers nothing once the workspace is on a plan', () => {
-            expect(foremanNextSteps([assistant(dismissed), user('Und nun?'), reply], { entitled: true })).toEqual([])
+            expect(foremanNextSteps([assistant(dismissed), user('Und nun?'), reply], { entitled: true, t })).toEqual([])
         })
 
         it('leaves the card to itself while it is the last thing said', () => {

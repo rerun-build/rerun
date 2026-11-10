@@ -22,7 +22,7 @@ import {
     PLAN_LABELS,
     connectMethod,
     planProviders,
-    PROVIDER_PITCH,
+    providerPitch,
     effectiveDefault,
     isCreditExhausted,
     isRerunPaused,
@@ -306,7 +306,7 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
                 const tightest = source.connected ? tightestPlanWindow(livePlanWindows(source)) : null
                 return (
                     <SourceRow key={source.id} source={source} credit={credit} onClick={() => onOpen(source.id)}>
-                        {tightest && <PlanLimitMeter percent={tightest.usedPercent} label={t('meter.planLimit', { name: planWindowName(tightest, source.provider) })} className="mt-1.5 max-w-56" />}
+                        {tightest && <PlanLimitMeter percent={tightest.usedPercent} label={t('meter.planLimit', { name: planWindowName(tightest, t, source.provider) })} className="mt-1.5 max-w-56" />}
                     </SourceRow>
                 )
             })}
@@ -317,7 +317,7 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
                         <TooltipDisabledReason key={provider} reason={addDisabledReason}>
                             <Button variant="outline" disabled={!!addDisabledReason} onClick={() => onAdd(provider)}>
                                 <ProviderIcon provider={provider} className="size-4" />
-                                {only === 'plan' ? PLAN_LABELS[provider] : PROVIDER_PITCH[provider].title}
+                                {only === 'plan' ? PLAN_LABELS[provider] : providerPitch(provider, t).title}
                             </Button>
                         </TooltipDisabledReason>
                     ))}
@@ -328,12 +328,14 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
 }
 
 function SourceRow({ source, credit, onClick, children }: { source: BoxConnection; credit: RerunCredit; onClick: () => void; children?: ReactNode }) {
+    const t = useTranslations('connections')
+    const locale = useLocale()
     return (
         <PanelRow
             onClick={onClick}
             leading={<SourceAvatar provider={source.provider} />}
             title={source.name}
-            description={sourceSummary(source, credit)}
+            description={sourceSummary(source, credit, t, locale)}
             actions={
                 <>
                     <SourceStatus source={source} credit={credit} />

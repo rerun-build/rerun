@@ -2,7 +2,7 @@
 
 import { Combobox, type ComboboxGroup } from '@/components/ui/combobox'
 import { useBoardStore } from '@/stores/board.store'
-import { UNNAMED_BOX_LABEL, type IsoAgent } from '@/lib/board/types'
+import type { IsoAgent } from '@/lib/board/types'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
@@ -29,6 +29,7 @@ type MultiProps = BaseProps & {
 
 export function AgentCombobox({ leadingGroup, exclude, ...props }: SingleProps | MultiProps) {
     const t = useTranslations('agent.agentCombobox')
+    const tAgent = useTranslations('agent')
     const agents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
 
@@ -48,14 +49,14 @@ export function AgentCombobox({ leadingGroup, exclude, ...props }: SingleProps |
         const result: ComboboxGroup[] = []
         for (const space of spaces) {
             const spaceAgents = bySpace.get(space.id)
-            if (spaceAgents) result.push(toGroup(space.id, space.name || UNNAMED_BOX_LABEL, spaceAgents))
+            if (spaceAgents) result.push(toGroup(space.id, space.name || tAgent('untitledBox'), spaceAgents))
             bySpace.delete(space.id)
         }
         for (const [spaceId, spaceAgents] of bySpace) {
             result.push(toGroup(spaceId, t('unassigned'), spaceAgents))
         }
         return leadingGroup ? [leadingGroup, ...result] : result
-    }, [agents, spaces, leadingGroup, exclude, t])
+    }, [agents, spaces, leadingGroup, exclude, t, tAgent])
 
     return (
         <Combobox

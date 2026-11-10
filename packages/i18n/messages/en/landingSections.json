@@ -67,12 +67,30 @@
             "keys": "Your API keys"
         },
         "sources": {
-            "claude": { "name": "Claude Pro or Max", "hint": "Signed in with your Claude account" },
-            "chatgpt": { "name": "ChatGPT Plus or Pro", "hint": "Signed in with your ChatGPT account" },
-            "anthropic": { "name": "Anthropic", "hint": "Claude models, billed per token" },
-            "openai": { "name": "OpenAI", "hint": "GPT models, billed per token" },
-            "google": { "name": "Google", "hint": "Gemini models, billed per token" },
-            "openrouter": { "name": "OpenRouter", "hint": "Every model behind one key" }
+            "claude": {
+                "name": "Claude Pro or Max",
+                "hint": "Signed in with your Claude account"
+            },
+            "chatgpt": {
+                "name": "ChatGPT Plus or Pro",
+                "hint": "Signed in with your ChatGPT account"
+            },
+            "anthropic": {
+                "name": "Anthropic",
+                "hint": "Claude models, billed per token"
+            },
+            "openai": {
+                "name": "OpenAI",
+                "hint": "GPT models, billed per token"
+            },
+            "google": {
+                "name": "Google",
+                "hint": "Gemini models, billed per token"
+            },
+            "openrouter": {
+                "name": "OpenRouter",
+                "hint": "Every model behind one key"
+            }
         },
         "composer": "Find 30 CFOs at logistics firms in Dubai.",
         "members": {
@@ -87,12 +105,36 @@
             "title": "Routines",
             "action": "New",
             "items": {
-                "invoices": { "name": "Chase unpaid invoices", "when": "Every weekday at 07:00 · Europe/Paris", "badge": "in 34m" },
-                "payment": { "name": "Flag a failed payment", "when": "When Stripe calls the webhook", "badge": "listening" },
-                "drafts": { "name": "Post today’s three drafts", "when": "Every day at 11:30", "badge": "11:30" },
-                "welcome": { "name": "Welcome a new customer", "when": "When your CRM calls the webhook", "badge": "listening" },
-                "ranking": { "name": "Weekly ranking report", "when": "Every Friday at 09:00", "badge": "Fri 09:00" },
-                "close": { "name": "Close the month", "when": "On the last day of the month at 18:00", "badge": "31/10" }
+                "invoices": {
+                    "name": "Chase unpaid invoices",
+                    "when": "Every weekday at 07:00 · Europe/Paris",
+                    "badge": "in 34m"
+                },
+                "payment": {
+                    "name": "Flag a failed payment",
+                    "when": "When Stripe calls the webhook",
+                    "badge": "listening"
+                },
+                "drafts": {
+                    "name": "Post today’s three drafts",
+                    "when": "Every day at 11:30",
+                    "badge": "11:30"
+                },
+                "welcome": {
+                    "name": "Welcome a new customer",
+                    "when": "When your CRM calls the webhook",
+                    "badge": "listening"
+                },
+                "ranking": {
+                    "name": "Weekly ranking report",
+                    "when": "Every Friday at 09:00",
+                    "badge": "Fri 09:00"
+                },
+                "close": {
+                    "name": "Close the month",
+                    "when": "On the last day of the month at 18:00",
+                    "badge": "31/10"
+                }
             }
         },
         "schedule": {
@@ -136,11 +178,26 @@
             "connect": "Connect",
             "connecting": "Connecting",
             "sources": {
-                "chatgpt": { "name": "ChatGPT plan", "summary": "Codex, on your own subscription." },
-                "claude": { "name": "Claude plan", "summary": "Claude Code, on your own subscription." },
-                "google": { "name": "Google API key", "summary": "Gemini models, billed per token." },
-                "openrouter": { "name": "OpenRouter API key", "summary": "Every model behind one key." },
-                "anthropic": { "name": "Anthropic API key", "summary": "Claude models, billed per token." }
+                "chatgpt": {
+                    "name": "ChatGPT plan",
+                    "summary": "Codex, on your own subscription."
+                },
+                "claude": {
+                    "name": "Claude plan",
+                    "summary": "Claude Code, on your own subscription."
+                },
+                "google": {
+                    "name": "Google API key",
+                    "summary": "Gemini models, billed per token."
+                },
+                "openrouter": {
+                    "name": "OpenRouter API key",
+                    "summary": "Every model behind one key."
+                },
+                "anthropic": {
+                    "name": "Anthropic API key",
+                    "summary": "Claude models, billed per token."
+                }
             }
         },
         "hire": {
@@ -173,17 +230,60 @@
             "cloud": "What they cover"
         },
         "gainTitles": {
-            "tidy": { "lead": "Your whole company,", "mid": "organized." },
-            "organized": { "lead": "Your whole company,", "mid": "organized.", "tail": "And it stays that way on its own." },
-            "never": { "lead": "Never spend", "mid": "another hour", "tail": "organizing your business." },
-            "once": { "lead": "Tidy your business", "mid": "once.", "tail": "It never falls apart again." },
-            "board": { "lead": "A", "mid": "business you can see,", "tail": "not a folder you dig through." },
-            "mess": { "lead": "Twenty", "mid": "Coworkers.", "tail": "Zero mess to clean up after them." },
-            "files": { "lead": "Everything", "mid": "in its place,", "tail": "and you never filed a thing." },
-            "brief": { "lead": "Set up your", "mid": "workspace once.", "tail": "Never brief a Coworker twice." },
-            "workspace": { "lead": "A", "mid": "workspace that", "tail": "knows your business." },
-            "concretely": { "lead": "What does Rerun", "mid": "actually", "tail": "bring to your business?" },
-            "needs": { "lead": "Rerun", "mid": "is everything your", "tail": "business needs." }
+            "tidy": {
+                "lead": "Your whole company,",
+                "mid": "organized."
+            },
+            "organized": {
+                "lead": "Your whole company,",
+                "mid": "organized.",
+                "tail": "And it stays that way on its own."
+            },
+            "never": {
+                "lead": "Never spend",
+                "mid": "another hour",
+                "tail": "organizing your business."
+            },
+            "once": {
+                "lead": "Tidy your business",
+                "mid": "once.",
+                "tail": "It never falls apart again."
+            },
+            "board": {
+                "lead": "A",
+                "mid": "business you can see,",
+                "tail": "not a folder you dig through."
+            },
+            "mess": {
+                "lead": "Twenty",
+                "mid": "Coworkers.",
+                "tail": "Zero mess to clean up after them."
+            },
+            "files": {
+                "lead": "Everything",
+                "mid": "in its place,",
+                "tail": "and you never filed a thing."
+            },
+            "brief": {
+                "lead": "Set up your",
+                "mid": "workspace once.",
+                "tail": "Never brief a Coworker twice."
+            },
+            "workspace": {
+                "lead": "A",
+                "mid": "workspace that",
+                "tail": "knows your business."
+            },
+            "concretely": {
+                "lead": "What does Rerun",
+                "mid": "actually",
+                "tail": "bring to your business?"
+            },
+            "needs": {
+                "lead": "Rerun",
+                "mid": "is everything your",
+                "tail": "business needs."
+            }
         },
         "boxes": {
             "marketing": "Marketing",

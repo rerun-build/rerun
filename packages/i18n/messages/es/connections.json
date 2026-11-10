@@ -1,4 +1,108 @@
 {
+    "sources": {
+        "kinds": {
+            "included": "Incluido",
+            "plan": "Plan",
+            "key": "Clave API"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro o Max",
+                "hint": "Inicia sesión con tu cuenta de Claude"
+            },
+            "codex": {
+                "title": "ChatGPT Plus o Pro",
+                "hint": "Inicia sesión con tu cuenta de ChatGPT"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "Modelos Claude, facturados por token"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "Modelos GPT, facturados por token"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "Modelos Gemini, facturados por token"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "Todos los modelos con una sola clave"
+            },
+            "opencode": {
+                "title": "OpenCode Go o Console",
+                "hint": "Pega tu clave de OpenCode"
+            },
+            "custom": {
+                "title": "Endpoint personalizado",
+                "hint": "Ollama, LM Studio, vLLM o cualquier servidor compatible con OpenAI"
+            }
+        },
+        "summary": "{kind} · {count, plural, one {# modelo} other {# modelos}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "Los créditos de Rerun están en pausa",
+        "creditUsed": "{percent} % de los créditos del mes usados",
+        "creditUsedUpOn": "Créditos del mes agotados, vuelven el {date}",
+        "creditUsedUpNextMonth": "Créditos del mes agotados, vuelven el mes que viene",
+        "creditBackOn": "el {date}",
+        "creditBackNextMonth": "el mes que viene",
+        "windows": {
+            "session": "Sesión",
+            "fiveHour": "5 horas",
+            "weekly": "Semanal",
+            "monthly": "Mensual",
+            "modelWeekly": "{label} semanal",
+            "modelWeeklyUnnamed": "Modelo semanal"
+        },
+        "windowResets": "se reinicia {when}",
+        "tiers": {
+            "fast": "Rápido y económico",
+            "smart": "El más inteligente"
+        },
+        "opencodePlan": {
+            "go": "Incluido en Go",
+            "console": "Créditos de Console"
+        },
+        "unavailable": {
+            "opencodeRetired": "OpenCode ya no lo ofrece",
+            "codexOutdated": "Codex CLI desactualizado en esta box",
+            "notInChatgptPlan": "No está en tu plan de ChatGPT"
+        },
+        "pricePerMillion": "{input} entrada · {output} salida /M",
+        "guide": {
+            "anthropic": {
+                "title": "Cómo conseguir tu clave de Anthropic",
+                "step1": "Abre la [consola de Anthropic](https://console.anthropic.com/settings/keys) e inicia sesión.",
+                "step2": "Haz clic en **Create Key** y ponle un nombre, por ejemplo \"Rerun\".",
+                "step3": "Copia la clave (empieza por `sk-ant-`) y pégala arriba. Solo se muestra una vez."
+            },
+            "openai": {
+                "title": "Cómo conseguir tu clave de OpenAI",
+                "step1": "Abre [OpenAI API keys](https://platform.openai.com/api-keys) e inicia sesión.",
+                "step2": "Haz clic en **Create new secret key** y ponle un nombre, por ejemplo \"Rerun\".",
+                "step3": "Copia la clave (empieza por `sk-`) y pégala arriba. Solo se muestra una vez."
+            },
+            "google": {
+                "title": "Cómo conseguir tu clave de Google",
+                "step1": "Abre [Google AI Studio](https://aistudio.google.com/apikey) e inicia sesión con tu cuenta de Google.",
+                "step2": "Haz clic en **Create API key** y elige un proyecto de Google Cloud.",
+                "step3": "Copia la clave y pégala arriba."
+            },
+            "openrouter": {
+                "title": "Cómo conseguir tu clave de OpenRouter",
+                "step1": "Abre la página de [claves de OpenRouter](https://openrouter.ai/keys) e inicia sesión.",
+                "step2": "Haz clic en **Create API Key** y añade créditos si tu saldo está vacío.",
+                "step3": "Copia la clave (empieza por `sk-or-`) y pégala arriba. Solo se muestra una vez."
+            },
+            "opencode": {
+                "title": "Cómo conseguir tu clave de OpenCode",
+                "step1": "Abre [OpenCode](https://opencode.ai/auth) e inicia sesión.",
+                "step2": "Suscríbete a **OpenCode Go** o añade créditos para usar los modelos de Console.",
+                "step3": "Crea una clave API, cópiala (empieza por `oc_sk_`) y pégala arriba."
+            }
+        }
+    },
     "noPlan": {
         "trialText": "Empieza tu prueba gratis para conectar tu plan de Claude, tu plan de ChatGPT o una clave API.",
         "subscribeText": "Suscríbete para conectar tu plan de Claude, tu plan de ChatGPT o una clave API.",

@@ -34,14 +34,14 @@
         "coworkers": {
             "crumb": "Coworkers",
             "title": "Hire an AI Coworker, don’t write a prompt.",
-            "lede": "Give it a job, the apps it needs and a time to run. It does the work in your own tools and reports back — no flow chart to draw, no prompt to engineer.",
+            "lede": "Give it a job, the apps it needs and a time to run. It does the work in your own tools and reports back: no flow chart to draw, no prompt to engineer.",
             "metaTitle": "AI Coworkers: hire an agent instead of building a workflow",
             "metaDescription": "A Rerun Coworker takes a job, your apps and a schedule, then does the work in your own tools and reports back. No flow chart, no prompt engineering.",
             "stageCaption": "Two Coworkers at work in the same Box, saying what they just did.",
             "points": {
                 "first": {
                     "title": "It holds a job, not a trigger",
-                    "body": "You hire it for a role — Bookkeeper, Sales rep, Community manager — and it keeps that role from one run to the next."
+                    "body": "You hire it for a role (Bookkeeper, Sales rep, Community manager) and it keeps that role from one run to the next."
                 },
                 "second": {
                     "title": "It remembers your business",
@@ -93,7 +93,7 @@
                 "voice": {
                     "eyebrow": "Manage by voice",
                     "title": "What you can actually say to it.",
-                    "body": "“Ask the bookkeeper where we are on the Dupont invoice.” “Tell the sales rep to stop writing to agencies.” “What did my Coworkers get done this weekend?” You name the job, not the Coworker — the manager knows who holds it. If nobody holds it yet, it offers to hire for it."
+                    "body": "“Ask the bookkeeper where we are on the Dupont invoice.” “Tell the sales rep to stop writing to agencies.” “What did my Coworkers get done this weekend?” You name the job, not the Coworker: the manager knows who holds it. If nobody holds it yet, it offers to hire for it."
                 },
                 "partner": {
                     "eyebrow": "A proactive partner",
@@ -162,7 +162,7 @@
         "tools": {
             "crumb": "Tools",
             "title": "Natively connected to {count, number}+ tools.",
-            "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify — and any MCP server you point it at. Click to connect, and your Coworker uses it on its next run. No integration project, no extra bill.",
+            "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify, and any MCP server you point it at. Click to connect, and your Coworker uses it on its next run. No integration project, no extra bill.",
             "metaTitle": "{count, number}+ tools and integrations, included in the plan",
             "metaDescription": "Your Coworkers reach Gmail, Slack, Stripe, HubSpot, Shopify and {count, number}+ other tools, plus any MCP server. Click to connect, no extra bill.",
             "stageCaption": "The apps a Coworker can open, and the {count, number}+ it reaches beyond them.",
@@ -199,14 +199,14 @@
         "human-in-the-loop": {
             "crumb": "Human in the loop",
             "title": "Autonomous, until it needs a yes.",
-            "lede": "Your Coworker runs alone and stops before anything consequential — a payment, a send, a deletion. It asks, waits, and anyone on the team can answer.",
+            "lede": "Your Coworker runs alone and stops before anything consequential: a payment, a send, a deletion. It asks, waits, and anyone on the team can answer.",
             "metaTitle": "Human in the loop: your AI agent asks before it acts",
             "metaDescription": "A Rerun Coworker runs on its own and stops before anything consequential. It asks, waits for a yes, and anyone on the team can answer.",
             "stageCaption": "A Coworker that stops mid-run, asks, and waits for someone to answer.",
             "points": {
                 "first": {
                     "title": "It stops before it commits",
-                    "body": "Spending is locked in the product itself; the rest — what it sends, what it deletes — you set in its instructions."
+                    "body": "Spending is locked in the product itself; the rest (what it sends, what it deletes) you set in its instructions."
                 },
                 "second": {
                     "title": "Anyone on the team can answer",
@@ -220,7 +220,7 @@
             "faq": {
                 "first": {
                     "question": "What does a Coworker stop for?",
-                    "answer": "Spending money is locked in the product: a Coworker cannot buy anything without an approval. Everything else — sending an email to a customer, deleting records, publishing — is set in its instructions, so you decide how much rope it has."
+                    "answer": "Spending money is locked in the product: a Coworker cannot buy anything without an approval. Everything else (sending an email to a customer, deleting records, publishing) is set in its instructions, so you decide how much rope it has."
                 },
                 "second": {
                     "question": "Who can approve a request?",
@@ -265,7 +265,7 @@
                 },
                 "third": {
                     "question": "Can a Coworker react to something instead of waiting for its hour?",
-                    "answer": "Yes. A Coworker can run on a schedule, and it can also start when something happens in one of your connected apps — a new email, a new order, a new row."
+                    "answer": "Yes. A Coworker can run on a schedule, and it can also start when something happens in one of your connected apps: a new email, a new order, a new row."
                 }
             },
             "templatesTitle": "Coworkers that work while you sleep."
@@ -298,7 +298,7 @@
                 },
                 "second": {
                     "question": "Do I have to keep it up to date by hand?",
-                    "answer": "No. Your Coworkers write back what they find on a run — a competitor’s new price, a question customers keep asking — so the pages follow the business instead of ageing."
+                    "answer": "No. Your Coworkers write back what they find on a run (a competitor’s new price, a question customers keep asking), so the pages follow the business instead of ageing."
                 },
                 "third": {
                     "question": "Does each Coworker have its own memory too?",
@@ -368,7 +368,7 @@
             "faq": {
                 "first": {
                     "question": "How much does an extra seat cost?",
-                    "answer": "Nothing. The plan is per workspace, not per person, so you can invite the whole team — and the people who only ever answer a question once a week."
+                    "answer": "Nothing. The plan is per workspace, not per person, so you can invite the whole team, including the people who only ever answer a question once a week."
                 },
                 "second": {
                     "question": "Does everyone see everything?",

@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Icon } from '@/components/ui/icon'
 import { ShieldCheck } from '@/lib/icons'
@@ -11,11 +11,14 @@ import { TemplateDetailMedia } from '@/components/templates/TemplateDetailMedia'
 import { CardCarousel, ScrollFade, Stripes } from '@rerun/ui/primitives'
 import { serviceIconProps } from '@/lib/services/icons'
 import { type LibraryTemplate } from '@/lib/templates/library'
-import { priceLabel, TEMPLATE_CATEGORY_LABELS } from '@rerun/contracts'
+import { priceLabel, templateCategoryLabel } from '@rerun/contracts'
 import { cn } from '@/lib/utils'
 
 export function TemplateDetailPanel({ template, showStatus, onImported }: { template: LibraryTemplate; showStatus: boolean; onImported: () => void }) {
     const t = useTranslations('templates.detail')
+    const tPrice = useTranslations('templates.price')
+    const tCategory = useTranslations('templates.categories')
+    const locale = useLocale()
     return (
         // w-full min-w-0 : la dialog qui accueille ce panneau est une grille, et une piste `auto`
         // s'élargit jusqu'à la min-content de son contenu. Sans ça, une URL dans la description
@@ -33,11 +36,11 @@ export function TemplateDetailPanel({ template, showStatus, onImported }: { temp
 
                     <div className="relative flex flex-col gap-2.5 overflow-hidden rounded-lg border border-border/60 bg-muted/30 p-3">
                         <Stripes />
-                        <MetaRow label={t('price')} value={priceLabel(template.pricing)} />
+                        <MetaRow label={t('price')} value={priceLabel(template.pricing, tPrice, locale)} />
                         <MetaRow label={t('coworkers')} value={String(template.agentCount)} />
                         {template.connectors.length > 0 && <MetaRow label={t('apps')} value={String(template.connectors.length)} />}
                         <MetaRow label={t('setupTime')} value={t('minutes', { minutes: template.setupMinutes })} />
-                        <MetaRow label={t('category')} value={TEMPLATE_CATEGORY_LABELS[template.category]} />
+                        <MetaRow label={t('category')} value={templateCategoryLabel(template.category, tCategory)} />
                     </div>
 
                     {template.longDescription && (

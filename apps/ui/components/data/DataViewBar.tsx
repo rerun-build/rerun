@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from '@/components/ui/popover'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
-import { ALL_ROWS, LAYOUT_META } from '@/lib/data/views'
+import { ALL_ROWS, LAYOUT_ICONS } from '@/lib/data/views'
 import { EllipsisIcon, Maximize2Icon, PencilIcon, PlusIcon, TableIcon, Trash2Icon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { CARD_LAYOUTS, type CardLayout, type TableView } from '@rerun/contracts'
@@ -39,7 +39,7 @@ export function DataViewBar({ views, activeId, unavailableReason, onSelect, onAd
             <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none]">
                 <ViewTab label={t('allRows')} icon={TableIcon} active={activeId === ALL_ROWS} onSelect={() => onSelect(ALL_ROWS)} />
                 {views.map(view => (
-                    <ViewTab key={view.id} label={view.name} icon={LAYOUT_META[view.layout].icon} active={activeId === view.id} onSelect={() => onSelect(view.id)}>
+                    <ViewTab key={view.id} label={view.name} icon={LAYOUT_ICONS[view.layout]} active={activeId === view.id} onSelect={() => onSelect(view.id)}>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button type="button" aria-label={t('viewOptions', { name: view.name })} className="-mr-1 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground">

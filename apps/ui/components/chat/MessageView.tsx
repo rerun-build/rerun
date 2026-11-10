@@ -165,6 +165,7 @@ export function UnderText({ children }: { children: ReactNode }) {
 
 function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
     const t = useTranslations('chat')
+    const tTools = useTranslations('tools')
     const toolDisplay = useToolDisplay(agentId)
     const publishedAccess = usePublishedAccessEnabled()
     const sources = message.role === 'assistant' ? messageSources(message) : []
@@ -323,7 +324,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                     <ToolCallStep toolName={toolName} agentId={agentId} state={state} input={toolPart.input} inputText={toolPart.inputText} output={toolPart.output} errorText={toolPart.errorText} />
                 )
                 const display = toolDisplay(toolName, toolPart.input)
-                return { kind: 'group-item', key, iconProps: display.iconProps, node, status, runningLabel: toolActivityOf(toolName, toolPart.input) ?? `Running ${display.label}` }
+                return { kind: 'group-item', key, iconProps: display.iconProps, node, status, runningLabel: toolActivityOf(toolName, toolPart.input, tTools) ?? t('activity.runningTool', { tool: display.label }) }
             }
             return null
         }

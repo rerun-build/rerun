@@ -8,7 +8,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { formatKeptUntil } from '@/components/layout/WorkspacePausedBanner'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useEntitlements } from '@/hooks/useEntitlements'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { LoaderIcon, LockIcon } from '@/lib/icons'
 import { isPlanLimited, type IsoAgent } from '@/lib/board/types'
@@ -81,6 +81,7 @@ export function WorkspaceRestoringOverlay({ name }: { name: string }) {
 }
 
 function AgentSlotOverlay({ agent }: { agent: IsoAgent }) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentLockedOverlay')
     const errorText = useErrorText()
     const { noFreeAgentSlot, activeAgentsCount, maxAgents, gate } = useEntitlements()
@@ -131,7 +132,7 @@ function AgentSlotOverlay({ agent }: { agent: IsoAgent }) {
                         )}
                     </div>
                 ) : (
-                    <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON}>
+                    <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
                         <Button size="sm" disabled={activating || !canManage} onClick={handleActivate}>
                             {activating ? t('slot.activating') : t('slot.activate')}
                         </Button>

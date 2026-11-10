@@ -36,7 +36,9 @@
         "trial.perMonth": "Shown right after a price.",
         "trial.includes": "{agents} is a number of coworkers, {credits} a number of credits.",
         "purchase.billedTo": "{name} is the name of the workspace.",
-        "teamEmptyState.buildPrompt": "Prefilled in the composer: the start of the user's own sentence to the assistant, completed by them. Keep the trailing space."
+        "teamEmptyState.buildPrompt": "Prefilled in the composer: the start of the user's own sentence to the assistant, completed by them. Keep the trailing space.",
+        "plan.lifeDelivered": "Caption under a coworker block in an animated preview of its day: it finished and handed the result to the user.",
+        "gettingStarted.prompts": "Messages sent to the assistant in the user's name when they click a step of the getting started checklist. First person, the user speaking."
     },
     "welcome": {
         "title": "Hey, ready to hand off your first task?",
@@ -74,6 +76,13 @@
         "prompt": "Already have an account? <link>Sign in</link>"
     },
     "nextSteps": {
+        "turnOn": "Turn on my coworker",
+        "yourInstallStarted": "Your coworker's install has started",
+        "installStarted": "{name}'s install has started",
+        "startInstallingMine": "Start installing my coworker",
+        "startInstalling": "Start installing {name}",
+        "startTrial": "Start free trial",
+        "startPlan": "Start my plan",
         "starting": "Starting…",
         "openChat": "Open chat",
         "installFailed": "Could not start the installation"
@@ -220,6 +229,12 @@
             "doneDescription": "Your coworkers can run on their own now.",
             "lockedTitle": "Get {days} more free trial days",
             "lockedDescription": "Complete the {total} steps above. {remaining} to go."
+        },
+        "prompts": {
+            "first_agent": "Help me create my first coworker",
+            "ai_provider": "Help me connect my Claude or ChatGPT subscription, or an API key",
+            "invite": "Help me invite a teammate to my workspace",
+            "schedule": "Schedule a recurring task for one of my coworkers"
         }
     },
     "contact": {
@@ -262,7 +277,9 @@
         "nextBox": "Next Box",
         "build": "Build my coworker",
         "change": "Change something",
-        "standingBy": "Standing by"
+        "standingBy": "Standing by",
+        "lifeWorking": "Working on it",
+        "lifeDelivered": "Handed over to you"
     },
     "starterPack": {
         "title": "Your starter team",

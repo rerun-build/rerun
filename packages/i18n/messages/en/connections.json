@@ -1,4 +1,108 @@
 {
+    "sources": {
+        "kinds": {
+            "included": "Included",
+            "plan": "Plan",
+            "key": "API key"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro or Max",
+                "hint": "Sign in with your Claude account"
+            },
+            "codex": {
+                "title": "ChatGPT Plus or Pro",
+                "hint": "Sign in with your ChatGPT account"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "Claude models, billed per token"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "GPT models, billed per token"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "Gemini models, billed per token"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "Every model behind one key"
+            },
+            "opencode": {
+                "title": "OpenCode Go or Console",
+                "hint": "Paste your OpenCode key"
+            },
+            "custom": {
+                "title": "Custom endpoint",
+                "hint": "Ollama, LM Studio, vLLM or any OpenAI-compatible server"
+            }
+        },
+        "summary": "{kind} · {count, plural, one {# model} other {# models}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "Rerun credits are paused",
+        "creditUsed": "{percent}% of this month's credits used",
+        "creditUsedUpOn": "Monthly credits used up, back on {date}",
+        "creditUsedUpNextMonth": "Monthly credits used up, back next month",
+        "creditBackOn": "on {date}",
+        "creditBackNextMonth": "next month",
+        "windows": {
+            "session": "Session",
+            "fiveHour": "5-hour",
+            "weekly": "Weekly",
+            "monthly": "Monthly",
+            "modelWeekly": "{label} weekly",
+            "modelWeeklyUnnamed": "Model weekly"
+        },
+        "windowResets": "resets {when}",
+        "tiers": {
+            "fast": "Quick and cheap",
+            "smart": "The smartest"
+        },
+        "opencodePlan": {
+            "go": "Included in Go",
+            "console": "Console credits"
+        },
+        "unavailable": {
+            "opencodeRetired": "No longer offered by OpenCode",
+            "codexOutdated": "Codex CLI outdated on this box",
+            "notInChatgptPlan": "Not in your ChatGPT plan"
+        },
+        "pricePerMillion": "{input} in · {output} out /M",
+        "guide": {
+            "anthropic": {
+                "title": "How to get your Anthropic key",
+                "step1": "Open the [Anthropic Console](https://console.anthropic.com/settings/keys) and sign in.",
+                "step2": "Click **Create Key** and name it, for example \"Rerun\".",
+                "step3": "Copy the key (it starts with `sk-ant-`) and paste it above. It is shown only once."
+            },
+            "openai": {
+                "title": "How to get your OpenAI key",
+                "step1": "Open [OpenAI API keys](https://platform.openai.com/api-keys) and sign in.",
+                "step2": "Click **Create new secret key** and name it, for example \"Rerun\".",
+                "step3": "Copy the key (it starts with `sk-`) and paste it above. It is shown only once."
+            },
+            "google": {
+                "title": "How to get your Google key",
+                "step1": "Open [Google AI Studio](https://aistudio.google.com/apikey) and sign in with your Google account.",
+                "step2": "Click **Create API key** and pick a Google Cloud project.",
+                "step3": "Copy the key and paste it above."
+            },
+            "openrouter": {
+                "title": "How to get your OpenRouter key",
+                "step1": "Open [OpenRouter keys](https://openrouter.ai/keys) and sign in.",
+                "step2": "Click **Create API Key**, and add credits if your balance is empty.",
+                "step3": "Copy the key (it starts with `sk-or-`) and paste it above. It is shown only once."
+            },
+            "opencode": {
+                "title": "How to get your OpenCode key",
+                "step1": "Open [OpenCode](https://opencode.ai/auth) and sign in.",
+                "step2": "Subscribe to **OpenCode Go**, or add credits to use the Console models.",
+                "step3": "Create an API key, copy it (it starts with `oc_sk_`) and paste it above."
+            }
+        }
+    },
     "_context": {
         "panel.groups.included": "Heading of the group of AI sources that come with the Rerun plan (the Rerun credit).",
         "panel.default.change": "Button that opens the picker to change the workspace default model.",
@@ -30,7 +134,44 @@
         "custom.probe.unreachableLocal": "{host} is a host name and port, such as localhost:11434.",
         "custom.probe.refused": "{model} is a model id. {detail} is the error the server sent back, in English.",
         "custom.probe.refusedUnnamedDetail": "{detail} is the error the server sent back, in English.",
-        "detail.readOnly": "{reason} is a sentence without a final period that explains why the controls are disabled."
+        "detail.readOnly": "{reason} is a sentence without a final period that explains why the controls are disabled.",
+        "sources.summary": "One line under a connection in the AI providers list. {kind} is already translated, such as Plan, API key or Custom endpoint.",
+        "sources.summaryWindow": "One usage figure of a subscription, in the line under it. {name} is a plan window such as Session or Weekly, {percent} is already formatted, such as 42%. Several are joined with ' · '.",
+        "sources.creditPaused": "Line under the Rerun connection: a member paused the Rerun credit.",
+        "sources.creditUsed": "Line under the Rerun connection. {percent} is a whole number from 0 to 100.",
+        "sources.creditUsedUpOn": "Line under the Rerun connection. {date} is a short date already localized, such as Nov 12.",
+        "sources.creditBackOn": "A fragment the iOS app sets inside its own sentence \"credits used up, back {backOn}\". {date} is a short date already localized, such as Nov 12. Keep the preposition the target sentence needs.",
+        "sources.creditBackNextMonth": "A fragment the iOS app sets inside its own sentence \"credits used up, back {backOn}\", in place of a date.",
+        "sources.windows.session": "Name of a usage window of a Claude or ChatGPT subscription: the rolling limit of a few hours.",
+        "sources.windows.fiveHour": "Name of OpenCode Go's rolling usage window, five hours long. Used as an adjective before 'limit' elsewhere, such as '5-hour limit used'.",
+        "sources.windows.weekly": "Name of the weekly usage window of a subscription.",
+        "sources.windows.monthly": "Name of the monthly usage window of a subscription.",
+        "sources.windows.modelWeekly": "Name of the weekly usage window of one model of a subscription. {label} is a model family such as Opus.",
+        "sources.windows.modelWeeklyUnnamed": "Name of the weekly usage window of one model of a subscription, when the model is not named.",
+        "sources.windowResets": "Follows a usage figure, such as '42% used, resets in 3h'. {when} is a short relative time already localized, such as 'in 3h'.",
+        "sources.tiers.fast": "Hint under the Rerun Fast model in a model picker.",
+        "sources.tiers.smart": "Hint under the Rerun Smart model in a model picker.",
+        "sources.opencodePlan.go": "Hint under an OpenCode model in a model picker: paid by the OpenCode Go subscription.",
+        "sources.opencodePlan.console": "Hint under an OpenCode model in a model picker: paid with the OpenCode Console credits.",
+        "sources.unavailable.codexOutdated": "Why a model cannot be picked: the Codex command line tool on the user's machine is too old for it.",
+        "sources.unavailable.notInChatgptPlan": "Why a model cannot be picked: the user's ChatGPT subscription does not include it.",
+        "sources.unavailable.opencodeRetired": "Why a model cannot be picked: OpenCode stopped offering it.",
+        "sources.pricePerMillion": "Price of an OpenCode model per million tokens. {input} and {output} are amounts already formatted, such as $2.",
+        "sources.guide.anthropic.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.anthropic.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.anthropic.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openai.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openai.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openai.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.google.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.google.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.google.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openrouter.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openrouter.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openrouter.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.opencode.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.opencode.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.opencode.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English."
     },
     "noPlan": {
         "trialText": "Start your free trial to connect your own Claude plan, ChatGPT plan or API key.",

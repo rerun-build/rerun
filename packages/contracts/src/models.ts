@@ -190,8 +190,7 @@ export const MODEL_LABEL: Record<string, string> = {
 }
 
 // Friendly label for a model id; falls back to the raw id for custom/unknown models.
-export function modelLabel(id: string | null | undefined): string {
-    if (!id) return 'Select model'
+export function modelLabel(id: string): string {
     return MODEL_LABEL[id] ?? id
 }
 

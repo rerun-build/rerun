@@ -1,8 +1,6 @@
 import { OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
 import { modelLabel } from './models.js'
 
-const GENERIC_ERROR = 'Something went wrong. Try sending your message again.'
-
 // The Rerun proxy returns 402 { error: 'rerun_budget_exhausted' } when a workspace
 // has spent its monthly demo budget; the engine surfaces that marker in its run
 // error. Runs after `unwrapChatError`, never before.
@@ -76,67 +74,62 @@ export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
 
 const PLAN_LABELS: Record<'claude' | 'chatgpt' | 'opencode', string> = { claude: 'Claude', chatgpt: 'ChatGPT', opencode: 'OpenCode Go' }
 
-const WINDOW_NAME: Record<'session' | 'weekly' | 'monthly', string> = { session: '5-hour', weekly: 'weekly', monthly: 'monthly' }
+type TitledKind = Exclude<ChatErrorKind, 'generic' | 'usage_limit'>
+type ExplainedKind = Exclude<TitledKind, 'run_in_flight'>
 
-function opencodeLimitMessage(limit: SubscriptionLimit): string {
-    if (limit.scope === 'credits') return 'No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.'
-    const window = WINDOW_NAME[limit.scope as keyof typeof WINDOW_NAME] ?? '5-hour'
-    return limit.resetsAt
-        ? `Your OpenCode Go plan has reached its ${window} limit. It resets ${limit.resetsAt}; switch to a Console model or another provider until then.`
-        : `Your OpenCode Go plan has reached its ${window} limit. Switch to a Console model or another provider until it resets.`
+const EXPLAINED_KINDS: readonly ExplainedKind[] = ['budget', 'unauthorized', 'overloaded', 'context_window', 'provider_error', 'thinking_replay', 'interrupted', 'session_gone']
+
+type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeWindow' | 'opencode'
+type LimitMessageKey = 'opencodeCredits' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
+
+// The `chatErrors` namespace: next-intl's, use-intl's or the server's `t` of it fits as is.
+export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
+
+function opencodeLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
+    if (limit.scope === 'credits') return t('limits.messages.opencodeCredits')
+    return limit.resetsAt ? t('limits.messages.opencodeWindowResets', { window: limit.scope, resetsAt: limit.resetsAt }) : t('limits.messages.opencodeWindow', { window: limit.scope })
 }
 
-function opencodeLimitTitle(limit: SubscriptionLimit): string {
-    if (limit.scope === 'credits') return 'OpenCode credits used up'
-    if (limit.scope === 'weekly' || limit.scope === 'monthly') return `OpenCode Go ${limit.scope} limit reached`
-    return 'OpenCode Go limit reached'
+function opencodeLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string {
+    if (limit.scope === 'credits') return t('limits.titles.opencodeCredits')
+    if (limit.scope === 'weekly' || limit.scope === 'monthly') return t('limits.titles.opencodeWindow', { window: limit.scope })
+    return t('limits.titles.opencode')
 }
 
 // The one line the notice puts under its title. It names the plan the user pays for rather than
 // "the provider", because a Box can hold both and only one of them is out.
-export function subscriptionLimitMessage(limit: SubscriptionLimit): string {
-    if (limit.plan === 'opencode') return opencodeLimitMessage(limit)
+export function subscriptionLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
+    if (limit.plan === 'opencode') return opencodeLimitMessage(limit, t)
     if (limit.scope === 'not_in_plan') {
-        const model = limit.modelName ?? 'this model'
-        if (!limit.plan) return `This connection can't run ${model}. Pick another model to keep going.`
-        return `Your ${PLAN_LABELS[limit.plan]} plan doesn't include ${model}. Pick another model to keep going.`
+        const model = limit.modelName
+        if (!limit.plan) return model ? t('limits.messages.modelUnavailable', { model }) : t('limits.messages.anyModelUnavailable')
+        const plan = PLAN_LABELS[limit.plan]
+        return model ? t('limits.messages.modelNotInPlan', { plan, model }) : t('limits.messages.anyModelNotInPlan', { plan })
     }
-    if (!limit.plan) return 'This subscription has reached its usage limit. Switch to another model, or wait for the limit to reset.'
+    if (!limit.plan) return t('limits.messages.usageLimit')
     const plan = PLAN_LABELS[limit.plan]
-    if (limit.scope === 'credits') return `Your ${plan} plan has used up its usage credits. Pick a model your plan includes to keep going.`
-    if (limit.scope === 'spend') return `Your organization has reached its monthly ${plan} spend limit. An admin can raise it; switch this coworker to another model in the meantime.`
-    if (limit.scope === 'weekly') return limit.resetsAt ? `Your ${plan} plan has reached its weekly limit. It resets ${limit.resetsAt}; switch this coworker to another model until then.` : `Your ${plan} plan has reached its weekly limit. Switch this coworker to another model until the week rolls over.`
-    if (limit.scope === 'model') return `Your ${plan} plan has reached its ${limit.modelName} limit. The other ${plan} models still run: switch to one of them.`
-    return limit.resetsAt
-        ? `Your ${plan} plan has used up its current usage window. It refills at ${limit.resetsAt}; switch this coworker to another model in the meantime.`
-        : `Your ${plan} plan has used up its current usage window. It refills on its own; switch this coworker to another model in the meantime.`
+    if (limit.scope === 'credits') return t('limits.messages.credits', { plan })
+    if (limit.scope === 'spend') return t('limits.messages.spend', { plan })
+    if (limit.scope === 'weekly') return limit.resetsAt ? t('limits.messages.weeklyResets', { plan, resetsAt: limit.resetsAt }) : t('limits.messages.weekly', { plan })
+    if (limit.scope === 'model') return t('limits.messages.model', { plan, model: limit.modelName ?? '' })
+    return limit.resetsAt ? t('limits.messages.sessionResets', { plan, resetsAt: limit.resetsAt }) : t('limits.messages.session', { plan })
 }
 
-export function subscriptionLimitTitle(limit: SubscriptionLimit): string {
-    if (limit.plan === 'opencode') return opencodeLimitTitle(limit)
+export function subscriptionLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string {
+    if (limit.plan === 'opencode') return opencodeLimitTitle(limit, t)
     if (limit.scope === 'not_in_plan') {
-        if (!limit.plan) return `${limit.modelName ?? 'Model'} unavailable`
-        return limit.modelName ? `${limit.modelName} isn't in your ${PLAN_LABELS[limit.plan]} plan` : `Model not in your ${PLAN_LABELS[limit.plan]} plan`
+        const model = limit.modelName
+        if (!limit.plan) return model ? t('limits.titles.modelUnavailable', { model }) : t('limits.titles.anyModelUnavailable')
+        const plan = PLAN_LABELS[limit.plan]
+        return model ? t('limits.titles.modelNotInPlan', { plan, model }) : t('limits.titles.anyModelNotInPlan', { plan })
     }
-    if (!limit.plan) return 'Usage limit reached'
+    if (!limit.plan) return t('limits.titles.usageLimit')
     const plan = PLAN_LABELS[limit.plan]
-    if (limit.scope === 'credits') return `${plan} usage credits used up`
-    if (limit.scope === 'spend') return `${plan} spend limit reached`
-    if (limit.scope === 'weekly' || limit.scope === 'monthly') return `${plan} ${limit.scope} limit reached`
-    if (limit.scope === 'model') return `${plan} ${limit.modelName} limit reached`
-    return `${plan} ${limit.plan === 'claude' ? 'session' : 'usage'} limit reached`
-}
-
-const KIND_TITLES: Record<Exclude<ChatErrorKind, 'generic' | 'usage_limit'>, string> = {
-    budget: 'Rerun credits used up',
-    unauthorized: 'Connection signed out',
-    overloaded: 'Provider overloaded',
-    context_window: 'Conversation too long',
-    provider_error: 'The model could not answer',
-    thinking_replay: 'The run could not continue',
-    interrupted: 'Run interrupted',
-    run_in_flight: 'This conversation is still busy',
-    session_gone: 'Conversation unavailable',
+    if (limit.scope === 'credits') return t('limits.titles.credits', { plan })
+    if (limit.scope === 'spend') return t('limits.titles.spend', { plan })
+    if (limit.scope === 'weekly' || limit.scope === 'monthly') return t('limits.titles.window', { plan, window: limit.scope })
+    if (limit.scope === 'model') return t('limits.titles.model', { plan, model: limit.modelName ?? '' })
+    return limit.plan === 'claude' ? t('limits.titles.claudeSession', { plan }) : t('limits.titles.usage', { plan })
 }
 
 // Codex's wording when one model has no room while the provider itself is fine: the notice names
@@ -146,32 +139,23 @@ function isModelAtCapacity(kind: ChatErrorKind, message: string): boolean {
 }
 
 // A generic error has no headline worth more than its own text, so it gets none.
-export function chatErrorTitle(kind: ChatErrorKind, message: string): string | null {
+export function chatErrorTitle(kind: ChatErrorKind, message: string, t: ChatErrorCopy): string | null {
     if (kind === 'generic') return null
-    if (kind === 'usage_limit') return subscriptionLimitTitle(describeSubscriptionLimit(message))
-    if (isModelAtCapacity(kind, message)) return 'Model at capacity'
-    return KIND_TITLES[kind]
+    if (kind === 'usage_limit') return subscriptionLimitTitle(describeSubscriptionLimit(message), t)
+    if (isModelAtCapacity(kind, message)) return t('modelAtCapacity.title')
+    return t(`titles.${kind}`)
 }
 
-const KIND_MESSAGES: Partial<Record<ChatErrorKind, string>> = {
-    budget: 'Rerun credits used up for this period. Add credits or wait for the monthly reset.',
-    unauthorized: 'This connection needs to be signed in again before the coworker can run.',
-    overloaded: 'The provider is overloaded right now. Try again in a moment.',
-    context_window: 'This conversation no longer fits the model, and sending it again will hit the same wall. Switch to a model with a larger context window, or start a new conversation.',
-    provider_error: 'The model provider refused this request, and sending it again will get the same answer. Switch to another model to keep going.',
-    thinking_replay: 'The engine replayed this turn in a way the model provider rejects. This is an engine bug, not the model: switching models will not help. Try again, and update the engine if it keeps happening.',
-    interrupted: 'The run was cut off before it could finish.',
-    session_gone: 'This coworker cannot reach this conversation anymore, so the message was not sent. Start a new conversation to keep going.',
-}
+const isExplainedKind = (kind: ChatErrorKind): kind is ExplainedKind => (EXPLAINED_KINDS as readonly ChatErrorKind[]).includes(kind)
 
-export function friendlyError(message: string): string {
-    if (!message) return GENERIC_ERROR
+// An error no kind explains reads as the provider wrote it, untranslated: it is all there is to say.
+export function friendlyError(message: string, t: ChatErrorCopy): string {
+    if (!message) return t('generic')
     const kind = classifyChatError(message)
-    if (kind === 'usage_limit') return subscriptionLimitMessage(describeSubscriptionLimit(message))
-    if (isModelAtCapacity(kind, message)) return 'This model has no room right now. Try again in a moment or pick another model.'
-    const known = KIND_MESSAGES[kind]
-    if (known) return known
-    return stripErrorPrefix(message) || GENERIC_ERROR
+    if (kind === 'usage_limit') return subscriptionLimitMessage(describeSubscriptionLimit(message), t)
+    if (isModelAtCapacity(kind, message)) return t('modelAtCapacity.message')
+    if (isExplainedKind(kind)) return t(`messages.${kind}`)
+    return stripErrorPrefix(message) || t('generic')
 }
 
 /**

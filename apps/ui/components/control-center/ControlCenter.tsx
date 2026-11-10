@@ -82,6 +82,7 @@ function isMacPlatform(): boolean {
 
 export function ControlCenter() {
     const t = useTranslations('layout.controlCenter')
+    const tReasons = useTranslations('workspace.access')
     const agentTabs = useAgentTabs()
     const open = useControlCenterStore(s => s.open)
     const setOpen = useControlCenterStore(s => s.setOpen)
@@ -248,7 +249,7 @@ export function ControlCenter() {
     })
 
     function rootSections(): ControlSection[] {
-        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme }).map(command => ({
+        const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox') }).map(command => ({
             ...command,
             label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`),
         }))

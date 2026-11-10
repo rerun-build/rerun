@@ -126,5 +126,16 @@
     },
     "signInPopup": {
         "connecting": "Conectando con {name}…"
+    },
+    "categories": {
+        "payments": "Pagos",
+        "ecommerce": "E-commerce",
+        "crm": "CRM",
+        "marketing": "Marketing",
+        "seo": "SEO",
+        "analytics": "Analítica",
+        "dev": "Desarrollo",
+        "productivity": "Productividad",
+        "other": "Otros"
     }
 }

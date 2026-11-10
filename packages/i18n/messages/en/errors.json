@@ -1,6 +1,7 @@
 {
     "_context": {
-        "generic": "Fallback when an action failed for a reason the screen cannot explain."
+        "generic": "Fallback when an action failed for a reason the screen cannot explain.",
+        "whatsappNumberRefused": "{message} is the provider's own explanation, in English."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -423,5 +424,22 @@
     "purchaseOtherWorkspace": "This purchase belongs to another workspace.",
     "changePlanFailed": "Failed to change your plan",
     "updateBrainProposalFailed": "Could not update the proposal",
-    "prepareSandboxFailed": "Could not prepare your sandbox"
+    "prepareSandboxFailed": "Could not prepare your sandbox",
+    "templateTitleFirst": "Give the template a title first.",
+    "uploadImageBeforeAltText": "Upload the image before writing its alt text.",
+    "boxManagerOnlyChange": "Only an admin or a manager of this Box can change this",
+    "boxAccessLost": "You no longer have access to this Box",
+    "whatsappCodeExpired": "The code expired before the phone linked. Ask for a new one and scan it within three minutes.",
+    "whatsappLinkRefused": "WhatsApp refused to link this number. Check it on the phone, then try again.",
+    "whatsappNumberRefused": "WhatsApp refused this number: {message}",
+    "whatsappLinkRefusedBecause": "WhatsApp refused the link: {message}",
+    "linkedinWrongCredentials": "Wrong email or password. Check them on linkedin.com, then try again.",
+    "linkedinSignInRefused": "LinkedIn refused the sign-in: {message}",
+    "bankNotConfirmed": "Your bank didn't confirm the payment. Nothing was charged, try again.",
+    "fileTooLongToSave": "This file is over {max, number} characters and cannot be saved from here.",
+    "fileNotTextSave": "This file is not text, so saving it here would corrupt it.",
+    "fileChangedOnBox": "This file changed on the Box since you opened it.",
+    "saveThisFileFailed": "Failed to save this file",
+    "templateSubscriptionEnded": "This coworker came from a template subscription that has ended. Buy the template again to bring it back.",
+    "noFreeCoworkerSlot": "No free coworker slot on your plan. Start Pro for unlimited coworkers, or delete a coworker to make room."
 }

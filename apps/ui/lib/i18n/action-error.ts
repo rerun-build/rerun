@@ -10,6 +10,11 @@ export type ActionFailure = { ok: false; error: string; code?: ErrorCode; params
 
 const english = createTranslator({ locale: 'en', messages: ENGLISH_MESSAGES, namespace: 'errors' })
 
+// A zod schema shared with the server names its refusal by code, so the action can send it translated.
+export function isErrorCode(value: string): value is ErrorCode {
+    return value !== '_context' && english.has(value as ErrorCode)
+}
+
 export function failure(code: ErrorCode, params?: ErrorParams): ActionFailure {
     return { ok: false, error: english(code, params as never), code, ...(params ? { params } : {}) }
 }

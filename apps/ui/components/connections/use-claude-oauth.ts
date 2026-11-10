@@ -4,7 +4,7 @@ import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import { exchangeClaudeSubscriptionAction, startClaudeOAuthAction } from '@/app/api/_actions/workspace-connection.actions'
 import { trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
 import type { AiConnectionSurface } from '@rerun/analytics'
-import { claudeTokenProblem } from '@rerun/contracts'
+import { claudeTokenIssue } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useCallback, useRef, useState } from 'react'
 
@@ -30,6 +30,7 @@ const OPEN_LOCK_MS = 5000
 export function useClaudeOAuth(onKeys: KeysHandler, surface: AiConnectionSurface): ClaudeOAuth {
     const t = useTranslations('connections.errors')
     const tCommon = useTranslations('common')
+    const tErrors = useTranslations('errors')
     const errorText = useErrorText()
     const [pkce, setPkce] = useState<{ verifier: string; state: string } | null>(null)
     const [busy, setBusy] = useState(false)
@@ -90,10 +91,10 @@ export function useClaudeOAuth(onKeys: KeysHandler, surface: AiConnectionSurface
             // old lineage. The code Claude shows can only be exchanged by the flow that asked for
             // it: with none armed (a reload, a closed dialog) it falls here too, and is refused.
             if (text.startsWith('sk-ant') || !pkce) {
-                const problem = claudeTokenProblem(text)
-                if (problem) {
-                    setError(problem)
-                    trackAiConnectionFailed('claude', 'token', surface, 'invalid_token', problem)
+                const issue = claudeTokenIssue(text)
+                if (issue) {
+                    setError(tErrors(issue))
+                    trackAiConnectionFailed('claude', 'token', surface, 'invalid_token', issue)
                     return false
                 }
                 setBusy(true)
@@ -114,7 +115,7 @@ export function useClaudeOAuth(onKeys: KeysHandler, surface: AiConnectionSurface
             setBusy(false)
             return saved
         },
-        [busy, pkce, apply, surface, tCommon, errorText]
+        [busy, pkce, apply, surface, tCommon, tErrors, errorText]
     )
 
     const phase: ClaudeOAuthPhase = connected ? 'connected' : busy ? 'checking' : pkce ? 'waiting' : 'idle'

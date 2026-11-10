@@ -7,7 +7,7 @@ import { TriggerEditor } from '@/components/agent/TriggerEditor'
 import { Button } from '@/components/ui/button'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel-list'
 import { PanelRow } from '@/components/ui/panel-row'
@@ -29,6 +29,7 @@ type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string
 
 
 export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTriggersProps) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelTriggers')
     const [triggers, setTriggers] = useState<EngineTrigger[]>([])
     const [outcomes, setOutcomes] = useState<Record<string, TaskOutcome>>({})
@@ -100,7 +101,7 @@ export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTrigger
     }
 
     const newButton = (
-        <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON}>
+        <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
                 <PlusIcon className="size-3.5 mr-1" /> {t('new')}
             </Button>

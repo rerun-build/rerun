@@ -26,7 +26,13 @@
         "sidebar.search": "Placeholder of the search field.",
         "workspace.seedingTitle": "Rerun is reading the company's website to fill the Brain.",
         "workspace.missingPageTitle": "{slug} is the page identifier a link pointed to.",
-        "workspace.missingTableTitle": "{name} is the table name a link pointed to."
+        "workspace.missingTableTitle": "{name} is the table name a link pointed to.",
+        "sources.dns": "A source of facts about the company: its email DNS records (MX, SPF).",
+        "sources.stack": "A source of facts: the tools detected on the company's website (analytics, CRM...).",
+        "sources.registry": "A source of facts: the official register of companies.",
+        "authors.seed": "Author of a page Rerun filled by reading the company's website.",
+        "authors.foreman": "Author of a page written by Rerun's own assistant coworker.",
+        "proposals.headlineEdit": "Title of a card proposing a change to a Brain page (the company's knowledge base). {title} is the page name."
     },
     "unavailable": {
         "title": "The Brain is not on this box yet",
@@ -75,7 +81,9 @@
         "after": "After",
         "removed": "Removed",
         "outdatedCreate": "This page was created while the proposal waited. What follows compares with what it says now.",
-        "outdatedEdit": "The page changed since the coworker read it. What follows compares with what it says now, so check nothing gets lost."
+        "outdatedEdit": "The page changed since the coworker read it. What follows compares with what it says now, so check nothing gets lost.",
+        "headlineCreate": "New page: {title}",
+        "headlineEdit": "Update to {title}"
     },
     "pageTypes": {
         "company": "Company",
@@ -229,5 +237,34 @@
         "databaseUnavailable": "Database unavailable",
         "missingTableTitle": "No table \"{name}\"",
         "missingTableDescription": "It may have been deleted, or the coworker that mentioned it has not created it yet."
+    },
+    "sources": {
+        "website": "Website",
+        "sitePages": {
+            "about": "About page",
+            "team": "Team page",
+            "pricing": "Pricing page",
+            "customers": "Customers page",
+            "product": "Product page",
+            "legal": "Legal notice",
+            "careers": "Careers page",
+            "contact": "Contact page",
+            "privacy": "Privacy policy",
+            "blog": "Blog"
+        },
+        "dns": "Email setup",
+        "stack": "Website tools",
+        "search": "Web search",
+        "catalog": "Product catalog",
+        "registry": "Company registry",
+        "linkedin": "LinkedIn",
+        "linkedinCompany": "LinkedIn page",
+        "linkedinPerson": "Your LinkedIn",
+        "google": "Google",
+        "googleBusiness": "Google Business Profile"
+    },
+    "authors": {
+        "seed": "Rerun, from your website",
+        "foreman": "Rerun coworker"
     }
 }

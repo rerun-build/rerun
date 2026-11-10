@@ -9,12 +9,12 @@ import { SkeletonPanelRows, SkeletonRows } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { modelLogLabel } from '@/lib/engine/models'
 import type { EngineRun, EngineRunStep, EngineToolCall } from '@/lib/engine/types'
-import { getToolMeta } from '@/lib/tool-meta'
+import { toolIconOf } from '@/lib/tool-meta'
 import { formatDate, formatNumber } from '@rerun/i18n/format'
 import { RunStatusBadge } from '@rerun/ui/monitoring'
 import { CheckIcon, ChevronRightIcon, ScrollTextIcon, XIcon } from '@/lib/icons'
 import { useLocale, useTranslations } from 'next-intl'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { createElement, useCallback, useEffect, useRef, useState } from 'react'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 
 function runTokens(run: EngineRun): number | undefined {
@@ -180,8 +180,6 @@ function StepRow({ step, tools }: { step: EngineRunStep; tools: EngineToolCall[]
 
 function ToolRow({ tool }: { tool: EngineToolCall }) {
     const t = useTranslations('agent.agentPanelLogs')
-    const meta = getToolMeta(tool.toolName)
-    const Icon = meta.icon
     const input = prettyJson(tool.inputJson)
     const output = prettyJson(tool.resultJson)
     const isError = tool.isError !== 0
@@ -189,7 +187,7 @@ function ToolRow({ tool }: { tool: EngineToolCall }) {
         <Collapsible className="border-t border-border/40 first:border-t-0">
             <CollapsibleTrigger className="group flex w-full items-center gap-2 py-1.5 text-left text-xs transition-colors hover:bg-accent/30">
                 <ChevronRightIcon className="size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
-                <Icon className="size-3.5 shrink-0 text-muted-foreground" />
+                {createElement(toolIconOf(tool.toolName), { className: 'size-3.5 shrink-0 text-muted-foreground' })}
                 <span className="truncate font-mono">{tool.toolName}</span>
                 {isError ? <XIcon className="size-3 shrink-0 text-destructive" /> : <CheckIcon className="size-3 shrink-0 text-emerald-500" />}
                 <span className="flex-1" />

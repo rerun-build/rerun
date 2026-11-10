@@ -16,8 +16,6 @@ import { JoinCard } from './JoinShell'
 
 const STEP_COUNT = 3
 
-type CreatorTermId = 'terms' | 'cadence' | 'quality' | 'sandbox'
-
 export function CreatorOnboarding({ invite, token }: { invite: CreatorInvite; token?: string }) {
     const router = useRouter()
     const stepper = useStepper(STEP_COUNT, invite.claimed ? 2 : 0)
@@ -147,10 +145,10 @@ function TermsStep({ onDone }: { onDone: () => void }) {
                         <label htmlFor={`term-${term.id}`} className="text-sm leading-5 text-muted-foreground">
                             {term.href ? (
                                 <a href={term.href} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
-                                    {t(`terms.items.${term.id as CreatorTermId}`)}
+                                    {t(`terms.items.${term.id}`)}
                                 </a>
                             ) : (
-                                t(`terms.items.${term.id as CreatorTermId}`)
+                                t(`terms.items.${term.id}`)
                             )}
                         </label>
                     </li>

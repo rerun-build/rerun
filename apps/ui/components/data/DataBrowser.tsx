@@ -53,6 +53,7 @@ const NO_ROWS: DbRow[] = []
 export function DataBrowser({ source, initial, onInitialConsumed, onExpand, table: pinnedTable, onTableDropped }: DataBrowserProps) {
     const locale = useLocale()
     const t = useTranslations('data.browser')
+    const tLayouts = useTranslations('data.layouts')
     const errorText = useErrorText()
     const [requested] = useState(() => initial ?? null)
     const requestedTableRef = useRef(requested?.table ?? null)
@@ -383,7 +384,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
 
     const addView = async (layout: CardLayout) => {
         if (!selected) return
-        const input = quickViewInput(layout, { columns: allColumns, rows, takenNames: views.map(view => view.name) })
+        const input = quickViewInput(layout, { columns: allColumns, rows, takenNames: views.map(view => view.name), baseName: tLayouts(layout) })
         if (!input) {
             setViewDialog({ open: true, layout })
             return

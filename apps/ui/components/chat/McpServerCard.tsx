@@ -24,6 +24,7 @@ type McpServerCardProps = McpRegisterCard & { agentId?: string; signInPending?: 
 // in the history follows the sign-in made since, and shows no status once the server is gone.
 export function McpServerCard({ agentId, name, url, outcome, failure, signInPending }: McpServerCardProps) {
     const t = useTranslations('chat')
+    const tServices = useTranslations('services')
     const connectors = useConnectorServices(outcome === 'saved' ? agentId : undefined)
     const { statuses, loading } = useMcpServerStatuses(outcome === 'saved' ? agentId : undefined)
     const [signIn, setSignIn] = useState<{ popup: Window | null } | null>(null)
@@ -71,7 +72,7 @@ export function McpServerCard({ agentId, name, url, outcome, failure, signInPend
                 </div>
                 <CustomMcpStatusBadge status={status} loading={loading || !connectors.loaded} />
                 {canSignIn && !signIn && (
-                    <Button size="sm" variant="outline" onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName) })}>
+                    <Button size="sm" variant="outline" onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName, tServices('signInPopup.connecting', { name: displayName })) })}>
                         <LogInIcon />
                         {t('actions.connect')}
                     </Button>

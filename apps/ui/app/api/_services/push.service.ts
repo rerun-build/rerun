@@ -58,8 +58,9 @@ async function pushToUser(supabase: SupabaseClient<Database>, userId: string, no
     if (!devices?.length) return
 
     const { notification } = context
-    const t = await translatorFor(await recipientLocale(supabase, userId, context.workspaceId), 'push')
-    const { silent, ...copy } = pushCopyOf({ agentName: context.agentName, notification, t })
+    const locale = await recipientLocale(supabase, userId, context.workspaceId)
+    const [t, tErrors] = await Promise.all([translatorFor(locale, 'push'), translatorFor(locale, 'chatErrors')])
+    const { silent, ...copy } = pushCopyOf({ agentName: context.agentName, notification, t, tErrors })
     const message = {
         ...copy,
         ...(silent ? {} : { sound: 'default' as const }),

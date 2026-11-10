@@ -251,10 +251,11 @@ function Pulsing({ active, children }: { active: boolean; children: ReactNode })
 
 function StepLine({ call, tone, last }: { call: SubRunCall; tone: Tone; last: boolean }) {
     const t = useTranslations('mobileSteps.subRun')
+    const tTools = useTranslations('tools')
     const theme = useTheme()
     const tool = stripBridgePrefix(call.tool)
     const current = call.elapsedMs !== undefined
-    const label = (hasVerb(tool) ? t(`verbs.${tool}`, { summary: call.summary }) : `${toolLabelOf(tool)} ${call.summary}`).trim()
+    const label = (hasVerb(tool) ? t(`verbs.${tool}`, { summary: call.summary }) : `${toolLabelOf(tool, undefined, tTools)} ${call.summary}`).trim()
     const color = call.failed ? TONES.red[theme.scheme] : current ? theme.foreground : theme.mutedForeground
     return (
         <Branch tone={call.failed ? 'red' : tone} last={last} elbowHeight={STEP_ROW_HEIGHT / 2}>

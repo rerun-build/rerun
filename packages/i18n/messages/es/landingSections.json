@@ -67,12 +67,30 @@
             "keys": "Tus claves de API"
         },
         "sources": {
-            "claude": { "name": "Claude Pro o Max", "hint": "Conectado con tu cuenta de Claude" },
-            "chatgpt": { "name": "ChatGPT Plus o Pro", "hint": "Conectado con tu cuenta de ChatGPT" },
-            "anthropic": { "name": "Anthropic", "hint": "Modelos Claude, facturados por token" },
-            "openai": { "name": "OpenAI", "hint": "Modelos GPT, facturados por token" },
-            "google": { "name": "Google", "hint": "Modelos Gemini, facturados por token" },
-            "openrouter": { "name": "OpenRouter", "hint": "Todos los modelos tras una clave" }
+            "claude": {
+                "name": "Claude Pro o Max",
+                "hint": "Conectado con tu cuenta de Claude"
+            },
+            "chatgpt": {
+                "name": "ChatGPT Plus o Pro",
+                "hint": "Conectado con tu cuenta de ChatGPT"
+            },
+            "anthropic": {
+                "name": "Anthropic",
+                "hint": "Modelos Claude, facturados por token"
+            },
+            "openai": {
+                "name": "OpenAI",
+                "hint": "Modelos GPT, facturados por token"
+            },
+            "google": {
+                "name": "Google",
+                "hint": "Modelos Gemini, facturados por token"
+            },
+            "openrouter": {
+                "name": "OpenRouter",
+                "hint": "Todos los modelos tras una clave"
+            }
         },
         "composer": "Encuentra 30 directores financieros de empresas de logística en Dubái.",
         "members": {
@@ -87,12 +105,36 @@
             "title": "Rutinas",
             "action": "Nueva",
             "items": {
-                "invoices": { "name": "Reclamar facturas impagadas", "when": "Cada día laborable a las 07:00 · Europe/Paris", "badge": "en 34 min" },
-                "payment": { "name": "Avisar de un pago fallido", "when": "Cuando Stripe llama al webhook", "badge": "escuchando" },
-                "drafts": { "name": "Publicar los tres borradores de hoy", "when": "Cada día a las 11:30", "badge": "11:30" },
-                "welcome": { "name": "Dar la bienvenida a un cliente", "when": "Cuando tu CRM llama al webhook", "badge": "escuchando" },
-                "ranking": { "name": "Informe semanal de posiciones", "when": "Cada viernes a las 09:00", "badge": "vie 09:00" },
-                "close": { "name": "Cerrar el mes", "when": "El último día del mes a las 18:00", "badge": "31/10" }
+                "invoices": {
+                    "name": "Reclamar facturas impagadas",
+                    "when": "Cada día laborable a las 07:00 · Europe/Paris",
+                    "badge": "en 34 min"
+                },
+                "payment": {
+                    "name": "Avisar de un pago fallido",
+                    "when": "Cuando Stripe llama al webhook",
+                    "badge": "escuchando"
+                },
+                "drafts": {
+                    "name": "Publicar los tres borradores de hoy",
+                    "when": "Cada día a las 11:30",
+                    "badge": "11:30"
+                },
+                "welcome": {
+                    "name": "Dar la bienvenida a un cliente",
+                    "when": "Cuando tu CRM llama al webhook",
+                    "badge": "escuchando"
+                },
+                "ranking": {
+                    "name": "Informe semanal de posiciones",
+                    "when": "Cada viernes a las 09:00",
+                    "badge": "vie 09:00"
+                },
+                "close": {
+                    "name": "Cerrar el mes",
+                    "when": "El último día del mes a las 18:00",
+                    "badge": "31/10"
+                }
             }
         },
         "schedule": {
@@ -136,11 +178,26 @@
             "connect": "Conectar",
             "connecting": "Conectando",
             "sources": {
-                "chatgpt": { "name": "Plan de ChatGPT", "summary": "Codex, con tu propia suscripción." },
-                "claude": { "name": "Plan de Claude", "summary": "Claude Code, con tu propia suscripción." },
-                "google": { "name": "Clave de API de Google", "summary": "Modelos Gemini, facturados por token." },
-                "openrouter": { "name": "Clave de API de OpenRouter", "summary": "Todos los modelos tras una clave." },
-                "anthropic": { "name": "Clave de API de Anthropic", "summary": "Modelos Claude, facturados por token." }
+                "chatgpt": {
+                    "name": "Plan de ChatGPT",
+                    "summary": "Codex, con tu propia suscripción."
+                },
+                "claude": {
+                    "name": "Plan de Claude",
+                    "summary": "Claude Code, con tu propia suscripción."
+                },
+                "google": {
+                    "name": "Clave de API de Google",
+                    "summary": "Modelos Gemini, facturados por token."
+                },
+                "openrouter": {
+                    "name": "Clave de API de OpenRouter",
+                    "summary": "Todos los modelos tras una clave."
+                },
+                "anthropic": {
+                    "name": "Clave de API de Anthropic",
+                    "summary": "Modelos Claude, facturados por token."
+                }
             }
         },
         "hire": {
@@ -173,17 +230,60 @@
             "cloud": "Lo que cubren"
         },
         "gainTitles": {
-            "tidy": { "lead": "Toda tu empresa,", "mid": "organizada." },
-            "organized": { "lead": "Toda tu empresa,", "mid": "organizada.", "tail": "Y sigue así sola." },
-            "never": { "lead": "No pierdas", "mid": "ni una hora más", "tail": "organizando tu negocio." },
-            "once": { "lead": "Ordena tu negocio", "mid": "una vez.", "tail": "Nunca más se desordena." },
-            "board": { "lead": "Un", "mid": "negocio que puedes ver,", "tail": "no una carpeta donde rebuscar." },
-            "mess": { "lead": "Veinte", "mid": "Coworkers.", "tail": "Cero desorden que limpiar detrás." },
-            "files": { "lead": "Todo", "mid": "en su sitio,", "tail": "sin archivar nada nunca." },
-            "brief": { "lead": "Configura tu", "mid": "workspace una vez.", "tail": "Nunca expliques dos veces a un Coworker." },
-            "workspace": { "lead": "Un", "mid": "workspace que", "tail": "conoce tu negocio." },
-            "concretely": { "lead": "¿Qué aporta Rerun", "mid": "de verdad", "tail": "a tu negocio?" },
-            "needs": { "lead": "Rerun", "mid": "es todo lo que tu", "tail": "negocio necesita." }
+            "tidy": {
+                "lead": "Toda tu empresa,",
+                "mid": "organizada."
+            },
+            "organized": {
+                "lead": "Toda tu empresa,",
+                "mid": "organizada.",
+                "tail": "Y sigue así sola."
+            },
+            "never": {
+                "lead": "No pierdas",
+                "mid": "ni una hora más",
+                "tail": "organizando tu negocio."
+            },
+            "once": {
+                "lead": "Ordena tu negocio",
+                "mid": "una vez.",
+                "tail": "Nunca más se desordena."
+            },
+            "board": {
+                "lead": "Un",
+                "mid": "negocio que puedes ver,",
+                "tail": "no una carpeta donde rebuscar."
+            },
+            "mess": {
+                "lead": "Veinte",
+                "mid": "Coworkers.",
+                "tail": "Cero desorden que limpiar detrás."
+            },
+            "files": {
+                "lead": "Todo",
+                "mid": "en su sitio,",
+                "tail": "sin archivar nada nunca."
+            },
+            "brief": {
+                "lead": "Configura tu",
+                "mid": "workspace una vez.",
+                "tail": "Nunca expliques dos veces a un Coworker."
+            },
+            "workspace": {
+                "lead": "Un",
+                "mid": "workspace que",
+                "tail": "conoce tu negocio."
+            },
+            "concretely": {
+                "lead": "¿Qué aporta Rerun",
+                "mid": "de verdad",
+                "tail": "a tu negocio?"
+            },
+            "needs": {
+                "lead": "Rerun",
+                "mid": "es todo lo que tu",
+                "tail": "negocio necesita."
+            }
         },
         "boxes": {
             "marketing": "Marketing",

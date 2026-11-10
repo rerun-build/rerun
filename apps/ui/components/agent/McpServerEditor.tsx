@@ -10,7 +10,7 @@ import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeade
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useAgentVariables } from '@/hooks/useAgentVariables'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { argsHaveSecret, externalizeArgs, externalizePairs, externalizeUrl, sanitize, urlHasSecret } from '@/lib/engine/mcp-secrets'
 import type { EngineMcpServer } from '@/lib/engine/types'
 import { MCP_SERVER_NAME_RE } from '@rerun/contracts'
@@ -49,6 +49,7 @@ export function McpServerEditor({
     onDone: () => void
     onBack: () => void
 }) {
+    const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.mcpServerEditor')
     const errorText = useErrorText()
     const isEdit = !!server
@@ -72,7 +73,7 @@ export function McpServerEditor({
     const [error, setError] = useState<string | null>(null)
     const vars = useAgentVariables(agentId)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
     // `readOnly` is a server an app owns, with no footer at all. A use-only member keeps the footer, disabled, to read why.
     const fieldsLocked = readOnly || !canManage
 

@@ -8,19 +8,12 @@ import type { TemplateStoryStep } from './template.js'
 export const TEMPLATE_CATEGORIES = ['agencies', 'ecommerce', 'saas', 'sales', 'recruiting', 'real-estate', 'legal', 'creators', 'productivity', 'other'] as const
 export type TemplateCategory = (typeof TEMPLATE_CATEGORIES)[number]
 
-// Several slugs do not title case into anything readable ("Saas", "Real-estate"), so the label
-// is written once here rather than derived on each surface.
-export const TEMPLATE_CATEGORY_LABELS: Record<TemplateCategory, string> = {
-    agencies: 'Agencies',
-    ecommerce: 'E-commerce',
-    saas: 'SaaS',
-    sales: 'Sales',
-    recruiting: 'Recruiting',
-    'real-estate': 'Real estate',
-    legal: 'Legal & compliance',
-    creators: 'Creators',
-    productivity: 'Productivity',
-    other: 'Other',
+// The `templates.categories` catalog: several slugs do not title case into anything readable
+// ("Saas", "Real-estate"), so each category is named once there.
+export type TemplateCategoryCopy = (key: TemplateCategory) => string
+
+export function templateCategoryLabel(category: string, t: TemplateCategoryCopy): string {
+    return t((TEMPLATE_CATEGORIES as readonly string[]).includes(category) ? (category as TemplateCategory) : 'other')
 }
 
 // What each category promises, in one line. Written next to the labels because both surfaces that
@@ -139,28 +132,30 @@ export function amountFormat(cents: number, currency: string = TEMPLATE_CURRENCY
     }
 }
 
-export function formatAmount(cents: number, currency: string = TEMPLATE_CURRENCY): string {
-    return new Intl.NumberFormat(AMOUNT_LOCALE, amountFormat(cents, currency)).format(cents / 100)
+export function formatAmount(cents: number, currency: string = TEMPLATE_CURRENCY, locale: string = AMOUNT_LOCALE): string {
+    return new Intl.NumberFormat(locale, amountFormat(cents, currency)).format(cents / 100)
 }
 
-export function priceLabel(pricing: TemplatePricing): string {
-    if (!isPaid(pricing)) return 'Free'
-    const amount = formatAmount(pricing.amountCents, pricing.currency)
-    return pricing.model === 'recurring' ? `${amount}/mo` : amount
+// The `templates.price` catalog, or the landing's copy of it.
+export type TemplatePriceCopy = (key: 'free' | 'monthly' | 'useForFree' | 'hire' | 'hireCard', values?: Record<string, string | number>) => string
+
+export function priceLabel(pricing: TemplatePricing, t: TemplatePriceCopy, locale: string): string {
+    if (!isPaid(pricing)) return t('free')
+    const amount = formatAmount(pricing.amountCents, pricing.currency, locale)
+    return pricing.model === 'recurring' ? t('monthly', { amount }) : amount
 }
 
-export function priceCtaLabel(pricing: TemplatePricing, agentCount: number): string {
-    if (!isPaid(pricing)) return 'Use for free'
-    const hire = agentCount > 1 ? `Hire these ${agentCount} coworkers` : 'Hire this coworker'
-    return `${hire} · ${priceLabel(pricing)}`
+export function priceCtaLabel(pricing: TemplatePricing, agentCount: number, t: TemplatePriceCopy, locale: string): string {
+    if (!isPaid(pricing)) return t('useForFree')
+    return t('hire', { count: Math.max(agentCount, 1), price: priceLabel(pricing, t, locale) })
 }
 
 // The label a card reveals under the cursor, where the price it replaces already said the amount.
 // Shorter than priceCtaLabel, which stands alone at the bottom of a detail page and has to name
 // who is being hired, not just what it costs. Kept short: a longer label starts squeezing the meta
 // line beside it on a narrow card.
-export function templateCardCtaLabel(pricing: TemplatePricing): string {
-    return isPaid(pricing) ? `Hire · ${priceLabel(pricing)}` : 'Use for free'
+export function templateCardCtaLabel(pricing: TemplatePricing, t: TemplatePriceCopy, locale: string): string {
+    return isPaid(pricing) ? t('hireCard', { price: priceLabel(pricing, t, locale) }) : t('useForFree')
 }
 
 // What Rerun keeps on a sale. Plain constants rather than env vars: the creator UI quotes the

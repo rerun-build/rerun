@@ -2,5 +2,15 @@
     "save": "Enregistrer",
     "saving": "Enregistrement",
     "cancel": "Annuler",
-    "somethingWentWrong": "Une erreur est survenue. Veuillez réessayer."
+    "somethingWentWrong": "Une erreur est survenue. Veuillez réessayer.",
+    "backToDashboard": "Retour au tableau de bord",
+    "notFound": {
+        "title": "Page introuvable",
+        "body": "Cette page n'existe pas ou a été déplacée. Reprenons au bon endroit."
+    },
+    "crash": {
+        "title": "Une erreur est survenue",
+        "body": "Cette page a rencontré une erreur inattendue. Vos coworkers et leur travail sont intacts. Rechargez pour reprendre là où vous en étiez.",
+        "reload": "Recharger"
+    }
 }

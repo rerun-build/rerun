@@ -3,12 +3,12 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
-import { PROVIDER_PITCH, connectMethod, sourceKind, isCreditExhausted, isRerunPaused, planLimitTone, type AddableProvider, type RerunCredit } from '@/lib/engine/ai-sources'
+import { connectMethod, providerPitch, sourceKind, isCreditExhausted, isRerunPaused, planLimitTone, type AddableProvider, type RerunCredit } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection } from '@/lib/engine/types'
 import { ChevronLeftIcon, PencilIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import { RERUN_CONNECTION_ID } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, addableProviderSchema } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -103,9 +103,11 @@ function BackButton({ onBack }: { onBack: () => void }) {
 
 function SourceSubtitle({ source }: { source: BoxConnection }) {
     const t = useTranslations('connections.subtitle')
+    const tConnections = useTranslations('connections')
     if (source.id === RERUN_CONNECTION_ID) return t('included')
-    const pitch = PROVIDER_PITCH[source.provider as AddableProvider]
-    if (!pitch) return source.provider
+    const provider = addableProviderSchema.safeParse(source.provider)
+    if (!provider.success) return source.provider
+    const pitch = providerPitch(provider.data, tConnections)
     return sourceKind(source.provider) === 'plan' || source.provider === 'custom' ? pitch.title : t('apiKey', { provider: pitch.title })
 }
 
@@ -124,13 +126,15 @@ export function DetailHeader({ source, credit, onBack, onRename }: { source: Box
 }
 
 export function ProviderHeader({ provider, onBack }: { provider: AddableProvider; onBack: () => void }) {
+    const t = useTranslations('connections')
+    const pitch = providerPitch(provider, t)
     return (
         <div className="flex items-center gap-3 border-b px-3 py-2.5">
             <BackButton onBack={onBack} />
             <SourceAvatar provider={provider} size="sm" />
             <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-sm font-medium">{PROVIDER_PITCH[provider].title}</span>
-                <span className="truncate text-[11px] text-muted-foreground">{PROVIDER_PITCH[provider].hint}</span>
+                <span className="truncate text-sm font-medium">{pitch.title}</span>
+                <span className="truncate text-[11px] text-muted-foreground">{pitch.hint}</span>
             </div>
         </div>
     )

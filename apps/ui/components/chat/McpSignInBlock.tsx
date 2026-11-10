@@ -30,6 +30,7 @@ type McpSignInBlockProps = McpSignInRequest & {
 // here and the agent picks up on its own, the way a suggested app does.
 export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }: McpSignInBlockProps) {
     const t = useTranslations('chat')
+    const tServices = useTranslations('services')
     const connectors = useConnectorServices(agentId)
     const { statuses, loading } = useMcpServerStatuses(agentId)
     const [signIn, setSignIn] = useState<{ popup: Window | null } | null>(null)
@@ -80,7 +81,7 @@ export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }
                                 {t('actions.continue')}
                             </Button>
                         ) : (
-                            <Button size="sm" disabled={submitted || !server?.signInUrl} onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName) })}>
+                            <Button size="sm" disabled={submitted || !server?.signInUrl} onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName, tServices('signInPopup.connecting', { name: displayName })) })}>
                                 {t('actions.connect')}
                             </Button>
                         )}
