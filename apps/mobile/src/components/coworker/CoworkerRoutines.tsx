@@ -10,6 +10,7 @@ import { Card, GROUPED_ROW_HEIGHT, Separator } from '@/components/ui/GroupedList
 import { Skeleton } from '@/components/ui/Skeleton'
 import { currentLocale, translatorFor } from '@/i18n/translator'
 import { spacing } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 
 import { CoworkerPage, LoadFailed } from './CoworkerPage'
 
@@ -105,7 +106,7 @@ export function CoworkerRoutines({ name, routines, savingKeys, onToggle, failed,
                 )}
                 {routines && failed && <LoadFailed />}
                 <AppText variant="footnote" tone="muted" style={{ paddingHorizontal: spacing.lg }}>
-                    {lock.reason ? tAccess(lock.reason) : t('askInChat', { name })}
+                    {lock.reason ? tAccess(lock.reason, { host: webHost }) : t('askInChat', { name })}
                 </AppText>
             </View>
         </CoworkerPage>

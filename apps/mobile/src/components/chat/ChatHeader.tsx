@@ -3,12 +3,13 @@ import { disabled } from '@expo/ui/swift-ui/modifiers'
 import type { SessionStatus } from '@rerun/contracts'
 import { GlassView } from 'expo-glass-effect'
 import { SymbolView } from 'expo-symbols'
-import { useWindowDimensions, View } from 'react-native'
+import { View } from 'react-native'
 import Animated, { Extrapolation, FadeIn, interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
 import { conversationSections, glyphOf, stateOf } from '@/components/chat/conversation-sections'
+import { usePaneSize } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { EdgeFade } from '@/components/ui/EdgeFade'
@@ -141,7 +142,8 @@ type ChatHeaderProps = {
     // The pager's position, in pages: the chip's content slides with the finger.
     progress: SharedValue<number>
     allSessions: ChatTab[]
-    onBack: () => void
+    // Absent beside the sidebar of a wide window, where the conversation is the root of its pane.
+    onBack?: () => void
     onSelect: (sessionId: string) => void
     onNewSession: () => void
     onOpenDetails?: () => void
@@ -152,8 +154,8 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     const glass = useGlassStyle()
     const insets = useSafeAreaInsets()
     const t = useTranslations('mobileChat.header')
-    const { width: screenWidth } = useWindowDimensions()
-    const chipWidth = Math.min(CHIP_MAX_WIDTH, screenWidth - 2 * (spacing.lg + GLASS_BUTTON_SIZE + spacing.sm))
+    const { width: paneWidth } = usePaneSize()
+    const chipWidth = Math.min(CHIP_MAX_WIDTH, paneWidth - 2 * (spacing.lg + GLASS_BUTTON_SIZE + spacing.sm))
     const hasConversations = tabs.length > 0
     const pages = [...tabs, DRAFT_TAB]
     const activeIndex = hasConversations && activeId ? tabs.findIndex(session => session.id === activeId) : tabs.length
@@ -186,7 +188,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
         <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
             <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} />
             <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingHorizontal: spacing.lg, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
-                <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} />
+                {onBack ? <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
                 <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>
                     {menuOpens ? (
                         <NativeMenu label={t('menuLabel', { name: coworker.name, title: activeTitle })} trigger={identity}>

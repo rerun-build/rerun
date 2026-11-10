@@ -5,7 +5,10 @@
         "continueWithGoogle": "Continue with Google",
         "continueWithPhone": "Continue with phone",
         "continueWithEmail": "Continue with email",
-        "or": "Or"
+        "or": "Or",
+        "welcome": "Welcome to Rerun",
+        "ownServer": "Use your own server",
+        "useCloud": "Use Rerun Cloud"
     },
     "back": "Back",
     "phone": {
@@ -87,6 +90,22 @@
         "code.resendIn": "{seconds} is a countdown in seconds, shown on a link.",
         "code.switchChannel": "{channel} is WhatsApp or SMS: send the code through the other channel.",
         "phone.countryLabel": "VoiceOver label of the country picker button; {name} is the country name.",
-        "errors.phone.taken": "The errors.phone.* and errors.email.* keys mirror the hub's sign-in refusals, keyed by their reason."
+        "errors.phone.taken": "The errors.phone.* and errors.email.* keys mirror the hub's sign-in refusals, keyed by their reason.",
+        "start.welcome": "Title of the sign-in screen when the app is connected to a self-hosted Rerun server.",
+        "start.ownServer": "Link under the sign-in buttons: connect the app to a self-hosted Rerun server.",
+        "start.useCloud": "Link that leaves a self-hosted server and goes back to Rerun Cloud.",
+        "server.address": "VoiceOver label of the field where the person types the address of their Rerun server."
+    },
+    "server": {
+        "title": "Your Rerun server",
+        "address": "Server address",
+        "connect": "Connect",
+        "problems": {
+            "invalid": "Enter the address of your Rerun server.",
+            "insecure": "Use https:// outside your local network.",
+            "unreachable": "Could not reach this server.",
+            "not-rerun": "This address is not a Rerun server.",
+            "outdated": "Update this Rerun server to use it from the app."
+        }
     }
 }

@@ -16,6 +16,7 @@ import { CircleTrigger, NativeMenu } from '@/components/ui/NativeMenu'
 import type { CoworkerStatus } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 
 const BUDDY_SIZE = 96
 
@@ -97,7 +98,7 @@ export function CoworkerDetails({ coworker, files, apps, routines, notifications
                 <Button label={t('edit')} variant="secondary" size="sm" onPress={onEdit} disabled={lock.locked} />
                 {lock.reason ? (
                     <AppText variant="footnote" tone="muted" style={{ textAlign: 'center' }}>
-                        {tAccess(lock.reason)}
+                        {tAccess(lock.reason, { host: webHost })}
                     </AppText>
                 ) : null}
             </View>

@@ -16,6 +16,7 @@ import { PillButton } from '@/components/ui/PillButton'
 import { TextField } from '@/components/ui/TextField'
 import { useTheme } from '@/theme/theme'
 import { brand, radius, spacing } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 
 const NAME_MAX = 60
 
@@ -94,7 +95,7 @@ export default function NewCoworker() {
 
             {blocked ? (
                 <AppText variant="callout" tone="muted">
-                    {tAccess(blocked)}
+                    {tAccess(blocked, { host: webHost })}
                 </AppText>
             ) : (
                 <>

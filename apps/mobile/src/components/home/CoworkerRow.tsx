@@ -26,6 +26,8 @@ type CoworkerRowProps = {
     line: StatusLine
     minutesAgo: number | null
     unread: boolean
+    // The conversation open beside the list, on a wide window.
+    selected?: boolean
     onPress: () => void
     // The finger lands before the tap ends: enough of a head start to read the conversation. Held
     // back a few frames so a scroll or a pin swipe starting on the row does not read anything.
@@ -66,7 +68,7 @@ function PinSwipe({ pin, children }: { pin: PinControl; children: ReactNode }) {
     )
 }
 
-export function CoworkerRow({ coworker, line, minutesAgo, unread, onPress, onPressIn, pin }: CoworkerRowProps) {
+export function CoworkerRow({ coworker, line, minutesAgo, unread, selected = false, onPress, onPressIn, pin }: CoworkerRowProps) {
     const theme = useTheme()
     const timeAgo = useTimeAgo()
     const t = useTranslations('mobileHome')
@@ -81,7 +83,8 @@ export function CoworkerRow({ coworker, line, minutesAgo, unread, onPress, onPre
             accessibilityActions={pin ? [{ name: 'togglePin', label: pin.pinned ? t('row.unpin') : t('row.pinToTop') }] : undefined}
             onAccessibilityAction={event => event.nativeEvent.actionName === 'togglePin' && pin?.onToggle()}
             // Opaque under the content: the pin action waits behind the row.
-            style={pin ? { backgroundColor: theme.background } : undefined}
+            style={selected ? { backgroundColor: theme.muted } : pin ? { backgroundColor: theme.background } : undefined}
+            accessibilityState={{ selected }}
         >
             {({ pressed }) => (
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.lg, paddingVertical: spacing.md, paddingHorizontal: spacing.xl, opacity: pressed ? 0.6 : 1 }}>

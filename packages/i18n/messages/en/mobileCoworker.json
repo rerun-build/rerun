@@ -2,9 +2,9 @@
     "access": {
         "boxManage": "Only an admin or a manager of this Box can change this.",
         "aiProvidersAdminOnly": "Only an admin can change the AI providers.",
-        "noManagedBox": "You need a Box you manage to add a coworker. Create one at rerun.build, or ask an admin.",
+        "noManagedBox": "You need a Box you manage to add a coworker. Create one at {host}, or ask an admin.",
         "boxesFailed": "We could not load your Boxes. Try again in a moment.",
-        "noBoxYet": "This workspace has no Box yet. Create one at rerun.build."
+        "noBoxYet": "This workspace has no Box yet. Create one at {host}."
     },
     "page": {
         "loadFailed": "Could not load this. Try again in a moment."
@@ -84,6 +84,8 @@
         "failed": "Could not create the coworker"
     },
     "_context": {
+        "access.noManagedBox": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "access.noBoxYet": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
         "details.filesCount": "The number of files the coworker keeps, shown as the value of the Files row.",
         "details.filesTruncated": "More files than the app read: the count followed by a plus sign.",
         "details.routinesOn": "How many of the coworker's routines are switched on.",

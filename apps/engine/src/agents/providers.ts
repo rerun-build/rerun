@@ -27,6 +27,7 @@ import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
 import { claudeContextCapture, type ClaudeContextCapture } from './claude-context.js'
 import { claudeScreenshotMiddleware } from './claude-stream.js'
 import { codexMcpCompatibilityMiddleware } from './codex-stream.js'
+import { createCodexImageMiddleware } from './codex-images.js'
 import { googleToolSchemaMiddleware } from './google-tool-schema.js'
 import { createQuickRepliesCapture, type QuickRepliesCapture } from './quick-replies-stream.js'
 import { createFakeToolCallGuard } from './fake-tool-call-stream.js'
@@ -58,7 +59,7 @@ const BRIDGE_TOOL_TIMEOUT_SEC = 3600
 // The CLI is a transport for the subscription and nothing more: no built-in tool but WebSearch
 // (Rerun's reach it bridged over MCP), no settings file, no prompt of its own. What it still does
 // on its own initiative is switched off here so a run holds only what Rerun put in it. Every name exists in
-// the CLI the Agent SDK ships (2.1.317); the provider forwards any `CLAUDE_*` through its allowlist
+// the CLI the Agent SDK ships (2.1.322); the provider forwards any `CLAUDE_*` through its allowlist
 // and merges these over it, so the unprefixed one passes too.
 export const CLAUDE_HARNESS_ENV = {
     // Rerun compacts the session before the run. A second compaction inside the CLI would rewrite
@@ -468,7 +469,7 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
     const guard = createFakeToolCallGuard(agent.id)
     if (provider === 'codex') {
         const codex = codexAppServerProvider(agent, tools, mcpServers, { system })
-        return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, replies.middleware, cardTags, guard] }), close: () => codex.close(), quickReplies: replies.read }
+        return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, createCodexImageMiddleware(agent.id), replies.middleware, cardTags, guard] }), close: () => codex.close(), quickReplies: replies.read }
     }
     if (provider === 'claude') {
         const capture = claudeContextCapture(agent.resolved.connection?.id)

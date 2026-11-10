@@ -5,7 +5,10 @@
         "continueWithGoogle": "Continuar con Google",
         "continueWithPhone": "Continuar con el teléfono",
         "continueWithEmail": "Continuar con el correo",
-        "or": "O"
+        "or": "O",
+        "welcome": "Te damos la bienvenida a Rerun",
+        "ownServer": "Usar tu propio servidor",
+        "useCloud": "Usar Rerun Cloud"
     },
     "back": "Atrás",
     "phone": {
@@ -81,5 +84,17 @@
         "privacy": "Política de privacidad",
         "notNow": "Ahora no",
         "agree": "Aceptar y continuar"
+    },
+    "server": {
+        "title": "Tu servidor Rerun",
+        "address": "Dirección del servidor",
+        "connect": "Conectar",
+        "problems": {
+            "invalid": "Escribe la dirección de tu servidor Rerun.",
+            "insecure": "Usa https:// fuera de tu red local.",
+            "unreachable": "No se pudo conectar con este servidor.",
+            "not-rerun": "Esta dirección no es un servidor Rerun.",
+            "outdated": "Actualiza este servidor Rerun para usarlo desde la app."
+        }
     }
 }

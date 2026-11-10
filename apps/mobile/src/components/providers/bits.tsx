@@ -15,6 +15,7 @@ import { GROUPED_ROW_HEIGHT } from '@/components/ui/GroupedList'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 import { signsIn } from './routes'
 
 export const LOGO_TILE = 36
@@ -104,7 +105,7 @@ export function ReadOnlyNote({ reason }: { reason: AccessReason | null | undefin
     if (!reason) return null
     return (
         <AppText variant="footnote" tone="muted" style={{ textAlign: 'center' }}>
-            {t(reason)}
+            {t(reason, { host: webHost })}
         </AppText>
     )
 }

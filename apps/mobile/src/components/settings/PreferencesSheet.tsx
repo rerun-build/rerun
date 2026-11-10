@@ -10,12 +10,12 @@ import { useLocale, useTranslations } from 'use-intl'
 
 import { appBuild } from '@/api/client'
 import { useAuth } from '@/auth/AuthProvider'
-import { askToDeleteAccount, contactSupport, initialsOf } from '@/components/home/account-actions'
+import { askToDeleteAccount, askToLeaveServer, contactSupport, initialsOf } from '@/components/home/account-actions'
 import { workspaceLabel } from '@/components/home/workspace-logos'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { Card, Section, SectionTitle, Separator, SettingsRow } from '@/components/ui/GroupedList'
-import { environment } from '@/config/environment'
+import { environment, onCustomServer, webHost } from '@/config/environment'
 import { track } from '@/lib/analytics'
 import { usePushPermission } from '@/notifications/usePushPermission'
 import { useAppearancePreference, type AppearancePreference } from '@/theme/appearance'
@@ -110,8 +110,12 @@ export function PreferencesSheet() {
             </Section>
 
             <Section title={t('support')}>
-                <SettingsRow label={t('contactSupport')} onPress={() => contactSupport(user)} />
-                <Separator />
+                {!onCustomServer && (
+                    <>
+                        <SettingsRow label={t('contactSupport')} onPress={() => contactSupport(user)} />
+                        <Separator />
+                    </>
+                )}
                 <SettingsRow label={t('privacy')} accessory="external" onPress={() => WebBrowser.openBrowserAsync('https://rerun.build/privacy')} />
                 <Separator />
                 <SettingsRow label={t('terms')} accessory="external" onPress={() => WebBrowser.openBrowserAsync('https://rerun.build/terms')} />
@@ -119,11 +123,18 @@ export function PreferencesSheet() {
 
             <Section title={t('about')}>
                 <SettingsRow label={t('version')} value={version} />
-                {environment.name !== 'production' && (
+                {onCustomServer ? (
                     <>
                         <Separator />
-                        <SettingsRow label={t('environment')} value={environment.name} />
+                        <SettingsRow testID="row-server" label={t('server')} value={webHost} onPress={() => askToLeaveServer(signOut)} />
                     </>
+                ) : (
+                    environment.name !== 'production' && (
+                        <>
+                            <Separator />
+                            <SettingsRow label={t('environment')} value={environment.name} />
+                        </>
+                    )
                 )}
             </Section>
 

@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
+import { FORM_COLUMN_MAX_WIDTH } from '@/components/layout/split'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
@@ -24,7 +25,7 @@ export function AiConsent({ onAgree, onDecline }: { onAgree: () => Promise<void>
     }
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, width: '100%', maxWidth: FORM_COLUMN_MAX_WIDTH, alignSelf: 'center' }}>
             <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.xl, gap: spacing.lg }}>
                 <ForemanOrb size={48} />
                 <View style={{ gap: spacing.sm }}>

@@ -53,7 +53,10 @@
         "reauthTitle": "Vuelve a iniciar sesión para eliminar tu cuenta",
         "reauthMessage": "Por tu seguridad, eliminar la cuenta requiere un inicio de sesión reciente. Vuelve a iniciar sesión y elimínala desde aquí.",
         "deleteFailedTitle": "No se pudo eliminar tu cuenta",
-        "deleteFailedMessage": "Inténtalo de nuevo en un momento."
+        "deleteFailedMessage": "Inténtalo de nuevo en un momento.",
+        "leaveServerTitle": "¿Salir de {host}?",
+        "leaveServerMessage": "Se cerrará tu sesión y Rerun se abrirá de nuevo en Rerun Cloud.",
+        "leaveServer": "Salir"
     },
     "workspace": {
         "untitled": "Mi workspace",

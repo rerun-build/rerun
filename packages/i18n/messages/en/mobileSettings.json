@@ -20,7 +20,8 @@
         "version": "Version",
         "environment": "Environment",
         "signOut": "Sign out",
-        "deleteAccount": "Delete account"
+        "deleteAccount": "Delete account",
+        "server": "Server"
     },
     "notifications": {
         "title": "Notifications",
@@ -107,6 +108,7 @@
         "preferences.pushOff": "Value of the Notifications row when push notifications are turned off in iOS.",
         "notifications.perCoworker.followsTasks": "Value of a coworker's row: it keeps the global setting but also follows the coworker's scheduled tasks.",
         "notifications.coworker.quotedScope": "Hint under the 'Your setting' option: the label of the global setting, quoted.",
-        "notifications.coworker.scheduled": "{count} is the number of scheduled tasks of the coworker."
+        "notifications.coworker.scheduled": "{count} is the number of scheduled tasks of the coworker.",
+        "preferences.server": "Settings row showing the self-hosted Rerun server the app is connected to."
     }
 }

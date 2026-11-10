@@ -61,7 +61,7 @@ export default function Desktop() {
     const [finishing, setFinishing] = useState(false)
     const t = useTranslations('mobileChat.desktop')
     const tc = useTranslations('mobileCommon.actions')
-    const web = useRef<WebView>(null)
+    const web = useRef<WebView<object>>(null)
     const reconnects = useRef(0)
     const started = useRef(false)
     const accessToken = session?.access_token

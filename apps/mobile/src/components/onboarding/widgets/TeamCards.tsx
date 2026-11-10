@@ -5,6 +5,7 @@ import { useTranslations } from 'use-intl'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
+import { webHost } from '@/config/environment'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -39,7 +40,7 @@ export function TeamStartCard({ state, onRetry }: { state: TeamStartState; onRet
                 <View style={{ flex: 1, gap: 2 }}>
                     <AppText variant="headline">{t(`team.${state}.title`)}</AppText>
                     <AppText variant="footnote" tone="muted">
-                        {t(`team.${state}.body`)}
+                        {t(`team.${state}.body`, { host: webHost })}
                     </AppText>
                 </View>
             </View>

@@ -20,7 +20,8 @@
         "version": "Versión",
         "environment": "Entorno",
         "signOut": "Cerrar sesión",
-        "deleteAccount": "Eliminar cuenta"
+        "deleteAccount": "Eliminar cuenta",
+        "server": "Servidor"
     },
     "notifications": {
         "title": "Notificaciones",

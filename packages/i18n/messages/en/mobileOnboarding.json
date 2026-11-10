@@ -98,7 +98,7 @@
         },
         "blocked": {
             "title": "This workspace cannot start here",
-            "body": "Finish setting it up at rerun.build."
+            "body": "Finish setting it up at {host}."
         },
         "tryAgain": "Try again"
     },
@@ -125,6 +125,7 @@
         "body": "This version is no longer supported."
     },
     "_context": {
+        "team.blocked.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
         "intake.progress": "VoiceOver label of the step dots of the welcome questions.",
         "starter.hire": "Button under a rail of coworker cards: how many are picked.",
         "build.oneFailed": "{name} is the name of a coworker the build could not create.",

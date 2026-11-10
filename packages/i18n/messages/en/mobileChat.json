@@ -126,11 +126,11 @@
     "foreman": {
         "away": {
             "none": {
-                "body": "This workspace has no machine right now. Check it at rerun.build.",
+                "body": "This workspace has no machine right now. Check it at {host}.",
                 "title": "Rerun is not running"
             },
             "onboarding": {
-                "body": "Finish setting it up at rerun.build.",
+                "body": "Finish setting it up at {host}.",
                 "title": "Rerun is setting up your workspace"
             }
         },
@@ -264,6 +264,8 @@
         "waitingForMicrophone": "Waiting for the microphone…"
     },
     "_context": {
+        "foreman.away.none.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "foreman.away.onboarding.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
         "desktop.keys.delete": "The Backspace key of a keyboard, on a button that sends it to a remote screen.",
         "desktop.keys.return": "The Return/Enter key of a keyboard, on a button that sends it to a remote screen.",
         "header.sections.needs-you": "Section of a menu: conversations waiting on the person.",

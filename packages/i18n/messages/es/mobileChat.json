@@ -126,11 +126,11 @@
     "foreman": {
         "away": {
             "none": {
-                "body": "Este workspace no tiene máquina ahora mismo. Revísalo en rerun.build.",
+                "body": "Este workspace no tiene máquina ahora mismo. Revísalo en {host}.",
                 "title": "Rerun no está en marcha"
             },
             "onboarding": {
-                "body": "Termina de configurarlo en rerun.build.",
+                "body": "Termina de configurarlo en {host}.",
                 "title": "Rerun está configurando tu workspace"
             }
         },

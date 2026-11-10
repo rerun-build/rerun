@@ -98,7 +98,7 @@
         },
         "blocked": {
             "title": "Este workspace no puede empezar aquí",
-            "body": "Termina de configurarlo en rerun.build."
+            "body": "Termina de configurarlo en {host}."
         },
         "tryAgain": "Intentar de nuevo"
     },

@@ -2,7 +2,7 @@ import { RERUN_CONNECTION_ID, appendAttachmentsRef, authorIdOf, queuedPreview, r
 import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Keyboard, ScrollView, StyleSheet, View } from 'react-native'
+import { Alert, Keyboard, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
@@ -23,6 +23,7 @@ import { cachedBoard } from '@/data/local-cache'
 import { useCoworkerSkills } from '@/data/useCoworkerSkills'
 import { useMemberProfiles } from '@/data/useMemberProfiles'
 import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
+import { CHAT_COLUMN_MAX_WIDTH } from '@/components/layout/split'
 import { connectHref } from '@/components/providers/routes'
 import { AppText } from '@/components/ui/AppText'
 import { moodOf } from '@/components/ui/CoworkerAvatar'
@@ -98,7 +99,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const insets = useSafeAreaInsets()
     const t = useTranslations('mobileChat.pane')
     const tc = useTranslations('mobileCommon.errors')
-    const scroll = useRef<ScrollView>(null)
+    const scroll = useRef<ScrollViewInstance>(null)
     // The transcript a conversation opens on is shown already at its end; only what comes after scrolls.
     const shownTranscript = useRef(false)
     const [endpoints] = useState(makeEndpoints)
@@ -391,7 +392,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                         if (stuck.current) scroll.current?.scrollToEnd({ animated: shownTranscript.current })
                         if (chat.history === 'ready') shownTranscript.current = true
                     }}
-                    contentContainerStyle={{ flexGrow: 1, justifyContent: empty ? 'center' : 'flex-end', paddingTop: insets.top + CHAT_HEADER_HEIGHT + spacing.lg, paddingBottom: footerHeight + BLUR_ABOVE_FOOTER, paddingHorizontal: spacing.xl - 4 }}
+                    contentContainerStyle={{ flexGrow: 1, justifyContent: empty ? 'center' : 'flex-end', width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: insets.top + CHAT_HEADER_HEIGHT + spacing.lg, paddingBottom: footerHeight + BLUR_ABOVE_FOOTER, paddingHorizontal: spacing.xl - 4 }}
                 >
                     {chat.history === 'loading' && <ConversationSkeleton />}
                     {chat.history === 'error' && (
@@ -464,7 +465,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                     </Animated.View>
                 )}
 
-                <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, paddingTop: replacesComposer && !alert ? 0 : spacing.sm }}>
+                <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: replacesComposer && !alert ? 0 : spacing.sm }}>
                     {alert && (
                         <Animated.View entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
                             <AlertWidget

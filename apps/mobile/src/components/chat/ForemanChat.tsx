@@ -12,10 +12,11 @@ import { fetchAgentModels } from '@/api/models'
 import { useAuth } from '@/auth/AuthProvider'
 import { takePendingAsk } from '@/chat/pending-ask'
 import { foremanEndpoints } from '@/chat/endpoints'
+import { useChatBack } from '@/components/layout/useChatBack'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
 import { PillButton } from '@/components/ui/PillButton'
-import { environment } from '@/config/environment'
+import { environment, webHost } from '@/config/environment'
 import { cachedForeman } from '@/data/local-cache'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -80,6 +81,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.foreman')
     const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, role: t('role') }), [t])
+    const back = useChatBack()
     const { session, me } = useAuth()
     const [ask] = useState(() => (sessionId === null ? takePendingAsk() : undefined))
     const [wantsLast] = useState(sessionId === LAST_CONVERSATION)
@@ -235,7 +237,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         <View style={{ flex: 1, backgroundColor: theme.background }}>
             {surface === 'loading' && <LoadingConversation />}
             {surface === 'engine' && <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => <ConversationPane coworker={foreman} makeEndpoints={makeEndpoints} initialSessionId={page.sessionId} onSessionCreated={onSessionCreated} models={models} status={null} onStatusChange={noop} webUrl={`${environment.apiUrl}/`} onScreen={onScreen} initialMessage={page.sessionId ? undefined : ask} canAttach={filesOnEngine} />} />}
-            {(surface === 'onboarding' || surface === 'none') && <Notice title={t(`away.${surface}.title`)} body={t(`away.${surface}.body`)} />}
+            {(surface === 'onboarding' || surface === 'none') && <Notice title={t(`away.${surface}.title`)} body={t(`away.${surface}.body`, { host: webHost })} />}
             {surface === 'error' && (
                 <Notice
                     title={t('unreachableTitle')}
@@ -246,7 +248,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
                     }}
                 />
             )}
-            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={activeId ?? undefined} progress={progress} allSessions={surface === 'engine' ? tabs : []} onBack={() => router.back()} onSelect={select} onNewSession={startNew} />
+            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={activeId ?? undefined} progress={progress} allSessions={surface === 'engine' ? tabs : []} onBack={back} onSelect={select} onNewSession={startNew} />
         </View>
     )
 }

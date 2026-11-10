@@ -53,7 +53,10 @@
         "reauthTitle": "Reconnectez-vous pour supprimer votre compte",
         "reauthMessage": "Pour votre sécurité, la suppression du compte demande une connexion récente. Reconnectez-vous, puis supprimez-le depuis cet écran.",
         "deleteFailedTitle": "Impossible de supprimer votre compte",
-        "deleteFailedMessage": "Réessayez dans un instant."
+        "deleteFailedMessage": "Réessayez dans un instant.",
+        "leaveServerTitle": "Quitter {host} ?",
+        "leaveServerMessage": "Vous serez déconnecté, et Rerun se rouvrira sur Rerun Cloud.",
+        "leaveServer": "Quitter"
     },
     "workspace": {
         "untitled": "Mon workspace",

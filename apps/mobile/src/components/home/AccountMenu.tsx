@@ -10,6 +10,7 @@ import { contactSupport, initialsOf } from '@/components/home/account-actions'
 import { WorkspaceSubmenu } from '@/components/home/WorkspaceMenu'
 import { AppText } from '@/components/ui/AppText'
 import { CircleTrigger, NativeMenu } from '@/components/ui/NativeMenu'
+import { onCustomServer } from '@/config/environment'
 import { useTheme } from '@/theme/theme'
 
 export function AccountMenu() {
@@ -39,7 +40,7 @@ export function AccountMenu() {
         >
             <WorkspaceSubmenu />
             <Button label={t('account.preferences')} systemImage="gearshape" onPress={() => router.push('/settings')} />
-            <Button label={t('account.contactSupport')} systemImage="bubble.left" onPress={() => contactSupport(me?.user)} />
+            {!onCustomServer && <Button label={t('account.contactSupport')} systemImage="bubble.left" onPress={() => contactSupport(me?.user)} />}
             <Button label={t('account.signOut')} systemImage="rectangle.portrait.and.arrow.right" role="destructive" onPress={signOut} />
         </NativeMenu>
     )

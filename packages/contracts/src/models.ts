@@ -3,6 +3,7 @@ import { OPENCODE_SNAPSHOT } from './opencode-snapshot.js'
 
 // What each model accepts when reached through its own API.
 export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
+    'claude-fable-5-2': 1_000_000,
     'claude-fable-5-1': 1_000_000,
     'claude-fable-5': 1_000_000,
     'claude-opus-5-5': 1_000_000,
@@ -47,6 +48,7 @@ export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
     'gemini-3.1-pro-preview': 1_000_000,
     'gemini-3.1-flash-lite': 1_000_000,
     'gemini-3-flash-preview': 1_000_000,
+    'anthropic/claude-fable-5.2': 1_000_000,
     'anthropic/claude-fable-5.1': 1_000_000,
     'anthropic/claude-opus-5.5': 1_000_000,
     'anthropic/claude-opus-5': 1_000_000,
@@ -128,6 +130,7 @@ export const MODEL_LABEL: Record<string, string> = {
     // What the boxes provisioned before the `rerun-max` alias still name: without this line their
     // model picker reads the raw OpenRouter id.
     'qwen/qwen3.7-max': 'Rerun',
+    'claude-fable-5-2': 'Fable 5.2',
     'claude-fable-5-1': 'Fable 5.1',
     'claude-fable-5': 'Fable 5',
     'claude-opus-5-5': 'Opus 5.5',
@@ -163,6 +166,7 @@ export const MODEL_LABEL: Record<string, string> = {
     'gemini-3.1-pro-preview': 'Gemini 3.1 Pro',
     'gemini-3.5-flash': 'Gemini 3.5 Flash',
     'gemini-3.5-flash-lite': 'Gemini 3.5 Flash-Lite',
+    'anthropic/claude-fable-5.2': 'Fable 5.2',
     'anthropic/claude-fable-5.1': 'Fable 5.1',
     'anthropic/claude-opus-5.5': 'Opus 5.5',
     'anthropic/claude-opus-5': 'Opus 5',

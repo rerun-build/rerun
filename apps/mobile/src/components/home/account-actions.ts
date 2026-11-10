@@ -5,6 +5,8 @@ import { Alert } from 'react-native'
 import { deleteAccount, fetchDeletionBlockers } from '@/api/account'
 import { ApiError } from '@/api/client'
 import { translatorFor } from '@/i18n/translator'
+import { switchServer } from '@/config/custom-server'
+import { webHost } from '@/config/environment'
 
 // The web opens the same Crisp chat; the app has no widget of its own, so it opens the chat page.
 const CRISP_WEBSITE_ID = 'fa9be3a1-b3f1-4813-840f-d6e235a05179'
@@ -27,6 +29,14 @@ const confirm = (title: string, message: string, action: string, cancel: string)
             { text: action, style: 'destructive', onPress: () => resolve(true) },
         ])
     )
+
+export async function askToLeaveServer(signOut: () => Promise<void>) {
+    const t = translatorFor('mobileHome')
+    const confirmed = await confirm(t('account.leaveServerTitle', { host: webHost }), t('account.leaveServerMessage'), t('account.leaveServer'), t('account.cancel'))
+    if (!confirmed) return
+    await signOut()
+    await switchServer(null)
+}
 
 // Same rule as the web: a workspace only this account holds and that still bills stops the deletion,
 // and is named so it can be cancelled first.

@@ -12,6 +12,8 @@ import { useChannelLabel, useOAuthSignIn, usePhoneCode } from '@/components/auth
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
+import { switchServer } from '@/config/custom-server'
+import { onCustomServer, webHost } from '@/config/environment'
 import { useTheme } from '@/theme/theme'
 import { controlSize, spacing } from '@/theme/tokens'
 
@@ -103,12 +105,39 @@ function Choices() {
     )
 }
 
+// A server of the person's own signs in by email code only: phone codes go out through Rerun Cloud,
+// and Apple and Google answer for Rerun's app, not for that server.
+function OwnServer() {
+    const t = useTranslations('mobileAuth')
+    const { goTo } = useSignInFlow()
+    return (
+        <View style={{ gap: spacing.lg, alignItems: 'center' }}>
+            <View style={{ alignSelf: 'stretch' }}>
+                <Button label={t('start.continueWithEmail')} size="lg" symbol="envelope" onPress={() => goTo({ name: 'email' })} />
+            </View>
+            <TextLink label={t('start.useCloud')} onPress={() => switchServer(null)} />
+        </View>
+    )
+}
+
 export function StartStep({ layout }: { layout: StartLayout }) {
     const t = useTranslations('mobileAuth')
+    const { goTo } = useSignInFlow()
+    if (onCustomServer) {
+        return (
+            <>
+                <StepTitle title={t('start.welcome')} subtitle={webHost} />
+                <OwnServer />
+            </>
+        )
+    }
     return (
         <>
             <StepTitle title={t('start.title')} />
             {layout === 'phone-first' ? <PhoneFirst /> : <Choices />}
+            <View style={{ alignItems: 'center' }}>
+                <TextLink label={t('start.ownServer')} onPress={() => goTo({ name: 'server' })} />
+            </View>
         </>
     )
 }
