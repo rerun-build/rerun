@@ -16,7 +16,6 @@ import { CoworkerRow } from '@/components/home/CoworkerRow'
 import { ForemanRow } from '@/components/home/ForemanRow'
 import { HomeBottomBar } from '@/components/home/HomeBottomBar'
 import { SectionHeader } from '@/components/home/SectionHeader'
-import { AppText } from '@/components/ui/AppText'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { ProgressiveBlur } from '@/components/ui/ProgressiveBlur'
 import { statusLine } from '@/components/ui/status'
@@ -65,10 +64,9 @@ function MockHome({ onForeman }: { onForeman: () => void }) {
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
             <ScrollView contentContainerStyle={{ paddingTop: insets.top + 60, paddingBottom: insets.bottom + 120 }}>
-                <AppText variant="largeTitle" style={{ paddingHorizontal: spacing.xl, marginBottom: spacing.md }}>
-                    Coworkers
-                </AppText>
-                <ForemanRow last={{ title: 'Overnight catch-up', running: false }} onPress={onForeman} />
+                <View style={{ marginBottom: spacing.lg }}>
+                    <ForemanRow last={{ title: 'Overnight catch-up', running: false }} onPress={onForeman} />
+                </View>
                 <SectionHeader label="Needs you" count={2} collapsed={false} onToggle={noop} divided />
                 {['agent-scout', 'agent-ledger'].map(id => (
                     <CoworkerRow key={id} coworker={byId(id)} line={statusLine(byId(id), latestOf(id))} minutesAgo={byId(id).updatedMinutesAgo} unread={byId(id).unread} onPress={noop} />
@@ -138,7 +136,7 @@ export default function ForemanLab() {
         <View style={{ flex: 1 }}>
             <MockHome onForeman={() => router.push({ pathname: '/lab-chat', params: { coworker: 'foreman', tabs: '1', state } })} />
             <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + spacing.sm }}>
-                <HomeBottomBar count={32} onSearch={noop} onInbox={noop} />
+                <HomeBottomBar onSearch={noop} />
             </View>
         </View>
     )

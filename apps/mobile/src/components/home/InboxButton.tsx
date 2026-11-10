@@ -2,11 +2,9 @@ import { View } from 'react-native'
 
 import { badgeLabel } from '@/components/inbox/inbox'
 import { AppText } from '@/components/ui/AppText'
-import { GLASS_BUTTON_SIZE, GlassButton } from '@/components/ui/GlassButton'
+import { GlassButton } from '@/components/ui/GlassButton'
 import { useTheme } from '@/theme/theme'
 
-// The height of the Home's bottom bar: the search capsule and the bell.
-export const BOTTOM_BAR_SIZE = GLASS_BUTTON_SIZE
 const BADGE = 20
 
 export function InboxButton({ count, onPress }: { count: number; onPress: () => void }) {

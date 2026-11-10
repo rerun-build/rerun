@@ -12,9 +12,12 @@ import type { Coworker } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { brand, spacing } from '@/theme/tokens'
 
-export const AVATAR = 36
+export const AVATAR = 44
+// The Home's side margin and its row title, as Grok's sidebar draws them.
+export const HOME_GUTTER = 20
+export const ROW_TITLE = { fontSize: 17, lineHeight: 22 } as const
 // At the default text size: the padding around a name line (22) and a status line (20) under it.
-export const COWORKER_ROW_HEIGHT = 68
+export const COWORKER_ROW_HEIGHT = 76
 const PIN_ACTION_WIDTH = 96
 
 export type PinControl = { pinned: boolean; onToggle: () => void }
@@ -82,13 +85,11 @@ export function CoworkerRow({ coworker, line, minutesAgo, unread, selected = fal
             accessibilityState={{ selected }}
         >
             {({ pressed }) => (
-                <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.lg, paddingVertical: spacing.md, paddingHorizontal: spacing.xl, opacity: pressed ? 0.6 : 1 }}>
-                    <View style={{ paddingTop: 2 }}>
-                        <CoworkerAvatar coworker={coworker} size={AVATAR} facing="right" />
-                    </View>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.lg, paddingVertical: spacing.lg, paddingHorizontal: HOME_GUTTER, opacity: pressed ? 0.6 : 1 }}>
+                    <CoworkerAvatar coworker={coworker} size={AVATAR} facing="right" />
                     <View style={{ flex: 1, gap: 2 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm }}>
-                            <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.4} style={{ flex: 1 }}>
+                            <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.4} style={[ROW_TITLE, { flex: 1 }]}>
                                 {coworker.name}
                             </AppText>
                             {minutesAgo !== null && (
