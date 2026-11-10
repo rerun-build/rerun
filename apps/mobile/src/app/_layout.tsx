@@ -15,6 +15,7 @@ import { Onboarding, type LeadStarted } from '@/components/onboarding/Onboarding
 import { OnboardingShell } from '@/components/onboarding/OnboardingShell'
 import { useOnboardingRoute } from '@/components/onboarding/useOnboardingRoute'
 import { WaitlistNotice } from '@/components/onboarding/widgets/TeamCards'
+import { SystemDialogHost } from '@/components/ui/system-dialogs'
 import { UpdateRequired } from '@/components/update/UpdateRequired'
 import { useUpdateRequired } from '@/components/update/useUpdateRequired'
 import { MediaViewerHost } from '@/components/viewer/MediaViewerHost'
@@ -158,6 +159,7 @@ function App() {
                                 </Stack>
                             </SplitShell>
                             <MediaViewerHost />
+                            <SystemDialogHost />
                         </InboxProvider>
                     </MockStore>
                 )}

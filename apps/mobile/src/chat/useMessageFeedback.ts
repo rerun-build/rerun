@@ -1,10 +1,11 @@
 import { MESSAGE_FEEDBACK_CATEGORIES, type MessageFeedbackCategory, type MessageFeedbackRating, type MessageFeedbackScope } from '@rerun/contracts'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ActionSheetIOS, Alert } from 'react-native'
+import { Alert } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { clearMessageFeedback, fetchMessageFeedback, rateMessage, updateMessageFeedback } from '@/api/chat'
 import { useAuth } from '@/auth/AuthProvider'
+import { promptText, showActionSheet } from '@/components/ui/system-dialogs'
 
 // The row id is a promise: the vote shows on the tap while the hub is still copying the transcript
 // off the engine, and both the details and an undo wait for that row.
@@ -18,7 +19,7 @@ const NO_VOTES: ReadonlyMap<string, Vote> = new Map()
 function askCategory(t: FeedbackTranslator): Promise<MessageFeedbackCategory | null | undefined> {
     const options = [...MESSAGE_FEEDBACK_CATEGORIES.map(category => t(`categories.${category.value}`)), t('skip'), t('cancel')]
     return new Promise(resolve =>
-        ActionSheetIOS.showActionSheetWithOptions({ title: t('negativeTitle'), message: t('categoryLabel'), options, cancelButtonIndex: options.length - 1 }, index => {
+        showActionSheet({ title: t('negativeTitle'), message: t('categoryLabel'), options, cancelButtonIndex: options.length - 1 }, index => {
             if (index === options.length - 1) resolve(undefined)
             else resolve(MESSAGE_FEEDBACK_CATEGORIES[index]?.value ?? null)
         })
@@ -27,15 +28,15 @@ function askCategory(t: FeedbackTranslator): Promise<MessageFeedbackCategory | n
 
 function askDetails(rating: MessageFeedbackRating, t: FeedbackTranslator): Promise<string | undefined> {
     return new Promise(resolve =>
-        Alert.prompt(
-            rating === 'down' ? t('negativePlaceholder') : t('positivePlaceholder'),
-            t('disclaimer'),
-            [
-                { text: t('cancel'), style: 'cancel', onPress: () => resolve(undefined) },
-                { text: t('submit'), isPreferred: true, onPress: (text?: string) => resolve(text ?? '') },
-            ],
-            'plain-text'
-        )
+        promptText({
+            title: rating === 'down' ? t('negativePlaceholder') : t('positivePlaceholder'),
+            message: t('disclaimer'),
+            cancelLabel: t('cancel'),
+            submitLabel: t('submit'),
+            preferred: true,
+            onCancel: () => resolve(undefined),
+            onSubmit: resolve,
+        })
     )
 }
 

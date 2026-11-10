@@ -1,6 +1,6 @@
 import { EMAIL_CATEGORIES, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@rerun/contracts'
 import type { PermissionStatus } from 'expo-notifications'
-import { ActionSheetIOS, Platform, Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Card, CheckRow, GROUPED_ROW_HEIGHT, ICON_ROW_INSET, Section, SectionTitle, Separator, SettingsRow, SwitchRow } from '@/components/ui/GroupedList'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { showActionSheet } from '@/components/ui/system-dialogs'
 import { translatorFor } from '@/i18n/translator'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -118,7 +119,7 @@ export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePus
     const addable = (coworkers ?? []).filter(coworker => !listed.includes(coworker))
 
     const pickCoworker = () =>
-        ActionSheetIOS.showActionSheetWithOptions({ title: t('perCoworker.pickTitle'), options: [...addable.map(coworker => coworker.name), t('perCoworker.cancel')], cancelButtonIndex: addable.length }, index => {
+        showActionSheet({ title: t('perCoworker.pickTitle'), options: [...addable.map(coworker => coworker.name), t('perCoworker.cancel')], cancelButtonIndex: addable.length }, index => {
             const coworker = addable[index]
             if (coworker) onPatch({ coworkers: { [coworker.id]: { ...coworkerRuleOf(prefs, coworker.id), mode: 'everything' } } })
         })

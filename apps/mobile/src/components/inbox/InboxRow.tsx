@@ -1,6 +1,6 @@
 import type { CoworkerRule, InboxItem } from '@rerun/contracts'
 import { useRef } from 'react'
-import { ActionSheetIOS, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
 import { useTranslations } from 'use-intl'
 
@@ -10,6 +10,7 @@ import { moodOfInbox } from '@/components/inbox/inbox'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { Icon } from '@/components/ui/Icon'
+import { showActionSheet } from '@/components/ui/system-dialogs'
 import * as Haptics from '@/lib/haptics'
 import { useTimeAgo } from '@/lib/time'
 import { useTheme } from '@/theme/theme'
@@ -48,7 +49,7 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
         if (rule?.follow) actions.push({ label: t('row.unfollow'), run: () => onRule(item, { ...rule, follow: false }, t('row.unfollowed', { name: item.agentName })) })
         if (rule && rule.mode !== 'muted') actions.push({ label: t('row.mute', { name: item.agentName }), run: () => onRule(item, { ...rule, mode: 'muted' }, t('row.muted', { name: item.agentName })) })
         actions.push({ label: t('row.settings'), run: () => onSettings(item) })
-        ActionSheetIOS.showActionSheetWithOptions({ options: [...actions.map(action => action.label), t('row.cancel')], cancelButtonIndex: actions.length }, index => actions[index]?.run())
+        showActionSheet({ options: [...actions.map(action => action.label), t('row.cancel')], cancelButtonIndex: actions.length }, index => actions[index]?.run())
     }
 
     return (
