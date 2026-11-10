@@ -34,8 +34,11 @@ const KEPT_CLIENTS = 4
 const AVD_PREFIX = 'Rerun_'
 const AVD_DEVICE = 'pixel_9'
 const AVD_RAM_MB = 3072
-const WORKSPACE_NAME = process.env.CONDUCTOR_WORKSPACE_NAME || basename(REPO_ROOT)
-const AVD_NAME = `${AVD_PREFIX}${WORKSPACE_NAME.replace(/[^A-Za-z0-9._-]/g, '_')}`
+// Named after the workspace's folder, the name the cleanup of archived workspaces compares against
+// (a Conductor workspace's display name can differ from its folder).
+const WORKSPACE_PATH = process.env.CONDUCTOR_WORKSPACE_PATH || process.env.ORCA_WORKTREE_PATH || REPO_ROOT
+const avdNameOf = (folder) => `${AVD_PREFIX}${folder.replace(/[^A-Za-z0-9._-]/g, '_')}`
+const AVD_NAME = avdNameOf(basename(WORKSPACE_PATH))
 const API_PORT = Number(process.env.CONDUCTOR_PORT ?? 3050)
 const METRO_PORT = API_PORT + 2
 const PACKAGE = 'build.rerun.app.dev'
@@ -115,9 +118,8 @@ function avds() {
 
 // The AVDs of archived workspaces would keep their disk images (several GB each) forever.
 function deleteArchivedWorkspaceAvds() {
-    const workspacePath = process.env.CONDUCTOR_WORKSPACE_PATH || process.env.ORCA_WORKTREE_PATH
-    if (!workspacePath) return
-    const workspaces = new Set(readdirSync(dirname(workspacePath)).map(name => `${AVD_PREFIX}${name.replace(/[^A-Za-z0-9._-]/g, '_')}`))
+    if (WORKSPACE_PATH === REPO_ROOT && !process.env.CONDUCTOR_WORKSPACE_PATH && !process.env.ORCA_WORKTREE_PATH) return
+    const workspaces = new Set(readdirSync(dirname(WORKSPACE_PATH)).map(avdNameOf))
     for (const avd of avds()) {
         if (!avd.startsWith(AVD_PREFIX) || workspaces.has(avd)) continue
         log(`deleting the emulator of the archived workspace ${avd.slice(AVD_PREFIX.length)}`)
