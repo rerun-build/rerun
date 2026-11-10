@@ -3,6 +3,7 @@
 import { clearMessageFeedbackAction, fetchSessionFeedbackAction, rateMessageAction, updateMessageFeedbackAction, type FeedbackScope } from '@/app/api/_actions/message-feedback.actions'
 import type { MessageFeedbackDetails } from '@/components/chat/MessageFeedbackDialog'
 import type { MessageFeedbackRating } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -13,13 +14,12 @@ type Vote = { rating: MessageFeedbackRating; feedbackId: Promise<string | null> 
 // Kept once closed so the dialog does not change title while it animates out.
 type FeedbackDialog = { open: boolean; rating: MessageFeedbackRating; feedbackId: Promise<string | null> }
 
-const SAVE_FAILED = 'Could not save your feedback'
-
 type SessionVotes = { sessionId: string | null; votes: ReadonlyMap<string, Vote> }
 
 const NO_VOTES: ReadonlyMap<string, Vote> = new Map()
 
 export function useMessageFeedback(sessionId: string | null | undefined, scope: FeedbackScope = 'agent') {
+    const t = useTranslations('chat.feedback')
     const key = sessionId ?? null
     // Tagged with the session they belong to, so switching conversations shows none of the last one's.
     const [sessionVotes, setSessionVotes] = useState<SessionVotes>({ sessionId: null, votes: NO_VOTES })
@@ -75,7 +75,7 @@ export function useMessageFeedback(sessionId: string | null | undefined, scope: 
                     })
                     .catch(() => {
                         setVote(messageId, previous)
-                        toast.error('Could not remove your feedback')
+                        toast.error(t('removeFailed'))
                     })
                 return
             }
@@ -89,10 +89,10 @@ export function useMessageFeedback(sessionId: string | null | undefined, scope: 
                 if (id) return
                 setVote(messageId, previous)
                 setDialog(current => (current?.feedbackId === feedbackId ? { ...current, open: false } : current))
-                toast.error(SAVE_FAILED)
+                toast.error(t('saveFailed'))
             })
         },
-        [sessionId, scope, setVote],
+        [sessionId, scope, setVote, t],
     )
 
     const submitDetails = useCallback(
@@ -101,13 +101,13 @@ export function useMessageFeedback(sessionId: string | null | undefined, scope: 
             if (!id) return false
             const res = await updateMessageFeedbackAction({ id, category, details }).catch(() => null)
             if (!res?.ok) {
-                toast.error(SAVE_FAILED)
+                toast.error(t('saveFailed'))
                 return false
             }
-            toast.success('Thanks for your feedback')
+            toast.success(t('thanks'))
             return true
         },
-        [dialog],
+        [dialog, t],
     )
 
     const onDialogOpenChange = useCallback((open: boolean) => {

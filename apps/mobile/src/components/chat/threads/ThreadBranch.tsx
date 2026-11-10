@@ -6,7 +6,7 @@ import Svg, { Defs, LinearGradient, Mask, Path, Pattern, Rect, Stop } from 'reac
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge, TONES } from '@/components/ui/Badge'
-import { timeAgo } from '@/components/ui/status'
+import { useTimeAgo } from '@/lib/time'
 import { useTheme } from '@/theme/theme'
 import { brand, fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
@@ -70,6 +70,7 @@ function Hatch() {
  */
 export function ThreadBranch({ thread, onOpen }: { thread: ThreadItem; onOpen: () => void }) {
     const theme = useTheme()
+    const timeAgo = useTimeAgo()
     const state = threadStateOf(thread.status)
     const badge = state === 'needs' || state === 'error' ? STATE_BADGE[state] : null
     const opener = thread.firstMessage?.trim() || genericOpener(thread)

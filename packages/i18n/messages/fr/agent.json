@@ -1,0 +1,965 @@
+{
+    "untitledBox": "Box sans nom",
+    "agentCard": {
+        "destinations": {
+            "services": "Apps",
+            "skills": "Skills",
+            "memories": "Savoir",
+            "scheduled": "Routines",
+            "files": "Fichiers",
+            "data": "Base de données",
+            "monitoring": "Activité",
+            "settings": "Réglages"
+        },
+        "delete": "Supprimer ce coworker",
+        "share": "Partager",
+        "close": "Fermer la carte",
+        "nameField": "Nom du coworker",
+        "rename": "Renommer {name}"
+    },
+    "agentChatsList": {
+        "title": "Fils",
+        "newThread": "Nouveau fil",
+        "close": "Fermer",
+        "filters": {
+            "all": "Tous",
+            "chats": "Discussions",
+            "automations": "Automatisations",
+            "needs": "Pour vous"
+        },
+        "markAllRead": {
+            "title": "Tout marquer comme lu ?",
+            "description": "{count, plural, one {# fil quittera} other {# fils quitteront}} cette liste. Les demandes qui attendent encore une réponse sont aussi effacées, sans réponse.",
+            "confirm": "Tout marquer comme lu"
+        },
+        "emptyNeeds": "Rien ne vous attend.",
+        "emptyThreads": "Aucun fil pour l’instant.",
+        "emptyAutomations": "Aucune exécution automatique pour l’instant.",
+        "running": "En cours",
+        "startedBy": "Lancé par {name}"
+    },
+    "agentComputerThumbnail": {
+        "working": "Travaille sur son ordinateur",
+        "live": "Son ordinateur",
+        "computer": "Ordinateur",
+        "wentAway": "L’écran s’est déconnecté"
+    },
+    "agentView": {
+        "closePanel": "Fermer le panneau",
+        "views": {
+            "apps": "Apps",
+            "skills": "Skills",
+            "knowledge": "Connaissances",
+            "files": "Fichiers",
+            "data": "Base de données",
+            "routines": "Routines",
+            "activity": "Activité",
+            "settings": "Réglages"
+        },
+        "tabs": {
+            "services": "Apps",
+            "mcp": "MCP",
+            "skills": "Skills",
+            "memories": "Connaissances",
+            "files": "Fichiers",
+            "published": "Publiés",
+            "data": "Base de données",
+            "scheduled": "Planifiées",
+            "triggers": "Déclencheurs",
+            "monitoring": "Suivi",
+            "logs": "Journaux",
+            "settings": "Général",
+            "tools": "Capacités",
+            "setup": "Installation"
+        }
+    },
+    "openChatsTabs": {
+        "closeTab": "Fermer {title}",
+        "newThread": "Nouveau fil",
+        "general": "Général"
+    },
+    "threadBranch": {
+        "needs": "Pour vous",
+        "error": "Erreur",
+        "opener": {
+            "schedule": "Exécution planifiée · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "Demandé par {name}",
+            "askedByUnknown": "Demandé par un autre coworker",
+            "started": "A lancé un fil"
+        }
+    },
+    "floating": {
+        "backToChat": "Retour à la discussion"
+    },
+    "agentPanelServices": {
+        "uninstallFailed": "Impossible de désinstaller l'app",
+        "removeServerFailed": "Impossible de supprimer le serveur",
+        "loadServerFailed": "Impossible de charger ce serveur depuis l'engine.",
+        "alternativeLoadFailed": "Impossible de charger {name}.",
+        "signInHint": "Connectez-vous à {host} pour que le coworker puisse utiliser ses outils.",
+        "searchPlaceholder": "Rechercher des apps…",
+        "allCategories": "Toutes",
+        "installed": "Installées",
+        "library": "Bibliothèque",
+        "needsAuthHint": "Cette app demande que vous vous connectiez avant que le coworker puisse l'utiliser. Cliquez sur Connecter.",
+        "needsConfigHint": "Cette app a besoin d'identifiants avant que le coworker puisse l'utiliser. Cliquez sur Configurer.",
+        "configure": "Configurer",
+        "connect": "Connecter",
+        "account": "Compte",
+        "reconnect": "Reconnecter",
+        "uninstall": "Désinstaller {name}",
+        "uninstallLabeled": "Désinstaller {name} ({label})",
+        "uninstallConfirm": "Désinstaller {name} ?",
+        "uninstallLabeledConfirm": "Désinstaller {name} ({label}) ?",
+        "uninstallDescription": "Le coworker perd ce service et ses outils. Sa connexion est révoquée : pour le réinstaller, il faudra se reconnecter.",
+        "uninstallAction": "Désinstaller",
+        "requestHint": "Vous ne trouvez pas ? Nous pouvons ajouter l'app qu'il vous faut.",
+        "requestApp": "Demander une app"
+    },
+    "agentPanelMcp": {
+        "unreachableTitle": "Engine injoignable",
+        "unreachableDescription": "Impossible de joindre l'engine de ce coworker.",
+        "new": "Nouveau",
+        "emptyTitle": "Aucun serveur MCP pour l'instant",
+        "emptyDescription": "Les serveurs MCP donnent à votre coworker des outils en plus des apps intégrées. Ajoutez-en un pour étendre ce qu'il sait faire.",
+        "appBadge": "App"
+    },
+    "mcpOAuthAuthorize": {
+        "discoveryFailed": "Échec de la découverte",
+        "authorizationFailed": "Échec de l'autorisation",
+        "startFailed": "Impossible de lancer OAuth",
+        "discovering": "Recherche du fournisseur OAuth...",
+        "connected": "Connecté",
+        "retry": "Réessayer",
+        "waiting": "En attente de l'autorisation…",
+        "connect": "Connecter"
+    },
+    "mcpServerEditor": {
+        "invalidName": "Le nom doit faire de 1 à 64 caractères : lettres, chiffres, tirets bas ou tirets.",
+        "storeCredentialsFailed": "Impossible d'enregistrer les identifiants",
+        "saveFailed": "Échec de l'enregistrement",
+        "deleteFailed": "Échec de la suppression",
+        "secretWarning": "Un secret a été détecté ici. Il part sur l'engine et devient un {token} à l'enregistrement.",
+        "titleReadOnly": "Serveur MCP",
+        "titleEdit": "Modifier le serveur MCP",
+        "titleNew": "Nouveau serveur MCP",
+        "providedByApp": "Ce serveur MCP est fourni par une app et géré automatiquement.",
+        "name": "Nom",
+        "nameHelper": "Les outils sont nommés \"{prefix}_{tool}\".",
+        "namePrefixFallback": "nom",
+        "transport": "Transport",
+        "command": "Commande",
+        "arguments": "Arguments",
+        "argumentsHelper": "Un argument par ligne.",
+        "argumentsHelperEditable": "Un argument par ligne. Cliquez sur un {token} en surbrillance pour changer sa valeur.",
+        "url": "URL",
+        "urlHelper": "Cliquez sur un {token} en surbrillance pour changer sa valeur.",
+        "environment": "Environnement",
+        "environmentHelper": "Une ligne CLÉ=valeur par variable. Les valeurs sont stockées sur l'engine.",
+        "environmentHelperEditable": "Une ligne CLÉ=valeur par variable. Les valeurs sont stockées sur l'engine ; cliquez sur un {token} en surbrillance pour changer sa valeur.",
+        "headers": "En-têtes",
+        "headersHelper": "Une ligne En-tête=valeur par en-tête. Envoyés avec chaque requête (pour l'authentification).",
+        "headersHelperEditable": "Une ligne En-tête=valeur par en-tête. Envoyés avec chaque requête (pour l'authentification). Cliquez sur un {token} en surbrillance pour changer sa valeur.",
+        "deleteServer": "Supprimer le serveur",
+        "deleteConfirm": "Supprimer {name} ?",
+        "deleteConfirmUnnamed": "Supprimer ce serveur ?",
+        "deleteDescription": "Le coworker perd tous les outils de ce serveur. Ses variables enregistrées partent avec lui.",
+        "saveChanges": "Enregistrer",
+        "createServer": "Créer le serveur"
+    },
+    "mcpVariableToken": {
+        "editVariable": "Modifier la variable {name}",
+        "statusSaved": "Enregistrée",
+        "statusEngine": "Définie sur l'engine",
+        "statusUnset": "Non définie",
+        "placeholderOverride": "Saisissez une valeur pour la remplacer",
+        "placeholderNew": "Saisissez une valeur",
+        "helperSaved": "Stockée sur l'engine et jamais réaffichée. Saisissez une nouvelle valeur pour la remplacer.",
+        "helperEngine": "Fournie par l'environnement de l'engine. Enregistrer une valeur la remplace pour ce coworker.",
+        "helperUnset": "Stockée sur l'engine, hors de portée du navigateur et de la base de données.",
+        "remove": "Supprimer {name}",
+        "save": "Enregistrer",
+        "removeConfirm": "Supprimer {name} ?",
+        "removeDescription": "La valeur est supprimée de l'engine. Tout serveur qui utilise cette variable cesse de fonctionner jusqu'à ce que vous la redéfinissiez.",
+        "removeAction": "Supprimer"
+    },
+    "agentPanelTools": {
+        "unreachable": "Impossible de joindre l'engine de ce coworker.",
+        "updateFailed": "Échec de la mise à jour",
+        "unavailableTitle": "Capacités indisponibles",
+        "intro": "Choisissez ce que ce coworker peut faire. Les changements s'appliquent au prochain run.",
+        "about": "À propos : {capability}",
+        "includes": "Comprend",
+        "selfImprovement": {
+            "allowToolInstall": {
+                "label": "Installer outils et MCP",
+                "description": "Autorise le coworker à installer des paquets npm et à ajouter des serveurs MCP."
+            },
+            "allowSoulEdit": {
+                "label": "Modifier son âme",
+                "description": "Autorise le coworker à réécrire son identité SOUL.md."
+            },
+            "autoMemory": {
+                "label": "Mémoire auto",
+                "description": "Trie automatiquement les souvenirs après chaque tour."
+            }
+        },
+        "capabilities": {
+            "filesystem": {
+                "label": "Lire et écrire des fichiers",
+                "blurb": "Travailler sur les fichiers de son espace",
+                "help": "Permet au coworker d'ouvrir, créer et modifier des fichiers dans son propre espace."
+            },
+            "shell": {
+                "label": "Lancer des commandes",
+                "blurb": "Exécuter des commandes sur sa machine",
+                "help": "Permet au coworker de lancer des commandes dans le terminal pour installer des outils et automatiser des tâches."
+            },
+            "web": {
+                "label": "Naviguer sur le web",
+                "blurb": "Chercher et lire des pages web",
+                "help": "Permet au coworker de chercher sur internet et de lire des pages web pour trouver des informations."
+            },
+            "memory": {
+                "label": "Se souvenir",
+                "blurb": "Enregistrer et retrouver des informations",
+                "help": "Permet au coworker de garder des faits d'un run à l'autre et de s'en souvenir plus tard."
+            },
+            "db": {
+                "label": "Accéder aux données",
+                "blurb": "Interroger sa base de données",
+                "help": "Permet au coworker de lire et d'écrire des données structurées dans sa propre base."
+            },
+            "brain": {
+                "label": "Utiliser le Brain",
+                "blurb": "Lire ce que l'entreprise a validé",
+                "help": "Permet au coworker de chercher et lire le Brain, les pages que votre équipe a validées sur l'entreprise, et de proposer des changements que vous relisez avant tout enregistrement."
+            },
+            "sharedDb": {
+                "label": "Accéder aux données partagées",
+                "blurb": "Interroger la base partagée",
+                "help": "Permet au coworker de lire et d'écrire dans la base que partagent tous les coworkers du workspace."
+            },
+            "skills": {
+                "label": "Utiliser des skills",
+                "blurb": "Lancer les skills installés",
+                "help": "Permet au coworker d'utiliser les skills que vous avez installés pour des tâches spécialisées."
+            },
+            "self": {
+                "label": "S'améliorer",
+                "blurb": "Ajuster sa propre configuration",
+                "help": "Permet au coworker d'affiner ses propres instructions et sa configuration au fil du temps."
+            },
+            "schedule": {
+                "label": "Planifier des tâches",
+                "blurb": "Prévoir du travail pour plus tard",
+                "help": "Permet au coworker de planifier des tâches qui se lancent toutes seules à l'heure choisie."
+            },
+            "trigger": {
+                "label": "Réagir aux webhooks",
+                "blurb": "Se lancer quand une autre app l'appelle",
+                "help": "Permet au coworker d'exposer des URL publiques qui lancent un run quand un service externe les appelle."
+            },
+            "callAgent": {
+                "label": "Travailler avec d'autres coworkers",
+                "blurb": "Déléguer à ses collègues",
+                "help": "Permet au coworker de confier du travail aux autres coworkers du workspace."
+            },
+            "team": {
+                "label": "Voir les autres coworkers",
+                "blurb": "Lire leurs routines et leurs runs",
+                "help": "Permet au coworker de consulter les autres coworkers du workspace : leur statut, leurs tâches planifiées, leurs triggers et leurs runs récents, avec les outils appelés par chaque run quand il doit comprendre un échec. Il ne peut rien modifier. Un run peut contenir des données des apps connectées de l'autre coworker."
+            },
+            "askUser": {
+                "label": "Vous poser des questions",
+                "blurb": "S'arrêter pour demander, avec des choix",
+                "help": "Permet au coworker de s'arrêter et de vous poser une question avec des choix de réponse avant de continuer."
+            },
+            "requestApproval": {
+                "label": "Demander une validation",
+                "blurb": "Attendre votre feu vert",
+                "help": "Permet au coworker de s'arrêter et de vous demander d'approuver ou de refuser une action avant de la lancer."
+            },
+            "cards": {
+                "label": "Afficher des cartes dans le chat",
+                "blurb": "Aperçu d'une table ou d'un fichier",
+                "help": "Permet au coworker de déposer une carte d'aperçu dans la conversation : les premières lignes d'une de ses tables, ou un fichier de son espace, à ouvrir en un clic."
+            },
+            "quickReplies": {
+                "label": "Suggérer des réponses",
+                "blurb": "Proposer des réponses en un clic",
+                "help": "Permet au coworker de terminer un message par jusqu'à trois réponses courtes à envoyer en un clic, comme \"Trouve-en 100 de plus\"."
+            },
+            "computer": {
+                "label": "Utiliser son ordinateur",
+                "blurb": "Voir et piloter son propre écran",
+                "help": "Permet au coworker de regarder son propre bureau et de cliquer, taper et défiler dans son navigateur, ses fichiers et son terminal, pour le travail qui doit se faire à la main dans une app ou un site. Vous pouvez le regarder en direct, et il se met en pause quand vous prenez l'écran."
+            },
+            "paidData": {
+                "label": "Leads, SEO et données sociales",
+                "blurb": "Payé avec vos crédits Rerun",
+                "help": "Permet au coworker de trouver des prospects, leurs e-mails pro, leurs numéros et des données d'entreprise, de consulter volumes de recherche, idées de mots-clés et backlinks, de lire les résultats Google et les commerces locaux, et de lire profils et publications publics sur LinkedIn, TikTok, Instagram, X, YouTube, Facebook et Reddit, sans abonnement Apollo, Semrush ou de scraping. Chaque appel est payé avec vos crédits Rerun, dépensés par le coworker quand une tâche le demande."
+            },
+            "requestSecret": {
+                "label": "Demander un identifiant",
+                "blurb": "Attendre une clé, saisie en sécurité",
+                "help": "Permet au coworker de s'arrêter et de vous demander une clé API ou un jeton dans un champ masqué. La valeur est stockée comme variable du coworker et n'entre jamais dans la conversation."
+            }
+        }
+    },
+    "agentPanelTriggers": {
+        "new": "Nouveau",
+        "emptyTitle": "Aucun trigger pour l'instant",
+        "emptyDescription": "Un trigger donne à votre coworker une URL publique. Chaque fois qu'un autre service l'appelle, le coworker se lance avec les données reçues.",
+        "summary": "{methods} · {count, plural, one {# appel} other {# appels}}",
+        "paused": "en pause",
+        "neverCalled": "Jamais appelé"
+    },
+    "triggerEditor": {
+        "saveFailed": "Échec de l'enregistrement",
+        "rotateFailed": "Impossible de renouveler le secret",
+        "deleteFailed": "Échec de la suppression",
+        "titleEdit": "Modifier le trigger",
+        "titleReadOnly": "Trigger",
+        "titleNew": "Nouveau trigger",
+        "history": "Historique",
+        "name": "Nom",
+        "nameLockedHelper": "Le nom ne peut pas changer (il fixe l'URL).",
+        "nameHelper": "L'URL est tirée de ce nom.",
+        "namePlaceholder": "Push GitHub",
+        "description": "Description",
+        "descriptionPlaceholder": "Se lance quand un commit arrive sur main",
+        "methods": "Méthodes acceptées",
+        "methodsGetHelper": "GET sert aux services qui ne savent appeler qu'une URL simple. Les aperçus de liens et les visites dans un navigateur sont ignorés.",
+        "methodsHelper": "La plupart des services envoient POST.",
+        "modelHelper": "Le modèle utilisé quand ce trigger se lance. Nécessite la clé API du fournisseur.",
+        "enabled": "Activé",
+        "prompt": "Prompt du trigger",
+        "promptDialogTitle": "Modifier le prompt du trigger",
+        "promptHelper": "Ce que le coworker exécute quand l'URL est appelée (une nouvelle session à chaque fois). Les données de l'appel sont jointes en dessous.",
+        "promptPlaceholder": "Un commit vient d'arriver. Relis le diff dans les données et poste un résumé sur Slack.",
+        "delete": "Supprimer le trigger",
+        "deleteConfirm": "Supprimer {name} ?",
+        "deleteConfirmUnnamed": "Supprimer ce trigger ?",
+        "deleteDescription": "Son URL de webhook cesse de répondre immédiatement. Tout ce qui l'appelle encore se met à échouer.",
+        "saveChanges": "Enregistrer",
+        "create": "Créer le trigger"
+    },
+    "triggerUrlField": {
+        "label": "URL du webhook",
+        "noSecretHelper": "Renouveler crée un nouveau secret et l'URL qui va avec.",
+        "noSecret": "Ce trigger n'a pas encore de secret, donc pas d'URL.",
+        "getUrl": "Obtenir l'URL",
+        "helper": "Toute personne qui a cette URL peut lancer un run. Gardez-la secrète. La copier, l'afficher en aperçu dans un chat ou l'ouvrir dans un navigateur ne lance rien.",
+        "copy": "Copier l'URL du webhook",
+        "rotateConfirm": "Renouveler le secret du webhook ?",
+        "rotateDescription": "L'URL actuelle cesse de fonctionner immédiatement. Vous devrez coller la nouvelle partout où ce trigger est appelé.",
+        "rotateAction": "Renouveler",
+        "rotate": "Renouveler le secret"
+    },
+    "agentPanelScheduled": {
+        "new": "Nouvelle",
+        "emptyTitle": "Aucune tâche planifiée pour l'instant",
+        "emptyDescription": "Demandez à votre coworker de faire quelque chose à intervalle régulier (un rapport quotidien, un résumé hebdo) et les tâches récurrentes apparaîtront ici.",
+        "paused": "en pause",
+        "noExecutions": "Aucune exécution pour l'instant",
+        "picker": {
+            "when": "Quand",
+            "notSet": "Non défini",
+            "describe": "Décrivez la planification",
+            "describePlaceholder": "chaque jour de semaine à 8 h",
+            "update": "Mettre à jour"
+        },
+        "editor": {
+            "saveFailed": "Échec de l'enregistrement",
+            "runFailed": "Impossible de lancer la tâche",
+            "deleteFailed": "Échec de la suppression",
+            "titleEdit": "Modifier la tâche",
+            "titleReadOnly": "Tâche",
+            "titleNew": "Nouvelle tâche",
+            "history": "Historique",
+            "name": "Nom",
+            "nameLockedHelper": "Le nom ne peut pas changer (il fixe le slug).",
+            "namePlaceholder": "Résumé quotidien",
+            "description": "Description",
+            "descriptionPlaceholder": "Point du matin",
+            "timezone": "Fuseau horaire",
+            "modelHelper": "Le modèle utilisé quand cette tâche se lance. Nécessite la clé API du fournisseur.",
+            "enabled": "Activée",
+            "prompt": "Prompt de la tâche",
+            "promptDialogTitle": "Modifier le prompt de la tâche",
+            "promptHelper": "Le prompt que le coworker exécute quand la tâche se lance (une nouvelle session à chaque fois).",
+            "promptPlaceholder": "Résume mes notes d'hier et envoie-moi un récapitulatif par e-mail.",
+            "setupPendingContinue": "Le test se débloque une fois la configuration terminée. <link>Reprendre la configuration</link>",
+            "setupPendingStart": "Le test se débloque une fois la configuration terminée. Lancez-la d'abord depuis le chat.",
+            "delete": "Supprimer la tâche",
+            "deleteConfirm": "Supprimer {name} ?",
+            "deleteConfirmUnnamed": "Supprimer cette tâche ?",
+            "deleteDescription": "La tâche ne se lance plus et sa planification est supprimée. Les runs déjà produits sont conservés.",
+            "testRun": "Tester",
+            "saveChanges": "Enregistrer",
+            "create": "Créer la tâche"
+        }
+    },
+    "taskNotifyField": {
+        "label": "Me prévenir",
+        "muted": "Ce coworker est en sourdine"
+    },
+    "taskOutcomeFooter": {
+        "lastRun": "dernier run il y a {time}",
+        "neverRan": "Jamais lancée",
+        "failed": "Échec",
+        "done": "Terminé"
+    },
+    "modelsShared": {
+        "boxManageReason": "Seul un admin ou un manager de cette Box peut modifier ceci",
+        "creditPaused": "Les crédits Rerun sont en pause"
+    },
+    "modelSelector": {
+        "setUp": "Configurer un modèle",
+        "defaultLabel": "Par défaut · {model}",
+        "select": "Choisir un modèle",
+        "loading": "Chargement",
+        "empty": "Aucun modèle disponible",
+        "workspaceDefault": "Par défaut du workspace",
+        "coworkerDefault": "Par défaut du coworker",
+        "setCoworkerDefault": "Définir par défaut pour le coworker",
+        "makeDefault": "Faire de {model} le modèle par défaut de ce coworker",
+        "refused": "{model} · {reason}. Choisissez un autre modèle ci-dessous."
+    },
+    "modelPickerProviders": {
+        "pitch": {
+            "claude": {
+                "plan": "Claude Pro ou Max",
+                "hint": "Connectez-vous avec votre compte Claude",
+                "nudge": "Vous avez Claude Pro ou Max ?"
+            },
+            "codex": {
+                "plan": "ChatGPT Plus ou Pro",
+                "hint": "Connectez-vous avec votre compte ChatGPT",
+                "nudge": "Vous avez ChatGPT Plus ou Pro ?"
+            }
+        },
+        "hints": {
+            "claude": "Pro ou Max",
+            "codex": "Plus ou Pro",
+            "anthropic": "Modèles Claude",
+            "openai": "Modèles GPT",
+            "google": "Modèles Gemini",
+            "openrouter": "Tous les modèles"
+        },
+        "pitchHeading": "Utilisez l'abonnement que vous payez déjà",
+        "connect": "Connecter",
+        "addProvider": "Ajouter un fournisseur",
+        "sections": {
+            "subscription": "Abonnement",
+            "api": "Clé API"
+        },
+        "connected": "Connecté",
+        "manage": "Gérer les connexions"
+    },
+    "modelTierRow": {
+        "pro": "Pro"
+    },
+    "runModelField": {
+        "label": "Modèle",
+        "placeholder": "Choisir un modèle",
+        "coworkerDefault": "Par défaut du coworker",
+        "coworkerDefaultWithModel": "Par défaut du coworker · {model}",
+        "current": "Actuel"
+    },
+    "planLimitHint": {
+        "windows": {
+            "session": "Session",
+            "fiveHour": "5 heures",
+            "weekly": "Hebdomadaire",
+            "monthly": "Mensuel",
+            "modelWeekly": "{label} hebdomadaire",
+            "modelWeeklyUnnamed": "Modèle hebdomadaire"
+        },
+        "windowUsed": "{name} : {percent} utilisé",
+        "windowResets": "{name} : {percent} utilisé, réinitialisé {when}",
+        "paused": "En pause",
+        "credit": {
+            "usedUpOn": "Crédits du mois épuisés, de retour le {date}",
+            "usedUpNextMonth": "Crédits du mois épuisés, de retour le mois prochain",
+            "usageOn": "Crédits du mois : {percent} % utilisés, réinitialisés le {date}",
+            "usageNextMonth": "Crédits du mois : {percent} % utilisés, réinitialisés le mois prochain"
+        }
+    },
+    "skillEditor": {
+        "titleView": "Skill",
+        "titleEdit": "Modifier le skill",
+        "titleNew": "Nouveau skill",
+        "download": "Télécharger le skill",
+        "connectorManaged": "Ce skill est fourni par une app et géré automatiquement.",
+        "name": "Nom",
+        "nameLocked": "Le nom ne peut pas être modifié (il définit le slug).",
+        "namePlaceholder": "Recherche web",
+        "description": "Description",
+        "descriptionPlaceholder": "Comment rechercher un sujet",
+        "procedure": "Procédure",
+        "procedureDialogTitle": "Modifier la procédure",
+        "procedurePlaceholder": "1. Identifier les sources\n2. Récupérer\n3. Résumer",
+        "delete": "Supprimer le skill",
+        "deleteTitle": "Supprimer {name} ?",
+        "deleteTitleUnnamed": "Supprimer ce skill ?",
+        "deleteDescription": "Le skill et tous les fichiers qui l'accompagnent sont retirés du coworker. Cette action est irréversible.",
+        "saveChanges": "Enregistrer",
+        "create": "Créer le skill",
+        "saveFailed": "Échec de l'enregistrement",
+        "downloadFailed": "Échec du téléchargement du skill",
+        "deleteFailed": "Échec de la suppression",
+        "locks": {
+            "edit": "La modification de ce skill se débloque une fois votre workspace sur un plan payant.",
+            "delete": "La suppression de ce skill se débloque une fois votre workspace sur un plan payant.",
+            "download": "Le téléchargement de ce skill se débloque une fois votre workspace sur un plan payant.",
+            "addFile": "L'ajout d'un fichier joint se débloque une fois votre workspace sur un plan payant.",
+            "deleteFile": "La suppression d'un fichier joint se débloque une fois votre workspace sur un plan payant."
+        }
+    },
+    "skillFileEditor": {
+        "readFailed": "Impossible de lire ce fichier",
+        "saveFailed": "Échec de l'enregistrement",
+        "deleteFailed": "Échec de la suppression",
+        "truncated": "Ce fichier est trop volumineux pour être modifié ici ; seuls ses 100 000 premiers caractères sont affichés.",
+        "delete": "Supprimer le fichier",
+        "deleteTitle": "Supprimer {path} ?",
+        "deleteDescription": "Le fichier est retiré du skill. Cette action est irréversible.",
+        "saveChanges": "Enregistrer",
+        "locks": {
+            "edit": "La modification de ce fichier se débloque une fois votre workspace sur un plan payant.",
+            "delete": "La suppression de ce fichier se débloque une fois votre workspace sur un plan payant."
+        }
+    },
+    "skillFilesSection": {
+        "label": "Fichiers joints",
+        "helper": "Les longues checklists, banques et corpus vivent ici. Le coworker n'en lit un que lorsque la procédure y renvoie.",
+        "empty": "Aucun fichier joint.",
+        "pathRequired": "Saisissez un chemin de fichier, par exemple references/checklist.md",
+        "createFailed": "Échec de la création du fichier",
+        "deleteFailed": "Échec de la suppression du fichier",
+        "deleteLabel": "Supprimer {path}",
+        "deleteTitle": "Supprimer {path} ?",
+        "deleteDescription": "Le fichier est retiré du skill. Cette action est irréversible.",
+        "add": "Ajouter",
+        "cancel": "Annuler",
+        "addFile": "Ajouter un fichier"
+    },
+    "agentPanelSkills": {
+        "notFound": "Skill introuvable",
+        "fileTooLarge": "Fichier trop volumineux (10 Mo max.)",
+        "importFailed": "Échec de l'import du skill",
+        "folderImportFailed": "échec de l'import",
+        "folderFailure": "{name} : {error}",
+        "readFolderFailed": "Impossible de lire le dossier",
+        "imported": "{count, plural, one {# skill importé} other {# skills importés}}",
+        "importedSkipped": "{count, plural, one {# skill importé} other {# skills importés}}, {skipped, plural, one {# fichier non texte ignoré} other {# fichiers non texte ignorés}}",
+        "upload": "Importer",
+        "markdownFile": "Fichier Markdown",
+        "skillFolder": "Dossier de skill",
+        "newSkill": "Nouveau",
+        "emptyTitle": "Aucun skill pour l'instant",
+        "emptyDescription": "Les skills sont des instructions pas à pas réutilisables que votre coworker apprend, pour accomplir les tâches récurrentes toujours de la même façon.",
+        "appBadge": "App"
+    },
+    "shareAgentDialog": {
+        "titleLink": "Votre lien de partage",
+        "titleShare": "Partager {name}",
+        "descriptionLink": "Envoyez-le à qui doit recevoir une copie. Pas besoin de compte pour l'instant.",
+        "descriptionShare": "Choisissez ce qui accompagne la copie. Tout ce qui en fait un coworker est déjà inclus.",
+        "done": "Terminé",
+        "cancel": "Annuler",
+        "packing": "Préparation du coworker…",
+        "createLink": "Créer le lien",
+        "carried": {
+            "memories": "{count, plural, one {# souvenir} other {# souvenirs}}",
+            "database": "sa base de données ({size}, non analysée pour les secrets)",
+            "files": "{count, plural, one {# fichier du workspace} other {# fichiers du workspace}}"
+        },
+        "confirmTitle": "Envoyer {name} avec ses données ?",
+        "confirmDescription": "La copie contiendra {items}. Toute personne ayant le lien peut tout lire jusqu'à ce que vous le révoquiez."
+    },
+    "shareAgentLink": {
+        "label": "Lien de partage",
+        "reused": "Un lien avec ces mêmes réponses existait déjà pour ce coworker : le voici, plutôt qu'une deuxième copie.",
+        "fresh": "Toute personne ayant ce lien peut ajouter une copie de ce coworker à son propre board. Révoquez-le quand vous voulez.",
+        "copy": "Copier le lien de partage"
+    },
+    "shareAgentOptions": {
+        "memories": "Souvenirs",
+        "memoriesCount": "{count, plural, one {# souvenir} other {# souvenirs}} · {size}",
+        "memoriesEmpty": "Aucun souvenir pour l'instant",
+        "database": "Base de données du coworker",
+        "databaseSize": "{size} · non analysée pour les secrets",
+        "databaseEmpty": "Aucune table pour l'instant",
+        "files": "Fichiers du workspace",
+        "filesCount": "{count, plural, one {# fichier} other {# fichiers}} · {size}",
+        "filesEmpty": "Aucun fichier pour l'instant"
+    },
+    "shareAgentSafety": {
+        "title": "Les données sensibles sont retirées",
+        "description": "Les clés API, les comptes connectés et l'historique des conversations ne quittent jamais votre workspace, quoi que vous choisissiez ci-dessus. Les fichiers qui semblent contenir un identifiant sont écartés, et les apps arrivent déconnectées pour que la personne qui ouvre le lien les autorise elle-même."
+    },
+    "sharedLinksSection": {
+        "revokeFailed": "Impossible de révoquer ce lien",
+        "revoked": "Lien révoqué",
+        "revokedDescription": "La copie qu'il contenait a été supprimée. Qui l'ouvre maintenant n'obtient rien.",
+        "label": "Liens de partage",
+        "helper": "Toute personne en ayant un peut ajouter une copie de ce coworker à son propre board.",
+        "carried": {
+            "memories": "Souvenirs",
+            "database": "Base de données",
+            "files": "Fichiers"
+        },
+        "notUsed": "Pas encore utilisé",
+        "added": "Ajouté {count, plural, one {# fois} other {# fois}}",
+        "agentOnly": "Le coworker seul, sans données",
+        "copy": "Copier le lien de partage",
+        "revokeTitle": "Révoquer ce lien de partage ?",
+        "revokeDescription": "La copie qu'il contient est supprimée immédiatement. Ceux qui ont déjà ajouté le coworker gardent le leur.",
+        "revoke": "Révoquer",
+        "revokeLabel": "Révoquer ce lien"
+    },
+    "sharedAgentContents": {
+        "memories": "{count, plural, one {# souvenir} other {# souvenirs}}",
+        "memoriesSubtitle": "Tout ce qu'il a appris jusqu'ici",
+        "database": "Sa base de données",
+        "databaseSubtitle": "Ses propres tables, lignes comprises",
+        "files": "{count, plural, one {# fichier du workspace} other {# fichiers du workspace}}",
+        "keys": "{count, plural, one {# clé API} other {# clés API}}",
+        "keysSubtitle": "À renseigner par vous",
+        "mcpAuth": "{count, plural, one {# service auquel se reconnecter} other {# services auxquels se reconnecter}}",
+        "mcpAuthSubtitle": "Sur vos propres comptes",
+        "agentOnly": "Juste le coworker",
+        "agentOnlySubtitle": "Aucune donnée ne l'accompagne",
+        "connectorsNote": "Vous les connecterez avec vos propres comptes.",
+        "triggersNote": "Chacun reçoit sa propre nouvelle URL."
+    },
+    "useShareAgentFlow": {
+        "failedRequest": "La requête n'a pas abouti. Vérifiez votre connexion et réessayez."
+    },
+    "agentTabs": {
+        "chat": {
+            "label": "Chat",
+            "description": "Discutez avec ce coworker"
+        },
+        "actions": {
+            "label": "À traiter",
+            "description": "Ce qui attend votre attention"
+        },
+        "services": {
+            "label": "Apps",
+            "description": "Intégrations prêtes à l'emploi pour ce coworker"
+        },
+        "mcp": {
+            "label": "MCP",
+            "description": "Serveurs Model Context Protocol"
+        },
+        "skills": {
+            "label": "Skills",
+            "description": "Skills réutilisables que le coworker peut lancer"
+        },
+        "data": {
+            "label": "Base de données",
+            "description": "Les données de ce coworker"
+        },
+        "memories": {
+            "label": "Connaissances",
+            "description": "Ce dont ce coworker se souvient"
+        },
+        "files": {
+            "label": "Fichiers",
+            "description": "Les fichiers de ce coworker"
+        },
+        "published": {
+            "label": "Publié",
+            "description": "Ce que ce coworker a publié, et qui peut l'ouvrir"
+        },
+        "scheduled": {
+            "label": "Routines",
+            "description": "Tâches récurrentes et planifiées"
+        },
+        "triggers": {
+            "label": "Déclencheurs",
+            "description": "URL publiques qui lancent une exécution quand on les appelle"
+        },
+        "tools": {
+            "label": "Capacités",
+            "description": "Les outils que ce coworker peut utiliser"
+        },
+        "monitoring": {
+            "label": "Suivi",
+            "description": "Usage, coût et activité de ce coworker"
+        },
+        "logs": {
+            "label": "Logs",
+            "description": "Activité et logs d'exécution"
+        },
+        "setup": {
+            "label": "Installation",
+            "description": "Ce que fait ce coworker la première fois qu'on l'installe"
+        },
+        "settings": {
+            "label": "Réglages",
+            "description": "Configurer ce coworker"
+        }
+    },
+    "accessSummary": {
+        "youManage": "Vous gérez ce coworker",
+        "youCanUse": "Vous pouvez utiliser ce coworker",
+        "youManageViaBox": "Vous gérez ce coworker, via la Box {box}",
+        "youCanUseViaBox": "Vous pouvez utiliser ce coworker, via la Box {box}",
+        "viaBox": "via la Box {box}",
+        "everyone": "Tout le workspace",
+        "adminsOnly": "Admins uniquement",
+        "peopleViaBox": "{count, plural, one {# personne} other {# personnes}}, via la Box {box}"
+    },
+    "agentLockedOverlay": {
+        "saved": "Ses conversations, sa mémoire, ses skills, ses routines et ses fichiers sont conservés.",
+        "savedUntil": "Ses conversations, sa mémoire, ses skills, ses routines et ses fichiers sont conservés jusqu'au {date}.",
+        "paused": {
+            "title": "{name} est en pause avec votre workspace",
+            "subscribeToResume": "Abonnez-vous et {name} reprend exactement là où il s'est arrêté.",
+            "updatePaymentToResume": "Mettez à jour votre paiement et {name} reprend exactement là où il s'est arrêté.",
+            "updatePayment": "Mettre à jour le paiement",
+            "subscribe": "S'abonner pour restaurer"
+        },
+        "sandboxArchived": {
+            "title": "{name} est archivé avec votre sandbox",
+            "requestReactivation": "Demandez une réactivation depuis le board et {name} reprend exactement là où il s'est arrêté."
+        },
+        "restoring": {
+            "title": "{name} est en train de revenir",
+            "description": "Votre workspace est en cours de restauration. {name} se réveille avec lui d'ici une à deux minutes."
+        },
+        "slot": {
+            "activateFailed": "Impossible d'activer ce coworker",
+            "backOnline": "{name} est de nouveau en ligne",
+            "inactive": "{name} est inactif",
+            "templateEnded": "L'abonnement au template dont vient ce coworker a pris fin. Rachetez le template pour le récupérer.",
+            "nothingLost": "Rien n'est perdu : ses souvenirs, ses fichiers et ses skills sont toujours là. Il lui faut juste une place de coworker libre pour tourner à nouveau.",
+            "fixedLimit": "Ce workspace a une limite de coworkers fixe. Contactez le support pour l'augmenter.",
+            "upgradeToActivate": "Passer à un plan supérieur pour activer",
+            "activeCount": "{active} coworkers actifs sur {max}",
+            "activating": "Activation…",
+            "activate": "Activer"
+        }
+    },
+    "panelsShared": {
+        "yourCoworker": "votre coworker",
+        "closePanel": "Fermer le panneau"
+    },
+    "agentPanel": {
+        "threads": "Fils",
+        "coworkerCard": "Fiche du coworker"
+    },
+    "templateContentLock": {
+        "title": "Verrouillé pendant l'essai",
+        "description": {
+            "skills": "Ce coworker vient d'un template. Ses skills se débloquent dès que votre workspace passe à un plan payant.",
+            "systemPrompt": "Ce coworker vient d'un template. Son prompt système se débloque dès que votre workspace passe à un plan payant.",
+            "taskPrompts": "Ce coworker vient d'un template. Les prompts de ses tâches se débloquent dès que votre workspace passe à un plan payant.",
+            "triggerPrompts": "Ce coworker vient d'un template. Les prompts de ses déclencheurs se débloquent dès que votre workspace passe à un plan payant.",
+            "referenceFiles": "Ce coworker vient d'un template. Ses fichiers de référence se débloquent dès que votre workspace passe à un plan payant."
+        },
+        "upgrade": "Passer au payant pour débloquer"
+    },
+    "agentAccessRow": {
+        "label": "Accès",
+        "manage": "Gérer l'accès"
+    },
+    "agentCombobox": {
+        "unassigned": "Non attribué",
+        "selectMany": "Choisir des coworkers",
+        "selectOne": "Choisir un coworker",
+        "search": "Rechercher des coworkers…",
+        "empty": "Aucun coworker trouvé"
+    },
+    "timezoneCombobox": {
+        "placeholder": "Choisir un fuseau horaire",
+        "search": "Rechercher un fuseau…",
+        "empty": "Aucun fuseau trouvé"
+    },
+    "agentFileNavigation": {
+        "notFound": "Fichier introuvable"
+    },
+    "agentSetupFields": {
+        "yes": "Oui",
+        "no": "Non",
+        "resetToDefault": "Revenir au template par défaut",
+        "useDefault": "Utiliser le template par défaut",
+        "needsSetup": {
+            "label": "Ce coworker doit-il être configuré après l'installation ?",
+            "helper": "Répondez une fois. Toute personne qui installe ce coworker voit le résultat : un coworker sans réponse ne peut pas être publié."
+        },
+        "instructions": {
+            "label": "Instructions d'installation",
+            "helper": "Écrites pour le coworker, pas pour l'utilisateur : il les lit et le guide pas à pas dans le chat.",
+            "dialogTitle": "Modifier les instructions d'installation"
+        },
+        "resetConfirm": {
+            "title": "Revenir au template par défaut ?",
+            "description": "Ce qui est écrit ici sera remplacé par les instructions par défaut. Cette action est irréversible.",
+            "confirm": "Réinitialiser"
+        }
+    },
+    "agentPanelData": {
+        "unreachable": "Impossible de joindre le moteur de ce coworker.",
+        "emptyTitle": "Pas encore de tables",
+        "emptyDescription": "Votre coworker a sa propre base de données privée. Quand il doit stocker des données structurées (contacts, résultats, listes de suivi), il crée ici des tables que vous pouvez consulter à tout moment.",
+        "dialogTitle": "Base de données du coworker",
+        "dialogDescription": "La base de données privée de ce coworker, en grand."
+    },
+    "agentSheetChat": {
+        "anotherCoworker": "un autre coworker",
+        "messagePlaceholder": "Écrire à {name}...",
+        "replyPlaceholder": "Répondre dans {title}...",
+        "startedBy": "Cette session a été lancée par <b>{name}</b>"
+    },
+    "agentPanelChat": {
+        "notSetUp": "Ce coworker n'est pas encore configuré",
+        "setUp": "Le configurer"
+    },
+    "agentPanelSetup": {
+        "unreachable": "Impossible de joindre le moteur de ce coworker.",
+        "saveFailed": "Échec de l'enregistrement",
+        "intro": "Une copie de cet agent arrive sur le compte de quelqu'un d'autre sans identifiants et sans rien de connecté. Ces instructions sont ce qu'il exécute, seul, la première fois que cette personne l'ouvre.",
+        "saved": "Enregistré",
+        "saving": "Enregistrement...",
+        "save": "Enregistrer"
+    },
+    "agentPanelSettings": {
+        "unreachable": "Impossible de joindre le moteur de ce coworker.",
+        "saveFailed": "Échec de l'enregistrement",
+        "name": "Nom",
+        "inactive": "Ce coworker est inactif : sa configuration ne peut être ni chargée ni modifiée.",
+        "soul": {
+            "label": "Âme (prompt système)",
+            "dialogTitle": "Modifier le prompt système",
+            "placeholder": "Tu es..."
+        },
+        "verbosity": {
+            "label": "Verbosité",
+            "helper": "La longueur de ses réponses, pas la quantité de travail qu'il fait.",
+            "minimal": "Minimale",
+            "concise": "Concise",
+            "normal": "Normale",
+            "detailed": "Détaillée"
+        },
+        "notifications": {
+            "label": "Notifications",
+            "choose": "Choisir ce qui vous parvient"
+        },
+        "delete": "Supprimer le coworker",
+        "saved": "Enregistré",
+        "save": "Enregistrer les modifications"
+    },
+    "agentPanelLogs": {
+        "empty": {
+            "title": "Aucune exécution pour l'instant",
+            "description": "Chaque exécution de votre coworker est enregistrée ici : vous pouvez voir étape par étape ce qu'il a fait et pourquoi."
+        },
+        "tokens": "{total} tokens",
+        "tokensShort": "{total} tok",
+        "stepCount": "{count, plural, one {# étape} other {# étapes}}",
+        "step": "Étape {number}",
+        "noSteps": "Aucune étape enregistrée pour cette exécution.",
+        "input": "Entrée",
+        "output": "Sortie"
+    },
+    "agentRunHistory": {
+        "tokens": "{total} tokens",
+        "stepCount": "{count, plural, one {# étape} other {# étapes}}"
+    },
+    "agentPanelMemories": {
+        "dormant": "en sommeil",
+        "delete": {
+            "label": "Supprimer le souvenir",
+            "confirmTitle": "Supprimer ce souvenir ?",
+            "confirmDescription": "Le coworker l'oublie définitivement. Cette action est irréversible."
+        },
+        "recallPlaceholder": "Rechercher dans les souvenirs...",
+        "new": "Nouveau",
+        "clearAll": "Effacer tous les souvenirs",
+        "searching": "Recherche…",
+        "recalled": "{count, plural, one {# souvenir trouvé} other {# souvenirs trouvés}} pour « {query} »",
+        "form": {
+            "contentPlaceholder": "L'utilisateur préfère des réponses concises.",
+            "kindPlaceholder": "type (ex. préférence)",
+            "tagsPlaceholder": "tags, séparés,par des virgules",
+            "save": "Enregistrer le souvenir"
+        },
+        "empty": {
+            "noMatches": "Aucun résultat",
+            "title": "Aucun souvenir pour l'instant",
+            "description": "Votre coworker enregistre ici des faits durables sur vous et sur son travail, pour garder le contexte d'une conversation à l'autre.",
+            "add": "Ajouter un souvenir"
+        }
+    },
+    "agentPanelMonitoring": {
+        "charts": {
+            "kpiRuns": "Exécutions",
+            "kpiCost": "Coût total",
+            "kpiTokens": "Tokens au total",
+            "kpiErrorRate": "Taux d'erreur",
+            "runsOverTime": "Exécutions dans le temps",
+            "costOverTime": "Coût dans le temps",
+            "avgDuration": "Durée moyenne d'exécution",
+            "runsByModel": "Exécutions par modèle",
+            "topTools": "Outils les plus appelés",
+            "toolErrors": "Erreurs d'outils"
+        },
+        "tokenUsage": {
+            "title": "Consommation de tokens",
+            "subtitle": "Tokens par jour"
+        },
+        "ranges": {
+            "24h": {
+                "short": "24 h",
+                "label": "Dernières 24 heures"
+            },
+            "7d": {
+                "short": "7 j",
+                "label": "7 derniers jours"
+            },
+            "30d": {
+                "short": "30 j",
+                "label": "30 derniers jours"
+            },
+            "90d": {
+                "short": "90 j",
+                "label": "90 derniers jours"
+            }
+        },
+        "empty": {
+            "title": "Aucune activité pour l'instant",
+            "description": "L'usage, le coût et les statistiques d'exécution de ce coworker apparaîtront ici dès qu'il se mettra au travail."
+        },
+        "expand": "Agrandir {title}"
+    },
+    "agentPanelFiles": {
+        "publishFailed": "Impossible de publier {name}",
+        "dropToUpload": "Déposez des fichiers ou des dossiers à envoyer",
+        "hideHidden": "Masquer les fichiers cachés",
+        "showHidden": "Afficher les fichiers cachés",
+        "emptyDescription": "C'est l'espace de travail de votre coworker. Les fichiers qu'il télécharge, crée ou modifie pendant ses exécutions sont rangés ici."
+    },
+    "shareCta": {
+        "placeLabel": "Placer le coworker",
+        "placeCaption": "Déposez-le sur votre board, prêt à tourner.",
+        "trialAdd": "Démarrer l'essai et l'ajouter",
+        "planAdd": "S'abonner à {price}/mois et l'ajouter",
+        "add": "Ajouter à mon board"
+    },
+    "schedule": {
+        "once": "une fois · {date}",
+        "onceOn": "Une fois, {date}",
+        "everyMinutes": "Toutes les {count} minutes",
+        "everyDay": "Tous les jours à {time}",
+        "weekdays": "En semaine à {time}",
+        "everyWeekday": "Chaque {day} à {time}",
+        "monthly": "Tous les mois le {day} à {time}"
+    }
+}

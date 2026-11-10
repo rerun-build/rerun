@@ -1,0 +1,526 @@
+{
+    "_context": {
+        "directory.eyebrow": "Shown next to a row of expert faces at the top of the experts directory.",
+        "directory.featured.carousel": "Accessible name of the carousel, read by screen readers inside the carousel arrow buttons (Previous / Next).",
+        "filters.skills": "Options of the Skill filter of the experts directory: the fields an AI automation expert works in. Keep RAG, MCP, APIs and CRM as they are.",
+        "filters.segment": "Screen reader label of a filter button: the filter name, then the value picked or the word for 'any'.",
+        "card.hire": "Button on an expert card that opens a form to contact the expert.",
+        "hire": "Dialog where a visitor sends a project request to an expert. {name} is the expert's name or studio name.",
+        "program.hero.title": "The empty mark tag is replaced by the Rerun logo, placed right before the word Rerun.",
+        "program.showcase.carousel": "Accessible name of the carousel, read by screen readers inside the carousel arrow buttons (Previous / Next).",
+        "program.valueProps.cells.ship.desc": "connectorCount is an already formatted number such as 1,000.",
+        "visuals": "Mock content played in animated demos of the product: coworker names (Jules, Margo, Sam, Nora, Leo), companies and emails stay as they are.",
+        "visuals.memory.files": "Unit shown right after an animated number of files attached to a skill.",
+        "visuals.memory.cards.invoiceChasing.lines": "Lines of a markdown document: keep the leading markers (##, 1., -) exactly.",
+        "visuals.triggers.status.triggered": "Lowercase status badge on an automation card.",
+        "visuals.monitor.status.subtitle": "Number of coworkers working right now."
+    },
+    "metadata": {
+        "layout": {
+            "title": "Experts",
+            "description": "Discover trusted builders and studios to design, ship and run your AI agents on Rerun."
+        },
+        "directory": {
+            "title": "Hire the best AI experts",
+            "description": "Work with vetted builders, freelancers and studios who design, ship and run AI agents that actually deliver. Browse Rerun experts by skill and location."
+        },
+        "program": {
+            "title": "Become a Rerun expert",
+            "description": "Join the Rerun Expert Program: get listed in the directory, build client agents in a free sandbox, keep 95% of template sales and earn 20% recurring."
+        }
+    },
+    "jsonLd": {
+        "home": "Home",
+        "experts": "Experts"
+    },
+    "directory": {
+        "eyebrow": "{count, plural, one {# vetted expert} other {# vetted experts}}",
+        "title": "Find your AI expert",
+        "description": "Vetted builders and studios who set up your most complex systems, with Coworkers wired into every tool and process your business runs on.",
+        "joinAside": "Join the experts already listed on Rerun",
+        "becomeExpert": "Become an expert",
+        "featured": {
+            "label": "Featured",
+            "title": "The experts worth a call first.",
+            "carousel": "featured experts"
+        },
+        "grid": {
+            "allLabel": "All experts",
+            "resultsLabel": "Results",
+            "title": "{count, plural, one {# vetted builder.} other {# vetted builders and studios.}}",
+            "clear": "Clear filters",
+            "empty": "No experts match these filters."
+        }
+    },
+    "filters": {
+        "facets": {
+            "type": {
+                "label": "Type",
+                "search": "Search types"
+            },
+            "availability": {
+                "label": "Availability",
+                "search": "Search availabilities"
+            },
+            "budget": {
+                "label": "Budget",
+                "search": "Search budgets"
+            },
+            "skill": {
+                "label": "Skill",
+                "search": "Search skills"
+            },
+            "language": {
+                "label": "Language",
+                "search": "Search languages"
+            }
+        },
+        "types": {
+            "studio": "Studio",
+            "freelancer": "Freelancer",
+            "expert": "Expert"
+        },
+        "availabilities": {
+            "available": "Available",
+            "soon": "Available soon",
+            "unavailable": "Not available"
+        },
+        "segment": "{label}: {value}",
+        "any": "any",
+        "clear": "Clear",
+        "noResults": "No results",
+        "skills": {
+            "agent-design": "Agent Design",
+            "workflow-automation": "Workflow Automation",
+            "rag-knowledge-bases": "RAG & Knowledge Bases",
+            "integrations-apis": "Integrations & APIs",
+            "mcp-servers": "MCP Servers",
+            "prompt-engineering": "Prompt Engineering",
+            "data-pipelines": "Data Pipelines",
+            "chatbots-support": "Chatbots & Support",
+            "voice-agents": "Voice Agents",
+            "lead-gen-outreach": "Lead Gen & Outreach",
+            "crm-automation": "CRM Automation",
+            "web-scraping": "Web Scraping",
+            "e-commerce-automation": "E-commerce Automation",
+            "analytics-reporting": "Analytics & Reporting",
+            "fine-tuning": "Fine-tuning",
+            "no-code-automation": "No-code Automation"
+        }
+    },
+    "card": {
+        "hire": "Hire"
+    },
+    "hire": {
+        "title": "Work with {name}",
+        "description": "Tell them about your project. They reply directly by email.",
+        "fields": {
+            "name": "Your name",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "Email",
+            "emailPlaceholder": "you@company.com",
+            "website": "Company website",
+            "message": "Message",
+            "messagePlaceholder": "What are you building, and what do you need help with?"
+        },
+        "submit": "Send request",
+        "sending": "Sending...",
+        "sent": {
+            "title": "Request sent",
+            "description": "{name} will get back to you by email. Usually within 24 hours.",
+            "close": "Close"
+        },
+        "validation": {
+            "nameRequired": "Name is required",
+            "emailRequired": "Email is required",
+            "emailInvalid": "Invalid email",
+            "urlProtocol": "Must start with http:// or https://",
+            "messageTooShort": "Tell the expert a bit more about your project",
+            "messageTooLong": "Message is too long"
+        },
+        "errors": {
+            "unavailable": "This expert is no longer available.",
+            "invalid": "Please check the form and try again.",
+            "failed": "Something went wrong. Please try again."
+        }
+    },
+    "program": {
+        "hero": {
+            "eyebrow": "Expert program",
+            "title": "Join the <mark></mark>Rerun Expert Program",
+            "promises": {
+                "listed": "Get listed in the Expert directory and get matched with clients",
+                "workspace": "Get a free workspace to build everything you want",
+                "templates": "Build or import Coworkers and sell them as templates, and keep 95% of every sale",
+                "revenue": "Earn 20% recurring on every client plan you bring in"
+            },
+            "findExpert": "Find an expert",
+            "joined": "Join the experts already listed on Rerun"
+        },
+        "showcase": {
+            "label": "The directory",
+            "title": "Be among the best talent.",
+            "lede": "The people already listed on Rerun, and the profile clients see before they reach out.",
+            "carousel": "Rerun experts",
+            "browseAll": "Browse all experts"
+        },
+        "cta": {
+            "label": "Expert program",
+            "title": "Become a Rerun expert",
+            "subtitle": "Apply once. We review every application by hand and reply by email with the next step."
+        },
+        "valueProps": {
+            "badge": "Why Rerun",
+            "title": "Why freelancers and studios build on Rerun.",
+            "subtitle": "You ship the Coworker, the client keeps it running. No infrastructure to rent, no handover doc nobody reads.",
+            "cells": {
+                "ship": {
+                    "title": "Ship in days, not months",
+                    "desc": "Start from ready-to-run Coworkers and {connectorCount}+ apps, one click each. Nothing to provision before your first demo."
+                },
+                "harness": {
+                    "title": "Build the harness, not just the prompt",
+                    "desc": "Pick exactly what the Coworker can do: files, shell, web, memory, its own database, skills. Every capability is a switch."
+                },
+                "board": {
+                    "title": "Deliver a live board, not a chat log",
+                    "desc": "Runs, cost, success rate and what needs a human, live on the board. Your client sees the work happening without pinging you for a status."
+                },
+                "handoff": {
+                    "title": "Hand off without hand-holding",
+                    "desc": "Before anything sensitive, the Coworker stops and asks your client. They approve from the app or Slack, so you are not the one in the loop forever."
+                },
+                "running": {
+                    "title": "It keeps running after you leave",
+                    "desc": "Coworkers run 24/7 on the client's own machine, on a schedule or on a trigger. No babysitting, no emergency call at 2am."
+                },
+                "improving": {
+                    "title": "The Coworker you sold keeps improving",
+                    "desc": "It writes down what it learns about the client, so the work you delivered gets sharper on its own instead of aging badly."
+                }
+            }
+        },
+        "benefits": {
+            "badge": "What you get",
+            "title": "Grow faster as a Rerun Expert.",
+            "subtitle": "One application, four ways to get paid for the work you already do.",
+            "items": {
+                "listed": {
+                    "title": "Get listed in the Expert directory",
+                    "desc": "A public profile clients browse, filter by skill and budget, and contact in one click. Every brief that comes in lands straight in your inbox."
+                },
+                "sandbox": {
+                    "title": "Build for free in your sandbox",
+                    "desc": "Expert accounts get a sandbox with no Coworker limit and no bill. Prototype, demo, then hand the finished Coworker over to the client."
+                },
+                "templates": {
+                    "title": "Keep 95% of your template sales",
+                    "desc": "Package a Coworker as a template, publish it on the marketplace, and get paid every time someone installs it. You set the price, you keep 95% of every sale, and we handle the payout."
+                },
+                "revenue": {
+                    "title": "Earn 20% on every client you bring",
+                    "desc": "When a client you onboarded subscribes, you earn 20% of their Rerun plan, every month, for as long as they stay."
+                }
+            }
+        },
+        "perks": {
+            "badge": "Expert advantage",
+            "title": "What every Rerun Expert gets.",
+            "subtitle": "One tier, no points to farm. Here is what changes the day your application is accepted.",
+            "regular": {
+                "title": "Regular account",
+                "subtitle": "Any Rerun user"
+            },
+            "expert": {
+                "title": "Rerun Expert",
+                "subtitle": "Accepted into the program"
+            },
+            "rows": {
+                "directory": {
+                    "label": "Directory listing",
+                    "regular": "Not listed, clients cannot find you",
+                    "expert": "A public profile, indexed and filterable by clients"
+                },
+                "matching": {
+                    "label": "Client matching",
+                    "regular": "You chase your own leads",
+                    "expert": "Inbound briefs routed to you by skill and budget"
+                },
+                "sandbox": {
+                    "label": "Sandbox",
+                    "regular": "Coworker limits and a bill on every workspace",
+                    "expert": "Unlimited and free, to build and demo client Coworkers"
+                },
+                "marketplace": {
+                    "label": "Template marketplace",
+                    "regular": "Browse and install templates",
+                    "expert": "Publish your Coworkers and keep 95% of every sale"
+                },
+                "revenue": {
+                    "label": "Revenue share",
+                    "regular": "None",
+                    "expert": "20% recurring on the client plans you bring in"
+                },
+                "community": {
+                    "label": "Community",
+                    "regular": "Docs and the shared support inbox",
+                    "expert": "A private channel and a direct line to the team"
+                },
+                "earlyAccess": {
+                    "label": "Early access",
+                    "regular": "Features when they ship publicly",
+                    "expert": "New features and models before they ship publicly"
+                },
+                "coMarketing": {
+                    "label": "Co-marketing",
+                    "regular": "None",
+                    "expert": "Featured profiles, case studies and launch support"
+                }
+            }
+        },
+        "apply": {
+            "button": "Apply as an expert",
+            "sent": {
+                "title": "Application received",
+                "description": "We review every application by hand. If it is a fit, you get an email with a link to claim your creator account and your sandbox.",
+                "close": "Close"
+            },
+            "title": "Apply to the Expert Program",
+            "description": "Tell us who you are. We reply by email with the next step.",
+            "fields": {
+                "name": "Name or studio",
+                "namePlaceholder": "Ada Lovelace",
+                "email": "Email",
+                "emailPlaceholder": "you@studio.com",
+                "type": "You work as",
+                "location": "Location",
+                "locationPlaceholder": "Paris, France",
+                "website": "Website or portfolio",
+                "linkedin": "LinkedIn",
+                "x": "X"
+            },
+            "types": {
+                "freelancer": "Freelancer",
+                "studio": "Studio"
+            },
+            "submit": "Send application",
+            "sending": "Sending...",
+            "validation": {
+                "nameRequired": "Name is required",
+                "emailRequired": "Email is required",
+                "emailInvalid": "Invalid email",
+                "locationTooLong": "Location is too long",
+                "urlProtocol": "Must start with http:// or https://"
+            },
+            "errors": {
+                "alreadyApplied": "This email is already on file. We will get back to you.",
+                "invalid": "Please check the form and try again.",
+                "failed": "Something went wrong. Please try again."
+            }
+        }
+    },
+    "visuals": {
+        "harness": {
+            "capabilities": {
+                "filesystem": {
+                    "label": "Read & write files",
+                    "blurb": "Work with files in its workspace"
+                },
+                "shell": {
+                    "label": "Run commands",
+                    "blurb": "Execute commands in its Box"
+                },
+                "web": {
+                    "label": "Browse the web",
+                    "blurb": "Search and read web pages"
+                },
+                "memory": {
+                    "label": "Remember things",
+                    "blurb": "Save and recall information"
+                },
+                "db": {
+                    "label": "Access data",
+                    "blurb": "Query its database"
+                },
+                "skills": {
+                    "label": "Use skills",
+                    "blurb": "Run installed skills"
+                },
+                "self": {
+                    "label": "Improve itself",
+                    "blurb": "Adjust its own setup"
+                },
+                "schedule": {
+                    "label": "Schedule tasks",
+                    "blurb": "Plan work for later"
+                },
+                "callAgent": {
+                    "label": "Work with other coworkers",
+                    "blurb": "Delegate to teammates"
+                },
+                "askUser": {
+                    "label": "Ask you questions",
+                    "blurb": "Pause to ask with answer options"
+                },
+                "requestApproval": {
+                    "label": "Request approval",
+                    "blurb": "Pause for your go-ahead"
+                }
+            }
+        },
+        "hitl": {
+            "agent": "Margo · Invoice Chasing",
+            "question": "Two invoices at acme.com are 20 days overdue. How should I chase them?",
+            "options": {
+                "remind": "Send a firm reminder to billing@acme.com",
+                "call": "Call their AP contact first",
+                "escalate": "Escalate to the account owner"
+            },
+            "approval": {
+                "action": "Margo wants to send a refund of $230 to acme.com",
+                "detail": "Invoice #1042 · disputed charge"
+            },
+            "permission": {
+                "label": "Send email",
+                "message": "Send the payment reminder to billing@acme.com",
+                "preview": "Subject: Invoice #1042: payment overdue\n\nHi, invoice #1042 ($230) was due on Aug 20."
+            },
+            "resume": {
+                "question": "Calling their AP contact · reminder queued",
+                "approval": "Refund sent · customer notified",
+                "permission": "Email sent to billing@acme.com"
+            }
+        },
+        "monitor": {
+            "runs": {
+                "title": "Runs today",
+                "subtitle": "Live"
+            },
+            "status": {
+                "title": "Coworker status",
+                "subtitle": "{count} working now"
+            },
+            "tokens": {
+                "title": "Tokens used",
+                "subtitle": "Last 7 days"
+            },
+            "success": {
+                "title": "Success rate",
+                "subtitle": "Rolling 24h"
+            },
+            "logs": {
+                "title": "Run logs",
+                "subtitle": "Jules · Inbound Sales"
+            },
+            "revenue": {
+                "title": "Revenue closed",
+                "subtitle": "This month"
+            },
+            "agents": {
+                "a1": "Jules · Inbound Sales",
+                "a2": "Margo · Invoice Chasing",
+                "a3": "Sam · Inbox Triage",
+                "a4": "Nora · Support",
+                "a5": "Leo · Reporting"
+            }
+        },
+        "triggers": {
+            "listening": "listening",
+            "status": {
+                "triggered": "triggered",
+                "running": "running",
+                "done": "done"
+            },
+            "events": {
+                "morning": {
+                    "source": "Every morning at 7:00",
+                    "action": "Sam sorted your inbox"
+                },
+                "lead": {
+                    "source": "New email from a lead",
+                    "action": "Jules is drafting a reply"
+                },
+                "payment": {
+                    "source": "A payment just failed",
+                    "action": "Margo is chasing it"
+                },
+                "signup": {
+                    "source": "New signup",
+                    "action": "Onboarding kicked off"
+                },
+                "meeting": {
+                    "source": "A meeting just ended",
+                    "action": "Sam is writing the recap"
+                }
+            }
+        },
+        "memory": {
+            "files": "{count, plural, one {file} other {files}}",
+            "updated": "updated just now",
+            "kinds": {
+                "skill": "skill",
+                "context": "context",
+                "preference": "preference"
+            },
+            "cards": {
+                "invoiceChasing": {
+                    "name": "Invoice chasing",
+                    "description": "Chase overdue invoices without burning the client.",
+                    "lines": {
+                        "1": "## Procedure",
+                        "2": "1. Pull unpaid invoices from Stripe daily",
+                        "3": "2. Send a first reminder on day 7 past due",
+                        "4": "3. Escalate to the account owner after 2 tries",
+                        "5": "4. Log every touch in the CRM thread",
+                        "6": "## Exceptions",
+                        "7": "- Never chase an invoice under $50",
+                        "8": "- Read references/tone.md before escalating"
+                    }
+                },
+                "acme": {
+                    "name": "Acme Corp",
+                    "description": "What the coworker knows about the account.",
+                    "lines": {
+                        "1": "## Billing",
+                        "2": "- Pays around day 30, sometimes later",
+                        "3": "- A PO number is required on every invoice",
+                        "4": "- Invoices go to ap@acme.co, not to Dana",
+                        "5": "## People",
+                        "6": "- Dana Reyes runs ops, answers within a day",
+                        "7": "- Escalations go through their COO"
+                    }
+                },
+                "emailTone": {
+                    "name": "Email tone",
+                    "description": "How the user wants leads written to.",
+                    "lines": {
+                        "1": "## Voice",
+                        "2": "- English, formal, no emoji",
+                        "3": "- Sign off as the founder, not an assistant",
+                        "4": "- Keep it under 120 words",
+                        "5": "## Timing",
+                        "6": "- Follow up twice, then stop",
+                        "7": "- Send whenever the draft is ready"
+                    }
+                }
+            },
+            "rounds": {
+                "confirmed": {
+                    "label": "Confirmed",
+                    "text": "Acme paid on day 44 again",
+                    "after": "- Pays on net 45, confirmed on 3 invoices"
+                },
+                "preference": {
+                    "label": "Preference",
+                    "text": "Never email a client before 9am",
+                    "after": "- Never send before 9am, their local time"
+                },
+                "learned": {
+                    "label": "Learned",
+                    "text": "Acme escalations go through their COO",
+                    "after": "3. Escalate to their COO after 2 tries"
+                }
+            }
+        }
+    }
+}

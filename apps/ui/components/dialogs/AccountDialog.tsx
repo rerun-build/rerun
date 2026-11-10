@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
 import {
     deleteMyAccountAction,
@@ -13,12 +14,15 @@ import {
     type SignInMethods,
 } from '@/app/api/_actions/account.actions'
 import type { ActionResult } from '@/app/api/_actions/space.actions'
-import { ACCOUNT_TABS, AccountTabs } from '@/components/account/AccountTabs'
+import { AccountTabs, useAccountTabText } from '@/components/account/AccountTabs'
 import { DeleteAccountPanel } from '@/components/account/DeleteAccountPanel'
+import { LanguagePanel } from '@/components/account/LanguagePanel'
+import { useLanguageChoice } from '@/components/account/useLanguageChoice'
 import { ProfilePanel } from '@/components/account/ProfilePanel'
 import { SignInMethodsPanel } from '@/components/account/SignInMethodsPanel'
 import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
 import { DIALOG_TABS_CONTENT, DIALOG_TABS_HEADER } from '@/components/dialogs/DialogTabs'
+import { useLanguagePacksEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PHONE_ENABLED } from '@rerun/cloud/phone'
 import { PhoneChangeForm } from '@rerun/cloud/phone.client'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -35,11 +39,12 @@ import { useAccountStore, type AccountTab } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
-function unwrap(result: ActionResult) {
-    if (!result.ok) throw new Error(result.error)
+function unwrap(result: ActionResult, errorText: ReturnType<typeof useErrorText>) {
+    if (!result.ok) throw new Error(errorText(result))
 }
 
 // The name and the photo ride on the session's user, so reading them back is a token refresh.
@@ -49,6 +54,7 @@ async function refreshSession() {
 
 function ProfileTab() {
     const { session } = useSession()
+    const errorText = useErrorText()
     const authUser = session?.user
     if (!authUser) return null
     const profile = readProfile(authUser)
@@ -56,17 +62,17 @@ function ProfileTab() {
     const uploadAvatar = async (file: File) => {
         const formData = new FormData()
         formData.append('file', file)
-        unwrap(await uploadMyAvatarAction(formData))
+        unwrap(await uploadMyAvatarAction(formData), errorText)
         await refreshSession()
     }
 
     const removeAvatar = async () => {
-        unwrap(await removeMyAvatarAction())
+        unwrap(await removeMyAvatarAction(), errorText)
         await refreshSession()
     }
 
     const saveName = async (name: string) => {
-        unwrap(await updateMyNameAction({ name }))
+        unwrap(await updateMyNameAction({ name }), errorText)
         await refreshSession()
     }
 
@@ -76,6 +82,8 @@ function ProfileTab() {
 type SignInStep = 'list' | 'email' | 'phone'
 
 function SignInTab() {
+    const t = useTranslations('dialogs.account')
+    const errorText = useErrorText()
     const { refreshPhoneStep } = useSession()
     const [methods, setMethods] = useState<SignInMethods | null>(null)
     const [step, setStep] = useState<SignInStep>(() => useAccountStore.getState().signInStart)
@@ -84,7 +92,7 @@ function SignInTab() {
 
     const show = (result: Awaited<ReturnType<typeof getSignInMethodsAction>>) => {
         if (result.ok) setMethods(result.methods)
-        else toast.error(result.error)
+        else toast.error(errorText(result))
     }
     const load = async () => show(await getSignInMethodsAction())
 
@@ -104,7 +112,7 @@ function SignInTab() {
     }
 
     const sendEmailCode = async (email: string) => {
-        unwrap(await prepareEmailChangeAction({ email }))
+        unwrap(await prepareEmailChangeAction({ email }), errorText)
         const live = await resendLiveSignInCode(email)
         if (live.resent) return live.held ? 'held' : undefined
         const { error } = await createClient().auth.updateUser({ email })
@@ -116,16 +124,16 @@ function SignInTab() {
         if (error) throw error
         // Supabase answers a success while the change still waits on the current address, which is
         // how a project left on double confirmation behaves.
-        if (data.user?.email?.toLowerCase() !== email) throw new Error('This change still has to be confirmed from your current address.')
+        if (data.user?.email?.toLowerCase() !== email) throw new Error(t('emailChangeNeedsCurrentAddress'))
         void syncAccountEmailAction()
-        toast.success('Email updated')
+        toast.success(t('emailUpdated'))
         await backToList()
     }
 
     const onPhoneChanged = async () => {
         // An account born from a number is filed under it, so its address just moved with it.
         await Promise.all([refreshSession(), refreshPhoneStep()])
-        toast.success('Phone number updated')
+        toast.success(t('phoneUpdated'))
         await backToList()
     }
 
@@ -139,12 +147,12 @@ function SignInTab() {
         if (!error) return
         forgetLinkIntent()
         setBusyProvider(null)
-        toast.error(`Could not connect ${label}. Try again.`)
+        toast.error(t('connectFailed', { provider: label }))
     }
 
     const disconnectProvider = async (provider: OAuthProvider) => {
         const { label } = OAUTH_PROVIDER_CONFIG[provider]
-        const failure = `Could not disconnect ${label}. Try again.`
+        const failure = t('disconnectFailed', { provider: label })
         setBusyProvider(provider)
         try {
             const supabase = createClient()
@@ -152,9 +160,9 @@ function SignInTab() {
             const identity = data?.identities.find(candidate => candidate.provider === provider)
             if (readError || !identity) throw new Error(failure)
             const { error } = await supabase.auth.unlinkIdentity(identity)
-            if (error) throw new Error(error.code === 'single_identity_not_deletable' ? `${label} is the only sign-in method connected to this account.` : failure)
+            if (error) throw new Error(error.code === 'single_identity_not_deletable' ? t('onlySignInMethod', { provider: label }) : failure)
             await refreshSession()
-            toast.success(`${label} disconnected`)
+            toast.success(t('disconnected', { provider: label }))
             await load()
         } catch (error) {
             toast.error(error instanceof Error ? error.message : failure)
@@ -167,7 +175,7 @@ function SignInTab() {
         return (
             <PanelSteps stepKey="email" depth={1}>
                 <PanelEditorShell>
-                    <PanelEditorHeader title={methods?.email ? 'Change email' : 'Add email'} onBack={() => setStep('list')} />
+                    <PanelEditorHeader title={methods?.email ? t('changeEmail') : t('addEmail')} onBack={() => setStep('list')} />
                     <PanelEditorBody>
                         <div className="mx-auto w-full max-w-sm py-4">
                             <EmailCodeForm purpose="change" sendCode={sendEmailCode} verifyCode={verifyEmailCode} />
@@ -182,7 +190,7 @@ function SignInTab() {
         return (
             <PanelSteps stepKey="phone" depth={1}>
                 <PanelEditorShell>
-                    <PanelEditorHeader title={methods?.phone ? 'Change phone number' : 'Add phone number'} onBack={() => setStep('list')} />
+                    <PanelEditorHeader title={methods?.phone ? t('changePhone') : t('addPhone')} onBack={() => setStep('list')} />
                     <PanelEditorBody>
                         <div className="mx-auto w-full max-w-sm py-4">
                             <PhoneChangeForm onChanged={onPhoneChanged} />
@@ -197,7 +205,7 @@ function SignInTab() {
         <PanelSteps stepKey="list" depth={0}>
             <SignInMethodsPanel
                 methods={methods}
-                unavailableReasons={inAppBrowser ? { google: 'Open Rerun in your browser to connect Google.' } : undefined}
+                unavailableReasons={inAppBrowser ? { google: t('googleNeedsBrowser') } : undefined}
                 busyProvider={busyProvider}
                 onChangeEmail={() => setStep('email')}
                 onChangePhone={PHONE_ENABLED ? () => setStep('phone') : undefined}
@@ -210,6 +218,7 @@ function SignInTab() {
 
 function DeleteAccountTab() {
     const { workspace, signOut } = useSession()
+    const errorText = useErrorText()
     const setOpen = useAccountStore(state => state.setOpen)
     const openBilling = useBillingStore(state => state.openBilling)
     const [blockers, setBlockers] = useState<AccountDeletionBlocker[] | null>(null)
@@ -219,7 +228,7 @@ function DeleteAccountTab() {
         void getAccountDeletionStatusAction().then(result => {
             if (!mounted) return
             if (result.ok) setBlockers(result.blockers)
-            else toast.error(result.error)
+            else toast.error(errorText(result))
         })
         return () => {
             mounted = false
@@ -232,7 +241,7 @@ function DeleteAccountTab() {
     }
 
     const deleteAccount = async (confirmation: string) => {
-        unwrap(await deleteMyAccountAction({ confirmation }))
+        unwrap(await deleteMyAccountAction({ confirmation }), errorText)
         setOpen(false)
         await signOut()
     }
@@ -240,14 +249,24 @@ function DeleteAccountTab() {
     return <DeleteAccountPanel blockers={blockers} currentWorkspaceId={workspace?.id ?? null} onOpenBilling={openBillingPanel} deleteAccount={deleteAccount} />
 }
 
+function LanguageTab() {
+    const { value, change } = useLanguageChoice()
+    return <LanguagePanel value={value} onChange={change} />
+}
+
 const TAB_CONTENT: Record<AccountTab, () => ReactNode> = {
     profile: ProfileTab,
     'sign-in': SignInTab,
+    language: LanguageTab,
     delete: DeleteAccountTab,
 }
 
 export function AccountDialog() {
-    const { open, tab, setOpen, setTab } = useAccountStore()
+    const { open, tab: requestedTab, setOpen, setTab } = useAccountStore()
+    const t = useTranslations('account')
+    const showLanguage = useLanguagePacksEnabled()
+    const tab = requestedTab === 'language' && !showLanguage ? 'profile' : requestedTab
+    const { description } = useAccountTabText(tab)
     const TabContent = TAB_CONTENT[tab]
 
     return (
@@ -256,10 +275,11 @@ export function AccountDialog() {
                 <AccountTabs
                     tab={tab}
                     onTabChange={setTab}
+                    showLanguage={showLanguage}
                     header={
                         <DialogHeader className={DIALOG_TABS_HEADER}>
-                            <DialogTitle>Account</DialogTitle>
-                            <DialogDescription>{ACCOUNT_TABS[tab].description}</DialogDescription>
+                            <DialogTitle>{t('title')}</DialogTitle>
+                            <DialogDescription>{description}</DialogDescription>
                         </DialogHeader>
                     }
                 >

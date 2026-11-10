@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { Button } from '@/components/ui/button'
 import { PANEL_CARD } from '@/components/ui/panel-row'
 import { asStringArray } from '@/lib/mcp/args'
@@ -17,8 +19,9 @@ type ForemanEitherWidgetProps = {
 }
 
 export function ForemanEitherWidget({ input, output, onAnswer }: ForemanEitherWidgetProps) {
+    const t = useTranslations('foreman.question')
     const args = input && typeof input === 'object' ? (input as Record<string, unknown>) : {}
-    const title = typeof args.title === 'string' ? args.title : 'One question'
+    const title = typeof args.title === 'string' ? args.title : t('fallback')
     const description = typeof args.description === 'string' ? args.description : ''
     const options = asStringArray(args.options).slice(0, 2)
 
@@ -41,7 +44,7 @@ export function ForemanEitherWidget({ input, output, onAnswer }: ForemanEitherWi
             {/* The composer is gone while the card waits: without a way out, someone neither answer
                 fits has nothing left to click. */}
             <Button size="sm" variant="ghost" className="self-center text-muted-foreground" onClick={() => onAnswer({ answered: false, reason: 'neither' })}>
-                Neither
+                {t('neither')}
             </Button>
         </div>
     )

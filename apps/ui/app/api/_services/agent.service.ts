@@ -13,12 +13,14 @@ import {
 import type { EngineAgentConfigPatch } from '@/lib/engine/types'
 import { AGENT_SPAN, UNPLACED_COL, agentsOverlap, isPlaced } from '@/lib/board/iso'
 import type { GridPosition } from '@/lib/board/types'
+import { coworkerLanguageFor } from '@/app/api/_services/coworker-language.service'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectSingle } from '@/supabase/supabase-helpers'
 import { sanitizeIdentifier } from '@/lib/utils'
 import { duplicateAgentName } from '@/lib/copy-name'
 import { PLAN_LIMIT_REASON, hasFreeAgentSlot } from './capacity.service'
 import { getSpaceConnection } from './space.service'
+import { AppError, failure, type ActionFailure } from '@/lib/i18n/action-error'
 
 type CreateAgentParams = {
     name: string
@@ -85,20 +87,20 @@ export async function findFreeCellsInSpace(supabase: ReturnType<typeof createSer
 // the old one would park it in the rectangle it just left.
 // Moving changes who sees the coworker, so it takes `manage` on the Box it leaves and on the one it
 // joins.
-export async function moveAgentToBox(agentId: string, spaceId: string, actor: Actor): Promise<{ ok: true; position: GridPosition } | { ok: false; error: string }> {
+export async function moveAgentToBox(agentId: string, spaceId: string, actor: Actor): Promise<{ ok: true; position: GridPosition } | ActionFailure> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['space_id', 'workspace_id'] as const, { id: agentId })
-    if (!agent || agent.workspace_id !== actor.workspaceId) return { ok: false, error: 'Coworker not found' }
-    if (agent.space_id === spaceId) return { ok: false, error: 'This coworker is already in that Box' }
+    if (!agent || agent.workspace_id !== actor.workspaceId) return failure(COWORKER_NOT_FOUND)
+    if (agent.space_id === spaceId) return failure('coworkerAlreadyInBox')
     const [from, to] = await Promise.all([readSpaceAccess(actor, agent.space_id), readSpaceAccess(actor, spaceId)])
-    if (from === 'none') return { ok: false, error: 'Coworker not found' }
-    if (to === 'none') return { ok: false, error: 'Box not found' }
-    if (from !== 'manage' || to !== 'manage') return { ok: false, error: BOX_MANAGE_ONLY }
+    if (from === 'none') return failure(COWORKER_NOT_FOUND)
+    if (to === 'none') return failure(BOX_NOT_FOUND)
+    if (from !== 'manage' || to !== 'manage') return failure(BOX_MANAGE_ONLY)
 
     // Refused rather than moved unplaced: an unplaced agent leaves the board, and the toolbar badge
     // that brings it back is a worse place than the one it already had.
     const position = await findFreeCellInSpace(supabase, spaceId)
-    if (!position) return { ok: false, error: 'That Box has no room left. Free a cell in it first.' }
+    if (!position) return failure('boxFull')
 
     const { error } = await supabase.from('agents').update<Database['public']['Tables']['agents']['Update']>({ space_id: spaceId, col: position.col, row: position.row }).eq('id', agentId)
     if (error) return { ok: false, error: `Failed to move agent: ${error.message}` }
@@ -161,8 +163,9 @@ export async function createAgent(params: CreateAgentParams) {
     // returns its canonical id. We mirror only what the grid UI needs. The engine
     // stores the handle as config.name (mention/resolution key); the free display
     // name goes to displayName (used in the SOUL prompt).
+    const language = config?.language ?? (await coworkerLanguageFor(supabase, workspaceId))
     const detail = await engineCreateAgent(conn, {
-        config: { ...config, name: handle, displayName: name, description: description || undefined, enabled },
+        config: { ...config, name: handle, displayName: name, description: description || undefined, enabled, ...(language ? { language } : {}) },
         soul: soulMd || undefined,
         install: installMd || undefined,
     })
@@ -224,7 +227,8 @@ export async function importAgent(params: ImportAgentParams) {
     const imported = await importAgentArchive(conn, archive, handle, name)
     // The archive carries its own config, so unlike createAgent the flag has to be applied after
     // the unpack rather than passed into it.
-    if (!enabled) await enginePatchAgent(conn, imported.id, { enabled: false })
+    // The archive may carry the language of the workspace it was captured in: this one's replaces it.
+    await enginePatchAgent(conn, imported.id, { ...(enabled ? {} : { enabled: false }), language: await coworkerLanguageFor(supabase, workspaceId) })
 
     const cell = position ?? (await findFreeCellInSpace(supabase, spaceId))
     const { data: agent, error } = await supabase
@@ -276,8 +280,6 @@ export type DuplicatedAgent = {
 // An engine that predates the duplicate route answers 404 to a perfectly good request, and the
 // only other 404 on that path is an agent the engine really does not have. The body tells them
 // apart, so a box being behind never reads as "your agent is gone".
-const STALE_DUPLICATE_HINT = 'This workspace runs on a machine whose engine is too old to duplicate coworkers. Ask the Rerun team to update it, then try again.'
-
 function isMissingDuplicateRoute(err: unknown): boolean {
     return err instanceof Error && /failed: 404/.test(err.message) && !err.message.includes('agent not found')
 }
@@ -291,7 +293,7 @@ export async function duplicateAgent(params: DuplicateAgentParams): Promise<Dupl
 
     const supabase = createServiceRoleClient()
     const { data: source } = await selectSingle(supabase, 'agents', ['name', 'space_id', 'engine_agent_id', 'description', 'template_id', 'workspace_id'] as const, { id: agentRowId })
-    if (!source || source.workspace_id !== workspaceId || !source.engine_agent_id) throw new Error('Coworker not found')
+    if (!source || source.workspace_id !== workspaceId || !source.engine_agent_id) throw new AppError(COWORKER_NOT_FOUND)
     // A copy carries its source's whole setup, keys and connected services included, so both Boxes
     // have to be managed: the source like a share link, the copy's like any creation.
     enforce(await readSpaceAccess(params.actor, source.space_id), 'manage', COWORKER_NOT_FOUND)
@@ -305,7 +307,7 @@ export async function duplicateAgent(params: DuplicateAgentParams): Promise<Dupl
     try {
         copy = await engineDuplicateAgent(conn, source.engine_agent_id, { name: handle, displayName: name })
     } catch (err) {
-        throw isMissingDuplicateRoute(err) ? new Error(STALE_DUPLICATE_HINT) : err
+        throw isMissingDuplicateRoute(err) ? new AppError('engineTooOldToDuplicate') : err
     }
 
     // The copy carries the source's own `enabled`, so the flag is applied after the fact rather
@@ -393,7 +395,7 @@ export async function resumeAgentSchedules(id: string): Promise<void> {
 export async function renameAgent(id: string, newName: string) {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id', 'handle'] as const, { id })
-    if (!agent) throw new Error('Coworker not found')
+    if (!agent) throw new AppError(COWORKER_NOT_FOUND)
 
     const handle = await deriveUniqueHandle(supabase, agent.workspace_id, newName, id)
     if (agent.engine_agent_id) {
@@ -412,15 +414,15 @@ export async function renameAgent(id: string, newName: string) {
 export async function changeAgentHandle(id: string, requestedHandle: string) {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id', 'name', 'handle'] as const, { id })
-    if (!agent) throw new Error('Coworker not found')
+    if (!agent) throw new AppError(COWORKER_NOT_FOUND)
 
     const handle = sanitizeIdentifier(requestedHandle).replace(/^_+|_+$/g, '')
-    if (!handle) throw new Error(`"${requestedHandle}" leaves nothing usable as a handle. Use letters, digits and underscores.`)
+    if (!handle) throw new AppError('handleUnusable', { handle: requestedHandle })
 
     if (handle !== agent.handle) {
         const { data: siblings } = await selectMany(supabase, 'agents', ['id', 'handle'] as const, { workspace_id: agent.workspace_id })
         if ((siblings ?? []).some(sibling => sibling.id !== id && sibling.handle === handle)) {
-            throw new Error(`Another coworker in this workspace already answers to "${handle}".`)
+            throw new AppError('handleTaken', { handle })
         }
     }
 
@@ -441,7 +443,7 @@ export async function deleteAgent(id: string) {
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { id })
 
     if (!agent) {
-        throw new Error('Coworker not found')
+        throw new AppError(COWORKER_NOT_FOUND)
     }
 
     if (agent.engine_agent_id) {

@@ -9,6 +9,7 @@ import { useTemplateImportFlow } from '@/lib/templates/useTemplateImportFlow'
 import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
 // The template counterpart of useStartPendingAgent: claims a Space when the workspace has none,
@@ -17,6 +18,7 @@ import { toast } from 'sonner'
 // toasting, leaving the parked entry in place so the chain can be retried.
 export function useStartPendingTemplate() {
     const { workspace } = useSession()
+    const t = useTranslations('templates.installFeedback')
     const setStartingFirstAgent = useBoardStore(s => s.setStartingFirstAgent)
     const selectAgentWhenReady = useBoardStore(s => s.selectAgentWhenReady)
     const { run: startImport } = useTemplateImportFlow({ onDone: () => {} })
@@ -32,7 +34,7 @@ export function useStartPendingTemplate() {
         if (parked.needsPlacement) {
             const template = await getSharedTemplateAction(parked.slug)
             if (!template) {
-                toast.error(`"${parked.title}" is no longer available`)
+                toast.error(t('noLongerAvailable', { title: parked.title }))
                 useOnboardingStore.getState().clearPendingTemplate()
                 return false
             }
@@ -40,7 +42,7 @@ export function useStartPendingTemplate() {
             if (!template.owned) {
                 const result = await startTemplateCheckoutAction(parked.slug)
                 if (!result.ok) {
-                    toast.error(`Could not buy "${parked.title}"`, { description: result.error })
+                    toast.error(t('buyFailed', { title: parked.title }), { description: result.error })
                     throw new Error(result.error)
                 }
                 // Le checkout ramène sur `?template=<slug>&purchase=success`, où la fiche de succès
@@ -67,7 +69,7 @@ export function useStartPendingTemplate() {
             if (!spaceId || !corner) {
                 const claim = await claimSpaceAction({ workspaceId: workspace.id })
                 if (!claim.ok) {
-                    toast.error('Could not prepare your Box', { description: claim.error })
+                    toast.error(t('prepareBoxFailed'), { description: claim.error })
                     throw new Error(claim.error)
                 }
                 spaceId = claim.spaceId
@@ -75,7 +77,7 @@ export function useStartPendingTemplate() {
                 // The Space row lands through realtime, which turns the board's loading placeholder
                 // off well before the archives are downloaded and unpacked. Without this the board
                 // sits empty and silent for the whole import.
-                toast.info(`Setting up "${parked.title}"`, { description: 'Your coworkers will appear on the board in a moment.' })
+                toast.info(t('settingUp', { title: parked.title }), { description: t('settingUpHint') })
             }
 
             // The agents land where the user dropped them on the placeholder, rebased on the Space
@@ -83,7 +85,7 @@ export function useStartPendingTemplate() {
             const positions = parked.offsets?.map(offset => rebaseOffset(offset, corner))
             const result = await installTemplateAction({ slug: parked.slug, spaceId, positions })
             if (!result.ok) {
-                toast.error(`Could not set up "${parked.title}"`, { description: result.error })
+                toast.error(t('setUpFailed', { title: parked.title }), { description: result.error })
                 throw new Error(result.error)
             }
 

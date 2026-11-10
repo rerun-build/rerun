@@ -14,6 +14,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@/lib/icons'
 import type { ComponentProps, HTMLAttributes, ReactElement } from 'react'
 import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { Streamdown } from 'streamdown'
+import { useTranslations } from 'next-intl'
 
 export { Message, MessageContent } from '@rerun/ui/chat'
 export type { MessageProps, MessageContentProps } from '@rerun/ui/chat'
@@ -158,10 +159,11 @@ export const MessageBranchSelector = ({ className, ...props }: MessageBranchSele
 export type MessageBranchPreviousProps = ComponentProps<typeof Button>
 
 export const MessageBranchPrevious = ({ children, ...props }: MessageBranchPreviousProps) => {
+    const t = useTranslations('chat.message.branch')
     const { goToPrevious, totalBranches } = useMessageBranch()
 
     return (
-        <Button aria-label="Previous branch" disabled={totalBranches <= 1} onClick={goToPrevious} size="icon-sm" type="button" variant="ghost" {...props}>
+        <Button aria-label={t('previous')} disabled={totalBranches <= 1} onClick={goToPrevious} size="icon-sm" type="button" variant="ghost" {...props}>
             {children ?? <ChevronLeftIcon size={14} />}
         </Button>
     )
@@ -170,10 +172,11 @@ export const MessageBranchPrevious = ({ children, ...props }: MessageBranchPrevi
 export type MessageBranchNextProps = ComponentProps<typeof Button>
 
 export const MessageBranchNext = ({ children, ...props }: MessageBranchNextProps) => {
+    const t = useTranslations('chat.message.branch')
     const { goToNext, totalBranches } = useMessageBranch()
 
     return (
-        <Button aria-label="Next branch" disabled={totalBranches <= 1} onClick={goToNext} size="icon-sm" type="button" variant="ghost" {...props}>
+        <Button aria-label={t('next')} disabled={totalBranches <= 1} onClick={goToNext} size="icon-sm" type="button" variant="ghost" {...props}>
             {children ?? <ChevronRightIcon size={14} />}
         </Button>
     )
@@ -182,11 +185,12 @@ export const MessageBranchNext = ({ children, ...props }: MessageBranchNextProps
 export type MessageBranchPageProps = HTMLAttributes<HTMLSpanElement>
 
 export const MessageBranchPage = ({ className, ...props }: MessageBranchPageProps) => {
+    const t = useTranslations('chat.message.branch')
     const { currentBranch, totalBranches } = useMessageBranch()
 
     return (
         <ButtonGroupText className={cn('border-none bg-transparent text-muted-foreground shadow-none', className)} {...props}>
-            {currentBranch + 1} of {totalBranches}
+            {t('page', { current: currentBranch + 1, total: totalBranches })}
         </ButtonGroupText>
     )
 }

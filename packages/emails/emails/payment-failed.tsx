@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface PaymentFailedProps {
@@ -21,6 +23,7 @@ export interface PaymentFailedProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -38,55 +41,45 @@ export default function PaymentFailed({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: PaymentFailedProps) {
-  const workspace = workspaceName ?? "your workspace";
+  const t = emailTranslator(locale);
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
-      preview={`Your Rerun payment was declined, your workspace is paused on ${pausedLabel}`}
+      preview={t("paymentFailed.preview", { pausedAt: pausedLabel })}
       hero={{ scene: "trial-ended", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Your payment was declined</Heading>
+      <Heading style={text.heading}>{t("paymentFailed.heading")}</Heading>
       <Text style={text.paragraph}>
-        The renewal for <strong>{workspace}</strong>
-        {amountLabel ? (
-          <>
-            , <strong>{amountLabel}</strong>,
-          </>
-        ) : null}{" "}
-        did not go through on <strong>{declinedLabel}</strong>. Your bank may
-        simply be asking you to confirm it.
+        {amountLabel
+          ? t.rich("paymentFailed.declinedWithAmount", { workspace, amount: amountLabel, date: declinedLabel, strong })
+          : t.rich("paymentFailed.declined", { workspace, date: declinedLabel, strong })}
       </Text>
       <Text style={text.paragraph}>
-        Your workspace keeps running until <strong>{pausedLabel}</strong>. After
-        that it is <strong>paused</strong> and your coworkers stop. Nothing is
-        deleted: your coworkers and everything they know are saved until{" "}
-        <strong>{keptUntilLabel}</strong>. Pay the invoice and nothing changes,
-        on the same plan.
+        {t.rich("paymentFailed.consequences", { pausedAt: pausedLabel, keptUntil: keptUntilLabel, strong })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Workspace", value: workspace },
-            ...(amountLabel ? [{ label: "Amount due", value: amountLabel }] : []),
-            { label: "Declined on", value: declinedLabel },
-            { label: "Workspace paused", value: pausedLabel },
-            { label: "Saved until", value: keptUntilLabel },
+            { label: t("common.meta.workspace"), value: workspace },
+            ...(amountLabel ? [{ label: t("common.meta.amountDue"), value: amountLabel }] : []),
+            { label: t("common.meta.declinedOn"), value: declinedLabel },
+            { label: t("common.meta.workspacePaused"), value: pausedLabel },
+            { label: t("common.meta.savedUntil"), value: keptUntilLabel },
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={billingUrl}>Pay the invoice</Button>
+        <Button href={billingUrl}>{t("paymentFailed.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        We will try the card again over the next few days. If one of those
-        attempts goes through, your workspace carries on, or is restored on its
-        own if it was already paused.
-      </Text>
+      <Text style={text.footnote}>{t("paymentFailed.footnote")}</Text>
     </Layout>
   );
 }

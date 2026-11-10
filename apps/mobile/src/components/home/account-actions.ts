@@ -4,6 +4,7 @@ import { Alert } from 'react-native'
 
 import { deleteAccount, fetchDeletionBlockers } from '@/api/account'
 import { ApiError } from '@/api/client'
+import { translatorFor } from '@/i18n/translator'
 import { switchServer } from '@/config/custom-server'
 import { webHost } from '@/config/environment'
 
@@ -21,16 +22,17 @@ export function contactSupport(user: Me['user'] | undefined) {
     return WebBrowser.openBrowserAsync(`https://go.crisp.chat/chat/embed/?website_id=${CRISP_WEBSITE_ID}${email}`)
 }
 
-const confirm = (title: string, message: string, action: string) =>
+const confirm = (title: string, message: string, action: string, cancel: string) =>
     new Promise<boolean>(resolve =>
         Alert.alert(title, message, [
-            { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+            { text: cancel, style: 'cancel', onPress: () => resolve(false) },
             { text: action, style: 'destructive', onPress: () => resolve(true) },
         ])
     )
 
 export async function askToLeaveServer(signOut: () => Promise<void>) {
-    const confirmed = await confirm(`Leave ${webHost}?`, 'You will be signed out, and Rerun reopens on Rerun Cloud.', 'Leave')
+    const t = translatorFor('mobileHome')
+    const confirmed = await confirm(t('account.leaveServerTitle', { host: webHost }), t('account.leaveServerMessage'), t('account.leaveServer'), t('account.cancel'))
     if (!confirmed) return
     await signOut()
     await switchServer(null)
@@ -39,13 +41,14 @@ export async function askToLeaveServer(signOut: () => Promise<void>) {
 // Same rule as the web: a workspace only this account holds and that still bills stops the deletion,
 // and is named so it can be cancelled first.
 export async function askToDeleteAccount(accessToken: string, signOut: () => Promise<void>) {
+    const t = translatorFor('mobileHome')
     try {
         const blockers = await fetchDeletionBlockers({ accessToken })
         if (blockers.length) {
-            Alert.alert('Cancel the subscription first', `${blockers.map(blocker => blocker.name).join(', ')} still renews. Cancel it from Billing on rerun.build, then delete your account.`)
+            Alert.alert(t('account.subscriptionTitle'), t('account.subscriptionMessage', { workspaces: blockers.map(blocker => blocker.name).join(', ') }))
             return
         }
-        const confirmed = await confirm('Delete your account?', 'You leave the workspaces you share. A workspace only you are in stops for good, with its coworkers and its files. This cannot be undone.', 'Delete')
+        const confirmed = await confirm(t('account.deleteTitle'), t('account.deleteMessage'), t('account.delete'), t('account.cancel'))
         if (!confirmed) return
         await deleteAccount({ accessToken })
         await signOut()
@@ -53,9 +56,9 @@ export async function askToDeleteAccount(accessToken: string, signOut: () => Pro
         // The hub wants a sign-in from the last minutes behind an irreversible step: the person signs
         // in again and asks once more.
         if (error instanceof ApiError && error.status === 403) {
-            Alert.alert('Sign in again to delete your account', 'For your safety, deleting your account needs a fresh sign-in. Sign in again, then delete it from here.', [{ text: 'Sign out', onPress: () => void signOut() }, { text: 'Cancel', style: 'cancel' }])
+            Alert.alert(t('account.reauthTitle'), t('account.reauthMessage'), [{ text: t('account.signOut'), onPress: () => void signOut() }, { text: t('account.cancel'), style: 'cancel' }])
             return
         }
-        Alert.alert('Could not delete your account', 'Try again in a moment.')
+        Alert.alert(t('account.deleteFailedTitle'), t('account.deleteFailedMessage'))
     }
 }

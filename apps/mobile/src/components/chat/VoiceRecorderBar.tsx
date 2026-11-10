@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing } from '@/theme/tokens'
 
-import type { VoiceLiveState, VoiceMessageStatus } from './useVoiceMessage'
+import type { VoiceLiveState, VoiceMessageError, VoiceMessageStatus } from './useVoiceMessage'
 import { formatVoiceDuration } from './voice-duration'
 import { LiveWaveform } from './VoiceWaveform'
 
@@ -25,7 +26,7 @@ function RecordingDot() {
 
 type VoiceRecorderBarProps = {
     status: Exclude<VoiceMessageStatus, 'idle'>
-    error: string | null
+    error: VoiceMessageError | null
     getLiveState: () => VoiceLiveState
 }
 
@@ -33,6 +34,7 @@ type VoiceRecorderBarProps = {
 // so the composer around it does not re-render twenty times a second.
 export function VoiceRecorderBar({ status, error, getLiveState }: VoiceRecorderBarProps) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.voice')
     const [durationMs, setDurationMs] = useState(0)
 
     useEffect(() => {
@@ -45,7 +47,7 @@ export function VoiceRecorderBar({ status, error, getLiveState }: VoiceRecorderB
         return (
             <View style={{ flex: 1, minHeight: 48, justifyContent: 'center' }}>
                 <AppText variant="footnote" numberOfLines={2} style={{ color: theme.destructive }}>
-                    {error ?? 'Could not send that recording.'}
+                    {t(error ?? 'sendFailed')}
                 </AppText>
             </View>
         )
@@ -55,7 +57,7 @@ export function VoiceRecorderBar({ status, error, getLiveState }: VoiceRecorderB
         return (
             <View style={{ flex: 1, minHeight: 48, justifyContent: 'center' }}>
                 <AppText variant="footnote" tone="muted" numberOfLines={1}>
-                    Waiting for the microphone…
+                    {t('waitingForMicrophone')}
                 </AppText>
             </View>
         )

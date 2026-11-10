@@ -38,11 +38,11 @@ describe('messageDayLabel', () => {
     const now = new Date(2026, 9, 26, 15, 0)
 
     it('names the last days, then the date', () => {
-        expect(messageDayLabel(local(26, 8), now)).toBe('Today')
-        expect(messageDayLabel(local(25, 23, 59), now)).toBe('Yesterday')
-        expect(messageDayLabel(local(22, 10), now)).toBe('Thursday')
-        expect(messageDayLabel(local(19, 10), now)).toBe('Mon, Oct 19')
-        expect(messageDayLabel(new Date(2025, 5, 27, 10).toISOString(), now)).toBe('Fri, Jun 27, 2025')
+        expect(messageDayLabel(local(26, 8), 'en', now)).toBe('Today')
+        expect(messageDayLabel(local(25, 23, 59), 'en', now)).toBe('Yesterday')
+        expect(messageDayLabel(local(22, 10), 'en', now)).toBe('Thursday')
+        expect(messageDayLabel(local(19, 10), 'en', now)).toBe('Mon, Oct 19')
+        expect(messageDayLabel(new Date(2025, 5, 27, 10).toISOString(), 'en', now)).toBe('Fri, Jun 27, 2025')
     })
 })
 

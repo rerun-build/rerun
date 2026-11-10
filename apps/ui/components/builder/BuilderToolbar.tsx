@@ -19,8 +19,11 @@ import { useSession } from '@/supabase/session/SessionProvider'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { CirclePlusIcon, GridIcon, PlusIcon, SearchIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 export function BuilderToolbar() {
+    const t = useTranslations('builder.toolbar')
+    const tCommon = useTranslations('common')
     const agents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
     const hydrated = useBoardStore(s => s.hydrated)
@@ -40,9 +43,9 @@ export function BuilderToolbar() {
 
     // Une template pose plusieurs agents à la suite : on nomme celui qu'on attend, et la jauge dit où
     // on en est du lot. Un agent seul n'a pas de progression à afficher.
-    const placementPrompt = placement ? `Tap a tile to place ${placementLabel(placement)}` : 'Tap a tile to place your coworker'
+    const placementPrompt = placement ? t('placementPrompt', { name: placementLabel(placement) }) : t('placementPromptDefault')
     const placementQueue = placement && placement.labels.length > 1 ? placement : null
-    const placementProgressLabel = placementQueue ? `Coworker ${placementQueue.placed.length + 1} of ${placementQueue.labels.length}` : ''
+    const placementProgressLabel = placementQueue ? t('placementProgress', { current: placementQueue.placed.length + 1, total: placementQueue.labels.length }) : ''
 
     // Pendant l'onboarding « recrute ton premier agent » (placeholder sur la grille), on masque les deux
     // boutons pour forcer le passage par le bloc fantôme ; le logout reste dans le switcher.
@@ -73,37 +76,37 @@ export function BuilderToolbar() {
                         <Shimmer as="span" duration={1.6} className="text-sm font-medium whitespace-nowrap [--color-muted-foreground:#9ca3af] [--color-background:#ffffff]">
                             {placementPrompt}
                         </Shimmer>
-                        <ChromeButton label="Cancel" onClick={cancelPlacement} />
+                        <ChromeButton label={tCommon('cancel')} onClick={cancelPlacement} />
                     </div>
                 ) : (
                     <>
                         {!recruitingFirstAgent && (
                             <>
                                 <div className="hidden sm:contents">
-                                    <ChromeButton icon={CirclePlusIcon} label="New coworker" disabledReason={needsMachineReason} onClick={openNewAgent} />
+                                    <ChromeButton icon={CirclePlusIcon} label={t('newCoworker')} disabledReason={needsMachineReason} onClick={openNewAgent} />
                                     <ChromeDivider />
-                                    <ChromeButton icon={GridIcon} label="Template" disabledReason={needsMachineReason} onClick={() => openLibrary()} />
+                                    <ChromeButton icon={GridIcon} label={t('template')} disabledReason={needsMachineReason} onClick={() => openLibrary()} />
                                 </div>
                                 {/* Below `sm` the two labels crowd the notification bell: one "+" opens both choices. */}
                                 <div className="flex shrink-0 sm:hidden">
                                     <DropdownMenu>
                                         <TooltipDisabledReason reason={needsMachineReason ?? undefined} side="top" className="rounded-full">
                                             <DropdownMenuTrigger asChild>
-                                                <ChromeButton aria-label="Create" icon={PlusIcon} disabled={!!needsMachineReason} />
+                                                <ChromeButton aria-label={t('create')} icon={PlusIcon} disabled={!!needsMachineReason} />
                                             </DropdownMenuTrigger>
                                         </TooltipDisabledReason>
                                         <DropdownMenuContent side="top" align="center" sideOffset={12}>
                                             <DropdownMenuItem onSelect={openNewAgent} className="gap-2 whitespace-nowrap">
                                                 <CirclePlusIcon className="size-4" />
-                                                New coworker
+                                                {t('newCoworker')}
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onSelect={() => openLibrary()} className="gap-2 whitespace-nowrap">
                                                 <GridIcon className="size-4" />
-                                                Template
+                                                {t('template')}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                    <ChromeButton aria-label="Search" icon={SearchIcon} onClick={openControlCenter} />
+                                    <ChromeButton aria-label={t('search')} icon={SearchIcon} onClick={openControlCenter} />
                                 </div>
                             </>
                         )}
@@ -112,7 +115,7 @@ export function BuilderToolbar() {
                             <>
                                 {!recruitingFirstAgent && <ChromeDivider />}
                                 <div className="relative flex h-(--chrome-control) shrink-0 items-center gap-1.5 px-1 md:pl-3">
-                                    <span className="hidden text-xs text-muted-foreground md:inline">{unplacedAgents.length} unplaced</span>
+                                    <span className="hidden text-xs text-muted-foreground md:inline">{t('unplaced', { count: unplacedAgents.length })}</span>
                                     {unplacedAgents.map(agent => (
                                         <button key={agent.id} className="flex h-6 items-center rounded-full bg-secondary px-2.5 text-xs whitespace-nowrap text-secondary-foreground transition-colors hover:bg-secondary/80" onClick={() => useBoardStore.setState({ placingAgentId: agent.id })}>
                                             {agent.name}

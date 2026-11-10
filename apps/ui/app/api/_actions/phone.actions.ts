@@ -9,13 +9,14 @@ import { skipPhoneVerification } from '@/app/api/_services/phone-verification.se
 import { callerIp } from '@/lib/auth/caller-ip'
 import { verifyCaptcha } from '@/lib/auth/captcha'
 import { captchaProofSchema } from '@/lib/auth/captcha-proof'
-import { PHONE_FAILURE_MESSAGES, type PhoneFailure } from '@/lib/phone/failure-messages'
+import { failure, type ActionFailure } from '@/lib/i18n/action-error'
+import { PHONE_FAILURE_CODES, type PhoneFailure } from '@/lib/phone/failure-messages'
 import { isPhoneCountry, toE164 } from '@/lib/phone/normalize'
 import { VERIFICATION_CODE_LENGTH, verificationLanguage, type VerificationChannel } from '@/lib/phone/verification'
 import { createClient } from '@/supabase/server'
 
 // `reason` is what the client reports to analytics, `error` what it shows.
-export type PhoneActionRefusal = { ok: false; error: string; reason: PhoneFailure; retryAfterSeconds?: number }
+export type PhoneActionRefusal = ActionFailure & { reason: PhoneFailure; retryAfterSeconds?: number }
 export type PhoneActionResult = { ok: true } | PhoneActionRefusal
 export type PhoneSendActionResult = { ok: true; channel: VerificationChannel } | PhoneActionRefusal
 export type PhoneSignInActionResult = { ok: true; created: boolean; session: SessionTokens } | PhoneActionRefusal
@@ -33,8 +34,7 @@ const signInSchema = sendSchema.extend({ code: z.string().regex(new RegExp(`^\\d
 const numberSchema = sendSchema.omit({ channel: true })
 
 const refused = (reason: PhoneFailure, retryAfterSeconds?: number): PhoneActionRefusal => ({
-    ok: false,
-    error: PHONE_FAILURE_MESSAGES[reason],
+    ...failure(PHONE_FAILURE_CODES[reason]),
     reason,
     ...(retryAfterSeconds ? { retryAfterSeconds } : {}),
 })
@@ -105,7 +105,7 @@ async function signedInAccount(): Promise<PhoneAccount | null> {
     return data.user && !data.user.is_anonymous ? { id: data.user.id, email: data.user.email ?? null } : null
 }
 
-const signInFirst = (): PhoneActionRefusal => ({ ...refused('signed_out'), error: 'Sign in to change your number.' })
+const signInFirst = (): PhoneActionRefusal => ({ ...failure('signInToChangeNumber'), reason: 'signed_out' })
 
 // The number a signed-in account adds or moves to, from its account settings.
 export async function sendPhoneChangeCodeAction(input: z.input<typeof sendSchema>): Promise<PhoneSendActionResult> {

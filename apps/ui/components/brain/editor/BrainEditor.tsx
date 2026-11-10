@@ -7,6 +7,7 @@ import { richTextClassName } from '@rerun/ui/rich-text-editor'
 import { PluginKey } from '@tiptap/pm/state'
 import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import { exitSuggestion } from '@tiptap/suggestion'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react'
 
 import { BrainBubbleMenu } from './BrainBubbleMenu'
@@ -47,14 +48,15 @@ const MENU_WIDTH = 288
 // The page body as Notion edits it: no toolbar, `/` for blocks, `[[` to link a page or a file,
 // formatting on the selection. Reads and writes the same markdown agents read.
 export function BrainEditor({ content, editable = true, pages = [], titles, files = [], currentSlug = null, placeholder, className, handleRef, onOpenPage, onOpenFile, onChange, onBlur }: BrainEditorProps) {
+    const t = useTranslations('brain.editor')
     const containerRef = useRef<HTMLDivElement>(null)
     const [menu, setMenu] = useState<OpenMenu | null>(null)
     const [menuIndex, setMenuIndex] = useState(0)
 
     // The extensions are built once; everything they read that changes over time goes through here.
-    const live = useRef({ pages, titles, files, currentSlug, onOpenPage, onOpenFile, onChange, onBlur, menu, menuIndex, pickerMode: 'pages' as PickerMode })
+    const live = useRef({ t, pages, titles, files, currentSlug, onOpenPage, onOpenFile, onChange, onBlur, menu, menuIndex, pickerMode: 'pages' as PickerMode })
     useEffect(() => {
-        Object.assign(live.current, { pages, titles, files, currentSlug, onOpenPage, onOpenFile, onChange, onBlur, menu, menuIndex })
+        Object.assign(live.current, { t, pages, titles, files, currentSlug, onOpenPage, onOpenFile, onChange, onBlur, menu, menuIndex })
     })
 
     const handleMenuKey = useCallback((event: KeyboardEvent) => {
@@ -96,13 +98,13 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
                 titleOf: slug => live.current.titles.get(slug),
                 onOpenPage: slug => live.current.onOpenPage?.(slug),
                 onOpenFile: path => live.current.onOpenFile?.(path),
-                placeholder: placeholder ?? 'Type / for commands, [[ to link a page',
+                placeholder: placeholder ?? t('placeholder'),
             }),
             suggestionMenu({
                 name: 'brainSlashMenu',
                 pluginKey: SLASH_MENU,
                 char: '/',
-                items: query => slashItems(query, mode => (live.current.pickerMode = mode)),
+                items: query => slashItems(query, mode => (live.current.pickerMode = mode), live.current.t),
                 onState: state => showMenu('slash', state),
                 onKeyDown: handleMenuKey,
             }),
@@ -112,7 +114,7 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
                 char: '[[',
                 allowSpaces: true,
                 allowedPrefixes: null,
-                items: query => pickerItems(query, live.current.pickerMode, live.current.pages, live.current.files, live.current.currentSlug),
+                items: query => pickerItems(query, live.current.pickerMode, live.current.pages, live.current.files, live.current.currentSlug, live.current.t),
                 onState: state => {
                     showMenu('picker', state)
                     if (!state) live.current.pickerMode = 'pages'
@@ -207,7 +209,7 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
                     state={menu.state}
                     index={menuIndex}
                     position={menu.position}
-                    emptyLabel={menu.kind === 'slash' ? 'No block matches' : menu.mode === 'files' ? 'No file opened so far matches' : 'No page matches'}
+                    emptyLabel={menu.kind === 'slash' ? t('noBlock') : menu.mode === 'files' ? t('noFile') : t('noPage')}
                     onHover={setMenuIndex}
                 />
             )}

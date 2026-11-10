@@ -90,7 +90,7 @@ describe('installTemplateAction', () => {
     it('refuses a published template on a workspace with no active plan', async () => {
         database(template(), 'canceled')
 
-        await expect(installTemplateAction({ slug: 'crm', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'This workspace has no active plan.' })
+        await expect(installTemplateAction({ slug: 'crm', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'This workspace has no active plan.', code: 'noActivePlan' })
         expect(mocks.installTemplate).not.toHaveBeenCalled()
     })
 
@@ -104,7 +104,7 @@ describe('installTemplateAction', () => {
         database(template({ pricing_model: 'one_time' }))
         mocks.hasTemplateEntitlement.mockResolvedValue(false)
 
-        await expect(installTemplateAction({ slug: 'crm', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'This template requires a purchase.' })
+        await expect(installTemplateAction({ slug: 'crm', spaceId: SPACE_ID })).resolves.toEqual({ ok: false, error: 'This template requires a purchase.', code: 'templateNeedsPurchase' })
         expect(mocks.hasTemplateEntitlement).toHaveBeenCalledWith(expect.anything(), WORKSPACE_ID, expect.objectContaining({ id: 'template-1', pricing_model: 'one_time' }), STRANGER)
         expect(mocks.installTemplate).not.toHaveBeenCalled()
     })

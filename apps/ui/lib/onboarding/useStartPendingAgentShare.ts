@@ -8,6 +8,8 @@ import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { toast } from 'sonner'
+import { useErrorText } from '@/hooks/useErrorText'
+import { useTranslations } from 'next-intl'
 
 // The share counterpart of useStartPendingTemplate, and deliberately the shorter one: a share has
 // no purchase door, so once the plan is in place all that is left is a Space to drop into.
@@ -18,6 +20,8 @@ import { toast } from 'sonner'
 export function useStartPendingAgentShare() {
     const { workspace } = useSession()
     const beginAgentSharePlacement = useBoardStore(s => s.beginAgentSharePlacement)
+    const t = useTranslations('builder.boardToasts')
+    const errorText = useErrorText()
 
     return async function startPendingAgentShare(): Promise<boolean> {
         if (!workspace) return false
@@ -26,7 +30,7 @@ export function useStartPendingAgentShare() {
 
         const preview = await getSharedAgentAction(token)
         if (!preview) {
-            toast.error('This share link is no longer available')
+            toast.error(t('shareLinkGone'))
             useOnboardingStore.getState().clearPendingShareLink()
             return false
         }
@@ -37,7 +41,7 @@ export function useStartPendingAgentShare() {
         if (!existing) {
             const claim = await claimSpaceAction({ workspaceId: workspace.id })
             if (!claim.ok) {
-                toast.error('Could not prepare your Box', { description: claim.error })
+                toast.error(t('prepareBoxFailed'), { description: errorText(claim) })
                 throw new Error(claim.error)
             }
         }

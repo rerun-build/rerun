@@ -2,6 +2,7 @@ import type { CountryCode } from 'libphonenumber-js/min'
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { countryByCode, examplePlaceholder, formatAsTyped } from '@/lib/phone'
@@ -25,10 +26,12 @@ type PhoneFieldProps = {
 export function PhoneField({ country, value, onChangeText, onPickCountry, onSubmit, autoFocus, invalid }: PhoneFieldProps) {
     const theme = useTheme()
     const [focused, setFocused] = useState(false)
-    const { flag, callingCode, name } = countryByCode(country)
+    const t = useTranslations('mobileAuth')
+    const locale = useLocale()
+    const { flag, callingCode, name } = countryByCode(country, locale)
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', height: FIELD_HEIGHT, borderRadius: FIELD_RADIUS, borderCurve: 'continuous', ...fieldOutline(theme, { focused, invalid }), backgroundColor: theme.card }}>
-            <Pressable onPress={onPickCountry} accessibilityRole="button" accessibilityLabel={`Country, ${name}`} hitSlop={4} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, height: '100%', paddingLeft: spacing.lg, paddingRight: spacing.md, opacity: pressed ? 0.6 : 1 })}>
+            <Pressable onPress={onPickCountry} accessibilityRole="button" accessibilityLabel={t('phone.countryLabel', { name })} hitSlop={4} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, height: '100%', paddingLeft: spacing.lg, paddingRight: spacing.md, opacity: pressed ? 0.6 : 1 })}>
                 <AppText variant="body" maxFontSizeMultiplier={1.2}>
                     {flag}
                 </AppText>
@@ -48,7 +51,7 @@ export function PhoneField({ country, value, onChangeText, onPickCountry, onSubm
                 textContentType="telephoneNumber"
                 autoComplete="tel"
                 autoFocus={autoFocus}
-                accessibilityLabel="Phone number"
+                accessibilityLabel={t('phone.numberLabel')}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 maxFontSizeMultiplier={1.3}

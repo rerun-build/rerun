@@ -10,8 +10,8 @@ export function MyTemplateEditorSkeleton() {
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex h-12 shrink-0 items-end gap-1 overflow-hidden border-b border-border px-5">
-                {['Details', 'Pricing', 'Media', 'FAQ', 'Coworkers'].map((label, index) => (
-                    <div key={label} className="flex h-10 min-w-20 flex-1 items-center justify-center">
+                {['details', 'pricing', 'media', 'faq', 'agents'].map((tab, index) => (
+                    <div key={tab} className="flex h-10 min-w-20 flex-1 items-center justify-center">
                         <Skeleton className={index === 0 ? 'h-3.5 w-12' : 'h-3.5 w-10'} />
                     </div>
                 ))}

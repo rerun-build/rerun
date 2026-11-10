@@ -1,3 +1,6 @@
+import { formatDate } from '@rerun/i18n/format'
+import { useLocale } from 'next-intl'
+
 import { cn } from '@/lib/utils'
 
 export type CancelMilestone = { at: number; label: string; date: Date; highlighted?: boolean }
@@ -35,10 +38,11 @@ export function CancelTimeline({ milestones }: { milestones: readonly CancelMile
 }
 
 function CalendarTile({ date, highlighted }: { date: Date; highlighted?: boolean }) {
+    const locale = useLocale()
     return (
         <div className={cn('flex w-10 flex-col overflow-hidden rounded-lg border bg-popover shadow-xs', highlighted && 'border-brand/70 shadow-brand/20 shadow-md')}>
             <span className={cn('flex h-3.5 items-center justify-center text-[9px] leading-none font-semibold tracking-wider uppercase', highlighted ? 'bg-brand text-white' : 'bg-muted text-muted-foreground')}>
-                {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                {formatDate(date, locale, { weekday: 'short' })}
             </span>
             <span className={cn('flex h-[1.875rem] items-center justify-center text-base leading-none font-semibold tabular-nums', highlighted ? BRAND_TEXT : 'text-foreground')}>{date.getDate()}</span>
         </div>

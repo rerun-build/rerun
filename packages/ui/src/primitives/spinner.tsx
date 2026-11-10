@@ -1,4 +1,7 @@
+"use client"
+
 import { cn } from "../cn"
+import { useKitTranslations } from "../locale"
 
 /**
  * L'icône loader du pack Nucleo peint ses arcs avec un gradient `#000` codé en dur :
@@ -15,8 +18,9 @@ function SpinnerIcon({ size = 18, strokeWidth = 1.5, className, ...props }: Reac
 }
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
+  const t = useKitTranslations()
   return (
-    <SpinnerIcon role="status" aria-label="Loading" className={cn("size-4 animate-spin", className)} {...props} />
+    <SpinnerIcon role="status" aria-label={t('primitives.loading')} className={cn("size-4 animate-spin", className)} {...props} />
   )
 }
 

@@ -43,7 +43,7 @@ export {
     planPriceCents,
     trialChargeLine,
     trialEndDate,
-    trialLimitsLabel,
+    trialLimitsCaption,
     yearlyDiscountPercent,
     type AddonKey,
     type AddonQuantities,
@@ -113,6 +113,10 @@ export function baseLimitsToColumns(): WorkspaceLimitColumns {
 }
 
 export const LIFETIME_PLAN_SLUG = 'lifetime'
+
+export function isLifetimePlan(workspace: { plan: string | null } | null | undefined): boolean {
+    return workspace?.plan === LIFETIME_PLAN_SLUG
+}
 
 // What an AppSumo code buys for good: unlimited coworkers and seats on its machine, and no Rerun
 // credit, so its coworkers run on the buyer's own AI key or subscription.

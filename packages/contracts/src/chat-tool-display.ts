@@ -1,251 +1,61 @@
-import { capabilityOfCall, PAID_DATA_TOOL, paidDataEntry } from './paid-data.js'
+import { capabilityOfCall, PAID_DATA_TOOL, type PaidDataCapability } from './paid-data.js'
 
-// What a tool call reads as in the chat's steps, the same on every client: each one draws its own
-// icon beside it.
-const TOOL_LABELS: Record<string, string> = {
-    shell_exec: 'Terminal',
+// The tools the chat's steps name, the same on every client (`labels.*` of the `tools` catalog): each
+// one draws its own icon beside it.
+const LABELLED_TOOLS = [
+    'shell_exec', 'fs_read', 'fs_write', 'fs_edit', 'fs_list', 'fs_search', 'shared_read', 'shared_write', 'shared_edit', 'shared_list',
+    'shared_search', 'browser_navigate', 'computer', 'computer_open_app', 'web_fetch', 'web_search', 'WebSearch', 'leads_people_search',
+    'leads_email_find', 'leads_email_verify', 'leads_phone_find', 'google_serp', 'google_maps_search', 'paid_data', 'paid_data_catalog',
+    'paid_data_read', 'download', 'memory_write', 'memory_recall', 'brain_search', 'brain_read', 'brain_propose', 'brain_write', 'brain_delete',
+    'brain_proposals', 'brain_decide', 'vision_analyze', 'delegate_tasks', 'call_agent', 'team_status', 'team_list_schedules', 'team_list_triggers',
+    'team_list_runs', 'team_get_run', 'schedule_list', 'schedule_create', 'schedule_update', 'schedule_delete', 'trigger_list', 'trigger_create',
+    'trigger_get', 'trigger_update', 'trigger_rotate_token', 'trigger_delete', 'skill_list', 'skill_read', 'skill_read_file', 'skill_write_file',
+    'skill_delete_file', 'skill_create', 'skill_import', 'skill_edit', 'skill_update', 'skill_delete', 'skill_propose', 'soul_update',
+    'verbosity_set', 'tool_install', 'mcp_register', 'mcp_login', 'mcp_login_complete', 'mcp_status', 'card_table', 'card_file', 'image_generation', 'table_view_save',
+    'table_view_delete', 'rerun_hub_service_search', 'rerun_hub_service_details', 'rerun_hub_service_install', 'rerun_hub_service_list_installed',
+    'rerun_hub_service_uninstall', 'rerun_hub_publish_file', 'rerun_hub_unpublish_file', 'rerun_hub_list_published', 'task_complete', 'list_spaces',
+    'list_agents', 'get_agent', 'create_agent', 'update_agent', 'delete_agent', 'list_ai_connections', 'set_default_model', 'list_skills',
+    'get_skill', 'upsert_skill', 'delete_skill', 'list_schedules', 'upsert_schedule', 'run_schedule_now', 'delete_schedule', 'list_runs', 'get_run',
+    'search_connectors', 'list_agent_connectors', 'attach_connector', 'detach_connector', 'send_message', 'create_boxes', 'build_team', 'write_agent',
+    'rename_box', 'delete_box', 'focus_agent', 'show_agents', 'open_connector_setup', 'open_settings', 'recenter_board', 'open_brain_page',
+    'read_attachment', 'search_docs', 'analyze_website', 'save_profile', 'save_needs', 'list_templates', 'propose_plan', 'install_template',
+    'install_shared_agent', 'open_template_card', 'start_agent_setup', 'open_checkout', 'open_template_purchase', 'ask_choice', 'ask_either',
+    'ask_input', 'show_templates', 'show_plan', 'show_starter_pack', 'contact_team', 'ask_user', 'request_approval', 'suggest_service',
+    'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'notify_user', 'install_complete',
+] as const
 
-    fs_read: 'Read File',
-    fs_write: 'Write File',
-    fs_edit: 'Edit File',
-    fs_list: 'List Files',
-    fs_search: 'Search Files',
+// The tools that say what they are doing while they run (`activities.*`). A tool missing here falls
+// back on its label on each client.
+const ACTIVE_TOOLS = [
+    'shell_exec', 'fs_read', 'fs_write', 'fs_edit', 'fs_list', 'fs_search', 'shared_read', 'shared_write', 'shared_edit', 'shared_list',
+    'shared_search', 'browser_navigate', 'computer', 'computer_open_app', 'web_fetch', 'web_search', 'WebSearch', 'leads_people_search',
+    'leads_email_find', 'leads_email_verify', 'leads_phone_find', 'google_serp', 'google_maps_search', 'download', 'memory_write', 'memory_recall',
+    'brain_search', 'brain_read', 'brain_propose', 'brain_write', 'vision_analyze', 'image_generation', 'delegate_tasks', 'call_agent', 'team_status', 'team_list_runs',
+    'team_get_run', 'skill_read', 'skill_read_file', 'skill_create', 'skill_edit', 'skill_update', 'rerun_hub_service_search',
+    'rerun_hub_service_install', 'list_agents', 'create_agent', 'update_agent', 'send_message', 'build_team', 'search_docs', 'analyze_website',
+    'list_templates', 'propose_plan', 'install_template',
+] as const
 
-    shared_read: 'Read Shared File',
-    shared_write: 'Write Shared File',
-    shared_edit: 'Edit Shared File',
-    shared_list: 'List Shared Files',
-    shared_search: 'Search Shared Files',
+export type LabelledTool = (typeof LABELLED_TOOLS)[number]
+export type ActiveTool = (typeof ACTIVE_TOOLS)[number]
 
-    browser_navigate: 'Browse Web',
-    computer: 'Used its computer',
-    computer_open_app: 'Opened an app',
-    web_fetch: 'Fetch Page',
-    web_search: 'Web Search',
-    WebSearch: 'Web Search',
-    leads_people_search: 'Find People',
-    leads_email_find: 'Find Email',
-    leads_email_verify: 'Verify Email',
-    leads_phone_find: 'Find Phone',
-    google_serp: 'Google Results',
-    google_maps_search: 'Google Maps',
-    paid_data: 'Paid data',
-    paid_data_catalog: 'Paid data catalog',
-    paid_data_read: 'Read paid data',
-    download: 'Download',
+// The `tools` namespace, in the reader's language.
+export type ToolCopy = (key: `labels.${LabelledTool}` | `activities.${ActiveTool}` | `paidData.${PaidDataCapability}`) => string
 
-    memory_write: 'Save to Memory',
-    memory_recall: 'Recall Memory',
-    brain_search: 'Search the Brain',
-    brain_read: 'Read the Brain',
-    brain_propose: 'Propose to the Brain',
-    brain_write: 'Write to the Brain',
-    brain_delete: 'Remove from the Brain',
-    brain_proposals: 'Review Brain changes',
-    brain_decide: 'Decide a Brain change',
+const labelledTools = new Set<string>(LABELLED_TOOLS)
+const activeTools = new Set<string>(ACTIVE_TOOLS)
 
-    vision_analyze: 'Analyze Image',
+const isLabelledTool = (toolName: string): toolName is LabelledTool => labelledTools.has(toolName)
+const isActiveTool = (toolName: string): toolName is ActiveTool => activeTools.has(toolName)
 
-    delegate_tasks: 'Delegate Tasks',
-    call_agent: 'Call Coworker',
-    team_status: 'Team Status',
-    team_list_schedules: "List a Coworker's Schedules",
-    team_list_triggers: "List a Coworker's Triggers",
-    team_list_runs: "List a Coworker's Runs",
-    team_get_run: "Read a Coworker's Run",
-
-    schedule_list: 'List Schedules',
-    schedule_create: 'Create Schedule',
-    schedule_update: 'Update Schedule',
-    schedule_delete: 'Delete Schedule',
-    trigger_list: 'List Triggers',
-    trigger_create: 'Create Trigger',
-    trigger_get: 'Read Trigger',
-    trigger_update: 'Update Trigger',
-    trigger_rotate_token: 'Rotate Trigger Secret',
-    trigger_delete: 'Delete Trigger',
-
-    skill_list: 'List Skills',
-    skill_read: 'Read Skill',
-    skill_read_file: 'Read Skill File',
-    skill_write_file: 'Write Skill File',
-    skill_delete_file: 'Delete Skill File',
-    skill_create: 'Create Skill',
-    skill_import: 'Import Skill',
-    skill_edit: 'Edit Skill',
-    skill_update: 'Update Skill',
-    skill_delete: 'Delete Skill',
-    skill_propose: 'Skill Proposal',
-
-    soul_update: 'Update Personality',
-    verbosity_set: 'Adjust Response Length',
-    tool_install: 'Install Tool',
-    mcp_register: 'Connect Integration',
-    mcp_login: 'Sign in to Integration',
-    mcp_login_complete: 'Finish Sign-in',
-    mcp_status: 'Integration Status',
-
-    card_table: 'Show a table',
-    card_file: 'Show a file',
-    image_generation: 'Generate an image',
-    table_view_save: 'Save a table view',
-    table_view_delete: 'Delete a table view',
-
-    rerun_hub_service_search: 'Search Apps',
-    rerun_hub_service_details: 'App Details',
-    rerun_hub_service_install: 'Install App',
-    rerun_hub_service_list_installed: 'List Apps',
-    rerun_hub_service_uninstall: 'Remove App',
-    rerun_hub_publish_file: 'Publish File',
-    rerun_hub_unpublish_file: 'Unpublish File',
-    rerun_hub_list_published: 'List Published Files',
-
-    task_complete: 'Task Complete',
-
-    // The foreman's belt. Same map as everything else, so its tool calls wear a real label in
-    // the Foreman's column instead of a title-cased tool name under a wrench.
-    list_spaces: 'List Boxes',
-    list_agents: 'List Coworkers',
-    get_agent: 'Read Coworker',
-    create_agent: 'Create Coworker',
-    update_agent: 'Update Coworker',
-    delete_agent: 'Delete Coworker',
-    list_ai_connections: 'List AI Providers',
-    set_default_model: 'Set Default Model',
-    list_skills: 'List Skills',
-    get_skill: 'Read Skill',
-    upsert_skill: 'Write Skill',
-    delete_skill: 'Delete Skill',
-    list_schedules: 'List Scheduled Tasks',
-    upsert_schedule: 'Schedule Task',
-    run_schedule_now: 'Run Task Now',
-    delete_schedule: 'Delete Scheduled Task',
-    list_runs: 'List Runs',
-    get_run: 'Read Run',
-    search_connectors: 'Search Apps',
-    list_agent_connectors: 'List Apps',
-    attach_connector: 'Add App',
-    detach_connector: 'Remove App',
-    send_message: 'Message Coworker',
-    create_boxes: 'Create Boxes',
-    build_team: 'Build Team',
-    write_agent: 'Writing its SOUL and install',
-    rename_box: 'Rename Box',
-    delete_box: 'Delete Box',
-    focus_agent: 'Open Coworker',
-    show_agents: 'Show Coworkers',
-    open_connector_setup: 'Open App Setup',
-    open_settings: 'Open Settings',
-    recenter_board: 'Recenter Board',
-    open_brain_page: 'Open the Brain',
-    read_attachment: 'Read Attachment',
-    search_docs: 'Search Docs',
-    analyze_website: 'Read Website',
-    save_profile: 'Save Profile',
-    save_needs: 'Save Needs',
-    list_templates: 'Browse Templates',
-    propose_plan: 'Write Plan',
-    install_template: 'Install Template',
-    install_shared_agent: 'Install Shared Coworker',
-    open_template_card: 'Open Template',
-    start_agent_setup: 'Hand Over Setup',
-    open_checkout: 'Start Trial',
-    open_template_purchase: 'Buy Template',
-    ask_choice: 'Asked the user',
-    ask_either: 'Asked the user',
-    ask_input: 'Asked the user',
-    show_templates: 'Showed Templates',
-    show_plan: 'Showed the Plan',
-    show_starter_pack: 'Showed the Starter Pack',
-    contact_team: 'Offered the Team',
-
-    ask_user: 'Asked the user',
-    request_approval: 'Requested approval',
-    suggest_service: 'Suggested an app',
-    request_secret: 'Requested a credential',
-    request_mcp_sign_in: 'Asked you to sign in to an MCP server',
-    request_takeover: 'Asked you to take over the browser',
-    request_spend: 'Asked to spend credits',
-    notify_user: 'Notified you',
-    install_complete: 'Finished the setup',
-}
-
-// What a step reads as while it runs, beside the coworker at work. A tool missing here falls back
-// on its label on each client.
-const TOOL_ACTIVITIES: Record<string, string> = {
-    shell_exec: 'Running a command',
-
-    fs_read: 'Reading a file',
-    fs_write: 'Writing a file',
-    fs_edit: 'Editing a file',
-    fs_list: 'Listing files',
-    fs_search: 'Searching files',
-
-    shared_read: 'Reading a shared file',
-    shared_write: 'Writing a shared file',
-    shared_edit: 'Editing a shared file',
-    shared_list: 'Listing shared files',
-    shared_search: 'Searching shared files',
-
-    browser_navigate: 'Browsing the web',
-    computer: 'Using its computer',
-    computer_open_app: 'Opening an app',
-    web_fetch: 'Reading a page',
-    web_search: 'Searching the web',
-    WebSearch: 'Searching the web',
-    leads_people_search: 'Finding people',
-    leads_email_find: 'Finding an email',
-    leads_email_verify: 'Verifying an email',
-    leads_phone_find: 'Finding a phone number',
-    google_serp: 'Searching Google',
-    google_maps_search: 'Searching Google Maps',
-    download: 'Downloading',
-
-    memory_write: 'Saving to memory',
-    memory_recall: 'Recalling memory',
-    brain_search: 'Searching the Brain',
-    brain_read: 'Reading the Brain',
-    brain_propose: 'Proposing a Brain change',
-    brain_write: 'Writing to the Brain',
-
-    vision_analyze: 'Looking at an image',
-    image_generation: 'Generating an image',
-
-    delegate_tasks: 'Delegating tasks',
-    call_agent: 'Calling a coworker',
-    team_status: 'Checking the team',
-    team_list_runs: "Reading a coworker's runs",
-    team_get_run: "Reading a coworker's run",
-
-    skill_read: 'Reading a skill',
-    skill_read_file: 'Reading a skill',
-    skill_create: 'Creating a skill',
-    skill_edit: 'Editing a skill',
-    skill_update: 'Updating a skill',
-
-    rerun_hub_service_search: 'Searching apps',
-    rerun_hub_service_install: 'Installing an app',
-
-    list_agents: 'Looking at the team',
-    create_agent: 'Creating a coworker',
-    update_agent: 'Updating a coworker',
-    send_message: 'Messaging a coworker',
-    build_team: 'Building the team',
-    search_docs: 'Searching the docs',
-    analyze_website: 'Reading the website',
-    list_templates: 'Browsing templates',
-    propose_plan: 'Writing the plan',
-    install_template: 'Installing a template',
-}
-
-export function toolActivityOf(toolName: string, input?: unknown): string | undefined {
+export function toolActivityOf(toolName: string, input: unknown, t: ToolCopy): string | undefined {
     const capability = toolName === PAID_DATA_TOOL ? capabilityOfCall(toolName, input) : null
-    if (capability) return paidDataEntry(capability).activity
-    return TOOL_ACTIVITIES[toolName]
+    if (capability) return t(`paidData.${capability}`)
+    return isActiveTool(toolName) ? t(`activities.${toolName}`) : undefined
 }
 
 export function isKnownTool(toolName: string): boolean {
-    return toolName in TOOL_LABELS
+    return isLabelledTool(toolName)
 }
 
 export function formatToolName(name: string): string {
@@ -256,10 +66,10 @@ export function formatToolName(name: string): string {
 }
 
 // A paid_data call is named after the capability it bought: "Reading TikTok", not "Paid data".
-export function toolLabelOf(toolName: string, input?: unknown): string {
+export function toolLabelOf(toolName: string, input: unknown, t: ToolCopy): string {
     const capability = toolName === PAID_DATA_TOOL ? capabilityOfCall(toolName, input) : null
-    if (capability) return paidDataEntry(capability).activity
-    if (TOOL_LABELS[toolName]) return TOOL_LABELS[toolName]
+    if (capability) return t(`paidData.${capability}`)
+    if (isLabelledTool(toolName)) return t(`labels.${toolName}`)
     if (toolName.startsWith('mcp_')) return formatToolName(toolName.replace(/^mcp__?/, '').replace(/__/g, ' '))
     return formatToolName(toolName)
 }

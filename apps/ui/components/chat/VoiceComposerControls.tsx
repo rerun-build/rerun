@@ -4,6 +4,7 @@ import { PromptInputButton } from '@/components/ai-elements/prompt-input'
 import { Spinner } from '@/components/ui/spinner'
 import type { VoiceMessageStatus } from '@/hooks/useVoiceMessage'
 import { MicIcon, RefreshCcwIcon, SendIcon, XIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 type VoiceComposerControlsProps = {
     status: VoiceMessageStatus
@@ -23,9 +24,10 @@ type VoiceComposerControlsProps = {
  * inside it changes.
  */
 export function VoiceComposerControls({ status, besideSend = false, onStart, onFinish, onRetry, onDiscard }: VoiceComposerControlsProps) {
+    const t = useTranslations('chat.voice')
     if (status === 'idle') {
         return (
-            <PromptInputButton variant={besideSend ? 'ghost' : 'default'} tooltip="Record a voice message" aria-label="Record a voice message" onClick={onStart}>
+            <PromptInputButton variant={besideSend ? 'ghost' : 'default'} tooltip={t('record')} aria-label={t('record')} onClick={onStart}>
                 <MicIcon className="size-4" />
             </PromptInputButton>
         )
@@ -35,13 +37,13 @@ export function VoiceComposerControls({ status, besideSend = false, onStart, onF
 
     return (
         <>
-            <PromptInputButton tooltip="Discard" aria-label="Discard recording" onClick={onDiscard} disabled={status === 'processing'}>
+            <PromptInputButton tooltip={t('discard')} aria-label={t('discardLabel')} onClick={onDiscard} disabled={status === 'processing'}>
                 <XIcon className="size-4" />
             </PromptInputButton>
             <PromptInputButton
                 variant="default"
-                tooltip={status === 'failed' ? 'Retry' : 'Send'}
-                aria-label={status === 'failed' ? 'Retry sending the recording' : 'Send the recording'}
+                tooltip={status === 'failed' ? t('retry') : t('send')}
+                aria-label={status === 'failed' ? t('retryLabel') : t('sendLabel')}
                 onClick={status === 'failed' ? onRetry : onFinish}
                 disabled={busy}
             >

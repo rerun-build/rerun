@@ -26,6 +26,7 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => {
         },
     }
 })
+vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
 vi.mock('@/app/api/_services/capacity.service', () => ({
     NoPlanError: class NoPlanError extends Error {
         constructor() {
@@ -259,10 +260,10 @@ describe('POST /api/v1/ai-connections', () => {
     it('refuses the code Claude shows in place of a token, and a key its provider turns down', async () => {
         const code = await send(list.POST, 'POST', '', { provider: 'claude', apiKey: 'abc#def' })
         expect(code.status).toBe(400)
-        providerKeyProblem.mockResolvedValue('Anthropic turned this key down.')
+        providerKeyProblem.mockResolvedValue({ code: 'providerKeyRejected', params: { provider: 'Anthropic' } })
         const refused = await send(list.POST, 'POST', '', { provider: 'anthropic', apiKey: 'sk-ant-api03-bad' })
         expect(refused.status).toBe(400)
-        expect(await refused.json()).toEqual({ error: 'Anthropic turned this key down.' })
+        expect(await refused.json()).toEqual({ error: 'Anthropic turned this key down. Check it was copied in full and is still active.' })
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
 

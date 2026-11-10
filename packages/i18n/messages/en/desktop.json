@@ -1,0 +1,41 @@
+{
+    "_context": {
+        "session.title": "Title of the dialog showing a coworker's virtual computer screen. {name} is the coworker's name.",
+        "session.description": "Under the title of the dialog of a coworker's virtual computer: what the person does there, the coworker sees afterwards.",
+        "session.takeoverDescription": "Under the title when the coworker asked the person to act in its browser (sign in, solve a captcha). Done is the button that hands it back.",
+        "screen.wentAway": "The live view of the coworker's computer disconnected.",
+        "notch.browser": "Button opening a web browser on the coworker's computer.",
+        "notch.done": "Button: the person has finished in the coworker's browser and hands it back.",
+        "screenCard.takeControl": "Shown when hovering the coworker's screen: a click lets the person drive it."
+    },
+    "session": {
+        "title": "{name}’s desktop",
+        "titleFallback": "Desktop",
+        "description": "The screen this coworker works on. What you do here, it finds afterwards.",
+        "takeoverDescription": "You are in your coworker’s browser. Press Done when it can carry on.",
+        "takeoverHoldsBrowser": "Your coworker’s browser is already open for this request.",
+        "clipboardDenied": "Your browser did not let Rerun read the clipboard.",
+        "disconnectedDescription": "The connection to the machine closed. Nothing on it was lost.",
+        "reconnect": "Reconnect",
+        "tryAgain": "Try again"
+    },
+    "screen": {
+        "connecting": "Connecting to the screen...",
+        "unavailable": "The screen is not available",
+        "wentAway": "The screen went away",
+        "resize": "Resize the screen"
+    },
+    "notch": {
+        "browser": "Browser",
+        "closeBrowser": "Close browser",
+        "files": "Files",
+        "terminal": "Terminal",
+        "paste": "Paste",
+        "done": "Done",
+        "close": "Close"
+    },
+    "screenCard": {
+        "openBrowser": "Open browser",
+        "takeControl": "Take control"
+    }
+}

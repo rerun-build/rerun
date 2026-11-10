@@ -8,7 +8,9 @@ import { PanelRow } from '@/components/ui/panel-row'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
 import type { EngineRun } from '@/lib/engine/types'
 import { ArrowLeftIcon, Loader2Icon } from '@/lib/icons'
+import { formatDate, formatNumber } from '@rerun/i18n/format'
 import { RunStatusBadge } from '@rerun/ui/monitoring'
+import { useLocale, useTranslations } from 'next-intl'
 import { type ComponentType, useCallback, useState } from 'react'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 
@@ -18,20 +20,22 @@ export async function adoptRunSession(agentId: string, engineSessionId: string, 
     return adoptEngineSessionAction(agentId, engineSessionId, title).catch(() => adoptEngineSessionAction(agentId, engineSessionId, title))
 }
 
-function parseUsage(usageJson?: string | null): string {
-    if (!usageJson) return ''
+type RunHistoryTranslator = ReturnType<typeof useTranslations<'agent.agentRunHistory'>>
+
+function usageTokens(usageJson: string | null | undefined): number | undefined {
+    if (!usageJson) return undefined
     try {
         const u = JSON.parse(usageJson) as { totalTokens?: number; inputTokens?: number; outputTokens?: number }
-        const total = u.totalTokens ?? ((u.inputTokens ?? 0) + (u.outputTokens ?? 0) || undefined)
-        return total ? `${total.toLocaleString()} tokens` : ''
+        return u.totalTokens ?? ((u.inputTokens ?? 0) + (u.outputTokens ?? 0) || undefined)
     } catch {
-        return ''
+        return undefined
     }
 }
 
-function runMeta(run: { stepCount?: number | null; usageJson?: string | null }): string {
-    const usage = parseUsage(run.usageJson)
-    const steps = typeof run.stepCount === 'number' ? `${run.stepCount} step${run.stepCount !== 1 ? 's' : ''}` : ''
+function runMeta(run: { stepCount?: number | null; usageJson?: string | null }, locale: string, t: RunHistoryTranslator): string {
+    const tokens = usageTokens(run.usageJson)
+    const usage = tokens ? t('tokens', { total: formatNumber(tokens, locale) }) : ''
+    const steps = typeof run.stepCount === 'number' ? t('stepCount', { count: run.stepCount }) : ''
     return [steps, usage].filter(Boolean).join(' · ')
 }
 
@@ -45,6 +49,8 @@ type RunHistoryListProps = {
 }
 
 export function RunHistoryList({ title, loadRuns, emptyIcon: EmptyIcon, emptyLabel, onBack, onSelectRun }: RunHistoryListProps) {
+    const t = useTranslations('agent.agentRunHistory')
+    const locale = useLocale()
     const [runs, setRuns] = useState<EngineRun[]>([])
     const [loading, setLoading] = useState(true)
     const [openingRunId, setOpeningRunId] = useState<string | null>(null)
@@ -86,8 +92,8 @@ export function RunHistoryList({ title, loadRuns, emptyIcon: EmptyIcon, emptyLab
                                 key={r.id}
                                 disabled={openingRunId !== null}
                                 onClick={() => handleSelect(r)}
-                                title={r.startedAt ? new Date(r.startedAt).toLocaleString() : r.id}
-                                description={runMeta(r)}
+                                title={r.startedAt ? formatDate(r.startedAt, locale) : r.id}
+                                description={runMeta(r, locale, t)}
                                 meta={openingRunId === r.id ? <Loader2Icon className="size-3.5 shrink-0 animate-spin text-muted-foreground" /> : <RunStatusBadge status={r.status} />}
                             />
                         ))}

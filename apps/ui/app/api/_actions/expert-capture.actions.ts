@@ -6,6 +6,7 @@ import { captureAuthorAgents, listAuthorCaptureSources, planAuthorCapture, remov
 import { captureSetupSchema, type AgentCapturePlan, type CaptureSourceSpace } from '@/lib/templates/capture'
 
 import type { ActionResult } from './space.actions'
+import { failureOf } from '@/lib/i18n/action-error'
 
 // The runtime half of expert authoring: the same capture the admin console runs, scoped to what the
 // caller owns. Every action re-resolves the sandbox, the template and the agents, so the client only
@@ -41,7 +42,7 @@ export async function listMyCaptureSourcesAction(): Promise<ActionResult<{ space
     try {
         return { ok: true, spaces: await listAuthorCaptureSources(await requireSandboxAuthorSession()) }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to list your Boxes.' }
+        return failureOf(err, 'listBoxesFailed')
     }
 }
 
@@ -50,7 +51,7 @@ export async function planMyCaptureAction(input: unknown): Promise<ActionResult<
         const scope = await requireSandboxAuthorSession()
         return { ok: true, plans: await planAuthorCapture(scope, planInputSchema.parse(input)) }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to inspect the coworkers.' }
+        return failureOf(err, 'inspectCoworkersFailed')
     }
 }
 
@@ -60,7 +61,7 @@ export async function captureMyAgentsAction(input: unknown): Promise<ActionResul
         const { captured, warnings } = await captureAuthorAgents(scope, captureInputSchema.parse(input))
         return { ok: true, captured, warnings }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to capture the coworkers.' }
+        return failureOf(err, 'captureCoworkersFailed')
     }
 }
 
@@ -70,6 +71,6 @@ export async function removeMyTemplateAgentAction(input: unknown): Promise<Actio
         await removeAuthorTemplateAgent(scope, removeAgentInputSchema.parse(input))
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to remove the coworker.' }
+        return failureOf(err, 'removeCoworkerFailed')
     }
 }

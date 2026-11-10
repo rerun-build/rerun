@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { PanelDeleteButton } from '@/components/ui/panel-editor'
@@ -23,6 +24,7 @@ type CustomMcpRowProps = {
 }
 
 export function CustomMcpRow({ server, status, statusLoading, onConnect, onEdit, onRemove, disabledReason }: CustomMcpRowProps) {
+    const t = useTranslations('services.customMcp')
     const disabled = !!disabledReason
     const canSignIn = status?.status === 'needs_auth' && !!server.signInUrl
     return (
@@ -32,7 +34,7 @@ export function CustomMcpRow({ server, status, statusLoading, onConnect, onEdit,
                 <span className="flex min-w-0 items-center gap-1.5">
                     <span className="truncate">{server.displayName}</span>
                     <Badge size="xs" tone="neutral" glow={false}>
-                        Custom
+                        {t('custom')}
                     </Badge>
                 </span>
             }
@@ -45,23 +47,23 @@ export function CustomMcpRow({ server, status, statusLoading, onConnect, onEdit,
                     {canSignIn && (
                         <TooltipDisabledReason reason={disabledReason}>
                             <Button size="sm" variant="outline" disabled={disabled} onClick={onConnect}>
-                                Connect
+                                {t('connect')}
                             </Button>
                         </TooltipDisabledReason>
                     )}
                     <TooltipDisabledReason reason={disabledReason}>
-                        <Button size="icon-sm" variant="ghost" className="text-muted-foreground" aria-label={`Edit ${server.displayName}`} disabled={disabled} onClick={onEdit}>
+                        <Button size="icon-sm" variant="ghost" className="text-muted-foreground" aria-label={t('edit', { name: server.displayName })} disabled={disabled} onClick={onEdit}>
                             <PencilIcon />
                         </Button>
                     </TooltipDisabledReason>
                     <TooltipDisabledReason reason={disabledReason}>
                         <PanelDeleteButton
-                            label={`Remove ${server.displayName}`}
+                            label={t('remove', { name: server.displayName })}
                             disabled={disabled}
                             onClick={onRemove}
-                            confirmTitle={`Remove ${server.displayName}?`}
-                            confirmDescription="The coworker loses every tool this server exposes, and its sign-in is cleared."
-                            confirmLabel="Remove"
+                            confirmTitle={t('removeTitle', { name: server.displayName })}
+                            confirmDescription={t('removeDescription')}
+                            confirmLabel={t('removeConfirm')}
                         />
                     </TooltipDisabledReason>
                 </>

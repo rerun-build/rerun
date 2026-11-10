@@ -1,8 +1,9 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
 import { AppAccountPicker } from '@rerun/cloud/apps.client'
-import { AuthMethodPicker, methodKindLabel } from '@/components/services/AuthMethodPicker'
+import { AuthMethodPicker, methodKindKey } from '@/components/services/AuthMethodPicker'
 import { ComposioConnect } from '@/components/services/ComposioConnect'
 import { ManagedConnect } from '@/components/services/ManagedConnect'
 import { ServiceFields } from '@/components/services/ServiceFields'
@@ -15,6 +16,7 @@ import type { AppTarget, AuthMethodSummary, ComposioTarget, ManagedTarget, OAuth
 import { ArrowLeftIcon, CheckCircle2Icon, ExternalLinkIcon, Loader2Icon } from '@/lib/icons'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 
 type ServiceConfigFormProps = {
     agentId: string
@@ -70,6 +72,8 @@ export function connectsInOneClick(authMethods: AuthMethodSummary[], initialMeth
 // the selected method into engine primitives. OAuth methods surface an inline sign-in step,
 // so the form handles both credential and browser-sign-in flows end-to-end.
 export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, name, authMethods, initialMethodId, initialAuthTarget, onInstalled, autoConnect }: ServiceConfigFormProps) {
+    const t = useTranslations('services')
+    const errorText = useErrorText()
     const driver = useServiceSetupDriver()
     // Null until the install allocated the new account's key, so a retry reuses it.
     const [activeKey, setActiveKey] = useState<string | null>(() => (newInstance ? null : (instanceKey ?? slug)))
@@ -146,7 +150,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         }
         popup?.close()
         if (!res.ok) {
-            setError(res.error)
+            setError(errorText(res))
             return
         }
         if (res.result.status === 'installed') {
@@ -154,7 +158,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
             onInstalled?.(key, name)
             return
         }
-        setError(res.result.status === 'needs_auth' ? 'This service needs sign-in but returned no connection target.' : 'Some required fields are still missing.')
+        setError(res.result.status === 'needs_auth' ? t('configForm.noTarget') : t('configForm.missingFields'))
     }
     const submit = form.handleSubmit(vals => install(vals, null))
     const connect = (popup: Window | null) => form.handleSubmit(vals => install(vals, popup))()
@@ -174,7 +178,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         return (
             <p className="flex items-center gap-2 text-sm font-medium">
                 <CheckCircle2Icon className="size-4 shrink-0 text-emerald-400" />
-                {name} configured
+                {t('configForm.configured', { name })}
             </p>
         )
     }
@@ -183,9 +187,9 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         return (
             <div className="space-y-3">
                 <p className="text-sm font-medium">
-                    Connect {name}
+                    {t('configForm.connectTitle', { name })}
                 </p>
-                <p className="text-xs text-muted-foreground">Sign in to {name} so your agent can use it.</p>
+                <p className="text-xs text-muted-foreground">{t('configForm.signInOAuth', { name })}</p>
                 <McpOAuthAuthorize
                     url={authStep.url}
                     agentId={agentId}
@@ -206,7 +210,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         return (
             <AppAccountPicker
                 slug={appStep}
-                title={`Set up ${name}`}
+                title={t('configForm.setUp', { name })}
                 agentId={agentId}
                 onAuthorized={() => {
                     setInstalled(true)
@@ -220,9 +224,9 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         return (
             <div className="space-y-3">
                 <p className="text-sm font-medium">
-                    Connect {name}
+                    {t('configForm.connectTitle', { name })}
                 </p>
-                <p className="text-xs text-muted-foreground">Sign in with {name} so your agent can use it. Rerun handles the connection for you.</p>
+                <p className="text-xs text-muted-foreground">{t('configForm.signInManaged', { name })}</p>
                 <ComposioConnect
                     autoStart={signInStart !== null}
                     pendingPopup={signInStart?.popup}
@@ -242,9 +246,9 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         return (
             <div className="space-y-3">
                 <p className="text-sm font-medium">
-                    Connect {name}
+                    {t('configForm.connectTitle', { name })}
                 </p>
-                <p className="text-xs text-muted-foreground">Sign in with {name} so your agent can use it. Rerun handles the connection for you.</p>
+                <p className="text-xs text-muted-foreground">{t('configForm.signInManaged', { name })}</p>
                 <ManagedConnect
                     autoStart={signInStart !== null}
                     pendingPopup={signInStart?.popup}
@@ -266,7 +270,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         <PanelSteps stepKey={choosing ? 'methods' : method.id} depth={choosing ? 0 : 1}>
             {choosing ? (
                 <div className="space-y-3">
-                    <p className="text-sm font-medium">Authentication</p>
+                    <p className="text-sm font-medium">{t('configForm.authentication')}</p>
                     <AuthMethodPicker
                         methods={authMethods}
                         onSelect={id => {
@@ -279,13 +283,13 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
                 <div className="space-y-3">
                     {hasChoice ? (
                         <div className="flex items-center gap-1">
-                            <Button size="icon-sm" variant="ghost" onClick={() => setChoosing(true)} aria-label="Back to methods" className="-my-1 -ml-1.5 text-muted-foreground">
+                            <Button size="icon-sm" variant="ghost" onClick={() => setChoosing(true)} aria-label={t('configForm.backToMethods')} className="-my-1 -ml-1.5 text-muted-foreground">
                                 <ArrowLeftIcon className="size-4" />
                             </Button>
-                            <p className="min-w-0 truncate text-sm font-medium">{method.label || methodKindLabel(method.kind)}</p>
+                            <p className="min-w-0 truncate text-sm font-medium">{method.label || t(`authMethod.label.${methodKindKey(method.kind)}`)}</p>
                         </div>
                     ) : (
-                        <p className="text-sm font-medium">Authentication</p>
+                        <p className="text-sm font-medium">{t('configForm.authentication')}</p>
                     )}
 
                     {visibleInputs.length > 0 && <ServiceFields inputs={visibleInputs} values={values} onChange={(key, v) => form.setValue(key, v)} />}
@@ -293,14 +297,14 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
                     {error && <p className="text-xs text-destructive">{error}</p>}
 
                     {isConnect ? (
-                        <Button variant="outline" size="sm" disabled={loading || missingRequired} onClick={() => connect(openPendingSignInPopup(name))} className="w-full">
+                        <Button variant="outline" size="sm" disabled={loading || missingRequired} onClick={() => connect(openPendingSignInPopup(name, t('signInPopup.connecting', { name })))} className="w-full">
                             {loading ? <Loader2Icon className="size-3.5 animate-spin mr-1.5" /> : <ExternalLinkIcon className="size-3.5 mr-1.5" />}
-                            {loading ? 'Connecting…' : 'Connect'}
+                            {loading ? t('configForm.connecting') : t('configForm.connect')}
                         </Button>
                     ) : (
                         <div className="flex justify-end">
                             <Button size="sm" disabled={loading || missingRequired} onClick={submit}>
-                                {loading ? 'Installing…' : method.kind === 'app' ? 'Choose an account' : 'Install'}
+                                {loading ? t('configForm.installing') : method.kind === 'app' ? t('configForm.chooseAccount') : t('configForm.install')}
                             </Button>
                         </div>
                     )}

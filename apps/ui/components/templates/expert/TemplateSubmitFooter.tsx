@@ -2,6 +2,7 @@
 
 import { isPublicStatus, type TemplateStatus } from '@rerun/contracts'
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import { useFormContext } from 'react-hook-form'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
@@ -35,6 +36,7 @@ export function TemplateSubmitFooter({
     onWithdraw: () => Promise<boolean>
     onDelete: () => Promise<boolean>
 }) {
+    const t = useTranslations('templates.expert.footer')
     // Subscribes the footer to every field: the checklist has to move as the author types.
     const { watch, formState } = useFormContext<TemplateFormValues>()
     const values = watch()
@@ -57,7 +59,7 @@ export function TemplateSubmitFooter({
     if (live) {
         return (
             <footer className="border-t border-border px-5 py-4">
-                <p className="text-xs text-muted-foreground">This template is live on the marketplace. Reach out to the Rerun team to change it.</p>
+                <p className="text-xs text-muted-foreground">{t('live')}</p>
             </footer>
         )
     }
@@ -65,7 +67,7 @@ export function TemplateSubmitFooter({
     if (inReview) {
         return (
             <footer className="flex items-center gap-3 border-t border-border px-5 py-4">
-                <p className="text-xs text-muted-foreground">We are reviewing this template. Withdraw it to keep editing.</p>
+                <p className="text-xs text-muted-foreground">{t('inReview')}</p>
                 <Button
                     type="button"
                     size="sm"
@@ -76,32 +78,32 @@ export function TemplateSubmitFooter({
                     onClick={() => run('withdraw', onWithdraw)}
                 >
                     <RotateCwIcon className="size-3.5" />
-                    Withdraw
+                    {t('withdraw')}
                 </Button>
             </footer>
         )
     }
 
-    const checklist = templateSubmitChecklist(values, { payoutsReady })
+    const checklist = templateSubmitChecklist(values, t, { payoutsReady })
     const metCount = checklist.filter(requirement => requirement.met).length
     const ready = metCount === checklist.length
     const readyTone = ready ? 'text-emerald-500' : 'text-muted-foreground'
     // Submitting reads the stored row, so an unsaved edit would not be part of what we review.
-    const blocker = !ready ? 'Complete the checklist first' : formState.isDirty ? 'Save your changes first' : null
+    const blocker = !ready ? t('completeChecklist') : formState.isDirty ? t('saveFirst') : null
 
     return (
         <footer className="flex flex-col gap-3 border-t border-border px-5 py-4">
             {reviewNote && (
                 <div className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-500">
-                    <p className="font-medium">We sent this one back</p>
+                    <p className="font-medium">{t('sentBack')}</p>
                     <p className="mt-0.5 whitespace-pre-line">{reviewNote}</p>
                 </div>
             )}
 
             <div className="flex items-center gap-2">
                 <ConfirmDialog
-                    title="Delete this template for good?"
-                    description="The template, its media and every coworker captured for it are removed. This cannot be undone."
+                    title={t('deleteTitle')}
+                    description={t('deleteDescription')}
                     onConfirm={() => run('delete', onDelete)}
                 >
                     <Button
@@ -110,8 +112,8 @@ export function TemplateSubmitFooter({
                         size="icon-sm"
                         loading={running === 'delete'}
                         disabled={pending || saving}
-                        title="Delete this template for good"
-                        aria-label="Delete template"
+                        title={t('deleteTooltip')}
+                        aria-label={t('deleteLabel')}
                         className="text-muted-foreground hover:text-destructive"
                     >
                         <Trash2Icon className="size-3.5" />
@@ -123,30 +125,30 @@ export function TemplateSubmitFooter({
                         <button
                             type="button"
                             className="ml-auto flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                            aria-label={`Submission checklist: ${metCount} of ${checklist.length} done`}
+                            aria-label={t('checklistLabel', { met: metCount, total: checklist.length })}
                         >
                             <Gauge ratio={metCount / checklist.length} complete={ready} className={cn(readyTone, ready && 'hover:text-emerald-500')} />
                         </button>
                     </PopoverTrigger>
                     <PopoverContent align="end" className="w-64">
                         <div className="mb-2 flex items-center justify-between gap-4">
-                            <span className="text-xs font-medium">Ready to submit</span>
+                            <span className="text-xs font-medium">{t('ready')}</span>
                             <span className={cn('flex items-center gap-1.5 text-xs font-medium tabular-nums', readyTone)}>
                                 {metCount}/{checklist.length}
                                 {ready && <CircleCheckIcon className="size-3.5" />}
                             </span>
                         </div>
-                        <p className="mb-2 text-xs text-muted-foreground">What a template needs before we review it.</p>
+                        <p className="mb-2 text-xs text-muted-foreground">{t('checklistHint')}</p>
                         <ul className="flex flex-col gap-1.5">
                             {checklist.map(requirement => (
-                                <li key={requirement.label} className={cn('flex flex-col gap-0.5 text-xs', requirement.met ? 'text-foreground' : 'text-muted-foreground')}>
+                                <li key={requirement.id} className={cn('flex flex-col gap-0.5 text-xs', requirement.met ? 'text-foreground' : 'text-muted-foreground')}>
                                     <span className="flex items-center gap-2">
                                         {requirement.met ? <CircleCheckIcon className="size-3.5 text-emerald-500" /> : <CircleIcon className="size-3.5" />}
                                         {requirement.label}
                                     </span>
-                                    {!requirement.met && requirement.label.includes('payouts') && (
+                                    {!requirement.met && requirement.id === 'payouts' && (
                                         <button type="button" className="ml-5 w-fit text-left underline" onClick={() => setPane({ kind: 'payouts' })}>
-                                            Set up payouts
+                                            {t('setUpPayouts')}
                                         </button>
                                     )}
                                 </li>
@@ -156,7 +158,7 @@ export function TemplateSubmitFooter({
                 </Popover>
 
                 <Button type="submit" size="sm" variant="secondary" loading={saving} disabled={saving || pending}>
-                    Save
+                    {t('save')}
                 </Button>
                 <Button
                     type="button"
@@ -167,7 +169,7 @@ export function TemplateSubmitFooter({
                     onClick={() => run('submit', onSubmit)}
                 >
                     <SendIcon className="size-3.5" />
-                    Submit for review
+                    {t('submit')}
                 </Button>
             </div>
         </footer>

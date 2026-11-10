@@ -7,12 +7,10 @@ import { resolveMemberIdentities } from '@/app/api/_services/members.service'
 import { selectAll, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+import { failure, failureOf, type ErrorCode } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
 
-const BOX_ACCESS_ADMIN_ONLY = 'Only an admin can change who can access a Box'
-const BOX_NOT_FOUND = 'Box not found'
-const NOT_A_MEMBER = 'This user is not a member of the workspace.'
-const ADMINS_ALWAYS = 'Admins always have access to every Box'
+const BOX_ACCESS_ADMIN_ONLY = 'adminOnlyBoxAccess' satisfies ErrorCode
 
 type ServiceClient = SupabaseClient<Database>
 
@@ -32,15 +30,11 @@ async function spaceOfWorkspace(supabase: ServiceClient, workspaceId: number, sp
     return space && space.workspace_id === workspaceId ? space : null
 }
 
-function failure(err: unknown, fallback: string): { ok: false; error: string } {
-    return { ok: false, error: err instanceof Error ? err.message : fallback }
-}
-
 export async function getSpaceAccessAction(spaceId: string): Promise<ActionResult<SpaceAccessView>> {
     try {
         const { workspace, supabase } = await requireAdminContext(BOX_ACCESS_ADMIN_ONLY)
         const space = await spaceOfWorkspace(supabase, workspace.id, spaceId)
-        if (!space) return { ok: false, error: BOX_NOT_FOUND }
+        if (!space) return failure('boxNotFound')
 
         const [{ data: agentRows }, { data: grantRows }, { data: memberRows }] = await Promise.all([
             selectAll(supabase, 'agents', ['id', 'name'] as const, { workspace_id: workspace.id, space_id: spaceId }, { column: 'created_at', ascending: true }),
@@ -65,39 +59,39 @@ export async function getSpaceAccessAction(spaceId: string): Promise<ActionResul
             members: members.map(m => ({ userId: m.user_id, email: identities.get(m.user_id)?.email ?? null, role: m.role })),
         }
     } catch (err) {
-        return failure(err, 'Failed to load who can access this Box')
+        return failureOf(err, 'loadBoxAccessFailed')
     }
 }
 
 export async function setSpaceVisibilityAction(spaceId: string, visibility: SpaceVisibility): Promise<ActionResult> {
     try {
         const { workspace, supabase } = await requireAdminContext(BOX_ACCESS_ADMIN_ONLY)
-        if (visibility !== 'workspace' && visibility !== 'restricted') return { ok: false, error: 'Unknown visibility' }
-        if (!(await spaceOfWorkspace(supabase, workspace.id, spaceId))) return { ok: false, error: BOX_NOT_FOUND }
+        if (visibility !== 'workspace' && visibility !== 'restricted') return failure('unknownVisibility')
+        if (!(await spaceOfWorkspace(supabase, workspace.id, spaceId))) return failure('boxNotFound')
 
         const { error } = await supabase.from('spaces').update<Database['public']['Tables']['spaces']['Update']>({ visibility }).eq('id', spaceId).eq('workspace_id', workspace.id)
         if (error) return { ok: false, error: error.message }
         return { ok: true }
     } catch (err) {
-        return failure(err, 'Failed to change who can access this Box')
+        return failureOf(err, 'changeBoxAccessFailed')
     }
 }
 
 export async function grantSpaceAccessAction(spaceId: string, userIds: string[], access: AccessLevel): Promise<ActionResult> {
     try {
         const { userId: grantor, workspace, supabase } = await requireAdminContext(BOX_ACCESS_ADMIN_ONLY)
-        if (access !== 'use' && access !== 'manage') return { ok: false, error: 'Unknown access level' }
+        if (access !== 'use' && access !== 'manage') return failure('unknownAccessLevel')
         const targets = [...new Set(userIds)]
         if (targets.length === 0) return { ok: true }
-        if (!(await spaceOfWorkspace(supabase, workspace.id, spaceId))) return { ok: false, error: BOX_NOT_FOUND }
+        if (!(await spaceOfWorkspace(supabase, workspace.id, spaceId))) return failure('boxNotFound')
 
         const [{ data: memberRows }, { data: existingRows }] = await Promise.all([
             selectMany(supabase, 'workspace_members', ['user_id', 'role'] as const, { workspace_id: workspace.id, user_id: targets }),
             selectMany(supabase, 'space_members', ['user_id', 'granted_by'] as const, { space_id: spaceId, user_id: targets }),
         ])
         const roleOf = new Map((memberRows ?? []).map(m => [m.user_id, m.role]))
-        if (targets.some(id => !roleOf.has(id))) return { ok: false, error: NOT_A_MEMBER }
-        if (targets.some(id => roleOf.get(id) === 'admin')) return { ok: false, error: ADMINS_ALWAYS }
+        if (targets.some(id => !roleOf.has(id))) return failure('userNotMember')
+        if (targets.some(id => roleOf.get(id) === 'admin')) return failure('adminsAlwaysReachBoxes')
 
         // A level changed on an existing row keeps who granted it, so the creator of the Box stays known.
         const grantedBy = new Map((existingRows ?? []).map(row => [row.user_id, row.granted_by]))
@@ -112,20 +106,20 @@ export async function grantSpaceAccessAction(spaceId: string, userIds: string[],
         if (error) return { ok: false, error: error.message }
         return { ok: true }
     } catch (err) {
-        return failure(err, 'Failed to give access to this Box')
+        return failureOf(err, 'grantBoxAccessFailed')
     }
 }
 
 export async function revokeSpaceAccessAction(spaceId: string, userId: string): Promise<ActionResult> {
     try {
         const { workspace, supabase } = await requireAdminContext(BOX_ACCESS_ADMIN_ONLY)
-        if (!(await spaceOfWorkspace(supabase, workspace.id, spaceId))) return { ok: false, error: BOX_NOT_FOUND }
+        if (!(await spaceOfWorkspace(supabase, workspace.id, spaceId))) return failure('boxNotFound')
 
         const { error } = await supabase.from('space_members').delete().eq('space_id', spaceId).eq('user_id', userId).eq('workspace_id', workspace.id)
         if (error) return { ok: false, error: error.message }
         return { ok: true }
     } catch (err) {
-        return failure(err, 'Failed to remove access to this Box')
+        return failureOf(err, 'revokeBoxAccessFailed')
     }
 }
 
@@ -141,11 +135,11 @@ export async function listMemberAccessAction(targetUserId: string): Promise<Acti
     try {
         const ctx = await requireWorkspaceContext()
         const viewerIsAdmin = ctx.role === 'admin'
-        if (!viewerIsAdmin && targetUserId !== ctx.userId) return { ok: false, error: 'Only an admin can see the Boxes of another member' }
+        if (!viewerIsAdmin && targetUserId !== ctx.userId) return failure('adminOnlyMemberBoxes')
         const { workspace, supabase } = ctx
 
         const { data: target } = await selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: targetUserId, workspace_id: workspace.id })
-        if (!target) return { ok: false, error: NOT_A_MEMBER }
+        if (!target) return failure('userNotMember')
 
         const [{ data: spaceRows }, { data: agentRows }, { data: grantRows }] = await Promise.all([
             selectAll(supabase, 'spaces', ['id', 'workspace_id', 'name', 'visibility'] as const, { workspace_id: workspace.id }, { column: 'created_at', ascending: true }),
@@ -169,6 +163,6 @@ export async function listMemberAccessAction(targetUserId: string): Promise<Acti
 
         return { ok: true, userId: targetUserId, role: target.role, boxScope, boxes }
     } catch (err) {
-        return failure(err, 'Failed to load the Boxes of this member')
+        return failureOf(err, 'loadMemberBoxesFailed')
     }
 }

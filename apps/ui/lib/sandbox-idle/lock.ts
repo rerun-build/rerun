@@ -9,8 +9,6 @@ export type LockArchive = Pick<ArchiveRow, 'reason' | 'status' | 'reactivation_r
 
 export const LOCK_ARCHIVE_COLUMNS = ['id', 'workspace_id', 'reason', 'status', 'archived_at', 'expires_at', 'reactivation_requested_at', 'reactivation_approved_at', 'reactivation_rejected_at'] as const
 
-export const SANDBOX_LOCKED_ERROR = 'This sandbox was archived after 30 days without activity. Request its reactivation to get it back.'
-
 /**
  * `archive` is the sandbox's latest completed archive. A restore that passed lifts the lock on its
  * own, which is what makes an admin restoring by hand an approval like any other.

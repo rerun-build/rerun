@@ -1,6 +1,7 @@
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
-import { AVATAR, COWORKER_ROW_HEIGHT } from '@/components/home/CoworkerRow'
+import { AVATAR, COWORKER_ROW_HEIGHT, HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -9,11 +10,11 @@ export const SKELETON_ROWS = 6
 // Where a CoworkerRow draws its avatar, its name and its status line. The native launch screen
 // draws the same shapes (plugins/with-home-launch-screen.js), so the app takes over without a jump.
 export const SKELETON = {
-    avatarTop: spacing.md + 2,
-    textLeft: spacing.xl + AVATAR + spacing.lg,
-    nameTop: spacing.md + 4,
+    avatarTop: spacing.lg,
+    textLeft: HOME_GUTTER + AVATAR + spacing.lg,
+    nameTop: spacing.lg + 4,
     nameHeight: 14,
-    statusTop: spacing.md + 28,
+    statusTop: spacing.lg + 28,
     statusHeight: 12,
 } as const
 
@@ -24,8 +25,9 @@ export function skeletonBarWidths(index: number) {
 
 // The shape of the rows to come, as the web loads: never a spinner in the middle of the screen.
 export function HomeSkeleton({ rows = SKELETON_ROWS }: { rows?: number }) {
+    const t = useTranslations('mobileHome')
     return (
-        <View accessibilityLabel="Loading coworkers">
+        <View accessibilityLabel={t('loadingCoworkers')}>
             {Array.from({ length: rows }, (_, index) => (
                 <SkeletonRow key={index} index={index} />
             ))}
@@ -38,8 +40,8 @@ export function SkeletonRow({ index, opaque = false }: { index: number; opaque?:
     const widths = skeletonBarWidths(index)
     return (
         <View style={{ height: COWORKER_ROW_HEIGHT, backgroundColor: opaque ? theme.background : undefined }}>
-            <View style={{ position: 'absolute', left: spacing.xl, top: SKELETON.avatarTop, width: AVATAR, height: AVATAR, borderRadius: radius.md, backgroundColor: theme.muted }} />
-            <View style={{ position: 'absolute', left: SKELETON.textLeft, right: spacing.xl, top: 0, bottom: 0 }}>
+            <View style={{ position: 'absolute', left: HOME_GUTTER, top: SKELETON.avatarTop, width: AVATAR, height: AVATAR, borderRadius: radius.md, backgroundColor: theme.muted }} />
+            <View style={{ position: 'absolute', left: SKELETON.textLeft, right: HOME_GUTTER, top: 0, bottom: 0 }}>
                 <View style={{ position: 'absolute', top: SKELETON.nameTop, width: `${widths.name}%`, height: SKELETON.nameHeight, borderRadius: radius.sm, backgroundColor: theme.muted }} />
                 <View style={{ position: 'absolute', top: SKELETON.statusTop, width: `${widths.status}%`, height: SKELETON.statusHeight, borderRadius: radius.sm, backgroundColor: theme.muted }} />
             </View>

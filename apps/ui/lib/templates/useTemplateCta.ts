@@ -1,7 +1,9 @@
 'use client'
 
-import { TRIAL_DAYS, formatAmount, isPaid, priceCtaLabel, trialLimitsLabel } from '@rerun/contracts'
+import { TRIAL_DAYS, formatAmount, isPaid, priceCtaLabel, trialLimitsCaption } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
+import { useLocale, useTranslations } from 'next-intl'
+import { useErrorText } from '@/hooks/useErrorText'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
 import { startTemplateCheckoutAction } from '@rerun/cloud/marketplace.client'
@@ -47,32 +49,37 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     const { run: startImport } = useTemplateImportFlow({ onDone })
     const [pending, startTransition] = useTransition()
     const installed = useBoardStore(s => s.agents.find(agent => agent.templateId === template.id) ?? null)
+    const t = useTranslations('templates.cta')
+    const tPrice = useTranslations('templates.price')
+    const tTrial = useTranslations('billing.trialOffer')
+    const errorText = useErrorText()
+    const locale = useLocale()
 
     const count = template.archiveAgentNames.length
     const paid = isPaid(template.pricing)
-    const price = formatAmount(template.pricing.amountCents, template.pricing.currency)
+    const recurring = template.pricing.model === 'recurring'
+    const price = formatAmount(template.pricing.amountCents, template.pricing.currency, locale)
     const priceArm = usePriceArm()
-    const planPrice = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY)
+    const planPrice = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY, locale)
+    const hireLabel = priceCtaLabel(template.pricing, count, tPrice, locale)
 
-    const placeLabel = `Place ${count} coworker${count === 1 ? '' : 's'}`
-    const payLabel = template.pricing.model === 'recurring' ? `subscribe ${price}/mo` : `pay ${price}`
+    const placeLabel = t('place', { count })
 
     // Un seul essai gratuit par workspace, avec ou sans carte selon le bras du test. Ici pour le
     // libellé seulement : le serveur tranche au clic.
     const offer = trialOffer(workspace)
     const trialEligible = offer !== 'paid'
-    const trialCaption = `${trialLimitsLabel()} during the trial.`
-    const trialTerms = trialOfferLine(priceArm, offer)
+    const trialTerms = trialOfferLine(priceArm, offer, tTrial, locale)
 
     const trialStep: TemplateStep = trialEligible
-        ? { label: `Start your ${TRIAL_DAYS}-day free trial`, caption: trialCaption, icon: CreditCard }
-        : { label: `Subscribe ${planPrice}/mo`, caption: 'Billed today. Cancel anytime.', icon: CreditCard }
+        ? { label: tTrial('startTrial', { days: TRIAL_DAYS }), caption: trialLimitsCaption(tTrial), icon: CreditCard }
+        : { label: tTrial('subscribe', { price: planPrice }), caption: tTrial('billedToday'), icon: CreditCard }
     const payStep: TemplateStep = {
-        label: template.pricing.model === 'recurring' ? `Subscribe ${price}/mo` : `Pay ${price}`,
-        caption: 'This template, billed separately.',
+        label: recurring ? t('subscribe', { price }) : t('pay', { price }),
+        caption: t('payCaption'),
         icon: ShoppingBagIcon,
     }
-    const placeStep: TemplateStep = { label: placeLabel, caption: `Drag ${count === 1 ? 'it' : 'them'} onto your board, ready to run.`, icon: LayoutGridIcon }
+    const placeStep: TemplateStep = { label: placeLabel, caption: t('placeCaption', { count }), icon: LayoutGridIcon }
 
     const status = workspace?.subscription_status
     const entitled = isSubscriptionEntitled(status)
@@ -95,7 +102,7 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
                 // Le plan manquant ne devrait plus arriver ici (la porte 1 passe avant), mais le
                 // serveur reste l'autorité : s'il le dit, on repart par le trial.
                 if ('needsPlan' in result) startTrial()
-                else toast.error(result.error)
+                else toast.error(errorText(result))
                 return
             }
             // Free and already-owned come back from the server rather than being assumed here: the
@@ -109,7 +116,7 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     const use = () => startImport(template)
 
     if (count === 0) {
-        return { gate: 'blocked', label: 'Use this template', note: 'No coworker has been captured into this template yet.', steps: [], disabled: true, disabledReason: null, pending: false, run: () => {} }
+        return { gate: 'blocked', label: t('useTemplate'), note: t('nothingCaptured'), steps: [], disabled: true, disabledReason: null, pending: false, run: () => {} }
     }
 
     // Les coworkers déjà posés s'ouvrent d'abord : une seconde équipe aux mêmes noms, chacune à
@@ -118,8 +125,8 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     if (installed && (template.access !== 'lapsed' || isAdmin)) {
         return {
             gate: 'installed',
-            label: `Open ${installed.name}`,
-            note: 'Already on your board.',
+            label: t('open', { name: installed.name }),
+            note: t('alreadyOnBoard'),
             steps: [],
             disabled: false,
             disabledReason: null,
@@ -128,13 +135,13 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
                 useBoardStore.getState().openAgentChat(installed.id)
                 onDone()
             },
-            secondary: { label: 'Install again', run: () => startImport(template, { again: true }) },
+            secondary: { label: t('installAgain'), run: () => startImport(template, { again: true }) },
         }
     }
 
     // The sandbox has no plan and no card of its own, so it can hold a draft but never a purchase.
     if (paid && workspace?.is_sandbox && !template.isMine && !isAdmin) {
-        return { gate: 'blocked', label: priceCtaLabel(template.pricing, count), note: null, steps: [], disabled: true, disabledReason: 'Switch to a workspace to buy templates.', pending: false, run: () => {} }
+        return { gate: 'blocked', label: hireLabel, note: null, steps: [], disabled: true, disabledReason: t('sandboxCannotBuy'), pending: false, run: () => {} }
     }
 
     const ownedOrGranted = template.owned || isAdmin
@@ -142,14 +149,24 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     if (!entitled) {
         return {
             gate: 'plan',
-            label: trialEligible ? (ownedOrGranted ? 'Start free trial & install' : `Start free trial, then ${payLabel}`) : ownedOrGranted ? `Subscribe ${planPrice}/mo & install` : `Subscribe ${planPrice}/mo, then ${payLabel}`,
+            label: trialEligible
+                ? ownedOrGranted
+                    ? t('trialInstall')
+                    : recurring
+                      ? t('trialThenSubscribe', { price })
+                      : t('trialThenPay', { price })
+                : ownedOrGranted
+                  ? t('planInstall', { plan: planPrice })
+                  : recurring
+                    ? t('planThenSubscribe', { plan: planPrice, price })
+                    : t('planThenPay', { plan: planPrice, price }),
             note: trialEligible
                 ? ownedOrGranted
                     ? trialTerms
-                    : `${trialTerms} This template is billed separately.`
+                    : t('trialBilledSeparately', { terms: trialTerms })
                 : ownedOrGranted
-                  ? 'Your free trial has been used. Billed today, cancel anytime.'
-                  : 'Your free trial has been used. Billed today; this template is billed separately.',
+                  ? tTrial('trialUsed')
+                  : t('trialUsedBilledSeparately'),
             steps: ownedOrGranted ? [trialStep, placeStep] : [trialStep, payStep, placeStep],
             disabled: false,
             disabledReason: null,
@@ -161,8 +178,8 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     if (template.access === 'lapsed' && !isAdmin) {
         return {
             gate: 'purchase',
-            label: `Resubscribe ${price}/mo`,
-            note: 'Your subscription ended. The coworkers this template installed are disabled.',
+            label: t('resubscribe', { price }),
+            note: t('lapsed'),
             steps: [payStep, placeStep],
             disabled: false,
             disabledReason: null,
@@ -174,8 +191,8 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     if (!ownedOrGranted) {
         return {
             gate: 'purchase',
-            label: priceCtaLabel(template.pricing, count),
-            note: workspace ? `Billed to ${workspace.name}. Your Rerun plan is already active.` : null,
+            label: hireLabel,
+            note: workspace?.name ? t('billedTo', { workspace: workspace.name }) : null,
             steps: [payStep, placeStep],
             disabled: false,
             disabledReason: null,
@@ -187,7 +204,7 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     return {
         gate: 'place',
         label: placeLabel,
-        note: template.isMine ? 'Your template, no charge.' : paid && template.access === 'active' ? 'Purchased' : null,
+        note: template.isMine ? t('yours') : paid && template.access === 'active' ? tPrice('purchased') : null,
         steps: [],
         disabled: false,
         disabledReason: null,

@@ -4,6 +4,7 @@ import { SymbolView } from 'expo-symbols'
 import { Fragment, useState } from 'react'
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
@@ -45,6 +46,7 @@ function Facepile({ sources }: { sources: PaidSource[] }) {
 }
 
 function SourceRow({ line }: { line: PaidSourceLine }) {
+    const t = useTranslations('tools')
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.lg, paddingVertical: spacing.md }}>
             <SourceLogo source={line.source} size={ROW_LOGO_SIZE} />
@@ -53,7 +55,7 @@ function SourceRow({ line }: { line: PaidSourceLine }) {
                     {line.source.name}
                 </AppText>
                 <AppText variant="caption" tone="muted" numberOfLines={1}>
-                    {line.activity}
+                    {t(`paidData.${line.capability}`)}
                 </AppText>
             </View>
             <View style={{ alignItems: 'flex-end', flexShrink: 0 }}>
@@ -72,15 +74,17 @@ function SourceRow({ line }: { line: PaidSourceLine }) {
 function SourcesSheet({ turn, open, onClose }: { turn: PaidTurnSources; open: boolean; onClose: () => void }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const t = useTranslations('mobileChat.paidSources')
+    const tc = useTranslations('mobileCommon.actions')
     const { checked, valid } = turn.emails
     return (
         <Modal visible={open} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
             <View style={{ flex: 1, backgroundColor: theme.background }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md }}>
                     <AppText variant="headline" numberOfLines={1} style={{ flex: 1 }}>
-                        Sources
+                        {t('title')}
                     </AppText>
-                    <GlassButton symbol="xmark" label="Close" onPress={onClose} />
+                    <GlassButton symbol="xmark" label={tc('close')} onPress={onClose} />
                 </View>
                 <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: insets.bottom + spacing.xl, gap: spacing.md }}>
                     <Card>
@@ -91,7 +95,7 @@ function SourcesSheet({ turn, open, onClose }: { turn: PaidTurnSources; open: bo
                             </Fragment>
                         ))}
                     </Card>
-                    {checked > 0 && <Badge tone={valid === checked ? 'green' : 'neutral'} label={`${valid} of ${checked} ${checked > 1 ? 'emails' : 'email'} verified`} />}
+                    {checked > 0 && <Badge tone={valid === checked ? 'green' : 'neutral'} label={t('emailsVerified', { valid, checked })} />}
                 </ScrollView>
             </View>
         </Modal>
@@ -102,8 +106,8 @@ function SourcesSheet({ turn, open, onClose }: { turn: PaidTurnSources; open: bo
 export function PaidSourcesPill({ turn }: { turn: PaidTurnSources }) {
     const theme = useTheme()
     const [open, setOpen] = useState(false)
-    const count = turn.sources.length
-    const label = count > 1 ? `${count} sources` : '1 source'
+    const t = useTranslations('mobileChat.paidSources')
+    const label = t('count', { count: turn.sources.length })
     return (
         <>
             <Pressable

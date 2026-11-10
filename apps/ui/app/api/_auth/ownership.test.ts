@@ -123,9 +123,10 @@ describe('requireAdminContext', () => {
 
     it('refuses a member with the reason given', async () => {
         mocks.selectMaybeSingle.mockResolvedValue({ data: { role: 'member' }, error: null })
-        const error = await requireAdminContext('Only an admin can manage billing').catch(e => e)
+        const error = await requireAdminContext('adminOnlyMembers').catch(e => e)
         expect(error).toBeInstanceOf(AuthorizationError)
-        expect(error.message).toBe('Only an admin can manage billing')
+        expect(error.message).toBe('Only an admin can manage members')
+        expect(error.code).toBe('adminOnlyMembers')
     })
 })
 

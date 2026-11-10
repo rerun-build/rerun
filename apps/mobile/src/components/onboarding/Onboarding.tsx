@@ -1,6 +1,7 @@
 import type { ForemanStateResponse } from '@rerun/contracts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { ApiError } from '@/api/client'
 import { decideIndustry, saveIntake, startLead, startTeam } from '@/api/onboarding'
@@ -30,6 +31,7 @@ export function Onboarding({ state, onLeadStarted }: { state: ForemanStateRespon
     const chat = useOnboardingChat(caller)
     const [teamStart, setTeamStart] = useState<TeamStartState>('starting')
     const [leadStarting, setLeadStarting] = useState(false)
+    const t = useTranslations('mobileOnboarding')
 
     const phase = state.phase
     useEffect(() => {
@@ -115,9 +117,9 @@ export function Onboarding({ state, onLeadStarted }: { state: ForemanStateRespon
         return (
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md }}>
                 <AppText variant="callout" tone="muted">
-                    We could not load your setup.
+                    {t('setup.loadFailed')}
                 </AppText>
-                <PillButton label="Retry" variant="secondary" onPress={chat.load} />
+                <PillButton label={t('setup.retry')} variant="secondary" onPress={chat.load} />
             </View>
         )
 

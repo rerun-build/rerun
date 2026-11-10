@@ -1,6 +1,7 @@
 'use client'
 
 import { track } from '@rerun/analytics/client'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getSubscriptionStateAction } from '@/ee/actions/billing.actions'
@@ -11,10 +12,12 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { checkoutRouteFor, trialOffer, type CheckoutRoute } from '@/ee/lib/billing/checkout-variant'
-import { CreditCardIcon, RefreshCwIcon } from '@/lib/icons'
+import { CreditCardIcon, RefreshCwIcon, TicketIcon } from '@/lib/icons'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
+import { isLifetimePlan } from '@/ee/lib/billing/plans'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
+import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import { BillingDialogShell } from './billing/BillingDialogShell'
@@ -25,7 +28,7 @@ import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscripti
 // What the dialog shows, decided when it opens and held until it closes: a payment rewrites the
 // workspace through the webhook, and re-deciding then would swap the success panel for the next
 // dialog under the user's eyes.
-type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'error' }
+type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'error' }
 
 // Every openBilling() lands here. Two dialogs: the checkout, which sells a plan (or ends a trial),
 // and the plan dialog, which manages one that is paid.
@@ -69,6 +72,13 @@ export function BillingDialog() {
     // An entitled workspace whose Stripe read failed is not one without a plan: deciding on nothing
     // would offer a paying customer to subscribe.
     const decide = useCallback(async () => {
+        // Paid once, outside Stripe: there is nothing to sell, and a Pro subscription would overwrite
+        // the plan, so cancelling it later would take the lifetime access away.
+        if (isLifetimePlan(workspace)) {
+            setResolved({ kind: 'lifetime' })
+            track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: 'lifetime' })
+            return
+        }
         setResolved({ kind: 'loading' })
         const read = entitled ? await loadState() : null
         if (read && !read.ok) {
@@ -77,7 +87,7 @@ export function BillingDialog() {
         }
         const route = resolve(read?.state ?? null)
         track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: route?.variant ?? 'plan' })
-    }, [entitled, loadState, resolve, trigger, highlightAddon])
+    }, [workspace, entitled, loadState, resolve, trigger, highlightAddon])
 
     const opened = useRef(false)
     useEffect(() => {
@@ -102,6 +112,13 @@ export function BillingDialog() {
                 <AdminOnlyShell onClose={close} />
             ) : resolved.kind === 'loading' ? (
                 <LoadingShell />
+            ) : resolved.kind === 'lifetime' ? (
+                <LifetimeShell
+                    onConnectAi={() => {
+                        close()
+                        useWorkspaceSettingsStore.getState().openAiProviders()
+                    }}
+                />
             ) : resolved.kind === 'error' ? (
                 <ErrorShell onRetry={() => void decide()} />
             ) : resolved.kind === 'checkout' ? (
@@ -127,16 +144,36 @@ export function BillingDialog() {
 // Every upgrade, top-up and trial button of the app lands here, so a member is told once, in place,
 // rather than refused by the server after a click.
 function AdminOnlyShell({ onClose }: { onClose: () => void }) {
+    const t = useTranslations('billing.dialog')
     return (
         <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
-            <DialogTitle className="sr-only">Billing</DialogTitle>
+            <DialogTitle className="sr-only">{t('title')}</DialogTitle>
             <EmptyState
                 icon={CreditCardIcon}
-                title="Billing is managed by an admin"
-                description="Ask an admin of this workspace to change the plan or add credits."
+                title={t('adminOnly.title')}
+                description={t('adminOnly.description')}
                 action={
                     <Button size="sm" variant="outline" onClick={onClose}>
-                        Got it
+                        {t('adminOnly.gotIt')}
+                    </Button>
+                }
+            />
+        </DialogContent>
+    )
+}
+
+function LifetimeShell({ onConnectAi }: { onConnectAi: () => void }) {
+    const t = useTranslations('billing.dialog')
+    return (
+        <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
+            <DialogTitle className="sr-only">{t('title')}</DialogTitle>
+            <EmptyState
+                icon={TicketIcon}
+                title={t('lifetime.title')}
+                description={t('lifetime.description')}
+                action={
+                    <Button size="sm" variant="outline" onClick={onConnectAi}>
+                        {t('lifetime.connectAi')}
                     </Button>
                 }
             />
@@ -145,16 +182,17 @@ function AdminOnlyShell({ onClose }: { onClose: () => void }) {
 }
 
 function ErrorShell({ onRetry }: { onRetry: () => void }) {
+    const t = useTranslations('billing.dialog')
     return (
         <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
-            <DialogTitle className="sr-only">Billing</DialogTitle>
+            <DialogTitle className="sr-only">{t('title')}</DialogTitle>
             <EmptyState
                 icon={CreditCardIcon}
-                title="Your plan could not be loaded"
-                description="Stripe did not answer. Your subscription is untouched, try again in a moment."
+                title={t('error.title')}
+                description={t('error.description')}
                 action={
                     <Button size="sm" variant="outline" onClick={onRetry}>
-                        <RefreshCwIcon className="size-3.5" /> Retry
+                        <RefreshCwIcon className="size-3.5" /> {t('error.retry')}
                     </Button>
                 }
             />
@@ -163,9 +201,10 @@ function ErrorShell({ onRetry }: { onRetry: () => void }) {
 }
 
 function LoadingShell() {
+    const t = useTranslations('billing.dialog')
     return (
         <BillingDialogShell
-            title="Billing"
+            title={t('title')}
             left={
                 <div className="flex flex-col gap-4">
                     <Skeleton className="h-5 w-28" />

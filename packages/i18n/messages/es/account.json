@@ -1,0 +1,89 @@
+{
+    "title": "Cuenta",
+    "tabs": {
+        "profile": {
+            "label": "Perfil",
+            "description": "Tu foto y tu nombre, tal como los ve tu equipo."
+        },
+        "signIn": {
+            "label": "Inicio de sesión",
+            "description": "Las formas de iniciar sesión en esta cuenta."
+        },
+        "language": {
+            "label": "Idioma",
+            "description": "El idioma que Rerun usa contigo."
+        },
+        "delete": {
+            "label": "Eliminar cuenta",
+            "description": "Cierra tu cuenta de Rerun para siempre."
+        }
+    },
+    "language": {
+        "field": "Idioma",
+        "automatic": "Automático",
+        "automaticHint": "Sigue a tu navegador: {language}.",
+        "failed": "No se pudo cambiar el idioma. Inténtalo de nuevo."
+    },
+    "profile": {
+        "photo": "Foto",
+        "photoHelp": "La ven tus compañeros, junto a tus mensajes y tu cursor.",
+        "dropPhoto": "Suelta tu foto",
+        "changePhoto": "Cambiar foto",
+        "uploadPhoto": "Subir foto",
+        "removePhoto": "Quitar",
+        "name": "Nombre",
+        "namePlaceholder": "p. ej. Ada Lovelace",
+        "save": "Guardar",
+        "notAnImage": "Elige un archivo de imagen.",
+        "nameUpdated": "Nombre actualizado",
+        "failed": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "signIn": {
+        "email": {
+            "title": "Email",
+            "empty": "Sin conectar. Añade uno para iniciar sesión con un código enviado a tu bandeja de entrada."
+        },
+        "phone": {
+            "title": "Teléfono",
+            "empty": "Sin conectar. Añade un número para iniciar sesión con un código por WhatsApp o SMS.",
+            "otherAccount": "Este número inicia sesión en otra cuenta de Rerun. Cámbialo para iniciar sesión aquí por teléfono."
+        },
+        "change": "Cambiar",
+        "add": "Añadir",
+        "connect": "Conectar",
+        "disconnect": "Desconectar",
+        "connected": "Conectado",
+        "notConnected": "Sin conectar.",
+        "onlyMethod": "{provider} es el único método de inicio de sesión conectado a esta cuenta.",
+        "disconnectTitle": "¿Desconectar {provider}?",
+        "disconnectDescription": "Ya no podrás iniciar sesión en esta cuenta con {provider}. Tus otros métodos de inicio de sesión siguen funcionando.",
+        "linkError": {
+            "identityTaken": "Esta cuenta de {provider} ya se usa para iniciar sesión en otra cuenta de Rerun.",
+            "denied": "{provider} no se conectó.",
+            "failed": "No se pudo conectar {provider}. Inténtalo de nuevo."
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "Workspaces compartidos",
+                "description": "Sales de cada workspace que compartes con tu equipo. Ellos lo conservan, con sus coworkers y sus archivos."
+            },
+            "own": {
+                "title": "Tus propios workspaces",
+                "description": "Un workspace en el que solo estás tú se detiene para siempre: sus coworkers se apagan y su máquina se elimina con sus archivos."
+            },
+            "signIn": {
+                "title": "Inicio de sesión",
+                "description": "Se cierra tu sesión en todas partes. Tu email, tu cuenta de Google y tu número quedan libres, así que podrás volver a registrarte más adelante."
+            }
+        },
+        "blocker": {
+            "current": "Su suscripción sigue renovándose. Cancélala desde Facturación antes de eliminar tu cuenta.",
+            "other": "Su suscripción sigue renovándose. Cambia a este workspace y cancélala desde Facturación antes de eliminar tu cuenta.",
+            "openBilling": "Abrir facturación"
+        },
+        "submit": "Eliminar cuenta",
+        "failed": "No se pudo eliminar tu cuenta."
+    }
+}

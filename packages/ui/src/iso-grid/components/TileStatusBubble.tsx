@@ -4,6 +4,8 @@ import { memo, useEffect, useState } from 'react'
 import { Badge } from '../../primitives/badge'
 import { DEFAULT_SPAN, TILE_W, isoPosition, tileTopLift } from '../iso'
 import type { Tile } from '../types'
+import { useKitTranslations } from '../../locale'
+import { tileStatusLabel } from '../status-label'
 
 const ENTER_MS = 200
 const EXIT_MS = 140
@@ -20,6 +22,7 @@ type Props = {
 // curseur qui tient la pastille en vie, pas un minuteur. Le ton reprend la teinte du bloc : c'est
 // ce rapprochement qui apprend la couleur, pas le mot seul.
 export const TileStatusBubble = memo(function TileStatusBubble({ tile, worldOffset, reducedMotion }: Props) {
+    const t = useKitTranslations()
     const active = tile?.style.status ? tile : null
     // La tile effectivement peinte. Elle survit au départ du curseur le temps de la sortie :
     // démonter sur-le-champ ferait disparaître la pastille d'un coup.
@@ -77,7 +80,7 @@ export const TileStatusBubble = memo(function TileStatusBubble({ tile, worldOffs
                     {/* Une taille en dessous du plus petit Badge : la pastille se lit à côté du
                         label de 8px posé sur la face, pas à l'échelle d'une pastille de panneau. */}
                     <Badge tone={status.tone} size="xs" className="gap-0.5 px-1.5 py-px text-[8px]">
-                        {status.label}
+                        {tileStatusLabel(status, t)}
                     </Badge>
                 </div>
             </div>

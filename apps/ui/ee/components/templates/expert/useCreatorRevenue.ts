@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { getCreatorRevenueAction } from '@/ee/actions/creator-billing.actions'
@@ -9,18 +10,19 @@ import type { CreatorRevenue, RevenueRange } from '@/ee/services/creator-revenue
 // rather than a client-side filter: "all time" on a busy creator is more rows than a dialog needs.
 export function useCreatorRevenue(active: boolean) {
     const [range, setRange] = useState<RevenueRange>('30d')
+    const errorText = useErrorText()
     const [revenue, setRevenue] = useState<CreatorRevenue | null>(null)
 
     const load = useCallback(
         (next: RevenueRange) =>
             getCreatorRevenueAction(next).then(result => {
                 if (!result.ok) {
-                    toast.error(result.error)
+                    toast.error(errorText(result))
                     return
                 }
                 setRevenue(result.revenue)
             }),
-        [],
+        [errorText],
     )
 
     useEffect(() => {

@@ -8,7 +8,7 @@ import { ExplainerCheck } from '@/components/dialogs/ExplainerPanel'
 import { cn } from '@/lib/utils'
 
 // `remark` is what the Foreman says once the plan is linked and it stands on this step.
-export type TrackStep = { title: string; body?: ReactNode; remark?: string }
+export type TrackStep = { title: ReactNode; body?: ReactNode; remark?: ReactNode }
 
 type StepStatus = 'done' | 'active' | 'next'
 
@@ -18,7 +18,7 @@ type ForemanTrackProps = {
     at: number
     done: number
     orb: OrbActivity
-    remark: string
+    remark: ReactNode
     thinking?: boolean
 }
 
@@ -34,7 +34,7 @@ export function ForemanTrack({ steps, at, done, orb, remark, thinking = false }:
         </motion.span>
     )
     const bubble = (
-        <motion.p key={remark} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex w-fit items-center gap-2 rounded-2xl rounded-tl-md bg-muted px-3 py-1.5 text-xs">
+        <motion.p key={typeof remark === 'string' ? remark : `step-${at}`} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex w-fit items-center gap-2 rounded-2xl rounded-tl-md bg-muted px-3 py-1.5 text-xs">
             {remark}
             {thinking && <TypingDots className="text-muted-foreground" />}
         </motion.p>

@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { parseServiceRegistryKey } from '@rerun/contracts'
 
 import { getServiceAlternativesAction, getServiceDetailsAction, installServiceAction, listCatalogServicesAction, resetServiceConnectionAction, searchServicesAction, uninstallServiceAction } from '@/app/api/_actions/services.actions'
@@ -25,15 +26,16 @@ import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { serviceIconProps } from '@/lib/services/icons'
-import { SERVICE_CATEGORIES, SERVICE_CATEGORY_LABELS, type ServiceCategory } from '@/lib/services/manifest'
+import { SERVICE_CATEGORIES, type ServiceCategory } from '@/lib/services/manifest'
 import { MAX_OFFERED_ALTERNATIVES } from '@/lib/services/alternatives'
 import type { AppTarget, AuthMethodSummary, ComposioTarget, CustomMcpServer, InstalledService, ManagedTarget, OAuthTarget, ServiceAlternative, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
 import { AlertTriangleIcon, Loader2Icon, RefreshCwIcon } from '@/lib/icons'
 import { PanelList, PanelScroller, PanelSection } from '@/components/ui/panel-list'
 import { PanelRow } from '@/components/ui/panel-row'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 type AgentPanelServicesProps = {
@@ -97,6 +99,10 @@ const BROWSE_PAGE_SIZE = 60
 // Services tab: browse the library and manage installed services. Reuses the exact
 // same ServiceConfigForm shown inline in chat, so config is identical on both sides.
 export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelServices')
+    const tServices = useTranslations('services')
+    const errorText = useErrorText()
     const [installed, setInstalled] = useState<InstalledService[]>([])
     const [custom, setCustom] = useState<CustomMcpServer[]>([])
     const [customStep, setCustomStep] = useState<CustomStep | null>(null)
@@ -111,7 +117,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const [error, setError] = useState<string | null>(null)
     const [reconnecting, setReconnecting] = useState<string | null>(null)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
 
     // Paginated browse accumulation (empty query). A ref tracks server rows fetched so
     // client-side dedup can't drift the offset, and a ref guard blocks the concurrent calls a
@@ -257,13 +263,13 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                     setSetupTarget({ ...target, key: res.result.key, newInstance: false, initialAuthTarget: pendingAuthTarget(res.result) })
                     return
                 }
-                if (!res.ok) setError(res.error)
+                if (!res.ok) setError(errorText(res))
                 await load()
                 return
             }
             setSetupTarget(target)
         },
-        [agentId, load, installed, browseServices, searchResults],
+        [agentId, load, installed, browseServices, searchResults, errorText],
     )
 
 
@@ -277,23 +283,23 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
             const res = await resetServiceConnectionAction(agentId, key)
             setReconnecting(null)
             if (!res.ok) {
-                setError(res.error)
+                setError(errorText(res))
                 return
             }
             await onInstall(key, res.result.mode === 'auth' && res.result.app ? { app: res.result.app } : undefined)
             await load()
         },
-        [agentId, onInstall, load],
+        [agentId, onInstall, load, errorText],
     )
 
     const onUninstall = useCallback(
         async (key: string) => {
             setError(null)
             const res = await uninstallServiceAction(agentId, key)
-            if (!res.success) setError(res.error ?? 'Failed to uninstall app')
+            if (!res.success) setError(errorText(res, t('uninstallFailed')))
             await load()
         },
-        [agentId, load],
+        [agentId, load, t, errorText],
     )
 
     const afterCustomChange = useCallback(async () => {
@@ -306,10 +312,10 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         async (name: string) => {
             setError(null)
             const res = await removeCustomMcpServerAction(agentId, name)
-            if (!res.success) setError(res.error ?? 'Failed to remove the server')
+            if (!res.success) setError(errorText(res, t('removeServerFailed')))
             await afterCustomChange()
         },
-        [agentId, afterCustomChange],
+        [agentId, afterCustomChange, t, errorText],
     )
 
     const onEditCustom = useCallback(
@@ -317,9 +323,9 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
             setError(null)
             const server = (await getAgentDetailAction(agentId))?.config.mcpServers?.find(s => s.name === name)
             if (server) setCustomStep({ kind: 'edit', server: server as EngineMcpServer })
-            else setError('Could not load this server from the engine.')
+            else setError(t('loadServerFailed'))
         },
-        [agentId],
+        [agentId, t],
     )
 
     const swapTo = async (alternative: ServiceAlternative) => {
@@ -329,7 +335,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         const details = await getServiceDetailsAction(agentId, alternative.slug)
         setSwapping(null)
         if (!details || details.authMethods.length === 0) {
-            setSwapError(`${alternative.name} could not be loaded.`)
+            setSwapError(t('alternativeLoadFailed', { name: alternative.name }))
             return
         }
         const current: ServiceAlternative = { slug: setupTarget.slug, name: setupTarget.name, category: setupTarget.category, icon: setupTarget.icon }
@@ -363,7 +369,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                 <PanelEditorShell>
                     <PanelEditorHeader title={server.displayName} onBack={() => setCustomStep(null)} />
                     <PanelEditorBody>
-                        <p className="text-xs text-muted-foreground">Sign in to {server.host ?? server.displayName} so the coworker can use its tools.</p>
+                        <p className="text-xs text-muted-foreground">{t('signInHint', { host: server.host ?? server.displayName })}</p>
                         <McpOAuthAuthorize url={signInUrl} agentId={agentId} serverName={server.name} autoStart pendingPopup={popup} onAuthorized={afterCustomChange} />
                     </PanelEditorBody>
                 </PanelEditorShell>
@@ -423,14 +429,14 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         <PanelSteps stepKey="list" depth={0}>
             <div className="flex h-full flex-col">
                 <div className="space-y-2 border-b border-border p-3">
-                    <Input value={query} placeholder="Search apps…" className="h-8 text-sm" onChange={e => setQuery(e.target.value)} />
+                    <Input value={query} placeholder={t('searchPlaceholder')} className="h-8 text-sm" onChange={e => setQuery(e.target.value)} />
                     <HScrollFade className="-mx-1 gap-1.5 px-1" fadeClassName="from-background">
                         <Chip selected={selectedCategory === null} onClick={() => setSelectedCategory(null)}>
-                            All
+                            {t('allCategories')}
                         </Chip>
                         {SERVICE_CATEGORIES.filter(c => c !== 'other').map(c => (
                             <Chip key={c} selected={selectedCategory === c} onClick={() => setSelectedCategory(c)}>
-                                {SERVICE_CATEGORY_LABELS[c]}
+                                {tServices(`categories.${c}`)}
                             </Chip>
                         ))}
                     </HScrollFade>
@@ -442,7 +448,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                     ) : (
                         <>
                             {installed.length + custom.length > 0 && (
-                                <PanelSection label="Installed">
+                                <PanelSection label={t('installed')}>
                                     <PanelList>
                                         {installed.map(s => (
                                             <PanelRow
@@ -453,7 +459,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                     <span className="flex min-w-0 items-center gap-1.5">
                                                         <span className="truncate">{s.name}</span>
                                                         {(s.status === 'needs_config' || s.status === 'needs_auth') && (
-                                                            <TooltipLabeled label={s.status === 'needs_auth' ? 'This app needs you to sign in before the coworker can use it. Click Connect.' : 'This app needs credentials before the coworker can use it. Click Configure to set it up.'}>
+                                                            <TooltipLabeled label={s.status === 'needs_auth' ? t('needsAuthHint') : t('needsConfigHint')}>
                                                                 <AlertTriangleIcon className="size-3.5 shrink-0 text-amber-400" />
                                                             </TooltipLabeled>
                                                         )}
@@ -464,14 +470,14 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                         {s.status === 'needs_config' && (
                                                             <TooltipDisabledReason reason={manageReason}>
                                                                 <Button size="sm" variant="outline" disabled={!canManage} onClick={() => onInstall(s.key)}>
-                                                                    Configure
+                                                                    {t('configure')}
                                                                 </Button>
                                                             </TooltipDisabledReason>
                                                         )}
                                                         {s.status === 'needs_auth' && (
                                                             <TooltipDisabledReason reason={manageReason}>
                                                                 <Button size="sm" variant="outline" disabled={!canManage} onClick={() => onInstall(s.key)}>
-                                                                    Connect
+                                                                    {t('connect')}
                                                                 </Button>
                                                             </TooltipDisabledReason>
                                                         )}
@@ -479,18 +485,18 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                             <TooltipDisabledReason reason={manageReason}>
                                                                 <Button size="sm" variant="ghost" className="text-muted-foreground" disabled={!canManage || reconnecting === s.key} onClick={() => onReconnect(s.key)}>
                                                                     {reconnecting === s.key ? <Loader2Icon className="animate-spin" /> : <RefreshCwIcon />}
-                                                                    {s.app ? 'Account' : 'Reconnect'}
+                                                                    {s.app ? t('account') : t('reconnect')}
                                                                 </Button>
                                                             </TooltipDisabledReason>
                                                         )}
                                                         <TooltipDisabledReason reason={manageReason}>
                                                             <PanelDeleteButton
-                                                                label={`Uninstall ${s.label ? `${s.name} (${s.label})` : s.name}`}
+                                                                label={s.label ? t('uninstallLabeled', { name: s.name, label: s.label }) : t('uninstall', { name: s.name })}
                                                                 disabled={!canManage}
                                                                 onClick={() => onUninstall(s.key)}
-                                                                confirmTitle={`Uninstall ${s.label ? `${s.name} (${s.label})` : s.name}?`}
-                                                                confirmDescription="The coworker loses this service and its tools. Its connection is revoked, so reinstalling means connecting again."
-                                                                confirmLabel="Uninstall"
+                                                                confirmTitle={s.label ? t('uninstallLabeledConfirm', { name: s.name, label: s.label }) : t('uninstallConfirm', { name: s.name })}
+                                                                confirmDescription={t('uninstallDescription')}
+                                                                confirmLabel={t('uninstallAction')}
                                                             />
                                                         </TooltipDisabledReason>
                                                     </>
@@ -503,7 +509,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 server={server}
                                                 status={customStatuses.get(server.name)}
                                                 statusLoading={customStatusesLoading}
-                                                onConnect={() => setCustomStep({ kind: 'connect', server, popup: openPendingSignInPopup(server.displayName) })}
+                                                onConnect={() => setCustomStep({ kind: 'connect', server, popup: openPendingSignInPopup(server.displayName, tServices('signInPopup.connecting', { name: server.displayName })) })}
                                                 onEdit={() => onEditCustom(server.name)}
                                                 onRemove={() => onRemoveCustom(server.name)}
                                                 disabledReason={manageReason}
@@ -512,7 +518,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                     </PanelList>
                                 </PanelSection>
                             )}
-                            <PanelSection label="Library">
+                            <PanelSection label={t('library')}>
                                 {searchLoading ? <SkeletonPanelRows rows={6} leading className="p-0" /> : <ServiceList services={isSearchActive ? searchResults : browseWithInstalled} onInstall={onInstall} onUninstall={onUninstall} onAddAccount={onAddAccount} disabledReason={manageReason} />}
                                 {!isSearchActive && (
                                     <>
@@ -524,10 +530,10 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                         )}
                                         {!browseHasMore && browseServices.length > 0 && (
                                             <div className="flex flex-col items-center gap-2 rounded-md border border-dashed border-border py-6 text-center">
-                                                <p className="text-xs text-muted-foreground">Still looking? We can add the app you need.</p>
+                                                <p className="text-xs text-muted-foreground">{t('requestHint')}</p>
                                                 <RequestConnectorDialog agentId={agentId}>
                                                     <Button size="sm" variant="outline">
-                                                        Request an app
+                                                        {t('requestApp')}
                                                     </Button>
                                                 </RequestConnectorDialog>
                                             </div>

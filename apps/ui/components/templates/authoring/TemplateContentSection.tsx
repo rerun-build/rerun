@@ -4,6 +4,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@rerun/ui/
 import { RichTextEditor } from '@rerun/ui/rich-text-editor'
 import * as React from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 import { Field } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import type { TemplateFormValues } from '@/lib/templates/edit-schema'
@@ -12,6 +13,7 @@ import { useTemplateAuthoring } from './actions-context'
 import { PrefillButton } from './PrefillButton'
 
 export function TemplateContentSection() {
+    const t = useTranslations('templates.authoring.content')
     const { control, setValue } = useFormContext<TemplateFormValues>()
     const { actions } = useTemplateAuthoring()
     // The editor ignores an incoming value while it holds focus, so a prefill would land in the
@@ -21,7 +23,7 @@ export function TemplateContentSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Content</CardTitle>
+                <CardTitle>{t('title')}</CardTitle>
                 <CardAction>
                     <PrefillButton
                         run={async brief => {
@@ -41,15 +43,15 @@ export function TemplateContentSection() {
                     name="tagline"
                     render={({ field, fieldState }) => (
                         <Field
-                            label="Tagline"
-                            helperText={fieldState.error?.message ?? `${field.value.length}/${TAGLINE_LIMIT}, one sentence.`}
+                            label={t('tagline')}
+                            helperText={fieldState.error?.message ?? t('taglineHelp', { count: field.value.length, limit: TAGLINE_LIMIT })}
                             error={fieldState.error?.message}
                         >
                             <Textarea
                                 {...field}
                                 rows={2}
                                 maxLength={TAGLINE_LIMIT}
-                                placeholder="Finds prospects, writes the first touch and follows up until they reply."
+                                placeholder={t('taglinePlaceholder')}
                             />
                         </Field>
                     )}
@@ -58,8 +60,8 @@ export function TemplateContentSection() {
                     control={control}
                     name="longDescription"
                     render={({ field, fieldState }) => (
-                        <Field label="Long description" optional error={fieldState.error?.message}>
-                            <RichTextEditor key={editorKey} placeholder="What this template does, who it is for, and what it needs to run." value={field.value} onChange={field.onChange} />
+                        <Field label={t('longDescription')} optional error={fieldState.error?.message}>
+                            <RichTextEditor key={editorKey} placeholder={t('longDescriptionPlaceholder')} value={field.value} onChange={field.onChange} />
                         </Field>
                     )}
                 />

@@ -1,6 +1,8 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { Stripes } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState, type KeyboardEvent } from 'react'
 import { toast } from 'sonner'
 
@@ -18,7 +20,7 @@ import { publishedHostOf } from '@/lib/published/links'
 import type { PublishedFile } from '@/lib/services/types'
 import { CheckIcon, ChevronDownIcon, LinkIcon, Share2Icon, Trash2Icon, XIcon } from '@/lib/icons'
 
-import { ACCESS_HINT, ACCESS_ORDER, AccessIcon, accessLabel, inviteLabel, useWorkspaceName } from './access'
+import { ACCESS_ORDER, AccessIcon, useAccessCopy, useWorkspaceName } from './access'
 import { PublishedThumb } from './PublishedThumb'
 
 type ShareDialogProps = {
@@ -42,6 +44,8 @@ export function ShareDialog({ open, onOpenChange, slug, initial, onChanged, onUn
 }
 
 function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: { slug: string; initial: PublishedFile | null; onChanged?: (file: PublishedFile) => void; onUnpublished?: (slug: string) => void; onClose: () => void }) {
+    const t = useTranslations('published')
+    const errorText = useErrorText()
     const workspaceName = useWorkspaceName()
     const [file, setFile] = useState<PublishedFile | null>(initial?.slug === slug ? initial : null)
     const [settings, setSettings] = useState<PublishSettings | null>(null)
@@ -68,7 +72,7 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
         const result = await updatePublishedAccessAction(slug, change)
         setSaving(false)
         if (!result.ok) {
-            toast.error('Could not update the link', { description: result.error })
+            toast.error(t('share.updateFailed'), { description: errorText(result) })
             return false
         }
         setFile(result.file)
@@ -89,7 +93,7 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
         const result = await unpublishLinkAction(slug)
         setConfirmingUnpublish(false)
         if (!result.ok) {
-            toast.error('Could not unpublish', { description: result.error })
+            toast.error(t('share.unpublishFailed'), { description: errorText(result) })
             return
         }
         onUnpublished?.(slug)
@@ -102,10 +106,10 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
         <>
             <div className="flex h-11 shrink-0 items-center gap-2 border-b pr-2 pl-4">
                 <Share2Icon className="size-4 text-muted-foreground" />
-                <DialogTitle className="min-w-0 flex-1 truncate text-sm leading-normal">Share</DialogTitle>
-                <DialogDescription className="sr-only">Choose who can open this link.</DialogDescription>
+                <DialogTitle className="min-w-0 flex-1 truncate text-sm leading-normal">{t('share.title')}</DialogTitle>
+                <DialogDescription className="sr-only">{t('share.description')}</DialogDescription>
                 <DialogClose asChild>
-                    <Button variant="ghost" size="icon-sm" aria-label="Close" className="max-sm:hidden">
+                    <Button variant="ghost" size="icon-sm" aria-label={t('share.close')} className="max-sm:hidden">
                         <XIcon />
                     </Button>
                 </DialogClose>
@@ -156,9 +160,9 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
                 <ConfirmDialog
                     open
                     onOpenChange={next => !next && setConfirmingUnpublish(false)}
-                    title={`Unpublish ${file.title}?`}
-                    description="The link stops working right away, for everyone who has it."
-                    confirmLabel="Unpublish"
+                    title={t('unpublishConfirm.title', { title: file.title })}
+                    description={t('unpublishConfirm.description')}
+                    confirmLabel={t('unpublishConfirm.confirm')}
                     onConfirm={() => void unpublish()}
                 />
             )}
@@ -183,9 +187,11 @@ function AccessTrigger({
     onPick: (access: PublishedAccess) => void
     onUnpublish: () => void
 }) {
+    const t = useTranslations('published.share')
+    const accessCopy = useAccessCopy()
     const offReason = (mode: PublishedAccess): string | null => {
-        if (mode === 'public' && publicOff) return `Turned off for ${workspaceName}`
-        if (mode === 'invited' && invitesOff) return 'This server sends no email'
+        if (mode === 'public' && publicOff) return t('publicOff', { workspace: workspaceName })
+        if (mode === 'invited' && invitesOff) return t('noEmail')
         return null
     }
     return (
@@ -193,7 +199,7 @@ function AccessTrigger({
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="-ml-1.5 min-w-0" disabled={disabled}>
                     <AccessIcon access={access} />
-                    <span className="truncate">{accessLabel(access, workspaceName)}</span>
+                    <span className="truncate">{accessCopy.label(access, workspaceName)}</span>
                     <ChevronDownIcon className="text-muted-foreground" />
                 </Button>
             </DropdownMenuTrigger>
@@ -204,8 +210,8 @@ function AccessTrigger({
                         <DropdownMenuItem key={mode} disabled={!!reason} onSelect={() => onPick(mode)} className="items-start gap-2.5 py-2">
                             <AccessIcon access={mode} className="mt-0.5 size-4 shrink-0" />
                             <span className="flex min-w-0 flex-1 flex-col">
-                                <span>{accessLabel(mode, workspaceName)}</span>
-                                <span className="text-xs text-muted-foreground">{reason ?? ACCESS_HINT[mode]}</span>
+                                <span>{accessCopy.label(mode, workspaceName)}</span>
+                                <span className="text-xs text-muted-foreground">{reason ?? accessCopy.hint(mode)}</span>
                             </span>
                             {access === mode && <CheckIcon className="mt-0.5 size-4 shrink-0" />}
                         </DropdownMenuItem>
@@ -214,7 +220,7 @@ function AccessTrigger({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onSelect={onUnpublish}>
                     <Trash2Icon />
-                    Unpublish
+                    {t('unpublish')}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
@@ -224,6 +230,7 @@ function AccessTrigger({
 // Never prefilled: only its hash is kept. A password already set reads as one, and typing a new one
 // replaces it.
 function PasswordField({ hasPassword, disabled, onSave }: { hasPassword: boolean; disabled: boolean; onSave: (password: string) => Promise<boolean> }) {
+    const t = useTranslations('published.share')
     const [value, setValue] = useState('')
     // Emptied before the save: Enter disables the field, which blurs it, and the blur must find
     // nothing left to save.
@@ -247,8 +254,8 @@ function PasswordField({ hasPassword, disabled, onSave }: { hasPassword: boolean
                     event.preventDefault()
                     void commit()
                 }}
-                placeholder={hasPassword ? 'Password set' : 'Set a password'}
-                aria-label="Password"
+                placeholder={hasPassword ? t('passwordSet') : t('setPassword')}
+                aria-label={t('password')}
                 className="h-8"
             />
         </div>
@@ -256,6 +263,8 @@ function PasswordField({ hasPassword, disabled, onSave }: { hasPassword: boolean
 }
 
 function InviteDetail({ invited, disabled, onSave }: { invited: string[]; disabled: boolean; onSave: (invite: string[]) => Promise<boolean> }) {
+    const t = useTranslations('published.share')
+    const accessCopy = useAccessCopy()
     const [draft, setDraft] = useState('')
 
     const add = async () => {
@@ -278,16 +287,16 @@ function InviteDetail({ invited, disabled, onSave }: { invited: string[]; disabl
 
     return (
         <div className="flex flex-col gap-2 px-4 pb-1">
-            <Input value={draft} disabled={disabled} onChange={event => setDraft(event.target.value)} onKeyDown={onKeyDown} onBlur={() => void add()} placeholder="Emails or @company.com" aria-label="Invite emails or domains" className="h-8" />
+            <Input value={draft} disabled={disabled} onChange={event => setDraft(event.target.value)} onKeyDown={onKeyDown} onBlur={() => void add()} placeholder={t('invitePlaceholder')} aria-label={t('invite')} className="h-8" />
             {invited.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                     {invited.map(entry => (
                         <span key={entry} className="flex max-w-full items-center gap-1 rounded-full bg-muted py-0.5 pr-1 pl-2.5 text-xs">
-                            <span className="truncate">{inviteLabel(entry)}</span>
+                            <span className="truncate">{accessCopy.invite(entry)}</span>
                             {removable && (
                                 <button
                                     type="button"
-                                    aria-label={`Remove ${entry}`}
+                                    aria-label={t('removeInvite', { entry })}
                                     disabled={disabled}
                                     className="flex size-5 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
                                     onClick={() => void onSave(invited.filter(other => other !== entry))}
@@ -303,7 +312,8 @@ function InviteDetail({ invited, disabled, onSave }: { invited: string[]; disabl
     )
 }
 
-export function CopyLinkButton({ url, label = 'Copy link', variant = 'outline', size }: { url: string | null; label?: string; variant?: 'outline' | 'ghost'; size?: 'sm' }) {
+export function CopyLinkButton({ url, label, variant = 'outline', size }: { url: string | null; label?: string; variant?: 'outline' | 'ghost'; size?: 'sm' }) {
+    const t = useTranslations('published.share')
     const [copied, setCopied] = useState(false)
     const copy = () => {
         if (!url) return
@@ -314,7 +324,7 @@ export function CopyLinkButton({ url, label = 'Copy link', variant = 'outline', 
     return (
         <Button variant={variant} size={size} onClick={copy} disabled={!url} className="shrink-0">
             {copied ? <CheckIcon /> : <LinkIcon />}
-            {copied ? 'Copied' : label}
+            {copied ? t('copied') : (label ?? t('copyLink'))}
         </Button>
     )
 }

@@ -4,6 +4,8 @@ import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
 import { Panel } from "../components/Panel";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
 export interface RunFailedProps {
@@ -18,6 +20,7 @@ export interface RunFailedProps {
   /** Opens the conversation the email is about. Without it the button opens the board. */
   conversationUrl?: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function RunFailed({
@@ -29,18 +32,19 @@ export default function RunFailed({
   appUrl,
   conversationUrl,
   unsubscribeUrl,
+  locale,
 }: RunFailedProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`${agentName} ran into an error`}
+      preview={t("runFailed.preview", { agentName })}
       hero={{ variant: "failed", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Run failed</Heading>
-      <Text style={text.paragraph}>
-        Your coworker <strong>{agentName}</strong> stopped with an error.
-      </Text>
+      <Heading style={text.heading}>{t("runFailed.heading")}</Heading>
+      <Text style={text.paragraph}>{t.rich("runFailed.body", { agentName, strong })}</Text>
       {reason ? <Text style={reasonLine}>{reason}</Text> : null}
       <Panel tone="error" mono>
         {errorMessage}
@@ -48,14 +52,14 @@ export default function RunFailed({
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Coworker", value: agentName },
-            ...(runId ? [{ label: "Run", value: runId }] : []),
+            { label: t("common.meta.coworker"), value: agentName },
+            ...(runId ? [{ label: t("common.meta.run"), value: runId }] : []),
           ]}
         />
       </Section>
       <Section style={cta}>
         <Button href={conversationUrl ?? appUrl}>
-          {conversationUrl ? "Open the conversation" : "Open Rerun"}
+          {conversationUrl ? t("common.openConversation") : t("common.openRerun")}
         </Button>
       </Section>
     </Layout>

@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
 
 export type PanelSection<T extends string> = {
@@ -83,6 +84,7 @@ export function SectionTabsHeader<T extends string>({
     onClose: () => void
     actions?: ReactNode
 }) {
+    const t = useTranslations('agent.panelsShared')
     return (
         <div className="flex shrink-0 items-center gap-1 border-b border-border pl-3 pr-2">
             <div role="tablist" className="no-scrollbar flex min-w-0 flex-1 touch-pan-x items-stretch gap-4 overflow-x-auto">
@@ -109,7 +111,7 @@ export function SectionTabsHeader<T extends string>({
                 })}
             </div>
             {actions}
-            <Button aria-label="Close panel" variant="ghost" size="icon-sm" onClick={onClose}>
+            <Button aria-label={t('closePanel')} variant="ghost" size="icon-sm" onClick={onClose}>
                 <XIcon className="size-4" />
             </Button>
         </div>

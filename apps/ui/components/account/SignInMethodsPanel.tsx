@@ -10,6 +10,7 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { ENABLED_OAUTH_PROVIDERS, OAUTH_PROVIDER_CONFIG, type OAuthProvider } from '@/lib/auth/oauth-providers'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { Mail, Smartphone } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import type { ComponentType } from 'react'
 
 const PROVIDER_GLYPHS: Record<OAuthProvider, ComponentType<{ className?: string }>> = {
@@ -32,32 +33,33 @@ function OAuthRow({
     onConnect: () => void
     onDisconnect: () => void
 }) {
+    const t = useTranslations('account.signIn')
     const { label } = OAUTH_PROVIDER_CONFIG[provider]
 
     return (
         <PanelRow
             leading={<Icon icon={PROVIDER_GLYPHS[provider]} size="sm" />}
             title={label}
-            description={identity ? (identity.email ?? 'Connected') : 'Not connected.'}
+            description={identity ? (identity.email ?? t('connected')) : t('notConnected')}
             actions={
                 identity ? (
-                    <TooltipDisabledReason reason={identity.canDisconnect ? undefined : `${label} is the only sign-in method connected to this account.`}>
+                    <TooltipDisabledReason reason={identity.canDisconnect ? undefined : t('onlyMethod', { provider: label })}>
                         <ConfirmDialog
-                            title={`Disconnect ${label}?`}
-                            description={`You will no longer be able to sign into this account with ${label}. Your other sign-in methods keep working.`}
-                            confirmLabel="Disconnect"
+                            title={t('disconnectTitle', { provider: label })}
+                            description={t('disconnectDescription', { provider: label })}
+                            confirmLabel={t('disconnect')}
                             pending={busy}
                             onConfirm={onDisconnect}
                         >
                             <Button type="button" variant="outline" size="sm" disabled={!identity.canDisconnect} loading={busy}>
-                                Disconnect
+                                {t('disconnect')}
                             </Button>
                         </ConfirmDialog>
                     </TooltipDisabledReason>
                 ) : (
                     <TooltipDisabledReason reason={unavailableReason}>
                         <Button type="button" variant="outline" size="sm" disabled={!!unavailableReason} loading={busy} onClick={onConnect}>
-                            Connect
+                            {t('connect')}
                         </Button>
                     </TooltipDisabledReason>
                 )
@@ -80,6 +82,7 @@ export type SignInMethodsPanelProps = {
 }
 
 export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider = null, onChangeEmail, onChangePhone, onConnect, onDisconnect }: SignInMethodsPanelProps) {
+    const t = useTranslations('account.signIn')
     if (!methods) {
         return (
             <div className="px-1 py-2 sm:px-3">
@@ -94,11 +97,11 @@ export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider =
         <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6">
             <PanelRow
                 leading={<Icon icon={Mail} size="sm" />}
-                title="Email"
-                description={email ?? 'Not connected. Add one to sign in with a code sent to your inbox.'}
+                title={t('email.title')}
+                description={email ?? t('email.empty')}
                 actions={
                     <Button type="button" variant="outline" size="sm" onClick={onChangeEmail}>
-                        {email ? 'Change' : 'Add'}
+                        {email ? t('change') : t('add')}
                     </Button>
                 }
             />
@@ -118,12 +121,12 @@ export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider =
             {onChangePhone && (
                 <PanelRow
                     leading={<Icon icon={Smartphone} size="sm" />}
-                    title="Phone"
-                    description={phone ? phone.number : 'Not connected. Add a number to sign in with a code by WhatsApp or SMS.'}
-                    footer={phone && !phone.signsInHere ? 'This number signs into another Rerun account. Change it to sign in here by phone.' : undefined}
+                    title={t('phone.title')}
+                    description={phone ? phone.number : t('phone.empty')}
+                    footer={phone && !phone.signsInHere ? t('phone.otherAccount') : undefined}
                     actions={
                         <Button type="button" variant="outline" size="sm" onClick={onChangePhone}>
-                            {phone ? 'Change' : 'Add'}
+                            {phone ? t('change') : t('add')}
                         </Button>
                     }
                 />

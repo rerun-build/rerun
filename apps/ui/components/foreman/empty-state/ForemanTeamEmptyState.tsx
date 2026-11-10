@@ -2,6 +2,7 @@
 
 import { Orb, shortCountdown, WELCOME_ORB_SIZE } from '@rerun/ui/foreman'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 
 import { PanelRow } from '@/components/ui/panel-row'
 import { Skeleton, SkeletonPanelRows } from '@/components/ui/skeleton'
@@ -65,6 +66,7 @@ function RowLeading({ row }: { row: TeamEmptyStateRow }) {
 }
 
 function Pulse({ pulse, now }: { pulse: TeamPulse; now: number }) {
+    const t = useTranslations('foreman.teamPulse')
     const count = pulse.agents.length
     return (
         <div className={cn('flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground', SHORT_HIDDEN)}>
@@ -74,11 +76,11 @@ function Pulse({ pulse, now }: { pulse: TeamPulse; now: number }) {
                 ))}
             </span>
             <span>
-                {count} {count === 1 ? 'coworker' : 'coworkers'}
+                {t('coworkers', { count })}
                 {pulse.working > 0 && (
                     <>
                         {' · '}
-                        <span className="text-emerald-500">{pulse.working} working now</span>
+                        <span className="text-emerald-500">{t('working', { count: pulse.working })}</span>
                     </>
                 )}
             </span>

@@ -69,26 +69,26 @@ describe('moveAgentToBox', () => {
         vi.mocked(selectSingle).mockImplementation(((_client: unknown, table: string) =>
             Promise.resolve(table === 'agents' ? { data: { space_id: 'from', workspace_id: 1 } } : { data: { col_start: 10, row_start: 0, col_end: 17, row_end: 1 } })) as never)
 
-        await expect(moveAgentToBox('agent', 'to', admin)).resolves.toEqual({ ok: false, error: 'That Box has no room left. Free a cell in it first.' })
+        await expect(moveAgentToBox('agent', 'to', admin)).resolves.toEqual({ ok: false, error: 'That Box has no room left. Free a cell in it first.', code: 'boxFull' })
         expect(update).not.toHaveBeenCalled()
     })
 
     it('refuses the Box the agent is already in', async () => {
-        await expect(moveAgentToBox('agent', 'from', admin)).resolves.toEqual({ ok: false, error: 'This coworker is already in that Box' })
+        await expect(moveAgentToBox('agent', 'from', admin)).resolves.toEqual({ ok: false, error: 'This coworker is already in that Box', code: 'coworkerAlreadyInBox' })
         expect(update).not.toHaveBeenCalled()
     })
 
     it('refuses a member who does not manage both Boxes, before touching the row', async () => {
         vi.mocked(readSpaceAccess).mockImplementation(async (_actor, spaceId) => (spaceId === 'from' ? 'manage' : 'use'))
-        await expect(moveAgentToBox('agent', 'to', member)).resolves.toEqual({ ok: false, error: 'Only an admin or a manager of this Box can do this' })
+        await expect(moveAgentToBox('agent', 'to', member)).resolves.toEqual({ ok: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
 
         vi.mocked(readSpaceAccess).mockImplementation(async (_actor, spaceId) => (spaceId === 'from' ? 'manage' : 'none'))
-        await expect(moveAgentToBox('agent', 'to', member)).resolves.toEqual({ ok: false, error: 'Box not found' })
+        await expect(moveAgentToBox('agent', 'to', member)).resolves.toEqual({ ok: false, error: 'Box not found', code: 'boxNotFound' })
         expect(update).not.toHaveBeenCalled()
     })
 
     it('refuses a coworker of another workspace', async () => {
-        await expect(moveAgentToBox('agent', 'to', workspaceActor(2))).resolves.toEqual({ ok: false, error: 'Coworker not found' })
+        await expect(moveAgentToBox('agent', 'to', workspaceActor(2))).resolves.toEqual({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound' })
         expect(update).not.toHaveBeenCalled()
     })
 })

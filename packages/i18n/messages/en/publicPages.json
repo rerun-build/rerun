@@ -1,0 +1,61 @@
+{
+    "_context": {
+        "linkOff.subtitle": "On a page shared by a coworker whose link was turned off.",
+        "publishedView.publishedBy": "Link preview of a published page. {agent} is a coworker's name, {workspace} the name of the workspace.",
+        "publishedView.publishedByUnknown": "Same, when the coworker's name is unknown. {workspace} is the name of the workspace.",
+        "publishedView.protectedDescription": "{workspace} is the name of the workspace that shared the page.",
+        "publishedAuth.signedInAs": "{email} is the visitor's address, {workspace} the name of the workspace that owns the page.",
+        "gate.open": "Button that opens a protected page.",
+        "gate.password.subtitle": "{workspace} is the name of the workspace that shared the page.",
+        "gate.members.subtitle": "{workspace} is the name of the workspace whose members can open the page."
+    },
+    "linkOff": {
+        "title": "This link no longer works",
+        "subtitle": "Whoever shared it turned it off."
+    },
+    "unsubscribe": {
+        "title": "Email preferences",
+        "subtitle": "Update which emails Rerun sends you. No account login needed.",
+        "subtitleRuns": "Choose whether your coworkers can email you. No account login needed.",
+        "invalid": "This unsubscribe link is invalid or has expired.",
+        "logIn": "Log in to manage your preferences"
+    },
+    "publishedView": {
+        "protectedTitle": "Protected page",
+        "protectedDescription": "Shared by {workspace}. Sign in or confirm your email to open it.",
+        "publishedBy": "Published by {agent} at {workspace}",
+        "publishedByUnknown": "Published by a coworker at {workspace}"
+    },
+    "publishedAuth": {
+        "metaTitle": "Open a page",
+        "noAccess": "You don't have access",
+        "signedInAs": "Signed in as {email}. This page is for {workspace} members.",
+        "signedInAsOther": "Signed in as another account. This page is for {workspace} members."
+    },
+    "gate": {
+        "open": "Open",
+        "errors": {
+            "limited": "Too many tries. Wait a few minutes.",
+            "password": "Wrong password",
+            "code": "Wrong or expired code",
+            "email": "Enter a valid email"
+        },
+        "password": {
+            "subtitle": "{workspace} protected this page with a password",
+            "placeholder": "Password"
+        },
+        "code": {
+            "title": "Check your inbox",
+            "subtitle": "If {email} can open this page, a code is on its way",
+            "otherEmail": "Use another email"
+        },
+        "email": {
+            "subtitle": "Confirm your email to open it",
+            "submit": "Send code"
+        },
+        "members": {
+            "subtitle": "For {workspace} members",
+            "continue": "Continue with Rerun"
+        }
+    }
+}

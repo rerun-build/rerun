@@ -3,6 +3,9 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { formatNumber } from "@rerun/i18n/format";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 /**
@@ -36,6 +39,7 @@ export interface TrialEndedProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -55,59 +59,37 @@ export default function TrialEnded({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: TrialEndedProps) {
-  const workspace = workspaceName ?? "your workspace";
-
-  const paymentFailed = reason === "payment_failed";
+  const t = emailTranslator(locale);
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
-      preview={
-        paymentFailed
-          ? `Your first Rerun payment failed, your workspace is paused on ${pausedLabel}`
-          : `Your Rerun trial has ended, your workspace is paused on ${pausedLabel}`
-      }
+      preview={t("trialEnded.preview", { reason, pausedAt: pausedLabel })}
       hero={{ scene: "trial-ended", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>
-        {paymentFailed ? "Your first payment failed" : "Your trial has ended"}
-      </Heading>
+      <Heading style={text.heading}>{t("trialEnded.heading", { reason })}</Heading>
       <Text style={text.paragraph}>
-        {paymentFailed ? (
-          <>
-            The trial for <strong>{workspace}</strong> ended on{" "}
-            <strong>{trialEndedLabel}</strong>, and the first charge to your
-            card did not go through. Your bank may simply be asking you to
-            confirm it.
-          </>
-        ) : (
-          <>
-            The trial for <strong>{workspace}</strong> ended on{" "}
-            <strong>{trialEndedLabel}</strong>, and your coworkers have stopped.
-          </>
-        )}
+        {t.rich("trialEnded.ended", { reason, workspace, date: trialEndedLabel, strong })}
       </Text>
       <Text style={text.paragraph}>
-        Your workspace is <strong>paused on {pausedLabel}</strong>. Nothing is
-        deleted: your coworkers and everything they know are saved until{" "}
-        <strong>{keptUntilLabel}</strong>.{" "}
-        {paymentFailed
-          ? "Pay the invoice before it is paused to keep it running, or subscribe any time before then and it all comes back exactly as you left it."
-          : "Subscribe any time before then and it all comes back exactly as you left it."}
+        {t.rich("trialEnded.paused", { reason, pausedAt: pausedLabel, keptUntil: keptUntilLabel, strong })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Trial ended", value: trialEndedLabel },
-            { label: "Workspace paused", value: pausedLabel },
-            { label: "Saved until", value: keptUntilLabel },
+            { label: t("common.meta.trialEnded"), value: trialEndedLabel },
+            { label: t("common.meta.workspacePaused"), value: pausedLabel },
+            { label: t("common.meta.savedUntil"), value: keptUntilLabel },
             ...(summary
               ? [
-                  { label: "Coworkers", value: String(summary.agents) },
-                  { label: "Runs", value: String(summary.runs) },
+                  { label: t("common.meta.coworkers"), value: formatNumber(summary.agents, locale) },
+                  { label: t("common.meta.runs"), value: formatNumber(summary.runs, locale) },
                 ]
               : []),
           ]}
@@ -115,14 +97,9 @@ export default function TrialEnded({
       </Section>
 
       <Section style={cta}>
-        <Button href={billingUrl}>
-          {paymentFailed ? "Pay the invoice" : "Start my plan"}
-        </Button>
+        <Button href={billingUrl}>{t("trialEnded.button", { reason })}</Button>
       </Section>
-      <Text style={text.footnote}>
-        Not the right time? You can leave it, nothing further will be charged.
-        Your workspace stays saved until {keptUntilLabel}.
-      </Text>
+      <Text style={text.footnote}>{t("trialEnded.footnote", { keptUntil: keptUntilLabel })}</Text>
     </Layout>
   );
 }

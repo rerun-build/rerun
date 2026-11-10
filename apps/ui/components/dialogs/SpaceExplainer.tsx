@@ -1,19 +1,15 @@
 'use client'
 
 import { BoxExplainerScene } from '@/components/dialogs/BoxExplainerScene'
-import { ExplainerCheck, type ExplainerPoint } from '@/components/dialogs/ExplainerPanel'
+import { ExplainerCheck } from '@/components/dialogs/ExplainerPanel'
 import { useRenderedFrame } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import type { CSSProperties } from 'react'
 
 // Four lines, not four paragraphs: on two columns a cell is about 280px wide, and the sentences the
 // single column afforded would run five lines each. What carries the argument here is the scene
 // above them, the copy only names what is being looked at.
-const SPACE_CHECKPOINTS: readonly ExplainerPoint[] = [
-    { label: 'A room of the workspace', description: 'One per team, per client or per project.' },
-    { label: 'Home for many coworkers', description: 'Coworkers live and work side by side inside it.' },
-    { label: 'Nothing is walled off', description: 'Every coworker shares the files and data of the workspace.' },
-    { label: 'Free and instant', description: 'Make as many as the work needs.' },
-] as const
+const SPACE_CHECKPOINTS = ['room', 'home', 'shared', 'free'] as const
 
 // The panel's own surface, stated once and opaque. It is what `bg-muted/30` resolves to over the
 // dialog's `bg-popover`, and it is written out rather than left to the utility because the scrim
@@ -33,6 +29,7 @@ export function SpaceExplainer() {
     // The copy band is measured rather than pinned to a constant: it is what the scene's framing
     // subtracts, and a number written twice stops being true the first time the wording changes.
     // The scene waits for it, because a camera posed on the wrong frame is never revisited.
+    const t = useTranslations('dialogs.boxExplainer')
     const { ref, frame } = useRenderedFrame()
 
     return (
@@ -40,14 +37,14 @@ export function SpaceExplainer() {
             {frame && <BoxExplainerScene band={frame.height} className="absolute inset-0" />}
 
             <div ref={ref} className="relative mt-auto px-8 pt-16 pb-8" style={{ backgroundImage: COPY_SCRIM }}>
-                <h3 className="mb-5 text-lg font-medium">What is a Box?</h3>
+                <h3 className="mb-5 text-lg font-medium">{t('title')}</h3>
                 <ul className="grid grid-cols-2 gap-x-5 gap-y-4">
                     {SPACE_CHECKPOINTS.map(point => (
-                        <li key={point.label} className="flex items-start gap-3">
+                        <li key={point} className="flex items-start gap-3">
                             <ExplainerCheck />
                             <div className="min-w-0">
-                                <p className="text-sm font-medium">{point.label}</p>
-                                <p className="text-sm text-muted-foreground">{point.description}</p>
+                                <p className="text-sm font-medium">{t(`points.${point}.label`)}</p>
+                                <p className="text-sm text-muted-foreground">{t(`points.${point}.description`)}</p>
                             </div>
                         </li>
                     ))}

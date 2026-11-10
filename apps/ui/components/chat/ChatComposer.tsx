@@ -4,6 +4,7 @@ import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
 import type { ChatStatus, FileUIPart } from 'ai'
 import { AnimatePresence, motion } from 'motion/react'
 import { type ReactNode, type Ref, type RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
 import { deleteFileAction } from '@/app/api/_actions/file.actions'
@@ -127,9 +128,10 @@ export function ChatComposer({
     textareaProps,
     mentionTokens,
     onUploadingChange,
-    placeholder = 'Send a message...',
+    placeholder,
     ref,
 }: ChatComposerProps) {
+    const t = useTranslations('chat.composer')
     const { load: loadDraft, save: saveDraft, clear: clearDraft } = useComposerDraft(uid)
 
     const ownRef = useRef<HTMLTextAreaElement | null>(null)
@@ -311,19 +313,18 @@ export function ChatComposer({
             // A chip with no transfer behind it would leave in silence: the message goes out
             // without the file the user attached, and nothing says so.
             if (settled.length < attachedCount) {
-                throw new SubmitBlocked('Some attachments were not uploaded. Remove them and attach them again before sending.')
+                throw new SubmitBlocked(t('attachmentsMissing'))
             }
 
             const failed = settled.filter(item => item.status === 'error')
             if (failed.length > 0) {
-                const plural = failed.length > 1
-                throw new SubmitBlocked(`${failed.length} ${plural ? 'attachments' : 'attachment'} failed to upload. Retry or remove ${plural ? 'them' : 'it'} before sending.`)
+                throw new SubmitBlocked(t('attachmentsFailed', { count: failed.length }))
             }
 
             const paths = settled.filter(item => item.status === 'done').map(item => item.path)
             return paths.length > 0 ? appendAttachmentsRef(text, buildAttachmentsRef(paths)) : text
         },
-        [uploads]
+        [uploads, t]
     )
 
     const handleSubmit = useCallback(
@@ -407,10 +408,10 @@ export function ChatComposer({
                 onSubmit={handleSubmit}
                 onAttach={handleAttach}
                 onRemoveAttachment={handleRemoveAttachment}
-                onError={({ message }) => toast.error(attachmentsEnabled ? message : 'This chat cannot take files yet.')}
+                onError={({ message }) => toast.error(attachmentsEnabled ? message : t('noFiles'))}
                 onSubmitError={error => {
                     if (error instanceof SubmitBlocked && error.silent) return
-                    toast.error(error instanceof Error ? error.message : 'Could not send your message')
+                    toast.error(error instanceof Error ? error.message : t('sendFailed'))
                 }}
             >
                 {attachmentsEnabled && <PromptInputDropOverlay />}
@@ -421,7 +422,7 @@ export function ChatComposer({
                         <div className="relative w-full">
                             <PromptInputTextarea
                                 ref={inputRef}
-                                placeholder={placeholder}
+                                placeholder={placeholder ?? t('placeholder')}
                                 className={cn(expandable && 'pr-9', links.hasTokens && 'text-transparent caret-foreground [scrollbar-gutter:stable]')}
                                 {...textareaProps}
                                 onChange={e => {
@@ -466,8 +467,8 @@ export function ChatComposer({
                                         setExpandSession(session => session + 1)
                                         setExpandOpen(true)
                                     }}
-                                    aria-label="Open the full editor"
-                                    title="Open the full editor"
+                                    aria-label={t('openEditor')}
+                                    title={t('openEditor')}
                                     className="absolute top-1.5 right-1.5 z-10 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
                                 >
                                     <Maximize2Icon className="size-3.5" />
@@ -494,7 +495,7 @@ export function ChatComposer({
                             />
                         )}
                         {showStop && (
-                            <PromptInputButton tooltip="Stop the current run" aria-label="Stop the current run" onClick={onStop}>
+                            <PromptInputButton tooltip={t('stop')} aria-label={t('stop')} onClick={onStop}>
                                 <SquareIcon className="size-4" />
                             </PromptInputButton>
                         )}
@@ -507,11 +508,11 @@ export function ChatComposer({
                 open={expandOpen}
                 onOpenChange={setExpandOpen}
                 initialValue={expandValue}
-                title="Write your message"
-                description="Room to structure a long message. Enter starts a new line."
-                hint="Send with Cmd + Enter"
-                closeLabel="Cancel"
-                submitLabel="Send"
+                title={t('editor.title')}
+                description={t('editor.description')}
+                hint={t('editor.hint')}
+                closeLabel={t('editor.cancel')}
+                submitLabel={t('editor.send')}
                 submitIcon={<SendIcon className="size-4" />}
                 submitting={uploading}
                 onClose={markdown => {

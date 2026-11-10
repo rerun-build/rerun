@@ -1120,6 +1120,13 @@ describe('createPlanCheckoutSession', () => {
         expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
     })
 
+    it('turns away a workspace on the lifetime plan, before anything reaches Stripe', async () => {
+        useDb({ row: { ...FRESH_WORKSPACE, plan: 'lifetime', subscription_status: 'active', stripe_customer_id: null } })
+        await expect(createPlanCheckoutSession(BASE_SELECTION)).rejects.toThrow('This workspace is on the lifetime plan.')
+        expect(stripe.customers.create).not.toHaveBeenCalled()
+        expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
+    })
+
     it('lends the placeholder of a phone account to a customer without an email', async () => {
         useDb({ row: FRESH_WORKSPACE })
         m.getServerSession.mockResolvedValue({ session: { email: '393480000000@phone.rerun.build' }, isAnonymous: false })
@@ -1211,7 +1218,7 @@ describe('createPlanCheckoutSession', () => {
         const db = useDb({ row: { ...FRESH_WORKSPACE, stripe_customer_id: null } })
         vi.mocked(stripe.customers.create).mockResolvedValue({ id: 'cus_new' } as never)
         await createPlanCheckoutSession(BASE_SELECTION)
-        expect(stripe.customers.create).toHaveBeenCalledWith({ email: 'a@b.co', name: 'Acme', metadata: { workspace_id: String(WORKSPACE_ID) } })
+        expect(stripe.customers.create).toHaveBeenCalledWith({ email: 'a@b.co', name: 'Acme', metadata: { workspace_id: String(WORKSPACE_ID) }, preferred_locales: ['en'] })
         expect(db.updates()[0]).toEqual({ stripe_customer_id: 'cus_new' })
         expect(vi.mocked(stripe.checkout.sessions.create).mock.calls[0][0]).toMatchObject({ customer: 'cus_new' })
     })

@@ -3,7 +3,8 @@ import { isSetupAnswered, type AgentArchivePlan } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { patchAgent, planAgentArchive } from '@/lib/engine/client'
-import { archiveWarnings, captureAgentArchive, isMissingRoute, STALE_EXPORT_HINT } from '@/lib/agents/capture-archive'
+import { archiveWarnings, captureAgentArchive, isMissingRoute, staleExportError } from '@/lib/agents/capture-archive'
+import { AppError } from '@/lib/i18n/action-error'
 import { getSpaceConnection } from '@/app/api/_services/space.service'
 import { selectAll, selectMany, selectSingle, type Filters } from '@/supabase/supabase-helpers'
 import { removePrivateFiles, uploadPrivateFile } from '@/lib/storage/private'
@@ -69,7 +70,7 @@ export async function planCapture(supabase: SupabaseClient<Database>, spaceId: s
         try {
             plans.push({ ...(await planAgentArchive(conn, agent.engine_agent_id)), agentRowId: agent.id })
         } catch (err) {
-            throw isMissingRoute(err) ? new Error(STALE_EXPORT_HINT) : err
+            throw isMissingRoute(err) ? staleExportError() : err
         }
     }
     return plans
@@ -97,7 +98,7 @@ export async function captureAgents(
 ): Promise<CaptureOutcome> {
     const conn = await getSpaceConnection(spaceId)
     const { data: template } = await selectSingle(supabase, 'templates', ['id', 'slug', 'agents', 'agent_archives'] as const, { slug })
-    if (!template) throw new Error(`No template found with slug "${slug}"`)
+    if (!template) throw new AppError('templateSlugNotFound', { slug })
 
     const agents = agentsFromRow.parse(template.agents)
     const archives = archivesFromRow.parse(template.agent_archives)
@@ -112,12 +113,12 @@ export async function captureAgents(
     // Resolved for the whole selection before the first upload: failing halfway would leave an
     // archive in the bucket that the row never gets to point at.
     if (selections.some(selection => !engineIds.has(selection.agentRowId))) {
-        throw new Error('One of the selected coworkers is not in this Box any more.')
+        throw new AppError('selectedCoworkerLeftBox')
     }
     // Same reason, and before the first patch: an agent that needs setup but ships no instructions
     // arrives on its buyer's account with nothing to run, while the card still promises an install.
     if (selections.some(selection => selection.setup && !isSetupAnswered(selection.setup))) {
-        throw new Error('A coworker that needs setup must carry the install instructions the copy runs on its new owner account.')
+        throw new AppError('setupNeedsInstructions')
     }
 
     const warnings: string[] = []
@@ -199,7 +200,7 @@ export async function captureAgents(
 // list without deleting the archive would leave a `.tar.gz` nothing points at any more.
 export async function removeCapturedAgent(supabase: SupabaseClient<Database>, slug: string, agentKey: string): Promise<void> {
     const { data: template } = await selectSingle(supabase, 'templates', ['id', 'slug', 'agents', 'agent_archives'] as const, { slug })
-    if (!template) throw new Error(`No template found with slug "${slug}"`)
+    if (!template) throw new AppError('templateSlugNotFound', { slug })
 
     const agents = agentsFromRow.parse(template.agents).filter(agent => agent.key !== agentKey)
     const archives = archivesFromRow.parse(template.agent_archives)

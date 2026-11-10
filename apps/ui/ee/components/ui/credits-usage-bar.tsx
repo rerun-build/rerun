@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils'
 import NumberFlow from '@number-flow/react'
+import { formatDate } from '@rerun/i18n/format'
+import { useLocale, useTranslations } from 'next-intl'
 import type { CSSProperties } from 'react'
 
 const PERCENT_FORMAT = { minimumFractionDigits: 1, maximumFractionDigits: 1 } as const
@@ -7,7 +9,8 @@ const PERCENT_FORMAT = { minimumFractionDigits: 1, maximumFractionDigits: 1 } as
 // Animated usage percentage. `className` carries the size/layout (always applied);
 // `mutedColor` is the resting color, overridden to red when the budget is exhausted.
 function UsagePercent({ percent, exhausted, className, mutedColor }: { percent: number; exhausted: boolean; className?: string; mutedColor: string }) {
-    return <NumberFlow value={percent} suffix="%" format={PERCENT_FORMAT} locales="en-US" className={cn('font-mono leading-none font-medium tabular-nums', className, exhausted ? 'text-red-500 dark:text-red-400' : mutedColor)} />
+    const locale = useLocale()
+    return <NumberFlow value={percent} suffix="%" format={PERCENT_FORMAT} locales={locale} className={cn('font-mono leading-none font-medium tabular-nums', className, exhausted ? 'text-red-500 dark:text-red-400' : mutedColor)} />
 }
 
 type CreditsUsageBarProps = {
@@ -36,6 +39,8 @@ function tickMask({ width, gap, height }: TickGeometry): CSSProperties {
 }
 
 export function CreditsUsageBar({ usedMicros, budgetMicros, resetAt, className }: CreditsUsageBarProps) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
     const budget = budgetMicros ?? 0
     if (budget <= 0) return null
 
@@ -62,13 +67,13 @@ export function CreditsUsageBar({ usedMicros, budgetMicros, resetAt, className }
     return (
         <div className={cn('mt-3 flex flex-col gap-3', className)}>
             <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Credits used</span>
+                <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{t('creditsBar.used')}</span>
                 <UsagePercent percent={percent} exhausted={exhausted} className="text-xs" mutedColor="text-foreground" />
             </div>
 
             {bar}
 
-            {resetAt && <span className="text-[11px] text-muted-foreground">Resets on {new Date(resetAt).toLocaleDateString()}</span>}
+            {resetAt && <span className="text-[11px] text-muted-foreground">{t('creditsBar.resetsOn', { date: formatDate(resetAt, locale, { year: 'numeric', month: 'numeric', day: 'numeric' }) })}</span>}
         </div>
     )
 }

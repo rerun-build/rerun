@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { readBrainPageAction, saveBrainPageAction } from '@/app/api/_actions/brain.actions'
 import type { BrainPageDetail } from '@/lib/engine/client'
 import type { BrainPage, BrainPageType } from '@rerun/contracts'
@@ -28,6 +29,7 @@ type UseBrainAutosaveOptions = {
 export function useBrainAutosave({ page, onSaved }: UseBrainAutosaveOptions) {
     const [status, setStatus] = useState<AutosaveStatus>('idle')
     const [error, setError] = useState<string | null>(null)
+    const errorText = useErrorText()
     const [conflictWith, setConflictWith] = useState<BrainPage | null>(null)
 
     const draft = useRef<BrainDraft>({ title: page.title, type: page.type, content: page.content })
@@ -68,9 +70,9 @@ export function useBrainAutosave({ page, onSaved }: UseBrainAutosaveOptions) {
             return
         }
         failed.current = true
-        setError(result.error)
+        setError(errorText(result))
         setStatus('error')
-    }, [page.slug])
+    }, [page.slug, errorText])
 
     const flushRef = useRef<() => Promise<void>>(async () => {})
 

@@ -1,4 +1,5 @@
 import type { AddonKey } from '@rerun/contracts'
+import type { ErrorCode, ErrorParams } from '@/lib/i18n/action-error'
 import { APP_INFO, type AppInfo } from './catalog'
 import { LINKEDIN_WEBHOOK_EVENTS, linkedinProfile, linkedinSignInRefusal } from './linkedin/connect'
 import * as linkedinEvents from './linkedin/events'
@@ -34,7 +35,7 @@ export type AppDefinition = AppInfo & {
     // reconnects: the free trial is claimed on it.
     profile(accountId: string): Promise<{ label: string; memberId: string }>
     // What the person reads when the provider turns the sign-in down.
-    signInRefusal(message: string): string
+    signInRefusal(message: string): { code: ErrorCode; params?: ErrorParams }
     deleteProviderAccount: (accountId: string) => Promise<void>
 }
 

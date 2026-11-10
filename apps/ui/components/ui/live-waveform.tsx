@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, type HTMLAttributes } from "react"
 
 import { cn } from "@/lib/utils"
@@ -58,6 +59,7 @@ export const LiveWaveform = ({
   className,
   ...props
 }: LiveWaveformProps) => {
+  const t = useTranslations("ui")
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const historyRef = useRef<number[]>([])
@@ -561,10 +563,10 @@ export const LiveWaveform = ({
       style={{ height: heightStyle }}
       aria-label={
         active
-          ? "Live audio waveform"
+          ? t("waveform.live")
           : processing
-            ? "Processing audio"
-            : "Audio waveform idle"
+            ? t("waveform.processing")
+            : t("waveform.idle")
       }
       role="img"
       {...props}

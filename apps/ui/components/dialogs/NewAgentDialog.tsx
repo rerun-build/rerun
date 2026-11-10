@@ -1,6 +1,7 @@
 'use client'
 
 import type { NewAgentRequest } from '@rerun/ui/new-agent'
+import { useTranslations } from 'next-intl'
 
 import { readAgentJobAction } from '@/app/api/_actions/onboarding.actions'
 import { NewAgentForm } from '@/components/dialogs/new-agent/NewAgentForm'
@@ -22,6 +23,7 @@ import { useStartScratchAgent } from '@/lib/templates/useStartScratchAgent'
 // the agent can only be dropped in it. A Box the caller only uses keeps its suggestions but is no
 // destination: the drop then goes to one they manage.
 export function NewAgentDialog({ open, onOpenChange, onBrowseTemplates, spaceId = null }: { open: boolean; onOpenChange: (open: boolean) => void; onBrowseTemplates: (slug?: string) => void; spaceId?: string | null }) {
+    const t = useTranslations('dialogs.newAgent')
     const startScratchAgent = useStartScratchAgent()
     const { suggestions, heading } = useBoxAgentSuggestions(spaceId, open)
     const catalog = useConnectorCatalog(open)
@@ -35,8 +37,8 @@ export function NewAgentDialog({ open, onOpenChange, onBrowseTemplates, spaceId 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <SplitDialogContent aside={null} gridClassName="sm:grid-cols-1">
-                <DialogTitle className="sr-only">New coworker</DialogTitle>
-                <DialogDescription className="sr-only">Describe the job, or start from a suggestion or a template.</DialogDescription>
+                <DialogTitle className="sr-only">{t('title')}</DialogTitle>
+                <DialogDescription className="sr-only">{t('description')}</DialogDescription>
                 <NewAgentForm suggestions={suggestions} suggestionsHeading={heading} catalog={catalog} read={readAgentJobAction} onCreate={create} onBrowseTemplates={() => onBrowseTemplates()} />
             </SplitDialogContent>
         </Dialog>

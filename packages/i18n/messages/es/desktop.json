@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "Escritorio de {name}",
+        "titleFallback": "Escritorio",
+        "description": "La pantalla en la que trabaja este coworker. Lo que hagas aquí, lo encuentra después.",
+        "takeoverDescription": "Estás en el navegador de tu coworker. Pulsa Listo cuando pueda continuar.",
+        "takeoverHoldsBrowser": "El navegador de tu coworker ya está abierto para esta solicitud.",
+        "clipboardDenied": "Tu navegador no dejó que Rerun leyera el portapapeles.",
+        "disconnectedDescription": "La conexión con la máquina se cerró. No se perdió nada.",
+        "reconnect": "Reconectar",
+        "tryAgain": "Reintentar"
+    },
+    "screen": {
+        "connecting": "Conectando con la pantalla...",
+        "unavailable": "La pantalla no está disponible",
+        "wentAway": "La pantalla se desconectó",
+        "resize": "Cambiar el tamaño de la pantalla"
+    },
+    "notch": {
+        "browser": "Navegador",
+        "closeBrowser": "Cerrar navegador",
+        "files": "Archivos",
+        "terminal": "Terminal",
+        "paste": "Pegar",
+        "done": "Listo",
+        "close": "Cerrar"
+    },
+    "screenCard": {
+        "openBrowser": "Abrir navegador",
+        "takeControl": "Tomar el control"
+    }
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import { ScrollFade } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import type { RevenueRange } from '@/ee/services/creator-revenue.service'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -14,15 +15,12 @@ import { RevenueStatTiles } from './RevenueStatTiles'
 import { useCreatorPayouts } from './useCreatorPayouts'
 import { useCreatorRevenue } from './useCreatorRevenue'
 
-const RANGES: { value: RevenueRange; label: string }[] = [
-    { value: '30d', label: '30 days' },
-    { value: '12m', label: '12 months' },
-    { value: 'all', label: 'All time' },
-]
+const RANGES: RevenueRange[] = ['30d', '12m', 'all']
 
 // What Rerun can answer that Stripe cannot: revenue per template. Everything else, payout history
 // included, is one login link away in the Express dashboard.
 export function CreatorRevenuePanel({ active }: { active: boolean }) {
+    const t = useTranslations('templates.revenue')
     const { revenue, range, changeRange } = useCreatorRevenue(active)
     const { account, pending, openDashboard } = useCreatorPayouts(active)
     const setPane = useCreatorStore(state => state.setPane)
@@ -31,11 +29,11 @@ export function CreatorRevenuePanel({ active }: { active: boolean }) {
         return (
             <EmptyState
                 icon={WalletIcon}
-                title="No payouts account yet"
-                description="Set up payouts to start selling your templates."
+                title={t('noAccountTitle')}
+                description={t('noAccountDescription')}
                 action={
                     <Button type="button" size="sm" onClick={() => setPane({ kind: 'payouts' })}>
-                        Set up payouts
+                        {t('setUpPayouts')}
                     </Button>
                 }
             />
@@ -47,19 +45,19 @@ export function CreatorRevenuePanel({ active }: { active: boolean }) {
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 px-5 pt-5">
-                <h3 className="text-base font-medium">Revenue</h3>
+                <h3 className="text-base font-medium">{t('title')}</h3>
                 <div className="flex items-center gap-1">
                     {RANGES.map(option => (
                         <Button
-                            key={option.value}
+                            key={option}
                             type="button"
                             size="sm"
                             variant="ghost"
-                            aria-pressed={range === option.value}
-                            onClick={() => changeRange(option.value)}
-                            className={cn('text-xs', range === option.value && 'bg-accent text-foreground')}
+                            aria-pressed={range === option}
+                            onClick={() => changeRange(option)}
+                            className={cn('text-xs', range === option && 'bg-accent text-foreground')}
                         >
-                            {option.label}
+                            {t(`ranges.${option}`)}
                         </Button>
                     ))}
                 </div>
@@ -74,7 +72,7 @@ export function CreatorRevenuePanel({ active }: { active: boolean }) {
                     <div className="flex">
                         <Button type="button" size="sm" variant="outline" loading={pending === 'dashboard'} onClick={openDashboard}>
                             <ExternalLinkIcon className="size-3.5" />
-                            Open Stripe dashboard
+                            {t('openDashboard')}
                         </Button>
                     </div>
                 </div>

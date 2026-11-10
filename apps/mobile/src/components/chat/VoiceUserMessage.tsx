@@ -3,6 +3,7 @@ import * as Clipboard from 'expo-clipboard'
 import * as Haptics from 'expo-haptics'
 import { useState } from 'react'
 import Animated from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import type { FileOwner } from '@/api/files'
 import type { ViewerItem } from '@/components/viewer/viewer-store'
@@ -28,6 +29,7 @@ type VoiceUserMessageProps = {
 export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscriptOpen = false }: VoiceUserMessageProps) {
     const playback = useVoicePlayback(voice, owner)
     const [open, setOpen] = useState(defaultTranscriptOpen)
+    const t = useTranslations('mobileChat.voice')
     const started = playback.playing || playback.elapsedMs > 0
     const transcript = voice.transcript
 
@@ -37,7 +39,7 @@ export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscript
             <Animated.View layout={layoutTransition} style={{ flexDirection: 'row', marginRight: -spacing.sm }}>
                 <Action
                     symbol={open ? 'captions.bubble.fill' : 'captions.bubble'}
-                    label={open ? 'Hide transcript' : 'Transcript'}
+                    label={open ? t('hideTranscript') : t('transcript')}
                     selected={open}
                     onPress={() => {
                         Haptics.selectionAsync()
@@ -46,7 +48,7 @@ export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscript
                 />
                 <Action
                     symbol="doc.on.doc"
-                    label="Copy transcript"
+                    label={t('copyTranscript')}
                     onPress={() => {
                         Clipboard.setStringAsync(transcript)
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)

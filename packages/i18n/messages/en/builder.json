@@ -1,0 +1,135 @@
+{
+    "_context": {
+        "boardToasts.createdInactive": "Toast after a coworker was created on the board. {name} is the coworker's name.",
+        "boardToasts.importInterruptedHint": "Under 'The import was interrupted' (a template import): the user's machine (the server running their coworkers) may hold a partial import.",
+        "isoBoard.boxCta": "Pill on an empty Box of the board. {name} is the Box's name. Keep it under 34 characters with a short name.",
+        "contextMenu.moveToBox": "Submenu of a coworker on the board: move it into another Box (a group of coworkers on the board).",
+        "contextMenu.duplicate": "Menu item (verb): make a copy of this coworker.",
+        "contextMenu.share": "Menu item (verb): share this coworker through a link.",
+        "toolbar.placementPrompt": "Shown while the person places a coworker on the board grid. {name} is the coworker's name.",
+        "toolbar.placementProgress": "A template installs several coworkers one after another: which one is being placed.",
+        "toolbar.template": "Button opening the template library (ready-made coworkers).",
+        "toolbar.unplaced": "Count of coworkers not yet placed on the board.",
+        "isoBoard.settingUpTemplate": "{title} is the name of a template being installed.",
+        "isoBoard.installTemplate": "{title} is the name of a template the person came to install.",
+        "isoBoard.addBoxOnSide": "Button on the side of a Box on the board: adds a new Box next to it.",
+        "discoveries.statusDigging": "Onboarding: Rerun is researching the person's company. {name} is the company name.",
+        "discoveries.statusDone": "Title once the research on the company is done. {name} is the company name.",
+        "discoveries.found": "Badge: how many facts were found about the company.",
+        "discoveries.cards.brain.title": "Company Brain: the pages of knowledge about the company that coworkers read before working.",
+        "discoveries.cards.registry.people": "Headcount from a public company registry. {headcount} is a number or a range like 11-50.",
+        "discoveries.cards.person.title": "{firstName} is the first name of the person found on LinkedIn."
+    },
+    "contextMenu": {
+        "openChat": "Open chat",
+        "rename": "Rename",
+        "settings": "Settings",
+        "share": "Share",
+        "duplicate": "Duplicate",
+        "moveToBox": "Move to Box",
+        "noOtherBox": "No other Box you manage",
+        "delete": "Delete",
+        "manageAccess": "Manage access",
+        "boxAccessAdminOnly": "Only an admin can change who can access a Box",
+        "manageReason": "Only an admin or a manager of this Box can do this",
+        "untitledBox": "Untitled Box",
+        "thisCoworker": "this coworker"
+    },
+    "toolbar": {
+        "placementPrompt": "Tap a tile to place {name}",
+        "placementPromptDefault": "Tap a tile to place your coworker",
+        "placementProgress": "Coworker {current} of {total}",
+        "newCoworker": "New coworker",
+        "template": "Template",
+        "create": "Create",
+        "search": "Search",
+        "unplaced": "{count} unplaced"
+    },
+    "isoBoard": {
+        "boxCta": "Explore {name} templates",
+        "boxCtaFallback": "Explore templates",
+        "recruitFirst": "Click to recruit your first coworker",
+        "createBox": "Click to create a Box",
+        "preparingSandbox": "Preparing your sandbox…",
+        "settingUpTemplate": "Setting up {title}…",
+        "settingUpCoworker": "Setting up your coworker…",
+        "installTemplate": "Click to install {title}",
+        "addBoxOnSide": "Add a Box on this side"
+    },
+    "discoveries": {
+        "statusDigging": "Getting to know {name}",
+        "statusDone": "{name}, at a glance",
+        "found": "{count} found",
+        "sources": {
+            "website": "Your website",
+            "domain": "Your domain",
+            "registry": "Public registry",
+            "web": "The web"
+        },
+        "teasers": {
+            "profile": "Reading {domain}…",
+            "stack": "Peeking under the hood of {domain}…",
+            "dns": "Checking how you run email…",
+            "registry": "Looking you up in the public registry…",
+            "site": "Reading every page of {domain}…",
+            "search": "Searching the web for {name}…",
+            "linkedinPerson": "Looking for you on LinkedIn…",
+            "linkedinCompany": "Finding {name} on LinkedIn…",
+            "googleBusiness": "Reading your Google reviews…",
+            "catalog": "Browsing the {domain} shop…",
+            "synthesis": "Piecing it all together…"
+        },
+        "cards": {
+            "identity": { "title": "Found you" },
+            "audience": { "title": "Who you sell to" },
+            "tools": { "title": "Tools we spotted" },
+            "mail": {
+                "title": "Your inbox",
+                "runsOn": "Email runs on <b>{provider}</b>"
+            },
+            "social": { "title": "Where you show up" },
+            "brand": { "title": "Your brand" },
+            "registry": {
+                "title": "On paper",
+                "since": "Since <b>{year}</b>",
+                "people": "<b>{headcount}</b> people"
+            },
+            "person": { "title": "Is this you, {firstName}?" },
+            "linkedin": {
+                "title": "Your LinkedIn page",
+                "followers": "followers",
+                "team": "on the team"
+            },
+            "reviews": {
+                "title": "What customers say",
+                "count": "<n>{count}</n> Google reviews"
+            },
+            "products": { "title": "What you sell" },
+            "competitors": { "title": "Who you're up against" },
+            "customers": { "title": "Who already buys" },
+            "brain": {
+                "title": "Company Brain",
+                "pages": "{count, plural, one {# page} other {# pages}} your agents read before they start",
+                "productsAndCompetitors": "+ {products, plural, one {# product} other {# products}}, {competitors, plural, one {# competitor} other {# competitors}}",
+                "productsOnly": "+ {products, plural, one {# product} other {# products}}",
+                "competitorsOnly": "+ {competitors, plural, one {# competitor} other {# competitors}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "\"{name}\" was created but is inactive",
+        "createdInactiveHint": "Your plan has no free coworker slot. Activate it from the coworker panel.",
+        "addFailed": "Could not add this coworker",
+        "duplicateFailed": "Could not duplicate this coworker",
+        "importFailed": "Could not import this template",
+        "importInterrupted": "The import was interrupted",
+        "importInterruptedHint": "Check your machine before importing again.",
+        "moveAgentFailed": "Could not move this coworker",
+        "moveBoxFailed": "Could not move this Box",
+        "deleteBoxFailed": "Could not delete this Box",
+        "checkConnection": "Check your connection and try again.",
+        "shareLinkGone": "This share link is no longer available",
+        "prepareBoxFailed": "Could not prepare your Box",
+        "startCoworkerFailed": "Could not start your coworker"
+    }
+}

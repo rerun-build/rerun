@@ -1,4 +1,4 @@
-import { teamEmptyStateOf as teamEmptyStateFor, type TeamAgent, type TeamEmptyStateModel, type TeamPulse } from '@rerun/contracts'
+import { teamEmptyStateOf as teamEmptyStateFor, type TeamAgent, type TeamEmptyStateCopy, type TeamEmptyStateModel, type TeamPulse } from '@rerun/contracts'
 
 import type { AgentSchedule } from '@/lib/board/next-runs'
 import { nextRunAt } from '@/lib/schedules/cron'
@@ -18,6 +18,6 @@ function soonestRoutine(schedules: AgentSchedule[], now: number): TeamPulse['nex
     return soonest
 }
 
-export function teamEmptyStateOf({ agents, schedules, firstName, now }: { agents: TeamAgent[]; schedules: AgentSchedule[]; firstName: string; now: number }): TeamEmptyStateModel {
-    return teamEmptyStateFor({ agents, firstName, nextRoutine: soonestRoutine(schedules, now) })
+export function teamEmptyStateOf({ agents, schedules, firstName, now, copy }: { agents: TeamAgent[]; schedules: AgentSchedule[]; firstName: string; now: number; copy?: TeamEmptyStateCopy }): TeamEmptyStateModel {
+    return teamEmptyStateFor({ agents, firstName, nextRoutine: soonestRoutine(schedules, now), copy })
 }

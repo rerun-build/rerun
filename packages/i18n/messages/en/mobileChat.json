@@ -1,0 +1,288 @@
+{
+    "composer": {
+        "attach": "Attach",
+        "camera": "Camera",
+        "coworkers": "Coworkers",
+        "discardRecording": "Discard recording",
+        "files": "Files",
+        "modelLabel": "Model, {model}",
+        "photos": "Photos",
+        "recordVoice": "Record a voice message",
+        "removeAttachment": "Remove {name}",
+        "retryRecording": "Retry sending the recording",
+        "send": "Send",
+        "sendRecording": "Send the recording",
+        "sendTo": "Send to {name}",
+        "skills": "Skills",
+        "stop": "Stop",
+        "tooLargeBody": "{files}: {megabytes} MB at most.",
+        "tooLargeTitle": "{count, plural, one {This file is too large} other {These files are too large}}",
+        "tooManyBody": "{max} at most: {files} left out.",
+        "tooManyTitle": "Too many files"
+    },
+    "desktop": {
+        "connecting": "Connecting to the screen…",
+        "dropping": "The screen keeps dropping. Try again in a moment.",
+        "handingBack": "Handing back…",
+        "keys": {
+            "delete": "Delete",
+            "return": "Return",
+            "tab": "Tab"
+        },
+        "retry": "Retry",
+        "screen": "Screen",
+        "screenOf": "{name}'s screen",
+        "type": "Type",
+        "typePlaceholder": "Type on the screen",
+        "unreachable": "The screen could not be reached."
+    },
+    "empty": {
+        "asleep": "Asleep. A message wakes it up.",
+        "loading": "Loading",
+        "pulseCoworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+        "pulseWorking": "{count} working now",
+        "sendToCoworker": "Send a message to this coworker",
+        "startTitle": "Start a conversation",
+        "starters": {
+            "capabilities": "What can you help me with?",
+            "recentWork": "Summarize your recent work",
+            "projectFiles": "Review my project files",
+            "tools": "What tools do you have access to?"
+        },
+        "team": {
+            "greeting": "Hi, I'm Rerun",
+            "greetingNamed": "Hi {firstName}, I'm Rerun",
+            "greetingWithTeam": "{greeting}. Here is your team.",
+            "emptySubtitle": "You have no coworkers yet. Tell me a job you would hand off and I'll build the first one.",
+            "buildPrompt": "Build me a coworker that ",
+            "buildFirst": {
+                "title": "Build my first coworker",
+                "description": "Describe the job in a sentence"
+            },
+            "template": {
+                "title": "Start from a template",
+                "description": "Ready-made coworkers for your kind of business",
+                "send": "Show me templates that fit my business"
+            },
+            "guide": {
+                "title": "How does this work?",
+                "description": "Coworkers, Boxes, routines, in two minutes",
+                "send": "How does Rerun work?"
+            },
+            "checkWorking": {
+                "title": "What is {name} doing?",
+                "description": "Working now",
+                "send": "What is {mention} doing right now?"
+            },
+            "checkIdle": {
+                "title": "What did {name} do today?",
+                "description": "Catch up on its latest runs",
+                "send": "What did {mention} do today?"
+            },
+            "handOff": {
+                "title": "Give {name} a task",
+                "description": "I brief it and follow it through",
+                "prefill": "Ask {mention} to "
+            },
+            "build": {
+                "title": "Build a new coworker",
+                "description": "For a job nobody on the team does yet"
+            }
+        }
+    },
+    "error": {
+        "connectChatGpt": "Connect ChatGPT",
+        "connectClaude": "Connect Claude",
+        "creditsBody": "You've used up your Rerun credits for this period. Already paying for Claude or ChatGPT? Run your coworkers on that plan, at no extra cost here.",
+        "creditsTitle": "Rerun credits",
+        "fallbackTitle": "Something went wrong",
+        "reconnect": "Reconnect",
+        "switchModel": "Switch model",
+        "tryAgain": "Try again"
+    },
+    "feedback": {
+        "cancel": "Cancel",
+        "categories": {
+            "did_not_follow": "Did not follow my request",
+            "incomplete": "Incomplete response",
+            "memory": "Issue with memory",
+            "not_factual": "Not factually correct",
+            "other": "Other",
+            "too_slow": "Too slow",
+            "tool_error": "Tool or connection error",
+            "ui_bug": "UI bug",
+            "wrong_tool": "Wrong tool or app used"
+        },
+        "categoryLabel": "What type of issue do you wish to report?",
+        "disclaimer": "Submitting this report shares this conversation with the Rerun team so we can improve your coworkers.",
+        "negativePlaceholder": "What was unsatisfying about this response?",
+        "negativeTitle": "Give negative feedback",
+        "positivePlaceholder": "What was satisfying about this response?",
+        "removeFailed": "Could not remove your feedback",
+        "saveFailed": "Could not save your feedback",
+        "skip": "Skip",
+        "submit": "Submit"
+    },
+    "foreman": {
+        "away": {
+            "none": {
+                "body": "This workspace has no machine right now. Check it at {host}.",
+                "title": "Rerun is not running"
+            },
+            "onboarding": {
+                "body": "Finish setting it up at {host}.",
+                "title": "Rerun is setting up your workspace"
+            }
+        },
+        "retry": "Retry",
+        "role": "Your workspace assistant",
+        "unreachableBody": "Check your connection and try again.",
+        "unreachableTitle": "We could not reach Rerun"
+    },
+    "header": {
+        "back": "Back",
+        "conversationCount": "{count, plural, one {# conversation} other {# conversations}}",
+        "conversations": "Conversations",
+        "coworkerDetails": "Coworker details",
+        "earlier": "Earlier",
+        "general": "General",
+        "menuLabel": "{name}, {title}, conversations",
+        "newChat": "New chat",
+        "newConversation": "New conversation",
+        "newThread": "New thread",
+        "sections": {
+            "needs-you": "Needs you",
+            "new": "Unread",
+            "running": "Running"
+        },
+        "threadCount": "{count, plural, one {# thread} other {# threads}}",
+        "threads": "Threads"
+    },
+    "markdown": {
+        "code": "code",
+        "copied": "Copied",
+        "copy": "Copy",
+        "draft": "Draft",
+        "image": "Image"
+    },
+    "messages": {
+        "askRerun": "Ask Rerun",
+        "badResponse": "Bad response",
+        "compacting": "Compacting",
+        "copy": "Copy",
+        "goodResponse": "Good response",
+        "needsYourAnswer": "Needs your answer",
+        "open": "Open {name}",
+        "photo": "Photo",
+        "regenerate": "Regenerate",
+        "replyBelow": "Reply below.",
+        "runningTool": "Running {tool}",
+        "scrollToLatest": "Scroll to the latest message",
+        "sentBy": "Sent by {name}",
+        "share": "Share",
+        "showLess": "Show less",
+        "showMore": "Show more",
+        "thinking": "Thinking"
+    },
+    "origins": {
+        "copied": "Copied",
+        "copy": "Copy",
+        "installComplete": "Install complete",
+        "installGuideOf": "{name} install guide",
+        "installStarted": "Install started",
+        "noPayload": "No payload",
+        "payload": "Payload",
+        "prompt": "Prompt",
+        "promptOf": "{name} prompt",
+        "scheduledRun": "Scheduled run",
+        "startedBy": "This session was started by <strong>{name}</strong>",
+        "truncated": "truncated",
+        "viewDetails": "View details",
+        "viewGuide": "View guide",
+        "viewPayload": "View payload",
+        "viewPrompt": "View prompt",
+        "webhookReceived": "Webhook received"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {# source} other {# sources}}",
+        "emailsVerified": "{valid} of {checked, plural, one {# email} other {# emails}} verified",
+        "title": "Sources"
+    },
+    "pane": {
+        "answerPlaceholder": "Answer {name}",
+        "attachFailed": "Could not attach the files",
+        "defaultModel": "Default · {model}",
+        "foremanPlaceholder": "Ask Rerun anything",
+        "loadFailed": "We could not load this conversation.",
+        "loading": "Loading the conversation",
+        "messagePlaceholder": "Message {name}",
+        "newPlaceholder": "What should we work on?",
+        "openBrowser": "Open browser",
+        "retry": "Retry",
+        "stopTaskFailed": "Could not stop this task",
+        "takeControl": "Take control"
+    },
+    "queued": {
+        "attachmentsOnly": "Attachments only",
+        "badge": "Queued",
+        "remove": "Remove queued message",
+        "sendNow": "Send now",
+        "sendNowStops": "Send now, stops the current run"
+    },
+    "runPhase": {
+        "label": "{name}: {phase}",
+        "thinking": "Thinking",
+        "waking": "Waking up",
+        "working": "Working"
+    },
+    "screen": {
+        "disconnected": "The screen went away",
+        "error": "The screen is not available",
+        "handBackFailed": "Could not hand the browser back",
+        "resize": "Resize the screen"
+    },
+    "skillUpdateFailed": "Could not update the skill",
+    "takeover": {
+        "closing": "Closing…",
+        "done": "Done",
+        "openAgain": "Open again",
+        "openBrowser": "Open browser",
+        "opened": "The browser is open on your coworker’s desktop. Come back here once you are through.",
+        "opensBrowser": "Opens your coworker’s browser, for you to drive.",
+        "opensSite": "Opens {site} in your coworker’s browser, for you to drive.",
+        "privacy": "What you sign in to stays in this coworker’s browser on your machine.",
+        "skip": "Skip",
+        "skipTakeover": "Skip the browser takeover"
+    },
+    "voice": {
+        "copyTranscript": "Copy transcript",
+        "hideTranscript": "Hide transcript",
+        "pause": "Pause",
+        "play": "Play voice message",
+        "recording": "Recording",
+        "seek": "Seek",
+        "sendFailed": "Could not send that recording.",
+        "sending": "Sending the recording",
+        "silent": "Couldn't hear anything in that recording.",
+        "transcript": "Transcript",
+        "waitingForMicrophone": "Waiting for the microphone…"
+    },
+    "_context": {
+        "foreman.away.none.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "foreman.away.onboarding.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "desktop.keys.delete": "The Backspace key of a keyboard, on a button that sends it to a remote screen.",
+        "desktop.keys.return": "The Return/Enter key of a keyboard, on a button that sends it to a remote screen.",
+        "header.sections.needs-you": "Section of a menu: conversations waiting on the person.",
+        "messages.thinking": "Status shown while the model reasons, before it answers.",
+        "messages.compacting": "Status shown while the conversation history is being summarized to save context.",
+        "markdown.code": "Fallback label over a code block whose language is unknown.",
+        "origins.payload": "The body of an HTTP request a webhook received.",
+        "takeover.done": "Button: the person has finished using the coworker's browser and hands it back.",
+        "empty.starters.capabilities": "One of four chips on an empty conversation with a coworker: tapped, it is sent as the user's own message to the coworker. Same for the other empty.starters keys.",
+        "empty.team.greetingWithTeam": "Title of the workspace assistant's empty conversation. {greeting} is the greeting sentence, for example \"Hi Alex, I'm Rerun\".",
+        "empty.team.buildPrompt": "Prefilled in the composer: the start of the user's own sentence to the assistant, completed by them. Keep the trailing space.",
+        "empty.team.handOff.prefill": "Prefilled in the composer: the start of the user's own sentence to the assistant. {mention} is a coworker's handle, like @scout. Keep the trailing space.",
+        "empty.team.checkWorking.send": "Sent as the user's own message to the assistant. {mention} is a coworker's handle, like @scout. Same for checkIdle.send.",
+        "empty.team.template.send": "Sent as the user's own message to the assistant when the row is tapped. Same for guide.send."
+    }
+}

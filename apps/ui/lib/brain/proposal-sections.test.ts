@@ -1,5 +1,6 @@
 import type { BrainProposal } from '@rerun/contracts'
 import { describe, expect, it } from 'vitest'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 import { changedOnly, humanAgentName, proposalHeadline, sectionChanges, sectionsOf } from './proposal-sections'
 
 const proposal = (fields: Partial<BrainProposal>) => ({ title: 'Pricing', mode: 'edit', headline: null, ...fields }) as BrainProposal
@@ -43,13 +44,14 @@ describe('sectionChanges', () => {
 })
 
 describe('proposalHeadline', () => {
+    const t = englishTranslator('brain.proposals')
     it('keeps the headline the coworker wrote', () => {
-        expect(proposalHeadline(proposal({ headline: 'Pricing is now public' }))).toBe('Pricing is now public')
+        expect(proposalHeadline(proposal({ headline: 'Pricing is now public' }), t)).toBe('Pricing is now public')
     })
 
     it('falls back on the page when the proposal has none', () => {
-        expect(proposalHeadline(proposal({}))).toBe('Update to Pricing')
-        expect(proposalHeadline(proposal({ mode: 'create', title: 'Lindy' }))).toBe('New page: Lindy')
+        expect(proposalHeadline(proposal({}), t)).toBe('Update to Pricing')
+        expect(proposalHeadline(proposal({ mode: 'create', title: 'Lindy' }), t)).toBe('New page: Lindy')
     })
 })
 

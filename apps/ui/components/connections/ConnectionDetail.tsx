@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BaseUrlField } from '@/components/connections/BaseUrlField'
 import { CustomModelList } from '@/components/connections/CustomModelList'
@@ -15,23 +16,19 @@ import { Button } from '@/components/ui/button'
 import { CreditsUsageBar } from '@rerun/cloud/billing.client'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { connectMethod, creditResetPhrase, isCreditUsedUp, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
+import { connectMethod, isCreditUsedUp, sourceKind, type RerunCredit } from '@/lib/engine/ai-sources'
 import { catalogFor } from '@/lib/engine/models'
 import type { BoxConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { AlertTriangle, CoinsIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBillingStore } from '@/stores/billing.store'
 import { CONNECTION_SATELLITE_KEYS, CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID } from '@rerun/contracts'
+import { shortDate } from '@rerun/i18n/format'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
 type MutationResult = { success: boolean; error?: string }
-
-const CUSTOM_MODEL_HINT = (
-    <>
-        Add a model the server serves but does not list (e.g. <span className="font-mono">llama3.3:70b</span>).
-    </>
-)
 
 type ConnectionDetailProps = {
     connection: BoxConnection
@@ -52,6 +49,8 @@ type ConnectionDetailProps = {
 // Everything one named credential of the workspace owns. Every edit persists immediately: a moved
 // model is a PATCH, a pasted key is a PATCH, and a failed one says so under the header.
 export function ConnectionDetail({ connection, credit, defaultModel, reconnectRequested = false, onReconnected, onBack, onUpdate, onUpdateKeys, onDelete, readOnlyReason }: ConnectionDetailProps) {
+    const t = useTranslations('connections')
+    const errorText = useErrorText()
     const [error, setError] = useState<string | null>(null)
     const rejected = reconnectRequested || connection.credentialRejected
     const isOpenRouter = connection.provider === 'openrouter'
@@ -61,9 +60,9 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
     const patch = useCallback(
         async (next: UpdateBoxConnectionInput) => {
             const result = await onUpdate(connection.id, next)
-            setError(result.success ? null : (result.error ?? 'Failed to save'))
+            setError(result.success ? null : errorText(result, t('errors.saveFailed')))
         },
-        [connection.id, onUpdate]
+        [connection.id, onUpdate, t, errorText]
     )
 
     const applyKeys = useCallback(
@@ -75,18 +74,18 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
             const result = await onUpdateKeys(connection.id, { set: keys, remove })
             if (result.success && rejected) {
                 onReconnected?.()
-                toast.success(connectMethod(connection.provider) === 'key' ? 'Key replaced' : 'Signed in again')
+                toast.success(connectMethod(connection.provider) === 'key' ? t('detail.keyReplaced') : t('detail.signedInAgain'))
             }
             return result
         },
-        [connection.id, connection.provider, onUpdateKeys, rejected, onReconnected]
+        [connection.id, connection.provider, onUpdateKeys, rejected, onReconnected, t]
     )
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <DetailHeader source={connection} credit={credit} onBack={onBack} onRename={readOnlyReason ? undefined : name => void patch({ name })} />
             <PanelScroller className="space-y-5 p-4">
-                {readOnlyReason && <p className="text-xs text-muted-foreground">{readOnlyReason}.</p>}
+                {readOnlyReason && <p className="text-xs text-muted-foreground">{t('detail.readOnly', { reason: readOnlyReason })}</p>}
                 {error && <p className="text-[11px] text-destructive">{error}</p>}
                 <fieldset disabled={!!readOnlyReason} className="contents">
                 <SourceAlert connection={connection} credit={credit} reconnectRequested={rejected} onKeys={applyKeys} />
@@ -98,7 +97,7 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
                 )}
                 {isOpenRouter && <BaseUrlField baseUrl={connection.baseUrl ?? ''} onCommit={value => void patch({ baseUrl: value })} />}
                 {isOpenRouter && connection.connected && <CustomModelList models={connection.extraModels} onChange={extraModels => void patch({ extraModels })} reserved={catalog.models.map(m => m.id)} />}
-                {isCustom && <CustomModelList hint={CUSTOM_MODEL_HINT} placeholder="model id" models={connection.extraModels} onChange={extraModels => void patch({ extraModels })} reserved={[...connection.models, ...(connection.discoveredModels ?? []).map(m => m.id)]} />}
+                {isCustom && <CustomModelList hint={t.rich('customModels.serverHint', { mono: chunks => <span className="font-mono">{chunks}</span> })} placeholder={t('customModels.idPlaceholder')} models={connection.extraModels} onChange={extraModels => void patch({ extraModels })} reserved={[...connection.models, ...(connection.discoveredModels ?? []).map(m => m.id)]} />}
                 {isCustom && <CustomEndpointSettings key={connection.id} connection={connection} onPatch={next => void patch(next)} />}
                 </fieldset>
             </PanelScroller>
@@ -126,6 +125,10 @@ function AlertBlock({ children }: { children: ReactNode }) {
 
 // Renders nothing while a source works: switching account or key is remove, then add again.
 function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { connection: BoxConnection; credit: RerunCredit; reconnectRequested: boolean; onKeys: (keys: Record<string, string>) => Promise<MutationResult> }) {
+    const t = useTranslations('connections')
+    const tCommon = useTranslations('common')
+    const errorText = useErrorText()
+    const locale = useLocale()
     const [value, setValue] = useState('')
     const [busy, setBusy] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -136,11 +139,11 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
         const usedUp = isCreditUsedUp(credit)
         return (
             <DetailBlock
-                title="This month's credits"
+                title={t('detail.creditsTitle')}
                 aside={
                     <Button size="xs" variant={usedUp ? 'default' : 'outline'} onClick={() => openBilling('credit_pack', 'ai_providers')}>
                         <CoinsIcon />
-                        Top up
+                        {t('detail.topUp')}
                     </Button>
                 }
             >
@@ -148,7 +151,7 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
                     <CreditsUsageBar className="mt-0" usedMicros={credit.usedMicros} budgetMicros={credit.budgetMicros} resetAt={credit.resetAt} />
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                    {usedUp ? `Coworkers running on Rerun are paused until the credits are back ${creditResetPhrase(credit)}. Top up or pick another default model to keep them going.` : 'Comes with your Rerun plan. No key, nothing to set up.'}
+                    {usedUp ? (credit.resetAt ? t('detail.creditsUsedUpOn', { date: shortDate(credit.resetAt, locale) }) : t('detail.creditsUsedUpNextMonth')) : t('detail.creditsIncluded')}
                 </p>
             </DetailBlock>
         )
@@ -161,9 +164,9 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
         return (
             <div className="space-y-5">
                 <AlertBlock>
-                    <p className="text-xs">{connection.connected ? 'This sign-in was rejected. Coworkers using it are stopped until you sign in again.' : 'This sign-in expired. Coworkers using it are stopped until you sign in again.'}</p>
+                    <p className="text-xs">{connection.connected ? t('detail.signInRejected') : t('detail.signInExpired')}</p>
                 </AlertBlock>
-                <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={onKeys} surface="reconnect" lastStep={() => ({ title: 'Your coworkers start again' })} />
+                <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={onKeys} surface="reconnect" lastStep={() => ({ title: t('detail.reconnected') })} />
             </div>
         )
     }
@@ -172,19 +175,19 @@ function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { conne
         const trimmed = value.trim()
         if (!trimmed) return
         setBusy(true)
-        const result = await onKeys({ [CONNECTION_TOKEN_KEY[connection.provider]]: trimmed }).catch(() => ({ success: false as const, error: 'Something went wrong. Please try again.' }))
+        const result = await onKeys({ [CONNECTION_TOKEN_KEY[connection.provider]]: trimmed }).catch(() => ({ success: false as const, error: tCommon('somethingWentWrong') }))
         setBusy(false)
-        setError(result.success ? null : (result.error ?? 'Failed to save'))
+        setError(result.success ? null : errorText(result, t('errors.saveFailed')))
         if (result.success) setValue('')
     }
 
     return (
         <AlertBlock>
-            <p className="text-xs">{connection.connected ? 'This key was rejected. Coworkers using it are stopped until you paste a new one.' : 'No key on file. Coworkers using it are stopped until you paste one.'}</p>
+            <p className="text-xs">{connection.connected ? t('detail.keyRejected') : t('detail.keyMissing')}</p>
             <div className="flex items-center gap-2">
-                <Input hideRequired type="password" value={value} onChange={e => setValue(e.target.value)} placeholder="Paste your key" className="h-8 font-mono text-xs" />
+                <Input hideRequired type="password" value={value} onChange={e => setValue(e.target.value)} placeholder={t('key.placeholder')} className="h-8 font-mono text-xs" />
                 <Button size="sm" disabled={!value.trim() || busy} onClick={() => void save()}>
-                    Save
+                    {tCommon('save')}
                 </Button>
             </div>
             {error && <p className="text-[11px] text-destructive">{error}</p>}

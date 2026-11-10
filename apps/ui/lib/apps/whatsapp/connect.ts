@@ -1,4 +1,5 @@
 import { getMe, login, type LinkupLoginResult } from '@/lib/apps/linkup/client'
+import type { ErrorCode, ErrorParams } from '@/lib/i18n/action-error'
 
 // How a WhatsApp number is linked at Linkup, as a linked device of the phone (the way WhatsApp Web
 // is), and what it is known by once it is.
@@ -21,9 +22,9 @@ export async function whatsappProfile(accountId: string): Promise<{ label: strin
 
 export const WHATSAPP_WEBHOOK_EVENTS = ['message_received'] as const
 
-export function whatsappSignInRefusal(message: string): string {
-    if (/expired/i.test(message)) return 'The code expired before the phone linked. Ask for a new one and scan it within three minutes.'
-    if (/refused|denied/i.test(message)) return 'WhatsApp refused to link this number. Check it on the phone, then try again.'
-    if (/phone|number/i.test(message)) return `WhatsApp refused this number: ${message}`
-    return `WhatsApp refused the link: ${message}`
+export function whatsappSignInRefusal(message: string): { code: ErrorCode; params?: ErrorParams } {
+    if (/expired/i.test(message)) return { code: 'whatsappCodeExpired' }
+    if (/refused|denied/i.test(message)) return { code: 'whatsappLinkRefused' }
+    if (/phone|number/i.test(message)) return { code: 'whatsappNumberRefused', params: { message } }
+    return { code: 'whatsappLinkRefusedBecause', params: { message } }
 }

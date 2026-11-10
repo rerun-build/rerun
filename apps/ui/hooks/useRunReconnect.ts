@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type RefObject } from 'react'
 
 // How many times a dropped stream is chased before the run is called dead.
@@ -32,6 +33,7 @@ type RunReconnectOptions = {
 // streaming the tokens live in the same assistant message. If the run already finished (no live
 // stream to resume), fall back to reloading the persisted messages.
 export function useRunReconnect({ error, completedRef, start, resumeStream, setMessages, clearError }: RunReconnectOptions): boolean {
+    const t = useTranslations('chat.agentChat')
     const [reconnecting, setReconnecting] = useState(false)
     const reconnectingRef = useRef(false)
     const mountedRef = useRef(true)
@@ -85,7 +87,7 @@ export function useRunReconnect({ error, completedRef, start, resumeStream, setM
                     if (finished) break
                     if (attempt === RECONNECT_ATTEMPTS - 1) {
                         errored = true
-                        errorText = 'The run stopped responding. Stop it to send another message.'
+                        errorText = t('runStoppedResponding')
                     }
                 }
                 if (!mountedRef.current) return
@@ -100,7 +102,7 @@ export function useRunReconnect({ error, completedRef, start, resumeStream, setM
                 reconnectingRef.current = false
             }
         })()
-    }, [error, completedRef, setMessages, clearError, resumeStream])
+    }, [error, completedRef, setMessages, clearError, resumeStream, t])
 
     return reconnecting
 }

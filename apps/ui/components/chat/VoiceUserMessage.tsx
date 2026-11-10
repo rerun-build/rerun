@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
@@ -33,6 +34,7 @@ type VoiceUserMessageProps = {
  * screen.
  */
 export function VoiceUserMessage({ voice, agentId, rawUrlFor, readFile, attachmentPaths, createdAt, defaultTranscriptOpen = false }: VoiceUserMessageProps) {
+    const t = useTranslations('chat.voice')
     const playback = useVoicePlayback({ agentId, rawUrlFor, src: voice.src, durationMs: voice.durationMs })
     const [open, setOpen] = useState(defaultTranscriptOpen)
     const transcript = voice.transcript
@@ -50,10 +52,10 @@ export function VoiceUserMessage({ voice, agentId, rawUrlFor, readFile, attachme
                 <div className="-mt-1 flex flex-col items-end group-[:not(:last-child)]:-mb-4">
                     <VoiceTranscript transcript={transcript} open={open} heardUpTo={started ? playback.progress : null} />
                     <MessageActions className={cn('transition-opacity group-hover:opacity-100 has-focus-visible:opacity-100 [@media(hover:none)]:opacity-100', !open && 'opacity-0')}>
-                        <MessageAction tooltip={open ? 'Hide transcript' : 'Transcript'} aria-expanded={open} onClick={() => setOpen(value => !value)} className={cn(open && 'bg-accent text-foreground')}>
+                        <MessageAction tooltip={open ? t('hideTranscript') : t('transcript')} aria-expanded={open} onClick={() => setOpen(value => !value)} className={cn(open && 'bg-accent text-foreground')}>
                             <CaptionsIcon className="size-3.5" />
                         </MessageAction>
-                        <CopyAction text={transcript} tooltip="Copy transcript" />
+                        <CopyAction text={transcript} tooltip={t('copyTranscript')} />
                     </MessageActions>
                 </div>
             )}

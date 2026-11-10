@@ -7,6 +7,7 @@ import { cjk } from '@streamdown/cjk'
 import { code } from '@streamdown/code'
 import { math } from '@streamdown/math'
 import { mermaid } from '@streamdown/mermaid'
+import { useLocale, useTranslations } from 'next-intl'
 import { Streamdown } from 'streamdown'
 
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
@@ -28,8 +29,10 @@ type InboxDetailCardProps = {
 }
 
 export function InboxDetailCard({ entry, message, total, onClose, onSeeAll, onOpenConversation, onMarkRead }: InboxDetailCardProps) {
-    const meta = ATTENTION_STATUS_META[entry.status] ?? ATTENTION_STATUS_META.waiting_human
-    const subtitle = [entry.title || meta.label, entry.updatedAt && shortRelativeTime(entry.updatedAt)].filter(Boolean).join(' · ')
+    const t = useTranslations('notifications.inbox.detail')
+    const locale = useLocale()
+    const status = (Object.hasOwn(ATTENTION_STATUS_META, entry.status) ? entry.status : 'waiting_human') as 'error' | 'awaiting_question' | 'awaiting_approval' | 'awaiting_ack' | 'done' | 'waiting_human'
+    const subtitle = [entry.title || t(`status.${status}`), entry.updatedAt && shortRelativeTime(entry.updatedAt, locale)].filter(Boolean).join(' · ')
 
     return (
         <div className="flex flex-col gap-3 p-3">
@@ -39,7 +42,7 @@ export function InboxDetailCard({ entry, message, total, onClose, onSeeAll, onOp
                     <span className="truncate text-sm font-medium text-foreground">{entry.agentName}</span>
                     <span className="truncate text-xs text-muted-foreground">{subtitle}</span>
                 </div>
-                <Button size="icon-sm" variant="ghost" aria-label="Close" onClick={onClose}>
+                <Button size="icon-sm" variant="ghost" aria-label={t('close')} onClick={onClose}>
                     <XIcon className="size-3.5" />
                 </Button>
             </div>
@@ -48,31 +51,31 @@ export function InboxDetailCard({ entry, message, total, onClose, onSeeAll, onOp
             </div>
             <div className="flex items-center justify-between gap-2">
                 <Button size="sm" variant="ghost" onClick={onSeeAll}>
-                    {total > 0 ? `See all ${total}` : 'See all'}
+                    {total > 0 ? t('seeAllCount', { count: total }) : t('seeAll')}
                 </Button>
                 <div className="flex items-center gap-1.5">
                     {onMarkRead ? (
-                        <TooltipLabeled label="Mark as read">
-                            <Button size="icon-sm" variant="outline" aria-label="Mark as read" onClick={onMarkRead}>
+                        <TooltipLabeled label={t('markRead')}>
+                            <Button size="icon-sm" variant="outline" aria-label={t('markRead')} onClick={onMarkRead}>
                                 <CheckCheckIcon className="size-3.5" />
                             </Button>
                         </TooltipLabeled>
                     ) : (
-                        <TooltipDisabledReason reason="This update is not in your list yet">
-                            <Button size="icon-sm" variant="outline" aria-label="Mark as read" disabled>
+                        <TooltipDisabledReason reason={t('notInList')}>
+                            <Button size="icon-sm" variant="outline" aria-label={t('markRead')} disabled>
                                 <CheckCheckIcon className="size-3.5" />
                             </Button>
                         </TooltipDisabledReason>
                     )}
                     {onOpenConversation ? (
                         <Button size="sm" onClick={onOpenConversation}>
-                            Open conversation
+                            {t('openConversation')}
                             <ArrowRight className="size-3.5" />
                         </Button>
                     ) : (
-                        <TooltipDisabledReason reason="This update is not tied to a coworker">
+                        <TooltipDisabledReason reason={t('noCoworker')}>
                             <Button size="sm" disabled>
-                                Open conversation
+                                {t('openConversation')}
                                 <ArrowRight className="size-3.5" />
                             </Button>
                         </TooltipDisabledReason>

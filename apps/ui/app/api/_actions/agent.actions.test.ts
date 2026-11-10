@@ -17,7 +17,8 @@ const mocks = vi.hoisted(() => ({
     getWorkspaceConnection: vi.fn(),
 }))
 
-class AccessDeniedError extends Error {}
+const { AppError } = await vi.importActual<typeof import('@/lib/i18n/action-error')>('@/lib/i18n/action-error')
+class AccessDeniedError extends AppError {}
 
 vi.mock('@/app/api/_auth/access', () => ({
     AccessDeniedError,
@@ -109,9 +110,9 @@ describe('the level each action asks of the Box', () => {
     })
 
     it('reports a member who only uses the Box, without reaching the engine', async () => {
-        mocks.getAgentChatTarget.mockRejectedValue(new AccessDeniedError('Only an admin or a manager of this Box can do this'))
+        mocks.getAgentChatTarget.mockRejectedValue(new AccessDeniedError('boxManagerOnly'))
 
-        await expect(actions.createSkillAction(AGENT, { name: 'Brief', description: 'd', body: 'b' })).resolves.toEqual({ success: false, error: 'Only an admin or a manager of this Box can do this' })
+        await expect(actions.createSkillAction(AGENT, { name: 'Brief', description: 'd', body: 'b' })).resolves.toEqual({ success: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly' })
         expect(engine.createSkill).not.toHaveBeenCalled()
     })
 
@@ -163,7 +164,7 @@ describe('answerSecretRequestAction', () => {
     })
 
     it('refuses a key the request does not name', async () => {
-        await expect(actions.answerSecretRequestAction('session-1', { API_KEY: 'secret', OTHER_KEY: 'x' })).resolves.toEqual({ success: false, error: 'This coworker did not ask for these credentials' })
+        await expect(actions.answerSecretRequestAction('session-1', { API_KEY: 'secret', OTHER_KEY: 'x' })).resolves.toEqual({ success: false, error: 'This coworker did not ask for these credentials', code: 'secretNotRequested' })
         expect(engine.updateAgentKeys).not.toHaveBeenCalled()
     })
 

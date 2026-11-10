@@ -1,0 +1,42 @@
+{
+    "group": {
+        "steps": "{count, plural, one {# paso} other {# pasos}}",
+        "stepsWithFailures": "{count, plural, one {# paso} other {# pasos}}, {failed, plural, one {# fallido} other {# fallidos}}",
+        "failed": "{failed, plural, one {# fallido} other {# fallidos}}"
+    },
+    "tool": {
+        "input": "Entrada",
+        "error": "Error",
+        "output": "Salida",
+        "completedInMs": "Completado en {ms} ms",
+        "completedInSeconds": "Completado en {seconds} s"
+    },
+    "reasoning": {
+        "thinking": "Pensando...",
+        "thought": "Razonamiento"
+    },
+    "compaction": {
+        "running": "Compactando el contexto…",
+        "failed": "Falló la compactación del contexto",
+        "done": "Contexto compactado",
+        "summarized": "{count} mensajes anteriores resumidos",
+        "recovered": "~{count} tokens recuperados"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {# fallo} other {# fallos}}",
+        "idle": "Inactiva {minutes} min",
+        "stop": "Detener esta tarea",
+        "failed": "Falló",
+        "stopped": "Detenida, trabajo parcial conservado",
+        "earlier": "+{count} anteriores",
+        "verbs": {
+            "web_search": "Buscando {summary}",
+            "web_fetch": "Leyendo {summary}",
+            "browser_navigate": "Navegando {summary}",
+            "shell_exec": "Ejecutando {summary}",
+            "fs_read": "Leyendo {summary}",
+            "fs_write": "Escribiendo {summary}",
+            "fs_edit": "Editando {summary}"
+        }
+    }
+}

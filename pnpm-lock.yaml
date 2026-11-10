@@ -44,6 +44,9 @@ importers:
 
   .:
     devDependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^1.6.0
+        version: 1.7.0(zod@4.6.7)
       '@react-email/preview-server':
         specifier: 5.2.10
         version: 5.2.10(react-dom@19.2.4)(react@19.2.4)
@@ -94,7 +97,7 @@ importers:
         version: 6.0.195(zod@4.6.7)
       ai-sdk-provider-claude-code:
         specifier: ^3.5.3
-        version: 3.5.3(@anthropic-ai/sdk@0.105.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7)
+        version: 3.5.3(@anthropic-ai/sdk@1.7.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7)
       ai-sdk-provider-codex-cli:
         specifier: ^1.3.1
         version: 1.3.1(patch_hash=c4iczjmmf7pnovr47opvnr6ydq)(zod@4.6.7)
@@ -177,6 +180,9 @@ importers:
       '@rerun/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@rerun/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@supabase/supabase-js':
         specifier: ^2.106.1
         version: 2.107.0
@@ -315,6 +321,9 @@ importers:
       remend:
         specifier: 1.3.0
         version: 1.3.0
+      use-intl:
+        specifier: ^4.14.9
+        version: 4.14.9(@types/react@19.2.16)(react@19.3.0)
     devDependencies:
       '@rerun/analytics':
         specifier: workspace:*
@@ -421,6 +430,9 @@ importers:
       '@rerun/emails':
         specifier: workspace:*
         version: link:../../packages/emails
+      '@rerun/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@rerun/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -529,6 +541,9 @@ importers:
       next:
         specifier: 16.4.4
         version: 16.4.4(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@20.19.41)(react-dom@19.2.4)(react@19.2.4)
+      next-intl:
+        specifier: ^4.14.9
+        version: 4.14.9(@types/react@19.2.16)(next@16.4.4)(react@19.2.4)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.4)(react@19.2.4)
@@ -583,6 +598,9 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+      use-intl:
+        specifier: ^4.14.9
+        version: 4.14.9(@types/react@19.2.16)(react@19.2.4)
       use-stick-to-bottom:
         specifier: ^1.1.4
         version: 1.1.4(react@19.2.4)
@@ -688,12 +706,18 @@ importers:
       '@react-email/components':
         specifier: ^1.0.12
         version: 1.0.12(react-dom@19.2.4)(react@19.2.4)
+      '@rerun/i18n':
+        specifier: workspace:*
+        version: link:../i18n
       react:
         specifier: ^19
         version: 19.2.4
       react-dom:
         specifier: ^19
         version: 19.2.4(react@19.2.4)
+      use-intl:
+        specifier: ^4.14.9
+        version: 4.14.9(@types/react@19.2.16)(react@19.2.4)
     devDependencies:
       '@react-email/ui':
         specifier: 6.11.6
@@ -708,6 +732,12 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  packages/i18n:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   packages/ui:
     dependencies:
       '@hookform/resolvers':
@@ -716,6 +746,9 @@ importers:
       '@rerun/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@rerun/i18n':
+        specifier: workspace:*
+        version: link:../i18n
       '@tiptap/pm':
         specifier: ^3.32.2
         version: 3.32.2
@@ -767,6 +800,9 @@ importers:
       tiptap-markdown:
         specifier: ^0.9.0
         version: 0.9.0(@tiptap/core@3.32.2)
+      use-intl:
+        specifier: ^4.14.9
+        version: 4.14.9(@types/react@19.2.16)(react@19.2.4)
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1033,7 +1069,7 @@ packages:
     dev: false
     optional: true
 
-  /@anthropic-ai/claude-agent-sdk@0.3.322(@anthropic-ai/sdk@0.105.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7):
+  /@anthropic-ai/claude-agent-sdk@0.3.322(@anthropic-ai/sdk@1.7.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7):
     resolution: {integrity: sha512-r88ij7R3SPV2j3BtFuavgrbWZNE8SVVS42AOQ1KxlS+QnSwNNnUhmVXV3Es2dniZySBYX8ENebL43ffhiB0azw==}
     engines: {node: '>=18.14.0'}
     peerDependencies:
@@ -1041,7 +1077,7 @@ packages:
       '@modelcontextprotocol/sdk': ^1.29.0
       zod: ^4.0.0
     dependencies:
-      '@anthropic-ai/sdk': 0.105.0(zod@4.6.7)
+      '@anthropic-ai/sdk': 1.7.0(zod@4.6.7)
       '@modelcontextprotocol/sdk': 1.32.2(zod@4.6.7)
       zod: 4.6.7
     optionalDependencies:
@@ -1055,8 +1091,8 @@ packages:
       '@anthropic-ai/claude-agent-sdk-win32-x64': 0.3.322
     dev: false
 
-  /@anthropic-ai/sdk@0.105.0(zod@4.6.7):
-    resolution: {integrity: sha512-sDyu+aM9cE6uZE+HgRjjHRb+qqb87GHZOx+8bE0YlWetdL1YcVLxn8h9ltxGOflyChTe6PMEo50kMQV4cw0hfg==}
+  /@anthropic-ai/sdk@1.7.0(zod@4.6.7):
+    resolution: {integrity: sha512-Z+0c1iHQozlt4ymMHapPXEXfFnSbPEWGnSKbkavt+qeyaMQ3Sd6QNxfQj7vyhHYqiqYadC9shrXub8ISKf7xjQ==}
     hasBin: true
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
@@ -1064,10 +1100,10 @@ packages:
       zod:
         optional: true
     dependencies:
+      '@opentelemetry/api': 1.9.1
       json-schema-to-ts: 3.1.1
       standardwebhooks: 1.1.1
       zod: 4.6.7
-    dev: false
 
   /@apify/consts@2.54.2:
     resolution: {integrity: sha512-ypdLZcGR0F+MwG+kOsvXar9JjZ32c7Vh086bywgNX31uVlIrnmDtOS0uWDG1VWPu4g2u0x1iA1tTtdMzRtyPpw==}
@@ -2252,6 +2288,23 @@ packages:
       '@microsoft/fetch-event-source': 2.0.1
     optionalDependencies:
       '@rollup/rollup-darwin-arm64': 4.61.0
+
+  /@eloqnt/config@0.1.1:
+    resolution: {integrity: sha512-YRDigSaiJEzKDfzTth5kG+L/PKfB3mo8h7yNzpXExPfvQmcD05WoZT57PdhJE0jI+Vva6eb0OCU8hnHHgdME3g==}
+    dev: false
+
+  /@eloqnt/format-json@0.1.0:
+    resolution: {integrity: sha512-4Pkb+HyzgWNJXoU48aJhUyNZSjZvMGooPCNG1ZFmBm55xTiNNPQCNXH66Ob6sXS6RvbWZrRpCf+Uo/Jz9K9g+A==}
+    dependencies:
+      '@eloqnt/config': 0.1.1
+    dev: false
+
+  /@eloqnt/format-po@0.1.1:
+    resolution: {integrity: sha512-aLtmIoqXGEaeTT0RcsLN8sZ3aIrsT/c/dVs28zrLhDjO3+vA3KNP+r98N0xq8w/k36+/GIUt4uZNbqcA71GVWw==}
+    dependencies:
+      '@eloqnt/config': 0.1.1
+      po-parser: 2.2.0
+    dev: false
 
   /@emnapi/core@1.10.0:
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -3638,6 +3691,36 @@ packages:
   /@floating-ui/utils@0.2.11:
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
     requiresBuild: true
+    dev: false
+
+  /@formatjs/fast-memoize@3.1.7:
+    resolution: {integrity: sha512-zXfhLpvA6T7+efdt9JLbBwZ00tT7NsBMDVnDu8rpHeNNv8KfRZAMo2gkG0k9lK/Nzc//3kJ9pImsfuJxk3KhUA==}
+    dev: false
+
+  /@formatjs/icu-messageformat-parser@3.5.18:
+    resolution: {integrity: sha512-wX1efcL8d7K5QapOTRsP/OLTA/kpwe4LwqWyNxDNg5iRs8i9jJbCyxB5P8jc4KOW5oiLzz2DJr+BRY5xMV9+bA==}
+    dependencies:
+      '@formatjs/icu-skeleton-parser': 2.1.11
+    dev: false
+
+  /@formatjs/icu-messageformat-parser@3.5.23:
+    resolution: {integrity: sha512-iB1fYfhtSGd8uH9A8b1m01Ujcv6QtQnJasefP3jPApmz72L/zNipzf3BdoinTMd1xuviVChjUJWL60iTwjUQ+w==}
+    dependencies:
+      '@formatjs/icu-skeleton-parser': 2.1.13
+    dev: false
+
+  /@formatjs/icu-skeleton-parser@2.1.11:
+    resolution: {integrity: sha512-j8cUmOJzVgkHuS0QiQ6ga76UIoLOFSAMWhs7aZJztH3aAdCOAE6vpC8KVvFB4cU10ON0y2/5oOVmPJ43s2lTwA==}
+    dev: false
+
+  /@formatjs/icu-skeleton-parser@2.1.13:
+    resolution: {integrity: sha512-IdAJ9NrHn7AF0zqncD9UpxQozTYyJtbwwrZnJMEKVxTcOOXtVkUb2XYTpNOGTAv58NCsk0rjRB9G+i2SvBmGAQ==}
+    dev: false
+
+  /@formatjs/intl-localematcher@0.8.14:
+    resolution: {integrity: sha512-8O7V38QmbB11+ryJ3KM/znrzXtiqgpXzqNoqDsndHZZ5/zDKTTL+cf5F0mzXkQEwhx8IlWnqYvEovf2S5EwLTw==}
+    dependencies:
+      '@formatjs/fast-memoize': 3.1.7
     dev: false
 
   /@google-cloud/precise-date@4.0.0:
@@ -7831,6 +7914,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /@schummar/icu-type-parser@1.21.5:
+    resolution: {integrity: sha512-bXHSaW5jRTmke9Vd0h5P7BtWZG9Znqb8gSDxZnxaGSJnGwPLDPfS+3g0BKzeWqzgZPsIVZkM7m2tbo18cm5HBw==}
+    dev: false
+
   /@sec-ant/readable-stream@0.4.1:
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
     dev: true
@@ -7936,7 +8023,6 @@ packages:
 
   /@stablelib/base64@1.0.1:
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
-    dev: false
 
   /@standard-schema/spec@1.1.0:
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
@@ -8128,10 +8214,155 @@ packages:
       '@supabase/realtime-js': 2.107.0
       '@supabase/storage-js': 2.107.0
 
+  /@swc/core-darwin-arm64@1.16.22:
+    resolution: {integrity: sha512-PddkOjOK3MK01AVOvqG309iAJ0hn5vK37ug9g5Zt5e2aWF3IhVLdDLjMePXts1zi8yc4ild2h9FYCkVYb5+Qcw==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-darwin-x64@1.16.22:
+    resolution: {integrity: sha512-Zzia5cuIQFLTfZyf5mC1JvRMPW1VlxbvkZ0qNESoD4okE6T6Us2ZNVZ5XMVELqkYNw9eL2GeuMJgDIHBdYo7Gg==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-arm-gnueabihf@1.16.22:
+    resolution: {integrity: sha512-GI6VICiuYc7mb61XenLtiEGoOXTXDdUda8w0bu29Mh3Z6rhuTkAiBAdDFpdww2QNV0iACY5ylUSL127I6Nx8yQ==}
+    engines: {node: '>=10'}
+    cpu: [arm]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-arm64-gnu@1.16.22:
+    resolution: {integrity: sha512-Ic+qrMmV78QdlG9irJuc/37xSqY7+5ZFhg4kaYbF82UQkaEfWgqGSUbU75Y4To21eaBB07c05kbXmTWTrvPURA==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-arm64-musl@1.16.22:
+    resolution: {integrity: sha512-ophleEwlj0SqkzYPDJ7xMPK0+MnWfc4+u9GzDYLLFG1TkIJuwj0rHNWto4MmKo00TylHFwGx9+5bLs/+YZ00IQ==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-ppc64-gnu@1.16.22:
+    resolution: {integrity: sha512-/4kR7SafFsVqY8N4HSepTs4Ni9YA0OY6n/SVBk/V15PhDiw97stG9SVqvgc8EzC+3XOe4pTmwlvFLWzNYfuNWg==}
+    engines: {node: '>=10'}
+    cpu: [ppc64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-s390x-gnu@1.16.22:
+    resolution: {integrity: sha512-b3GQqKmHBHUFQby1sh/QLtNQMMXTSBUhnmXcJ5qSrWbkYnhljIW3Y+30eMrrxCfy7HXLLDug1sjlhJDhf3tPhA==}
+    engines: {node: '>=10'}
+    cpu: [s390x]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-x64-gnu@1.16.22:
+    resolution: {integrity: sha512-u9hdfNEI3oI/dTRJ+In8G32EgfFpZDvMoI5elIERl6/XfaIzE9gpv4WomhKblAXA1+EYyLfDCS1EFFKQlBXTQQ==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-linux-x64-musl@1.16.22:
+    resolution: {integrity: sha512-C3YVRL717kKSSU8n6HaC7sesFSGnHjRuHN3609Wl4epPYVDDutzD6aj7CMcx9cg3WWJ/oE8woDZ8qrCfzmxvnw==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-win32-arm64-msvc@1.16.22:
+    resolution: {integrity: sha512-+MpNuE45LMFo+6RF8vMUqZPmaOfRQIuzCUHJ+jSXwEhiR5KHeZiQ9MaJglZRDeMuML67voCiFLrxqYTqGCbcCQ==}
+    engines: {node: '>=10'}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-win32-ia32-msvc@1.16.22:
+    resolution: {integrity: sha512-z1p/CMDSRqvsE5Gs7axHVl6p+2zjoQTYuGcZ/q+3PMjAxx2bo/+lkpG9ot+725e6lj9os3WwYQrncmOWKVDrEQ==}
+    engines: {node: '>=10'}
+    cpu: [ia32]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core-win32-x64-msvc@1.16.22:
+    resolution: {integrity: sha512-IyBPJn/SpXsh7i5ZLfQUPJ+R+fuELPI7Sz51igmYMTv2wdnDn/tqnIlAUwQe6AgnclbuJdbOb6crUbyN/zwMzw==}
+    engines: {node: '>=10'}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: false
+    optional: true
+
+  /@swc/core@1.16.22:
+    resolution: {integrity: sha512-kFqhtSmmNSZqJXIK0l9rF+oNg2efaZoeNbN/4qwbNTWfMRKApc6n7rKx827bw8K+4kmu7iH0LZ144QJTQzulHw==}
+    engines: {node: '>=10'}
+    requiresBuild: true
+    peerDependencies:
+      '@swc/helpers': '>=0.5.17'
+    peerDependenciesMeta:
+      '@swc/helpers':
+        optional: true
+    dependencies:
+      '@swc/counter': 0.1.3
+      '@swc/types': 0.1.28
+    optionalDependencies:
+      '@swc/core-darwin-arm64': 1.16.22
+      '@swc/core-darwin-x64': 1.16.22
+      '@swc/core-linux-arm-gnueabihf': 1.16.22
+      '@swc/core-linux-arm64-gnu': 1.16.22
+      '@swc/core-linux-arm64-musl': 1.16.22
+      '@swc/core-linux-ppc64-gnu': 1.16.22
+      '@swc/core-linux-s390x-gnu': 1.16.22
+      '@swc/core-linux-x64-gnu': 1.16.22
+      '@swc/core-linux-x64-musl': 1.16.22
+      '@swc/core-win32-arm64-msvc': 1.16.22
+      '@swc/core-win32-ia32-msvc': 1.16.22
+      '@swc/core-win32-x64-msvc': 1.16.22
+    dev: false
+
+  /@swc/counter@0.1.3:
+    resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
+    dev: false
+
   /@swc/helpers@0.5.23:
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
     dependencies:
       tslib: 2.8.1
+
+  /@swc/types@0.1.28:
+    resolution: {integrity: sha512-V6Mnml8v09QALx6K0elJ7o9K/MkVDtW3t6L+7Ou/JcWtb3xwId2AH4FeOceySd2JaO87IMw4+6vSZxLm34LPbw==}
+    dependencies:
+      '@swc/counter': 0.1.3
+    dev: false
 
   /@tailwindcss/node@4.3.0:
     resolution: {integrity: sha512-aFb4gUhFOgdh9AXo4IzBEOzBkkAxm9VigwDJnMIYv3lcfXCJVesNfbEaBl4BNgVRyid92AmdviqwBUBRKSeY3g==}
@@ -9935,7 +10166,7 @@ packages:
     engines: {node: '>=18.18'}
     hasBin: true
 
-  /ai-sdk-provider-claude-code@3.5.3(@anthropic-ai/sdk@0.105.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7):
+  /ai-sdk-provider-claude-code@3.5.3(@anthropic-ai/sdk@1.7.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7):
     resolution: {integrity: sha512-+uzxoU4X3ldzi14jbNvQ9SIitEmjXUM8wYwBC9xb7nfF0W03OB+EvzGrFMwkiE9mVSkFijXIDFzKBhMQ5zkqcg==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -9943,7 +10174,7 @@ packages:
     dependencies:
       '@ai-sdk/provider': 3.0.10
       '@ai-sdk/provider-utils': 4.0.27(zod@4.6.7)
-      '@anthropic-ai/claude-agent-sdk': 0.3.322(@anthropic-ai/sdk@0.105.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7)
+      '@anthropic-ai/claude-agent-sdk': 0.3.322(@anthropic-ai/sdk@1.7.0)(@modelcontextprotocol/sdk@1.32.2)(zod@4.6.7)
       zod: 4.6.7
     transitivePeerDependencies:
       - '@anthropic-ai/sdk'
@@ -13658,7 +13889,6 @@ packages:
 
   /fast-sha256@1.3.0:
     resolution: {integrity: sha512-n11RGP/lrWEFI/bWdygLxhI+pVeo1ZYIVwvvPkW7azl/rOy+F3HYRZ2K5zeE9mmkhQppyv9sQFx0JM9UabnpPQ==}
-    dev: false
 
   /fast-string-truncated-width@3.0.3:
     resolution: {integrity: sha512-0jjjIEL6+0jag3l2XWWizO64/aZVtpiGE3t0Zgqxv0DPuxiMjvB3M24fCyhZUO4KomJQPj3LTSUnDP3GpdwC0g==}
@@ -14560,6 +14790,12 @@ packages:
     dependencies:
       safer-buffer: 2.1.2
 
+  /icu-minify@4.14.9:
+    resolution: {integrity: sha512-PmO+fNnC3K3mfPKTnm3RrPERrhQZnjm1AlpyZQ0ShbXi8Y/kYZ3YOde8TEjCLz9k3P2DmzkBn8lykGrCAi1Ajw==}
+    dependencies:
+      '@formatjs/icu-messageformat-parser': 3.5.23
+    dev: false
+
   /ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
@@ -14654,6 +14890,13 @@ packages:
   /internmap@2.0.3:
     resolution: {integrity: sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==}
     engines: {node: '>=12'}
+    dev: false
+
+  /intl-messageformat@11.2.15:
+    resolution: {integrity: sha512-W4VNytsXyWgW5lvVchmsb9xgA5rSKqoflu3/IQ9UCtB0z4R+Bx9MoEkwFT/+30RCl/KzUoH0QGGe9lppF5SuvQ==}
+    dependencies:
+      '@formatjs/fast-memoize': 3.1.7
+      '@formatjs/icu-messageformat-parser': 3.5.18
     dev: false
 
   /invariant@2.2.4:
@@ -15735,7 +15978,6 @@ packages:
     dependencies:
       '@babel/runtime': 7.29.7
       ts-algebra: 2.0.0
-    dev: false
 
   /json-schema-traverse@0.4.1:
     resolution: {integrity: sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==}
@@ -17333,6 +17575,37 @@ packages:
     engines: {node: '>= 0.4.0'}
     dev: false
 
+  /next-intl-swc-plugin-extractor@4.14.9:
+    resolution: {integrity: sha512-8jAkmDwQJo6RDavBHm9QRl1YTn2WXf+rI4SVhMaZxZcxopnwZic6fKTXOoNIo3kzC+a6vJySkOkXmHTVFLAYtg==}
+    dev: false
+
+  /next-intl@4.14.9(@types/react@19.2.16)(next@16.4.4)(react@19.2.4):
+    resolution: {integrity: sha512-uauRtUC+TrYNA1OL/QcwL9irndLrI9jK3Wdaa9W0B5AeKh9cqVdNeT0IWgLnhBqBRrVwppVdI0M+C1+JdGPQ3w==}
+    peerDependencies:
+      '@types/react': ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      next: 16.4.4
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@eloqnt/config': 0.1.1
+      '@eloqnt/format-json': 0.1.0
+      '@eloqnt/format-po': 0.1.1
+      '@formatjs/intl-localematcher': 0.8.14
+      '@parcel/watcher': 2.6.0
+      '@swc/core': 1.16.22
+      '@types/react': 19.2.16
+      icu-minify: 4.14.9
+      negotiator: 1.0.0
+      next: 16.4.4(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@types/node@20.19.41)(react-dom@19.2.4)(react@19.2.4)
+      next-intl-swc-plugin-extractor: 4.14.9
+      react: 19.2.4
+      use-intl: 4.14.9(@types/react@19.2.16)(react@19.2.4)
+    transitivePeerDependencies:
+      - '@swc/helpers'
+    dev: false
+
   /next-themes@0.4.6(react-dom@19.2.4)(react@19.2.4):
     resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
     peerDependencies:
@@ -18025,6 +18298,10 @@ packages:
   /pngjs@3.4.0:
     resolution: {integrity: sha512-NCrCHhWmnQklfH4MtJMRjZ2a8c80qXeMlQMv2uVp9ISJMTt562SbGd6n2oq0PaPgKm7Z6pL9E2UlLIhC+SHL3w==}
     engines: {node: '>=4.0.0'}
+
+  /po-parser@2.2.0:
+    resolution: {integrity: sha512-NdTrKgh0oO7+y+RFX8KKhOB438x/j94UGXEFzl/7pHH0JjWSn42iJ9tgmPksIO6n1JKDHmNDcejPJfKspljB9g==}
+    dev: false
 
   /points-on-curve@0.2.0:
     resolution: {integrity: sha512-0mYKnYYe9ZcqMCWhUjItv/oHjvgEsfKvnUTg8sAtnHr3GVy7rGkXCb6d5cSyqrWqL4k81b9CPg3urd+T7aop3A==}
@@ -19996,7 +20273,6 @@ packages:
     dependencies:
       '@stablelib/base64': 1.0.1
       fast-sha256: 1.3.0
-    dev: false
 
   /statuses@1.5.0:
     resolution: {integrity: sha512-OpZ3zP+jT1PI7I8nemJX4AKmAX070ZkYPVWV/AaKTJl+tXCTGyVdC1a4SL8RUQYEwk/f34ZX8UTykN68FwrqAA==}
@@ -20599,7 +20875,6 @@ packages:
 
   /ts-algebra@2.0.0:
     resolution: {integrity: sha512-FPAhNPFMrkwz76P7cdjdmiShwMynZYN6SgOujD1urY4oNm80Ou9oMdmbR45LotcKOXoy7wSmHkRFE6Mxbrhefw==}
-    dev: false
 
   /ts-api-utils@2.5.0(typescript@5.9.3):
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -20999,6 +21274,40 @@ packages:
       '@types/react': 19.2.16
       react: 19.2.4
       tslib: 2.8.1
+    dev: false
+
+  /use-intl@4.14.9(@types/react@19.2.16)(react@19.2.4):
+    resolution: {integrity: sha512-37ktvdCCz+6JY2VFPl/GV69Ds4ahiUT2c2xEZZRZYxdgGLxFsUbdxzjQVRm3YMIOUU0VPs6zvlifb4Yjk4IxIg==}
+    peerDependencies:
+      '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@formatjs/fast-memoize': 3.1.7
+      '@schummar/icu-type-parser': 1.21.5
+      '@types/react': 19.2.16
+      icu-minify: 4.14.9
+      intl-messageformat: 11.2.15
+      react: 19.2.4
+    dev: false
+
+  /use-intl@4.14.9(@types/react@19.2.16)(react@19.3.0):
+    resolution: {integrity: sha512-37ktvdCCz+6JY2VFPl/GV69Ds4ahiUT2c2xEZZRZYxdgGLxFsUbdxzjQVRm3YMIOUU0VPs6zvlifb4Yjk4IxIg==}
+    peerDependencies:
+      '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@formatjs/fast-memoize': 3.1.7
+      '@schummar/icu-type-parser': 1.21.5
+      '@types/react': 19.2.16
+      icu-minify: 4.14.9
+      intl-messageformat: 11.2.15
+      react: 19.3.0
     dev: false
 
   /use-latest-callback@0.2.6(react@19.3.0):

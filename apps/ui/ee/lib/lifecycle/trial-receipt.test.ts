@@ -48,7 +48,7 @@ describe('sendTrialStartedReceipt', () => {
         expect(claimedBeforeSend).toBe(true)
         expect(db.writes('lifecycle_emails')[0].payload).toMatchObject({ user_id: 'owner', workspace_id: 1, sequence_key: 'trial_started', status: 'sent' })
         expect(sendTrialStartedEmail).toHaveBeenCalledWith(
-            { to: 'owner@example.com', unsubscribeUrl: expect.stringMatching(/&category=billing$/) },
+            { to: 'owner@example.com', unsubscribeUrl: expect.stringMatching(/&category=billing$/), locale: 'en' },
             expect.objectContaining({ workspaceName: 'Acme', trialDays: 3, trialEndsLabel: '23 September', includedLabel: '3 coworkers and 350 credits' }),
         )
     })

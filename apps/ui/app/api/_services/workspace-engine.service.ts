@@ -7,6 +7,7 @@ import { buildBaseUrl } from '@/lib/engine/base-url'
 import type { EngineConnection } from '@/lib/engine/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
+import { AppError, failure, type ActionFailure } from '@/lib/i18n/action-error'
 
 // One workspace, one machine. The engine lives in `engine_pool`, claimed by a workspace, and every
 // door onto it opens here: the Boxes drawn on the board are a way to arrange agents, not a way to
@@ -17,9 +18,9 @@ import { selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supaba
 
 const ENGINE_COLUMNS = ['id', 'engine_host', 'engine_api_key', 'provider_server_id'] as const
 
-export class NoEngineError extends Error {
-    constructor(message = 'This workspace has no machine yet') {
-        super(message)
+export class NoEngineError extends AppError {
+    constructor() {
+        super('noMachineYet')
         this.name = 'NoEngineError'
     }
 }
@@ -48,8 +49,6 @@ export async function getWorkspaceConnection(workspaceId: number): Promise<Engin
     return engine.conn
 }
 
-export const WORKSPACE_RESTORING_ERROR = 'Your workspace is being restored. It will be back in a minute or two.'
-
 // Claims the workspace's machine, once. Not called when the workspace row is created: a
 // workspace is minted for every anonymous visitor, and claiming there would drain the pool on bot
 // traffic. It is called the first time the workspace needs a machine to put an agent on.
@@ -57,13 +56,13 @@ export const WORKSPACE_RESTORING_ERROR = 'Your workspace is being restored. It w
 // An archived workspace only ever gets its machine back through the restore (`forRestore`): a box
 // claimed by anything else would come up empty, and the restore would then set aside whatever had
 // been put on it in the meantime.
-export async function ensureWorkspaceEngine(workspaceId: number, { forRestore = false }: { forRestore?: boolean } = {}): Promise<{ ok: true; instanceId: string } | { ok: false; error: string }> {
+export async function ensureWorkspaceEngine(workspaceId: number, { forRestore = false }: { forRestore?: boolean } = {}): Promise<{ ok: true; instanceId: string } | ActionFailure> {
     const existing = await findWorkspaceEngine(workspaceId)
     if (existing) return { ok: true, instanceId: existing.instanceId }
 
     if (!forRestore) {
         const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['boxes_archived_at'] as const, { id: workspaceId })
-        if (workspace?.boxes_archived_at) return { ok: false, error: WORKSPACE_RESTORING_ERROR }
+        if (workspace?.boxes_archived_at) return failure('workspaceRestoring')
     }
 
     await assertEngineEntitlement(workspaceId)

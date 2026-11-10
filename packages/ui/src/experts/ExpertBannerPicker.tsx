@@ -6,6 +6,7 @@ import { cn } from '../cn'
 import { FileDropzone } from '../forms'
 import { ImageIcon } from '../icons'
 import type { ExpertUpload } from './types'
+import { useKitTranslations } from '../locale'
 
 interface ExpertBannerPickerProps {
     options: readonly string[]
@@ -16,6 +17,7 @@ interface ExpertBannerPickerProps {
 }
 
 export function ExpertBannerPicker({ options, value, onChange, onDone, upload }: ExpertBannerPickerProps) {
+    const t = useKitTranslations()
     const [uploading, setUploading] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
@@ -23,7 +25,7 @@ export function ExpertBannerPicker({ options, value, onChange, onDone, upload }:
         const file = files[0]
         if (!file) return
         if (!file.type.startsWith('image/')) {
-            setError('Please choose an image file.')
+            setError(t('experts.images.notAnImage'))
             return
         }
 
@@ -47,7 +49,7 @@ export function ExpertBannerPicker({ options, value, onChange, onDone, upload }:
     return (
         <div className="flex flex-col gap-2">
             <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto pr-0.5">
-                <FileDropzone accept="image/*" onFiles={handleFiles} disabled={uploading} overlayLabel="Drop" className="rounded-md">
+                <FileDropzone accept="image/*" onFiles={handleFiles} disabled={uploading} overlayLabel={t('experts.images.drop')} className="rounded-md">
                     {({ inputId, dragOver }) => (
                         <label
                             htmlFor={inputId}
@@ -58,7 +60,7 @@ export function ExpertBannerPicker({ options, value, onChange, onDone, upload }:
                             )}
                         >
                             <ImageIcon className="size-4" />
-                            <span className="text-[10px] leading-tight">{uploading ? 'Uploading…' : 'Upload'}</span>
+                            <span className="text-[10px] leading-tight">{uploading ? t('experts.images.uploading') : t('experts.images.upload')}</span>
                         </label>
                     )}
                 </FileDropzone>

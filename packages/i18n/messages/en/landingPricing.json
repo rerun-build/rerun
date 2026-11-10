@@ -1,0 +1,208 @@
+{
+    "_context": {
+        "seo.title": "Title of the pricing page in the browser tab and search results, followed by \" | Rerun\".",
+        "billing.discount": "Badge on the yearly billing option: the saving, e.g. \"-20%\".",
+        "price.perMonth": "Suffix right after a price, e.g. \"$29/month\".",
+        "price.perMonthBilledYearly": "Suffix after the monthly price of a yearly plan; the argument \"total\" is the yearly amount, e.g. \"$276\".",
+        "tiers.pro.creditsNote": "Small note next to the monthly included credits: more credits can be bought at any time.",
+        "socialApps.price": "Price of a paid app add-on, e.g. \"+$9/month\".",
+        "addons.items.credit_pack.unit": "How many credits one pack adds per month, e.g. \"+1,000 credits/mo\".",
+        "plan.trialNote": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
+        "faq.items.trial.answer": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
+        "comparison.versus": "Link to the page comparing Rerun with a competitor, e.g. \"Rerun vs Zapier\"."
+    },
+    "seo": {
+        "title": "Pricing",
+        "headline": "One plan. Everything included.",
+        "description": "One Rerun plan from {price} a month: unlimited agents, unlimited seats, your own private machine, every app and unlimited runs. Free {trialDays}-day trial.",
+        "breadcrumbHome": "Home"
+    },
+    "hero": {
+        "eyebrow": "Pricing",
+        "description": "Try Rerun free for {trialDays} days. Then pick how many Coworkers you need, and invite your whole team."
+    },
+    "price": {
+        "perMonth": "/month",
+        "perMonthBilledYearly": "/month, billed {total}/yr"
+    },
+    "billing": {
+        "label": "Billing period",
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "discount": "-{percent}%"
+    },
+    "tiers": {
+        "trial": {
+            "name": "Free trial",
+            "description": "Put your first Coworkers to work and see what they can do.",
+            "control": "A card starts the trial and nothing is charged for {trialDays} days. Cancel before and you pay nothing.",
+            "cta": "Start your {trialDays}-day free trial",
+            "featuresLabel": "Free trial includes",
+            "features": {
+                "agents": "<b>Up to {agents} Coworkers</b> to hand off your first tasks",
+                "seats": "<b>Unlimited seats</b> to try it with your team",
+                "credits": "<b>{credits, plural, one {# credit} other {# credits}} free</b> to try it out",
+                "models": "The same <b>smart models</b> as Pro",
+                "privacy": "Your data stays in a <b>private, secured workspace</b>",
+                "apps": "<b>{connectors}+ apps & MCPs</b> your Coworkers can work in",
+                "byom": "Connect your <b>own AI subscription</b> or API key"
+            }
+        },
+        "pro": {
+            "name": "Pro",
+            "description": "For teams that put Coworkers to work every day.",
+            "cta": "Get started",
+            "featuresLabel": "Everything in Free trial, plus",
+            "features": {
+                "coworkers": "<b>Unlimited Coworkers</b> working for you, side by side",
+                "seats": "<b>Unlimited seats</b>, no per-user fees",
+                "team": "Manage your Coworkers with <b>your whole team</b>",
+                "credits": "<b>{credits, plural, one {# credit} other {# credits}} on us</b>, every month",
+                "models": "<b>Smart models</b> for your hardest tasks",
+                "autopilot": "Put your business on <b>Autopilot</b>"
+            },
+            "creditsNote": "Top up anytime"
+        }
+    },
+    "socialApps": {
+        "label": "Add-ons",
+        "caption": "Full access to your account, just like you.",
+        "lede": "Everything you do by hand, your Coworkers can do.",
+        "details": "What {app} lets your Coworkers do",
+        "add": "Add {app}",
+        "price": "<b>+{price}</b>/month",
+        "can": {
+            "linkedin_slot": {
+                "search": "Search people, read profiles",
+                "invite": "Send and accept invitations",
+                "message": "Message, read every conversation",
+                "post": "Post, comment and react"
+            },
+            "whatsapp_slot": {
+                "send": "Send messages, files, voice notes",
+                "reply": "Read and reply to every chat",
+                "check": "Check numbers on WhatsApp"
+            }
+        }
+    },
+    "enterprise": {
+        "name": "Enterprise",
+        "description": "For large organizations with their own requirements",
+        "features": {
+            "everything": "Everything in Rerun",
+            "infrastructure": "Custom infrastructure",
+            "infrastructureDetail": "Dedicated or self-hosted: your Coworkers run where your organization needs them to run.",
+            "support": "Dedicated support",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "cta": "Contact sales",
+        "ctaNote": "Custom pricing, tailored to your organization"
+    },
+    "plan": {
+        "tagline": "Everything you need to put Coworkers to work",
+        "from": "From",
+        "flexible": "Add Coworkers or credits whenever you need them.",
+        "cta": "Start your free trial",
+        "trialNote": "{trialDays}-day free trial · card required, {free} today",
+        "included": "Included",
+        "alsoIncluded": "Also included",
+        "features": {
+            "coworkers": {
+                "label": "Unlimited Coworkers",
+                "caption": "As many Coworkers as you need, running side by side, each with its own job and tools."
+            },
+            "machine": {
+                "label": "Your own machine",
+                "caption": "A private computer in the cloud where every Coworker of your workspace lives, shares its files and its data. Only yours."
+            },
+            "seats": {
+                "label": "Unlimited seats",
+                "caption": "Your whole team on the same workspace, with no per-seat fee."
+            },
+            "byoAi": {
+                "label": "Bring your own AI",
+                "caption": "Optional: your own key, subscription or local model."
+            },
+            "apps": {
+                "label": "{connectors}+ apps",
+                "caption": "All your tools ready to connect, plus any MCP or API."
+            },
+            "delegate": {
+                "label": "Delegate any task",
+                "caption": "Hand off the busywork. Your Coworkers run it around the clock."
+            },
+            "invite": {
+                "label": "Invite your teammates",
+                "caption": "Share your workspace and build your Coworkers together."
+            }
+        }
+    },
+    "addons": {
+        "label": "Add-ons",
+        "title": "Grow one piece at a time.",
+        "lede": "Add-ons are quantities on the plan you already have, not another tier. Take one when you need it, drop it when you do not.",
+        "items": {
+            "credit_pack": {
+                "title": "Rerun credits",
+                "unit": "+{credits, plural, one {# credit} other {# credits}}/mo",
+                "caption": "More credits for the models we host, on top of the plan."
+            }
+        }
+    },
+    "comparison": {
+        "badge": "Comparison",
+        "title": "Why people switch to Rerun.",
+        "compareWith": "Compare Rerun with",
+        "fullComparison": "Read the full Rerun vs {competitor} comparison",
+        "allComparisons": "All comparisons",
+        "alsoCompared": "Also compared",
+        "versus": "Rerun vs {competitor}"
+    },
+    "faq": {
+        "label": "Pricing FAQ",
+        "title": "Questions about the bill.",
+        "items": {
+            "basePlan": {
+                "question": "What do I get for the base plan?",
+                "answer": "Unlimited Coworkers, your own private machine in the cloud, unlimited seats and {credits, plural, one {# credit} other {# credits}} every month, plus every app, every template and unlimited runs. There is no feature locked behind a higher tier."
+            },
+            "trial": {
+                "question": "Is there a free trial?",
+                "answer": "Yes, {trialDays} days with {agents} coworkers and {trialCredits, plural, one {# credit} other {# credits}}. A card is required, {free} is charged today, and the plan starts on day {trialDays}. You build your first team, watch it work and decide afterwards. Cancel before the trial ends and nothing is charged."
+            },
+            "perTask": {
+                "question": "Do you charge per task or per run?",
+                "answer": "No. Your Coworkers can run every hour of every day for the same flat price, however many you build. Executions are never counted."
+            },
+            "ownAi": {
+                "question": "Can I use my own AI subscription or API keys?",
+                "answer": "Yes. Plug in your Claude or ChatGPT subscription, your own API keys, or a local model, and the models cost you nothing on our side. The included credits are there for when you would rather not."
+            },
+            "whereRun": {
+                "question": "Where do my Coworkers actually run?",
+                "answer": "On your own private computer in the cloud, one per workspace, where your Coworkers live and your data stays. Inside it you arrange them in Boxes, by team, by client or by project, as many as you like."
+            },
+            "addons": {
+                "question": "How do add-ons work?",
+                "answer": "They are quantities on your existing subscription, not another plan. Add credits whenever you need them, and remove them the same way."
+            },
+            "removeAddon": {
+                "question": "What happens when I remove an add-on?",
+                "answer": "You keep what you paid for until the end of the billing period, and the smaller amount applies from the next invoice. Nothing is cut off mid-month."
+            },
+            "cancel": {
+                "question": "Can I cancel anytime?",
+                "answer": "Yes, in one click from your billing settings, with no notice period and nobody to email. Our refund policy spells out the rest."
+            },
+            "taxes": {
+                "question": "Are taxes included in the price?",
+                "answer": "Prices are shown excluding tax. VAT or sales tax, when it applies to your country, is calculated and added at checkout."
+            },
+            "enterprise": {
+                "question": "Do you offer Enterprise pricing?",
+                "answer": "Yes. Dedicated or self-hosted infrastructure, SSO, an SLA and dedicated support, priced for your organization. Talk to us at help@rerun.build."
+            }
+        }
+    }
+}

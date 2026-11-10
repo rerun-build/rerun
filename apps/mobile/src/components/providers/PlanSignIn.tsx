@@ -1,8 +1,9 @@
 import * as Clipboard from 'expo-clipboard'
 import { SymbolView } from 'expo-symbols'
 import * as WebBrowser from 'expo-web-browser'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ActivityIndicator, Pressable, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { TONES } from '@/components/ui/Badge'
@@ -16,22 +17,24 @@ import { ErrorLine, SheetFrame, StepTrack, type TrackStep } from './bits'
 
 // Same constants as apps/ui/components/connections/plan-connect/chatgpt-setup.ts.
 export const CHATGPT_SECURITY_URL = 'https://chatgpt.com/#settings/Security'
+// ChatGPT's own labels, as its English settings show them.
 const SETTING_PATH = ['Settings', 'Security', 'Enable device code authorization for Codex']
-const ADMIN_MESSAGE = `Hi! Could you turn on "Device code authorization for Codex" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Rerun.`
 
 // Adding a plan ends on its name; signing one in again ends on the coworkers starting again.
 export type SignInEnding = { kind: 'name'; name: string; placeholder: string; onName: (name: string) => void; onDone: () => void; saving: boolean; error: string | null } | { kind: 'reconnect' }
 
-function lastStep(ending: SignInEnding, linked: boolean): TrackStep {
-    if (ending.kind === 'reconnect') return { title: 'Your coworkers start again' }
+type EndingTranslator = ReturnType<typeof useTranslations<'mobileProviders.ending'>>
+
+function lastStep(ending: SignInEnding, linked: boolean, t: EndingTranslator): TrackStep {
+    if (ending.kind === 'reconnect') return { title: t('coworkersStart') }
     const canFinish = linked && !ending.saving && ending.name.trim() !== ''
     return {
-        title: 'Name it',
+        title: t('nameIt'),
         body: (
             <View style={{ gap: spacing.sm }}>
-                <TextField id="connection-name" label="Connection name" help="Shown in every coworker's model picker." value={ending.name} onChangeText={ending.onName} placeholder={ending.placeholder} />
+                <TextField id="connection-name" label={t('connectionName')} help={t('nameHelp')} value={ending.name} onChangeText={ending.onName} placeholder={ending.placeholder} />
                 <View style={{ alignSelf: 'flex-start' }}>
-                    <Button label={ending.saving ? 'Saving…' : 'Done'} onPress={ending.onDone} disabled={!canFinish} loading={ending.saving} />
+                    <Button label={ending.saving ? t('saving') : t('done')} onPress={ending.onDone} disabled={!canFinish} loading={ending.saving} />
                 </View>
                 <ErrorLine error={ending.error} />
             </View>
@@ -59,6 +62,8 @@ export function ClaudeSignIn({ phase, error, code, onCode, onOpenClaude, onPaste
     const opened = phase !== 'idle'
     const busy = phase === 'checking'
     const linked = phase === 'connected'
+    const t = useTranslations('mobileProviders.claude')
+    const tEnding = useTranslations('mobileProviders.ending')
     return (
         <SheetFrame title="Claude" onBack={onBack}>
             <StepTrack
@@ -66,27 +71,27 @@ export function ClaudeSignIn({ phase, error, code, onCode, onOpenClaude, onPaste
                 done={linked ? 3 : opened ? 1 : 0}
                 steps={[
                     {
-                        title: 'Approve Rerun on Claude',
+                        title: t('approve'),
                         body: (
                             <View style={{ alignSelf: 'flex-start' }}>
-                                <Button label={opened ? 'Open Claude again' : 'Open Claude'} variant={opened ? 'outline' : 'default'} icon={<ProviderLogo provider="claude" size={16} />} onPress={onOpenClaude} disabled={busy || linked} />
+                                <Button label={opened ? t('openAgain') : t('open')} variant={opened ? 'outline' : 'default'} icon={<ProviderLogo provider="claude" size={16} />} onPress={onOpenClaude} disabled={busy || linked} />
                             </View>
                         ),
                     },
                     {
-                        title: 'Paste the code',
+                        title: t('pasteStep'),
                         body: (
                             <View style={{ gap: spacing.sm }}>
-                                <TextField id="claude-code" label="Code from Claude" value={code} onChangeText={onCode} placeholder={busy ? 'Checking the code…' : 'Code from Claude'} secret />
+                                <TextField id="claude-code" label={t('codeLabel')} value={code} onChangeText={onCode} placeholder={busy ? t('checking') : t('codeLabel')} secret />
                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-                                    <Button label="Paste" symbol="doc.on.clipboard" variant={code.trim() ? 'outline' : 'default'} onPress={onPaste} disabled={busy} />
-                                    {code.trim() !== '' && <Button label="Connect" onPress={onSubmit} loading={busy} />}
+                                    <Button label={t('paste')} symbol="doc.on.clipboard" variant={code.trim() ? 'outline' : 'default'} onPress={onPaste} disabled={busy} />
+                                    {code.trim() !== '' && <Button label={t('connect')} onPress={onSubmit} loading={busy} />}
                                 </View>
                                 <ErrorLine error={error} />
                             </View>
                         ),
                     },
-                    lastStep(ending, linked),
+                    lastStep(ending, linked, tEnding),
                 ]}
             />
         </SheetFrame>
@@ -115,6 +120,8 @@ export function ChatGptSignIn({ phase, pending, expired, stuck, error, onGetCode
     const [workspacePlan, setWorkspacePlan] = useState(false)
     const linked = phase === 'connected'
     const onCode = settingsOpened || phase !== 'idle' || expired || error !== null
+    const t = useTranslations('mobileProviders.chatgpt')
+    const tEnding = useTranslations('mobileProviders.ending')
 
     const openSettings = () => {
         setSettingsOpened(true)
@@ -128,28 +135,28 @@ export function ChatGptSignIn({ phase, pending, expired, stuck, error, onGetCode
                 done={linked ? 3 : onCode ? 1 : 0}
                 steps={[
                     {
-                        title: 'Allow sign-in by code in ChatGPT',
+                        title: t('allowStep'),
                         body: (
                             <View style={{ gap: spacing.md }}>
                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-                                    <Button label="Open ChatGPT settings" symbol="arrow.up.right" onPress={openSettings} />
-                                    <Button label="It's already on" symbol="checkmark" variant="outline" onPress={onGetCode} />
+                                    <Button label={t('openSettings')} symbol="arrow.up.right" onPress={openSettings} />
+                                    <Button label={t('alreadyOn')} symbol="checkmark" variant="outline" onPress={onGetCode} />
                                 </View>
                                 {workspacePlan ? (
                                     <AppText variant="footnote" tone="muted">
-                                        Your ChatGPT admin switches it on for the whole workspace. <CopyAdminMessage />
+                                        {t('adminSwitches')} <CopyAdminMessage />
                                     </AppText>
                                 ) : (
                                     <SettingPath />
                                 )}
                                 <AppText variant="footnote" tone="muted" style={{ textDecorationLine: 'underline' }} onPress={() => setWorkspacePlan(value => !value)}>
-                                    {workspacePlan ? 'I’m on Plus or Pro' : 'On ChatGPT Business or Enterprise?'}
+                                    {workspacePlan ? t('onPlusOrPro') : t('onBusiness')}
                                 </AppText>
                             </View>
                         ),
                     },
-                    { title: 'Enter the code on OpenAI', body: <CodeStep phase={phase} pending={pending} expired={expired} stuck={stuck} error={error} workspacePlan={workspacePlan} onGetCode={onGetCode} onOpenVerification={onOpenVerification} /> },
-                    lastStep(ending, linked),
+                    { title: t('enterStep'), body: <CodeStep phase={phase} pending={pending} expired={expired} stuck={stuck} error={error} workspacePlan={workspacePlan} onGetCode={onGetCode} onOpenVerification={onOpenVerification} /> },
+                    lastStep(ending, linked, tEnding),
                 ]}
             />
         </SheetFrame>
@@ -175,15 +182,16 @@ function SettingPath() {
 }
 
 function CopyAdminMessage() {
+    const t = useTranslations('mobileProviders.chatgpt')
     const [copied, setCopied] = useState(false)
     const copy = () => {
-        Clipboard.setStringAsync(ADMIN_MESSAGE)
+        Clipboard.setStringAsync(t('adminMessage'))
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
     }
     return (
         <AppText variant="footnote" medium onPress={copy} style={{ textDecorationLine: 'underline' }}>
-            {copied ? 'Copied' : 'Copy a message for them'}
+            {copied ? t('copied') : t('copyAdminMessage')}
         </AppText>
     )
 }
@@ -192,6 +200,7 @@ type CodeStepProps = { phase: ChatGptPhase; pending: ChatGptSignInProps['pending
 
 function CodeStep({ phase, pending, expired, stuck, error, workspacePlan, onGetCode, onOpenVerification }: CodeStepProps) {
     const theme = useTheme()
+    const t = useTranslations('mobileProviders.chatgpt')
     const [copied, setCopied] = useState(false)
     if (phase === 'connected') return null
 
@@ -206,14 +215,14 @@ function CodeStep({ phase, pending, expired, stuck, error, workspacePlan, onGetC
         <View style={{ gap: spacing.md }}>
             {pending && !expired ? (
                 <>
-                    <Pressable onPress={copy} accessibilityRole="button" accessibilityLabel="Copy code" testID="codex-code" style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderRadius: radius.md, borderCurve: 'continuous', paddingVertical: spacing.md, paddingLeft: spacing.lg, paddingRight: spacing.md, backgroundColor: pressed ? theme.secondary : theme.muted })}>
+                    <Pressable onPress={copy} accessibilityRole="button" accessibilityLabel={t('copyCode')} testID="codex-code" style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, borderRadius: radius.md, borderCurve: 'continuous', paddingVertical: spacing.md, paddingLeft: spacing.lg, paddingRight: spacing.md, backgroundColor: pressed ? theme.secondary : theme.muted })}>
                         <AppText numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.2} style={{ flex: 1, fontFamily: fonts.mono, fontSize: 22, lineHeight: 28, letterSpacing: 4, color: theme.foreground }}>
                             {pending.userCode}
                         </AppText>
                         <SymbolView name={copied ? 'checkmark' : 'doc.on.doc'} size={17} tintColor={theme.foreground} />
                     </Pressable>
                     <View style={{ alignSelf: 'flex-start' }}>
-                        <Button label="Open OpenAI" icon={<ProviderLogo provider="codex" size={16} color={theme.primaryForeground} />} onPress={() => {
+                        <Button label={t('openOpenAI')} icon={<ProviderLogo provider="codex" size={16} color={theme.primaryForeground} />} onPress={() => {
                                 onOpenVerification?.()
                                 WebBrowser.openBrowserAsync(pending.verificationUrl)
                             }}
@@ -222,13 +231,13 @@ function CodeStep({ phase, pending, expired, stuck, error, workspacePlan, onGetC
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                         <ActivityIndicator size="small" color={theme.mutedForeground} />
                         <AppText variant="footnote" tone="muted" style={{ flex: 1 }}>
-                            Enter it on OpenAI's page and approve. This screen picks it up on its own.
+                            {t('enterHint')}
                         </AppText>
                     </View>
                 </>
             ) : (
                 <View style={{ alignSelf: 'flex-start' }}>
-                    <Button label={phase === 'starting' ? 'Getting code…' : expired ? 'Get a new code' : 'Get code'} icon={<ProviderLogo provider="codex" size={16} color={theme.primaryForeground} />} onPress={onGetCode} loading={phase === 'starting'} />
+                    <Button label={phase === 'starting' ? t('gettingCode') : expired ? t('getNewCode') : t('getCode')} icon={<ProviderLogo provider="codex" size={16} color={theme.primaryForeground} />} onPress={onGetCode} loading={phase === 'starting'} />
                 </View>
             )}
             {stuck ? <StuckHint expired={expired} workspacePlan={workspacePlan} /> : <ErrorLine error={error} />}
@@ -238,23 +247,24 @@ function CodeStep({ phase, pending, expired, stuck, error, workspacePlan, onGetC
 
 function StuckHint({ expired, workspacePlan }: { expired: boolean; workspacePlan: boolean }) {
     const theme = useTheme()
+    const t = useTranslations('mobileProviders.chatgpt.stuck')
+    const settingsLink = (chunks: ReactNode) => (
+        <AppText variant="footnote" medium style={{ textDecorationLine: 'underline' }} onPress={() => WebBrowser.openBrowserAsync(CHATGPT_SECURITY_URL)}>
+            {chunks}
+        </AppText>
+    )
     return (
         <View style={{ flexDirection: 'row', gap: spacing.sm }}>
             <SymbolView name="exclamationmark.triangle" size={14} tintColor={TONES.yellow[theme.scheme]} style={{ marginTop: 2 }} />
             <AppText variant="footnote" tone="muted" style={{ flex: 1 }}>
-                {expired ? 'The code expired. ' : 'Error on OpenAI’s page? '}
                 {workspacePlan ? (
                     <>
-                        Your admin has probably not allowed sign-in by code yet. <CopyAdminMessage />
+                        {expired ? t('expiredAdmin') : t('errorAdmin')} <CopyAdminMessage />
                     </>
+                ) : expired ? (
+                    t.rich('expiredSetting', { link: settingsLink })
                 ) : (
-                    <>
-                        Sign-in by code is probably still off: turn it on in{' '}
-                        <AppText variant="footnote" medium style={{ textDecorationLine: 'underline' }} onPress={() => WebBrowser.openBrowserAsync(CHATGPT_SECURITY_URL)}>
-                            Settings → Security
-                        </AppText>
-                        , then {expired ? 'get a new code' : 'enter the code again'}.
-                    </>
+                    t.rich('errorSetting', { link: settingsLink })
                 )}
             </AppText>
         </View>

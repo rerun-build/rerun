@@ -2,6 +2,7 @@
 
 import { Orb } from '@rerun/ui/foreman'
 import { useFollow } from '@rerun/ui/new-agent'
+import { useTranslations } from 'next-intl'
 import { type ReactNode, type RefObject, useRef } from 'react'
 
 import { Form } from '@/components/ui/form'
@@ -23,15 +24,13 @@ export type NewBoxStill = { name: string; frozen?: boolean; drawnCaret?: boolean
 // Nothing is created here: `onCreate` receives the name, and what it throws is shown under the field.
 export type NewBoxIntro = { heading: string; description: string }
 
-const DEFAULT_INTRO: NewBoxIntro = { heading: 'Name your new Box', description: 'A Box is a name on your board, a place to sort your coworkers by department.' }
-
 export function NewBoxForm({
     suggestions,
     onCreate,
     controls,
     placeholderEffect = DEFAULT_PLACEHOLDER_EFFECT,
     still,
-    intro = DEFAULT_INTRO,
+    intro,
 }: {
     suggestions: string[]
     onCreate: (name: string) => Promise<void>
@@ -40,6 +39,8 @@ export function NewBoxForm({
     still?: NewBoxStill
     intro?: NewBoxIntro
 }) {
+    const t = useTranslations('dialogs.newBox')
+    const { heading, description } = intro ?? { heading: t('heading'), description: t('description') }
     const rootRef = useRef<HTMLFormElement>(null)
     const anchorRef = useRef<HTMLSpanElement>(null)
     const draft = useBoxDraft({ initialName: still?.name ?? '', frozen: Boolean(still?.frozen) })
@@ -52,7 +53,7 @@ export function NewBoxForm({
         try {
             await onCreate(name)
         } catch (error) {
-            draft.form.setError('root', { message: error instanceof Error ? error.message : 'Failed to create the Box' })
+            draft.form.setError('root', { message: error instanceof Error ? error.message : t('failed') })
         }
     })
 
@@ -79,8 +80,8 @@ export function NewBoxForm({
                 {/* The sheet this becomes on a phone drops the safe-area padding of the frame, so the
                     last row carries it. */}
                 <div className="relative z-20 flex w-full max-w-[640px] flex-col items-center pt-[calc(var(--stage)_-_16px)] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pb-0">
-                    <h2 className="text-center font-heading text-2xl font-medium tracking-tight">{intro.heading}</h2>
-                    <p className="mt-1.5 text-center text-sm text-muted-foreground">{intro.description}</p>
+                    <h2 className="text-center font-heading text-2xl font-medium tracking-tight">{heading}</h2>
+                    <p className="mt-1.5 text-center text-sm text-muted-foreground">{description}</p>
                     <BoxComposer draft={draft} suggestions={suggestions} placeholderEffect={still?.frozen ? 'static' : placeholderEffect} controls={controls} creating={isSubmitting} error={errors.root?.message} autoFocus={!still} drawnCaret={Boolean(still?.drawnCaret)} className="mt-6 w-full" />
                 </div>
                 {still?.overlay}

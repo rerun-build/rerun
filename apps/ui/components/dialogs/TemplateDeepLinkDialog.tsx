@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { getSharedTemplateAction } from '@/app/api/_actions/template.actions'
@@ -13,6 +14,7 @@ import { useTemplateFlowStore } from '@/stores/template-flow.store'
 // rien à configurer, une seule décision. C'est exactement la fiche de la library, en une colonne, et
 // c'est son footer partagé qui sait quelle porte le bouton franchit (plan, achat, placement).
 export function TemplateDeepLinkDialog({ slug }: { slug: string }) {
+    const t = useTranslations('dialogs.templateDeepLink')
     const template = useTemplateFlowStore(s => s.linkTemplate)
     const closeLink = useTemplateFlowStore(s => s.closeLink)
     const isAdmin = useIsAdmin()
@@ -25,7 +27,7 @@ export function TemplateDeepLinkDialog({ slug }: { slug: string }) {
         void getSharedTemplateAction(slug).then(found => {
             if (cancelled) return
             if (!found) {
-                toast.error('This template link is no longer available')
+                toast.error(t('unavailable'))
                 useTemplateFlowStore.getState().closeLink()
                 return
             }
@@ -34,7 +36,7 @@ export function TemplateDeepLinkDialog({ slug }: { slug: string }) {
         return () => {
             cancelled = true
         }
-    }, [slug])
+    }, [slug, t])
 
     return (
         <Dialog open onOpenChange={open => !open && closeLink()}>
@@ -43,8 +45,8 @@ export function TemplateDeepLinkDialog({ slug }: { slug: string }) {
                     {/* Le panneau affiche déjà le titre : celui-ci n'existe que pour Radix, qui exige
                         un titre et une description accessibles sur tout contenu de dialog. */}
                     <DialogHeader className="sr-only">
-                        <DialogTitle>{template ? `Install "${template.title}"` : 'Install this template'}</DialogTitle>
-                        <DialogDescription>Review what this template installs, then place its coworkers on your board.</DialogDescription>
+                        <DialogTitle>{template ? t('titleNamed', { title: template.title }) : t('title')}</DialogTitle>
+                        <DialogDescription>{t('description')}</DialogDescription>
                     </DialogHeader>
                     {template ? <TemplateDetailPanel template={template} showStatus={isAdmin || template.isMine} onImported={closeLink} /> : <TemplateDetailSkeleton />}
                 </div>

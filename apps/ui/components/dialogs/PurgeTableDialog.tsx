@@ -10,6 +10,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { useTranslations } from 'next-intl'
 
 type PurgeTableDialogProps = {
     open: boolean
@@ -19,20 +20,19 @@ type PurgeTableDialogProps = {
 }
 
 export function PurgeTableDialog({ open, onOpenChange, onConfirm, table }: PurgeTableDialogProps) {
+    const t = useTranslations('dialogs.purgeTable')
+    const tCommon = useTranslations('common')
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent size="sm">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Purge table &ldquo;{table}&rdquo;?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This deletes every row in the table, including the rows hidden by the current search. The table and its columns stay. This
-                        cannot be undone.
-                    </AlertDialogDescription>
+                    <AlertDialogTitle>{t('title', { table })}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('description')}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
                     <AlertDialogAction variant="destructive" onClick={onConfirm}>
-                        Purge
+                        {t('confirm')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

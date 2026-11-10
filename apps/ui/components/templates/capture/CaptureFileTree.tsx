@@ -1,6 +1,7 @@
 'use client'
 
 import type { AgentArchiveEntry } from '@rerun/contracts'
+import { useLocale, useTranslations } from 'next-intl'
 import * as React from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatBytes } from '@/lib/files/format'
@@ -94,6 +95,8 @@ function TreeRow({
     excluded: string[]
     onToggle: (paths: string[], keep: boolean) => void
 }) {
+    const t = useTranslations('templates.capture.tree')
+    const locale = useLocale()
     const leaves = React.useMemo(() => leavesOf(node), [node])
     const kept = leaves.filter(file => !excluded.includes(file.path))
     const checked = kept.length === leaves.length ? true : kept.length === 0 ? false : 'indeterminate'
@@ -123,7 +126,7 @@ function TreeRow({
                 {node.file ? (
                     <span className="w-3.5 shrink-0" />
                 ) : (
-                    <button type="button" onClick={toggleOpen} className="shrink-0 text-muted-foreground" aria-label={isOpen ? 'Collapse' : 'Expand'}>
+                    <button type="button" onClick={toggleOpen} className="shrink-0 text-muted-foreground" aria-label={isOpen ? t('collapse') : t('expand')}>
                         <ChevronRight className={cn('size-3.5 transition-transform', isOpen && 'rotate-90')} />
                     </button>
                 )}
@@ -134,10 +137,10 @@ function TreeRow({
                 {node.file?.note && !node.file.flagged.length && <span className="shrink-0 text-[0.65rem] text-muted-foreground">{node.file.note}</span>}
                 {flaggedCount > 0 && (
                     <span className="shrink-0 text-[0.65rem] text-destructive">
-                        {node.file ? node.file.flagged.join(', ') : `${flaggedCount} flagged`}
+                        {node.file ? node.file.flagged.join(', ') : t('flagged', { count: flaggedCount })}
                     </span>
                 )}
-                <span className="w-14 shrink-0 text-right text-[0.65rem] text-muted-foreground">{formatBytes(node.bytes)}</span>
+                <span className="w-14 shrink-0 text-right text-[0.65rem] text-muted-foreground">{formatBytes(node.bytes, locale)}</span>
             </div>
 
             {!node.file &&

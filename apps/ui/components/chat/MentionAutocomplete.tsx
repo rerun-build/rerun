@@ -3,6 +3,7 @@
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import type { ComposerMention } from '@/lib/chat/composer-links'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode, type SyntheticEvent } from 'react'
 
 /** `hint` disambiguates two agents sharing a name, e.g. the Box each one lives in. `preferred` opens the list, e.g. the agents that share the Box of the conversation being typed in. */
@@ -107,6 +108,7 @@ type MentionMenuProps = {
 }
 
 function MentionMenu({ trigger, items, highlight, onHover, onPick }: MentionMenuProps) {
+    const t = useTranslations('chat.mentions')
     const listRef = useRef<HTMLUListElement>(null)
 
     // The list scrolls on its own; scrollIntoView would drag the surrounding sheet along, so
@@ -121,7 +123,7 @@ function MentionMenu({ trigger, items, highlight, onHover, onPick }: MentionMenu
 
     return (
         <div className="absolute bottom-full left-0 right-0 z-50 mb-1 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md">
-            <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{trigger === '@' ? 'Coworkers' : 'Skills'}</p>
+            <p className="px-3 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{trigger === '@' ? t('coworkers') : t('skills')}</p>
             <ul ref={listRef} role="listbox" className="relative max-h-56 space-y-0.5 overflow-y-auto p-1">
                 {items.map((item, index) => (
                     <li key={item.kind === 'agent' ? item.id : item.slug}>

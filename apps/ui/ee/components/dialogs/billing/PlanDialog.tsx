@@ -1,7 +1,9 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { useCheckout } from '@stripe/react-stripe-js/checkout'
 import type { StripeExpressCheckoutElementConfirmEvent } from '@stripe/stripe-js'
+import { useLocale, useTranslations } from 'next-intl'
 import { Badge, Stripes, type BadgeTone } from '@rerun/ui/primitives'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -19,7 +21,7 @@ import { Button } from '@/components/ui/button'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { BASE_PLAN_CREDITS, CREDITS_PER_PACK, PLAN_PRICES_CENTS, creditsLabel, formatCredits, planDiscountCents, planPriceCents, type AddonKey, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_CREDITS, CREDITS_PER_PACK, PLAN_PRICES_CENTS, formatCredits, planDiscountCents, planPriceCents, type AddonKey, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
 import { ChevronRightIcon, CoinsIcon, ExternalLinkIcon, MinusIcon, PlusIcon, Receipt } from '@/lib/icons'
 import { useSession } from '@/supabase/session/SessionProvider'
 
@@ -41,8 +43,10 @@ import { usePlanQuote } from './usePlanQuote'
 type Drill = 'overview' | 'card' | 'invoices' | 'credit' | 'usage' | 'business'
 type Success = { title: string; body: string; rows?: { label: string; value: string }[] }
 
-function billed(cents: number, interval: BillingInterval): string {
-    return `${usd(cents)}${interval === 'yearly' ? '/yr' : '/mo'}`
+type BillingTranslator = ReturnType<typeof useTranslations<'billing'>>
+
+function billed(cents: number, interval: BillingInterval, t: BillingTranslator): string {
+    return t(interval === 'yearly' ? 'plan.billed.yearly' : 'plan.billed.monthly', { price: usd(cents) })
 }
 
 // What the plan bills each interval at `quantities`, with the legacy price and the promos it keeps.
@@ -50,11 +54,11 @@ function planBillCents(state: SubscriptionState, quantities: AddonQuantities, in
     return Math.max(0, planPriceCents(quantities, interval, state.priceArm) - planDiscountCents(state, interval))
 }
 
-function statusOf(state: SubscriptionState): { label: string; tone: BadgeTone } {
-    if (state.status === 'past_due') return { label: 'Payment failed', tone: 'red' }
-    if (state.cancelAtPeriodEnd) return { label: state.periodEnd ? `Ends ${shortDate(state.periodEnd)}` : 'Ending', tone: 'orange' }
-    if (state.pendingSwitch) return { label: `Monthly from ${shortDate(state.pendingSwitch.at)}`, tone: 'yellow' }
-    return { label: 'Active', tone: 'green' }
+function statusOf(state: SubscriptionState, locale: string, t: BillingTranslator): { label: string; tone: BadgeTone } {
+    if (state.status === 'past_due') return { label: t('plan.status.paymentFailed'), tone: 'red' }
+    if (state.cancelAtPeriodEnd) return { label: state.periodEnd ? t('plan.status.ends', { date: shortDate(state.periodEnd, locale) }) : t('plan.status.ending'), tone: 'orange' }
+    if (state.pendingSwitch) return { label: t('plan.status.monthlyFrom', { date: shortDate(state.pendingSwitch.at, locale) }), tone: 'yellow' }
+    return { label: t('plan.status.active'), tone: 'green' }
 }
 
 // `appSlots` stands in for the fetched accounts, for the lab only.
@@ -73,6 +77,8 @@ export function PlanDialog({
     onChanged: () => Promise<void>
     appSlots?: Partial<Record<AppSlug, AppSlotsState>>
 }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
     const { refreshWorkspace } = useSession()
     const currentSlots = appSlotsOf(state.quantities)
     const [slots, setSlots] = useState<AppSlots>(currentSlots)
@@ -89,7 +95,7 @@ export function PlanDialog({
     const pastDue = state.status === 'past_due'
     const locked = pastDue || state.cancelAtPeriodEnd || !!success
     const dirty = APP_SLUGS.some(slug => slots[slug] !== currentSlots[slug]) || interval !== state.interval
-    const renewal = state.periodEnd ? shortDate(state.periodEnd) : 'your renewal'
+    const renewal = state.periodEnd ? shortDate(state.periodEnd, locale) : t('plan.yourRenewal')
     const selection: PlanSelection = { quantities: withAppSlots(state.quantities, slots), interval }
     const currentBillCents = planBillCents(state, state.quantities, state.interval)
 
@@ -104,7 +110,7 @@ export function PlanDialog({
         setBillingInterval(state.interval)
     }
 
-    const status = statusOf(state)
+    const status = statusOf(state, locale, t)
     const left = (
         <>
             <div className="flex flex-col items-start gap-3">
@@ -113,7 +119,16 @@ export function PlanDialog({
                 </Badge>
                 <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Rerun Pro</h2>
                 <p className="text-base text-muted-foreground">
-                    Unlimited coworkers · billed {state.interval} · {state.cancelAtPeriodEnd ? 'ends' : 'renews'} {renewal}
+                    {t(
+                        state.interval === 'yearly'
+                            ? state.cancelAtPeriodEnd
+                                ? 'plan.summary.yearlyEnds'
+                                : 'plan.summary.yearlyRenews'
+                            : state.cancelAtPeriodEnd
+                              ? 'plan.summary.monthlyEnds'
+                              : 'plan.summary.monthlyRenews',
+                        { renewal },
+                    )}
                 </p>
             </div>
             <div className="mt-6 flex flex-col gap-3">
@@ -149,9 +164,9 @@ export function PlanDialog({
     )
 
     const right = (() => {
-        if (success) return <SuccessPanel title={success.title} body={success.body} rows={success.rows} cta="Done" onDone={onClose} />
-        if (pastDue) return <PastDuePane state={state} onDone={() => void done({ title: 'Payment received', body: 'Your card is updated and Pro is active again.' })} />
-        if (state.cancelAtPeriodEnd) return <CancelPendingPane state={state} currentBillCents={currentBillCents} onResumed={() => void done({ title: 'Pro is back on', body: `Your plan renews on ${renewal}.` })} />
+        if (success) return <SuccessPanel title={success.title} body={success.body} rows={success.rows} cta={t('plan.success.done')} onDone={onClose} />
+        if (pastDue) return <PastDuePane state={state} onDone={() => void done({ title: t('plan.success.paymentReceivedTitle'), body: t('plan.success.paymentReceivedBody') })} />
+        if (state.cancelAtPeriodEnd) return <CancelPendingPane state={state} currentBillCents={currentBillCents} onResumed={() => void done({ title: t('plan.success.backOnTitle'), body: t('plan.success.backOnBody', { date: renewal }) })} />
         if (dirty) return <ChangePane state={state} currentBillCents={currentBillCents} selection={selection} onReset={reset} onDone={next => void done(next)} />
 
         return (
@@ -161,7 +176,7 @@ export function PlanDialog({
                         onBack={() => setDrill('overview')}
                         onSaved={async () => {
                             await onChanged()
-                            toast.success('Card updated')
+                            toast.success(t('plan.cardUpdated'))
                             setDrill('overview')
                         }}
                     />
@@ -211,59 +226,69 @@ function OverviewPane({
     onCancel: () => void
     onChanged: () => Promise<void>
 }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
+    const errorText = useErrorText()
     const [keeping, setKeeping] = useState(false)
 
     const keepYearly = async () => {
         setKeeping(true)
         const result = await cancelPendingSwitchAction()
         setKeeping(false)
-        if (!result.ok) return toast.error('Could not keep your yearly plan', { description: result.error })
+        if (!result.ok) return toast.error(t('plan.overview.keepYearlyFailed'), { description: errorText(result) })
         await onChanged()
     }
 
     const rows = [
-        { label: 'Next invoice', value: state.nextInvoice ? `${shortDate(state.nextInvoice.at)} · ${usd(state.nextInvoice.amountCents)}` : '-' },
-        { label: 'Billed', value: `${state.interval === 'yearly' ? 'Yearly' : 'Monthly'}, tax included`, muted: true },
-        ...(state.pendingSwitch ? [{ label: 'From ' + shortDate(state.pendingSwitch.at), value: `Monthly · ${billed(planPriceCents(state.pendingSwitch.selection.quantities, 'monthly', state.priceArm), 'monthly')}` }] : []),
+        { label: t('plan.nextInvoice'), value: state.nextInvoice ? `${shortDate(state.nextInvoice.at, locale)} · ${usd(state.nextInvoice.amountCents)}` : '-' },
+        { label: t('plan.overview.billed'), value: state.interval === 'yearly' ? t('plan.overview.billedYearly') : t('plan.overview.billedMonthly'), muted: true },
+        ...(state.pendingSwitch
+            ? [
+                  {
+                      label: t('plan.overview.from', { date: shortDate(state.pendingSwitch.at, locale) }),
+                      value: t('plan.overview.monthlyPrice', { price: billed(planPriceCents(state.pendingSwitch.selection.quantities, 'monthly', state.priceArm), 'monthly', t) }),
+                  },
+              ]
+            : []),
     ]
 
     return (
         <>
             <Stripes fade="bottom" className="opacity-50" />
             <div className="relative flex flex-1 flex-col">
-                <RightTitle>Billing</RightTitle>
+                <RightTitle>{t('plan.overview.title')}</RightTitle>
                 <div className="mt-6 flex flex-col gap-3">
                     <SummaryRows rows={rows} />
-                    <CardOnFile card={state.card} action="Update" onAction={onCard} />
+                    <CardOnFile card={state.card} action={t('plan.overview.update')} onAction={onCard} />
                     <button type="button" onClick={onInvoices} className="flex items-center justify-between rounded-xl bg-background/60 px-4 py-3 text-sm ring-1 ring-border hover:bg-background">
                         <span className="flex items-center gap-3">
                             <Receipt className="size-4 text-muted-foreground" />
-                            Invoices
+                            {t('plan.overview.invoices')}
                         </span>
-                        <span className="text-muted-foreground underline underline-offset-4">View all</span>
+                        <span className="text-muted-foreground underline underline-offset-4">{t('plan.overview.viewAll')}</span>
                     </button>
                     <BusinessDetailsRow business={state.business} onOpen={onBusiness} />
                     <button type="button" onClick={onUsage} className="flex items-center justify-between rounded-xl bg-background/60 px-4 py-3 text-sm ring-1 ring-border hover:bg-background">
                         <span className="flex items-center gap-3">
                             <CoinsIcon className="size-4 text-muted-foreground" />
-                            Credit usage
+                            {t('plan.overview.creditUsage')}
                         </span>
                         <span className="flex items-center gap-1 text-muted-foreground">
-                            {creditLeftMicros != null && <span className="tabular-nums">{formatCredits(creditLeftMicros)} left</span>}
+                            {creditLeftMicros != null && <span className="tabular-nums">{t('plan.overview.creditsLeft', { credits: formatCredits(creditLeftMicros, locale) })}</span>}
                             <ChevronRightIcon className="size-4" />
                         </span>
                     </button>
                     {state.pendingSwitch && (
                         <Button variant="outline" onClick={() => void keepYearly()} disabled={keeping}>
-                            Keep my yearly plan
+                            {t('plan.overview.keepYearly')}
                         </Button>
                     )}
                 </div>
                 <div className="mt-auto flex flex-col gap-3 pt-6">
-                    <p className="text-center text-xs text-muted-foreground">Switch the billing to see the new price.</p>
+                    <p className="text-center text-xs text-muted-foreground">{t('plan.overview.switchHint')}</p>
                     {state.cancelPhase && (
                         <button type="button" onClick={onCancel} className="text-center text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground">
-                            Cancel plan
+                            {t('plan.overview.cancelPlan')}
                         </button>
                     )}
                 </div>
@@ -286,18 +311,21 @@ function ChangePane({
     onReset: () => void
     onDone: (success: Success) => void
 }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
+    const errorText = useErrorText()
     const [accepted, setAccepted] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
     const slots = appSlotsOf(selection.quantities)
     const currentSlots = appSlotsOf(state.quantities)
-    const planLabel = (slotCounts: AppSlots) => `Unlimited coworkers${appSlotsLabel(slotCounts)}`
+    const planLabel = (slotCounts: AppSlots) => t('plan.change.planLabel', { slots: appSlotsLabel(slotCounts, t) })
     const changedApps = APP_SLUGS.filter(slug => slots[slug] !== currentSlots[slug])
     const interval = selection.interval
     const newBillCents = planBillCents(state, selection.quantities, interval)
-    const newBill = billed(newBillCents, interval)
-    const renewal = state.periodEnd ? shortDate(state.periodEnd) : 'your renewal'
+    const newBill = billed(newBillCents, interval, t)
+    const renewal = state.periodEnd ? shortDate(state.periodEnd, locale) : t('plan.yourRenewal')
     const switchingDown = state.interval === 'yearly' && interval === 'monthly'
     const switchingUp = state.interval === 'monthly' && interval === 'yearly'
     const increase = APP_SLUGS.some(slug => slots[slug] > currentSlots[slug])
@@ -310,38 +338,42 @@ function ChangePane({
         setError(null)
         const result = await runPlanChange(selection)
         setSubmitting(false)
-        if (!result.ok) return setError(result.error)
-        if (result.switchAt) return onDone({ title: 'Switch scheduled', body: `Your yearly plan runs to its end. Monthly billing starts on ${shortDate(result.switchAt)}.` })
-        if (!chargesToday) return onDone({ title: 'Change scheduled', body: `You keep ${planLabel(currentSlots)} until ${renewal}, then ${planLabel(slots)} at ${newBill}.` })
-        onDone({ title: 'Plan updated', body: `${planLabel(slots)}, billed ${interval}. Your receipt is on its way by email.` })
+        if (!result.ok) return setError(errorText(result))
+        if (result.switchAt) return onDone({ title: t('plan.change.switchScheduledTitle'), body: t('plan.change.switchScheduledBody', { date: shortDate(result.switchAt, locale) }) })
+        if (!chargesToday) return onDone({ title: t('plan.change.changeScheduledTitle'), body: t('plan.change.changeScheduledBody', { current: planLabel(currentSlots), renewal, next: planLabel(slots), price: newBill }) })
+        onDone({ title: t('plan.change.planUpdatedTitle'), body: t(interval === 'yearly' ? 'plan.change.planUpdatedBodyYearly' : 'plan.change.planUpdatedBodyMonthly', { plan: planLabel(slots) }) })
     }
 
     const newBillFlow = <BilledFlow cents={newBillCents} interval={interval} />
     const onlySlots = !switchingUp && !switchingDown
-    const title = switchingDown ? (
-        'Switch to monthly'
-    ) : onlySlots && changedApps.length === 1 ? (
-        <>
-            Change to <CountFlow value={slots[changedApps[0]]} /> {appInfo(changedApps[0]).providerLabel} slot{slots[changedApps[0]] === 1 ? '' : 's'}
-        </>
-    ) : onlySlots ? (
-        'Change your app slots'
-    ) : (
-        'Switch to yearly'
-    )
+    const title = switchingDown
+        ? t('plan.change.switchToMonthly')
+        : onlySlots && changedApps.length === 1
+          ? t.rich('plan.change.changeToSlots', { count: slots[changedApps[0]], provider: appInfo(changedApps[0]).providerLabel, n: () => <CountFlow value={slots[changedApps[0]]} /> })
+          : onlySlots
+            ? t('plan.change.changeAppSlots')
+            : t('plan.change.switchToYearly')
     const quoteValue = (cents: number | undefined) => (quote === 'loading' ? <Skeleton className="inline-block h-4 w-14" /> : cents == null ? '-' : usd(cents))
 
     const rows = chargesToday
         ? [
-              { label: `Pro · ${planLabel(slots)}, ${interval}`, value: newBillFlow },
-              ...(switchingUp ? [{ label: `Unused time on your ${state.interval} plan`, value: quote && quote !== 'loading' ? `-${usd(quote.unusedCreditCents)}` : quoteValue(undefined), muted: true }] : []),
-              { label: 'Due today, tax included', value: quoteValue(quote && quote !== 'loading' ? quote.dueTodayCents : undefined), strong: true },
-              ...(switchingDown ? [{ label: 'From ' + renewal, value: <>Monthly · {newBillFlow}</>, muted: true }] : []),
+              { label: t(interval === 'yearly' ? 'plan.change.proLineYearly' : 'plan.change.proLineMonthly', { plan: planLabel(slots) }), value: newBillFlow },
+              ...(switchingUp
+                  ? [
+                        {
+                            label: t(state.interval === 'yearly' ? 'plan.change.unusedTimeYearly' : 'plan.change.unusedTimeMonthly'),
+                            value: quote && quote !== 'loading' ? `-${usd(quote.unusedCreditCents)}` : quoteValue(undefined),
+                            muted: true,
+                        },
+                    ]
+                  : []),
+              { label: t('plan.change.dueTodayTaxIncluded'), value: quoteValue(quote && quote !== 'loading' ? quote.dueTodayCents : undefined), strong: true },
+              ...(switchingDown ? [{ label: t('plan.change.from', { date: renewal }), value: t.rich('plan.change.monthlyFrom', { price: () => newBillFlow }), muted: true }] : []),
           ]
         : [
-              { label: 'Until ' + renewal, value: `${planLabel(currentSlots)} · ${billed(currentBillCents, state.interval)}` },
+              { label: t('plan.change.until', { date: renewal }), value: `${planLabel(currentSlots)} · ${billed(currentBillCents, state.interval, t)}` },
               {
-                  label: 'From ' + renewal,
+                  label: t('plan.change.from', { date: renewal }),
                   value: (
                       <>
                           {planLabel(slots)} · {newBillFlow}
@@ -353,7 +385,7 @@ function ChangePane({
 
     return (
         <>
-            <RightTitle onBack={onReset} backLabel="Keep my plan">
+            <RightTitle onBack={onReset} backLabel={t('plan.change.keepMyPlan')}>
                 {title}
             </RightTitle>
             <div className="mt-6 flex flex-col gap-3">
@@ -361,12 +393,20 @@ function ChangePane({
                 {chargesToday && <CardOnFile card={state.card} />}
             </div>
             <PayFooter
-                cta={chargesToday ? 'Confirm and pay' : switchingDown ? `Switch on ${renewal}` : `Schedule for ${renewal}`}
-                footnote={chargesToday ? (switchingDown ? `Billed now for the new slots. Monthly billing starts on ${renewal}.` : onlySlots ? 'The new slots are ready as soon as the payment goes through.' : 'Your yearly plan starts as soon as the payment goes through.') : 'Nothing is charged today.'}
+                cta={chargesToday ? t('plan.change.confirmAndPay') : switchingDown ? t('plan.change.switchOn', { date: renewal }) : t('plan.change.scheduleFor', { date: renewal })}
+                footnote={
+                    chargesToday
+                        ? switchingDown
+                            ? t('plan.change.billedNowSlots', { date: renewal })
+                            : onlySlots
+                              ? t('plan.change.slotsReady')
+                              : t('plan.change.yearlyStarts')
+                        : t('plan.change.nothingToday')
+                }
                 onClick={() => void apply()}
                 loading={submitting}
                 disabled={(chargesToday && (!accepted || quote === 'loading'))}
-                disabledReason={!accepted ? 'Accept the terms first' : undefined}
+                disabledReason={!accepted ? t('plan.acceptTerms') : undefined}
                 error={error}
             >
                 {chargesToday && <TermsConsent checked={accepted} onChange={setAccepted} />}
@@ -376,25 +416,28 @@ function ChangePane({
 }
 
 function CancelPendingPane({ state, currentBillCents, onResumed }: { state: SubscriptionState; currentBillCents: number; onResumed: () => void }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
+    const errorText = useErrorText()
     const [resuming, setResuming] = useState(false)
-    const ends = state.periodEnd ? shortDate(state.periodEnd) : 'the end of your period'
+    const ends = state.periodEnd ? shortDate(state.periodEnd, locale) : t('plan.cancelPending.endOfPeriod')
 
     const resume = async () => {
         setResuming(true)
         const result = await resumeSubscriptionAction()
         setResuming(false)
-        if (!result.ok) return toast.error('Could not resume your plan', { description: result.error })
+        if (!result.ok) return toast.error(t('plan.cancelPending.resumeFailed'), { description: errorText(result) })
         onResumed()
     }
 
     return (
         <>
-            <RightTitle>Pro ends on {ends}</RightTitle>
+            <RightTitle>{t('plan.cancelPending.title', { date: ends })}</RightTitle>
             <div className="mt-6 flex flex-col gap-3">
-                <p className="text-sm text-muted-foreground">Your coworkers keep running until then. After that the workspace pauses and its data is saved for 90 days.</p>
-                <SummaryRows rows={[{ label: 'Next invoice', value: 'None', muted: true }]} />
+                <p className="text-sm text-muted-foreground">{t('plan.cancelPending.body')}</p>
+                <SummaryRows rows={[{ label: t('plan.nextInvoice'), value: t('plan.cancelPending.none'), muted: true }]} />
             </div>
-            <PayFooter cta="Resume Pro" footnote={`Resuming keeps your plan and bills ${billed(currentBillCents, state.interval)} on ${ends}.`} onClick={() => void resume()} loading={resuming} />
+            <PayFooter cta={t('plan.cancelPending.resume')} footnote={t('plan.cancelPending.footnote', { price: billed(currentBillCents, state.interval, t), date: ends })} onClick={() => void resume()} loading={resuming} />
         </>
     )
 }
@@ -403,20 +446,23 @@ function CancelPendingPane({ state, currentBillCents, onResumed }: { state: Subs
 
 function useSetupSession(): { clientSecret: string; sessionId: string } | { error: string } | null {
     const [session, setSession] = useState<{ clientSecret: string; sessionId: string } | { error: string } | null>(null)
+    const errorText = useErrorText()
     useEffect(() => {
         let cancelled = false
         createPlanCardSetupAction().then(result => {
             if (cancelled) return
-            setSession(result.ok ? { clientSecret: result.clientSecret, sessionId: result.sessionId } : { error: result.error })
+            setSession(result.ok ? { clientSecret: result.clientSecret, sessionId: result.sessionId } : { error: errorText(result) })
         })
         return () => {
             cancelled = true
         }
-    }, [])
+    }, [errorText])
     return session
 }
 
 function SetupForm({ sessionId, cta, footnote, onSaved }: { sessionId: string; cta: string; footnote?: string; onSaved: () => void }) {
+    const t = useTranslations('billing')
+    const errorText = useErrorText()
     const checkout = useCheckout()
     const loaded = checkout.type === 'success' ? checkout.checkout : null
     const [submitting, setSubmitting] = useState(false)
@@ -430,10 +476,10 @@ function SetupForm({ sessionId, cta, footnote, onSaved }: { sessionId: string; c
             const result = await loaded.confirm({ redirect: 'if_required', expressCheckoutConfirmEvent })
             if (result.type === 'error') throw new Error(result.error.message)
             const saved = await confirmCardSetupAction(sessionId)
-            if (!saved.ok) throw new Error(saved.error)
+            if (!saved.ok) throw new Error(errorText(saved))
             onSaved()
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Your card could not be saved')
+            setError(err instanceof Error ? err.message : t('plan.card.notSaved'))
         } finally {
             setSubmitting(false)
         }
@@ -442,7 +488,7 @@ function SetupForm({ sessionId, cta, footnote, onSaved }: { sessionId: string; c
     return (
         <>
             <div className="mt-6">
-                <StripePaymentFields wallet={{ onConfirm: event => void save(event), disabledReason: submitting ? 'Please wait' : undefined }} />
+                <StripePaymentFields wallet={{ onConfirm: event => void save(event), disabledReason: submitting ? t('plan.pleaseWait') : undefined }} />
             </div>
             <PayFooter cta={cta} footnote={footnote} onClick={() => void save()} loading={submitting} disabled={!loaded} error={error} />
         </>
@@ -457,39 +503,49 @@ function SetupSessionPane({ children }: { children: (sessionId: string) => React
 }
 
 function CardPane({ onBack, onSaved }: { onBack: () => void; onSaved: () => void }) {
+    const t = useTranslations('billing.plan.card')
     return (
         <>
-            <RightTitle onBack={onBack}>Update your card</RightTitle>
-            <SetupSessionPane>{sessionId => <SetupForm sessionId={sessionId} cta="Save card" footnote="Your next invoices are charged to this card." onSaved={onSaved} />}</SetupSessionPane>
+            <RightTitle onBack={onBack}>{t('title')}</RightTitle>
+            <SetupSessionPane>{sessionId => <SetupForm sessionId={sessionId} cta={t('save')} footnote={t('footnote')} onSaved={onSaved} />}</SetupSessionPane>
         </>
     )
 }
 
 function PastDuePane({ state, onDone }: { state: SubscriptionState; onDone: () => void }) {
+    const locale = useLocale()
+    const t = useTranslations('billing.plan')
     const { access } = useWorkspaceAccess()
     const due = state.openInvoice ? usd(state.openInvoice.amountCents) : null
     return (
         <>
-            <RightTitle>Update your card</RightTitle>
+            <RightTitle>{t('card.title')}</RightTitle>
             <div className="mt-6">
                 <Notice tone="danger">
-                    {due ? `Your ${due} payment${state.openInvoice ? ` on ${shortDate(state.openInvoice.createdAt)}` : ''} was declined.` : 'Your last payment was declined.'}{' '}
-                    {access === 'paused' ? 'Your workspace is paused and comes back as soon as it goes through.' : 'Pay it now to keep your workspace running.'}
+                    {due
+                        ? state.openInvoice
+                            ? t('pastDue.declinedOn', { amount: due, date: shortDate(state.openInvoice.createdAt, locale) })
+                            : t('pastDue.declined', { amount: due })
+                        : t('pastDue.lastDeclined')}{' '}
+                    {access === 'paused' ? t('pastDue.paused') : t('pastDue.keepRunning')}
                 </Notice>
             </div>
-            <SetupSessionPane>{sessionId => <SetupForm sessionId={sessionId} cta={due ? `Update card and pay ${due}` : 'Update card and pay'} onSaved={onDone} />}</SetupSessionPane>
+            <SetupSessionPane>{sessionId => <SetupForm sessionId={sessionId} cta={due ? t('pastDue.ctaAmount', { amount: due }) : t('pastDue.cta')} onSaved={onDone} />}</SetupSessionPane>
         </>
     )
 }
 
 function InvoicesPane({ onBack }: { onBack: () => void }) {
+    const locale = useLocale()
+    const t = useTranslations('billing.plan.invoices')
+    const errorText = useErrorText()
     const [invoices, setInvoices] = useState<InvoiceSummary[] | null>(null)
 
     useEffect(() => {
         let cancelled = false
         listInvoicesAction().then(result => {
             if (cancelled) return
-            if (!result.ok) toast.error('Could not load your invoices', { description: result.error })
+            if (!result.ok) toast.error(t('loadFailed'), { description: errorText(result) })
             setInvoices(result.ok ? result.invoices : [])
         })
         return () => {
@@ -499,7 +555,7 @@ function InvoicesPane({ onBack }: { onBack: () => void }) {
 
     return (
         <>
-            <RightTitle onBack={onBack}>Invoices</RightTitle>
+            <RightTitle onBack={onBack}>{t('title')}</RightTitle>
             <div className="mt-6 flex flex-col divide-y divide-border rounded-xl bg-background/60 ring-1 ring-border">
                 {invoices === null
                     ? Array.from({ length: 4 }, (_, index) => (
@@ -509,7 +565,7 @@ function InvoicesPane({ onBack }: { onBack: () => void }) {
                           </div>
                       ))
                     : invoices.length === 0
-                      ? <p className="px-4 py-6 text-center text-sm text-muted-foreground">No invoice yet.</p>
+                      ? <p className="px-4 py-6 text-center text-sm text-muted-foreground">{t('empty')}</p>
                       : invoices.map(invoice => (
                             <a
                                 key={invoice.id}
@@ -518,9 +574,9 @@ function InvoicesPane({ onBack }: { onBack: () => void }) {
                                 rel="noreferrer"
                                 className="flex items-center justify-between gap-4 px-4 py-3 text-sm hover:bg-background"
                             >
-                                <span>{longDate(invoice.createdAt)}</span>
+                                <span>{longDate(invoice.createdAt, locale)}</span>
                                 <span className="flex items-center gap-3">
-                                    {invoice.status !== 'paid' && <span className="text-xs text-muted-foreground capitalize">{invoice.status}</span>}
+                                    {invoice.status !== 'paid' && <span className="text-xs text-muted-foreground capitalize">{invoiceStatusLabel(invoice.status, t)}</span>}
                                     <span className="tabular-nums">{usd(invoice.amountCents)}</span>
                                     <ExternalLinkIcon className="size-3.5 text-muted-foreground" />
                                 </span>
@@ -531,8 +587,17 @@ function InvoicesPane({ onBack }: { onBack: () => void }) {
     )
 }
 
+const INVOICE_STATUSES = ['draft', 'open', 'uncollectible', 'void'] as const
+
+function invoiceStatusLabel(status: string, t: ReturnType<typeof useTranslations<'billing.plan.invoices'>>): string {
+    const known = INVOICE_STATUSES.find(candidate => candidate === status)
+    return known ? t(`status.${known}`) : status
+}
+
 // Rerun credit is a monthly quantity on the plan: each pack adds its credit every month.
 function CreditPane({ state, onBack, onDone }: { state: SubscriptionState; onBack: () => void; onDone: (success: Success) => void }) {
+    const t = useTranslations('billing')
+    const errorText = useErrorText()
     const current = state.quantities.credit_pack
     const [packs, setPacks] = useState(current + 1)
     const [accepted, setAccepted] = useState(false)
@@ -548,32 +613,30 @@ function CreditPane({ state, onBack, onDone }: { state: SubscriptionState; onBac
         setError(null)
         const result = await runPlanChange(selection)
         setSubmitting(false)
-        if (!result.ok) return setError(result.error)
+        if (!result.ok) return setError(errorText(result))
         onDone({
-            title: increase ? 'Credits added' : 'Change scheduled',
-            body: increase ? `You now get ${creditsLabel(BASE_PLAN_CREDITS + packs * CREDITS_PER_PACK)} every month. Your coworkers pick up where they stopped.` : 'Your credits stay as they are until your renewal.',
+            title: increase ? t('plan.credit.addedTitle') : t('plan.change.changeScheduledTitle'),
+            body: increase ? t('plan.credit.addedBody', { count: BASE_PLAN_CREDITS + packs * CREDITS_PER_PACK }) : t('plan.credit.unchangedBody'),
         })
     }
 
     return (
         <>
-            <RightTitle onBack={onBack}>Add Rerun credits</RightTitle>
+            <RightTitle onBack={onBack}>{t('plan.credit.title')}</RightTitle>
             <p className="mt-2 text-sm text-muted-foreground">
-                Each pack adds {creditsLabel(CREDITS_PER_PACK)} every month, for {billed(packPrice, state.interval)}.
+                {t('plan.credit.eachPack', { count: CREDITS_PER_PACK, price: billed(packPrice, state.interval, t) })}
             </p>
             <div className="mt-6 flex flex-col gap-3">
                 <div className="flex items-center justify-between rounded-xl bg-background/60 px-4 py-3 ring-1 ring-border">
                     <div>
-                        <p className="text-sm font-medium">
-                            {packs} {packs === 1 ? 'pack' : 'packs'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">+{creditsLabel(packs * CREDITS_PER_PACK)} a month</p>
+                        <p className="text-sm font-medium">{t('plan.credit.packs', { count: packs })}</p>
+                        <p className="text-xs text-muted-foreground">{t('plan.credit.perMonth', { count: packs * CREDITS_PER_PACK })}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon-sm" aria-label="One pack less" onClick={() => setPacks(value => Math.max(0, value - 1))} disabled={packs === 0}>
+                        <Button variant="outline" size="icon-sm" aria-label={t('plan.credit.lessAria')} onClick={() => setPacks(value => Math.max(0, value - 1))} disabled={packs === 0}>
                             <MinusIcon />
                         </Button>
-                        <Button variant="outline" size="icon-sm" aria-label="One pack more" onClick={() => setPacks(value => value + 1)}>
+                        <Button variant="outline" size="icon-sm" aria-label={t('plan.credit.moreAria')} onClick={() => setPacks(value => value + 1)}>
                             <PlusIcon />
                         </Button>
                     </div>
@@ -581,20 +644,20 @@ function CreditPane({ state, onBack, onDone }: { state: SubscriptionState; onBac
                 {increase && (
                     <SummaryRows
                         rows={[
-                            { label: 'Due today, tax included', value: quote === 'loading' ? <Skeleton className="inline-block h-4 w-14" /> : quote ? usd(quote.dueTodayCents) : '-', strong: true },
-                            { label: 'Then', value: billed(planBillCents(state, selection.quantities, state.interval), state.interval), muted: true },
+                            { label: t('plan.change.dueTodayTaxIncluded'), value: quote === 'loading' ? <Skeleton className="inline-block h-4 w-14" /> : quote ? usd(quote.dueTodayCents) : '-', strong: true },
+                            { label: t('plan.credit.then'), value: billed(planBillCents(state, selection.quantities, state.interval), state.interval, t), muted: true },
                         ]}
                     />
                 )}
                 <CardOnFile card={state.card} />
             </div>
             <PayFooter
-                cta={increase ? 'Add credits' : packs === current ? 'Pick a number of packs' : 'Remove at renewal'}
-                footnote={increase ? 'Charged now, prorated to your renewal.' : 'Nothing is charged today.'}
+                cta={increase ? t('plan.credit.add') : packs === current ? t('plan.credit.pickPacks') : t('plan.credit.removeAtRenewal')}
+                footnote={increase ? t('plan.credit.chargedNow') : t('plan.change.nothingToday')}
                 onClick={() => void apply()}
                 loading={submitting}
                 disabled={packs === current || (increase && (!accepted || quote === 'loading'))}
-                disabledReason={increase && !accepted ? 'Accept the terms first' : undefined}
+                disabledReason={increase && !accepted ? t('plan.acceptTerms') : undefined}
                 error={error}
             >
                 {increase && <TermsConsent checked={accepted} onChange={setAccepted} />}

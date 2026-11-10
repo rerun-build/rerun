@@ -158,8 +158,11 @@ export function newestFirst(templates: LibraryTemplate[]): LibraryTemplate[] {
     return [...templates].sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
 }
 
-const CREATOR_KIND_LABELS: Record<LibraryCreator['kind'], string> = { studio: 'Studio', freelancer: 'Freelancer', expert: 'Expert' }
+const CREATOR_KINDS: readonly LibraryCreator['kind'][] = ['studio', 'freelancer', 'expert']
 
-export function creatorKindLabel(kind: LibraryCreator['kind']): string {
-    return CREATOR_KIND_LABELS[kind] ?? CREATOR_KIND_LABELS.expert
+// The `templates.creatorKind` catalog.
+export type CreatorKindCopy = (key: LibraryCreator['kind']) => string
+
+export function creatorKindLabel(kind: LibraryCreator['kind'], t: CreatorKindCopy): string {
+    return t(CREATOR_KINDS.includes(kind) ? kind : 'expert')
 }

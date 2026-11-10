@@ -10,16 +10,18 @@ jest.mock('expo-router', () => ({ router: { back: jest.fn(), push: jest.fn(), re
 jest.mock('react-native-safe-area-context', () => jest.requireActual('react-native-safe-area-context/jest/mock').default)
 jest.mock('react-native-svg', () => ({ __esModule: true, default: () => null, Path: () => null }))
 
+const ADMIN_ONLY_TEXT = 'Only an admin can change the AI providers.'
+
 const listHandlers = () => ({ onClose: jest.fn(), onOpen: jest.fn(), onAdd: jest.fn(), onAddKind: jest.fn(), onChangeDefault: jest.fn() })
 
 describe('AI providers for a member', () => {
     it('opens every source to read and greys the default and every add', async () => {
         const handlers = listHandlers()
         await render(<ProvidersList view={AI_CONNECTIONS_FULL} readOnlyReason={AI_PROVIDERS_ADMIN_ONLY} {...handlers} />)
-        expect(screen.getByText(AI_PROVIDERS_ADMIN_ONLY)).toBeTruthy()
+        expect(screen.getByText(ADMIN_ONLY_TEXT)).toBeTruthy()
         await fireEvent.press(screen.getByTestId('provider-default'))
         expect(handlers.onChangeDefault).not.toHaveBeenCalled()
-        await fireEvent.press(screen.getByTestId('add-row-Add API key'))
+        await fireEvent.press(screen.getByTestId('add-row-key'))
         expect(handlers.onAddKind).not.toHaveBeenCalled()
         await fireEvent.press(screen.getByTestId('provider-cnx-openrouter'))
         expect(handlers.onOpen).toHaveBeenCalledWith('cnx-openrouter')
@@ -35,8 +37,8 @@ describe('AI providers for a member', () => {
     it('keeps everything open to an admin', async () => {
         const handlers = listHandlers()
         await render(<ProvidersList view={AI_CONNECTIONS_FULL} {...handlers} />)
-        expect(screen.queryByText(AI_PROVIDERS_ADMIN_ONLY)).toBeNull()
-        await fireEvent.press(screen.getByTestId('add-row-Add API key'))
+        expect(screen.queryByText(ADMIN_ONLY_TEXT)).toBeNull()
+        await fireEvent.press(screen.getByTestId('add-row-key'))
         expect(handlers.onAddKind).toHaveBeenCalledWith('key')
     })
 
@@ -45,7 +47,7 @@ describe('AI providers for a member', () => {
         const onRemove = jest.fn()
         const onRename = jest.fn()
         await render(<ConnectionDetail connection={connection} view={AI_CONNECTIONS_FULL} error={null} onBack={() => {}} onRename={onRename} onModels={() => {}} onBaseUrl={() => {}} onExtraModels={() => {}} onSignInAgain={() => {}} replacement={{ key: '', onKey: () => {}, busy: false, error: null, onSave: () => {} }} onRemove={onRemove} readOnlyReason={AI_PROVIDERS_ADMIN_ONLY} />)
-        expect(screen.getByText(AI_PROVIDERS_ADMIN_ONLY)).toBeTruthy()
+        expect(screen.getByText(ADMIN_ONLY_TEXT)).toBeTruthy()
         await fireEvent.press(screen.getByText(`Remove ${connection.name}`))
         expect(onRemove).not.toHaveBeenCalled()
         await fireEvent.press(screen.getByLabelText('Name'))

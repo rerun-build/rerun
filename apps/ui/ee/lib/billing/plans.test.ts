@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
+    BASE_PLAN_SLUG,
     MICROS_PER_USD,
     baseLimitsToColumns,
     basePriceCents,
+    isLifetimePlan,
     isModelAccess,
     parsePriceArm,
     perMonthCents,
@@ -93,6 +95,15 @@ describe('isModelAccess', () => {
         expect(isModelAccess('pro')).toBe(false)
         expect(isModelAccess('')).toBe(false)
         expect(isModelAccess(null)).toBe(false)
+    })
+})
+
+describe('isLifetimePlan', () => {
+    it('is true only for a workspace on the lifetime plan', () => {
+        expect(isLifetimePlan({ plan: 'lifetime' })).toBe(true)
+        expect(isLifetimePlan({ plan: BASE_PLAN_SLUG })).toBe(false)
+        expect(isLifetimePlan({ plan: null })).toBe(false)
+        expect(isLifetimePlan(null)).toBe(false)
     })
 })
 

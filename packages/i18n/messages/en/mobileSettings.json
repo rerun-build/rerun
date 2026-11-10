@@ -1,0 +1,118 @@
+{
+    "preferences": {
+        "title": "Preferences",
+        "close": "Close",
+        "yourAccount": "Your account",
+        "workspace": "Workspace",
+        "aiProviders": "AI providers",
+        "appearance": "Appearance",
+        "appearanceSystem": "System",
+        "appearanceLight": "Light",
+        "appearanceDark": "Dark",
+        "coworkers": "Coworkers",
+        "groupRecent": "Recent",
+        "groupByBox": "By box",
+        "language": "Language",
+        "notifications": "Notifications",
+        "pushOff": "Push off",
+        "support": "Support",
+        "contactSupport": "Contact support",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "about": "About",
+        "version": "Version",
+        "environment": "Environment",
+        "signOut": "Sign out",
+        "deleteAccount": "Delete account",
+        "server": "Server"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "saveFailed": "Could not save",
+        "tryAgainShortly": "Try again in a moment.",
+        "loadFailed": "Could not load your settings. Try again in a moment.",
+        "push": {
+            "label": "Push notifications",
+            "off": "Off",
+            "turnOn": "Turn on",
+            "openIosSettings": "Open iOS Settings",
+            "footnote": "Nothing below reaches this iPhone until push is on."
+        },
+        "scopeTitle": "Notify me about",
+        "recommended": "Recommended",
+        "scopes": {
+            "everything": {
+                "label": "Everything",
+                "detail": "Every run in the workspace, whoever started it."
+            },
+            "mine": {
+                "label": "My runs and what I follow",
+                "detail": "Runs I start, conversations I am in, coworkers I follow."
+            },
+            "needed": {
+                "label": "Only when I am needed",
+                "detail": "Questions, approvals and errors in my runs. A finished run stays quiet."
+            },
+            "nothing": {
+                "label": "Nothing",
+                "detail": "I check the inbox myself."
+            }
+        },
+        "email": {
+            "label": "Email",
+            "footnote": "When it needs you while you are away. One email per incident, never one per run."
+        },
+        "perCoworker": {
+            "title": "Per coworker",
+            "add": "Add coworker",
+            "pickTitle": "Every run of this coworker reaches you",
+            "cancel": "Cancel",
+            "empty": "Every coworker follows the rule above.",
+            "detail": "Also set from each coworker's details.",
+            "rowLabel": "{name}, {value}",
+            "followsTasks": "Follows tasks",
+            "yourSetting": "Your setting"
+        },
+        "accountEmails": {
+            "title": "Account emails",
+            "billing": "Trial & billing",
+            "product": "Product updates"
+        },
+        "modes": {
+            "default": {
+                "label": "Default",
+                "hint": "Follows your setting."
+            },
+            "everything": {
+                "label": "All activity",
+                "hint": "Every run, whoever started it."
+            },
+            "muted": {
+                "label": "Muted",
+                "hint": "Nothing. The board still shows it."
+            }
+        },
+        "coworker": {
+            "title": "Notify me about {name}",
+            "yourSetting": "Your setting",
+            "quotedScope": "“{scope}”",
+            "follow": "Follow its scheduled tasks",
+            "nothingScheduled": "Nothing scheduled yet.",
+            "scheduled": "{count} scheduled, they reach you like your own runs.",
+            "reachYou": "They reach you like your own runs.",
+            "tasksTitle": "Scheduled tasks",
+            "tasksFailed": "Could not load its tasks. Try again in a moment.",
+            "taskSwitch": "Notify me about {name}",
+            "muted": "{name} is muted."
+        }
+    },
+    "_context": {
+        "preferences.language": "Settings row that opens the iOS settings of the app, where its language is chosen. Its value is the current language in its own words.",
+        "preferences.pushOff": "Value of the Notifications row when push notifications are turned off in iOS.",
+        "notifications.perCoworker.followsTasks": "Value of a coworker's row: it keeps the global setting but also follows the coworker's scheduled tasks.",
+        "notifications.coworker.quotedScope": "Hint under the 'Your setting' option: the label of the global setting, quoted.",
+        "notifications.coworker.scheduled": "{count} is the number of scheduled tasks of the coworker.",
+        "preferences.server": "Settings row showing the self-hosted Rerun server the app is connected to.",
+        "preferences.groupByBox": "Option of the Coworkers picker: the Home lists the coworkers grouped by Box."
+    }
+}

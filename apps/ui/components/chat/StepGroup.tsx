@@ -4,6 +4,7 @@ import { TextShimmer } from '@rerun/ui'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { ScrollFade } from '@rerun/ui/primitives'
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 import type { ToolIconProps } from '@/hooks/useToolDisplay'
@@ -70,11 +71,12 @@ function Activity({ label }: { label: string }) {
  * beside a pill with every tool used so far. The pill opens on the full list of steps.
  */
 export function StepGroup({ items, agentId }: { items: StepGroupItem[]; agentId?: string }) {
+    const t = useTranslations('chat.steps')
     const [open, setOpen] = useState(false)
     const running = items.find(item => item.status === 'running')
     const live = !!running
     const failed = items.filter(item => item.status === 'error').length
-    const count = `${items.length} ${items.length > 1 ? 'steps' : 'step'}`
+    const count = t('count', { count: items.length })
 
     return (
         <div className="flex w-full flex-col">
@@ -84,13 +86,13 @@ export function StepGroup({ items, agentId }: { items: StepGroupItem[]; agentId?
                 <button
                     type="button"
                     aria-expanded={open}
-                    aria-label={failed > 0 ? `${count}, ${failed} failed` : count}
+                    aria-label={failed > 0 ? t('countWithFailures', { count: items.length, failed }) : count}
                     onClick={() => setOpen(!open)}
                     className="flex h-7 shrink-0 items-center gap-1.5 rounded-full border border-border bg-muted/40 pr-2 pl-1 transition-colors hover:bg-muted/70"
                 >
                     <ToolStack items={items} />
                     <span className="tabular-nums">{live ? items.length : count}</span>
-                    {failed > 0 && <span className="text-red-500">{failed} failed</span>}
+                    {failed > 0 && <span className="text-red-500">{t('failed', { failed })}</span>}
                     <ChevronRightIcon className={cn('size-3 shrink-0 transition-transform', open && 'rotate-90')} />
                 </button>
             </div>

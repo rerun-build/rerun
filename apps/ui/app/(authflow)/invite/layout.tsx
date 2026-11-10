@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { AuthIsoBackground } from '@/components/auth/AuthIsoBackground'
+import { getTranslations } from 'next-intl/server'
 
-export const metadata: Metadata = {
-    title: 'Workspace invitation',
-    description: 'Accept your invitation to collaborate on Rerun.',
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('auth.invite')
+    return { title: t('metaTitle'), description: t('metaDescription') }
 }
 
 export default function InviteLayout({ children }: { children: React.ReactNode }) {

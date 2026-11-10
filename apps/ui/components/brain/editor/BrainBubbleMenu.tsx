@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { TextSelection } from '@tiptap/pm/state'
 import { useEditorState, type Editor } from '@tiptap/react'
 import { BubbleMenu } from '@tiptap/react/menus'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 function MenuButton({ icon: Glyph, label, active, onClick }: { icon: LucideIcon; label: string; active?: boolean; onClick: () => void }) {
@@ -26,6 +27,7 @@ const normalizeUrl = (value: string) => (/^[a-z][a-z0-9+.-]*:/i.test(value) ? va
 
 // Formatting on the selection, the way Notion shows it: nothing on screen until text is selected.
 export function BrainBubbleMenu({ editor }: { editor: Editor }) {
+    const t = useTranslations('brain.editor.bubble')
     const [linkDraft, setLinkDraft] = useState<string | null>(null)
     const active = useEditorState({
         editor,
@@ -74,15 +76,15 @@ export function BrainBubbleMenu({ editor }: { editor: Editor }) {
                             setLinkDraft(null)
                             editor.commands.focus()
                         }}
-                        placeholder="Paste a link"
-                        aria-label="Link URL"
+                        placeholder={t('pasteLink')}
+                        aria-label={t('linkUrl')}
                         className="h-7 w-56 rounded-md bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
                     />
-                    <MenuButton icon={CheckIcon} label="Apply link" onClick={applyLink} />
+                    <MenuButton icon={CheckIcon} label={t('applyLink')} onClick={applyLink} />
                     {active.link && (
                         <MenuButton
                             icon={Link2OffIcon}
-                            label="Remove link"
+                            label={t('removeLink')}
                             onClick={() => {
                                 editor.chain().focus().extendMarkRange('link').unsetLink().run()
                                 setLinkDraft(null)
@@ -92,15 +94,15 @@ export function BrainBubbleMenu({ editor }: { editor: Editor }) {
                 </form>
             ) : (
                 <>
-                    <MenuButton icon={Heading2} label="Turn into heading" active={active.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} />
-                    <MenuButton icon={Heading3} label="Turn into subheading" active={active.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} />
+                    <MenuButton icon={Heading2} label={t('heading')} active={active.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} />
+                    <MenuButton icon={Heading3} label={t('subheading')} active={active.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} />
                     <span className="mx-0.5 h-4 w-px bg-border" />
-                    <MenuButton icon={Bold} label="Bold" active={active.bold} onClick={() => editor.chain().focus().toggleBold().run()} />
-                    <MenuButton icon={Italic} label="Italic" active={active.italic} onClick={() => editor.chain().focus().toggleItalic().run()} />
-                    <MenuButton icon={Strikethrough} label="Strikethrough" active={active.strike} onClick={() => editor.chain().focus().toggleStrike().run()} />
-                    <MenuButton icon={CodeIcon} label="Inline code" active={active.code} onClick={() => editor.chain().focus().toggleCode().run()} />
+                    <MenuButton icon={Bold} label={t('bold')} active={active.bold} onClick={() => editor.chain().focus().toggleBold().run()} />
+                    <MenuButton icon={Italic} label={t('italic')} active={active.italic} onClick={() => editor.chain().focus().toggleItalic().run()} />
+                    <MenuButton icon={Strikethrough} label={t('strikethrough')} active={active.strike} onClick={() => editor.chain().focus().toggleStrike().run()} />
+                    <MenuButton icon={CodeIcon} label={t('inlineCode')} active={active.code} onClick={() => editor.chain().focus().toggleCode().run()} />
                     <span className="mx-0.5 h-4 w-px bg-border" />
-                    <MenuButton icon={LinkIcon} label="Link" active={active.link} onClick={() => setLinkDraft((editor.getAttributes('link').href as string | undefined) ?? '')} />
+                    <MenuButton icon={LinkIcon} label={t('link')} active={active.link} onClick={() => setLinkDraft((editor.getAttributes('link').href as string | undefined) ?? '')} />
                 </>
             )}
         </BubbleMenu>

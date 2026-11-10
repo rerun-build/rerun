@@ -5,6 +5,7 @@ import { deleteAgent, renameAgent } from '@/app/api/_services/agent.service'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { patchNotificationPrefs, readNotificationPrefs } from '@/app/api/_services/notification-prefs.service'
 import { listFiles, listSchedules, listSkillSummaries, listTriggers, updateSchedule, updateTrigger } from '@/lib/engine/client'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { coworkerRuleOf } from '@/lib/notifications/prefs'
 import { humanCron } from '@/lib/schedules/cron'
 import type { CoworkerFile, CoworkerFiles, CoworkerNotifications, CoworkerNotifyMode, RenameCoworkerInput, RoutineKind, RoutinesView, SkillSummariesView } from '@rerun/contracts'
@@ -23,7 +24,7 @@ export async function deleteCoworker(ctx: WorkspaceContext, agentId: string): Pr
 
 export async function listCoworkerRoutines(ctx: WorkspaceContext, agentId: string): Promise<RoutinesView> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actorFromContext(ctx))
-    const [schedules, triggers] = await Promise.all([listSchedules(conn, engineAgentId), listTriggers(conn, engineAgentId)])
+    const [schedules, triggers, locale] = await Promise.all([listSchedules(conn, engineAgentId), listTriggers(conn, engineAgentId), recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id)])
     return {
         routines: [
             ...schedules.map(schedule => ({
@@ -31,7 +32,7 @@ export async function listCoworkerRoutines(ctx: WorkspaceContext, agentId: strin
                 slug: schedule.slug,
                 name: schedule.name,
                 enabled: schedule.enabled,
-                cronLabel: schedule.cron ? (humanCron(schedule.cron) ?? schedule.cron) : null,
+                cronLabel: schedule.cron ? (humanCron(schedule.cron, locale) ?? schedule.cron) : null,
                 runAt: schedule.runAt,
                 timezone: schedule.timezone,
             })),

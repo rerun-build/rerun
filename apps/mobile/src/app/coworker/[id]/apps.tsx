@@ -2,6 +2,7 @@ import type { InstalledServiceView } from '@rerun/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { fetchInstalledServices } from '@/api/coworker'
 import { manageLock } from '@/auth/access'
@@ -16,6 +17,7 @@ const keyOf = (app: InstalledServiceView) => app.key ?? app.slug
 export default function CoworkerAppsScreen() {
     const { id: agentId, name = '' } = useLocalSearchParams<{ id: string; name?: string }>()
     const { session, me } = useAuth()
+    const t = useTranslations('mobileCoworker.apps')
     const [apps, setApps] = useState<InstalledServiceView[] | null>(() => (me ? (readCoworkerDetails(me.workspace.id, agentId).apps ?? null) : null))
     const [failed, setFailed] = useState(false)
     const [connectingKey, setConnectingKey] = useState<string | null>(null)
@@ -41,7 +43,7 @@ export default function CoworkerAppsScreen() {
         setConnectingKey(keyOf(app))
         const outcome = await runConnect({ accessToken, workspaceId }, agentId, keyOf(app))
         setConnectingKey(null)
-        if (outcome.status === 'error') Alert.alert(`Could not connect ${app.name}`, outcome.message)
+        if (outcome.status === 'error') Alert.alert(t('connectFailed', { name: app.name }), outcome.message)
         if (outcome.status === 'connected') load()
     }
 

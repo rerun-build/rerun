@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface TrialStartedProps {
@@ -21,6 +23,7 @@ export interface TrialStartedProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function TrialStarted({
@@ -34,51 +37,43 @@ export default function TrialStarted({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: TrialStartedProps) {
-  const workspace = workspaceName ?? "your workspace";
+  const t = emailTranslator(locale);
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
-      preview={`Your ${trialDays}-day Rerun trial is active`}
+      preview={t("trialStarted.preview", { trialDays })}
       hero={{ scene: "trial-started", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Your trial is active</Heading>
+      <Heading style={text.heading}>{t("trialStarted.heading")}</Heading>
       <Text style={text.paragraph}>
-        <strong>{workspace}</strong> is on a {trialDays}-day free trial. Your
-        coworkers run, your schedules fire, and nothing is charged today.
+        {t.rich("trialStarted.body", { workspace, trialDays, strong })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Workspace", value: workspace },
-            { label: "Included", value: includedLabel },
-            { label: "Trial ends", value: trialEndsLabel },
-            { label: "Then", value: `${monthlyPriceLabel}/month` },
+            { label: t("common.meta.workspace"), value: workspace },
+            { label: t("common.meta.included"), value: includedLabel },
+            { label: t("common.meta.trialEnds"), value: trialEndsLabel },
+            { label: t("common.meta.then"), value: t("trialStarted.perMonth", { price: monthlyPriceLabel }) },
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={workspaceUrl}>Open workspace</Button>
+        <Button href={workspaceUrl}>{t("trialStarted.button")}</Button>
       </Section>
-      {hasCard ? (
-        <Text style={text.footnote}>
-          Your plan starts on its own on {trialEndsLabel}: {monthlyPriceLabel} is
-          charged to the card you added, then every month. Not planning to
-          continue? Cancel before {trialEndsLabel} from Billing, in your
-          workspace menu, and nothing is charged.
-        </Text>
-      ) : (
-        <Text style={text.footnote}>
-          No card needed for the trial. To keep going after {trialEndsLabel},
-          add one from Billing, in your workspace menu, and your plan starts at{" "}
-          {monthlyPriceLabel}/month. Without one, your coworkers stop and
-          nothing is charged.
-        </Text>
-      )}
+      <Text style={text.footnote}>
+        {hasCard
+          ? t("trialStarted.footnoteCard", { date: trialEndsLabel, price: monthlyPriceLabel })
+          : t("trialStarted.footnoteNoCard", { date: trialEndsLabel, price: monthlyPriceLabel })}
+      </Text>
     </Layout>
   );
 }

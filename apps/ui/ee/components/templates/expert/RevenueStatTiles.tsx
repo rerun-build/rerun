@@ -2,29 +2,31 @@
 
 import { formatAmount } from '@rerun/contracts'
 import { Stripes } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import type { CreatorRevenue } from '@/ee/services/creator-revenue.service'
 import { cn } from '@/lib/utils'
 
 export function RevenueStatTiles({ revenue }: { revenue: CreatorRevenue }) {
+    const t = useTranslations('templates.revenue')
     const { totals, currency } = revenue
 
     return (
         <div className="flex flex-col gap-3">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Tile label="Sales" value={String(totals.salesCount)} stripes />
-                <Tile label="Gross" value={formatAmount(totals.grossCents, currency)} />
-                <Tile label="Rerun fee" value={formatAmount(totals.feeCents, currency)} />
-                <Tile label="You earned" value={formatAmount(totals.netCents, currency)} />
+                <Tile label={t('sales')} value={String(totals.salesCount)} stripes />
+                <Tile label={t('gross')} value={formatAmount(totals.grossCents, currency)} />
+                <Tile label={t('fee')} value={formatAmount(totals.feeCents, currency)} />
+                <Tile label={t('youEarned')} value={formatAmount(totals.netCents, currency)} />
             </div>
 
             {revenue.balance && (
                 <div className="flex flex-col gap-2.5 rounded-lg border border-border/60 bg-muted/30 p-3">
-                    <BalanceRow label="Pending payout" value={formatAmount(revenue.balance.pendingCents, currency)} />
-                    <BalanceRow label="Available now" value={formatAmount(revenue.balance.availableCents, currency)} />
+                    <BalanceRow label={t('pending')} value={formatAmount(revenue.balance.pendingCents, currency)} />
+                    <BalanceRow label={t('available')} value={formatAmount(revenue.balance.availableCents, currency)} />
                     {revenue.activeSubscriptions > 0 && (
                         <BalanceRow
-                            label={`${revenue.activeSubscriptions} active subscription${revenue.activeSubscriptions > 1 ? 's' : ''}`}
-                            value={`${formatAmount(revenue.mrrCents, currency)}/mo`}
+                            label={t('subscriptions', { count: revenue.activeSubscriptions })}
+                            value={t('perMonth', { amount: formatAmount(revenue.mrrCents, currency) })}
                         />
                     )}
                 </div>

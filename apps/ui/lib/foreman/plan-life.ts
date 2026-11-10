@@ -15,10 +15,11 @@ const REST_MS = 2800
 
 // A model that left the day out still wrote what sets the agent off, which is enough to play one.
 // With neither, a template or a card from an older transcript, there is no day to play.
-export function planLifeScript(item: Pick<PlanItem, 'beats' | 'when'>): PlanBeats | null {
+// `lines` are the two the screen writes itself, in the reader's language.
+export function planLifeScript(item: Pick<PlanItem, 'beats' | 'when'>, lines: Pick<PlanBeats, 'working' | 'delivered'> = { working: 'Working on it', delivered: 'Handed over to you' }): PlanBeats | null {
     if (item.beats) return item.beats
     const trigger = item.when.trim()
-    return trigger ? { trigger, working: 'Working on it', delivered: 'Handed over to you' } : null
+    return trigger ? { trigger, ...lines } : null
 }
 
 export function planLifeBeats({ trigger, working, delivered }: PlanBeats): PlanLifeBeat[] {

@@ -1,7 +1,9 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { LastUsedBadge } from '@/components/auth/LastUsedBadge'
 import { PhoneSendError } from '@/components/auth/phone-send'
+import { CaptchaError } from '@/components/auth/captcha/captcha-error'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
@@ -15,7 +17,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { StepTransition } from '@rerun/ui/steps'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import type { CountryCode } from 'libphonenumber-js/min'
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -32,19 +35,25 @@ const NUDGE_AFTER_MS = 30_000
 
 const CHANNEL_NAMES: Record<VerificationChannel, string> = { sms: 'SMS', whatsapp: 'WhatsApp' }
 
-const phoneSchema = z.object({ phone: z.string().trim().min(1, 'Enter your phone number') })
-const codeSchema = z.object({ code: z.string().length(VERIFICATION_CODE_LENGTH, `Enter the ${VERIFICATION_CODE_LENGTH}-digit code`) })
+type PhoneTranslator = ReturnType<typeof useTranslations<'auth.phone'>>
+
+const phoneSchemaFor = (t: PhoneTranslator) => z.object({ phone: z.string().trim().min(1, t('errors.phoneRequired')) })
+const codeSchemaFor = (t: PhoneTranslator) => z.object({ code: z.string().length(VERIFICATION_CODE_LENGTH, t('errors.codeLength', { length: VERIFICATION_CODE_LENGTH })) })
 
 const FALLBACK_COUNTRY = countryFromLocale(undefined)
 const neverChanges = () => () => {}
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : 'Something went wrong. Please try again.')
+const errorMessage = (error: unknown, t: PhoneTranslator, tCaptcha: ReturnType<typeof useTranslations<'auth.captcha'>>, errorText: ReturnType<typeof useErrorText>) => {
+    if (error instanceof CaptchaError) return tCaptcha(error.inAppBrowser ? 'failedInApp' : 'failed')
+    if (error instanceof PhoneSendError) return errorText(error.refusal)
+    return error instanceof Error ? error.message : t('errors.generic')
+}
 
 const retryAfterMs = (error: unknown) => (error instanceof PhoneSendError && error.retryAfterSeconds ? error.retryAfterSeconds * 1000 : null)
 
 const secondsLeft = (until: number, now: number) => Math.max(0, Math.ceil((until - now) / 1000))
 
-const formatWait = (seconds: number) => (seconds < 60 ? `${seconds}s` : `${Math.ceil(seconds / 60)} min`)
+const formatWait = (seconds: number, t: PhoneTranslator) => (seconds < 60 ? t('wait.seconds', { count: seconds }) : t('wait.minutes', { count: Math.ceil(seconds / 60) }))
 
 function WhatsAppIcon() {
     return (
@@ -79,6 +88,11 @@ export function PhoneCodeForm({
     // This number was the way in last time on this browser, badged beside the field's title.
     phoneLastUsed?: boolean
 }) {
+    const t = useTranslations('auth.phone')
+    const tCaptcha = useTranslations('auth.captcha')
+    const errorText = useErrorText()
+    const phoneSchema = useMemo(() => phoneSchemaFor(t), [t])
+    const codeSchema = useMemo(() => codeSchemaFor(t), [t])
     const [step, setStep] = useState<PhoneCodeStep>(initialSent ? 'code' : 'phone')
     // The server has no idea where the visitor is, so the guess only joins in on the client.
     const localeCountry = useSyncExternalStore(
@@ -158,7 +172,7 @@ export function PhoneCodeForm({
     const submitPhone = (channel: VerificationChannel) =>
         phoneForm.handleSubmit(async ({ phone }) => {
             if (!toE164(phone, country)) {
-                phoneForm.setError('phone', { message: 'Enter a valid mobile number.' })
+                phoneForm.setError('phone', { message: t('errors.invalidNumber') })
                 return
             }
             try {
@@ -170,7 +184,7 @@ export function PhoneCodeForm({
                     setRetryAt(Date.now() + wait)
                     setNow(Date.now())
                 }
-                phoneForm.setError('phone', { message: errorMessage(error) })
+                phoneForm.setError('phone', { message: errorMessage(error, t, tCaptcha, errorText) })
             }
         })()
 
@@ -180,7 +194,7 @@ export function PhoneCodeForm({
             await verifyCode(code, sent)
             if (persistKey) clearSentCode(persistKey)
         } catch (error) {
-            codeForm.setError('code', { message: errorMessage(error) })
+            codeForm.setError('code', { message: errorMessage(error, t, tCaptcha, errorText) })
         }
     })
 
@@ -194,11 +208,11 @@ export function PhoneCodeForm({
         const switching = channel !== sent.channel
         try {
             const went = await deliver({ ...sent, channel })
-            toast.success(`We sent a new code by ${CHANNEL_NAMES[went]}`)
+            toast.success(t('code.resent', { channel: CHANNEL_NAMES[went] }))
         } catch (error) {
             const wait = retryAfterMs(error)
             if (wait) (switching ? setSwitchAt : setResendAt)(Date.now() + wait)
-            toast.error(errorMessage(error))
+            toast.error(errorMessage(error, t, tCaptcha, errorText))
         }
     }
 
@@ -210,7 +224,8 @@ export function PhoneCodeForm({
     const otherChannel: VerificationChannel = sentChannel === 'sms' ? 'whatsapp' : 'sms'
     const sentTo = sent ? (toE164(sent.phone, sent.country) ?? sent.phone) : ''
     const canSwitch = !!sent && reachableChannels(countryOfE164(sentTo), 'verify').includes(otherChannel)
-    const waitLabel = (seconds: number) => (seconds > 0 ? ` (${formatWait(seconds)})` : '')
+    const sendByLabel = (channel: VerificationChannel) =>
+        retryIn > 0 ? t('sendByWait', { channel: CHANNEL_NAMES[channel], wait: formatWait(retryIn, t) }) : t('sendBy', { channel: CHANNEL_NAMES[channel] })
 
     return (
         <StepTransition stepKey={step} direction={step === 'code' ? 1 : -1}>
@@ -233,7 +248,7 @@ export function PhoneCodeForm({
                                     <FormItem>
                                         <FormControl>
                                             <PhoneNumberInput
-                                                label="Phone number"
+                                                label={t('label')}
                                                 labelTrailing={phoneLastUsed && <LastUsedBadge />}
                                                 autoFocus
                                                 country={country}
@@ -253,7 +268,7 @@ export function PhoneCodeForm({
                                 )}
                             />
                             {channels.length === 0 ? (
-                                <p className="text-sm text-muted-foreground text-balance">We can&apos;t send codes to this country yet.</p>
+                                <p className="text-sm text-muted-foreground text-balance">{t('unsupportedCountry')}</p>
                             ) : (
                                 <div className="space-y-2">
                                     {channels.includes('whatsapp') && (
@@ -265,7 +280,7 @@ export function PhoneCodeForm({
                                             onClick={() => submitPhone('whatsapp')}
                                         >
                                             <WhatsAppIcon />
-                                            Send by WhatsApp{waitLabel(retryIn)}
+                                            {sendByLabel('whatsapp')}
                                         </Button>
                                     )}
                                     {channels.includes('sms') && (
@@ -277,13 +292,13 @@ export function PhoneCodeForm({
                                             disabled={sending !== null || retryIn > 0}
                                             onClick={() => submitPhone('sms')}
                                         >
-                                            Send by SMS{waitLabel(retryIn)}
+                                            {sendByLabel('sms')}
                                         </Button>
                                     )}
                                 </div>
                             )}
                             <p className="text-center text-xs text-muted-foreground text-balance">
-                                By continuing, you agree to be contacted by Rerun on WhatsApp or SMS.
+                                {t('consent')}
                             </p>
                         </form>
                     </Form>
@@ -293,7 +308,12 @@ export function PhoneCodeForm({
                 <Form {...codeForm}>
                     <form onSubmit={submitCode} className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                            We sent a {VERIFICATION_CODE_LENGTH}-digit code to <span className="font-medium text-foreground">{sentTo}</span> by {CHANNEL_NAMES[sentChannel]}.
+                            {t.rich('code.sent', {
+                                length: VERIFICATION_CODE_LENGTH,
+                                phone: sentTo,
+                                channel: CHANNEL_NAMES[sentChannel],
+                                number: chunks => <span className="font-medium text-foreground">{chunks}</span>,
+                            })}
                         </p>
                         <FormField
                             control={codeForm.control}
@@ -322,38 +342,38 @@ export function PhoneCodeForm({
                             )}
                         />
                         <Button type="submit" className="w-full" loading={codeForm.formState.isSubmitting}>
-                            Continue
+                            {t('code.submit')}
                         </Button>
                         {nudged && canSwitch && (
                             <Button type="button" variant="outline" className="w-full" loading={sending === otherChannel} disabled={sending !== null || switchIn > 0} onClick={() => resend(otherChannel)}>
-                                Didn&apos;t get it? Send by {CHANNEL_NAMES[otherChannel]}
+                                {t('code.nudge', { channel: CHANNEL_NAMES[otherChannel] })}
                             </Button>
                         )}
                         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm text-muted-foreground">
                             <button type="button" onClick={changeNumber} className="transition-colors hover:text-foreground">
-                                Use a different number
+                                {t('code.changeNumber')}
                             </button>
-                            <TooltipDisabledReason reason={resendIn > 0 ? `You can ask for a new code in ${resendIn}s` : undefined}>
+                            <TooltipDisabledReason reason={resendIn > 0 ? t('code.resendIn', { seconds: resendIn }) : undefined}>
                                 <button
                                     type="button"
                                     onClick={() => resend(sentChannel)}
                                     disabled={resendIn > 0 || sending !== null}
                                     className="transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
                                 >
-                                    Resend code{waitLabel(resendIn)}
+                                    {resendIn > 0 ? t('code.resendWait', { wait: formatWait(resendIn, t) }) : t('code.resend')}
                                 </button>
                             </TooltipDisabledReason>
                         </div>
                         {!nudged && canSwitch && (
                             <div className="flex justify-center text-sm text-muted-foreground">
-                                <TooltipDisabledReason reason={switchIn > 0 ? `You can switch to ${CHANNEL_NAMES[otherChannel]} in ${switchIn}s` : undefined}>
+                                <TooltipDisabledReason reason={switchIn > 0 ? t('code.switchIn', { channel: CHANNEL_NAMES[otherChannel], seconds: switchIn }) : undefined}>
                                     <button
                                         type="button"
                                         onClick={() => resend(otherChannel)}
                                         disabled={switchIn > 0 || sending !== null}
                                         className="transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
                                     >
-                                        Send by {CHANNEL_NAMES[otherChannel]} instead{waitLabel(switchIn)}
+                                        {switchIn > 0 ? t('code.switchWait', { channel: CHANNEL_NAMES[otherChannel], wait: formatWait(switchIn, t) }) : t('code.switch', { channel: CHANNEL_NAMES[otherChannel] })}
                                     </button>
                                 </TooltipDisabledReason>
                             </div>

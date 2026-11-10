@@ -1,6 +1,7 @@
 'use client'
 
 import { getAgentKeysAction, updateAgentKeysAction } from '@/app/api/_actions/agent.actions'
+import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export type AgentVariableSource = 'agent' | 'engine' | null
@@ -18,6 +19,7 @@ export type AgentVariables = {
 // `engineKeys` are the RERUN_* names the engine resolves from its own process env: they count as
 // defined too, and an agent-level save overrides them (the resolver reads the agent env first).
 export function useAgentVariables(agentId: string): AgentVariables {
+    const errorText = useErrorText()
     const [agentKeys, setAgentKeys] = useState<string[]>([])
     const [engineKeys, setEngineKeys] = useState<string[]>([])
 
@@ -34,11 +36,11 @@ export function useAgentVariables(agentId: string): AgentVariables {
     const apply = useCallback(
         async (body: { set?: Record<string, string>; remove?: string[] }): Promise<string | null> => {
             const result = await updateAgentKeysAction(agentId, body)
-            if (!result.success) return result.error ?? 'Failed to save'
+            if (!result.success) return errorText(result)
             await refresh()
             return null
         },
-        [agentId, refresh],
+        [agentId, refresh, errorText],
     )
 
     const save = useCallback((name: string, value: string) => apply({ set: { [name]: value } }), [apply])

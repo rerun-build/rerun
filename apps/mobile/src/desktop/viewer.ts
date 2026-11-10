@@ -7,9 +7,9 @@ export function viewerUrl(socketUrl: string, mode: 'watch' | 'drive'): string {
 
 // X11 keysyms and their DOM codes, for the keys a phone keyboard cannot send to a canvas.
 export const DESKTOP_KEYS = {
-    tab: { keysym: 0xff09, code: 'Tab', label: 'Tab' },
-    backspace: { keysym: 0xff08, code: 'Backspace', label: 'Delete' },
-    enter: { keysym: 0xff0d, code: 'Enter', label: 'Return' },
+    tab: { keysym: 0xff09, code: 'Tab', labelKey: 'tab' },
+    backspace: { keysym: 0xff08, code: 'Backspace', labelKey: 'delete' },
+    enter: { keysym: 0xff0d, code: 'Enter', labelKey: 'return' },
 } as const
 
 export const typeScript = (text: string) => `window.rerunDesktop && window.rerunDesktop.type(${JSON.stringify(text)}); true;`

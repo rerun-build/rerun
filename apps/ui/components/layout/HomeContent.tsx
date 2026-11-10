@@ -48,6 +48,7 @@ import { OAUTH_PROVIDER_CONFIG, isOAuthProvider, type OAuthProvider } from '@/li
 import { oauthErrorCode, oauthRetryCopy, withoutOAuthError } from '@/lib/auth/oauth-error'
 import { oauthProviderLeftFor } from '@/lib/auth/oauth-sign-in'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { track } from '@rerun/analytics/client'
 
 // Durée minimale d'affichage du loader : le temps que le R se trace (45% d'un
@@ -69,6 +70,9 @@ function clearTemplateParam() {
 }
 
 export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: { initialSpaces?: SpacePublic[]; initialWorkspaceId?: number | null }) {
+    const t = useTranslations('layout')
+    const tOAuthRetry = useTranslations('auth.oauthRetry')
+    const tLinkError = useTranslations('account.signIn.linkError')
     const { user, workspace, loading, isAnonymous, phoneStep } = useSession()
     const foremanVisible = useForemanStore(selectForemanVisible)
     const foremanFunnel = useForemanStore(state => state.funnel)
@@ -99,7 +103,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     const readyMadeParked = useOnboardingStore(s => s.pendingTemplateLink !== null || s.pendingShareLink !== null)
     const arrivalHoldsTheWall = foremanArrival ? foremanFunnel === 'guided' && !foremanArrival.installed && foremanOpen !== false : foremanFunnel === 'unknown' && readyMadeParked && !workspace?.onboarded_at
     const accountWallOpen = isAnonymous && !accountClaimed && !foremanHoldsTheWall && !arrivalHoldsTheWall
-    const retryCopy = signInRetry ? oauthRetryCopy(signInRetry.code, signInRetry.provider ? OAUTH_PROVIDER_CONFIG[signInRetry.provider].label : null) : null
+    const retryCopy = signInRetry ? oauthRetryCopy(signInRetry.code, signInRetry.provider ? OAUTH_PROVIDER_CONFIG[signInRetry.provider].label : null, tOAuthRetry) : null
     const phoneWallOpen = phoneStep === 'pending' && !arrivalHoldsTheWall
     const templateLinkSlug = useTemplateFlowStore(s => s.linkSlug)
     const shareLinkToken = useAgentShareStore(s => s.token)
@@ -159,9 +163,9 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         const linkError = searchParams.get(ACCOUNT_LINK_ERROR_PARAM)
         const linkProvider = searchParams.get(ACCOUNT_LINK_PROVIDER_PARAM)
         useAccountStore.getState().openAccount('sign-in')
-        if (linkError) toast.error(linkErrorMessage(linkError, isOAuthProvider(linkProvider) ? linkProvider : 'google'))
+        if (linkError) toast.error(linkErrorMessage(linkError, isOAuthProvider(linkProvider) ? linkProvider : 'google', tLinkError))
         clearSearchParams(ACCOUNT_PARAM, ACCOUNT_LINK_ERROR_PARAM, ACCOUNT_LINK_PROVIDER_PARAM)
-    }, [searchParams, loading, isAnonymous])
+    }, [searchParams, loading, isAnonymous, tLinkError])
 
     // A provider sign-in that failed upstream lands here with the error in the URL, where it would
     // otherwise stay for the whole session. Only someone still anonymous needs to hear about it: an
@@ -223,19 +227,19 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         // Achetée en plein tunnel d'arrivée : c'est la carte d'achat de la colonne qui attend ce
         // retour et lance l'install, la fiche et le placement à la main n'ont rien à y faire.
         if (useOnboardingStore.getState().pendingTemplateLink === slug) {
-            if (outcome === 'cancel') toast('Purchase cancelled')
+            if (outcome === 'cancel') toast(t('purchaseCancelled'))
             else if (sessionId) void confirmTemplatePurchaseAction(sessionId)
             clearSearchParams('purchase', 'template', 'session_id')
             return
         }
         if (outcome === 'cancel') {
-            toast('Purchase cancelled')
+            toast(t('purchaseCancelled'))
             if (slug) flow.openLink(slug)
         } else if (slug) {
             flow.openPurchase({ slug, sessionId })
         }
         clearSearchParams('purchase', 'template', 'session_id')
-    }, [searchParams])
+    }, [searchParams, t])
 
     // Lien de partage de template `?template=<slug>` : il court-circuite tout le wizard de
     // recrutement pour poser sa fiche, seule à l'écran. Le slug part dans le store AVANT que le

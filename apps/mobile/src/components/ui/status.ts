@@ -1,12 +1,5 @@
 import type { Coworker, Session } from '@/mocks/data'
 
-export function timeAgo(minutes: number): string {
-    if (minutes < 1) return 'now'
-    if (minutes < 60) return `${minutes}m`
-    if (minutes < 60 * 24) return `${Math.floor(minutes / 60)}h`
-    return `${Math.floor(minutes / (60 * 24))}d`
-}
-
 export type StatusLine = { text: string; tone: 'default' | 'muted' | 'waiting' | 'destructive' }
 
 // The one line under a coworker's name: what it needs from you, what it is doing, or what it said last.

@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { prepareEmailSignIn, resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
 import { EmailCodeForm, type EmailCodeStep } from '@/components/auth/EmailCodeForm'
 import { useCaptcha } from '@/components/auth/captcha/useCaptcha'
@@ -18,6 +19,7 @@ import type { ReactNode } from 'react'
 // twice. A code mailed again keeps the cookie the first one set.
 export default function EmailAuth({ beforeEmail, onStepChange, onSignedIn }: { beforeEmail?: ReactNode; onStepChange: (step: EmailCodeStep) => void; onSignedIn: () => void }) {
     const searchParams = useSearchParams()
+    const errorText = useErrorText()
     const supabase = createClient()
     const { containerRef, challenging, getToken } = useCaptcha()
 
@@ -26,7 +28,7 @@ export default function EmailAuth({ beforeEmail, onStepChange, onSignedIn }: { b
             const live = await resendLiveSignInCode(email)
             if (live.resent) return live.held ? 'held' : undefined
             const prepared = await prepareEmailSignIn({ email, captcha: await getToken() })
-            if (!prepared.ok) throw new EmailSendError(prepared.error, prepared.reason)
+            if (!prepared.ok) throw new EmailSendError(errorText(prepared), prepared.reason)
             if (prepared.created) setSharedCookie(SIGNUP_INTENT_COOKIE, 'email', 1)
             const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } })
             if (error) throw error

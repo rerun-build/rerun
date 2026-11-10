@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from 'react-native'
 import Animated, { FadeInLeft, FadeInRight, FadeOut, useAnimatedKeyboard, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { AuthBoard } from '@/components/auth/AuthBoard'
 import { useSignInFlow } from '@/components/auth/SignInFlow'
@@ -50,6 +51,7 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
     const { height: windowHeight } = useWindowDimensions()
     const { step, direction, back, thinking } = useSignInFlow()
     const keyboard = useAnimatedKeyboard()
+    const t = useTranslations('mobileAuth')
 
     const paddingTop = FOREMAN_SIZE / 2 + spacing.lg
     const paddingBottom = insets.bottom + spacing.lg
@@ -98,7 +100,7 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
                 <Foreman thinking={thinking} />
                 {step.name !== 'start' && (
                     <View style={{ position: 'absolute', top: spacing.lg, left: spacing.lg, zIndex: 1 }}>
-                        <GlassButton symbol="chevron.left" label="Back" onPress={back} />
+                        <GlassButton symbol="chevron.left" label={t('back')} onPress={back} />
                     </View>
                 )}
                 <Animated.View style={[{ overflow: 'hidden' }, frame]}>

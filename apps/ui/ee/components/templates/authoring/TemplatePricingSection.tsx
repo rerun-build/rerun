@@ -3,6 +3,7 @@
 import { MIN_TEMPLATE_PRICE_CENTS, TEMPLATE_PRICING_MODELS, type TemplatePricingModel } from '@rerun/contracts'
 import { Card, CardContent, CardHeader, CardTitle } from '@rerun/ui/primitives'
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import { Controller, useFormContext } from 'react-hook-form'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -14,18 +15,6 @@ import { useCreatorStore } from '@/stores/creator.store'
 import { useTemplateAuthoring } from '@/components/templates/authoring/actions-context'
 import { EnumSelect } from '@/components/templates/authoring/EnumSelect'
 import { PricePayoutPreview } from './PricePayoutPreview'
-
-const MODEL_LABELS: Record<TemplatePricingModel, string> = {
-    free: 'Free',
-    one_time: 'One-time purchase',
-    recurring: 'Monthly subscription',
-}
-
-const MODEL_HELPERS: Record<TemplatePricingModel, string> = {
-    free: 'Anyone on a Rerun plan can install it.',
-    one_time: 'Charged once. The buyer keeps it for good.',
-    recurring: 'Charged every month. Access ends when the buyer cancels.',
-}
 
 // The form holds cents, the input holds a string. Deriving the text from the number would make a
 // trailing dot or a leading zero impossible to type, so the two are kept side by side and only the
@@ -41,6 +30,8 @@ function textToCents(text: string): number {
 }
 
 export function TemplatePricingSection() {
+    const t = useTranslations('templates.pricing')
+    const modelLabels: Record<TemplatePricingModel, string> = { free: t('models.free'), one_time: t('models.one_time'), recurring: t('models.recurring') }
     const { control, watch, setValue } = useFormContext<TemplateFormValues>()
     const { scope, payoutsReady } = useTemplateAuthoring()
     const setPane = useCreatorStore(state => state.setPane)
@@ -60,7 +51,7 @@ export function TemplatePricingSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Pricing</CardTitle>
+                <CardTitle>{t('title')}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
                 <Controller
@@ -68,12 +59,12 @@ export function TemplatePricingSection() {
                     name="pricingModel"
                     render={({ field }) => (
                         <EnumSelect
-                            label="Pricing"
+                            label={t('title')}
                             value={field.value}
                             onChange={changeModel}
                             options={TEMPLATE_PRICING_MODELS}
-                            labels={MODEL_LABELS}
-                            helperText={`${MODEL_HELPERS[field.value]} Buyers still need an active Rerun plan to install a template.`}
+                            labels={modelLabels}
+                            helperText={t('modelHelp', { helper: t(`helpers.${field.value}`) })}
                         />
                     )}
                 />
@@ -85,7 +76,7 @@ export function TemplatePricingSection() {
                             name="priceAmountCents"
                             render={({ field, fieldState }) => (
                                 <Input
-                                    label="Price (USD)"
+                                    label={t('priceLabel')}
                                     type="number"
                                     min={MIN_TEMPLATE_PRICE_CENTS / 100}
                                     step="1"
@@ -95,7 +86,7 @@ export function TemplatePricingSection() {
                                         setAmountText(event.target.value)
                                         field.onChange(textToCents(event.target.value))
                                     }}
-                                    helperText={fieldState.error?.message ?? `Minimum $${MIN_TEMPLATE_PRICE_CENTS / 100}. Changing it later only applies to new buyers.`}
+                                    helperText={fieldState.error?.message ?? t('priceHelp', { min: `$${MIN_TEMPLATE_PRICE_CENTS / 100}` })}
                                     aria-invalid={!!fieldState.error}
                                 />
                             )}
@@ -108,11 +99,11 @@ export function TemplatePricingSection() {
                 {model !== 'free' && scope === 'author' && !payoutsReady && (
                     <Alert variant="warning" stripes className="grid-cols-[auto_1fr] gap-x-3 gap-y-0">
                         <Icon icon={WalletIcon} size="sm" className="row-span-2 self-center" />
-                        <AlertTitle className="col-start-2 leading-tight">Payouts are not enabled</AlertTitle>
+                        <AlertTitle className="col-start-2 leading-tight">{t('payoutsTitle')}</AlertTitle>
                         <AlertDescription className="col-start-2 leading-snug">
-                            You can save this price now, but a paid template cannot be submitted for review until Stripe payouts are enabled.
+                            {t('payoutsBody')}
                             <Button type="button" variant="link" size="sm" className="mt-1 h-auto p-0" onClick={() => setPane({ kind: 'payouts' })}>
-                                Set up payouts
+                                {t('setUpPayouts')}
                             </Button>
                         </AlertDescription>
                     </Alert>

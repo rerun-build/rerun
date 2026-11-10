@@ -1,0 +1,70 @@
+{
+    "_context": {
+        "back": "Screen reader label of the arrow that goes back to the previous panel.",
+        "deleteConfirmTitle": "Default title of a delete confirmation. {label} is the label of the delete button, such as 'Delete skill'.",
+        "filter.search": "Placeholder of the search field of a filter. {label} is the name of the filter in lower case, such as 'status'.",
+        "combobox.selected": "Heading of the group listing the options already picked.",
+        "combobox.reorder": "Screen reader label of the handle that drags an option to change its order. {option} is the option.",
+        "powerBars": "Screen reader label of a row of bars rating how capable an AI model is.",
+        "phone.code": "Screen reader label of the field that holds the country calling code, such as +33.",
+        "upload.waiting": "Status of a file waiting its turn to upload. {size} is its size, already formatted.",
+        "upload.more": "Button that shows the rest of the upload list. {count} is the number of rows still hidden.",
+        "markdown.done": "Button that closes the full markdown editor and keeps the text.",
+        "waveform.idle": "Screen reader label of a flat audio waveform while nothing is recorded."
+    },
+    "close": "Close",
+    "back": "Back",
+    "moreOptions": "More options",
+    "deleteConfirmTitle": "{label}?",
+    "command": {
+        "title": "Command Palette",
+        "description": "Search for a command to run..."
+    },
+    "combobox": {
+        "placeholder": "Select an option",
+        "placeholderMultiple": "Select options",
+        "search": "Search…",
+        "empty": "No results found",
+        "selected": "Selected",
+        "remove": "Remove {option}",
+        "reorder": "Reorder {option}"
+    },
+    "filter": {
+        "search": "Search {label}…",
+        "empty": "No match",
+        "clear": "Clear"
+    },
+    "phone": {
+        "code": "Country calling code, type a code or a country",
+        "noCountry": "No country found"
+    },
+    "powerBars": "Power {filled} of {max}",
+    "markdown": {
+        "openEditor": "Open the full editor",
+        "done": "Done"
+    },
+    "upload": {
+        "menu": "Upload",
+        "files": "Upload files",
+        "folder": "Upload folder",
+        "failed": "Upload failed",
+        "finishing": "Finishing",
+        "waiting": "Waiting · {size}",
+        "progress": "Upload progress",
+        "uploadingFile": "Uploading {name}",
+        "totalProgress": "Total upload progress",
+        "retry": "Retry",
+        "cancel": "Cancel",
+        "cancelAll": "Cancel all",
+        "dismiss": "Dismiss",
+        "headingFailed": "{failed} of {total} files failed to upload",
+        "headingDone": "{count, plural, one {# file uploaded} other {# files uploaded}}",
+        "headingUploading": "Uploading {current} of {total}",
+        "more": "+ {count} more"
+    },
+    "waveform": {
+        "live": "Live audio waveform",
+        "processing": "Processing audio",
+        "idle": "Audio waveform idle"
+    }
+}

@@ -3,13 +3,10 @@ import type { NotificationKind } from '@/lib/engine/types'
 
 export {
     COWORKER_MODES,
-    COWORKER_MODE_COPY,
     DEFAULT_COWORKER_RULE,
     DEFAULT_NOTIFICATION_PREFS,
     EMAIL_CATEGORIES,
-    EMAIL_CATEGORY_LABELS,
     NOTIFICATION_SCOPES,
-    NOTIFICATION_SCOPE_COPY,
     coworkerRuleOf,
     hasOwnRule,
     isScheduledSource,
@@ -47,11 +44,6 @@ export const EMAIL_KIND_LABELS: Record<NotificationKind, string> = {
     question: 'Coworker has a question',
     approval: 'Approval needed',
     connector: 'App setup',
-}
-
-export const EMAIL_CATEGORY_DESCRIPTIONS: Record<EmailCategory, string> = {
-    billing: 'Trial reminders and billing notices about your subscription.',
-    product: 'New features, tips and occasional product news.',
 }
 
 // What the unsubscribe page edits: the run email switch and the account categories.

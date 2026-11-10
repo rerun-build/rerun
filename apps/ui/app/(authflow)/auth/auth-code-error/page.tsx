@@ -2,16 +2,18 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { routes } from '@/lib/routes'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 
-export default function AuthCodeErrorPage() {
+export default async function AuthCodeErrorPage() {
+    const t = await getTranslations('auth.linkExpired')
     return (
         <Card className="space-y-4 p-8">
             <div className="space-y-2">
-                <h1 className="text-xl font-semibold tracking-tight">This link has expired</h1>
-                <p className="text-sm text-muted-foreground">Sign-in links work once and expire after 15 minutes. Ask for a new code to continue.</p>
+                <h1 className="text-xl font-semibold tracking-tight">{t('title')}</h1>
+                <p className="text-sm text-muted-foreground">{t('message')}</p>
             </div>
             <Button asChild variant="secondary" className="w-full">
-                <Link href={routes.auth}>Get a new code</Link>
+                <Link href={routes.auth}>{t('newCode')}</Link>
             </Button>
         </Card>
     )

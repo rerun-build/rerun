@@ -54,6 +54,7 @@ import { cn } from '@/lib/utils'
 import { QUICK_REPLIES_TOOL, fileCardSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { Fragment, isValidElement, memo, type ReactNode } from 'react'
 
 type RenderStep =
@@ -91,10 +92,11 @@ function messageSources(message: { parts: readonly MessagePartLike[] }): Normali
 }
 
 function FeedbackAction({ rating, current, onRate }: { rating: MessageFeedbackRating; current: MessageFeedbackRating | null; onRate: (rating: MessageFeedbackRating) => void }) {
+    const t = useTranslations('chat.message')
     const pressed = current === rating
     const Glyph = rating === 'up' ? ThumbsUpIcon : ThumbsDownIcon
     return (
-        <MessageAction tooltip={rating === 'up' ? 'Good response' : 'Bad response'} aria-pressed={pressed} className={cn(pressed ? 'bg-accent text-foreground' : 'text-muted-foreground')} onClick={() => onRate(rating)}>
+        <MessageAction tooltip={rating === 'up' ? t('goodResponse') : t('badResponse')} aria-pressed={pressed} className={cn(pressed ? 'bg-accent text-foreground' : 'text-muted-foreground')} onClick={() => onRate(rating)}>
             <Glyph className="size-3.5" />
         </MessageAction>
     )
@@ -162,6 +164,8 @@ export function UnderText({ children }: { children: ReactNode }) {
 }
 
 function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
+    const t = useTranslations('chat')
+    const tTools = useTranslations('tools')
     const toolDisplay = useToolDisplay(agentId)
     const publishedAccess = usePublishedAccessEnabled()
     const sources = message.role === 'assistant' ? messageSources(message) : []
@@ -203,7 +207,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 const streaming = isActive && i === lastPart
                 if (!rp.text && !streaming) return null
                 const node = <ReasoningStep text={rp.text} isStreaming={streaming} />
-                return { kind: 'group-item', key: gkey, iconProps: { icon: BrainIcon }, node, status: streaming ? 'running' : 'done', runningLabel: 'Thinking' }
+                return { kind: 'group-item', key: gkey, iconProps: { icon: BrainIcon }, node, status: streaming ? 'running' : 'done', runningLabel: t('steps.thinking') }
             }
             if (part.type === 'data-delegate' || part.type === 'data-call-agent') {
                 const orphan = subRuns.orphans.get((part as { id?: string }).id ?? '')
@@ -218,7 +222,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 const cp = part as unknown as { id?: string; data: CompactionData }
                 const key = cp.id ?? gkey
                 const node = <CompactionStep data={cp.data} />
-                return { kind: 'group-item', key, iconProps: { icon: FoldVerticalIcon }, node, status: cp.data.status, runningLabel: 'Compacting' }
+                return { kind: 'group-item', key, iconProps: { icon: FoldVerticalIcon }, node, status: cp.data.status, runningLabel: t('steps.compacting') }
             }
             if (part.type.startsWith('tool-') || part.type === 'dynamic-tool') {
                 const toolPart = part as { toolCallId: string; state: string; toolName?: string; input?: unknown; inputText?: string; output?: unknown; errorText?: string; type: string; approval?: { id: string } }
@@ -321,7 +325,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                     <ToolCallStep toolName={toolName} agentId={agentId} state={state} input={toolPart.input} inputText={toolPart.inputText} output={toolPart.output} errorText={toolPart.errorText} />
                 )
                 const display = toolDisplay(toolName, toolPart.input)
-                return { kind: 'group-item', key, iconProps: display.iconProps, node, status, runningLabel: toolActivityOf(toolName, toolPart.input) ?? `Running ${display.label}` }
+                return { kind: 'group-item', key, iconProps: display.iconProps, node, status, runningLabel: toolActivityOf(toolName, toolPart.input, tTools) ?? t('activity.runningTool', { tool: display.label }) }
             }
             return null
         }
@@ -423,7 +427,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
             {message.role === 'assistant' && !isActive && onRegenerate && messageText(message).length > 0 && (
                 <MessageActions className={cn('-mt-1 transition-opacity group-hover:opacity-100 group-[:not(:last-child)]:-mb-4', feedbackRating === null && 'opacity-0')}>
                     <CopyAction text={messageText(message)} />
-                    <MessageAction tooltip="Regenerate" onClick={() => onRegenerate(message.id)}>
+                    <MessageAction tooltip={t('message.regenerate')} onClick={() => onRegenerate(message.id)}>
                         <RefreshCcwIcon className="size-3.5" />
                     </MessageAction>
                     {onRateMessage && (

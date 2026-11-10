@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { SearchIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
 // `/` reaches the field from anywhere in the library, except from another field.
 export function TemplateLibrarySearch({ value, onChange, className }: { value: string; onChange: (value: string) => void; className?: string }) {
+    const t = useTranslations('templates.library.search')
     const inputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
@@ -27,12 +29,12 @@ export function TemplateLibrarySearch({ value, onChange, className }: { value: s
                 ref={inputRef}
                 value={value}
                 onChange={event => onChange(event.target.value)}
-                placeholder="Search templates"
-                aria-label="Search templates"
+                placeholder={t('placeholder')}
+                aria-label={t('placeholder')}
                 className="min-w-0 flex-1 bg-transparent text-[13px] outline-hidden placeholder:text-muted-foreground"
             />
             {value ? (
-                <button type="button" aria-label="Clear search" onClick={() => onChange('')} className="flex size-4 items-center justify-center rounded text-muted-foreground hover:text-foreground">
+                <button type="button" aria-label={t('clear')} onClick={() => onChange('')} className="flex size-4 items-center justify-center rounded text-muted-foreground hover:text-foreground">
                     <XIcon className="size-3" />
                 </button>
             ) : (

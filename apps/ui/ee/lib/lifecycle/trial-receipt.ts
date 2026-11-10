@@ -5,14 +5,17 @@
 // from the sweeper's bundle so both paths share the same guards.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
-import { PLAN_CURRENCY, basePriceCents, parsePriceArm, trialLimitsLabel } from '@/ee/lib/billing/plans'
+import { PLAN_CURRENCY, basePriceCents, parsePriceArm } from '@/ee/lib/billing/plans'
 import { BANNER_WARM_INLINE_MS, emailBoardBanner } from '@/lib/email/board-banner'
 import { APP_URL } from '@/lib/email/client'
+import { emailDateLabel } from '@/lib/email/date-labels'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { sendTrialStartedEmail } from '@/ee/lib/email/lifecycle-emails'
 import { wantsCategoryEmail } from '@/lib/notifications/prefs'
 import { buildUnsubscribeUrl } from '@/lib/email/unsubscribeToken'
 import { selectMany, selectSingle } from '@/supabase/supabase-helpers'
-import { formatAmount } from '@rerun/contracts'
+import { TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, formatAmount } from '@rerun/contracts'
+import { emailTranslator } from '@rerun/emails/i18n'
 import { loadRecipient } from './recipient'
 import { recordLifecycleEmail } from './store'
 
@@ -43,17 +46,18 @@ export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>
         const recipient = await loadRecipient(supabase, owner.user_id)
         if (!recipient) return
 
+        const locale = await recipientLocale(supabase, owner.user_id, workspaceId)
         const boardUrl = await emailBoardBanner(supabase, workspaceId, 'working', BANNER_WARM_INLINE_MS)
         await sendTrialStartedEmail(
-            { to: recipient.email, unsubscribeUrl: `${buildUnsubscribeUrl(owner.user_id)}&category=billing` },
+            { to: recipient.email, unsubscribeUrl: `${buildUnsubscribeUrl(owner.user_id)}&category=billing`, locale },
             {
                 workspaceName: workspace.name,
                 trialDays,
-                trialEndsLabel: new Date(trialEndsAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' }),
+                trialEndsLabel: emailDateLabel(new Date(trialEndsAt), locale),
                 // The price this workspace is sold the plan at, before any promotion code entered at
                 // Checkout: it lowers the first charge, and overstating is the safe direction for a receipt.
                 monthlyPriceLabel: formatAmount(basePriceCents(parsePriceArm(workspace.price_arm)), PLAN_CURRENCY),
-                includedLabel: trialLimitsLabel(),
+                includedLabel: emailTranslator(locale)('trialStarted.included', { coworkers: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS }),
                 hasCard,
                 workspaceUrl: APP_URL,
                 boardUrl,

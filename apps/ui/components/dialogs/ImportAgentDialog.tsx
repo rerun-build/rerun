@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { createImportKeyAction } from '@/app/api/_actions/api-keys.actions'
 import { CopyBlock } from '@/components/dialogs/CopyBlock'
 import { CopyLine } from '@/components/dialogs/CopyLine'
@@ -10,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { importSource, type ImportSourceId } from '@/lib/agent-import/sources'
 import { track } from '@rerun/analytics/client'
 import { ScrollFade } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -34,6 +36,8 @@ function PreparedSkeleton() {
 // agent never shares a coworker with the right one. Closing the dialog drops the key from memory;
 // it still expires on its own a day later.
 export function ImportAgentDialog({ open, onOpenChange, spaceId = null }: { open: boolean; onOpenChange: (open: boolean) => void; spaceId?: string | null }) {
+    const t = useTranslations('dialogs.importAgent')
+    const errorText = useErrorText()
     const [source, setSource] = useState<ImportSourceId | null>(null)
     const [prepared, setPrepared] = useState<Prepared | null>(null)
     const latest = useRef<ImportSourceId | null>(null)
@@ -46,7 +50,7 @@ export function ImportAgentDialog({ open, onOpenChange, spaceId = null }: { open
         const result = await createImportKeyAction(next, spaceId)
         if (latest.current !== next) return
         if (!result.ok) {
-            toast.error(result.error)
+            toast.error(errorText(result))
             setSource(null)
             return
         }
@@ -63,14 +67,14 @@ export function ImportAgentDialog({ open, onOpenChange, spaceId = null }: { open
         onOpenChange(next)
     }
 
-    const connectorStep = source ? importSource(source).connectorStep : undefined
+    const connectorStep = source && importSource(source).connectorStep ? t('grokConnectorStep') : undefined
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="flex flex-col sm:max-h-[85dvh] sm:max-w-lg sm:overflow-hidden">
                 <DialogHeader>
-                    <DialogTitle>Import a coworker</DialogTitle>
-                    <DialogDescription>Your agent moves itself here, with its skills, tasks and memory.</DialogDescription>
+                    <DialogTitle>{t('title')}</DialogTitle>
+                    <DialogDescription>{t('description')}</DialogDescription>
                 </DialogHeader>
 
                 <ScrollFade className="-mx-1 min-h-0 flex-1 px-1 py-1">
@@ -81,11 +85,11 @@ export function ImportAgentDialog({ open, onOpenChange, spaceId = null }: { open
 
                         {prepared && (
                             <div className="space-y-3">
-                                <Field label="Connector URL" helperText={connectorStep}>
-                                    <CopyLine value={prepared.connectorUrl} label="Copy the connector URL" />
+                                <Field label={t('connectorUrl')} helperText={connectorStep}>
+                                    <CopyLine value={prepared.connectorUrl} label={t('copyConnectorUrl')} />
                                 </Field>
-                                <Field label={`Paste in ${importSource(prepared.source).label}`} helperText="Expires in 24 hours.">
-                                    <CopyBlock value={prepared.prompt} label="Copy the prompt" wrap />
+                                <Field label={t('pasteIn', { source: prepared.source === 'other' ? t('otherSource') : importSource(prepared.source).label })} helperText={t('expires')}>
+                                    <CopyBlock value={prepared.prompt} label={t('copyPrompt')} wrap />
                                 </Field>
                             </div>
                         )}

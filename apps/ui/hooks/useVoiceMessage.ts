@@ -5,6 +5,7 @@ import { useVoiceRecorder, type VoiceRecording } from '@/hooks/useVoiceRecorder'
 import { transcribeVoiceRecording, uploadVoiceRecording } from '@/lib/voice/client'
 import { appendVoiceMarker, buildVoiceMarker } from '@/lib/voice/marker'
 import { nanoid } from 'nanoid'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -30,6 +31,7 @@ type Pending = VoiceRecording & { path?: string }
  * upload or transcribe is kept so the user can retry rather than lose what they said.
  */
 export function useVoiceMessage({ target, dir, onSend }: Options) {
+    const t = useTranslations('chat.voice')
     const [processing, setProcessing] = useState(false)
     const [failed, setFailed] = useState(false)
     const pendingRef = useRef<Pending | null>(null)
@@ -62,7 +64,7 @@ export function useVoiceMessage({ target, dir, onSend }: Options) {
 
                 if (!transcript) {
                     setFailed(true)
-                    toast.error("Couldn't hear anything in that recording.")
+                    toast.error(t('nothingHeard'))
                     return
                 }
 
@@ -70,12 +72,12 @@ export function useVoiceMessage({ target, dir, onSend }: Options) {
                 pendingRef.current = null
             } catch (err) {
                 setFailed(true)
-                toast.error(err instanceof Error ? err.message : 'Could not send your voice message.')
+                toast.error(t('voiceMessageFailed'))
             } finally {
                 setProcessing(false)
             }
         },
-        [target, dir]
+        [target, dir, t]
     )
 
     const { stop, cancel } = recorder
@@ -87,11 +89,11 @@ export function useVoiceMessage({ target, dir, onSend }: Options) {
         const recording = await stop()
         if (!recording) {
             setProcessing(false)
-            toast.error('Nothing was recorded.')
+            toast.error(t('nothingRecorded'))
             return
         }
         await process(recording)
-    }, [stop, process])
+    }, [stop, process, t])
 
     useEffect(() => {
         onSendRef.current = onSend

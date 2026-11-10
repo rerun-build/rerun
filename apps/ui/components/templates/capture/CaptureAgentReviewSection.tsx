@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import * as React from 'react'
 import { isSetupAnswered } from '@rerun/contracts'
 import { Stripes } from '@rerun/ui/primitives'
@@ -35,6 +36,8 @@ export function CaptureAgentReviewSection({
     onApprove: (next: boolean) => void
     onSetupChange: (next: AgentSetupDraft) => void
 }) {
+    const t = useTranslations('templates.capture.review')
+    const locale = useLocale()
     const flagged = React.useMemo(() => flaggedPathSet(plan), [plan])
     const stats = planStats(plan, excluded)
     const [filesOpen, setFilesOpen] = React.useState(stats.flaggedTotal > 0 || soloAgent)
@@ -49,7 +52,7 @@ export function CaptureAgentReviewSection({
                 <div className="flex items-baseline justify-between gap-3">
                     <span className="min-w-0 truncate text-sm font-medium">{plan.displayName || plan.name}</span>
                     <span className="shrink-0 text-xs text-muted-foreground">
-                        {stats.kept} of {stats.total} files, {formatBytes(stats.keptBytes)}
+                        {t('files', { kept: stats.kept, total: stats.total, size: formatBytes(stats.keptBytes, locale) })}
                     </span>
                 </div>
                 <span className="flex min-w-0 items-baseline gap-1.5 text-xs text-muted-foreground">
@@ -59,44 +62,42 @@ export function CaptureAgentReviewSection({
             </div>
 
             {travels && (
-                <CaptureReviewGroup icon={Package} title="Tools">
+                <CaptureReviewGroup icon={Package} title={t('tools')}>
                     {plan.tools.length > 0 && (
                         <div className="flex flex-wrap items-center gap-1">
                             <CaptureReviewChips items={plan.tools} max={plan.tools.length} />
                         </div>
                     )}
                     {plan.connectorSlugs.length > 0 && (
-                        <CaptureReviewRow label="Apps">
+                        <CaptureReviewRow label={t('apps')}>
                             <CaptureReviewChips items={plan.connectorSlugs} />
                         </CaptureReviewRow>
                     )}
                     {plan.skills.length > 0 && (
-                        <CaptureReviewRow label="Skills">
+                        <CaptureReviewRow label={t('skills')}>
                             <CaptureReviewChips items={plan.skills.map(skill => skill.name)} max={6} />
                         </CaptureReviewRow>
                     )}
                     {plan.schedules.length > 0 && (
-                        <CaptureReviewRow label="Schedules">
-                            <CaptureReviewChips items={plan.schedules.map(s => `${s.name}: ${s.cron ? scheduleLabel(s.cron) : 'One-shot'}`)} max={4} />
+                        <CaptureReviewRow label={t('schedules')}>
+                            <CaptureReviewChips items={plan.schedules.map(s => `${s.name}: ${s.cron ? scheduleLabel(s.cron, locale) : t('oneShot')}`)} max={4} />
                         </CaptureReviewRow>
                     )}
                     {plan.triggers.length > 0 && (
-                        <CaptureReviewRow label="Webhooks">
+                        <CaptureReviewRow label={t('webhooks')}>
                             <CaptureReviewChips items={plan.triggers.map(trigger => `${trigger.name}: ${trigger.methods.join('/')}`)} max={4} />
                         </CaptureReviewRow>
                     )}
                     {plan.memoryCount > 0 && (
-                        <CaptureReviewRow label="Memories">
-                            <span className="text-[0.7rem] text-muted-foreground">
-                                {plan.memoryCount} recorded, excluded from the archive by default
-                            </span>
+                        <CaptureReviewRow label={t('memories')}>
+                            <span className="text-[0.7rem] text-muted-foreground">{t('memoriesNote', { count: plan.memoryCount })}</span>
                         </CaptureReviewRow>
                     )}
                 </CaptureReviewGroup>
             )}
 
             {removed && (
-                <CaptureReviewGroup icon={ShieldCheck} title="Removed on the way out">
+                <CaptureReviewGroup icon={ShieldCheck} title={t('removed')}>
                     {plan.redactions.map(redaction => (
                         <div key={redaction.path} className="flex items-baseline gap-2 text-xs">
                             <span className="shrink-0 font-mono text-foreground/80">{redaction.path}</span>
@@ -112,9 +113,9 @@ export function CaptureAgentReviewSection({
             )}
 
             {toProvide && (
-                <CaptureReviewGroup icon={LockIcon} title="To provide again on a copy" tone="warning">
+                <CaptureReviewGroup icon={LockIcon} title={t('toProvide')} tone="warning">
                     {plan.envKeys.length > 0 && (
-                        <CaptureReviewRow label="Env keys">
+                        <CaptureReviewRow label={t('envKeys')}>
                             <CaptureReviewChips items={plan.envKeys} mono max={10} />
                         </CaptureReviewRow>
                     )}
@@ -129,29 +130,23 @@ export function CaptureAgentReviewSection({
             {stats.flaggedTotal > 0 && (
                 <CaptureReviewGroup
                     icon={ShieldAlertIcon}
-                    title="Flagged files"
+                    title={t('flagged')}
                     tone={stats.flaggedKept.length > 0 ? 'danger' : 'warning'}
                 >
                     {stats.flaggedKept.length > 0 ? (
                         <>
-                            <p className="text-xs text-destructive">
-                                {stats.flaggedKept.length} of {stats.flaggedTotal} files that look like they carry a credential are still included.
-                                They will travel inside the archive.
-                            </p>
+                            <p className="text-xs text-destructive">{t('flaggedKept', { kept: stats.flaggedKept.length, total: stats.flaggedTotal })}</p>
                             <div className="flex flex-wrap gap-1">
                                 <CaptureReviewChips items={stats.flaggedKept} mono max={5} />
                             </div>
                         </>
                     ) : (
-                        <p className="text-xs text-muted-foreground">
-                            {stats.flaggedTotal} file{stats.flaggedTotal === 1 ? '' : 's'} look like they carry a credential. They stay out of the
-                            archive.
-                        </p>
+                        <p className="text-xs text-muted-foreground">{t('flaggedOut', { count: stats.flaggedTotal })}</p>
                     )}
                 </CaptureReviewGroup>
             )}
 
-            <CaptureReviewGroup icon={WrenchIcon} title="Install">
+            <CaptureReviewGroup icon={WrenchIcon} title={t('install')}>
                 <AgentSetupFields
                     value={setup}
                     onChange={next => {
@@ -164,13 +159,11 @@ export function CaptureAgentReviewSection({
             </CaptureReviewGroup>
 
             <Collapsible open={filesOpen} onOpenChange={setFilesOpen}>
-                <CaptureReviewGroup icon={FolderIcon} title="Files">
+                <CaptureReviewGroup icon={FolderIcon} title={t('filesGroup')}>
                     <CollapsibleTrigger className="group flex w-full items-center gap-2 rounded py-1 text-xs text-muted-foreground transition-colors hover:text-foreground">
                         <ChevronRight className="size-3.5 shrink-0 transition-transform group-data-[state=open]:rotate-90" />
-                        {filesOpen ? 'Hide the folder' : 'Show the folder'}
-                        <span className="ml-auto">
-                            {stats.kept} of {stats.total} kept
-                        </span>
+                        {filesOpen ? t('hideFolder') : t('showFolder')}
+                        <span className="ml-auto">{t('kept', { kept: stats.kept, total: stats.total })}</span>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                         <CaptureFileTree
@@ -192,15 +185,15 @@ export function CaptureAgentReviewSection({
                 <Field
                     className="relative"
                     orientation="row"
-                    label="I reviewed what this coworker carries"
+                    label={t('confirm')}
                     helperText={
                         setup.required === null
-                            ? 'Answer the install question above first.'
+                            ? t('answerFirst')
                             : !isSetupAnswered(setup)
-                              ? 'Write the install instructions above first.'
+                              ? t('writeFirst')
                               : stats.flaggedKept.length > 0
-                                ? `${stats.flaggedKept.length} flagged file(s) will travel inside the archive.`
-                                : 'Nothing on this list is a secret that should not ship.'
+                                ? t('flaggedTravel', { count: stats.flaggedKept.length })
+                                : t('nothingSecret')
                     }
                 >
                     <Checkbox size="sm" disabled={!isSetupAnswered(setup)} checked={approved} onCheckedChange={value => onApprove(value === true)} />

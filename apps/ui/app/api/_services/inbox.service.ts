@@ -2,6 +2,8 @@ import { actorFromContext, keepVisible, visibleSpaceIds } from '@/app/api/_auth/
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { markSessionsHandled } from '@/app/api/_services/conversation.service'
 import type { Database } from '@/app/api/database.types'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { translatorFor } from '@/lib/i18n/server-translator'
 import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificationsFilter } from '@/lib/notifications/attention-details'
 import { isScheduledSource } from '@/lib/notifications/prefs'
 import { groupUnseenRuns } from '@/lib/notifications/unseen-runs'
@@ -30,10 +32,11 @@ export async function listWorkspaceInbox(ctx: WorkspaceContext): Promise<Inbox> 
 
     // `unseen_runs` answers for `auth.uid()`: it runs as the caller, not through the service role.
     const asCaller = await createClient()
-    const [attention, unseen, running] = await Promise.all([
+    const [attention, unseen, running, tErrors] = await Promise.all([
         selectMany(ctx.supabase, 'sessions', ATTENTION_COLUMNS, { agent_id: agentIds, status: [...ATTENTION_STATUSES] }, { column: 'updated_at', ascending: false }, ATTENTION_PAGE),
         asCaller.rpc('unseen_runs', { p_workspace_id: ctx.workspace.id }),
         selectCount(ctx.supabase, 'sessions', { agent_id: agentIds, status: 'working' }),
+        recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'chatErrors')),
     ])
     if (attention.error) throw attention.error
     if (unseen.error) throw unseen.error
@@ -43,7 +46,7 @@ export async function listWorkspaceInbox(ctx: WorkspaceContext): Promise<Inbox> 
     const filter = attentionNotificationsFilter(sessions)
     const notifications = filter ? await selectMany(ctx.supabase, 'notifications', ATTENTION_NOTIFICATION_COLUMNS, filter, { column: 'created_at', ascending: false }) : { data: [], error: null }
     if (notifications.error) throw notifications.error
-    const details = attentionDetailsOf(sessions, notifications.data ?? [], ctx.userId)
+    const details = attentionDetailsOf(sessions, notifications.data ?? [], ctx.userId, tErrors)
 
     // A row whose notification went to someone else is theirs, as on the web.
     const waiting: InboxItem[] = sessions.flatMap(session => {

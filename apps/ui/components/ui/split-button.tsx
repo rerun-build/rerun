@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { ChevronDownIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export type SplitButtonAction = {
     label: string
@@ -42,7 +43,7 @@ const SEAM_BY_VARIANT: Partial<Record<ButtonVariant, string>> = {
 export function SplitButton({
     actions,
     menuAlign = 'end',
-    menuLabel = 'More options',
+    menuLabel,
     variant: variantProp,
     size: sizeProp,
     className,
@@ -53,6 +54,7 @@ export function SplitButton({
     menuAlign?: 'start' | 'end'
     menuLabel?: string
 }) {
+    const t = useTranslations('ui')
     const variant = variantProp ?? 'default'
     const size = sizeProp ?? 'default'
 
@@ -66,7 +68,7 @@ export function SplitButton({
             <Button variant={variant} size={size} disabled={disabled} className={cn('rounded-r-none!', className)} {...props} />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant={variant} size={TRIGGER_SIZE[size]} disabled={disabled} aria-label={menuLabel} className={cn('-ml-px rounded-l-none! border-l', SEAM_BY_VARIANT[variant])}>
+                    <Button variant={variant} size={TRIGGER_SIZE[size]} disabled={disabled} aria-label={menuLabel ?? t('moreOptions')} className={cn('-ml-px rounded-l-none! border-l', SEAM_BY_VARIANT[variant])}>
                         <ChevronDownIcon className="size-3.5 opacity-60" />
                     </Button>
                 </DropdownMenuTrigger>

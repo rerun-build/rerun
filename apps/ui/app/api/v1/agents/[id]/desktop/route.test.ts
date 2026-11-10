@@ -40,9 +40,9 @@ describe('/api/v1/agents/:id/desktop', () => {
     })
 
     it('reads a coworker of a Box the member cannot see as missing', async () => {
-        openDesktopAction.mockResolvedValue({ ok: false, error: 'Coworker not found', code: 'not_found' })
+        openDesktopAction.mockResolvedValue({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound', denied: 'not_found' })
         expect((await desktop.POST(request('POST', { mode: 'watch' }), segment)).status).toBe(404)
-        startTakeoverAction.mockResolvedValue({ ok: false, error: 'Coworker not found', code: 'not_found' })
+        startTakeoverAction.mockResolvedValue({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound', denied: 'not_found' })
         expect((await takeover.POST(request('POST', {}), segment)).status).toBe(404)
     })
 

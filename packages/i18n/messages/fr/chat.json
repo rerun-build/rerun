@@ -1,0 +1,498 @@
+{
+    "actions": {
+        "copy": "Copier",
+        "copied": "Copié",
+        "connect": "Connecter",
+        "cancel": "Annuler",
+        "continue": "Continuer",
+        "notNow": "Plus tard",
+        "copiedExclaim": "Copié !"
+    },
+    "sources": {
+        "used": "{count, plural, one {# source utilisée} other {# sources utilisées}}"
+    },
+    "draft": {
+        "label": "Brouillon"
+    },
+    "mcpServer": {
+        "failed": "Impossible de connecter {name}",
+        "notAdded": "Non ajouté",
+        "added": "{name} ajouté",
+        "custom": "Serveur MCP personnalisé",
+        "customWithHost": "Serveur MCP personnalisé · {host}"
+    },
+    "mcpSignIn": {
+        "title": "Se connecter à {name}"
+    },
+    "mentions": {
+        "coworkers": "Coworkers",
+        "skills": "Skills"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {# source} other {# sources}}",
+        "emailsVerified": "{valid} e-mails vérifiés sur {checked}"
+    },
+    "tableCard": {
+        "openDisabledReason": "Ouvrez ce coworker depuis le board pour parcourir sa base de données."
+    },
+    "conversation": {
+        "emptyTitle": "Aucun message pour l'instant",
+        "emptyDescription": "Démarrez une conversation pour voir les messages ici",
+        "scrollToLatest": "Aller au dernier message"
+    },
+    "brainProposal": {
+        "create": "Nouvelle page du Brain : {title}",
+        "edit": "Modification du Brain : {title}",
+        "description": "Proposé pour relecture. Rien ne change tant que personne ne l'accepte.",
+        "review": "Relire"
+    },
+    "attachments": {
+        "attach": "Joindre des fichiers",
+        "open": "Ouvrir {name}",
+        "position": "{current} / {total}",
+        "previous": "Pièce jointe précédente",
+        "next": "Pièce jointe suivante",
+        "download": "Télécharger",
+        "waiting": "En attente",
+        "finishing": "Finalisation",
+        "progress": "{percent} %",
+        "progressWithEta": "{percent} % · {eta}",
+        "fileFallback": "fichier",
+        "uploading": "Envoi de {name}",
+        "retryUpload": "Relancer l'envoi",
+        "cancelUpload": "Annuler l'envoi",
+        "remove": "Retirer la pièce jointe",
+        "openMore": "Ouvrir les {count} autres",
+        "uploadFailed": "Échec de l'envoi",
+        "uploadingProgress": "Envoi · {percent} %",
+        "retryUploading": "Relancer l'envoi de {name}",
+        "removeNamed": "Retirer {name}"
+    },
+    "screen": {
+        "openBrowser": "Ouvrir le navigateur",
+        "takeControl": "Prendre la main"
+    },
+    "composer": {
+        "link": {
+            "open": "Ouvrir",
+            "unlink": "Retirer le lien"
+        },
+        "subscriptionCta": "Vous payez déjà un abonnement IA ? Faites tourner ce coworker dessus.",
+        "placeholder": "Écrivez un message...",
+        "attachmentsMissing": "Certaines pièces jointes n'ont pas été envoyées. Retirez-les et joignez-les à nouveau avant d'envoyer.",
+        "attachmentsFailed": "{count, plural, one {# pièce jointe n'a pas pu être envoyée. Relancez-la ou retirez-la avant d'envoyer.} other {# pièces jointes n'ont pas pu être envoyées. Relancez-les ou retirez-les avant d'envoyer.}}",
+        "noFiles": "Ce chat n'accepte pas encore de fichiers.",
+        "sendFailed": "Impossible d'envoyer votre message",
+        "openEditor": "Ouvrir l'éditeur complet",
+        "stop": "Arrêter l'exécution en cours",
+        "editor": {
+            "title": "Écrivez votre message",
+            "description": "De la place pour structurer un long message. Entrée crée une nouvelle ligne.",
+            "hint": "Envoyer avec Cmd + Entrée",
+            "cancel": "Annuler",
+            "send": "Envoyer"
+        }
+    },
+    "message": {
+        "showLess": "Afficher moins",
+        "showMore": "Afficher plus",
+        "openFile": "Ouvrir {path}",
+        "branch": {
+            "previous": "Branche précédente",
+            "next": "Branche suivante",
+            "page": "{current} sur {total}"
+        },
+        "goodResponse": "Bonne réponse",
+        "badResponse": "Mauvaise réponse",
+        "regenerate": "Régénérer"
+    },
+    "installGate": {
+        "title": "Configurer {name}",
+        "inProgressTitle": "{name} est en cours de configuration",
+        "inProgressHint": "Dans une autre conversation",
+        "facts": "{apps, plural, =0 {~{minutes} min} one {# app · ~{minutes} min} other {# apps · ~{minutes} min}}",
+        "continue": "Reprendre la configuration",
+        "installing": "Installation",
+        "install": "Installer {name}",
+        "skip": "Passer pour l'instant"
+    },
+    "activity": {
+        "thinking": "Réflexion...",
+        "processing": "Traitement de votre demande...",
+        "crafting": "Rédaction d'une réponse...",
+        "writing": "Rédaction...",
+        "runningTool": "Exécution de {tool}",
+        "waitingOn": "En attente de {name}",
+        "building": "Création de {name}",
+        "buildingCoworkers": "Création de {count, plural, one {# coworker} other {# coworkers}} · {done} terminés",
+        "waitingOnSubCoworkers": "En attente de {count, plural, one {# sous-coworker} other {# sous-coworkers}} · {done} terminés"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {Question en attente} one {Question en attente} other {# questions en attente}}",
+        "approval": "{count, plural, =0 {Validation requise} one {Validation requise} other {# validations requises}}",
+        "secret": "{count, plural, =0 {Identifiant requis} one {Identifiant requis} other {# identifiants requis}}",
+        "mcpNamed": "Se connecter à {name}",
+        "mcp": "Connexion requise",
+        "service": "{count, plural, =0 {App à connecter} one {App à connecter} other {# apps à connecter}}",
+        "takeover": "À vous de prendre l'écran"
+    },
+    "pendingHitl": {
+        "goTo": "{label}, y aller"
+    },
+    "reasoning": {
+        "thinking": "Réflexion...",
+        "thought": "Réflexion"
+    },
+    "secretRequest": {
+        "saveFailed": "Impossible d'enregistrer les identifiants"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "Brain mis à jour : {title}",
+            "created": "Nouvelle page du Brain : {title}",
+            "deleted": "Retiré du Brain : {title}",
+            "accepted": "Modification acceptée : {title}",
+            "acceptedBy": "Modification de {name} acceptée : {title}",
+            "dismissed": "Modification écartée : {title}",
+            "dismissedBy": "Modification de {name} écartée : {title}"
+        },
+        "notes": {
+            "saved": "Enregistré. Chaque coworker le lit dès sa prochaine exécution.",
+            "deleted": "Plus aucun coworker ne la lit. Son historique est conservé.",
+            "accepted": "Enregistré. Chaque coworker le lit dès sa prochaine exécution.",
+            "dismissed": "La page est inchangée."
+        },
+        "undone": "Annulé : {title}",
+        "undoneNote": "La version précédente est revenue.",
+        "undo": "Annuler",
+        "open": "Ouvrir"
+    },
+    "compaction": {
+        "running": "Compactage du contexte…",
+        "failed": "Échec du compactage du contexte",
+        "done": "Contexte compacté",
+        "summarized": "{count, plural, one {# message précédent résumé} other {# messages précédents résumés}}",
+        "recovered": "~{tokens} tokens récupérés"
+    },
+    "scheduledRun": {
+        "label": "Exécution planifiée",
+        "viewPrompt": "Voir le prompt",
+        "promptTitle": "Prompt de {name}"
+    },
+    "steps": {
+        "count": "{count, plural, one {# étape} other {# étapes}}",
+        "countWithFailures": "{count, plural, one {# étape} other {# étapes}}, {failed} en échec",
+        "failed": "{failed} en échec",
+        "thinking": "Réflexion",
+        "compacting": "Compactage"
+    },
+    "subRun": {
+        "failuresInARow": "{count} échecs d'affilée",
+        "idle": "Inactive depuis {minutes} min",
+        "stopTask": "Arrêter cette tâche",
+        "stopped": "Arrêtée, travail partiel conservé",
+        "failed": "Échec",
+        "earlier": "+{count} plus tôt",
+        "verbs": {
+            "search": "Recherche {summary}",
+            "read": "Lecture {summary}",
+            "browse": "Navigation {summary}",
+            "run": "Exécution {summary}",
+            "write": "Écriture {summary}",
+            "edit": "Modification {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "tronqué",
+        "empty": "Aucun contenu",
+        "payload": "Contenu"
+    },
+    "voice": {
+        "sendFailed": "Impossible d'envoyer cet enregistrement.",
+        "sendFailedHint": "Réessayez, ou supprimez-le.",
+        "waitingForMicrophone": "En attente du micro...",
+        "hideTranscript": "Masquer la transcription",
+        "transcript": "Transcription",
+        "copyTranscript": "Copier la transcription",
+        "pause": "Pause",
+        "play": "Écouter le message vocal",
+        "seek": "Avancer",
+        "record": "Enregistrer un message vocal",
+        "discard": "Supprimer",
+        "discardLabel": "Supprimer l'enregistrement",
+        "retry": "Réessayer",
+        "send": "Envoyer",
+        "retryLabel": "Réessayer d'envoyer l'enregistrement",
+        "sendLabel": "Envoyer l'enregistrement",
+        "unsupported": "Les messages vocaux ne sont pas pris en charge par ce navigateur.",
+        "microphoneBlocked": "L'accès au micro est bloqué. Autorisez-le dans les réglages de votre navigateur pour enregistrer.",
+        "noMicrophone": "Aucun micro disponible.",
+        "startFailed": "Impossible de démarrer l'enregistrement.",
+        "nothingHeard": "Rien n'a été entendu dans cet enregistrement.",
+        "voiceMessageFailed": "Impossible d'envoyer votre message vocal.",
+        "nothingRecorded": "Rien n'a été enregistré."
+    },
+    "agentInstall": {
+        "started": "Installation lancée",
+        "complete": "Installation terminée",
+        "viewGuide": "Voir le guide",
+        "guideTitle": "Guide d'installation de {name}"
+    },
+    "setupEvents": {
+        "notificationSent": "Vous a envoyé une notification",
+        "read": "Lue",
+        "schedulesOn": "{count, plural, one {# planification activée} other {# planifications activées}}",
+        "triggersOn": "{count, plural, one {# déclencheur activé} other {# déclencheurs activés}}",
+        "setUp": "{name} est configuré",
+        "setupComplete": "Configuration terminée",
+        "connectedHint": "Connecté, le coworker peut l'utiliser",
+        "signInHint": "Connectez-vous une fois pour que le coworker puisse l'utiliser",
+        "connected": "Connecté",
+        "signIn": "Se connecter"
+    },
+    "takeover": {
+        "opened": "Le navigateur est ouvert sur le bureau de votre coworker. Revenez ici une fois terminé.",
+        "opensSite": "Ouvre {site} dans le navigateur de votre coworker, pour que vous le pilotiez.",
+        "opens": "Ouvre le navigateur de votre coworker, pour que vous le pilotiez.",
+        "skipLabel": "Ignorer la prise en main du navigateur",
+        "privacy": "Les comptes auxquels vous vous connectez restent dans le navigateur de ce coworker, sur votre machine.",
+        "openAgain": "Rouvrir",
+        "closing": "Fermeture…",
+        "done": "Terminé",
+        "skip": "Passer",
+        "openBrowser": "Ouvrir le navigateur"
+    },
+    "video": {
+        "play": "Lire {name}",
+        "pause": "Mettre {name} en pause",
+        "previewUnavailable": "Aperçu indisponible",
+        "openFullScreen": "Ouvrir {name} en plein écran"
+    },
+    "tool": {
+        "error": "Erreur",
+        "output": "Résultat",
+        "input": "Entrée",
+        "completedIn": "Terminé en {duration}"
+    },
+    "webhookRun": {
+        "label": "Webhook reçu",
+        "viewPrompt": "Voir le prompt",
+        "viewPayload": "Voir le contenu",
+        "promptTitle": "Prompt de {name}",
+        "payloadTitle": "Contenu de {name}"
+    },
+    "question": {
+        "tooManyFiles": "Vous pouvez joindre jusqu'à {max} fichiers. {rejected} n'ont pas été ajoutés.",
+        "uploadsFailed": "{count, plural, one {# pièce jointe n'a pas pu être envoyée. Relancez-la ou retirez-la avant de répondre.} other {# pièces jointes n'ont pas pu être envoyées. Relancez-les ou retirez-les avant de répondre.}}"
+    },
+    "queued": {
+        "stopping": "Arrêt de l'exécution en cours",
+        "badge": "En attente",
+        "attachmentsOnly": "Pièces jointes seules",
+        "sendNowStops": "Envoyer maintenant, arrête l'exécution en cours",
+        "sendNow": "Envoyer maintenant",
+        "sendNowLabel": "Envoyer le message en attente maintenant",
+        "remove": "Retirer",
+        "removeLabel": "Retirer le message en attente"
+    },
+    "context": {
+        "usedLabel": "Contexte utilisé : {percent} %",
+        "title": "Contexte",
+        "input": "Entrée",
+        "cached": "En cache",
+        "reasoning": "Réflexion",
+        "output": "Sortie",
+        "total": "Total"
+    },
+    "feedback": {
+        "negativeTitle": "Donner un avis négatif",
+        "positiveTitle": "Donner un avis positif",
+        "categoryLabel": "Quel type de problème souhaitez-vous signaler ?",
+        "categoryPlaceholder": "Choisir…",
+        "detailsLabel": "Donnez des détails",
+        "negativePlaceholder": "Qu'est-ce qui ne vous a pas convenu dans cette réponse ?",
+        "positivePlaceholder": "Qu'est-ce qui vous a plu dans cette réponse ?",
+        "disclaimer": "Envoyer ce signalement partage cette conversation avec l'équipe Rerun pour que nous puissions améliorer vos coworkers.",
+        "cancel": "Annuler",
+        "submit": "Envoyer",
+        "categories": {
+            "ui_bug": "Bug d'interface",
+            "did_not_follow": "N'a pas suivi ma demande",
+            "not_factual": "Factuellement incorrect",
+            "incomplete": "Réponse incomplète",
+            "wrong_tool": "Mauvais outil ou mauvaise app",
+            "tool_error": "Erreur d'outil ou de connexion",
+            "too_slow": "Trop lent",
+            "memory": "Problème de mémoire",
+            "other": "Autre"
+        },
+        "removeFailed": "Impossible de retirer votre avis",
+        "saveFailed": "Impossible d'enregistrer votre avis",
+        "thanks": "Merci pour votre avis"
+    },
+    "providerError": {
+        "fallbackTitle": "Une erreur est survenue",
+        "runInFlight": "Une exécution lancée plus tôt occupe encore cette conversation. Arrêtez-la pour envoyer votre message.",
+        "stop": {
+            "title": "Arrêter cette exécution",
+            "cta": "Arrêter",
+            "description": "Libère la conversation pour votre message."
+        },
+        "newConversation": {
+            "title": "Démarrer une nouvelle conversation",
+            "cta": "Nouvelle conversation",
+            "description": "Ouvre une nouvelle conversation avec ce coworker."
+        },
+        "continue": {
+            "title": "Reprendre l'exécution",
+            "cta": "Continuer",
+            "description": "Reprend là où le coworker a été interrompu."
+        },
+        "retry": {
+            "title": "Réessayer",
+            "cta": "Réessayer",
+            "description": "Renvoie votre dernier message."
+        },
+        "switch": {
+            "title": "Passer à un autre modèle",
+            "cta": "Changer",
+            "descriptionModel": "Choisissez un autre modèle pour cette conversation.",
+            "descriptionConnection": "Choisissez une autre connexion de ce workspace."
+        },
+        "reconnect": {
+            "title": "Se reconnecter",
+            "cta": "Se reconnecter",
+            "description": "Reconnectez-vous à la connexion qu'utilise ce coworker."
+        }
+    },
+    "budget": {
+        "title": "Crédits Rerun",
+        "paused": {
+            "title": "Crédits Rerun en pause",
+            "body": "Vos coworkers ne peuvent plus utiliser les modèles Rerun ni les données payantes tant que personne ne les réactive.",
+            "actionTitle": "Réactiver les crédits Rerun",
+            "actionDescription": "Les dépenses reprennent immédiatement.",
+            "cta": "Réactiver"
+        },
+        "preTrial": {
+            "body": "Vous avez épuisé les {credits} offerts à la création du compte. L'abonnement donne accès à la suite.",
+            "actionDescription": "Vos coworkers continuent de travailler, résiliable à tout moment."
+        },
+        "subscribe": {
+            "title": "S'abonner maintenant",
+            "cta": "S'abonner",
+            "descriptionTrial": "Met fin à votre essai aujourd'hui. {credits} inclus chaque mois.",
+            "description": "{credits} inclus chaque mois."
+        },
+        "topUp": {
+            "title": "Recharger vos crédits Rerun",
+            "cta": "Recharger",
+            "description": "Ou attendez, ils se renouvellent le mois prochain."
+        },
+        "usedUp": {
+            "noCredit": "Ce workspace n'a pas encore de crédits Rerun.",
+            "trial": "Vous avez épuisé les {credits} de votre essai gratuit.",
+            "period": "Vous avez épuisé vos crédits Rerun pour cette période."
+        },
+        "ownConnection": {
+            "body": "Cette conversation tournait sur Rerun, et votre abonnement {plan} est connecté."
+        },
+        "runOn": "Utiliser {plan}",
+        "or": "Ou",
+        "connectProvider": {
+            "body": "Vous payez déjà Claude ou ChatGPT ? Faites tourner vos coworkers sur cet abonnement, sans frais en plus ici.",
+            "claude": "Connecter Claude",
+            "chatgpt": "Connecter ChatGPT"
+        },
+        "subscribeToKeepWorking": "Abonnez-vous pour que vos coworkers continuent de travailler.",
+        "resetsNextMonth": "Ils se renouvellent le mois prochain.",
+        "lifetime": {
+            "ownConnection": "Votre offre à vie fonctionne avec votre propre IA, et votre abonnement {plan} est connecté.",
+            "connectProvider": "Votre offre à vie fonctionne avec votre propre IA. Connectez Claude ou ChatGPT pour que vos coworkers continuent de travailler.",
+            "body": "Votre offre à vie fonctionne avec votre propre IA.",
+            "connectTitle": "Connecter votre IA",
+            "connectDescription": "Claude, ChatGPT ou une clé API.",
+            "connectCta": "Connecter"
+        },
+        "trial": {
+            "onPro": "Vous êtes sur Pro.",
+            "resuming": "Votre coworker reprend la tâche.",
+            "resumingNamed": "{name} reprend la tâche.",
+            "title": "Crédits d'essai épuisés",
+            "stopped": "{name} s'est arrêté.",
+            "continueWithPro": "Continuer avec Pro · {price}/mois",
+            "useMyPlan": "Ou utiliser mon abonnement :"
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "Connecté",
+            "skipped": "Ignoré",
+            "notReconnected": "Non reconnecté",
+            "notFound": "Introuvable",
+            "stored": "Enregistrée",
+            "approved": "Approuvé",
+            "notNow": "Plus tard"
+        },
+        "apps": {
+            "title": "Apps",
+            "meta": "{connected} sur {total} connectées",
+            "insteadOf": "À la place de {name}"
+        },
+        "answers": {
+            "title": {
+                "one": "Réponse",
+                "other": "Réponses"
+            },
+            "meta": "{answered} sur {total} répondues"
+        },
+        "keys": {
+            "title": "Clés",
+            "meta": "{stored} sur {total} enregistrées",
+            "note": "Enregistrées sur la Box. Le coworker ne voit que les noms."
+        },
+        "approvals": {
+            "title": {
+                "one": "Approbation",
+                "other": "Approbations"
+            },
+            "metaBoth": "{approved} approuvées, {declined} plus tard",
+            "metaApproved": "{approved} approuvées",
+            "metaDeclined": "{declined} plus tard"
+        },
+        "mcp": {
+            "title": "Serveur MCP"
+        },
+        "takeover": {
+            "handedBackOn": "Vous avez rendu le navigateur sur {url}",
+            "handedBack": "Vous avez rendu le navigateur"
+        },
+        "dismissed": {
+            "service": "Vous avez fermé la configuration des apps",
+            "question": "Vous avez passé les questions",
+            "secret": "Vous avez refusé de partager les clés",
+            "mcp": "Vous avez passé la connexion",
+            "takeover": "Vous avez laissé le navigateur à votre coworker"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "Impossible d'arrêter l'exécution en cours. Votre message partira à la fin de celle-ci.",
+        "selectModel": "Choisissez un modèle pour commencer : ouvrez le menu des modèles ci-dessous.",
+        "emptyTitle": "Démarrer une conversation",
+        "emptyDescription": "Envoyez un message à ce coworker",
+        "runStoppedResponding": "L'exécution ne répond plus. Arrêtez-la pour envoyer un autre message.",
+        "continueWhereLeftOff": "Reprends là où tu t'es arrêté."
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, one {{names} est trop volumineux pour être joint.} =2 {{names} sont trop volumineux pour être joints.} other {{names} et {more} autres sont trop volumineux pour être joints.}}",
+        "addFiles": "Ajouter des photos ou des fichiers",
+        "takeScreenshot": "Faire une capture d'écran",
+        "noMatchingFiles": "Aucun fichier ne correspond aux types acceptés.",
+        "tooManyFiles": "Vous pouvez joindre jusqu'à {max} fichiers. {rejected} n'ont pas été ajoutés.",
+        "uploadFiles": "Envoyer des fichiers",
+        "dropFiles": "Déposez des fichiers pour les joindre",
+        "placeholder": "Que voulez-vous savoir ?",
+        "stop": "Arrêter",
+        "submit": "Envoyer"
+    }
+}

@@ -7,6 +7,7 @@ import { LinkIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { AGENT_WORKSPACE_FILE_PATH_ATTRIBUTE, AGENT_WORKSPACE_FILE_TAG, remarkAgentWorkspaceLinks } from '@/lib/files/workspace-link'
 import { useBoardStore } from '@/stores/board.store'
+import { useTranslations } from 'next-intl'
 import { createContext, type ReactNode, useContext, useMemo } from 'react'
 import { defaultRemarkPlugins, type Components } from 'streamdown'
 
@@ -20,6 +21,7 @@ type WorkspaceFileLinkProps = {
 }
 
 function WorkspaceFileLink({ children, className, path }: WorkspaceFileLinkProps) {
+    const t = useTranslations('chat.message')
     const agentId = useContext(AgentWorkspaceContext)
     const openAgentFile = useBoardStore(state => state.openAgentFile)
 
@@ -30,7 +32,7 @@ function WorkspaceFileLink({ children, className, path }: WorkspaceFileLinkProps
             type="button"
             className={cn('wrap-anywhere appearance-none text-left font-medium text-primary underline', className)}
             data-streamdown="link"
-            title={`Open ${path}`}
+            title={t('openFile', { path })}
             onClick={() => openAgentFile(agentId, path)}
         >
             {children}

@@ -2,6 +2,7 @@
 
 import { memo } from 'react'
 
+import { useUiLocale } from '../../locale'
 import { shortRelativeTime } from '../../time'
 import { BLOCK_HEIGHT, DEFAULT_SPAN, TILE_H, TILE_W, buddyFootprintShare, isoPosition, tileTopLift } from '../iso'
 import type { Tile, TileResults } from '../types'
@@ -47,6 +48,7 @@ export const TileResultsCard = memo(function TileResultsCard({ tile, worldOffset
 })
 
 export function TileResultsList({ results, animated = true }: { results: TileResults; animated?: boolean }) {
+    const locale = useUiLocale()
     const rows = results.items.slice(0, CARD_ROWS)
     const hidden = results.items.slice(CARD_ROWS).reduce((sum, item) => sum + item.count, 0)
     return (
@@ -59,7 +61,7 @@ export function TileResultsList({ results, animated = true }: { results: TileRes
                     <FlagCheckeredIcon className="size-[7px] shrink-0" style={{ color: RESULTS_GREEN }} />
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
                     {item.count > 1 && <span className="shrink-0 rounded-full bg-muted px-[3px] font-semibold text-foreground/80 tabular-nums">×{item.count}</span>}
-                    <span className="shrink-0 text-muted-foreground tabular-nums">{shortRelativeTime(new Date(item.at).toISOString())}</span>
+                    <span className="shrink-0 text-muted-foreground tabular-nums">{shortRelativeTime(new Date(item.at).toISOString(), locale)}</span>
                 </span>
             ))}
             {hidden > 0 && <span className="pl-[11px] text-muted-foreground tabular-nums">+{hidden}</span>}

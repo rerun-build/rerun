@@ -2,12 +2,14 @@ import { toast } from 'sonner'
 
 const UPDATE_TOAST_ID = 'deploy-update'
 
-export function showUpdateAvailableToast() {
-    toast('New version available', {
+export type UpdateToastCopy = { title: string; description: string; reload: string }
+
+export function showUpdateAvailableToast(copy: UpdateToastCopy) {
+    toast(copy.title, {
         id: UPDATE_TOAST_ID,
-        description: 'Reload to get the latest Rerun.',
+        description: copy.description,
         duration: Infinity,
-        action: { label: 'Reload', onClick: () => window.location.reload() },
+        action: { label: copy.reload, onClick: () => window.location.reload() },
     })
 }
 

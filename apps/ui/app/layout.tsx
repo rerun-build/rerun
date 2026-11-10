@@ -12,6 +12,10 @@ import { DeployUpdateWatcher } from "@/components/deploy-update/DeployUpdateWatc
 import { DomMutationGuard } from "@rerun/ui/dom-guard";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
 import { ThemeCookieBootstrap, ThemeProvider } from "@rerun/ui/theme";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
+import { TimeZoneCookie } from "@/components/layout/TimeZoneCookie";
+import { UiLocaleProvider } from "@rerun/ui/locale";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -73,14 +77,15 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
@@ -92,18 +97,23 @@ export default function RootLayout({
             __html: `window.__pwaPrompt=null;addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__pwaPrompt=e;dispatchEvent(new Event('pwa-can-install'))});addEventListener('appinstalled',function(){window.__pwaPrompt=null;dispatchEvent(new Event('pwa-installed'))});`,
           }}
         />
-        <ThemeProvider>
-          <TooltipProvider>
-            {children}
-            <Toaster />
-            <AppChrome>
-              <CookieConsent />
-              <AffiliateTracking />
-              <DeployUpdateWatcher />
-              <RegisterSW />
-            </AppChrome>
-          </TooltipProvider>
-        </ThemeProvider>
+        <NextIntlClientProvider>
+          <UiLocaleProvider locale={locale} messages={{ kit: messages.kit }}>
+            <TimeZoneCookie />
+            <ThemeProvider>
+              <TooltipProvider>
+                {children}
+                <Toaster />
+                <AppChrome>
+                  <CookieConsent />
+                  <AffiliateTracking />
+                  <DeployUpdateWatcher />
+                  <RegisterSW />
+                </AppChrome>
+              </TooltipProvider>
+            </ThemeProvider>
+          </UiLocaleProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

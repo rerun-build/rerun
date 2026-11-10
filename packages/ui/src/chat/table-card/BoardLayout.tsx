@@ -3,12 +3,14 @@ import type { TableCard } from '@rerun/contracts'
 import { cellText, type CellContext } from './format-cell'
 import { BoardColumnHeader, BoardItem } from './items'
 import { EmptyRows } from './TableCardFrame'
+import { useKitTranslations } from '../../locale'
 
 /**
  * A kanban over `groupBy`. The counts and sums on each column come from `groups`, counted over the
  * whole table: the cards under them are only the first few rows of each group.
  */
 export function BoardLayout({ card, context }: { card: TableCard; context: CellContext }) {
+    const t = useKitTranslations()
     const { fields = {}, formats = {}, groupBy, groups = [] } = card
     const valueFormat = fields.value ? formats[fields.value] : undefined
     if (groups.length === 0) return <EmptyRows />
@@ -24,7 +26,7 @@ export function BoardLayout({ card, context }: { card: TableCard; context: CellC
                         {rows.map((row, i) => (
                             <BoardItem key={i} row={row} fields={fields} formats={formats} context={context} />
                         ))}
-                        {hidden > 0 && <span className="px-1 pb-0.5 text-[11px] text-muted-foreground">+ {hidden} more</span>}
+                        {hidden > 0 && <span className="px-1 pb-0.5 text-[11px] text-muted-foreground">{t('chat.table.more', { count: hidden })}</span>}
                     </div>
                 )
             })}

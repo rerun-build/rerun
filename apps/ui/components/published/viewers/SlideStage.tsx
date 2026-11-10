@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/lib/icons'
@@ -7,6 +8,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@/lib/icons'
 const SWIPE_THRESHOLD_PX = 40
 
 export function SlideStage({ slides }: { slides: ReactNode[] }) {
+    const t = useTranslations('published.viewer')
     const [index, setIndex] = useState(0)
     const swipeStart = useRef<number | null>(null)
     const count = slides.length
@@ -42,13 +44,13 @@ export function SlideStage({ slides }: { slides: ReactNode[] }) {
         >
             <div className="flex min-h-0 w-full max-w-[860px] flex-1 items-center justify-center [container-type:size]">{slides[index]}</div>
             <div className="flex shrink-0 items-center gap-2 text-white/70">
-                <Button variant="ghost" size="icon-sm" className="text-white/70 hover:bg-white/10 hover:text-white" aria-label="Previous slide" disabled={index === 0} onClick={() => go(-1)}>
+                <Button variant="ghost" size="icon-sm" className="text-white/70 hover:bg-white/10 hover:text-white" aria-label={t('previousSlide')} disabled={index === 0} onClick={() => go(-1)}>
                     <ChevronLeftIcon />
                 </Button>
                 <span className="font-mono text-xs tabular-nums" aria-live="polite">
                     {index + 1} / {count}
                 </span>
-                <Button variant="ghost" size="icon-sm" className="text-white/70 hover:bg-white/10 hover:text-white" aria-label="Next slide" disabled={index === count - 1} onClick={() => go(1)}>
+                <Button variant="ghost" size="icon-sm" className="text-white/70 hover:bg-white/10 hover:text-white" aria-label={t('nextSlide')} disabled={index === count - 1} onClick={() => go(1)}>
                     <ChevronRightIcon />
                 </Button>
             </div>

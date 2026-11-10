@@ -9,6 +9,7 @@ import { useOnScreen } from '../iso-grid/hooks/useOnScreen'
 import { FOREMAN_BALL_FRAME, ForemanBall, foremanFacePose, foremanFaceRest } from './ForemanBall'
 import type { ForemanFacing } from './foreman-face'
 import { ORB_TUNING, approachTuning, type OrbTuning } from './orb-tuning'
+import { useKitTranslations } from '../locale'
 
 export type OrbActivity = 'idle' | 'listening' | 'thinking' | 'speaking'
 
@@ -56,7 +57,8 @@ export type OrbProps = {
  * Le Foreman : une boule de verre indigo, deux yeux ronds sur une plaque sombre. Les quatre états ne
  * changent jamais la forme ni la matière, seulement le rythme du rebond, du reflet et du regard.
  */
-export function Orb({ state = 'idle', size, onClick, label = 'Ask Rerun', paused = false, gaze, facing = 'left', className }: OrbProps) {
+export function Orb({ state = 'idle', size, onClick, label, paused = false, gaze, facing = 'left', className }: OrbProps) {
+    const t = useKitTranslations()
     const reducedMotion = useReducedMotion()
     const rest = foremanFaceRest(facing)
     // Un état et non un `useRef` : la racine passe de `button` à `span` quand `onClick` tombe (le
@@ -137,7 +139,7 @@ export function Orb({ state = 'idle', size, onClick, label = 'Ask Rerun', paused
 
     return (
         <Root
-            {...(onClick ? { type: 'button' as const, 'aria-label': label, onClick } : { 'aria-hidden': true })}
+            {...(onClick ? { type: 'button' as const, 'aria-label': label ?? t('foreman.orbLabel'), onClick } : { 'aria-hidden': true })}
             className={cn(
                 'relative block rounded-full',
                 onClick && 'cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',

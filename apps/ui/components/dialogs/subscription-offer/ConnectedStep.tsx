@@ -3,22 +3,27 @@
 import { ExplainerCheck } from '@/components/dialogs/ExplainerPanel'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { PROVIDER_PITCH, type AddableProvider } from '@/lib/engine/ai-sources'
+import { providerPitch, type AddableProvider, type SourceCopy } from '@/lib/engine/ai-sources'
+import { useTranslations } from 'next-intl'
 
 import { OfferFooter } from './offer-footer'
 import { PLANS, PROVIDER_GLYPH } from './offer-plans'
 
-function connectedCopy(provider: AddableProvider) {
+type ConnectedTranslator = ReturnType<typeof useTranslations<'dialogs.subscriptionOffer'>>
+
+function connectedCopy(provider: AddableProvider, t: ConnectedTranslator, tConnections: SourceCopy) {
     if (provider === 'claude' || provider === 'codex') {
         const { name } = PLANS[provider]
-        return { title: `${name} is connected`, detail: `Your coworkers now run on your ${name} plan.` }
+        return { title: t('connected.title', { name }), detail: t('connected.planDetail', { name }) }
     }
-    if (provider === 'opencode') return { title: 'OpenCode is connected', detail: 'Your coworkers now run on your OpenCode Go plan.' }
-    return { title: `${PROVIDER_PITCH[provider].title} is connected`, detail: 'Your coworkers now run on this key.' }
+    if (provider === 'opencode') return { title: t('connected.title', { name: 'OpenCode' }), detail: t('connected.opencodeDetail') }
+    return { title: t('connected.title', { name: providerPitch(provider, tConnections).title }), detail: t('connected.keyDetail') }
 }
 
 export function ConnectedStep({ provider, onDone }: { provider: AddableProvider; onDone: () => void }) {
-    const { title, detail } = connectedCopy(provider)
+    const t = useTranslations('dialogs.subscriptionOffer')
+    const tConnections = useTranslations('connections')
+    const { title, detail } = connectedCopy(provider, t, tConnections)
 
     return (
         <>
@@ -36,7 +41,7 @@ export function ConnectedStep({ provider, onDone }: { provider: AddableProvider;
             </div>
 
             <OfferFooter>
-                <Button onClick={onDone}>Done</Button>
+                <Button onClick={onDone}>{t('connected.done')}</Button>
             </OfferFooter>
         </>
     )

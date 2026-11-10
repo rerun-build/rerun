@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { Icon } from '@/components/ui/icon'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { Stripes } from '@rerun/ui/primitives'
@@ -22,6 +23,8 @@ export type AgentCardEntry = { key: string; icon: LucideIcon; title: string; sub
 export type AgentCardNotes = { connectors?: string; triggers?: string }
 
 export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }: { agent: TemplateAgent; connectors: TemplateConnector[]; comesWith?: AgentCardEntry[]; notes?: AgentCardNotes }) {
+    const t = useTranslations('templates.agentCard')
+    const locale = useLocale()
     const agentConnectors = connectors.filter(connector => agent.connectorSlugs.includes(connector.slug))
     const shownConnectors = agentConnectors.slice(0, MAX_CONNECTORS)
     const hiddenConnectors = agentConnectors.slice(MAX_CONNECTORS)
@@ -44,7 +47,7 @@ export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }:
                 whether to take it, and what travels with it is the part of that decision the rest of
                 the card cannot answer. */}
             {comesWith && comesWith.length > 0 && (
-                <CardSection title="Comes with">
+                <CardSection title={t('comesWith')}>
                     {comesWith.map(entry => (
                         <AgentListRow key={entry.key} icon={entry.icon} title={entry.title} subtitle={entry.subtitle} />
                     ))}
@@ -52,7 +55,7 @@ export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }:
             )}
 
             {agentConnectors.length > 0 && (
-                <CardSection title="Apps" note={notes?.connectors}>
+                <CardSection title={t('apps')} note={notes?.connectors}>
                     <div className="flex flex-wrap items-center gap-1.5">
                         {shownConnectors.map(connector => (
                             <TooltipLabeled key={connector.slug} label={connector.name}>
@@ -74,7 +77,7 @@ export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }:
             )}
 
             {agent.skills.length > 0 && (
-                <CardSection title="Skills" count={agent.skills.length}>
+                <CardSection title={t('skills')} count={agent.skills.length}>
                     {shownSkills.map(skill => (
                         <AgentListRow key={skill.name} icon={Zap} title={skill.name} subtitle={skill.description} />
                     ))}
@@ -83,16 +86,16 @@ export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }:
             )}
 
             {agent.schedules.length > 0 && (
-                <CardSection title="Scheduled tasks" count={agent.schedules.length}>
+                <CardSection title={t('schedules')} count={agent.schedules.length}>
                     {shownSchedules.map(schedule => (
-                        <AgentListRow key={schedule.name} icon={CalendarClock} title={schedule.name} subtitle={scheduleLabel(schedule.cron)} />
+                        <AgentListRow key={schedule.name} icon={CalendarClock} title={schedule.name} subtitle={scheduleLabel(schedule.cron, locale)} />
                     ))}
                     {agent.schedules.length > shownSchedules.length && <MoreRow count={agent.schedules.length - shownSchedules.length} />}
                 </CardSection>
             )}
 
             {agent.triggers.length > 0 && (
-                <CardSection title="Webhooks" count={agent.triggers.length} note={notes?.triggers}>
+                <CardSection title={t('webhooks')} count={agent.triggers.length} note={notes?.triggers}>
                     {shownTriggers.map(trigger => (
                         <AgentListRow key={trigger.name} icon={WebhookIcon} title={trigger.name} subtitle={trigger.description || trigger.methods.join(' · ')} />
                     ))}
@@ -131,5 +134,6 @@ function AgentListRow({ icon: Glyph, title, subtitle }: { icon: LucideIcon; titl
 }
 
 function MoreRow({ count }: { count: number }) {
-    return <p className="pl-6 text-[11px] text-muted-foreground">+{count} more</p>
+    const t = useTranslations('templates.agentCard')
+    return <p className="pl-6 text-[11px] text-muted-foreground">{t('more', { count })}</p>
 }

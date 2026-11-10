@@ -6,6 +6,7 @@ import { Alert } from 'react-native'
 import { fetchNotificationPrefs, patchNotificationPrefs } from '@/api/notifications'
 import { useAuth } from '@/auth/AuthProvider'
 import { cachedNotificationPrefs } from '@/data/local-cache'
+import { translatorFor } from '@/i18n/translator'
 
 type Caller = { accessToken: string; workspaceId: number }
 type Store = { userId: string | null; prefs: NotificationPrefs | null; failed: boolean }
@@ -64,7 +65,8 @@ function update(userId: string, caller: Caller, patch: NotificationPrefsPatch) {
             },
             err => {
                 pending -= 1
-                Alert.alert('Could not save', err instanceof Error && err.message ? err.message : 'Try again in a moment.')
+                const t = translatorFor('mobileSettings')
+                Alert.alert(t('notifications.saveFailed'), err instanceof Error && err.message ? err.message : t('notifications.tryAgainShortly'))
                 if (pending === 0) reload(userId, caller)
             }
         )

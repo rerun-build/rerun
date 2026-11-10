@@ -1,0 +1,908 @@
+{
+    "credits": "{count, plural, one {# crédito} other {# créditos}}",
+    "plan": {
+        "billed": {
+            "monthly": "{price}/mes",
+            "yearly": "{price}/año"
+        },
+        "yourRenewal": "tu renovación",
+        "status": {
+            "paymentFailed": "Pago fallido",
+            "ends": "Termina el {date}",
+            "ending": "Por terminar",
+            "monthlyFrom": "Mensual desde el {date}",
+            "active": "Activo"
+        },
+        "summary": {
+            "monthlyRenews": "Coworkers ilimitados · facturación mensual · se renueva el {renewal}",
+            "monthlyEnds": "Coworkers ilimitados · facturación mensual · termina el {renewal}",
+            "yearlyRenews": "Coworkers ilimitados · facturación anual · se renueva el {renewal}",
+            "yearlyEnds": "Coworkers ilimitados · facturación anual · termina el {renewal}"
+        },
+        "success": {
+            "done": "Listo",
+            "paymentReceivedTitle": "Pago recibido",
+            "paymentReceivedBody": "Tu tarjeta está actualizada y Pro vuelve a estar activo.",
+            "backOnTitle": "Pro vuelve a estar activo",
+            "backOnBody": "Tu plan se renueva el {date}."
+        },
+        "cardUpdated": "Tarjeta actualizada",
+        "acceptTerms": "Primero acepta las condiciones",
+        "pleaseWait": "Espera un momento",
+        "nextInvoice": "Próxima factura",
+        "overview": {
+            "keepYearlyFailed": "No se pudo mantener tu plan anual",
+            "billed": "Facturación",
+            "billedYearly": "Anual, impuestos incluidos",
+            "billedMonthly": "Mensual, impuestos incluidos",
+            "from": "Desde el {date}",
+            "monthlyPrice": "Mensual · {price}",
+            "title": "Facturación",
+            "update": "Cambiar",
+            "invoices": "Facturas",
+            "viewAll": "Ver todas",
+            "creditUsage": "Uso de créditos",
+            "creditsLeft": "Quedan {credits}",
+            "keepYearly": "Mantener mi plan anual",
+            "switchHint": "Cambia la facturación para ver el nuevo precio.",
+            "cancelPlan": "Cancelar plan"
+        },
+        "change": {
+            "planLabel": "Coworkers ilimitados{slots}",
+            "switchScheduledTitle": "Cambio programado",
+            "switchScheduledBody": "Tu plan anual sigue hasta su fin. La facturación mensual empieza el {date}.",
+            "changeScheduledTitle": "Cambio programado",
+            "changeScheduledBody": "Mantienes {current} hasta el {renewal} y luego {next} por {price}.",
+            "planUpdatedTitle": "Plan actualizado",
+            "planUpdatedBodyMonthly": "{plan}, facturación mensual. Tu recibo llegará por email.",
+            "planUpdatedBodyYearly": "{plan}, facturación anual. Tu recibo llegará por email.",
+            "switchToMonthly": "Pasar a mensual",
+            "changeToSlots": "Cambiar a {count, plural, one {<n></n> plaza de {provider}} other {<n></n> plazas de {provider}}}",
+            "changeAppSlots": "Cambiar tus plazas de apps",
+            "switchToYearly": "Pasar a anual",
+            "proLineMonthly": "Pro · {plan}, mensual",
+            "proLineYearly": "Pro · {plan}, anual",
+            "unusedTimeMonthly": "Tiempo sin usar de tu plan mensual",
+            "unusedTimeYearly": "Tiempo sin usar de tu plan anual",
+            "dueTodayTaxIncluded": "A pagar hoy, impuestos incluidos",
+            "from": "Desde el {date}",
+            "until": "Hasta el {date}",
+            "monthlyFrom": "Mensual · <price></price>",
+            "keepMyPlan": "Mantener mi plan",
+            "confirmAndPay": "Confirmar y pagar",
+            "switchOn": "Cambiar el {date}",
+            "scheduleFor": "Programar para el {date}",
+            "billedNowSlots": "Las nuevas plazas se cobran ahora. La facturación mensual empieza el {date}.",
+            "slotsReady": "Las nuevas plazas están listas en cuanto se procese el pago.",
+            "yearlyStarts": "Tu plan anual empieza en cuanto se procese el pago.",
+            "nothingToday": "Hoy no se cobra nada."
+        },
+        "cancelPending": {
+            "endOfPeriod": "el fin de tu periodo",
+            "resumeFailed": "No se pudo reanudar tu plan",
+            "title": "Pro termina el {date}",
+            "body": "Tus coworkers siguen funcionando hasta entonces. Después, el workspace se pausa y sus datos se guardan 90 días.",
+            "none": "Ninguna",
+            "resume": "Reanudar Pro",
+            "footnote": "Al reanudar mantienes tu plan y se cobran {price} el {date}."
+        },
+        "card": {
+            "notSaved": "No se pudo guardar tu tarjeta",
+            "title": "Actualiza tu tarjeta",
+            "save": "Guardar tarjeta",
+            "footnote": "Tus próximas facturas se cobran en esta tarjeta."
+        },
+        "pastDue": {
+            "declinedOn": "Tu pago de {amount} del {date} fue rechazado.",
+            "declined": "Tu pago de {amount} fue rechazado.",
+            "lastDeclined": "Tu último pago fue rechazado.",
+            "paused": "Tu workspace está en pausa y vuelve en cuanto se procese el pago.",
+            "keepRunning": "Págalo ahora para que tu workspace siga funcionando.",
+            "ctaAmount": "Actualizar tarjeta y pagar {amount}",
+            "cta": "Actualizar tarjeta y pagar"
+        },
+        "invoices": {
+            "loadFailed": "No se pudieron cargar tus facturas",
+            "title": "Facturas",
+            "empty": "Aún no hay facturas.",
+            "status": {
+                "draft": "Borrador",
+                "open": "Pendiente",
+                "uncollectible": "Incobrable",
+                "void": "Anulada"
+            }
+        },
+        "credit": {
+            "addedTitle": "Créditos añadidos",
+            "addedBody": "Ahora recibes {count, plural, one {# crédito} other {# créditos}} al mes. Tus coworkers retoman donde se quedaron.",
+            "unchangedBody": "Tus créditos siguen igual hasta tu renovación.",
+            "title": "Añadir créditos de Rerun",
+            "eachPack": "Cada pack añade {count, plural, one {# crédito} other {# créditos}} al mes, por {price}.",
+            "packs": "{count, plural, one {# pack} other {# packs}}",
+            "perMonth": "+{count, plural, one {# crédito} other {# créditos}} al mes",
+            "lessAria": "Un pack menos",
+            "moreAria": "Un pack más",
+            "then": "Después",
+            "add": "Añadir créditos",
+            "pickPacks": "Elige un número de packs",
+            "removeAtRenewal": "Quitar al renovar",
+            "chargedNow": "Se cobra ahora, prorrateado hasta tu renovación."
+        }
+    },
+    "apps": {
+        "title": "Apps",
+        "description": "Superpoderes extra para tus coworkers, en la misma factura que tu plan.",
+        "slotsSuffix": "{count, plural, one { + # plaza de {provider}} other { + # plazas de {provider}}}",
+        "unit": {
+            "monthly": "/mes",
+            "yearly": "/año"
+        },
+        "lessReason": {
+            "freeUntil": "Gratis hasta el {date}",
+            "loading": "Cargando tus cuentas",
+            "disconnectFirst": "Primero desconecta una cuenta en {app}"
+        },
+        "free": "Gratis",
+        "slots": {
+            "none": "Aún no hay plazas",
+            "used": "{total, plural, one {<used></used> de <n></n> plaza en uso} other {<used></used> de <n></n> plazas en uso}}",
+            "count": "{total, plural, one {<n></n> plaza} other {<n></n> plazas}}",
+            "lineMonthly": "<slots></slots>, {price}/mes cada una",
+            "lineYearly": "<slots></slots>, {price}/año cada una"
+        },
+        "trial": {
+            "free": "<b>1 plaza gratis hasta el {date}</b>, luego {price}",
+            "withPaid": "{count, plural, one {<trial></trial>, más <n></n> plaza de pago} other {<trial></trial>, más <n></n> plazas de pago}}",
+            "withPaidInUse": "{count, plural, one {<trial></trial>, más <n></n> plaza de pago (<inUse></inUse> en uso)} other {<trial></trial>, más <n></n> plazas de pago (<inUse></inUse> en uso)}}"
+        },
+        "lessAria": "Una plaza de {provider} menos",
+        "moreAria": "Una plaza de {provider} más",
+        "leaving": "{count, plural, one {# plaza se retira el {date}} other {# plazas se retiran el {date}}}"
+    },
+    "business": {
+        "noAddress": "Primero añade una tarjeta",
+        "title": "Datos de la empresa",
+        "add": "Añadir",
+        "saved": "Datos de la empresa guardados",
+        "removeFailed": "No se pudo quitar el número",
+        "removed": "Número quitado",
+        "noTaxId": "Stripe no admite ningún número fiscal para este país: {country}.",
+        "nameLabel": "Nombre de la empresa",
+        "typeLabel": "Tipo",
+        "euVat": "IVA UE",
+        "field": {
+            "vat": "Número de IVA",
+            "taxId": "Número fiscal"
+        },
+        "confirm": {
+            "title": "¿Quitar este número?",
+            "description": "Tus próximas facturas ya no lo mostrarán.",
+            "confirm": "Quitar"
+        },
+        "removeNumber": "Quitar número",
+        "save": "Guardar",
+        "footnote": "Aparece en tus próximas facturas.",
+        "status": {
+            "verified": "Verificado",
+            "pending": "Verificando",
+            "unverified": "Sin verificar"
+        }
+    },
+    "dialog": {
+        "title": "Facturación",
+        "adminOnly": {
+            "title": "La facturación la gestiona un admin",
+            "description": "Pide a un admin de este workspace que cambie el plan o añada créditos.",
+            "gotIt": "Entendido"
+        },
+        "error": {
+            "title": "No se pudo cargar tu plan",
+            "description": "Stripe no respondió. Tu suscripción sigue intacta, vuelve a intentarlo en un momento.",
+            "retry": "Reintentar"
+        },
+        "lifetime": {
+            "title": "Plan de por vida",
+            "description": "Pagado una vez, tuyo para siempre. Coworkers y asientos ilimitados, con tu propia IA.",
+            "connectAi": "Conectar tu IA"
+        }
+    },
+    "postPayment": {
+        "title": "Todo listo",
+        "ready": {
+            "place": "Tu plan está activo. Coloca \"{title}\" en tu tablero.",
+            "setUp": "Tu plan está activo. ¿Listo para configurar \"{title}\"?",
+            "first": "Tu plan está activo. ¿Listo para dar vida a tu primer coworker?"
+        },
+        "finalizing": "Finalizando tu suscripción, solo tarda un momento.",
+        "button": {
+            "placeOne": "Colocar tu coworker",
+            "placeMany": "Colocar tus {count} coworkers",
+            "placingOne": "Colocando tu coworker",
+            "placingMany": "Colocando tus {count} coworkers",
+            "startOne": "Iniciar tu coworker",
+            "startMany": "Iniciar tus {count} coworkers",
+            "startingOne": "Iniciando tu coworker",
+            "startingMany": "Iniciando tus {count} coworkers",
+            "finalizing": "Finalizando suscripción"
+        }
+    },
+    "templatePurchase": {
+        "title": "Gracias por tu compra",
+        "waiting": "Finalizando tu compra, solo tarda un momento.",
+        "timeout": "Tu pago se procesó. Está tardando más de lo habitual en aparecer, actualiza en un momento.",
+        "fallbackTitle": "tu plantilla",
+        "readyOne": "\"{title}\" es tuyo. ¿Listo para colocar su coworker?",
+        "readyMany": "\"{title}\" es tuyo. ¿Listo para colocar sus {count} coworkers?",
+        "needsPlan": "\"{title}\" es tuyo. Necesitas un plan de Rerun activo para instalarlo.",
+        "finalizing": "Finalizando compra",
+        "close": "Cerrar",
+        "placeOne": "Colocar su coworker",
+        "placeMany": "Colocar {count} coworkers",
+        "subscribe": "Suscribirme"
+    },
+    "checkout": {
+        "trialEndFallback": "el final de tu prueba",
+        "badge": {
+            "freeTrial": "Prueba gratis",
+            "freeTrialEndsToday": "Prueba gratis · termina hoy",
+            "freeTrialDaysLeft": "Prueba gratis · {count, plural, one {# día restante} other {# días restantes}}",
+            "trialDays": "Prueba gratis de {days} días",
+            "complimentary": "Acceso de cortesía",
+            "paused": "En pausa",
+            "pausedUntil": "En pausa · guardado hasta el {date}",
+            "yourCoworker": "Tu coworker",
+            "parkedMany": "{title} · {count} coworkers"
+        },
+        "timeline": {
+            "today": "Hoy",
+            "anytime": "Cuando quieras",
+            "cancelTitle": "Cancela en un clic",
+            "noNotice": "Sin preaviso",
+            "reminderDayBefore": "Recordatorio el día antes",
+            "proStarts": "Empieza Pro",
+            "unlimitedCoworkers": "Coworkers ilimitados",
+            "nextInvoice": "Próxima factura",
+            "billedExclVat": "<billed></billed>, sin IVA",
+            "trialEndsProStarts": "Termina la prueba, empieza Pro",
+            "chargedToday": "<billed></billed> cobrados hoy, coworkers ilimitados",
+            "trialRunning": "Prueba en curso",
+            "zeroToday": "$0 hoy",
+            "trialEnds": "Termina la prueba",
+            "nothingCharged": "Sin cargos",
+            "reminder": "Recordatorio por email",
+            "reminderDetail": "El día antes, para decidir con calma",
+            "firstCharge": "{charge}, cancela antes y no pagas nada",
+            "trialStarts": "Empieza la prueba",
+            "trialStartsDetail": "$0 hoy, {agents} coworkers y {credits, plural, one {# crédito} other {# créditos}} de uso de IA",
+            "proStartsDetail": "{charge} cobrados, coworkers ilimitados y {credits, plural, one {# crédito} other {# créditos}} al mes",
+            "restoreStarts": "Empieza la restauración",
+            "restoreDetail": "Coworkers de vuelta en un minuto",
+            "installs": "Se instala",
+            "placedCount": "{count, plural, one {# coworker colocado} other {# coworkers colocados}}",
+            "placedOnBoard": "Colocado en tu tablero"
+        },
+        "variants": {
+            "startTrial": {
+                "title": "Empieza tu prueba gratis",
+                "subtitle": "Se pide tarjeta, $0 hoy. Se cobran {price} el {date} salvo que canceles antes.",
+                "cta": "Empezar prueba gratis",
+                "footnote": "$0 hoy. Cancela antes del {date} y no se te cobra nada."
+            },
+            "trialCardless": {
+                "title": "Pásate a Pro",
+                "subtitle": "Todo lo que creaste durante la prueba se queda y sigue funcionando.",
+                "cta": "Terminar prueba y suscribirme"
+            },
+            "trialCard": {
+                "title": "Tu prueba gratis",
+                "subtitle": "Nada que pagar hoy. Pro empieza solo el {date}.",
+                "subtitleWithReminder": "Nada que pagar hoy. Pro empieza solo el {date}, y te escribimos el día antes.",
+                "subtitleCancelled": "Cancelaste tu prueba. Tus coworkers siguen funcionando hasta el {date}, y no se cobra nada.",
+                "cta": "Pasarme a Pro ahora"
+            },
+            "trialCardPayNow": {
+                "title": "Pásate a Pro",
+                "subtitle": "La prueba ejecuta {agents} coworkers. Empieza Pro ahora para tener coworkers ilimitados, o deja que la prueba pase a Pro el {date}.",
+                "cta": "Terminar prueba y empezar Pro",
+                "footnote": "Esto termina tu prueba gratis hoy. Para no pagar nada hoy, sigue con tu prueba: Pro empieza solo el {date}."
+            },
+            "creditLocked": {
+                "title": "Los créditos de Rerun vienen con Pro",
+                "titleCoworker": "Sigue con Pro",
+                "subtitle": "Se agotaron tus {trialCredits, number} créditos de prueba. Pro incluye {credits, plural, one {# crédito} other {# créditos}} cada mes, y puedes añadir más cuando quieras.",
+                "subtitleCoworker": "{coworker} sigue donde se quedó.",
+                "cta": "Terminar prueba y suscribirme",
+                "ctaCoworker": "Pagar y reanudar",
+                "payCta": "Pagar {amount} y reanudar",
+                "footnote": "Cierra esto y no se cobra nada. Tu prueba sigue igual."
+            },
+            "noPlan": {
+                "title": "Suscríbete a Pro",
+                "subtitle": "Coworkers ilimitados, un solo precio. Cancela cuando quieras.",
+                "cta": "Suscribirme"
+            },
+            "complimentary": {
+                "title": "Suscríbete a Pro",
+                "subtitle": "Tu workspace tiene acceso de cortesía. Suscríbete para añadir créditos encima.",
+                "cta": "Suscribirme"
+            },
+            "paused": {
+                "title": "Reactiva Pro",
+                "subtitle": "Tus coworkers, memorias y archivos están archivados. Vuelven tal como los dejaste.",
+                "cta": "Reactivar Pro"
+            },
+            "template": {
+                "title": "Hazte Pro para instalarlo",
+                "subtitle": "Está listo. Llega a tu tablero en cuanto te suscribas.",
+                "cta": "Suscribirme"
+            }
+        },
+        "refusal": {
+            "unchanged": "{message} Tu prueba no ha cambiado.",
+            "nothingCharged": "{message} No se cobró nada y tu prueba no ha cambiado."
+        },
+        "usageBack": {
+            "trial": "Prueba",
+            "back": "Volver"
+        },
+        "success": {
+            "plan": "Plan",
+            "planValue": "Pro · Coworkers ilimitados",
+            "nextInvoice": "Próxima factura",
+            "backToBoard": "Volver a mi tablero",
+            "lastDayFallback": "el último día de tu prueba",
+            "placeCoworkers": "Colocar {count} coworkers",
+            "placeOnBoard": "Colocarlo en mi tablero",
+            "startCoworker": "Arrancar mi coworker",
+            "paid": {
+                "title": "Ya tienes Pro",
+                "body": "Tu recibo va de camino por email."
+            },
+            "cardSaved": {
+                "title": "Tarjeta guardada",
+                "body": "Tu prueba sigue. Pro empieza el {date}, con {charge} cobrados a esta tarjeta."
+            },
+            "trialStarted": {
+                "title": "Tu prueba está activa",
+                "body": "Nada cobrado hoy. {charge} el {date} salvo que canceles antes.",
+                "cta": "Crear mis coworkers"
+            },
+            "restoring": {
+                "title": "Bienvenido de nuevo",
+                "body": "Tu workspace se está restaurando. Tus coworkers despiertan en un minuto aproximadamente."
+            },
+            "creditUnlocked": {
+                "body": "{coworker} está listo para retomar la tarea. Tu recibo va de camino por email.",
+                "bodyNoCoworker": "Tu coworker está listo para retomar la tarea. Tu recibo va de camino por email.",
+                "credits": "Créditos",
+                "creditsValue": "{credits, plural, one {# crédito} other {# créditos}} al mes",
+                "models": "Modelos",
+                "modelsValue": "Todos los modelos premium",
+                "coworkers": "Coworkers",
+                "coworkersValue": "Ilimitados",
+                "resume": "Retomar la tarea"
+            }
+        },
+        "pay": {
+            "tryAgain": "Reintentar",
+            "trialRefused": "Esta tarjeta ya tuvo una prueba gratis",
+            "trialRefusedDescription": "Aún puedes suscribirte, con cobro hoy.",
+            "genericError": "Algo salió mal",
+            "acceptTerms": "Primero acepta las condiciones",
+            "updateFailed": "No se pudo actualizar tu plan",
+            "stillUpdating": "Tu plan aún se está actualizando",
+            "pleaseWait": "Espera un momento",
+            "freeFor": "Rerun Pro, gratis durante {days} días",
+            "subscribe": "Suscribirme a Rerun Pro",
+            "dueToday": "a pagar hoy",
+            "perYear": "al año",
+            "perMonth": "al mes",
+            "thenPerMonth": "Después <amount></amount> al mes, sin IVA.",
+            "authorize": "Al suscribirte, autorizas a Rerun a cobrarte hasta que canceles."
+        },
+        "card": {
+            "exclVat": "Sin IVA, calculado según tu dirección.",
+            "payLaterFootnote": "Pagar ahora termina tu prueba gratis hoy, y autorizas a Rerun a cobrarte hasta que canceles. ¿Prefieres terminar tu prueba? <later></later>",
+            "saving": "Guardando…",
+            "payOn": "Pagar el {date}",
+            "payOnLastDay": "Pagar el último día"
+        },
+        "cardOnFile": {
+            "back": "Tu prueba",
+            "title": "Empieza Pro hoy",
+            "header": "Terminar prueba, empezar Rerun Pro",
+            "tax": "Impuestos",
+            "taxFromAddress": "Impuestos, según tu dirección",
+            "dueToday": "A pagar hoy",
+            "change": "Cambiar"
+        },
+        "cancelTrial": "Cancelar prueba",
+        "trial": {
+            "title": "Tu prueba gratis",
+            "included": "Incluye",
+            "includedValue": "{agents} coworkers y {credits, plural, one {# crédito} other {# créditos}}",
+            "slots": "{count, plural, one {{provider}: # plaza} other {{provider}: # plazas}}",
+            "slotPriceMonthly": "$0 ahora, {amount}/mes desde el {date}",
+            "slotPriceYearly": "$0 ahora, {amount}/año desde el {date}",
+            "ends": "Termina la prueba",
+            "reminder": "Recordatorio por email",
+            "firstCharge": "Primer cobro",
+            "firstChargeValue": "<charge></charge> el {date}",
+            "cancelBefore": "Cancela antes del {date} y no se cobra nada. Tus coworkers siguen funcionando hasta entonces.",
+            "continue": "Seguir con mi prueba"
+        },
+        "trialCancelled": {
+            "resumeFailed": "No se pudo reanudar tu prueba",
+            "title": "Tu prueba termina",
+            "unit": "sin cargos",
+            "body": "Cancelaste tu prueba. Tus coworkers siguen funcionando hasta entonces, y no se cobra nada.",
+            "resume": "Reanudar mi prueba"
+        },
+        "paneError": "No se pudo abrir el formulario de pago"
+    },
+    "parts": {
+        "interval": {
+            "monthly": "Mensual",
+            "yearly": "Anual",
+            "perYear": "<amount></amount>/año",
+            "perMonth": "<amount></amount>/mes"
+        },
+        "features": {
+            "runs": "<b>Ejecuciones ilimitadas</b>, 24/7",
+            "models": "<b>Modelos inteligentes</b> incluidos",
+            "autopilot": "<b>Piloto automático</b> para tu negocio",
+            "trial": {
+                "agents": "<b>{count} coworkers</b> durante la prueba, ilimitados en Pro",
+                "teammates": "Invita a <b>tu equipo</b> cuando empiece Pro",
+                "credit": "<b>{credits, plural, one {# crédito} other {# créditos}} de uso de IA</b>, luego {monthly, number} al mes"
+            },
+            "pro": {
+                "agents": "<b>Coworkers ilimitados</b> trabajando",
+                "teammates": "Invita a <b>todo tu equipo</b>",
+                "credit": "<b>{credits, plural, one {# crédito} other {# créditos}} de uso de IA</b> al mes"
+            }
+        },
+        "plan": {
+            "title": "Plan Pro",
+            "freeTrialLine": "Prueba gratis, luego coworkers ilimitados",
+            "unlimited": "Coworkers ilimitados",
+            "billedYearly": "facturado <amount></amount> al año",
+            "billedMonthly": "facturado cada mes",
+            "forDays": "durante {days} días",
+            "perMonth": "al mes"
+        },
+        "showTestimonial": "Ver {company}",
+        "quoted": "«{quote}»",
+        "cardOnFile": "Tarjeta guardada",
+        "promo": {
+            "add": "Añadir código promocional",
+            "label": "Código promocional",
+            "apply": "Aplicar",
+            "remove": "Quitar código promocional"
+        },
+        "backToPlan": "Plan",
+        "terms": "Acepto las <terms>Condiciones</terms> y pido a Rerun que empiece ya. Si soy consumidor, mi derecho de desistimiento termina una vez empezado el servicio."
+    },
+    "stripe": {
+        "orPayWithCard": "o paga con tarjeta",
+        "percentOff": "{percent} % de descuento",
+        "amountOff": "{amount} de descuento"
+    },
+    "perks": {
+        "feature": "Función",
+        "trial": "Prueba",
+        "pro": "Pro",
+        "rows": {
+            "credits": {
+                "title": "Uso de IA",
+                "trial": "{credits, plural, one {# crédito} other {# créditos}}, una vez",
+                "pro": "{credits, plural, one {# crédito} other {# créditos}} cada mes"
+            },
+            "models": {
+                "title": "Modelos",
+                "trial": "Modelos más ligeros",
+                "pro": "Todos los modelos premium desbloqueados"
+            },
+            "coworkers": {
+                "title": "Coworkers",
+                "trial": "{count} activos",
+                "pro": "Ilimitados"
+            },
+            "team": {
+                "title": "Compañeros",
+                "trial": "Solo tú",
+                "pro": "Invita a todo tu equipo"
+            },
+            "topup": {
+                "title": "Recargas",
+                "trial": "No disponible",
+                "pro": "+{credits, plural, one {# crédito} other {# créditos}} cuando los necesites"
+            }
+        },
+        "headlines": {
+            "credits": "{credits, plural, one {# crédito/mes} other {# créditos/mes}}",
+            "models": "Modelos premium",
+            "coworkers": "Coworkers ilimitados"
+        }
+    },
+    "cancel": {
+        "toasts": {
+            "openFailed": "No se pudo abrir la cancelación",
+            "remindFailed": "No se pudo programar el recordatorio",
+            "claimFailed": "No se pudo aplicar la oferta",
+            "cancelFailed": "No se pudo cancelar tu suscripción",
+            "resumeFailed": "No se pudo reactivar tu suscripción",
+            "trialResumed": "Tu prueba vuelve a estar activa",
+            "subscriptionResumed": "Tu suscripción vuelve a estar activa"
+        },
+        "header": {
+            "goodbyeTitle": "¿Aún no lo tienes claro? Decide el {date}",
+            "goodbyeTrialDescription": "Mantén tu prueba activa. Te escribiremos el día antes del primer cobro.",
+            "goodbyePaidDescription": "Mantén tus coworkers activos. Te escribiremos una semana antes del cobro, para que aún puedas cancelar.",
+            "sunkTrialTitle": "Tus coworkers ya están configurados",
+            "sunkTrialDescription": "Lo difícil ya está hecho. Si te vas ahora, dejan de funcionar.",
+            "sunkPaidTitle": "Ya has pagado por esto",
+            "sunkPaidDescription": "Es tuyo hasta el {date} de todos modos. Los créditos que no uses se pierden.",
+            "reasonTitle": "¿Por qué te vas?",
+            "reasonDescription": "Con tus palabras. Nos dice qué arreglar primero.",
+            "offerDescription": "Tu plan y tus coworkers se quedan exactamente igual.",
+            "farewellTitle": "Tus coworkers se detendrán el {date}",
+            "farewellDescription": "Las tareas programadas dejan de ejecutarse y tu workspace se pausa.",
+            "claimedTitle": "Gracias por quedarte",
+            "claimedDescription": "Tus coworkers nunca dejaron de trabajar.",
+            "remindedTitle": "Te lo recordaremos el {date}",
+            "remindedDescription": "Nada cambia hasta entonces. Tus coworkers siguen trabajando.",
+            "cancelledTitle": "Cancelación confirmada",
+            "cancelledDescription": "No se te volverá a cobrar. Tus coworkers trabajan hasta el {date}."
+        },
+        "offerTitle": {
+            "too_expensive": "Preferimos bajar el precio a perderte",
+            "unused": "Dale un mes más",
+            "too_complex": "Tómate un mes más para configurarlo",
+            "low_quality": "Sentimos haberte decepcionado",
+            "missing_features": "Lanzamos novedades cada semana",
+            "switched_service": "Antes de cambiarte",
+            "other": "Antes de irte"
+        },
+        "comeback": {
+            "coming_back": "¡Volveré!",
+            "maybe": "Puede que vuelva.",
+            "not_coming_back": "Probablemente no."
+        },
+        "reason": {
+            "field": "¿Qué te hizo decidir irte?",
+            "placeholder": "Basta con una frase",
+            "comebackField": "¿Volverás a usar Rerun?",
+            "missingComment": "Cuéntanos en pocas palabras por qué te vas",
+            "missingComeback": "Dinos si volverás",
+            "required": "Cuéntanos en pocas palabras por qué te vas.",
+            "tooLong": "Mantenlo por debajo de {max, number} caracteres.",
+            "notAReason": "Eso no parece un motivo. ¿Qué te hizo decidir irte?"
+        },
+        "milestones": {
+            "youStay": "Te quedas",
+            "email": "Correo",
+            "reminder": "Recordatorio",
+            "firstCharge": "Primer cobro",
+            "renewal": "Renovación"
+        },
+        "daysLeft": {
+            "trial": "A tu prueba le quedan <days>{count, plural, one {# día} other {# días}}</days>",
+            "paid": "Aún te quedan <days>{count, plural, one {# día} other {# días}}</days> en tu plan",
+            "runsSoFar": "{count, plural, one {<figure>#</figure> ejecución hasta ahora} other {<figure>#</figure> ejecuciones hasta ahora}}",
+            "runsThisWeek": "{count, plural, one {<figure>#</figure> ejecución esta semana} other {<figure>#</figure> ejecuciones esta semana}}"
+        },
+        "offerCard": {
+            "billedOn": "el {date}"
+        },
+        "offer": {
+            "trialHalf": {
+                "headline": "50 % de descuento en tu primer mes",
+                "terms": "Después {full}/mes desde el {fullFrom}. Te escribimos antes del {endsOn} y puedes cancelar gratis hasta entonces.",
+                "claim": "Obtener 50 % de descuento",
+                "claimed": "Tu primera factura es de {price} el {endsOn}, después {full}/mes."
+            },
+            "nextMonth": {
+                "headline": "El próximo mes por $1",
+                "terms": "Después {full}/mes desde el {fullFrom}.",
+                "termsWithAddons": "Tus complementos siguen a {addons}/mes. Después {full}/mes desde el {fullFrom}.",
+                "claim": "El próximo mes por $1",
+                "claimed": "Tu próxima factura es de {price}. La facturación vuelve a {full}/mes el {fullFrom}."
+            }
+        },
+        "sunk": {
+            "paidCaption": "de este mes, ya pagado",
+            "creditsLeft": "Créditos restantes",
+            "runsThisMonth": "Ejecuciones este mes",
+            "agents": "{count, plural, one {# agente} other {# agentes}}",
+            "agentsCaption": "configurados, conectados y trabajando",
+            "creditsCaption": "créditos de Rerun restantes",
+            "runsSoFar": "Ejecuciones hasta ahora",
+            "schedules": "Programaciones"
+        },
+        "remindMe": "Recuérdamelo el {date}",
+        "keepRunning": "Mantener mis coworkers activos",
+        "keepCoworkers": "Mantener mis coworkers",
+        "saved": {
+            "title": "Guardado hasta el {date}",
+            "description": "Memorias, archivos y skills se conservan. Suscríbete de nuevo antes y todo vuelve."
+        },
+        "done": {
+            "emailTitle": "Correo el {date}",
+            "emailTrialDescription": "El día antes de tu primer cobro. Cancela desde ese correo si quieres.",
+            "emailPaidDescription": "Una semana antes de que tu plan se renueve el {date}.",
+            "activeTitle": "Activo hasta el {date}",
+            "activeTrialDescription": "Tu prueba sigue hasta el final. No se cobra nada.",
+            "activePaidDescription": "Todo sigue funcionando hasta entonces.",
+            "changedMindTitle": "¿Cambiaste de opinión?",
+            "changedMindDescription": "Reactiva antes del {endsOn} y nada se detiene. Después, tu workspace se guarda hasta el {keptUntil}."
+        },
+        "buttons": {
+            "resumeTrial": "Reactivar prueba",
+            "resumeSubscription": "Reactivar suscripción",
+            "done": "Listo",
+            "goBack": "Volver",
+            "continueToCancel": "Seguir con la cancelación",
+            "continue": "Continuar",
+            "noThanks": "No, gracias",
+            "cancelTrial": "Cancelar prueba",
+            "cancelSubscription": "Cancelar suscripción"
+        }
+    },
+    "usage": {
+        "card": {
+            "title": "Créditos de Rerun",
+            "subtitle": "Gastados por tus coworkers en modelos de Rerun y datos de pago",
+            "addCredits": "Añadir créditos",
+            "startProNow": "Empezar Pro ahora",
+            "usedTrial": "Usados · créditos de prueba",
+            "used": "Usados",
+            "usedResets": "Usados · se reinicia el {date}",
+            "usedOf": "{used} de {whole} créditos",
+            "seeUsage": "Ver uso"
+        },
+        "outOfCredits": {
+            "trialTitle": "Te quedaste sin créditos de prueba",
+            "title": "Te quedaste sin créditos",
+            "trialDescription": "Tus coworkers no pueden usar modelos de Rerun ni datos de pago. Pro incluye {count, plural, one {# crédito} other {# créditos}} cada mes.",
+            "description": "Tus coworkers no pueden usar modelos de Rerun ni datos de pago.",
+            "descriptionUntil": "Tus coworkers no pueden usar modelos de Rerun ni datos de pago hasta el {date}."
+        },
+        "switch": {
+            "label": "Permitir gastos",
+            "on": "Los coworkers pueden usar modelos de Rerun y datos de pago.",
+            "off": "En pausa. Los coworkers no pueden usar modelos de Rerun ni datos de pago."
+        },
+        "kind": {
+            "ai": "Modelos de IA",
+            "data": "Datos de pago"
+        },
+        "tier": {
+            "fast": "Modelo rápido",
+            "balanced": "Modelo equilibrado",
+            "smart": "Modelo avanzado"
+        },
+        "bar": {
+            "aiSpent": "Modelos de IA · {figure} créditos",
+            "dataSpent": "Datos de pago · {figure} créditos",
+            "leftThisMonth": "Restante este mes · {figure} créditos",
+            "left": "Restante · {figure} créditos",
+            "topup": "Recarga, nunca caduca · {figure} créditos"
+        },
+        "legendLeft": "Restante",
+        "calls": "{count, plural, one {# llamada} other {# llamadas}}",
+        "otherCoworker": "Otro",
+        "pace": {
+            "onTopup": "Los créditos de este mes se agotaron. Los coworkers ahora usan tu recarga, quedan {figure}.",
+            "runsOutBeforeTrialEnds": "A este ritmo, te quedarás sin créditos hacia el {date}, {days, plural, one {# día} other {# días}} antes de que termine tu prueba.",
+            "runsOutBeforeReset": "A este ritmo, te quedarás sin créditos hacia el {date}, {days, plural, one {# día} other {# días}} antes del reinicio."
+        },
+        "pane": {
+            "title": "Uso de créditos",
+            "loadFailed": "No se pudo cargar tu uso de créditos. Inténtalo de nuevo en un momento.",
+            "creditsUsed": "{figure} <muted>créditos usados</muted>",
+            "periodLeft": "Del {start} al {end} · quedan {left}",
+            "perDay": "Por día",
+            "pace": "Ritmo",
+            "nothingSpentTrial": "Aún no has gastado nada en esta prueba.",
+            "nothingSpentPeriod": "Aún no has gastado nada en este periodo.",
+            "bySource": "Por fuente",
+            "byCoworker": "Por coworker",
+            "latestCharges": "Últimos cargos"
+        },
+        "chart": {
+            "spentSoFar": "<value>{figure}</value> gastados hasta ahora",
+            "ai": "IA <value>{figure}</value>",
+            "data": "Datos <value>{figure}</value>",
+            "perDay": "Créditos por día",
+            "paceCaption": "Gastado hasta ahora, y adónde lleva este ritmo",
+            "monthly": "Mensual {figure}",
+            "trialCredits": "Créditos de prueba {figure}",
+            "topup": "+ recarga {figure}",
+            "credits": "Créditos {figure}",
+            "today": "Hoy",
+            "trialEnds": "Fin de la prueba {date}",
+            "resets": "Se reinicia {date}"
+        },
+        "paidData": {
+            "people": {
+                "search": "Perfiles",
+                "email": {
+                    "find": "Correos de trabajo",
+                    "verify": "Verificaciones de correo"
+                },
+                "phone": {
+                    "find": "Números de teléfono"
+                },
+                "enrich": "Perfiles de personas",
+                "identity": {
+                    "resolve": "Búsquedas en LinkedIn"
+                }
+            },
+            "companies": {
+                "search": "Empresas",
+                "enrich": "Perfiles de empresas",
+                "similar": "Búsquedas de empresas similares",
+                "jobs": {
+                    "search": "Búsquedas de ofertas de empleo"
+                },
+                "news": "Búsquedas de noticias de empresas"
+            },
+            "google": {
+                "serp": {
+                    "organic": "Posiciones en Google",
+                    "maps": "Búsquedas en Google Maps",
+                    "local": "Posiciones locales",
+                    "news": "Búsquedas en Google News"
+                },
+                "keywords": {
+                    "volume": "Volúmenes de palabras clave",
+                    "ideas": "Listas de ideas de palabras clave",
+                    "trends": "Gráficos de tendencias"
+                }
+            },
+            "ai-search": {
+                "perplexity": {
+                    "answer": "Respuestas de Perplexity"
+                }
+            },
+            "web": {
+                "backlinks": {
+                    "summary": "Informes de backlinks",
+                    "list": "Listas de backlinks"
+                },
+                "anchors": {
+                    "list": "Listas de textos de anclaje"
+                },
+                "url": {
+                    "metrics": "Comprobaciones de autoridad"
+                }
+            },
+            "linkedin": {
+                "user": {
+                    "profile": "Perfiles de LinkedIn",
+                    "posts": "Listas de publicaciones de LinkedIn"
+                },
+                "company": {
+                    "profile": "Páginas de empresa de LinkedIn"
+                },
+                "post": {
+                    "detail": "Publicaciones de LinkedIn",
+                    "comments": "Listas de comentarios de LinkedIn",
+                    "reactions": "Listas de reacciones de LinkedIn"
+                }
+            },
+            "tiktok": {
+                "user": {
+                    "profile": "Perfiles de TikTok",
+                    "videos": "Listas de videos de TikTok"
+                },
+                "search": {
+                    "users": "Búsquedas de cuentas de TikTok",
+                    "videos": "Búsquedas de videos de TikTok"
+                },
+                "video": {
+                    "detail": "Videos de TikTok",
+                    "comments": "Listas de comentarios de TikTok"
+                },
+                "comment": {
+                    "replies": "Listas de respuestas de TikTok"
+                }
+            },
+            "instagram": {
+                "user": {
+                    "profile": "Perfiles de Instagram",
+                    "posts": "Listas de publicaciones de Instagram",
+                    "reels": "Listas de reels de Instagram"
+                },
+                "search": {
+                    "users": "Búsquedas de cuentas de Instagram",
+                    "reels": "Búsquedas de reels de Instagram"
+                },
+                "hashtag": {
+                    "posts": "Búsquedas de hashtags de Instagram"
+                },
+                "post": {
+                    "detail": "Publicaciones de Instagram",
+                    "comments": "Listas de comentarios de Instagram"
+                }
+            },
+            "x": {
+                "user": {
+                    "profile": "Perfiles de X",
+                    "posts": "Listas de publicaciones de X"
+                },
+                "search": {
+                    "posts": "Búsquedas en X"
+                },
+                "post": {
+                    "comments": "Listas de respuestas de X"
+                }
+            },
+            "youtube": {
+                "channel": {
+                    "profile": "Canales de YouTube",
+                    "videos": "Listas de videos de YouTube"
+                },
+                "search": {
+                    "videos": "Búsquedas en YouTube"
+                },
+                "video": {
+                    "detail": "Videos de YouTube",
+                    "comments": "Listas de comentarios de YouTube"
+                }
+            },
+            "facebook": {
+                "user": {
+                    "profile": "Páginas de Facebook",
+                    "posts": "Listas de publicaciones de Facebook"
+                },
+                "post": {
+                    "comments": "Listas de comentarios de Facebook"
+                }
+            },
+            "reddit": {
+                "subreddit": {
+                    "posts": "Feeds de subreddits"
+                },
+                "post": {
+                    "detail": "Publicaciones de Reddit"
+                }
+            }
+        }
+    },
+    "layout": {
+        "pill": {
+            "updatePayment": "Actualizar pago",
+            "freeTrial": "Prueba gratis",
+            "upgrade": "Mejorar plan",
+            "daysLeft": "Quedan {count} d",
+            "underADayLeft": "Queda '<'1 d"
+        },
+        "meter": {
+            "trialCredits": "Créditos de prueba",
+            "credits": "Créditos",
+            "noTrialCreditsLeft": "Sin créditos de prueba",
+            "outOfCredits": "Sin créditos",
+            "left": "Quedan {figure}",
+            "ariaUsed": "Créditos de Rerun usados"
+        }
+    },
+    "creditsBar": {
+        "used": "Créditos usados",
+        "resetsOn": "Se reinicia el {date}"
+    },
+    "trialOffer": {
+        "limitsDuringTrial": "{agents} coworkers y {credits, plural, one {# crédito} other {# créditos}} durante la prueba.",
+        "chargeLine": "Tarjeta obligatoria, 0 $ hoy. Se cobran {price} el {date} salvo que canceles antes.",
+        "cardlessLine": "Sin tarjeta, 0 $ hoy. Añade una antes del {date} para seguir por {price}/mes.",
+        "startTrial": "Empieza tu prueba gratis de {days} días",
+        "subscribe": "Suscribirte por {price}/mes",
+        "billedToday": "Se factura hoy. Cancela cuando quieras.",
+        "trialUsed": "Ya usaste tu prueba gratis. Se factura hoy, cancela cuando quieras."
+    },
+    "startPlan": {
+        "trialFailed": "No se pudo iniciar tu prueba",
+        "trialStarted": "Prueba iniciada"
+    }
+}

@@ -7,6 +7,8 @@ import { Badge, Button, Icon, IconBadge, Stripes } from '../primitives'
 import { cn } from '../cn'
 import { TooltipDisabledReason } from '../Tooltip'
 import { BrainIcon, CheckIcon, ChevronDownIcon, XIcon } from '../icons'
+import { useKitTranslations } from '../locale'
+import type { KitTranslator } from '../kit-translator'
 
 export type SkillProposalMode = 'create' | 'edit'
 export type SkillProposalState = 'proposed' | 'accepted' | 'applied' | 'failed' | 'dismissed'
@@ -34,13 +36,13 @@ export type SkillProposalBlockProps = {
 
 type Copy = { headline: string; detail: string; accept?: string; dismiss?: string }
 
-function copyFor({ title, summary, state, instructions, error }: SkillProposalBlockProps): Copy {
+function copyFor({ title, summary, state, instructions, error }: SkillProposalBlockProps, t: KitTranslator): Copy {
     const firstRule = instructions?.[0] || summary
-    if (state === 'accepted') return { headline: 'Remembering', detail: firstRule }
-    if (state === 'applied') return { headline: 'Remembered', detail: title }
-    if (state === 'failed') return { headline: 'Couldn’t remember this', detail: error || title, accept: 'Retry', dismiss: 'Dismiss' }
-    if (state === 'dismissed') return { headline: 'Not remembered', detail: title }
-    return { headline: 'Remember this?', detail: firstRule, accept: 'Remember', dismiss: 'No' }
+    if (state === 'accepted') return { headline: t('chat.skillProposal.remembering'), detail: firstRule }
+    if (state === 'applied') return { headline: t('chat.skillProposal.remembered'), detail: title }
+    if (state === 'failed') return { headline: t('chat.skillProposal.failed'), detail: error || title, accept: t('chat.skillProposal.retry'), dismiss: t('chat.skillProposal.dismiss') }
+    if (state === 'dismissed') return { headline: t('chat.skillProposal.notRemembered'), detail: title }
+    return { headline: t('chat.skillProposal.question'), detail: firstRule, accept: t('chat.skillProposal.remember'), dismiss: t('chat.skillProposal.no') }
 }
 
 /**
@@ -49,7 +51,8 @@ function copyFor({ title, summary, state, instructions, error }: SkillProposalBl
  */
 export function SkillProposalBlock(props: SkillProposalBlockProps) {
     const { state, pinned, onOpenSkill, className } = props
-    const { headline, detail, accept, dismiss } = copyFor(props)
+    const t = useKitTranslations()
+    const { headline, detail, accept, dismiss } = copyFor(props, t)
     const open = state === 'proposed' || state === 'failed'
     const done = state === 'applied'
 
@@ -71,7 +74,7 @@ export function SkillProposalBlock(props: SkillProposalBlockProps) {
                         <IconBadge tone="green" icon={CheckIcon} glow={false} />
                         {onOpenSkill && (
                             <Button size="xs" variant="ghost" onClick={onOpenSkill}>
-                                View
+                                {t('chat.skillProposal.view')}
                             </Button>
                         )}
                     </>
@@ -91,6 +94,7 @@ const COLLAPSED_DETAIL_HEIGHT = 18
  */
 function PinnedDecision(props: SkillProposalBlockProps & Copy) {
     const { state, instructions = [], className, headline, detail } = props
+    const t = useKitTranslations()
     const [expanded, setExpanded] = useState(false)
     // The full wording stays mounted until the card has folded back, so the closing has something to animate.
     const [unfolded, setUnfolded] = useState(false)
@@ -105,7 +109,7 @@ function PinnedDecision(props: SkillProposalBlockProps & Copy) {
             <Stripes fade="bottom" />
             <div className={cn('relative flex gap-3 text-sm', unfolded ? 'items-start' : 'items-center')}>
                 <Icon size="sm" icon={BrainIcon} />
-                <button type="button" aria-expanded={expanded} aria-label={expanded ? 'Hide details' : 'Show details'} onClick={toggle} className="group min-w-0 flex-1 cursor-pointer text-left">
+                <button type="button" aria-expanded={expanded} aria-label={expanded ? t('chat.skillProposal.hideDetails') : t('chat.skillProposal.showDetails')} onClick={toggle} className="group min-w-0 flex-1 cursor-pointer text-left">
                     <span className={cn('flex gap-1', unfolded ? 'items-start' : 'items-center')}>
                         <span className={cn('font-medium', unfolded ? 'break-words' : 'truncate')}>{headline}</span>
                         <ChevronDownIcon className={cn('size-3.5 shrink-0 text-muted-foreground transition group-hover:text-foreground', unfolded && 'mt-1', expanded && 'rotate-180')} />

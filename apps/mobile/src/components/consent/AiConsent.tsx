@@ -2,6 +2,7 @@ import * as WebBrowser from 'expo-web-browser'
 import { useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { FORM_COLUMN_MAX_WIDTH } from '@/components/layout/split'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
@@ -16,6 +17,7 @@ const PRIVACY_URL = 'https://rerun.build/privacy'
 export function AiConsent({ onAgree, onDecline }: { onAgree: () => Promise<void>; onDecline: () => void }) {
     const insets = useSafeAreaInsets()
     const [agreeing, setAgreeing] = useState(false)
+    const t = useTranslations('mobileAuth')
 
     const agree = async () => {
         setAgreeing(true)
@@ -27,23 +29,23 @@ export function AiConsent({ onAgree, onDecline }: { onAgree: () => Promise<void>
             <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingHorizontal: spacing.xl, paddingVertical: spacing.xl, gap: spacing.lg }}>
                 <ForemanOrb size={48} />
                 <View style={{ gap: spacing.sm }}>
-                    <AppText variant="title">Your coworkers run on AI</AppText>
+                    <AppText variant="title">{t('consent.title')}</AppText>
                     <AppText variant="callout" tone="muted">
-                        To do your tasks, Rerun sends your messages, photos, voice messages, files and website to AI providers: OpenAI, Anthropic and Google through OpenRouter, and any provider you connect yourself.
+                        {t('consent.body')}
                     </AppText>
                     <AppText variant="callout" tone="muted">
-                        Rerun&apos;s providers don&apos;t train on your data.{' '}
+                        {t('consent.noTraining')}{' '}
                         <AppText variant="callout" style={{ textDecorationLine: 'underline' }} onPress={() => WebBrowser.openBrowserAsync(PRIVACY_URL)} accessibilityRole="link">
-                            Privacy Policy
+                            {t('consent.privacy')}
                         </AppText>
                     </AppText>
                 </View>
             </ScrollView>
 
             <View style={{ flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.xl, paddingBottom: insets.bottom + spacing.md }}>
-                <Button label="Not now" variant="ghost" size="lg" onPress={onDecline} disabled={agreeing} />
+                <Button label={t('consent.notNow')} variant="ghost" size="lg" onPress={onDecline} disabled={agreeing} />
                 <View style={{ flex: 1 }}>
-                    <Button label="Agree and continue" size="lg" onPress={() => void agree()} loading={agreeing} />
+                    <Button label={t('consent.agree')} size="lg" onPress={() => void agree()} loading={agreeing} />
                 </View>
             </View>
         </View>

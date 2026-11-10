@@ -3,3 +3,7 @@ export type Testimonial = { id: string; quote: string; author: string; role: str
 
 // No customer quote ships with the open source build: the billing dialog shows none.
 export const TESTIMONIALS: readonly Testimonial[] = []
+
+export function testimonialCopy(testimonial: Testimonial, _locale: string): { quote: string; role: string } {
+    return testimonial
+}

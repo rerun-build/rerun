@@ -1,0 +1,76 @@
+{
+    "_context": {
+        "generic": "Shown when a chat message failed without any detail.",
+        "titles.unauthorized": "The AI connection (Claude, ChatGPT...) the coworker runs on needs its user to sign in again.",
+        "titles.thinking_replay": "A run is one turn of work of a coworker.",
+        "limits.titles.window": "{plan} is the name of an AI subscription (Claude, ChatGPT). {window} is weekly or monthly.",
+        "limits.titles.model": "{plan} is an AI subscription (Claude); {model} is a model family of it (Opus, Sonnet).",
+        "limits.titles.opencodeWindow": "OpenCode Go is the name of a paid plan. {window} is weekly or monthly.",
+        "limits.messages.opencodeCredits": "Console is the pay-as-you-go side of OpenCode, Go its subscription. Both are product names.",
+        "limits.messages.opencodeWindowResets": "{window} is the limit's period: weekly, monthly, or a 5-hour window. {resetsAt} is a time written by the provider in English, e.g. 'Nov 6, 3:00 PM UTC'.",
+        "limits.messages.weeklyResets": "{plan} is an AI subscription (Claude, ChatGPT). {resetsAt} is a time written by the provider in English, e.g. '6:50pm (UTC)'.",
+        "limits.messages.sessionResets": "{plan} is an AI subscription (Claude, ChatGPT). {resetsAt} is a time written by the provider in English, e.g. '6:50pm (UTC)'.",
+        "limits.messages.spend": "{plan} is an AI subscription (Claude). The organization is the company account at the AI provider."
+    },
+    "generic": "Something went wrong. Try sending your message again.",
+    "modelAtCapacity": {
+        "title": "Model at capacity",
+        "message": "This model has no room right now. Try again in a moment or pick another model."
+    },
+    "titles": {
+        "budget": "Rerun credits used up",
+        "unauthorized": "Connection signed out",
+        "overloaded": "Provider overloaded",
+        "context_window": "Conversation too long",
+        "provider_error": "The model could not answer",
+        "thinking_replay": "The run could not continue",
+        "interrupted": "Run interrupted",
+        "run_in_flight": "This conversation is still busy",
+        "session_gone": "Conversation unavailable"
+    },
+    "messages": {
+        "budget": "Rerun credits used up for this period. Add credits or wait for the monthly reset.",
+        "unauthorized": "This connection needs to be signed in again before the coworker can run.",
+        "overloaded": "The provider is overloaded right now. Try again in a moment.",
+        "context_window": "This conversation no longer fits the model, and sending it again will hit the same wall. Switch to a model with a larger context window, or start a new conversation.",
+        "provider_error": "The model provider refused this request, and sending it again will get the same answer. Switch to another model to keep going.",
+        "thinking_replay": "The engine replayed this turn in a way the model provider rejects. This is an engine bug, not the model: switching models will not help. Try again, and update the engine if it keeps happening.",
+        "interrupted": "The run was cut off before it could finish.",
+        "session_gone": "This coworker cannot reach this conversation anymore, so the message was not sent. Start a new conversation to keep going."
+    },
+    "limits": {
+        "titles": {
+            "usageLimit": "Usage limit reached",
+            "modelUnavailable": "{model} unavailable",
+            "anyModelUnavailable": "Model unavailable",
+            "modelNotInPlan": "{model} isn't in your {plan} plan",
+            "anyModelNotInPlan": "Model not in your {plan} plan",
+            "credits": "{plan} usage credits used up",
+            "spend": "{plan} spend limit reached",
+            "window": "{plan} {window, select, weekly {weekly} other {monthly}} limit reached",
+            "model": "{plan} {model} limit reached",
+            "claudeSession": "{plan} session limit reached",
+            "usage": "{plan} usage limit reached",
+            "opencodeCredits": "OpenCode credits used up",
+            "opencodeWindow": "OpenCode Go {window, select, weekly {weekly} other {monthly}} limit reached",
+            "opencode": "OpenCode Go limit reached"
+        },
+        "messages": {
+            "opencodeCredits": "No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.",
+            "opencodeWindowResets": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. It resets {resetsAt}; switch to a Console model or another provider until then.",
+            "opencodeWindow": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. Switch to a Console model or another provider until it resets.",
+            "modelUnavailable": "This connection can't run {model}. Pick another model to keep going.",
+            "anyModelUnavailable": "This connection can't run this model. Pick another model to keep going.",
+            "modelNotInPlan": "Your {plan} plan doesn't include {model}. Pick another model to keep going.",
+            "anyModelNotInPlan": "Your {plan} plan doesn't include this model. Pick another model to keep going.",
+            "usageLimit": "This subscription has reached its usage limit. Switch to another model, or wait for the limit to reset.",
+            "credits": "Your {plan} plan has used up its usage credits. Pick a model your plan includes to keep going.",
+            "spend": "Your organization has reached its monthly {plan} spend limit. An admin can raise it; switch this coworker to another model in the meantime.",
+            "weeklyResets": "Your {plan} plan has reached its weekly limit. It resets {resetsAt}; switch this coworker to another model until then.",
+            "weekly": "Your {plan} plan has reached its weekly limit. Switch this coworker to another model until the week rolls over.",
+            "model": "Your {plan} plan has reached its {model} limit. The other {plan} models still run: switch to one of them.",
+            "sessionResets": "Your {plan} plan has used up its current usage window. It refills at {resetsAt}; switch this coworker to another model in the meantime.",
+            "session": "Your {plan} plan has used up its current usage window. It refills on its own; switch this coworker to another model in the meantime."
+        }
+    }
+}

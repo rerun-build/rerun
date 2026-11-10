@@ -1,0 +1,57 @@
+{
+    "close": "Fermer",
+    "back": "Retour",
+    "moreOptions": "Plus d'options",
+    "deleteConfirmTitle": "{label} ?",
+    "command": {
+        "title": "Palette de commandes",
+        "description": "Recherchez une commande à lancer..."
+    },
+    "combobox": {
+        "placeholder": "Choisissez une option",
+        "placeholderMultiple": "Choisissez des options",
+        "search": "Rechercher…",
+        "empty": "Aucun résultat",
+        "selected": "Sélection",
+        "remove": "Retirer {option}",
+        "reorder": "Déplacer {option}"
+    },
+    "filter": {
+        "search": "Rechercher : {label}…",
+        "empty": "Aucun résultat",
+        "clear": "Effacer"
+    },
+    "phone": {
+        "code": "Indicatif du pays, saisissez un indicatif ou un pays",
+        "noCountry": "Aucun pays trouvé"
+    },
+    "powerBars": "Puissance {filled} sur {max}",
+    "markdown": {
+        "openEditor": "Ouvrir l'éditeur complet",
+        "done": "Terminé"
+    },
+    "upload": {
+        "menu": "Importer",
+        "files": "Importer des fichiers",
+        "folder": "Importer un dossier",
+        "failed": "Échec de l'import",
+        "finishing": "Finalisation",
+        "waiting": "En attente · {size}",
+        "progress": "Progression de l'import",
+        "uploadingFile": "Import de {name}",
+        "totalProgress": "Progression totale de l'import",
+        "retry": "Réessayer",
+        "cancel": "Annuler",
+        "cancelAll": "Tout annuler",
+        "dismiss": "Fermer",
+        "headingFailed": "{failed} fichiers sur {total} n'ont pas pu être importés",
+        "headingDone": "{count, plural, one {# fichier importé} other {# fichiers importés}}",
+        "headingUploading": "Import {current} sur {total}",
+        "more": "+ {count} de plus"
+    },
+    "waveform": {
+        "live": "Onde audio en direct",
+        "processing": "Traitement de l'audio",
+        "idle": "Onde audio inactive"
+    }
+}

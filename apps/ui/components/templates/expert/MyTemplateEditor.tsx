@@ -2,6 +2,7 @@
 
 import { ScrollFade } from '@rerun/ui/primitives'
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import { type FieldErrors, FormProvider, useForm } from 'react-hook-form'
 import { TemplateAuthoringProvider } from '@/components/templates/authoring/actions-context'
 import { TemplateContentSection } from '@/components/templates/authoring/TemplateContentSection'
@@ -16,15 +17,9 @@ import { expertAuthoringActions } from './expertAuthoringActions'
 import { ExpertTemplateAgents } from './ExpertTemplateAgents'
 import { TemplateSubmitFooter } from './TemplateSubmitFooter'
 
-const EDITOR_TABS = [
-    { value: 'details', label: 'Details' },
-    { value: 'pricing', label: 'Pricing' },
-    { value: 'media', label: 'Media' },
-    { value: 'faq', label: 'FAQ' },
-    { value: 'agents', label: 'Coworkers' },
-] as const
+const EDITOR_TABS = ['details', 'pricing', 'media', 'faq', 'agents'] as const
 
-type TemplateEditorTab = (typeof EDITOR_TABS)[number]['value']
+type TemplateEditorTab = (typeof EDITOR_TABS)[number]
 
 const TAB_FIELDS = {
     details: ['slug', 'title', 'tagline', 'longDescription', 'category', 'tags', 'metaTitle', 'metaDescription', 'setupMinutes'],
@@ -35,7 +30,7 @@ const TAB_FIELDS = {
 } as const satisfies Record<TemplateEditorTab, readonly (keyof TemplateFormValues)[]>
 
 function firstInvalidTab(errors: FieldErrors<TemplateFormValues>): TemplateEditorTab {
-    return EDITOR_TABS.find(tab => TAB_FIELDS[tab.value].some(field => errors[field] !== undefined))?.value ?? 'details'
+    return EDITOR_TABS.find(tab => TAB_FIELDS[tab].some(field => errors[field] !== undefined)) ?? 'details'
 }
 
 // The author's editor: the same sections as the admin console, over the same document, with the
@@ -61,6 +56,7 @@ export function MyTemplateEditor({
     onCapture: () => void
     onRemoveAgent: (agentKey: string) => Promise<boolean>
 }) {
+    const t = useTranslations('templates.expert.tabs')
     const readOnly = templateEditBlockReason(template.status) !== null
     const actions = React.useMemo(() => expertAuthoringActions(template.id), [template.id])
     const [activeTab, setActiveTab] = React.useState<TemplateEditorTab>('details')
@@ -96,8 +92,8 @@ export function MyTemplateEditor({
                         <div className="shrink-0 overflow-x-auto border-b border-border">
                             <TabsList className="h-12 w-full min-w-max px-5">
                                 {EDITOR_TABS.map(tab => (
-                                    <TabsTrigger key={tab.value} value={tab.value} className="min-w-20 flex-1">
-                                        {tab.label}
+                                    <TabsTrigger key={tab} value={tab} className="min-w-20 flex-1">
+                                        {t(tab)}
                                     </TabsTrigger>
                                 ))}
                             </TabsList>

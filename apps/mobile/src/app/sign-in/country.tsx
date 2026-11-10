@@ -4,6 +4,7 @@ import { SymbolView } from 'expo-symbols'
 import { useMemo, useState } from 'react'
 import { FlatList, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { useSignInFlow } from '@/components/auth/SignInFlow'
 import { AppText } from '@/components/ui/AppText'
@@ -17,8 +18,10 @@ export default function PickCountry() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const { country, setCountry } = useSignInFlow()
+    const t = useTranslations('mobileAuth')
+    const locale = useLocale()
     const [query, setQuery] = useState('')
-    const results = useMemo(() => searchCountries(query), [query])
+    const results = useMemo(() => searchCountries(query, locale), [query, locale])
 
     const pick = (picked: PhoneCountry) => {
         Haptics.selectionAsync()
@@ -33,7 +36,7 @@ export default function PickCountry() {
             <View collapsable={false} style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.md }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 44, paddingHorizontal: spacing.md, borderRadius: radius.md, backgroundColor: theme.muted }}>
                     <SymbolView name="magnifyingglass" size={15} weight="medium" tintColor={theme.mutedForeground} />
-                    <TextInput value={query} onChangeText={setQuery} placeholder="Search" placeholderTextColor={theme.mutedForeground} autoCorrect={false} accessibilityLabel="Search countries" style={{ flex: 1, height: '100%', fontFamily: fonts.regular, fontSize: 16, color: theme.foreground }} />
+                    <TextInput value={query} onChangeText={setQuery} placeholder={t('country.search')} placeholderTextColor={theme.mutedForeground} autoCorrect={false} accessibilityLabel={t('country.searchLabel')} style={{ flex: 1, height: '100%', fontFamily: fonts.regular, fontSize: 16, color: theme.foreground }} />
                 </View>
             </View>
             <FlatList

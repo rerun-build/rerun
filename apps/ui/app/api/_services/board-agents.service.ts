@@ -46,7 +46,7 @@ export async function readAgentView(ctx: WorkspaceContext, agentId: string): Pro
     const actor = actorFromContext(ctx)
     const [{ data: row, error }, { access }] = await Promise.all([selectMaybeSingle(ctx.supabase, 'agents', AGENT_COLUMNS, { id: agentId }), assertAgentAccess(agentId, 'use', actor)])
     if (error) throw error
-    if (!row || row.workspace_id !== ctx.workspace.id || access === 'none') throw new AuthorizationError('Coworker not found')
+    if (!row || row.workspace_id !== ctx.workspace.id || access === 'none') throw new AuthorizationError('coworkerNotFound')
 
     const agent: BoardAgent = { ...boardAgentFromRow(row), access }
     const locked = isTemplateContentLocked(agent, ctx.workspace)

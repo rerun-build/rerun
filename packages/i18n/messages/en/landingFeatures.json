@@ -1,0 +1,422 @@
+{
+    "_context": {
+        "hub.count": "Small label above the grid of feature cards on the features hub.",
+        "page.faqTitle": "{crumb} is the short name of the feature, as in the breadcrumb (e.g. \"Computer use\").",
+        "stage.job": "Job title of the example Coworker shown on a name plate in the animated demo.",
+        "stage.shift": "When that example Coworker runs, shown under its job title.",
+        "items.tools.title": "{count} is the number of connected apps (3,000)."
+    },
+    "hub": {
+        "name": "Features",
+        "metaTitle": "Features: everything an AI Coworker comes with",
+        "headline": "Everything a Coworker comes with.",
+        "description": "A Coworker reaches your tools, works on its own screen, runs 24/7 in Europe and asks before anything consequential. One page for each of the ten.",
+        "count": "{count, plural, one {# feature} other {# features}}",
+        "pickTitle": "Pick the one you came for.",
+        "pickLede": "Each page shows the thing working, in the product, not in a diagram."
+    },
+    "page": {
+        "breadcrumbLabel": "Breadcrumb",
+        "notFound": "Feature not found",
+        "libraryLabel": "From the library",
+        "browseTemplates": "Browse all templates",
+        "faqLabel": "FAQ",
+        "faqTitle": "{crumb}, your questions.",
+        "moreLabel": "More features",
+        "moreTitle": "The rest of what a Coworker comes with.",
+        "allFeatures": "All features"
+    },
+    "stage": {
+        "job": "Bookkeeper",
+        "shift": "Every Monday, 07:00"
+    },
+    "items": {
+        "coworkers": {
+            "crumb": "Coworkers",
+            "title": "Hire an AI Coworker, don’t write a prompt.",
+            "lede": "Give it a job, the apps it needs and a time to run. It does the work in your own tools and reports back: no flow chart to draw, no prompt to engineer.",
+            "metaTitle": "AI Coworkers: hire an agent instead of building a workflow",
+            "metaDescription": "A Rerun Coworker takes a job, your apps and a schedule, then does the work in your own tools and reports back. No flow chart, no prompt engineering.",
+            "stageCaption": "Two Coworkers at work in the same Box, saying what they just did.",
+            "points": {
+                "first": {
+                    "title": "It holds a job, not a trigger",
+                    "body": "You hire it for a role (Bookkeeper, Sales rep, Community manager) and it keeps that role from one run to the next."
+                },
+                "second": {
+                    "title": "It remembers your business",
+                    "body": "Each Coworker keeps its own memory: what you sell, how you write, and what it did the last time it ran."
+                },
+                "third": {
+                    "title": "It shows up on its own",
+                    "body": "Every morning, every Monday, or when something happens in one of your apps. You never have to start it."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "What is an AI Coworker?",
+                    "answer": "A Coworker is an agent you hire for a job rather than a workflow you draw. It has a name, a role, its own memory, the apps it needs and a schedule. Once it is hired it does that job again and again, and tells you what it did each time."
+                },
+                "second": {
+                    "question": "Do I need to know how to code, or to prompt?",
+                    "answer": "No. You describe the job in one sentence and Rerun turns it into a Coworker, picks the apps it needs and sets its schedule. Everything it set up stays readable and editable afterwards."
+                },
+                "third": {
+                    "question": "How many Coworkers can I hire?",
+                    "answer": "As many as your workspace needs. They share the same machine and the same plan, they can use the same connected apps, and they can hand work to each other."
+                }
+            },
+            "templatesTitle": "Three Coworkers you can hire today."
+        },
+        "coworker-manager": {
+            "crumb": "Coworker manager",
+            "title": "One manager for every Coworker you hire.",
+            "lede": "Rerun manages your workspace: it knows every Coworker, hires the ones you are missing, and passes each request to whoever handles it. Talk to it by voice, or leave it on autopilot while you are off.",
+            "metaTitle": "Coworker manager: run your AI team by voice or on autopilot",
+            "metaDescription": "Rerun manages your workspace: it hires the Coworkers you need, passes each request to the right one, listens when you hold Space, and runs on autopilot.",
+            "stageCaption": "Hold Space, say what you need: the manager passes it to the Coworker that handles it.",
+            "points": {
+                "first": {
+                    "title": "It knows your whole team",
+                    "body": "Who you hired, what each one does and what it is working on right now. You ask the manager, not the Coworker."
+                },
+                "second": {
+                    "title": "Hold Space and talk",
+                    "body": "Say what you need out loud, anywhere in the workspace. It transcribes, finds the right Coworker and hands it over."
+                },
+                "third": {
+                    "title": "It keeps things moving while you’re off",
+                    "body": "On autopilot it answers your Coworkers’ questions by the rules you set, so a run finishes instead of waiting for you."
+                }
+            },
+            "acts": {
+                "voice": {
+                    "eyebrow": "Manage by voice",
+                    "title": "What you can actually say to it.",
+                    "body": "“Ask the bookkeeper where we are on the Dupont invoice.” “Tell the sales rep to stop writing to agencies.” “What did my Coworkers get done this weekend?” You name the job, not the Coworker: the manager knows who holds it. If nobody holds it yet, it offers to hire for it."
+                },
+                "partner": {
+                    "eyebrow": "A proactive partner",
+                    "title": "It reads across the whole business.",
+                    "body": "A Coworker only sees its own job. The manager sees all of them at once: the run that has been failing for three days, the reply nobody sent, the draft you keep rewriting by hand. It brings those to you instead of waiting to be asked."
+                },
+                "autopilot": {
+                    "eyebrow": "Autopilot",
+                    "title": "What it decides while you’re away.",
+                    "body": "You write the rules once: how much it may approve, what it must never send, what to do when a Coworker is unsure. Autopilot answers inside them so the work finishes, and everything it decided is in the thread when you come back. Anything outside them still waits for you."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "What is the Coworker manager?",
+                    "answer": "It is Rerun itself, the manager of your workspace. It knows every Coworker you hired, what each one does and what it is working on. You tell it what you need and it tells the right Coworker, or hires one if the job has no owner yet."
+                },
+                "second": {
+                    "question": "How does managing by voice work?",
+                    "answer": "Hold the Space bar anywhere in your workspace and say what you need. What you say is transcribed in the manager’s bar, it picks the Coworker that handles it, and the answer comes back in the same place."
+                },
+                "third": {
+                    "question": "What exactly does autopilot do?",
+                    "answer": "When a Coworker stops to ask something and you are not there, autopilot answers it by the rules you set, so the run finishes instead of waiting. Everything it decided is in the thread when you come back."
+                }
+            },
+            "templatesTitle": "Give it a team to manage."
+        },
+        "computer-use": {
+            "crumb": "Computer use",
+            "title": "Each Coworker works on its own screen.",
+            "lede": "When an app has no API, your Coworker opens it on its own screen and clicks through it the way a person would. You can watch it work, and take the mouse back whenever you want.",
+            "metaTitle": "Computer use: an AI agent that clicks through your apps",
+            "metaDescription": "Your Coworker opens a real browser on its own screen and clicks through the portals that have no API. Watch it live, and take the mouse back any time.",
+            "stageCaption": "A real browser, on the Coworker’s own screen, logged into your account.",
+            "points": {
+                "first": {
+                    "title": "A real screen, not a scraper",
+                    "body": "A full desktop in the cloud with a browser on it. The supplier portal with no API is reachable like any other tool."
+                },
+                "second": {
+                    "title": "Watch it live",
+                    "body": "Open the screen while it runs and follow every click. Take the mouse back at any moment, then hand it over again."
+                },
+                "third": {
+                    "title": "Logged in once",
+                    "body": "You sign in on its screen the first time. The session stays on its machine, inside your workspace."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "What is computer use?",
+                    "answer": "It is a real desktop, in your workspace’s machine, that a Coworker can see and click. It is what lets it use an app that has no API: it opens the browser, navigates, fills the form and reads the result the way a person would."
+                },
+                "second": {
+                    "question": "Can I watch what it is doing?",
+                    "answer": "Yes. Open its screen while it runs and you see every click as it happens. You can take the mouse back at any moment, do a step yourself, and let it carry on."
+                },
+                "third": {
+                    "question": "How does it log into my accounts?",
+                    "answer": "You log in once on its screen, as you would on a new laptop. The session stays on that machine, inside your workspace, and the Coworker reuses it on the next run."
+                }
+            },
+            "templatesTitle": "Coworkers that go where no API goes."
+        },
+        "tools": {
+            "crumb": "Tools",
+            "title": "Natively connected to {count, number}+ tools.",
+            "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify, and any MCP server you point it at. Click to connect, and your Coworker uses it on its next run. No integration project, no extra bill.",
+            "metaTitle": "{count, number}+ tools and integrations, included in the plan",
+            "metaDescription": "Your Coworkers reach Gmail, Slack, Stripe, HubSpot, Shopify and {count, number}+ other tools, plus any MCP server. Click to connect, no extra bill.",
+            "stageCaption": "The apps a Coworker can open, and the {count, number}+ it reaches beyond them.",
+            "points": {
+                "first": {
+                    "title": "Click to connect",
+                    "body": "Pick the app, sign in once, and every Coworker in the workspace can use it. There is nothing to deploy."
+                },
+                "second": {
+                    "title": "Any MCP server",
+                    "body": "Your own internal server, or one of the thousands already hosted. Point your Coworker at it and it uses its tools."
+                },
+                "third": {
+                    "title": "Included, not metered",
+                    "body": "Connecting a tool costs nothing on top of the plan. There is no per-task fee and no per-connector fee."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Which {count, number} tools are included?",
+                    "answer": "The ones a small business actually runs on: email and calendar, Slack, the CRMs, Stripe, the ad platforms, Notion and the drives, the e-commerce back offices, the databases. Anything beyond them is reachable through a hosted MCP server, or through the Coworker’s own screen."
+                },
+                "second": {
+                    "question": "What if my tool is not in the list?",
+                    "answer": "Two ways in. If it has an MCP server, point your Coworker at it and it uses its tools straight away. If it has no API at all, the Coworker opens it on its own screen and clicks through it like a person."
+                },
+                "third": {
+                    "question": "Do connected apps cost extra?",
+                    "answer": "No. Connecting a tool is part of the plan, however many you connect and however often your Coworkers use them."
+                }
+            },
+            "templatesTitle": "Coworkers that live in your apps."
+        },
+        "human-in-the-loop": {
+            "crumb": "Human in the loop",
+            "title": "Autonomous, until it needs a yes.",
+            "lede": "Your Coworker runs alone and stops before anything consequential: a payment, a send, a deletion. It asks, waits, and anyone on the team can answer.",
+            "metaTitle": "Human in the loop: your AI agent asks before it acts",
+            "metaDescription": "A Rerun Coworker runs on its own and stops before anything consequential. It asks, waits for a yes, and anyone on the team can answer.",
+            "stageCaption": "A Coworker that stops mid-run, asks, and waits for someone to answer.",
+            "points": {
+                "first": {
+                    "title": "It stops before it commits",
+                    "body": "Spending is locked in the product itself; the rest (what it sends, what it deletes) you set in its instructions."
+                },
+                "second": {
+                    "title": "Anyone on the team can answer",
+                    "body": "The question lands on the board and in your notifications. Whoever gets to it first unblocks the run."
+                },
+                "third": {
+                    "title": "Every run is on the record",
+                    "body": "What it asked, who answered and what it did next stay in the thread. Nothing happens off the page."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "What does a Coworker stop for?",
+                    "answer": "Spending money is locked in the product: a Coworker cannot buy anything without an approval. Everything else (sending an email to a customer, deleting records, publishing) is set in its instructions, so you decide how much rope it has."
+                },
+                "second": {
+                    "question": "Who can approve a request?",
+                    "answer": "Anyone in the workspace. Seats are free, so the person who should decide can be the one who decides, instead of forwarding it to whoever owns the account."
+                },
+                "third": {
+                    "question": "What happens if nobody answers?",
+                    "answer": "The run waits, and the question stays on the board. If you turn autopilot on, the workspace manager answers it by the rules you wrote so the run finishes without you."
+                }
+            },
+            "templatesTitle": "Coworkers you want to keep on a leash."
+        },
+        "runs-24-7": {
+            "crumb": "Runs 24/7",
+            "title": "Runs 24/7, on servers in Europe.",
+            "lede": "Your workspace gets its own machine, hosted in Germany. It never sleeps, so the 7am run happens whether your laptop is open or not.",
+            "metaTitle": "AI agents that run 24/7 on servers in Europe",
+            "metaDescription": "Each Rerun workspace gets its own machine, hosted in Germany. Your Coworkers run on schedule through the night, the weekend and your holidays, laptop shut.",
+            "stageCaption": "The same workspace at 7am and at 3am: the run happens either way.",
+            "points": {
+                "first": {
+                    "title": "Your own machine",
+                    "body": "Not a shared queue: a machine for your workspace, where your Coworkers keep their files, their sessions and their screens."
+                },
+                "second": {
+                    "title": "Hosted in Germany",
+                    "body": "The machines sit in Europe, which is where your data stays while your Coworkers work on it."
+                },
+                "third": {
+                    "title": "On a schedule or on an event",
+                    "body": "Every morning, every Monday, or the moment something lands in one of your apps. Nobody has to press start."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Does my computer need to stay on?",
+                    "answer": "No. Your Coworkers run on a machine in the cloud, not on your laptop. Close it, fly somewhere, and the Monday morning run still happens."
+                },
+                "second": {
+                    "question": "Where are the servers?",
+                    "answer": "In Germany. Your workspace has its own machine there, and that is where your Coworkers work and keep what they need between runs."
+                },
+                "third": {
+                    "question": "Can a Coworker react to something instead of waiting for its hour?",
+                    "answer": "Yes. A Coworker can run on a schedule, and it can also start when something happens in one of your connected apps: a new email, a new order, a new row."
+                }
+            },
+            "templatesTitle": "Coworkers that work while you sleep."
+        },
+        "second-brain": {
+            "crumb": "Second brain",
+            "title": "A second brain for your business.",
+            "lede": "Your Coworkers read the same pages: what you sell, who you sell to, how you write. They keep those pages current, and every run starts from them.",
+            "metaTitle": "A second brain your AI Coworkers read before every run",
+            "metaDescription": "Your offer, your market, your tone and your rules, written once in pages every Coworker reads. They keep them current, so you stop pasting context.",
+            "stageCaption": "The pages your Coworkers read, and the sources they keep them from.",
+            "points": {
+                "first": {
+                    "title": "Pages, not prompts",
+                    "body": "Your offer, your customers, your tone of voice and your rules, written once and read by every Coworker."
+                },
+                "second": {
+                    "title": "It keeps itself current",
+                    "body": "Coworkers write back what they learn on a run, so the brain is never the version you wrote in month one."
+                },
+                "third": {
+                    "title": "Shared by the whole team",
+                    "body": "Hire a new Coworker and it already knows the business. Your colleagues read and correct the same pages."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "What goes into the second brain?",
+                    "answer": "What you would tell a new hire on their first week: what you sell and at what price, who buys it, who you compete with, how you write, and the rules you never break. It lives as pages, not as a prompt you paste."
+                },
+                "second": {
+                    "question": "Do I have to keep it up to date by hand?",
+                    "answer": "No. Your Coworkers write back what they find on a run (a competitor’s new price, a question customers keep asking), so the pages follow the business instead of ageing."
+                },
+                "third": {
+                    "question": "Does each Coworker have its own memory too?",
+                    "answer": "Yes. The brain is what the whole workspace shares; on top of it each Coworker keeps its own memory of its job and of what it did last time."
+                }
+            },
+            "templatesTitle": "Coworkers that need to sound like you."
+        },
+        "workspaces": {
+            "crumb": "Workspaces",
+            "title": "One account, a workspace per business.",
+            "lede": "A client, a brand, a side project: each gets its own workspace, its own Coworkers, its own connected apps and its own brain. Switch from the pill in the corner.",
+            "metaTitle": "Workspaces: keep each business, client or brand apart",
+            "metaDescription": "One Rerun account carries as many workspaces as you need: each with its own Coworkers, its own apps and its own brain. Nothing crosses between them.",
+            "stageCaption": "The switcher: every business on one account, none of them mixed.",
+            "points": {
+                "first": {
+                    "title": "Nothing crosses over",
+                    "body": "Separate Coworkers, separate apps, separate brain. A client’s inbox is never one autocomplete away from another’s."
+                },
+                "second": {
+                    "title": "Departments inside each one",
+                    "body": "Marketing, Finance, Admin: group your Coworkers into Boxes so a workspace stays readable as it grows."
+                },
+                "third": {
+                    "title": "One switcher, one login",
+                    "body": "Change workspace from the pill in the corner. Same account, same password, different company."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "When should I use several workspaces?",
+                    "answer": "When the businesses have nothing to share: an agency with one per client, a founder with a company and a side project, a group with one per brand. If it is the same business with several teams, use Boxes inside one workspace instead."
+                },
+                "second": {
+                    "question": "Does each workspace need its own apps?",
+                    "answer": "Yes, and that is the point: each one connects its own Gmail, its own Stripe, its own CRM. A Coworker can only reach the apps of the workspace it lives in."
+                },
+                "third": {
+                    "question": "Can my team be in several workspaces?",
+                    "answer": "Yes. People are invited per workspace, so a colleague can be in two of them and a client can be in only one."
+                }
+            },
+            "templatesTitle": "One workspace, one line of business."
+        },
+        "invite-your-team": {
+            "crumb": "Your whole team",
+            "title": "Invite your whole team, at no extra cost.",
+            "lede": "Seats are free. Everyone sees the same board, talks to the same Coworkers, and can answer when one of them asks for a yes.",
+            "metaTitle": "Invite your whole team: free seats on every plan",
+            "metaDescription": "Rerun does not charge per seat. Invite everyone, work on the same board, talk to the same Coworkers, and let whoever is around approve a run.",
+            "stageCaption": "The same board, the same Coworkers, several people on it at once.",
+            "points": {
+                "first": {
+                    "title": "Free seats, not per-user pricing",
+                    "body": "The plan covers the workspace, not the headcount. Adding a colleague does not change the bill."
+                },
+                "second": {
+                    "title": "One shared board",
+                    "body": "You see each other’s cursors, the Coworkers at work and what they just finished, live."
+                },
+                "third": {
+                    "title": "Anyone can unblock a run",
+                    "body": "When a Coworker asks for a yes, whoever is around answers. Nothing waits on one person’s login."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "How much does an extra seat cost?",
+                    "answer": "Nothing. The plan is per workspace, not per person, so you can invite the whole team, including the people who only ever answer a question once a week."
+                },
+                "second": {
+                    "question": "Does everyone see everything?",
+                    "answer": "Inside a workspace, yes: the same board, the same Coworkers, the same threads. If something should stay apart, put it in its own workspace and invite only who needs it."
+                },
+                "third": {
+                    "question": "Can a colleague talk to a Coworker I hired?",
+                    "answer": "Yes. A Coworker belongs to the workspace, not to the person who hired it. Anyone can give it work, read what it did and answer its questions."
+                }
+            },
+            "templatesTitle": "Coworkers the whole team leans on."
+        },
+        "coworkers-work-together": {
+            "crumb": "Working together",
+            "title": "Your Coworkers hand work to each other.",
+            "lede": "One finds the leads, the next writes to them, a third files them in your CRM. Nobody copies anything between them, and you read the whole chain in one place.",
+            "metaTitle": "AI Coworkers that hand work to each other",
+            "metaDescription": "One Coworker finds the leads, the next writes to them, a third files them in your CRM. They pass work directly and leave one readable thread.",
+            "stageCaption": "Three Coworkers passing the same job down the line.",
+            "points": {
+                "first": {
+                    "title": "They pass the work on",
+                    "body": "A Coworker that finishes its part tells the next one, with what it found. You are not the courier."
+                },
+                "second": {
+                    "title": "Same apps, same brain",
+                    "body": "They share the workspace’s connected tools and its second brain, so nothing has to be explained twice."
+                },
+                "third": {
+                    "title": "One thread to read",
+                    "body": "The chain shows on the board as it happens: who did what, in what order, and what came out of it."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "How do Coworkers hand work to each other?",
+                    "answer": "One Coworker can message another the way you would, passing on what it found. The chain plays out on the board, and you can follow it without opening three threads."
+                },
+                "second": {
+                    "question": "Do I have to wire the chain myself?",
+                    "answer": "No. You say what each one is responsible for; the workspace manager knows who handles what and routes between them. You can also name the next Coworker in a Coworker’s instructions if the order matters."
+                },
+                "third": {
+                    "question": "Is this the same as a multi-agent workflow?",
+                    "answer": "It solves the same problem without the diagram. There is no canvas of nodes to maintain: you hire people for jobs, and the work moves between them the way it moves in a team."
+                }
+            },
+            "templatesTitle": "Setups where several Coworkers share the job."
+        }
+    }
+}

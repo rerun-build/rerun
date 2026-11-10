@@ -1,0 +1,769 @@
+{
+    "_context": {
+        "default-seo.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-seo.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-seo.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "default-inbox.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-inbox.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-inbox.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "default-research.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-research.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-research.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "default-content.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-content.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-content.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "default-meeting-notes.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-meeting-notes.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-meeting-notes.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "default-daily-brief.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-daily-brief.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-daily-brief.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "default-follow-ups.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-follow-ups.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-follow-ups.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "default-weekly-report.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "default-weekly-report.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "default-weekly-report.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-client-report.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-client-report.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-client-report.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-proposal.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-proposal.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-proposal.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-meeting-notes.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-meeting-notes.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-meeting-notes.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-seo.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-seo.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-seo.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-lead-responder.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-lead-responder.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-lead-responder.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-case-studies.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-case-studies.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-case-studies.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-inbox.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-inbox.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-inbox.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "agencies-invoices.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "agencies-invoices.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "agencies-invoices.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-product-copy.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-product-copy.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-product-copy.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-abandoned-cart.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-abandoned-cart.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-abandoned-cart.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-reviews.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-reviews.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-reviews.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-sales-report.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-sales-report.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-sales-report.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-support.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-support.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-support.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-ads.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-ads.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-ads.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-newsletter.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-newsletter.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-newsletter.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "ecommerce-stock.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "ecommerce-stock.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "ecommerce-stock.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-changelog.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-changelog.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-changelog.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-issue-triage.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-issue-triage.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-issue-triage.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-onboarding-emails.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-onboarding-emails.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-onboarding-emails.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-seo.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-seo.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-seo.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-churn.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-churn.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-churn.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-support.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-support.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-support.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-errors.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-errors.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-errors.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "saas-metrics.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "saas-metrics.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "saas-metrics.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-prospect-research.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-prospect-research.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-prospect-research.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-follow-ups.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-follow-ups.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-follow-ups.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-outreach.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-outreach.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-outreach.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-crm-hygiene.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-crm-hygiene.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-crm-hygiene.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-reply-sorter.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-reply-sorter.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-reply-sorter.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-lead-responder.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-lead-responder.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-lead-responder.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-call-notes.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-call-notes.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-call-notes.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "sales-pipeline.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "sales-pipeline.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "sales-pipeline.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-screening.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-screening.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-screening.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-sourcing.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-sourcing.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-sourcing.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-job-posts.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-job-posts.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-job-posts.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-scheduling.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-scheduling.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-scheduling.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-updates.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-updates.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-updates.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-interview-prep.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-interview-prep.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-interview-prep.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-references.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-references.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-references.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "recruiting-offers.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "recruiting-offers.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "recruiting-offers.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-leads.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-leads.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-leads.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-listings.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-listings.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-listings.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-market-watch.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-market-watch.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-market-watch.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-documents.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-documents.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-documents.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-viewings.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-viewings.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-viewings.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-seller-updates.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-seller-updates.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-seller-updates.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-social.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-social.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-social.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "real-estate-nurture.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "real-estate-nurture.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "real-estate-nurture.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-contract-review.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-contract-review.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-contract-review.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-drafting.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-drafting.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-drafting.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-summaries.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-summaries.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-summaries.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-deadlines.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-deadlines.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-deadlines.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-intake.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-intake.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-intake.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-signatures.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-signatures.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-signatures.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-research.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-research.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-research.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "legal-time-entries.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "legal-time-entries.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "legal-time-entries.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-content-calendar.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-content-calendar.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-content-calendar.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-repurpose.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-repurpose.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-repurpose.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-newsletter.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-newsletter.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-newsletter.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-seo.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-seo.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-seo.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-comments.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-comments.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-comments.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-scheduler.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-scheduler.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-scheduler.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-ideas.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-ideas.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-ideas.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "creators-analytics.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "creators-analytics.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "creators-analytics.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-inbox.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-inbox.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-inbox.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-meeting-notes.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-meeting-notes.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-meeting-notes.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-weekly-review.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-weekly-review.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-weekly-review.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-research.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-research.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-research.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-daily-brief.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-daily-brief.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-daily-brief.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-follow-ups.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-follow-ups.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-follow-ups.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-weekly-report.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-weekly-report.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-weekly-report.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "productivity-docs.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "productivity-docs.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "productivity-docs.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "support-help-center.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "support-help-center.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "support-help-center.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "support-escalations.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "support-escalations.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "support-escalations.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "finance-cash-brief.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "finance-cash-brief.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "finance-cash-brief.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "finance-expenses.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "finance-expenses.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "finance-expenses.kickoff": "The first message the user sends to the new coworker, in the first person.",
+        "finance-failed-payments.title": "A ready-made job offered in the New coworker dialog, written as the user asking. Rolls in the pill of an empty Box: keep it under 28 characters.",
+        "finance-failed-payments.name": "The name the new coworker gets once created: 2 to 4 words, like a job title. Shown on the suggestion card.",
+        "finance-failed-payments.kickoff": "The first message the user sends to the new coworker, in the first person."
+    },
+    "default-seo": {
+        "title": "Automate my SEO",
+        "description": "The fixes worth doing, ranked, with the briefs.",
+        "name": "SEO Assistant",
+        "kickoff": "Audit my website's SEO. List the ten highest-impact fixes ranked by effort, then draft the content briefs for the pages that need one."
+    },
+    "default-inbox": {
+        "title": "Triage my inbox",
+        "description": "What needs you today, with the replies drafted.",
+        "name": "Inbox Triage",
+        "kickoff": "Help me get through my inbox. Ask me which account to work on, then sort what arrives, tell me what actually needs me today, and draft the replies I can send as they are."
+    },
+    "default-research": {
+        "title": "Research things for me",
+        "description": "A briefing you can act on, with the sources.",
+        "name": "Research Assistant",
+        "kickoff": "I want you to research topics for me. Ask me what to look into first, then read around it and come back with a briefing I can act on, with the sources."
+    },
+    "default-content": {
+        "title": "Write my content",
+        "description": "The next piece drafted, plus three more to write.",
+        "name": "Content Writer",
+        "kickoff": "Help me write content. Ask me what I publish, who reads it and how I sound, then draft the next piece and suggest three more I could write after it."
+    },
+    "default-meeting-notes": {
+        "title": "Turn my meetings into tasks",
+        "description": "Notes, and who owes what by when.",
+        "name": "Meeting Notes",
+        "kickoff": "Turn my meetings into notes and tasks. Ask me where the recordings or transcripts land, then summarise each one and list who owes what by when."
+    },
+    "default-daily-brief": {
+        "title": "Brief me every morning",
+        "description": "Your day: meetings, emails and what is due.",
+        "name": "Daily Brief",
+        "kickoff": "Every morning, tell me what my day looks like: my meetings, the emails that need me, and what is due."
+    },
+    "default-follow-ups": {
+        "title": "Chase what I am waiting on",
+        "description": "Who owes you an answer, and the nudge to send.",
+        "name": "Follow-up Chaser",
+        "kickoff": "Keep track of what I am waiting on. Every morning, tell me who owes me an answer and draft the nudge for each of them."
+    },
+    "default-weekly-report": {
+        "title": "Build my weekly report",
+        "description": "The numbers pulled and written up, every Friday.",
+        "name": "Report Builder",
+        "kickoff": "Every Friday, pull the week's numbers from my spreadsheet and write the report I send to the team."
+    },
+    "agencies-client-report": {
+        "title": "Report to my clients",
+        "description": "A weekly recap of the numbers, written for the client.",
+        "name": "Client Reporting",
+        "kickoff": "Help me set up a weekly client report. Ask me which client to start with and where their numbers live, then pull the figures, write the summary in plain language, and tell me what changed since last week."
+    },
+    "agencies-proposal": {
+        "title": "Draft my proposals",
+        "description": "Scope, pricing and timeline, in your usual tone.",
+        "name": "Proposal Writer",
+        "kickoff": "I want you to draft proposals for new clients. Ask me about the scope, the budget range and the deliverables, then write the proposal with pricing and a timeline, in the tone we already use with clients."
+    },
+    "agencies-meeting-notes": {
+        "title": "Turn calls into action items",
+        "description": "Notes and owners after every client call.",
+        "name": "Meeting Notes",
+        "kickoff": "After every client call I want notes and action items. Ask me where the recordings or transcripts land, then summarise each one, list who owes what by when, and flag anything that changes the scope."
+    },
+    "agencies-seo": {
+        "title": "Automate my SEO",
+        "description": "The fixes worth doing, ranked, with the briefs.",
+        "name": "SEO Assistant",
+        "kickoff": "Audit my website's SEO. List the ten highest-impact fixes ranked by effort, then draft the content briefs for the pages that need one."
+    },
+    "agencies-lead-responder": {
+        "title": "Answer my new leads",
+        "description": "Every enquiry answered, and posted to the team.",
+        "name": "Lead Responder",
+        "kickoff": "Answer every new enquiry from our contact form. Ask me where they arrive, then reply within minutes, ask the qualifying questions, and post the lead in Slack."
+    },
+    "agencies-case-studies": {
+        "title": "Write my case studies",
+        "description": "A draft from the project, ready to publish.",
+        "name": "Case Study Writer",
+        "kickoff": "When a project closes, draft its case study. Ask me where the project notes live, then write the story, the results and a pull quote, and tell me what is missing to publish it."
+    },
+    "agencies-inbox": {
+        "title": "Triage our shared inbox",
+        "description": "What needs the team today, every morning.",
+        "name": "Inbox Triage",
+        "kickoff": "Every morning, sort our shared inbox and tell us in Slack what needs us today, with the replies drafted for the ones I can send as they are."
+    },
+    "agencies-invoices": {
+        "title": "Chase my unpaid invoices",
+        "description": "Who is late, and the reminder to send them.",
+        "name": "Invoice Chaser",
+        "kickoff": "Help me chase unpaid invoices. Ask me where my invoices live, then tell me every Monday who is late and draft the reminder for each of them."
+    },
+    "ecommerce-product-copy": {
+        "title": "Write my product pages",
+        "description": "Titles and descriptions that match your catalogue.",
+        "name": "Product Copy",
+        "kickoff": "I want you to write product descriptions for my store. Ask me which products to start with, then write titles, descriptions and bullet points that match how the rest of the catalogue reads."
+    },
+    "ecommerce-abandoned-cart": {
+        "title": "Win back abandoned carts",
+        "description": "The recovery sequence, and when each email goes out.",
+        "name": "Cart Recovery",
+        "kickoff": "Help me recover abandoned carts. Ask me what my current flow looks like, then write the email sequence, tell me when each one should go out, and suggest what to test first."
+    },
+    "ecommerce-reviews": {
+        "title": "Digest my customer reviews",
+        "description": "What buyers keep complaining about, weekly.",
+        "name": "Reviews Digest",
+        "kickoff": "Read my recent customer reviews and support messages, group them by the problem behind them, and give me a weekly digest of what buyers complain about and what they love."
+    },
+    "ecommerce-sales-report": {
+        "title": "Track my sales every morning",
+        "description": "Revenue, orders and anything that moved oddly.",
+        "name": "Sales Report",
+        "kickoff": "Give me a daily sales report. Ask me where my sales data lives, then send me revenue, orders and best sellers each morning, with anything that moved unusually called out."
+    },
+    "ecommerce-support": {
+        "title": "Answer my customers",
+        "description": "Order questions answered, the odd ones flagged.",
+        "name": "Support Assistant",
+        "kickoff": "Help me answer customer emails. Ask me where they arrive and what my policies are, then draft the reply to each order question and flag the ones that need me."
+    },
+    "ecommerce-ads": {
+        "title": "Watch my ad spend",
+        "description": "What each campaign returned, and what to pause.",
+        "name": "Ads Watch",
+        "kickoff": "Keep an eye on my ad campaigns. Every Monday, tell me what each one spent and returned, and which ones I should pause or push."
+    },
+    "ecommerce-newsletter": {
+        "title": "Write my newsletter",
+        "description": "This week's email, from what is new in the store.",
+        "name": "Newsletter Writer",
+        "kickoff": "Write my weekly newsletter. Ask me what is new in the store and how I usually sound, then draft the email and suggest two subject lines."
+    },
+    "ecommerce-stock": {
+        "title": "Warn me before I run out",
+        "description": "Low stock and slow sellers, every week.",
+        "name": "Stock Watch",
+        "kickoff": "Watch my stock. Every week, tell me which products are about to run out at the current pace and which ones have stopped selling."
+    },
+    "saas-changelog": {
+        "title": "Write my changelog",
+        "description": "Release notes a customer can actually read.",
+        "name": "Changelog Writer",
+        "kickoff": "I want a changelog written from what we ship. Ask me where our repository and releases live, then turn the merged work into release notes a customer can read, grouped by what it changes for them."
+    },
+    "saas-issue-triage": {
+        "title": "Triage my issues",
+        "description": "Labelled, deduped, and ranked by what needs you.",
+        "name": "Issue Triage",
+        "kickoff": "Help me triage incoming issues. Ask me where they land, then label each one, judge how urgent it is, spot duplicates, and tell me every morning what deserves attention today."
+    },
+    "saas-onboarding-emails": {
+        "title": "Onboard my new users",
+        "description": "The signup sequence, written and scheduled.",
+        "name": "Onboarding Emails",
+        "kickoff": "Design the onboarding email sequence for new signups. Ask me what the product does and what the first win looks like, then write each email and tell me when it should be sent."
+    },
+    "saas-seo": {
+        "title": "Automate my SEO",
+        "description": "The fixes worth doing, ranked, with the briefs.",
+        "name": "SEO Assistant",
+        "kickoff": "Audit my website's SEO. List the ten highest-impact fixes ranked by effort, then draft the content briefs for the pages that need one."
+    },
+    "saas-churn": {
+        "title": "Spot accounts about to churn",
+        "description": "Who went quiet, and what to send them.",
+        "name": "Churn Watch",
+        "kickoff": "Help me spot accounts about to churn. Ask me where usage and billing live, then tell me every week who went quiet and draft the message I should send them."
+    },
+    "saas-support": {
+        "title": "Answer my support tickets",
+        "description": "A reply drafted from the docs, the bugs filed.",
+        "name": "Support Assistant",
+        "kickoff": "Help me with support. Ask me where tickets arrive, then draft a reply from our docs for each one and open an issue for the real bugs."
+    },
+    "saas-errors": {
+        "title": "Triage my errors",
+        "description": "New errors grouped, with the likely cause.",
+        "name": "Error Triage",
+        "kickoff": "Every morning, read the new errors in Sentry, group them by cause, and tell me in Slack which ones are worth fixing today."
+    },
+    "saas-metrics": {
+        "title": "Send my weekly metrics",
+        "description": "Signups, activation and revenue, with what moved.",
+        "name": "Metrics Digest",
+        "kickoff": "Every Monday, send me the numbers that matter: signups, activation, revenue and churn, with what moved since last week and why."
+    },
+    "sales-prospect-research": {
+        "title": "Research my prospects",
+        "description": "A briefing on the company before every call.",
+        "name": "Prospect Research",
+        "kickoff": "Before every call I want a briefing on the prospect. Ask me who to research first, then give me the company, the people, what they announced recently, and the angle I should open on."
+    },
+    "sales-follow-ups": {
+        "title": "Chase my follow-ups",
+        "description": "Who went quiet, and the message to send them.",
+        "name": "Follow-up Assistant",
+        "kickoff": "Help me stay on top of follow-ups. Ask me where my pipeline lives, then tell me every morning who has gone quiet, and draft the follow-up I should send each of them."
+    },
+    "sales-outreach": {
+        "title": "Write my cold outreach",
+        "description": "A first email and two follow-ups, per prospect.",
+        "name": "Outreach Writer",
+        "kickoff": "I want you to write cold outreach for me. Ask me who we sell to and what we sell, then write a first email and two follow-ups, personalised per prospect rather than templated."
+    },
+    "sales-crm-hygiene": {
+        "title": "Keep my CRM clean",
+        "description": "Missing fields, stale stages and duplicates, weekly.",
+        "name": "CRM Assistant",
+        "kickoff": "Keep my CRM up to date. Ask me which CRM I use, then find records with missing fields, stale stages or duplicates, and give me a weekly list of what to fix."
+    },
+    "sales-reply-sorter": {
+        "title": "Sort my campaign replies",
+        "description": "Interested prospects flagged, answers drafted.",
+        "name": "Reply Sorter",
+        "kickoff": "Sort every reply to my cold campaigns, draft my answer to the interested ones, and ping me in Slack when a prospect wants to talk."
+    },
+    "sales-lead-responder": {
+        "title": "Answer my inbound leads",
+        "description": "Every form answered within minutes.",
+        "name": "Lead Responder",
+        "kickoff": "Answer every new contact form within five minutes. Ask me where they land, then reply, qualify the lead, and post it in Slack."
+    },
+    "sales-call-notes": {
+        "title": "Log my sales calls",
+        "description": "Notes and next steps, written to the CRM.",
+        "name": "Call Notes",
+        "kickoff": "After every sales call, write the notes and the next steps, and log them on the deal. Ask me where my recordings land first."
+    },
+    "sales-pipeline": {
+        "title": "Review my pipeline",
+        "description": "Deals at risk and what to do, every Monday.",
+        "name": "Pipeline Review",
+        "kickoff": "Every Monday, review my pipeline and tell me which deals are at risk, which are stuck, and what I should do about each this week."
+    },
+    "recruiting-screening": {
+        "title": "Screen my applicants",
+        "description": "Every application read, summarised and ranked.",
+        "name": "Candidate Screening",
+        "kickoff": "Help me screen applicants. Ask me for the role and what matters most in it, then review each application against it, summarise the candidate in five lines, and rank them for me."
+    },
+    "recruiting-sourcing": {
+        "title": "Source my candidates",
+        "description": "Profiles that fit, and the first message to each.",
+        "name": "Sourcing Assistant",
+        "kickoff": "I want you to source candidates for an open role. Ask me about the role, the seniority and the market, then find profiles that fit and draft the first message to each of them."
+    },
+    "recruiting-job-posts": {
+        "title": "Write my job posts",
+        "description": "The role described the way you actually speak.",
+        "name": "Job Post Writer",
+        "kickoff": "Write the job posting for a role I am opening. Ask me what the job actually involves and what we offer, then write the post the way we speak, not the way job boards do."
+    },
+    "recruiting-scheduling": {
+        "title": "Schedule my interviews",
+        "description": "Slots proposed, invites sent, reminders handled.",
+        "name": "Interview Scheduler",
+        "kickoff": "Handle interview scheduling for me. Ask me where my calendar and candidates live, then propose slots, send the invites, and remind me the day before each interview."
+    },
+    "recruiting-updates": {
+        "title": "Keep candidates posted",
+        "description": "Nobody left waiting on an answer.",
+        "name": "Candidate Updates",
+        "kickoff": "Keep candidates informed. Ask me where my pipeline lives, then tell me every week who has been waiting on an answer and draft the update for each of them."
+    },
+    "recruiting-interview-prep": {
+        "title": "Prepare my interviews",
+        "description": "The profile and the questions, before each one.",
+        "name": "Interview Prep",
+        "kickoff": "Before every interview on my calendar, send me a briefing on the candidate and the questions I should ask for this role."
+    },
+    "recruiting-references": {
+        "title": "Check my references",
+        "description": "Referees contacted, answers summarised.",
+        "name": "Reference Checker",
+        "kickoff": "Handle reference checks. Ask me for the candidate and their referees, then write to each one, chase the answers, and summarise what they said."
+    },
+    "recruiting-offers": {
+        "title": "Draft my offers",
+        "description": "The offer letter, ready for signature.",
+        "name": "Offer Writer",
+        "kickoff": "Draft offer letters. Ask me for the role, the package and the start date, then write the letter from our template and prepare it for signature."
+    },
+    "real-estate-leads": {
+        "title": "Follow up on my leads",
+        "description": "Every enquiry answered and qualified the same day.",
+        "name": "Lead Follow-up",
+        "kickoff": "Help me follow up on new leads. Ask me where enquiries arrive, then reply to each one quickly, ask the qualifying questions, and tell me who is worth a call today."
+    },
+    "real-estate-listings": {
+        "title": "Write my listings",
+        "description": "Descriptions and highlights without the clichés.",
+        "name": "Listing Writer",
+        "kickoff": "I want you to write property listings. Ask me for the details of the property, then write the description, the highlights and a short version for social, without the usual clichés."
+    },
+    "real-estate-market-watch": {
+        "title": "Watch my market",
+        "description": "New listings, price changes and sales, weekly.",
+        "name": "Market Watch",
+        "kickoff": "Keep an eye on my market. Ask me which areas and price ranges I work in, then send me a weekly note on new listings, price changes and what sold."
+    },
+    "real-estate-documents": {
+        "title": "Prepare my paperwork",
+        "description": "Documents filled from the deal, and what is unsigned.",
+        "name": "Document Assistant",
+        "kickoff": "Help me with the paperwork on each deal. Ask me which documents I use, then prepare them from the deal details, check nothing is missing, and track what is still unsigned."
+    },
+    "real-estate-viewings": {
+        "title": "Book my viewings",
+        "description": "Slots proposed, confirmed and reminded.",
+        "name": "Viewing Scheduler",
+        "kickoff": "Handle viewings for me. Ask me where my calendar lives, then propose slots to each buyer, confirm them, and remind everyone the day before."
+    },
+    "real-estate-seller-updates": {
+        "title": "Report to my sellers",
+        "description": "A weekly update on visits and feedback.",
+        "name": "Seller Updates",
+        "kickoff": "Every Friday, write each seller an update on their property: visits, feedback and what I suggest next. Ask me where I track them first."
+    },
+    "real-estate-social": {
+        "title": "Post my listings",
+        "description": "Each new property turned into posts.",
+        "name": "Listing Posts",
+        "kickoff": "When I add a new listing, turn it into posts for my social accounts, with a caption for each platform."
+    },
+    "real-estate-nurture": {
+        "title": "Stay in touch with past clients",
+        "description": "Who to call this month, and why.",
+        "name": "Client Nurture",
+        "kickoff": "Help me stay in touch with past clients. Every month, tell me who I should reach out to and why, and draft the message."
+    },
+    "legal-contract-review": {
+        "title": "Review my contracts",
+        "description": "Risky clauses, gaps, and what to negotiate.",
+        "name": "Contract Review",
+        "kickoff": "Review contracts for me. Ask me what to look at first and what our usual positions are, then flag the risky clauses, what is missing, and what I should negotiate."
+    },
+    "legal-drafting": {
+        "title": "Draft my documents",
+        "description": "A draft from your templates, plus the open decisions.",
+        "name": "Document Drafting",
+        "kickoff": "I want you to draft legal documents from our templates. Ask me which document and for which matter, then produce the draft and list every point that still needs my decision."
+    },
+    "legal-summaries": {
+        "title": "Summarise my case files",
+        "description": "Facts, dates and obligations, with references.",
+        "name": "Case Summariser",
+        "kickoff": "Summarise long documents and case files for me. Ask me where they are, then give me the facts, the dates, the obligations and the open questions, with references back to the source."
+    },
+    "legal-deadlines": {
+        "title": "Track my deadlines",
+        "description": "A dated list, and a warning before anything is due.",
+        "name": "Deadline Tracker",
+        "kickoff": "Track deadlines and renewals for me. Ask me where the contracts and matters live, then keep a dated list and warn me well before anything comes due."
+    },
+    "legal-intake": {
+        "title": "Handle my client intake",
+        "description": "New enquiries qualified before the first call.",
+        "name": "Client Intake",
+        "kickoff": "Handle new client enquiries. Ask me what I need to know before taking a matter, then collect it from each enquiry and tell me who is worth a call."
+    },
+    "legal-signatures": {
+        "title": "Chase my signatures",
+        "description": "What is still unsigned, and the reminder.",
+        "name": "Signature Tracker",
+        "kickoff": "Track what is out for signature. Every morning, tell me which documents are still unsigned and send the reminder for the ones that are late."
+    },
+    "legal-research": {
+        "title": "Research a point of law",
+        "description": "What the sources say, with citations.",
+        "name": "Legal Research",
+        "kickoff": "I want you to research legal questions for me. Ask me the question and the jurisdiction, then come back with what the sources say, with citations I can check."
+    },
+    "legal-time-entries": {
+        "title": "Prepare my time entries",
+        "description": "The week's work turned into billable lines.",
+        "name": "Time Entries",
+        "kickoff": "Every Friday, go through my calendar and my emails and draft the week's time entries, matter by matter, for me to review."
+    },
+    "creators-content-calendar": {
+        "title": "Plan my content",
+        "description": "A month of posts, each with a hook and an angle.",
+        "name": "Content Calendar",
+        "kickoff": "Help me plan my content. Ask me what I publish and who for, then build a calendar for the next month with a hook and an angle for each post."
+    },
+    "creators-repurpose": {
+        "title": "Repurpose what I publish",
+        "description": "One piece rewritten for every platform you're on.",
+        "name": "Repurposing Assistant",
+        "kickoff": "I want to get more out of each piece I publish. Ask me for a recent one, then turn it into posts for each platform I am on, rewritten for that platform rather than copied."
+    },
+    "creators-newsletter": {
+        "title": "Write my newsletter",
+        "description": "A draft in your voice, and what to cut from it.",
+        "name": "Newsletter Writer",
+        "kickoff": "Help me write my newsletter. Ask me what the issue should cover and how I usually sound, then draft it, and tell me what I could cut."
+    },
+    "creators-seo": {
+        "title": "Automate my SEO",
+        "description": "The fixes worth doing, ranked, with the briefs.",
+        "name": "SEO Assistant",
+        "kickoff": "Audit my website's SEO. List the ten highest-impact fixes ranked by effort, then draft the content briefs for the pages that need one."
+    },
+    "creators-comments": {
+        "title": "Answer my comments",
+        "description": "Replies drafted, the ones worth your time flagged.",
+        "name": "Comment Replies",
+        "kickoff": "Help me keep up with comments. Every day, read the new ones on my videos, draft the replies, and tell me which deserve an answer from me."
+    },
+    "creators-scheduler": {
+        "title": "Schedule my posts",
+        "description": "The week queued on every platform.",
+        "name": "Post Scheduler",
+        "kickoff": "Every Monday, take the posts I have ready and schedule them across my platforms for the week, at the hours that work best."
+    },
+    "creators-ideas": {
+        "title": "Find my next ideas",
+        "description": "What your audience is asking, every week.",
+        "name": "Idea Scout",
+        "kickoff": "Every week, look at what people in my niche are asking and discussing, and give me five ideas worth a post, with the angle for each."
+    },
+    "creators-analytics": {
+        "title": "Read my numbers",
+        "description": "What worked this week, and what to repeat.",
+        "name": "Audience Report",
+        "kickoff": "Every Monday, tell me how last week's content did: what grew, what flopped, and what I should make more of."
+    },
+    "productivity-inbox": {
+        "title": "Triage my inbox",
+        "description": "What needs you today, with the replies drafted.",
+        "name": "Inbox Triage",
+        "kickoff": "Help me get through my inbox. Ask me which account to work on, then sort what arrives, tell me what actually needs me today, and draft the replies I can send as they are."
+    },
+    "productivity-meeting-notes": {
+        "title": "Turn my meetings into tasks",
+        "description": "Notes, and who owes what by when.",
+        "name": "Meeting Notes",
+        "kickoff": "Turn my meetings into notes and tasks. Ask me where the recordings or transcripts land, then summarise each one and list who owes what by when."
+    },
+    "productivity-weekly-review": {
+        "title": "Prepare my weekly review",
+        "description": "What moved and what is stuck, every Friday.",
+        "name": "Weekly Review",
+        "kickoff": "Prepare my weekly review. Ask me where my work is tracked, then tell me every Friday what moved, what is stuck, and what I said I would do and did not."
+    },
+    "productivity-research": {
+        "title": "Research things for me",
+        "description": "A briefing you can act on, with the sources.",
+        "name": "Research Assistant",
+        "kickoff": "I want you to research topics for me. Ask me what to look into first, then read around it and come back with a briefing I can act on, with the sources."
+    },
+    "productivity-daily-brief": {
+        "title": "Brief me every morning",
+        "description": "Your day: meetings, emails and what is due.",
+        "name": "Daily Brief",
+        "kickoff": "Every morning, tell me what my day looks like: my meetings, the emails that need me, and what is due."
+    },
+    "productivity-follow-ups": {
+        "title": "Chase what I am waiting on",
+        "description": "Who owes you an answer, and the nudge to send.",
+        "name": "Follow-up Chaser",
+        "kickoff": "Keep track of what I am waiting on. Every morning, tell me who owes me an answer and draft the nudge for each of them."
+    },
+    "productivity-weekly-report": {
+        "title": "Build my weekly report",
+        "description": "The numbers pulled and written up, every Friday.",
+        "name": "Report Builder",
+        "kickoff": "Every Friday, pull the week's numbers from my spreadsheet and write the report I send to the team."
+    },
+    "productivity-docs": {
+        "title": "Keep my docs up to date",
+        "description": "Stale pages found, updates drafted.",
+        "name": "Docs Keeper",
+        "kickoff": "Keep our internal docs current. Every week, find the pages that have gone stale and draft the update for each."
+    },
+    "support-help-center": {
+        "title": "Keep my help center up to date",
+        "description": "The questions that keep coming back, turned into articles.",
+        "name": "Help Center Writer",
+        "kickoff": "Help me keep my help center up to date. Ask me where support questions arrive, then tell me each week which ones keep coming back and draft the article that answers each of them."
+    },
+    "support-escalations": {
+        "title": "Flag the unhappy customers",
+        "description": "Who is upset today, why, and what to tell them.",
+        "name": "Escalation Watch",
+        "kickoff": "Watch my support inbox for unhappy customers. Every morning, tell me who is upset and why, and draft what I should answer to each of them."
+    },
+    "finance-cash-brief": {
+        "title": "Brief me on my cash every week",
+        "description": "What came in, what went out, what is due.",
+        "name": "Cash Brief",
+        "kickoff": "Every Monday, tell me where my cash stands: what came in last week, what went out, and which payments are due in the next two."
+    },
+    "finance-expenses": {
+        "title": "Sort my receipts",
+        "description": "Every receipt filed, with what is missing.",
+        "name": "Receipt Sorter",
+        "kickoff": "Help me keep my receipts in order. Ask me where they arrive, then file each one in my spreadsheet with its amount, date and category, and tell me which ones are missing at the end of the month."
+    },
+    "finance-failed-payments": {
+        "title": "Recover my failed payments",
+        "description": "Each failed charge, with the email to win it back.",
+        "name": "Payment Recovery",
+        "kickoff": "Help me recover failed payments. Every morning, list the charges that failed yesterday and draft the email I should send to each customer."
+    }
+}

@@ -5,10 +5,10 @@ import { Icon } from '@/components/ui/icon'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import { CheckIcon } from '@/lib/icons'
-import { BRAIN_PAGE_TYPE_LABELS } from '@/lib/brain/labels'
 import { cn } from '@/lib/utils'
 import { brainPageTypeSchema, type BrainPageType } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useLayoutEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
 
 // The reading column every brain page sits in, centred with the margins Notion gives a page.
@@ -31,6 +31,7 @@ type PageTitleProps = {
 
 // A heading you type into: no border, grows with what it holds, Enter moves on to the body.
 export function PageTitle({ value, autoFocus, readOnly, onChange, onCommit, onEnter }: PageTitleProps) {
+    const t = useTranslations('brain.parts')
     const ref = useRef<HTMLTextAreaElement>(null)
 
     useLayoutEffect(() => {
@@ -59,8 +60,8 @@ export function PageTitle({ value, autoFocus, readOnly, onChange, onCommit, onEn
             autoFocus={autoFocus}
             readOnly={readOnly}
             maxLength={120}
-            placeholder="Untitled"
-            aria-label="Page title"
+            placeholder={t('untitled')}
+            aria-label={t('pageTitle')}
             onChange={event => onChange(event.target.value.replace(/\n/g, ' '))}
             onBlur={onCommit}
             onKeyDown={handleKeyDown}
@@ -81,8 +82,9 @@ export function PageProperty({ label, children }: { label: string; children: Rea
 // The sections the seed imported from the public web: the coworkers take them as a guess until a
 // person edits or confirms them.
 export function UnconfirmedSections({ headings, confirming, onConfirm }: { headings: string[]; confirming: boolean; onConfirm: () => void }) {
+    const t = useTranslations('brain.parts')
     return (
-        <PageProperty label="Unconfirmed">
+        <PageProperty label={t('unconfirmed')}>
             {headings.map(heading => (
                 <Badge key={heading} size="xs" tone="yellow" glow={false} fill="outline" className="max-w-full min-w-0">
                     <span className="truncate">{heading}</span>
@@ -90,16 +92,17 @@ export function UnconfirmedSections({ headings, confirming, onConfirm }: { headi
             ))}
             <Button size="xs" loading={confirming} onClick={onConfirm}>
                 <CheckIcon />
-                Confirm
+                {t('confirm')}
             </Button>
         </PageProperty>
     )
 }
 
 export function PageTypeSelect({ value, disabled, onChange }: { value: BrainPageType; disabled?: boolean; onChange: (type: BrainPageType) => void }) {
+    const t = useTranslations('brain')
     return (
         <Select value={value} onValueChange={next => onChange(next as BrainPageType)} disabled={disabled}>
-            <SelectTrigger size="sm" className="-ml-2 border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent" aria-label="Page type">
+            <SelectTrigger size="sm" className="-ml-2 border-transparent bg-transparent shadow-none hover:bg-accent dark:bg-transparent dark:hover:bg-accent" aria-label={t('parts.pageType')}>
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -108,7 +111,7 @@ export function PageTypeSelect({ value, disabled, onChange }: { value: BrainPage
                     return (
                         <SelectItem key={type} value={type}>
                             <Glyph className="size-3.5 text-muted-foreground" />
-                            {BRAIN_PAGE_TYPE_LABELS[type]}
+                            {t(`pageTypes.${type}`)}
                         </SelectItem>
                     )
                 })}

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { attachmentDisplayName } from '@/lib/chat/attachments-marker'
 import { rawUrlResolver, type RawUrlFor } from '@/lib/files/raw-url'
 import { ChevronLeftIcon, ChevronRightIcon, DownloadIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useCallback } from 'react'
 
 export type ReadChatFile = (path: string) => Promise<{ content: string; truncated: boolean }>
@@ -27,6 +28,7 @@ type AttachmentLightboxProps = {
 
 /** Full-screen view of one attachment, with arrows across the message's other files. */
 export function AttachmentLightbox({ agentId, paths, names, index, rawUrlFor, readFile, onIndexChange, onClose }: AttachmentLightboxProps) {
+    const t = useTranslations('chat.attachments')
     const path = paths[index]
     const name = names?.[index] ?? attachmentDisplayName(path)
     const rawUrl = rawUrlResolver(agentId, rawUrlFor)?.(path) ?? ''
@@ -45,17 +47,17 @@ export function AttachmentLightbox({ agentId, paths, names, index, rawUrlFor, re
                     {paths.length > 1 && (
                         <>
                             <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
-                                {index + 1} / {paths.length}
+                                {t('position', { current: index + 1, total: paths.length })}
                             </span>
-                            <Button size="icon-sm" variant="ghost" onClick={() => onIndexChange((index - 1 + paths.length) % paths.length)} aria-label="Previous attachment">
+                            <Button size="icon-sm" variant="ghost" onClick={() => onIndexChange((index - 1 + paths.length) % paths.length)} aria-label={t('previous')}>
                                 <ChevronLeftIcon className="size-4" />
                             </Button>
-                            <Button size="icon-sm" variant="ghost" onClick={() => onIndexChange((index + 1) % paths.length)} aria-label="Next attachment">
+                            <Button size="icon-sm" variant="ghost" onClick={() => onIndexChange((index + 1) % paths.length)} aria-label={t('next')}>
                                 <ChevronRightIcon className="size-4" />
                             </Button>
                         </>
                     )}
-                    <Button size="icon-sm" variant="ghost" asChild title="Download" aria-label="Download">
+                    <Button size="icon-sm" variant="ghost" asChild title={t('download')} aria-label={t('download')}>
                         <a href={rawUrl} download={name}>
                             <DownloadIcon className="size-4" />
                         </a>

@@ -5,6 +5,7 @@ import { PanelDeleteButton } from '@/components/ui/panel-editor'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { DownloadIcon, PencilIcon } from '@/lib/icons'
 import { Badge } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 
 import { FilePublishControl } from './FilePublishControl'
 
@@ -23,29 +24,30 @@ type FileDetailActionsProps = {
 }
 
 export function FileDetailActions({ name, truncated, editDisabledReason, onEdit, onDownload, onDelete, publicUrl, onPublish, onUnpublish, onShareSettings, openUrl }: FileDetailActionsProps) {
+    const t = useTranslations('files')
     return (
         <>
             {truncated && (
                 <Badge size="xs" tone="orange" glow={false}>
-                    Truncated
+                    {t('actions.truncated')}
                 </Badge>
             )}
             {onEdit && (
                 <TooltipDisabledReason reason={editDisabledReason}>
-                    <Button size="icon-sm" variant="ghost" disabled={!!editDisabledReason} onClick={onEdit} title="Edit" aria-label="Edit">
+                    <Button size="icon-sm" variant="ghost" disabled={!!editDisabledReason} onClick={onEdit} title={t('actions.edit')} aria-label={t('actions.edit')}>
                         <PencilIcon className="size-4" />
                     </Button>
                 </TooltipDisabledReason>
             )}
-            <Button size="icon-sm" variant="ghost" onClick={onDownload} title="Download" aria-label="Download">
+            <Button size="icon-sm" variant="ghost" onClick={onDownload} title={t('actions.download')} aria-label={t('actions.download')}>
                 <DownloadIcon className="size-4" />
             </Button>
             {onPublish && <FilePublishControl name={name} publicUrl={publicUrl} onPublish={onPublish} onUnpublish={onUnpublish} onShareSettings={onShareSettings} openUrl={openUrl} />}
             <PanelDeleteButton
-                label="Delete file"
+                label={t('actions.deleteFile')}
                 onClick={onDelete}
-                confirmTitle={`Delete ${name}?`}
-                confirmDescription="The file is deleted from the box. This cannot be undone."
+                confirmTitle={t('delete.title', { name })}
+                confirmDescription={t('delete.file')}
             />
         </>
     )

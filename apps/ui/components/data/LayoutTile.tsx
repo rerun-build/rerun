@@ -1,8 +1,9 @@
 'use client'
 
-import { LAYOUT_META } from '@/lib/data/views'
+import { LAYOUT_ICONS } from '@/lib/data/views'
 import { cn } from '@/lib/utils'
 import type { CardLayout } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 
 type LayoutTileProps = {
     layout: CardLayout
@@ -11,7 +12,8 @@ type LayoutTileProps = {
 }
 
 export function LayoutTile({ layout, active, onClick }: LayoutTileProps) {
-    const meta = LAYOUT_META[layout]
+    const t = useTranslations('data.layouts')
+    const LayoutIcon = LAYOUT_ICONS[layout]
     return (
         <button
             type="button"
@@ -22,8 +24,8 @@ export function LayoutTile({ layout, active, onClick }: LayoutTileProps) {
                 active ? 'border-primary/40 text-primary ring-1 ring-primary/40' : 'text-muted-foreground hover:border-foreground/20 hover:text-foreground',
             )}
         >
-            <meta.icon className="size-5" />
-            {meta.label}
+            <LayoutIcon className="size-5" />
+            {t(layout)}
         </button>
     )
 }

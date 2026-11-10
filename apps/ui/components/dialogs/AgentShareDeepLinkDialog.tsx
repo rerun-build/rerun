@@ -2,6 +2,7 @@
 
 import type { AgentSharePreview } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { ScrollFade } from '@rerun/ui/primitives'
@@ -21,6 +22,7 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // one decision. It is deliberately also what an anonymous visitor sees, ahead of the account wall,
 // because a share link has no public page of its own to preview from.
 export function AgentShareDeepLinkDialog({ token }: { token: string }) {
+    const t = useTranslations('dialogs.agentShare')
     const preview = useAgentShareStore(s => s.preview)
     const closeLink = useAgentShareStore(s => s.closeLink)
 
@@ -30,7 +32,7 @@ export function AgentShareDeepLinkDialog({ token }: { token: string }) {
         void getSharedAgentAction(token).then(found => {
             if (cancelled) return
             if (!found) {
-                toast.error('This share link is no longer available')
+                toast.error(t('unavailable'))
                 useAgentShareStore.getState().closeLink()
                 return
             }
@@ -39,7 +41,7 @@ export function AgentShareDeepLinkDialog({ token }: { token: string }) {
         return () => {
             cancelled = true
         }
-    }, [token])
+    }, [token, t])
 
     return (
         <Dialog open onOpenChange={open => !open && closeLink()}>
@@ -48,8 +50,8 @@ export function AgentShareDeepLinkDialog({ token }: { token: string }) {
                     {/* The panel already shows the title: this only exists for Radix, which requires
                         an accessible title and description on any dialog content. */}
                     <DialogHeader className="sr-only">
-                        <DialogTitle>{preview ? `Add ${preview.agent.name}` : 'Add this coworker'}</DialogTitle>
-                        <DialogDescription>Review what this coworker does, then place it on your board.</DialogDescription>
+                        <DialogTitle>{preview ? t('titleNamed', { name: preview.agent.name }) : t('title')}</DialogTitle>
+                        <DialogDescription>{t('description')}</DialogDescription>
                     </DialogHeader>
                     {preview ? <SharedAgentPanel token={token} preview={preview} onDone={closeLink} /> : <SharedAgentSkeleton />}
                 </div>
@@ -59,6 +61,7 @@ export function AgentShareDeepLinkDialog({ token }: { token: string }) {
 }
 
 function SharedAgentPanel({ token, preview, onDone }: { token: string; preview: AgentSharePreview; onDone: () => void }) {
+    const t = useTranslations('dialogs.agentShare')
     const { isAnonymous } = useSession()
 
     useEffect(() => {
@@ -77,9 +80,7 @@ function SharedAgentPanel({ token, preview, onDone }: { token: string; preview: 
                 <div className="flex flex-col gap-5 p-5">
                     <div className="space-y-1.5">
                         <h2 className="text-lg font-medium">{preview.agent.name}</h2>
-                        <p className="text-sm text-muted-foreground">
-                            {preview.sharedBy ? `${preview.sharedBy} sent you a copy of this coworker.` : 'Someone sent you a copy of this coworker.'} It will run on your own Box.
-                        </p>
+                        <p className="text-sm text-muted-foreground">{preview.sharedBy ? t('sentBy', { name: preview.sharedBy }) : t('sentBySomeone')}</p>
                     </div>
 
                     <TemplateDetailAgentCard agent={preview.agent} connectors={preview.connectors} comesWith={comesWith} notes={notes} />
@@ -107,13 +108,14 @@ function InstallFooter({ token, preview, onDone }: { token: string; preview: Age
 // agent is described, so asking to sign up before showing it would be asking blind. Closing the
 // card hands the screen back to the account wall, which is already mounted underneath.
 function SignUpFooter() {
+    const t = useTranslations('dialogs.agentShare')
     const closeLink = useAgentShareStore(s => s.closeLink)
     return (
         <div className="flex flex-col gap-3 border-t bg-muted/50 px-5 py-4 max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <Button className="w-full" onClick={closeLink}>
-                Sign up to add this coworker
+                {t('signUp')}
             </Button>
-            <p className="text-center text-xs text-muted-foreground">It will be waiting for you right after.</p>
+            <p className="text-center text-xs text-muted-foreground">{t('waiting')}</p>
         </div>
     )
 }

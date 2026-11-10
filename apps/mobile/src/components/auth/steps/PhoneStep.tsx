@@ -1,10 +1,11 @@
 import { router } from 'expo-router'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { PhoneField } from '@/components/auth/PhoneField'
 import { useSignInFlow } from '@/components/auth/SignInFlow'
 import { StepTitle } from '@/components/auth/steps/StepTitle'
-import { CHANNEL_LABELS, usePhoneCode } from '@/components/auth/useSignInActions'
+import { useChannelLabel, usePhoneCode } from '@/components/auth/useSignInActions'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { spacing } from '@/theme/tokens'
@@ -12,10 +13,12 @@ import { spacing } from '@/theme/tokens'
 export function PhoneStep() {
     const { country, phone, setPhone } = useSignInFlow()
     const { channels, send, sending, error, clearError } = usePhoneCode()
+    const t = useTranslations('mobileAuth')
+    const channelLabel = useChannelLabel()
 
     return (
         <>
-            <StepTitle title="Your phone number" />
+            <StepTitle title={t('phone.title')} />
             <PhoneField
                 country={country}
                 value={phone}
@@ -35,17 +38,17 @@ export function PhoneStep() {
             )}
             {channels.length === 0 ? (
                 <AppText variant="callout" tone="muted" style={{ textAlign: 'center' }}>
-                    We can&apos;t send codes to this country yet.
+                    {t('phone.unsupportedCountry')}
                 </AppText>
             ) : (
                 <View style={{ gap: spacing.sm }}>
                     {channels.map((channel, index) => (
-                        <Button key={channel} label={CHANNEL_LABELS[channel]} size="lg" variant={index === 0 ? 'default' : 'outline'} loading={sending === channel} disabled={sending !== null || !phone} onPress={() => send(channel)} />
+                        <Button key={channel} label={channelLabel(channel)} size="lg" variant={index === 0 ? 'default' : 'outline'} loading={sending === channel} disabled={sending !== null || !phone} onPress={() => send(channel)} />
                     ))}
                 </View>
             )}
             <AppText variant="caption" tone="muted" style={{ textAlign: 'center' }}>
-                By continuing, you agree to be contacted by Rerun on WhatsApp or SMS.
+                {t('phone.consent')}
             </AppText>
         </>
     )

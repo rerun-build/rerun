@@ -12,6 +12,7 @@ import { Icon } from '../primitives/icon'
 import { SpinnerIcon } from '../primitives/spinner'
 import { TextShimmer } from '../TextShimmer'
 import { useActionTicker } from './useActionTicker'
+import { useKitTranslations } from '../locale'
 
 const ENTER = { duration: 0.36, ease: [0.22, 1, 0.36, 1] as const }
 const LEAVE = { duration: 0.22, ease: [0.4, 0, 1, 1] as const }
@@ -39,11 +40,11 @@ export type StoryArtifactPlacement = {
 type CardState = 'running' | 'approval' | 'success' | 'done'
 
 // Same colours as the tiles: amber while the agent works, cyan when it waits for you, green once done.
-const STATE: Record<CardState, { label: string; tone: NonNullable<BorderBeamProps['tone']>; beam: NonNullable<BorderBeamProps['tone']>; stem: string }> = {
-    running: { label: 'Running', tone: 'orange', beam: 'orange', stem: 'rgb(249 115 22)' },
-    approval: { label: 'Needs you', tone: 'cyan', beam: 'cyan', stem: 'rgb(34 211 238)' },
-    success: { label: 'Done', tone: 'green', beam: 'green', stem: 'rgb(52 211 153)' },
-    done: { label: 'Done', tone: 'green', beam: 'neutral', stem: 'color-mix(in oklab, var(--foreground) 45%, transparent)' },
+const STATE: Record<CardState, { tone: NonNullable<BorderBeamProps['tone']>; beam: NonNullable<BorderBeamProps['tone']>; stem: string }> = {
+    running: { tone: 'orange', beam: 'orange', stem: 'rgb(249 115 22)' },
+    approval: { tone: 'cyan', beam: 'cyan', stem: 'rgb(34 211 238)' },
+    success: { tone: 'green', beam: 'green', stem: 'rgb(52 211 153)' },
+    done: { tone: 'green', beam: 'neutral', stem: 'color-mix(in oklab, var(--foreground) 45%, transparent)' },
 }
 
 function cardState(result: TemplateStoryArtifact | null, running: boolean): CardState {
@@ -143,6 +144,7 @@ export function StoryActivityCard({
     stem?: boolean
     className?: string
 }) {
+    const t = useKitTranslations()
     const told = useActionTicker(actions.length, playing, reducedMotion)
     const running = told < actions.length
     const state = cardState(result, running)
@@ -173,7 +175,7 @@ export function StoryActivityCard({
                             )
                         }
                     >
-                        {look.label}
+                        {t(`templateStory.states.${state}`)}
                     </Badge>
                 </div>
 
@@ -192,8 +194,8 @@ export function StoryActivityCard({
                                     </div>
                                     {result.tone === 'approval' && (
                                         <div className="flex shrink-0 gap-1">
-                                            <span className="rounded-md bg-foreground px-2 py-1 text-[10px] font-medium text-background shadow-[var(--relief-solid)]">Approve</span>
-                                            <span className="rounded-md bg-foreground/[0.06] px-2 py-1 text-[10px] font-medium text-foreground shadow-[var(--relief-subtle)]">Edit</span>
+                                            <span className="rounded-md bg-foreground px-2 py-1 text-[10px] font-medium text-background shadow-[var(--relief-solid)]">{t('templateStory.approve')}</span>
+                                            <span className="rounded-md bg-foreground/[0.06] px-2 py-1 text-[10px] font-medium text-foreground shadow-[var(--relief-subtle)]">{t('templateStory.edit')}</span>
                                         </div>
                                     )}
                                 </div>

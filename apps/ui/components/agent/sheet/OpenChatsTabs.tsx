@@ -2,6 +2,7 @@
 
 import { BorderBeam } from '@rerun/ui'
 import { useScrollFade } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 import { isGeneralTab, type SessionTab } from '@/hooks/useSessionTabs'
@@ -33,6 +34,7 @@ type OpenChatsTabsProps = {
  * Too many to fit, the row scrolls and only the edge still hiding a tab fades.
  */
 export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }: OpenChatsTabsProps) {
+    const t = useTranslations('agent.openChatsTabs')
     const [scroller, setScroller] = useState<HTMLDivElement | null>(null)
     const fadeMask = useScrollFade(scroller, { axis: 'x' })
     const sessions = useBoardStore(s => s.sessions)
@@ -80,7 +82,7 @@ export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }
                                 </button>
                                 <button
                                     type="button"
-                                    aria-label={`Close ${tab.title}`}
+                                    aria-label={t('closeTab', { title: tab.title })}
                                     onClick={() => onClose(index)}
                                     className={cn('relative z-10 flex size-5 shrink-0 items-center justify-center rounded hover:bg-background/60', !active && 'opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100')}
                                 >
@@ -93,7 +95,7 @@ export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }
             </div>
             <button
                 type="button"
-                aria-label="New thread"
+                aria-label={t('newThread')}
                 onClick={onCreate}
                 className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             >
@@ -110,6 +112,7 @@ export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }
  * color changes without the ring jumping.
  */
 function MainChatTab({ active, onSelect }: { active: boolean; onSelect: () => void }) {
+    const t = useTranslations('agent.openChatsTabs')
     const animationPlayState = active ? 'running' : 'paused'
     return (
         <button
@@ -122,7 +125,7 @@ function MainChatTab({ active, onSelect }: { active: boolean; onSelect: () => vo
             <BorderBeam pattern="arcs" animated className={cn('transition-opacity duration-500', active && 'opacity-0')} style={{ animationPlayState }} />
             <BorderBeam pattern="arcs" tone="brand" animated glow className={cn('transition-opacity duration-500', !active && 'opacity-0')} style={{ animationPlayState }} />
             <MessagesSquare className={cn('size-3.5 transition-colors', active && 'text-brand-text')} />
-            General
+            {t('general')}
         </button>
     )
 }

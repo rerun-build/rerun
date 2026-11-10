@@ -10,15 +10,14 @@ import { useSiblingFiles } from '@/components/files/useSiblingFiles'
 import { sharedFileRawUrl } from '@/lib/files/raw-url'
 import type { UploadEntry } from '@/lib/files/upload'
 import { FileIcon, FolderIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect } from 'react'
 import { toast } from 'sonner'
 
-const ROOT_LABEL = 'Files'
-
-function folderCrumbs(path: string, onSelect: (selection: BrainSelection) => void): BrainCrumb[] {
+function folderCrumbs(path: string, rootLabel: string, onSelect: (selection: BrainSelection) => void): BrainCrumb[] {
     const parts = path.split('/').filter(Boolean)
     return [
-        { label: ROOT_LABEL, icon: FolderIcon, onClick: () => onSelect({ kind: 'folder', path: '' }) },
+        { label: rootLabel, icon: FolderIcon, onClick: () => onSelect({ kind: 'folder', path: '' }) },
         ...parts.map((part, index) => ({ label: part, onClick: () => onSelect({ kind: 'folder', path: parts.slice(0, index + 1).join('/') }) })),
     ]
 }
@@ -35,6 +34,7 @@ function download(path: string) {
 type FolderProps = { path: string; files: SharedFilesTree; onSelect: (selection: BrainSelection) => void; onUpload: (entries: UploadEntry[], dir: string) => void }
 
 export function BrainFolderView({ path, files, onSelect, onUpload }: FolderProps) {
+    const t = useTranslations('brain.files')
     const { expand, refresh } = files
 
     useEffect(() => {
@@ -45,7 +45,7 @@ export function BrainFolderView({ path, files, onSelect, onUpload }: FolderProps
         try {
             await renameWorkspaceFileAction(joinPath(path, name), joinPath(path, next))
         } catch {
-            toast.error(`Could not rename ${name}`)
+            toast.error(t('renameFailed', { name }))
         }
         await refresh(path)
     }
@@ -54,16 +54,16 @@ export function BrainFolderView({ path, files, onSelect, onUpload }: FolderProps
         try {
             await deleteWorkspaceFileAction(joinPath(path, name))
         } catch {
-            toast.error(`Could not delete ${name}`)
+            toast.error(t('deleteFailed', { name }))
         }
         await refresh(path)
     }
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <BrainTopBar crumbs={folderCrumbs(path, onSelect)} />
+            <BrainTopBar crumbs={folderCrumbs(path, t('root'), onSelect)} />
             <FileList
-                title={path.split('/').filter(Boolean).pop() ?? ROOT_LABEL}
+                title={path.split('/').filter(Boolean).pop() ?? t('root')}
                 entries={files.entriesOf(path)}
                 onOpen={entry => onSelect({ kind: entry.type === 'dir' ? 'folder' : 'file', path: joinPath(path, entry.name) })}
                 onRename={(name, next) => void rename(name, next)}
@@ -78,6 +78,7 @@ export function BrainFolderView({ path, files, onSelect, onUpload }: FolderProps
 type FileProps = { path: string; files: SharedFilesTree; onSelect: (selection: BrainSelection) => void }
 
 export function BrainFileView({ path, files, onSelect }: FileProps) {
+    const t = useTranslations('brain.files')
     const dir = parentPath(path)
     const name = path.split('/').pop() ?? path
     const { expand, refresh } = files
@@ -96,7 +97,7 @@ export function BrainFileView({ path, files, onSelect }: FileProps) {
         try {
             await deleteWorkspaceFileAction(path)
         } catch {
-            toast.error(`Could not delete ${name}`)
+            toast.error(t('deleteFailed', { name }))
             return
         }
         await refresh(dir)
@@ -105,7 +106,7 @@ export function BrainFileView({ path, files, onSelect }: FileProps) {
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <BrainTopBar crumbs={[...folderCrumbs(dir, onSelect), { label: name, icon: FileIcon }]} />
+            <BrainTopBar crumbs={[...folderCrumbs(dir, t('root'), onSelect), { label: name, icon: FileIcon }]} />
             <div className="flex min-h-0 flex-1 flex-col border-t border-border">
                 <FileDetail
                     name={name}

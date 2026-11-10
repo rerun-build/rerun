@@ -1,0 +1,88 @@
+{
+    "agentPicker": {
+        "open": "{tab, select, chat {Open Chat for {name}} actions {Open To handle for {name}} services {Open Apps for {name}} mcp {Open MCP for {name}} skills {Open Skills for {name}} data {Open Database for {name}} memories {Open Knowledge for {name}} files {Open Files for {name}} scheduled {Open Routines for {name}} triggers {Open Triggers for {name}} other {{name}}}"
+    },
+    "connect": {
+        "added": "{name} added",
+        "connectedNote": "Connected, the coworker can use it",
+        "signInNote": "Sign in once so the coworker can use it",
+        "connected": "Connected",
+        "signingIn": "Signing in…",
+        "signIn": "Sign in",
+        "signInNeeded": "Sign-in needed",
+        "unreachable": "Unreachable",
+        "couldNotConnect": "Couldn't connect {name}",
+        "notAdded": "Not added",
+        "customServer": "Custom MCP server",
+        "customServerAt": "Custom MCP server · {host}",
+        "connecting": "Connecting…",
+        "connect": "Connect",
+        "installed": "{name} installed",
+        "availableNextTurn": "Available on the next turn: {tools}"
+    },
+    "event": {
+        "notification": "Sent you a notification",
+        "setUp": "{name} is set up",
+        "setupComplete": "Setup complete",
+        "schedules": "{count, plural, one {# schedule on} other {# schedules on}}",
+        "triggers": "{count, plural, one {# trigger on} other {# triggers on}}",
+        "newBrainPage": "New Brain page: {title}",
+        "brainChange": "Change to the Brain: {title}",
+        "proposedNote": "Proposed for review. Nothing changes until someone accepts it.",
+        "undone": "Undone: {title}",
+        "undoneNote": "The previous version is back.",
+        "undo": "Undo",
+        "undoFailed": "Could not undo this change",
+        "tryAgainShortly": "Try again in a moment."
+    },
+    "brain": {
+        "saved": "Brain updated: {title}",
+        "created": "New Brain page: {title}",
+        "deleted": "Removed from the Brain: {title}",
+        "accepted": "Accepted the change: {title}",
+        "acceptedBy": "Accepted {name}'s change: {title}",
+        "dismissed": "Dismissed the change: {title}",
+        "dismissedBy": "Dismissed {name}'s change: {title}",
+        "notes": {
+            "saved": "Saved. Every coworker reads it from its next run.",
+            "deleted": "No coworker reads it anymore. Its history is kept.",
+            "accepted": "Saved. Every coworker reads it from its next run.",
+            "dismissed": "The page is unchanged."
+        }
+    },
+    "file": {
+        "open": "Open {name}",
+        "title": "{count, plural, =0 {File} one {File} other {# files}}",
+        "size": {
+            "b": "{value} B",
+            "kb": "{value} KB",
+            "mb": "{value} MB"
+        }
+    },
+    "skill": {
+        "remembering": "Remembering",
+        "remembered": "Remembered",
+        "failed": "Couldn’t remember this",
+        "retry": "Retry",
+        "dismiss": "Dismiss",
+        "notRemembered": "Not remembered",
+        "ask": "Remember this?",
+        "remember": "Remember",
+        "no": "No",
+        "hideDetails": "Hide details",
+        "showDetails": "Show details"
+    },
+    "sources": {
+        "count": "{count, plural, one {# source} other {# sources}}"
+    },
+    "table": {
+        "partial": "{shown} of {total}"
+    },
+    "_context": {
+        "agentPicker.open": "A chip under a message of the workspace assistant: opens one screen of a coworker. The words after Open are the names of the coworker's tabs.",
+        "event.schedules": "A badge on the card that says a coworker finished its setup: how many schedules are turned on.",
+        "event.triggers": "A badge on the card that says a coworker finished its setup: how many triggers are turned on.",
+        "skill.ask": "A coworker offers to remember a rule it learned in the conversation.",
+        "table.partial": "How many rows of a table a card shows, out of the table's total."
+    }
+}

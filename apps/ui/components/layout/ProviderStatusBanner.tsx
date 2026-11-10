@@ -1,6 +1,7 @@
 'use client'
 
 import { TextShimmer } from '@rerun/ui'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,8 @@ export function ProviderStatusBanner() {
 }
 
 function ProviderIncidentsBanner({ pages }: { pages: string[] }) {
+    const t = useTranslations('layout.providerStatus')
+    const locale = useLocale()
     const incidents = useProviderIncidents().filter(incident => pages.includes(incident.provider))
     const [dismissedNow, setDismissedNow] = useState<string[] | null>(null)
 
@@ -50,9 +53,9 @@ function ProviderIncidentsBanner({ pages }: { pages: string[] }) {
     }
 
     const outage = active.some(incident => incident.severity === 'outage')
-    const providers = active.map(incident => incident.label).join(' and ')
-    const verb = active.length > 1 ? 'are' : 'is'
-    const headline = `${providers} ${verb} having issues.`
+    const providers = new Intl.ListFormat(locale, { type: 'conjunction' }).format(active.map(incident => incident.label))
+    const many = active.length > 1
+    const headline = many ? t('headline.many', { providers }) : t('headline.one', { providers })
 
     return (
         <div role="status" className="shrink-0 border-b border-border px-2 pb-1 md:border-b-0 md:px-0">
@@ -62,17 +65,17 @@ function ProviderIncidentsBanner({ pages }: { pages: string[] }) {
                     {headline}
                 </TextShimmer>
                 <TextShimmer as="span" duration={5} className="hidden font-medium md:inline-block">
-                    {`${headline} Your coworkers may be slower or fail.`}
+                    {many ? t('headlineLong.many', { providers }) : t('headlineLong.one', { providers })}
                 </TextShimmer>
                 <Button asChild size="sm" className="h-6 shrink-0 rounded-full px-3">
                     <a href={active[0].url} target="_blank" rel="noopener noreferrer">
-                        View status
+                        {t('viewStatus')}
                     </a>
                 </Button>
                 <button
                     type="button"
                     onClick={dismiss}
-                    aria-label="Dismiss provider status"
+                    aria-label={t('dismiss')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <XIcon className="size-3.5" />

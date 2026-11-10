@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from '@/components/ui/popover'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
-import { ALL_ROWS, LAYOUT_META } from '@/lib/data/views'
+import { ALL_ROWS, LAYOUT_ICONS } from '@/lib/data/views'
 import { EllipsisIcon, Maximize2Icon, PencilIcon, PlusIcon, TableIcon, Trash2Icon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { CARD_LAYOUTS, type CardLayout, type TableView } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 type DataViewBarProps = {
@@ -29,30 +30,31 @@ type DataViewBarProps = {
 }
 
 export function DataViewBar({ views, activeId, unavailableReason, onSelect, onAdd, adding, onEdit, onDelete, onExpand, actions }: DataViewBarProps) {
+    const t = useTranslations('data.viewBar')
     const [pendingDelete, setPendingDelete] = useState<TableView | null>(null)
     const [pickerOpen, setPickerOpen] = useState(false)
 
     return (
         <div className="flex items-center gap-2 border-b border-border">
             <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto [scrollbar-width:none]">
-                <ViewTab label="All rows" icon={TableIcon} active={activeId === ALL_ROWS} onSelect={() => onSelect(ALL_ROWS)} />
+                <ViewTab label={t('allRows')} icon={TableIcon} active={activeId === ALL_ROWS} onSelect={() => onSelect(ALL_ROWS)} />
                 {views.map(view => (
-                    <ViewTab key={view.id} label={view.name} icon={LAYOUT_META[view.layout].icon} active={activeId === view.id} onSelect={() => onSelect(view.id)}>
+                    <ViewTab key={view.id} label={view.name} icon={LAYOUT_ICONS[view.layout]} active={activeId === view.id} onSelect={() => onSelect(view.id)}>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button type="button" aria-label={`Options of ${view.name}`} className="-mr-1 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground">
+                                <button type="button" aria-label={t('viewOptions', { name: view.name })} className="-mr-1 rounded p-0.5 text-muted-foreground hover:bg-accent hover:text-foreground">
                                     <EllipsisIcon className="size-3.5" />
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
                                 <DropdownMenuItem onSelect={() => onEdit(view)}>
                                     <PencilIcon />
-                                    Edit view
+                                    {t('editView')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem variant="destructive" onSelect={() => setPendingDelete(view)}>
                                     <Trash2Icon />
-                                    Delete view
+                                    {t('deleteView')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -61,14 +63,14 @@ export function DataViewBar({ views, activeId, unavailableReason, onSelect, onAd
                 <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
                     <TooltipDisabledReason reason={unavailableReason}>
                         <PopoverTrigger asChild>
-                            <Button type="button" variant="ghost" size="icon-xs" disabled={!!unavailableReason || adding} aria-label="Add view" className="mb-1 shrink-0 text-muted-foreground">
+                            <Button type="button" variant="ghost" size="icon-xs" disabled={!!unavailableReason || adding} aria-label={t('addView')} className="mb-1 shrink-0 text-muted-foreground">
                                 <PlusIcon className="size-3.5" />
                             </Button>
                         </PopoverTrigger>
                     </TooltipDisabledReason>
                     <PopoverContent align="start" className="w-[min(24rem,calc(100vw-2rem))]">
                         <PopoverHeader>
-                            <PopoverTitle className="text-xs text-muted-foreground">Add a new view</PopoverTitle>
+                            <PopoverTitle className="text-xs text-muted-foreground">{t('addNewView')}</PopoverTitle>
                         </PopoverHeader>
                         <div className="grid grid-cols-4 gap-2">
                             {CARD_LAYOUTS.map(layout => (
@@ -88,8 +90,8 @@ export function DataViewBar({ views, activeId, unavailableReason, onSelect, onAd
             <div className="flex shrink-0 items-center gap-0.5 pb-1">
                 {actions}
                 {onExpand && (
-                    <TooltipLabeled label="Expand">
-                        <Button type="button" variant="ghost" size="icon-xs" onClick={onExpand} aria-label="Expand" className="text-muted-foreground">
+                    <TooltipLabeled label={t('expand')}>
+                        <Button type="button" variant="ghost" size="icon-xs" onClick={onExpand} aria-label={t('expand')} className="text-muted-foreground">
                             <Maximize2Icon className="size-3.5" />
                         </Button>
                     </TooltipLabeled>
@@ -98,8 +100,8 @@ export function DataViewBar({ views, activeId, unavailableReason, onSelect, onAd
             <ConfirmDialog
                 open={!!pendingDelete}
                 onOpenChange={open => !open && setPendingDelete(null)}
-                title={`Delete the view "${pendingDelete?.name ?? ''}"?`}
-                description="Only the view goes away. The rows of the table are untouched."
+                title={t('deleteViewTitle', { name: pendingDelete?.name ?? '' })}
+                description={t('deleteViewDescription')}
                 onConfirm={() => {
                     if (pendingDelete) onDelete(pendingDelete)
                     setPendingDelete(null)

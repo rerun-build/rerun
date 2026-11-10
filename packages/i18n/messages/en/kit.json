@@ -1,0 +1,560 @@
+{
+    "_context": {
+        "close": "Accessible label of the button that closes a dialog, a sheet or a panel.",
+        "chat.actionApproval.decline": "Button that refuses the action the coworker asks to run.",
+        "chat.approval.title": "{label} is the name of the tool that asks for approval.",
+        "chat.approval.responded": "{choice} is the raw choice code (once, session, always, deny), kept untranslated.",
+        "chat.approval.choices.session": "Approve for the rest of this chat session.",
+        "chat.decline.confirm": "Confirms the refusal.",
+        "chat.question.somethingElse": "Last option of a multiple-choice question: opens a free-text field to give another answer.",
+        "chat.question.skip": "Skips the current question without answering.",
+        "chat.reasoning.thoughtFor": "{duration} is a short elapsed time such as 12s or 1m 4s.",
+        "chat.reasoning.thought": "Past tense: the model has finished thinking.",
+        "chat.secret.storedAs": "{key} is the name of the environment variable the value is stored under.",
+        "chat.skillProposal.question": "The coworker proposes to remember a rule it noticed.",
+        "chat.skillProposal.no": "Button that refuses to remember the rule.",
+        "chat.table.groupedBy": "{column} is the name of the database column a kanban board is grouped by.",
+        "chat.table.more": "Under a kanban column: how many more cards are not shown.",
+        "chat.table.rating": "Accessible label of a 5-star rating.",
+        "canvas.recenter": "Tooltip of the button that brings the board back to its default view.",
+        "consent.short": "Mobile cookie banner. <policy> wraps a link to the cookie policy page.",
+        "consent.long": "Desktop cookie banner. <policy> wraps a link to the cookie policy page.",
+        "experts.wizard.step": "Small label above the title of each step of the profile wizard.",
+        "experts.preview.hire": "Button on an expert's public profile to hire them.",
+        "experts.card.status": "Label on a holographic profile card, followed by the profile type (Studio, Freelancer).",
+        "experts.availability.tooltip": "{label} is the availability (Available, Not available), {hint} its short explanation.",
+        "experts.images.drop": "Overlay shown while a file is dragged over the upload tile.",
+        "foreman.tabs.assistant": "Tab of the Foreman chat where you ask it questions.",
+        "foreman.periods.running": "Heading of the routines that are running right now.",
+        "foreman.routines.runningMinutes": "A routine running for {minutes} minutes; m is the short unit for minutes.",
+        "foreman.routines.startsInMinutes": "A routine that starts in {minutes} minutes; m is the short unit for minutes.",
+        "foreman.routines.runningJustNow": "A routine that started less than a minute ago.",
+        "foreman.routines.pause": "Accessible label of the switch that pauses the routine {name}.",
+        "foreman.orbLabel": "Accessible label of the round button that opens the Foreman chat.",
+        "forms.optional": "Shown next to the title of a form field that can be left empty.",
+        "forms.select": "Placeholder of a dropdown with nothing picked yet.",
+        "monitoring.live": "Small badge: the data updates in real time.",
+        "inbox.sections.headsUps": "Section of notifications a coworker flagged for you to read.",
+        "inbox.sentences.awaiting_question": "{agent} is the coworker's name.",
+        "inbox.pillLabel": "Accessible label of the notifications pill. {summary} is a short count such as 2 need you · 1 done.",
+        "inbox.needsYouCount": "How many notifications need the user.",
+        "inbox.doneRich": "<b> wraps the number.",
+        "inbox.running": "<n> wraps the number. Tasks being run by coworkers right now.",
+        "richText.linkPrompt": "Browser prompt asking for the address of a link.",
+        "richText.heading": "Toolbar button: makes the line a heading.",
+        "theme.options.system": "Follow the operating system's light or dark setting.",
+        "monitoring.runs.tokens": "{tokens} is an already formatted number of tokens.",
+        "monitoring.usage.cached": "Input tokens read from the model provider's cache.",
+        "monitoring.chart.other": "Chart series grouping every smaller category.",
+        "monitoring.agentStatus.waiting_human": "A coworker waiting for a person to answer.",
+        "newAgent.create": "Button that creates the coworker named {name}.",
+        "newAgent.pickedApps": "Accessible label: {apps} is a comma-separated list of app names.",
+        "newAgent.or": "Separator between two alternatives: pick a suggestion, or browse templates.",
+        "newAgent.schedule.everyDays": "{days} is a list of weekday names (Monday, Tuesday and Friday), {time} a 24-hour time such as 9:00.",
+        "newAgent.schedule.onDemand": "The coworker runs only when the user asks it to, never on a schedule.",
+        "newAgent.schedule.button": "Button that opens the schedule planner.",
+        "newAgent.schedule.readFromDescription": "Under a timing that was understood from the job description the user typed.",
+        "newAgent.appsPicker.limit": "{max} is the maximum number of apps a new coworker can start with.",
+        "newAgent.forYou.closeToIdea": "Heading above suggested coworkers similar to what the user is typing.",
+        "isoGrid.board": "Accessible name of the isometric board where coworkers are laid out as blocks.",
+        "isoGrid.addBlock": "Tooltip of the + handle on the side of a Box: adds space to it on that side.",
+        "isoGrid.status.waiting_human": "Status of a coworker waiting for the user to answer.",
+        "isoGrid.status.disabled": "Status of a coworker that is switched off.",
+        "templateStory.states.approval": "Badge on a demo card: the coworker waits for the user.",
+        "templateStory.edit": "Fake button on a demo card, next to Approve.",
+        "primitives.carousel.goTo": "Accessible label of a pagination dot. {label} names what the carousel holds (Coworkers), {index} the card number.",
+        "primitives.carousel.previous": "{label} names what the carousel holds, such as Coworkers.",
+        "forms.remove": "Accessible label of the cross that removes {item} from a multiple choice.",
+        "foreman.agentPicker.openTab": "{tab} is the name of a coworker panel tab (Skills, Schedules), {name} the coworker's name.",
+        "experts.card.namePlaceholder": "Shown on a profile card before a name is typed.",
+        "experts.card.rolePlaceholder": "Shown on a profile card before a role is typed. Rerun is the brand.",
+        "isoGrid.countdown.minutes": "Very short countdown to a coworker's next run, on a tiny badge: keep the one-letter unit (m for minutes).",
+        "isoGrid.status.paused": "Status of a coworker whose workspace is paused (unsubscribed): its machine is archived.",
+        "isoGrid.status.restoring": "Status of a coworker while its paused workspace is being brought back.",
+        "isoGrid.untitledBox": "Name shown on a Box (a group of coworkers on the board) that has no name.",
+        "isoGrid.tileAria": "Screen reader label of a coworker block on the board. {name} is the coworker, {state} its status word, {toHandle} how many conversations wait on the user, {results} how many finished results are unread.",
+        "newAgent.appsPicker.categories": "Filter chips over a list of apps a coworker can use: the kind of app."
+    },
+    "close": "Close",
+    "chat": {
+        "actionApproval": {
+            "title": "Approval required",
+            "previous": "Previous approval",
+            "next": "Next approval",
+            "decline": "Not now",
+            "approve": "Approve",
+            "approved": "Approved"
+        },
+        "alert": {
+            "title": "Notification",
+            "markAsRead": "Mark as read"
+        },
+        "approval": {
+            "title": "Approval required: {label}",
+            "responded": "Responded: <b>{choice}</b>",
+            "choices": {
+                "once": "Allow once",
+                "session": "This session",
+                "always": "Always",
+                "deny": "Deny"
+            }
+        },
+        "decline": {
+            "placeholder": "Why not? (optional)",
+            "back": "Back",
+            "confirm": "Confirm"
+        },
+        "question": {
+            "typeAnswer": "Type your answer…",
+            "somethingElse": "Something else",
+            "attachFiles": "Attach files",
+            "dropFiles": "Drop files to attach them",
+            "selectAll": "Select all that apply",
+            "dismiss": "Dismiss questions",
+            "skip": "Skip",
+            "submit": "Submit answers",
+            "next": "Next question"
+        },
+        "reasoning": {
+            "thinking": "Thinking...",
+            "thoughtFor": "Thought for {duration}",
+            "thought": "Thought"
+        },
+        "secret": {
+            "saveFailed": "Could not save the credentials",
+            "titleOne": "Credential needed",
+            "titleMany": "Credentials needed",
+            "dismiss": "Dismiss credential request",
+            "storedAs": "Stored as {key}",
+            "replacePlaceholder": "Already saved. Enter a value to replace it",
+            "placeholder": "Paste the value",
+            "whereToFind": "Where to find it",
+            "storageNote": "Stored on your engine as a coworker variable. Never sent to the model.",
+            "skip": "Skip",
+            "saving": "Saving…",
+            "save": "Save"
+        },
+        "skillProposal": {
+            "remembering": "Remembering",
+            "remembered": "Remembered",
+            "failed": "Couldn’t remember this",
+            "retry": "Retry",
+            "dismiss": "Dismiss",
+            "notRemembered": "Not remembered",
+            "question": "Remember this?",
+            "remember": "Remember",
+            "no": "No",
+            "view": "View",
+            "hideDetails": "Hide details",
+            "showDetails": "Show details"
+        },
+        "steps": {
+            "previous": "Previous step",
+            "next": "Next step",
+            "goTo": "Go to step {step}"
+        },
+        "table": {
+            "boxDatabase": "Box database",
+            "coworkerDatabase": "Coworker database",
+            "rows": "{count, plural, one {# row} other {# rows}}",
+            "columnsHidden": "some columns hidden",
+            "groupedBy": "grouped by {column}",
+            "open": "Open database",
+            "empty": "No rows yet.",
+            "more": "+ {count} more",
+            "rating": "{value} out of 5"
+        }
+    },
+    "canvas": {
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "recenter": "Recenter",
+        "recenterView": "Recenter view"
+    },
+    "consent": {
+        "rejectAll": "Reject all",
+        "acceptAll": "Accept all",
+        "region": "Cookie consent",
+        "title": "Cookies",
+        "short": "We use analytics cookies. <policy>Cookie policy</policy>",
+        "long": "We use analytics cookies to understand how Rerun is used. Cookies needed to sign you in, run the support chat and remember your preferences are always on. <policy>Cookie policy</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "step": "Step {step}",
+            "steps": {
+                "identity": {
+                    "title": "Your identity",
+                    "description": "Your photo, banner, name and how you work."
+                },
+                "about": {
+                    "title": "About you",
+                    "description": "Where you are and what you do."
+                },
+                "pricing": {
+                    "title": "Rates & availability",
+                    "description": "Your availability and a sense of your rates."
+                },
+                "expertise": {
+                    "title": "Your expertise",
+                    "description": "The skills and languages you work with. Optional."
+                },
+                "links": {
+                    "title": "Links & publish",
+                    "description": "Add your links, then publish your profile."
+                }
+            },
+            "name": "Name",
+            "namePlaceholder": "e.g. Mira Labs",
+            "email": "Email",
+            "emailHelper": "Private. Only the Rerun team can see it.",
+            "type": "Type",
+            "location": "Location",
+            "locationPlaceholder": "e.g. Paris",
+            "bio": "Bio",
+            "bioPlaceholder": "What you build and who you help.",
+            "availability": "Availability",
+            "budget": "Budget",
+            "budgetPlaceholder": "Select a range",
+            "skills": "Skills",
+            "skillsPlaceholder": "Select skills",
+            "languages": "Languages",
+            "languagesPlaceholder": "Select languages",
+            "website": "Website",
+            "back": "Back",
+            "continue": "Continue"
+        },
+        "types": {
+            "studio": {
+                "title": "Studio",
+                "description": "An agency or team building for clients"
+            },
+            "freelancer": {
+                "title": "Freelancer",
+                "description": "An independent building solo"
+            },
+            "expert": {
+                "title": "Expert",
+                "description": "A specialist offering advice and guidance"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}: {hint}",
+            "available": {
+                "label": "Available",
+                "hint": "Taking on new work now"
+            },
+            "soon": {
+                "label": "Available soon",
+                "hint": "Opening up shortly"
+            },
+            "unavailable": {
+                "label": "Not available",
+                "hint": "Fully booked for now"
+            }
+        },
+        "validation": {
+            "nameRequired": "Name is required",
+            "nameTooLong": "Name is too long",
+            "nameInvalid": "Name cannot contain < or >",
+            "emailRequired": "Email is required",
+            "emailInvalid": "Invalid email",
+            "bioTooLong": "Bio is too long",
+            "budgetInvalid": "Invalid budget",
+            "skillInvalid": "Invalid skill",
+            "languageInvalid": "Invalid language"
+        },
+        "images": {
+            "title": "Photo & banner",
+            "drop": "Drop",
+            "dropBanner": "Drop your banner",
+            "dropPhoto": "Drop your photo",
+            "upload": "Upload",
+            "uploading": "Uploading…",
+            "changeBanner": "Change banner",
+            "uploadPhoto": "Upload photo",
+            "remove": "Remove",
+            "notAnImage": "Please choose an image file."
+        },
+        "card": {
+            "location": "Location",
+            "status": "Status",
+            "links": "Links",
+            "namePlaceholder": "Your name",
+            "rolePlaceholder": "Rerun Expert"
+        },
+        "preview": {
+            "hire": "Hire"
+        }
+    },
+    "foreman": {
+        "orbLabel": "Ask Rerun",
+        "empty": {
+            "title": "Ask anything about your workspace",
+            "description": "Rerun builds and runs your coworkers with you"
+        },
+        "header": {
+            "closeChat": "Close the chat",
+            "resize": "Resize chat"
+        },
+        "tabs": {
+            "assistant": "Ask",
+            "tasks": "Tasks",
+            "routines": "Routines"
+        },
+        "periods": {
+            "running": "Running",
+            "morning": "This morning",
+            "afternoon": "This afternoon",
+            "tonight": "Tonight",
+            "tomorrow": "Tomorrow",
+            "week": "This week",
+            "later": "Later",
+            "paused": "Paused"
+        },
+        "routines": {
+            "setupFirst": "Finish the setup first",
+            "pause": "Pause {name}",
+            "resume": "Resume {name}",
+            "nameLabel": "Routine name",
+            "runningJustNow": "Running · <1m",
+            "runningMinutes": "Running · {minutes}m",
+            "runningHours": "Running · {hours}h",
+            "startsNow": "Starts now",
+            "startsInMinutes": "Starts in {minutes}m",
+            "startsInHours": "Starts in {hours}h"
+        },
+        "agentPicker": {
+            "openTab": "Open {tab} for {name}"
+        }
+    },
+    "forms": {
+        "optional": "Optional",
+        "hidePassword": "Hide password",
+        "showPassword": "Show password",
+        "select": "Select…",
+        "search": "Type to search…",
+        "noResults": "No results",
+        "dropFile": "Drop your file here",
+        "remove": "Remove {item}"
+    },
+    "primitives": {
+        "loading": "Loading",
+        "scrollLeft": "Scroll left",
+        "scrollRight": "Scroll right",
+        "carousel": {
+            "previous": "Previous {label}",
+            "next": "Next {label}",
+            "goTo": "Go to {label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "Count",
+            "totalTokens": "Total tokens",
+            "inputTokens": "Input tokens",
+            "outputTokens": "Output tokens",
+            "cachedInputTokens": "Cached tokens",
+            "reasoningTokens": "Reasoning tokens",
+            "cost": "Cost",
+            "avgDurationMs": "Avg duration",
+            "errorCount": "Errors",
+            "errorRate": "Error rate"
+        },
+        "live": "Live",
+        "runStatus": {
+            "running": "Running",
+            "done": "Done",
+            "error": "Error",
+            "cancelled": "Cancelled"
+        },
+        "runs": {
+            "emptyTitle": "No runs yet",
+            "emptyDescription": "Every run of the coworker is recorded here",
+            "steps": "{count, plural, one {# step} other {# steps}}",
+            "tokens": "{tokens} tokens"
+        },
+        "agentStatus": {
+            "idle": "Idle",
+            "working": "Working",
+            "error": "Error",
+            "waiting_human": "Waiting for human",
+            "offline": "Offline",
+            "empty": "No coworkers to display."
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} runs",
+                "runSteps": "{count} run steps",
+                "toolCalls": "{count} tool calls",
+                "sessions": "{count} sessions"
+            },
+            "other": "Other",
+            "loading": "Loading...",
+            "noData": "No data in this period."
+        },
+        "usage": {
+            "input": "Input",
+            "output": "Output",
+            "cached": "Cached",
+            "cost": "Cost",
+            "tokens": "Tokens",
+            "totalCost": "Total cost",
+            "totalTokens": "Total tokens",
+            "runs": "{count, plural, one {# run} other {# runs}}",
+            "noUsage": "No usage in this period."
+        }
+    },
+    "inbox": {
+        "title": "Notifications",
+        "resize": "Resize notifications",
+        "close": "Close notifications",
+        "preferences": "Preferences",
+        "preferencesUnavailable": "Preferences are not available here",
+        "markAllRead": "Mark all as read",
+        "nothingToMark": "Nothing to mark as read",
+        "markRead": "Mark as read",
+        "noUpdates": "No updates",
+        "pillLabel": "Notifications: {summary}",
+        "pillLabelEmpty": "Notifications: no updates",
+        "needsYouCount": "{count, plural, one {# needs you} other {# need you}}",
+        "doneCount": "{count, plural, other {# done}}",
+        "needsYouRich": "{count, plural, one {<b>#</b> needs you} other {<b>#</b> need you}}",
+        "doneRich": "{count, plural, other {<b>#</b> done}}",
+        "newUpdates": "{count, plural, one {<b>#</b> new update} other {<b>#</b> new updates}}",
+        "running": "{count, plural, one {<n>#</n> task running} other {<n>#</n> tasks running}}",
+        "empty": {
+            "title": "Nothing to handle",
+            "description": "When a coworker needs you or finishes a task, it lands here."
+        },
+        "sections": {
+            "needsYou": "Needs you",
+            "headsUps": "Heads-ups",
+            "errors": "Errors",
+            "done": "Done"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} asked you a question",
+            "awaiting_approval": "{agent} needs your approval",
+            "awaiting_connector": "{agent} needs an app connected",
+            "waiting_human": "{agent} is waiting on you",
+            "awaiting_ack": "{agent} flagged something for you",
+            "error": "{agent} hit an error",
+            "done": "{agent} finished its run"
+        }
+    },
+    "richText": {
+        "bold": "Bold",
+        "italic": "Italic",
+        "heading": "Heading",
+        "subheading": "Subheading",
+        "bulletList": "Bullet list",
+        "numberedList": "Numbered list",
+        "quote": "Quote",
+        "inlineCode": "Inline code",
+        "codeBlock": "Code block",
+        "link": "Link",
+        "linkPrompt": "Link URL"
+    },
+    "theme": {
+        "label": "Theme",
+        "options": {
+            "system": "System",
+            "light": "Light",
+            "dark": "Dark"
+        }
+    },
+    "newAgent": {
+        "create": "Create {name}",
+        "createCoworker": "Create coworker",
+        "apps": "Apps",
+        "pickedApps": "Apps: {apps}",
+        "or": "Or",
+        "browseTemplates": "Browse templates",
+        "job": {
+            "placeholder": "Describe the job, the way you would brief a teammate.",
+            "label": "What should your new coworker do?"
+        },
+        "name": {
+            "placeholder": "Name your coworker",
+            "label": "Coworker name"
+        },
+        "forYou": {
+            "heading": "Or start from one picked for you",
+            "closeToIdea": "Close to your idea",
+            "otherIdeas": "Other ideas"
+        },
+        "appsPicker": {
+            "search": "Search apps",
+            "all": "All",
+            "empty": "No app by that name.",
+            "limit": "Up to {max} apps to start with. Your agent can connect more later.",
+            "categories": {
+                "payments": "Payments",
+                "ecommerce": "E-commerce",
+                "crm": "CRM",
+                "marketing": "Marketing",
+                "seo": "SEO",
+                "analytics": "Analytics",
+                "dev": "Developer",
+                "productivity": "Productivity",
+                "other": "Other"
+            }
+        },
+        "schedule": {
+            "button": "Schedule",
+            "readFromDescription": "Read from your description",
+            "onASchedule": "On a schedule",
+            "custom": "Custom",
+            "noSchedule": "No schedule",
+            "onDemand": "Only when I ask",
+            "timeOfDay": "Time of day",
+            "presets": {
+                "weekday": {
+                    "label": "Every weekday at 9:00",
+                    "detail": "Monday to Friday"
+                },
+                "monday": {
+                    "label": "Every Monday at 9:00",
+                    "detail": "Once a week"
+                }
+            },
+            "everyDay": "Every day at {time}",
+            "everyWeekday": "Every weekday at {time}",
+            "everyDays": "Every {days} at {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "Coworker board",
+        "addBlock": "Add a block on this side",
+        "status": {
+            "idle": "Idle",
+            "working": "Working",
+            "error": "Error",
+            "offline": "Offline",
+            "waiting_human": "Waiting for you",
+            "disabled": "Inactive",
+            "paused": "Paused",
+            "restoring": "Restoring"
+        },
+        "countdown": {
+            "seconds": "{count}s",
+            "minutes": "{count}m",
+            "hours": "{count}h",
+            "days": "{count}d"
+        },
+        "untitledBox": "Untitled Box",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} other {, # to handle}}{results, plural, =0 {} one {, # new result} other {, # new results}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "Running",
+            "approval": "Needs you",
+            "success": "Done",
+            "done": "Done"
+        },
+        "approve": "Approve",
+        "edit": "Edit"
+    }
+}

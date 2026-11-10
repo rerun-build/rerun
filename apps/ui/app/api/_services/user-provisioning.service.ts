@@ -5,6 +5,7 @@ import { randomBlob } from '@/lib/blobs/catalog'
 import { DEFAULT_NOTIFICATION_PREFS } from '@/lib/notifications/prefs'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 
 // Just-in-time provisioning: the first time an authenticated user (real or anonymous) is seen, seed
@@ -20,10 +21,13 @@ import type { SupabaseClient, User } from '@supabase/supabase-js'
 //
 // `priceArm` is the arm of the price test a workspace born on this request is frozen on, null to
 // leave it out of the test.
+//
+// `locale` is the language of the request (the visitor's cookie, else the browser): a workspace born
+// on it has its coworkers write in that language when they work on their own.
 export async function provisionUser(
     supabase: SupabaseClient<Database>,
     user: User,
-    { phoneStep, priceArm }: { phoneStep: boolean; priceArm: PriceArm | null },
+    { phoneStep, priceArm, locale = DEFAULT_LOCALE }: { phoneStep: boolean; priceArm: PriceArm | null; locale?: Locale },
 ): Promise<{ signedUp: boolean } | null> {
     const existingUser = await selectMaybeSingle(supabase, 'users', ['id', 'workspace_id', 'signed_up_at'] as const, { id: user.id })
 
@@ -54,6 +58,7 @@ export async function provisionUser(
             // five dollars of Rerun credit.
             rerun_budget_micros: 0,
             price_arm: priceArm,
+            locale,
         })
         .select()
         .single()

@@ -8,8 +8,7 @@ import { CoworkerRow } from '@/components/home/CoworkerRow'
 import { HomeBoot } from '@/components/home/HomeBoot'
 import { HomeHeader } from '@/components/home/HomeHeader'
 import { HomeSkeleton } from '@/components/home/HomeSkeleton'
-import { HomeBottomBar } from '@/components/home/HomeBottomBar'
-import { BOTTOM_BAR_SIZE } from '@/components/home/InboxButton'
+import { BOTTOM_BAR_SIZE, HomeBottomBar } from '@/components/home/HomeBottomBar'
 import { AppText } from '@/components/ui/AppText'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { statusLine } from '@/components/ui/status'
@@ -56,15 +55,11 @@ function Stage({ pace, onDone }: { pace: number; onDone: () => void }) {
 function MockHome({ ready, pace }: { ready: boolean; pace: number }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
-    const [group, setGroup] = useState<'recent' | 'box'>('recent')
     const fill = useBootFill(ready, { replay: true, pace })
     const byId = (id: string) => coworkers.find(coworker => coworker.id === id)!
 
     return (
-        <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm + GLASS_BUTTON_SIZE + spacing.lg }}>
-            <AppText variant="largeTitle" maxFontSizeMultiplier={1} style={{ paddingHorizontal: spacing.xl, marginBottom: spacing.md }}>
-                Coworkers
-            </AppText>
+        <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm + GLASS_BUTTON_SIZE + spacing.xl }}>
             {ready ? (
                 <View>
                     {ROW_IDS.map((id, index) => {
@@ -91,10 +86,10 @@ function MockHome({ ready, pace }: { ready: boolean; pace: number }) {
             )}
 
             <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: 0, right: 0 }}>
-                <HomeHeader group={group} onGroup={setGroup} />
+                <HomeHeader inboxCount={2} onInbox={() => {}} onNewCoworker={() => {}} />
             </Animated.View>
             <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + spacing.sm }}>
-                <HomeBottomBar count={2} onSearch={() => {}} onInbox={() => {}} />
+                <HomeBottomBar onSearch={() => {}} />
             </Animated.View>
         </View>
     )

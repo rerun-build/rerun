@@ -1,0 +1,137 @@
+{
+    "title": "Coworkers",
+    "loadFailed": "We could not load your coworkers.",
+    "retry": "Retry",
+    "empty": "No coworkers yet.",
+    "loadingCoworkers": "Loading coworkers",
+    "newCoworker": "New coworker",
+    "untitledBox": "Untitled Box",
+    "teammate": "Teammate",
+    "pinned": {
+        "dragToReorder": "Drag to reorder",
+        "done": "Done",
+        "unpin": "Unpin",
+        "details": "Coworker details",
+        "edit": "Edit pins",
+        "unreadLabel": "{name}, unread"
+    },
+    "row": {
+        "label": "{name}, {line}",
+        "opensConversation": "Opens the conversation",
+        "pin": "Pin",
+        "unpin": "Unpin",
+        "pinToTop": "Pin to top"
+    },
+    "line": {
+        "paused": "Paused",
+        "waiting": "Waiting for you",
+        "error": "Something went wrong",
+        "working": "Working",
+        "workingOn": "Working · {detail}",
+        "asleep": "Asleep",
+        "asleepAbout": "Asleep · {about}"
+    },
+    "foreman": {
+        "askAnything": "Ask anything"
+    },
+    "header": {
+        "account": "Account"
+    },
+    "account": {
+        "preferences": "Preferences",
+        "contactSupport": "Contact support",
+        "signOut": "Sign out",
+        "subscriptionTitle": "Cancel the subscription first",
+        "subscriptionMessage": "{workspaces} still renews. Cancel it from Billing on rerun.build, then delete your account.",
+        "deleteTitle": "Delete your account?",
+        "deleteMessage": "You leave the workspaces you share. A workspace only you are in stops for good, with its coworkers and its files. This cannot be undone.",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "reauthTitle": "Sign in again to delete your account",
+        "reauthMessage": "For your safety, deleting your account needs a fresh sign-in. Sign in again, then delete it from here.",
+        "deleteFailedTitle": "Could not delete your account",
+        "deleteFailedMessage": "Try again in a moment.",
+        "leaveServerTitle": "Leave {host}?",
+        "leaveServerMessage": "You will be signed out, and Rerun reopens on Rerun Cloud.",
+        "leaveServer": "Leave"
+    },
+    "workspace": {
+        "untitled": "My workspace",
+        "menuLabel": "Workspace {name}"
+    },
+    "section": {
+        "label": "{label}, {count}"
+    },
+    "search": {
+        "title": "Search",
+        "back": "Back",
+        "placeholder": "Search coworkers and conversations",
+        "askRerun": "Ask Rerun",
+        "quotedAsk": "“{query}”",
+        "coworkers": "Coworkers",
+        "conversations": "Conversations",
+        "noCoworker": "No coworker by that name.",
+        "newConversation": "New conversation",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "Notifications",
+        "bellLabel": "Notifications, {count}",
+        "close": "Close",
+        "settings": "Notification settings",
+        "markAllRead": "Mark all as read",
+        "markAllTitle": "Mark everything as read?",
+        "markAllMessage": "{count, plural, one {# item} other {# items}} will leave this list. Requests still waiting on an answer are cleared too, without being answered.",
+        "cancel": "Cancel",
+        "running": "{count, plural, one {# task running} other {# tasks running}}",
+        "loadFailed": "We could not load your notifications.",
+        "retry": "Retry",
+        "emptyTitle": "Nothing to handle",
+        "emptyDescription": "When a coworker needs you or finishes a task, it lands here.",
+        "undo": "Undo",
+        "ok": "OK",
+        "sections": {
+            "needsYou": "Needs you",
+            "headsUps": "Heads-ups",
+            "errors": "Errors",
+            "done": "Done"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} asked you a question",
+            "awaiting_approval": "{agent} needs your approval",
+            "awaiting_connector": "{agent} needs an app connected",
+            "waiting_human": "{agent} is waiting on you",
+            "awaiting_ack": "{agent} flagged something for you",
+            "error": "{agent} hit an error",
+            "done": "{agent} finished its run"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}, {detail}",
+            "read": "Read",
+            "markRead": "Mark as read",
+            "opensConversation": "Opens the conversation",
+            "unfollow": "Stop following its scheduled tasks",
+            "unfollowed": "You no longer follow {name}'s scheduled tasks.",
+            "mute": "Mute {name}",
+            "muted": "{name} is muted.",
+            "settings": "Notification settings",
+            "cancel": "Cancel"
+        }
+    },
+    "_context": {
+        "title": "Large title of the Home: the list of the workspace's coworkers. The native launch screen draws the same word.",
+        "line.workingOn": "Status line under a coworker's name: it is running, {detail} is the title of its conversation or its description.",
+        "line.asleepAbout": "Status line under a coworker's name: its machine is off, {about} is its description.",
+        "foreman.askAnything": "Status line of Rerun, the workspace assistant, when it has no conversation yet.",
+        "account.subscriptionMessage": "{workspaces} is a comma-separated list of workspace names.",
+        "workspace.untitled": "Fallback name of a workspace without a name.",
+        "search.quotedAsk": "The text typed in the search field, quoted, under 'Ask Rerun'.",
+        "search.hitDetail": "Under a conversation found by the search: the coworker's name and how long ago it was active (\"5m\").",
+        "inbox.row.detail": "Under an inbox row: the coworker's name and the conversation's title.",
+        "inbox.row.read": "Very short label of the swipe action that marks a row as read.",
+        "section.label": "VoiceOver label of a collapsible section header: its name and how many rows it holds.",
+        "account.leaveServerTitle": "{host} is the web address of the Rerun server the app is connected to.",
+        "account.leaveServer": "Destructive button of the dialog that leaves a self-hosted server."
+    }
+}

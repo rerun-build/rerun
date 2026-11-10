@@ -14,11 +14,7 @@ export function stateOf({ status, unseen }: Stateful): ConversationState {
     return 'earlier'
 }
 
-export const CONVERSATION_SECTIONS = [
-    { state: 'needs-you', label: 'Needs you' },
-    { state: 'running', label: 'Running' },
-    { state: 'new', label: 'Unread' },
-] as const satisfies readonly { state: ConversationState; label: string }[]
+export const CONVERSATION_SECTIONS = [{ state: 'needs-you' }, { state: 'running' }, { state: 'new' }] as const satisfies readonly { state: ConversationState }[]
 
 export const WAITING_GLYPH: Partial<Record<SessionStatus, SFSymbol>> = {
     awaiting_question: 'questionmark.bubble.fill',

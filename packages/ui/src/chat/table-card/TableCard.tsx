@@ -9,6 +9,7 @@ import { GalleryLayout } from './GalleryLayout'
 import { ListLayout } from './ListLayout'
 import { TableCardFrame } from './TableCardFrame'
 import { TableLayout } from './TableLayout'
+import { useKitTranslations } from '../../locale'
 
 export type TableCardProps = {
     card: TableCardData
@@ -32,6 +33,7 @@ export type TableCardProps = {
  * sent the card.
  */
 export function TableCard({ card, onOpen, openDisabledReason, noun, mobileColumns, fileUrl, className }: TableCardProps) {
+    const t = useKitTranslations()
     const context: CellContext = { tones: card.tones, fileUrl }
 
     return (
@@ -40,7 +42,7 @@ export function TableCard({ card, onOpen, openDisabledReason, noun, mobileColumn
             onOpen={onOpen}
             openDisabledReason={openDisabledReason}
             noun={noun}
-            footerNote={card.layout === 'board' && card.groupBy ? `grouped by ${card.groupBy}` : undefined}
+            footerNote={card.layout === 'board' && card.groupBy ? t('chat.table.groupedBy', { column: card.groupBy }) : undefined}
             className={className}
         >
             {card.layout === 'list' ? (

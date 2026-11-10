@@ -6,6 +6,7 @@ import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { BrainCircuitIcon, ChevronRightIcon, Settings2Icon } from '@/lib/icons'
 import type { Provider } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
 export type AddableProvider = Exclude<Provider, 'rerun'>
@@ -17,20 +18,15 @@ export const SUBSCRIPTION_PROVIDERS: SubscriptionProvider[] = ['claude', 'codex'
 // moving down to another row does not leave the submenu hanging over the list.
 const SUBMENU_CLOSE_DELAY_MS = 120
 
-const SUBSCRIPTION_PITCH: Record<SubscriptionProvider, { plan: string; hint: string; nudge: string }> = {
-    claude: { plan: 'Claude Pro or Max', hint: 'Sign in with your Claude account', nudge: 'Have Claude Pro or Max?' },
-    codex: { plan: 'ChatGPT Plus or Pro', hint: 'Sign in with your ChatGPT account', nudge: 'Have ChatGPT Plus or Pro?' },
-}
-
 // The section heading already says plan or API key, so a subscription's hint names the eligible
 // plans and an API key's hint names the models it unlocks.
-const ADDABLE: { provider: AddableProvider; label: string; hint: string; section: 'subscription' | 'api' }[] = [
-    { provider: 'claude', label: 'Claude', hint: 'Pro or Max', section: 'subscription' },
-    { provider: 'codex', label: 'ChatGPT', hint: 'Plus or Pro', section: 'subscription' },
-    { provider: 'anthropic', label: 'Anthropic', hint: 'Claude models', section: 'api' },
-    { provider: 'openai', label: 'OpenAI', hint: 'GPT models', section: 'api' },
-    { provider: 'google', label: 'Google', hint: 'Gemini models', section: 'api' },
-    { provider: 'openrouter', label: 'OpenRouter', hint: 'Every model', section: 'api' },
+const ADDABLE: { provider: Extract<AddableProvider, 'claude' | 'codex' | 'anthropic' | 'openai' | 'google' | 'openrouter'>; label: string; section: 'subscription' | 'api' }[] = [
+    { provider: 'claude', label: 'Claude', section: 'subscription' },
+    { provider: 'codex', label: 'ChatGPT', section: 'subscription' },
+    { provider: 'anthropic', label: 'Anthropic', section: 'api' },
+    { provider: 'openai', label: 'OpenAI', section: 'api' },
+    { provider: 'google', label: 'Google', section: 'api' },
+    { provider: 'openrouter', label: 'OpenRouter', section: 'api' },
 ]
 
 type SubscriptionCallProps = { providers: SubscriptionProvider[]; onConnect: (provider: SubscriptionProvider) => void }
@@ -38,16 +34,17 @@ type SubscriptionCallProps = { providers: SubscriptionProvider[]; onConnect: (pr
 // The full pitch, for a workspace that runs on Rerun alone: a group of its own rather than a line,
 // but dressed like every other group of the list.
 export function SubscriptionPitch({ providers, onConnect }: SubscriptionCallProps) {
+    const t = useTranslations('agent.modelPickerProviders')
     return (
-        <CommandGroup heading="Run on the plan you already pay for">
+        <CommandGroup heading={t('pitchHeading')}>
             {providers.map(provider => (
                 <CommandItem key={provider} value={`connect subscription ${provider}`} onSelect={() => onConnect(provider)} className="gap-2.5 [&>svg:last-child]:hidden">
                     <ProviderIcon provider={provider} className="size-4" />
                     <span className="flex min-w-0 flex-1 flex-col">
-                        <span className="truncate text-sm">{SUBSCRIPTION_PITCH[provider].plan}</span>
-                        <span className="truncate text-[11px] text-muted-foreground">{SUBSCRIPTION_PITCH[provider].hint}</span>
+                        <span className="truncate text-sm">{t(`pitch.${provider}.plan`)}</span>
+                        <span className="truncate text-[11px] text-muted-foreground">{t(`pitch.${provider}.hint`)}</span>
                     </span>
-                    <span className="shrink-0 text-xs text-muted-foreground group-data-selected/command-item:text-foreground">Connect</span>
+                    <span className="shrink-0 text-xs text-muted-foreground group-data-selected/command-item:text-foreground">{t('connect')}</span>
                 </CommandItem>
             ))}
         </CommandGroup>
@@ -56,13 +53,14 @@ export function SubscriptionPitch({ providers, onConnect }: SubscriptionCallProp
 
 // Once a subscription is plugged in the principle is understood, so the other one is a single line.
 export function SubscriptionNudge({ providers, onConnect }: SubscriptionCallProps) {
+    const t = useTranslations('agent.modelPickerProviders')
     return (
         <CommandGroup>
             {providers.map(provider => (
                 <CommandItem key={provider} value={`connect subscription ${provider}`} onSelect={() => onConnect(provider)} className="text-xs text-muted-foreground [&>svg:last-child]:hidden">
                     <ProviderIcon provider={provider} className="size-3.5" />
-                    <span className="min-w-0 flex-1 truncate">{SUBSCRIPTION_PITCH[provider].nudge}</span>
-                    <span className="shrink-0">Connect</span>
+                    <span className="min-w-0 flex-1 truncate">{t(`pitch.${provider}.nudge`)}</span>
+                    <span className="shrink-0">{t('connect')}</span>
                 </CommandItem>
             ))}
         </CommandGroup>
@@ -78,6 +76,7 @@ type AddProviderItemProps = {
 // A submenu opened by hovering, like a native menu's: the row and the submenu count as one surface,
 // so closing waits a beat after the pointer leaves either. Enter on the row opens it for keyboards.
 export function AddProviderItem({ connectedProviders, onConnect, onManage }: AddProviderItemProps) {
+    const t = useTranslations('agent.modelPickerProviders')
     const [open, setOpen] = useState(false)
     const closeTimer = useRef<number | undefined>(undefined)
 
@@ -102,7 +101,7 @@ export function AddProviderItem({ connectedProviders, onConnect, onManage }: Add
                     className="data-[open=true]:bg-muted [&>svg:last-child]:hidden"
                 >
                     <BrainCircuitIcon className="size-3.5" />
-                    <span className="flex-1">Add a provider</span>
+                    <span className="flex-1">{t('addProvider')}</span>
                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                 </CommandItem>
             </PopoverAnchor>
@@ -119,17 +118,17 @@ export function AddProviderItem({ connectedProviders, onConnect, onManage }: Add
                 <Command>
                     <CommandList className="max-h-[min(32rem,70vh)]">
                         {(['subscription', 'api'] as const).map(section => (
-                            <CommandGroup key={section} heading={section === 'subscription' ? 'Subscription' : 'API key'}>
+                            <CommandGroup key={section} heading={t(`sections.${section}`)}>
                                 {ADDABLE.filter(p => p.section === section).map(p => (
-                                    <CommandItem key={p.provider} value={`${p.label} ${p.hint}`} onSelect={() => onConnect(p.provider)} className="gap-2.5 [&>svg:last-child]:hidden">
+                                    <CommandItem key={p.provider} value={`${p.label} ${t(`hints.${p.provider}`)}`} onSelect={() => onConnect(p.provider)} className="gap-2.5 [&>svg:last-child]:hidden">
                                         <ProviderIcon provider={p.provider} className="size-4" />
                                         <span className="flex min-w-0 flex-1 flex-col">
                                             <span className="truncate text-sm">{p.label}</span>
-                                            <span className="truncate text-[11px] text-muted-foreground">{p.hint}</span>
+                                            <span className="truncate text-[11px] text-muted-foreground">{t(`hints.${p.provider}`)}</span>
                                         </span>
                                         {connectedProviders.has(p.provider) && (
                                             <Badge size="xs" tone="green" fill="outline">
-                                                Connected
+                                                {t('connected')}
                                             </Badge>
                                         )}
                                     </CommandItem>
@@ -140,7 +139,7 @@ export function AddProviderItem({ connectedProviders, onConnect, onManage }: Add
                         <CommandGroup>
                             <CommandItem value="manage connections" onSelect={onManage} className="text-muted-foreground [&>svg:last-child]:hidden">
                                 <Settings2Icon className="size-3.5" />
-                                Manage connections
+                                {t('manage')}
                             </CommandItem>
                         </CommandGroup>
                     </CommandList>

@@ -118,7 +118,7 @@ describe('startLeadSetupAction', () => {
         db = database(WORKSPACE_ID)
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
 
-        await expect(startLeadSetupAction('agent-1')).resolves.toEqual({ ok: false, error: 'Coworker not found' })
+        await expect(startLeadSetupAction('agent-1')).resolves.toEqual({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound' })
         expect(db.chainsOn('sessions')).toHaveLength(0)
         expect(mocks.startAgentSetup).not.toHaveBeenCalled()
     })

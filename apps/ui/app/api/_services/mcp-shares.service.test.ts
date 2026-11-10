@@ -18,7 +18,6 @@ vi.mock('@/lib/agents/share-read', () => ({ listWorkspaceShares: mocks.listWorks
 vi.mock('./mcp-templates.service', () => ({ dispatchTemplateTool: mocks.dispatchTemplateTool }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
-const { BOX_MANAGE_ONLY, COWORKER_NOT_FOUND } = await import('@/app/api/_auth/access')
 const { dispatchShareTool } = await import('./mcp-shares.service')
 
 const WORKSPACE_ID = 7
@@ -63,8 +62,8 @@ describe('dispatchShareTool for a member', () => {
     it('answers a coworker of a Box they do not reach as if it did not exist', async () => {
         database({ visibility: 'restricted' })
 
-        await expect(dispatchShareTool(MEMBER, 'create_agent_share', { agentId: AGENT_ID })).rejects.toThrow(COWORKER_NOT_FOUND)
-        await expect(dispatchShareTool(MEMBER, 'plan_agent_share', { agentId: AGENT_ID })).rejects.toThrow(COWORKER_NOT_FOUND)
+        await expect(dispatchShareTool(MEMBER, 'create_agent_share', { agentId: AGENT_ID })).rejects.toThrow('Coworker not found')
+        await expect(dispatchShareTool(MEMBER, 'plan_agent_share', { agentId: AGENT_ID })).rejects.toThrow('Coworker not found')
         expect(mocks.createAgentShare).not.toHaveBeenCalled()
         expect(mocks.planAgentShare).not.toHaveBeenCalled()
     })
@@ -72,7 +71,7 @@ describe('dispatchShareTool for a member', () => {
     it('refuses to share a coworker of a Box they only use', async () => {
         database()
 
-        await expect(dispatchShareTool(MEMBER, 'create_agent_share', { agentId: AGENT_ID })).rejects.toThrow(BOX_MANAGE_ONLY)
+        await expect(dispatchShareTool(MEMBER, 'create_agent_share', { agentId: AGENT_ID })).rejects.toThrow('Only an admin or a manager of this Box can do this')
         expect(mocks.createAgentShare).not.toHaveBeenCalled()
     })
 
@@ -96,7 +95,7 @@ describe('dispatchShareTool for a member', () => {
     it('cannot revoke the link of a coworker they do not reach', async () => {
         database({ visibility: 'restricted' })
 
-        await expect(dispatchShareTool(MEMBER, 'revoke_agent_share', { shareId: SHARE_ID, confirm: true })).rejects.toThrow(COWORKER_NOT_FOUND)
+        await expect(dispatchShareTool(MEMBER, 'revoke_agent_share', { shareId: SHARE_ID, confirm: true })).rejects.toThrow('Coworker not found')
         expect(mocks.revokeAgentShare).not.toHaveBeenCalled()
     })
 })

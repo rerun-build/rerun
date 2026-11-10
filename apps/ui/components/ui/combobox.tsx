@@ -7,6 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { ChevronsUpDownIcon, GripVerticalIcon, XIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useMemo, useRef, useState, type ReactNode } from 'react'
 
 // A `disabled` option stays listed and cannot be picked; `hint` says why, on its right.
@@ -36,11 +37,12 @@ type MultiProps = BaseProps & {
 }
 
 export function Combobox(props: SingleProps | MultiProps) {
+    const t = useTranslations('ui.combobox')
     const {
         groups,
-        placeholder = props.multiple ? 'Select options' : 'Select an option',
-        searchPlaceholder = 'Search…',
-        emptyText = 'No results found',
+        placeholder = props.multiple ? t('placeholderMultiple') : t('placeholder'),
+        searchPlaceholder = t('search'),
+        emptyText = t('empty'),
         disabled,
         className,
     } = props
@@ -118,7 +120,7 @@ export function Combobox(props: SingleProps | MultiProps) {
                                     <span className="truncate">{option.label}</span>
                                     <span
                                         role="button"
-                                        aria-label={`Remove ${option.label}`}
+                                        aria-label={t('remove', { option: option.label })}
                                         onPointerDown={e => e.stopPropagation()}
                                         onClick={e => {
                                             e.stopPropagation()
@@ -146,7 +148,7 @@ export function Combobox(props: SingleProps | MultiProps) {
                     <CommandList className="mt-1 border-t border-border/50">
                         <CommandEmpty>{emptyText}</CommandEmpty>
                         {props.multiple && selected.length > 0 && (
-                            <CommandGroup heading="Selected" className="border-b border-border/50">
+                            <CommandGroup heading={t('selected')} className="border-b border-border/50">
                                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
                                     <SortableContext items={props.value} strategy={verticalListSortingStrategy}>
                                         {selected.map((option, index) => (
@@ -189,6 +191,7 @@ export function Combobox(props: SingleProps | MultiProps) {
 }
 
 function SortableSelectedItem({ option, order, onSelect }: { option: ComboboxOption; order: number; onSelect: () => void }) {
+    const t = useTranslations('ui.combobox')
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: option.value })
     const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }
     return (
@@ -204,7 +207,7 @@ function SortableSelectedItem({ option, order, onSelect }: { option: ComboboxOpt
                 <span className="flex-1 truncate">{option.label}</span>
                 <button
                     type="button"
-                    aria-label={`Reorder ${option.label}`}
+                    aria-label={t('reorder', { option: option.label })}
                     onClick={e => e.stopPropagation()}
                     className="cursor-grab touch-none text-muted-foreground transition-colors hover:text-foreground"
                     {...attributes}

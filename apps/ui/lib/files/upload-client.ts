@@ -1,8 +1,11 @@
 export class UploadHttpError extends Error {
     status: number
-    constructor(status: number, message: string) {
+    // What the server said, when it said something: the fallback message is only for the logs.
+    serverMessage: string | null
+    constructor(status: number, message: string, serverMessage: string | null = null) {
         super(message)
         this.status = status
+        this.serverMessage = serverMessage
         this.name = 'UploadHttpError'
     }
 }
@@ -33,7 +36,7 @@ export type XhrUploadHandle = {
     abort: () => void
 }
 
-function messageFor(status: number, responseText: string): string {
+function serverMessageOf(responseText: string): string | null {
     try {
         const parsed: unknown = JSON.parse(responseText)
         const message = (parsed as { error?: unknown }).error
@@ -41,6 +44,12 @@ function messageFor(status: number, responseText: string): string {
     } catch {
         // An empty or non-JSON body is the normal shape of a proxy-level rejection.
     }
+    return null
+}
+
+function messageFor(status: number, responseText: string): string {
+    const message = serverMessageOf(responseText)
+    if (message) return message
     if (status === 401 || status === 403) return 'Your session expired. Reload the page and try again.'
     if (status === 413) return 'This file is too large to upload.'
     return 'Upload failed. Retry in a moment.'
@@ -68,7 +77,7 @@ export function xhrUpload({ url, body, onProgress, onSent }: XhrUploadParams): X
                 }
                 return
             }
-            reject(new UploadHttpError(xhr.status, messageFor(xhr.status, xhr.responseText)))
+            reject(new UploadHttpError(xhr.status, messageFor(xhr.status, xhr.responseText), serverMessageOf(xhr.responseText)))
         })
         xhr.addEventListener('error', () => reject(new UploadNetworkError()))
         xhr.addEventListener('timeout', () => reject(new UploadNetworkError('Upload timed out. Retry in a moment.')))

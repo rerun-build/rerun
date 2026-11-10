@@ -1,0 +1,12 @@
+{
+    "states": {
+        "done": "Hecho",
+        "error": "Error",
+        "question": "Pregunta",
+        "approval": "Requiere aprobación",
+        "connector": "Necesita una app",
+        "info": "Novedad"
+    },
+    "subtitle": "{source} · {state}",
+    "fallbackAgent": "tu coworker"
+}

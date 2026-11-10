@@ -7,6 +7,8 @@ import { ApiError } from '@/lib/api-error'
 import { isPremiumModelEntitled } from '@rerun/cloud/billing'
 import { getAgent as engineGetAgent, listConnections, patchAgent as enginePatchAgent } from '@/lib/engine/client'
 import { connectionGroups } from '@/lib/engine/model-groups'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { translatorFor } from '@/lib/i18n/server-translator'
 import { FOREMAN_AGENT_ID, type AgentModels, type ModelChoice, type SetAgentModelInput } from '@rerun/contracts'
 
 // The foreman has no agent row, so it resolves the way the web's picker resolves it, and stays every
@@ -19,8 +21,12 @@ const choiceOf = (connectionId: string | null | undefined, model: string | null 
 // pinned and what it runs today.
 export async function readAgentModels(ctx: WorkspaceContext, agentId: string): Promise<AgentModels> {
     const { conn, engineAgentId } = await targetOf(ctx, agentId, 'use')
-    const [detail, list] = await Promise.all([engineGetAgent(conn, engineAgentId), listConnections(conn)])
-    const groups = connectionGroups(list.connections, isPremiumModelEntitled(ctx.workspace))
+    const [detail, list, t] = await Promise.all([
+        engineGetAgent(conn, engineAgentId),
+        listConnections(conn),
+        recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'connections')),
+    ])
+    const groups = connectionGroups(list.connections, isPremiumModelEntitled(ctx.workspace), t)
     return {
         groups: groups.map(group => ({
             connectionId: group.connectionId,

@@ -3,6 +3,7 @@ import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { isPremiumModelEntitled } from '@rerun/cloud/billing'
 import { setBoxPlan } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
+import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
@@ -23,9 +24,9 @@ export async function pushBoxPlan(workspaceId: number, conn: EngineConnection): 
     }
 }
 
-export class ModelNotEntitledError extends Error {
+export class ModelNotEntitledError extends AppError {
     constructor(model: string) {
-        super(`${modelLabel(model)} is available with a paid plan.`)
+        super('modelNeedsPaidPlan', { model: modelLabel(model) })
         this.name = 'ModelNotEntitledError'
     }
 }

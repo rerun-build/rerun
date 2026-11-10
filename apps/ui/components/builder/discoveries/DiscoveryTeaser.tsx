@@ -1,10 +1,11 @@
 'use client'
 
 import { TextShimmer } from '@rerun/ui'
+import { useTranslations } from 'next-intl'
 
 import { Skeleton } from '@/components/ui/skeleton'
-import { DISCOVERY_SOURCE_LABELS, DISCOVERY_TEASERS, type DiscoverySource } from '@/lib/company/explore/findings'
-import { DISCOVERY_CARD_CLASS } from './DiscoveryCard'
+import type { DiscoverySource } from '@/lib/company/explore/findings'
+import { DISCOVERY_CARD_CLASS, useDiscoverySourceLabel } from './DiscoveryCard'
 
 // Each teaser is drawn in the shape of the card it turns into, so the swap reads as the same card
 // being filled in rather than one card replaced by another.
@@ -67,12 +68,14 @@ function TeaserBody({ shape }: { shape: TeaserShape }) {
 }
 
 export function DiscoveryTeaser({ source, subject }: { source: DiscoverySource; subject: { name: string; domain: string } }) {
+    const t = useTranslations('builder.discoveries.teasers')
+    const sourceLabel = useDiscoverySourceLabel()
     return (
         <div className={DISCOVERY_CARD_CLASS}>
             <div className="mb-2 flex items-center gap-2">
                 <Skeleton className="size-5 rounded-md" />
-                <TextShimmer className="truncate text-[11px] font-medium">{DISCOVERY_TEASERS[source].line(subject)}</TextShimmer>
-                <span className="ml-auto shrink-0 text-[10px] text-muted-foreground/70">{DISCOVERY_SOURCE_LABELS[source]}</span>
+                <TextShimmer className="truncate text-[11px] font-medium">{t(source, subject)}</TextShimmer>
+                <span className="ml-auto shrink-0 text-[10px] text-muted-foreground/70">{sourceLabel(source)}</span>
             </div>
             <TeaserBody shape={TEASER_SHAPE[source]} />
         </div>

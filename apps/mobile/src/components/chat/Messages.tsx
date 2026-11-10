@@ -5,6 +5,7 @@ import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Pressable, Share, View, type ViewStyle } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
@@ -35,6 +36,7 @@ const COLLAPSED_HEIGHT = 384
 function ExpandableText({ children }: { children: ReactNode }) {
     const [height, setHeight] = useState(0)
     const [expanded, setExpanded] = useState(false)
+    const t = useTranslations('mobileChat.messages')
     const overflows = height > COLLAPSED_HEIGHT
     return (
         <View>
@@ -46,7 +48,7 @@ function ExpandableText({ children }: { children: ReactNode }) {
             {overflows && (
                 <Pressable onPress={() => setExpanded(open => !open)} accessibilityRole="button" accessibilityState={{ expanded }} hitSlop={8} style={({ pressed }) => ({ alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: spacing.sm, paddingHorizontal: 8, paddingVertical: 2, borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.12)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)', opacity: pressed ? 0.6 : 0.9 })}>
                     <AppText variant="caption" style={{ color: '#ffffff', fontSize: 11, lineHeight: 15 }}>
-                        {expanded ? 'Show less' : 'Show more'}
+                        {expanded ? t('showLess') : t('showMore')}
                     </AppText>
                     <SymbolView name={expanded ? 'chevron.up' : 'chevron.down'} size={9} weight="semibold" tintColor="#ffffff" />
                 </Pressable>
@@ -62,6 +64,7 @@ function ExpandableText({ children }: { children: ReactNode }) {
 // The tap that brings the time up lives inside the right-aligned column, so only the bubble answers it.
 export function UserBubble({ text, media, owner = null, stamp, children, footer }: { text: string; media?: ViewerItem[]; owner?: FileOwner | null; stamp?: MessageStamp; children?: ReactNode; footer?: ReactNode }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.messages')
     const photos = media?.filter(isImageItem) ?? []
     const files = media?.filter(item => !isImageItem(item)) ?? []
     return (
@@ -71,14 +74,14 @@ export function UserBubble({ text, media, owner = null, stamp, children, footer 
                     {photos.length > 0 && (
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: spacing.xs }}>
                             {photos.map((photo, index) => (
-                                <Pressable key={photo.url} onPress={() => openViewer(photos, index)} accessibilityRole="imagebutton" accessibilityLabel={`Open ${photo.name}`}>
+                                <Pressable key={photo.url} onPress={() => openViewer(photos, index)} accessibilityRole="imagebutton" accessibilityLabel={t('open', { name: photo.name })}>
                                     <AuthedImage url={photo.url} style={{ width: THUMB, height: THUMB, borderRadius: radius.lg }} />
                                 </Pressable>
                             ))}
                         </View>
                     )}
                     {files.map((file, index) => (
-                        <Pressable key={file.url} onPress={() => openViewer(files, index)} accessibilityRole="button" accessibilityLabel={`Open ${file.name}`} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, maxWidth: '100%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: theme.border, backgroundColor: pressed ? theme.muted : theme.card })}>
+                        <Pressable key={file.url} onPress={() => openViewer(files, index)} accessibilityRole="button" accessibilityLabel={t('open', { name: file.name })} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, maxWidth: '100%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: theme.border, backgroundColor: pressed ? theme.muted : theme.card })}>
                             <SymbolView name="doc.text" size={15} tintColor={theme.mutedForeground} />
                             <AppText variant="footnote" medium numberOfLines={1} style={{ flexShrink: 1 }}>
                                 {file.name}
@@ -139,6 +142,7 @@ type AnswerActions = {
 }
 
 export function AssistantMessage({ text, showActions, streaming = false, owner = null, actions }: { text: string; showActions: boolean; streaming?: boolean; owner?: FileOwner | null; actions?: AnswerActions }) {
+    const t = useTranslations('mobileChat.messages')
     const plain = text.replace(/\*\*/g, '')
     const rate = (rating: MessageFeedbackRating) => {
         Haptics.selectionAsync()
@@ -151,18 +155,18 @@ export function AssistantMessage({ text, showActions, streaming = false, owner =
                 <View style={{ flexDirection: 'row', marginLeft: -spacing.sm }}>
                     <Action
                         symbol="doc.on.doc"
-                        label="Copy"
+                        label={t('copy')}
                         onPress={() => {
                             Clipboard.setStringAsync(plain)
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
                         }}
                     />
-                    <Action symbol="square.and.arrow.up" label="Share" onPress={() => Share.share({ message: plain })} />
-                    {actions?.onRegenerate && <Action symbol="arrow.clockwise" label="Regenerate" onPress={actions.onRegenerate} />}
+                    <Action symbol="square.and.arrow.up" label={t('share')} onPress={() => Share.share({ message: plain })} />
+                    {actions?.onRegenerate && <Action symbol="arrow.clockwise" label={t('regenerate')} onPress={actions.onRegenerate} />}
                     {actions?.onRate && (
                         <>
-                            <Action symbol={actions.rating === 'up' ? 'hand.thumbsup.fill' : 'hand.thumbsup'} label="Good response" selected={actions.rating === 'up'} onPress={() => rate('up')} />
-                            <Action symbol={actions.rating === 'down' ? 'hand.thumbsdown.fill' : 'hand.thumbsdown'} label="Bad response" selected={actions.rating === 'down'} onPress={() => rate('down')} />
+                            <Action symbol={actions.rating === 'up' ? 'hand.thumbsup.fill' : 'hand.thumbsup'} label={t('goodResponse')} selected={actions.rating === 'up'} onPress={() => rate('up')} />
+                            <Action symbol={actions.rating === 'down' ? 'hand.thumbsdown.fill' : 'hand.thumbsdown'} label={t('badResponse')} selected={actions.rating === 'down'} onPress={() => rate('down')} />
                         </>
                     )}
                 </View>
@@ -173,33 +177,35 @@ export function AssistantMessage({ text, showActions, streaming = false, owner =
 
 export function NeedsYouCard({ question }: { question: string }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.messages')
     return (
         <View style={{ gap: spacing.xs, padding: spacing.lg, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: withAlpha('#06b6d4', 0.35), backgroundColor: withAlpha('#06b6d4', theme.scheme === 'dark' ? 0.1 : 0.06) }}>
             <AppText variant="caption" tone="waiting" medium>
-                Needs your answer
+                {t('needsYourAnswer')}
             </AppText>
             <AppText variant="body">{question}</AppText>
             <AppText variant="footnote" tone="muted">
-                Reply below.
+                {t('replyBelow')}
             </AppText>
         </View>
     )
 }
 
 export function EmptyConversation({ coworker }: { coworker: Coworker }) {
+    const t = useTranslations('mobileChat')
     return (
         <View style={{ alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.xl }}>
             <CoworkerAvatar coworker={coworker} size={96} />
             <View style={{ alignItems: 'center', gap: 2 }}>
                 <AppText variant="title" numberOfLines={1}>
-                    {coworker.kind === 'foreman' ? 'Ask Rerun' : coworker.name}
+                    {coworker.kind === 'foreman' ? t('messages.askRerun') : coworker.name}
                 </AppText>
                 <AppText variant="callout" tone="muted" numberOfLines={2} style={{ textAlign: 'center' }}>
                     {coworker.role}
                 </AppText>
                 {coworker.status === 'offline' && (
                     <AppText variant="footnote" tone="muted" style={{ textAlign: 'center', marginTop: spacing.sm }}>
-                        Asleep. A message wakes it up.
+                        {t('empty.asleep')}
                     </AppText>
                 )}
             </View>

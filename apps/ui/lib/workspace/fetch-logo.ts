@@ -1,32 +1,34 @@
 import { resolvesToPublicAddresses } from '@/lib/net/public-fetch'
 
-import { LOGO_MAX_BYTES, LOGO_TOO_LARGE, NO_LOGO_FOUND } from './logo-input'
+import { failure, type ActionFailure } from '@/lib/i18n/action-error'
+
+import { LOGO_MAX_BYTES } from './logo-input'
 
 const FETCH_TIMEOUT_MS = 5000
 // The favicon service answers with a redirect to its CDN, so a hop or two has to be followed, each
 // one checked like the first.
 const MAX_REDIRECTS = 3
 
-type FetchedLogo = { ok: true; bytes: Uint8Array } | { ok: false; error: string }
+type FetchedLogo = { ok: true; bytes: Uint8Array } | ActionFailure
 
 // Downloads the image a logo link points at: public http(s) only, every redirect re-checked, an
 // image content type, and never more than LOGO_MAX_BYTES read off the wire.
 export async function fetchLogoBytes(url: string, redirectsLeft = MAX_REDIRECTS): Promise<FetchedLogo> {
-    if (!URL.canParse(url)) return { ok: false, error: NO_LOGO_FOUND }
+    if (!URL.canParse(url)) return failure('noLogoFound')
     const { protocol, hostname } = new URL(url)
-    if (!/^https?:$/.test(protocol) || !(await resolvesToPublicAddresses(hostname))) return { ok: false, error: NO_LOGO_FOUND }
+    if (!/^https?:$/.test(protocol) || !(await resolvesToPublicAddresses(hostname))) return failure('noLogoFound')
 
     const res = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) }).catch(() => null)
-    if (!res) return { ok: false, error: NO_LOGO_FOUND }
+    if (!res) return failure('noLogoFound')
 
     const location = res.headers.get('location')
     if (res.status >= 300 && res.status < 400) {
-        if (!location || redirectsLeft === 0) return { ok: false, error: NO_LOGO_FOUND }
+        if (!location || redirectsLeft === 0) return failure('noLogoFound')
         return fetchLogoBytes(new URL(location, url).toString(), redirectsLeft - 1)
     }
 
-    if (!res.ok || !res.body || !(res.headers.get('content-type') ?? '').startsWith('image/')) return { ok: false, error: NO_LOGO_FOUND }
-    if (Number(res.headers.get('content-length') ?? 0) > LOGO_MAX_BYTES) return { ok: false, error: LOGO_TOO_LARGE }
+    if (!res.ok || !res.body || !(res.headers.get('content-type') ?? '').startsWith('image/')) return failure('noLogoFound')
+    if (Number(res.headers.get('content-length') ?? 0) > LOGO_MAX_BYTES) return failure('imageTooLarge', { max: LOGO_MAX_BYTES / (1024 * 1024) })
 
     const chunks: Uint8Array[] = []
     let total = 0
@@ -35,7 +37,7 @@ export async function fetchLogoBytes(url: string, redirectsLeft = MAX_REDIRECTS)
         total += chunk.value.byteLength
         if (total > LOGO_MAX_BYTES) {
             await reader.cancel()
-            return { ok: false, error: LOGO_TOO_LARGE }
+            return failure('imageTooLarge', { max: LOGO_MAX_BYTES / (1024 * 1024) })
         }
         chunks.push(chunk.value)
     }

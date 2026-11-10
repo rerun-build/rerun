@@ -7,6 +7,7 @@ import { ChevronDownIcon, SearchIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { BorderBeam } from '@rerun/ui'
 import { Command as CommandPrimitive } from 'cmdk'
+import { useTranslations } from 'next-intl'
 import { useMemo, useRef, useState } from 'react'
 
 export type FilterOption<T extends string = string> = { value: T; label: string; icon?: React.ReactNode }
@@ -41,6 +42,7 @@ function TriggerSummary<T extends string>({ selected }: { selected: FilterOption
 }
 
 export function FilterSelect<T extends string>({ label, options, values, onChange, loading, className }: { label: string; options: FilterOption<T>[]; values: T[]; onChange: (values: T[]) => void; loading?: boolean; className?: string }) {
+    const t = useTranslations('ui.filter')
     const [open, setOpen] = useState(false)
     const triggerRef = useRef<HTMLButtonElement>(null)
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
@@ -85,10 +87,10 @@ export function FilterSelect<T extends string>({ label, options, values, onChang
                     {/* The house CommandInput carries a boxed InputGroup, too heavy for a filter popover. */}
                     <div className="flex items-center gap-2 px-2.5 pb-2">
                         <SearchIcon className="size-4 shrink-0 opacity-40" />
-                        <CommandPrimitive.Input placeholder={`Search ${label.toLowerCase()}…`} className="h-6 w-full bg-transparent text-sm outline-hidden placeholder:text-muted-foreground" />
+                        <CommandPrimitive.Input placeholder={t('search', { label: label.toLowerCase() })} className="h-6 w-full bg-transparent text-sm outline-hidden placeholder:text-muted-foreground" />
                     </div>
                     <CommandList className="border-t border-border/50 pt-1">
-                        <CommandEmpty>No match</CommandEmpty>
+                        <CommandEmpty>{t('empty')}</CommandEmpty>
                         {options.map(option => (
                             <CommandItem key={option.value} value={option.value} keywords={[option.label]} onSelect={() => toggle(option.value)} className="gap-2.5 [&>svg:last-child]:hidden">
                                 <Checkbox size="sm" checked={values.includes(option.value)} className="pointer-events-none" />
@@ -100,7 +102,7 @@ export function FilterSelect<T extends string>({ label, options, values, onChang
                 </Command>
                 {selected.length > 0 && (
                     <button type="button" onClick={() => onChange([])} className="w-full border-t border-border/50 px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:text-foreground">
-                        Clear
+                        {t('clear')}
                     </button>
                 )}
             </PopoverContent>

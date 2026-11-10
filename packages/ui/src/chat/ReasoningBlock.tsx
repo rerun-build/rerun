@@ -5,6 +5,7 @@ import { cn } from '../cn'
 import { BrainIcon, ChevronRightIcon } from '../icons'
 import { TextShimmer } from '../TextShimmer'
 import { useEffect, useState, type ReactNode } from 'react'
+import { useKitTranslations } from '../locale'
 
 export type ReasoningBlockProps = {
     text: string
@@ -55,17 +56,18 @@ export function ReasoningBlock({ text, streaming = false, seconds, renderText = 
  * to a number it already knows.
  */
 function ReasoningHeader({ streaming, seconds }: { streaming: boolean; seconds?: number }) {
+    const t = useKitTranslations()
     const live = useElapsed(streaming && seconds === undefined)
     const elapsed = seconds ?? live
 
     if (streaming) {
         return (
             <>
-                <TextShimmer className="text-sm">Thinking...</TextShimmer>
+                <TextShimmer className="text-sm">{t('chat.reasoning.thinking')}</TextShimmer>
                 {live !== undefined && <span className="shrink-0 font-mono text-xs tabular-nums">{formatElapsed(live)}</span>}
             </>
         )
     }
 
-    return <span className="truncate">{elapsed !== undefined ? `Thought for ${formatElapsed(elapsed)}` : 'Thought'}</span>
+    return <span className="truncate">{elapsed !== undefined ? t('chat.reasoning.thoughtFor', { duration: formatElapsed(elapsed) }) : t('chat.reasoning.thought')}</span>
 }

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { AGENT_FOCUS_TABS, AGENT_TAB_LABELS, resolveTab } from '@/lib/board/types'
 import { SETTINGS_PANELS, SETTINGS_PANEL_LABELS } from '@/lib/settings/panels'
 import { WrenchIcon } from '@/lib/icons'
-import { getToolMeta } from '@/lib/tool-meta'
+import { toolIconOf } from '@/lib/tool-meta'
 import { ACCOUNT_TOOL_NAMES } from '@/lib/mcp/account-tools'
 import { ALL_PLAN_KINDS, FOREMAN_BOX_TOOL_DEFS, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_WIDGET_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_CLIENT_TOOL_NAMES, FOREMAN_MCP_TOOL_NAMES, FOREMAN_TOOL_DEFS, FOREMAN_TOOL_NAMES, showPlanDef, showTemplatesDef } from './tool-defs'
 
@@ -132,10 +132,10 @@ describe('foreman tool defs', () => {
         expect(SETTINGS_PANELS.filter(panel => !openSettings.description.includes(`\`${panel}\` ("${SETTINGS_PANEL_LABELS[panel]}"`))).toEqual([])
     })
 
-    // getToolMeta never fails, it falls back to a title-cased name under a wrench. That fallback is
+    // toolIconOf never fails, it falls back to a title-cased name under a wrench. That fallback is
     // right for an unknown MCP tool and wrong for ours, so the assertion is on the icon.
     it('gives every tool a label of its own in the chat', () => {
-        expect(FOREMAN_TOOL_NAMES.filter(name => getToolMeta(name).icon === WrenchIcon)).toEqual([])
+        expect(FOREMAN_TOOL_NAMES.filter(name => toolIconOf(name) === WrenchIcon)).toEqual([])
     })
 })
 

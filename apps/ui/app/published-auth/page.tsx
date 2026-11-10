@@ -12,10 +12,14 @@ import { UsersIcon } from '@/lib/icons'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { createClient } from '@/supabase/server'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { getTranslations } from 'next-intl/server'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = { title: 'Open a page', robots: { index: false, follow: false } }
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('publicPages.publishedAuth')
+    return { title: t('metaTitle'), robots: { index: false, follow: false } }
+}
 
 type Search = Record<string, string | string[] | undefined>
 
@@ -31,7 +35,8 @@ export default async function PublishedAuthPage({ searchParams }: { searchParams
     const slug = param(search, 'slug')?.trim() ?? ''
     const next = safeNextPath(param(search, 'next'))
     const entry = slug ? await loadPublished(slug) : null
-    if (!entry) return <GateScreen brand={{ name: 'Rerun', iconUrl: null }} lock={null} mark={<RerunTile />} title="This link no longer works" subtitle="Whoever shared it turned it off." />
+    const t = await getTranslations('publicPages')
+    if (!entry) return <GateScreen brand={{ name: 'Rerun', iconUrl: null }} lock={null} mark={<RerunTile />} title={t('linkOff.title')} subtitle={t('linkOff.subtitle')} />
 
     const returnTo = openPublishedHref(slug, next)
     const { data } = await (await createClient()).auth.getUser()
@@ -47,9 +52,14 @@ export default async function PublishedAuthPage({ searchParams }: { searchParams
     }
 
     const brand = await loadWorkspaceBrand(entry.workspace_id)
-    const email = realEmail(user.email) ?? 'another account'
+    const email = realEmail(user.email)
     return (
-        <GateScreen brand={brand} lock={<Icon icon={UsersIcon} size="lg" />} title="You don't have access" subtitle={`Signed in as ${email}. This page is for ${brand.name} members.`}>
+        <GateScreen
+            brand={brand}
+            lock={<Icon icon={UsersIcon} size="lg" />}
+            title={t('publishedAuth.noAccess')}
+            subtitle={email ? t('publishedAuth.signedInAs', { email, workspace: brand.name }) : t('publishedAuth.signedInAsOther', { workspace: brand.name })}
+        >
             <SwitchAccountButton returnTo={returnTo} />
         </GateScreen>
     )

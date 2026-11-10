@@ -1,6 +1,7 @@
 'use client'
 
 import { BorderBeam } from '@rerun/ui'
+import { useTranslations } from 'next-intl'
 import type { ReactNode, Ref } from 'react'
 
 import { TakeoverAsk, type TakeoverRequestState } from '@/components/chat/TakeoverAsk'
@@ -20,6 +21,7 @@ type ScreenCardProps = {
 // The coworker's screen as a block of its thread, where the run uses it. A takeover the run asks for
 // joins the same block, under a rule: the screen it is about, then what to do.
 export function ScreenCard({ live, site, screen, takeover, onTakeControl, ref }: ScreenCardProps) {
+    const t = useTranslations('desktop.screenCard')
     return (
         <div ref={ref} className={cn('relative w-full max-w-[95%] overflow-hidden rounded-xl ring-1 ring-border', takeover ? 'bg-muted/30' : 'bg-background')}>
             <div className={cn('group relative flex aspect-video overflow-hidden', takeover && 'm-1.5 rounded-lg bg-background')}>
@@ -30,7 +32,7 @@ export function ScreenCard({ live, site, screen, takeover, onTakeControl, ref }:
                         {site}
                     </span>
                 )}
-                {live && !takeover?.locked && <TakeControlOverlay label={takeover ? 'Open browser' : 'Take control'} onClick={takeover ? takeover.onOpen : onTakeControl} />}
+                {live && !takeover?.locked && <TakeControlOverlay label={takeover ? t('openBrowser') : t('takeControl')} onClick={takeover ? takeover.onOpen : onTakeControl} />}
             </div>
             {takeover && (
                 <div className="border-t border-border">

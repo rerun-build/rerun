@@ -1,0 +1,29 @@
+{
+    "time": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "now": "ahora",
+        "minutesAgo": "{count} min",
+        "hoursAgo": "{count} h",
+        "daysAgo": "{count} d"
+    },
+    "actions": {
+        "close": "Cerrar",
+        "cancel": "Cancelar",
+        "done": "Listo",
+        "share": "Compartir",
+        "update": "Actualizar"
+    },
+    "errors": {
+        "tryAgainShortly": "Inténtalo de nuevo en un momento.",
+        "generic": "Algo salió mal. Inténtalo de nuevo.",
+        "requestFailed": "La solicitud falló con el código {status}",
+        "uploadFailed": "La subida falló con el código {status}"
+    },
+    "unread": "No leído",
+    "viewer": {
+        "shareFailed": "No se pudo compartir el archivo",
+        "noPreview": "No hay vista previa de este archivo. Compártelo para abrirlo en otra app.",
+        "position": "{index} / {total}"
+    }
+}

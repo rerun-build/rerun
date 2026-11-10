@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { entriesFromFileList, type UploadEntry } from '@/lib/files/upload'
 import { FolderUpIcon, UploadIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
 type FileUploadMenuProps = {
@@ -13,6 +14,7 @@ type FileUploadMenuProps = {
 // Picking files no longer blocks: the upload reports itself in the tray, so this stays a plain
 // trigger with no pending state of its own.
 export function FileUploadMenu({ onPick }: FileUploadMenuProps) {
+    const t = useTranslations('ui.upload')
     const fileInputRef = useRef<HTMLInputElement>(null)
     const folderInputRef = useRef<HTMLInputElement>(null)
 
@@ -28,18 +30,18 @@ export function FileUploadMenu({ onPick }: FileUploadMenuProps) {
             <input ref={folderInputRef} type="file" multiple className="hidden" onChange={handleChange} {...{ webkitdirectory: '' }} />
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon-sm" title="Upload">
+                    <Button variant="ghost" size="icon-sm" title={t('menu')}>
                         <UploadIcon className="size-3.5" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem className="whitespace-nowrap" onSelect={() => fileInputRef.current?.click()}>
                         <UploadIcon />
-                        Upload files
+                        {t('files')}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="whitespace-nowrap" onSelect={() => folderInputRef.current?.click()}>
                         <FolderUpIcon />
-                        Upload folder
+                        {t('folder')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

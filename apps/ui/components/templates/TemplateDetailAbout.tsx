@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Markdown } from '@rerun/ui/markdown'
 import { Badge } from '@rerun/ui/primitives'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 const COLLAPSED_HEIGHT = 208
 
@@ -13,6 +14,7 @@ const COLLAPSED_HEIGHT = 208
 const COMPACT_PROSE = 'break-words text-xs leading-relaxed text-muted-foreground [&>*:first-child]:mt-0 [&_h2]:mt-4 [&_h2]:mb-1.5 [&_h2]:text-sm [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:text-xs [&_p:not(:first-child)]:mt-2 [&_ul]:mt-2 [&_ol]:mt-2 [&_blockquote]:mt-2'
 
 export function TemplateDetailAbout({ content }: { content: string }) {
+    const t = useTranslations('templates.about')
     const contentRef = useRef<HTMLDivElement>(null)
     const [contentHeight, setContentHeight] = useState(0)
     const [expanded, setExpanded] = useState(false)
@@ -43,7 +45,7 @@ export function TemplateDetailAbout({ content }: { content: string }) {
             {overflows && (
                 <button type="button" aria-expanded={expanded} onClick={() => setExpanded(open => !open)} className="mt-2 self-center opacity-80 transition-opacity hover:opacity-100">
                     <Badge tone="neutral" size="xs" glow={false} trailing={expanded ? <ChevronUpIcon className="size-3" /> : <ChevronDownIcon className="size-3" />}>
-                        {expanded ? 'Show less' : 'Show more'}
+                        {expanded ? t('showLess') : t('showMore')}
                     </Badge>
                 </button>
             )}

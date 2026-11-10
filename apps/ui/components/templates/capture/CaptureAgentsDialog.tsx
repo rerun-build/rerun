@@ -2,11 +2,12 @@
 
 import { useStepper } from '@rerun/ui/steps'
 import { useLayoutEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
 import { StepDialogHeader } from '@/components/dialogs/StepDialogHeader'
 import { Dialog } from '@/components/ui/dialog'
 import { CaptureProgressPanel } from './CaptureProgressPanel'
-import { CAPTURE_STEP_COPY } from './CaptureStepBody'
+import { useCaptureStepCopy } from './CaptureStepBody'
 import { CaptureStepPanel } from './CaptureStepPanel'
 import type { CaptureActions } from './types'
 import { useCaptureFlow, type CaptureStep } from './useCaptureFlow'
@@ -47,13 +48,14 @@ export function CaptureAgentsDialog({ open, onOpenChange, actions, onCaptured }:
 }
 
 function CaptureFlow({ stepper, actions, onCaptured, onClose }: { stepper: Stepper; actions: CaptureActions; onCaptured: () => void; onClose: () => void }) {
+    const t = useTranslations('templates.capture.dialog')
     const { goTo } = stepper
     // Held here rather than inside the panel: StepTransition keys its subtree on the step, so a hook
     // mounted in there would lose its plans on the way to the review.
     const flow = useCaptureFlow(actions)
 
     const step = STEPS[stepper.index]
-    const copy = CAPTURE_STEP_COPY[step]
+    const copy = useCaptureStepCopy()[step]
 
     return (
         <div className="flex min-h-0 flex-col p-6">
@@ -68,8 +70,8 @@ function CaptureFlow({ stepper, actions, onCaptured, onClose }: { stepper: Stepp
                     goTo(STEPS.indexOf(next))
                 }}
                 onClose={onClose}
-                cancelLabel="Cancel"
-                doneLabel="Done"
+                cancelLabel={t('cancel')}
+                doneLabel={t('done')}
             />
         </div>
     )

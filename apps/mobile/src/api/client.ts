@@ -2,6 +2,7 @@ import { CLIENT_HEADER, formatClientHeader } from '@rerun/contracts'
 import * as Application from 'expo-application'
 
 import { environment } from '@/config/environment'
+import { translatorFor } from '@/i18n/translator'
 
 const WORKSPACE_HEADER = 'x-workspace-id'
 
@@ -48,7 +49,7 @@ export function createApiClient({ baseUrl, clientHeader, fetch: fetchImpl = fetc
         if (res.status === 204) return undefined as T
 
         const payload: unknown = await res.json().catch(() => null)
-        if (!res.ok) throw new ApiError(res.status, errorMessageOf(payload) ?? `Request failed with ${res.status}`, payload)
+        if (!res.ok) throw new ApiError(res.status, errorMessageOf(payload) ?? translatorFor('mobileCommon')('errors.requestFailed', { status: res.status }), payload)
         return payload as T
     }
 }

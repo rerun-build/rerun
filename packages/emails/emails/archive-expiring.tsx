@@ -3,6 +3,9 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { formatNumber } from "@rerun/i18n/format";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface ArchiveExpiringProps {
@@ -19,6 +22,7 @@ export interface ArchiveExpiringProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -36,55 +40,49 @@ export default function ArchiveExpiring({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: ArchiveExpiringProps) {
-  const workspace = workspaceName ?? "your workspace";
-  const subject = sandbox ? "archived sandbox" : "paused workspace";
+  const t = emailTranslator(locale);
+  const kind = sandbox ? "sandbox" : "workspace";
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
-      preview={`Your ${sandbox ? "archived Rerun sandbox" : "paused Rerun workspace"} is deleted on ${deletionLabel}`}
+      preview={t("archiveExpiring.preview", { kind, date: deletionLabel })}
       hero={{ scene: "trial-ended", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Heading style={text.heading}>
-        Your {subject} is deleted on {deletionLabel}
+        {t("archiveExpiring.heading", { kind, date: deletionLabel })}
       </Heading>
       <Text style={text.paragraph}>
-        {workspaceName ? <strong>{workspaceName}</strong> : "Your workspace"}{" "}
-        has been {sandbox ? "archived" : "paused"} since{" "}
-        <strong>{pausedLabel}</strong>. Its coworkers and everything they know
-        are still saved, and this is the last week they will be.
+        {workspaceName
+          ? t.rich("archiveExpiring.statusNamed", { kind, workspaceName, pausedOn: pausedLabel, strong })
+          : t.rich("archiveExpiring.statusUnnamed", { kind, pausedOn: pausedLabel, strong })}
       </Text>
       <Text style={text.paragraph}>
-        On <strong>{deletionLabel}</strong>, the saved copy is deleted for good
-        and cannot be recovered.{" "}
-        {sandbox
-          ? "Open your sandbox and request its reactivation before then to get it back exactly as you left it."
-          : "Subscribe before then and your workspace comes back exactly as you left it."}
+        {t.rich("archiveExpiring.deletion", { kind, date: deletionLabel, strong })}
       </Text>
 
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Workspace", value: workspace },
-            { label: sandbox ? "Archived since" : "Paused since", value: pausedLabel },
+            { label: t("common.meta.workspace"), value: workspace },
+            { label: sandbox ? t("common.meta.archivedSince") : t("common.meta.pausedSince"), value: pausedLabel },
             ...(agentCount > 0
-              ? [{ label: "Coworkers saved", value: String(agentCount) }]
+              ? [{ label: t("common.meta.coworkersSaved"), value: formatNumber(agentCount, locale) }]
               : []),
-            { label: "Deleted on", value: deletionLabel },
+            { label: t("common.meta.deletedOn"), value: deletionLabel },
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={billingUrl}>
-          {sandbox ? "Open my sandbox" : "Bring my workspace back"}
-        </Button>
+        <Button href={billingUrl}>{t("archiveExpiring.button", { kind })}</Button>
       </Section>
-      <Text style={text.footnote}>
-        This is the last email about this {sandbox ? "sandbox" : "workspace"}.
-      </Text>
+      <Text style={text.footnote}>{t("archiveExpiring.footnote", { kind })}</Text>
     </Layout>
   );
 }

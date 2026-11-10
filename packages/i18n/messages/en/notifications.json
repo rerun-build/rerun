@@ -1,0 +1,173 @@
+{
+    "_context": {
+        "settings.scopeTitle": "Heading of the list of notification scopes (what you get notified about).",
+        "settings.modes.default.yourSetting": "Hint under the Default option of a coworker's bell menu. {scope} is the label of the user's global scope, already translated.",
+        "settings.modes.everything.label": "Per-coworker notification mode: notified of every run of this coworker.",
+        "settings.bell.title": "{name} is a coworker's name.",
+        "settings.bell.scheduled": "{count} is the number of scheduled tasks of the coworker.",
+        "settings.channels.title": "Heading of the notification channels (toast, sound, email): how you are notified.",
+        "settings.channels.toast.label": "A toast is the small popup notification in the app.",
+        "inbox.rowMenu.unfollow": "Menu item on a coworker's inbox row.",
+        "inbox.detail.seeAllCount": "Button that opens the whole inbox. {count} is how many items it holds.",
+        "inbox.markAll.description": "{count} is how many items the inbox holds.",
+        "inbox.detail.status.awaiting_ack": "Kind of a notification: something a coworker flagged that the user has not read yet.",
+        "notices": "Notices the app sends the whole workspace (in-app and by email) about a paid app (LinkedIn Pro, WhatsApp Pro) or the credits. {provider} is LinkedIn or WhatsApp, {account} the name of the connected account. Settings → Apps names a screen of the app.",
+        "notices.trialEndsSoon": "{endsAt} is the day the free slot ends.",
+        "toast.coworker": "Title of a notification from a coworker whose name is not known.",
+        "toast.scheduledTask": "Title of a notification from a scheduled run. {name} is the coworker.",
+        "inbox.reasons": "Line under a notification row: why it reached the user. {agentName} is a coworker."
+    },
+    "toast": {
+        "close": "Close notification",
+        "openConversation": "Open conversation",
+        "coworker": "Coworker",
+        "scheduledTask": "{name} · Scheduled task"
+    },
+    "inbox": {
+        "unknownCoworker": "Coworker",
+        "detail": {
+            "close": "Close",
+            "seeAll": "See all",
+            "seeAllCount": "See all {count}",
+            "markRead": "Mark as read",
+            "notInList": "This update is not in your list yet",
+            "openConversation": "Open conversation",
+            "noCoworker": "This update is not tied to a coworker",
+            "status": {
+                "error": "Error",
+                "awaiting_question": "Question",
+                "awaiting_approval": "Approval",
+                "awaiting_ack": "Unread",
+                "done": "Finished",
+                "waiting_human": "Waiting"
+            }
+        },
+        "markAll": {
+            "title": "Mark everything as read?",
+            "description": "{count, plural, one {# item} other {# items}} will leave this list. Requests still waiting on an answer are cleared too, without being answered.",
+            "confirm": "Mark all as read"
+        },
+        "rowMenu": {
+            "options": "Notification options",
+            "undo": "Undo",
+            "unfollow": "Stop following its scheduled tasks",
+            "unfollowed": "You no longer follow {name}'s scheduled tasks.",
+            "mute": "Mute {name}",
+            "muted": "{name} is muted.",
+            "settings": "Notification settings"
+        },
+        "untitledSession": "Untitled session",
+        "reasons": {
+            "mine": "You started this run",
+            "participant": "You are in this conversation",
+            "followed": "You follow {agentName}'s scheduled tasks",
+            "allActivity": "You get all activity from {agentName}",
+            "everything": "You get every run in the workspace",
+            "workspace": "This is about your workspace"
+        }
+    },
+    "settings": {
+        "scopeTitle": "Notify me about",
+        "recommended": "Recommended",
+        "notificationsFor": "Notifications for {name}",
+        "scopes": {
+            "everything": {
+                "label": "Everything",
+                "detail": "Every run in the workspace, whoever started it."
+            },
+            "mine": {
+                "label": "My runs and what I follow",
+                "detail": "Runs I start, conversations I am in, coworkers I follow."
+            },
+            "needed": {
+                "label": "Only when I am needed",
+                "detail": "Questions, approvals and errors in my runs. A finished run stays quiet."
+            },
+            "nothing": {
+                "label": "Nothing",
+                "detail": "I check the inbox myself."
+            }
+        },
+        "modes": {
+            "default": {
+                "label": "Default",
+                "yourSetting": "Your setting: “{scope}”."
+            },
+            "everything": {
+                "label": "All activity",
+                "hint": "Every run, whoever started it."
+            },
+            "muted": {
+                "label": "Muted",
+                "hint": "Nothing. The board still shows it."
+            }
+        },
+        "bell": {
+            "title": "Notify me about {name}",
+            "follow": "Follow its scheduled tasks",
+            "noSchedule": "{name} has no scheduled task yet",
+            "nothingScheduled": "Nothing scheduled yet.",
+            "scheduled": "{count} scheduled, they reach you like your own runs.",
+            "allSettings": "All notification settings"
+        },
+        "perCoworker": {
+            "title": "Per coworker",
+            "detail": "Also set from the bell on each coworker.",
+            "add": "Add",
+            "allListed": "Every coworker is already listed",
+            "empty": "Every coworker follows the rule above.",
+            "following": "Following its scheduled tasks",
+            "alreadyDefault": "{name} already follows your setting",
+            "reset": "Reset {name}"
+        },
+        "channels": {
+            "title": "How",
+            "toast": {
+                "label": "Toast in the app",
+                "description": "Pops up above your inbox while Rerun is open."
+            },
+            "sound": {
+                "label": "Sound",
+                "description": "Only when a coworker needs you or something breaks.",
+                "play": "Play notification sound"
+            },
+            "email": {
+                "label": "Email",
+                "description": "When it needs you while you are away. One email per incident, never one per run."
+            }
+        },
+        "accountEmails": {
+            "title": "Account emails",
+            "billing": {
+                "label": "Trial & billing",
+                "description": "Trial reminders and billing notices about your subscription."
+            },
+            "product": {
+                "label": "Product updates",
+                "description": "New features, tips and occasional product news."
+            }
+        },
+        "saveFailed": "Could not save your notification settings",
+        "networkError": "Network error"
+    },
+    "emailPreferences": {
+        "coworkerTitle": "Coworker notifications",
+        "email": {
+            "label": "Email",
+            "description": "When a coworker needs you or breaks while you are away. One email per incident, never one per run."
+        },
+        "saveFailed": "Could not save preferences",
+        "saving": "Saving…",
+        "saved": "All changes saved"
+    },
+    "notices": {
+        "slotsPaused": "Your plan now has {slots, plural, one {# {provider} slot} other {# {provider} slots}}, so {paused, plural, one {# connected account is} other {# connected accounts are}} paused. Add a slot in Billing to bring {paused, plural, one {it} other {them}} back.",
+        "workspaceBack": "Your workspace is back. Reconnect your {provider} account from Settings → Apps so your coworkers can use it again.",
+        "trialEndsSoon": "Your free {provider} slot ends on {endsAt, date, long}. It then becomes a paid slot on your plan. Disconnect the account from Settings → Apps before then if you do not want to keep it.",
+        "trialEndedPlanInactive": "Your free {provider} slot ended while your plan is not active, so {account, select, none {the account} other {{account}}} is paused. Add a slot in Billing within a week to keep it, or it will be disconnected.",
+        "trialEndedDeclined": "Your free {provider} slot ended and the card was declined, so {account, select, none {the account} other {{account}}} is paused. Add a slot in Billing within a week to keep it, or it will be disconnected.",
+        "rateLimited": "{provider} asked {account, select, none {one of your accounts} other {{account}}} to slow down. Your coworkers will not use it for 24 hours, so the account stays safe.",
+        "signedOut": "{provider} signed {account, select, none {one of your accounts} other {{account}}} out. Reconnect it from Settings → Apps so your coworkers can use it again.",
+        "budgetExhausted": "Your Rerun credits for this month are used up. Scheduled and triggered runs on Rerun models are paused, and coworkers cannot buy leads, SEO or social data, until they reset or you add credits."
+    }
+}

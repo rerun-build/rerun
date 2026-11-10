@@ -1,6 +1,7 @@
 'use client'
 
 import type { PointerEvent, RefObject } from 'react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 
 import { type ForemanPlacement, FOREMAN_DOCK_DEFAULT_WIDTH, clampForemanDockWidth } from '@/lib/foreman-layout'
@@ -17,6 +18,7 @@ type ResizeState = { pointerId: number; startX: number; startWidth: number; widt
  * qu'elle suive le pointeur. Le lâcher la range dans le placement.
  */
 export function ForemanDockResizeHandle({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement & { mode: 'dock' } }) {
+    const t = useTranslations('foreman')
     const resizeRef = useRef<ResizeState | null>(null)
     const growsLeft = placement.side === 'right'
 
@@ -71,7 +73,7 @@ export function ForemanDockResizeHandle({ panelRef, placement }: { panelRef: Ref
         <div
             role="separator"
             aria-orientation="vertical"
-            aria-label="Resize chat"
+            aria-label={t('resize')}
             data-resizing="false"
             className={cn(
                 'group absolute inset-y-0 z-30 hidden w-2 cursor-col-resize touch-none md:block',

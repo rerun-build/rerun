@@ -1,0 +1,332 @@
+{
+    "hub": {
+        "eyebrow": "Sectores",
+        "title": "Coworkers de IA para tu sector",
+        "headline": "Encuentra los Coworkers de tu oficio.",
+        "description": "Agencias, freelancers, e-commerce, inmobiliarias, startups, SaaS, legal y reclutamiento: los ocho Coworkers que cada uno contrata primero, y por qué.",
+        "gridLabel": "{count, plural, one {# sector} other {# sectores}}",
+        "gridTitle": "Empieza por lo que realmente haces.",
+        "gridLede": "Cada página se abre con los ocho Coworkers que ese negocio contrata primero."
+    },
+    "page": {
+        "breadcrumbLabel": "Ruta de navegación",
+        "breadcrumbRoot": "Sectores",
+        "wallLabel": "A quién contratas",
+        "wallLede": "Cada uno es un template de la biblioteca: instálalo, conecta sus apps y se pone a trabajar.",
+        "painsLabel": "Lo que duele",
+        "proofLabel": "Por qué funciona",
+        "proofTitle": "Lo que un Coworker tiene y una ventana de chat no.",
+        "faqLabel": "Preguntas frecuentes",
+        "faqTitle": "{industry} en Rerun: tus preguntas.",
+        "othersLabel": "Otros sectores",
+        "othersTitle": "¿No es exactamente tu oficio?",
+        "othersLink": "Todos los sectores",
+        "notFoundTitle": "Sector no encontrado"
+    },
+    "industries": {
+        "agencies": {
+            "crumb": "Agencias",
+            "title": "Coworkers de IA para agencias.",
+            "lede": "El trabajo que se repite en cada cuenta (la prospección, las auditorías SEO, el informe semanal al cliente, el cobro de una factura impagada) en manos de Coworkers que lo hacen en tus propias herramientas y te informan.",
+            "metaTitle": "Agentes de IA para agencias: prospección, SEO, informes",
+            "metaDescription": "Las agencias repiten el mismo trabajo en cada cuenta. Contrata Coworkers de IA para prospección, SEO, redes sociales, informes y facturas impagadas.",
+            "wallTitle": "Ocho Coworkers que una agencia contrataría primero.",
+            "templatesLink": "Templates para agencias",
+            "painsTitle": "Lo que una agencia deja de hacer a mano.",
+            "pains": {
+                "1": {
+                    "title": "Nuevos clientes entre dos entregas",
+                    "body": "La prospección es lo primero que se cae cuando un proyecto va con retraso. Un Coworker sigue armando y escribiendo la lista, sea la semana tranquila o no."
+                },
+                "2": {
+                    "title": "El mismo informe, multiplicado por doce clientes",
+                    "body": "Cifras extraídas, comentadas y enviadas, un deck por cuenta. El trabajo es idéntico cada mes y nadie quiere hacerlo."
+                },
+                "3": {
+                    "title": "Facturas que nadie se atreve a reclamar",
+                    "body": "El recordatorio que debía salir el día 31 sale el día 60. Un Coworker lo envía el día 31, con tus palabras."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿Puedo mantener a cada cliente por separado?",
+                    "answer": "Sí, y deberías. Dale a cada cliente su propio workspace: sus Coworkers, sus apps conectadas, su Brain. Nada pasa de una cuenta a otra, y cambias desde la pastilla de la esquina."
+                },
+                "2": {
+                    "question": "¿El trabajo sonará como nosotros o como un robot?",
+                    "answer": "Tu tono, tu oferta y tus reglas viven en el Brain del workspace, y cada Coworker los lee antes de escribir. En el workspace de un cliente, es el tono del cliente, no el tuyo."
+                },
+                "3": {
+                    "question": "¿Pago por cliente o por persona?",
+                    "answer": "Ninguna de las dos. El plan cubre el workspace y los asientos son gratis, así que todo el equipo (y el cliente, si quieres invitarlo) puede leer lo que hicieron los Coworkers y responder cuando uno pregunta."
+                }
+            }
+        },
+        "freelancers": {
+            "crumb": "Freelancers",
+            "title": "Coworkers de IA para freelancers.",
+            "lede": "Eres la producción, el equipo de ventas y el departamento de contabilidad. Deja los dos últimos a Coworkers que trabajan mientras estás en un proyecto con un cliente.",
+            "metaTitle": "Agentes de IA para freelancers: ventas, correo, facturas",
+            "metaDescription": "Eres la producción, las ventas y la contabilidad. Contrata Coworkers de IA para prospectar, ordenar tu correo, hacer seguimientos, facturar y escribir.",
+            "wallTitle": "Ocho Coworkers que te devuelven tus tardes.",
+            "templatesLink": "Templates de productividad",
+            "painsTitle": "Lo que un negocio de una sola persona siempre deja caer.",
+            "pains": {
+                "1": {
+                    "title": "Las ventas se paran la semana que estás ocupado",
+                    "body": "El pipeline se vacía justo cuando termina el proyecto actual, porque nadie prospectó mientras tanto. Un Coworker prospecta mientras tanto."
+                },
+                "2": {
+                    "title": "Facturas que nadie reclama",
+                    "body": "Recordarle a un cliente que te debe dinero es la tarea que siempre dejas para mañana. Que un Coworker lo envíe a tiempo no cuesta nada."
+                },
+                "3": {
+                    "title": "Un correo que lees cinco veces al día",
+                    "body": "Tres mensajes te necesitan de verdad. Un Coworker te dice cuáles, y redacta las respuestas para el resto."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿Vale la pena para una sola persona?",
+                    "answer": "Es el caso para el que se creó: los puestos que un freelancer cubriría si contratar tuviera sentido (media jornada de prospección, una hora de facturación, el correo). Un solo plan los cubre todos."
+                },
+                "2": {
+                    "question": "¿Funciona con mi portátil cerrado?",
+                    "answer": "Sí. Tus Coworkers funcionan en una máquina en la nube, en Europa. La ejecución del lunes por la mañana ocurre estés en tu escritorio, con un cliente o de viaje."
+                },
+                "3": {
+                    "question": "¿Puede enviar cosas en mi nombre sin preguntar?",
+                    "answer": "Solo hasta donde tú le dejes. Un Coworker no puede gastar dinero sin una aprobación, y tú decides en sus instrucciones si envía por su cuenta o te entrega un borrador."
+                }
+            }
+        },
+        "ecommerce": {
+            "crumb": "E-commerce",
+            "title": "Coworkers de IA para e-commerce.",
+            "lede": "Lo que hizo tu tienda esta semana, lo que está por agotarse, qué carritos se pueden recuperar y qué acaban de cambiar tus competidores: leído cada día, resuelto, y resumido para ti en un mensaje.",
+            "metaTitle": "Agentes de IA para e-commerce: pedidos, stock, carritos",
+            "metaDescription": "Coworkers de IA que leen tu tienda, detectan el stock bajo, recuperan carritos, vigilan los precios de la competencia y arreglan las páginas que no venden.",
+            "wallTitle": "Ocho Coworkers para una tienda que nunca cierra.",
+            "templatesLink": "Templates de e-commerce",
+            "painsTitle": "Lo que el dueño de una tienda descubre demasiado tarde.",
+            "pains": {
+                "1": {
+                    "title": "El más vendido que se agotó el viernes",
+                    "body": "Nadie miró el stock hasta que se pararon los pedidos. Un Coworker lo mira cada día y te avisa con una semana de margen."
+                },
+                "2": {
+                    "title": "El precio de un competidor que te cuenta un cliente",
+                    "body": "Su promoción salió el lunes y te enteraste el jueves, en una reseña. Un Coworker lee sus páginas por ti."
+                },
+                "3": {
+                    "title": "Carritos abandonados sin seguimiento",
+                    "body": "La secuencia que querías montar sigue siendo una nota. Un Coworker segmenta según lo que realmente compraron y escribe el seguimiento."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿Se conecta a Shopify y al resto de mis herramientas?",
+                    "answer": "Shopify, Stripe, tu plataforma de email, tus cuentas de anuncios, tus hojas de cálculo, y más de 3000 herramientas más. Un back office sin API sigue siendo accesible: el Coworker lo abre en su propia pantalla y hace clic en él."
+                },
+                "2": {
+                    "question": "¿Un Coworker puede cambiar precios o enviar una campaña por su cuenta?",
+                    "answer": "El gasto está bloqueado: no puede comprar anuncios ni nada sin un sí. Para lo demás, tú decides: que prepare la campaña para que la envíes tú, o que la envíe y te informe."
+                },
+                "3": {
+                    "question": "¿Cuánto tardará en conocer mi catálogo?",
+                    "answer": "Lo lee en la primera ejecución y guarda lo importante en el Brain del workspace: tu gama, tus márgenes, tu tono. Cada Coworker que contrates después parte de las mismas páginas."
+                }
+            }
+        },
+        "real-estate": {
+            "crumb": "Inmobiliarias",
+            "title": "Coworkers de IA para inmobiliarias.",
+            "lede": "Propietarios con ganas de vender, consultas respondidas en minutos, anuncios escritos con la visita aún fresca, alquileres que se gestionan solos. El trabajo que llena la semana de un agente, hecho por Coworkers.",
+            "metaTitle": "Agentes de IA para inmobiliarias: vendedores, leads, anuncios",
+            "metaDescription": "Coworkers de IA que encuentran vendedores, califican cada consulta, escriben el anuncio, valoran con ventas reales y gestionan tus alquileres.",
+            "wallTitle": "Ocho Coworkers para una agencia que no pierde ningún lead.",
+            "templatesLink": "Templates inmobiliarios",
+            "painsTitle": "Donde una agencia pierde el encargo.",
+            "pains": {
+                "1": {
+                    "title": "La consulta respondida tres horas tarde",
+                    "body": "El primer agente que responde consigue la visita. Un Coworker responde en minutos, hace las preguntas de calificación y la agenda."
+                },
+                "2": {
+                    "title": "Un precio defendido de memoria",
+                    "body": "El propietario quiere una cifra y una razón. Un Coworker arma la comparación con lo que realmente se vendió cerca, antes de la cita."
+                },
+                "3": {
+                    "title": "Propietarios a los que nunca contactaste",
+                    "body": "Las señales son públicas: anuncios caducados, herencias, mucho tiempo en el mercado. Un Coworker las lee cada semana y ordena a quién llamar."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿Funciona con mi CRM?",
+                    "answer": "Si tu CRM tiene una API o un servidor MCP, se conecta. Si es un portal antiguo sin ninguna de las dos, el Coworker lo abre en su propia pantalla y lo rellena como lo harías tú."
+                },
+                "2": {
+                    "question": "¿Puede responder a los leads en mi nombre?",
+                    "answer": "Sí, y tú decides hasta dónde llega: solo borrador, o enviar y agendar. En ambos casos el hilo sigue siendo legible, y todo lo que no tenía claro te llega a ti."
+                },
+                "3": {
+                    "question": "¿Son fiables los datos del mercado?",
+                    "answer": "Un Coworker cita lo que usó. Arma la comparación con los anuncios y las transacciones que realmente leyó, y ves las fuentes junto a la cifra en lugar de un número salido de la nada."
+                }
+            }
+        },
+        "startups": {
+            "crumb": "Startups",
+            "title": "Coworkers de IA para startups.",
+            "lede": "Cinco personas haciendo el trabajo de quince. Contrata Coworkers para los puestos que aún no puedes justificar: demos agendadas, pipeline analizado, lanzamiento preparado, métricas en tu correo el lunes.",
+            "metaTitle": "Agentes de IA para startups: pipeline, lanzamientos, métricas",
+            "metaDescription": "Un equipo pequeño no contrata para cada puesto. Coworkers de IA que agendan demos, leen el pipeline, preparan el lanzamiento y envían tus métricas.",
+            "wallTitle": "Ocho Coworkers para los puestos que aún no puedes cubrir.",
+            "templatesLink": "Templates de SaaS",
+            "painsTitle": "Lo que un equipo pequeño no alcanza a hacer.",
+            "pains": {
+                "1": {
+                    "title": "Roles que nadie asume",
+                    "body": "El outbound, las notas de versión, las cifras de la semana. Todos coinciden en que importan y nadie tiene el día para ellos."
+                },
+                "2": {
+                    "title": "Cifras sacadas a mano el lunes",
+                    "body": "Alguien exporta, pega, comenta, publica. Cuarenta minutos a la semana que un Coworker hace a las 7 de la mañana, gratis."
+                },
+                "3": {
+                    "title": "Lanzamientos que se retrasan por los detalles",
+                    "body": "El mensaje, el changelog, el email, el post. Un Coworker redacta todo a partir de la spec mientras tú construyes."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿Cuánto tarda un Coworker en ser útil?",
+                    "answer": "Minutos, si partes de un template: conectas sus apps, revisas su horario y se pone a trabajar. Crear uno a partir de tu propia descripción lleva más o menos lo que tardas en escribir el puesto."
+                },
+                "2": {
+                    "question": "¿Puede usarlo todo el equipo?",
+                    "answer": "Sí, y sin coste extra: los asientos son gratis. Todos ven el mismo tablero, pueden darle trabajo a un Coworker y responder cuando uno pide un sí."
+                },
+                "3": {
+                    "question": "¿Reemplaza nuestras herramientas de automatización?",
+                    "answer": "Reemplaza las que no dejas de mantener. A un Coworker se le explica el trabajo, no se le dibuja como un flujo, así que un campo nuevo o una columna renombrada no lo rompe como rompe un grafo de nodos."
+                }
+            }
+        },
+        "saas": {
+            "crumb": "SaaS",
+            "title": "Coworkers de IA para equipos SaaS.",
+            "lede": "Las señales que solo lees cuando algo se rompe (el uso que cae en una cuenta clave, la misma petición en cinco tickets, los bugs que se acumulan antes del standup) leídas cada día por Coworkers que te las traen.",
+            "metaTitle": "Agentes de IA para SaaS: churn, feedback, releases, métricas",
+            "metaDescription": "Coworkers de IA que detectan cuentas en riesgo de churn, agrupan el feedback, clasifican bugs, escriben notas de versión e informan de tus métricas.",
+            "wallTitle": "Ocho Coworkers para el trabajo de producto y de ingresos.",
+            "templatesLink": "Templates de SaaS",
+            "painsTitle": "Las señales que un equipo SaaS lee demasiado tarde.",
+            "pains": {
+                "1": {
+                    "title": "Churn que ves en la fecha de renovación",
+                    "body": "El uso cayó hace ocho semanas y nadie miró. Un Coworker vigila las cuentas y te avisa cuando todavía hay tiempo."
+                },
+                "2": {
+                    "title": "Feedback disperso en cuatro herramientas",
+                    "body": "Tickets, llamadas, la comunidad, las reseñas. Un Coworker lo lee todo y te trae lo que se repite, con las citas."
+                },
+                "3": {
+                    "title": "Releases publicadas sin sus notas",
+                    "body": "Los cambios están en las PR y los clientes nunca se enteran. Un Coworker escribe las notas a partir de lo que realmente se publicó."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿De dónde lee nuestros datos de uso y facturación?",
+                    "answer": "De las herramientas que ya usas: Stripe, tu base de datos o data warehouse, tu analítica de producto, tu soporte. Las conectas una vez y cada Coworker del workspace puede leerlas."
+                },
+                "2": {
+                    "question": "¿Puede escribir en nuestro gestor de incidencias?",
+                    "answer": "Sí. Clasificar un bug significa eliminar duplicados, añadir el contexto y registrarlo donde tu equipo realmente mira: Linear, Jira, GitHub, Notion."
+                },
+                "3": {
+                    "question": "¿Se usan nuestros datos para entrenar un modelo?",
+                    "answer": "No. Tu workspace funciona en su propia máquina en Europa, y lo que leen tus Coworkers se queda ahí. También puedes conectar el plan de Claude o ChatGPT que ya pagas y mantener tu relación con el modelo."
+                }
+            }
+        },
+        "legal": {
+            "crumb": "Legal y cumplimiento",
+            "title": "Coworkers de IA para legal y cumplimiento.",
+            "lede": "La lectura para la que nadie tiene tiempo: contratos revisados según tus propias reglas, obligaciones y plazos de preaviso extraídos, cambios regulatorios explicados, evidencias de auditoría reunidas. Siempre con la validación de una persona.",
+            "metaTitle": "Agentes de IA para legal y cumplimiento: contratos, auditorías",
+            "metaDescription": "Coworkers de IA que revisan contratos según tus reglas, extraen obligaciones y fechas de renovación, siguen la normativa y reúnen evidencias de auditoría.",
+            "wallTitle": "Ocho Coworkers para el papeleo que nadie lee a tiempo.",
+            "templatesLink": "Templates de legal y cumplimiento",
+            "painsTitle": "Dónde está realmente el riesgo.",
+            "pains": {
+                "1": {
+                    "title": "Un preaviso que se te pasó por una semana",
+                    "body": "La cláusula estaba en la página nueve y la fecha no estaba en el calendario de nadie. Un Coworker extrae cada fecha de renovación y te avisa antes del plazo."
+                },
+                "2": {
+                    "title": "Contratos firmados sin una segunda lectura",
+                    "body": "El equipo comercial lo necesitaba ayer. Un Coworker lo lee según tus propias reglas y solo señala lo que merece tu tiempo."
+                },
+                "3": {
+                    "title": "Una auditoría buscando documentos",
+                    "body": "Las evidencias existen, en seis unidades compartidas y un buzón. Un Coworker las encuentra, las nombra y las archiva frente a cada requisito."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿Un Coworker da asesoramiento legal?",
+                    "answer": "No. Lee, extrae y señala, y cada resultado está escrito para que lo revise una persona cualificada. Te dice de qué parte del documento salió cada punto para que lo compruebes en segundos."
+                },
+                "2": {
+                    "question": "¿Dónde están los documentos?",
+                    "answer": "En tus propias unidades y herramientas, que el Coworker lee con el acceso que le das. Su máquina está en Europa, y los archivos se quedan dentro de tu workspace."
+                },
+                "3": {
+                    "question": "¿Podemos incluir nuestros propios estándares de cláusulas?",
+                    "answer": "Sí. Tus posiciones, tus líneas rojas y tus redacciones alternativas van al Brain del workspace, y el Coworker revisa según ellas en lugar de según una checklist genérica."
+                }
+            }
+        },
+        "recruiting": {
+            "crumb": "Reclutamiento y RR. HH.",
+            "title": "Coworkers de IA para reclutamiento y RR. HH.",
+            "lede": "Cada candidatura leída frente al puesto de la misma manera, entrevistas preparadas a partir del CV, debriefs convertidos en decisión, y ningún candidato sin respuesta.",
+            "metaTitle": "Agentes de IA para reclutamiento: filtrado, entrevistas",
+            "metaDescription": "Coworkers de IA que filtran cada candidatura según el puesto, resumen CV con evidencias, preparan entrevistas y mantienen informados a los candidatos.",
+            "wallTitle": "Ocho Coworkers para un proceso de selección que cumple lo que promete.",
+            "templatesLink": "Templates de reclutamiento",
+            "painsTitle": "Donde un proceso de selección se queda en silencio.",
+            "pains": {
+                "1": {
+                    "title": "Doscientas candidaturas, una tarde",
+                    "body": "Las últimas cincuenta reciben treinta segundos cada una. Un Coworker las lee todas con los mismos criterios y muestra sus evidencias."
+                },
+                "2": {
+                    "title": "Candidatos que nunca reciben respuesta",
+                    "body": "No por mala educación, por volumen. Un Coworker mantiene informado a cada candidato en cada etapa, con tus palabras."
+                },
+                "3": {
+                    "title": "Debriefs que nunca se convierten en decisión",
+                    "body": "Cuatro juegos de notas en cuatro formatos. Un Coworker los convierte en evidencias, preguntas abiertas y una comparación con el puesto."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "¿Un Coworker decide a quién se contrata?",
+                    "answer": "No. Lee según los criterios que escribiste y muestra las evidencias de cada punto, incluido lo que no pudo verificar. La preselección es una lectura, y la decisión sigue siendo de tu equipo."
+                },
+                "2": {
+                    "question": "¿Cómo trata los datos de los candidatos?",
+                    "answer": "Lee las candidaturas en las herramientas que conectas, y trabaja en una máquina en Europa que pertenece a tu workspace. Nada se copia en un pool compartido."
+                },
+                "3": {
+                    "question": "¿Puede escribir en nuestro ATS?",
+                    "answer": "Si tu ATS tiene una API o un servidor MCP, sí. Si no, el Coworker lo abre en su propia pantalla y lo rellena como lo haría una persona."
+                }
+            }
+        }
+    }
+}

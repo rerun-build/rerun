@@ -7,6 +7,7 @@ import { TextareaMirror } from '@/components/ui/textarea-mirror'
 import type { ComposerMention, ComposerSegment, TextRange } from '@/lib/chat/composer-links'
 import { ExternalLinkIcon, Link2OffIcon, LinkIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { type ReactNode, type Ref, useRef, useState } from 'react'
 
 type TokenProps = {
@@ -53,6 +54,7 @@ type LinkChipProps = {
 }
 
 function LinkChip({ text, url, onUnlink, onDone }: LinkChipProps) {
+    const t = useTranslations('chat.composer.link')
     const [open, setOpen] = useState(false)
     const unlinkingRef = useRef(false)
 
@@ -87,7 +89,7 @@ function LinkChip({ text, url, onUnlink, onDone }: LinkChipProps) {
                     }}
                 >
                     <ExternalLinkIcon />
-                    Open
+                    {t('open')}
                 </Button>
                 <Button
                     variant="ghost"
@@ -98,7 +100,7 @@ function LinkChip({ text, url, onUnlink, onDone }: LinkChipProps) {
                     }}
                 >
                     <Link2OffIcon />
-                    Unlink
+                    {t('unlink')}
                 </Button>
             </PopoverContent>
         </Popover>

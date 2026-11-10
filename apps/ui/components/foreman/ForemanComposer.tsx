@@ -2,6 +2,7 @@
 
 import type { ChatStatus } from 'ai'
 import { FOREMAN_AGENT_ID, MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useMemo, type ComponentProps, type RefObject } from 'react'
 
 import { Context } from '@/components/ai-elements/context'
@@ -10,7 +11,6 @@ import { ForemanModelPill } from '@/components/foreman/ForemanModelPill'
 import type { ContextStats } from '@/lib/chat/context-stats'
 import { modelContextWindow } from '@/lib/engine/models'
 import type { ForemanBackend } from '@/lib/foreman/phase'
-import { OWN_ENTRY } from '@/components/foreman/intake/copy'
 import { FOREMAN_MAX_UPLOAD_BYTES } from '@/lib/foreman/upload-limit'
 
 export type ForemanComposerProps = {
@@ -38,6 +38,7 @@ export type ForemanComposerMentionProps = Pick<ComponentProps<typeof ChatCompose
 export function ForemanComposer({ sessionId, backend, status, busy, queue, onSend, onStop, onUploadingChange, composerRef, filesOnEngine, contextStats, ownEntry = false, textareaRef, textareaProps, mentionTokens }: ForemanComposerProps) {
     // On the engine a file lands in the foreman's own workspace, where its tools can open the path
     // the message names. The hub foreman reads its files from the hub's bucket.
+    const t = useTranslations('foreman')
     const onEngineFiles = backend === 'engine' && filesOnEngine
     const uploadTarget = useMemo(() => (onEngineFiles ? ({ kind: 'agent', agentId: FOREMAN_AGENT_ID } as const) : ({ kind: 'foreman', sessionId } as const)), [onEngineFiles, sessionId])
 
@@ -59,7 +60,7 @@ export function ForemanComposer({ sessionId, backend, status, busy, queue, onSen
             // An engine that predates the foreman's file routes would be handed a path it cannot
             // open.
             attachmentsEnabled={!ownEntry && (backend === 'hub' || filesOnEngine)}
-            {...(ownEntry ? { placeholder: `${OWN_ENTRY}…` } : {})}
+            {...(ownEntry ? { placeholder: t('ownEntryPlaceholder') } : {})}
             modelSlot={<ForemanModelPill backend={backend} />}
             contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />}
         />

@@ -6,22 +6,22 @@ import { PhoneNumberInput } from '@/components/ui/phone-number-input'
 import { countryFromLocale, toE164 } from '@/lib/phone/normalize'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CountryCode } from 'libphonenumber-js/min'
-import { useState, useSyncExternalStore } from 'react'
+import { useTranslations } from 'next-intl'
+import { useMemo, useState, useSyncExternalStore } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 export type PhoneNumberRequest = { phone: string; country: CountryCode }
 
-const phoneSchema = z.object({ phone: z.string().trim().min(1, 'Enter your phone number') })
 
 const FALLBACK_COUNTRY = countryFromLocale(undefined)
 const neverChanges = () => () => {}
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : 'Something went wrong. Please try again.')
-
 // A phone number taken in as typed, without a code. `submit` rejects with the message to show under
 // the field; `skip` is the way past without a number.
 export function PhoneNumberForm({ submit, skip }: { submit: (request: PhoneNumberRequest) => Promise<void>; skip: () => Promise<void> }) {
+    const t = useTranslations('auth.phone')
+    const phoneSchema = useMemo(() => z.object({ phone: z.string().trim().min(1, t('errors.phoneRequired')) }), [t])
     const [skipping, setSkipping] = useState(false)
     // The server has no idea where the visitor is, so the guess only joins in on the client.
     const localeCountry = useSyncExternalStore(
@@ -35,13 +35,13 @@ export function PhoneNumberForm({ submit, skip }: { submit: (request: PhoneNumbe
 
     const onSubmit = form.handleSubmit(async ({ phone }) => {
         if (!toE164(phone, country)) {
-            form.setError('phone', { message: 'Enter a valid mobile number.' })
+            form.setError('phone', { message: t('errors.invalidNumber') })
             return
         }
         try {
             await submit({ phone, country })
         } catch (error) {
-            form.setError('phone', { message: errorMessage(error) })
+            form.setError('phone', { message: error instanceof Error ? error.message : t('errors.generic') })
         }
     })
 
@@ -65,7 +65,7 @@ export function PhoneNumberForm({ submit, skip }: { submit: (request: PhoneNumbe
                     render={({ field }) => (
                         <FormItem>
                             <FormControl>
-                                <PhoneNumberInput label="Phone number" autoFocus country={country} {...field} onCountryChange={setPickedCountry} />
+                                <PhoneNumberInput label={t('label')} autoFocus country={country} {...field} onCountryChange={setPickedCountry} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -73,13 +73,13 @@ export function PhoneNumberForm({ submit, skip }: { submit: (request: PhoneNumbe
                 />
                 <div className="space-y-2">
                     <Button type="submit" className="w-full" loading={submitting} disabled={skipping}>
-                        Continue
+                        {t('code.submit')}
                     </Button>
                     <Button type="button" variant="ghost" onClick={onSkip} loading={skipping} disabled={submitting} className="w-full text-muted-foreground">
-                        Skip for now
+                        {t('skip')}
                     </Button>
                 </div>
-                <p className="text-center text-xs text-muted-foreground text-balance">By continuing, you agree to be contacted by Rerun on WhatsApp or SMS.</p>
+                <p className="text-center text-xs text-muted-foreground text-balance">{t('consent')}</p>
             </form>
         </Form>
     )

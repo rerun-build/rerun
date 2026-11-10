@@ -1,4 +1,4 @@
-import { AVATAR, COWORKER_ROW_HEIGHT } from '@/components/home/CoworkerRow'
+import { AVATAR, COWORKER_ROW_HEIGHT, HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { SKELETON, SKELETON_ROWS, skeletonBarWidths } from '@/components/home/HomeSkeleton'
 import { SIDEBAR } from '@/components/layout/split'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
@@ -9,10 +9,8 @@ const { LAUNCH_LAYOUT } = require('../../../plugins/with-home-launch-screen')
 const appJson = require('../../../app.json')
 
 describe('native launch screen', () => {
-    it('draws the title where the Home draws it', () => {
-        const titleTop = spacing.sm + GLASS_BUTTON_SIZE + spacing.lg
-        expect(LAUNCH_LAYOUT.title).toMatchObject({ left: spacing.xl, top: titleTop, height: 36 })
-        expect(LAUNCH_LAYOUT.listTop).toBe(titleTop + 36 + spacing.md)
+    it('starts the rows where the Home starts its list, under the header', () => {
+        expect(LAUNCH_LAYOUT.listTop).toBe(spacing.sm + GLASS_BUTTON_SIZE + spacing.xl)
     })
 
     it('narrows the rows to the sidebar of a regular-width screen', () => {
@@ -30,8 +28,8 @@ describe('native launch screen', () => {
             muted: { light: palette.light.muted, dark: palette.dark.muted },
             rows: SKELETON_ROWS,
             rowHeight: COWORKER_ROW_HEIGHT,
-            avatar: { left: spacing.xl, top: SKELETON.avatarTop, size: AVATAR, radius: radius.md },
-            column: { left: SKELETON.textLeft, right: spacing.xl },
+            avatar: { left: HOME_GUTTER, top: SKELETON.avatarTop, size: AVATAR, radius: radius.md },
+            column: { left: SKELETON.textLeft, right: HOME_GUTTER },
             name: { top: SKELETON.nameTop, height: SKELETON.nameHeight },
             status: { top: SKELETON.statusTop, height: SKELETON.statusHeight },
             barRadius: radius.sm,

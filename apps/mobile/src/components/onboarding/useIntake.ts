@@ -19,7 +19,7 @@ export function useIntake({ knownFirstName, decideIndustry, submit, initial, ini
     const [index, setIndex] = useState(initialIndex)
     const [decided, setDecided] = useState<TemplateCategory | null>(null)
     const [submitting, setSubmitting] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const [saveFailed, setSaveFailed] = useState(false)
     const [deciding, setDeciding] = useState(false)
     const asked = useRef(0)
 
@@ -47,7 +47,7 @@ export function useIntake({ knownFirstName, decideIndustry, submit, initial, ini
     }
 
     const set = (patch: Partial<IntakeDraft>) => {
-        setError(null)
+        setSaveFailed(false)
         setDraft(current => ({ ...current, ...patch }))
     }
 
@@ -56,7 +56,7 @@ export function useIntake({ knownFirstName, decideIndustry, submit, initial, ini
         try {
             await submit(toIntake(final, knownFirstName, decided))
         } catch {
-            setError('We could not save that. Try again.')
+            setSaveFailed(true)
             setSubmitting(false)
         }
     }
@@ -82,14 +82,14 @@ export function useIntake({ knownFirstName, decideIndustry, submit, initial, ini
     }
 
     const back = () => {
-        setError(null)
+        setSaveFailed(false)
         if (index === 0) return
         // Back on the site question, the line of work is asked again only if they pass on it again.
         if (index === 1 && draft.websiteSkipped) set({ websiteSkipped: false })
         setIndex(current => current - 1)
     }
 
-    return { step, steps, index, draft, industry: draft.industry ?? decided, deciding, submitting, error, canAdvance: stepAnswered(step, draft), last, set, choose, next, back, skipWebsite }
+    return { step, steps, index, draft, industry: draft.industry ?? decided, deciding, submitting, saveFailed, canAdvance: stepAnswered(step, draft), last, set, choose, next, back, skipWebsite }
 }
 
 export type IntakeController = ReturnType<typeof useIntake>

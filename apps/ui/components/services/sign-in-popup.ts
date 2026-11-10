@@ -3,13 +3,13 @@ const HEIGHT = 640
 
 // A popup opened after the install and start round-trips is too far from the click and gets
 // blocked. So the window opens empty inside the click handler, and is pointed at the
-// authorization URL once it is known.
-export function openPendingSignInPopup(name: string): Window | null {
+// authorization URL once it is known. `label` is what the empty window shows meanwhile, already in
+// the viewer's language; a caller with no translator gets the English one.
+export function openPendingSignInPopup(name: string, label = `Connecting to ${name}…`): Window | null {
     const left = window.screenX + (window.outerWidth - WIDTH) / 2
     const top = window.screenY + (window.outerHeight - HEIGHT) / 2
     const popup = window.open('about:blank', 'rerun-sign-in', `width=${WIDTH},height=${HEIGHT},left=${left},top=${top},popup=yes`)
     if (!popup) return null
-    const label = `Connecting to ${name}…`
     // A window of that name left on a provider's page by an abandoned sign-in is still
     // cross-origin here: decorating it throws, redirecting it later works.
     try {

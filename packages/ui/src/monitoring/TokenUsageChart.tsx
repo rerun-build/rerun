@@ -1,21 +1,23 @@
 'use client'
 
+import { formatDate, formatNumber } from '@rerun/i18n/format'
 import { useCallback, useMemo } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts'
 import type { EngineUsageBucket } from '@rerun/contracts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '../primitives/chart'
 import { CHART_FALLBACK_COLOR, CHART_PALETTE, chartColorAt } from './chart-palette'
 import { cn } from '../cn'
+import { useKitTranslations, useUiLocale } from '../locale'
 
-const compactFmt = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 })
+const compact = (n: number, locale: string) => formatNumber(n, locale, { notation: 'compact', maximumFractionDigits: 1 })
 
 function formatCost(n: number): string {
     return `$${n >= 1 ? n.toFixed(2) : n.toFixed(4)}`
 }
 
-function dayShort(day: string): string {
+function dayShort(day: string, locale: string): string {
     const d = new Date(`${day}T00:00:00`)
-    return Number.isNaN(d.getTime()) ? day : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    return Number.isNaN(d.getTime()) ? day : formatDate(d, locale, { month: 'short', day: 'numeric' })
 }
 
 type Series = { key: string; label: string; color: string }
@@ -32,7 +34,9 @@ export type TokenUsageChartProps = {
 }
 
 export function TokenUsageChart({ metric = 'tokens', breakdown = 'total', chartType = 'area', buckets, className, animated = true }: TokenUsageChartProps) {
-    const formatValue = useCallback((n: number) => (metric === 'cost' ? formatCost(n) : compactFmt.format(n)), [metric])
+    const locale = useUiLocale()
+    const t = useKitTranslations()
+    const formatValue = useCallback((n: number) => (metric === 'cost' ? formatCost(n) : compact(n, locale)), [metric, locale])
 
     const daily = useMemo(() => {
         const map = new Map<string, { day: string; tokens: number; cost: number; input: number; output: number; cached: number; runCount: number }>()
@@ -73,7 +77,7 @@ export function TokenUsageChart({ metric = 'tokens', breakdown = 'total', chartT
             }
             const s: Series[] = models.map(m => ({ key: m.key, label: m.name, color: m.color }))
             const r = daily.map(d => {
-                const row: Record<string, number | string> = { day: dayShort(d.day) }
+                const row: Record<string, number | string> = { day: dayShort(d.day, locale) }
                 for (const m of models) row[m.key] = perDay.get(d.day)?.get(m.name) ?? 0
                 return row
             })
@@ -81,17 +85,17 @@ export function TokenUsageChart({ metric = 'tokens', breakdown = 'total', chartT
         }
         if (effectiveBreakdown === 'inputOutput') {
             const s: Series[] = [
-                { key: 'input', label: 'Input', color: CHART_PALETTE[0] },
-                { key: 'output', label: 'Output', color: CHART_PALETTE[1] },
-                { key: 'cached', label: 'Cached', color: CHART_PALETTE[2] },
+                { key: 'input', label: t('monitoring.usage.input'), color: CHART_PALETTE[0] },
+                { key: 'output', label: t('monitoring.usage.output'), color: CHART_PALETTE[1] },
+                { key: 'cached', label: t('monitoring.usage.cached'), color: CHART_PALETTE[2] },
             ]
-            const r = daily.map(d => ({ day: dayShort(d.day), input: d.input, output: d.output, cached: d.cached }))
+            const r = daily.map(d => ({ day: dayShort(d.day, locale), input: d.input, output: d.output, cached: d.cached }))
             return { rows: r, series: s }
         }
-        const s: Series[] = [{ key: 'value', label: metric === 'cost' ? 'Cost' : 'Tokens', color: CHART_PALETTE[0] }]
-        const r = daily.map(d => ({ day: dayShort(d.day), value: metric === 'cost' ? d.cost : d.tokens }))
+        const s: Series[] = [{ key: 'value', label: metric === 'cost' ? t('monitoring.usage.cost') : t('monitoring.usage.tokens'), color: CHART_PALETTE[0] }]
+        const r = daily.map(d => ({ day: dayShort(d.day, locale), value: metric === 'cost' ? d.cost : d.tokens }))
         return { rows: r, series: s }
-    }, [buckets, daily, models, metric, effectiveBreakdown])
+    }, [buckets, daily, models, metric, effectiveBreakdown, locale, t])
 
     const chartConfig = useMemo<ChartConfig>(() => Object.fromEntries(series.map(s => [s.key, { label: s.label, color: s.color }])), [series])
 
@@ -101,13 +105,13 @@ export function TokenUsageChart({ metric = 'tokens', breakdown = 'total', chartT
             const output = daily.reduce((sum, d) => sum + d.output, 0)
             const cached = daily.reduce((sum, d) => sum + d.cached, 0)
             return [
-                { name: 'Input', value: input, fill: CHART_PALETTE[0] },
-                { name: 'Output', value: output, fill: CHART_PALETTE[1] },
-                { name: 'Cached', value: cached, fill: CHART_PALETTE[2] },
+                { name: t('monitoring.usage.input'), value: input, fill: CHART_PALETTE[0] },
+                { name: t('monitoring.usage.output'), value: output, fill: CHART_PALETTE[1] },
+                { name: t('monitoring.usage.cached'), value: cached, fill: CHART_PALETTE[2] },
             ].filter(s => s.value > 0)
         }
         return models.map(m => ({ name: m.name, value: m.value, fill: m.color })).filter(s => s.value > 0)
-    }, [daily, models, effectiveBreakdown])
+    }, [daily, models, effectiveBreakdown, t])
 
     const stat = useMemo(() => {
         const total = daily.reduce((sum, d) => sum + (metric === 'cost' ? d.cost : d.tokens), 0)
@@ -128,17 +132,17 @@ export function TokenUsageChart({ metric = 'tokens', breakdown = 'total', chartT
     return (
         <div className={cn('h-full w-full p-1', className)}>
             {isEmpty ? (
-                <div className="flex h-full items-center justify-center text-center text-[12px] text-muted-foreground">{buckets === null ? 'Loading...' : 'No usage in this period.'}</div>
+                <div className="flex h-full items-center justify-center text-center text-[12px] text-muted-foreground">{buckets === null ? t('monitoring.chart.loading') : t('monitoring.usage.noUsage')}</div>
             ) : chartType === 'stat' ? (
                 <div className="flex h-full flex-col justify-center gap-1 px-2">
                     <div className="text-3xl font-semibold leading-none text-foreground">{formatValue(stat.total)}</div>
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                        <span>{metric === 'cost' ? 'Total cost' : 'Total tokens'}</span>
+                        <span>{metric === 'cost' ? t('monitoring.usage.totalCost') : t('monitoring.usage.totalTokens')}</span>
                         <span>·</span>
-                        <span>{stat.runCount} runs</span>
+                        <span>{t('monitoring.usage.runs', { count: stat.runCount })}</span>
                         {stat.delta !== null && <span className={stat.delta >= 0 ? 'text-emerald-500' : 'text-rose-500'}>{stat.delta >= 0 ? '▲' : '▼'} {Math.abs(stat.delta).toFixed(0)}%</span>}
                     </div>
-                    <ChartContainer config={{ v: { label: metric === 'cost' ? 'Cost' : 'Tokens', color: CHART_PALETTE[0] } }} className="mt-2 h-16 w-full aspect-auto">
+                    <ChartContainer config={{ v: { label: metric === 'cost' ? t('monitoring.usage.cost') : t('monitoring.usage.tokens'), color: CHART_PALETTE[0] } }} className="mt-2 h-16 w-full aspect-auto">
                         <AreaChart data={stat.sparkRows} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
                             <Area dataKey="v" type="monotone" stroke="var(--color-v)" fill="var(--color-v)" fillOpacity={0.15} strokeWidth={1.5} dot={false} isAnimationActive={animated} />
                         </AreaChart>

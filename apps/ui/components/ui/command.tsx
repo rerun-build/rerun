@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@rerun/ui/forms"
 
 import { cn } from "@/lib/utils"
@@ -13,8 +14,8 @@ import {
 } from "@/components/ui/dialog"
 
 function CommandDialog({
-  title = "Command Palette",
-  description = "Search for a command to run...",
+  title,
+  description,
   children,
   className,
   showCloseButton = false,
@@ -25,12 +26,13 @@ function CommandDialog({
   className?: string
   showCloseButton?: boolean
 }) {
+  const t = useTranslations("ui")
   return (
     // asSheet={false}: a bottom sheet would sit under the virtual keyboard the search field opens.
     <Dialog {...props} asSheet={false}>
       <DialogHeader className="sr-only">
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>{description}</DialogDescription>
+        <DialogTitle>{title ?? t("command.title")}</DialogTitle>
+        <DialogDescription>{description ?? t("command.description")}</DialogDescription>
       </DialogHeader>
       <DialogContent
         className={cn(

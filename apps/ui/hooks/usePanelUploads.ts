@@ -1,6 +1,7 @@
 'use client'
 
 import { useFileUploads, type UploadTarget } from '@/hooks/useFileUploads'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 
@@ -17,6 +18,7 @@ const RELOAD_DEBOUNCE_MS = 500
  * once. Shared by the agent and Box panels, which behave identically apart from what they upload to.
  */
 export function usePanelUploads({ target, currentPath, onDirectoryChanged }: UsePanelUploadsOptions) {
+    const t = useTranslations('files.uploadOutcome')
     const pathRef = useRef(currentPath)
     const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
     const onDirectoryChangedRef = useRef(onDirectoryChanged)
@@ -61,9 +63,9 @@ export function usePanelUploads({ target, currentPath, onDirectoryChanged }: Use
         settledRef.current = true
 
         const failed = items.filter(item => item.status === 'error').length
-        if (failed) toast.error(failed === items.length ? 'Upload failed' : `${failed} of ${items.length} files failed to upload`)
-        else toast.success(`${items.length} ${items.length > 1 ? 'files' : 'file'} uploaded`)
-    }, [items, active])
+        if (failed) toast.error(failed === items.length ? t('allFailed') : t('someFailed', { failed, total: items.length }))
+        else toast.success(t('uploaded', { count: items.length }))
+    }, [items, active, t])
 
     return uploads
 }

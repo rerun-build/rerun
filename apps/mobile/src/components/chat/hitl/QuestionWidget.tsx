@@ -3,6 +3,7 @@ import * as Haptics from 'expo-haptics'
 import { SymbolView } from 'expo-symbols'
 import { useRef, useState, type ReactNode } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { fieldOutline } from '@/theme/field'
@@ -52,22 +53,24 @@ export function OptionRow({ index, label, description, selected, multiple, onPre
 }
 
 export function AnswerInput({ value, onChangeText, onSubmit, placeholder, last, autoFocus }: { value: string; onChangeText: (text: string) => void; onSubmit: () => void; placeholder: string; last: boolean; autoFocus?: boolean }) {
+    const t = useTranslations('mobileHitl.question')
     const theme = useTheme()
     const [focused, setFocused] = useState(false)
-    return <TextInput value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} submitBehavior="submit" returnKeyType={last ? 'send' : 'next'} multiline autoFocus={autoFocus} placeholder={placeholder} placeholderTextColor={theme.mutedForeground} accessibilityLabel="Your answer" testID="hitl-answer" onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={{ flex: 1, minHeight: 48, maxHeight: 160, paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.md, borderRadius: radius.md, borderCurve: 'continuous', ...fieldOutline(theme, { focused }), backgroundColor: theme.background, color: theme.foreground, fontFamily: fonts.regular, fontSize: 16 }} />
+    return <TextInput value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} submitBehavior="submit" returnKeyType={last ? 'send' : 'next'} multiline autoFocus={autoFocus} placeholder={placeholder} placeholderTextColor={theme.mutedForeground} accessibilityLabel={t('yourAnswer')} testID="hitl-answer" onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={{ flex: 1, minHeight: 48, maxHeight: 160, paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.md, borderRadius: radius.md, borderCurve: 'continuous', ...fieldOutline(theme, { focused }), backgroundColor: theme.background, color: theme.foreground, fontFamily: fonts.regular, fontSize: 16 }} />
 }
 
 // The web's "Something else" row: a pencil and a label until it is tapped, then the field itself.
 export function CustomOptionRow({ open, onOpen, children }: { open: boolean; onOpen: () => void; children: ReactNode }) {
+    const t = useTranslations('mobileHitl.question')
     const theme = useTheme()
     if (open) return <View style={{ flexDirection: 'row' }}>{children}</View>
     return (
-        <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel="Something else" style={({ pressed }) => ({ ...ROW, borderColor: theme.border, backgroundColor: pressed ? theme.muted : 'transparent' })}>
+        <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={t('somethingElse')} style={({ pressed }) => ({ ...ROW, borderColor: theme.border, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <View style={{ width: 22, height: 22, borderRadius: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.muted }}>
                 <SymbolView name="pencil" size={11} weight="semibold" tintColor={theme.mutedForeground} />
             </View>
             <AppText variant="body" tone="muted" style={{ flex: 1 }}>
-                Something else
+                {t('somethingElse')}
             </AppText>
         </Pressable>
     )
@@ -78,6 +81,7 @@ export function CustomOptionRow({ open, onOpen, children }: { open: boolean; onO
 // question without options take a typed answer. Every answer leaves in one message once the last
 // question is passed, written as the web writes it.
 export function QuestionWidget({ pending, onAnswer, onDismiss }: HitlWidgetProps) {
+    const t = useTranslations('mobileHitl')
     const questions = pendingQuestions(pending.input)
     const [index, setIndex] = useState(0)
     const [answers, setAnswers] = useState<Answer[]>(() => questions.map(() => EMPTY))
@@ -128,7 +132,7 @@ export function QuestionWidget({ pending, onAnswer, onDismiss }: HitlWidgetProps
     if (!question) return null
 
     return (
-        <HitlCard symbol="questionmark.bubble" onClose={onDismiss} closeLabel="Dismiss questions">
+        <HitlCard symbol="questionmark.bubble" onClose={onDismiss} closeLabel={t('question.dismiss')}>
             <HitlSteps
                 count={questions.length}
                 index={index}
@@ -153,18 +157,18 @@ export function QuestionWidget({ pending, onAnswer, onDismiss }: HitlWidgetProps
                             </View>
                             {step.multiple && step.options.length > 0 && (
                                 <AppText variant="footnote" tone="muted">
-                                    Select all that apply
+                                    {t('question.selectAll')}
                                 </AppText>
                             )}
                             {step.options.length === 0 ? (
-                                <View style={{ flexDirection: 'row' }}>{input('Type your answer…')}</View>
+                                <View style={{ flexDirection: 'row' }}>{input(t('question.typeAnswer'))}</View>
                             ) : (
                                 <View style={{ gap: spacing.sm }}>
                                     {step.options.map((option, position) => (
                                         <OptionRow key={option.label} index={position} label={option.label} description={option.description} selected={answer.picked.includes(option.label)} multiple={Boolean(step.multiple)} onPress={() => pick(at, option.label)} />
                                     ))}
                                     <CustomOptionRow open={Boolean(customOpen[at])} onOpen={() => openCustom(at)}>
-                                        {input('Something else', true)}
+                                        {input(t('question.somethingElse'), true)}
                                     </CustomOptionRow>
                                 </View>
                             )}
@@ -173,8 +177,8 @@ export function QuestionWidget({ pending, onAnswer, onDismiss }: HitlWidgetProps
                 }}
                 actions={
                     <>
-                        <HitlAction label="Skip" onPress={skip} />
-                        <HitlAction label={last ? 'Send' : 'Next'} primary onPress={() => advance(answers)} />
+                        <HitlAction label={t('actions.skip')} onPress={skip} />
+                        <HitlAction label={last ? t('actions.send') : t('actions.next')} primary onPress={() => advance(answers)} />
                     </>
                 }
             />
