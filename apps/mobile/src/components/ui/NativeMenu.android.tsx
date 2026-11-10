@@ -1,7 +1,7 @@
 import { Column, DropdownMenu, DropdownMenuItem, Host, HorizontalDivider, RNHostView, Text } from '@expo/ui/jetpack-compose'
-import { padding } from '@expo/ui/jetpack-compose/modifiers'
+import { height, padding } from '@expo/ui/jetpack-compose/modifiers'
 import { Image } from 'expo-image'
-import { createContext, Fragment, use, useState, type ReactElement, type ReactNode } from 'react'
+import { Children, createContext, Fragment, isValidElement, use, useState, type ReactElement, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 
 import { AppText } from '@/components/ui/AppText'
@@ -20,8 +20,29 @@ const BADGE = 22
 // and the host gives the room back with a negative margin so the layout does not move.
 const SHADOW_ROOM = 8
 
+// A single-line row as tall as an iOS menu row; Compose's default (48 dp) read as too tall.
+const ROW_HEIGHT = 44
+const NESTED_INDENT = spacing.lg
+
 // A row closes the menu it sits in before it runs its action, as a system menu does.
 const CloseMenu = createContext<() => void>(() => {})
+
+// `iconColumn`: some row of the menu has an icon, so a row without one keeps the column empty and its
+// label lines up with the others. `depth`: how many submenus the row is unfolded in.
+const RowLayout = createContext({ iconColumn: false, depth: 0 })
+
+function someRowHasIcon(rows: ReactNode): boolean {
+    return Children.toArray(rows).some(row => {
+        if (!isValidElement<{ icon?: unknown; badge?: unknown; children?: ReactNode }>(row)) return false
+        if (row.props.icon || row.props.badge) return true
+        return row.type === Fragment || row.type === MenuSection ? someRowHasIcon(row.props.children) : false
+    })
+}
+
+function useRowModifiers({ singleLine }: { singleLine: boolean }) {
+    const { depth } = use(RowLayout)
+    return [...(singleLine ? [height(ROW_HEIGHT)] : []), ...(depth > 0 ? [padding(NESTED_INDENT * depth, 0, 0, 0)] : [])]
+}
 
 // Each opening mounts the rows afresh, so a submenu unfolded last time is folded again.
 function useMenuState() {
@@ -54,7 +75,9 @@ function AnchoredMenu({ menu, items, children }: { menu: MenuState; items: React
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Items>
                     <CloseMenu value={menu.hide}>
-                        <Fragment key={menu.openings}>{items}</Fragment>
+                        <RowLayout value={{ iconColumn: someRowHasIcon(items), depth: 0 }}>
+                            <Fragment key={menu.openings}>{items}</Fragment>
+                        </RowLayout>
                     </CloseMenu>
                 </DropdownMenu.Items>
             </DropdownMenu>
@@ -102,6 +125,26 @@ function Glyph({ name, color }: { name: IconName; color: string }) {
     )
 }
 
+function IconSpace() {
+    return (
+        <RNHostView matchContents>
+            <View testID="menu-icon-space" style={{ width: BADGE, height: BADGE }} />
+        </RNHostView>
+    )
+}
+
+// The row's icon, an empty column when another row has one, nothing in a menu without icons.
+function LeadingSlot({ children }: { children: ReactNode }) {
+    const { iconColumn } = use(RowLayout)
+    if (children) return <DropdownMenuItem.LeadingIcon>{children}</DropdownMenuItem.LeadingIcon>
+    if (!iconColumn) return null
+    return (
+        <DropdownMenuItem.LeadingIcon>
+            <IconSpace />
+        </DropdownMenuItem.LeadingIcon>
+    )
+}
+
 function Badge({ badge }: { badge: MenuBadge }) {
     const theme = useTheme()
     return (
@@ -123,9 +166,11 @@ export function MenuItem({ label, icon, subtitle, destructive = false, disabled 
     const theme = useTheme()
     const close = use(CloseMenu)
     const color = disabled ? theme.mutedForeground : destructive ? theme.destructive : theme.foreground
+    const modifiers = useRowModifiers({ singleLine: subtitle === undefined })
     return (
         <DropdownMenuItem
             enabled={!disabled}
+            modifiers={modifiers}
             onClick={() => {
                 close()
                 onPress()
@@ -134,11 +179,7 @@ export function MenuItem({ label, icon, subtitle, destructive = false, disabled 
             <DropdownMenuItem.Text>
                 <RowText label={label} subtitle={subtitle} color={color} />
             </DropdownMenuItem.Text>
-            {icon ? (
-                <DropdownMenuItem.LeadingIcon>
-                    <Glyph name={icon} color={destructive && !disabled ? theme.destructive : theme.mutedForeground} />
-                </DropdownMenuItem.LeadingIcon>
-            ) : null}
+            <LeadingSlot>{icon ? <Glyph name={icon} color={destructive && !disabled ? theme.destructive : theme.mutedForeground} /> : null}</LeadingSlot>
         </DropdownMenuItem>
     )
 }
@@ -147,8 +188,10 @@ export function MenuItem({ label, icon, subtitle, destructive = false, disabled 
 export function MenuToggle({ label, icon, badge, isOn, onChange }: MenuToggleProps) {
     const theme = useTheme()
     const close = use(CloseMenu)
+    const modifiers = useRowModifiers({ singleLine: true })
     return (
         <DropdownMenuItem
+            modifiers={modifiers}
             onClick={() => {
                 close()
                 onChange()
@@ -157,7 +200,7 @@ export function MenuToggle({ label, icon, badge, isOn, onChange }: MenuTogglePro
             <DropdownMenuItem.Text>
                 <RowText label={label} color={theme.foreground} />
             </DropdownMenuItem.Text>
-            {badge || icon ? <DropdownMenuItem.LeadingIcon>{badge ? <Badge badge={badge} /> : icon ? <Glyph name={icon} color={theme.mutedForeground} /> : null}</DropdownMenuItem.LeadingIcon> : null}
+            <LeadingSlot>{badge ? <Badge badge={badge} /> : icon ? <Glyph name={icon} color={theme.mutedForeground} /> : null}</LeadingSlot>
             {isOn ? (
                 <DropdownMenuItem.TrailingIcon>
                     <Glyph name="check" color={theme.foreground} />
@@ -187,22 +230,20 @@ export function MenuSection({ title, children }: MenuSectionProps) {
 export function SubMenu({ label, icon, children }: SubMenuProps) {
     const theme = useTheme()
     const [open, setOpen] = useState(false)
+    const layout = use(RowLayout)
+    const modifiers = useRowModifiers({ singleLine: true })
     return (
         <>
-            <DropdownMenuItem onClick={() => setOpen(shown => !shown)}>
+            <DropdownMenuItem modifiers={modifiers} onClick={() => setOpen(shown => !shown)}>
                 <DropdownMenuItem.Text>
                     <RowText label={label} color={theme.foreground} />
                 </DropdownMenuItem.Text>
-                {icon ? (
-                    <DropdownMenuItem.LeadingIcon>
-                        <Glyph name={icon} color={theme.mutedForeground} />
-                    </DropdownMenuItem.LeadingIcon>
-                ) : null}
+                <LeadingSlot>{icon ? <Glyph name={icon} color={theme.mutedForeground} /> : null}</LeadingSlot>
                 <DropdownMenuItem.TrailingIcon>
                     <Glyph name={open ? 'chevron-up' : 'chevron-down'} color={theme.mutedForeground} />
                 </DropdownMenuItem.TrailingIcon>
             </DropdownMenuItem>
-            {open ? children : null}
+            {open ? <RowLayout value={{ iconColumn: layout.iconColumn || someRowHasIcon(children), depth: layout.depth + 1 }}>{children}</RowLayout> : null}
         </>
     )
 }

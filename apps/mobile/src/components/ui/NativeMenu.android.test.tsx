@@ -14,8 +14,8 @@ jest.mock('@expo/ui/jetpack-compose', () => {
     const Items = ({ children }: { children: React.ReactNode }) => (use(Expanded) ? <View>{children}</View> : null)
     DropdownMenu.Trigger = passThrough
     DropdownMenu.Items = Items
-    const DropdownMenuItem = ({ onClick, enabled = true, children }: { onClick: () => void; enabled?: boolean; children: React.ReactNode }) => (
-        <Pressable accessibilityRole="menuitem" accessibilityState={{ disabled: !enabled }} disabled={!enabled} onPress={onClick}>
+    const DropdownMenuItem = ({ onClick, enabled = true, modifiers = [], children }: { onClick: () => void; enabled?: boolean; modifiers?: unknown[]; children: React.ReactNode }) => (
+        <Pressable accessibilityRole="menuitem" accessibilityState={{ disabled: !enabled }} disabled={!enabled} onPress={onClick} testID={`modifiers:${JSON.stringify(modifiers)}`}>
             {children}
         </Pressable>
     )
@@ -41,7 +41,12 @@ jest.mock('@expo/ui/jetpack-compose', () => {
         DropdownMenuItem,
     }
 })
-jest.mock('@expo/ui/jetpack-compose/modifiers', () => ({ padding: () => ({}) }))
+jest.mock('@expo/ui/jetpack-compose/modifiers', () => ({
+    height: (value: number) => ({ height: value }),
+    padding: (start: number) => ({ paddingStart: start }),
+}))
+
+const modifiersOf = (name: string | RegExp) => JSON.parse(screen.getByRole('menuitem', { name }).props.testID.replace('modifiers:', ''))
 
 const describeOnAndroid = Platform.OS === 'android' ? describe : describe.skip
 
@@ -114,6 +119,62 @@ describeOnAndroid('NativeMenu on Android', () => {
         await fireEvent.press(screen.getByText('Acme'))
         await fireEvent.press(trigger)
         expect(screen.queryByText('Acme')).toBeNull()
+    })
+})
+
+describeOnAndroid('NativeMenu rows on Android', () => {
+    it('gives a single-line row the height of an iOS menu row, and lets a row with a subtitle grow', async () => {
+        await render(
+            <NativeMenu label="Account" trigger={<Text>Me</Text>}>
+                <MenuItem label="Preferences" icon="settings" onPress={() => {}} />
+                <MenuItem label="CV to send" subtitle="Which CV should I send?" onPress={() => {}} />
+            </NativeMenu>,
+        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Account' }))
+        expect(modifiersOf('Preferences')).toEqual([{ height: 44 }])
+        expect(modifiersOf('CV to send Which CV should I send?')).toEqual([])
+    })
+
+    it('lines a row without an icon up with the rows that have one', async () => {
+        await render(
+            <NativeMenu label="Chat" trigger={<Text>Chat</Text>}>
+                <SubMenu label="Conversations">
+                    <MenuToggle label="Plan the launch" isOn onChange={() => {}} />
+                </SubMenu>
+                {false}
+                <>
+                    <MenuItem label="Details" icon="info" onPress={() => {}} />
+                </>
+            </NativeMenu>,
+        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Chat' }))
+        expect(screen.getAllByTestId('menu-icon-space')).toHaveLength(1)
+    })
+
+    it('keeps no empty icon column in a menu without icons', async () => {
+        await render(
+            <NativeMenu label="Coworker" trigger={<Text>To</Text>}>
+                <MenuToggle label="Scout" isOn onChange={() => {}} />
+                <MenuToggle label="Writer" isOn={false} onChange={() => {}} />
+            </NativeMenu>,
+        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Coworker' }))
+        expect(screen.queryByTestId('menu-icon-space')).toBeNull()
+    })
+
+    it('indents the rows a submenu unfolds', async () => {
+        await render(
+            <NativeMenu label="Account" trigger={<Text>Me</Text>}>
+                <SubMenu label="Workspaces" icon="layers">
+                    <MenuToggle label="Acme" badge={{ initials: 'A' }} isOn onChange={() => {}} />
+                </SubMenu>
+                <MenuItem label="Preferences" icon="settings" onPress={() => {}} />
+            </NativeMenu>,
+        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Account' }))
+        await fireEvent.press(screen.getByText('Workspaces'))
+        expect(modifiersOf(/Acme/)).toEqual([{ height: 44 }, { paddingStart: 16 }])
+        expect(modifiersOf('Preferences')).toEqual([{ height: 44 }])
     })
 })
 
