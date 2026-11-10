@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
-import { Pressable, Switch, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 
 import { AppText } from '@/components/ui/AppText'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Switch } from '@/components/ui/Switch'
 import { useTheme } from '@/theme/theme'
 import { brand, radius, spacing } from '@/theme/tokens'
 
