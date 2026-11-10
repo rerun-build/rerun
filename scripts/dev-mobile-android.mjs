@@ -17,7 +17,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { basename, dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { apiAnswers, createLogger, startApi, waitForApi, waitForMetro } from './dev-mobile-shared.mjs'
@@ -27,6 +27,7 @@ const APP_DIR = join(REPO_ROOT, 'apps/mobile')
 const ANDROID_DIR = join(APP_DIR, 'android')
 const PREBUILD_STAMP = join(APP_DIR, '.expo/android-prebuild-stamp')
 const NATIVE_INPUTS = ['package.json', 'app.json', 'app.config.ts']
+const LOCAL_MODULES_DIR = join(APP_DIR, 'modules')
 const CLIENT_CACHE_DIR = join(homedir(), 'Library/Caches/rerun-mobile/android')
 const INSTALLED_DIR = join(CLIENT_CACHE_DIR, 'installed')
 const CLIENT_KEY = /^[0-9a-f]{64}$/
@@ -188,9 +189,34 @@ async function bootEmulator() {
     log(`${AVD_NAME} is up`)
 }
 
+// The local modules' Kotlin and their expo-module.config.json go into the APK too, so they are native
+// inputs. Sorted, with their paths, so the key only moves when a file is added, removed or changed.
+function localModuleInputs() {
+    if (!existsSync(LOCAL_MODULES_DIR)) return []
+    const files = []
+    // Gradle writes its outputs to android/build, android/.gradle and android/.cxx.
+    const walk = (dir, isModuleRoot) => {
+        for (const entry of readdirSync(dir, { withFileTypes: true })) {
+            if (entry.name.startsWith('.') || (isModuleRoot && entry.name === 'build')) continue
+            const path = join(dir, entry.name)
+            if (entry.isDirectory()) walk(path, false)
+            else if (entry.isFile()) files.push(path)
+        }
+    }
+    for (const module of readdirSync(LOCAL_MODULES_DIR, { withFileTypes: true })) {
+        if (!module.isDirectory()) continue
+        const config = join(LOCAL_MODULES_DIR, module.name, 'expo-module.config.json')
+        if (existsSync(config)) files.push(config)
+        const android = join(LOCAL_MODULES_DIR, module.name, 'android')
+        if (existsSync(android)) walk(android, true)
+    }
+    return files.map(file => relative(APP_DIR, file)).sort()
+}
+
 function nativeInputsHash() {
     const hash = createHash('sha256')
     for (const file of NATIVE_INPUTS) hash.update(readFileSync(join(APP_DIR, file)))
+    for (const file of localModuleInputs()) hash.update(`\0${file}\0`).update(readFileSync(join(APP_DIR, file)))
     return hash.digest('hex')
 }
 
