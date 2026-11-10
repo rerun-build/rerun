@@ -23,11 +23,12 @@ export type ChatEndpoints = {
     fileOwner: (sessionId: string | null) => FileOwner
 }
 
-export function coworkerEndpoints(agentId: string): ChatEndpoints {
+// `general`: the first send opens the coworker's General, or continues it if another device just did.
+export function coworkerEndpoints(agentId: string, { general = false }: { general?: boolean } = {}): ChatEndpoints {
     return {
         agentId,
         sendPath: '/api/chat',
-        sendBody: (sessionId, text) => ({ agentId, sessionId: sessionId ?? undefined, text }),
+        sendBody: (sessionId, text) => (general && !sessionId ? { agentId, kind: 'general', text } : { agentId, sessionId: sessionId ?? undefined, text }),
         bornSessionOf: response => response.headers.get('X-Session-Id'),
         messages: async (caller, sessionId) => (await fetchMessages(caller, sessionId)) as UIMessage[],
         activeRun: fetchActiveRun,

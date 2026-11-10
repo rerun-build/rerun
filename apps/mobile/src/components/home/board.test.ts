@@ -1,6 +1,6 @@
-import type { AgentConversationsOverview, BoardAgent } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type AgentConversationsOverview, type BoardAgent } from '@rerun/contracts'
 
-import { byRecency, lineOf, minutesSince, moodStatus, moveIn, sectionOf, recentCoworkers, sectionsByBox, toHomeCoworkers, withPinned } from '@/components/home/board'
+import { byRecency, foremanOnBoard, lineOf, minutesSince, moodStatus, moveIn, sectionOf, recentCoworkers, sectionsByBox, toHomeCoworkers, withPinned } from '@/components/home/board'
 
 const agent = (patch: Partial<BoardAgent>): BoardAgent => ({ id: 'a1', name: 'Scout', handle: 'scout', description: 'Finds leads', templateId: null, status: 'idle', workspaceId: 7, spaceId: 's1', disabledAt: null, disabledReason: null, ...patch })
 const latest = (patch: Partial<NonNullable<AgentConversationsOverview[number]['latest']>> = {}) => ({ id: 'c1', agentId: 'a1', engineSessionId: 'e1', title: 'Q4 prospects', status: 'idle' as const, source: 'dashboard' as const, updatedAt: '2026-10-21T10:00:00Z', originAgentName: null, ...patch })
@@ -79,6 +79,14 @@ describe('withPinned', () => {
 
     it('skips a pin of a coworker deleted since', () => {
         expect(withPinned(team, ['gone', 'b']).pinned.map(coworker => coworker.id)).toEqual(['b'])
+    })
+
+    it('places the pinned Foreman among the pins and never in the list', () => {
+        const foreman = foremanOnBoard(false)
+        const { pinned, others } = withPinned(team, ['b', FOREMAN_AGENT_ID], foreman)
+        expect(pinned.map(coworker => coworker.id)).toEqual(['b', FOREMAN_AGENT_ID])
+        expect(others.map(coworker => coworker.id)).toEqual(['a', 'c'])
+        expect(withPinned(team, [], foreman).others.map(coworker => coworker.id)).toEqual(['a', 'b', 'c'])
     })
 })
 

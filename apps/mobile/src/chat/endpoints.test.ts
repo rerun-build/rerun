@@ -13,6 +13,12 @@ describe('coworker endpoints', () => {
         expect(endpoints.sendBody('s1', 'Hi')).toEqual({ agentId: 'agent-1', sessionId: 's1', text: 'Hi' })
     })
 
+    it('opens General on its first send, then talks to it by its id', () => {
+        const general = coworkerEndpoints('agent-1', { general: true })
+        expect(general.sendBody(null, 'Hi')).toEqual({ agentId: 'agent-1', kind: 'general', text: 'Hi' })
+        expect(general.sendBody('g1', 'Hi')).toEqual({ agentId: 'agent-1', sessionId: 'g1', text: 'Hi' })
+    })
+
     it('learns a new conversation from the header the hub sets', () => {
         expect(endpoints.bornSessionOf(response(200, { 'X-Session-Id': 's9' }))).toBe('s9')
         expect(endpoints.bornSessionOf(response(200))).toBeNull()

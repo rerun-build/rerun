@@ -39,7 +39,7 @@ type CoworkerRowProps = {
     pin?: PinControl
 }
 
-function PinSwipe({ pin, children }: { pin: PinControl; children: ReactNode }) {
+export function PinSwipe({ pin, children }: { pin: PinControl; children: ReactNode }) {
     const swipeable = useRef<SwipeableMethods>(null)
     const t = useTranslations('mobileHome')
     const label = pin.pinned ? t('row.unpin') : t('row.pin')

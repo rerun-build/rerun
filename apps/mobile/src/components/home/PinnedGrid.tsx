@@ -1,4 +1,5 @@
 import { Button, ContextMenu, Host, RNHostView } from '@expo/ui/swift-ui'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { accessibilityLabel, buttonStyle } from '@expo/ui/swift-ui/modifiers'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -9,7 +10,7 @@ import { usePaneSize } from '@/components/layout/PaneSize'
 import { columnsFor } from '@/components/layout/split'
 import { HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { AppText } from '@/components/ui/AppText'
-import { moodOf } from '@/components/ui/CoworkerAvatar'
+import { CoworkerAvatar, moodOf } from '@/components/ui/CoworkerAvatar'
 import { UnreadDot } from '@/components/ui/UnreadDot'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -39,7 +40,7 @@ export function PinnedAvatar({ coworker, cell, animated = true }: { coworker: Ho
     return (
         <View style={{ width: cell.width, alignItems: 'center', gap: spacing.xs + 2, paddingVertical: spacing.sm }}>
             <View style={{ width: cell.disc, height: cell.disc, borderRadius: cell.disc / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.muted }}>
-                <AgentBuddy agentId={coworker.id} size={Math.round(cell.disc * 0.7)} mood={moodOf(moodStatus(coworker))} animated={animated} />
+                {coworker.id === FOREMAN_AGENT_ID ? <CoworkerAvatar coworker={{ id: coworker.id, kind: 'foreman', status: coworker.status === 'working' ? 'working' : 'idle' }} size={Math.round(cell.disc * 0.7)} animated={animated} /> : <AgentBuddy agentId={coworker.id} size={Math.round(cell.disc * 0.7)} mood={moodOf(moodStatus(coworker))} animated={animated} />}
                 {unread && <UnreadDot style={{ position: 'absolute', top: dotInset, left: dotInset, width: UNREAD_DOT, height: UNREAD_DOT, borderRadius: UNREAD_DOT / 2, borderWidth: 2, borderColor: theme.background }} />}
             </View>
             <AppText variant="footnote" tone={unread ? 'default' : 'muted'} medium={unread} numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ maxWidth: cell.width - spacing.sm, textAlign: 'center' }}>
@@ -71,7 +72,7 @@ export function PinnedGrid({ coworkers, onOpen, onUnpin, onDetails, onEdit }: Pi
                     <ContextMenu>
                         <ContextMenu.Items>
                             <Button label={t('pinned.unpin')} systemImage="pin.slash" onPress={() => onUnpin(coworker)} />
-                            <Button label={t('pinned.details')} systemImage="info.circle" onPress={() => onDetails(coworker)} />
+                            {coworker.id === FOREMAN_AGENT_ID ? null : <Button label={t('pinned.details')} systemImage="info.circle" onPress={() => onDetails(coworker)} />}
                             {onEdit ? <Button label={t('pinned.edit')} systemImage="arrow.up.arrow.down" onPress={onEdit} /> : null}
                         </ContextMenu.Items>
                         <ContextMenu.Trigger>

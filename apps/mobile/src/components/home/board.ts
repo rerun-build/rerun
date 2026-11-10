@@ -1,4 +1,4 @@
-import type { AgentConversationsOverview, AgentStatus, BoardAgent, Box } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type AgentConversationsOverview, type AgentStatus, type BoardAgent, type Box } from '@rerun/contracts'
 
 import type { StatusLine } from '@/components/ui/status'
 import { translatorFor } from '@/i18n/translator'
@@ -79,8 +79,13 @@ export function sectionsByBox(coworkers: HomeCoworker[], boxes: Box[], unnamedLa
 
 // The coworkers pinned on this phone, in the order they were arranged, and everyone else. A pin of a
 // coworker deleted since is simply skipped.
-export function withPinned(coworkers: HomeCoworker[], pinnedIds: readonly string[]): { pinned: HomeCoworker[]; others: HomeCoworker[] } {
-    const byId = new Map(coworkers.map(coworker => [coworker.id, coworker]))
+// The Foreman as a cell of the pinned grid: it can be pinned like a coworker, never listed among them.
+export function foremanOnBoard(running: boolean): HomeCoworker {
+    return { id: FOREMAN_AGENT_ID, name: 'Rerun', handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0 }
+}
+
+export function withPinned(coworkers: HomeCoworker[], pinnedIds: readonly string[], foreman?: HomeCoworker): { pinned: HomeCoworker[]; others: HomeCoworker[] } {
+    const byId = new Map([...coworkers, ...(foreman ? [foreman] : [])].map(coworker => [coworker.id, coworker]))
     const pinned = pinnedIds.flatMap(id => byId.get(id) ?? [])
     const kept = new Set(pinned.map(coworker => coworker.id))
     return { pinned, others: coworkers.filter(coworker => !kept.has(coworker.id)) }

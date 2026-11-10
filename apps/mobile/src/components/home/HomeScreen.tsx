@@ -8,8 +8,9 @@ import { useTranslations } from 'use-intl'
 
 import { useAuth } from '@/auth/AuthProvider'
 import { coworkerEndpoints } from '@/chat/endpoints'
-import { lineOf, minutesSince, moodStatus, recentCoworkers, sectionsByBox, withPinned, type HomeCoworker } from '@/components/home/board'
+import { foremanOnBoard, lineOf, minutesSince, moodStatus, recentCoworkers, sectionsByBox, withPinned, type HomeCoworker } from '@/components/home/board'
 import { SkeletonFade, useBootFill } from '@/components/home/BootFill'
+import { GENERAL_PAGE_ID } from '@/components/chat/conversation-pages'
 import { LAST_CONVERSATION } from '@/components/chat/ForemanChat'
 import { CoworkerRow, HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { ForemanRow } from '@/components/home/ForemanRow'
@@ -65,7 +66,8 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const pins = usePinnedAgents()
     const cell = usePinnedCell()
     const [reordering, setReordering] = useState(false)
-    const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned)
+    const foremanPinned = pins.pinned.includes(FOREMAN_AGENT_ID)
+    const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned, board.state === 'ready' ? foremanOnBoard(foreman.running) : undefined)
     const sections = board.state === 'ready' && group === 'box' ? sectionsByBox(others, board.boxes, t('untitledBox')) : []
     const recent = board.state === 'ready' && group === 'recent' ? recentCoworkers(others) : []
 
@@ -75,7 +77,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
         if (unread !== null) setBadge(unread).catch(() => {})
     }, [unread])
 
-    const open = (coworker: HomeCoworker) => go({ pathname: '/chat/[id]', params: { id: coworker.latest?.id ?? 'new', to: coworker.id } })
+    const open = (coworker: HomeCoworker) => (coworker.id === FOREMAN_AGENT_ID ? openForeman() : go({ pathname: '/chat/[id]', params: { id: coworker.latest?.id ?? GENERAL_PAGE_ID, to: coworker.id } }))
 
     const warmUp = (coworker: HomeCoworker) => {
         const sessionId = coworker.latest?.id
@@ -106,18 +108,6 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
                 )}
 
                 <View>
-                    {board.state === 'ready' && (
-                        <Animated.View entering={fill.playing ? fill.rowEntering(0) : undefined} style={{ marginBottom: spacing.lg }}>
-                            <ForemanRow last={foreman} selected={openAgentId === FOREMAN_AGENT_ID} onPress={openForeman} />
-                        </Animated.View>
-                    )}
-
-                    {board.state === 'ready' && board.coworkers.length === 0 && (
-                        <AppText variant="callout" tone="muted" style={{ paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
-                            {t('empty')}
-                        </AppText>
-                    )}
-
                     {pinned.length > 0 && (
                         <Animated.View layout={layout} entering={fill.playing ? fill.rowEntering(0) : undefined} style={{ marginBottom: spacing.sm }}>
                             {reordering && (
@@ -140,6 +130,18 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
                                 <PinnedGrid coworkers={pinned} onOpen={open} onUnpin={coworker => pins.unpin(coworker.id)} onDetails={coworker => router.push({ pathname: '/coworker/[id]', params: { id: coworker.id, name: coworker.name } })} onEdit={pinned.length > 1 ? () => setReordering(true) : undefined} />
                             )}
                         </Animated.View>
+                    )}
+
+                    {board.state === 'ready' && !foremanPinned && (
+                        <Animated.View key="foreman" layout={layout} entering={fill.playing ? fill.rowEntering(0) : FadeIn.duration(180)} exiting={FadeOut.duration(120)}>
+                            <ForemanRow last={foreman} selected={openAgentId === FOREMAN_AGENT_ID} onPress={openForeman} pin={{ pinned: false, onToggle: () => pins.pin(FOREMAN_AGENT_ID) }} />
+                        </Animated.View>
+                    )}
+
+                    {board.state === 'ready' && board.coworkers.length === 0 && (
+                        <AppText variant="callout" tone="muted" style={{ paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
+                            {t('empty')}
+                        </AppText>
                     )}
 
                     {recent.map((coworker, index) => (

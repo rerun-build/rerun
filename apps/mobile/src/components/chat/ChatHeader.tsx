@@ -212,7 +212,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
                         identity
                     )}
                 </View>
-                <View style={{ width: GLASS_BUTTON_SIZE }} />
+                {general && activeIndex !== 0 ? <GlassButton symbol="bubble.left.and.bubble.right" label={t('general')} onPress={() => onSelect(general.id)} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
             </View>
         </View>
     )
