@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
 import { conversationSections, glyphOf, stateOf } from '@/components/chat/conversation-sections'
-import { usePaneSize } from '@/components/layout/PaneSize'
+import { usePaneInsets, usePaneSize } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { EdgeFade } from '@/components/ui/EdgeFade'
@@ -159,6 +159,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     const theme = useTheme()
     const glass = useGlassStyle()
     const insets = useSafeAreaInsets()
+    const pane = usePaneInsets()
     const t = useTranslations('mobileChat.header')
     const { width: paneWidth } = usePaneSize()
     const chipWidth = Math.min(CHIP_MAX_WIDTH, paneWidth - 2 * (spacing.lg + GLASS_BUTTON_SIZE + spacing.sm))
@@ -197,7 +198,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     return (
         <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
             <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} />
-            <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingHorizontal: spacing.lg, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
+            <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
                 {onBack ? <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
                 <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>
                     {menuOpens ? (

@@ -12,6 +12,7 @@ import { PinnedAvatar, PinnedGrid, usePinnedCell } from '@/components/home/Pinne
 import { SortableGrid } from '@/components/home/SortableGrid'
 import { AppText } from '@/components/ui/AppText'
 import { EdgeFade } from '@/components/ui/EdgeFade'
+import { usePaneInsets } from '@/components/layout/PaneSize'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { ThemeScope, useColorSchemeName, useTheme } from '@/theme/theme'
 import { spacing, type ColorScheme } from '@/theme/tokens'
@@ -37,9 +38,10 @@ const TEAM: HomeCoworker[] = [
     mock('agent-press', 'Press', 'idle', 'Watches the news'),
 ]
 
-function MockHome({ pinCount }: { pinCount: number }) {
+export function MockHome({ pinCount }: { pinCount: number }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const pane = usePaneInsets()
     const cell = usePinnedCell()
     const [pinnedIds, setPinnedIds] = useState(() => TEAM.slice(0, pinCount).map(coworker => coworker.id))
     const [reordering, setReordering] = useState(false)
@@ -50,7 +52,7 @@ function MockHome({ pinCount }: { pinCount: number }) {
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ScrollView scrollEnabled={!reordering} contentContainerStyle={{ paddingTop: headerHeight + spacing.xl, paddingBottom: insets.bottom + 120 }} contentInsetAdjustmentBehavior="never">
+            <ScrollView scrollEnabled={!reordering} contentContainerStyle={{ paddingTop: headerHeight + spacing.xl, paddingBottom: insets.bottom + 120, paddingLeft: pane.left, paddingRight: pane.right }} contentInsetAdjustmentBehavior="never">
                 <View style={{ marginBottom: spacing.lg }}>
                     <ForemanRow last={{ title: 'Overnight catch-up', running: false }} onPress={() => router.push({ pathname: '/lab-chat', params: { coworker: 'foreman', tabs: '1', state: 'conversation' } })} />
                 </View>
@@ -83,10 +85,10 @@ function MockHome({ pinCount }: { pinCount: number }) {
             </ScrollView>
             <EdgeFade edge="top" height={headerHeight + spacing.xl} />
             <EdgeFade edge="bottom" height={insets.bottom + 90} />
-            <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: 0, right: 0 }}>
+            <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: pane.left, right: pane.right }}>
                 <HomeHeader inboxCount={4} onInbox={noop} onNewCoworker={() => router.push('/new-coworker')} />
             </View>
-            <View pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + spacing.sm }}>
+            <View pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: insets.bottom + spacing.sm }}>
                 <HomeBottomBar onSearch={() => router.push('/search')} />
             </View>
         </View>

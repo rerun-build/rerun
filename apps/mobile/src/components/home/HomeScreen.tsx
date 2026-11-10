@@ -22,6 +22,7 @@ import { SortableGrid } from '@/components/home/SortableGrid'
 import { useForemanLast } from '@/components/home/useForemanLast'
 import { useGroupMode } from '@/components/home/useGroupMode'
 import { usePinnedAgents } from '@/components/home/usePinnedAgents'
+import { usePaneInsets } from '@/components/layout/PaneSize'
 import { inboxCount } from '@/components/inbox/inbox'
 import { AppText } from '@/components/ui/AppText'
 import { EdgeFade } from '@/components/ui/EdgeFade'
@@ -40,6 +41,7 @@ import { spacing } from '@/theme/tokens'
 export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const pane = usePaneInsets()
     const { session, me } = useAuth()
     const board = useBoard()
     const inbox = useInbox()
@@ -91,7 +93,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ScrollView scrollEnabled={!reordering} contentContainerStyle={{ paddingTop: headerHeight + spacing.xl, paddingBottom: insets.bottom + 120 }} contentInsetAdjustmentBehavior="never">
+            <ScrollView scrollEnabled={!reordering} contentContainerStyle={{ paddingTop: headerHeight + spacing.xl, paddingBottom: insets.bottom + 120, paddingLeft: pane.left, paddingRight: pane.right }} contentInsetAdjustmentBehavior="never">
                 {board.state === 'loading' && <HomeSkeleton />}
 
                 {board.state === 'error' && (
@@ -164,10 +166,10 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
 
             <EdgeFade edge="top" height={headerHeight + spacing.xl} />
             <EdgeFade edge="bottom" height={insets.bottom + 90} />
-            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: 0, right: 0 }}>
+            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: pane.left, right: pane.right }}>
                 <HomeHeader inboxCount={inbox.state === 'ready' ? inboxCount(inbox.items) : 0} onInbox={() => router.push('/inbox')} onNewCoworker={() => router.push('/new-coworker')} />
             </Animated.View>
-            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + spacing.sm }}>
+            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: insets.bottom + spacing.sm }}>
                 <HomeBottomBar onSearch={() => router.push('/search')} />
             </Animated.View>
         </View>

@@ -8,6 +8,7 @@ import { useTranslations } from 'use-intl'
 import { cachedFile, fileHeadersFor, isHubFileUrl } from '@/api/files'
 import { useAuth } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
+import { usePaneInsets } from '@/components/layout/PaneSize'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { spacing } from '@/theme/tokens'
 
@@ -27,6 +28,7 @@ export function MediaViewerHost() {
     const state = useViewerState()
     const { width } = useWindowDimensions()
     const insets = useSafeAreaInsets()
+    const pane = usePaneInsets()
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     const [index, setIndex] = useState(0)
@@ -93,7 +95,7 @@ export function MediaViewerHost() {
                     )}
                 </ScrollView>
                 {current && (
-                    <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: spacing.lg, right: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.md, opacity: 1 - drag }}>
+                    <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: spacing.lg + pane.left, right: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'center', gap: spacing.md, opacity: 1 - drag }}>
                         <GlassButton symbol="xmark" label={t('actions.close')} onPress={closeViewer} scheme="dark" />
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <AppText variant="callout" medium numberOfLines={1} style={{ color: '#ffffff' }}>

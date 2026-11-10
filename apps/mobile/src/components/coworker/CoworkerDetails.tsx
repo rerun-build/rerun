@@ -10,6 +10,7 @@ import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { moodOf } from '@/components/ui/CoworkerAvatar'
+import { usePaneInsets } from '@/components/layout/PaneSize'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { Card, ICON_ROW_INSET, Separator, SettingsRow } from '@/components/ui/GroupedList'
 import { CircleTrigger, NativeMenu } from '@/components/ui/NativeMenu'
@@ -72,10 +73,11 @@ function routinesValue(routines: RoutineView[], t: DetailsTranslator): string {
 export function CoworkerDetails({ coworker, files, apps, routines, notifications, unavailable = {}, computerUnavailable, canDelete, lock, onBack, onEdit, onDelete, onFiles, onApps, onRoutines, onComputer, onNotifications }: CoworkerDetailsProps) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const pane = usePaneInsets()
     const t = useTranslations('mobileCoworker.details')
     const tAccess = useTranslations('mobileCoworker.access')
     return (
-        <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: insets.top + spacing.xs, paddingBottom: insets.bottom + spacing.xl, paddingHorizontal: spacing.lg, gap: spacing.xl }}>
+        <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: insets.top + spacing.xs, paddingBottom: insets.bottom + spacing.xl, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} />
                 <NativeMenu glass="circle" label={t('more')} trigger={<CircleTrigger symbol="ellipsis" />}>

@@ -36,7 +36,7 @@ const lockFor = (state: LabState): ManageLock => (state === 'use' ? { locked: tr
 
 const routinesFor = (state: LabState): RoutineView[] | null => (state === 'loading' ? null : state === 'empty' ? [] : MOCK_ROUTINES)
 
-function DetailsLab({ state }: { state: LabState }) {
+export function DetailsLab({ state }: { state: LabState }) {
     const [name, setName] = useState(SCOUT.name)
     const rename = () => Alert.prompt('Rename', undefined, next => next?.trim() && setName(next.trim()), 'plain-text', name)
     const remove = () =>

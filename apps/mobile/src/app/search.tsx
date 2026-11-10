@@ -15,6 +15,7 @@ import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { lineOf, minutesSince, moodStatus, toHomeCoworkers, type HomeCoworker } from '@/components/home/board'
 import { CoworkerRow } from '@/components/home/CoworkerRow'
 import { SectionHeader } from '@/components/home/SectionHeader'
+import { usePaneInsets } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { cachedBoard } from '@/data/local-cache'
@@ -102,6 +103,7 @@ function useTeam(): Team | null {
 export default function Search() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const pane = usePaneInsets()
     const team = useTeam()
     const t = useTranslations('mobileHome')
     const [query, setQuery] = useState('')
@@ -123,7 +125,7 @@ export default function Search() {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm }}>
+        <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm, paddingLeft: pane.left, paddingRight: pane.right }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.md }}>
                 <GlassButton symbol="chevron.left" label={t('search.back')} onPress={() => router.back()} />
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 44, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: theme.muted }}>

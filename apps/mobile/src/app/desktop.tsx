@@ -11,6 +11,7 @@ import { useTranslations } from 'use-intl'
 
 import { finishTakeover, openDesktop, startTakeover } from '@/api/desktop'
 import { useAuth } from '@/auth/AuthProvider'
+import { usePaneInsets } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
 import { PillButton } from '@/components/ui/PillButton'
 import { environment } from '@/config/environment'
@@ -54,6 +55,7 @@ export default function Desktop() {
     const call = intent?.call
     const url = intent?.url
     const insets = useSafeAreaInsets()
+    const pane = usePaneInsets()
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     const [connection, setConnection] = useState<Connection>({ state: 'connecting' })
@@ -129,7 +131,7 @@ export default function Desktop() {
     if (!ROUTE_ID_PATTERN.test(agent)) return <Redirect href="/" />
     return (
         <View style={{ flex: 1, backgroundColor: SCREEN_BACKGROUND }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingTop: insets.top + spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.sm }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingTop: insets.top + spacing.sm, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, paddingBottom: spacing.sm }}>
                 <SymbolView name="display" size={16} tintColor="#a1a1a1" />
                 <AppText variant="headline" numberOfLines={1} style={{ flex: 1, color: '#fafafa' }}>
                     {name ? t('screenOf', { name }) : t('screen')}

@@ -16,11 +16,11 @@ export function SplitShell({ enabled, children }: { enabled: boolean; children: 
     return (
         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: theme.background }}>
             {split && (
-                <PaneSizeProvider style={{ flex: 0, width: sidebarWidth(width), borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: theme.border }}>
+                <PaneSizeProvider side="sidebar" style={{ flex: 0, width: sidebarWidth(width), borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: theme.border }}>
                     <HomeScreen sidebar />
                 </PaneSizeProvider>
             )}
-            <PaneSizeProvider>{children}</PaneSizeProvider>
+            <PaneSizeProvider side="detail">{children}</PaneSizeProvider>
         </View>
     )
 }
