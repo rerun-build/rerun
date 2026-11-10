@@ -87,7 +87,6 @@ function App() {
         <ThemeProvider value={navigationTheme}>
             {/* iOS picks the bar's ink from the appearance on its own; Android keeps light icons unless told. */}
             <StatusBar barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'} />
-            <ReducedMotionOverride />
             <BuddyClock>
                 {updateRequired ? (
                     <UpdateRequired />
@@ -173,6 +172,8 @@ function App() {
 export default function RootLayout() {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
+            {/* Before App, whose first render waits on the fonts: the screens it mounts then already read it. */}
+            <ReducedMotionOverride />
             <AuthProvider>
                 <I18nProvider>
                     <App />
