@@ -1,21 +1,27 @@
 import type { RoutineView } from '@rerun/contracts'
+import { fullDateTime } from '@rerun/i18n/format'
 import { Fragment } from 'react'
 import { Switch, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { OPEN_LOCK, type ManageLock } from '@/auth/access'
 import { AppText } from '@/components/ui/AppText'
 import { Card, GROUPED_ROW_HEIGHT, Separator } from '@/components/ui/GroupedList'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { currentLocale, translatorFor } from '@/i18n/translator'
 import { spacing } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 
 import { CoworkerPage, LoadFailed } from './CoworkerPage'
 
 export const routineKey = (routine: Pick<RoutineView, 'kind' | 'slug'>) => `${routine.kind}:${routine.slug}`
 
+// The cron's own words come from the hub, in English.
 export function whenOf(routine: RoutineView): string {
     if (routine.cronLabel) return routine.cronLabel
-    if (routine.runAt) return `Once, ${new Date(routine.runAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`
-    return routine.kind === 'trigger' ? 'Webhook' : ''
+    const t = translatorFor('mobileCoworker')
+    if (routine.runAt) return t('routines.once', { date: fullDateTime(routine.runAt, currentLocale()) })
+    return routine.kind === 'trigger' ? t('routines.webhook') : ''
 }
 
 type RoutineRowProps = { routine: RoutineView; saving: boolean; readOnly: boolean; onToggle: (enabled: boolean) => void }
@@ -73,8 +79,10 @@ type CoworkerRoutinesProps = {
 // What the coworker runs on its own, each with its switch. Creating or changing one goes through the
 // chat.
 export function CoworkerRoutines({ name, routines, savingKeys, onToggle, failed, lock = OPEN_LOCK, onBack }: CoworkerRoutinesProps) {
+    const t = useTranslations('mobileCoworker.routines')
+    const tAccess = useTranslations('mobileCoworker.access')
     return (
-        <CoworkerPage title="Routines" onBack={onBack}>
+        <CoworkerPage title={t('title')} onBack={onBack}>
             <View style={{ gap: spacing.sm }}>
                 {!routines ? (
                     failed ? <LoadFailed /> : <RoutinesSkeleton />
@@ -82,7 +90,7 @@ export function CoworkerRoutines({ name, routines, savingKeys, onToggle, failed,
                     <Card>
                         <View style={{ padding: spacing.lg }}>
                             <AppText variant="body" tone="muted">
-                                No routine yet.
+                                {t('empty')}
                             </AppText>
                         </View>
                     </Card>
@@ -98,7 +106,7 @@ export function CoworkerRoutines({ name, routines, savingKeys, onToggle, failed,
                 )}
                 {routines && failed && <LoadFailed />}
                 <AppText variant="footnote" tone="muted" style={{ paddingHorizontal: spacing.lg }}>
-                    {lock.reason ?? `Ask ${name} in the chat to set one up.`}
+                    {lock.reason ? tAccess(lock.reason, { host: webHost }) : t('askInChat', { name })}
                 </AppText>
             </View>
         </CoworkerPage>

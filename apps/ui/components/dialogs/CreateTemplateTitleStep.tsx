@@ -1,6 +1,8 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTranslations } from 'next-intl'
+import { useMemo } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -10,15 +12,14 @@ import { Input } from '@/components/ui/input'
 import { slugify } from '@/lib/slugify'
 import { TITLE_LIMIT } from '@/lib/templates/limits'
 
-const schema = z.object({
-    title: z.string().trim().min(1, 'A title is required').max(TITLE_LIMIT),
-})
-
-type FormValues = z.infer<typeof schema>
+type FormValues = { title: string }
 
 // A title is enough to get a draft: it is what the slug and the archive paths are addressed by, so
 // the rest of the wizard needs a row to exist before it can capture anything into it.
 export function CreateTemplateTitleStep({ onCreate, onCancel }: { onCreate: (title: string) => Promise<void>; onCancel: () => void }) {
+    const t = useTranslations('dialogs.createTemplate')
+    const tCommon = useTranslations('common')
+    const schema = useMemo(() => z.object({ title: z.string().trim().min(1, t('titleRequired')).max(TITLE_LIMIT) }), [t])
     const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { title: '' } })
 
     const {
@@ -39,11 +40,11 @@ export function CreateTemplateTitleStep({ onCreate, onCancel }: { onCreate: (tit
                             <FormItem>
                                 <FormControl>
                                     <Input
-                                        label="Title"
+                                        label={t('titleField')}
                                         autoFocus
                                         maxLength={TITLE_LIMIT}
-                                        placeholder="e.g. Outbound SDR"
-                                        helperText={`${title.length}/${TITLE_LIMIT} · ${slug ? `/templates/${slug}` : 'The public address is derived from the title.'}`}
+                                        placeholder={t('titlePlaceholder')}
+                                        helperText={slug ? t('helperWithSlug', { length: title.length, limit: TITLE_LIMIT, slug }) : t('helperEmpty', { length: title.length, limit: TITLE_LIMIT })}
                                         {...field}
                                     />
                                 </FormControl>
@@ -55,10 +56,10 @@ export function CreateTemplateTitleStep({ onCreate, onCancel }: { onCreate: (tit
 
                 <DialogFooter className="mt-auto -mx-6 -mb-6 border-t bg-muted/50 px-6 py-4">
                     <Button type="button" variant="outline" onClick={onCancel}>
-                        Cancel
+                        {tCommon('cancel')}
                     </Button>
                     <Button type="submit" disabled={!slug} loading={isSubmitting}>
-                        Continue
+                        {t('continue')}
                     </Button>
                 </DialogFooter>
             </form>

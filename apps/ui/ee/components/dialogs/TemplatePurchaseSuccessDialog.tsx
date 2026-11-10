@@ -1,6 +1,7 @@
 'use client'
 
 import { track } from '@rerun/analytics/client'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -18,6 +19,7 @@ import { useAwaitTemplatePurchase } from './useAwaitTemplatePurchase'
 // `beginTemplatePlacement`, so "resuming" here means starting that handover for the first time,
 // exactly as the library CTA would have.
 export function TemplatePurchaseSuccessDialog({ slug, sessionId, onOpenChange }: { slug: string; sessionId: string | null; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('billing.templatePurchase')
     const { workspace } = useSession()
     const openBilling = useBillingStore(store => store.openBilling)
     const { state, template } = useAwaitTemplatePurchase(slug, sessionId)
@@ -29,38 +31,40 @@ export function TemplatePurchaseSuccessDialog({ slug, sessionId, onOpenChange }:
 
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
     const agentCount = template?.archiveAgentNames.length ?? 0
-    const title = template?.title ?? 'your template'
+    const title = template?.title ?? t('fallbackTitle')
 
     return (
         <Dialog open onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Thank you for your purchase</DialogTitle>
+                    <DialogTitle>{t('title')}</DialogTitle>
                     <DialogDescription>
                         {state === 'waiting'
-                            ? 'Finalizing your purchase, this only takes a moment.'
+                            ? t('waiting')
                             : state === 'timeout'
-                              ? 'Your payment went through. It is taking longer than usual to appear, refresh in a moment.'
+                              ? t('timeout')
                               : entitled
-                                ? `You own "${title}". Ready to place ${agentCount === 1 ? 'its coworker' : `its ${agentCount} coworkers`}?`
-                                : `You own "${title}". An active Rerun plan is required to install it.`}
+                                ? agentCount === 1
+                                    ? t('readyOne', { title })
+                                    : t('readyMany', { title, count: agentCount })
+                                : t('needsPlan', { title })}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                     {state === 'waiting' ? (
                         <Button loading disabled>
-                            Finalizing purchase
+                            {t('finalizing')}
                         </Button>
                     ) : state === 'timeout' ? (
                         <Button variant="outline" onClick={() => onOpenChange(false)}>
-                            Close
+                            {t('close')}
                         </Button>
                     ) : entitled ? (
                         <Button disabled={!template || agentCount === 0} onClick={() => template && run(template)}>
-                            {agentCount === 1 ? 'Place its coworker' : `Place ${agentCount} coworkers`}
+                            {agentCount === 1 ? t('placeOne') : t('placeMany', { count: agentCount })}
                         </Button>
                     ) : (
-                        <Button onClick={() => openBilling(undefined, 'template_purchase')}>Subscribe</Button>
+                        <Button onClick={() => openBilling(undefined, 'template_purchase')}>{t('subscribe')}</Button>
                     )}
                 </DialogFooter>
             </DialogContent>

@@ -1,6 +1,7 @@
 'use client'
 
 import { BorderBeam } from '@rerun/ui'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
@@ -28,6 +29,8 @@ type McpSignInBlockProps = McpSignInRequest & {
 // The sign-in an agent asks for after registering a server that answered 401: the user connects
 // here and the agent picks up on its own, the way a suggested app does.
 export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }: McpSignInBlockProps) {
+    const t = useTranslations('chat')
+    const tServices = useTranslations('services')
     const connectors = useConnectorServices(agentId)
     const { statuses, loading } = useMcpServerStatuses(agentId)
     const [signIn, setSignIn] = useState<{ popup: Window | null } | null>(null)
@@ -56,7 +59,7 @@ export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }
     }
 
     const displayName = server?.displayName ?? humanizeToolSegment(name)
-    const subtitle = reason ?? (server?.host ? `Custom MCP server · ${server.host}` : 'Custom MCP server')
+    const subtitle = reason ?? (server?.host ? t('mcpServer.customWithHost', { host: server.host }) : t('mcpServer.custom'))
 
     return (
         <div className={cn('relative space-y-3 overflow-hidden rounded-lg border border-border bg-muted/30 p-3', !inline && 'mb-2')}>
@@ -64,22 +67,22 @@ export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }
             <div className="relative flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
                 <Icon {...serviceIconProps(server?.icon ?? null, 'custom')} size="sm" />
                 <div className="min-w-32 flex-1">
-                    <span className="block truncate font-medium leading-snug">Sign in to {displayName}</span>
+                    <span className="block truncate font-medium leading-snug">{t('mcpSignIn.title', { name: displayName })}</span>
                     <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
                 </div>
                 <CustomMcpStatusBadge status={status} loading={loading || !connectors.loaded} />
                 {!signIn && (
                     <div className="flex items-center gap-1">
                         <Button size="sm" variant="ghost" disabled={submitted} onClick={() => answer(onSkip)}>
-                            Not now
+                            {t('actions.notNow')}
                         </Button>
                         {connected ? (
                             <Button size="sm" disabled={submitted} onClick={() => answer(() => onDone(serializeMcpSignInResult(name)))}>
-                                Continue
+                                {t('actions.continue')}
                             </Button>
                         ) : (
-                            <Button size="sm" disabled={submitted || !server?.signInUrl} onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName) })}>
-                                Connect
+                            <Button size="sm" disabled={submitted || !server?.signInUrl} onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName, tServices('signInPopup.connecting', { name: displayName })) })}>
+                                {t('actions.connect')}
                             </Button>
                         )}
                     </div>
@@ -90,7 +93,7 @@ export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }
                             setSignIn(null)
                         }}
                         className="text-muted-foreground">
-                        Cancel
+                        {t('actions.cancel')}
                     </Button>
                 )}
             </div>

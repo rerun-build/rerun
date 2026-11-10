@@ -1,0 +1,136 @@
+{
+    "viewer": {
+        "label": "Tu Rewind semanal",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "close": "Cerrar",
+        "fallbackAgentName": "Un coworker"
+    },
+    "weekPicker": {
+        "label": "Elige una semana",
+        "new": "Nuevo"
+    },
+    "intro": {
+        "headline": "Tu semana,<br></br>en rerun.",
+        "clockedInOne": "Un coworker fichó mientras tú te ocupabas de todo lo demás.",
+        "clockedInOther": "{count} coworkers ficharon mientras tú te ocupabas de todo lo demás."
+    },
+    "hours": {
+        "eyebrow": "Tiempo de trabajo",
+        "headline": "Tus coworkers trabajaron",
+        "units": {
+            "hours": "horas",
+            "minutes": "minutos"
+        },
+        "workdays": "Son unas <b>{days, plural, one {# jornada} other {# jornadas}}</b> de concentración, sin una sola pausa para el café.",
+        "vsLastWeek": "{change} frente a la semana pasada"
+    },
+    "rhythm": {
+        "eyebrow": "El ritmo",
+        "headline": "{count, plural, one {<value></value> ejecución.} other {<value></value> ejecuciones.}}<br></br>El {day} fue el gran día.",
+        "finished": "{count, plural, one {# terminó sin problemas} other {# terminaron sin problemas}}",
+        "errors": "{count, plural, one {# se topó con un muro y te avisó.} other {# se toparon con un muro y te avisaron.}}",
+        "noErrors": "Ni una sola ejecución salió mal."
+    },
+    "clock": {
+        "eyebrow": "Día y noche",
+        "headline": "<value></value> del trabajo<br></br>se hizo mientras no estabas.",
+        "subtitle": "Noches, madrugadas y fines de semana incluidos.",
+        "hourMark": "{hour}h",
+        "less": "Menos",
+        "more": "Más"
+    },
+    "mvp": {
+        "eyebrow": "Coworker de la semana",
+        "badge": "MVP",
+        "stats": {
+            "runs": "ejecuciones",
+            "share": "del trabajo total",
+            "onTheClock": "de trabajo"
+        },
+        "goToMoves": "Sus jugadas favoritas: {tools}.",
+        "inSpace": "en {space}"
+    },
+    "connectors": {
+        "eyebrow": "Apps más usadas",
+        "headline": "{name} sonó<br></br>sin parar.",
+        "calls": "{count, plural, one {<value></value> llamada} other {<value></value> llamadas}}",
+        "shareOfCalls": "Parte de las llamadas"
+    },
+    "highlights": {
+        "eyebrow": "Lo más destacado",
+        "headline": "Lo que se hizo."
+    },
+    "memory": {
+        "eyebrow": "Cada vez más listos",
+        "recalled": "El más consultado, {count, plural, one {# vez} other {# veces}} por {name}",
+        "headline": "{count, plural, one {<value></value> cosa nueva aprendida sobre cómo trabajas.} other {<value></value> cosas nuevas aprendidas sobre cómo trabajas.}}",
+        "empty": "Tus coworkers se guardaron sus notas."
+    },
+    "awards": {
+        "eyebrow": "Los premios",
+        "headline": "Y los trofeos son para…",
+        "night-owl": {
+            "title": "Búho nocturno",
+            "caption": "{count, plural, one {# ejecución de noche} other {# ejecuciones de noche}}"
+        },
+        "marathon": {
+            "title": "Maratonista",
+            "caption": "{duration} de un tirón"
+        },
+        "flawless": {
+            "title": "Impecable",
+            "caption": "{count, plural, one {# ejecución, cero errores} other {# ejecuciones, cero errores}}"
+        },
+        "toolsmith": {
+            "title": "Rey de las herramientas",
+            "caption": "{count, plural, one {# llamada a herramienta} other {# llamadas a herramientas}}"
+        },
+        "connector-hub": {
+            "title": "Malabarista",
+            "caption": "{count, plural, one {# app manejada} other {# apps manejadas}}"
+        },
+        "team-player": {
+            "title": "Espíritu de equipo",
+            "caption": "{count, plural, one {# relevo} other {# relevos}}"
+        }
+    },
+    "outro": {
+        "eyebrow": "Eso es todo",
+        "stats": {
+            "runs": "ejecuciones",
+            "hoursWorked": "horas trabajadas",
+            "minutesWorked": "minutos trabajados",
+            "toolCalls": "llamadas a herramientas",
+            "appsUsed": "apps usadas"
+        },
+        "mvp": "MVP <b>{name}</b>",
+        "headline": "Nos vemos el próximo lunes.",
+        "watchAgain": "Ver de nuevo",
+        "backToBoard": "Volver al tablero"
+    },
+    "tools": {
+        "web_search": "Búsqueda web",
+        "web_fetch": "Lectura web",
+        "leads_people_search": "Búsqueda de personas",
+        "leads_email_find": "Búsqueda de correos",
+        "leads_email_verify": "Verificación de correos",
+        "leads_phone_find": "Búsqueda de teléfonos",
+        "google_serp": "Resultados de Google",
+        "google_maps_search": "Google Maps",
+        "paid_data": "Datos de pago",
+        "paid_data_catalog": "Lectura del catálogo de datos de pago",
+        "browser_navigate": "Navegación",
+        "shell_exec": "Shell",
+        "fs_read": "Lectura de archivos",
+        "fs_write": "Escritura de archivos",
+        "fs_edit": "Edición de archivos",
+        "memory_write": "Tomar notas",
+        "memory_search": "Recordar",
+        "call_agent": "Llamar a coworkers",
+        "delegate_tasks": "Delegar",
+        "notify_user": "Avisarte",
+        "publish_file": "Publicar",
+        "download": "Descargar"
+    }
+}

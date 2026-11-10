@@ -8,7 +8,7 @@ import { selectMaybeSingle, selectSingle } from '../supabase-helpers'
 // here instead of paying for the workspace row and a round-trip to the auth server.
 export const getSessionWorkspace = cache(async () => {
     const supabase = await createClient()
-    const { data: storedUser } = await selectSingle(supabase, 'users', ['id', 'workspace_id', 'email_notification_prefs'] as const, {})
+    const { data: storedUser } = await selectSingle(supabase, 'users', ['id', 'workspace_id', 'email_notification_prefs', 'locale'] as const, {})
     const requestedWorkspaceId = await getRequestWorkspaceId()
 
     // The workspace, named by the request or stored on the row, only stands once the caller's own
@@ -36,7 +36,7 @@ export const getServerSession = cache(async () => {
 
     const [{ data: workspace }, { data: authUser }] = await Promise.all([
         !workspaceRefused
-            ? selectSingle(supabase, 'workspaces', ['id', 'name', 'icon_url', 'plan', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'is_sandbox', 'onboarded_at', 'price_arm'] as const, { id: user?.workspace_id })
+            ? selectSingle(supabase, 'workspaces', ['id', 'name', 'icon_url', 'plan', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'is_sandbox', 'onboarded_at', 'price_arm', 'locale'] as const, { id: user?.workspace_id })
             : Promise.resolve({ data: null }),
         getRequestAccessToken().then(token => supabase.auth.getUser(token ?? undefined)),
     ])

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 import { DeleteAccountDialog } from '@/components/dialogs/DeleteAccountDialog'
 import { Button } from '@/components/ui/button'
@@ -12,9 +13,9 @@ import type { AccountDeletionBlocker } from '@/lib/auth/account-deletion'
 import { CreditCard, LogOutIcon, Server, Users } from '@/lib/icons'
 
 const CONSEQUENCES = [
-    { icon: Users, title: 'Shared workspaces', description: 'You leave every workspace you share with teammates. They keep it, with its coworkers and its files.' },
-    { icon: Server, title: 'Your own workspaces', description: 'A workspace only you are in stops for good: its coworkers are turned off and its machine is deleted with its files.' },
-    { icon: LogOutIcon, title: 'Signing in', description: 'You are signed out everywhere. Your email, Google account and phone number are freed, so you can sign up again later.' },
+    { icon: Users, key: 'shared' },
+    { icon: Server, key: 'own' },
+    { icon: LogOutIcon, key: 'signIn' },
 ] as const
 
 export type DeleteAccountPanelProps = {
@@ -28,6 +29,7 @@ export type DeleteAccountPanelProps = {
 }
 
 export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling, deleteAccount }: DeleteAccountPanelProps) {
+    const t = useTranslations('account.delete')
     const [confirmOpen, setConfirmOpen] = useState(false)
     const [pending, setPending] = useState(false)
 
@@ -44,7 +46,7 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
         try {
             await deleteAccount(confirmation)
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : 'Could not delete your account.')
+            toast.error(err instanceof Error ? err.message : t('failed'))
             setPending(false)
             setConfirmOpen(false)
         }
@@ -54,7 +56,7 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
         <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-5 sm:px-6">
                 {CONSEQUENCES.map(consequence => (
-                    <PanelRow key={consequence.title} leading={<Icon icon={consequence.icon} size="sm" />} title={consequence.title} description={consequence.description} />
+                    <PanelRow key={consequence.key} leading={<Icon icon={consequence.icon} size="sm" />} title={t(`consequences.${consequence.key}.title`)} description={t(`consequences.${consequence.key}.description`)} />
                 ))}
 
                 {blockers.map(blocker => (
@@ -62,11 +64,11 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
                         key={blocker.workspaceId}
                         leading={<Icon icon={CreditCard} size="sm" />}
                         title={blocker.name}
-                        description={blocker.workspaceId === currentWorkspaceId ? 'Its subscription still renews. Cancel it from Billing before deleting your account.' : 'Its subscription still renews. Switch to this workspace and cancel it from Billing before deleting your account.'}
+                        description={blocker.workspaceId === currentWorkspaceId ? t('blocker.current') : t('blocker.other')}
                         actions={
                             blocker.workspaceId === currentWorkspaceId && (
                                 <Button type="button" variant="outline" size="sm" onClick={onOpenBilling}>
-                                    Open billing
+                                    {t('blocker.openBilling')}
                                 </Button>
                             )
                         }
@@ -76,7 +78,7 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
 
             <div className="flex justify-end border-t px-4 py-3 max-sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-6">
                 <Button type="button" variant="destructive" disabled={blockers.length > 0} onClick={() => setConfirmOpen(true)}>
-                    Delete account
+                    {t('submit')}
                 </Button>
             </div>
 

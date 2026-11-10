@@ -7,7 +7,7 @@ import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { listWorkspacePublishedAction, publishFileAction, unpublishLinkAction, updatePublishedAccessAction } from './publish.actions'
 
-vi.mock('@/app/api/_auth/ownership', () => ({ AuthorizationError: class extends Error {}, requireAdminContext: vi.fn(), requireWorkspaceContext: vi.fn() }))
+vi.mock('@/app/api/_auth/ownership', async () => ({ AuthorizationError: (await vi.importActual<typeof import('@/app/api/_auth/errors')>('@/app/api/_auth/errors')).AuthorizationError, requireAdminContext: vi.fn(), requireWorkspaceContext: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({
     assertAgentInWorkspace: vi.fn(),
     isAdminActor: (actor: Actor) => actor.kind === 'workspace' || actor.role === 'admin',
@@ -103,10 +103,10 @@ describe('links reached by their slug', () => {
 
     it('refuses a member a link published by a coworker they cannot reach', async () => {
         vi.mocked(requireLightSessionActor).mockResolvedValue(MEMBER)
-        vi.mocked(assertAgentInWorkspace).mockRejectedValue(new AuthorizationError('Coworker not found'))
+        vi.mocked(assertAgentInWorkspace).mockRejectedValue(new AuthorizationError('coworkerNotFound'))
 
-        await expect(unpublishLinkAction('report')).resolves.toEqual({ ok: false, error: 'Coworker not found' })
-        await expect(updatePublishedAccessAction('report', { access: 'public' } as never)).resolves.toEqual({ ok: false, error: 'Coworker not found' })
+        await expect(unpublishLinkAction('report')).resolves.toEqual({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound' })
+        await expect(updatePublishedAccessAction('report', { access: 'public' } as never)).resolves.toEqual({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound' })
         expect(assertAgentInWorkspace).toHaveBeenCalledWith('agent-hidden', 'use', MEMBER)
         expect(unpublishInWorkspace).not.toHaveBeenCalled()
         expect(updatePublishedAccess).not.toHaveBeenCalled()

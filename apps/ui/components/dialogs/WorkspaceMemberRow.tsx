@@ -12,10 +12,8 @@ import type { AuthorProfile } from '@/lib/chat/message-author'
 import type { WorkspaceRole } from '@/supabase/session/SessionProvider'
 import { Badge } from '@rerun/ui/primitives'
 import { CardAvatar } from '@rerun/ui/chat'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
-
-export const MEMBERS_ADMIN_ONLY = 'Only an admin can manage members'
-const LAST_ADMIN = 'The workspace needs at least one admin'
 
 const asIs = (path: string) => path
 
@@ -33,11 +31,12 @@ type MemberRowProps = {
 }
 
 export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isLastAdmin, busy, onRoleChange, onRemove, onOpen }: MemberRowProps) {
+    const t = useTranslations('dialogs.members')
     const [confirmingRemoval, setConfirmingRemoval] = useState(false)
-    const email = member.email ?? 'Unknown user'
+    const email = member.email ?? t('unknownUser')
     const name = profile?.name && profile.name !== UNNAMED ? profile.name : null
     const nextRole: WorkspaceRole = member.role === 'admin' ? 'member' : 'admin'
-    const roleChangeBlocked = nextRole === 'member' && isLastAdmin ? LAST_ADMIN : undefined
+    const roleChangeBlocked = nextRole === 'member' && isLastAdmin ? t('lastAdmin') : undefined
 
     return (
         <>
@@ -47,7 +46,7 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
                 title={
                     <span className="flex min-w-0 items-center gap-1.5">
                         <span className="truncate">{name ?? email}</span>
-                        {isSelf && <span className="shrink-0 text-xs font-normal text-muted-foreground">You</span>}
+                        {isSelf && <span className="shrink-0 text-xs font-normal text-muted-foreground">{t('you')}</span>}
                     </span>
                 }
                 description={name ? email : undefined}
@@ -55,15 +54,15 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
                     <>
                         {member.role === 'admin' && (
                             <Badge size="xs" tone="brand" glow={false} className="mr-1">
-                                Admin
+                                {t('adminBadge')}
                             </Badge>
                         )}
                         {/* The menu is portaled, and React still bubbles its clicks to the row. */}
                         <div className="flex" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
                             <DropdownMenu>
-                                <TooltipDisabledReason reason={viewerIsAdmin ? undefined : MEMBERS_ADMIN_ONLY}>
+                                <TooltipDisabledReason reason={viewerIsAdmin ? undefined : t('adminOnly')}>
                                     <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="icon-xs" disabled={!viewerIsAdmin || busy} aria-label={`Manage ${email}`} className="text-muted-foreground">
+                                        <Button type="button" variant="ghost" size="icon-xs" disabled={!viewerIsAdmin || busy} aria-label={t('manage', { email })} className="text-muted-foreground">
                                             <EllipsisIcon className="size-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -71,14 +70,14 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
                                 <DropdownMenuContent align="end" className="min-w-40">
                                     <TooltipDisabledReason reason={roleChangeBlocked} side="bottom" className="flex w-full">
                                         <DropdownMenuItem disabled={!!roleChangeBlocked} onSelect={() => onRoleChange(nextRole)} className="w-full">
-                                            {nextRole === 'admin' ? 'Make admin' : 'Make member'}
+                                            {nextRole === 'admin' ? t('makeAdmin') : t('makeMember')}
                                         </DropdownMenuItem>
                                     </TooltipDisabledReason>
                                     {!isSelf && (
                                         <>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem variant="destructive" onSelect={() => setConfirmingRemoval(true)}>
-                                                Remove
+                                                {t('remove')}
                                             </DropdownMenuItem>
                                         </>
                                     )}
@@ -92,9 +91,9 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
             <ConfirmDialog
                 open={confirmingRemoval}
                 onOpenChange={setConfirmingRemoval}
-                title={`Remove ${email}?`}
-                description="They lose access to this workspace and everything in it right away. You can invite them back later."
-                confirmLabel="Remove"
+                title={t('removeConfirm.title', { email })}
+                description={t('removeConfirm.description')}
+                confirmLabel={t('remove')}
                 onConfirm={onRemove}
             />
         </>
@@ -102,24 +101,25 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
 }
 
 export function WorkspaceInviteRowView({ invite, viewerIsAdmin, onRevoke }: { invite: WorkspaceInviteRow; viewerIsAdmin: boolean; onRevoke: () => void }) {
+    const t = useTranslations('dialogs.members')
     return (
         <PanelRow
             className="border-dashed bg-transparent"
             leading={<CardAvatar name={invite.email} className="size-8 opacity-60" />}
             title={<span className="text-muted-foreground">{invite.email}</span>}
-            description={invite.boxScope === 'assigned' ? 'assign later' : undefined}
+            description={invite.boxScope === 'assigned' ? t('invite.assignLater') : undefined}
             meta={
                 <Badge size="xs" tone="neutral" glow={false}>
-                    Pending
+                    {t('invite.pending')}
                 </Badge>
             }
             actions={
                 viewerIsAdmin ? (
-                    <ConfirmDialog title={`Revoke the invitation to ${invite.email}?`} description="Their invitation link stops working. You can send a new one at any time." confirmLabel="Revoke" onConfirm={onRevoke}>
+                    <ConfirmDialog title={t('revokeConfirm.title', { email: invite.email })} description={t('revokeConfirm.description')} confirmLabel={t('revokeConfirm.confirm')} onConfirm={onRevoke}>
                         <RevokeButton />
                     </ConfirmDialog>
                 ) : (
-                    <TooltipDisabledReason reason={MEMBERS_ADMIN_ONLY}>
+                    <TooltipDisabledReason reason={t('adminOnly')}>
                         <RevokeButton disabled />
                     </TooltipDisabledReason>
                 )
@@ -129,8 +129,9 @@ export function WorkspaceInviteRowView({ invite, viewerIsAdmin, onRevoke }: { in
 }
 
 function RevokeButton({ disabled }: { disabled?: boolean }) {
+    const t = useTranslations('dialogs.members')
     return (
-        <Button type="button" variant="ghost" size="icon-xs" disabled={disabled} aria-label="Revoke invitation" className="text-muted-foreground">
+        <Button type="button" variant="ghost" size="icon-xs" disabled={disabled} aria-label={t('invite.revoke')} className="text-muted-foreground">
             <XIcon className="size-4" />
         </Button>
     )

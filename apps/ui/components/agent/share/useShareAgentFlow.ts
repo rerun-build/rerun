@@ -1,12 +1,16 @@
 'use client'
 
+import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import type { AgentShareInclude } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
+import { useTranslations } from 'next-intl'
 import * as React from 'react'
 import type { AgentSharePlan } from '@/lib/agents/share-create'
 
-export type SharePlanResult = { ok: true; plan: AgentSharePlan } | { ok: false; error: string }
-export type ShareCreateResult = { ok: true; url: string; warnings: string[]; reused: boolean } | { ok: false; error: string }
+type ShareRefusal = { ok: false; error: string } & Pick<Refusal, 'code' | 'params'>
+
+export type SharePlanResult = { ok: true; plan: AgentSharePlan } | ShareRefusal
+export type ShareCreateResult = { ok: true; url: string; warnings: string[]; reused: boolean } | ShareRefusal
 
 // One action per prop, each answering a discriminated result rather than throwing, so the same flow
 // can be mounted by a surface that authorizes its caller differently. Same contract as
@@ -15,10 +19,6 @@ export type ShareActions = {
     plan: () => Promise<SharePlanResult>
     create: (include: AgentShareInclude) => Promise<ShareCreateResult>
 }
-
-// A server action rejects rather than answering when the request itself fails (offline, a redeploy
-// invalidating the action id), and a silent no-op reads as "nothing happened, click again".
-const FAILED_REQUEST = 'The request did not go through. Check your connection and try again.'
 
 // Nothing is on by default. What makes an agent an agent (its instructions, skills, schedules and
 // webhooks) travels either way; the three switches are all data, and someone sending a colleague an
@@ -44,6 +44,10 @@ export type ShareFlow = {
 // Mounted only while the dialog is on screen, like useCaptureFlow: the inspection streams a plan
 // off the source box, so it has no business running behind a closed dialog.
 export function useShareAgentFlow(actions: ShareActions): ShareFlow {
+    // A server action rejects rather than answering when the request itself fails (offline, a redeploy
+    // invalidating the action id), and a silent no-op reads as "nothing happened, click again".
+    const failedRequest = useTranslations('agent.useShareAgentFlow')('failedRequest')
+    const errorText = useErrorText()
     const [plan, setPlan] = React.useState<AgentSharePlan | null>(null)
     const [loading, setLoading] = React.useState(true)
     const [include, setIncludeState] = React.useState<AgentShareInclude>(DEFAULT_INCLUDE)
@@ -62,11 +66,11 @@ export function useShareAgentFlow(actions: ShareActions): ShareFlow {
             .current()
             .then(result => {
                 if (cancelled) return
-                if (!result.ok) setError(result.error)
+                if (!result.ok) setError(errorText(result))
                 else setPlan(result.plan)
             })
             .catch(() => {
-                if (!cancelled) setError(FAILED_REQUEST)
+                if (!cancelled) setError(failedRequest)
             })
             .finally(() => {
                 if (!cancelled) setLoading(false)
@@ -74,7 +78,7 @@ export function useShareAgentFlow(actions: ShareActions): ShareFlow {
         return () => {
             cancelled = true
         }
-    }, [])
+    }, [failedRequest, errorText])
 
     const setInclude = React.useCallback((next: Partial<AgentShareInclude>) => {
         setIncludeState(current => ({ ...current, ...next }))
@@ -86,7 +90,7 @@ export function useShareAgentFlow(actions: ShareActions): ShareFlow {
         try {
             const result = await actions.create(include)
             if (!result.ok) {
-                setError(result.error)
+                setError(errorText(result))
                 return
             }
             setUrl(result.url)
@@ -95,11 +99,11 @@ export function useShareAgentFlow(actions: ShareActions): ShareFlow {
             // defaults held or whether everybody turns everything on.
             if (!result.reused) track('agent_share_created', { carries_memories: include.memories, carries_database: include.database, carries_files: include.files })
         } catch {
-            setError(FAILED_REQUEST)
+            setError(failedRequest)
         } finally {
             setBusy(false)
         }
-    }, [actions, include])
+    }, [actions, include, failedRequest, errorText])
 
     return {
         step: url ? 'link' : 'configure',

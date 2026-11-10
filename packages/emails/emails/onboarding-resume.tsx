@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface OnboardingResumeProps {
@@ -9,6 +10,7 @@ export interface OnboardingResumeProps {
   resumeUrl: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 // Nothing is stored while the survey is open, so this email never claims a saved position. What it
@@ -18,31 +20,26 @@ export default function OnboardingResume({
   resumeUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: OnboardingResumeProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview="Your Rerun setup isn't finished"
+      preview={t("onboardingResume.preview")}
       hero={{ scene: "onboarding-resume" }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Heading style={text.heading}>
-        {firstName ? `${firstName}, your setup isn't finished` : "Your setup isn't finished"}
+        {firstName ? t("onboardingResume.headingNamed", { firstName }) : t("onboardingResume.heading")}
       </Heading>
-      <Text style={text.paragraph}>
-        Your workspace is created, but you left before the end of the setup. It
-        takes about a minute: your site, and the tools you already work with.
-      </Text>
-      <Text style={text.paragraph}>
-        Those two answers are what decide which coworkers Rerun puts in front of
-        you. Without them you get the generic list.
-      </Text>
+      <Text style={text.paragraph}>{t("onboardingResume.leftEarly")}</Text>
+      <Text style={text.paragraph}>{t("onboardingResume.whyItMatters")}</Text>
       <Section style={cta}>
-        <Button href={resumeUrl}>Finish setup</Button>
+        <Button href={resumeUrl}>{t("onboardingResume.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        The questions reopen on their own when you land on your workspace.
-      </Text>
+      <Text style={text.footnote}>{t("onboardingResume.footnote")}</Text>
     </Layout>
   );
 }

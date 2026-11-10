@@ -23,6 +23,8 @@ export async function runPlanChange(selection: PlanSelection): ReturnType<typeof
         await confirmPlanPayment(result.paymentClientSecret)
         return result
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : NOT_CONFIRMED }
+        // Stripe's own refusal is already in the reader's language; ours goes by its code.
+        const message = err instanceof Error ? err.message : NOT_CONFIRMED
+        return message === NOT_CONFIRMED ? { ok: false, error: NOT_CONFIRMED, code: 'bankNotConfirmed' } : { ok: false, error: message }
     }
 }

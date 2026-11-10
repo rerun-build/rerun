@@ -1,5 +1,6 @@
 import type { TemplateConnector } from '@rerun/contracts'
 import { brandIconFilter } from '@rerun/ui/brand-icon'
+import { useTranslations } from 'next-intl'
 import { serviceIconProps } from '@/lib/services/icons'
 import { cn } from '@/lib/utils'
 
@@ -7,11 +8,12 @@ const MAX_SHOWN = 4
 
 // Bare logos rather than the boxed Icon: on a card footer four boxes read as buttons.
 export function TemplateConnectorLogos({ connectors, className }: { connectors: TemplateConnector[]; className?: string }) {
-    if (connectors.length === 0) return <span className={cn('shrink-0 text-xs text-muted-foreground', className)}>No apps needed</span>
+    const t = useTranslations('templates.connectors')
+    if (connectors.length === 0) return <span className={cn('shrink-0 text-xs text-muted-foreground', className)}>{t('none')}</span>
 
     const hidden = connectors.length - MAX_SHOWN
     return (
-        <span className={cn('flex shrink-0 items-center gap-1.5', className)} aria-label={`Apps: ${connectors.map(c => c.name).join(', ')}`}>
+        <span className={cn('flex shrink-0 items-center gap-1.5', className)} aria-label={t('label', { names: connectors.map(c => c.name).join(', ') })}>
             {connectors.slice(0, MAX_SHOWN).map(connector => (
                 <ConnectorLogo key={connector.slug} connector={connector} />
             ))}

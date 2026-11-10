@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { TemplateCreatorCard } from '@/components/templates/TemplateCreatorCard'
 import { TemplateCreatorSpotlight } from '@/components/templates/TemplateCreatorSpotlight'
 import { TemplateLibraryGrid } from '@/components/templates/TemplateLibraryGrid'
@@ -38,6 +39,7 @@ export function TemplateLibraryDiscover({
     onSelectTemplate: (slug: string) => void
     onView: (view: LibraryView) => void
 }) {
+    const t = useTranslations('templates.library.discover')
     const creators = useMemo(() => creatorSummaries(templates, directory), [templates, directory])
     const spotlight = useMemo(() => creatorOfTheWeek(creators, now), [creators, now])
     const otherCreators = useMemo(() => creatorsToMeet(creators, { exclude: spotlight?.creator.slug, seed: now.getTime(), count: CREATORS_SHOWN }), [creators, spotlight, now])
@@ -54,7 +56,7 @@ export function TemplateLibraryDiscover({
     const grid = (items: LibraryTemplate[], key: string) => (
         <TemplateLibraryGrid templates={items} selectedSlug={selectedSlug} showStatus={t => isAdmin || t.isMine} onSelectTemplate={onSelectTemplate} empty={false} filtered={false} revealKey={key} />
     )
-    const seeAll = <TemplateLibrarySectionLink onClick={() => onView({ kind: 'all' })}>See all</TemplateLibrarySectionLink>
+    const seeAll = <TemplateLibrarySectionLink onClick={() => onView({ kind: 'all' })}>{t('seeAll')}</TemplateLibrarySectionLink>
 
     return (
         <div className="flex flex-col gap-8">
@@ -68,7 +70,7 @@ export function TemplateLibraryDiscover({
             )}
 
             {otherCreators.length > 0 && (
-                <TemplateLibrarySection title="Creators" subtitle="The people behind the templates." action={<TemplateLibrarySectionLink href={landingUrl('/community/experts')}>All creators</TemplateLibrarySectionLink>}>
+                <TemplateLibrarySection title={t('creators')} subtitle={t('creatorsSubtitle')} action={<TemplateLibrarySectionLink href={landingUrl('/community/experts')}>{t('allCreators')}</TemplateLibrarySectionLink>}>
                     <div className="grid grid-cols-2 gap-3 @min-[40rem]:grid-cols-3 @min-[52rem]:grid-cols-4 @min-[60rem]:grid-cols-5">
                         {otherCreators.map((creator, index) => (
                             <TemplateCreatorCard key={creator.slug} creator={creator} onOpen={() => onView({ kind: 'creator', slug: creator.slug })} className={cn(CREATOR_CARD_VISIBILITY[index])} />
@@ -78,13 +80,13 @@ export function TemplateLibraryDiscover({
             )}
 
             {picks.length > 0 && (
-                <TemplateLibrarySection title={personal ? 'For you' : 'Featured'} subtitle={personal ? 'Matched to your industry and the apps you use.' : 'Hand-picked setups worth a look first.'} action={<TemplateLibrarySectionLink onClick={() => onView({ kind: 'foryou' })}>See all</TemplateLibrarySectionLink>}>
+                <TemplateLibrarySection title={personal ? t('forYou') : t('featured')} subtitle={personal ? t('forYouSubtitle') : t('featuredSubtitle')} action={<TemplateLibrarySectionLink onClick={() => onView({ kind: 'foryou' })}>{t('seeAll')}</TemplateLibrarySectionLink>}>
                     {grid(picks, 'picks')}
                 </TemplateLibrarySection>
             )}
 
             {newest.length > 0 && (
-                <TemplateLibrarySection title="Just added" subtitle="The latest templates published on Rerun." action={seeAll}>
+                <TemplateLibrarySection title={t('justAdded')} subtitle={t('justAddedSubtitle')} action={seeAll}>
                     {grid(newest, 'newest')}
                 </TemplateLibrarySection>
             )}

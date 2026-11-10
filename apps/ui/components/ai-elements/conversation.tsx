@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
 import { ArrowDownIcon, DownloadIcon } from '@/lib/icons';
 import { AnimatePresence, motion } from "motion/react";
+import { useTranslations } from "next-intl";
 import type { ComponentProps, RefObject } from "react";
 import { useCallback } from "react";
 import { StickToBottom, type StickToBottomContext, useStickToBottomContext } from "use-stick-to-bottom";
@@ -49,12 +50,16 @@ export type ConversationEmptyStateProps = ComponentProps<"div"> & {
 
 export const ConversationEmptyState = ({
   className,
-  title = "No messages yet",
-  description = "Start a conversation to see messages here",
+  title,
+  description,
   icon,
   children,
   ...props
-}: ConversationEmptyStateProps) => (
+}: ConversationEmptyStateProps) => {
+  const t = useTranslations("chat.conversation");
+  const shownTitle = title ?? t("emptyTitle");
+  const shownDescription = description ?? t("emptyDescription");
+  return (
   <div
     className={cn(
       "flex size-full flex-col items-center justify-center gap-3 p-8 text-center",
@@ -66,15 +71,16 @@ export const ConversationEmptyState = ({
       <>
         {icon && <div className="text-muted-foreground">{icon}</div>}
         <div className="space-y-1">
-          <h3 className="font-medium text-sm">{title}</h3>
-          {description && (
-            <p className="text-muted-foreground text-sm">{description}</p>
+          <h3 className="font-medium text-sm">{shownTitle}</h3>
+          {shownDescription && (
+            <p className="text-muted-foreground text-sm">{shownDescription}</p>
           )}
         </div>
       </>
     )}
   </div>
-);
+  );
+};
 
 export type PendingHitlCue = {
   key: string;
@@ -98,6 +104,7 @@ export const ConversationScrollButton = ({
   pending = null,
   ...props
 }: ConversationScrollButtonProps) => {
+  const t = useTranslations("chat.conversation");
   const context = useStickToBottomContext();
   const { isAtBottom, scrollToBottom, scrollRef } = context;
   const visibility = usePendingInView(scrollRef, pending?.blockRef, pending?.key ?? null);
@@ -127,7 +134,7 @@ export const ConversationScrollButton = ({
               size="icon"
               type="button"
               variant="outline"
-              aria-label="Scroll to the latest message"
+              aria-label={t("scrollToLatest")}
               {...props}
             >
               <ArrowDownIcon className="size-4" />

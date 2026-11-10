@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button'
 import { useAgentBuddyMood } from '@/hooks/useAgentBuddyMood'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
-import { AGENT_SHEET_VIEW_LABELS, AGENT_SHEET_VIEWS, AGENT_VIEW_TAB_LABELS, agentSheetViewOf, type AgentViewTab } from '@/lib/board/agent-sheet-views'
+import { AGENT_SHEET_VIEWS, agentSheetViewOf, type AgentViewTab } from '@/lib/board/agent-sheet-views'
 import type { IsoAgent } from '@/lib/board/types'
 import { ChevronLeftIcon, XIcon } from '@/lib/icons'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 const TAB_ICONS = Object.fromEntries(AGENT_TABS.map(tab => [tab.id, tab.icon]))
@@ -29,6 +30,7 @@ type AgentViewProps = {
 
 /** A screen of the coworker, in place of the thread. Its header is a breadcrumb, coworker / screen, whose first step goes back to the card. */
 export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSession, overlay }: AgentViewProps) {
+    const t = useTranslations('agent.agentView')
     const isTemplateAuthor = useIsTemplateAuthor()
     const mood = useAgentBuddyMood(agent.id)
     const servicesNeedConfig = useConnectorServices(agent.id).needsConfig
@@ -40,7 +42,7 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
     const view = agentSheetViewOf(shown)
     const switcherTabs = (AGENT_SHEET_VIEWS[view] as readonly AgentViewTab[])
         .filter(id => !hidden(id))
-        .map(id => ({ id, icon: TAB_ICONS[id], label: AGENT_VIEW_TAB_LABELS[id], dot: id === 'services' && servicesNeedConfig }))
+        .map(id => ({ id, icon: TAB_ICONS[id], label: t(`tabs.${id}`), dot: id === 'services' && servicesNeedConfig }))
 
     return (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -53,8 +55,8 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
                     <span className="truncate text-muted-foreground">{agent.name}</span>
                 </Button>
                 <span className="text-muted-foreground/50">/</span>
-                <span className="shrink-0 px-1.5 text-sm font-semibold">{AGENT_SHEET_VIEW_LABELS[view]}</span>
-                <Button aria-label="Close panel" variant="ghost" size="icon-sm" onClick={onClose} className="ml-auto">
+                <span className="shrink-0 px-1.5 text-sm font-semibold">{t(`views.${view}`)}</span>
+                <Button aria-label={t('closePanel')} variant="ghost" size="icon-sm" onClick={onClose} className="ml-auto">
                     <XIcon className="size-4" />
                 </Button>
             </div>

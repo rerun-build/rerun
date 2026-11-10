@@ -1,5 +1,13 @@
+import { englishTranslator } from '@/lib/i18n/english-translator'
+import { loadMessages } from '@rerun/i18n/messages'
+import { createTranslator } from 'use-intl'
 import { describe, expect, it } from 'vitest'
-import { chatErrorTitle, classifyChatError, describeSubscriptionLimit, friendlyError, isBudgetExhausted, stripErrorPrefix, installInFlightOf, teammateRunOf, unwrapChatError } from './chat-error'
+import { chatErrorTitle as titleIn, classifyChatError, describeSubscriptionLimit, friendlyError as friendlyIn, isBudgetExhausted, stripErrorPrefix, installInFlightOf, subscriptionLimitMessage, subscriptionLimitTitle, teammateRunOf, unwrapChatError, type ChatErrorKind, type SubscriptionLimit } from './chat-error'
+
+const english = englishTranslator('chatErrors')
+const french = createTranslator({ locale: 'fr', messages: await loadMessages('fr'), namespace: 'chatErrors' })
+const friendlyError = (message: string) => friendlyIn(message, english)
+const chatErrorTitle = (kind: ChatErrorKind, message: string) => titleIn(kind, message, english)
 
 describe('unwrapChatError', () => {
     it('reads the error field of a JSON envelope', () => {
@@ -302,5 +310,47 @@ describe('a conversation the coworker cannot reach', () => {
         const message = unwrapChatError('{"error":"session_not_found"}')
         expect(chatErrorTitle('session_gone', message)).toBe('Conversation unavailable')
         expect(friendlyError(message)).toMatch(/Start a new conversation/)
+    })
+})
+
+// Every sentence as it read before it moved to the catalog: the English must not change.
+describe('the English copy of a spent subscription', () => {
+    const cases: [SubscriptionLimit, string, string][] = [
+        [{ plan: 'opencode', scope: 'credits' }, 'OpenCode credits used up', 'No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.'],
+        [{ plan: 'opencode', scope: 'monthly', resetsAt: 'Dec 1' }, 'OpenCode Go monthly limit reached', 'Your OpenCode Go plan has reached its monthly limit. It resets Dec 1; switch to a Console model or another provider until then.'],
+        [{ plan: 'opencode', scope: 'session' }, 'OpenCode Go limit reached', 'Your OpenCode Go plan has reached its 5-hour limit. Switch to a Console model or another provider until it resets.'],
+        [{ plan: null, scope: 'not_in_plan', modelName: 'GPT-6' }, 'GPT-6 unavailable', "This connection can't run GPT-6. Pick another model to keep going."],
+        [{ plan: null, scope: 'not_in_plan' }, 'Model unavailable', "This connection can't run this model. Pick another model to keep going."],
+        [{ plan: 'claude', scope: 'not_in_plan', modelName: 'Fable 5.1' }, "Fable 5.1 isn't in your Claude plan", "Your Claude plan doesn't include Fable 5.1. Pick another model to keep going."],
+        [{ plan: 'chatgpt', scope: 'not_in_plan' }, 'Model not in your ChatGPT plan', "Your ChatGPT plan doesn't include this model. Pick another model to keep going."],
+        [{ plan: null, scope: 'session' }, 'Usage limit reached', 'This subscription has reached its usage limit. Switch to another model, or wait for the limit to reset.'],
+        [{ plan: 'claude', scope: 'credits' }, 'Claude usage credits used up', 'Your Claude plan has used up its usage credits. Pick a model your plan includes to keep going.'],
+        [{ plan: 'claude', scope: 'spend' }, 'Claude spend limit reached', 'Your organization has reached its monthly Claude spend limit. An admin can raise it; switch this coworker to another model in the meantime.'],
+        [{ plan: 'claude', scope: 'weekly', resetsAt: 'Oct 12, 3am (UTC)' }, 'Claude weekly limit reached', 'Your Claude plan has reached its weekly limit. It resets Oct 12, 3am (UTC); switch this coworker to another model until then.'],
+        [{ plan: 'claude', scope: 'weekly' }, 'Claude weekly limit reached', 'Your Claude plan has reached its weekly limit. Switch this coworker to another model until the week rolls over.'],
+        [{ plan: 'claude', scope: 'model', modelName: 'Opus' }, 'Claude Opus limit reached', 'Your Claude plan has reached its Opus limit. The other Claude models still run: switch to one of them.'],
+        [{ plan: 'claude', scope: 'session', resetsAt: '3pm' }, 'Claude session limit reached', 'Your Claude plan has used up its current usage window. It refills at 3pm; switch this coworker to another model in the meantime.'],
+        [{ plan: 'chatgpt', scope: 'session' }, 'ChatGPT usage limit reached', 'Your ChatGPT plan has used up its current usage window. It refills on its own; switch this coworker to another model in the meantime.'],
+    ]
+
+    it.each(cases)('%o', (limit, title, message) => {
+        expect(subscriptionLimitTitle(limit, english)).toBe(title)
+        expect(subscriptionLimitMessage(limit, english)).toBe(message)
+    })
+
+    it('keeps the fixed sentences', () => {
+        expect(friendlyError('rerun_budget_exhausted')).toBe('Rerun credits used up for this period. Add credits or wait for the monthly reset.')
+        expect(chatErrorTitle('run_in_flight', 'A run is already in flight')).toBe('This conversation is still busy')
+        expect(chatErrorTitle('unauthorized', '401')).toBe('Connection signed out')
+        expect(chatErrorTitle('overloaded', 'Selected model is at capacity')).toBe('Model at capacity')
+    })
+})
+
+describe('in the reader\'s language', () => {
+    it('translates what it explains and keeps the provider\'s own words otherwise', () => {
+        expect(titleIn('usage_limit', "You've hit your weekly limit", french)).toBe('Limite hebdomadaire Claude atteinte')
+        expect(friendlyIn("AI_APICallError: You've hit your session limit · resets 6:50pm (UTC)", french)).toContain('Elle se recharge à 6:50pm (UTC)')
+        expect(friendlyIn('', french)).toBe('Une erreur est survenue. Essayez de renvoyer votre message.')
+        expect(friendlyIn('Error: ECONNRESET', french)).toBe('ECONNRESET')
     })
 })

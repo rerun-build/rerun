@@ -2,6 +2,7 @@
 
 import { ChromePill } from '@rerun/ui/chrome'
 import { motion, useReducedMotion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, type MouseEvent, type PointerEvent } from 'react'
 
 import { GettingStartedPanel, GettingStartedProgressMark, type OnGettingStartedStep } from '@/components/foreman/getting-started/GettingStartedPanel'
@@ -24,6 +25,7 @@ const HOVER_CLOSE_DELAY_MS = 150
  * workspace, not to the Foreman it hands every step to. A mouse opens it by hovering, a finger by tapping.
  */
 export function GettingStartedPopover({ progress, reward, open, onOpenChange, onStep, onHide, pulse = 0 }: GettingStartedPopoverProps) {
+    const t = useTranslations('foreman.gettingStarted')
     const reducedMotion = useReducedMotion()
     const done = doneCount(progress)
     const total = stepsOf(progress).length
@@ -70,7 +72,7 @@ export function GettingStartedPopover({ progress, reward, open, onOpenChange, on
                     start="gauge"
                     beamTone="brand"
                     beamAnimated={!complete}
-                    aria-label={`Getting started: ${done} of ${total} done`}
+                    aria-label={t('pillLabel', { done, total })}
                     onPointerEnter={openOnHover}
                     onPointerLeave={closeOnLeave}
                     onClick={keepHoverOpen}

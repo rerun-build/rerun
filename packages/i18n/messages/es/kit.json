@@ -1,0 +1,484 @@
+{
+    "close": "Cerrar",
+    "chat": {
+        "actionApproval": {
+            "title": "Se requiere aprobación",
+            "previous": "Aprobación anterior",
+            "next": "Aprobación siguiente",
+            "decline": "Ahora no",
+            "approve": "Aprobar",
+            "approved": "Aprobado"
+        },
+        "alert": {
+            "title": "Notificación",
+            "markAsRead": "Marcar como leído"
+        },
+        "approval": {
+            "title": "Se requiere aprobación: {label}",
+            "responded": "Respuesta: <b>{choice}</b>",
+            "choices": {
+                "once": "Permitir una vez",
+                "session": "Esta sesión",
+                "always": "Siempre",
+                "deny": "Denegar"
+            }
+        },
+        "decline": {
+            "placeholder": "¿Por qué no? (opcional)",
+            "back": "Atrás",
+            "confirm": "Confirmar"
+        },
+        "question": {
+            "typeAnswer": "Escribe tu respuesta…",
+            "somethingElse": "Otra cosa",
+            "attachFiles": "Adjuntar archivos",
+            "dropFiles": "Suelta archivos para adjuntarlos",
+            "selectAll": "Selecciona todas las que correspondan",
+            "dismiss": "Descartar preguntas",
+            "skip": "Omitir",
+            "submit": "Enviar respuestas",
+            "next": "Siguiente pregunta"
+        },
+        "reasoning": {
+            "thinking": "Pensando...",
+            "thoughtFor": "Pensó durante {duration}",
+            "thought": "Pensamiento"
+        },
+        "secret": {
+            "saveFailed": "No se pudieron guardar las credenciales",
+            "titleOne": "Credencial necesaria",
+            "titleMany": "Credenciales necesarias",
+            "dismiss": "Descartar la solicitud de credenciales",
+            "storedAs": "Guardado como {key}",
+            "replacePlaceholder": "Ya guardado. Escribe un valor para reemplazarlo",
+            "placeholder": "Pega el valor",
+            "whereToFind": "Dónde encontrarlo",
+            "storageNote": "Se guarda en tu engine como variable del coworker. Nunca se envía al modelo.",
+            "skip": "Omitir",
+            "saving": "Guardando…",
+            "save": "Guardar"
+        },
+        "skillProposal": {
+            "remembering": "Recordando",
+            "remembered": "Recordado",
+            "failed": "No se pudo recordar esto",
+            "retry": "Reintentar",
+            "dismiss": "Descartar",
+            "notRemembered": "No recordado",
+            "question": "¿Recordar esto?",
+            "remember": "Recordar",
+            "no": "No",
+            "view": "Ver",
+            "hideDetails": "Ocultar detalles",
+            "showDetails": "Mostrar detalles"
+        },
+        "steps": {
+            "previous": "Paso anterior",
+            "next": "Paso siguiente",
+            "goTo": "Ir al paso {step}"
+        },
+        "table": {
+            "boxDatabase": "Base de datos de la Box",
+            "coworkerDatabase": "Base de datos del coworker",
+            "rows": "{count, plural, one {# fila} other {# filas}}",
+            "columnsHidden": "algunas columnas ocultas",
+            "groupedBy": "agrupado por {column}",
+            "open": "Abrir base de datos",
+            "empty": "Aún no hay filas.",
+            "more": "+ {count} más",
+            "rating": "{value} de 5"
+        }
+    },
+    "canvas": {
+        "zoomIn": "Acercar",
+        "zoomOut": "Alejar",
+        "recenter": "Recentrar",
+        "recenterView": "Recentrar la vista"
+    },
+    "consent": {
+        "rejectAll": "Rechazar todo",
+        "acceptAll": "Aceptar todo",
+        "region": "Consentimiento de cookies",
+        "title": "Cookies",
+        "short": "Usamos cookies de analítica. <policy>Política de cookies</policy>",
+        "long": "Usamos cookies de analítica para entender cómo se usa Rerun. Las cookies necesarias para iniciar sesión, hacer funcionar el chat de soporte y recordar tus preferencias siempre están activas. <policy>Política de cookies</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "step": "Paso {step}",
+            "steps": {
+                "identity": {
+                    "title": "Tu identidad",
+                    "description": "Tu foto, tu banner, tu nombre y cómo trabajas."
+                },
+                "about": {
+                    "title": "Sobre ti",
+                    "description": "Dónde estás y qué haces."
+                },
+                "pricing": {
+                    "title": "Tarifas y disponibilidad",
+                    "description": "Tu disponibilidad y una idea de tus tarifas."
+                },
+                "expertise": {
+                    "title": "Tu experiencia",
+                    "description": "Las habilidades e idiomas con los que trabajas. Opcional."
+                },
+                "links": {
+                    "title": "Enlaces y publicación",
+                    "description": "Añade tus enlaces y publica tu perfil."
+                }
+            },
+            "name": "Nombre",
+            "namePlaceholder": "p. ej. Mira Labs",
+            "email": "Correo",
+            "emailHelper": "Privado. Solo el equipo de Rerun puede verlo.",
+            "type": "Tipo",
+            "location": "Ubicación",
+            "locationPlaceholder": "p. ej. París",
+            "bio": "Bio",
+            "bioPlaceholder": "Qué construyes y a quién ayudas.",
+            "availability": "Disponibilidad",
+            "budget": "Presupuesto",
+            "budgetPlaceholder": "Elige un rango",
+            "skills": "Habilidades",
+            "skillsPlaceholder": "Elige habilidades",
+            "languages": "Idiomas",
+            "languagesPlaceholder": "Elige idiomas",
+            "website": "Sitio web",
+            "back": "Atrás",
+            "continue": "Continuar"
+        },
+        "types": {
+            "studio": {
+                "title": "Estudio",
+                "description": "Una agencia o equipo que construye para clientes"
+            },
+            "freelancer": {
+                "title": "Freelance",
+                "description": "Un independiente que construye en solitario"
+            },
+            "expert": {
+                "title": "Experto",
+                "description": "Un especialista que ofrece consejo y orientación"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}: {hint}",
+            "available": {
+                "label": "Disponible",
+                "hint": "Acepta nuevos proyectos ahora"
+            },
+            "soon": {
+                "label": "Disponible pronto",
+                "hint": "Se libera en breve"
+            },
+            "unavailable": {
+                "label": "No disponible",
+                "hint": "Completo por ahora"
+            }
+        },
+        "validation": {
+            "nameRequired": "El nombre es obligatorio",
+            "nameTooLong": "El nombre es demasiado largo",
+            "nameInvalid": "El nombre no puede contener < ni >",
+            "emailRequired": "El correo es obligatorio",
+            "emailInvalid": "Correo no válido",
+            "bioTooLong": "La bio es demasiado larga",
+            "budgetInvalid": "Presupuesto no válido",
+            "skillInvalid": "Habilidad no válida",
+            "languageInvalid": "Idioma no válido"
+        },
+        "images": {
+            "title": "Foto y banner",
+            "drop": "Soltar",
+            "dropBanner": "Suelta tu banner",
+            "dropPhoto": "Suelta tu foto",
+            "upload": "Subir",
+            "uploading": "Subiendo…",
+            "changeBanner": "Cambiar banner",
+            "uploadPhoto": "Subir foto",
+            "remove": "Quitar",
+            "notAnImage": "Elige un archivo de imagen."
+        },
+        "card": {
+            "location": "Ubicación",
+            "status": "Estado",
+            "links": "Enlaces",
+            "namePlaceholder": "Tu nombre",
+            "rolePlaceholder": "Experto Rerun"
+        },
+        "preview": {
+            "hire": "Contratar"
+        }
+    },
+    "foreman": {
+        "orbLabel": "Pregunta a Rerun",
+        "empty": {
+            "title": "Pregunta lo que quieras sobre tu workspace",
+            "description": "Rerun crea y ejecuta tus coworkers contigo"
+        },
+        "header": {
+            "closeChat": "Cerrar el chat",
+            "resize": "Cambiar el tamaño del chat"
+        },
+        "tabs": {
+            "assistant": "Preguntar",
+            "tasks": "Tareas",
+            "routines": "Rutinas"
+        },
+        "periods": {
+            "running": "En curso",
+            "morning": "Esta mañana",
+            "afternoon": "Esta tarde",
+            "tonight": "Esta noche",
+            "tomorrow": "Mañana",
+            "week": "Esta semana",
+            "later": "Más tarde",
+            "paused": "En pausa"
+        },
+        "routines": {
+            "setupFirst": "Primero termina la configuración",
+            "pause": "Pausar {name}",
+            "resume": "Reanudar {name}",
+            "nameLabel": "Nombre de la rutina",
+            "runningJustNow": "En curso · <1 min",
+            "runningMinutes": "En curso · {minutes} min",
+            "runningHours": "En curso · {hours} h",
+            "startsNow": "Empieza ahora",
+            "startsInMinutes": "Empieza en {minutes} min",
+            "startsInHours": "Empieza en {hours} h"
+        },
+        "agentPicker": {
+            "openTab": "Abrir {tab} de {name}"
+        }
+    },
+    "forms": {
+        "optional": "Opcional",
+        "hidePassword": "Ocultar contraseña",
+        "showPassword": "Mostrar contraseña",
+        "select": "Elegir…",
+        "search": "Escribe para buscar…",
+        "noResults": "Sin resultados",
+        "dropFile": "Suelta tu archivo aquí",
+        "remove": "Quitar {item}"
+    },
+    "primitives": {
+        "loading": "Cargando",
+        "scrollLeft": "Desplazar a la izquierda",
+        "scrollRight": "Desplazar a la derecha",
+        "carousel": {
+            "previous": "Anterior: {label}",
+            "next": "Siguiente: {label}",
+            "goTo": "Ir a {label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "Recuento",
+            "totalTokens": "Tokens totales",
+            "inputTokens": "Tokens de entrada",
+            "outputTokens": "Tokens de salida",
+            "cachedInputTokens": "Tokens en caché",
+            "reasoningTokens": "Tokens de razonamiento",
+            "cost": "Coste",
+            "avgDurationMs": "Duración media",
+            "errorCount": "Errores",
+            "errorRate": "Tasa de errores"
+        },
+        "live": "En vivo",
+        "runStatus": {
+            "running": "En curso",
+            "done": "Terminado",
+            "error": "Error",
+            "cancelled": "Cancelado"
+        },
+        "runs": {
+            "emptyTitle": "Aún no hay ejecuciones",
+            "emptyDescription": "Cada ejecución del coworker se registra aquí",
+            "steps": "{count, plural, one {# paso} other {# pasos}}",
+            "tokens": "{tokens} tokens"
+        },
+        "agentStatus": {
+            "idle": "Inactivo",
+            "working": "Trabajando",
+            "error": "Error",
+            "waiting_human": "Esperando a una persona",
+            "offline": "Desconectado",
+            "empty": "No hay coworkers que mostrar."
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} ejecuciones",
+                "runSteps": "{count} pasos",
+                "toolCalls": "{count} llamadas a herramientas",
+                "sessions": "{count} sesiones"
+            },
+            "other": "Otros",
+            "loading": "Cargando...",
+            "noData": "No hay datos en este periodo."
+        },
+        "usage": {
+            "input": "Entrada",
+            "output": "Salida",
+            "cached": "En caché",
+            "cost": "Coste",
+            "tokens": "Tokens",
+            "totalCost": "Coste total",
+            "totalTokens": "Tokens totales",
+            "runs": "{count, plural, one {# ejecución} other {# ejecuciones}}",
+            "noUsage": "No hay uso en este periodo."
+        }
+    },
+    "inbox": {
+        "title": "Notificaciones",
+        "resize": "Cambiar el tamaño de las notificaciones",
+        "close": "Cerrar las notificaciones",
+        "preferences": "Preferencias",
+        "preferencesUnavailable": "Las preferencias no están disponibles aquí",
+        "markAllRead": "Marcar todo como leído",
+        "nothingToMark": "Nada que marcar como leído",
+        "markRead": "Marcar como leído",
+        "noUpdates": "Sin novedades",
+        "pillLabel": "Notificaciones: {summary}",
+        "pillLabelEmpty": "Notificaciones: sin novedades",
+        "needsYouCount": "{count, plural, one {# te necesita} other {# te necesitan}}",
+        "doneCount": "{count, plural, one {# terminada} other {# terminadas}}",
+        "needsYouRich": "{count, plural, one {<b>#</b> te necesita} other {<b>#</b> te necesitan}}",
+        "doneRich": "{count, plural, one {<b>#</b> terminada} other {<b>#</b> terminadas}}",
+        "newUpdates": "{count, plural, one {<b>#</b> novedad} other {<b>#</b> novedades}}",
+        "running": "{count, plural, one {<n>#</n> tarea en curso} other {<n>#</n> tareas en curso}}",
+        "empty": {
+            "title": "Nada pendiente",
+            "description": "Cuando un coworker te necesite o termine una tarea, aparecerá aquí."
+        },
+        "sections": {
+            "needsYou": "Te necesitan",
+            "headsUps": "Avisos",
+            "errors": "Errores",
+            "done": "Terminadas"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} te hizo una pregunta",
+            "awaiting_approval": "{agent} necesita tu aprobación",
+            "awaiting_connector": "{agent} necesita que conectes una app",
+            "waiting_human": "{agent} te está esperando",
+            "awaiting_ack": "{agent} te señaló algo",
+            "error": "{agent} tuvo un error",
+            "done": "{agent} terminó su ejecución"
+        }
+    },
+    "richText": {
+        "bold": "Negrita",
+        "italic": "Cursiva",
+        "heading": "Título",
+        "subheading": "Subtítulo",
+        "bulletList": "Lista con viñetas",
+        "numberedList": "Lista numerada",
+        "quote": "Cita",
+        "inlineCode": "Código en línea",
+        "codeBlock": "Bloque de código",
+        "link": "Enlace",
+        "linkPrompt": "URL del enlace"
+    },
+    "theme": {
+        "label": "Tema",
+        "options": {
+            "system": "Sistema",
+            "light": "Claro",
+            "dark": "Oscuro"
+        }
+    },
+    "newAgent": {
+        "create": "Crear {name}",
+        "createCoworker": "Crear coworker",
+        "apps": "Apps",
+        "pickedApps": "Apps: {apps}",
+        "or": "O",
+        "browseTemplates": "Explorar plantillas",
+        "job": {
+            "placeholder": "Describe el trabajo como se lo explicarías a un compañero.",
+            "label": "¿Qué debe hacer tu nuevo coworker?"
+        },
+        "name": {
+            "placeholder": "Ponle nombre a tu coworker",
+            "label": "Nombre del coworker"
+        },
+        "forYou": {
+            "heading": "O empieza con uno elegido para ti",
+            "closeToIdea": "Parecido a tu idea",
+            "otherIdeas": "Otras ideas"
+        },
+        "appsPicker": {
+            "search": "Buscar apps",
+            "all": "Todas",
+            "empty": "No hay ninguna app con ese nombre.",
+            "limit": "Hasta {max} apps para empezar. Tu coworker podrá conectar más después.",
+            "categories": {
+                "payments": "Pagos",
+                "ecommerce": "E-commerce",
+                "crm": "CRM",
+                "marketing": "Marketing",
+                "seo": "SEO",
+                "analytics": "Analítica",
+                "dev": "Desarrollo",
+                "productivity": "Productividad",
+                "other": "Otros"
+            }
+        },
+        "schedule": {
+            "button": "Programar",
+            "readFromDescription": "Leído en tu descripción",
+            "onASchedule": "Con horario",
+            "custom": "Personalizado",
+            "noSchedule": "Sin horario",
+            "onDemand": "Solo cuando lo pida",
+            "timeOfDay": "Hora del día",
+            "presets": {
+                "weekday": {
+                    "label": "Cada día laborable a las 9:00",
+                    "detail": "De lunes a viernes"
+                },
+                "monday": {
+                    "label": "Cada lunes a las 9:00",
+                    "detail": "Una vez por semana"
+                }
+            },
+            "everyDay": "Todos los días a las {time}",
+            "everyWeekday": "Cada día laborable a las {time}",
+            "everyDays": "Cada {days} a las {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "Board de coworkers",
+        "addBlock": "Añadir un bloque en este lado",
+        "status": {
+            "idle": "Inactivo",
+            "working": "Trabajando",
+            "error": "Error",
+            "offline": "Desconectado",
+            "waiting_human": "Te espera",
+            "disabled": "Desactivado",
+            "paused": "En pausa",
+            "restoring": "Restaurando"
+        },
+        "countdown": {
+            "seconds": "{count} s",
+            "minutes": "{count} min",
+            "hours": "{count} h",
+            "days": "{count} d"
+        },
+        "untitledBox": "Box sin nombre",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} one {, # pendiente} other {, # pendientes}}{results, plural, =0 {} one {, # resultado nuevo} other {, # resultados nuevos}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "En curso",
+            "approval": "Te necesita",
+            "success": "Terminado",
+            "done": "Terminado"
+        },
+        "approve": "Aprobar",
+        "edit": "Editar"
+    }
+}

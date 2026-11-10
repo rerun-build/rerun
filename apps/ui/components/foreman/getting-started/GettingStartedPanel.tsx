@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -26,9 +27,10 @@ export function GettingStartedProgressMark({ progress, className }: { progress: 
 }
 
 export function GettingStartedHeader({ progress, onHide, className }: { progress: GettingStartedProgress; onHide?: () => void; className?: string }) {
+    const t = useTranslations('foreman.gettingStarted')
     return (
         <div className={cn('flex items-center gap-2', className)}>
-            <span className="text-base font-medium">Getting started</span>
+            <span className="text-base font-medium">{t('title')}</span>
             <span className="flex items-center gap-1.5">
                 <GettingStartedProgressMark progress={progress} />
                 <span className="text-xs text-muted-foreground tabular-nums">
@@ -36,8 +38,8 @@ export function GettingStartedHeader({ progress, onHide, className }: { progress
                 </span>
             </span>
             {onHide && (
-                <TooltipLabeled label="Hide">
-                    <Button variant="ghost" size="icon-sm" onClick={onHide} aria-label="Hide" className="-my-1 ml-auto text-muted-foreground">
+                <TooltipLabeled label={t('hide')}>
+                    <Button variant="ghost" size="icon-sm" onClick={onHide} aria-label={t('hide')} className="-my-1 ml-auto text-muted-foreground">
                         <EyeOffIcon />
                     </Button>
                 </TooltipLabeled>
@@ -47,6 +49,7 @@ export function GettingStartedHeader({ progress, onHide, className }: { progress
 }
 
 function StepRow({ step, done, highlighted, onStep }: { step: GettingStartedStep; done: boolean; highlighted: boolean; onStep: OnGettingStartedStep }) {
+    const t = useTranslations('foreman.gettingStarted.steps')
     return (
         <li>
             <button
@@ -61,8 +64,8 @@ function StepRow({ step, done, highlighted, onStep }: { step: GettingStartedStep
             >
                 <span className="pt-px">{done ? <IconBadge tone="green" icon={CheckIcon} /> : <IconBadge tone="neutral" glow={false} />}</span>
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className={cn('truncate text-sm transition-colors duration-300', done ? 'text-muted-foreground line-through decoration-muted-foreground/60' : 'font-medium text-foreground')}>{step.title}</span>
-                    {!done && <span className="text-xs text-muted-foreground">{step.description}</span>}
+                    <span className={cn('truncate text-sm transition-colors duration-300', done ? 'text-muted-foreground line-through decoration-muted-foreground/60' : 'font-medium text-foreground')}>{t(`${step.id}.title`)}</span>
+                    {!done && <span className="text-xs text-muted-foreground">{t(`${step.id}.description`)}</span>}
                     {!done && step.providers && (
                         <span className="mt-1 flex items-center gap-1.5 text-muted-foreground">
                             {step.providers.map(provider => (
@@ -125,19 +128,21 @@ function RewardNote({ title, description, className }: { title: string; descript
  * has nothing dangled in front of it on the way.
  */
 export function GettingStartedReward({ progress, reward, className }: { progress: GettingStartedProgress; reward: Reward; className?: string }) {
+    const t = useTranslations('foreman.gettingStarted.reward')
     const total = stepsOf(progress).length
     const remaining = total - doneCount(progress)
+    const days = GETTING_STARTED_REWARD_DAYS
 
     let content: ReactNode = null
-    if (reward === 'granted') content = <Celebration key="granted" title={`${GETTING_STARTED_REWARD_DAYS} days added to your trial`} description="Your workspace is all set. Enjoy the extra time." className={className} />
-    else if (remaining === 0 && reward === 'available') content = <RewardNote key="claiming" title={`Adding ${GETTING_STARTED_REWARD_DAYS} days to your trial`} description="One moment." className={className} />
-    else if (remaining === 0) content = <Celebration key="done" title="Your workspace is all set" description="Your coworkers can run on their own now." className={className} />
+    if (reward === 'granted') content = <Celebration key="granted" title={t('grantedTitle', { days })} description={t('grantedDescription')} className={className} />
+    else if (remaining === 0 && reward === 'available') content = <RewardNote key="claiming" title={t('claimingTitle', { days })} description={t('claimingDescription')} className={className} />
+    else if (remaining === 0) content = <Celebration key="done" title={t('doneTitle')} description={t('doneDescription')} className={className} />
     else if (reward === 'available')
         content = (
             <RewardNote
                 key="locked"
-                title={`Get ${GETTING_STARTED_REWARD_DAYS} more free trial days`}
-                description={`Complete the ${total} steps above. ${remaining} to go.`}
+                title={t('lockedTitle', { days })}
+                description={t('lockedDescription', { total, remaining })}
                 className={className}
             />
         )

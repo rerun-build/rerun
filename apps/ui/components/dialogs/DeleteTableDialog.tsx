@@ -10,6 +10,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { useTranslations } from 'next-intl'
 
 type DeleteTableDialogProps = {
     open: boolean
@@ -19,19 +20,19 @@ type DeleteTableDialogProps = {
 }
 
 export function DeleteTableDialog({ open, onOpenChange, onConfirm, table }: DeleteTableDialogProps) {
+    const t = useTranslations('dialogs.deleteTable')
+    const tCommon = useTranslations('common')
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent size="sm">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Delete table &ldquo;{table}&rdquo;?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This permanently deletes the entire table and all of its rows. This cannot be undone.
-                    </AlertDialogDescription>
+                    <AlertDialogTitle>{t('title', { table })}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('description')}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
                     <AlertDialogAction variant="destructive" onClick={onConfirm}>
-                        Delete
+                        {t('confirm')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

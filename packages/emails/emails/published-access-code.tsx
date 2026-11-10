@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text, theme } from "../theme";
 
 export interface PublishedAccessCodeProps {
@@ -9,6 +10,7 @@ export interface PublishedAccessCodeProps {
   pageTitle: string;
   expiresInMinutes: number;
   appUrl: string;
+  locale?: EmailLocale;
 }
 
 export default function PublishedAccessCode({
@@ -17,18 +19,20 @@ export default function PublishedAccessCode({
   pageTitle,
   expiresInMinutes,
   appUrl,
+  locale,
 }: PublishedAccessCodeProps) {
+  const t = emailTranslator(locale);
   return (
-    <Layout preview={`Your code to open ${pageTitle}: ${code}`} appUrl={appUrl}>
-      <Heading style={text.heading}>Open {pageTitle}</Heading>
+    <Layout preview={t("publishedAccessCode.preview", { pageTitle, code })} appUrl={appUrl} locale={locale}>
+      <Heading style={text.heading}>{t("publishedAccessCode.heading", { pageTitle })}</Heading>
       <Text style={text.paragraph}>
-        {workspaceName} shared this page with you. Enter this code on the page to open it.
+        {t("publishedAccessCode.body", { workspaceName })}
       </Text>
       <Section style={codeBox}>
         <Text style={codeText}>{code}</Text>
       </Section>
       <Text style={text.footnote}>
-        {`The code expires in ${expiresInMinutes} minutes and works once. If you didn't ask for it, you can safely ignore this email.`}
+        {t("publishedAccessCode.footnote", { minutes: expiresInMinutes })}
       </Text>
     </Layout>
   );

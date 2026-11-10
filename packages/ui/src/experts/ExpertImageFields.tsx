@@ -11,6 +11,8 @@ import { ExpertBannerPicker } from './ExpertBannerPicker'
 import { badgeTone } from './options'
 import type { ExpertBadge } from './options'
 import type { ExpertUpload } from './types'
+import { useKitTranslations } from '../locale'
+import type { KitTranslator } from '../kit-translator'
 
 interface ExpertImageFieldsProps {
     initials: string
@@ -35,18 +37,19 @@ export function ExpertImageFields({
     onBannerChange,
     badge,
 }: ExpertImageFieldsProps) {
+    const t = useKitTranslations()
     const [bannerOpen, setBannerOpen] = React.useState(false)
     const [avatarOpen, setAvatarOpen] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
-    const bannerUpload = useImageUpload(uploadBanner, onBannerChange, setError)
-    const avatarUpload = useImageUpload(uploadAvatar, onAvatarChange, setError)
+    const bannerUpload = useImageUpload(uploadBanner, onBannerChange, setError, t)
+    const avatarUpload = useImageUpload(uploadAvatar, onAvatarChange, setError, t)
 
     return (
         <div className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium text-muted-foreground">Photo &amp; banner</span>
+            <span className="text-xs font-medium text-muted-foreground">{t('experts.images.title')}</span>
             <div className="overflow-hidden rounded-xl border bg-card">
-                <FileDropzone accept="image/*" onFiles={bannerUpload.handleFiles} disabled={bannerUpload.uploading} overlayLabel="Drop your banner">
+                <FileDropzone accept="image/*" onFiles={bannerUpload.handleFiles} disabled={bannerUpload.uploading} overlayLabel={t('experts.images.dropBanner')}>
                     {({ dragOver }) => (
                         <div className="group relative h-44 bg-foreground/5">
                             {bannerUrl ? <img src={bannerUrl} alt="" className="absolute inset-0 size-full object-cover" /> : null}
@@ -67,7 +70,7 @@ export function ExpertImageFields({
                                             className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white ring-1 ring-white/20 backdrop-blur transition-colors hover:bg-white/20"
                                         >
                                             <ImageIcon className="size-3.5" />
-                                            {bannerUpload.uploading ? 'Uploading…' : 'Change banner'}
+                                            {bannerUpload.uploading ? t('experts.images.uploading') : t('experts.images.changeBanner')}
                                         </button>
                                     </PopoverTrigger>
                                     <PopoverContent side="right" align="center" sideOffset={8} className="w-[calc(100vw-2rem)] sm:w-[22rem]">
@@ -80,7 +83,7 @@ export function ExpertImageFields({
                 </FileDropzone>
 
                 <div className="relative -mt-10 px-6 pb-5">
-                    <FileDropzone accept="image/*" onFiles={avatarUpload.handleFiles} disabled={avatarUpload.uploading} overlayLabel="Drop your photo" className="w-fit rounded-2xl">
+                    <FileDropzone accept="image/*" onFiles={avatarUpload.handleFiles} disabled={avatarUpload.uploading} overlayLabel={t('experts.images.dropPhoto')} className="w-fit rounded-2xl">
                         {({ inputId, dragOver }) => (
                             <Popover open={avatarOpen} onOpenChange={setAvatarOpen}>
                                 <PopoverTrigger asChild>
@@ -98,7 +101,7 @@ export function ExpertImageFields({
                                         className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                     >
                                         <Upload className="size-4" />
-                                        Upload photo
+                                        {t('experts.images.uploadPhoto')}
                                     </label>
                                     {avatarUrl && (
                                         <button
@@ -110,7 +113,7 @@ export function ExpertImageFields({
                                             className="flex items-center gap-2 rounded-md px-2.5 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                         >
                                             <Trash2 className="size-4" />
-                                            Remove
+                                            {t('experts.images.remove')}
                                         </button>
                                     )}
                                 </PopoverContent>
@@ -125,14 +128,14 @@ export function ExpertImageFields({
     )
 }
 
-function useImageUpload(upload: ExpertUpload, onChange: (url: string) => void, setError: (error: string | null) => void) {
+function useImageUpload(upload: ExpertUpload, onChange: (url: string) => void, setError: (error: string | null) => void, t: KitTranslator) {
     const [uploading, setUploading] = React.useState(false)
 
     const handleFiles = async (files: File[]) => {
         const file = files[0]
         if (!file) return
         if (!file.type.startsWith('image/')) {
-            setError('Please choose an image file.')
+            setError(t('experts.images.notAnImage'))
             return
         }
 

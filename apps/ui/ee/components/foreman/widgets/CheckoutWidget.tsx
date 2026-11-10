@@ -1,6 +1,9 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { track } from '@rerun/analytics/client'
+import { priceLabel } from '@rerun/contracts'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { startTrialAction } from '@/ee/actions/billing.actions'
@@ -30,9 +33,10 @@ type CheckoutWidgetProps = {
 type Stage = 'offer' | 'checkout'
 
 export function CheckoutOutcome({ result, entitled, onReopen }: { result: CheckoutResult; entitled: boolean; onReopen: () => void }) {
+    const t = useTranslations('foreman.checkout')
     const openBilling = useBillingStore(state => state.openBilling)
 
-    if (result.ok) return <ForemanOutcomeRow className="mb-2" icon={CircleCheckIcon} tone="text-emerald-500" text="Trial started" />
+    if (result.ok) return <ForemanOutcomeRow className="mb-2" icon={CircleCheckIcon} tone="text-emerald-500" text={t('started')} />
 
     // Un trial refusé n'est pas un refus de l'utilisateur : il veut toujours de Rerun, il a juste
     // déjà eu son essai. Sans cette sortie, la conversation s'arrête sur un constat.
@@ -42,17 +46,17 @@ export function CheckoutOutcome({ result, entitled, onReopen }: { result: Checko
                 className="mb-2"
                 icon={CreditCardIcon}
                 tone="text-amber-500"
-                text="This card has already been used for a trial"
+                text={t('cardUsed')}
                 action={
                     <Button variant="secondary" size="sm" onClick={() => openBilling(undefined, 'trial_refused')}>
-                        Start my plan
+                        {t('startPlan')}
                     </Button>
                 }
             />
         )
     }
 
-    if (result.reason === 'pending') return <ForemanOutcomeRow className="mb-2" icon={ClockIcon} text="Still waiting on Stripe" />
+    if (result.reason === 'pending') return <ForemanOutcomeRow className="mb-2" icon={ClockIcon} text={t('pending')} />
 
     // Refuser n'est pas fermer la porte : la ligne dit ce que le refus laisse derrière lui, et le
     // bouton rouvre le formulaire sans avoir à redemander le trial au foreman.
@@ -60,11 +64,11 @@ export function CheckoutOutcome({ result, entitled, onReopen }: { result: Checko
         <ForemanOutcomeRow
             className="mb-2"
             icon={XCircleIcon}
-            text="Trial not started. Nothing can be built until it is."
+            text={t('notStarted')}
             action={
                 entitled ? undefined : (
                     <Button variant="secondary" size="sm" onClick={onReopen}>
-                        Start free trial
+                        {t('startTrial')}
                     </Button>
                 )
             }
@@ -74,6 +78,7 @@ export function CheckoutOutcome({ result, entitled, onReopen }: { result: Checko
 
 export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
     const { workspace } = useSession()
+    const errorText = useErrorText()
     const openBilling = useBillingStore(state => state.openBilling)
     const billingOpen = useBillingStore(state => state.open)
     const [stage, setStage] = useState<Stage>('offer')
@@ -99,6 +104,8 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
     const cardless = offer === 'cardless'
     const priceArm = usePriceArm()
     const arrival = useForemanStore(state => state.arrival)
+    const tPrice = useTranslations('templates.price')
+    const locale = useLocale()
 
     // Answering twice throws inside the AI SDK, and both the realtime row and the poll can land in
     // the same tick. Taking the trial back up after a refusal lands here too, one turn too late to
@@ -122,7 +129,7 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
         const trial = await startTrialAction()
         setSubmitting(false)
         if (!trial.ok) {
-            setTrialError(trial.error)
+            setTrialError(errorText(trial))
             return
         }
         if (!trial.entitled) {
@@ -131,7 +138,7 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
         }
         setReopened(true)
         setStartedWithoutCard(true)
-    }, [openCheckout])
+    }, [openCheckout, errorText])
 
     const recorded = settled && !reopened ? (output as CheckoutResult) : null
     // Entitlement is written by the webhook, so the workspace row is the fastest truthful signal:
@@ -159,5 +166,5 @@ export function CheckoutWidget({ output, onDone }: CheckoutWidgetProps) {
 
     // No way to turn it down: nothing can be built without a plan. Closing the card form lands back
     // here with the button still live.
-    return <TrialOfferCard offer={offer} priceArm={priceArm} submitting={submitting || (stage === 'checkout' && billingOpen)} error={trialError} onStart={cardless ? startTrial : openCheckout} subject={arrival?.coworker ?? arrival?.title} thenPay={arrival?.paid} />
+    return <TrialOfferCard offer={offer} priceArm={priceArm} submitting={submitting || (stage === 'checkout' && billingOpen)} error={trialError} onStart={cardless ? startTrial : openCheckout} subject={arrival?.coworker ?? arrival?.title} thenPay={arrival?.paid ? priceLabel(arrival.paid, tPrice, locale) : undefined} />
 }

@@ -2,8 +2,9 @@
 
 import { Combobox, type ComboboxGroup } from '@/components/ui/combobox'
 import { useBoardStore } from '@/stores/board.store'
-import { UNNAMED_BOX_LABEL, type IsoAgent } from '@/lib/board/types'
+import type { IsoAgent } from '@/lib/board/types'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 type BaseProps = {
@@ -27,6 +28,8 @@ type MultiProps = BaseProps & {
 }
 
 export function AgentCombobox({ leadingGroup, exclude, ...props }: SingleProps | MultiProps) {
+    const t = useTranslations('agent.agentCombobox')
+    const tAgent = useTranslations('agent')
     const agents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
 
@@ -46,22 +49,22 @@ export function AgentCombobox({ leadingGroup, exclude, ...props }: SingleProps |
         const result: ComboboxGroup[] = []
         for (const space of spaces) {
             const spaceAgents = bySpace.get(space.id)
-            if (spaceAgents) result.push(toGroup(space.id, space.name || UNNAMED_BOX_LABEL, spaceAgents))
+            if (spaceAgents) result.push(toGroup(space.id, space.name || tAgent('untitledBox'), spaceAgents))
             bySpace.delete(space.id)
         }
         for (const [spaceId, spaceAgents] of bySpace) {
-            result.push(toGroup(spaceId, 'Unassigned', spaceAgents))
+            result.push(toGroup(spaceId, t('unassigned'), spaceAgents))
         }
         return leadingGroup ? [leadingGroup, ...result] : result
-    }, [agents, spaces, leadingGroup, exclude])
+    }, [agents, spaces, leadingGroup, exclude, t, tAgent])
 
     return (
         <Combobox
             {...props}
             groups={groups}
-            placeholder={props.placeholder ?? (props.multiple ? 'Select coworkers' : 'Select a coworker')}
-            searchPlaceholder="Search coworkers…"
-            emptyText="No coworkers found"
+            placeholder={props.placeholder ?? (props.multiple ? t('selectMany') : t('selectOne'))}
+            searchPlaceholder={t('search')}
+            emptyText={t('empty')}
         />
     )
 }

@@ -7,6 +7,7 @@ import { Pressable, TextInput, View } from 'react-native'
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
+import { useTranslations } from 'use-intl'
 
 import { finishTakeover, openDesktop, startTakeover } from '@/api/desktop'
 import { useAuth } from '@/auth/AuthProvider'
@@ -21,7 +22,7 @@ import { fonts, radius, spacing } from '@/theme/tokens'
 const SCREEN_BACKGROUND = '#000000'
 const MAX_RECONNECTS = 3
 
-type Connection = { state: 'connecting' } | { state: 'open'; uri: string } | { state: 'failed'; message: string }
+type Connection = { state: 'connecting' } | { state: 'open'; uri: string } | { state: 'failed'; reason: 'unreachable' | 'dropping'; message?: string }
 
 function messageTypeOf(data: string): string | null {
     try {
@@ -58,6 +59,8 @@ export default function Desktop() {
     const [connection, setConnection] = useState<Connection>({ state: 'connecting' })
     const [text, setText] = useState('')
     const [finishing, setFinishing] = useState(false)
+    const t = useTranslations('mobileChat.desktop')
+    const tc = useTranslations('mobileCommon.actions')
     const web = useRef<WebView<object>>(null)
     const reconnects = useRef(0)
     const started = useRef(false)
@@ -75,7 +78,7 @@ export default function Desktop() {
             const { socketUrl } = await openDesktop(who, agent, 'drive')
             return { state: 'open', uri: viewerUrl(socketUrl, 'drive') }
         } catch (err) {
-            return { state: 'failed', message: err instanceof Error ? err.message : 'The screen could not be reached.' }
+            return { state: 'failed', reason: 'unreachable', message: err instanceof Error ? err.message : undefined }
         }
     }, [accessToken, workspaceId, agent, call, url])
 
@@ -94,7 +97,7 @@ export default function Desktop() {
         if (type === 'connected') reconnects.current = 0
         if (type !== 'disconnected') return
         reconnects.current += 1
-        if (reconnects.current > MAX_RECONNECTS) setConnection({ state: 'failed', message: 'The screen keeps dropping. Try again in a moment.' })
+        if (reconnects.current > MAX_RECONNECTS) setConnection({ state: 'failed', reason: 'dropping' })
         else reconnect()
     }
 
@@ -129,9 +132,9 @@ export default function Desktop() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingTop: insets.top + spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.sm }}>
                 <SymbolView name="display" size={16} tintColor="#a1a1a1" />
                 <AppText variant="headline" numberOfLines={1} style={{ flex: 1, color: '#fafafa' }}>
-                    {name ? `${name}'s screen` : 'Screen'}
+                    {name ? t('screenOf', { name }) : t('screen')}
                 </AppText>
-                <PillButton label={call ? (finishing ? 'Handing back…' : 'Done') : 'Close'} onPress={done} loading={finishing} />
+                <PillButton label={call ? (finishing ? t('handingBack') : tc('done')) : tc('close')} onPress={done} loading={finishing} />
             </View>
 
             <View style={{ flex: 1 }}>
@@ -139,17 +142,17 @@ export default function Desktop() {
                 {connection.state === 'connecting' && (
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         <AppText variant="callout" style={{ color: '#a1a1a1' }}>
-                            Connecting to the screen…
+                            {t('connecting')}
                         </AppText>
                     </View>
                 )}
                 {connection.state === 'failed' && (
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.lg, paddingHorizontal: spacing.xl }}>
                         <AppText variant="callout" style={{ color: '#a1a1a1', textAlign: 'center' }}>
-                            {connection.message}
+                            {connection.message ?? t(connection.reason)}
                         </AppText>
                         <PillButton
-                            label="Retry"
+                            label={t('retry')}
                             variant="secondary"
                             onPress={() => {
                                 reconnects.current = 0
@@ -163,7 +166,7 @@ export default function Desktop() {
             <Animated.View style={[{ gap: spacing.sm, paddingHorizontal: spacing.md, paddingTop: spacing.sm }, lift]}>
                 <View style={{ flexDirection: 'row', gap: spacing.sm }}>
                     {Object.values(DESKTOP_KEYS).map(key => (
-                        <KeyButton key={key.code} label={key.label} onPress={() => web.current?.injectJavaScript(keyScript(key.keysym, key.code))} />
+                        <KeyButton key={key.code} label={t(`keys.${key.labelKey}`)} onPress={() => web.current?.injectJavaScript(keyScript(key.keysym, key.code))} />
                     ))}
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
@@ -171,7 +174,7 @@ export default function Desktop() {
                         value={text}
                         onChangeText={setText}
                         onSubmitEditing={typeText}
-                        placeholder="Type on the screen"
+                        placeholder={t('typePlaceholder')}
                         placeholderTextColor="#737373"
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -179,7 +182,7 @@ export default function Desktop() {
                         testID="desktop-input"
                         style={{ flex: 1, height: 40, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: '#262626', color: '#fafafa', fontFamily: fonts.regular, fontSize: 16 }}
                     />
-                    <Pressable onPress={typeText} accessibilityRole="button" accessibilityLabel="Type" style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa', opacity: pressed ? 0.7 : 1 })}>
+                    <Pressable onPress={typeText} accessibilityRole="button" accessibilityLabel={t('type')} style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa', opacity: pressed ? 0.7 : 1 })}>
                         <SymbolView name="arrow.up" size={16} weight="semibold" tintColor="#0a0a0a" />
                     </Pressable>
                 </View>

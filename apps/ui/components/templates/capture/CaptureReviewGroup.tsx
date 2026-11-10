@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
@@ -45,6 +46,7 @@ export function CaptureReviewRow({ label, children }: { label: string; children:
 }
 
 export function CaptureReviewChips({ items, mono = false, max = 8 }: { items: string[]; mono?: boolean; max?: number }) {
+    const t = useTranslations('templates.capture.review')
     const shown = items.slice(0, max)
     const hidden = items.length - shown.length
 
@@ -58,7 +60,7 @@ export function CaptureReviewChips({ items, mono = false, max = 8 }: { items: st
                     {item}
                 </span>
             ))}
-            {hidden > 0 && <span className="text-[0.7rem] text-muted-foreground">+{hidden} more</span>}
+            {hidden > 0 && <span className="text-[0.7rem] text-muted-foreground">{t('more', { count: hidden })}</span>}
         </>
     )
 }

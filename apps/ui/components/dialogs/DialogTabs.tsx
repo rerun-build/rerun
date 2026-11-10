@@ -13,7 +13,7 @@ export function DialogTabs<T extends string>({ tabs, tab, onTabChange, header, c
         <Tabs value={tab} onValueChange={value => onTabChange(value as T)} className="min-h-0 w-full flex-1 sm:h-[min(40rem,88dvh)]">
             <div className="shrink-0 border-b">
                 {header}
-                <TabsList className="px-1 sm:px-3">
+                <TabsList className="max-w-full overflow-x-auto px-1 [scrollbar-width:none] sm:px-3">
                     {tabs.map(({ value, label }) => (
                         <TabsTrigger key={value} value={value}>
                             {label}

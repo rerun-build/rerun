@@ -2945,6 +2945,7 @@ export type Database = {
           email_notification_prefs: Json
           expert_profile_id: string | null
           id: string
+          locale: string | null
           onboarding_answers: Json | null
           onboarding_completed_at: string | null
           signed_up_at: string | null
@@ -2959,6 +2960,7 @@ export type Database = {
           email_notification_prefs?: Json
           expert_profile_id?: string | null
           id: string
+          locale?: string | null
           onboarding_answers?: Json | null
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
@@ -2973,6 +2975,7 @@ export type Database = {
           email_notification_prefs?: Json
           expert_profile_id?: string | null
           id?: string
+          locale?: string | null
           onboarding_answers?: Json | null
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
@@ -3591,6 +3594,7 @@ export type Database = {
           id: number
           is_sandbox: boolean
           last_active_at: string | null
+          locale: string
           max_agents: number | null
           max_seats: number | null
           model_access: string | null
@@ -3628,6 +3632,7 @@ export type Database = {
           id?: number
           is_sandbox?: boolean
           last_active_at?: string | null
+          locale?: string
           max_agents?: number | null
           max_seats?: number | null
           model_access?: string | null
@@ -3665,6 +3670,7 @@ export type Database = {
           id?: number
           is_sandbox?: boolean
           last_active_at?: string | null
+          locale?: string
           max_agents?: number | null
           max_seats?: number | null
           model_access?: string | null

@@ -3,6 +3,7 @@ import { CHAT_ATTACHMENTS_DIR, uniqueAttachmentName } from '@rerun/contracts'
 import { ApiError, clientHeader, hubHeaders } from '@/api/client'
 import type { FileOwner } from '@/api/files'
 import { environment } from '@/config/environment'
+import { translatorFor } from '@/i18n/translator'
 
 type Caller = { accessToken: string; workspaceId: number }
 
@@ -15,7 +16,7 @@ async function bytesOf(uri: string): Promise<Blob> {
 async function postBytes(caller: Caller, path: string, body: Blob): Promise<unknown> {
     const response = await fetch(`${environment.apiUrl}${path}`, { method: 'POST', headers: { ...hubHeaders(clientHeader, caller), 'Content-Type': 'application/octet-stream' }, body })
     const payload: unknown = await response.json().catch(() => null)
-    if (!response.ok) throw new ApiError(response.status, (payload as { error?: string } | null)?.error ?? `Upload failed with ${response.status}`, payload)
+    if (!response.ok) throw new ApiError(response.status, (payload as { error?: string } | null)?.error ?? translatorFor('mobileCommon')('errors.uploadFailed', { status: response.status }), payload)
     return payload
 }
 

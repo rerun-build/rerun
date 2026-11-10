@@ -1,7 +1,10 @@
+import frBuilder from '@rerun/i18n/messages/fr/builder.json'
 import { SUGGESTION_CARDS } from '@rerun/ui/new-agent'
+import { createTranslator } from 'use-intl'
 import { describe, expect, it } from 'vitest'
 
 import type { StoredIdea } from '@/lib/agent-ideas/stored'
+import { englishTranslator } from '@/lib/i18n/english-translator'
 import { INDUSTRY_AGENT_SUGGESTIONS } from './agent-suggestions'
 import { DEFAULT_BOX_NAMES } from './box-name-suggestions'
 import { BOX_THEMES, boxCtaExamples, boxCtaLabel, boxIdeas, boxSuggestions, boxTheme, themeSuggestions } from './box-themes'
@@ -77,10 +80,18 @@ describe('boxSuggestions', () => {
 
 describe('boxCtaLabel', () => {
     it('names the Box when it fits on the pill', () => {
-        expect(boxCtaLabel('Marketing')).toBe('Explore Marketing templates')
-        expect(boxCtaLabel(' Acme ')).toBe('Explore Acme templates')
-        expect(boxCtaLabel('Research and Development')).toBe('Explore templates')
-        expect(boxCtaLabel(null)).toBe('Explore templates')
+        const t = englishTranslator('builder.isoBoard')
+        expect(boxCtaLabel('Marketing', t)).toBe('Explore Marketing templates')
+        expect(boxCtaLabel(' Acme ', t)).toBe('Explore Acme templates')
+        expect(boxCtaLabel('Research and Development', t)).toBe('Explore templates')
+        expect(boxCtaLabel(null, t)).toBe('Explore templates')
+    })
+
+    it('measures the translated pill, not the English one', () => {
+        const t = createTranslator({ locale: 'fr', messages: { builder: frBuilder }, namespace: 'builder.isoBoard' })
+        expect(boxCtaLabel('Marketing', t)).toBe('Explorer les templates Marketing')
+        expect(boxCtaLabel('Customer Care', englishTranslator('builder.isoBoard'))).toBe('Explore Customer Care templates')
+        expect(boxCtaLabel('Customer Care', t)).toBe('Explorer les templates')
     })
 })
 

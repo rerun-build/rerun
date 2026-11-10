@@ -9,6 +9,7 @@ import { hasTemplateEntitlement } from '@/lib/templates/entitlement'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { AppError } from '@/lib/i18n/action-error'
 import { ensureStripeCustomer } from './billing.service'
 import { requirePayoutReadyAccount } from './connect.service'
 import { recordTemplatePurchase } from './template-purchase.service'
@@ -29,7 +30,7 @@ export async function createTemplateCheckoutSession(slug: string): Promise<Templ
     const supabase = createServiceRoleClient()
 
     const { data: template } = await selectMaybeSingle(supabase, 'templates', CHECKOUT_COLUMNS, { slug })
-    if (!template || !isPublicStatus(template.status as TemplateStatus)) throw new Error('This template is not available.')
+    if (!template || !isPublicStatus(template.status as TemplateStatus)) throw new AppError('templateUnavailable')
 
     if (template.pricing_model === 'free') return { kind: 'free' }
     if (template.creator_id && template.creator_id === user?.id) return { kind: 'owned' }
@@ -39,7 +40,7 @@ export async function createTemplateCheckoutSession(slug: string): Promise<Templ
     const status = workspace?.subscription_status
     if (status !== 'active' && status !== 'trialing') throw new Error(NO_PLAN_ERROR)
 
-    if (!template.stripe_price_id) throw new Error('This template is not available for purchase yet.')
+    if (!template.stripe_price_id) throw new AppError('templateNotPurchasableYet')
     const destination = await requirePayoutReadyAccount(template.creator_id)
 
     const { customerId } = await ensureStripeCustomer()
@@ -103,7 +104,7 @@ export async function confirmTemplateCheckoutSession(sessionId: string): Promise
     const workspaceId = await requireWorkspaceId()
     const session = await stripe.checkout.sessions.retrieve(sessionId)
 
-    if (session.metadata?.workspace_id !== String(workspaceId)) throw new Error('This purchase belongs to another workspace.')
+    if (session.metadata?.workspace_id !== String(workspaceId)) throw new AppError('purchaseOtherWorkspace')
     if (session.status !== 'complete' || session.payment_status !== 'paid') return { entitled: false }
 
     await recordTemplatePurchase(session)

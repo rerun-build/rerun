@@ -5,6 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const sendSignInCodeEmail = vi.fn()
 vi.mock('@/app/api/_services/email.service', () => ({ sendSignInCodeEmail: (input: unknown) => sendSignInCodeEmail(input) }))
 
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
+const recipientLocale = vi.fn()
+vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: (...args: unknown[]) => recipientLocale(...args) }))
+
 const claimAuthEmailSend = vi.fn()
 vi.mock('@/app/api/_services/email-sign-up.service', () => ({ claimAuthEmailSend: (email: string) => claimAuthEmailSend(email) }))
 
@@ -37,6 +41,7 @@ describe('supabase send email hook', () => {
     beforeEach(() => {
         vi.stubEnv('SEND_EMAIL_HOOK_SECRET', SECRET)
         sendSignInCodeEmail.mockReset().mockResolvedValue({ ok: true, id: 'email_1' })
+        recipientLocale.mockReset().mockResolvedValue('en')
         rememberSignInCode.mockReset()
         claimAuthEmailSend.mockReset().mockResolvedValue(true)
     })

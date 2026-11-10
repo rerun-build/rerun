@@ -1,6 +1,8 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { Badge } from '@rerun/ui/primitives'
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -10,32 +12,32 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { removeTaxIdAction, saveBusinessDetailsAction } from '@/ee/actions/billing.actions'
-import { TAX_ID_STATUS_BADGE, taxIdFieldLabel, taxIdPlaceholder, taxIdTypeLabel, taxIdTypesFor, type TaxIdStatus, type TaxIdType } from '@/ee/lib/billing/tax-id'
+import { TAX_ID_STATUS_BADGE, taxIdPlaceholder, taxIdTypeLabel, taxIdTypesFor, type TaxIdStatus, type TaxIdType } from '@/ee/lib/billing/tax-id'
 import type { BusinessDetails } from '@/ee/services/billing.service'
 import { Building2, ChevronRightIcon } from '@/lib/icons'
 
 import { PayFooter, RightTitle } from './parts'
 
-const NO_ADDRESS_REASON = 'Add a card first'
-
-function countryName(country: string): string {
-    return new Intl.DisplayNames(['en'], { type: 'region' }).of(country) ?? country
+function countryName(country: string, locale: string): string {
+    return new Intl.DisplayNames([locale], { type: 'region' }).of(country) ?? country
 }
 
 function TaxIdStatusBadge({ status }: { status: TaxIdStatus | null }) {
+    const t = useTranslations('billing.business.status')
     const badge = status ? TAX_ID_STATUS_BADGE[status] : null
-    if (!badge) return null
+    if (!status || !badge) return null
     return (
         <Badge size="sm" tone={badge.tone}>
-            {badge.label}
+            {t(status as Exclude<TaxIdStatus, 'unavailable'>)}
         </Badge>
     )
 }
 
 export function BusinessDetailsRow({ business, onOpen }: { business: BusinessDetails; onOpen: () => void }) {
+    const t = useTranslations('billing.business')
     const disabled = !business.country
     return (
-        <TooltipDisabledReason reason={disabled ? NO_ADDRESS_REASON : undefined} className="w-full">
+        <TooltipDisabledReason reason={disabled ? t('noAddress') : undefined} className="w-full">
             <button
                 type="button"
                 onClick={onOpen}
@@ -44,7 +46,7 @@ export function BusinessDetailsRow({ business, onOpen }: { business: BusinessDet
             >
                 <span className="flex shrink-0 items-center gap-3">
                     <Building2 className="size-4 text-muted-foreground" />
-                    Business details
+                    {t('title')}
                 </span>
                 <span className="flex min-w-0 items-center gap-2 text-muted-foreground">
                     {business.taxId ? (
@@ -53,7 +55,7 @@ export function BusinessDetailsRow({ business, onOpen }: { business: BusinessDet
                             <TaxIdStatusBadge status={business.taxId.status} />
                         </>
                     ) : (
-                        <span>Add</span>
+                        <span>{t('add')}</span>
                     )}
                     <ChevronRightIcon className="size-4 shrink-0" />
                 </span>
@@ -64,6 +66,9 @@ export function BusinessDetailsRow({ business, onOpen }: { business: BusinessDet
 
 // Only reached with a billing country: the row stays disabled without one.
 export function BusinessDetailsPane({ business, onBack, onSaved }: { business: BusinessDetails; onBack: () => void; onSaved: () => Promise<void> }) {
+    const t = useTranslations('billing.business')
+    const errorText = useErrorText()
+    const locale = useLocale()
     const country = business.country ?? ''
     const types = taxIdTypesFor(country)
     const [name, setName] = useState(business.name ?? '')
@@ -83,11 +88,11 @@ export function BusinessDetailsPane({ business, onBack, onSaved }: { business: B
         const result = await saveBusinessDetailsAction({ name, type, value })
         if (!result.ok) {
             setSaving(false)
-            return setError(result.error)
+            return setError(errorText(result))
         }
         await onSaved()
         setSaving(false)
-        toast.success('Business details saved')
+        toast.success(t('saved'))
         onBack()
     }
 
@@ -96,26 +101,26 @@ export function BusinessDetailsPane({ business, onBack, onSaved }: { business: B
         const result = await removeTaxIdAction()
         if (!result.ok) {
             setRemoving(false)
-            return toast.error('Could not remove the number', { description: result.error })
+            return toast.error(t('removeFailed'), { description: errorText(result) })
         }
         await onSaved()
         setRemoving(false)
-        toast.success('Number removed')
+        toast.success(t('removed'))
         onBack()
     }
 
     if (types.length === 0) {
         return (
             <>
-                <RightTitle onBack={onBack}>Business details</RightTitle>
-                <p className="mt-6 text-sm text-muted-foreground">Stripe takes no tax ID for {countryName(country)}.</p>
+                <RightTitle onBack={onBack}>{t('title')}</RightTitle>
+                <p className="mt-6 text-sm text-muted-foreground">{t('noTaxId', { country: countryName(country, locale) })}</p>
             </>
         )
     }
 
     return (
         <>
-            <RightTitle onBack={onBack}>Business details</RightTitle>
+            <RightTitle onBack={onBack}>{t('title')}</RightTitle>
             <form
                 className="mt-6 flex flex-1 flex-col"
                 onSubmit={event => {
@@ -124,11 +129,11 @@ export function BusinessDetailsPane({ business, onBack, onSaved }: { business: B
                 }}
             >
                 <div className="flex flex-col gap-4">
-                    <Field label="Business name" htmlFor="business-name">
+                    <Field label={t('nameLabel')} htmlFor="business-name">
                         <Input id="business-name" autoComplete="organization" value={name} onChange={event => setName(event.target.value)} disabled={saving} />
                     </Field>
                     {types.length > 1 && (
-                        <Field label="Type" htmlFor="tax-id-type">
+                        <Field label={t('typeLabel')} htmlFor="tax-id-type">
                             <Select value={type} onValueChange={next => setType(next as TaxIdType)} disabled={saving}>
                                 <SelectTrigger id="tax-id-type" className="w-full">
                                     <SelectValue />
@@ -136,7 +141,7 @@ export function BusinessDetailsPane({ business, onBack, onSaved }: { business: B
                                 <SelectContent position="popper">
                                     {types.map(option => (
                                         <SelectItem key={option} value={option}>
-                                            {option === 'eu_vat' ? 'EU VAT' : taxIdTypeLabel(option)}
+                                            {option === 'eu_vat' ? t('euVat') : taxIdTypeLabel(option)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -144,28 +149,28 @@ export function BusinessDetailsPane({ business, onBack, onSaved }: { business: B
                         </Field>
                     )}
                     <Field
-                        label={taxIdFieldLabel(type)}
+                        label={type?.endsWith('_vat') ? t('field.vat') : t('field.taxId')}
                         htmlFor="tax-id-value"
-                        helperText={countryName(country)}
+                        helperText={countryName(country, locale)}
                         labelTrailing={savedNumberShown ? <TaxIdStatusBadge status={business.taxId!.status} /> : undefined}
                     >
                         <Input id="tax-id-value" autoComplete="off" spellCheck={false} placeholder={taxIdPlaceholder(type, country)} value={value} onChange={event => setValue(event.target.value)} disabled={saving} />
                     </Field>
                     {business.taxId && (
                         <ConfirmDialog
-                            title="Remove this number?"
-                            description="Your next invoices will not show it."
-                            confirmLabel="Remove"
+                            title={t('confirm.title')}
+                            description={t('confirm.description')}
+                            confirmLabel={t('confirm.confirm')}
                             pending={removing}
                             onConfirm={() => void remove()}
                         >
                             <button type="button" disabled={saving || removing} className="self-start text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:opacity-60">
-                                Remove number
+                                {t('removeNumber')}
                             </button>
                         </ConfirmDialog>
                     )}
                 </div>
-                <PayFooter cta="Save" footnote="Shown on your next invoices." loading={saving} disabled={unchanged || !name.trim() || !value.trim()} error={error} />
+                <PayFooter cta={t('save')} footnote={t('footnote')} loading={saving} disabled={unchanged || !name.trim() || !value.trim()} error={error} />
             </form>
         </>
     )

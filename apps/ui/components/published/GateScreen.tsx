@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { R_PATH } from '@/components/layout/Logo'
 import { Icon } from '@/components/ui/icon'
@@ -29,6 +30,7 @@ export function RerunTile() {
 }
 
 function MadeWithRerun({ className }: { className?: string }) {
+    const t = useTranslations('published.gate')
     return (
         <a
             href={BADGE_URL}
@@ -39,7 +41,7 @@ function MadeWithRerun({ className }: { className?: string }) {
             <svg viewBox="0 0 512 512" aria-hidden className="size-3.5">
                 <path d={R_PATH} fill="currentColor" />
             </svg>
-            Made with Rerun
+            {t('madeWith')}
         </a>
     )
 }
@@ -47,11 +49,12 @@ function MadeWithRerun({ className }: { className?: string }) {
 // The lock a visitor meets: whose page it is on the left, what opens it on the right, the dots
 // between them saying the two are being linked. No pixel of the page leaks here.
 export function GateScreen({ brand, lock, mark, title, subtitle, children }: { brand: GateBrand; lock: ReactNode | null; mark?: ReactNode; title: string; subtitle: ReactNode; children?: ReactNode }) {
+    const t = useTranslations('published.gate')
     const markerProps = { [PUBLISHED_PAGE_MARKER]: '' }
     return (
         <main {...markerProps} className="relative flex min-h-dvh w-full flex-col items-center justify-center bg-background px-5 pt-10 pb-24 text-foreground">
             <div className="flex w-full max-w-[360px] flex-col items-center gap-6 text-center">
-                {lock ? <LinkedPair left={<WorkspaceTile brand={brand} />} right={lock} label={`${brand.name} page, locked`} /> : (mark ?? <WorkspaceTile brand={brand} />)}
+                {lock ? <LinkedPair left={<WorkspaceTile brand={brand} />} right={lock} label={t('locked', { workspace: brand.name })} /> : (mark ?? <WorkspaceTile brand={brand} />)}
                 <div className="flex flex-col gap-1.5">
                     <h1 className="text-xl font-semibold tracking-tight text-balance break-words">{title}</h1>
                     <p className="text-sm text-balance break-words text-muted-foreground">{subtitle}</p>

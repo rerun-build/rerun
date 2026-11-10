@@ -2,6 +2,8 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface TeamInviteProps {
@@ -12,6 +14,7 @@ export interface TeamInviteProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function TeamInvite({
@@ -21,30 +24,24 @@ export default function TeamInvite({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: TeamInviteProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`Bring your team into ${workspaceName}`}
+      preview={t("teamInvite.preview", { workspaceName })}
       hero={{ scene: "team-invite", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Bring your team into {workspaceName}</Heading>
-      <Text style={text.paragraph}>
-        <strong>{agentName}</strong> completed its first successful run, and you
-        are still the only person in this workspace.
-      </Text>
-      <Text style={text.paragraph}>
-        If someone else should read its results, approve what it is about to do,
-        or keep its workflow running when you are away, they need their own
-        access.
-      </Text>
+      <Heading style={text.heading}>{t("teamInvite.heading", { workspaceName })}</Heading>
+      <Text style={text.paragraph}>{t.rich("teamInvite.firstRun", { agentName, strong })}</Text>
+      <Text style={text.paragraph}>{t("teamInvite.access")}</Text>
       <Section style={cta}>
-        <Button href={inviteUrl}>Invite your team</Button>
+        <Button href={inviteUrl}>{t("teamInvite.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        You decide who joins. Nothing is shared until you send an invitation.
-      </Text>
+      <Text style={text.footnote}>{t("teamInvite.footnote")}</Text>
     </Layout>
   );
 }

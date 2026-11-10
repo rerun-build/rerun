@@ -1,0 +1,96 @@
+{
+    "detail": {
+        "readOnly": "Ce fichier est en lecture seule",
+        "stillLoading": "Chargement du fichier en cours",
+        "previousFile": "Fichier précédent",
+        "nextFile": "Fichier suivant",
+        "editNotText": "Seuls les fichiers texte peuvent être modifiés ici.",
+        "editTruncated": "Ce fichier dépasse {limit} caractères et ne peut pas être modifié ici. Téléchargez-le, ou demandez au coworker de le modifier.",
+        "editBinary": "Ce fichier n'est pas du texte : le modifier ici le corromprait."
+    },
+    "actions": {
+        "truncated": "Tronqué",
+        "edit": "Modifier",
+        "download": "Télécharger",
+        "deleteFile": "Supprimer le fichier"
+    },
+    "delete": {
+        "title": "Supprimer {name} ?",
+        "file": "Le fichier est supprimé de la box. Cette action est irréversible.",
+        "folder": "Le dossier et tout son contenu sont supprimés de la box. Cette action est irréversible."
+    },
+    "editor": {
+        "unsaved": "Non enregistré",
+        "close": "Fermer l'éditeur",
+        "cancel": "Annuler",
+        "noChanges": "Aucune modification à enregistrer",
+        "save": "Enregistrer",
+        "conflictTitle": "{name} a changé sur la Box",
+        "conflictDescription": "Quelqu'un, ou un coworker, a modifié ce fichier après que vous l'avez ouvert. Enregistrer maintenant remplace sa version par la vôtre.",
+        "overwrite": "Écraser",
+        "keepTheirs": "Garder la sienne",
+        "discardTitle": "Abandonner vos modifications ?",
+        "discardDescription": "Vos modifications de {name} ne sont pas encore enregistrées. Fermer l'éditeur les supprime.",
+        "discard": "Abandonner",
+        "keepEditing": "Continuer à modifier"
+    },
+    "preview": {
+        "noPreview": "Aucun aperçu disponible pour ce type de fichier",
+        "download": "Télécharger",
+        "readFailed": "Impossible de lire ce fichier"
+    },
+    "publish": {
+        "publish": "Publier",
+        "publishPublicly": "Publier publiquement",
+        "publishedLink": "Lien publié",
+        "publicLink": "Lien public",
+        "open": "Ouvrir",
+        "openPublicLink": "Ouvrir le lien public",
+        "copyLink": "Copier le lien",
+        "copyPublicLink": "Copier le lien public",
+        "shareSettings": "Paramètres de partage",
+        "unpublish": "Dépublier",
+        "unshare": "Ne plus partager",
+        "unpublishTitle": "Dépublier {name} ?",
+        "unshareTitle": "Ne plus partager {name} ?",
+        "unpublishDescription": "Le lien cesse de fonctionner immédiatement, pour tous ceux qui l'ont.",
+        "unshareDescription": "Le lien public cesse de fonctionner immédiatement. Quiconque l'a obtient une erreur 404."
+    },
+    "empty": {
+        "title": "Dossier vide",
+        "goUp": "Remonter d'un niveau"
+    },
+    "grid": {
+        "parentDirectory": "Dossier parent",
+        "openFolder": "Ouvrir le dossier",
+        "open": "Ouvrir",
+        "download": "Télécharger",
+        "rename": "Renommer",
+        "delete": "Supprimer",
+        "published": "Publié"
+    },
+    "list": {
+        "newName": "Nouveau nom",
+        "dropHere": "Déposez des fichiers ou des dossiers ici pour les importer",
+        "name": "Nom",
+        "size": "Taille",
+        "type": "Type",
+        "empty": "Rien ici pour l'instant. Tout ce qu'un coworker télécharge, crée ou modifie pour tout le workspace arrive dans ce dossier, tout comme ce que vous déposez sur cette page.",
+        "actionsFor": "Actions pour {name}",
+        "folder": "Dossier",
+        "file": "Fichier"
+    },
+    "uploadOutcome": {
+        "allFailed": "Échec de l'envoi",
+        "someFailed": "Échec de l'envoi pour {failed} sur {total, plural, one {# fichier} other {# fichiers}}",
+        "uploaded": "{count, plural, one {# fichier envoyé} other {# fichiers envoyés}}",
+        "sessionExpired": "Votre session a expiré. Rechargez la page et réessayez.",
+        "tooLarge": "Ce fichier est trop volumineux pour être envoyé.",
+        "retryLater": "Échec de l'envoi. Réessayez dans un instant.",
+        "networkFailed": "Échec de l'envoi. Vérifiez votre connexion et réessayez.",
+        "oversized": "{names}{more, plural, =0 {} one { et # autre} other { et # autres}} {count, plural, one {dépasse} other {dépassent}} la limite de {limit} Mo.",
+        "machineUpdating": "La machine de ce workspace était en cours de mise à jour. Relancez l'envoi.",
+        "engineUpdateNeeded": "Ce workspace tourne sur une machine dont le moteur doit être mis à jour pour accepter les fichiers de plus de {limit} Mo. La mise à jour est automatique, réessayez dans quelques minutes.",
+        "machineUnreachable": "Impossible d'envoyer {name}. Votre machine est peut-être injoignable."
+    }
+}

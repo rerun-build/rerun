@@ -39,16 +39,49 @@ type PartLike = { type: string; id?: string; data?: unknown; toolName?: string; 
 
 export const SUB_RUN_TOOL_NAMES: Record<SubRunProgress['kind'], string> = { delegate: 'delegate_tasks', 'call-agent': 'call_agent' }
 
+// The `subRuns` namespace, in the reader's language.
+export type SubRunCopy = (
+    key:
+        | 'untitledTask'
+        | 'untitledAgent'
+        | 'trouble.stalled'
+        | 'trouble.failing'
+        | 'progress.step'
+        | 'progress.calls'
+        | 'headline.messageSent'
+        | 'headline.calling'
+        | 'headline.callFailed'
+        | 'headline.callAnswered'
+        | 'headline.building'
+        | 'headline.buildFailed'
+        | 'headline.built'
+        | 'headline.buildingTeam'
+        | 'headline.delegating'
+        | 'headline.doneOfTotal'
+        | 'headline.coworkersBuilt'
+        | 'headline.openFromBoard'
+        | 'headline.tasksDone'
+        | 'headline.doneAndFailed',
+    values?: Record<string, string | number>
+) => string
+
 export function subRunProgressOf(part: PartLike): SubRunProgress | null {
     if (part.type === 'data-delegate') {
         const data = part.data as DelegatePartData
-        return { kind: 'delegate', tasks: (data.tasks ?? []).map((task, i) => ({ ...task, title: task.title || `Sub-coworker ${i + 1}` })) }
+        return { kind: 'delegate', tasks: (data.tasks ?? []).map(task => ({ ...task, title: task.title || '' })) }
     }
     if (part.type === 'data-call-agent') {
         const { agentName, ...task } = part.data as CallAgentPartData
-        return { kind: 'call-agent', tasks: [{ ...task, title: agentName || 'Coworker' }] }
+        return { kind: 'call-agent', tasks: [{ ...task, title: agentName || '' }] }
     }
     return null
+}
+
+// A task the engine sent without a title is named after its place in the delegation.
+export function titledSubRun(progress: SubRunProgress, t: SubRunCopy): SubRunProgress {
+    if (progress.tasks.every(task => task.title)) return progress
+    const untitled = (index: number) => (progress.kind === 'call-agent' ? t('untitledAgent') : t('untitledTask', { index: index + 1 }))
+    return { ...progress, tasks: progress.tasks.map((task, index) => (task.title ? task : { ...task, title: untitled(index) })) }
 }
 
 const toolNameOf = (part: PartLike) => stripBridgePrefix(part.toolName ?? part.type.replace(/^tool-/, ''))
@@ -115,9 +148,9 @@ export function countSubRuns(tasks: readonly SubRunTask[]): SubRunCounts {
     }
 }
 
-export function subRunTroubleLabel(counts: SubRunCounts): string {
-    const stalled = counts.stalled > 0 ? ` · ${counts.stalled} stalled` : ''
-    const failing = counts.failing > 0 ? ` · ${counts.failing} failing` : ''
+export function subRunTroubleLabel(counts: SubRunCounts, t: SubRunCopy): string {
+    const stalled = counts.stalled > 0 ? ` · ${t('trouble.stalled', { count: counts.stalled })}` : ''
+    const failing = counts.failing > 0 ? ` · ${t('trouble.failing', { count: counts.failing })}` : ''
     return `${stalled}${failing}`
 }
 
@@ -161,35 +194,35 @@ export function formatElapsed(seconds: number): string {
     return `${m}m ${String(s).padStart(2, '0')}s`
 }
 
-const plural = (count: number, word: string) => `${count} ${word}${count > 1 ? 's' : ''}`
-
-const progressLabel = (task: SubRunTask) => (task.toolCalls === undefined ? `Step ${task.steps}` : plural(task.toolCalls, 'call'))
+const progressLabel = (task: SubRunTask, t: SubRunCopy) => (task.toolCalls === undefined ? t('progress.step', { steps: task.steps }) : t('progress.calls', { count: task.toolCalls }))
 
 export type SubRunHeadline = { label: string; summary?: string }
 
 // build_team reports on the same block as a delegation: one row per agent of the plan, built rather
 // than delegated.
-export function subRunHeadline({ kind, tasks }: SubRunProgress, live: boolean, toolName: string): SubRunHeadline {
+export function subRunHeadline(progress: SubRunProgress, live: boolean, toolName: string, t: SubRunCopy): SubRunHeadline {
+    const { kind, tasks } = titledSubRun(progress, t)
     const counts = countSubRuns(tasks)
-    const trouble = subRunTroubleLabel(counts)
+    const trouble = subRunTroubleLabel(counts, t)
     const seconds = subRunDurationSeconds(tasks)
     const duration = seconds === undefined ? '' : ` · ${formatElapsed(seconds)}`
 
     if (kind === 'call-agent') {
         const [call] = tasks
-        if (call.status === 'dispatched') return { label: `Message sent to ${call.title}` }
-        if (live) return { label: `Calling ${call.title}`, summary: `${progressLabel(call)}${trouble}` }
-        return { label: call.status === 'error' ? `${call.title} failed${duration}` : `${call.title} answered${duration}` }
+        const name = call.title
+        if (call.status === 'dispatched') return { label: t('headline.messageSent', { name }) }
+        if (live) return { label: t('headline.calling', { name }), summary: `${progressLabel(call, t)}${trouble}` }
+        return { label: `${t(call.status === 'error' ? 'headline.callFailed' : 'headline.callAnswered', { name })}${duration}` }
     }
 
     const building = toolName === 'build_team'
     // The onboarding builds one agent: its name is the whole headline, and a count of one says nothing.
     if (building && tasks.length === 1) {
-        const [agent] = tasks
-        if (live) return { label: `Building ${agent.title}` }
-        return { label: counts.failed ? `${agent.title} could not be built${duration}` : `${agent.title} built${duration}` }
+        const name = tasks[0].title
+        if (live) return { label: t('headline.building', { name }) }
+        return { label: `${t(counts.failed ? 'headline.buildFailed' : 'headline.built', { name })}${duration}` }
     }
-    if (live) return { label: building ? `Building your team · ${plural(counts.total, 'coworker')}` : `Delegating · ${plural(counts.total, 'task')}`, summary: `${counts.done + counts.failed}/${counts.total} done${trouble}` }
-    if (counts.failed === 0) return building ? { label: `${plural(counts.total, 'coworker')} built${duration}`, summary: 'Open one from the board' } : { label: `${plural(counts.total, 'task')} done${duration}` }
-    return { label: `${counts.done} done · ${counts.failed} failed${duration}` }
+    if (live) return { label: t(building ? 'headline.buildingTeam' : 'headline.delegating', { count: counts.total }), summary: `${t('headline.doneOfTotal', { done: counts.done + counts.failed, total: counts.total })}${trouble}` }
+    if (counts.failed === 0) return building ? { label: `${t('headline.coworkersBuilt', { count: counts.total })}${duration}`, summary: t('headline.openFromBoard') } : { label: `${t('headline.tasksDone', { count: counts.total })}${duration}` }
+    return { label: `${t('headline.doneAndFailed', { done: counts.done, failed: counts.failed })}${duration}` }
 }

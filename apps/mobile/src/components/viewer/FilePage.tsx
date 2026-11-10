@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ActivityIndicator, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { WebView } from 'react-native-webview'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 
@@ -12,6 +13,7 @@ const HEADER_ROOM = 64
 // A file that is not a photo, read in a web view from its copy in the cache: iOS draws PDFs, text,
 // spreadsheets and office documents there. What it cannot draw says so, the share sheet stays a tap away.
 export function FilePage({ url, name, load }: { url: string; name: string; load: () => Promise<string> }) {
+    const t = useTranslations('mobileCommon')
     const { width, height } = useWindowDimensions()
     const insets = useSafeAreaInsets()
     const [uri, setUri] = useState<string | null>(null)
@@ -41,7 +43,7 @@ export function FilePage({ url, name, load }: { url: string; name: string; load:
                     {name}
                 </AppText>
                 <AppText variant="footnote" style={{ color: '#a1a1a1', textAlign: 'center' }}>
-                    No preview for this file. Share it to open it in another app.
+                    {t('viewer.noPreview')}
                 </AppText>
             </View>
         )

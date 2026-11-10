@@ -4,6 +4,7 @@ import { SymbolView } from 'expo-symbols'
 import { useEffect, useMemo, useState } from 'react'
 import { Pressable, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { fetchBoard } from '@/api/board'
 import { searchConversations } from '@/api/search'
@@ -11,13 +12,13 @@ import { useAuth } from '@/auth/AuthProvider'
 import { setPendingAsk } from '@/chat/pending-ask'
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
-import { lineOf, minutesSince, moodStatus, toHomeCoworkers, UNNAMED_BOX_LABEL, type HomeCoworker } from '@/components/home/board'
+import { lineOf, minutesSince, moodStatus, toHomeCoworkers, type HomeCoworker } from '@/components/home/board'
 import { CoworkerRow } from '@/components/home/CoworkerRow'
 import { SectionHeader } from '@/components/home/SectionHeader'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton } from '@/components/ui/GlassButton'
-import { timeAgo } from '@/components/ui/status'
 import { cachedBoard } from '@/data/local-cache'
+import { useTimeAgo } from '@/lib/time'
 import { fonts, radius, spacing } from '@/theme/tokens'
 import { useTheme } from '@/theme/theme'
 
@@ -51,16 +52,20 @@ function useConversationHits(text: string, enabled: boolean): ConversationHit[] 
 
 function ConversationRow({ hit, coworker, onPress }: { hit: ConversationHit; coworker: HomeCoworker | undefined; onPress: () => void }) {
     const theme = useTheme()
+    const timeAgo = useTimeAgo()
+    const t = useTranslations('mobileHome')
     const minutes = minutesSince(hit.updatedAt)
+    const ago = minutes !== null ? timeAgo(minutes) : null
+    const detail = coworker?.name && ago ? t('search.hitDetail', { coworker: coworker.name, time: ago }) : (coworker?.name ?? ago)
     return (
         <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.xl, paddingVertical: spacing.sm + 2, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <AgentBuddy agentId={hit.agentId} size={28} mood="idle" animated={false} facing="right" />
             <View style={{ flex: 1, gap: 1 }}>
                 <AppText variant="callout" medium numberOfLines={1}>
-                    {hit.title || 'New conversation'}
+                    {hit.title || t('search.newConversation')}
                 </AppText>
                 <AppText variant="footnote" tone="muted" numberOfLines={1}>
-                    {[coworker?.name, minutes !== null ? timeAgo(minutes) : null].filter(Boolean).join(' · ')}
+                    {detail}
                 </AppText>
             </View>
         </Pressable>
@@ -98,13 +103,14 @@ export default function Search() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const team = useTeam()
+    const t = useTranslations('mobileHome')
     const [query, setQuery] = useState('')
     const [collapsed, setCollapsed] = useState<string[]>([])
     const toggle = (key: string) => setCollapsed(current => (current.includes(key) ? current.filter(entry => entry !== key) : [...current, key]))
     const { scope, text } = parseQuery(query)
 
     const coworkers = useMemo(() => team?.coworkers ?? [], [team])
-    const boxNames = useMemo(() => new Map((team?.boxes ?? []).map(box => [box.id, box.name || UNNAMED_BOX_LABEL])), [team])
+    const boxNames = useMemo(() => new Map((team?.boxes ?? []).map(box => [box.id, box.name || t('untitledBox')])), [team, t])
     const foundCoworkers = scope === 'commands' ? [] : searchItems(coworkers.map(coworker => ({ coworker, label: coworker.name, keywords: [coworker.handle ?? '', boxNames.get(coworker.spaceId) ?? ''] })), text).map(entry => entry.coworker)
     const hits = useConversationHits(text, scope === 'all' && text.length >= MIN_CONVERSATION_QUERY)
     const byId = new Map(coworkers.map(coworker => [coworker.id, coworker]))
@@ -119,10 +125,10 @@ export default function Search() {
     return (
         <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.md }}>
-                <GlassButton symbol="chevron.left" label="Back" onPress={() => router.back()} />
+                <GlassButton symbol="chevron.left" label={t('search.back')} onPress={() => router.back()} />
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 44, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: theme.muted }}>
                     <SymbolView name="magnifyingglass" size={15} tintColor={theme.mutedForeground} />
-                    <TextInput value={query} onChangeText={setQuery} placeholder="Search coworkers and conversations" placeholderTextColor={theme.mutedForeground} autoFocus autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" style={{ flex: 1, fontFamily: fonts.regular, fontSize: 16, color: theme.foreground }} />
+                    <TextInput value={query} onChangeText={setQuery} placeholder={t('search.placeholder')} placeholderTextColor={theme.mutedForeground} autoFocus autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" style={{ flex: 1, fontFamily: fonts.regular, fontSize: 16, color: theme.foreground }} />
                 </View>
             </View>
             <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}>
@@ -131,25 +137,25 @@ export default function Search() {
                         <ForemanOrb size={28} />
                         <View style={{ flex: 1, gap: 1 }}>
                             <AppText variant="callout" medium>
-                                Ask Rerun
+                                {t('search.askRerun')}
                             </AppText>
                             <AppText variant="footnote" tone="muted" numberOfLines={1}>
-                                {`“${asked}”`}
+                                {t('search.quotedAsk', { query: asked })}
                             </AppText>
                         </View>
                     </Pressable>
                 )}
                 {foundCoworkers.length > 0 && (
                     <>
-                        <SectionHeader label="Coworkers" count={foundCoworkers.length} collapsed={collapsed.includes('coworkers')} onToggle={() => toggle('coworkers')} divided={asked.length > 0 && scope !== 'agents'} />
+                        <SectionHeader label={t('search.coworkers')} count={foundCoworkers.length} collapsed={collapsed.includes('coworkers')} onToggle={() => toggle('coworkers')} divided={asked.length > 0 && scope !== 'agents'} />
                         {!collapsed.includes('coworkers') && foundCoworkers.map(coworker => (
-                            <CoworkerRow key={coworker.id} coworker={{ id: coworker.id, kind: 'coworker', name: coworker.name, status: moodStatus(coworker) }} line={lineOf(coworker)} minutesAgo={minutesSince(coworker.latest?.updatedAt)} unread={coworker.pending > 0} onPress={() => openCoworker(coworker)} />
+                            <CoworkerRow key={coworker.id} coworker={{ id: coworker.id, kind: 'coworker', name: coworker.name, status: moodStatus(coworker) }} line={lineOf(coworker, t)} minutesAgo={minutesSince(coworker.latest?.updatedAt)} unread={coworker.pending > 0} onPress={() => openCoworker(coworker)} />
                         ))}
                     </>
                 )}
                 {hits.length > 0 && (
                     <>
-                        <SectionHeader label="Conversations" count={hits.length} collapsed={collapsed.includes('conversations')} onToggle={() => toggle('conversations')} divided />
+                        <SectionHeader label={t('search.conversations')} count={hits.length} collapsed={collapsed.includes('conversations')} onToggle={() => toggle('conversations')} divided />
                         {!collapsed.includes('conversations') && hits.map(hit => (
                             <ConversationRow key={hit.id} hit={hit} coworker={byId.get(hit.agentId)} onPress={() => router.push({ pathname: '/chat/[id]', params: { id: hit.id, to: hit.agentId } })} />
                         ))}
@@ -157,7 +163,7 @@ export default function Search() {
                 )}
                 {asked.length > 0 && foundCoworkers.length === 0 && hits.length === 0 && scope === 'agents' && (
                     <AppText variant="callout" tone="muted" style={{ paddingHorizontal: spacing.xl, paddingTop: spacing.lg }}>
-                        No coworker by that name.
+                        {t('search.noCoworker')}
                     </AppText>
                 )}
             </ScrollView>

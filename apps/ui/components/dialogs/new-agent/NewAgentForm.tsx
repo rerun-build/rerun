@@ -2,6 +2,7 @@
 
 import { Orb } from '@rerun/ui/foreman'
 import { type AgentSuggestion, BrowseTemplates, Composer, type ConnectorCatalog, fall, Floor, type FloorLight, ForYouCards, SUGGESTION_CARDS, type JobReader, type JobReading, type NewAgentDraft, type NewAgentRequest, OrbLight, useFollow, useNewAgentDraft } from '@rerun/ui/new-agent'
+import { useTranslations } from 'next-intl'
 import { type ReactNode, type RefObject, useRef } from 'react'
 
 const ORB_SIZE = 56
@@ -31,6 +32,7 @@ function floorLight(focused: boolean): FloorLight {
 // Nothing is created here: `onCreate` receives the agent as described, and whoever owns the dialog
 // sends it to the board to be placed.
 export function NewAgentForm({ suggestions, suggestionsHeading, catalog, read, onCreate, onBrowseTemplates, still }: { suggestions: AgentSuggestion[]; suggestionsHeading?: string; catalog: ConnectorCatalog | null; read: JobReader; onCreate: (agent: NewAgentRequest) => void; onBrowseTemplates: () => void; still?: NewAgentStill }) {
+    const t = useTranslations('dialogs.newAgent')
     const rootRef = useRef<HTMLDivElement>(null)
     const anchorRef = useRef<HTMLSpanElement>(null)
     const gaze = useFollow({ rootRef, anchorRef, cursorRef: still?.cursorRef, aim: still?.aim })
@@ -50,7 +52,7 @@ export function NewAgentForm({ suggestions, suggestionsHeading, catalog, read, o
                         <Orb state={pending ? 'thinking' : 'listening'} size={ORB_SIZE} gaze={gaze} />
                     </div>
                 </div>
-                <h2 className="mt-5 text-center font-heading text-2xl font-medium tracking-tight">{name ? `What should ${name} do?` : 'What should your new coworker do?'}</h2>
+                <h2 className="mt-5 text-center font-heading text-2xl font-medium tracking-tight">{name ? t('headingNamed', { name }) : t('heading')}</h2>
                 <Composer {...composer} catalog={catalog} drawnCaret={Boolean(still?.drawnCaret) && !editing} className="mt-6 w-full" />
                 <ForYouCards {...forYou} heading={suggestionsHeading} catalog={catalog} className="mt-9 w-full" />
                 <BrowseTemplates onBrowse={onBrowseTemplates} className="mt-7 w-full" />

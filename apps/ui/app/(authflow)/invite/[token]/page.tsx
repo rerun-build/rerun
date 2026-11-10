@@ -7,6 +7,7 @@ import { getServerSession } from '@/supabase/session/getServerSession'
 import { redirect } from 'next/navigation'
 import { InviteMismatch } from './InviteMismatch'
 import { InviteRedirect } from './InviteRedirect'
+import { getTranslations } from 'next-intl/server'
 
 function Shell({ title, message }: { title: string; message: string }) {
     return (
@@ -19,15 +20,17 @@ function Shell({ title, message }: { title: string; message: string }) {
 
 export default async function InvitePage({ params }: { params: Promise<{ token: string }> }) {
     const { token } = await params
+    const t = await getTranslations('auth.invite')
+    const tErrors = await getTranslations('errors')
 
     const invite = await loadInvitationAction(token)
-    if (invite.status === 'not_found') return <Shell title="Invitation not found" message="This invitation link is invalid." />
+    if (invite.status === 'not_found') return <Shell title={t('notFound.title')} message={t('notFound.message')} />
     if (invite.status === 'unavailable') {
         const joinedWorkspaceId = await joinedWorkspaceForInvitationAction(token)
         if (joinedWorkspaceId !== null) redirect(`${routes.home}?${WORKSPACE_PARAM}=${joinedWorkspaceId}`)
-        return <Shell title="Invitation unavailable" message="This invitation has already been used or was revoked." />
+        return <Shell title={t('unavailable.title')} message={t('unavailable.message')} />
     }
-    if (invite.status === 'expired') return <Shell title="Invitation expired" message="This invitation has expired. Ask the workspace owner to send a new one." />
+    if (invite.status === 'expired') return <Shell title={t('expired.title')} message={t('expired.message')} />
 
     const { session } = await getServerSession()
 
@@ -35,7 +38,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     if (session.email.toLowerCase() !== invite.email.toLowerCase()) return <InviteMismatch inviteEmail={invite.email} currentEmail={accountLabel(session.email) ?? session.email} workspaceName={invite.workspaceName} />
 
     const result = await acceptInvitationAction(token)
-    if (!result.ok) return <Shell title="Could not join workspace" message={result.error} />
+    if (!result.ok) return <Shell title={t('joinFailed')} message={result.code ? tErrors(result.code, result.params as never) : result.error} />
 
     // Named in the URL so a tab already pinned on another workspace lands on the joined one.
     redirect(`${routes.home}?${WORKSPACE_PARAM}=${result.workspaceId}`)

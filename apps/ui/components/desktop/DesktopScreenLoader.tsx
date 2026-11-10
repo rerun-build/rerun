@@ -7,8 +7,6 @@ import { Shimmer } from '@/components/ai-elements/shimmer'
 import { cn } from '@/lib/utils'
 import { sweepIntensity } from '@rerun/contracts'
 
-export const DESKTOP_CONNECTING_LABEL = 'Connecting to the screen...'
-
 const CELL = { size: 10, gap: 3, radius: 2.5 }
 const COMPACT_CELL = { size: 6, gap: 2, radius: 1.5 }
 const OPACITY_STEPS = 6

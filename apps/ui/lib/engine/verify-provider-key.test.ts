@@ -28,14 +28,14 @@ describe('providerKeyProblem', () => {
         ['openrouter', 'OPENROUTER_API_KEY', 'https://openrouter.ai/api/v1/key', 'OpenRouter'],
     ] as const)('asks %s about the key and reports a refusal', async (provider, envKey, url, name) => {
         answer(401)
-        expect(await providerKeyProblem(provider, { [envKey]: ' bad-key ' })).toBe(`${name} turned this key down. Check it was copied in full and is still active.`)
+        expect(await providerKeyProblem(provider, { [envKey]: ' bad-key ' })).toEqual({ code: 'providerKeyRejected', params: { provider: name } })
         expect(fetchMock.mock.calls[0][0]).toBe(url)
         expect(JSON.stringify(fetchMock.mock.calls[0][1].headers)).toContain('bad-key')
     })
 
     it('asks OpenCode about the key on its usage endpoint, the only one that checks it', async () => {
         answer(401)
-        expect(await providerKeyProblem('opencode', { OPENCODE_API_KEY: 'oc_sk_bad' })).toBe('OpenCode turned this key down. Check it was copied in full and is still active.')
+        expect(await providerKeyProblem('opencode', { OPENCODE_API_KEY: 'oc_sk_bad' })).toEqual({ code: 'providerKeyRejected', params: { provider: 'OpenCode' } })
         expect(fetchMock.mock.calls[0][0]).toBe('https://opencode.ai/zen/go/v1/usage')
         expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: 'Bearer oc_sk_bad' })
     })
@@ -55,21 +55,21 @@ describe('providerKeyProblem', () => {
 
     it('reads a 403 as a refusal too', async () => {
         answer(403)
-        expect(await providerKeyProblem('openai', { OPENAI_API_KEY: 'sk-revoked' })).toContain('OpenAI turned this key down')
+        expect(await providerKeyProblem('openai', { OPENAI_API_KEY: 'sk-revoked' })).toEqual({ code: 'providerKeyRejected', params: { provider: 'OpenAI' } })
     })
 
     it('lets through an OpenAI key that is only short of the scope to list models', async () => {
         answer(401, JSON.stringify({ error: { code: 'missing_scope', message: 'You have insufficient permissions for this operation. Missing scopes: api.model.read' } }))
         expect(await providerKeyProblem('openai', { OPENAI_API_KEY: 'sk-proj-restricted' })).toBeNull()
         answer(401, JSON.stringify({ error: { code: 'invalid_api_key', message: 'Incorrect API key provided' } }))
-        expect(await providerKeyProblem('openai', { OPENAI_API_KEY: 'sk-proj-wrong' })).toContain('OpenAI turned this key down')
+        expect(await providerKeyProblem('openai', { OPENAI_API_KEY: 'sk-proj-wrong' })).toEqual({ code: 'providerKeyRejected', params: { provider: 'OpenAI' } })
         answer(401, 'not json')
-        expect(await providerKeyProblem('openai', { OPENAI_API_KEY: 'sk-proj-wrong' })).toContain('OpenAI turned this key down')
+        expect(await providerKeyProblem('openai', { OPENAI_API_KEY: 'sk-proj-wrong' })).toEqual({ code: 'providerKeyRejected', params: { provider: 'OpenAI' } })
     })
 
     it('reads the 400 Google answers an unknown key with, and only that one', async () => {
         answer(400, JSON.stringify({ error: { details: [{ reason: 'API_KEY_INVALID' }] } }))
-        expect(await providerKeyProblem('google', { GOOGLE_GENERATIVE_AI_API_KEY: 'AIza-bad' })).toContain('Google turned this key down')
+        expect(await providerKeyProblem('google', { GOOGLE_GENERATIVE_AI_API_KEY: 'AIza-bad' })).toEqual({ code: 'providerKeyRejected', params: { provider: 'Google' } })
         answer(400, JSON.stringify({ error: { message: 'something else' } }))
         expect(await providerKeyProblem('google', { GOOGLE_GENERATIVE_AI_API_KEY: 'AIza-ok' })).toBeNull()
     })
@@ -84,7 +84,7 @@ describe('providerKeyProblem', () => {
     })
 
     it('turns a Claude plan token away before asking anyone', async () => {
-        expect(await providerKeyProblem('anthropic', { ANTHROPIC_API_KEY: 'sk-ant-oat01-plan' })).toBe('This is a Claude plan token. Add it under Claude Pro or Max instead.')
+        expect(await providerKeyProblem('anthropic', { ANTHROPIC_API_KEY: 'sk-ant-oat01-plan' })).toEqual({ code: 'claudePlanTokenAsApiKey' })
         expect(fetchMock).not.toHaveBeenCalled()
     })
 

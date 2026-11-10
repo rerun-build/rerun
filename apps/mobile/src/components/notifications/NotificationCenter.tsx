@@ -1,12 +1,14 @@
-import { COWORKER_MODE_COPY, EMAIL_CATEGORIES, EMAIL_CATEGORY_LABELS, NOTIFICATION_SCOPE_COPY, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@rerun/contracts'
+import { EMAIL_CATEGORIES, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@rerun/contracts'
 import type { PermissionStatus } from 'expo-notifications'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { ActionSheetIOS, Pressable, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CheckRow, GROUPED_ROW_HEIGHT, ICON_ROW_INSET, Section, SectionTitle, Separator, SettingsRow, SwitchRow } from '@/components/ui/GroupedList'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { translatorFor } from '@/i18n/translator'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
@@ -19,9 +21,11 @@ export const SCOPE_SYMBOLS: Record<NotificationScope, SFSymbol> = {
     nothing: 'bell.slash',
 }
 
-export function ruleValue(rule: CoworkerRule): string {
-    if (rule.mode !== 'default') return COWORKER_MODE_COPY[rule.mode].label
-    return rule.follow ? 'Follows tasks' : 'Your setting'
+export type SettingsTranslator = ReturnType<typeof translatorFor<'mobileSettings'>>
+
+export function ruleValue(rule: CoworkerRule, t: SettingsTranslator = translatorFor('mobileSettings')): string {
+    if (rule.mode !== 'default') return t(`notifications.modes.${rule.mode}.label`)
+    return rule.follow ? t('notifications.perCoworker.followsTasks') : t('notifications.perCoworker.yourSetting')
 }
 
 type NotificationCenterProps = {
@@ -44,14 +48,15 @@ export function Footnote({ children }: { children: string }) {
 }
 
 function PushOff({ push, onEnablePush, onOpenIosSettings }: Pick<NotificationCenterProps, 'onEnablePush' | 'onOpenIosSettings'> & { push: PermissionStatus }) {
+    const t = useTranslations('mobileSettings.notifications.push')
     return (
         <View style={{ gap: spacing.sm }}>
             <Card>
-                <SettingsRow icon="bell.slash" label="Push notifications" value="Off" />
+                <SettingsRow icon="bell.slash" label={t('label')} value={t('off')} />
                 <Separator inset={ICON_ROW_INSET} />
-                {push === 'undetermined' ? <SettingsRow label="Turn on" onPress={onEnablePush} /> : <SettingsRow label="Open iOS Settings" accessory="external" onPress={onOpenIosSettings} />}
+                {push === 'undetermined' ? <SettingsRow label={t('turnOn')} onPress={onEnablePush} /> : <SettingsRow label={t('openIosSettings')} accessory="external" onPress={onOpenIosSettings} />}
             </Card>
-            <Footnote>Nothing below reaches this iPhone until push is on.</Footnote>
+            <Footnote>{t('footnote')}</Footnote>
         </View>
     )
 }
@@ -59,8 +64,9 @@ function PushOff({ push, onEnablePush, onOpenIosSettings }: Pick<NotificationCen
 // The rule is what the row is for: a long name gives way before it does.
 function CoworkerRuleRow({ name, value, onPress }: { name: string; value: string; onPress: () => void }) {
     const theme = useTheme()
+    const t = useTranslations('mobileSettings.notifications.perCoworker')
     return (
-        <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${name}, ${value}`} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, backgroundColor: pressed ? theme.muted : 'transparent' })}>
+        <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={t('rowLabel', { name, value })} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <AppText variant="body" numberOfLines={1} style={{ flex: 1 }}>
                 {name}
             </AppText>
@@ -94,13 +100,15 @@ function CenterSkeleton() {
 // The web's notification settings: which runs are worth hearing about, the email, a rule for a
 // coworker apart, and the account emails. Toast and sound live in the browser, so they stay there.
 export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePush, onOpenIosSettings, onPatch, onOpenCoworker }: NotificationCenterProps) {
+    const t = useTranslations('mobileSettings.notifications')
+    const tSettings = useTranslations('mobileSettings')
     const pushOff = push !== null && push !== 'granted' && <PushOff push={push} onEnablePush={onEnablePush} onOpenIosSettings={onOpenIosSettings} />
 
     if (!prefs) {
         return (
             <>
                 {pushOff}
-                {failed ? <Footnote>Could not load your settings. Try again in a moment.</Footnote> : <CenterSkeleton />}
+                {failed ? <Footnote>{t('loadFailed')}</Footnote> : <CenterSkeleton />}
             </>
         )
     }
@@ -110,7 +118,7 @@ export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePus
     const addable = (coworkers ?? []).filter(coworker => !listed.includes(coworker))
 
     const pickCoworker = () =>
-        ActionSheetIOS.showActionSheetWithOptions({ title: 'Every run of this coworker reaches you', options: [...addable.map(coworker => coworker.name), 'Cancel'], cancelButtonIndex: addable.length }, index => {
+        ActionSheetIOS.showActionSheetWithOptions({ title: t('perCoworker.pickTitle'), options: [...addable.map(coworker => coworker.name), t('perCoworker.cancel')], cancelButtonIndex: addable.length }, index => {
             const coworker = addable[index]
             if (coworker) onPatch({ coworkers: { [coworker.id]: { ...coworkerRuleOf(prefs, coworker.id), mode: 'everything' } } })
         })
@@ -119,41 +127,41 @@ export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePus
         <>
             {pushOff}
 
-            <Section title="Notify me about">
+            <Section title={t('scopeTitle')}>
                 {NOTIFICATION_SCOPES.map((scope, index) => (
                     <View key={scope}>
                         {index > 0 && <Separator inset={ICON_ROW_INSET} />}
-                        <CheckRow testID={`scope-${scope}`} icon={SCOPE_SYMBOLS[scope]} label={NOTIFICATION_SCOPE_COPY[scope].label} detail={NOTIFICATION_SCOPE_COPY[scope].detail} badge={scope === 'mine' ? <Badge label="Recommended" tone="brand" size="xs" /> : undefined} checked={prefs.scope === scope} onPress={() => onPatch({ scope })} />
+                        <CheckRow testID={`scope-${scope}`} icon={SCOPE_SYMBOLS[scope]} label={t(`scopes.${scope}.label`)} detail={t(`scopes.${scope}.detail`)} badge={scope === 'mine' ? <Badge label={t('recommended')} tone="brand" size="xs" /> : undefined} checked={prefs.scope === scope} onPress={() => onPatch({ scope })} />
                     </View>
                 ))}
             </Section>
 
             <View style={{ gap: spacing.sm }}>
                 <Card>
-                    <SwitchRow testID="switch-email" label="Email" value={prefs.email} disabled={silent} onValueChange={email => onPatch({ email })} />
+                    <SwitchRow testID="switch-email" label={t('email.label')} value={prefs.email} disabled={silent} onValueChange={email => onPatch({ email })} />
                 </Card>
-                <Footnote>When it needs you while you are away. One email per incident, never one per run.</Footnote>
+                <Footnote>{t('email.footnote')}</Footnote>
             </View>
 
             <View style={{ gap: spacing.sm }}>
-                <SectionTitle>Per coworker</SectionTitle>
+                <SectionTitle>{t('perCoworker.title')}</SectionTitle>
                 <Card>
                     {listed.map(coworker => (
                         <View key={coworker.id}>
-                            <CoworkerRuleRow name={coworker.name} value={ruleValue(coworkerRuleOf(prefs, coworker.id))} onPress={() => onOpenCoworker(coworker)} />
+                            <CoworkerRuleRow name={coworker.name} value={ruleValue(coworkerRuleOf(prefs, coworker.id), tSettings)} onPress={() => onOpenCoworker(coworker)} />
                             <Separator />
                         </View>
                     ))}
-                    <SettingsRow icon="plus" label="Add coworker" loading={coworkers === null} disabled={coworkers !== null && addable.length === 0} onPress={coworkers === null ? undefined : pickCoworker} />
+                    <SettingsRow icon="plus" label={t('perCoworker.add')} loading={coworkers === null} disabled={coworkers !== null && addable.length === 0} onPress={coworkers === null ? undefined : pickCoworker} />
                 </Card>
-                <Footnote>{listed.length === 0 ? 'Every coworker follows the rule above.' : 'Also set from each coworker’s details.'}</Footnote>
+                <Footnote>{listed.length === 0 ? t('perCoworker.empty') : t('perCoworker.detail')}</Footnote>
             </View>
 
-            <Section title="Account emails">
+            <Section title={t('accountEmails.title')}>
                 {EMAIL_CATEGORIES.map((category, index) => (
                     <View key={category}>
                         {index > 0 && <Separator />}
-                        <SwitchRow label={EMAIL_CATEGORY_LABELS[category]} value={prefs.categories[category]} onValueChange={on => onPatch({ categories: { [category]: on } })} />
+                        <SwitchRow label={t(`accountEmails.${category}`)} value={prefs.categories[category]} onValueChange={on => onPatch({ categories: { [category]: on } })} />
                     </View>
                 ))}
             </Section>

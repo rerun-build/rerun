@@ -2,6 +2,7 @@ import * as Haptics from 'expo-haptics'
 import { SymbolView } from 'expo-symbols'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 import Animated, { interpolateColor, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 
 import { AppText } from '@/components/ui/AppText'
@@ -16,13 +17,14 @@ const DOTS_INSET = 4
 const CHEVRON = 28
 
 function Chevron({ direction, disabled, onPress }: { direction: 'left' | 'right'; disabled: boolean; onPress: () => void }) {
+    const t = useTranslations('mobileHitl.steps')
     const theme = useTheme()
     return (
         <Pressable
             onPress={onPress}
             disabled={disabled}
             accessibilityRole="button"
-            accessibilityLabel={direction === 'left' ? 'Previous step' : 'Next step'}
+            accessibilityLabel={direction === 'left' ? t('previous') : t('next')}
             accessibilityState={{ disabled }}
             hitSlop={6}
             style={({ pressed }) => ({ width: CHEVRON, height: CHEVRON, alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.35 : pressed ? 0.5 : 1 })}
@@ -33,13 +35,14 @@ function Chevron({ direction, disabled, onPress }: { direction: 'left' | 'right'
 }
 
 function Dot({ at, count, answered, progress, onPick }: { at: number; count: number; answered: boolean; progress: SharedValue<number>; onPick: (index: number) => void }) {
+    const t = useTranslations('mobileHitl.steps')
     const theme = useTheme()
     const faint = withAlpha(theme.mutedForeground, 0.4)
     const rest = answered ? theme.foreground : faint
     const ring = useAnimatedStyle(() => ({ borderColor: interpolateColor(Math.max(0, 1 - Math.abs(progress.value - at)), [0, 1], [rest, theme.foreground]) }))
     const fill = useAnimatedStyle(() => ({ opacity: answered ? Math.min(1, Math.abs(progress.value - at)) : 0 }))
     return (
-        <Pressable onPress={() => onPick(at)} accessibilityRole="button" accessibilityLabel={`Go to step ${at + 1} of ${count}`} hitSlop={{ top: 10, bottom: 10, left: 3, right: 3 }}>
+        <Pressable onPress={() => onPick(at)} accessibilityRole="button" accessibilityLabel={t('goTo', { step: at + 1, count })} hitSlop={{ top: 10, bottom: 10, left: 3, right: 3 }}>
             <Animated.View style={[{ width: DOT, height: DOT, borderRadius: DOT / 2, borderWidth: 1, overflow: 'hidden' }, ring]}>
                 <Animated.View style={[{ flex: 1, backgroundColor: theme.foreground }, fill]} />
             </Animated.View>
@@ -50,6 +53,7 @@ function Dot({ at, count, answered, progress, onPick }: { at: number; count: num
 // The web's step dots: the current step hollow inside a halo, answered ones filled, the rest faint.
 // The halo and the fills follow the pager's offset, so they move under the finger.
 function StepDots({ count, current, progress, done, onPick }: { count: number; current: number; progress: SharedValue<number>; done: (index: number) => boolean; onPick: (index: number) => void }) {
+    const t = useTranslations('mobileHitl.steps')
     const theme = useTheme()
     const halo = useAnimatedStyle(() => ({ transform: [{ translateX: DOTS_INSET + (DOT - HALO) / 2 + progress.value * (DOT + DOT_GAP) }] }))
     return (
@@ -57,7 +61,7 @@ function StepDots({ count, current, progress, done, onPick }: { count: number; c
             <Chevron direction="left" disabled={current === 0} onPress={() => onPick(current - 1)} />
             {count > MAX_DOTS ? (
                 <AppText variant="caption" tone="muted" style={{ fontVariant: ['tabular-nums'], minWidth: 36, textAlign: 'center' }}>
-                    {current + 1} / {count}
+                    {t('position', { step: current + 1, count })}
                 </AppText>
             ) : (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: DOT_GAP, paddingHorizontal: DOTS_INSET }}>

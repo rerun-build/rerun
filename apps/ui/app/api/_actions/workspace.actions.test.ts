@@ -65,7 +65,7 @@ describe('switchWorkspaceAction', () => {
     it('refuses a workspace the caller is not a member of, without touching the active one', async () => {
         const db = database()
 
-        await expect(switchWorkspaceAction(99)).resolves.toEqual({ ok: false, error: 'You are not a member of this workspace' })
+        await expect(switchWorkspaceAction(99)).resolves.toEqual({ ok: false, error: 'You are not a member of this workspace', code: 'notMember' })
         expect(db.writes('users')).toHaveLength(0)
     })
 
@@ -85,14 +85,14 @@ describe('updateWorkspaceAction', () => {
     it('refuses a member who is not an admin', async () => {
         const db = memberDatabase('member')
 
-        await expect(updateWorkspaceAction(formOf({ name: 'Acme' }))).resolves.toEqual({ ok: false, error: 'Only an admin can change the workspace settings' })
+        await expect(updateWorkspaceAction(formOf({ name: 'Acme' }))).resolves.toEqual({ ok: false, error: 'Only an admin can change the workspace settings', code: 'adminOnlySettings' })
         expect(db.writes('workspaces')).toHaveLength(0)
     })
 
     it('refuses an empty name', async () => {
         const db = memberDatabase()
 
-        await expect(updateWorkspaceAction(formOf({ name: '   ' }))).resolves.toEqual({ ok: false, error: 'Name is required' })
+        await expect(updateWorkspaceAction(formOf({ name: '   ' }))).resolves.toEqual({ ok: false, error: 'Name is required', code: 'nameRequired' })
         expect(db.writes('workspaces')).toHaveLength(0)
     })
 
@@ -106,7 +106,7 @@ describe('updateWorkspaceAction', () => {
     it('refuses an icon that is not in the catalogue, so no URL from the browser reaches icon_url', async () => {
         const db = memberDatabase()
 
-        await expect(updateWorkspaceAction(formOf({ name: 'Acme', iconFile: 'https://evil.test/x.svg' }))).resolves.toEqual({ ok: false, error: 'Unknown icon' })
+        await expect(updateWorkspaceAction(formOf({ name: 'Acme', iconFile: 'https://evil.test/x.svg' }))).resolves.toEqual({ ok: false, error: 'Unknown icon', code: 'unknownIcon' })
         expect(db.writes('workspaces')).toHaveLength(0)
     })
 
@@ -163,7 +163,7 @@ describe('updateWorkspaceAction', () => {
         const db = memberDatabase()
         const file = new File([new Uint8Array(8 * 1024 * 1024 + 1)], 'logo.png', { type: 'image/png' })
 
-        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoFile: file }))).resolves.toEqual({ ok: false, error: 'Image is too large (max 8MB).' })
+        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoFile: file }))).resolves.toEqual({ ok: false, error: 'Image is too large (max 8MB).', code: 'imageTooLarge', params: { max: 8 } })
         expect(db.writes('workspaces')).toHaveLength(0)
     })
 
@@ -181,7 +181,7 @@ describe('updateWorkspaceAction', () => {
         const fetch = vi.fn()
         vi.stubGlobal('fetch', fetch)
 
-        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: link }))).resolves.toEqual({ ok: false, error: 'No logo found at this address' })
+        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: link }))).resolves.toEqual({ ok: false, error: 'No logo found at this address', code: 'noLogoFound' })
         expect(fetch).not.toHaveBeenCalled()
         expect(db.writes('workspaces')).toHaveLength(0)
     })
@@ -190,7 +190,7 @@ describe('updateWorkspaceAction', () => {
         const db = memberDatabase()
         vi.stubGlobal('fetch', vi.fn().mockResolvedValue(imageResponse('text/html')))
 
-        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: 'https://acme.test/logo.png' }))).resolves.toEqual({ ok: false, error: 'No logo found at this address' })
+        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: 'https://acme.test/logo.png' }))).resolves.toEqual({ ok: false, error: 'No logo found at this address', code: 'noLogoFound' })
         expect(db.writes('workspaces')).toHaveLength(0)
     })
 
@@ -200,7 +200,7 @@ describe('updateWorkspaceAction', () => {
         const fetch = vi.fn()
         vi.stubGlobal('fetch', fetch)
 
-        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: 'https://metadata.acme.test/logo.png' }))).resolves.toEqual({ ok: false, error: 'No logo found at this address' })
+        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: 'https://metadata.acme.test/logo.png' }))).resolves.toEqual({ ok: false, error: 'No logo found at this address', code: 'noLogoFound' })
         expect(fetch).not.toHaveBeenCalled()
         expect(db.writes('workspaces')).toHaveLength(0)
     })
@@ -210,7 +210,7 @@ describe('updateWorkspaceAction', () => {
         const fetch = vi.fn().mockResolvedValueOnce(new Response(null, { status: 302, headers: { location: 'http://127.0.0.1/logo.png' } }))
         vi.stubGlobal('fetch', fetch)
 
-        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: 'https://acme.test/logo.png' }))).resolves.toEqual({ ok: false, error: 'No logo found at this address' })
+        await expect(updateWorkspaceAction(formOf({ name: 'Acme', logoLink: 'https://acme.test/logo.png' }))).resolves.toEqual({ ok: false, error: 'No logo found at this address', code: 'noLogoFound' })
         expect(fetch).toHaveBeenCalledTimes(1)
         expect(db.writes('workspaces')).toHaveLength(0)
     })
@@ -255,7 +255,7 @@ describe('createWorkspaceAction', () => {
     ])('refuses %s as the icon without creating anything', async (_label, iconUrl) => {
         const db = creatableDatabase()
 
-        await expect(createWorkspaceAction('Acme', iconUrl)).resolves.toEqual({ ok: false, error: 'Unknown icon' })
+        await expect(createWorkspaceAction('Acme', iconUrl)).resolves.toEqual({ ok: false, error: 'Unknown icon', code: 'unknownIcon' })
         expect(db.calls).toHaveLength(0)
     })
 

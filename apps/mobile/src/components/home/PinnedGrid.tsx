@@ -1,6 +1,7 @@
 import { Button, ContextMenu, Host, RNHostView } from '@expo/ui/swift-ui'
 import { accessibilityLabel, buttonStyle } from '@expo/ui/swift-ui/modifiers'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { moodStatus, type HomeCoworker } from '@/components/home/board'
@@ -61,18 +62,19 @@ type PinnedGridProps = {
 export function PinnedGrid({ coworkers, onOpen, onUnpin, onDetails, onEdit }: PinnedGridProps) {
     const theme = useTheme()
     const cell = usePinnedCell()
+    const t = useTranslations('mobileHome')
     return (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.xl }}>
             {coworkers.map(coworker => (
                 <Host key={coworker.id} matchContents colorScheme={theme.scheme}>
                     <ContextMenu>
                         <ContextMenu.Items>
-                            <Button label="Unpin" systemImage="pin.slash" onPress={() => onUnpin(coworker)} />
-                            <Button label="Coworker details" systemImage="info.circle" onPress={() => onDetails(coworker)} />
-                            {onEdit ? <Button label="Edit pins" systemImage="arrow.up.arrow.down" onPress={onEdit} /> : null}
+                            <Button label={t('pinned.unpin')} systemImage="pin.slash" onPress={() => onUnpin(coworker)} />
+                            <Button label={t('pinned.details')} systemImage="info.circle" onPress={() => onDetails(coworker)} />
+                            {onEdit ? <Button label={t('pinned.edit')} systemImage="arrow.up.arrow.down" onPress={onEdit} /> : null}
                         </ContextMenu.Items>
                         <ContextMenu.Trigger>
-                            <Button onPress={() => onOpen(coworker)} modifiers={[buttonStyle('plain'), accessibilityLabel(coworker.pending > 0 ? `${coworker.name}, unread` : coworker.name)]}>
+                            <Button onPress={() => onOpen(coworker)} modifiers={[buttonStyle('plain'), accessibilityLabel(coworker.pending > 0 ? t('pinned.unreadLabel', { name: coworker.name }) : coworker.name)]}>
                                 <RNHostView matchContents>
                                     <PinnedAvatar coworker={coworker} cell={cell} />
                                 </RNHostView>

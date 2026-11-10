@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { CreateTemplateDialog } from '@/components/dialogs/CreateTemplateDialog'
 import { CaptureAgentsDialog } from '@/components/templates/capture/CaptureAgentsDialog'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -25,6 +26,7 @@ import { useMyTemplates } from './useMyTemplates'
 // The create dialog is a sibling rather than a child: the toolbar's "+" menu creates a template
 // without ever opening the panel.
 export function MyTemplatesDialog() {
+    const t = useTranslations('templates.expert.dialog')
     const open = useCreatorStore(state => state.open)
     const setOpen = useCreatorStore(state => state.setOpen)
     const pane = useCreatorStore(state => state.pane)
@@ -53,8 +55,8 @@ export function MyTemplatesDialog() {
                     <div className="grid min-h-0 flex-1 grid-cols-1 sm:h-[min(46rem,88dvh)] sm:grid-cols-[19rem_1fr] sm:grid-rows-[minmax(0,1fr)]">
                         <div className="flex min-h-0 flex-col border-r border-border">
                             <DialogHeader className="p-5 pb-4">
-                                <DialogTitle>My templates</DialogTitle>
-                                <DialogDescription className="text-xs">Draft a template from your sandbox, then hand it over. We review it before it goes live.</DialogDescription>
+                                <DialogTitle>{t('title')}</DialogTitle>
+                                <DialogDescription className="text-xs">{t('description')}</DialogDescription>
                             </DialogHeader>
                             <ExpertTemplateList
                                 templates={templates}
@@ -71,7 +73,7 @@ export function MyTemplatesDialog() {
                             ) : pane.kind === 'revenue' ? (
                                 <CreatorRevenuePanel active={open} />
                             ) : pane.kind === 'empty' ? (
-                                <EmptyState icon={LayersIcon} title="Pick a template" description="Or start a new one to capture a coworker from your sandbox into it." />
+                                <EmptyState icon={LayersIcon} title={t('pickTitle')} description={t('pickDescription')} />
                             ) : detail === null ? (
                                 <MyTemplateEditorSkeleton />
                             ) : (

@@ -22,9 +22,9 @@ describe('conversation sections', () => {
             { id: 'd', status: 'awaiting_ack' as const },
         ])
 
-        expect(sections.map(section => [section.label, section.conversations.map(c => c.id)])).toEqual([
-            ['Needs you', ['b', 'd']],
-            ['Unread', ['a']],
+        expect(sections.map(section => [section.state, section.conversations.map(c => c.id)])).toEqual([
+            ['needs-you', ['b', 'd']],
+            ['new', ['a']],
         ])
         expect(earlier.map(c => c.id)).toEqual(['c'])
     })

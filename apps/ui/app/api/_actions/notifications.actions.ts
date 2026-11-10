@@ -4,8 +4,9 @@ import { patchNotificationPrefs } from '@/app/api/_services/notification-prefs.s
 import { verifyUnsubscribeToken } from '@rerun/cloud/email'
 import { notificationPrefsPatchSchema, type NotificationPrefsPatch } from '@/lib/notifications/prefs'
 import { getServerSession } from '@/supabase/session/getServerSession'
+import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
-export type UpdatePrefsResult = { ok: true } | { ok: false; error: string }
+export type UpdatePrefsResult = { ok: true } | ActionFailure
 
 // Persist a partial set of the caller's notification preferences (settings page or notifications
 // dialog). The user id comes from the auth session (never the client); the row updates live in the UI
@@ -13,15 +14,15 @@ export type UpdatePrefsResult = { ok: true } | { ok: false; error: string }
 export async function updateNotificationPrefsAction(patch: NotificationPrefsPatch): Promise<UpdatePrefsResult> {
     try {
         const parsed = notificationPrefsPatchSchema.safeParse(patch)
-        if (!parsed.success) return { ok: false, error: 'Invalid preferences' }
+        if (!parsed.success) return failure('invalidPreferences')
 
         const { user } = await getServerSession()
-        if (!user?.id) return { ok: false, error: 'Not authenticated' }
+        if (!user?.id) return failure('notAuthenticated')
 
         await patchNotificationPrefs(user.id, parsed.data)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to update preferences' }
+        return failureOf(err, 'updatePreferencesFailed')
     }
 }
 
@@ -30,14 +31,14 @@ export async function updateNotificationPrefsAction(patch: NotificationPrefsPatc
 export async function updateNotificationPrefsByTokenAction(token: string, patch: NotificationPrefsPatch): Promise<UpdatePrefsResult> {
     try {
         const parsed = notificationPrefsPatchSchema.safeParse(patch)
-        if (!parsed.success) return { ok: false, error: 'Invalid preferences' }
+        if (!parsed.success) return failure('invalidPreferences')
 
         const target = verifyUnsubscribeToken(token)
-        if (!target) return { ok: false, error: 'Invalid or expired link' }
+        if (!target) return failure('linkInvalidOrExpired')
 
         await patchNotificationPrefs(target.userId, parsed.data)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to update preferences' }
+        return failureOf(err, 'updatePreferencesFailed')
     }
 }

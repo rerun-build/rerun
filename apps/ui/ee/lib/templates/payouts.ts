@@ -1,5 +1,9 @@
 import type { BadgeTone } from '@rerun/ui/primitives'
 import type { PayoutState } from '@/ee/services/connect.service'
+import type { useTranslations } from 'next-intl'
+
+// The screens hand in the `templates.payouts` catalog; the English maps below are for the tests.
+type PayoutsTranslator = ReturnType<typeof useTranslations<'templates.payouts'>>
 
 // The five payout states as the panel shows them, mapped once here the way template statuses are.
 // A badge is never styled inline.
@@ -24,8 +28,8 @@ export function payoutStateTone(state: PayoutState): BadgeTone {
     return PAYOUT_TONES[state]
 }
 
-export function payoutStateLabel(state: PayoutState): string {
-    return PAYOUT_LABELS[state]
+export function payoutStateLabel(state: PayoutState, t?: PayoutsTranslator): string {
+    return t ? t(`stateLabels.${state}`) : PAYOUT_LABELS[state]
 }
 
 // Stripe names its requirements in dotted paths ("individual.verification.document"), which are
@@ -44,7 +48,9 @@ const REQUIREMENT_LABELS: Record<string, string> = {
     'tos_acceptance.date': 'Accepting the Stripe terms',
 }
 
-export function requirementLabel(requirement: string): string {
+export function requirementLabel(requirement: string, t?: PayoutsTranslator): string {
+    const key = `requirements.${requirement}` as Parameters<PayoutsTranslator>[0]
+    if (t && Object.hasOwn(REQUIREMENT_LABELS, requirement)) return t(key)
     const known = REQUIREMENT_LABELS[requirement]
     if (known) return known
 
@@ -59,6 +65,7 @@ export function saleKindTone(kind: string): BadgeTone {
     return SALE_TONES[kind] ?? 'neutral'
 }
 
-export function saleKindLabel(kind: string): string {
+export function saleKindLabel(kind: string, t?: PayoutsTranslator): string {
+    if (t && Object.hasOwn(SALE_LABELS, kind)) return t(`saleKinds.${kind}` as Parameters<PayoutsTranslator>[0])
     return SALE_LABELS[kind] ?? kind
 }

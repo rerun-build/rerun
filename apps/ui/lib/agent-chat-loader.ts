@@ -1,7 +1,16 @@
 import { stripBridgePrefix } from '@/lib/chat/bridge-name'
-import { countSubRuns, isSubRunLive, pairSubRuns, subRunTroubleLabel } from '@/lib/chat/sub-run-progress'
+import { countSubRuns, isSubRunLive, pairSubRuns, subRunTroubleLabel, titledSubRun, type SubRunCopy } from '@/lib/chat/sub-run-progress'
 
-export const loadingLabels = ['Thinking...', 'Processing your request...', 'Crafting a response...']
+// The `chat.activity` namespace, in the reader's language.
+export type ActivityCopy = (
+    key: 'thinking' | 'processing' | 'crafting' | 'writing' | 'runningTool' | 'waitingOn' | 'building' | 'buildingCoworkers' | 'waitingOnSubCoworkers',
+    values?: Record<string, string | number>
+) => string
+
+// What the loader rotates through while the run has said nothing yet.
+export const LOADING_ACTIVITIES = ['thinking', 'processing', 'crafting'] as const
+
+export type LiveActivityCopy = { t: ActivityCopy; subRuns: SubRunCopy; toolLabel: (toolName: string, input?: unknown) => string }
 
 const HITL_TOOLS = new Set(['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover'])
 const TERMINAL_TOOL_STATES = new Set(['output-available', 'output-error', 'output-denied'])
@@ -32,29 +41,31 @@ export function stepGroupShowsActivity(message: MessageLike | undefined): boolea
  * What the run is doing right now, read off the streaming message. Null when the message says nothing
  * yet, which leaves the caller on its generic rotation.
  */
-export function liveActivityLabel(message: MessageLike | undefined, toolLabel: (toolName: string, input?: unknown) => string): string | null {
+export function liveActivityLabel(message: MessageLike | undefined, { t, subRuns: tSubRuns, toolLabel }: LiveActivityCopy): string | null {
     if (!message || message.role !== 'assistant') return null
 
     const subRuns = pairSubRuns(message.parts).byToolCallId
     for (const part of message.parts) {
         if (!isRunningTool(part) || !part.toolCallId) continue
-        const progress = subRuns.get(part.toolCallId)
-        if (!progress || !progress.tasks.some(isSubRunLive)) continue
+        const reported = subRuns.get(part.toolCallId)
+        if (!reported || !reported.tasks.some(isSubRunLive)) continue
+        const progress = titledSubRun(reported, tSubRuns)
         const counts = countSubRuns(progress.tasks)
-        const trouble = subRunTroubleLabel(counts)
-        if (progress.kind === 'call-agent') return `Waiting on ${progress.tasks[0].title}${trouble}`
+        const trouble = subRunTroubleLabel(counts, tSubRuns)
+        const done = counts.done + counts.failed
+        if (progress.kind === 'call-agent') return `${t('waitingOn', { name: progress.tasks[0].title })}${trouble}`
         // The onboarding's build reports on a delegation's block, and it builds agents rather than waiting on them.
-        if (part.type === 'tool-build_team') return counts.total === 1 ? `Building ${progress.tasks[0].title}` : `Building ${counts.total} coworkers · ${counts.done + counts.failed} done${trouble}`
-        return `Waiting on ${counts.total} sub-coworker${counts.total > 1 ? 's' : ''} · ${counts.done + counts.failed} done${trouble}`
+        if (part.type === 'tool-build_team') return counts.total === 1 ? t('building', { name: progress.tasks[0].title }) : `${t('buildingCoworkers', { count: counts.total, done })}${trouble}`
+        return `${t('waitingOnSubCoworkers', { count: counts.total, done })}${trouble}`
     }
 
     const last = message.parts.findLast(part => !part.type.startsWith('data-'))
     if (!last) return null
     if (isRunningTool(last)) {
         const toolName = stripBridgePrefix(last.toolName ?? last.type.replace(/^tool-/, ''))
-        return HITL_TOOLS.has(toolName) ? null : `Running ${toolLabel(toolName, last.input)}`
+        return HITL_TOOLS.has(toolName) ? null : t('runningTool', { tool: toolLabel(toolName, last.input) })
     }
-    if (last.type === 'reasoning' && last.state === 'streaming') return 'Thinking...'
-    if (last.type === 'text' && last.state === 'streaming') return 'Writing...'
+    if (last.type === 'reasoning' && last.state === 'streaming') return t('thinking')
+    if (last.type === 'text' && last.state === 'streaming') return t('writing')
     return null
 }

@@ -3,18 +3,11 @@
 import { CheckIcon, MinusIcon, UserRoundIcon, XIcon } from '../icons'
 import { TextShimmer } from '../TextShimmer'
 import { IconBadge } from '../primitives/icon-badge'
+import { useKitTranslations } from '../locale'
 
 export type AgentStatusValue = 'idle' | 'working' | 'error' | 'waiting_human' | 'offline'
 
 export type AgentStatusEntry = { id: string; name: string; status: AgentStatusValue }
-
-const STATUS_LABEL: Record<AgentStatusValue, string> = {
-    idle: 'Idle',
-    working: 'Working',
-    error: 'Error',
-    waiting_human: 'Waiting for human',
-    offline: 'Offline',
-}
 
 function AgentStatusIndicator({ status }: { status: AgentStatusValue }) {
     switch (status) {
@@ -32,6 +25,7 @@ function AgentStatusIndicator({ status }: { status: AgentStatusValue }) {
 }
 
 export function AgentStatusList({ agents }: { agents: AgentStatusEntry[] }) {
+    const t = useKitTranslations()
     return (
         <div className="flex h-full flex-col gap-1 overflow-auto">
             {agents.map(a => (
@@ -40,14 +34,14 @@ export function AgentStatusList({ agents }: { agents: AgentStatusEntry[] }) {
                     <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">{a.name}</span>
                     {a.status === 'working' ? (
                         <TextShimmer as="span" duration={1.6} spread={2} scaleSpreadWithLength className="shrink-0 text-[11px] [--shimmer-base:#78716c] [--shimmer-highlight:#fbbf24]">
-                            Working
+                            {t('monitoring.agentStatus.working')}
                         </TextShimmer>
                     ) : (
-                        <span className="shrink-0 text-[11px] text-muted-foreground">{STATUS_LABEL[a.status]}</span>
+                        <span className="shrink-0 text-[11px] text-muted-foreground">{t(`monitoring.agentStatus.${a.status}`)}</span>
                     )}
                 </div>
             ))}
-            {agents.length === 0 && <div className="flex flex-1 items-center justify-center text-[12px] text-muted-foreground">No coworkers to display.</div>}
+            {agents.length === 0 && <div className="flex flex-1 items-center justify-center text-[12px] text-muted-foreground">{t('monitoring.agentStatus.empty')}</div>}
         </div>
     )
 }

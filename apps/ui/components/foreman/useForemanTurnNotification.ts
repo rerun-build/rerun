@@ -1,6 +1,7 @@
 'use client'
 
 import type { ChatStatus, UIMessage } from 'ai'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 
 import { showBrowserNotification } from '@/lib/notifications/browser'
@@ -21,14 +22,16 @@ function lastAssistantText(messages: UIMessage[]): string | null {
 // During the funnel, every turn that ends hands the user something to answer or look at: the plan,
 // the trial card, the built team. The tab is often elsewhere by then, the build especially.
 export function useForemanTurnNotification({ messages, status, guided }: { messages: UIMessage[]; status: ChatStatus; guided: boolean }) {
+    const t = useTranslations('foreman.notification')
     const busy = status === 'submitted' || status === 'streaming'
+    const waitingText = t('waiting')
 
     // Read when the turn starts: the turn that builds the team leaves the funnel before it ends.
     const turnGuided = useRef(false)
     const wasBusy = useRef(false)
-    const latest = useRef({ messages, guided })
+    const latest = useRef({ messages, guided, waitingText })
     useEffect(() => {
-        latest.current = { messages, guided }
+        latest.current = { messages, guided, waitingText }
     })
 
     useEffect(() => {
@@ -44,7 +47,7 @@ export function useForemanTurnNotification({ messages, status, guided }: { messa
         const timer = setTimeout(() => {
             showBrowserNotification({
                 title: 'Foreman',
-                body: lastAssistantText(latest.current.messages) ?? 'Foreman is waiting for you.',
+                body: lastAssistantText(latest.current.messages) ?? latest.current.waitingText,
                 tag: 'foreman',
                 onClick: () => useForemanStore.getState().openForFunnel(),
             })

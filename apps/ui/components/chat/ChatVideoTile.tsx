@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
@@ -55,6 +56,7 @@ type ChatVideoTileProps = {
  * and the corner button opens the lightbox. Starting one pauses any other playing in the chat.
  */
 export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) {
+    const t = useTranslations('chat.video')
     const videoRef = useRef<HTMLVideoElement>(null)
     const [meta, setMeta] = useState<VideoMeta | null>(null)
     const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
@@ -96,7 +98,7 @@ export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) 
             <button
                 type="button"
                 onClick={status === 'ready' ? togglePlayback : onOpen}
-                aria-label={`${playback === 'playing' ? 'Pause' : 'Play'} ${name}`}
+                aria-label={playback === 'playing' ? t('pause', { name }) : t('play', { name })}
                 title={name}
                 className="absolute inset-0 size-full cursor-pointer"
             >
@@ -104,7 +106,7 @@ export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) 
                     <span className="flex size-full flex-col items-center justify-center gap-1 p-2 text-muted-foreground">
                         <FilmIcon className="size-5" />
                         <span className="line-clamp-2 w-full break-words text-center text-[10px] leading-tight">{name}</span>
-                        <span className="text-[10px] text-muted-foreground/70">Preview unavailable</span>
+                        <span className="text-[10px] text-muted-foreground/70">{t('previewUnavailable')}</span>
                     </span>
                 ) : (
                     <video
@@ -149,7 +151,7 @@ export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) 
                             videoRef.current?.pause()
                             onOpen()
                         }}
-                        aria-label={`Open ${name} full screen`}
+                        aria-label={t('openFullScreen', { name })}
                         className={cn(
                             'absolute top-2 right-2 grid size-7 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-opacity',
                             !started && 'pointer-fine:opacity-0 pointer-fine:group-hover/video:opacity-100 pointer-fine:focus-visible:opacity-100'

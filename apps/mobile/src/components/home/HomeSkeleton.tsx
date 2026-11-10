@@ -1,4 +1,5 @@
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AVATAR, COWORKER_ROW_HEIGHT } from '@/components/home/CoworkerRow'
 import { useTheme } from '@/theme/theme'
@@ -24,8 +25,9 @@ export function skeletonBarWidths(index: number) {
 
 // The shape of the rows to come, as the web loads: never a spinner in the middle of the screen.
 export function HomeSkeleton({ rows = SKELETON_ROWS }: { rows?: number }) {
+    const t = useTranslations('mobileHome')
     return (
-        <View accessibilityLabel="Loading coworkers">
+        <View accessibilityLabel={t('loadingCoworkers')}>
             {Array.from({ length: rows }, (_, index) => (
                 <SkeletonRow key={index} index={index} />
             ))}

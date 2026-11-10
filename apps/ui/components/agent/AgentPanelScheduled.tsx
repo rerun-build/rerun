@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { createScheduleAction, deleteScheduleAction, getScheduleAction, listScheduleRunsAction, listSchedulesAction, listTaskOutcomesAction, parseScheduleAction, testScheduleAction, updateScheduleAction } from '@/app/api/_actions/agent.actions'
 import { adoptRunSession, RunHistoryList } from '@/components/agent/AgentRunHistory'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
@@ -19,7 +20,7 @@ import { Switch } from '@/components/ui/switch'
 import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineRun, EngineSchedule } from '@/lib/engine/types'
 import { humanCron, scheduleSummary } from '@/lib/schedules/cron'
 import { outcomeKey, type TaskOutcome } from '@/lib/schedules/outcomes'
@@ -31,6 +32,8 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkeletonPanelRows, SkeletonRows } from '@/components/ui/skeleton'
 import { useBoardStore } from '@/stores/board.store'
 import { Badge } from '@rerun/ui/primitives'
+import { formatDate } from '@rerun/i18n/format'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 type AgentPanelScheduledProps = {
@@ -44,6 +47,10 @@ type AgentPanelScheduledProps = {
 type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string } | { mode: 'runs'; slug: string }
 
 export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSlug, onFocusConsumed }: AgentPanelScheduledProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelScheduled')
+    const tAgent = useTranslations('agent')
+    const locale = useLocale()
     const [schedules, setSchedules] = useState<EngineSchedule[]>([])
     const [outcomes, setOutcomes] = useState<Record<string, TaskOutcome>>({})
     const [loading, setLoading] = useState(true)
@@ -114,9 +121,9 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     }
 
     const newButton = (
-        <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON}>
+        <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
-                <PlusIcon className="size-3.5 mr-1" /> New
+                <PlusIcon className="size-3.5 mr-1" /> {t('new')}
             </Button>
         </TooltipDisabledReason>
     )
@@ -131,8 +138,8 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
                 {schedules.length === 0 ? (
                     <EmptyState
                         icon={CalendarClockIcon}
-                        title="No scheduled tasks yet"
-                        description="Ask your coworker to do something on a schedule (a daily report, a weekly digest) and the recurring tasks will show up here."
+                        title={t('emptyTitle')}
+                        description={t('emptyDescription')}
                         action={newButton}
                     />
                 ) : (
@@ -143,12 +150,12 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
                                     key={s.slug}
                                     onClick={() => setView({ mode: 'edit', slug: s.slug })}
                                     title={s.name}
-                                    description={scheduleSummary(s)}
+                                    description={scheduleSummary(s, tAgent, locale)}
                                     footer={<TaskOutcomeFooter outcome={outcomes[outcomeKey('schedule', s.slug)]} lastStartedAt={s.lastRunAt} />}
                                     meta={
                                         !s.enabled && (
                                             <Badge size="xs" tone="neutral" glow={false} leading={<PauseIcon className="size-3" />}>
-                                                paused
+                                                {t('paused')}
                                             </Badge>
                                         )
                                     }
@@ -178,12 +185,15 @@ function localInputToIso(local: string): string {
 type ScheduleSelection = { mode: 'cron' | 'runAt'; cron?: string; runAtLocal?: string; timezone?: string }
 
 function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 'cron' | 'runAt'; cron: string; runAtLocal: string; timezone: string; disabled?: boolean; onChange: (next: ScheduleSelection) => void }) {
+    const t = useTranslations('agent.agentPanelScheduled.picker')
+    const locale = useLocale()
     const [open, setOpen] = useState(false)
     const [input, setInput] = useState('')
     const [busy, setBusy] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const errorText = useErrorText()
 
-    const summary = mode === 'cron' ? (cron.trim() ? (humanCron(cron) ?? cron) : '') : runAtLocal ? new Date(localInputToIso(runAtLocal)).toLocaleString() : ''
+    const summary = mode === 'cron' ? (cron.trim() ? (humanCron(cron, locale) ?? cron) : '') : runAtLocal ? formatDate(localInputToIso(runAtLocal), locale) : ''
 
     const handleGenerate = useCallback(async () => {
         if (!input.trim()) return
@@ -193,20 +203,20 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
         const result = await parseScheduleAction(input, { nowIso: new Date().toISOString(), timezone })
         setBusy(false)
         if (!result.success) {
-            setError(result.error)
+            setError(errorText(result))
             return
         }
         const data = result.data
         onChange(data.mode === 'cron' ? { mode: 'cron', cron: data.cron, timezone: data.timezone } : { mode: 'runAt', runAtLocal: isoToLocalInput(data.runAt), timezone: data.timezone })
         setInput('')
         setOpen(false)
-    }, [input, onChange])
+    }, [input, onChange, errorText])
 
     return (
-        <Field label="When">
+        <Field label={t('when')}>
             <div className="flex items-center gap-1.5">
                 <div className="flex h-8 flex-1 items-center rounded-md border border-input bg-muted/40 px-3 text-sm">
-                    <span className={summary ? '' : 'text-muted-foreground'}>{summary || 'Not set'}</span>
+                    <span className={summary ? '' : 'text-muted-foreground'}>{summary || t('notSet')}</span>
                 </div>
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
@@ -216,7 +226,7 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
                     </PopoverTrigger>
                     <PopoverContent align="end" className="w-72 space-y-2 p-3">
                         <Input
-                            label="Describe the schedule"
+                            label={t('describe')}
                             hideRequired
                             autoFocus
                             value={input}
@@ -227,13 +237,13 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
                                     handleGenerate()
                                 }
                             }}
-                            placeholder="every weekday at 8am"
+                            placeholder={t('describePlaceholder')}
                             className="h-8 text-sm"
                         />
                         {error && <p className="text-[10px] text-destructive">{error}</p>}
                         <div className="flex justify-end">
                             <Button size="sm" loading={busy} disabled={!input.trim()} onClick={handleGenerate}>
-                                Update schedule
+                                {t('update')}
                             </Button>
                         </div>
                     </PopoverContent>
@@ -244,12 +254,15 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
 }
 
 function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistory, onOpenSession }: { agentId: string; agentName: string; slug?: string; onDone: () => void; onBack: () => void; onShowHistory?: () => void; onOpenSession?: (sessionId: string, title: string, runId: string | null) => void }) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelScheduled.editor')
+    const errorText = useErrorText()
     const isEdit = !!slug
     const { pick, setPick, availableGroups, providerFor, agentModel } = useRunModel(agentId)
     // Only the prompt is sealed: pausing a task or moving its hour stays available.
     const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
     const [loading, setLoading] = useState(isEdit)
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
@@ -305,8 +318,8 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         setSaving(false)
         if (result.success) useBoardStore.getState().requestSchedulesRefresh()
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to save')
-    }, [agentId, slug, isEdit, canRename, name, description, scheduleMode, cron, runAtLocal, timezone, enabled, pick, body, onDone, providerFor])
+        else setError(errorText(result, t('saveFailed')))
+    }, [agentId, slug, isEdit, canRename, name, description, scheduleMode, cron, runAtLocal, timezone, enabled, pick, body, onDone, providerFor, t, errorText])
 
     const handleTest = useCallback(async () => {
         if (!slug) return
@@ -315,7 +328,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         try {
             const result = await testScheduleAction(agentId, slug)
             if (!result.success || !result.runId) {
-                setError(result.error ?? 'Failed to run task')
+                setError(errorText(result, t('runFailed')))
                 return
             }
             if (!result.sessionId) {
@@ -326,11 +339,11 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
             const sessionId = await adoptRunSession(agentId, result.sessionId, title)
             onOpenSession?.(sessionId, title, result.runId)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to run task')
+            setError(err instanceof Error ? err.message : t('runFailed'))
         } finally {
             setTesting(false)
         }
-    }, [agentId, slug, name, onOpenSession, onShowHistory])
+    }, [agentId, slug, name, onOpenSession, onShowHistory, t, errorText])
 
     const handleDelete = useCallback(async () => {
         if (!slug) return
@@ -339,8 +352,8 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         setDeleting(false)
         if (result.success) useBoardStore.getState().requestSchedulesRefresh()
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to delete')
-    }, [agentId, slug, onDone])
+        else setError(errorText(result, t('deleteFailed')))
+    }, [agentId, slug, onDone, t, errorText])
 
     if (loading) {
         return (
@@ -357,17 +370,17 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
 
     return (
         <PanelEditorShell>
-            <PanelEditorHeader title={isEdit ? (canManage ? 'Edit task' : 'Task') : 'New task'} onBack={onBack}>
+            <PanelEditorHeader title={isEdit ? (canManage ? t('titleEdit') : t('titleReadOnly')) : t('titleNew')} onBack={onBack}>
                 {isEdit && onShowHistory && (
                     <Button size="sm" variant="ghost" onClick={onShowHistory}>
-                        <HistoryIcon className="size-3.5 mr-1" /> History
+                        <HistoryIcon className="size-3.5 mr-1" /> {t('history')}
                     </Button>
                 )}
             </PanelEditorHeader>
             <PanelEditorBody>
                 {error && <p className="text-xs text-destructive">{error}</p>}
-                <Input label="Name" helperText={isEdit && !canRename ? "Name can't be changed (it sets the slug)." : undefined} hideRequired value={name} onChange={e => setName(e.target.value)} disabled={!canManage || (isEdit && !canRename)} maxLength={120} placeholder="Daily digest" className="h-8 text-sm" />
-                <Input label="Description" hideRequired value={description} onChange={e => setDescription(e.target.value)} disabled={!canManage} placeholder="Morning summary" className="h-8 text-sm" />
+                <Input label={t('name')} helperText={isEdit && !canRename ? t('nameLockedHelper') : undefined} hideRequired value={name} onChange={e => setName(e.target.value)} disabled={!canManage || (isEdit && !canRename)} maxLength={120} placeholder={t('namePlaceholder')} className="h-8 text-sm" />
+                <Input label={t('description')} hideRequired value={description} onChange={e => setDescription(e.target.value)} disabled={!canManage} placeholder={t('descriptionPlaceholder')} className="h-8 text-sm" />
 
                 <SchedulePicker
                     mode={scheduleMode}
@@ -383,14 +396,14 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
                     }}
                 />
 
-                <Field label="Timezone">
+                <Field label={t('timezone')}>
                     <TimezoneCombobox value={timezone} onChange={setTimezone} placeholder="Europe/Paris" disabled={!canManage} />
                 </Field>
 
-                <RunModelField id="schedule-model" value={pick} onChange={setPick} availableGroups={availableGroups} agentModel={agentModel} disabled={!canManage} helperText="The model this task runs under when it fires. Requires the provider's API key." />
+                <RunModelField id="schedule-model" value={pick} onChange={setPick} availableGroups={availableGroups} agentModel={agentModel} disabled={!canManage} helperText={t('modelHelper')} />
 
                 {isEdit && (
-                    <Field orientation="row" label="Enabled">
+                    <Field orientation="row" label={t('enabled')}>
                         <Switch checked={enabled} disabled={!canManage} onCheckedChange={setEnabled} />
                     </Field>
                 )}
@@ -398,19 +411,20 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
                 {slug && <TaskNotifyField agentId={agentId} source="schedule" slug={slug} />}
 
                 <TemplateContentLock locked={promptLocked} subject="task prompts">
-                    <MarkdownTextarea label="Task prompt" dialogTitle="Edit the task prompt" helperText="The prompt the coworker runs when the task fires (a fresh session each time)." value={body} onChange={setBody} disabled={promptLocked || !canManage} className="text-xs min-h-32 font-mono" placeholder="Summarize yesterday's notes and email me a digest." />
+                    <MarkdownTextarea label={t('prompt')} dialogTitle={t('promptDialogTitle')} helperText={t('promptHelper')} value={body} onChange={setBody} disabled={promptLocked || !canManage} className="text-xs min-h-32 font-mono" placeholder={t('promptPlaceholder')} />
                 </TemplateContentLock>
 
                 {isEdit && waitingForSetup && (
                     <p className="text-xs text-muted-foreground">
-                        Test Run unlocks once the setup is finished.{' '}
-                        {setup.sessionId ? (
-                            <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={() => setup.sessionId && onOpenSession?.(setup.sessionId, installSessionTitle(agentName), null)}>
-                                Continue the setup
-                            </Button>
-                        ) : (
-                            'Start it from the chat first.'
-                        )}
+                        {setup.sessionId
+                            ? t.rich('setupPendingContinue', {
+                                  link: chunks => (
+                                      <Button variant="link" size="sm" className="h-auto p-0 text-xs" onClick={() => setup.sessionId && onOpenSession?.(setup.sessionId, installSessionTitle(agentName), null)}>
+                                          {chunks}
+                                      </Button>
+                                  ),
+                              })
+                            : t('setupPendingStart')}
                     </p>
                 )}
             </PanelEditorBody>
@@ -418,23 +432,23 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
                 {isEdit && (
                     <TooltipDisabledReason reason={manageReason}>
                         <PanelDeleteButton
-                            label="Delete task"
+                            label={t('delete')}
                             busy={deleting}
                             disabled={!canManage}
                             onClick={handleDelete}
-                            confirmTitle={`Delete ${name || 'this task'}?`}
-                            confirmDescription="The task stops firing and its schedule is removed. Runs it already produced are kept."
+                            confirmTitle={name ? t('deleteConfirm', { name }) : t('deleteConfirmUnnamed')}
+                            confirmDescription={t('deleteDescription')}
                         />
                     </TooltipDisabledReason>
                 )}
                 {isEdit && (
                     <Button size="sm" variant="outline" className="flex-1" loading={testing} onClick={handleTest} disabled={saving || waitingForSetup}>
-                        Test Run
+                        {t('testRun')}
                     </Button>
                 )}
                 <TooltipDisabledReason reason={manageReason} className="flex-1">
                     <Button size="sm" className="flex-1" loading={saving} onClick={handleSave} disabled={testing || !canSave || !canManage}>
-                        {isEdit ? 'Save changes' : 'Create task'}
+                        {isEdit ? t('saveChanges') : t('create')}
                     </Button>
                 </TooltipDisabledReason>
             </PanelEditorFooter>
@@ -445,11 +459,12 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
 // --- Run history (per schedule) ---
 
 function ScheduleRuns({ agentId, schedule, slug, onBack, onOpenSession }: { agentId: string; schedule?: EngineSchedule; slug: string; onBack: () => void; onOpenSession: (sessionId: string, title: string, runId: string | null) => void }) {
+    const t = useTranslations('agent.agentPanelScheduled')
     const loadRuns = useCallback(() => listScheduleRunsAction(agentId, slug), [agentId, slug])
     const title = schedule?.name ?? slug
     const openRun = useCallback(async (run: EngineRun) => {
         const sessionId = await adoptRunSession(agentId, run.sessionId, title)
         onOpenSession(sessionId, title, run.status === 'running' ? run.id : null)
     }, [agentId, title, onOpenSession])
-    return <RunHistoryList title={title} loadRuns={loadRuns} emptyIcon={CalendarClockIcon} emptyLabel="No executions yet" onBack={onBack} onSelectRun={openRun} />
+    return <RunHistoryList title={title} loadRuns={loadRuns} emptyIcon={CalendarClockIcon} emptyLabel={t('noExecutions')} onBack={onBack} onSelectRun={openRun} />
 }

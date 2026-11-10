@@ -5,6 +5,7 @@ import { cn } from '../../cn'
 import { CheckIcon, MinusIcon } from '../../icons'
 import { Badge, type BadgeTone } from '../../primitives'
 import { CardThumb, type FileUrl } from './CardMedia'
+import { useKitTranslations } from '../../locale'
 
 export { cellText, formatText, isNumericFormat }
 
@@ -47,8 +48,9 @@ export function formatCell(value: unknown, format: string | undefined, context: 
 }
 
 export function Rating({ value, className }: { value: number; className?: string }) {
+    const t = useKitTranslations()
     return (
-        <span className={cn('inline-flex items-center gap-px', className)} aria-label={`${value} out of 5`}>
+        <span className={cn('inline-flex items-center gap-px', className)} aria-label={t('chat.table.rating', { value })}>
             {[1, 2, 3, 4, 5].map(step => (
                 <svg key={step} viewBox="0 0 24 24" aria-hidden className={cn('size-3 fill-current', step <= Math.round(value) ? 'text-yellow-500' : 'text-muted-foreground/25')}>
                     <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z" />

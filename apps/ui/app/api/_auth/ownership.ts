@@ -6,6 +6,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession, getSessionWorkspace } from '@/supabase/session/getServerSession'
 import { selectMany, selectMaybeSingle, selectMaybeSingleWithJoins, selectSingle } from '@/supabase/supabase-helpers'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
+import type { ErrorCode } from '@/lib/i18n/action-error'
 
 // Why this module exists: every mutation/read in the API goes through the
 // service-role client (createServiceRoleClient), which BYPASSES Row Level
@@ -16,7 +17,7 @@ import type { SupabaseClient, User } from '@supabase/supabase-js'
 
 export { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors'
 
-const NOT_A_MEMBER = 'You are not a member of this workspace'
+const NOT_A_MEMBER = 'notMember' satisfies ErrorCode
 
 export type WorkspaceRole = Enums<'workspace_role'>
 
@@ -58,11 +59,11 @@ export async function requireWorkspaceContext(): Promise<WorkspaceContext> {
     return { userId: user.id, userEmail: realEmail(session.email), authUser: session, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), supabase }
 }
 
-export const ADMIN_ONLY = 'Only an admin of the workspace can do this'
+export const ADMIN_ONLY = 'adminOnly' satisfies ErrorCode
 
-export async function requireAdminContext(message = ADMIN_ONLY): Promise<WorkspaceContext> {
+export async function requireAdminContext(code: ErrorCode = ADMIN_ONLY): Promise<WorkspaceContext> {
     const ctx = await requireWorkspaceContext()
-    if (ctx.role !== 'admin') throw new AuthorizationError(message)
+    if (ctx.role !== 'admin') throw new AuthorizationError(code)
     return ctx
 }
 
@@ -73,7 +74,7 @@ type OwnedSpace = { workspace_id: number }
 export async function assertSpaceOwnedBy(workspaceId: number, spaceId: string): Promise<OwnedSpace> {
     const supabase = createServiceRoleClient()
     const { data: space } = await selectSingle(supabase, 'spaces', ['workspace_id'] as const, { id: spaceId })
-    if (!space || space.workspace_id !== workspaceId) throw new AuthorizationError('Space not found')
+    if (!space || space.workspace_id !== workspaceId) throw new AuthorizationError('spaceNotFound')
     return space
 }
 

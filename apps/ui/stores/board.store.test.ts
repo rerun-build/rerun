@@ -203,7 +203,7 @@ describe('moveSpace', () => {
         expect(positionOf('carried')).toEqual({ col: 1, row: 1 })
         expect(db.fake.writes('spaces').map(w => w.payload)).toEqual([MOVED, { col_start: 0, row_start: 0, col_end: 7, row_end: 9 }])
         expect(db.fake.writes('agents').map(w => w.payload)).toEqual([{ col: 1, row: 21 }, { col: 1, row: 1 }])
-        expect(toast.error).toHaveBeenCalledWith('Could not move this Box', expect.anything())
+        expect(toast.error).toHaveBeenCalledWith(expect.objectContaining({ props: { id: 'builder.boardToasts.moveBoxFailed' } }), expect.anything())
     })
 
     it('keeps a carried agent where it was dropped when a realtime update still holds its old place', async () => {
@@ -235,7 +235,7 @@ describe('the board writes for a member who only uses the Box', () => {
         useBoardStore.getState().moveAgent('scout', { col: 11, row: 4 }, 'managed', MEMBER)
         expect(positionOf('scout')).toEqual({ col: 1, row: 1 })
         expect(db.fake.writes('agents')).toEqual([])
-        expect(toast.error).toHaveBeenCalledWith(REASON, expect.anything())
+        expect(toast.error).toHaveBeenCalledWith(expect.objectContaining({ props: { refusal: { error: REASON, code: 'boxManagerOnly' } } }), expect.anything())
     })
 
     it('does not drop a coworker in a Box they only use', () => {

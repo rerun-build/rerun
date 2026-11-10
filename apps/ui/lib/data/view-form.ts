@@ -13,16 +13,20 @@ import {
     type TableViewInput,
 } from '@rerun/contracts'
 import { z } from 'zod'
-import { cellInputText, LAYOUT_META } from '@/lib/data/views'
+import { cellInputText } from '@/lib/data/views'
 
 /** Select value standing for "no column" or "no format": Radix refuses an empty item value. */
 export const NONE = '__none'
 
 const fieldsSchema = z.object(Object.fromEntries(CARD_FIELD_ROLES.map(role => [role, z.string()])) as Record<(typeof CARD_FIELD_ROLES)[number], z.ZodString>)
 
-export const viewFormSchema = z
+// The `dialogs.viewSettings` catalog.
+export type ViewFormCopy = (key: 'nameRequired' | 'titleColumnRequired' | 'groupByRequired') => string
+
+export const viewFormSchema = (t: ViewFormCopy) =>
+    z
     .object({
-        name: z.string().trim().min(1, 'Name the view').max(TABLE_VIEW_NAME_MAX),
+        name: z.string().trim().min(1, t('nameRequired')).max(TABLE_VIEW_NAME_MAX),
         layout: z.enum(CARD_LAYOUTS),
         columns: z.array(z.string()),
         fields: fieldsSchema,
@@ -36,11 +40,11 @@ export const viewFormSchema = z
         tones: z.record(z.string(), z.string()),
     })
     .superRefine((values, ctx) => {
-        if (values.layout !== 'table' && values.fields.title === NONE) ctx.addIssue({ code: 'custom', path: ['fields', 'title'], message: 'Pick the column each item is named by' })
-        if (values.layout === 'board' && values.groupBy === NONE) ctx.addIssue({ code: 'custom', path: ['groupBy'], message: 'Pick the column whose values become the columns' })
+        if (values.layout !== 'table' && values.fields.title === NONE) ctx.addIssue({ code: 'custom', path: ['fields', 'title'], message: t('titleColumnRequired') })
+        if (values.layout === 'board' && values.groupBy === NONE) ctx.addIssue({ code: 'custom', path: ['groupBy'], message: t('groupByRequired') })
     })
 
-export type ViewFormValues = z.infer<typeof viewFormSchema>
+export type ViewFormValues = z.infer<ReturnType<typeof viewFormSchema>>
 
 const pick = (column: string | undefined) => column ?? NONE
 const unpick = (value: string) => (value === NONE ? undefined : value)
@@ -121,11 +125,11 @@ function guessGroupColumn(columns: string[], rows: Record<string, unknown>[]): s
     return best?.column
 }
 
-/** A view added in one click, filled with guessed defaults; null when a board has nothing to group by. */
-export function quickViewInput(layout: CardLayout, sample: { columns: string[]; rows: Record<string, unknown>[]; takenNames: string[] }): TableViewInput | null {
-    const { columns, rows, takenNames } = sample
+/** A view added in one click, filled with guessed defaults; null when a board has nothing to group by. `baseName` is the layout's name in the reader's language. */
+export function quickViewInput(layout: CardLayout, sample: { columns: string[]; rows: Record<string, unknown>[]; takenNames: string[]; baseName: string }): TableViewInput | null {
+    const { columns, rows, takenNames, baseName } = sample
     const values = viewToFormValues(undefined, columns)
-    values.name = freeName(LAYOUT_META[layout].label, takenNames)
+    values.name = freeName(baseName, takenNames)
     values.layout = layout
     const title = columns.find(column => TITLE_COLUMN.test(column))
     if (title) values.fields.title = title

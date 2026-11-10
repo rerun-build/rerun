@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { LayoutTile } from '@/components/data/LayoutTile'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
 import { ViewSettingsPreview } from '@/components/dialogs/ViewSettingsPreview'
@@ -13,14 +14,13 @@ import { Segmented } from '@/components/ui/segmented'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { DataSource } from '@/lib/data/source'
 import { columnsInUse, formValuesToInput, NONE, previewCard, toneColumn, viewFormSchema, viewToFormValues, type ViewFormValues } from '@/lib/data/view-form'
-import { LAYOUT_META } from '@/lib/data/views'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CARD_FIELD_ROLES, CARD_FORMATS, CARD_GALLERY_SHAPES, CARD_LAYOUTS, CARD_TONES, type CardLayout, type TableView } from '@rerun/contracts'
 import { ScrollFade } from '@rerun/ui/primitives'
-import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm, type Control, type FieldPath } from 'react-hook-form'
 
-const ROLE_LABELS: Record<(typeof CARD_FIELD_ROLES)[number], string> = { title: 'Title', subtitle: 'Subtitle', image: 'Image', badge: 'Badge', value: 'Value', date: 'Date' }
 const FORMAT_OPTIONS = [...CARD_FORMATS, 'currency:USD', 'currency:EUR', 'currency:GBP']
 const MAX_TONED_VALUES = 12
 
@@ -40,7 +40,11 @@ type ViewSettingsDialogProps = {
 }
 
 export function ViewSettingsDialog({ open, onOpenChange, source, table, columns, sample, view, initialLayout, onSaved }: ViewSettingsDialogProps) {
-    const form = useForm<ViewFormValues>({ resolver: zodResolver(viewFormSchema), defaultValues: viewToFormValues(view, columns) })
+    const t = useTranslations('dialogs.viewSettings')
+    const tCommon = useTranslations('common')
+    const errorText = useErrorText()
+    const schema = useMemo(() => viewFormSchema(t), [t])
+    const form = useForm<ViewFormValues>({ resolver: zodResolver(schema), defaultValues: viewToFormValues(view, columns) })
 
     useEffect(() => {
         if (!open) return
@@ -58,7 +62,7 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
     const onSubmit = form.handleSubmit(async submitted => {
         const result = await source.saveView(table, formValuesToInput(submitted, view), view?.id)
         if (!result.success) {
-            form.setError('root', { message: result.error })
+            form.setError('root', { message: errorText(result) })
             return
         }
         onSaved(result.view)
@@ -73,9 +77,9 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                 <Form {...form}>
                     <form onSubmit={onSubmit} className="flex min-h-0 flex-col p-6">
                         <DialogHeader className="mb-4">
-                            <DialogTitle>{view ? 'Edit view' : 'New view'}</DialogTitle>
+                            <DialogTitle>{view ? t('editTitle') : t('newTitle')}</DialogTitle>
                             <p className="text-sm text-muted-foreground">
-                                A view of <span className="font-mono">{table}</span>. Everyone who opens this table sees it, and the coworker can draw it in chat.
+                                {t.rich('description', { table, mono: chunks => <span className="font-mono">{chunks}</span> })}
                             </p>
                         </DialogHeader>
 
@@ -87,14 +91,14 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
-                                                <Input label="Name" required placeholder="e.g. Pipeline" {...field} />
+                                                <Input label={t('name')} required placeholder={t('namePlaceholder')} {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
 
-                                <Field label="Layout">
+                                <Field label={t('layout')}>
                                     <div className="grid grid-cols-4 gap-2">
                                         {CARD_LAYOUTS.map(option => (
                                             <LayoutTile
@@ -105,11 +109,11 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                             />
                                         ))}
                                     </div>
-                                    <p className="text-xs text-muted-foreground/70">{LAYOUT_META[layout].description}</p>
+                                    <p className="text-xs text-muted-foreground/70">{t(`layoutDescriptions.${layout}`)}</p>
                                 </Field>
 
                                 {layout === 'table' ? (
-                                    <Field label="Columns" helperText="Unchecked columns stay in the table, only hidden from this view.">
+                                    <Field label={t('columns')} helperText={t('columnsHint')}>
                                         <div className="grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border p-3">
                                             {columns.map(column => (
                                                 <label key={column} className="flex min-w-0 items-center gap-2 text-sm">
@@ -130,17 +134,17 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                     </Field>
                                 ) : (
                                     <div className="grid grid-cols-2 gap-3">
-                                        {layout === 'board' && <ColumnSelect control={form.control} name="groupBy" label="Group by" columns={columns} required />}
+                                        {layout === 'board' && <ColumnSelect control={form.control} name="groupBy" label={t('groupBy')} columns={columns} required />}
                                         {roles.map(role => (
-                                            <ColumnSelect key={role} control={form.control} name={`fields.${role}`} label={ROLE_LABELS[role]} columns={columns} required={role === 'title'} />
+                                            <ColumnSelect key={role} control={form.control} name={`fields.${role}`} label={t(`roles.${role}`)} columns={columns} required={role === 'title'} />
                                         ))}
                                     </div>
                                 )}
 
                                 {layout === 'gallery' && (
-                                    <Field label="Picture shape">
+                                    <Field label={t('pictureShape')}>
                                         <Segmented
-                                            options={CARD_GALLERY_SHAPES.map(shape => ({ value: shape, label: shape[0].toUpperCase() + shape.slice(1) }))}
+                                            options={CARD_GALLERY_SHAPES.map(shape => ({ value: shape, label: t(`shapes.${shape}`) }))}
                                             value={values.shape}
                                             onChange={shape => form.setValue('shape', shape)}
                                         />
@@ -148,13 +152,13 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                 )}
 
                                 <div className="grid grid-cols-[1fr_auto] items-end gap-3">
-                                    <ColumnSelect control={form.control} name="sortColumn" label="Sort by" columns={columns} noneLabel="Insertion order" />
+                                    <ColumnSelect control={form.control} name="sortColumn" label={t('sortBy')} columns={columns} noneLabel={t('insertionOrder')} />
                                     {values.sortColumn !== NONE && (
                                         <Segmented
                                             className="w-40"
                                             options={[
-                                                { value: 'asc', label: 'Ascending' },
-                                                { value: 'desc', label: 'Descending' },
+                                                { value: 'asc', label: t('ascending') },
+                                                { value: 'desc', label: t('descending') },
                                             ]}
                                             value={values.sortDir}
                                             onChange={dir => form.setValue('sortDir', dir)}
@@ -163,7 +167,7 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                 </div>
 
                                 {columnsInUse(values).length > 0 && (
-                                    <Field label="Formats" helperText="How each value reads: a price, a date, a rating, a status.">
+                                    <Field label={t('formats')} helperText={t('formatsHint')}>
                                         <div className="space-y-2 rounded-lg border p-3">
                                             {columnsInUse(values).map(column => {
                                                 const current = values.formats[column] ?? NONE
@@ -172,11 +176,11 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                                     <div key={column} className="grid grid-cols-[1fr_10rem] items-center gap-3">
                                                         <span className="truncate font-mono text-xs">{column}</span>
                                                         <Select value={current} onValueChange={format => form.setValue('formats', { ...values.formats, [column]: format })}>
-                                                            <SelectTrigger size="sm" className="w-full" aria-label={`Format of ${column}`}>
+                                                            <SelectTrigger size="sm" className="w-full" aria-label={t('formatOf', { column })}>
                                                                 <SelectValue />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                <SelectItem value={NONE}>Plain</SelectItem>
+                                                                <SelectItem value={NONE}>{t('plainFormat')}</SelectItem>
                                                                 {options.map(format => (
                                                                     <SelectItem key={format} value={format}>
                                                                         {format}
@@ -192,17 +196,17 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                                 )}
 
                                 {toned && toneValues.length > 0 && (
-                                    <Field label="Colors" helperText={layout === 'board' ? 'The columns listed here come first, in this order.' : undefined}>
+                                    <Field label={t('colors')} helperText={layout === 'board' ? t('colorsBoardHint') : undefined}>
                                         <div className="space-y-2 rounded-lg border p-3">
                                             {toneValues.slice(0, MAX_TONED_VALUES).map(value => (
                                                 <div key={value} className="grid grid-cols-[1fr_10rem] items-center gap-3">
-                                                    <span className="truncate text-xs">{value || 'Empty'}</span>
+                                                    <span className="truncate text-xs">{value || t('emptyValue')}</span>
                                                     <Select value={values.tones[value] ?? NONE} onValueChange={tone => form.setValue('tones', { ...values.tones, [value]: tone })}>
-                                                        <SelectTrigger size="sm" className="w-full" aria-label={`Color of ${value || 'empty values'}`}>
+                                                        <SelectTrigger size="sm" className="w-full" aria-label={value ? t('colorOf', { value }) : t('colorOfEmpty')}>
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value={NONE}>Automatic</SelectItem>
+                                                            <SelectItem value={NONE}>{t('automaticColor')}</SelectItem>
                                                             {CARD_TONES.map(tone => (
                                                                 <SelectItem key={tone} value={tone}>
                                                                     {tone}
@@ -222,10 +226,10 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
 
                         <DialogFooter className="mt-auto -mx-6 -mb-6 border-t bg-muted/50 px-6 py-4">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                Cancel
+                                {tCommon('cancel')}
                             </Button>
                             <Button type="submit" disabled={form.formState.isSubmitting}>
-                                {view ? 'Save' : 'Create view'}
+                                {view ? tCommon('save') : t('create')}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -244,7 +248,8 @@ type ColumnSelectProps = {
     noneLabel?: string
 }
 
-function ColumnSelect({ control, name, label, columns, required, noneLabel = 'None' }: ColumnSelectProps) {
+function ColumnSelect({ control, name, label, columns, required, noneLabel }: ColumnSelectProps) {
+    const t = useTranslations('dialogs.viewSettings')
     return (
         <FormField
             control={control}
@@ -259,8 +264,8 @@ function ColumnSelect({ control, name, label, columns, required, noneLabel = 'No
                                 </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                {!required && <SelectItem value={NONE}>{noneLabel}</SelectItem>}
-                                {required && field.value === NONE && <SelectItem value={NONE}>Pick a column</SelectItem>}
+                                {!required && <SelectItem value={NONE}>{noneLabel ?? t('none')}</SelectItem>}
+                                {required && field.value === NONE && <SelectItem value={NONE}>{t('pickColumn')}</SelectItem>}
                                 {columns.map(column => (
                                     <SelectItem key={column} value={column}>
                                         <span className="font-mono text-xs">{column}</span>

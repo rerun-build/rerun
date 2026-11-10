@@ -16,6 +16,7 @@ import { useIsMobile } from '@rerun/ui/primitives'
 import { StepTransition } from '@rerun/ui/steps'
 import { useReducedMotion } from 'motion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 type LibrarySelection = { kind: 'template'; slug: string } | null
 
@@ -41,6 +42,7 @@ export function TemplateLibraryDialog({
     // The agent with no template goes through the New agent dialog, which the opener owns.
     onCreateFromScratch: () => void
 }) {
+    const t = useTranslations('templates.library')
     const isAdmin = useIsAdmin()
     const reduceMotion = useReducedMotion() ?? false
 
@@ -126,7 +128,7 @@ export function TemplateLibraryDialog({
             >
                 {/* Outside the track: the visible title lives in the list column, which goes inert
                     on a phone showing the detail, and an inert element cannot name the dialog. */}
-                <DialogTitle className="sr-only">Template library</DialogTitle>
+                <DialogTitle className="sr-only">{t('title')}</DialogTitle>
 
                 {/* The sheet carries the phone height, not this track: vaul rewrites the sheet's own
                     height when the keyboard opens over the search field, and a track measured in
@@ -185,15 +187,15 @@ export function TemplateLibraryDialog({
                             <div className="flex shrink-0 items-center border-b px-2 py-1.5 sm:hidden">
                                 <Button type="button" variant="ghost" size="sm" className="gap-1.5 pl-1.5" onClick={() => setView('list')}>
                                     <ChevronLeftIcon className="size-4" />
-                                    Templates
+                                    {t('templates')}
                                 </Button>
                             </div>
 
                             {/* Folds the column away and leaves the library open, which the dialog's
                                 own close button does not. A phone has the bar above for that. */}
                             <span className="absolute top-2 left-2 z-20 flex rounded-md bg-background/70 backdrop-blur max-sm:hidden">
-                                <TooltipLabeled label="Hide details" side="bottom">
-                                    <Button type="button" variant="ghost" size="icon-sm" aria-label="Hide details" onClick={collapseDetail}>
+                                <TooltipLabeled label={t('hideDetails')} side="bottom">
+                                    <Button type="button" variant="ghost" size="icon-sm" aria-label={t('hideDetails')} onClick={collapseDetail}>
                                         <PanelRightCloseIcon />
                                     </Button>
                                 </TooltipLabeled>

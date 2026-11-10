@@ -9,14 +9,11 @@ import { RenameAgentDialog } from '@/components/dialogs/RenameAgentDialog'
 import { RenameBoxDialog } from '@/components/dialogs/RenameBoxDialog'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useBoxViewer, useCanManageAgent, useCanManageSpace, useManageableSpaceIds } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_ACTION_REASON } from '@/lib/board/box-access'
-import { UNNAMED_BOX_LABEL } from '@/lib/board/types'
 import { CopyPlusIcon, Link2, MessageCircle, PencilIcon, SettingsIcon, Trash2Icon, UsersIcon } from '@/lib/icons'
 import { useBoardStore } from '@/stores/board.store'
 import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
-
-const BOX_ACCESS_ADMIN_ONLY = 'Only an admin can change who can access a Box'
 
 // A menu entry the caller sees but may not use: disabled, with the reason on hover.
 function Forbidden({ reason, children }: { reason: string | undefined; children: ReactNode }) {
@@ -37,6 +34,7 @@ type BoardContextMenuProps = {
 }
 
 export function BoardContextMenu({ children, target, onTargetClear }: BoardContextMenuProps) {
+    const t = useTranslations('builder.contextMenu')
     const agents = useBoardStore(state => state.agents)
     const spaces = useBoardStore(state => state.spaces)
     const openAgentChat = useBoardStore(state => state.openAgentChat)
@@ -65,8 +63,8 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
     const canManageSpace = useCanManageSpace(targetSpace?.id)
     const manageableSpaceIds = useManageableSpaceIds()
     const viewer = useBoxViewer()
-    const agentReason = canManageAgent ? undefined : BOX_MANAGE_ACTION_REASON
-    const spaceReason = canManageSpace ? undefined : BOX_MANAGE_ACTION_REASON
+    const agentReason = canManageAgent ? undefined : t('manageReason')
+    const spaceReason = canManageSpace ? undefined : t('manageReason')
     const otherBoxes = targetAgent ? spaces.filter(space => space.id !== targetAgent.spaceId && manageableSpaceIds.has(space.id)) : []
 
     return (
@@ -85,43 +83,43 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
                         <ContextMenuSeparator />
                         <ContextMenuItem onSelect={() => openAgentChat(targetAgent.id)}>
                             <MessageCircle className="size-4" />
-                            Open chat
+                            {t('openChat')}
                         </ContextMenuItem>
                         <Forbidden reason={agentReason}>
                             <ContextMenuItem disabled={!canManageAgent} className="w-full" onSelect={() => setRenameAgentId(targetAgent.id)}>
                                 <PencilIcon className="size-4" />
-                                Rename
+                                {t('rename')}
                             </ContextMenuItem>
                         </Forbidden>
                         <ContextMenuItem onSelect={() => openAgentSettings(targetAgent.id)}>
                             <SettingsIcon className="size-4" />
-                            Settings
+                            {t('settings')}
                         </ContextMenuItem>
                         <Forbidden reason={agentReason}>
                             <ContextMenuItem disabled={!canManageAgent} className="w-full" onSelect={() => setShareAgentId(targetAgent.id)}>
                                 <Link2 className="size-4" />
-                                Share
+                                {t('share')}
                             </ContextMenuItem>
                         </Forbidden>
                         <Forbidden reason={agentReason}>
                             <ContextMenuItem disabled={!canManageAgent} className="w-full" onSelect={() => beginAgentDuplicatePlacement({ agentId: targetAgent.id, agentName: targetAgent.name })}>
                                 <CopyPlusIcon className="size-4" />
-                                Duplicate
+                                {t('duplicate')}
                             </ContextMenuItem>
                         </Forbidden>
                         <ContextMenuSub>
                             <Forbidden reason={agentReason}>
                                 <ContextMenuSubTrigger disabled={!canManageAgent} className="w-full pl-7">
-                                    Move to Box
+                                    {t('moveToBox')}
                                 </ContextMenuSubTrigger>
                             </Forbidden>
                             <ContextMenuSubContent>
                                 {otherBoxes.length === 0 ? (
-                                    <ContextMenuItem disabled>No other Box you manage</ContextMenuItem>
+                                    <ContextMenuItem disabled>{t('noOtherBox')}</ContextMenuItem>
                                 ) : (
                                     otherBoxes.map(space => (
                                         <ContextMenuItem key={space.id} className="max-w-56 truncate" onSelect={() => moveAgentToBox(targetAgent.id, space.id, viewer)}>
-                                            {space.name || UNNAMED_BOX_LABEL}
+                                            {space.name || t('untitledBox')}
                                         </ContextMenuItem>
                                     ))
                                 )}
@@ -131,32 +129,32 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
                         <Forbidden reason={agentReason}>
                             <ContextMenuItem variant="destructive" disabled={!canManageAgent} className="w-full" onSelect={() => setDeleteAgentId(targetAgent.id)}>
                                 <Trash2Icon className="size-4" />
-                                Delete
+                                {t('delete')}
                             </ContextMenuItem>
                         </Forbidden>
                     </ContextMenuContent>
                 )}
                 {targetSpace && (
                     <ContextMenuContent>
-                        <ContextMenuLabel className="max-w-56 truncate pl-7">{targetSpace.name || UNNAMED_BOX_LABEL}</ContextMenuLabel>
+                        <ContextMenuLabel className="max-w-56 truncate pl-7">{targetSpace.name || t('untitledBox')}</ContextMenuLabel>
                         <ContextMenuSeparator />
                         <Forbidden reason={spaceReason}>
                             <ContextMenuItem disabled={!canManageSpace} className="w-full" onSelect={() => setRenameSpaceId(targetSpace.id)}>
                                 <PencilIcon className="size-4" />
-                                Rename
+                                {t('rename')}
                             </ContextMenuItem>
                         </Forbidden>
-                        <Forbidden reason={workspaceAdmin ? undefined : BOX_ACCESS_ADMIN_ONLY}>
+                        <Forbidden reason={workspaceAdmin ? undefined : t('boxAccessAdminOnly')}>
                             <ContextMenuItem disabled={!workspaceAdmin} className="w-full" onSelect={() => setAccessSpaceId(targetSpace.id)}>
                                 <UsersIcon className="size-4" />
-                                Manage access
+                                {t('manageAccess')}
                             </ContextMenuItem>
                         </Forbidden>
                         <ContextMenuSeparator />
                         <Forbidden reason={spaceReason}>
                             <ContextMenuItem variant="destructive" disabled={!canManageSpace} className="w-full" onSelect={() => setDeleteSpaceId(targetSpace.id)}>
                                 <Trash2Icon className="size-4" />
-                                Delete
+                                {t('delete')}
                             </ContextMenuItem>
                         </Forbidden>
                     </ContextMenuContent>
@@ -166,7 +164,7 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
             {shareAgentId && (
                 <ShareAgentDialog
                     agentId={shareAgentId}
-                    agentName={shareAgent?.name ?? 'this coworker'}
+                    agentName={shareAgent?.name ?? t('thisCoworker')}
                     open
                     onOpenChange={open => {
                         if (!open) setShareAgentId(null)

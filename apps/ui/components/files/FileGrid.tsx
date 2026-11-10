@@ -5,6 +5,7 @@ import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { formatBytes } from '@/lib/files/format'
 import { ChevronUpIcon, CopyIcon, DownloadIcon, ExternalLinkIcon, GlobeIcon, PencilIcon, Trash2Icon } from '@/lib/icons'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useMemo, useState } from 'react'
 
 import { FolderGlyph, GLYPH_INK_MUTED } from './FileGlyph'
@@ -51,6 +52,8 @@ export function FileGrid({
     onUnpublish,
     contentRevision = 0,
 }: FileGridProps) {
+    const locale = useLocale()
+    const t = useTranslations('files')
     const [target, setTarget] = useState<string | null>(null)
     const [renaming, setRenaming] = useState<string | null>(null)
     const [confirming, setConfirming] = useState<{ name: string; action: 'delete' | 'unshare' } | null>(null)
@@ -71,7 +74,7 @@ export function FileGrid({
                         {currentPath && onGoUp && (
                             <FileTile
                                 name=".."
-                                title="Parent directory"
+                                title={t('grid.parentDirectory')}
                                 onOpen={onGoUp}
                                 glyph={
                                     <FolderGlyph>
@@ -84,7 +87,7 @@ export function FileGrid({
                             <FileTile
                                 key={entry.name}
                                 name={entry.name}
-                                title={entry.type === 'dir' ? entry.name : `${entry.name} — ${formatBytes(entry.size)}`}
+                                title={entry.type === 'dir' ? entry.name : `${entry.name} — ${formatBytes(entry.size, locale)}`}
                                 published={Boolean(publishedByName?.[entry.name])}
                                 renaming={renaming === entry.name}
                                 onOpen={() => (entry.type === 'dir' ? onNavigate(entry.name) : onSelectFile(entry.name))}
@@ -112,46 +115,46 @@ export function FileGrid({
                         <ContextMenuLabel className="max-w-56 truncate pl-7">{menuEntry.name}</ContextMenuLabel>
                         <ContextMenuSeparator />
                         <ContextMenuItem className="pl-7" onSelect={() => (menuEntry.type === 'dir' ? onNavigate(menuEntry.name) : onSelectFile(menuEntry.name))}>
-                            {menuEntry.type === 'dir' ? 'Open folder' : 'Open'}
+                            {menuEntry.type === 'dir' ? t('grid.openFolder') : t('grid.open')}
                         </ContextMenuItem>
                         {menuEntry.type !== 'dir' && (
                             <ContextMenuItem onSelect={() => onDownload(menuEntry.name)}>
                                 <DownloadIcon className="size-4" />
-                                Download
+                                {t('grid.download')}
                             </ContextMenuItem>
                         )}
                         <ContextMenuItem onSelect={() => setRenaming(menuEntry.name)}>
                             <PencilIcon className="size-4" />
-                            Rename
+                            {t('grid.rename')}
                         </ContextMenuItem>
                         {(onPublish || menuUrl) && <ContextMenuSeparator />}
                         {menuUrl ? (
                             <>
-                                <ContextMenuLabel className="pl-7">Public link</ContextMenuLabel>
+                                <ContextMenuLabel className="pl-7">{t('publish.publicLink')}</ContextMenuLabel>
                                 <ContextMenuItem onSelect={() => window.open(menuUrl, '_blank', 'noopener,noreferrer')}>
                                     <ExternalLinkIcon className="size-4" />
-                                    Open public link
+                                    {t('publish.openPublicLink')}
                                 </ContextMenuItem>
                                 <ContextMenuItem onSelect={() => navigator.clipboard.writeText(menuUrl)}>
                                     <CopyIcon className="size-4" />
-                                    Copy public link
+                                    {t('publish.copyPublicLink')}
                                 </ContextMenuItem>
                                 <ContextMenuItem variant="destructive" className="pl-7" onSelect={() => setConfirming({ name: menuEntry.name, action: 'unshare' })}>
-                                    Unshare
+                                    {t('publish.unshare')}
                                 </ContextMenuItem>
                             </>
                         ) : (
                             onPublish && (
                                 <ContextMenuItem onSelect={() => void onPublish(menuEntry.name)}>
                                     <GlobeIcon className="size-4" />
-                                    Publish publicly
+                                    {t('publish.publishPublicly')}
                                 </ContextMenuItem>
                             )
                         )}
                         <ContextMenuSeparator />
                         <ContextMenuItem variant="destructive" onSelect={() => setConfirming({ name: menuEntry.name, action: 'delete' })}>
                             <Trash2Icon className="size-4" />
-                            Delete
+                            {t('grid.delete')}
                         </ContextMenuItem>
                     </ContextMenuContent>
                 )}
@@ -160,11 +163,11 @@ export function FileGrid({
                 <ConfirmDialog
                     open
                     onOpenChange={open => !open && setConfirming(null)}
-                    title={`Delete ${confirming.name}?`}
+                    title={t('delete.title', { name: confirming.name })}
                     description={
                         entries.find(entry => entry.name === confirming.name)?.type === 'dir'
-                            ? 'The folder and everything inside it are deleted from the box. This cannot be undone.'
-                            : 'The file is deleted from the box. This cannot be undone.'
+                            ? t('delete.folder')
+                            : t('delete.file')
                     }
                     onConfirm={() => {
                         onDelete(confirming.name)
@@ -176,9 +179,9 @@ export function FileGrid({
                 <ConfirmDialog
                     open
                     onOpenChange={open => !open && setConfirming(null)}
-                    title={`Unshare ${confirming.name}?`}
-                    description="The public link stops working right away. Anyone holding it gets a 404."
-                    confirmLabel="Unshare"
+                    title={t('publish.unshareTitle', { name: confirming.name })}
+                    description={t('publish.unshareDescription')}
+                    confirmLabel={t('publish.unshare')}
                     onConfirm={() => {
                         void onUnpublish?.(confirming.name)
                         setConfirming(null)

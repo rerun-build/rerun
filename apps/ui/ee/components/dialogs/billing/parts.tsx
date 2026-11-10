@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState, type ReactNode } from 'react'
 
 import { AMOUNT_LOCALE, amountFormat, formatAmount } from '@rerun/contracts'
@@ -16,9 +17,9 @@ import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, creditsLabel, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
 import { ArrowLeft, BrainIcon, CheckIcon, CoinsIcon, CpuIcon, CreditCardIcon, Loader2Icon, Package, Repeat, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
-import { TESTIMONIALS } from '@rerun/cloud/testimonials'
+import { TESTIMONIALS, testimonialCopy } from '@rerun/cloud/testimonials'
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
@@ -36,12 +37,8 @@ export function CountFlow({ value }: { value: number }) {
 }
 
 export function BilledFlow({ cents, interval }: { cents: number; interval: BillingInterval }) {
-    return (
-        <span className="whitespace-nowrap">
-            <UsdFlow cents={cents} />
-            {interval === 'yearly' ? '/yr' : '/mo'}
-        </span>
-    )
+    const t = useTranslations('billing.parts.interval')
+    return <span className="whitespace-nowrap">{t.rich(interval === 'yearly' ? 'perYear' : 'perMonth', { amount: () => <UsdFlow cents={cents} /> })}</span>
 }
 
 export function Headline({ badge, title, subtitle }: { badge?: { label: string; tone: BadgeTone }; title: string; subtitle: string }) {
@@ -86,6 +83,7 @@ export function Timeline({ steps }: { steps: TimelineStep[] }) {
 }
 
 export function IntervalToggle({ value, onChange, disabled }: { value: BillingInterval; onChange: (value: BillingInterval) => void; disabled?: boolean }) {
+    const t = useTranslations('billing.parts.interval')
     return (
         <div className="inline-flex w-fit gap-1 rounded-xl bg-muted/60 p-1 ring-1 ring-border">
             {(['monthly', 'yearly'] as const).map(interval => (
@@ -100,7 +98,7 @@ export function IntervalToggle({ value, onChange, disabled }: { value: BillingIn
                         value === interval ? 'bg-foreground text-background shadow-[var(--relief-solid)]' : 'text-muted-foreground hover:text-foreground',
                     )}
                 >
-                    {interval === 'monthly' ? 'Monthly' : 'Yearly'}
+                    {interval === 'monthly' ? t('monthly') : t('yearly')}
                     {interval === 'yearly' && (
                         <Badge size="xs" tone="green" className={cn(value === interval && 'dark:[--badge-fg:#047857]!')}>
                             -{yearlyDiscountPercent()}%
@@ -112,40 +110,39 @@ export function IntervalToggle({ value, onChange, disabled }: { value: BillingIn
     )
 }
 
+const RICH_STRONG = { b: (chunks: ReactNode) => <span className="font-medium text-foreground">{chunks}</span> }
+
 // On a free trial the lines that differ from Pro say the trial's own limits first: the card sits under
 // a subtitle quoting them, and Pro's figures alone would read as what the trial gives.
-function features(freeTrial: boolean): { id: string; icon: LucideIcon; strong: ReactNode; rest: string; lead?: string }[] {
+function features(t: ReturnType<typeof useTranslations<'billing.parts.features'>>, freeTrial: boolean): { id: string; icon: LucideIcon; text: ReactNode }[] {
     if (freeTrial) {
         return [
-            { id: 'agents', icon: CpuIcon, strong: `${TRIAL_ACTIVE_AGENTS} coworkers`, rest: ' during the trial, unlimited on Pro' },
-            { id: 'teammates', icon: UserPlus, lead: 'Invite ', strong: 'your team', rest: ' once Pro starts' },
-            { id: 'runs', icon: Repeat, strong: 'Unlimited runs', rest: ', 24/7' },
-            { id: 'credit', icon: CoinsIcon, strong: `${creditsLabel(TRIAL_CREDITS)} of AI usage`, rest: `, then ${BASE_PLAN_CREDITS.toLocaleString('en-US')} a month` },
-            { id: 'models', icon: BrainIcon, strong: 'Smart models', rest: ' included' },
-            { id: 'autopilot', icon: ZapIcon, strong: 'Autopilot', rest: ' for your business' },
+            { id: 'agents', icon: CpuIcon, text: t.rich('trial.agents', { ...RICH_STRONG, count: TRIAL_ACTIVE_AGENTS }) },
+            { id: 'teammates', icon: UserPlus, text: t.rich('trial.teammates', RICH_STRONG) },
+            { id: 'runs', icon: Repeat, text: t.rich('runs', RICH_STRONG) },
+            { id: 'credit', icon: CoinsIcon, text: t.rich('trial.credit', { ...RICH_STRONG, credits: TRIAL_CREDITS, monthly: BASE_PLAN_CREDITS }) },
+            { id: 'models', icon: BrainIcon, text: t.rich('models', RICH_STRONG) },
+            { id: 'autopilot', icon: ZapIcon, text: t.rich('autopilot', RICH_STRONG) },
         ]
     }
     return [
-        { id: 'agents', icon: CpuIcon, strong: 'Unlimited coworkers', rest: ' at work' },
-        { id: 'teammates', icon: UserPlus, lead: 'Invite ', strong: 'all your teammates', rest: '' },
-        { id: 'runs', icon: Repeat, strong: 'Unlimited runs', rest: ', 24/7' },
-        { id: 'credit', icon: CoinsIcon, strong: `${creditsLabel(BASE_PLAN_CREDITS)} of AI usage`, rest: ' a month' },
-        { id: 'models', icon: BrainIcon, strong: 'Smart models', rest: ' included' },
-        { id: 'autopilot', icon: ZapIcon, strong: 'Autopilot', rest: ' for your business' },
+        { id: 'agents', icon: CpuIcon, text: t.rich('pro.agents', RICH_STRONG) },
+        { id: 'teammates', icon: UserPlus, text: t.rich('pro.teammates', RICH_STRONG) },
+        { id: 'runs', icon: Repeat, text: t.rich('runs', RICH_STRONG) },
+        { id: 'credit', icon: CoinsIcon, text: t.rich('pro.credit', { ...RICH_STRONG, credits: BASE_PLAN_CREDITS }) },
+        { id: 'models', icon: BrainIcon, text: t.rich('models', RICH_STRONG) },
+        { id: 'autopilot', icon: ZapIcon, text: t.rich('autopilot', RICH_STRONG) },
     ]
 }
 
 function FeatureGrid({ freeTrial = false }: { freeTrial?: boolean }) {
+    const t = useTranslations('billing.parts.features')
     return (
         <ul className="grid grid-cols-1 gap-x-6 gap-y-2.5 lg:grid-cols-2">
-            {features(freeTrial).map(feature => (
+            {features(t, freeTrial).map(feature => (
                 <li key={feature.id} className="flex items-center gap-3 text-sm text-muted-foreground">
                     <Icon size="sm" icon={feature.icon} />
-                    <span>
-                        {feature.lead}
-                        <span className="font-medium text-foreground">{feature.strong}</span>
-                        {feature.rest}
-                    </span>
+                    <span>{feature.text}</span>
                 </li>
             ))}
         </ul>
@@ -157,18 +154,12 @@ function FeatureGrid({ freeTrial = false }: { freeTrial?: boolean }) {
 // promo. `freeTrial` prices the card at what the trial costs, the plan's price struck beside it.
 // `priceArm` is the price this workspace is sold the base plan at.
 export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents = 0, freeTrial = false }: { interval: BillingInterval; priceArm?: PriceArm; discountCents?: number; freeTrial?: boolean }) {
+    const t = useTranslations('billing.parts.plan')
     const quantities = ZERO_QUANTITIES
     const periodCents = Math.max(0, planPriceCents(quantities, interval, priceArm) - discountCents)
     const monthCents = interval === 'yearly' ? Math.round(periodCents / 12) : periodCents
     const struckListPrice = freeTrial || interval === 'yearly' || discountCents > 0
-    const billing =
-        interval === 'yearly' ? (
-            <>
-                billed <UsdFlow cents={periodCents} /> yearly
-            </>
-        ) : (
-            'billed monthly'
-        )
+    const billing = interval === 'yearly' ? t.rich('billedYearly', { amount: () => <UsdFlow cents={periodCents} /> }) : t('billedMonthly')
     return (
         <div className="relative flex flex-col gap-5 rounded-2xl bg-background/60 p-5 ring-1 ring-border sm:p-6">
             <BorderBeam />
@@ -176,9 +167,9 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
                 <div className="flex min-w-0 items-center gap-4">
                     <Icon size="lg" icon={Package} />
                     <div className="min-w-0">
-                        <p className="text-lg font-medium">Pro plan</p>
+                        <p className="text-lg font-medium">{t('title')}</p>
                         <p className="text-sm text-muted-foreground">
-                            {freeTrial ? 'Free trial, then unlimited coworkers' : 'Unlimited coworkers'} · {billing}
+                            {freeTrial ? t('freeTrialLine') : t('unlimited')} · {billing}
                         </p>
                     </div>
                 </div>
@@ -194,7 +185,7 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
                             </span>
                         )}
                     </p>
-                    <p className="text-sm text-muted-foreground">{freeTrial ? `for ${TRIAL_DAYS} days` : 'per month'}</p>
+                    <p className="text-sm text-muted-foreground">{freeTrial ? t('forDays', { days: TRIAL_DAYS }) : t('perMonth')}</p>
                 </div>
             </div>
             <FeatureGrid freeTrial={freeTrial} />
@@ -211,6 +202,8 @@ export function TestimonialStrip() {
 }
 
 function TestimonialRotation() {
+    const t = useTranslations('billing.parts')
+    const locale = useLocale()
     const [index, setIndex] = useState(0)
     const [elapsed, setElapsed] = useState(0)
 
@@ -231,23 +224,24 @@ function TestimonialRotation() {
     }
 
     const testimonial = TESTIMONIALS[index]
+    const copy = testimonialCopy(testimonial, locale)
 
     return (
         <figure className="mt-auto flex flex-col gap-4 rounded-2xl bg-background/40 p-4 ring-1 ring-border">
             <div className="flex gap-2">
                 {TESTIMONIALS.map((item, itemIndex) => (
-                    <button key={item.id} type="button" aria-label={`Show ${item.company}`} onClick={() => show(itemIndex)} className="flex h-4 flex-1 items-center">
+                    <button key={item.id} type="button" aria-label={t('showTestimonial', { company: item.company })} onClick={() => show(itemIndex)} className="flex h-4 flex-1 items-center">
                         <Progress value={itemIndex === index ? elapsed : 0} size="sm" label={item.company} />
                     </button>
                 ))}
             </div>
             <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={testimonial.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
-                    <blockquote className="line-clamp-2 min-h-12 text-[15px] leading-6">{`“${testimonial.quote}”`}</blockquote>
+                    <blockquote className="line-clamp-2 min-h-12 text-[15px] leading-6">{t('quoted', { quote: copy.quote })}</blockquote>
                     <figcaption className="flex items-center gap-2.5 text-sm">
                         <ExpertAvatar initials={initialsFromName(testimonial.author)} src={testimonial.avatar} alt={testimonial.author} rounded="rounded-full" className="size-7 shrink-0 text-[10px]" />
                         <span className="font-medium">{testimonial.author}</span>
-                        <span className="truncate text-muted-foreground">· {testimonial.role}</span>
+                        <span className="truncate text-muted-foreground">· {copy.role}</span>
                         {testimonial.companyLogo ? (
                             // eslint-disable-next-line @next/next/no-img-element -- a company mark from public/, sized by CSS
                             <img src={testimonial.companyLogo} alt={testimonial.company} className="ml-auto size-5 object-contain" />
@@ -293,6 +287,7 @@ export function SummaryRows({ rows }: { rows: SummaryRow[] }) {
 export type SavedCardView = { brand: string; last4: string }
 
 export function CardOnFile({ card, action, onAction }: { card: SavedCardView | null; action?: string; onAction?: () => void }) {
+    const t = useTranslations('billing.parts')
     return (
         <div className="flex items-center justify-between rounded-xl bg-background/60 px-4 py-3 text-sm ring-1 ring-border">
             <span className="flex items-center gap-3">
@@ -302,7 +297,7 @@ export function CardOnFile({ card, action, onAction }: { card: SavedCardView | n
                         <span className="capitalize">{card.brand}</span> •••• {card.last4}
                     </span>
                 ) : (
-                    <span className="text-muted-foreground">Card on file</span>
+                    <span className="text-muted-foreground">{t('cardOnFile')}</span>
                 )}
             </span>
             {action && onAction && (
@@ -330,6 +325,7 @@ export function PromoCodeField({
     disabled?: boolean
     defaultOpen?: boolean
 }) {
+    const t = useTranslations('billing.parts.promo')
     const [open, setOpen] = useState(defaultOpen)
     const [code, setCode] = useState('')
     const [pending, setPending] = useState(false)
@@ -365,7 +361,7 @@ export function PromoCodeField({
                         </Badge>
                         <span className="text-muted-foreground tabular-nums">{applied.discount}</span>
                     </span>
-                    <button type="button" aria-label="Remove promo code" onClick={() => void remove()} disabled={pending || disabled} className="text-muted-foreground hover:text-foreground disabled:opacity-60">
+                    <button type="button" aria-label={t('remove')} onClick={() => void remove()} disabled={pending || disabled} className="text-muted-foreground hover:text-foreground disabled:opacity-60">
                         {pending ? <Loader2Icon className="size-4 animate-spin" /> : <XIcon className="size-4" />}
                     </button>
                 </div>
@@ -377,13 +373,13 @@ export function PromoCodeField({
     if (!open) {
         return (
             <button type="button" onClick={() => setOpen(true)} disabled={disabled} className="self-start text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground disabled:opacity-60">
-                Add promo code
+                {t('add')}
             </button>
         )
     }
 
     return (
-        <Field label="Promo code" htmlFor="promo-code" error={error ?? undefined}>
+        <Field label={t('label')} htmlFor="promo-code" error={error ?? undefined}>
             <div className="flex items-center gap-2">
                 <div className="min-w-0 flex-1">
                     <Input
@@ -400,7 +396,7 @@ export function PromoCodeField({
                 </div>
                 <Button variant="outline" onClick={() => void apply()} disabled={!entered || pending || disabled}>
                     {pending && <Loader2Icon className="animate-spin" />}
-                    Apply
+                    {t('apply')}
                 </Button>
             </div>
         </Field>
@@ -470,13 +466,14 @@ export function Notice({ tone, children }: { tone: 'warning' | 'danger'; childre
     )
 }
 
-export function RightTitle({ children, onBack, backLabel = 'Plan' }: { children: ReactNode; onBack?: () => void; backLabel?: string }) {
+export function RightTitle({ children, onBack, backLabel }: { children: ReactNode; onBack?: () => void; backLabel?: string }) {
+    const t = useTranslations('billing.parts')
     return (
         <div className="flex flex-col gap-2">
             {onBack && (
                 <button type="button" onClick={onBack} className="flex w-fit items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
                     <ArrowLeft className="size-3.5" />
-                    {backLabel}
+                    {backLabel ?? t('backToPlan')}
                 </button>
             )}
             <h3 className="text-lg font-semibold">{children}</h3>
@@ -487,15 +484,18 @@ export function RightTitle({ children, onBack, backLabel = 'Plan' }: { children:
 // The immediate-performance acknowledgement the hosted Checkout used to print above its button. The
 // Elements mode refuses Stripe's `custom_text`, so the dialog asks for it itself.
 export function TermsConsent({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) {
+    const t = useTranslations('billing.parts')
     return (
         <label className="flex cursor-pointer items-start gap-3 text-xs text-muted-foreground">
             <Checkbox size="sm" checked={checked} onCheckedChange={value => onChange(value === true)} className="mt-0.5 shrink-0" />
             <span>
-                I agree to the{' '}
-                <a href={landingUrl('/terms')} target="_blank" rel="noreferrer" className="text-foreground underline underline-offset-4">
-                    Terms
-                </a>{' '}
-                and ask Rerun to start right away. If I am a consumer, my right of withdrawal ends once the service has started.
+                {t.rich('terms', {
+                    terms: chunks => (
+                        <a href={landingUrl('/terms')} target="_blank" rel="noreferrer" className="text-foreground underline underline-offset-4">
+                            {chunks}
+                        </a>
+                    ),
+                })}
             </span>
         </label>
     )

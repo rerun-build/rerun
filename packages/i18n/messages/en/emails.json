@@ -1,0 +1,323 @@
+{
+    "_context": {
+        "common.dateAtTime": "A deadline to the minute, always in UTC. {date} is a day and month already formatted (\"12 March\"), {time} a 24-hour time (\"16:00\").",
+        "common.meta": "Short uppercase labels of a two-column table of facts in an email (label on the left, value on the right).",
+        "common.footer.tagline": "Last line of every email, under a rule, in small grey text.",
+        "reasons": "A small grey line under the first paragraph of a notification email: why this person receives it. {agentName} is a coworker's name.",
+        "incidentResolved.sources": "The thing that works again, used as {source} in the incident emails. {slug} is the technical name of a schedule or a trigger, shown as is.",
+        "agentNotification": "Notification emails a coworker sends. The heading is the email's title, the body names the coworker in bold.",
+        "agentIdle.createdHoursAgo": "Value of the \"Created\" row of a table: how long ago a coworker was created.",
+        "agentIdle.createdYesterday": "Value of the \"Created\" row of a table: how long ago a coworker was created.",
+        "agentIdle.createdDaysAgo": "Value of the \"Created\" row of a table: how long ago a coworker was created. Never 1, which reads createdYesterday.",
+        "automateAgent.periods": "Used as {period} in automateAgent.body: \"in the last week\".",
+        "archiveExpiring": "{kind} is \"sandbox\" for a creator's free sandbox, anything else for a paid workspace that was paused.",
+        "creatorInvite.button": "\"Box\" is the coworkers' machine, a product name kept as is.",
+        "creatorInvite.signoff": "Signature at the bottom of the email.",
+        "trialStarted.perMonth": "{price} is an amount with its currency (\"$49\")."
+    },
+    "common": {
+        "footer": {
+            "tagline": "Run your work on coworkers. Build them, watch them work, and keep your eyes on everything.",
+            "copyright": "© 2026 Rerun",
+            "unsubscribe": "Unsubscribe"
+        },
+        "openConversation": "Open the conversation",
+        "openRerun": "Open Rerun",
+        "useThisCoworker": "Use this coworker",
+        "yourWorkspace": "your workspace",
+        "dateAtTime": "{date}, {time} UTC",
+        "meta": {
+            "accessEnds": "Access ends",
+            "amount": "Amount",
+            "amountDue": "Amount due",
+            "archivedOn": "Archived on",
+            "archivedSince": "Archived since",
+            "coworker": "Coworker",
+            "coworkers": "Coworkers",
+            "coworkersSaved": "Coworkers saved",
+            "created": "Created",
+            "declinedOn": "Declined on",
+            "deletedOn": "Deleted on",
+            "included": "Included",
+            "lastOpened": "Last opened",
+            "pausedSince": "Paused since",
+            "renewsOn": "Renews on",
+            "run": "Run",
+            "runs": "Runs",
+            "savedUntil": "Saved until",
+            "source": "Source",
+            "then": "Then",
+            "trialEnded": "Trial ended",
+            "trialEnds": "Trial ends",
+            "workspace": "Workspace",
+            "workspacePaused": "Workspace paused"
+        }
+    },
+    "subjects": {
+        "signInCode": "Your Rerun code: {code}",
+        "publishedAccessCode": "Your code to open {pageTitle}: {code}",
+        "workspaceInvite": "You're invited to {workspaceName} on Rerun",
+        "runFailed": "{agentName} ran into an error",
+        "agentDone": "{agentName} finished a task",
+        "agentInfo": "{agentName} needs your attention",
+        "agentInput": "{agentName} needs your input",
+        "appNotice": "{appName}: action needed",
+        "incidentResolved": "{agentName} is back to normal",
+        "budgetExhausted": "Your Rerun credits are used up",
+        "onboardingResume": "Your Rerun setup isn't finished",
+        "agentRecommendations": "{count, plural, one {# Rerun coworker that fits {company}} other {# Rerun coworkers that fit {company}}}",
+        "agentIdle": "{agentName} is ready, but hasn't run yet",
+        "teamInvite": "Bring your team into {workspaceName}",
+        "automateAgent": "You've run {agentName} by hand {manualRuns, plural, other {# times}}, schedule the next one",
+        "trialStarted": "Your {trialDays}-day Rerun trial is active",
+        "trialEnding": "{daysLeft, plural, =1 {Your Rerun trial ends tomorrow} other {Your Rerun trial ends in # days}}",
+        "trialFinalNoticeCard": "Your Rerun plan starts in 2 hours",
+        "trialFinalNoticeNoCard": "Your Rerun trial ends in 2 hours, add a card to keep your coworkers running",
+        "trialEndedPaymentFailed": "Your first Rerun payment failed, your workspace is paused in 24 hours",
+        "trialEndedNoCard": "Your Rerun trial has ended, your workspace is paused in 2 hours",
+        "paymentFailed": "Your Rerun payment was declined, your workspace is paused in 24 hours",
+        "subscriptionEnding": "{daysLeft, plural, =1 {Your Rerun subscription ends tomorrow} other {Your Rerun subscription ends in # days}}",
+        "archiveExpiring": "{kind, select, sandbox {Your archived Rerun sandbox is deleted on {date}} other {Your paused Rerun workspace is deleted on {date}}}",
+        "sandboxIdle": "Your Rerun sandbox is archived on {date} unless you open it",
+        "renewalReminder": "{daysLeft, plural, =1 {Your Rerun plan renews tomorrow} other {Your Rerun plan renews in # days}}",
+        "creatorPitch": "Sell the coworkers you build on Rerun"
+    },
+    "reasons": {
+        "mine": "You started this run.",
+        "participant": "You are in this conversation.",
+        "followed": "You follow {agentName}'s scheduled tasks.",
+        "allActivity": "You get all activity from {agentName}.",
+        "everything": "You get every run in the workspace.",
+        "workspace": "This is about your workspace."
+    },
+    "signInCode": {
+        "preview": "Your Rerun code is {code}",
+        "headingSignIn": "Sign in to Rerun",
+        "headingConfirm": "Confirm your new email",
+        "bodySignIn": "Enter this code in the tab where you asked for it, or use the button below to sign in right away.",
+        "bodyConfirm": "Enter this code in your Rerun account settings to make this the email of your account.",
+        "button": "Sign in to Rerun",
+        "footnoteSignIn": "The code and the button expire in {minutes, plural, other {# minutes}} and work once. If you didn't ask for them, you can safely ignore this email.",
+        "footnoteConfirm": "The code expires in {minutes, plural, other {# minutes}} and works once. If you didn't ask for it, you can safely ignore this email."
+    },
+    "publishedAccessCode": {
+        "preview": "Your code to open {pageTitle}: {code}",
+        "heading": "Open {pageTitle}",
+        "body": "{workspaceName} shared this page with you. Enter this code on the page to open it.",
+        "footnote": "The code expires in {minutes, plural, other {# minutes}} and works once. If you didn't ask for it, you can safely ignore this email.",
+        "untitledPage": "a page"
+    },
+    "workspaceInvite": {
+        "preview": "You're invited to {workspaceName} on Rerun",
+        "heading": "You're invited",
+        "bodyWithInviter": "<strong>{inviter}</strong> invited you to join <strong>{workspaceName}</strong> on Rerun.",
+        "bodyAnonymous": "You've been invited to join <strong>{workspaceName}</strong> on Rerun.",
+        "pitch": "Rerun runs your business with autonomous AI coworkers. Accept the invite to start collaborating in this workspace.",
+        "button": "Join {workspaceName}",
+        "footnote": "This invitation expires in 7 days. If you weren't expecting it, you can safely ignore this email."
+    },
+    "teamInvite": {
+        "preview": "Bring your team into {workspaceName}",
+        "heading": "Bring your team into {workspaceName}",
+        "firstRun": "<strong>{agentName}</strong> completed its first successful run, and you are still the only person in this workspace.",
+        "access": "If someone else should read its results, approve what it is about to do, or keep its workflow running when you are away, they need their own access.",
+        "button": "Invite your team",
+        "footnote": "You decide who joins. Nothing is shared until you send an invitation.",
+        "fallbackAgent": "Your coworker"
+    },
+    "runFailed": {
+        "preview": "{agentName} ran into an error",
+        "heading": "Run failed",
+        "body": "Your coworker <strong>{agentName}</strong> stopped with an error."
+    },
+    "budgetExhausted": {
+        "preview": "Your Rerun credits are used up",
+        "heading": "Rerun credits used up",
+        "bodyNamed": "The Rerun credits of <strong>{workspaceName}</strong> are used up for this month. Scheduled and triggered runs on Rerun models are paused until they reset or you add credits.",
+        "bodyUnnamed": "Your workspace's Rerun credits are used up for this month. Scheduled and triggered runs on Rerun models are paused until they reset or you add credits.",
+        "ownKeys": "Coworkers using their own API keys keep running.",
+        "button": "Add credits"
+    },
+    "agentNotification": {
+        "done": {
+            "preview": "{agentName}: Task done",
+            "heading": "Task done",
+            "body": "Your agent <strong>{agentName}</strong> finished a task."
+        },
+        "info": {
+            "preview": "{agentName}: Needs your attention",
+            "heading": "Needs your attention",
+            "body": "Your agent <strong>{agentName}</strong> wants you to look at something."
+        },
+        "question": {
+            "preview": "{agentName}: Coworker has a question",
+            "heading": "Coworker has a question",
+            "body": "Your agent <strong>{agentName}</strong> needs an answer to continue."
+        },
+        "approval": {
+            "preview": "{agentName}: Approval needed",
+            "heading": "Approval needed",
+            "body": "Your agent <strong>{agentName}</strong> is waiting for your approval."
+        },
+        "connector": {
+            "preview": "{agentName}: App setup",
+            "heading": "App setup",
+            "body": "Your agent <strong>{agentName}</strong> needs you to connect a service."
+        }
+    },
+    "incidentResolved": {
+        "preview": "{source} of {agentName} works again",
+        "heading": "Back to normal",
+        "body": "{source} of <strong>{agentName}</strong> ran fine again. You won't get another email about it unless it breaks again.",
+        "sources": {
+            "schedule": "Schedule \"{slug}\"",
+            "anySchedule": "A scheduled task",
+            "trigger": "Trigger \"{slug}\"",
+            "anyTrigger": "A trigger",
+            "conversation": "A conversation"
+        }
+    },
+    "agentIdle": {
+        "preview": "{agentName} is ready, but hasn't run yet",
+        "heading": "{agentName} hasn't run yet",
+        "body": "You created <strong>{agentName}</strong> and it has never started a run. Give it one small task first: a result you can read in a minute is what tells you whether the setup is right before you put it on a schedule.",
+        "button": "Open {agentName}",
+        "footnote": "Opening this page does not start a run.",
+        "createdHoursAgo": "{count, plural, one {# hour ago} other {# hours ago}}",
+        "createdYesterday": "yesterday",
+        "createdDaysAgo": "{count, plural, one {# day ago} other {# days ago}}"
+    },
+    "agentRecommendations": {
+        "preview": "{count, plural, one {# Rerun coworker that fits {company}} other {# Rerun coworkers that fit {company}}}",
+        "yourCompany": "your company",
+        "heading": "Where to start at {company}",
+        "bodyWithSite": "You shared <strong>{domain}</strong> during setup. From the recurring work described there and the tools you told us you use, these are the clearest setups to start with.",
+        "bodyWithoutSite": "From the tools you told us you use, these are the clearest setups to start with.",
+        "button": "Browse the library",
+        "footnote": "Nothing runs until you pick one and review its setup."
+    },
+    "automateAgent": {
+        "preview": "You've started {agentName} by hand {manualRuns, plural, other {# times}}",
+        "heading": "Let {agentName} start itself",
+        "body": "You started <strong>{agentName}</strong> yourself <strong>{manualRuns, plural, other {# times}}</strong> in {period}, and every one of them finished.",
+        "workflowWorks": "The workflow works. On a schedule it does the same job without you opening the app to launch it.",
+        "button": "Schedule the next run",
+        "footnote": "You review the schedule before it is saved, and you can pause it at any time.",
+        "periods": {
+            "lastWeek": "the last week",
+            "lastTwoWeeks": "the last two weeks"
+        }
+    },
+    "onboardingResume": {
+        "preview": "Your Rerun setup isn't finished",
+        "headingNamed": "{firstName}, your setup isn't finished",
+        "heading": "Your setup isn't finished",
+        "leftEarly": "Your workspace is created, but you left before the end of the setup. It takes about a minute: your site, and the tools you already work with.",
+        "whyItMatters": "Those two answers are what decide which coworkers Rerun puts in front of you. Without them you get the generic list.",
+        "button": "Finish setup",
+        "footnote": "The questions reopen on their own when you land on your workspace."
+    },
+    "archiveExpiring": {
+        "preview": "{kind, select, sandbox {Your archived Rerun sandbox is deleted on {date}} other {Your paused Rerun workspace is deleted on {date}}}",
+        "heading": "{kind, select, sandbox {Your archived sandbox is deleted on {date}} other {Your paused workspace is deleted on {date}}}",
+        "statusNamed": "{kind, select, sandbox {<strong>{workspaceName}</strong> has been archived since <strong>{pausedOn}</strong>. Its coworkers and everything they know are still saved, and this is the last week they will be.} other {<strong>{workspaceName}</strong> has been paused since <strong>{pausedOn}</strong>. Its coworkers and everything they know are still saved, and this is the last week they will be.}}",
+        "statusUnnamed": "{kind, select, sandbox {Your workspace has been archived since <strong>{pausedOn}</strong>. Its coworkers and everything they know are still saved, and this is the last week they will be.} other {Your workspace has been paused since <strong>{pausedOn}</strong>. Its coworkers and everything they know are still saved, and this is the last week they will be.}}",
+        "deletion": "{kind, select, sandbox {On <strong>{date}</strong>, the saved copy is deleted for good and cannot be recovered. Open your sandbox and request its reactivation before then to get it back exactly as you left it.} other {On <strong>{date}</strong>, the saved copy is deleted for good and cannot be recovered. Subscribe before then and your workspace comes back exactly as you left it.}}",
+        "button": "{kind, select, sandbox {Open my sandbox} other {Bring my workspace back}}",
+        "footnote": "{kind, select, sandbox {This is the last email about this sandbox.} other {This is the last email about this workspace.}}"
+    },
+    "creatorInvite": {
+        "previewOutreach": "Built from your public work. Claim your profile and your sandbox.",
+        "previewApplication": "You are in. Claim your sandbox and start building templates.",
+        "headingOutreach": "Congratulations, {firstName}",
+        "headingApplication": "You are in, {firstName}",
+        "introOutreach": "Your profile was just added to our directory of professionals who design and deploy AI coworkers. We pre-filled your listing from your public work.",
+        "introApplication": "We reviewed your application to the Rerun Creator program and we would love to have you on board.",
+        "cardAlt": "{firstName}'s Rerun Expert card",
+        "sandbox": "The link below creates your creator account and hands you a sandbox: an unlimited workspace where you build coworkers, capture them as templates, and publish them to the marketplace. Creators keep the revenue on every paid template they ship.",
+        "button": "Claim my box",
+        "conditions": "You will be asked to accept the program conditions before the sandbox opens. It takes a minute. Your public listing stays yours to edit from the app, whenever you want.",
+        "fallbackLink": "If the button does not work, paste this into your browser: <link>{url}</link>",
+        "signoff": "The Rerun Team",
+        "unsubscribe": "Remove my profile"
+    },
+    "creatorPitch": {
+        "preview": "Sell the coworkers you build on Rerun",
+        "headingNamed": "{firstName}, sell what you built",
+        "heading": "Sell what you built",
+        "bodyWithAgent": "You built <strong>{agentName}</strong> in Rerun. If it solves a problem other people have too, you can package it as a template they install in one click.",
+        "bodyWithoutAgent": "You built working coworkers in Rerun. If one of them solves a problem other people have too, you can package it as a template they install in one click.",
+        "creator": "As a Rerun Creator you set the price, we handle the checkout and the payouts, and buyers land on a setup that already runs.",
+        "button": "Become a Creator",
+        "footnoteWithAgent": "Start with {agentName}, or build something for the marketplace from scratch.",
+        "footnoteWithoutAgent": "Start from a coworker you already have, or build something for the marketplace from scratch."
+    },
+    "paymentFailed": {
+        "preview": "Your Rerun payment was declined, your workspace is paused on {pausedAt}",
+        "heading": "Your payment was declined",
+        "declined": "The renewal for <strong>{workspace}</strong> did not go through on <strong>{date}</strong>. Your bank may simply be asking you to confirm it.",
+        "declinedWithAmount": "The renewal for <strong>{workspace}</strong>, <strong>{amount}</strong>, did not go through on <strong>{date}</strong>. Your bank may simply be asking you to confirm it.",
+        "consequences": "Your workspace keeps running until <strong>{pausedAt}</strong>. After that it is <strong>paused</strong> and your coworkers stop. Nothing is deleted: your coworkers and everything they know are saved until <strong>{keptUntil}</strong>. Pay the invoice and nothing changes, on the same plan.",
+        "button": "Pay the invoice",
+        "footnote": "We will try the card again over the next few days. If one of those attempts goes through, your workspace carries on, or is restored on its own if it was already paused."
+    },
+    "renewalReminder": {
+        "preview": "Your Rerun plan renews on {date}",
+        "heading": "Your plan renews in {daysLeft, plural, =1 {a day} other {# days}}",
+        "body": "You asked us to remind you before the plan for <strong>{workspace}</strong> renews. It renews on <strong>{date}</strong>, and the card on file is charged then. Until that date your coworkers keep running as they are.",
+        "button": "Review my plan",
+        "footnote": "Want to cancel? Do it before {date} from Billing, in your workspace menu, and your card is not charged again."
+    },
+    "sandboxIdle": {
+        "preview": "Your Rerun sandbox is archived on {date} unless you open it",
+        "heading": "Your sandbox is archived on {date}",
+        "unused": "Your Rerun sandbox has not been opened since <strong>{lastActive}</strong>. A sandbox keeps a machine running for you, so one that sits unused for 30 days is archived to free it.",
+        "openBefore": "Open your sandbox before <strong>{date}</strong> and nothing changes. After that date its coworkers and their data are saved, but getting it back means asking us to reactivate it.",
+        "button": "Open my sandbox"
+    },
+    "subscriptionEnding": {
+        "preview": "Your Rerun subscription ends on {date}",
+        "heading": "{daysLeft, plural, =1 {Your subscription ends tomorrow} other {Your subscription ends in # days}}",
+        "cancelled": "The subscription for <strong>{workspace}</strong> was cancelled and ends on <strong>{date}</strong>. On that date your coworkers stop and your workspace is paused.",
+        "nothingDeleted": "Nothing is deleted. Your coworkers, their memories, files and history are saved until <strong>{keptUntil}</strong>, and subscribing again brings it all back exactly as you left it.",
+        "button": "Keep my subscription",
+        "footnote": "Changed your mind? Reactivating before {date} leaves everything running, with nothing to restore."
+    },
+    "trialEnded": {
+        "preview": "{reason, select, payment_failed {Your first Rerun payment failed, your workspace is paused on {pausedAt}} other {Your Rerun trial has ended, your workspace is paused on {pausedAt}}}",
+        "heading": "{reason, select, payment_failed {Your first payment failed} other {Your trial has ended}}",
+        "ended": "{reason, select, payment_failed {The trial for <strong>{workspace}</strong> ended on <strong>{date}</strong>, and the first charge to your card did not go through. Your bank may simply be asking you to confirm it.} other {The trial for <strong>{workspace}</strong> ended on <strong>{date}</strong>, and your coworkers have stopped.}}",
+        "paused": "{reason, select, payment_failed {Your workspace is <strong>paused on {pausedAt}</strong>. Nothing is deleted: your coworkers and everything they know are saved until <strong>{keptUntil}</strong>. Pay the invoice before it is paused to keep it running, or subscribe any time before then and it all comes back exactly as you left it.} other {Your workspace is <strong>paused on {pausedAt}</strong>. Nothing is deleted: your coworkers and everything they know are saved until <strong>{keptUntil}</strong>. Subscribe any time before then and it all comes back exactly as you left it.}}",
+        "button": "{reason, select, payment_failed {Pay the invoice} other {Start my plan}}",
+        "footnote": "Not the right time? You can leave it, nothing further will be charged. Your workspace stays saved until {keptUntil}."
+    },
+    "trialEnding": {
+        "preview": "Your Rerun trial ends on {date}",
+        "heading": "Your trial ends in {daysLeft, plural, =1 {a day} other {# days}}",
+        "endsOn": "The trial for <strong>{workspace}</strong> ends on <strong>{date}</strong>. From then on your plan bills to the card on file every month. Without a card on file, your coworkers stop running and your workspace is paused 2 hours after your trial ends.",
+        "nothingDeleted": "Nothing is deleted: your coworkers and everything they know are saved until {keptUntil}, and subscribing brings it all back exactly as you left it.",
+        "button": "Start my plan",
+        "footnote": "Not planning to continue? Cancel before {date} from Billing, in your workspace menu, and nothing is charged."
+    },
+    "trialFinalNotice": {
+        "previewCard": "Your Rerun plan starts at {date}",
+        "previewNoCard": "Add a card before {date} to keep your Rerun coworkers running",
+        "heading": "Your trial ends in 2 hours",
+        "bodyCard": "The trial for <strong>{workspace}</strong> ends at <strong>{date}</strong>. Your plan starts then, and the card on file is charged for your first month. Your coworkers keep running, there is nothing to do.",
+        "noCard": "The trial for <strong>{workspace}</strong> ends at <strong>{date}</strong>, and there is no card on file.",
+        "noCardPause": "Without a plan, your coworkers stop at the end of the trial and your workspace is <strong>paused at {pausedAt}</strong>. Nothing is deleted: your coworkers and everything they know are saved until {keptUntil}, and subscribing brings it all back exactly as you left it.",
+        "buttonCard": "Review my plan",
+        "buttonNoCard": "Start my plan",
+        "footnoteCard": "Not planning to continue? Cancel before {date} from Billing, in your workspace menu, and your card is not charged."
+    },
+    "trialStarted": {
+        "preview": "Your {trialDays}-day Rerun trial is active",
+        "heading": "Your trial is active",
+        "body": "<strong>{workspace}</strong> is on a {trialDays}-day free trial. Your coworkers run, your schedules fire, and nothing is charged today.",
+        "included": "{coworkers, plural, one {# coworker} other {# coworkers}} and {credits, plural, one {# credit} other {# credits}}",
+        "perMonth": "{price}/month",
+        "button": "Open workspace",
+        "footnoteCard": "Your plan starts on its own on {date}: {price} is charged to the card you added, then every month. Not planning to continue? Cancel before {date} from Billing, in your workspace menu, and nothing is charged.",
+        "footnoteNoCard": "No card needed for the trial. To keep going after {date}, add one from Billing, in your workspace menu, and your plan starts at {price}/month. Without one, your coworkers stop and nothing is charged."
+    }
+}

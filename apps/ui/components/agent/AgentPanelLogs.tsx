@@ -9,15 +9,16 @@ import { SkeletonPanelRows, SkeletonRows } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { modelLogLabel } from '@/lib/engine/models'
 import type { EngineRun, EngineRunStep, EngineToolCall } from '@/lib/engine/types'
-import { getToolMeta } from '@/lib/tool-meta'
+import { toolIconOf } from '@/lib/tool-meta'
+import { formatDate, formatNumber } from '@rerun/i18n/format'
 import { RunStatusBadge } from '@rerun/ui/monitoring'
 import { CheckIcon, ChevronRightIcon, ScrollTextIcon, XIcon } from '@/lib/icons'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { createElement, useCallback, useEffect, useRef, useState } from 'react'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 
-function formatUsage(run: EngineRun): string {
-    const total = run.totalTokens ?? (((run.inputTokens ?? 0) + (run.outputTokens ?? 0)) || undefined)
-    return total ? `${total.toLocaleString()} tokens` : ''
+function runTokens(run: EngineRun): number | undefined {
+    return run.totalTokens ?? (((run.inputTokens ?? 0) + (run.outputTokens ?? 0)) || undefined)
 }
 
 function formatDuration(ms: number | null): string {
@@ -37,6 +38,7 @@ function prettyJson(raw: string | null): string | null {
 type RunDetail = { steps: EngineRunStep[]; tools: EngineToolCall[] }
 
 export function AgentPanelLogs({ agentId }: { agentId: string }) {
+    const t = useTranslations('agent.agentPanelLogs')
     const [runs, setRuns] = useState<EngineRun[]>([])
     const [loading, setLoading] = useState(true)
     const [details, setDetails] = useState<Record<string, RunDetail>>({})
@@ -74,8 +76,8 @@ export function AgentPanelLogs({ agentId }: { agentId: string }) {
             <EmptyState
                 className="h-full"
                 icon={ScrollTextIcon}
-                title="No runs yet"
-                description="Every run of your coworker is recorded here, so you can inspect step by step what it did and why."
+                title={t('empty.title')}
+                description={t('empty.description')}
             />
         )
     }
@@ -94,21 +96,22 @@ export function AgentPanelLogs({ agentId }: { agentId: string }) {
 }
 
 function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; onOpen: () => void }) {
-    const usage = formatUsage(run)
+    const t = useTranslations('agent.agentPanelLogs')
+    const locale = useLocale()
+    const tokens = runTokens(run)
+    const usage = tokens ? t('tokens', { total: formatNumber(tokens, locale) }) : ''
     const trigger = run.triggerSlug ?? run.triggerSource
     return (
         <Collapsible onOpenChange={open => open && onOpen()} className={cn(PANEL_CARD, 'overflow-hidden')}>
             <CollapsibleTrigger className={cn('group flex w-full flex-col gap-0.5 p-3 text-left', PANEL_CARD_INTERACTIVE)}>
                 <div className="flex items-center gap-2">
                     <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
-                    <span className="flex-1 truncate text-sm">{run.startedAt ? new Date(run.startedAt).toLocaleString() : run.id}</span>
+                    <span className="flex-1 truncate text-sm">{run.startedAt ? formatDate(run.startedAt, locale) : run.id}</span>
                     <RunStatusBadge status={run.status} />
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5 pl-6 text-[10px] text-muted-foreground">
                     {typeof run.stepCount === 'number' && (
-                        <span>
-                            {run.stepCount} step{run.stepCount !== 1 ? 's' : ''}
-                        </span>
+                        <span>{t('stepCount', { count: run.stepCount })}</span>
                     )}
                     {usage && (
                         <>
@@ -138,11 +141,11 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
                             <SkeletonRows rows={3} />
                         </div>
                     ) : detail.steps.length === 0 && detail.tools.length === 0 ? (
-                        <p className="py-2 text-xs text-muted-foreground">No steps recorded for this run.</p>
+                        <p className="py-2 text-xs text-muted-foreground">{t('noSteps')}</p>
                     ) : (
                         <div className="flex flex-col gap-2">
                             {detail.steps.map(step => (
-                                <StepRow key={step.id} step={step} tools={detail.tools.filter(t => t.stepNumber === step.stepNumber)} />
+                                <StepRow key={step.id} step={step} tools={detail.tools.filter(tool => tool.stepNumber === step.stepNumber)} />
                             ))}
                         </div>
                     )}
@@ -153,13 +156,15 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
 }
 
 function StepRow({ step, tools }: { step: EngineRunStep; tools: EngineToolCall[] }) {
+    const t = useTranslations('agent.agentPanelLogs')
+    const locale = useLocale()
     return (
         <div className="divide-y divide-border/40">
             <div className="flex items-center gap-2 py-1.5 text-xs">
-                <span className="font-medium">Step {step.stepNumber}</span>
+                <span className="font-medium">{t('step', { number: step.stepNumber })}</span>
                 {step.finishReason && <span className="text-muted-foreground">{step.finishReason}</span>}
                 <span className="flex-1" />
-                {step.totalTokens != null && <span className="text-muted-foreground">{step.totalTokens.toLocaleString()} tok</span>}
+                {step.totalTokens != null && <span className="text-muted-foreground">{t('tokensShort', { total: formatNumber(step.totalTokens, locale) })}</span>}
                 {step.durationMs != null && <span className="text-muted-foreground">{formatDuration(step.durationMs)}</span>}
             </div>
             {tools.length > 0 && (
@@ -174,8 +179,7 @@ function StepRow({ step, tools }: { step: EngineRunStep; tools: EngineToolCall[]
 }
 
 function ToolRow({ tool }: { tool: EngineToolCall }) {
-    const meta = getToolMeta(tool.toolName)
-    const Icon = meta.icon
+    const t = useTranslations('agent.agentPanelLogs')
     const input = prettyJson(tool.inputJson)
     const output = prettyJson(tool.resultJson)
     const isError = tool.isError !== 0
@@ -183,7 +187,7 @@ function ToolRow({ tool }: { tool: EngineToolCall }) {
         <Collapsible className="border-t border-border/40 first:border-t-0">
             <CollapsibleTrigger className="group flex w-full items-center gap-2 py-1.5 text-left text-xs transition-colors hover:bg-accent/30">
                 <ChevronRightIcon className="size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
-                <Icon className="size-3.5 shrink-0 text-muted-foreground" />
+                {createElement(toolIconOf(tool.toolName), { className: 'size-3.5 shrink-0 text-muted-foreground' })}
                 <span className="truncate font-mono">{tool.toolName}</span>
                 {isError ? <XIcon className="size-3 shrink-0 text-destructive" /> : <CheckIcon className="size-3 shrink-0 text-emerald-500" />}
                 <span className="flex-1" />
@@ -191,8 +195,8 @@ function ToolRow({ tool }: { tool: EngineToolCall }) {
             </CollapsibleTrigger>
             <CollapsibleContent>
                 <div className="flex flex-col gap-2 pb-2 pl-5">
-                    {input && <JsonBlock label="Input" json={input} />}
-                    {output && <JsonBlock label="Output" json={output} error={isError} />}
+                    {input && <JsonBlock label={t('input')} json={input} />}
+                    {output && <JsonBlock label={t('output')} json={output} error={isError} />}
                 </div>
             </CollapsibleContent>
         </Collapsible>

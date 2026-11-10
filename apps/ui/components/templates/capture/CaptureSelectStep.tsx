@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -31,6 +32,7 @@ export function CaptureSelectStep({
     onToggle: (agentId: string) => void
     onSelectionChange: (agentIds: string[]) => void
 }) {
+    const t = useTranslations('templates.capture.select')
     const [query, setQuery] = React.useState('')
 
     const space = spaces.find(s => s.id === spaceId)
@@ -48,8 +50,8 @@ export function CaptureSelectStep({
         return (
             <EmptyState
                 icon={BotIcon}
-                title="No coworker to capture"
-                description="Create a coworker in a Box first, then come back here."
+                title={t('emptyTitle')}
+                description={t('emptyDescription')}
             />
         )
     }
@@ -59,15 +61,15 @@ export function CaptureSelectStep({
             {/* A single source Box is already selected for the flow, so the control would only ever
                 confirm itself. Its name moves into the list title instead. */}
             {spaces.length > 1 && (
-                <Field label="Box">
+                <Field label={t('box')}>
                     <Select value={spaceId} onValueChange={onSpaceChange}>
                         <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Pick the Box holding the coworkers" />
+                            <SelectValue placeholder={t('boxPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
                             {spaces.map(option => (
                                 <SelectItem key={option.id} value={option.id}>
-                                    {option.name ?? 'Box'} ({option.agents.length})
+                                    {option.name ?? t('boxFallback')} ({option.agents.length})
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -76,28 +78,26 @@ export function CaptureSelectStep({
             )}
 
             {space && (
-                <Field label={spaces.length > 1 || !space.name ? 'Coworkers' : `Coworkers in ${space.name}`}>
+                <Field label={spaces.length > 1 || !space.name ? t('coworkers') : t('coworkersIn', { box: space.name })}>
                     <div className="flex flex-col gap-2">
                         {agents.length > FILTER_THRESHOLD && (
                             <Input
                                 value={query}
                                 onChange={event => setQuery(event.target.value)}
-                                placeholder="Search by name or handle"
+                                placeholder={t('search')}
                                 className="h-9"
                             />
                         )}
 
                         {agents.length > 1 && (
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                <span>
-                                    {selectedIds.length} of {agents.length} selected
-                                </span>
+                                <span>{t('selected', { selected: selectedIds.length, total: agents.length })}</span>
                                 <button
                                     type="button"
                                     className="text-foreground/70 transition-colors hover:text-foreground"
                                     onClick={() => onSelectionChange(allSelected ? [] : agents.map(agent => agent.id))}
                                 >
-                                    {allSelected ? 'Clear' : 'Select all'}
+                                    {allSelected ? t('clear') : t('selectAll')}
                                 </button>
                             </div>
                         )}
@@ -111,7 +111,7 @@ export function CaptureSelectStep({
                                     onToggle={() => onToggle(agent.id)}
                                 />
                             ))}
-                            {visible.length === 0 && <p className="px-2 py-4 text-xs text-muted-foreground">No coworker matches this search.</p>}
+                            {visible.length === 0 && <p className="px-2 py-4 text-xs text-muted-foreground">{t('noMatch')}</p>}
                         </div>
                     </div>
                 </Field>

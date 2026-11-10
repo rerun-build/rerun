@@ -1,0 +1,125 @@
+{
+    "title": "Coworkers",
+    "loadFailed": "Impossible de charger vos coworkers.",
+    "retry": "Réessayer",
+    "empty": "Aucun coworker pour l'instant.",
+    "loadingCoworkers": "Chargement des coworkers",
+    "newCoworker": "Nouveau coworker",
+    "untitledBox": "Box sans nom",
+    "teammate": "Coéquipier",
+    "pinned": {
+        "dragToReorder": "Faites glisser pour réorganiser",
+        "done": "OK",
+        "unpin": "Désépingler",
+        "details": "Détails du coworker",
+        "edit": "Modifier les épingles",
+        "unreadLabel": "{name}, non lu"
+    },
+    "row": {
+        "label": "{name}, {line}",
+        "opensConversation": "Ouvre la conversation",
+        "pin": "Épingler",
+        "unpin": "Désépingler",
+        "pinToTop": "Épingler en haut"
+    },
+    "line": {
+        "paused": "En pause",
+        "waiting": "Vous attend",
+        "error": "Une erreur est survenue",
+        "working": "Au travail",
+        "workingOn": "Au travail · {detail}",
+        "asleep": "Endormi",
+        "asleepAbout": "Endormi · {about}"
+    },
+    "foreman": {
+        "askAnything": "Demandez ce que vous voulez"
+    },
+    "header": {
+        "account": "Compte",
+        "view": "Affichage",
+        "recent": "Récents",
+        "byBox": "Par Box"
+    },
+    "account": {
+        "preferences": "Préférences",
+        "contactSupport": "Contacter le support",
+        "signOut": "Se déconnecter",
+        "subscriptionTitle": "Résiliez d'abord l'abonnement",
+        "subscriptionMessage": "{workspaces} se renouvelle encore. Résiliez-le depuis Facturation sur rerun.build, puis supprimez votre compte.",
+        "deleteTitle": "Supprimer votre compte ?",
+        "deleteMessage": "Vous quittez les workspaces que vous partagez. Un workspace dont vous êtes le seul membre s'arrête définitivement, avec ses coworkers et ses fichiers. Cette action est irréversible.",
+        "delete": "Supprimer",
+        "cancel": "Annuler",
+        "reauthTitle": "Reconnectez-vous pour supprimer votre compte",
+        "reauthMessage": "Pour votre sécurité, la suppression du compte demande une connexion récente. Reconnectez-vous, puis supprimez-le depuis cet écran.",
+        "deleteFailedTitle": "Impossible de supprimer votre compte",
+        "deleteFailedMessage": "Réessayez dans un instant.",
+        "leaveServerTitle": "Quitter {host} ?",
+        "leaveServerMessage": "Vous serez déconnecté, et Rerun se rouvrira sur Rerun Cloud.",
+        "leaveServer": "Quitter"
+    },
+    "workspace": {
+        "untitled": "Mon workspace",
+        "menuLabel": "Workspace {name}"
+    },
+    "section": {
+        "label": "{label}, {count}"
+    },
+    "search": {
+        "title": "Rechercher",
+        "back": "Retour",
+        "placeholder": "Rechercher des coworkers et des conversations",
+        "askRerun": "Demander à Rerun",
+        "quotedAsk": "« {query} »",
+        "coworkers": "Coworkers",
+        "conversations": "Conversations",
+        "noCoworker": "Aucun coworker de ce nom.",
+        "newConversation": "Nouvelle conversation",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "Notifications",
+        "bellLabel": "Notifications, {count}",
+        "close": "Fermer",
+        "settings": "Paramètres de notification",
+        "markAllRead": "Tout marquer comme lu",
+        "markAllTitle": "Tout marquer comme lu ?",
+        "markAllMessage": "{count, plural, one {# élément quittera} other {# éléments quitteront}} cette liste. Les demandes encore en attente de réponse sont aussi effacées, sans réponse.",
+        "cancel": "Annuler",
+        "running": "{count, plural, one {# tâche en cours} other {# tâches en cours}}",
+        "loadFailed": "Impossible de charger vos notifications.",
+        "retry": "Réessayer",
+        "emptyTitle": "Rien à traiter",
+        "emptyDescription": "Quand un coworker a besoin de vous ou termine une tâche, ça arrive ici.",
+        "undo": "Annuler",
+        "ok": "OK",
+        "sections": {
+            "needsYou": "Vous attendent",
+            "headsUps": "Signalements",
+            "errors": "Erreurs",
+            "done": "Terminées"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} vous a posé une question",
+            "awaiting_approval": "{agent} attend votre approbation",
+            "awaiting_connector": "{agent} a besoin qu'une app soit connectée",
+            "waiting_human": "{agent} vous attend",
+            "awaiting_ack": "{agent} vous a signalé quelque chose",
+            "error": "{agent} a rencontré une erreur",
+            "done": "{agent} a terminé son exécution"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}, {detail}",
+            "read": "Lu",
+            "markRead": "Marquer comme lu",
+            "opensConversation": "Ouvre la conversation",
+            "unfollow": "Ne plus suivre ses tâches planifiées",
+            "unfollowed": "Vous ne suivez plus les tâches planifiées de {name}.",
+            "mute": "Mettre {name} en sourdine",
+            "muted": "{name} est en sourdine.",
+            "settings": "Paramètres de notification",
+            "cancel": "Annuler"
+        }
+    }
+}

@@ -1,6 +1,7 @@
+import { emailTranslator } from '@rerun/emails/i18n'
 import { describe, expect, it } from 'vitest'
 
-import { announcesRecovery, describeSourceKey, incidentKeyFor, resolvedIncidentKeysFor } from './incidents'
+import { announcesRecovery, emailSourceLabel, incidentKeyFor, resolvedIncidentKeysFor } from './incidents'
 
 const failedSchedule = { event: 'agent.schedule.completed', kind: 'error', agentId: 'agt_1', sessionId: 'ses_1', metadata: { scheduleSlug: 'weekly' } } as const
 
@@ -33,6 +34,10 @@ describe('announcesRecovery', () => {
     })
 
     it('reads the key from the right, an agent id may hold a colon', () => {
-        expect(describeSourceKey('agt:1:schedule:weekly')).toBe('Schedule "weekly"')
+        expect(emailSourceLabel('agt:1:schedule:weekly', emailTranslator('en'))).toBe('Schedule "weekly"')
+    })
+
+    it('names the source in the language of the email', () => {
+        expect(emailSourceLabel('agt_1:trigger:run', emailTranslator('fr'))).toBe('Un déclencheur')
     })
 })

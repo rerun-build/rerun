@@ -1,5 +1,6 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 import { listPublishedAction } from '@/app/api/_actions/publish.actions'
@@ -22,6 +23,8 @@ const SKELETON_ROWS = 3
 
 // What one coworker published, a card per link. A card opens the share dialog.
 export function AgentPublishedPanel({ agentId, agentName }: { agentId: string; agentName: string }) {
+    const t = useTranslations('published.panel')
+    const locale = useLocale()
     const [files, setFiles] = useState<PublishedFile[] | null>(null)
     const [sharing, setSharing] = useState<PublishedFile | null>(null)
 
@@ -39,7 +42,7 @@ export function AgentPublishedPanel({ agentId, agentName }: { agentId: string; a
     const remove = useCallback((slug: string) => setFiles(list => list?.filter(other => other.slug !== slug) ?? null), [])
 
     if (files?.length === 0) {
-        return <EmptyState icon={GlobeIcon} title="Nothing published yet" description={`Pages, reports and files ${agentName} shares show up here.`} />
+        return <EmptyState icon={GlobeIcon} title={t('emptyTitle')} description={t('emptyDescription', { agent: agentName })} />
     }
 
     return (
@@ -55,13 +58,13 @@ export function AgentPublishedPanel({ agentId, agentName }: { agentId: string; a
                               title={file.title}
                               meta={<AccessBadge access={file.access} />}
                               description={<span className="block truncate font-mono text-[11px]">{publishedHostOf(file.url)}</span>}
-                              footer={`Updated ${relativeDate(file.updatedAt)}`}
+                              footer={t('updated', { when: relativeDate(file.updatedAt, locale) })}
                               actions={
                                   <>
                                       <Button
                                           variant="ghost"
                                           size="icon-sm"
-                                          aria-label="Copy link"
+                                          aria-label={t('copyLink')}
                                           className="@max-sm:hidden"
                                           onClick={event => {
                                               event.stopPropagation()

@@ -7,8 +7,10 @@ import { TemplatePriceBadge } from '@/components/templates/TemplatePriceBadge'
 import { templateStatusLabel, templateStatusTone } from '@/lib/templates/status'
 import type { LibraryTemplate } from '@/lib/templates/library'
 import { LayersIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 export function TemplateDetailMedia({ template, showStatus }: { template: LibraryTemplate; showStatus: boolean }) {
+    const tStatus = useTranslations('templates.status')
     return (
         // shrink-0 : le bandeau ne tient que par son ratio. Sans lui, un ancêtre en flex l'étire sur
         // toute la hauteur du panneau et pousse le titre, le prix et les agents sous la ligne de flottaison.
@@ -21,7 +23,7 @@ export function TemplateDetailMedia({ template, showStatus }: { template: Librar
             {showStatus && template.status !== 'published' && (
                 <span className="absolute left-3 top-3 z-10 flex rounded-full sm:left-12 bg-background/70 backdrop-blur">
                     <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
-                        {templateStatusLabel(template.status)}
+                        {templateStatusLabel(template.status, tStatus)}
                     </Badge>
                 </span>
             )}

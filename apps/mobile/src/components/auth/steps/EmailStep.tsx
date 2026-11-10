@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { TextInput } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { FIELD_HEIGHT, FIELD_RADIUS } from '@/components/auth/PhoneField'
 import { useSignInFlow } from '@/components/auth/SignInFlow'
@@ -16,10 +17,11 @@ export function EmailStep() {
     const [focused, setFocused] = useState(false)
     const { email, setEmail } = useSignInFlow()
     const { send, sending, error, clearError } = useEmailCode()
+    const t = useTranslations('mobileAuth')
 
     return (
         <>
-            <StepTitle title="Continue with email" />
+            <StepTitle title={t('email.title')} />
             <TextInput
                 value={email}
                 onChangeText={text => {
@@ -27,7 +29,7 @@ export function EmailStep() {
                     clearError()
                 }}
                 onSubmitEditing={send}
-                placeholder="you@company.com"
+                placeholder={t('email.placeholder')}
                 placeholderTextColor={theme.mutedForeground}
                 keyboardType="email-address"
                 textContentType="emailAddress"
@@ -36,7 +38,7 @@ export function EmailStep() {
                 autoCorrect={false}
                 autoFocus
                 returnKeyType="send"
-                accessibilityLabel="Email"
+                accessibilityLabel={t('email.label')}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 maxFontSizeMultiplier={1.3}
@@ -47,7 +49,7 @@ export function EmailStep() {
                     {error}
                 </AppText>
             )}
-            <Button label="Send code" size="lg" loading={sending} disabled={!email.trim()} onPress={send} />
+            <Button label={t('email.send')} size="lg" loading={sending} disabled={!email.trim()} onPress={send} />
         </>
     )
 }

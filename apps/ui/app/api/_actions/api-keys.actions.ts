@@ -13,13 +13,14 @@ import { buildImportPrompt } from '@/lib/agent-import/prompt'
 import { importSource, isImportSourceId, type ImportSourceId } from '@/lib/agent-import/sources'
 import { selectAll, selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
+import { AppError, failure, failureOf, type ErrorCode } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
 
 // A key acts as the whole workspace, so only an admin issues or revokes one; every member sees the
 // list. The subscription is gated too, trial included. A sandbox, which has no subscription at
 // all, is entitled by nature: see `isWorkspaceApiEntitled`.
 
-const API_KEYS_ADMIN_ONLY = 'Only an admin can manage API keys'
+const API_KEYS_ADMIN_ONLY = 'adminOnlyApiKeys' satisfies ErrorCode
 
 const MAX_ACTIVE_KEYS = 20
 const MAX_NAME_LENGTH = 60
@@ -40,7 +41,7 @@ export type ApiKeyView = {
 // this check a member could revoke another workspace's key by guessing its uuid.
 async function assertKeyInWorkspace(ctx: WorkspaceContext, id: string): Promise<void> {
     const { data: key } = await selectMaybeSingle(ctx.supabase, 'api_keys', ['workspace_id'] as const, { id })
-    if (!key || key.workspace_id !== ctx.workspace.id) throw new Error('Key not found')
+    if (!key || key.workspace_id !== ctx.workspace.id) throw new AppError('keyNotFound')
 }
 
 export async function listApiKeysAction(): Promise<ActionResult<{ keys: ApiKeyView[]; mcpUrl: string; entitled: boolean }>> {
@@ -71,7 +72,7 @@ export async function listApiKeysAction(): Promise<ActionResult<{ keys: ApiKeyVi
         // constant would hand out a command pointing at another app, or at nothing.
         return { ok: true, keys, mcpUrl: mcpAccountUrl(await getAppOrigin()), entitled: isWorkspaceApiEntitled(ctx.workspace) }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to load API keys' }
+        return failureOf(err, 'loadApiKeysFailed')
     }
 }
 
@@ -80,16 +81,16 @@ export async function createApiKeyAction(rawName: string): Promise<ActionResult<
     try {
         const ctx = await requireAdminContext(API_KEYS_ADMIN_ONLY)
         if (!isWorkspaceApiEntitled(ctx.workspace)) {
-            return { ok: false, error: 'The Rerun API needs an active subscription. Start your subscription to create a key.' }
+            return failure('apiNeedsSubscription')
         }
 
         const name = rawName.trim()
-        if (!name) return { ok: false, error: 'Give the key a name, so you can tell it apart later.' }
-        if (name.length > MAX_NAME_LENGTH) return { ok: false, error: `Keep the name under ${MAX_NAME_LENGTH} characters.` }
+        if (!name) return failure('keyNameRequired')
+        if (name.length > MAX_NAME_LENGTH) return failure('nameTooLongDot', { max: MAX_NAME_LENGTH })
 
         const { data: activeCount } = await selectCount(ctx.supabase, 'api_keys', { workspace_id: ctx.workspace.id, revoked_at: { isNull: true }, scope: 'account' })
         if ((activeCount ?? 0) >= MAX_ACTIVE_KEYS) {
-            return { ok: false, error: `This workspace already has ${MAX_ACTIVE_KEYS} active keys. Revoke one to create another.` }
+            return failure('tooManyActiveKeys', { max: MAX_ACTIVE_KEYS })
         }
 
         const key = generateApiKey()
@@ -105,7 +106,7 @@ export async function createApiKeyAction(rawName: string): Promise<ActionResult<
 
         return { ok: true, key }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to create the key' }
+        return failureOf(err, 'createKeyFailed')
     }
 }
 
@@ -113,10 +114,10 @@ export async function createApiKeyAction(rawName: string): Promise<ActionResult<
 // member trying several sources should never be told to revoke a real key first.
 export async function createImportKeyAction(sourceId: ImportSourceId, requestedSpaceId: string | null = null): Promise<ActionResult<{ connectorUrl: string; prompt: string; expiresAt: string }>> {
     try {
-        if (!isImportSourceId(sourceId)) return { ok: false, error: 'Unknown source' }
+        if (!isImportSourceId(sourceId)) return failure('unknownSource')
         const ctx = await requireWorkspaceContext()
         if (!isWorkspaceApiEntitled(ctx.workspace)) {
-            return { ok: false, error: 'Importing a coworker needs an active subscription.' }
+            return failure('importNeedsSubscription')
         }
 
         const spaceId = await importDestination(ctx, requestedSpaceId)
@@ -137,7 +138,7 @@ export async function createImportKeyAction(sourceId: ImportSourceId, requestedS
         const connectorUrl = `${mcpAccountUrl(await getAppOrigin())}/${key}`
         return { ok: true, connectorUrl, prompt: buildImportPrompt(sourceId, connectorUrl, spaceId), expiresAt }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to prepare the import' }
+        return failureOf(err, 'prepareImportFailed')
     }
 }
 
@@ -149,7 +150,7 @@ async function importDestination(ctx: WorkspaceContext, requested: string | null
         manageableSpaceIds(actorFromContext(ctx)),
     ])
     const spaces = keepVisible(all ?? [], manageable, space => space.id)
-    if (spaces.length === 0) throw new Error('You manage no Box in this workspace yet. Create one first.')
+    if (spaces.length === 0) throw new AppError('noManagedBox')
     return spaces.find(space => space.id === requested)?.id ?? spaces[0].id
 }
 
@@ -162,6 +163,6 @@ export async function revokeApiKeyAction(id: string): Promise<ActionResult> {
         if (error) return { ok: false, error: error.message }
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to revoke the key' }
+        return failureOf(err, 'revokeKeyFailed')
     }
 }

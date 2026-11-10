@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '../cn'
+import { useKitTranslations } from '../locale'
 import { ChevronLeft, ChevronRight } from '../icons'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -53,13 +54,14 @@ export function HScrollFade({ children, className, fadeClassName = 'from-popover
 }
 
 function Edge({ side, fadeClassName, onClick }: { side: 'left' | 'right'; fadeClassName: string; onClick: () => void }) {
+    const t = useKitTranslations()
     const isLeft = side === 'left'
     return (
         <div className={cn('pointer-events-none absolute inset-y-0 z-10 flex w-12 items-center to-transparent', fadeClassName, isLeft ? 'left-0 justify-start bg-gradient-to-r' : 'right-0 justify-end bg-gradient-to-l')}>
             <button
                 type="button"
                 onClick={onClick}
-                aria-label={isLeft ? 'Scroll left' : 'Scroll right'}
+                aria-label={isLeft ? t('primitives.scrollLeft') : t('primitives.scrollRight')}
                 className="pointer-events-auto flex size-5 items-center justify-center rounded-full bg-background text-muted-foreground shadow-sm ring-1 ring-border transition-colors hover:text-foreground"
             >
                 {isLeft ? <ChevronLeft className="size-3.5" /> : <ChevronRight className="size-3.5" />}

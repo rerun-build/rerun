@@ -1,9 +1,11 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { Card, CardContent, CardHeader, CardTitle } from '@rerun/ui/primitives'
 import { Reorder } from 'motion/react'
 import * as React from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 import { GripVerticalIcon, Trash2 } from '@/lib/icons'
 import { Field } from '@/components/ui/field'
 import { FileDropzone } from '@/components/ui/file-dropzone'
@@ -16,13 +18,14 @@ import { GenerateAltTextButton } from './GenerateAltTextButton'
 type GalleryImage = { url: string; alt: string }
 
 export function TemplateMediaSection() {
+    const t = useTranslations('templates.authoring.media')
     const { control } = useFormContext<TemplateFormValues>()
     const { scope } = useTemplateAuthoring()
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Media</CardTitle>
+                <CardTitle>{t('title')}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
                 <Controller control={control} name="gallery" render={({ field }) => <Gallery value={field.value} onChange={field.onChange} />} />
@@ -32,7 +35,7 @@ export function TemplateMediaSection() {
                         control={control}
                         name="videoUrl"
                         render={({ field }) => (
-                            <Input label="Video URL" optional placeholder="https://youtube.com/watch?v=… or a Loom link" {...field} />
+                            <Input label={t('videoUrl')} optional placeholder={t('videoPlaceholder')} {...field} />
                         )}
                     />
                     {scope === 'admin' && (
@@ -41,10 +44,10 @@ export function TemplateMediaSection() {
                             name="ogImageUrl"
                             render={({ field }) => (
                                 <Input
-                                    label="OG image override"
+                                    label={t('ogImage')}
                                     optional
-                                    placeholder="Leave empty to generate one"
-                                    helperText="Only set this for a bespoke social card."
+                                    placeholder={t('ogImagePlaceholder')}
+                                    helperText={t('ogImageHelp')}
                                     {...field}
                                 />
                             )}
@@ -59,6 +62,8 @@ export function TemplateMediaSection() {
 // The gallery is ordered and the first image is the cover, so reordering is a real
 // editorial action rather than a nicety.
 function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: GalleryImage[]) => void }) {
+    const t = useTranslations('templates.authoring.media')
+    const errorText = useErrorText()
     const { actions } = useTemplateAuthoring()
     const [uploading, setUploading] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
@@ -73,7 +78,7 @@ function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: 
                 formData.append('file', file)
                 const result = await actions.uploadImage(formData, 'gallery')
                 if (!result.ok) {
-                    setError(result.error)
+                    setError(errorText(result))
                     break
                 }
                 uploaded.push({ url: result.url, alt: '' })
@@ -86,8 +91,8 @@ function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: 
 
     return (
         <Field
-            label="Gallery"
-            helperText={error ?? 'Optional: cards draw the coworker board instead. These illustrate the detail page, the first one leading and a generated one landing there. Save to persist. Alt text is recommended: these end up on an indexed page.'}
+            label={t('gallery')}
+            helperText={error ?? t('galleryHelp')}
             error={error ?? undefined}
         >
             <div className="flex flex-col gap-3">
@@ -104,7 +109,7 @@ function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: 
                                 <img src={image.url} alt="" className="h-10 w-16 shrink-0 rounded object-cover" />
                                 <div className="flex-1">
                                     <Input
-                                        placeholder={index === 0 ? 'Alt text (cover)' : 'Alt text'}
+                                        placeholder={index === 0 ? t('altCover') : t('alt')}
                                         value={image.alt}
                                         onChange={e => onChange(value.map((img, i) => (i === index ? { ...img, alt: e.target.value } : img)))}
                                     />
@@ -114,12 +119,12 @@ function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: 
                                     isCover={index === 0}
                                     onGenerated={alt => onChange(value.map((img, i) => (i === index ? { ...img, alt } : img)))}
                                 />
-                                {index === 0 && <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">Cover</span>}
+                                {index === 0 && <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">{t('cover')}</span>}
                                 <button
                                     type="button"
                                     onClick={() => onChange(value.filter((_, i) => i !== index))}
                                     className="shrink-0 text-muted-foreground transition-colors hover:text-destructive"
-                                    title="Remove"
+                                    title={t('remove')}
                                 >
                                     <Trash2 className="size-4" />
                                 </button>
@@ -128,13 +133,13 @@ function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: 
                     </Reorder.Group>
                 )}
 
-                <FileDropzone onFiles={handleFiles} accept="image/*" multiple disabled={uploading} overlayLabel="Drop images">
+                <FileDropzone onFiles={handleFiles} accept="image/*" multiple disabled={uploading} overlayLabel={t('dropOverlay')}>
                     {({ inputId }) => (
                         <label
                             htmlFor={inputId}
                             className="flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-foreground/20 py-6 text-sm text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
                         >
-                            {uploading ? 'Uploading…' : 'Drop images here or click to choose'}
+                            {uploading ? t('uploading') : t('drop')}
                         </label>
                     )}
                 </FileDropzone>

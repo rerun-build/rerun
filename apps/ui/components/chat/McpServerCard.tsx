@@ -1,6 +1,7 @@
 'use client'
 
 import { Badge, PANEL_CARD } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
@@ -22,6 +23,8 @@ type McpServerCardProps = McpRegisterCard & { agentId?: string; signInPending?: 
 // The tool output is frozen at the time of the call, so the server is looked up again: an old card
 // in the history follows the sign-in made since, and shows no status once the server is gone.
 export function McpServerCard({ agentId, name, url, outcome, failure, signInPending }: McpServerCardProps) {
+    const t = useTranslations('chat')
+    const tServices = useTranslations('services')
     const connectors = useConnectorServices(outcome === 'saved' ? agentId : undefined)
     const { statuses, loading } = useMcpServerStatuses(outcome === 'saved' ? agentId : undefined)
     const [signIn, setSignIn] = useState<{ popup: Window | null } | null>(null)
@@ -47,11 +50,11 @@ export function McpServerCard({ agentId, name, url, outcome, failure, signInPend
             <div className={cn(PANEL_CARD, 'flex items-center gap-3 px-3 py-2.5')}>
                 <Icon icon={PlugIcon} size="sm" />
                 <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-foreground">Couldn&apos;t connect {displayName}</p>
+                    <p className="truncate text-sm text-foreground">{t('mcpServer.failed', { name: displayName })}</p>
                     {failure && <p className="line-clamp-2 text-xs text-muted-foreground">{failure}</p>}
                 </div>
                 <Badge size="xs" tone="red" glow={false}>
-                    Not added
+                    {t('mcpServer.notAdded')}
                 </Badge>
             </div>
         )
@@ -64,14 +67,14 @@ export function McpServerCard({ agentId, name, url, outcome, failure, signInPend
             <div className="flex items-center gap-3">
                 <Icon {...serviceIconProps(server?.icon ?? null, 'custom')} size="sm" />
                 <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-foreground">{displayName} added</p>
-                    <p className="truncate text-xs text-muted-foreground">{host ? `Custom MCP server · ${host}` : 'Custom MCP server'}</p>
+                    <p className="truncate text-sm text-foreground">{t('mcpServer.added', { name: displayName })}</p>
+                    <p className="truncate text-xs text-muted-foreground">{host ? t('mcpServer.customWithHost', { host }) : t('mcpServer.custom')}</p>
                 </div>
                 <CustomMcpStatusBadge status={status} loading={loading || !connectors.loaded} />
                 {canSignIn && !signIn && (
-                    <Button size="sm" variant="outline" onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName) })}>
+                    <Button size="sm" variant="outline" onClick={() => setSignIn({ popup: openPendingSignInPopup(displayName, tServices('signInPopup.connecting', { name: displayName })) })}>
                         <LogInIcon />
-                        Connect
+                        {t('actions.connect')}
                     </Button>
                 )}
             </div>

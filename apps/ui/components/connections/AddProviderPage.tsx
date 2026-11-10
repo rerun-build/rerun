@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { NoPlanNotice } from '@/components/connections/NoPlanNotice'
 import { nameStep } from '@/components/connections/plan-connect/NameStep'
 import { PlanConnect } from '@/components/connections/plan-connect/PlanConnect'
@@ -8,14 +9,13 @@ import { CredentialGuide } from '@/components/services/CredentialGuide'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
-import { PROVIDER_GUIDE, PROVIDER_PITCH, connectMethod, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
+import { connectMethod, providerGuide, providerPitch, suggestName, type AddableProvider, type GuidedProvider } from '@/lib/engine/ai-sources'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
 import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 type CreateConnectionResult = { success: true; connection: BoxConnection } | { success: false; error?: string; reason?: 'no_plan' }
-
-const CONNECT_FAILED = 'Something went wrong. Please try again.'
 
 type AddProviderPageProps = {
     provider: AddableProvider
@@ -32,6 +32,9 @@ type AddProviderPageProps = {
 // difference between "Claude" twice and "Claude Clement" / "Claude Theo". A plan is named last, once
 // signed in: the connection is created under the suggested name and renamed on Done.
 export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, takenNames, willBecomeBoxDefault }: AddProviderPageProps) {
+    const t = useTranslations('connections')
+    const tCommon = useTranslations('common')
+    const errorText = useErrorText()
     const [suggestedName] = useState(() => suggestName(provider, takenNames))
     const [name, setName] = useState(suggestedName)
     const [apiKey, setApiKey] = useState('')
@@ -46,18 +49,18 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
 
     const create = async (keys: Record<string, string>): Promise<CreateConnectionResult> => {
         const trimmed = name.trim()
-        if (!trimmed) return { success: false, error: 'Give this connection a name' }
+        if (!trimmed) return { success: false, error: t('errors.nameRequired') }
         setBusy(true)
         try {
             const result = await onCreate({ name: trimmed, provider, models: DEFAULT_CONNECTION_MODELS[provider], extraModels: [], keys })
             setNeedsPlan(!result.success && result.reason === 'no_plan')
-            setError(result.success ? null : (result.error ?? 'Failed to create the connection'))
+            setError(result.success ? null : errorText(result, t('errors.createFailed')))
             if (result.success && isPlan) setCreated(result.connection)
             else if (result.success) onOpen(result.connection.id)
             return result
         } catch {
-            setError(CONNECT_FAILED)
-            return { success: false, error: CONNECT_FAILED }
+            setError(tCommon('somethingWentWrong'))
+            return { success: false, error: tCommon('somethingWentWrong') }
         } finally {
             setBusy(false)
         }
@@ -68,9 +71,9 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
         const trimmed = name.trim()
         if (trimmed !== created.name) {
             setRenaming(true)
-            const result = await onRename(created.id, trimmed).catch(() => ({ success: false, error: CONNECT_FAILED }))
+            const result = await onRename(created.id, trimmed).catch(() => ({ success: false, error: tCommon('somethingWentWrong') }))
             setRenaming(false)
-            if (!result.success) return setRenameError(result.error ?? 'Failed to rename the connection')
+            if (!result.success) return setRenameError(errorText(result, t('errors.renameFailed')))
         }
         onOpen(created.id)
     }
@@ -87,13 +90,13 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
                     <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={create} surface="add_provider" lastStep={lastStep} />
                 ) : (
                     <>
-                        <Input label="Name" value={name} onChange={e => setName(e.target.value)} helperText="Shown in every coworker's model picker" className="h-8" />
-                        <Input hideRequired label="API key" type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder="Paste your key" className="h-8 font-mono text-xs" />
-                        <CredentialGuide label={PROVIDER_PITCH[provider].title} title={PROVIDER_GUIDE[provider as GuidedProvider].title} guide={PROVIDER_GUIDE[provider as GuidedProvider].steps} />
+                        <Input label={t('name.label')} value={name} onChange={e => setName(e.target.value)} helperText={t('name.helper')} className="h-8" />
+                        <Input hideRequired label={t('key.label')} type="password" value={apiKey} onChange={e => setApiKey(e.target.value)} placeholder={t('key.placeholder')} className="h-8 font-mono text-xs" />
+                        <CredentialGuide label={providerPitch(provider, t).title} title={providerGuide(provider as GuidedProvider, t).title} guide={providerGuide(provider as GuidedProvider, t).steps} />
                     </>
                 )}
 
-                {willBecomeBoxDefault && <p className="text-[11px] text-muted-foreground">This becomes the workspace default: every coworker with no model of its own will run on it.</p>}
+                {willBecomeBoxDefault && <p className="text-[11px] text-muted-foreground">{t('becomesDefault')}</p>}
 
                 {/* A plan's own widget already shows why its token was refused. */}
                 {needsPlan && <NoPlanNotice />}
@@ -102,7 +105,7 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
                     <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
                         {error && !needsPlan && <p className="min-w-0 flex-1 text-[11px] text-destructive">{error}</p>}
                         <Button size="sm" disabled={busy || !name.trim() || !apiKey.trim()} onClick={() => void create({ [CONNECTION_TOKEN_KEY[provider]]: apiKey.trim() })}>
-                            {busy ? 'Connecting…' : 'Add key'}
+                            {busy ? t('connecting') : t('addProvider.addKey')}
                         </Button>
                     </div>
                 )}

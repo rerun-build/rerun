@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ChevronDownIcon, WorkflowIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -32,13 +33,14 @@ export function CredentialHint({ help }: { help: string }) {
 }
 
 export function CredentialGuide({ label, title, guide }: { label: string; title?: string; guide: string }) {
+    const t = useTranslations('services.credentialGuide')
     return (
         <Collapsible className="mt-2 rounded-md border border-border bg-background/60">
             <CollapsibleTrigger className="group relative flex w-full items-center justify-between overflow-hidden rounded-md px-3 py-2 data-[state=open]:rounded-b-none text-xs font-medium text-foreground/80 hover:text-foreground">
                 <Stripes fade="bottom" band={6} period={13} />
                 <span className="relative inline-flex items-center gap-1.5">
                     <WorkflowIcon className="size-3.5" />
-                    {title ?? `How to get your ${inSentence(label)}`}
+                    {title ?? t('title', { label: inSentence(label) })}
                 </span>
                 <ChevronDownIcon className="relative size-3.5 transition-transform group-data-[state=open]:rotate-180" />
             </CollapsibleTrigger>

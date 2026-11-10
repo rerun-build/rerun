@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react'
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -37,6 +38,7 @@ function openPdf(): PdfLoad {
 }
 
 function PdfCanvas({ doc, pageNumber, aspect, eager = false, fit = false, className }: { doc: PDFDocumentProxy; pageNumber: number; aspect: number; eager?: boolean; fit?: boolean; className?: string }) {
+    const t = useTranslations('published.viewer')
     const frame = useRef<HTMLDivElement>(null)
     const canvas = useRef<HTMLCanvasElement>(null)
     const [visible, setVisible] = useState(eager)
@@ -77,7 +79,7 @@ function PdfCanvas({ doc, pageNumber, aspect, eager = false, fit = false, classN
     return (
         <div ref={frame} data-page={pageNumber} className={cn('relative overflow-hidden bg-white', !fit && 'w-full', className)} style={{ aspectRatio: pageAspect, ...(fit ? slideFit(pageAspect) : {}) }}>
             {!rendered && <Skeleton className="absolute inset-0 rounded-none bg-black/5" />}
-            <canvas ref={canvas} className="block size-full" aria-label={`Page ${pageNumber}`} />
+            <canvas ref={canvas} className="block size-full" aria-label={t('page', { page: pageNumber })} />
         </div>
     )
 }
@@ -120,6 +122,7 @@ function PdfSkeleton() {
 }
 
 export function PdfViewer({ slug, name, size }: { slug: string; name: string; size: number }) {
+    const t = useTranslations('published.viewer')
     const [pdf, setPdf] = useState<LoadedPdf | null>(null)
     const [failed, setFailed] = useState(false)
     const [page, setPage] = useState(1)
@@ -138,7 +141,7 @@ export function PdfViewer({ slug, name, size }: { slug: string; name: string; si
 
     if (pdf?.landscape) {
         return (
-            <ViewerPage slug={slug} bar={<ViewerTopBar icon={PresentationIcon} name={name} meta={`${pdf.doc.numPages} slide${pdf.doc.numPages === 1 ? '' : 's'}`} />} className="overflow-hidden">
+            <ViewerPage slug={slug} bar={<ViewerTopBar icon={PresentationIcon} name={name} meta={t('slides', { count: pdf.doc.numPages })} />} className="overflow-hidden">
                 <SlideStage
                     slides={Array.from({ length: pdf.doc.numPages }, (_, i) => (
                         <PdfCanvas key={i} doc={pdf.doc} pageNumber={i + 1} aspect={pdf.aspect} eager fit className="rounded-lg shadow-2xl" />

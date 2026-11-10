@@ -1,0 +1,176 @@
+{
+    "sheet": {
+        "back": "Back",
+        "close": "Close"
+    },
+    "badge": {
+        "creditsUsedUp": "Credits used up",
+        "signInAgain": "Sign in again",
+        "keyRejected": "Key rejected",
+        "keyMissing": "Key missing",
+        "ready": "Ready"
+    },
+    "usage": {
+        "agentsFallBack": "{agents} will fall back to the workspace default model.",
+        "automationsFallBack": "{count, plural, one {1 automation} other {# automations}} will fall back to the workspace default model.",
+        "agentsAndAutomationsFallBack": "{agents} and {count, plural, one {1 automation} other {# automations}} will fall back to the workspace default model.",
+        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to Rerun.",
+        "nothingRuns": "The credential is removed. Nothing runs on it."
+    },
+    "list": {
+        "title": "AI providers",
+        "notAnswering": "The machine of this workspace is not answering. Try again in a moment.",
+        "defaultModel": "Default model",
+        "included": "Included",
+        "subscriptions": "Your subscriptions",
+        "subscriptionsPitch": "Already use Claude Code or Codex? Your coworkers can run on your plan.",
+        "addSubscription": "Add subscription",
+        "apiKeys": "Your API keys",
+        "apiKeysPitch": "Pay your provider directly, per token.",
+        "addApiKey": "Add API key",
+        "via": "Via {name}",
+        "creditsUsedUpPickModel": "Rerun credits are used up until they are back {backOn}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+        "creditsUsedUpAddSource": "Rerun credits are used up until they are back {backOn}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+        "defaultBroken": "Coworkers with no model of their own are stopped. Fix {name} or pick another model.",
+        "signInAgain": "Sign in again",
+        "addKey": "Add key"
+    },
+    "add": {
+        "addSubscription": "Add subscription",
+        "addApiKey": "Add API key",
+        "addProvider": "Add a provider",
+        "subscriptions": "Subscriptions",
+        "apiKeys": "API keys"
+    },
+    "defaultModel": {
+        "title": "Default model",
+        "changeFailed": "Could not change the default model"
+    },
+    "detail": {
+        "name": "Name",
+        "removeButton": "Remove {name}",
+        "saveFailed": "Failed to save",
+        "renameTitle": "Rename",
+        "renameMessage": "Shown in every coworker's model picker.",
+        "keySaveFailed": "Failed to save the credential",
+        "removeTitle": "Remove {name}?",
+        "removeConfirm": "Remove",
+        "deleteFailed": "Failed to delete the connection"
+    },
+    "credit": {
+        "title": "This month's credits",
+        "percent": "{percent}%",
+        "usedUp": "Coworkers running on Rerun are paused until the credits are back {backOn}. Pick another default model to keep them going.",
+        "included": "Comes with your Rerun plan. No key, nothing to set up."
+    },
+    "reconnect": {
+        "signInRejected": "This sign-in was rejected. Coworkers using it are stopped until you sign in again.",
+        "signInExpired": "This sign-in expired. Coworkers using it are stopped until you sign in again.",
+        "signInAgain": "Sign in again",
+        "keyRejected": "This key was rejected. Coworkers using it are stopped until you paste a new one.",
+        "keyMissing": "No key on file. Coworkers using it are stopped until you paste one.",
+        "keyLabel": "API key",
+        "keyPlaceholder": "Paste your key",
+        "save": "Save"
+    },
+    "planUsage": {
+        "title": "Plan usage",
+        "empty": "Usage shows up here after the next run on this plan.",
+        "percent": "{percent}%"
+    },
+    "models": {
+        "title": "Your coworkers can use",
+        "enabledCount": "{enabled} of {total}",
+        "lockDefault": "Default model",
+        "lockCustom": "Custom model. Remove it below.",
+        "lockLast": "Coworkers need at least one model from this source."
+    },
+    "baseUrl": {
+        "label": "Custom base URL",
+        "help": "Send requests to your own OpenRouter-compatible router",
+        "save": "Save"
+    },
+    "customModels": {
+        "title": "Custom models",
+        "remove": "Remove",
+        "addLabel": "Add a model",
+        "addHelp": "Any OpenRouter model id, e.g. x-ai/grok-4.",
+        "add": "Add"
+    },
+    "apiKey": {
+        "name": "Name",
+        "keyLabel": "API key",
+        "keyPlaceholder": "Paste your key",
+        "connect": "Connect"
+    },
+    "modelSheet": {
+        "close": "Close",
+        "title": "Select model",
+        "notAnswering": "The machine of this workspace is not answering. Try again in a moment.",
+        "workspaceDefault": "Workspace default",
+        "addProvider": "Add a provider"
+    },
+    "ending": {
+        "coworkersStart": "Your coworkers start again",
+        "nameIt": "Name it",
+        "connectionName": "Connection name",
+        "nameHelp": "Shown in every coworker's model picker.",
+        "saving": "Saving…",
+        "done": "Done"
+    },
+    "claude": {
+        "claudeTokenIsApiKey": "This is an Anthropic API key. Add it as an Anthropic (API) connection instead.",
+        "claudeTokenIsCode": "That's the code from Claude. Click Get token first, then paste the code here.",
+        "approve": "Approve Rerun on Claude",
+        "open": "Open Claude",
+        "openAgain": "Open Claude again",
+        "pasteStep": "Paste the code",
+        "codeLabel": "Code from Claude",
+        "checking": "Checking the code…",
+        "paste": "Paste",
+        "connect": "Connect"
+    },
+    "chatgpt": {
+        "allowStep": "Allow sign-in by code in ChatGPT",
+        "openSettings": "Open ChatGPT settings",
+        "alreadyOn": "It's already on",
+        "adminSwitches": "Your ChatGPT admin switches it on for the whole workspace.",
+        "onPlusOrPro": "I’m on Plus or Pro",
+        "onBusiness": "On ChatGPT Business or Enterprise?",
+        "enterStep": "Enter the code on OpenAI",
+        "copied": "Copied",
+        "copyAdminMessage": "Copy a message for them",
+        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Rerun.",
+        "copyCode": "Copy code",
+        "openOpenAI": "Open OpenAI",
+        "enterHint": "Enter it on OpenAI's page and approve. This screen picks it up on its own.",
+        "gettingCode": "Getting code…",
+        "getNewCode": "Get a new code",
+        "getCode": "Get code",
+        "stuck": {
+            "expiredAdmin": "The code expired. Your admin has probably not allowed sign-in by code yet.",
+            "errorAdmin": "Error on OpenAI’s page? Your admin has probably not allowed sign-in by code yet.",
+            "expiredSetting": "The code expired. Sign-in by code is probably still off: turn it on in <link>Settings → Security</link>, then get a new code.",
+            "errorSetting": "Error on OpenAI’s page? Sign-in by code is probably still off: turn it on in <link>Settings → Security</link>, then enter the code again."
+        }
+    },
+    "connect": {
+        "renameFailed": "Failed to rename the connection",
+        "startFailed": "Could not start the connection",
+        "notSignedIn": "Not signed in",
+        "createFailed": "Failed to create the connection"
+    },
+    "oauth": {
+        "unfinished": "The sign-in did not finish. Try again.",
+        "authorizationFailed": "Authorization failed",
+        "startFailed": "Could not start the sign-in"
+    },
+    "_context": {
+        "list.via": "Under the default model: the connection it runs through, for example \"Via Rerun\".",
+        "list.creditsUsedUpPickModel": "{backOn} comes from the server in English, for example \"on Mar 1\".",
+        "chatgpt.adminMessage": "A message the user copies and sends to their ChatGPT admin. Keep the quoted setting name in English: it is ChatGPT's label.",
+        "chatgpt.stuck.expiredSetting": "<link>Settings → Security</link> is ChatGPT's own menu path: keep it in English.",
+        "chatgpt.stuck.errorSetting": "<link>Settings → Security</link> is ChatGPT's own menu path: keep it in English.",
+        "models.enabledCount": "How many of the source's models are switched on, out of all of them."
+    }
+}

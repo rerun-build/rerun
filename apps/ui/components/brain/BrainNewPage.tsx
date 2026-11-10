@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { saveBrainPageAction } from '@/app/api/_actions/brain.actions'
 import { BrainEditor, type BrainEditorHandle } from '@/components/brain/editor/BrainEditor'
 import { PageColumn, PageProperty, PageTitle, PageTypeIcon, PageTypeSelect } from '@/components/brain/BrainPageParts'
@@ -9,6 +10,7 @@ import { brainSlugify } from '@/lib/brain/labels'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import type { BrainPageDetail } from '@/lib/engine/client'
 import type { BrainPageSummary, BrainPageType } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
 type BrainNewPageProps = {
@@ -24,6 +26,8 @@ type BrainNewPageProps = {
 // page is created under the slug its title gives, and that slug stays: renaming later only changes
 // the title, so the [[links]] other pages hold keep working.
 export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onCreated }: BrainNewPageProps) {
+    const t = useTranslations('brain')
+    const errorText = useErrorText()
     const [title, setTitle] = useState('')
     const [type, setType] = useState<BrainPageType>('note')
     const [error, setError] = useState<string | null>(null)
@@ -39,11 +43,11 @@ export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onC
         if (!trimmed || started.current) return
         const slug = brainSlugify(trimmed)
         if (!slug) {
-            setError('Use at least one letter or digit in the title.')
+            setError(t('newPage.slugInvalid'))
             return
         }
         if (titles.has(slug)) {
-            setError(`A page "${titles.get(slug)}" already exists. Pick another title.`)
+            setError(t('newPage.exists', { title: titles.get(slug) ?? slug }))
             return
         }
         started.current = true
@@ -52,7 +56,7 @@ export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onC
         setCreating(false)
         if (!result.ok) {
             started.current = false
-            setError(result.error)
+            setError(errorText(result))
             return
         }
         onCreated(result.detail)
@@ -60,7 +64,7 @@ export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onC
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <BrainTopBar crumbs={[{ label: 'Pages' }, { label: title.trim() || 'New page', icon: BRAIN_PAGE_ICONS[type] }]} status={creating ? 'Saving…' : null} />
+            <BrainTopBar crumbs={[{ label: t('crumbs.pages') }, { label: title.trim() || t('crumbs.newPage'), icon: BRAIN_PAGE_ICONS[type] }]} status={creating ? t('page.saving') : null} />
             <div className="min-h-0 flex-1 overflow-y-auto">
                 <PageColumn>
                     <PageTypeIcon type={type} />
@@ -77,11 +81,11 @@ export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onC
                     {error ? (
                         <p className="mt-1 text-xs text-destructive">{error}</p>
                     ) : (
-                        title.trim() && <p className="mt-1 text-xs text-muted-foreground">Coworkers link to it as [[{brainSlugify(title)}]]</p>
+                        title.trim() && <p className="mt-1 text-xs text-muted-foreground">{t('newPage.linkHint', { slug: brainSlugify(title) })}</p>
                     )}
 
                     <div className="mt-4 space-y-0.5 border-b border-border pb-4">
-                        <PageProperty label="Type">
+                        <PageProperty label={t('page.type')}>
                             <PageTypeSelect value={type} onChange={setType} />
                         </PageProperty>
                     </div>
@@ -93,7 +97,7 @@ export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onC
                         titles={titles}
                         files={files}
                         handleRef={editorHandle}
-                        placeholder="Give the page a title, then type / for commands"
+                        placeholder={t('newPage.placeholder')}
                         onOpenPage={onOpenPage}
                         onOpenFile={onOpenFile}
                         onChange={markdown => (content.current = markdown)}

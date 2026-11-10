@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { cn } from '../cn'
+import { OptionalMark } from './optional-mark'
 
 export interface FieldProps {
     label?: string
@@ -54,7 +55,7 @@ function Field({ label, labelTrailing, optional, hideRequired, helperText, error
                     ) : (
                         <Title htmlFor={htmlFor}>{label}</Title>
                     )}
-                    {showOptional && <span className="opacity-70">Optional</span>}
+                    {showOptional && <OptionalMark />}
                 </div>
             )}
 

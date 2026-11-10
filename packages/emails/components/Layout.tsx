@@ -12,6 +12,7 @@ import {
 import { Footer } from "./Footer";
 import { Hero, type HeroProps } from "./Hero";
 import { LOGO_SIZE, LOGO_URL } from "../assets";
+import type { EmailLocale } from "../i18n";
 import { theme } from "../theme";
 
 export interface LayoutProps {
@@ -21,6 +22,7 @@ export interface LayoutProps {
   appUrl?: string;
   unsubscribeUrl?: string;
   unsubscribeLabel?: string;
+  locale?: EmailLocale;
 }
 
 export function Layout({
@@ -29,9 +31,10 @@ export function Layout({
   hero,
   unsubscribeUrl,
   unsubscribeLabel,
+  locale = "en",
 }: LayoutProps) {
   return (
-    <Html lang="en">
+    <Html lang={locale}>
       <Head>
         <meta name="color-scheme" content="dark" />
         <meta name="supported-color-schemes" content="dark" />
@@ -71,7 +74,7 @@ export function Layout({
             {children}
           </Section>
         </Container>
-        <Footer unsubscribeUrl={unsubscribeUrl} unsubscribeLabel={unsubscribeLabel} />
+        <Footer unsubscribeUrl={unsubscribeUrl} unsubscribeLabel={unsubscribeLabel} locale={locale} />
       </Body>
     </Html>
   );

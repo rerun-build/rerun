@@ -4,6 +4,7 @@ import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { CopyIcon, ExternalLinkIcon, GlobeIcon, Share2Icon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 type FilePublishControlProps = {
@@ -18,11 +19,12 @@ type FilePublishControlProps = {
 }
 
 export function FilePublishControl({ name, publicUrl, onPublish, onUnpublish, onShareSettings, openUrl }: FilePublishControlProps) {
+    const t = useTranslations('files.publish')
     const [confirmingUnshare, setConfirmingUnshare] = useState(false)
     const withAccess = !!onShareSettings
 
     if (!publicUrl) {
-        const label = withAccess ? 'Publish' : 'Publish publicly'
+        const label = withAccess ? t('publish') : t('publishPublicly')
         return (
             <Button size="icon-sm" variant="ghost" onClick={onPublish} title={label} aria-label={label}>
                 <GlobeIcon className="size-4" />
@@ -34,27 +36,27 @@ export function FilePublishControl({ name, publicUrl, onPublish, onUnpublish, on
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button size="icon-sm" variant="ghost" title={withAccess ? 'Published link' : 'Public link'} aria-label={withAccess ? 'Published link' : 'Public link'}>
+                    <Button size="icon-sm" variant="ghost" title={withAccess ? t('publishedLink') : t('publicLink')} aria-label={withAccess ? t('publishedLink') : t('publicLink')}>
                         <GlobeIcon className="size-4 text-emerald-400" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-auto">
                     <DropdownMenuItem className="whitespace-nowrap" onSelect={() => window.open(openUrl ?? publicUrl, '_blank', 'noopener,noreferrer')}>
                         <ExternalLinkIcon />
-                        {withAccess ? 'Open' : 'Open public link'}
+                        {withAccess ? t('open') : t('openPublicLink')}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="whitespace-nowrap" onSelect={() => navigator.clipboard.writeText(publicUrl)}>
                         <CopyIcon />
-                        {withAccess ? 'Copy link' : 'Copy public link'}
+                        {withAccess ? t('copyLink') : t('copyPublicLink')}
                     </DropdownMenuItem>
                     {onShareSettings && (
                         <DropdownMenuItem className="whitespace-nowrap" onSelect={onShareSettings}>
                             <Share2Icon />
-                            Share settings
+                            {t('shareSettings')}
                         </DropdownMenuItem>
                     )}
                     <DropdownMenuItem variant="destructive" inset onSelect={() => setConfirmingUnshare(true)}>
-                        {withAccess ? 'Unpublish' : 'Unshare'}
+                        {withAccess ? t('unpublish') : t('unshare')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -62,9 +64,9 @@ export function FilePublishControl({ name, publicUrl, onPublish, onUnpublish, on
                 <ConfirmDialog
                     open
                     onOpenChange={open => !open && setConfirmingUnshare(false)}
-                    title={withAccess ? `Unpublish ${name}?` : `Unshare ${name}?`}
-                    description={withAccess ? 'The link stops working right away, for everyone who has it.' : 'The public link stops working right away. Anyone holding it gets a 404.'}
-                    confirmLabel={withAccess ? 'Unpublish' : 'Unshare'}
+                    title={withAccess ? t('unpublishTitle', { name }) : t('unshareTitle', { name })}
+                    description={withAccess ? t('unpublishDescription') : t('unshareDescription')}
+                    confirmLabel={withAccess ? t('unpublish') : t('unshare')}
                     onConfirm={() => {
                         onUnpublish?.()
                         setConfirmingUnshare(false)

@@ -11,6 +11,7 @@ import { EyeOffIcon, PlusIcon, StarIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { RERUN_CONNECTION_ID } from '@rerun/contracts'
 import { BorderBeam } from '@rerun/ui'
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -55,6 +56,7 @@ function ModelChip({
     unavailable?: string
     onMove: () => void
 }) {
+    const t = useTranslations('connections.models')
     const { setNodeRef, listeners, attributes, isDragging } = useDraggable({ id: model.id, disabled: !!lockReason })
     const MoveIcon = bucket === 'available' ? EyeOffIcon : PlusIcon
 
@@ -65,12 +67,12 @@ function ModelChip({
                 muted={bucket === 'hidden' || !!unavailable}
                 corner={
                     isDefault ? (
-                        <StarIcon aria-label="Default model" className="size-3.5 self-start text-yellow-400 [&_polygon]:fill-current" />
+                        <StarIcon aria-label={t('defaultModel')} className="size-3.5 self-start text-yellow-400 [&_polygon]:fill-current" />
                     ) : (
                         !lockReason && (
                             <button
                                 type="button"
-                                aria-label={bucket === 'available' ? `Turn off ${model.label}` : `Turn on ${model.label}`}
+                                aria-label={bucket === 'available' ? t('turnOff', { model: model.label }) : t('turnOn', { model: model.label })}
                                 onClick={onMove}
                                 onKeyDown={e => e.stopPropagation()}
                                 className="-mr-1 flex size-5 items-center justify-center self-start rounded-sm text-muted-foreground opacity-0 transition-opacity duration-150 group-hover/chip:opacity-100 hover:text-foreground focus-visible:opacity-100"
@@ -118,6 +120,8 @@ type ModelBucketsProps = {
 // Which of a connection's models agents may pick: dragged between two zones, or moved with the
 // button each chip shows on hover.
 export function ModelBuckets({ connection, defaultModel, onModelsChange }: ModelBucketsProps) {
+    const t = useTranslations('connections.models')
+    const tConnections = useTranslations('connections')
     const [dragging, setDragging] = useState<CatalogModel | null>(null)
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }), useSensor(KeyboardSensor))
     const offered = offeredModels(connection)
@@ -128,7 +132,7 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
         // A custom endpoint's lone model is still the one thing saying what the server answered.
         if (available.length === 0 || (available.length === 1 && connection.provider !== 'custom')) return null
         return (
-            <DetailBlock title="Models">
+            <DetailBlock title={t('title')}>
                 <div className={MODEL_GRID}>
                     {available.map(model => (
                         <ChipFace key={model.id} model={model} />
@@ -139,9 +143,9 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
     }
 
     const lockReason = (model: CatalogModel) => {
-        if (model.id === defaultModel) return 'This is the default model. Pick another default first.'
-        if (connection.extraModels.includes(model.id)) return 'Custom model. Remove it below.'
-        if (available.length === 1) return 'Coworkers need at least one model from this source.'
+        if (model.id === defaultModel) return t('lockDefault')
+        if (connection.extraModels.includes(model.id)) return t('lockCustom')
+        if (available.length === 1) return t('lockLast')
         return undefined
     }
 
@@ -162,13 +166,13 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
             <div className="space-y-4">
                 <ModelZone
                     bucket="available"
-                    title="Your coworkers can use"
+                    title={t('available')}
                     aside={
                         <span className="text-[11px] text-muted-foreground">
-                            {available.length} of {offered.length}
+                            {t('count', { on: available.length, total: offered.length })}
                         </span>
                     }
-                    empty="Drag a model here so coworkers can use it."
+                    empty={t('availableEmpty')}
                     count={available.length}
                 >
                     {available.map(model => (
@@ -178,14 +182,14 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
                             bucket="available"
                             isDefault={model.id === defaultModel}
                             lockReason={lockReason(model)}
-                            unavailable={cliUnavailableReason(connection, model.id)}
+                            unavailable={cliUnavailableReason(connection, model.id, tConnections)}
                             onMove={() => move(model.id, 'hidden')}
                         />
                     ))}
                 </ModelZone>
-                <ModelZone bucket="hidden" title="Turned off" empty="Drag a model here to keep coworkers off it." count={hidden.length}>
+                <ModelZone bucket="hidden" title={t('hidden')} empty={t('hiddenEmpty')} count={hidden.length}>
                     {hidden.map(model => (
-                        <ModelChip key={model.id} model={model} bucket="hidden" isDefault={false} unavailable={cliUnavailableReason(connection, model.id)} onMove={() => move(model.id, 'available')} />
+                        <ModelChip key={model.id} model={model} bucket="hidden" isDefault={false} unavailable={cliUnavailableReason(connection, model.id, tConnections)} onMove={() => move(model.id, 'available')} />
                     ))}
                 </ModelZone>
             </div>

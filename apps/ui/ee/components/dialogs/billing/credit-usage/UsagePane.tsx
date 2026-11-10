@@ -1,15 +1,16 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
-import { dayLabel, runsOutOn, sourceKey, sourceLabel, type CreditBalance, type CreditUsage } from '@/ee/lib/billing/credit-usage'
+import { dayLabel, runsOutOn, sourceKey, type CreditBalance, type CreditUsage } from '@/ee/lib/billing/credit-usage'
 import { shortDate } from '@/ee/lib/billing/dates'
 import { formatCredits } from '@/ee/lib/billing/plans'
 import { cn } from '@/lib/utils'
 
 import { RightTitle } from '../parts'
-import { CoworkerAvatar, KIND_FILL, SourceChip, Swatch } from './parts'
+import { CoworkerAvatar, KIND_FILL, SourceChip, Swatch, useSourceLabel } from './parts'
 import { UsageChart, type ChartMode } from './UsageChart'
 import type { CreditUsageState } from './useCreditUsage'
 
@@ -29,13 +30,14 @@ function Segmented<T extends string>({ value, options, onChange }: { value: T; o
     )
 }
 
-const callsLabel = (calls: number) => `${calls.toLocaleString('en-US')} ${calls === 1 ? 'call' : 'calls'}`
-
 function BySource({ usage }: { usage: CreditUsage }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
+    const sourceLabel = useSourceLabel()
     const max = Math.max(...usage.bySource.map(total => total.micros), 1)
     const groups = [
-        { kind: 'ai' as const, title: 'AI models', rows: usage.bySource.filter(total => total.source.kind === 'ai') },
-        { kind: 'data' as const, title: 'Paid data', rows: usage.bySource.filter(total => total.source.kind === 'data') },
+        { kind: 'ai' as const, title: t('usage.kind.ai'), rows: usage.bySource.filter(total => total.source.kind === 'ai') },
+        { kind: 'data' as const, title: t('usage.kind.data'), rows: usage.bySource.filter(total => total.source.kind === 'data') },
     ].filter(group => group.rows.length > 0)
 
     return (
@@ -47,7 +49,7 @@ function BySource({ usage }: { usage: CreditUsage }) {
                             <Swatch kind={group.kind} />
                             {group.title}
                         </span>
-                        <span className="tabular-nums">{formatCredits(group.rows.reduce((sum, row) => sum + row.micros, 0))}</span>
+                        <span className="tabular-nums">{formatCredits(group.rows.reduce((sum, row) => sum + row.micros, 0), locale)}</span>
                     </p>
                     {group.rows.map(total => (
                         <div key={sourceKey(total.source)} className="flex items-center gap-3 text-sm">
@@ -55,13 +57,13 @@ function BySource({ usage }: { usage: CreditUsage }) {
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-baseline justify-between gap-2">
                                     <span className="truncate">{sourceLabel(total.source)}</span>
-                                    <span className="tabular-nums">{formatCredits(total.micros)}</span>
+                                    <span className="tabular-nums">{formatCredits(total.micros, locale)}</span>
                                 </div>
                                 <div className="mt-1 flex items-center gap-2">
                                     <div className="h-1 flex-1 rounded-full bg-muted-foreground/15">
                                         <div className={cn('h-full rounded-full', KIND_FILL[total.source.kind])} style={{ width: `${(total.micros / max) * 100}%` }} />
                                     </div>
-                                    <span className="w-20 text-right text-[11px] text-muted-foreground">{callsLabel(total.calls)}</span>
+                                    <span className="w-20 text-right text-[11px] text-muted-foreground">{t('usage.calls', { count: total.calls })}</span>
                                 </div>
                             </div>
                         </div>
@@ -73,6 +75,8 @@ function BySource({ usage }: { usage: CreditUsage }) {
 }
 
 function ByCoworker({ usage }: { usage: CreditUsage }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
     const max = Math.max(...usage.byCoworker.map(total => total.aiMicros + total.dataMicros), 1)
     return (
         <div className="flex flex-col gap-3">
@@ -83,8 +87,8 @@ function ByCoworker({ usage }: { usage: CreditUsage }) {
                         <CoworkerAvatar coworker={total.coworker} />
                         <div className="min-w-0 flex-1">
                             <div className="flex items-baseline justify-between gap-2">
-                                <span className={cn('truncate', !total.coworker && 'text-muted-foreground')}>{total.coworker?.name ?? 'Other'}</span>
-                                <span className="tabular-nums">{formatCredits(sum)}</span>
+                                <span className={cn('truncate', !total.coworker && 'text-muted-foreground')}>{total.coworker?.name ?? t('usage.otherCoworker')}</span>
+                                <span className="tabular-nums">{formatCredits(sum, locale)}</span>
                             </div>
                             <div className="mt-1 flex h-1 gap-px" style={{ width: `${(sum / max) * 100}%` }}>
                                 {total.aiMicros > 0 && <div className={cn('h-full rounded-l-full', KIND_FILL.ai, total.dataMicros === 0 && 'rounded-r-full')} style={{ flexGrow: total.aiMicros }} />}
@@ -99,6 +103,9 @@ function ByCoworker({ usage }: { usage: CreditUsage }) {
 }
 
 function LatestCharges({ usage }: { usage: CreditUsage }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
+    const sourceLabel = useSourceLabel()
     return (
         <ul className="flex flex-col divide-y divide-border">
             {usage.latest.map(charge => (
@@ -106,13 +113,13 @@ function LatestCharges({ usage }: { usage: CreditUsage }) {
                     <SourceChip source={charge.source} />
                     <div className="min-w-0 flex-1">
                         <p className="truncate">
-                            {sourceLabel(charge.source)} <span className="text-muted-foreground">· {charge.coworker?.name ?? 'Other'}</span>
+                            {sourceLabel(charge.source)} <span className="text-muted-foreground">· {charge.coworker?.name ?? t('usage.otherCoworker')}</span>
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
-                            {dayLabel(charge.day)} · {callsLabel(charge.calls)}
+                            {dayLabel(charge.day, locale)} · {t('usage.calls', { count: charge.calls })}
                         </p>
                     </div>
-                    <span className="tabular-nums">−{formatCredits(charge.micros)}</span>
+                    <span className="tabular-nums">−{formatCredits(charge.micros, locale)}</span>
                 </li>
             ))}
         </ul>
@@ -121,13 +128,13 @@ function LatestCharges({ usage }: { usage: CreditUsage }) {
 
 // What to say when the credit will not last: nothing when it does, nor once it is gone, the card
 // says that one.
-function paceNote(balance: CreditBalance, usage: CreditUsage, trial: boolean): string | null {
+function paceNote(t: ReturnType<typeof useTranslations<'billing'>>, balance: CreditBalance, usage: CreditUsage, trial: boolean, locale: string): string | null {
     if (balance.leftMicros <= 0) return null
-    if (!trial && balance.monthLeftMicros === 0 && balance.topupLeftMicros > 0) return `This month's credits are spent. Coworkers now draw on your top-up, ${formatCredits(balance.topupLeftMicros)} left.`
+    if (!trial && balance.monthLeftMicros === 0 && balance.topupLeftMicros > 0) return t('usage.pace.onTopup', { figure: formatCredits(balance.topupLeftMicros, locale) })
     const out = runsOutOn(balance, usage.period, new Date())
     if (!out) return null
     const early = Math.round((new Date(usage.period.end).getTime() - out.getTime()) / DAY_MS)
-    return `At this pace, you run out around ${shortDate(out)}, ${early} ${early === 1 ? 'day' : 'days'} before ${trial ? 'your trial ends' : 'the reset'}.`
+    return t(trial ? 'usage.pace.runsOutBeforeTrialEnds' : 'usage.pace.runsOutBeforeReset', { date: shortDate(out, locale), days: early })
 }
 
 function UsageSkeleton() {
@@ -158,31 +165,31 @@ function UsageSkeleton() {
 // The drill-in on the right of a billing dialog, like Card and Invoices: where the credit went this
 // period, by day, by source or by coworker, and the latest charges.
 export function UsagePane({ credit, onBack, backLabel }: { credit: CreditUsageState; onBack: () => void; backLabel?: string }) {
+    const locale = useLocale()
+    const t = useTranslations('billing')
     const [mode, setMode] = useState<ChartMode>('daily')
     const [breakdown, setBreakdown] = useState<Breakdown>('source')
     const { balance, usage, trial } = credit
 
     const body = (() => {
         if (!balance) return <UsageSkeleton />
-        if (!usage) return <p className="text-sm text-muted-foreground">Your credit usage could not be loaded. Try again in a moment.</p>
-        const pace = paceNote(balance, usage, trial)
+        if (!usage) return <p className="text-sm text-muted-foreground">{t('usage.pane.loadFailed')}</p>
+        const pace = paceNote(t, balance, usage, trial, locale)
         return (
             <>
                 <div className="flex items-end justify-between gap-4">
                     <div>
                         <p className="text-2xl font-semibold tabular-nums">
-                            {formatCredits(balance.usedAiMicros + balance.usedDataMicros)} <span className="text-sm font-normal text-muted-foreground">credits used</span>
+                            {t.rich('usage.pane.creditsUsed', { figure: formatCredits(balance.usedAiMicros + balance.usedDataMicros, locale), muted: chunks => <span className="text-sm font-normal text-muted-foreground">{chunks}</span> })}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                            {shortDate(usage.period.start)} – {shortDate(usage.period.end)} · {formatCredits(balance.leftMicros)} left
-                        </p>
+                        <p className="text-xs text-muted-foreground">{t('usage.pane.periodLeft', { start: shortDate(usage.period.start, locale), end: shortDate(usage.period.end, locale), left: formatCredits(balance.leftMicros, locale) })}</p>
                     </div>
                     <Segmented
                         value={mode}
                         onChange={setMode}
                         options={[
-                            { id: 'daily', label: 'Per day' },
-                            { id: 'cumulative', label: 'Pace' },
+                            { id: 'daily', label: t('usage.pane.perDay') },
+                            { id: 'cumulative', label: t('usage.pane.pace') },
                         ]}
                     />
                 </div>
@@ -192,7 +199,7 @@ export function UsagePane({ credit, onBack, backLabel }: { credit: CreditUsageSt
                 </div>
 
                 {usage.bySource.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">Nothing spent yet this {trial ? 'trial' : 'period'}.</p>
+                    <p className="text-sm text-muted-foreground">{trial ? t('usage.pane.nothingSpentTrial') : t('usage.pane.nothingSpentPeriod')}</p>
                 ) : (
                     <>
                         <div className="flex flex-col gap-4">
@@ -200,15 +207,15 @@ export function UsagePane({ credit, onBack, backLabel }: { credit: CreditUsageSt
                                 value={breakdown}
                                 onChange={setBreakdown}
                                 options={[
-                                    { id: 'source', label: 'By source' },
-                                    { id: 'coworker', label: 'By coworker' },
+                                    { id: 'source', label: t('usage.pane.bySource') },
+                                    { id: 'coworker', label: t('usage.pane.byCoworker') },
                                 ]}
                             />
                             {breakdown === 'source' ? <BySource usage={usage} /> : <ByCoworker usage={usage} />}
                         </div>
 
                         <div className="flex flex-col gap-3">
-                            <p className="text-xs font-medium text-muted-foreground">Latest charges</p>
+                            <p className="text-xs font-medium text-muted-foreground">{t('usage.pane.latestCharges')}</p>
                             <LatestCharges usage={usage} />
                         </div>
                     </>
@@ -220,7 +227,7 @@ export function UsagePane({ credit, onBack, backLabel }: { credit: CreditUsageSt
     return (
         <div className="flex flex-col gap-6">
             <RightTitle onBack={onBack} backLabel={backLabel}>
-                Credit usage
+                {t('usage.pane.title')}
             </RightTitle>
             {body}
         </div>

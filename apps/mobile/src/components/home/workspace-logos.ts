@@ -3,7 +3,10 @@ import { Directory, File, Paths } from 'expo-file-system'
 import type { SFSymbol } from 'expo-symbols'
 import { useEffect, useState } from 'react'
 
-export const workspaceLabel = (workspace: Pick<WorkspaceSummary, 'name'> | undefined) => workspace?.name?.trim() || 'My workspace'
+import type { HomeTranslator } from '@/components/home/board'
+import { translatorFor } from '@/i18n/translator'
+
+export const workspaceLabel = (workspace: Pick<WorkspaceSummary, 'name'> | undefined, t: HomeTranslator = translatorFor('mobileHome')) => workspace?.name?.trim() || t('workspace.untitled')
 
 export function workspaceInitials(workspace: Pick<WorkspaceSummary, 'name'> | undefined): string {
     const words = workspaceLabel(workspace).split(/\s+/).filter(Boolean)

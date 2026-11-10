@@ -11,17 +11,14 @@ import { installAgentShare, type AgentShareInstallOutcome } from '@/lib/agents/s
 import { listWorkspaceShares, readAgentShare, revokeAgentShare, type WorkspaceShare } from '@/lib/agents/share-read'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { AppError, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
 // Unlike a template capture, none of this is gated on the sandbox: a share is a transfer to one
 // person behind an unguessable, revocable token, not a page anyone installs from. What replaces
 // that gate is the freeze (the snapshot cannot grow after it is sent), the redaction (the engine
 // strips every credential on the way out) and revocation (the object is deleted, not flagged).
 
-type ActionResult<T = unknown> = ({ ok: true } & T) | { ok: false; error: string }
-
-function failed(err: unknown, fallback: string): { ok: false; error: string } {
-    return { ok: false, error: err instanceof Error ? err.message : fallback }
-}
+type ActionResult<T = unknown> = ({ ok: true } & T) | ActionFailure
 
 export async function planAgentShareAction(agentId: string): Promise<ActionResult<{ plan: AgentSharePlan }>> {
     try {
@@ -29,7 +26,7 @@ export async function planAgentShareAction(agentId: string): Promise<ActionResul
         const { workspace_id } = await assertAgentInWorkspace(id, 'manage')
         return { ok: true, plan: await planAgentShare(createServiceRoleClient(), id, workspace_id) }
     } catch (err) {
-        return failed(err, 'Could not inspect this coworker')
+        return failureOf(err, 'inspectCoworkerFailed')
     }
 }
 
@@ -43,7 +40,7 @@ export async function createAgentShareAction(input: unknown): Promise<ActionResu
         const { url, warnings, reused } = await createAgentShare(ctx.supabase, { agentRowId: agentId, workspaceId: ctx.workspace.id, userId: ctx.userId, include })
         return { ok: true, url, warnings, reused }
     } catch (err) {
-        return failed(err, 'Could not create a share link')
+        return failureOf(err, 'createShareLinkFailed')
     }
 }
 
@@ -53,7 +50,7 @@ export async function listAgentSharesAction(): Promise<ActionResult<{ shares: Wo
         const [shares, manageable] = await Promise.all([listWorkspaceShares(ctx.supabase, ctx.workspace.id), shareManageableAgentIds(actorFromContext(ctx))])
         return { ok: true, shares: keepVisible(shares, manageable, share => share.sourceAgentId) }
     } catch (err) {
-        return failed(err, 'Could not read your share links')
+        return failureOf(err, 'readShareLinksFailed')
     }
 }
 
@@ -65,7 +62,7 @@ export async function revokeAgentShareAction(shareId: string): Promise<ActionRes
         await revokeAgentShare(ctx.supabase, id, ctx.workspace.id)
         return { ok: true }
     } catch (err) {
-        return failed(err, 'Could not revoke this link')
+        return failureOf(err, 'revokeLinkFailed')
     }
 }
 
@@ -84,7 +81,7 @@ const installInputSchema = z.object({
     position: z.object({ col: z.number().int(), row: z.number().int() }).optional(),
 })
 
-export type InstallSharedAgentResult = ({ ok: true } & AgentShareInstallOutcome) | { ok: false; error: string }
+export type InstallSharedAgentResult = ({ ok: true } & AgentShareInstallOutcome) | ActionFailure
 
 // The target space comes from the client but its workspace never does: assertSpaceAccess resolves
 // it from the session, so an id from somewhere else resolves to "Box not found".
@@ -102,11 +99,11 @@ export async function installSharedAgentAction(input: unknown): Promise<InstallS
         if ((await getAdminEmail()) === null) {
             const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status'] as const, { id: workspace_id })
             const status = workspace?.subscription_status
-            if (status !== 'active' && status !== 'trialing') throw new Error('This workspace has no active plan.')
+            if (status !== 'active' && status !== 'trialing') throw new AppError('noActivePlan')
         }
 
         return { ok: true, ...(await installAgentShare(supabase, token, { workspaceId: workspace_id, spaceId, actor, position })) }
     } catch (err) {
-        return failed(err, 'Could not add this coworker to your board')
+        return failureOf(err, 'addSharedCoworkerFailed')
     }
 }

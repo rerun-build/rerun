@@ -1,0 +1,40 @@
+{
+    "_context": {
+        "untitledTask": "Name of a delegated task the AI gave no title to. {index} is its position, 1 for the first.",
+        "trouble.stalled": "Appended after ' · ' to a sub-task summary: how many sub-tasks have done nothing for minutes.",
+        "trouble.failing": "Appended after ' · ' to a sub-task summary: how many sub-tasks keep failing.",
+        "progress.step": "Progress of a coworker called by another one: the step it is on.",
+        "progress.calls": "Progress of a coworker called by another one: how many tools it called so far.",
+        "headline.calling": "{name} is the coworker being called by another coworker.",
+        "headline.buildingTeam": "The onboarding builds several AI coworkers at once.",
+        "headline.doneOfTotal": "How many delegated tasks have finished out of all of them.",
+        "headline.openFromBoard": "Under 'N coworkers built': open one of them from the board of the workspace.",
+        "headline.doneAndFailed": "Delegated tasks that finished and that failed."
+    },
+    "untitledTask": "Sub-coworker {index}",
+    "untitledAgent": "Coworker",
+    "trouble": {
+        "stalled": "{count} stalled",
+        "failing": "{count} failing"
+    },
+    "progress": {
+        "step": "Step {steps}",
+        "calls": "{count, plural, =0 {# call} one {# call} other {# calls}}"
+    },
+    "headline": {
+        "messageSent": "Message sent to {name}",
+        "calling": "Calling {name}",
+        "callFailed": "{name} failed",
+        "callAnswered": "{name} answered",
+        "building": "Building {name}",
+        "buildFailed": "{name} could not be built",
+        "built": "{name} built",
+        "buildingTeam": "Building your team · {count, plural, =0 {# coworker} one {# coworker} other {# coworkers}}",
+        "delegating": "Delegating · {count, plural, =0 {# task} one {# task} other {# tasks}}",
+        "doneOfTotal": "{done}/{total} done",
+        "coworkersBuilt": "{count, plural, =0 {# coworker} one {# coworker} other {# coworkers}} built",
+        "openFromBoard": "Open one from the board",
+        "tasksDone": "{count, plural, =0 {# task} one {# task} other {# tasks}} done",
+        "doneAndFailed": "{done} done · {failed} failed"
+    }
+}

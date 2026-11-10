@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import { AuthIsoBackground } from '@/components/auth/AuthIsoBackground'
+import { getTranslations } from 'next-intl/server'
 
-export const metadata: Metadata = {
-    title: 'Creator program',
-    description: 'Claim your Rerun creator account and your sandbox.',
-    robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('auth.creatorJoin')
+    return { title: t('metaTitle'), description: t('metaDescription'), robots: { index: false, follow: false } }
 }
 
 export default function CreatorJoinLayout({ children }: { children: React.ReactNode }) {

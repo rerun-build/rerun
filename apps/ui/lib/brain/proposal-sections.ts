@@ -57,7 +57,10 @@ export const changedOnly = (changes: SectionChange[]) => changes.filter(change =
 export const proposalChanges = (proposal: BrainProposal) => changedOnly(sectionChanges(proposal.currentContent, proposal.content))
 
 // A proposal made before the coworkers wrote a headline, or on an engine not updated yet, has none.
-export const proposalHeadline = (proposal: BrainProposal) => proposal.headline ?? (proposal.mode === 'create' ? `New page: ${proposal.title}` : `Update to ${proposal.title}`)
+// The `brain.proposals` catalog.
+export type ProposalHeadlineCopy = (key: 'headlineCreate' | 'headlineEdit', values: { title: string }) => string
+
+export const proposalHeadline = (proposal: BrainProposal, t: ProposalHeadlineCopy) => proposal.headline ?? t(proposal.mode === 'create' ? 'headlineCreate' : 'headlineEdit', { title: proposal.title })
 
 export const humanAgentName = (name: string) => name.replace(/_/g, ' ').replace(/^\w/, letter => letter.toUpperCase())
 

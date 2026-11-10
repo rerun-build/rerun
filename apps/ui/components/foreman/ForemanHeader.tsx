@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { type PointerEvent, useState } from 'react'
 
 import { AuthDialog } from '@/components/dialogs/AuthDialog'
@@ -16,10 +17,10 @@ import { type ForemanAnchor, ForemanHeaderBar } from '@rerun/ui/foreman'
 type PositionChoice = ForemanAnchor
 
 const POSITION_CHOICES = [
-    { value: 'dock-left', label: 'Dock left', icon: PanelLeftIcon },
-    { value: 'dock-right', label: 'Dock right', icon: PanelRightIcon },
-    { value: 'float', label: 'Float', icon: PictureInPicture2Icon },
-] as const satisfies readonly { value: PositionChoice; label: string; icon: unknown }[]
+    { value: 'dock-left', labelKey: 'dockLeft', icon: PanelLeftIcon },
+    { value: 'dock-right', labelKey: 'dockRight', icon: PanelRightIcon },
+    { value: 'float', labelKey: 'float', icon: PictureInPicture2Icon },
+] as const satisfies readonly { value: PositionChoice; labelKey: string; icon: unknown }[]
 
 function positionChoiceOf(placement: ForemanPlacement): PositionChoice {
     return placement.mode === 'float' ? 'float' : `dock-${placement.side}`
@@ -53,6 +54,7 @@ export function ForemanHeader({
     onToggleSheetDetent: () => void
     onNewChat: () => void
 }) {
+    const t = useTranslations('foreman.header')
     const close = useForemanStore(state => state.close)
     const open = useForemanStore(selectForemanOpen)
     const activity = useForemanStore(state => state.activity)
@@ -71,26 +73,26 @@ export function ForemanHeader({
             orbPaused={!open}
             orbHiddenOnSheet={intakeOpen}
             onClose={close}
-            closeDisabledReason={guided ? 'Finish the setup to close the chat' : undefined}
+            closeDisabledReason={guided ? t('closeDisabled') : undefined}
             onGutter
             onDragPointerDown={onDragPointerDown}
             onToggleSheetDetent={onToggleSheetDetent}
             actions={
                 <>
                     <DropdownMenu>
-                        <TooltipLabeled label="Move" side="bottom">
+                        <TooltipLabeled label={t('move')} side="bottom">
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon-sm" aria-label="Move the chat" className="max-md:hidden">
+                                <Button variant="ghost" size="icon-sm" aria-label={t('moveChat')} className="max-md:hidden">
                                     <ChoiceIcon className="size-3.5" />
                                 </Button>
                             </DropdownMenuTrigger>
                         </TooltipLabeled>
                         <DropdownMenuContent align="end" className="w-auto">
                             <DropdownMenuRadioGroup value={choice} onValueChange={value => useForemanStore.getState().setPlacement(placementFor(value as PositionChoice, placement))}>
-                                {POSITION_CHOICES.map(({ value, label, icon: Icon }) => (
+                                {POSITION_CHOICES.map(({ value, labelKey, icon: Icon }) => (
                                     <DropdownMenuRadioItem key={value} value={value}>
                                         <Icon />
-                                        {label}
+                                        {t(`position.${labelKey}`)}
                                     </DropdownMenuRadioItem>
                                 ))}
                             </DropdownMenuRadioGroup>
@@ -101,7 +103,7 @@ export function ForemanHeader({
                         <>
                             <Button variant="outline" size="sm" className="md:hidden" onClick={() => setSignInOpen(true)}>
                                 <LogInIcon />
-                                Sign in
+                                {t('signIn')}
                             </Button>
                             <AuthDialog variant="signin" open={signInOpen} onOpenChange={setSignInOpen} />
                         </>
@@ -109,7 +111,7 @@ export function ForemanHeader({
                     {!guided && (
                         <Button size="sm" onClick={onNewChat}>
                             <PlusIcon />
-                            New task
+                            {t('newTask')}
                         </Button>
                     )}
                 </>

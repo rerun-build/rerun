@@ -1,4 +1,4 @@
-import { capabilityOfCall, isKnownTool, PAID_DATA_TOOL, toolLabelOf } from '@rerun/contracts'
+import { capabilityOfCall, isKnownTool, PAID_DATA_TOOL, toolLabelOf, type ToolCopy } from '@rerun/contracts'
 import {
     ActivityIcon,
     BellIcon,
@@ -231,11 +231,13 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
 
 export { isKnownTool }
 
-// A paid_data call is named after the capability it bought: "Reading TikTok", not "Paid data".
-export function getToolMeta(toolName: string, input?: unknown): ToolMeta {
+export function toolIconOf(toolName: string, input?: unknown): LucideIcon {
     const capability = toolName === PAID_DATA_TOOL ? capabilityOfCall(toolName, input) : null
-    const label = toolLabelOf(toolName, input)
-    if (capability) return { label, icon: paidDataIcon(capability) }
-    if (TOOL_ICONS[toolName]) return { label, icon: TOOL_ICONS[toolName] }
-    return { label, icon: toolName.startsWith('mcp_') ? PuzzleIcon : WrenchIcon }
+    if (capability) return paidDataIcon(capability)
+    return TOOL_ICONS[toolName] ?? (toolName.startsWith('mcp_') ? PuzzleIcon : WrenchIcon)
+}
+
+// A paid_data call is named after the capability it bought: "Reading TikTok", not "Paid data".
+export function getToolMeta(toolName: string, input: unknown, t: ToolCopy): ToolMeta {
+    return { label: toolLabelOf(toolName, input, t), icon: toolIconOf(toolName, input) }
 }

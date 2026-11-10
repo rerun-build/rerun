@@ -14,6 +14,7 @@ import { revalidateLanding } from '@/lib/landing-revalidate'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
 // Self-serve edition of the caller's own marketplace fiche, the in-app twin of the landing claim
 // link. The capability is the account: `users.expert_profile_id` is the only way in, and the fiche
@@ -44,19 +45,19 @@ const OWNER_EXPERT_COLUMNS = [
     'status',
 ] as const
 
-export type ExpertProfileResult = { ok: true; expert: OwnerExpert; bannerOptions: string[] } | { ok: false; error: string }
-export type UpdateExpertProfileResult = { ok: true; slug: string } | { ok: false; error: string }
-export type UploadExpertProfileResult = { ok: true; url: string } | { ok: false; error: string }
+export type ExpertProfileResult = { ok: true; expert: OwnerExpert; bannerOptions: string[] } | ActionFailure
+export type UpdateExpertProfileResult = { ok: true; slug: string } | ActionFailure
+export type UploadExpertProfileResult = { ok: true; url: string } | ActionFailure
 
 const nullIfEmpty = (value: string) => (value.trim() ? value.trim() : null)
 
 async function requireOwnExpertId(): Promise<string> {
     const { user } = await getServerSession()
-    if (!user?.id) throw new AuthorizationError('Not authenticated')
+    if (!user?.id) throw new AuthorizationError('notAuthenticated')
 
     const supabase = createServiceRoleClient()
     const { data: account } = await selectMaybeSingle(supabase, 'users', ['expert_profile_id'] as const, { id: user.id })
-    if (!account?.expert_profile_id) throw new AuthorizationError('No expert profile is linked to this account.')
+    if (!account?.expert_profile_id) throw new AuthorizationError('noExpertProfile')
 
     return account.expert_profile_id
 }
@@ -67,7 +68,7 @@ export async function getMyExpertProfileAction(): Promise<ExpertProfileResult> {
         const supabase = createServiceRoleClient()
 
         const { data } = await selectMaybeSingle(supabase, 'experts', OWNER_EXPERT_COLUMNS, { id: expertId })
-        if (!data) return { ok: false, error: 'Expert profile not found.' }
+        if (!data) return failure('expertProfileNotFound')
 
         const bannerOptions = await listExpertBannerUrls(supabase)
 
@@ -100,7 +101,7 @@ export async function getMyExpertProfileAction(): Promise<ExpertProfileResult> {
             },
         }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to load your public profile.' }
+        return failureOf(err, 'loadPublicProfileFailed')
     }
 }
 
@@ -111,7 +112,7 @@ export async function updateMyExpertProfileAction(values: EditExpertValues): Pro
         const supabase = createServiceRoleClient()
 
         const { data: existing } = await selectMaybeSingle(supabase, 'experts', ['id', 'slug', 'email', 'banner_url'] as const, { id: expertId })
-        if (!existing) return { ok: false, error: 'Expert profile not found.' }
+        if (!existing) return failure('expertProfileNotFound')
 
         const now = new Date().toISOString()
         const { error } = await supabase
@@ -154,7 +155,7 @@ export async function updateMyExpertProfileAction(values: EditExpertValues): Pro
         await revalidateLanding(['/community/experts', `/community/experts/${existing.slug}`])
         return { ok: true, slug: existing.slug }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to save your public profile.' }
+        return failureOf(err, 'savePublicProfileFailed')
     }
 }
 
@@ -167,7 +168,7 @@ export async function uploadMyExpertAvatarAction(formData: FormData): Promise<Up
     try {
         return await uploadOwnExpertImage(formData, 'photo')
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to upload your photo.' }
+        return failureOf(err, 'uploadPhotoFailedShort')
     }
 }
 
@@ -175,6 +176,6 @@ export async function uploadMyExpertBannerAction(formData: FormData): Promise<Up
     try {
         return await uploadOwnExpertImage(formData, 'banner')
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to upload your banner.' }
+        return failureOf(err, 'uploadBannerFailed')
     }
 }

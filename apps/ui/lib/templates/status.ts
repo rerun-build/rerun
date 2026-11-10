@@ -1,3 +1,4 @@
+import { TEMPLATE_STATUSES, type TemplateStatus } from '@rerun/contracts'
 import type { BadgeTone } from '@rerun/ui/primitives'
 import { titleCase } from './labels'
 
@@ -7,12 +8,17 @@ const STATUS_TONES: Record<string, BadgeTone> = {
     unlisted: 'cyan',
 }
 
-const STATUS_LABELS: Record<string, string> = { in_review: 'In review' }
+// The `templates.status` catalog.
+export type TemplateStatusCopy = (key: TemplateStatus) => string
 
 export function templateStatusTone(status: string): BadgeTone {
     return STATUS_TONES[status] ?? 'neutral'
 }
 
-export function templateStatusLabel(status: string): string {
-    return STATUS_LABELS[status] ?? titleCase(status)
+function isTemplateStatus(status: string): status is TemplateStatus {
+    return (TEMPLATE_STATUSES as readonly string[]).includes(status)
+}
+
+export function templateStatusLabel(status: string, t: TemplateStatusCopy): string {
+    return isTemplateStatus(status) ? t(status) : titleCase(status)
 }

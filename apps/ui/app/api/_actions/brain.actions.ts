@@ -5,12 +5,11 @@ import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import * as engine from '@/lib/engine/client'
 import type { BrainPageSummary, BrainPageType, BrainProposal, BrainRevision } from '@rerun/contracts'
+import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal } from '@/lib/i18n/action-error'
 
 // A box that predates the brain answers 404 on every /brain route: the dialog shows an "update
 // your box" state rather than an error.
 const isMissingRoute = (err: unknown) => err instanceof engine.EngineRequestError && err.status === 404
-
-const errorMessage = (err: unknown, fallback: string) => (err instanceof Error ? err.message : fallback)
 
 // Every write names a person in the page history; the engine has no users of its own.
 async function authorContext() {
@@ -46,7 +45,7 @@ export async function readBrainPageAction(slug: string): Promise<engine.BrainPag
 
 export type BrainPageInput = { title: string; type: BrainPageType; content: string; sources: string[]; baseHash: string | null }
 
-export type BrainWriteResult = { ok: true; detail: engine.BrainPageDetail } | { ok: false; conflict: boolean; error: string }
+export type BrainWriteResult = { ok: true; detail: engine.BrainPageDetail } | (ActionFailure & { conflict: boolean })
 
 export async function saveBrainPageAction(slug: string, input: BrainPageInput): Promise<BrainWriteResult> {
     try {
@@ -54,16 +53,16 @@ export async function saveBrainPageAction(slug: string, input: BrainPageInput): 
         return { ok: true, detail: await engine.writeBrainPage(conn, slug, { ...input, author }) }
     } catch (err) {
         const conflict = err instanceof engine.EngineRequestError && err.status === 409
-        return { ok: false, conflict, error: conflict ? 'Someone changed this page while you were editing it. Reload it and apply your change again.' : errorMessage(err, 'Could not save the page') }
+        return { ok: false, conflict, ...(conflict ? refusal('brainPageConflict') : refusalOf(err, 'saveBrainPageFailed')) }
     }
 }
 
-export async function deleteBrainPageAction(slug: string): Promise<{ ok: boolean; error?: string }> {
+export async function deleteBrainPageAction(slug: string): Promise<{ ok: boolean } & Partial<ActionRefusal>> {
     try {
         await engine.deleteBrainPage(await requireWorkspaceConnection(), slug)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: errorMessage(err, 'Could not delete the page') }
+        return { ok: false, ...refusalOf(err, 'deleteBrainPageFailed') }
     }
 }
 
@@ -81,7 +80,7 @@ export async function revertBrainPageAction(slug: string, revisionId: string, ex
         return { ok: true, detail: await engine.revertBrainPage(conn, slug, revisionId, author, expectedHash) }
     } catch (err) {
         const conflict = err instanceof engine.EngineRequestError && err.status === 409
-        return { ok: false, conflict, error: conflict ? 'This page changed since. Open it and restore a version from its history.' : errorMessage(err, 'Could not restore this version') }
+        return { ok: false, conflict, ...(conflict ? refusal('brainPageChangedSince') : refusalOf(err, 'restoreVersionFailed')) }
     }
 }
 
@@ -89,7 +88,7 @@ export async function confirmBrainSectionsAction(slug: string, headings: string[
     try {
         return { ok: true, detail: await engine.confirmBrainSections(await requireWorkspaceConnection(), slug, headings) }
     } catch (err) {
-        return { ok: false, conflict: false, error: errorMessage(err, 'Could not confirm this page') }
+        return { ok: false, conflict: false, ...refusalOf(err, 'confirmBrainPageFailed') }
     }
 }
 
@@ -118,12 +117,12 @@ export async function decideBrainProposalAction(
     proposalId: string,
     decision: 'accept' | 'dismiss',
     edits: BrainProposalEdits = {}
-): Promise<{ ok: true; proposal: BrainProposal } | { ok: false; error: string }> {
+): Promise<{ ok: true; proposal: BrainProposal } | ActionFailure> {
     try {
         const { conn, author } = await authorContext()
         const proposal = await engine.decideBrainProposal(conn, proposalId, decision, decision === 'accept' ? { ...edits, decidedBy: author } : { decidedBy: author })
         return { ok: true, proposal }
     } catch (err) {
-        return { ok: false, error: errorMessage(err, 'Could not update the proposal') }
+        return failureOf(err, 'updateBrainProposalFailed')
     }
 }

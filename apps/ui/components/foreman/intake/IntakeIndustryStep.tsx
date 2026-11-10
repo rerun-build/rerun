@@ -2,6 +2,7 @@
 
 import { CustomOptionRow, OptionRow } from '@rerun/ui/chat'
 import type { TemplateCategory } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 import { Field } from '@/components/ui/field'
@@ -23,10 +24,11 @@ type IntakeIndustryStepProps = {
 export function IntakeIndustryStep({ draft, disabled, onChange, onChoose, onEnter }: IntakeIndustryStepProps) {
     // Ouvrir la ligne libre est un geste, pas une conséquence de ce qui est tapé dedans : sans ce
     // state elle se refermerait au premier effacement.
+    const t = useTranslations('foreman.intake')
     const [custom, setCustom] = useState(!!draft.industryLabel)
 
     return (
-        <Field label="Industry">
+        <Field label={t('industry.label')}>
             {/* Deux colonnes et pas une : neuf lignes empilées ne tiennent pas dans un pied de
                 colonne. Pas de défilement à elle : la liste est close, et un deuxième conteneur qui
                 défile dans celui du pied cachait « Other », qui est la moitié de la question. */}
@@ -36,7 +38,7 @@ export function IntakeIndustryStep({ draft, disabled, onChange, onChoose, onEnte
                         <OptionRow
                             key={option.value}
                             index={index}
-                            label={option.label}
+                            label={t(`industries.${option.value}`)}
                             selected={!custom && draft.industry === option.value}
                             disabled={disabled}
                             onChoose={() => {
@@ -51,10 +53,10 @@ export function IntakeIndustryStep({ draft, disabled, onChange, onChoose, onEnte
                             setCustom(true)
                             onChange({ industry: null })
                         }}
-                        label="Other"
+                        label={t('industry.other')}
                         className="col-span-2"
                     >
-                        <IntakeField autoFocus value={draft.industryLabel} disabled={disabled} placeholder="Bakery, dental practice, gym…" onChange={industryLabel => onChange({ industryLabel, industry: null })} onEnter={onEnter} />
+                        <IntakeField autoFocus value={draft.industryLabel} disabled={disabled} placeholder={t('industry.placeholder')} onChange={industryLabel => onChange({ industryLabel, industry: null })} onEnter={onEnter} />
                     </CustomOptionRow>
                 </div>
             </div>

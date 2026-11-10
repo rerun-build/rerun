@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { MonitorIcon, XIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 export type TakeoverRequestState = {
     reason: string
@@ -18,6 +19,7 @@ export type TakeoverRequestState = {
 
 // What the run asks of the person while it waits on its screen, laid out like the thread's HITL cards.
 export function TakeoverAsk({ takeover }: { takeover: TakeoverRequestState }) {
+    const t = useTranslations('chat.takeover')
     const { locked } = takeover
     return (
         <div className="space-y-3 p-3">
@@ -26,32 +28,32 @@ export function TakeoverAsk({ takeover }: { takeover: TakeoverRequestState }) {
                 <div className="min-w-0 flex-1 space-y-0.5">
                     <p className="text-sm leading-snug font-medium">{takeover.reason}</p>
                     <p className="truncate text-xs leading-snug text-muted-foreground">
-                        {takeover.opened ? 'The browser is open on your coworker’s desktop. Come back here once you are through.' : takeover.site ? `Opens ${takeover.site} in your coworker’s browser, for you to drive.` : 'Opens your coworker’s browser, for you to drive.'}
+                        {takeover.opened ? t('opened') : takeover.site ? t('opensSite', { site: takeover.site }) : t('opens')}
                     </p>
                 </div>
-                <Button size="icon-sm" variant="ghost" disabled={locked} onClick={takeover.onSkip} aria-label="Skip the browser takeover" data-hitl="dismiss" className="-my-1 shrink-0 text-muted-foreground">
+                <Button size="icon-sm" variant="ghost" disabled={locked} onClick={takeover.onSkip} aria-label={t('skipLabel')} data-hitl="dismiss" className="-my-1 shrink-0 text-muted-foreground">
                     <XIcon className="size-4" />
                 </Button>
             </div>
             <div className="flex items-center justify-between gap-3">
-                <p className="text-xs leading-snug text-muted-foreground/70">What you sign in to stays in this coworker’s browser on your machine.</p>
+                <p className="text-xs leading-snug text-muted-foreground/70">{t('privacy')}</p>
                 <div className="flex shrink-0 items-center gap-2">
                     {takeover.opened ? (
                         <>
                             <Button size="sm" variant="outline" disabled={locked} onClick={takeover.onOpen} data-hitl="reopen">
-                                Open again
+                                {t('openAgain')}
                             </Button>
                             <Button size="sm" disabled={locked} onClick={takeover.onDone} data-hitl="done">
-                                {takeover.finishing ? 'Closing…' : 'Done'}
+                                {takeover.finishing ? t('closing') : t('done')}
                             </Button>
                         </>
                     ) : (
                         <>
                             <Button size="sm" variant="outline" disabled={locked} onClick={takeover.onSkip} data-hitl="skip">
-                                Skip
+                                {t('skip')}
                             </Button>
                             <Button size="sm" disabled={locked} onClick={takeover.onOpen} data-hitl="open">
-                                Open browser
+                                {t('openBrowser')}
                             </Button>
                         </>
                     )}

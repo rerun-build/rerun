@@ -5,6 +5,7 @@ import { filePreviewKind, fileTypeIcon } from '@/lib/files/preview'
 import { rawUrlResolver, type RawUrlFor } from '@/lib/files/raw-url'
 import { FileIcon, FileTextIcon, Play } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 type AttachmentTileProps = {
     /** Absent on read-only transcripts rendered outside a Box: the tile stays inert. */
@@ -22,6 +23,7 @@ type AttachmentTileProps = {
 
 /** One file rendered as a clickable square: its own thumbnail for an image, its first frame for a video, a typed glyph otherwise. */
 export function AttachmentTile({ agentId, path, label, rawUrlFor, onOpen, standalone = false, className }: AttachmentTileProps) {
+    const t = useTranslations('chat.attachments')
     const name = label ?? path.split('/').pop() ?? path
     const rawUrl = rawUrlResolver(agentId, rawUrlFor)
     const isImage = rawUrl !== null && filePreviewKind(name) === 'image'
@@ -30,7 +32,7 @@ export function AttachmentTile({ agentId, path, label, rawUrlFor, onOpen, standa
     const fitsContent = standalone && isImage
 
     return (
-        <button type="button" onClick={onOpen} disabled={!rawUrl} title={name} aria-label={`Open ${name}`} className={cn(frame, !fitsContent && 'size-28', className)}>
+        <button type="button" onClick={onOpen} disabled={!rawUrl} title={name} aria-label={t('open', { name })} className={cn(frame, !fitsContent && 'size-28', className)}>
             {isImage ? (
                 // eslint-disable-next-line @next/next/no-img-element -- arbitrary proxied file bytes, no fixed dimensions or configured loader
                 <img

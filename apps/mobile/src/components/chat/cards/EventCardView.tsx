@@ -1,7 +1,8 @@
-import { BRAIN_CHANGE_NOTES, brainChangeHeadline, type BrainChange } from '@rerun/contracts'
+import { brainChangeHeadline, type BrainChange } from '@rerun/contracts'
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useState, type ReactNode } from 'react'
 import { Alert, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { revertBrainPage } from '@/api/chat'
 import { useAuth } from '@/auth/AuthProvider'
@@ -44,6 +45,8 @@ type Undo = 'idle' | 'pending' | 'done'
 // A change the Rerun agent made to the Brain itself, already landed: an edit can still be undone from
 // here, as on the web. Opening the page stays on the web, which has the Brain.
 function BrainChangeRow({ change }: { change: BrainChange }) {
+    const t = useTranslations('mobileCards')
+    const tBrain = useTranslations('mobileCards.brain')
     const { session, me } = useAuth()
     const [undo, setUndo] = useState<Undo>('idle')
     const undoRevisionId = change.status === 'saved' && change.mode === 'edit' ? change.undoRevisionId : null
@@ -55,32 +58,31 @@ function BrainChangeRow({ change }: { change: BrainChange }) {
             setUndo('done')
         } catch (error) {
             setUndo('idle')
-            Alert.alert('Could not undo this change', error instanceof Error ? error.message : 'Try again in a moment.')
+            Alert.alert(t('event.undoFailed'), error instanceof Error ? error.message : t('event.tryAgainShortly'))
         }
     }
-    if (undo === 'done') return <EventRow symbol="brain" title={`Undone: ${change.title}`} note="The previous version is back." />
-    return <EventRow symbol="brain" title={brainChangeHeadline(change)} note={BRAIN_CHANGE_NOTES[change.status]} trailing={undoRevisionId ? <Button size="sm" variant="ghost" label="Undo" loading={undo === 'pending'} onPress={() => void undoChange()} /> : undefined} />
+    if (undo === 'done') return <EventRow symbol="brain" title={t('event.undone', { title: change.title })} note={t('event.undoneNote')} />
+    return <EventRow symbol="brain" title={brainChangeHeadline(change, tBrain)} note={t(`brain.notes.${change.status}`)} trailing={undoRevisionId ? <Button size="sm" variant="ghost" label={t('event.undo')} loading={undo === 'pending'} onPress={() => void undoChange()} /> : undefined} />
 }
 
-const plural = (count: number, word: string) => `${count} ${word}${count > 1 ? 's' : ''} on`
-
 export function EventCardView({ card, coworkerName }: { card: EventCard; coworkerName: string }) {
+    const t = useTranslations('mobileCards.event')
     switch (card.kind) {
         case 'notification':
-            return <EventRow symbol="bell" title="Sent you a notification" note={card.message} />
+            return <EventRow symbol="bell" title={t('notification')} note={card.message} />
         case 'setup':
             return (
-                <EventRow symbol="checkmark.seal" title={coworkerName ? `${coworkerName} is set up` : 'Setup complete'} note={card.summary || undefined}>
+                <EventRow symbol="checkmark.seal" title={coworkerName ? t('setUp', { name: coworkerName }) : t('setupComplete')} note={card.summary || undefined}>
                     {(card.schedules > 0 || card.triggers > 0) && (
                         <View style={{ flexDirection: 'row', gap: spacing.xs, marginTop: spacing.xs }}>
-                            {card.schedules > 0 && <Badge size="xs" label={plural(card.schedules, 'schedule')} tone="green" />}
-                            {card.triggers > 0 && <Badge size="xs" label={plural(card.triggers, 'trigger')} tone="green" />}
+                            {card.schedules > 0 && <Badge size="xs" label={t('schedules', { count: card.schedules })} tone="green" />}
+                            {card.triggers > 0 && <Badge size="xs" label={t('triggers', { count: card.triggers })} tone="green" />}
                         </View>
                     )}
                 </EventRow>
             )
         case 'brain-proposal':
-            return <EventRow symbol="brain" title={card.mode === 'create' ? `New Brain page: ${card.title}` : `Change to the Brain: ${card.title}`} note="Proposed for review. Nothing changes until someone accepts it." />
+            return <EventRow symbol="brain" title={card.mode === 'create' ? t('newBrainPage', { title: card.title }) : t('brainChange', { title: card.title })} note={t('proposedNote')} />
         case 'brain-change':
             return <BrainChangeRow change={card.change} />
     }

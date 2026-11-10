@@ -13,6 +13,7 @@ import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { Badge } from '@rerun/ui/primitives'
 import { StepTransition } from '@rerun/ui/steps'
 import { Command as CommandPrimitive } from 'cmdk'
+import { useTranslations } from 'next-intl'
 import { useState, type CSSProperties, type KeyboardEvent } from 'react'
 
 import type { ControlRow, ControlSection } from './types'
@@ -68,6 +69,7 @@ function measureOrbAnchor(): OrbAnchor | null {
 }
 
 export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...panel }: ControlCenterPanelProps & { open: boolean; onOpenChange: (open: boolean) => void; anchorToOrb?: boolean }) {
+    const t = useTranslations('layout.controlCenter')
     const [anchor, setAnchor] = useState<OrbAnchor | null>(null)
     const [wasOpen, setWasOpen] = useState(false)
     if (wasOpen !== open) {
@@ -77,8 +79,8 @@ export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...
 
     const header = (
         <DialogHeader className="sr-only">
-            <DialogTitle>Control center</DialogTitle>
-            <DialogDescription>Jump to an agent, a setting or a conversation, or ask Rerun.</DialogDescription>
+            <DialogTitle>{t('title')}</DialogTitle>
+            <DialogDescription>{t('description')}</DialogDescription>
         </DialogHeader>
     )
 
@@ -116,6 +118,7 @@ export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...
 }
 
 export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey, depth, crumbs, onBack, sections, emptyLabel, mod }: ControlCenterPanelProps) {
+    const t = useTranslations('layout.controlCenter')
     const rows = sections.flatMap(section => section.rows)
     const firstRowId = rows.find(row => !row.disabledReason)?.id ?? ''
     const [selectedId, setSelectedId] = useState(firstRowId)
@@ -161,7 +164,7 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
         <Command shouldFilter={false} loop value={selectedId} onValueChange={setSelectedId} onKeyDown={handleKeyDown}>
             {crumbs.length > 0 && (
                 <div className="flex items-center gap-1 px-1 pt-1">
-                    <Button aria-label="Back" variant="ghost" size="icon-sm" onClick={onBack}>
+                    <Button aria-label={t('back')} variant="ghost" size="icon-sm" onClick={onBack}>
                         <ArrowLeftIcon className="size-4" />
                     </Button>
                     <span className="truncate text-xs font-medium text-muted-foreground">{crumbs.join(' / ')}</span>
@@ -185,24 +188,29 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
             <div className="-mx-1 -mb-1 flex items-center gap-4 border-t border-border/50 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                     <Kbd className={HINT_KEY}>↵</Kbd>
-                    Open
+                    {t('hints.open')}
                 </span>
                 {askRow ? (
                     <span className="flex items-center gap-1.5 max-sm:hidden">
                         <Kbd className={HINT_KEY}>{mod}</Kbd>
                         <Kbd className={HINT_KEY}>↵</Kbd>
-                        Ask Rerun
+                        {t('askRerun')}
                     </span>
                 ) : (
                     <span className="flex items-center gap-1.5 max-sm:hidden">
                         <Kbd className={HINT_KEY}>Tab</Kbd>
-                        More
+                        {t('hints.more')}
                     </span>
                 )}
                 <span className="ml-auto flex items-center gap-1.5 max-sm:hidden">
-                    <Kbd className={HINT_KEY}>{mod}</Kbd>
-                    <Kbd className={HINT_KEY}>F</Kbd>
-                    again to search in the page
+                    {t.rich('hints.searchPage', {
+                        keys: () => (
+                            <>
+                                <Kbd className={HINT_KEY}>{mod}</Kbd>
+                                <Kbd className={HINT_KEY}>F</Kbd>
+                            </>
+                        ),
+                    })}
                 </span>
             </div>
         </Command>

@@ -64,7 +64,7 @@ describe('rateMessageAction', () => {
     })
 
     it('refuses a vote on a message the conversation does not hold, without writing', async () => {
-        await expect(rateMessageAction({ sessionId: SESSION_ID, messageId: 'made-up', rating: 'up', messageText: 'Hi' })).resolves.toEqual({ ok: false, error: 'Message not found' })
+        await expect(rateMessageAction({ sessionId: SESSION_ID, messageId: 'made-up', rating: 'up', messageText: 'Hi' })).resolves.toEqual({ ok: false, error: 'Message not found', code: 'messageNotFound' })
         expect(db.writes('message_feedback')).toHaveLength(0)
     })
 
@@ -83,7 +83,7 @@ describe('rateMessageAction', () => {
     })
 
     it('refuses an unknown rating', async () => {
-        await expect(rateMessageAction({ sessionId: SESSION_ID, messageId: 'm1', rating: 'meh' as never, messageText: 'Hi' })).resolves.toEqual({ ok: false, error: 'Invalid feedback' })
+        await expect(rateMessageAction({ sessionId: SESSION_ID, messageId: 'm1', rating: 'meh' as never, messageText: 'Hi' })).resolves.toEqual({ ok: false, error: 'Invalid feedback', code: 'invalidFeedback' })
         expect(db.writes('message_feedback')).toHaveLength(0)
     })
 })
@@ -106,13 +106,13 @@ describe('updateMessageFeedbackAction', () => {
         mocks.requireLightSessionActor.mockResolvedValue(MEMBER)
         mocks.assertAgentInWorkspace.mockRejectedValue(new Error('Coworker not found'))
 
-        await expect(updateMessageFeedbackAction({ id: FEEDBACK_ID, category: 'not_factual', details: '' })).resolves.toEqual({ ok: false, error: 'Feedback not found' })
+        await expect(updateMessageFeedbackAction({ id: FEEDBACK_ID, category: 'not_factual', details: '' })).resolves.toEqual({ ok: false, error: 'Feedback not found', code: 'feedbackNotFound' })
         expect(mocks.assertAgentInWorkspace).toHaveBeenCalledWith('agent-hidden', 'use', MEMBER)
         expect(db.writes('message_feedback')).toHaveLength(0)
     })
 
     it('refuses a category outside the list', async () => {
-        await expect(updateMessageFeedbackAction({ id: FEEDBACK_ID, category: 'rude' as never, details: '' })).resolves.toEqual({ ok: false, error: 'Invalid feedback' })
+        await expect(updateMessageFeedbackAction({ id: FEEDBACK_ID, category: 'rude' as never, details: '' })).resolves.toEqual({ ok: false, error: 'Invalid feedback', code: 'invalidFeedback' })
         expect(db.writes('message_feedback')).toHaveLength(0)
     })
 })

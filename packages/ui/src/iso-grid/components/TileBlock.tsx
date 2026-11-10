@@ -9,6 +9,8 @@ import { BUDDY_BADGE_GAP, TileBuddy } from './TileBuddy'
 import { TileCountdownBadge } from './TileCountdownBadge'
 import { buddyColor, buddyLook, buddyMood } from './buddy/buddy-look'
 import type { Tile } from '../types'
+import { useKitTranslations } from '../../locale'
+import { tileStatusLabel } from '../status-label'
 
 // Croisement du pictogramme et de la pastille de statut (cf. TileStatusBubble, même durée de
 // sortie). Le pictogramme cède la place tout de suite, mais attend que la pastille soit partie pour
@@ -75,6 +77,7 @@ function ShimmerStrip({ animation, shade }: { animation: string | undefined; sha
 }
 
 export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDragging, dragPosition, worldOffset, ghost, onSelect, reducedMotion, paused, justPlaced }: TileBlockProps) {
+    const t = useKitTranslations()
     const s = tile.style
     const span = tile.span ?? DEFAULT_SPAN
     const AW = span * TILE_W
@@ -323,7 +326,7 @@ export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDr
                                 )}
                                 {PinnedIcon && <PinnedIcon className="size-[8px] shrink-0" />}
                                 {pinnedStatus.count != null && <span className="tabular-nums">{pinnedStatus.count}</span>}
-                                {pinnedStatus.label}
+                                {tileStatusLabel(pinnedStatus, t)}
                             </Badge>
                         )}
                     </div>

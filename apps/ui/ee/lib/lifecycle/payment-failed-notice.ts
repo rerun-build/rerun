@@ -7,6 +7,8 @@ import type { Database } from '@/app/api/database.types'
 import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
 import { BANNER_WARM_INLINE_MS, teamBoardBanner } from '@/lib/email/board-banner'
 import { APP_URL } from '@/lib/email/client'
+import { emailDateLabel, emailTimeLabel } from '@/lib/email/date-labels'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { sendPaymentFailedEmail } from '@/ee/lib/email/lifecycle-emails'
 import { PAYMENT_FAILED_GRACE_MS } from '@/ee/lib/billing/grace'
 import { deliverWhatsApp } from '@/lib/whatsapp/send'
@@ -31,28 +33,21 @@ export type DeclinedInvoice = {
     firstCharge: boolean
 }
 
-function dateLabel(value: Date): string {
-    return value.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' })
-}
-
-function timeLabel(value: Date): string {
-    return `${dateLabel(value)}, ${value.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} UTC`
-}
-
 async function emailOwner(supabase: SupabaseClient<Database>, workspace: { id: number; name: string | null }, team: TeamMember[], userId: string, invoice: DeclinedInvoice, now: Date): Promise<void> {
     const recipient = await loadRecipient(supabase, userId)
     if (!recipient) return
 
+    const locale = await recipientLocale(supabase, userId, workspace.id)
     const pausedAt = new Date(now.getTime() + PAYMENT_FAILED_GRACE_MS)
     const boardUrl = await teamBoardBanner(team, 'working', BANNER_WARM_INLINE_MS)
     const result = await sendPaymentFailedEmail(
-        { to: recipient.email, unsubscribeUrl: null },
+        { to: recipient.email, unsubscribeUrl: null, locale },
         {
             workspaceName: workspace.name,
             amountLabel: invoice.amountDueCents > 0 ? formatAmount(invoice.amountDueCents, invoice.currency) : undefined,
-            declinedLabel: dateLabel(now),
-            pausedLabel: timeLabel(pausedAt),
-            keptUntilLabel: dateLabel(new Date(pausedAt.getTime() + ARCHIVE_RETENTION_DAYS * DAY_MS)),
+            declinedLabel: emailDateLabel(now, locale),
+            pausedLabel: emailTimeLabel(pausedAt, locale),
+            keptUntilLabel: emailDateLabel(new Date(pausedAt.getTime() + ARCHIVE_RETENTION_DAYS * DAY_MS), locale),
             billingUrl: invoice.hostedUrl ?? `${APP_URL}/?billing=1`,
             boardUrl,
         },

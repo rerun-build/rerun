@@ -5,6 +5,7 @@ import { ChatAttachmentChip } from '@/components/chat/ChatAttachmentChip'
 import type { UploadItem } from '@/hooks/useFileUploads'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { PaperclipIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 /**
  * Paperclip button that opens the file dialog of the surrounding <PromptInput>.
@@ -12,9 +13,10 @@ import { PaperclipIcon } from '@/lib/icons'
  * conversation cannot take a file at all: the button stays visible and says why.
  */
 export function AttachButton({ disabledReason }: { disabledReason?: string }) {
+    const t = useTranslations('chat.attachments')
     const attachments = usePromptInputAttachments()
     const button = (
-        <PromptInputButton tooltip={disabledReason ? undefined : 'Attach files'} disabled={!!disabledReason} onClick={() => attachments.openFileDialog()}>
+        <PromptInputButton tooltip={disabledReason ? undefined : t('attach')} disabled={!!disabledReason} onClick={() => attachments.openFileDialog()}>
             <PaperclipIcon className="size-4" />
         </PromptInputButton>
     )

@@ -2,6 +2,7 @@ import { Image } from 'expo-image'
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { fileHeadersFor } from '@/api/files'
 import { useAuth } from '@/auth/AuthProvider'
@@ -17,14 +18,15 @@ export function MarkdownImage({ url, alt }: { url: string | null; alt: string })
     const { session, me } = useAuth()
     const [size, setSize] = useState<{ width: number; height: number } | null>(null)
     const [broken, setBroken] = useState(false)
+    const t = useTranslations('mobileChat.markdown')
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     const aspectRatio = size ? size.width / size.height : 4 / 3
     return (
         <Pressable
             disabled={!url || broken}
-            onPress={() => url && openViewer([{ url, name: alt || url.split(/[?#]/)[0].split('/').at(-1) || 'Image', image: true }])}
+            onPress={() => url && openViewer([{ url, name: alt || url.split(/[?#]/)[0].split('/').at(-1) || t('image'), image: true }])}
             accessibilityRole="imagebutton"
-            accessibilityLabel={alt || 'Image'}
+            accessibilityLabel={alt || t('image')}
             style={{ alignSelf: 'flex-start', width: '100%', maxWidth: size?.width, aspectRatio, maxHeight: MAX_HEIGHT, borderRadius: 20, borderCurve: 'continuous', overflow: 'hidden', backgroundColor: theme.muted, alignItems: 'center', justifyContent: 'center' }}
         >
             {url && !broken ? (

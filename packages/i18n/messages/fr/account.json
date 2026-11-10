@@ -1,0 +1,89 @@
+{
+    "title": "Compte",
+    "tabs": {
+        "profile": {
+            "label": "Profil",
+            "description": "Votre photo et votre nom, tels que votre équipe les voit."
+        },
+        "signIn": {
+            "label": "Connexion",
+            "description": "Les moyens de vous connecter à ce compte."
+        },
+        "language": {
+            "label": "Langue",
+            "description": "La langue que Rerun utilise avec vous."
+        },
+        "delete": {
+            "label": "Supprimer le compte",
+            "description": "Fermer définitivement votre compte Rerun."
+        }
+    },
+    "language": {
+        "field": "Langue",
+        "automatic": "Automatique",
+        "automaticHint": "Suit votre navigateur : {language}.",
+        "failed": "Impossible de changer la langue. Réessayez."
+    },
+    "profile": {
+        "photo": "Photo",
+        "photoHelp": "Visible par votre équipe, à côté de vos messages et de votre curseur.",
+        "dropPhoto": "Déposez votre photo",
+        "changePhoto": "Changer la photo",
+        "uploadPhoto": "Importer une photo",
+        "removePhoto": "Supprimer",
+        "name": "Nom",
+        "namePlaceholder": "ex. Ada Lovelace",
+        "save": "Enregistrer",
+        "notAnImage": "Choisissez un fichier image.",
+        "nameUpdated": "Nom mis à jour",
+        "failed": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "signIn": {
+        "email": {
+            "title": "E-mail",
+            "empty": "Non connecté. Ajoutez-en un pour vous connecter avec un code envoyé dans votre boîte de réception."
+        },
+        "phone": {
+            "title": "Téléphone",
+            "empty": "Non connecté. Ajoutez un numéro pour vous connecter avec un code par WhatsApp ou SMS.",
+            "otherAccount": "Ce numéro se connecte à un autre compte Rerun. Changez-le pour vous connecter ici par téléphone."
+        },
+        "change": "Modifier",
+        "add": "Ajouter",
+        "connect": "Connecter",
+        "disconnect": "Déconnecter",
+        "connected": "Connecté",
+        "notConnected": "Non connecté.",
+        "onlyMethod": "{provider} est le seul moyen de connexion lié à ce compte.",
+        "disconnectTitle": "Déconnecter {provider} ?",
+        "disconnectDescription": "Vous ne pourrez plus vous connecter à ce compte avec {provider}. Vos autres moyens de connexion continuent de fonctionner.",
+        "linkError": {
+            "identityTaken": "Ce compte {provider} sert déjà à se connecter à un autre compte Rerun.",
+            "denied": "{provider} n'a pas été connecté.",
+            "failed": "Impossible de connecter {provider}. Réessayez."
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "Workspaces partagés",
+                "description": "Vous quittez chaque workspace que vous partagez avec votre équipe. Elle le garde, avec ses coworkers et ses fichiers."
+            },
+            "own": {
+                "title": "Vos propres workspaces",
+                "description": "Un workspace dont vous êtes le seul membre s'arrête définitivement : ses coworkers sont éteints et sa machine est supprimée avec ses fichiers."
+            },
+            "signIn": {
+                "title": "Connexion",
+                "description": "Vous êtes déconnecté partout. Votre e-mail, votre compte Google et votre numéro sont libérés, vous pourrez donc vous réinscrire plus tard."
+            }
+        },
+        "blocker": {
+            "current": "Son abonnement se renouvelle encore. Résiliez-le depuis la Facturation avant de supprimer votre compte.",
+            "other": "Son abonnement se renouvelle encore. Passez sur ce workspace et résiliez-le depuis la Facturation avant de supprimer votre compte.",
+            "openBilling": "Ouvrir la facturation"
+        },
+        "submit": "Supprimer le compte",
+        "failed": "Impossible de supprimer votre compte."
+    }
+}

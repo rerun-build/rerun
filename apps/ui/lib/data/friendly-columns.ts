@@ -1,3 +1,6 @@
+import { DEFAULT_LOCALE } from '@rerun/i18n'
+import { formatDate, formatNumber } from '@rerun/i18n/format'
+
 import { humanizeTableName } from '@/lib/data/table-name'
 import type { EngineDbColumn } from '@/lib/engine/types'
 
@@ -129,27 +132,27 @@ function parseDate(text: string) {
 
 const DAY = 24 * 60 * 60 * 1000
 
-export function relativeDate(value: string, now = Date.now()): string {
+export function relativeDate(value: string, locale: string = DEFAULT_LOCALE, now = Date.now()): string {
     const time = parseDate(value)
     if (Number.isNaN(time)) return value
     const diff = now - time
-    if (diff < 0) return absoluteDate(value)
+    if (diff < 0) return absoluteDate(value, locale)
+    const relative = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' })
     const minutes = Math.round(diff / 60_000)
-    if (minutes < 60) return minutes <= 1 ? 'Just now' : `${minutes} min ago`
+    if (minutes < 60) return minutes <= 1 ? relative.format(0, 'second') : relative.format(-minutes, 'minute')
     const hours = Math.round(minutes / 60)
-    if (hours < 24) return `${hours}h ago`
+    if (hours < 24) return relative.format(-hours, 'hour')
     const days = Math.round(diff / DAY)
-    if (days === 1) return 'Yesterday'
-    if (days < 7) return `${days} days ago`
+    if (days < 7) return relative.format(-days, 'day')
     const sameYear = new Date(time).getFullYear() === new Date(now).getFullYear()
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: sameYear ? undefined : 'numeric' }).format(time)
+    return formatDate(time, locale, { month: 'short', day: 'numeric', year: sameYear ? undefined : 'numeric' })
 }
 
-export function absoluteDate(value: string): string {
+export function absoluteDate(value: string, locale: string = DEFAULT_LOCALE): string {
     const time = parseDate(value)
     if (Number.isNaN(time)) return value
     const hasTime = /\d{2}:\d{2}/.test(value)
-    return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: hasTime ? 'short' : undefined }).format(time)
+    return formatDate(time, locale, { dateStyle: 'medium', timeStyle: hasTime ? 'short' : undefined })
 }
 
 export function domainOf(url: string) {
@@ -176,32 +179,32 @@ export function rowCurrency(row: FriendlyRow): string | undefined {
     return typeof value === 'string' && CURRENCY_CODE.test(value) ? value.toUpperCase() : undefined
 }
 
-const plainNumber = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 })
+const plainNumber = (value: number, locale: string) => formatNumber(value, locale, { maximumFractionDigits: 2 })
 
-function money(amount: number, currency: string | undefined, fractionDigits: number) {
-    if (!currency) return new Intl.NumberFormat('en-US', { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }).format(amount)
+function money(amount: number, currency: string | undefined, fractionDigits: number, locale: string) {
+    if (!currency) return formatNumber(amount, locale, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits })
     try {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency, minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }).format(amount)
+        return formatNumber(amount, locale, { style: 'currency', currency, minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits })
     } catch {
-        return `${plainNumber.format(amount)} ${currency}`
+        return `${plainNumber(amount, locale)} ${currency}`
     }
 }
 
 /** A value as a person would write it. Money only gets a symbol when the row says which currency it is in. */
-export function plainValue(value: unknown, kind: ColumnKind, currency?: string): string {
+export function plainValue(value: unknown, kind: ColumnKind, currency?: string, locale: string = DEFAULT_LOCALE): string {
     if (isEmpty(value)) return ''
     const number = Number(value)
     switch (kind) {
         case 'date':
-            return relativeDate(String(value))
+            return relativeDate(String(value), locale)
         case 'currency':
-            return Number.isNaN(number) ? String(value) : money(number, currency, Number.isInteger(number) ? 0 : 2)
+            return Number.isNaN(number) ? String(value) : money(number, currency, Number.isInteger(number) ? 0 : 2, locale)
         case 'cents':
-            return Number.isNaN(number) ? String(value) : money(number / 100, currency, 2)
+            return Number.isNaN(number) ? String(value) : money(number / 100, currency, 2, locale)
         case 'percent':
             return Number.isNaN(number) ? String(value) : `${Math.round((Math.abs(number) <= 1 ? number * 100 : number) * 10) / 10}%`
         case 'number':
-            return Number.isNaN(number) ? String(value) : plainNumber.format(number)
+            return Number.isNaN(number) ? String(value) : plainNumber(number, locale)
         case 'url':
             return domainOf(String(value))
         case 'boolean':

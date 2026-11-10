@@ -7,14 +7,16 @@ import { cn } from '../cn'
 import { Monitor, Moon, Sun, type LucideIcon } from '../icons'
 import { SegmentedControl, SegmentedControlItem } from '../primitives/segmented-control'
 import type { ThemePreference } from './theme-cookie'
+import { useKitTranslations } from '../locale'
 
-const OPTIONS: { value: ThemePreference; label: string; icon: LucideIcon }[] = [
-    { value: 'system', label: 'System', icon: Monitor },
-    { value: 'light', label: 'Light', icon: Sun },
-    { value: 'dark', label: 'Dark', icon: Moon },
+const OPTIONS: { value: ThemePreference; icon: LucideIcon }[] = [
+    { value: 'system', icon: Monitor },
+    { value: 'light', icon: Sun },
+    { value: 'dark', icon: Moon },
 ]
 
 export function ThemeToggle({ className }: { className?: string }) {
+    const t = useKitTranslations()
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
 
@@ -28,10 +30,10 @@ export function ThemeToggle({ className }: { className?: string }) {
             onValueChange={setTheme}
             className={cn('gap-0.5 p-0.5', className)}
             role="radiogroup"
-            aria-label="Theme"
+            aria-label={t('theme.label')}
         >
-            {OPTIONS.map(({ value, label, icon: Glyph }) => (
-                <SegmentedControlItem key={value} value={value} className="inline-flex size-7 items-center justify-center p-0" aria-label={label} title={label}>
+            {OPTIONS.map(({ value, icon: Glyph }) => (
+                <SegmentedControlItem key={value} value={value} className="inline-flex size-7 items-center justify-center p-0" aria-label={t(`theme.options.${value}`)} title={t(`theme.options.${value}`)}>
                     <Glyph className="size-4" />
                 </SegmentedControlItem>
             ))}

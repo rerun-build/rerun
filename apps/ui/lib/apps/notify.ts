@@ -2,11 +2,15 @@
 import * as React from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { AgentNotification, renderEmail } from '@rerun/emails'
+import { emailTranslator } from '@rerun/emails/i18n'
 import type { Database } from '@/app/api/database.types'
 import { APP_URL, REPLY_TO, TRANSACTIONAL_FROM, getResendClient, redirectDelivery } from '@/lib/email/client'
 import { sendThrottled } from '@/lib/email/throttle'
 import { buildUnsubscribeUrl, listUnsubscribeHeaders } from '@/lib/email/unsubscribeToken'
 import { loadRecipient } from '@/ee/lib/lifecycle/recipient'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { translatorFor } from '@/lib/i18n/server-translator'
+import { noticeText, type NoticeCopy } from '@/lib/notifications/notice-copy'
 import { wantsCategoryEmail } from '@/lib/notifications/prefs'
 import { selectMany } from '@/supabase/supabase-helpers'
 
@@ -18,6 +22,7 @@ export const APP_NOTICE_EVENT = 'app_notice'
 export type AppNotice = {
     appName: string
     message: string
+    copy: NoticeCopy
     // Who hears about it by email on top of the bell: a fact that costs money or stops the coworkers
     // is worth an email, a reconnect reminder after a restore is not.
     email: boolean
@@ -35,7 +40,7 @@ export async function notifyWorkspace(supabase: Client, workspaceId: number, not
             event: APP_NOTICE_EVENT,
             kind: 'connector',
             message: notice.message,
-            metadata: { app: notice.appName },
+            metadata: { app: notice.appName, notice: notice.copy },
             notified_at: new Date().toISOString(),
         })
         if (error) throw new Error(error.message)
@@ -59,9 +64,11 @@ async function emailMembers(supabase: Client, workspaceId: number, notice: AppNo
         recipients.map(async user => {
             const recipient = await loadRecipient(supabase, user.id)
             if (!recipient) return
+            const locale = await recipientLocale(supabase, user.id, workspaceId)
             const unsubscribeUrl = buildUnsubscribeUrl(user.id)
-            const subject = `${notice.appName}: action needed`
-            const { html, text } = await renderEmail(React.createElement(AgentNotification, { agentName: notice.appName, kind: 'connector', message: notice.message, appUrl: APP_URL, unsubscribeUrl }))
+            const subject = emailTranslator(locale)('subjects.appNotice', { appName: notice.appName })
+            const message = noticeText({ message: notice.message, metadata: { notice: notice.copy } }, await translatorFor(locale, 'notifications.notices'))
+            const { html, text } = await renderEmail(React.createElement(AgentNotification, { agentName: notice.appName, kind: 'connector', message, appUrl: APP_URL, unsubscribeUrl, locale }))
             const delivery = redirectDelivery(recipient.email, subject)
             await sendThrottled(() => resend.emails.send({ from: TRANSACTIONAL_FROM, replyTo: REPLY_TO, to: delivery.to, subject: delivery.subject, html, text, headers: listUnsubscribeHeaders(unsubscribeUrl) }))
         }),

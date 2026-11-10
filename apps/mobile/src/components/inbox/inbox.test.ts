@@ -7,10 +7,10 @@ const item = (patch: Partial<InboxItem>): InboxItem => ({ id: 'i1', sessionId: '
 describe('inbox', () => {
     it('sorts the rows into the web sections, in its order, and leaves out an empty one', () => {
         const sections = inboxSections([item({ id: 'done', status: 'done' }), item({ id: 'ask' }), item({ id: 'broke', status: 'error' }), item({ id: 'wait', status: 'waiting_human' })])
-        expect(sections.map(section => [section.title, section.items.map(row => row.id)])).toEqual([
-            ['Needs you', ['ask', 'wait']],
-            ['Errors', ['broke']],
-            ['Done', ['done']],
+        expect(sections.map(section => [section.key, section.items.map(row => row.id)])).toEqual([
+            ['needsYou', ['ask', 'wait']],
+            ['errors', ['broke']],
+            ['done', ['done']],
         ])
     })
 

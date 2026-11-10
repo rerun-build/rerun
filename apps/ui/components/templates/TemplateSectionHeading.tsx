@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { ArrowLeftIcon, ChevronRightIcon, type LucideIcon } from '@/lib/icons'
@@ -8,6 +9,7 @@ import { ArrowLeftIcon, ChevronRightIcon, type LucideIcon } from '@/lib/icons'
 // to narrow the library down to themselves; one given `onBack` is the way out of the narrowed
 // catalogue those shelves lead to.
 export function TemplateSectionHeading({ title, subtitle, icon, onSelect, onBack }: { title: string; subtitle?: string; icon?: LucideIcon; onSelect?: () => void; onBack?: () => void }) {
+    const t = useTranslations('templates.section')
     if (!onSelect) {
         return (
             <div className="mb-4 flex items-center gap-2">
@@ -16,7 +18,7 @@ export function TemplateSectionHeading({ title, subtitle, icon, onSelect, onBack
                     column too, never pulled into its padding by an optical margin: this sits inside a
                     scroller that clips horizontally, and half the hover pill would be cut off. */}
                 {onBack && (
-                    <Button type="button" variant="ghost" size="icon-lg" aria-label="Back to all templates" onClick={onBack} className="shrink-0 text-muted-foreground">
+                    <Button type="button" variant="ghost" size="icon-lg" aria-label={t('back')} onClick={onBack} className="shrink-0 text-muted-foreground">
                         <ArrowLeftIcon className="size-5" />
                     </Button>
                 )}
@@ -53,7 +55,7 @@ export function TemplateSectionHeading({ title, subtitle, icon, onSelect, onBack
                 take phrasing content, so a heading and a paragraph cannot live inside one. This way the
                 icon and the subtitle are part of the target too, and `w-fit` keeps the empty half of the
                 row out of it. */}
-            <button type="button" onClick={onSelect} aria-label={`Filter by ${title}`} className="absolute -inset-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            <button type="button" onClick={onSelect} aria-label={t('filterBy', { title })} className="absolute -inset-1 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring" />
         </div>
     )
 }

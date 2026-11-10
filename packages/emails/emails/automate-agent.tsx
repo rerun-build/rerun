@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { Panel } from "../components/Panel";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface AutomateAgentProps {
@@ -17,6 +19,7 @@ export interface AutomateAgentProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function AutomateAgent({
@@ -28,35 +31,32 @@ export default function AutomateAgent({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: AutomateAgentProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`You've started ${agentName} by hand ${manualRuns} times`}
+      preview={t("automateAgent.preview", { agentName, manualRuns })}
       hero={{ scene: "automate-agent", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Let {agentName} start itself</Heading>
+      <Heading style={text.heading}>{t("automateAgent.heading", { agentName })}</Heading>
       <Text style={text.paragraph}>
-        You started <strong>{agentName}</strong> yourself{" "}
-        <strong>{manualRuns} times</strong> in {periodLabel}, and every one of
-        them finished.
+        {t.rich("automateAgent.body", { agentName, manualRuns, period: periodLabel, strong })}
       </Text>
 
       {lastResult ? <Panel>{lastResult}</Panel> : null}
 
       <Text style={{ ...text.paragraph, margin: lastResult ? "16px 0" : "0 0 16px" }}>
-        The workflow works. On a schedule it does the same job without you
-        opening the app to launch it.
+        {t("automateAgent.workflowWorks")}
       </Text>
 
       <Section style={cta}>
-        <Button href={scheduleUrl}>Schedule the next run</Button>
+        <Button href={scheduleUrl}>{t("automateAgent.button")}</Button>
       </Section>
-      <Text style={text.footnote}>
-        You review the schedule before it is saved, and you can pause it at any
-        time.
-      </Text>
+      <Text style={text.footnote}>{t("automateAgent.footnote")}</Text>
     </Layout>
   );
 }

@@ -7,6 +7,7 @@ import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
 import { CONSENT_COOKIE, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseSessionHintCookie } from '@rerun/contracts'
 import { createServerClient } from '@supabase/ssr'
 import type { User } from '@supabase/supabase-js'
+import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // A visitor with no session gets an anonymous Supabase user so they can explore the app without
@@ -157,6 +158,7 @@ export async function updateSession(request: NextRequest) {
                     consentCookie: request.cookies.get(CONSENT_COOKIE)?.value,
                     userAgent: request.headers.get('user-agent'),
                 }),
+                locale: resolveLocale({ cookie: request.cookies.get(LOCALE_COOKIE)?.value, acceptLanguage: request.headers.get('accept-language') }),
             })
         }
     }

@@ -43,7 +43,7 @@ export {
     planPriceCents,
     trialChargeLine,
     trialEndDate,
-    trialLimitsLabel,
+    trialLimitsCaption,
     yearlyDiscountPercent,
     type AddonKey,
     type AddonQuantities,

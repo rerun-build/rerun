@@ -5,23 +5,25 @@ import { SymbolView } from 'expo-symbols'
 import { useEffect, useState } from 'react'
 import { Alert, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { createCoworker, fetchBoxes } from '@/api/board'
 import { boxForNewCoworker, manageableBoxes, newCoworkerBlocker } from '@/auth/access'
 import { useAuth, useIsWorkspaceAdmin } from '@/auth/AuthProvider'
-import { UNNAMED_BOX_LABEL } from '@/components/home/board'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { PillButton } from '@/components/ui/PillButton'
 import { TextField } from '@/components/ui/TextField'
 import { useTheme } from '@/theme/theme'
 import { brand, radius, spacing } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 
 const NAME_MAX = 60
 
 function BoxRow({ box, selected, onPress, divided }: { box: Box; selected: boolean; onPress: () => void; divided: boolean }) {
     const theme = useTheme()
-    const label = box.name || UNNAMED_BOX_LABEL
+    const t = useTranslations('mobileHome')
+    const label = box.name || t('untitledBox')
     return (
         <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected }} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 48, paddingHorizontal: spacing.lg, borderTopWidth: divided ? 1 : 0, borderTopColor: theme.border, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <SymbolView name="square.dashed" size={16} tintColor={theme.mutedForeground} />
@@ -40,6 +42,9 @@ export default function NewCoworker() {
     const insets = useSafeAreaInsets()
     const { box: preselected } = useLocalSearchParams<{ box?: string }>()
     const { session, me } = useAuth()
+    const t = useTranslations('mobileCoworker.create')
+    const tAccess = useTranslations('mobileCoworker.access')
+    const tCommon = useTranslations('mobileCommon')
     const [boxes, setBoxes] = useState<Box[] | null>(null)
     const [boxId, setBoxId] = useState<string | null>(preselected ?? null)
     const [name, setName] = useState('')
@@ -70,10 +75,10 @@ export default function NewCoworker() {
             const created = await createCoworker({ accessToken, workspaceId }, { name: name.trim(), description: description.trim() || undefined, spaceId: boxId })
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
             router.replace({ pathname: '/chat/[id]', params: { id: created.sessionId ?? 'new', to: created.agentId } })
-            if (!created.active) Alert.alert(`${name.trim()} is paused`, 'Your plan has no free coworker slot. Start Pro at rerun.build for unlimited coworkers.')
+            if (!created.active) Alert.alert(t('pausedTitle', { name: name.trim() }), t('pausedMessage'))
         } catch (err) {
             setCreating(false)
-            Alert.alert('Could not create the coworker', err instanceof Error ? err.message : 'Try again in a moment.')
+            Alert.alert(t('failed'), err instanceof Error ? err.message : tCommon('errors.tryAgainShortly'))
         }
     }
 
@@ -81,28 +86,28 @@ export default function NewCoworker() {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <GlassButton symbol="xmark" label="Close" onPress={() => router.back()} />
+                <GlassButton symbol="xmark" label={tCommon('actions.close')} onPress={() => router.back()} />
                 <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
-                    New coworker
+                    {t('title')}
                 </AppText>
                 <View style={{ width: GLASS_BUTTON_SIZE }} />
             </View>
 
             {blocked ? (
                 <AppText variant="callout" tone="muted">
-                    {blocked}
+                    {tAccess(blocked, { host: webHost })}
                 </AppText>
             ) : (
                 <>
-                    <TextField id="coworker-name" label="Name" value={name} onChangeText={setName} placeholder="Scout" maxLength={NAME_MAX} autoFocus />
-                    <TextField id="coworker-description" label="What should it do?" value={description} onChangeText={setDescription} placeholder="Find marketing agencies in Lyon and draft a first email to each" multiline help="Its first task. It starts on it right away." />
+                    <TextField id="coworker-name" label={t('nameLabel')} value={name} onChangeText={setName} placeholder={t('namePlaceholder')} maxLength={NAME_MAX} autoFocus />
+                    <TextField id="coworker-description" label={t('descriptionLabel')} value={description} onChangeText={setDescription} placeholder={t('descriptionPlaceholder')} multiline help={t('descriptionHelp')} />
                 </>
             )}
 
             {boxes && boxes.length > 0 && (
                 <View style={{ gap: spacing.sm }}>
                     <AppText variant="footnote" medium>
-                        Box
+                        {t('boxLabel')}
                     </AppText>
                     <View style={{ borderRadius: radius.lg, borderCurve: 'continuous', backgroundColor: theme.card, overflow: 'hidden' }}>
                         {boxes.map((box, index) => (
@@ -111,7 +116,7 @@ export default function NewCoworker() {
                     </View>
                 </View>
             )}
-            {!blocked && <PillButton label="Create" onPress={create} loading={creating} disabled={!name.trim() || !boxId} />}
+            {!blocked && <PillButton label={t('submit')} onPress={create} loading={creating} disabled={!name.trim() || !boxId} />}
         </ScrollView>
     )
 }

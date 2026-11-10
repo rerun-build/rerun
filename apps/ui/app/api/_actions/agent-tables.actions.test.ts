@@ -35,12 +35,12 @@ describe('listAgentTablesAction', () => {
 
     it('reports an engine that does not answer instead of an empty list', async () => {
         mocks.listDbTables.mockRejectedValue(new TypeError('fetch failed'))
-        await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: false, error: 'Could not reach the engine for this coworker.' })
+        await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: false, error: 'Could not reach the engine for this coworker.', code: 'agentDbUnreachable' })
     })
 
     it('keeps the transport details of a failed engine call out of the message', async () => {
         mocks.listDbTables.mockRejectedValue(new EngineRequestError('rerun-engine GET /agents/cog1/data/tables failed: 500 boom', 500))
-        await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: false, error: 'Could not reach the engine for this coworker.' })
+        await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: false, error: 'Could not reach the engine for this coworker.', code: 'agentDbUnreachable' })
     })
 
     it('passes on why the coworker cannot be reached', async () => {
@@ -49,7 +49,7 @@ describe('listAgentTablesAction', () => {
             success: false,
             error: 'This coworker is inactive: your plan has no free coworker slot. Activate it from the coworker panel.',
         })
-        mocks.getAgentChatTarget.mockRejectedValue(new AuthorizationError('Coworker not found'))
-        await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: false, error: 'Coworker not found' })
+        mocks.getAgentChatTarget.mockRejectedValue(new AuthorizationError('coworkerNotFound'))
+        await expect(listAgentTablesAction('agent-1')).resolves.toEqual({ success: false, error: 'Coworker not found', code: 'coworkerNotFound' })
     })
 })

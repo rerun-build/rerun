@@ -2,12 +2,14 @@ import * as WebBrowser from 'expo-web-browser'
 
 import { claimMcpSignIn, connectMcpServer } from '@/api/mcp'
 import { claimServiceSignIn, connectService, readService } from '@/api/services'
+import { translatorFor } from '@/i18n/translator'
 
 type Caller = { accessToken: string; workspaceId: number }
 
 export type ConnectOutcome = { status: 'connected' } | { status: 'cancelled' } | { status: 'error'; message: string }
 
-const UNFINISHED = 'The sign-in did not finish. Try again.'
+// Read when the sign-in ends, in the language the app shows then.
+const oauthText = (key: 'unfinished' | 'authorizationFailed' | 'startFailed') => translatorFor('mobileProviders')(`oauth.${key}`)
 
 // iOS refuses a second auth session while one is open, and a double tap would otherwise answer the
 // coworker twice. The promise is also the only channel the result travels through: no Linking
@@ -28,9 +30,9 @@ async function signInClaim(target: { url: string; returnUrl: string }): Promise<
     const result = await WebBrowser.openAuthSessionAsync(target.url, target.returnUrl)
     if (result.type !== 'success') return { status: 'cancelled' }
     const returned = new URL(result.url)
-    if (returned.searchParams.get('status') !== 'success') return { status: 'error', message: returned.searchParams.get('message') ?? 'Authorization failed' }
+    if (returned.searchParams.get('status') !== 'success') return { status: 'error', message: returned.searchParams.get('message') ?? oauthText('authorizationFailed') }
     const claim = returned.searchParams.get('claim')
-    return claim ? { status: 'claim', claim } : { status: 'error', message: UNFINISHED }
+    return claim ? { status: 'claim', claim } : { status: 'error', message: oauthText('unfinished') }
 }
 
 export function runConnect(caller: Caller, agentId: string, slug: string): Promise<ConnectOutcome> {
@@ -47,7 +49,7 @@ export function runMcpConnect(caller: Caller, agentId: string, name: string): Pr
             await claimMcpSignIn(caller, agentId, name, ended.claim)
             return { status: 'connected' }
         } catch (err) {
-            return { status: 'error', message: err instanceof Error ? err.message : 'Could not start the sign-in' }
+            return { status: 'error', message: err instanceof Error ? err.message : oauthText('startFailed') }
         }
     })
 }
@@ -59,8 +61,8 @@ async function connect(caller: Caller, agentId: string, slug: string): Promise<C
         await claimServiceSignIn(caller, agentId, slug, ended.claim)
         // The registry says whether the app is connected, not the redirect.
         const service = await readService(caller, agentId, slug)
-        return service.installStatus === 'active' ? { status: 'connected' } : { status: 'error', message: UNFINISHED }
+        return service.installStatus === 'active' ? { status: 'connected' } : { status: 'error', message: oauthText('unfinished') }
     } catch (err) {
-        return { status: 'error', message: err instanceof Error ? err.message : 'Could not start the sign-in' }
+        return { status: 'error', message: err instanceof Error ? err.message : oauthText('startFailed') }
     }
 }

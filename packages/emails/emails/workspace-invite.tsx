@@ -2,6 +2,8 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface WorkspaceInviteProps {
@@ -11,6 +13,7 @@ export interface WorkspaceInviteProps {
   /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
+  locale?: EmailLocale;
 }
 
 export default function WorkspaceInvite({
@@ -19,38 +22,27 @@ export default function WorkspaceInvite({
   invitedByEmail,
   boardUrl,
   appUrl,
+  locale,
 }: WorkspaceInviteProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`You're invited to ${workspaceName} on Rerun`}
+      preview={t("workspaceInvite.preview", { workspaceName })}
       hero={{ scene: "workspace-invite", board: boardUrl }}
       appUrl={appUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>You&apos;re invited</Heading>
+      <Heading style={text.heading}>{t("workspaceInvite.heading")}</Heading>
       <Text style={text.paragraph}>
-        {invitedByEmail ? (
-          <>
-            <strong>{invitedByEmail}</strong> invited you to join{" "}
-            <strong>{workspaceName}</strong> on Rerun.
-          </>
-        ) : (
-          <>
-            You&apos;ve been invited to join <strong>{workspaceName}</strong> on
-            Rerun.
-          </>
-        )}
+        {invitedByEmail
+          ? t.rich("workspaceInvite.bodyWithInviter", { inviter: invitedByEmail, workspaceName, strong })
+          : t.rich("workspaceInvite.bodyAnonymous", { workspaceName, strong })}
       </Text>
-      <Text style={text.paragraph}>
-        Rerun runs your business with autonomous AI coworkers. Accept the invite to
-        start collaborating in this workspace.
-      </Text>
+      <Text style={text.paragraph}>{t("workspaceInvite.pitch")}</Text>
       <Section style={cta}>
-        <Button href={inviteUrl}>Join {workspaceName}</Button>
+        <Button href={inviteUrl}>{t("workspaceInvite.button", { workspaceName })}</Button>
       </Section>
-      <Text style={text.footnote}>
-        This invitation expires in 7 days. If you weren&apos;t expecting it, you
-        can safely ignore this email.
-      </Text>
+      <Text style={text.footnote}>{t("workspaceInvite.footnote")}</Text>
     </Layout>
   );
 }

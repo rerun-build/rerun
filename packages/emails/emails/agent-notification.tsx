@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { Panel } from "../components/Panel";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text, type ToneName } from "../theme";
 
 // All emailable kinds except `error`, which has its own RunFailed template.
@@ -25,37 +27,15 @@ export interface AgentNotificationProps {
   /** Opens the conversation the email is about. Without it the button opens the board. */
   conversationUrl?: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
-const COPY: Record<
-  AgentNotificationKind,
-  { heading: string; lead: string; tone: ToneName }
-> = {
-  done: {
-    heading: "Task done",
-    lead: "finished a task.",
-    tone: "done",
-  },
-  info: {
-    heading: "Needs your attention",
-    lead: "wants you to look at something.",
-    tone: "info",
-  },
-  question: {
-    heading: "Coworker has a question",
-    lead: "needs an answer to continue.",
-    tone: "question",
-  },
-  approval: {
-    heading: "Approval needed",
-    lead: "is waiting for your approval.",
-    tone: "approval",
-  },
-  connector: {
-    heading: "App setup",
-    lead: "needs you to connect a service.",
-    tone: "connector",
-  },
+const TONES_BY_KIND: Record<AgentNotificationKind, ToneName> = {
+  done: "done",
+  info: "info",
+  question: "question",
+  approval: "approval",
+  connector: "connector",
 };
 
 export default function AgentNotification({
@@ -67,24 +47,26 @@ export default function AgentNotification({
   appUrl,
   conversationUrl,
   unsubscribeUrl,
+  locale,
 }: AgentNotificationProps) {
-  const copy = COPY[kind];
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`${agentName}: ${copy.heading}`}
+      preview={t(`agentNotification.${kind}.preview`, { agentName })}
       hero={{ variant: kind, board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>{copy.heading}</Heading>
+      <Heading style={text.heading}>{t(`agentNotification.${kind}.heading`)}</Heading>
       <Text style={text.paragraph}>
-        Your agent <strong>{agentName}</strong> {copy.lead}
+        {t.rich(`agentNotification.${kind}.body`, { agentName, strong })}
       </Text>
       {reason ? <Text style={reasonLine}>{reason}</Text> : null}
-      <Panel tone={copy.tone}>{message}</Panel>
+      <Panel tone={TONES_BY_KIND[kind]}>{message}</Panel>
       <Section style={cta}>
         <Button href={conversationUrl ?? appUrl}>
-          {conversationUrl ? "Open the conversation" : "Open Rerun"}
+          {conversationUrl ? t("common.openConversation") : t("common.openRerun")}
         </Button>
       </Section>
     </Layout>

@@ -1,0 +1,16 @@
+{
+    "save": "Guardar",
+    "saving": "Guardando",
+    "cancel": "Cancelar",
+    "somethingWentWrong": "Algo salió mal. Inténtalo de nuevo.",
+    "backToDashboard": "Volver al tablero",
+    "notFound": {
+        "title": "Página no encontrada",
+        "body": "Esta página no existe o se ha movido. Te llevamos de vuelta."
+    },
+    "crash": {
+        "title": "Algo salió mal",
+        "body": "Esta página tuvo un error inesperado. Tus coworkers y su trabajo están a salvo. Recarga para seguir donde lo dejaste.",
+        "reload": "Recargar"
+    }
+}

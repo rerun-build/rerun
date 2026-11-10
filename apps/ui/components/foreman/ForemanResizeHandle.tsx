@@ -1,6 +1,7 @@
 'use client'
 
 import type { PointerEvent, RefObject } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
 import { type ForemanCorner, type ForemanPlacement, FOREMAN_FLOAT_DEFAULT_SIZE, clampForemanFloatSize } from '@/lib/foreman-layout'
@@ -18,6 +19,7 @@ const HANDLE_CLASSES: Record<ForemanCorner, string> = {
 }
 
 export function ForemanResizeHandle({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement & { mode: 'float' } }) {
+    const t = useTranslations('foreman')
     const resizeRef = useRef<ResizeState | null>(null)
     const growsLeft = placement.corner.endsWith('right')
     const growsUp = placement.corner.startsWith('bottom')
@@ -69,7 +71,7 @@ export function ForemanResizeHandle({ panelRef, placement }: { panelRef: RefObje
     return (
         <div
             role="separator"
-            aria-label="Resize chat"
+            aria-label={t('resize')}
             data-resizing="false"
             className={cn(
                 'absolute z-30 hidden size-4 touch-none border-transparent transition-colors hover:border-ring/70 data-[resizing=true]:border-ring md:block',

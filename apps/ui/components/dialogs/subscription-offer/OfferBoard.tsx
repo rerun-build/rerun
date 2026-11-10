@@ -12,6 +12,7 @@ import {
     usePrefersReducedMotion,
     useRenderedFrame,
 } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -23,10 +24,10 @@ import { CHATGPT_MARK, CLAUDE_MARK, OPENROUTER_MARK } from './offer-board-marks'
 // sits one free cell above its agent, close enough that the cable between them reads as a tether.
 // The three marks are the three answers the dialog offers, one per coworker.
 const CREW = [
-    { key: 'sales', name: 'Sales', col: 4, row: 7, mark: CLAUDE_MARK },
-    { key: 'customer_support', name: 'Customer Support', col: 7, row: 7, mark: CHATGPT_MARK },
-    { key: 'accounting', name: 'Accounting', col: 10, row: 7, mark: OPENROUTER_MARK },
-]
+    { key: 'sales', col: 4, row: 7, mark: CLAUDE_MARK },
+    { key: 'customer_support', col: 7, row: 7, mark: CHATGPT_MARK },
+    { key: 'accounting', col: 10, row: 7, mark: OPENROUTER_MARK },
+] as const
 
 const PLAN_ROW_OFFSET = 2
 const WAKE_STEP = 180
@@ -37,6 +38,7 @@ function planId(key: string) {
 }
 
 export function OfferBoard({ className, alive = true }: { className?: string; alive?: boolean }) {
+    const t = useTranslations('dialogs.subscriptionOffer.board.crew')
     const { ref, frame } = useRenderedFrame()
     const reducedMotion = usePrefersReducedMotion()
     const animated = alive && !reducedMotion
@@ -47,8 +49,8 @@ export function OfferBoard({ className, alive = true }: { className?: string; al
                 id: member.key,
                 position: { col: member.col, row: member.row },
                 span: 2,
-                style: agentTileStyle('idle', member.name),
-                ariaLabel: member.name,
+                style: agentTileStyle('idle', t(member.key)),
+                ariaLabel: t(member.key),
             })),
             ...CREW.map<Tile>(member => ({
                 id: planId(member.key),
@@ -58,7 +60,7 @@ export function OfferBoard({ className, alive = true }: { className?: string; al
                 highlighted: true,
             })),
         ],
-        []
+        [t]
     )
 
     const living = useLivingBoard({

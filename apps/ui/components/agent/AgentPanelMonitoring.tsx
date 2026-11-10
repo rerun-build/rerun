@@ -4,18 +4,17 @@ import { readAgentMonitoringAction } from '@/app/api/_actions/agent.actions'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
-import { STATS_TIME_RANGE_META } from '@rerun/contracts'
 import type { StatsChartType, StatsDataset, StatsGroupBy, StatsMetric, StatsTimeRange, UsageTimeRange } from '@rerun/contracts'
 import type { EngineStatsPoint, EngineUsageBucket } from '@/lib/engine/types'
 import { StatsChart, TokenUsageChart, MonitorCard } from '@rerun/ui/monitoring'
 import { ActivityIcon, AlertTriangleIcon, BarChart3Icon, CircleDollarSignIcon, CoinsIcon, CpuIcon, GaugeIcon, HashIcon, Maximize2Icon, TimerIcon, WrenchIcon } from '@/lib/icons'
 import type { ComponentType, ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 
 type StatSpec = {
-    key: string
-    title: string
+    key: 'kpiRuns' | 'kpiCost' | 'kpiTokens' | 'kpiErrorRate' | 'runsOverTime' | 'costOverTime' | 'avgDuration' | 'runsByModel' | 'topTools' | 'toolErrors'
     icon: ComponentType<{ className?: string }>
     dataset: StatsDataset
     metric: StatsMetric
@@ -24,29 +23,30 @@ type StatSpec = {
 }
 
 const KPI_SPECS: StatSpec[] = [
-    { key: 'kpiRuns', title: 'Runs', icon: HashIcon, dataset: 'runs', metric: 'count', groupBy: 'none', chartType: 'stat' },
-    { key: 'kpiCost', title: 'Total cost', icon: CircleDollarSignIcon, dataset: 'runs', metric: 'cost', groupBy: 'none', chartType: 'stat' },
-    { key: 'kpiTokens', title: 'Total tokens', icon: CoinsIcon, dataset: 'runs', metric: 'totalTokens', groupBy: 'none', chartType: 'stat' },
-    { key: 'kpiErrorRate', title: 'Error rate', icon: GaugeIcon, dataset: 'runs', metric: 'errorRate', groupBy: 'none', chartType: 'stat' },
+    { key: 'kpiRuns', icon: HashIcon, dataset: 'runs', metric: 'count', groupBy: 'none', chartType: 'stat' },
+    { key: 'kpiCost', icon: CircleDollarSignIcon, dataset: 'runs', metric: 'cost', groupBy: 'none', chartType: 'stat' },
+    { key: 'kpiTokens', icon: CoinsIcon, dataset: 'runs', metric: 'totalTokens', groupBy: 'none', chartType: 'stat' },
+    { key: 'kpiErrorRate', icon: GaugeIcon, dataset: 'runs', metric: 'errorRate', groupBy: 'none', chartType: 'stat' },
 ]
 
 const CHART_SPECS: StatSpec[] = [
-    { key: 'runsOverTime', title: 'Runs over time', icon: ActivityIcon, dataset: 'runs', metric: 'count', groupBy: 'status', chartType: 'bar' },
-    { key: 'costOverTime', title: 'Cost over time', icon: CircleDollarSignIcon, dataset: 'runs', metric: 'cost', groupBy: 'none', chartType: 'area' },
-    { key: 'avgDuration', title: 'Avg run duration', icon: TimerIcon, dataset: 'runs', metric: 'avgDurationMs', groupBy: 'none', chartType: 'line' },
-    { key: 'runsByModel', title: 'Runs by model', icon: CpuIcon, dataset: 'runs', metric: 'count', groupBy: 'model', chartType: 'donut' },
-    { key: 'topTools', title: 'Top tool calls', icon: WrenchIcon, dataset: 'toolCalls', metric: 'count', groupBy: 'toolName', chartType: 'bar' },
-    { key: 'toolErrors', title: 'Tool errors', icon: AlertTriangleIcon, dataset: 'toolCalls', metric: 'errorCount', groupBy: 'toolName', chartType: 'bar' },
+    { key: 'runsOverTime', icon: ActivityIcon, dataset: 'runs', metric: 'count', groupBy: 'status', chartType: 'bar' },
+    { key: 'costOverTime', icon: CircleDollarSignIcon, dataset: 'runs', metric: 'cost', groupBy: 'none', chartType: 'area' },
+    { key: 'avgDuration', icon: TimerIcon, dataset: 'runs', metric: 'avgDurationMs', groupBy: 'none', chartType: 'line' },
+    { key: 'runsByModel', icon: CpuIcon, dataset: 'runs', metric: 'count', groupBy: 'model', chartType: 'donut' },
+    { key: 'topTools', icon: WrenchIcon, dataset: 'toolCalls', metric: 'count', groupBy: 'toolName', chartType: 'bar' },
+    { key: 'toolErrors', icon: AlertTriangleIcon, dataset: 'toolCalls', metric: 'errorCount', groupBy: 'toolName', chartType: 'bar' },
 ]
 
 const ALL_SPECS = [...KPI_SPECS, ...CHART_SPECS]
 
-const RANGES: StatsTimeRange[] = ['24h', '7d', '30d', '90d']
+const RANGES = ['24h', '7d', '30d', '90d'] as const satisfies readonly StatsTimeRange[]
 const POLL_MS = 30000
 
 type StatsData = Record<string, EngineStatsPoint[] | null>
 
 export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
+    const t = useTranslations('agent.agentPanelMonitoring')
     const [range, setRange] = useState<StatsTimeRange>('7d')
     const [stats, setStats] = useState<StatsData>({})
     const [usage, setUsage] = useState<EngineUsageBucket[] | null>(null)
@@ -75,10 +75,10 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
     const isEmpty = !loading && usage?.length === 0 && ALL_SPECS.every(spec => (stats[spec.key]?.length ?? 0) === 0)
 
     const chartPanels: { key: string; title: string; subtitle?: string; icon: ComponentType<{ className?: string }>; node: ReactNode }[] = [
-        { key: 'tokenUsage', title: 'Token usage', subtitle: 'Tokens per day', icon: CoinsIcon, node: <TokenUsageChart metric="tokens" breakdown="total" chartType="area" buckets={usage} /> },
+        { key: 'tokenUsage', title: t('tokenUsage.title'), subtitle: t('tokenUsage.subtitle'), icon: CoinsIcon, node: <TokenUsageChart metric="tokens" breakdown="total" chartType="area" buckets={usage} /> },
         ...CHART_SPECS.map(spec => ({
             key: spec.key,
-            title: spec.title,
+            title: t(`charts.${spec.key}`),
             icon: spec.icon,
             node: <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />,
         })),
@@ -92,10 +92,10 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
                     <button
                         key={r}
                         onClick={() => setRange(r)}
-                        title={STATS_TIME_RANGE_META[r].label}
+                        title={t(`ranges.${r}.label`)}
                         className={`rounded-md px-2 py-1 text-xs font-medium transition-colors ${range === r ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'}`}
                     >
-                        {r}
+                        {t(`ranges.${r}.short`)}
                     </button>
                 ))}
             </div>
@@ -106,14 +106,14 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
                 <EmptyState
                     className="h-full"
                     icon={BarChart3Icon}
-                    title="No activity yet"
-                    description="Usage, cost and run analytics for this coworker will appear here once it starts working."
+                    title={t('empty.title')}
+                    description={t('empty.description')}
                 />
             ) : (
                 <div className="min-h-0 flex-1 overflow-y-auto p-3">
                     <div className="grid grid-cols-2 gap-3">
                         {KPI_SPECS.map(spec => (
-                            <MonitorCard key={spec.key} className="h-32" title={spec.title} icon={spec.icon}>
+                            <MonitorCard key={spec.key} className="h-32" title={t(`charts.${spec.key}`)} icon={spec.icon}>
                                 <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />
                             </MonitorCard>
                         ))}
@@ -130,7 +130,7 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
                                 action={
                                     <button
                                         onClick={() => setExpandedKey(panel.key)}
-                                        aria-label={`Expand ${panel.title}`}
+                                        aria-label={t('expand', { title: panel.title })}
                                         className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground"
                                     >
                                         <Maximize2Icon className="size-3.5" />

@@ -1,22 +1,17 @@
-import { friendlyError } from '@/lib/chat-error'
+import { friendlyError, type ChatErrorCopy } from '@/lib/chat-error'
 import type { NotificationKind } from '@/lib/engine/types'
 import type { StoredNotification } from '@/lib/notifications/inbound'
 
 export type PushCopy = { title: string; subtitle: string; body?: string; silent: boolean }
 
-const STATES: Record<NotificationKind, string> = {
-    done: 'Done',
-    error: 'Failed',
-    question: 'Question',
-    approval: 'Needs approval',
-    connector: 'Needs an app',
-    info: 'Update',
-}
+// The `push` namespace, in the language of whoever receives it.
+export type PushTranslator = (key: `states.${NotificationKind}` | 'subtitle', values?: Record<string, string>) => string
 
 const BODY_LIMIT = 180
 
-// The engine writes `Schedule "<name>" failed: <error>` and keeps only the slug in the metadata, so
-// the name people gave their task is read back from the sentence.
+// An engine since `metadata.sourceName` names the routine on its own. An older one writes
+// `Schedule "<name>" failed: <error>` and keeps only the slug, so the name is read back from that
+// English sentence.
 const SCHEDULED_RUN = /^(?:Schedule|Trigger) "(.+?)" (?:failed|completed|stopped)/
 const RUN_PREFIX = /^(?:(?:Schedule|Trigger) ".+?" failed|Message failed): /
 
@@ -24,6 +19,8 @@ const isScheduledEvent = (event: StoredNotification['event']) => event === 'agen
 
 function sourceNameOf(notification: StoredNotification): string | null {
     if (!isScheduledEvent(notification.event)) return null
+    const sourceName = notification.metadata?.sourceName
+    if (typeof sourceName === 'string' && sourceName) return sourceName
     const named = SCHEDULED_RUN.exec(notification.message)?.[1]
     if (named) return named
     const slug = notification.metadata?.scheduleSlug ?? notification.metadata?.triggerSlug
@@ -35,8 +32,8 @@ function errorOf(notification: StoredNotification): string {
     return typeof error === 'string' && error ? error : notification.message.replace(RUN_PREFIX, '')
 }
 
-function bodyOf(notification: StoredNotification): string | undefined {
-    if (notification.kind === 'error') return friendlyError(errorOf(notification))
+function bodyOf(notification: StoredNotification, tErrors: ChatErrorCopy): string | undefined {
+    if (notification.kind === 'error') return friendlyError(errorOf(notification), tErrors)
     // A finished schedule only says "completed", which the subtitle already does.
     if (notification.kind === 'done' && isScheduledEvent(notification.event)) return undefined
     return notification.message
@@ -49,13 +46,13 @@ function oneLine(text: string | undefined): string | undefined {
 }
 
 // Every push reads the same way on a lock screen: who, then where and what, then the detail.
-export function pushCopyOf({ agentName, notification }: { agentName: string; notification: StoredNotification }): PushCopy {
+export function pushCopyOf({ agentName, notification, t, tErrors }: { agentName: string; notification: StoredNotification; t: PushTranslator; tErrors: ChatErrorCopy }): PushCopy {
     const sourceName = sourceNameOf(notification)
-    const state = STATES[notification.kind]
+    const state = t(`states.${notification.kind}`)
     return {
         title: agentName,
-        subtitle: sourceName ? `${sourceName} · ${state}` : state,
-        body: oneLine(bodyOf(notification)),
+        subtitle: sourceName ? t('subtitle', { source: sourceName, state }) : state,
+        body: oneLine(bodyOf(notification, tErrors)),
         silent: notification.kind === 'done',
     }
 }

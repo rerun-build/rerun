@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { completeSignupAction, prepareAnonymousEmailStep, resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
 import { AuthMethods } from '@/components/auth/AuthMethods'
 import type { AuthMethod } from '@/lib/auth/auth-method'
@@ -18,6 +19,7 @@ import { useOptionalSession } from '@/supabase/session/SessionProvider'
 import { SIGNUP_INTENT_COOKIE, type SignupSurface } from '@rerun/analytics'
 import { setSharedCookie } from '@rerun/analytics/client'
 import { useRouter } from 'next/navigation'
+import { useLocale, useTranslations } from 'next-intl'
 import { useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
@@ -32,9 +34,12 @@ const SETTLE_TIMEOUT_MS = 5_000
 //
 // `active` is whether the form is on screen: it is what opens and closes the signup the funnel counts.
 export function useAnonymousSignUp({ surface, active, onEntered }: { surface: SignupSurface; active: boolean; onEntered?: (created: boolean) => void }): { form: ReactNode; abandon: () => void; reset: () => void; movedOn: boolean } {
+    const t = useTranslations('auth')
+    const locale = useLocale()
     const [formKey, setFormKey] = useState(0)
     // Past the first screen: a method switched to, or a code asked for.
     const [movedOn, setMovedOn] = useState(false)
+    const errorText = useErrorText()
     const supabase = createClient()
     const router = useRouter()
     const refreshUser = useOptionalSession()?.refreshUser
@@ -51,7 +56,7 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
     const sendCode = (email: string, getToken: GetCaptchaToken) =>
         trackEmailSend(async () => {
             const prepared = await prepareAnonymousEmailStep({ email, captcha: await getToken() })
-            if (!prepared.ok) throw new EmailSendError(prepared.error, prepared.reason)
+            if (!prepared.ok) throw new EmailSendError(errorText(prepared), prepared.reason)
             const { exists } = prepared
             emailIsNew.current = !exists
             if (!exists) setSharedCookie(SIGNUP_INTENT_COOKIE, 'email', 1)
@@ -62,7 +67,8 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
                 if (error) throw error
                 return
             }
-            const { error } = await supabase.auth.updateUser({ email })
+            // The code email is Supabase's template, which reads the language from the metadata.
+            const { error } = await supabase.auth.updateUser({ email, data: { locale } })
             if (error) throw error
         })
 
@@ -94,7 +100,7 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
         funnel.markConverted()
         markResume()
         await settleSignup()
-        toast.success(created ? 'Account created!' : 'Welcome back!')
+        toast.success(created ? t('accountCreated') : t('welcomeBack'))
         onEntered?.(created)
         reset()
         router.refresh()

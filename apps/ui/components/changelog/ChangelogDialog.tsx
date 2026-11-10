@@ -1,6 +1,7 @@
 'use client'
 
 import { StepTransition, useStepper } from '@rerun/ui/steps'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
@@ -26,6 +27,7 @@ export function ChangelogDialog() {
 }
 
 function ChangelogSteps() {
+    const t = useTranslations('changelog')
     const shown = useChangelogStore(state => state.shown)
     const close = useChangelogStore(state => state.close)
     const { index, direction, isFirst, isLast, goForward, back } = useStepper(shown.length)
@@ -57,15 +59,15 @@ function ChangelogSteps() {
                 <DialogFooter className="-mx-6 mt-auto -mb-6 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t bg-muted/50 px-6 py-4 sm:-mx-8 sm:-mb-8 sm:justify-between sm:px-8">
                     <ChangelogDots count={shown.length} current={index} />
                     <a href={landingUrl('/changelog')} target="_blank" rel="noreferrer" className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
-                        See all updates
+                        {t('seeAll')}
                     </a>
                     <div className="ml-auto flex items-center gap-2">
                         {!isFirst && (
                             <Button variant="ghost" onClick={back}>
-                                Back
+                                {t('back')}
                             </Button>
                         )}
-                        <Button onClick={() => (isLast ? close() : goForward())}>{isLast ? 'Done' : 'Next'}</Button>
+                        <Button onClick={() => (isLast ? close() : goForward())}>{isLast ? t('done') : t('next')}</Button>
                     </div>
                 </DialogFooter>
             </div>

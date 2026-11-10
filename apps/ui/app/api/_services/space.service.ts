@@ -39,7 +39,7 @@ export async function resolveSpaceTarget(spaceId: string, workspaceId?: number):
         workspaceId ?? requireWorkspaceId(),
         selectMaybeSingle(supabase, 'spaces', ['workspace_id'] as const, { id: spaceId }),
     ])
-    if (!space || space.workspace_id !== callerWorkspaceId) throw new AuthorizationError('Box not found')
+    if (!space || space.workspace_id !== callerWorkspaceId) throw new AuthorizationError('boxNotFound')
     return { spaceId, conn: await getWorkspaceConnection(callerWorkspaceId) }
 }
 
@@ -74,6 +74,6 @@ export async function readBox(actor: Actor, spaceId: string): Promise<Box> {
         selectSingle(createServiceRoleClient(), 'spaces', BOX_COLUMNS, { id: spaceId }),
         findWorkspaceEngine(actor.workspaceId),
     ])
-    if (error || !data || access === 'none') throw error ?? new AuthorizationError('Box not found')
+    if (error || !data || access === 'none') throw error ?? new AuthorizationError('boxNotFound')
     return boxFromRow(data, !!engine?.managed, access)
 }

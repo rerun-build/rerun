@@ -2,8 +2,9 @@
 
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { PROVIDER_PITCH, type AddableProvider } from '@/lib/engine/ai-sources'
+import { providerPitch, type AddableProvider } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 type ProviderPickerProps = {
@@ -17,6 +18,8 @@ type ProviderPickerProps = {
 }
 
 export function ProviderPicker({ taken, onPick, providers, children }: ProviderPickerProps) {
+    const t = useTranslations('connections.providerPicker')
+    const tConnections = useTranslations('connections')
     const [open, setOpen] = useState(false)
 
     return (
@@ -38,10 +41,10 @@ export function ProviderPicker({ taken, onPick, providers, children }: ProviderP
                                 >
                                     <ProviderIcon provider={provider} className="size-4" />
                                     <span className="flex min-w-0 flex-1 flex-col">
-                                        <span className="truncate text-sm">{PROVIDER_PITCH[provider].title}</span>
-                                        <span className="truncate text-[11px] text-muted-foreground">{PROVIDER_PITCH[provider].hint}</span>
+                                        <span className="truncate text-sm">{providerPitch(provider, tConnections).title}</span>
+                                        <span className="truncate text-[11px] text-muted-foreground">{providerPitch(provider, tConnections).hint}</span>
                                     </span>
-                                    {taken.has(provider) && <span className="shrink-0 text-[11px] text-muted-foreground">Added</span>}
+                                    {taken.has(provider) && <span className="shrink-0 text-[11px] text-muted-foreground">{t('added')}</span>}
                                 </CommandItem>
                             ))}
                         </CommandGroup>

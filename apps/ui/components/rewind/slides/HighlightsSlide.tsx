@@ -2,6 +2,7 @@
 
 import { Badge, Card } from '@rerun/ui/primitives'
 import { motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 
 import { RewindHeadline, RewindSlideFrame } from '../RewindSlideFrame'
 import type { RewindSlideProps } from './types'
@@ -9,10 +10,11 @@ import type { RewindSlideProps } from './types'
 const CARD_TILTS = [-2.5, 2, -1.5]
 
 export function HighlightsSlide({ payload, agentName }: RewindSlideProps) {
+    const t = useTranslations('rewind.highlights')
     return (
         <RewindSlideFrame
             tone="violet"
-            eyebrow="Highlights"
+            eyebrow={t('eyebrow')}
             visual={
                 <div className="flex flex-col gap-3 rewind-wide:gap-4">
                     {payload.highlights.map((highlight, i) => (
@@ -34,7 +36,7 @@ export function HighlightsSlide({ payload, agentName }: RewindSlideProps) {
                 </div>
             }
         >
-            <RewindHeadline>What got done.</RewindHeadline>
+            <RewindHeadline>{t('headline')}</RewindHeadline>
         </RewindSlideFrame>
     )
 }

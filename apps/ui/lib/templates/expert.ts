@@ -103,6 +103,11 @@ export function toExpertTemplateAgents(agents: unknown): ExpertTemplateAgent[] {
 
 // An author edits their drafts. A submission is frozen until we answer it, and a public template is
 // a page we maintain, so both turn read-only on their side and the admin editor takes over.
+export function templateEditBlockCode(status: string): 'templateInReview' | 'templatePublished' | null {
+    if (status === 'in_review') return 'templateInReview'
+    return isPublicStatus(status as TemplateStatus) ? 'templatePublished' : null
+}
+
 export function templateEditBlockReason(status: string): string | null {
     if (status === 'in_review') return 'This template is waiting for our review. Withdraw it to keep editing.'
     return isPublicStatus(status as TemplateStatus) ? 'This template has been published and can no longer be edited.' : null

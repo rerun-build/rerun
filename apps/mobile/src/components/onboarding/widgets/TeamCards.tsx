@@ -1,5 +1,6 @@
 import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { ActivityIndicator, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
@@ -21,12 +22,13 @@ export type TeamStartState = 'starting' | 'failed' | 'blocked' | 'started'
 // its own the moment the plan is confirmed, and only says something when that did not go through.
 export function TeamStartCard({ state, onRetry }: { state: TeamStartState; onRetry: () => void }) {
     const theme = useTheme()
+    const t = useTranslations('mobileOnboarding')
     if (state === 'started') {
         return (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
                 <SymbolView name="checkmark.circle.fill" size={13} tintColor={theme.mutedForeground} />
                 <AppText variant="footnote" tone="muted">
-                    Workspace ready
+                    {t('team.ready')}
                 </AppText>
             </View>
         )
@@ -36,13 +38,13 @@ export function TeamStartCard({ state, onRetry }: { state: TeamStartState; onRet
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md }}>
                 <ForemanOrb size={32} state={state === 'starting' ? 'thinking' : 'idle'} />
                 <View style={{ flex: 1, gap: 2 }}>
-                    <AppText variant="headline">{state === 'starting' ? 'Getting your workspace ready' : state === 'failed' ? 'That did not go through' : 'This workspace cannot start here'}</AppText>
+                    <AppText variant="headline">{t(`team.${state}.title`)}</AppText>
                     <AppText variant="footnote" tone="muted">
-                        {state === 'starting' ? 'Your coworker is built right after.' : state === 'failed' ? 'Nothing was lost. Try again in a moment.' : `Finish setting it up at ${webHost}.`}
+                        {t(`team.${state}.body`, { host: webHost })}
                     </AppText>
                 </View>
             </View>
-            {state === 'failed' && <Button label="Try again" onPress={onRetry} />}
+            {state === 'failed' && <Button label={t('team.tryAgain')} onPress={onRetry} />}
         </Frame>
     )
 }
@@ -75,10 +77,11 @@ function TaskRow({ task }: { task: BuildTask }) {
 // is run again from here: the composer is gone past the plan.
 export function BuildCard({ tasks, result, starting, onStartLead, onRetry }: { tasks: BuildTask[]; result: BuildResult | null; starting: boolean; onStartLead: () => void; onRetry: (() => void) | null }) {
     const done = result !== null
+    const t = useTranslations('mobileOnboarding')
     const empty = done && result.agents === 0
     return (
         <Frame>
-            <AppText variant="headline">{!done ? 'Building your team' : empty ? 'Your team could not be built' : 'Your team is ready'}</AppText>
+            <AppText variant="headline">{!done ? t('build.building') : empty ? t('build.empty') : t('build.ready')}</AppText>
             <View style={{ gap: spacing.xs }}>
                 {tasks.map((task, index) => (
                     <TaskRow key={`${index}-${task.title}`} task={task} />
@@ -86,16 +89,16 @@ export function BuildCard({ tasks, result, starting, onStartLead, onRetry }: { t
             </View>
             {empty && (
                 <AppText variant="footnote" tone="muted">
-                    Nothing was lost. Try again in a moment.
+                    {t('build.nothingLost')}
                 </AppText>
             )}
             {done && !empty && result.failed.length > 0 && (
                 <AppText variant="footnote" tone="muted">
-                    {result.failed.length === 1 ? `${result.failed[0]} could not be built yet.` : `${result.failed.length} coworkers could not be built yet.`}
+                    {result.failed.length === 1 ? t('build.oneFailed', { name: result.failed[0] }) : t('build.someFailed', { count: result.failed.length })}
                 </AppText>
             )}
-            {empty && onRetry && <Button label="Try again" onPress={onRetry} />}
-            {done && result.lead && <Button label={`Start installing ${result.lead.name}`} size="lg" loading={starting} onPress={onStartLead} />}
+            {empty && onRetry && <Button label={t('build.tryAgain')} onPress={onRetry} />}
+            {done && result.lead && <Button label={t('build.startLead', { name: result.lead.name })} size="lg" loading={starting} onPress={onStartLead} />}
         </Frame>
     )
 }
@@ -103,15 +106,16 @@ export function BuildCard({ tasks, result, starting, onStartLead, onRetry }: { t
 // No machine is free for the build: the web's waitlist wall. Their answers are kept, and the screen opens
 // on its own once a machine frees up.
 export function WaitlistNotice() {
+    const t = useTranslations('mobileOnboarding')
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.lg, paddingHorizontal: spacing.xl }}>
             <ForemanOrb size={64} />
             <View style={{ alignItems: 'center', gap: spacing.xs }}>
                 <AppText variant="title" style={{ textAlign: 'center' }}>
-                    We&apos;re at full capacity right now
+                    {t('waitlist.title')}
                 </AppText>
                 <AppText variant="callout" tone="muted" style={{ textAlign: 'center' }}>
-                    Every machine is taken. You&apos;re on the waitlist: your answers are saved, and this opens on its own as soon as one frees up.
+                    {t('waitlist.body')}
                 </AppText>
             </View>
         </View>

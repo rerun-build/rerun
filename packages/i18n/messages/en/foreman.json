@@ -1,0 +1,449 @@
+{
+    "_context": {
+        "welcome.preparing": "Shimmering line under the welcome title while the first turn of the onboarding starts.",
+        "header.newTask": "Button that starts a new conversation with the Foreman.",
+        "header.position.float": "Menu option: the chat floats in a corner of the screen instead of being docked.",
+        "modelPill.hubReason": "Tooltip on the disabled model picker. Rerun Balanced is the name of a model, keep it as is.",
+        "signupGate.perks.trial": "{days} is the length of the free trial in days.",
+        "signInLink.prompt": "<link> wraps the clickable part that opens the sign-in dialog.",
+        "dock.tooltip": "Tooltip of the Foreman orb. <key> wraps the keyboard shortcut, {shortcut} is that shortcut (e.g. ⌘F).",
+        "nudge.more": "Count of other questions waiting besides the one shown.",
+        "nudge.answer": "Button: go and answer the question.",
+        "nudge.later": "Button: dismiss the card for now.",
+        "voice.listening": "Space is the keyboard key held down to record.",
+        "pill.prompts.lastNight": "Example question typed in the placeholder of the ask field.",
+        "routines.options": "Accessible label of the menu button of a routine. {name} is the routine's name.",
+        "routines.started": "{name} is the routine's name.",
+        "intake.settingUp": "{title} is the name of the template or coworker the person picked before signing up. <highlight> wraps it.",
+        "intake.role.placeholder": "Example job title in an empty field.",
+        "intake.name.placeholder": "Example first name in an empty field.",
+        "intake.skip": "Button: skip the company website question.",
+        "ownEntry": "The way out of the onboarding cards: the person already knows which coworker they want and writes it themselves.",
+        "gettingStarted.pillLabel": "Accessible label of the checklist pill.",
+        "gettingStarted.reward.lockedDescription": "{total} is the number of steps of the checklist, {remaining} how many are left.",
+        "contact.defaultSummary": "Message sent to the support team on the person's behalf, written in the first person.",
+        "template.buildElse": "Button: the person wants something else built instead of the template offered.",
+        "plan.goesAfter": "Label before what the coworker targets. <label> wraps the label, {need} is the target.",
+        "plan.previousBox": "A Box is a department of the board (Marketing, Support...). Keep the word Box.",
+        "plan.standingBy": "The coworker is idle, waiting for its next task.",
+        "starterPack.hireMany": "Button that confirms the coworkers picked in the starter pack. {count} is 2 or more.",
+        "starterPack.pick": "Button on a card: add this coworker to the picks.",
+        "arrival.youPicked": "Small uppercase label above the name of the template the person picked.",
+        "arrival.by": "{name} is the author of the template.",
+        "arrival.gestures.installed": "Last step of the progress rail: the template is installed.",
+        "teamPulse.working": "{count} coworkers are running right now.",
+        "trial.dueOn": "{date} is the day the trial ends and the first charge happens.",
+        "trial.perMonth": "Shown right after a price.",
+        "trial.includes": "{agents} is a number of coworkers, {credits} a number of credits.",
+        "purchase.billedTo": "{name} is the name of the workspace.",
+        "teamEmptyState.buildPrompt": "Prefilled in the composer: the start of the user's own sentence to the assistant, completed by them. Keep the trailing space.",
+        "plan.lifeDelivered": "Caption under a coworker block in an animated preview of its day: it finished and handed the result to the user.",
+        "gettingStarted.prompts": "Messages sent to the assistant in the user's name when they click a step of the getting started checklist. First person, the user speaking."
+    },
+    "welcome": {
+        "title": "Hey, ready to hand off your first task?",
+        "preparing": "Getting your workspace ready...",
+        "gateTitle": "Your team is ready to be built",
+        "gateSubtitle": "Create your account and the Foreman starts building it right away."
+    },
+    "header": {
+        "closeDisabled": "Finish the setup to close the chat",
+        "move": "Move",
+        "moveChat": "Move the chat",
+        "position": {
+            "dockLeft": "Dock left",
+            "dockRight": "Dock right",
+            "float": "Float"
+        },
+        "signIn": "Sign in",
+        "newTask": "New task"
+    },
+    "resize": "Resize chat",
+    "modelPill": {
+        "hubReason": "This chat always runs on Rerun Balanced"
+    },
+    "signupGate": {
+        "teamAt": "Your team at {domain}",
+        "team": "Your team",
+        "perks": {
+            "trial": "{days}-day free trial",
+            "cancel": "Cancel anytime",
+            "kept": "Your answers are kept"
+        },
+        "createAccount": "Create my account"
+    },
+    "signInLink": {
+        "prompt": "Already have an account? <link>Sign in</link>"
+    },
+    "nextSteps": {
+        "turnOn": "Turn on my coworker",
+        "yourInstallStarted": "Your coworker's install has started",
+        "installStarted": "{name}'s install has started",
+        "startInstallingMine": "Start installing my coworker",
+        "startInstalling": "Start installing {name}",
+        "startTrial": "Start free trial",
+        "startPlan": "Start my plan",
+        "starting": "Starting…",
+        "openChat": "Open chat",
+        "installFailed": "Could not start the installation"
+    },
+    "notification": {
+        "waiting": "Foreman is waiting for you."
+    },
+    "dock": {
+        "tooltip": "Search or ask Rerun <key>{shortcut}</key>",
+        "failedReply": "Something went wrong on that one."
+    },
+    "nudge": {
+        "approval": "Needs your approval",
+        "question": "Needs your answer",
+        "more": "+{count} more",
+        "review": "Review",
+        "answer": "Answer",
+        "later": "Later"
+    },
+    "reply": {
+        "open": "Open the conversation",
+        "dismiss": "Dismiss"
+    },
+    "voice": {
+        "listening": "Listening · release Space to send",
+        "transcribing": "Transcribing...",
+        "nothingHeard": "Couldn't hear anything in that recording.",
+        "sendFailed": "Could not send your voice message."
+    },
+    "pill": {
+        "prompts": {
+            "lastNight": "What ran last night?",
+            "failedRun": "Why did that run fail?",
+            "newCoworker": "Build me a new coworker"
+        },
+        "ask": "Ask Rerun",
+        "send": "Send"
+    },
+    "routines": {
+        "resumeFailed": "Couldn't resume {name}",
+        "pauseFailed": "Couldn't pause {name}",
+        "renameFailed": "Couldn't rename {name}",
+        "runFailed": "Couldn't run {name}",
+        "started": "{name} started",
+        "emptyTitle": "No routines yet",
+        "emptyDescription": "Ask a coworker to do something on a schedule (a daily report, a weekly digest) and it will show up here.",
+        "unknownCoworker": "Unknown coworker",
+        "options": "{name} options",
+        "rename": "Rename",
+        "edit": "Edit",
+        "runNow": "Run now"
+    },
+    "ownEntry": "I know what I need",
+    "ownEntryPlaceholder": "I know what I need…",
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "What is your company website?",
+                "description": "We read it to learn what you sell and who you sell to."
+            },
+            "industry": {
+                "title": "What line of work are you in?",
+                "description": "It decides which teams we draw on your board."
+            },
+            "role": {
+                "title": "And what do you do there?",
+                "description": "It decides who gets built for you first."
+            },
+            "name": {
+                "title": "Last one: your first name?",
+                "description": "So we are not talking to a workspace."
+            }
+        },
+        "settingUp": "Setting up <highlight>{title}</highlight>",
+        "website": {
+            "label": "Company website"
+        },
+        "industry": {
+            "label": "Industry",
+            "other": "Other",
+            "placeholder": "Bakery, dental practice, gym…"
+        },
+        "industries": {
+            "agencies": "Agencies",
+            "ecommerce": "E-commerce",
+            "saas": "SaaS",
+            "sales": "Sales",
+            "recruiting": "Recruiting",
+            "real-estate": "Real estate",
+            "legal": "Legal & compliance",
+            "creators": "Creators",
+            "productivity": "Productivity",
+            "other": "Other"
+        },
+        "role": {
+            "label": "Your role",
+            "placeholder": "Head of Growth"
+        },
+        "name": {
+            "label": "First name",
+            "placeholder": "John"
+        },
+        "skip": "Skip",
+        "next": "Next",
+        "answerToContinue": "Answer this step to continue",
+        "saveFailed": "We could not save that. Try again."
+    },
+    "gettingStarted": {
+        "title": "Getting started",
+        "hide": "Hide",
+        "pillLabel": "Getting started: {done} of {total} done",
+        "steps": {
+            "phone": {
+                "title": "Verify your phone number",
+                "description": "Secure your account and hear from your coworkers on WhatsApp or SMS."
+            },
+            "first_agent": {
+                "title": "Create your first coworker",
+                "description": "A teammate that works while you are away."
+            },
+            "ai_provider": {
+                "title": "Plug in your AI subscription",
+                "description": "Claude, ChatGPT, Gemini or your own API key."
+            },
+            "invite": {
+                "title": "Invite a teammate",
+                "description": "Share your coworkers with the people you work with."
+            },
+            "schedule": {
+                "title": "Schedule a recurring task",
+                "description": "Put one of your coworkers on autopilot."
+            },
+            "payment_method": {
+                "title": "Add a payment method",
+                "description": "Keep your coworkers running when your trial ends. Nothing is charged today."
+            }
+        },
+        "reward": {
+            "grantedTitle": "{days} days added to your trial",
+            "grantedDescription": "Your workspace is all set. Enjoy the extra time.",
+            "claimingTitle": "Adding {days} days to your trial",
+            "claimingDescription": "One moment.",
+            "doneTitle": "Your workspace is all set",
+            "doneDescription": "Your coworkers can run on their own now.",
+            "lockedTitle": "Get {days} more free trial days",
+            "lockedDescription": "Complete the {total} steps above. {remaining} to go."
+        },
+        "prompts": {
+            "first_agent": "Help me create my first coworker",
+            "ai_provider": "Help me connect my Claude or ChatGPT subscription, or an API key",
+            "invite": "Help me invite a teammate to my workspace",
+            "schedule": "Schedule a recurring task for one of my coworkers"
+        }
+    },
+    "contact": {
+        "defaultSummary": "I am stuck while setting up my first coworker and need a hand.",
+        "sentWithEmail": "Sent to the Rerun team. They answer in the chat and at {email}.",
+        "sent": "Sent to the Rerun team. They answer in the chat.",
+        "openChat": "Open the chat",
+        "stillStuck": "Still stuck? Someone from the team can help.",
+        "send": "Send to the team",
+        "title": "Talk to someone at Rerun",
+        "description": "This goes to the team with your account, and they answer you in the chat.",
+        "notNow": "Not now"
+    },
+    "template": {
+        "skipped": "Skipped",
+        "buildingElse": "Building something else",
+        "installing": "Installing this template",
+        "install": "Install this template",
+        "buildElse": "Build me something else",
+        "buildElseDescription": "None of these fit. Start from what I told you and design it.",
+        "notNow": "Not now",
+        "somethingCustom": "Something custom",
+        "label": "Template",
+        "agents": "{count, plural, one {# agent} other {# agents}}"
+    },
+    "question": {
+        "fallback": "One question",
+        "skipped": "Skipped",
+        "neither": "Neither",
+        "typed": "Answered in chat"
+    },
+    "plan": {
+        "defaultTitle": "Your first coworker",
+        "skipped": "Skipped",
+        "confirmed": "Confirmed",
+        "askedChanges": "Asked for changes",
+        "goesAfter": "<label>Goes after:</label> {need}",
+        "thisWeek": "What you get this week",
+        "previousBox": "Previous Box",
+        "nextBox": "Next Box",
+        "build": "Build my coworker",
+        "change": "Change something",
+        "standingBy": "Standing by",
+        "lifeWorking": "Working on it",
+        "lifeDelivered": "Handed over to you"
+    },
+    "starterPack": {
+        "title": "Your starter team",
+        "subtitle": "Pick up to {max}. Each one sets itself up with you once it is on your board.",
+        "fullTitle": "Your trial runs {max} coworkers",
+        "fullDescription": "Drop one to take this one instead. The others can join once you are on a plan.",
+        "pickAtLeastOne": "Pick at least one",
+        "hireOne": "Hire this one",
+        "hireMany": "Hire these {count}",
+        "progress": "{count} of {max} picked",
+        "picked": "Picked",
+        "trialFull": "Trial full",
+        "pick": "Pick"
+    },
+    "agentTabs": {
+        "chat": "Chat",
+        "actions": "To handle",
+        "services": "Apps",
+        "mcp": "MCP",
+        "skills": "Skills",
+        "data": "Database",
+        "memories": "Knowledge",
+        "files": "Files",
+        "published": "Published",
+        "scheduled": "Routines",
+        "triggers": "Triggers",
+        "tools": "Capabilities",
+        "monitoring": "Monitoring",
+        "logs": "Logs",
+        "setup": "Install",
+        "settings": "Settings"
+    },
+    "arrival": {
+        "youPicked": "You picked",
+        "by": "by {name}",
+        "gestures": {
+            "account": "Account",
+            "trial": "Free trial",
+            "template": "Template",
+            "installed": "Installed"
+        },
+        "headings": {
+            "account": {
+                "title": "Put {name} to work",
+                "description": "Create your account and {name} is installed for you. No setup form, no questions first."
+            },
+            "phone": {
+                "title": "One last step",
+                "description": "Add your phone number. {name} is next."
+            },
+            "trial": {
+                "title": "Try {name} for {days} days",
+                "description": "{name} is installed the second your trial starts."
+            },
+            "purchase": {
+                "title": "Get {name}",
+                "description": "Your trial is on. This template has its own price, and it is installed right after."
+            },
+            "installing": {
+                "title": "Installing {name}",
+                "description": "Nothing to do here. This takes under a minute."
+            }
+        }
+    },
+    "teamPulse": {
+        "coworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+        "working": "{count} working now"
+    },
+    "trialGate": {
+        "plan": "Start your plan to keep going.",
+        "trial": "Start your free trial to keep going.",
+        "talk": "Talk to the team"
+    },
+    "trial": {
+        "badge": {
+            "cardless": "No card needed",
+            "card_trial": "{days}-day free trial",
+            "paid": "Free trial already used"
+        },
+        "titleTrial": "Start your {days}-day free trial",
+        "titlePlan": "Start your plan",
+        "pitchPaidInstall": "{subject} is installed right after. Cancel anytime from the workspace.",
+        "pitchPaidTeam": "Your team is built right after. Cancel anytime from the workspace.",
+        "pitchCardInstall": "Card required, $0 today. {price} charged on {date} unless you cancel before. {subject} is installed right after.",
+        "pitchCardTeam": "Card required, $0 today. {price} charged on {date} unless you cancel before. Your team is built right after.",
+        "pitchCardlessInstall": "No card needed, $0 today. Add one before {date} to keep going at {price}/month. {subject} is installed right after.",
+        "pitchCardlessTeam": "No card needed, $0 today. Add one before {date} to keep going at {price}/month. Your team is built right after.",
+        "includes": "Your trial includes {agents} coworkers and {credits, plural, one {# credit} other {# credits}}.",
+        "thenPay": "Then {price} for this template, billed separately.",
+        "dueToday": "Due today",
+        "withCard": "With a card",
+        "dueOn": "On {date}",
+        "then": "Then",
+        "perMonth": "/month",
+        "today": "Today",
+        "todayInstall": "Your trial starts and {subject} is installed.",
+        "todayTeam": "Your trial starts and your team is built.",
+        "reminder": "We email you, so it never ends by surprise.",
+        "chargeCardless": "Add a card to keep going at {price}/month. Without one, your coworkers stop and nothing is charged.",
+        "chargeCard": "{price} charged to the card you added, then every month. Cancel before and nothing is charged.",
+        "startingTrial": "Starting your trial…",
+        "opening": "Opening…",
+        "startAndInstall": "Start my trial and install",
+        "startTrial": "Start my free trial",
+        "startPlan": "Start my plan"
+    },
+    "checkout": {
+        "started": "Trial started",
+        "cardUsed": "This card has already been used for a trial",
+        "startPlan": "Start my plan",
+        "pending": "Still waiting on Stripe",
+        "notStarted": "Trial not started. Nothing can be built until it is.",
+        "startTrial": "Start free trial"
+    },
+    "purchase": {
+        "owned": "{title} is yours",
+        "recurring": "Billed monthly",
+        "oneTime": "One-time purchase",
+        "billedTo": "Billed to {name}, apart from your Rerun plan. It is installed the moment the payment goes through.",
+        "billedToWorkspace": "Billed to your workspace, apart from your Rerun plan. It is installed the moment the payment goes through.",
+        "dueToday": "Due today",
+        "perMonth": "/month",
+        "opening": "Opening…",
+        "subscribe": "Subscribe {price}",
+        "pay": "Pay {price}"
+    },
+    "teamEmptyState": {
+        "greeting": "Hi, I'm Rerun",
+        "greetingNamed": "Hi {firstName}, I'm Rerun",
+        "greetingWithTeam": "{greeting}. Here is your team.",
+        "emptySubtitle": "You have no coworkers yet. Tell me a job you would hand off and I'll build the first one.",
+        "buildPrompt": "Build me a coworker that ",
+        "buildFirst": {
+            "title": "Build my first coworker",
+            "description": "Describe the job in a sentence"
+        },
+        "template": {
+            "title": "Start from a template",
+            "description": "Ready-made coworkers for your kind of business",
+            "send": "Show me templates that fit my business"
+        },
+        "guide": {
+            "title": "How does this work?",
+            "description": "Coworkers, Boxes, routines, in two minutes",
+            "send": "How does Rerun work?"
+        },
+        "checkWorking": {
+            "title": "What is {name} doing?",
+            "description": "Working now",
+            "send": "What is {mention} doing right now?"
+        },
+        "checkIdle": {
+            "title": "What did {name} do today?",
+            "description": "Catch up on its latest runs",
+            "send": "What did {mention} do today?"
+        },
+        "handOff": {
+            "title": "Give {name} a task",
+            "description": "I brief it and follow it through",
+            "prefill": "Ask {mention} to "
+        },
+        "build": {
+            "title": "Build a new coworker",
+            "description": "For a job nobody on the team does yet"
+        }
+    }
+}

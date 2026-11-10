@@ -1,6 +1,7 @@
 'use client'
 
 import type { TemplateCategory } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { intakePreviewPlan, looksLikeSite, type ForemanIntake } from '@/lib/onboarding/intake'
@@ -62,6 +63,7 @@ export type ForemanIntakeController = {
 }
 
 export function useForemanIntake({ firstName, handlers }: { firstName: string | null; handlers: ForemanIntakeHandlers }): ForemanIntakeController {
+    const t = useTranslations('foreman.intake')
     const [index, setIndex] = useState(0)
     const [draft, setDraft] = useState<IntakeDraft>(EMPTY_DRAFT)
     const steps = useMemo(() => intakeSteps(firstName, draft.websiteSkipped), [firstName, draft.websiteSkipped])
@@ -170,10 +172,10 @@ export function useForemanIntake({ firstName, handlers }: { firstName: string | 
             setError(null)
             void handlersRef.current
                 .onSubmit(toIntake(value, firstName, decidedIndustry), ownAsk)
-                .catch(() => setError('We could not save that. Try again.'))
+                .catch(() => setError(t('saveFailed')))
                 .finally(() => setSubmitting(false))
         },
-        [firstName]
+        [firstName, t]
     )
 
     const chooseRole = useCallback(

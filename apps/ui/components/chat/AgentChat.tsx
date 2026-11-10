@@ -77,6 +77,7 @@ import { COWORKER_STARTER_SUGGESTIONS, paidDataSourcesByTurn, RERUN_CONNECTION_I
 import { track } from '@rerun/analytics/client'
 import { AnimatePresence, motion } from 'motion/react'
 import { DefaultChatTransport } from 'ai'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { scrollFadeMask, useScrollEdges } from '@rerun/ui/primitives'
@@ -129,6 +130,8 @@ type AgentChatProps = {
 }
 
 export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder }: AgentChatProps) {
+    const t = useTranslations('chat.agentChat')
+    const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace, user } = useSession()
     const userId = user?.id
     const onSessionCreatedRef = useRef(onSessionCreated)
@@ -361,7 +364,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
         conversationRef.current?.scrollToBottom('instant')
     }, [active, arrival])
     const pendingHitlRef = useArriveByTop(conversationRef, pendingHitl ? `${pendingHitl.toolCallId}:${arrival}` : null)
-    const pendingCue = useMemo(() => (pendingHitl ? { key: pendingHitl.toolCallId, summary: summarizePendingHitl(pendingHitl.kind, pendingHitl.input), blockRef: pendingHitlRef } : null), [pendingHitl, pendingHitlRef])
+    const pendingCue = useMemo(() => (pendingHitl ? { key: pendingHitl.toolCallId, summary: summarizePendingHitl(pendingHitl.kind, pendingHitl.input, tHitlCue), blockRef: pendingHitlRef } : null), [pendingHitl, pendingHitlRef, tHitlCue])
 
     // An alert never stopped the run, so it is the session status, not the shape of the transcript,
     // that says whether one is still unread. It stays pinned while the agent keeps working.
@@ -624,8 +627,8 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
         // this click is the user saying they want the message out regardless.
         setRunError(null)
         const stopped = await stopRun()
-        if (!stopped) toast.error('Could not stop the current run. Your message will be sent when it ends.')
-    }, [queued, stopRun, setRunError])
+        if (!stopped) toast.error(t('stopFailed'))
+    }, [queued, stopRun, setRunError, t])
 
     // The install this tab just asked for already runs in another conversation, started from a tab
     // or a device this one had not heard of yet. Nothing was sent: the tab goes back to blank and
@@ -701,18 +704,19 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
         return own.find(connection => connection.id === boxDefault?.connectionId) ?? own[0] ?? null
     }, [connections, boxDefault])
     const premiumAllowed = !workspace || isPremiumModelEntitled(workspace)
+    const tConnections = useTranslations('connections')
     const runOnOwnConnection = useMemo(() => {
         if (!ownConnection) return undefined
         const onUse = () => {
             track('connection_cta_clicked', { source: 'budget_notice_use_connection' })
             // The Box default is resolved by the engine on every run, so following it beats freezing it.
             if (boxDefault?.connectionId === ownConnection.id) selectModel({})
-            else selectModel({ connectionId: ownConnection.id, model: toGroup(ownConnection, premiumAllowed).defaultModel })
+            else selectModel({ connectionId: ownConnection.id, model: toGroup(ownConnection, premiumAllowed, tConnections).defaultModel })
             setRunError(null)
             clearError()
         }
         return { label: ownConnection.name, provider: ownConnection.provider, onUse }
-    }, [ownConnection, boxDefault, premiumAllowed, selectModel, clearError])
+    }, [ownConnection, boxDefault, premiumAllowed, tConnections, selectModel, clearError])
     const connectProvider = useCallback(
         (provider: 'claude' | 'codex') => {
             track('connection_cta_clicked', { source: `budget_notice_${provider}` })
@@ -724,7 +728,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
     // Only surface the hint while it's both armed (a blocked send) and still no model.
     const showModelHint = hintArmed && !modelReady
     // Shared by the composer and the install gate, which both refuse to run without a model.
-    const modelHint = showModelHint ? <p className="text-xs text-destructive">{refusedModel ?? 'Select a model to start — open the model menu below.'}</p> : null
+    const modelHint = showModelHint ? <p className="text-xs text-destructive">{refusedModel ?? t('selectModel')}</p> : null
     // A model the plan refuses has served models next to it: the picker opens on them right away.
     const blockSend = useCallback(() => {
         setHintArmed(true)
@@ -820,7 +824,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
     // for every message of the conversation.
     const handleRegenerate = useCallback((messageId: string) => regenerate({ messageId }), [regenerate])
     const messageFeedback = useMessageFeedback(sessionId)
-    const continueInterruptedRun = useCallback(() => sendMessage({ text: 'Continue where you left off.' }), [sendMessage])
+    const continueInterruptedRun = useCallback(() => sendMessage({ text: t('continueWhereLeftOff') }), [sendMessage, t])
 
     // Paid from the trial's notice. The plan lands through Stripe's webhook, not the payment itself, so
     // the stopped task waits for the credit to have room before it picks back up.
@@ -946,8 +950,8 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                             <ConversationEmptyState>
                                 <AgentBuddy agentId={agentId} mood={buddyMood} size={96} />
                                 <div className="space-y-1">
-                                    <h3 className="font-medium text-sm">Start a conversation</h3>
-                                    <p className="text-muted-foreground text-sm">Send a message to this coworker</p>
+                                    <h3 className="font-medium text-sm">{t('emptyTitle')}</h3>
+                                    <p className="text-muted-foreground text-sm">{t('emptyDescription')}</p>
                                 </div>
                                 <Suggestions className="mt-2 justify-center">
                                     {COWORKER_STARTER_SUGGESTIONS.map(s => (

@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { isSetupAnswered } from '@rerun/contracts'
 import { getAgentDetailAction, updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
 import { invalidateAgentContext } from '@/hooks/useAgentContext'
@@ -8,11 +9,15 @@ import { Button } from '@/components/ui/button'
 import { SkeletonForm } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { CheckIcon, Loader2Icon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 export function AgentPanelSetup({ agentId }: { agentId: string }) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelSetup')
+    const errorText = useErrorText()
     const [draft, setDraft] = useState<AgentSetupDraft>({ required: null, prompt: '' })
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -27,17 +32,17 @@ export function AgentPanelSetup({ agentId }: { agentId: string }) {
             .then(detail => {
                 if (cancelled) return
                 if (!detail) {
-                    setError('Could not reach the engine for this coworker.')
+                    setError(t('unreachable'))
                     return
                 }
                 setDraft({ required: detail.config.setup.required, prompt: detail.install })
             })
-            .catch(() => !cancelled && setError('Could not reach the engine for this coworker.'))
+            .catch(() => !cancelled && setError(t('unreachable')))
             .finally(() => !cancelled && setLoading(false))
         return () => {
             cancelled = true
         }
-    }, [agentId])
+    }, [agentId, t])
 
     const save = async () => {
         setError(null)
@@ -50,7 +55,7 @@ export function AgentPanelSetup({ agentId }: { agentId: string }) {
         })
         setSaving(false)
         if (!result.success) {
-            setError(result.error ?? 'Failed to save')
+            setError(errorText(result, t('saveFailed')))
             return
         }
         invalidateAgentContext(agentId)
@@ -69,25 +74,25 @@ export function AgentPanelSetup({ agentId }: { agentId: string }) {
     return (
         <div className="flex h-full flex-col gap-4 overflow-y-auto p-4">
             <p className="text-xs text-muted-foreground">
-                A copy of this agent arrives on someone else&apos;s account with no credentials and nothing connected. These instructions are what it runs, on its own, the first time they open it.
+                {t('intro')}
             </p>
 
             {error && <p className="text-xs text-destructive">{error}</p>}
 
             <AgentSetupFields value={draft} onChange={setDraft} disabled={saving || !canManage} />
 
-            <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON} className="flex w-full">
+            <TooltipDisabledReason reason={canManage ? undefined : boxManageReason} className="flex w-full">
                 <Button type="button" size="sm" onClick={save} disabled={saving || !canManage || !isSetupAnswered(draft)} className="w-full">
                     {saved ? (
                         <>
-                            <CheckIcon className="mr-1.5 size-3.5 text-emerald-500" /> Saved
+                            <CheckIcon className="mr-1.5 size-3.5 text-emerald-500" /> {t('saved')}
                         </>
                     ) : saving ? (
                         <>
-                            <Loader2Icon className="mr-1.5 size-3.5 animate-spin" /> Saving...
+                            <Loader2Icon className="mr-1.5 size-3.5 animate-spin" /> {t('saving')}
                         </>
                     ) : (
-                        'Save'
+                        t('save')
                     )}
                 </Button>
             </TooltipDisabledReason>

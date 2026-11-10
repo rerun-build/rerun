@@ -1,6 +1,7 @@
 'use client'
 
 import { Badge, PANEL_CARD, type BadgeTone } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState, type ComponentType, type ReactNode } from 'react'
 
 import { getServiceAlternativesAction } from '@/app/api/_actions/services.actions'
@@ -63,11 +64,11 @@ function ReceiptCard({ icon: Glyph, title, meta, children }: { icon: ComponentTy
     )
 }
 
-const SERVICE_STATUS: Record<ServiceSetupOutcome, { label: string; tone: BadgeTone }> = {
-    connected: { label: 'Connected', tone: 'green' },
-    skipped: { label: 'Skipped', tone: 'neutral' },
-    reset: { label: 'Not reconnected', tone: 'orange' },
-    'not-found': { label: 'Not found', tone: 'red' },
+const SERVICE_STATUS: Record<ServiceSetupOutcome, { labelKey: 'connected' | 'skipped' | 'notReconnected' | 'notFound'; tone: BadgeTone }> = {
+    connected: { labelKey: 'connected', tone: 'green' },
+    skipped: { labelKey: 'skipped', tone: 'neutral' },
+    reset: { labelKey: 'notReconnected', tone: 'orange' },
+    'not-found': { labelKey: 'notFound', tone: 'red' },
 }
 
 // The reply names an app picked as an alternative but not its slug, so its icon is found among the
@@ -91,13 +92,14 @@ function useAlternativeIcons(slugs: string[]): Map<string, string> {
 }
 
 function ServicesReceipt({ entries, askedSlugs }: { entries: ServiceSetupEntry[]; askedSlugs: string[] }) {
+    const t = useTranslations('chat.receipt')
     const { resolved, loading } = useCatalogServices(askedSlugs)
     const alternativeIcons = useAlternativeIcons(entries.some(entry => entry.replaces) ? askedSlugs : [])
     const iconByName = new Map([...resolved.values()].flatMap(service => (service.icon ? [[service.name, service.icon] as const] : [])))
     const connected = entries.filter(entry => entry.outcome === 'connected').length
 
     return (
-        <ReceiptCard icon={LinkIcon} title="Apps" meta={`${connected} of ${entries.length} connected`}>
+        <ReceiptCard icon={LinkIcon} title={t('apps.title')} meta={t('apps.meta', { connected, total: entries.length })}>
             {entries.map(entry => {
                 const status = SERVICE_STATUS[entry.outcome]
                 const dimmed = entry.outcome !== 'connected'
@@ -107,10 +109,10 @@ function ServicesReceipt({ entries, askedSlugs }: { entries: ServiceSetupEntry[]
                         {icon ? <Icon src={icon} size="sm" className={cn(dimmed && 'opacity-50 grayscale')} /> : loading ? <span className="size-8 shrink-0" /> : <Icon icon={LinkIcon} size="sm" className={cn(dimmed && 'opacity-50')} />}
                         <div className="min-w-0 flex-1">
                             <p className={cn('truncate text-sm', dimmed ? 'text-muted-foreground' : 'text-foreground')}>{entry.name}</p>
-                            {entry.replaces && <p className="truncate text-xs text-muted-foreground">Instead of {entry.replaces}</p>}
+                            {entry.replaces && <p className="truncate text-xs text-muted-foreground">{t('apps.insteadOf', { name: entry.replaces })}</p>}
                         </div>
                         <Badge size="xs" tone={status.tone} glow={false}>
-                            {status.label}
+                            {t(`status.${status.labelKey}`)}
                         </Badge>
                     </div>
                 )
@@ -128,18 +130,19 @@ type AnswersReceiptProps = {
 }
 
 function AnswersReceipt({ answers, input, agentId, rawUrlFor, readFile }: AnswersReceiptProps) {
+    const t = useTranslations('chat.receipt')
     const offered = new Map(input ? pendingQuestions(input).map(item => [item.question, item.options.length > 0]) : [])
     const answered = answers.filter(item => item.answers.length > 0 || (item.attachments?.length ?? 0) > 0).length
 
     return (
-        <ReceiptCard icon={MessageCircleQuestionIcon} title={answers.length === 1 ? 'Answer' : 'Answers'} meta={answers.length > 1 ? `${answered} of ${answers.length} answered` : undefined}>
+        <ReceiptCard icon={MessageCircleQuestionIcon} title={answers.length === 1 ? t('answers.title.one') : t('answers.title.other')} meta={answers.length > 1 ? t('answers.meta', { answered, total: answers.length }) : undefined}>
             {answers.map(item => {
                 const fromOptions = offered.get(item.question) ?? item.answers.length > 1
                 const files = item.attachments ?? []
                 return (
                     <div key={item.question} className="flex flex-col gap-1.5 px-3 py-2.5">
                         <p className="text-xs text-muted-foreground">{item.question}</p>
-                        {item.answers.length === 0 && files.length === 0 && <p className="text-sm text-muted-foreground/70 italic">Skipped</p>}
+                        {item.answers.length === 0 && files.length === 0 && <p className="text-sm text-muted-foreground/70 italic">{t('status.skipped')}</p>}
                         {item.answers.length > 0 &&
                             (fromOptions ? (
                                 <ul className="flex flex-col gap-1">
@@ -162,9 +165,10 @@ function AnswersReceipt({ answers, input, agentId, rawUrlFor, readFile }: Answer
 }
 
 function SecretsReceipt({ entries, labels }: { entries: { key: string; provided: boolean }[]; labels: Map<string, string> }) {
+    const t = useTranslations('chat.receipt')
     const stored = entries.filter(entry => entry.provided).length
     return (
-        <ReceiptCard icon={KeyIcon} title="Keys" meta={`${stored} of ${entries.length} stored`}>
+        <ReceiptCard icon={KeyIcon} title={t('keys.title')} meta={t('keys.meta', { stored, total: entries.length })}>
             {entries.map(entry => {
                 const label = labels.get(entry.key)
                 return (
@@ -174,22 +178,23 @@ function SecretsReceipt({ entries, labels }: { entries: { key: string; provided:
                             <p className="truncate font-mono text-[11px] text-muted-foreground">{entry.key}</p>
                         </div>
                         <Badge size="xs" tone={entry.provided ? 'green' : 'neutral'} glow={false}>
-                            {entry.provided ? 'Stored' : 'Skipped'}
+                            {entry.provided ? t('status.stored') : t('status.skipped')}
                         </Badge>
                     </div>
                 )
             })}
-            <p className="px-3 py-2 text-[11px] text-muted-foreground">Stored on the Box. The coworker only sees the names.</p>
+            <p className="px-3 py-2 text-[11px] text-muted-foreground">{t('keys.note')}</p>
         </ReceiptCard>
     )
 }
 
 function ApprovalsReceipt({ decisions, details }: { decisions: Extract<HitlReply, { kind: 'approval' }>['decisions']; details: Map<string, string | undefined> }) {
+    const t = useTranslations('chat.receipt')
     const approved = decisions.filter(item => item.decision === 'approved').length
     const declined = decisions.length - approved
-    const meta = decisions.length === 1 ? undefined : [approved && `${approved} approved`, declined && `${declined} not now`].filter(Boolean).join(', ')
+    const meta = decisions.length === 1 ? undefined : approved && declined ? t('approvals.metaBoth', { approved, declined }) : approved ? t('approvals.metaApproved', { approved }) : t('approvals.metaDeclined', { declined })
     return (
-        <ReceiptCard icon={ShieldCheckIcon} title={decisions.length === 1 ? 'Approval' : 'Approvals'} meta={meta}>
+        <ReceiptCard icon={ShieldCheckIcon} title={decisions.length === 1 ? t('approvals.title.one') : t('approvals.title.other')} meta={meta}>
             {decisions.map(item => {
                 const detail = details.get(item.action)
                 return (
@@ -200,7 +205,7 @@ function ApprovalsReceipt({ decisions, details }: { decisions: Extract<HitlReply
                             {item.note && <p className="mt-1 text-xs whitespace-pre-wrap text-foreground/80">“{item.note}”</p>}
                         </div>
                         <Badge size="xs" tone={item.decision === 'approved' ? 'green' : 'red'} glow={false} className="mt-0.5">
-                            {item.decision === 'approved' ? 'Approved' : 'Not now'}
+                            {item.decision === 'approved' ? t('status.approved') : t('status.notNow')}
                         </Badge>
                     </div>
                 )
@@ -210,9 +215,10 @@ function ApprovalsReceipt({ decisions, details }: { decisions: Extract<HitlReply
 }
 
 function McpSignInReceipt({ agentId, name }: { agentId?: string; name: string }) {
+    const t = useTranslations('chat.receipt')
     const server = useConnectorServices(agentId).custom.find(s => s.name === name)
     return (
-        <ReceiptCard icon={PlugIcon} title="MCP server">
+        <ReceiptCard icon={PlugIcon} title={t('mcp.title')}>
             <div className="flex items-center gap-3 px-3 py-2.5">
                 <Icon {...serviceIconProps(server?.icon ?? null, 'custom')} size="sm" />
                 <div className="min-w-0 flex-1">
@@ -220,7 +226,7 @@ function McpSignInReceipt({ agentId, name }: { agentId?: string; name: string })
                     {server?.host && <p className="truncate text-xs text-muted-foreground">{server.host}</p>}
                 </div>
                 <Badge size="xs" tone="green" glow={false}>
-                    Connected
+                    {t('status.connected')}
                 </Badge>
             </div>
         </ReceiptCard>
@@ -228,27 +234,21 @@ function McpSignInReceipt({ agentId, name }: { agentId?: string; name: string })
 }
 
 function TakeoverReceipt({ url }: { url: string | null }) {
+    const t = useTranslations('chat.receipt')
     return (
         <p className="ml-auto flex max-w-[85%] items-center gap-1.5 text-xs text-muted-foreground">
             <MonitorIcon className="size-3 shrink-0" />
-            <span className="truncate">{url ? `You handed the browser back on ${url}` : 'You handed the browser back'}</span>
+            <span className="truncate">{url ? t('takeover.handedBackOn', { url }) : t('takeover.handedBack')}</span>
         </p>
     )
 }
 
-const DISMISSED_LABEL: Record<Extract<HitlReply, { kind: 'cancelled' }>['of'], string> = {
-    service: 'You closed the app setup',
-    question: 'You skipped the questions',
-    secret: 'You declined to share the keys',
-    mcp: 'You skipped signing in',
-    takeover: 'You left the browser to your coworker',
-}
-
 function DismissedLine({ of }: { of: Extract<HitlReply, { kind: 'cancelled' }>['of'] }) {
+    const t = useTranslations('chat.receipt.dismissed')
     return (
         <p className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
             <XIcon className="size-3" />
-            {DISMISSED_LABEL[of]}
+            {t(of)}
         </p>
     )
 }

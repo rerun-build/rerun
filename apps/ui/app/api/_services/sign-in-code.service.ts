@@ -3,6 +3,7 @@ import type { Database } from '@/app/api/database.types'
 import { sendSignInCodeEmail } from '@rerun/cloud/email'
 import { normalizeEmail } from '@/lib/email'
 import { APP_URL } from '@/lib/app-url'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { User } from '@supabase/supabase-js'
@@ -94,7 +95,8 @@ export async function resendSignInCodeIfLive(email: string, sessionUserId: strin
 
     if (now - Date.parse(row.last_sent_at) < MIN_RESEND_INTERVAL_MS) return 'held'
 
-    const sent = await sendSignInCodeEmail({ to: row.email, code: row.code, signInUrl: mailedSignInUrl(row.token_hash, row.type, data.user), expiresInMinutes: minutesLeft })
+    const locale = await recipientLocale(supabase, row.user_id, null)
+    const sent = await sendSignInCodeEmail({ to: row.email, code: row.code, signInUrl: mailedSignInUrl(row.token_hash, row.type, data.user), expiresInMinutes: minutesLeft, locale })
     if (!sent.ok) return null
 
     await supabase

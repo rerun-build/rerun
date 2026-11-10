@@ -1,0 +1,764 @@
+{
+    "_context": {
+        "newAgent.suggestionsForBox": "Heading above the ready-made coworker suggestions chosen for one Box. {boxName} is the name the user gave the Box, like Marketing.",
+        "account.connectFailed": "Toast. {provider} is a sign-in provider name, like Google.",
+        "account.onlySignInMethod": "Error toast when the user tries to disconnect their last way to sign in. {provider} is a provider name, like Google.",
+        "members.description": "\"Members\" here is the role name: people who are not admins.",
+        "members.adminBadge": "Badge next to a person who has the admin role.",
+        "members.invite.assignLater": "Under a pending invitation: the person will get no Box until an admin assigns one.",
+        "members.invite.boxes": "Label of a select choosing which Boxes an invited person gets.",
+        "members.scope.assigned.label": "Option of the invite form: the invited person gets no Box now, an admin assigns them later.",
+        "members.boxes.title": "{person} is a person's name or email.",
+        "members.boxes.limit.confirm": "Button confirming that the person keeps only the Boxes named for them.",
+        "members.boxes.everyone.label": "Access level shown when a Box is open to the whole workspace.",
+        "createWorkspace.preview.solo": "Badge on the preview of a new workspace: its plan, a single person.",
+        "createWorkspace.preview.you": "Shown instead of the owner's email when it is unknown.",
+        "deleteAccount.typeToConfirm": "{word} is the word to type, kept in English (DELETE).",
+        "boxExplainer.points.room.label": "A Box is likened to a room of the workspace.",
+        "boxAccess.title": "Title of the dialog that sets who can use a Box. {box} is the Box's name.",
+        "boxAccess.restrict.confirm": "Button (verb): restrict the Box to the people listed.",
+        "boxAccess.levels.use.label": "Access level a person has on a Box: can chat with its coworkers.",
+        "boxAccess.levels.manage.label": "Access level a person has on a Box: can also edit, move and delete coworkers.",
+        "boxAccess.teammate": "Fallback name of a person with no name and no email.",
+        "boxAccess.outcome.admin": "In the confirmation before removing an admin from a Box's list of people.",
+        "boxAccess.outcome.scope": "In the confirmation before limiting a member to the Boxes they are named on.",
+        "newBox.createNamed": "Submit button once the Box has a name. {name} is the name typed.",
+        "newBox.placeholderName": "Example Box name (a department) shown in the empty name field.",
+        "deleteAgent.typeToConfirm": "{name} is the coworker's name, wrapped in <b> to stand out. The user must type it.",
+        "importAgent.pasteIn": "Label above the prompt to paste. {source} is the agent product it comes from (OpenClaw, Grok, Other).",
+        "importAgent.otherSource": "Choice of the import source: any other AI agent.",
+        "agentShare.sentBy": "{name} is the person who shared the coworker.",
+        "createTemplate.helperWithSlug": "Under the title field: characters typed / limit, then the public path of the template.",
+        "createTemplate.titlePlaceholder": "Example title of a template: an outbound sales development rep.",
+        "boxAccess.add.submitMany": "Button that adds the teammates picked, shown when two or more are picked. {count} is how many.",
+        "apiKeys.keysSection": "Section title above the list of API keys.",
+        "apiKeys.docsLink": "Link to the documentation page about API keys.",
+        "apiKeys.revoked": "Toast after an API key is revoked. {name} is the name the user gave the key.",
+        "apiKeys.lastUsed": "Under an API key: when it was last used. {time} is a short relative time such as '3d ago'.",
+        "apiKeys.revoke.description": "{name} is the name of the API key being revoked.",
+        "apiKeys.revoke.confirm": "Button that revokes (permanently disables) the API key.",
+        "copy.snippet": "Accessible label of a copy button. {label} is the name of the snippet (a command, a config file).",
+        "servers.connected": "Status badge: the server answers.",
+        "servers.runningSummary": "Line under the server. {address} is its URL, {count} the coworkers running on it.",
+        "servers.runningSummaryWithCommit": "Same as runningSummary, plus {commit}, a short git commit hash of the engine version.",
+        "servers.apiKeyPlaceholder": "RERUN_API_KEY is an environment variable name: keep it as is.",
+        "confirm.confirm": "Default label of the confirm button of a confirmation dialog, used when the caller gives none.",
+        "deleteTable.title": "{table} is the name of a database table.",
+        "purgeTable.title": "Purge means deleting every row while keeping the table. {table} is the name of a database table.",
+        "shortcuts.actions.searchInPage": "Pressing the shortcut twice searches the text of the page.",
+        "viewSettings.description": "Intro of the dialog that configures a view (a table, a board, a gallery) of a database table. {table} is the table's name, <mono> sets it in a code font.",
+        "viewSettings.roles.badge": "Card field shown as a small pill.",
+        "viewSettings.formatOf": "Accessible label of the format picker of a column. {column} is the column name.",
+        "viewSettings.colorOf": "Accessible label of the color picker of a value. {value} is the value.",
+        "viewSettings.plainFormat": "Format option: the value shown as it is stored.",
+        "engineWaitlist.signedInAs": "{email} is the address of the signed-in account, <b> highlights it.",
+        "paidApp.slotAddedTrial": "Toast after buying one more account slot of a paid app during the free trial. {price} is the price during the trial, formatted (e.g. $0).",
+        "paidApp.slotAdded": "Toast after buying one more account slot of a paid app (LinkedIn Pro, WhatsApp Pro).",
+        "linkedinPro.checkpoint.title": "Header of the screen where LinkedIn asks for a second verification step (code or approval in the app).",
+        "linkedinPro.checkpoint.cancel": "Back button label: leaves the screen and cancels the LinkedIn sign-in in progress.",
+        "whatsappPro.link.title": "Header of the screen showing the QR code or pairing code to link the phone to WhatsApp.",
+        "whatsappPro.link.cancel": "Back button label: leaves the screen and cancels the WhatsApp linking in progress.",
+        "subscriptionOffer.connect": "Button under a plan tile (Claude Pro or Max, ChatGPT Plus or Pro): connect that subscription.",
+        "subscriptionOffer.or": "Divider between the subscription tiles and the API key button, shown in uppercase.",
+        "subscriptionOffer.plans.claude": "The Claude subscriptions that work: Pro or Max. Keep the plan names.",
+        "subscriptionOffer.plans.codex": "The ChatGPT subscriptions that work: Plus or Pro. Keep the plan names.",
+        "subscriptionOffer.board.crew.sales": "Name of a sample AI coworker drawn on an illustration board.",
+        "subscriptionOffer.board.crew.customer_support": "Name of a sample AI coworker drawn on an illustration board.",
+        "subscriptionOffer.board.crew.accounting": "Name of a sample AI coworker drawn on an illustration board.",
+        "subscriptionOffer.connected.title": "{name} is the provider or plan just connected (Claude, ChatGPT, OpenCode, OpenRouter...).",
+        "subscriptionOffer.plan.linked": "Last step of the plan connection, once connected. {name} is Claude or ChatGPT.",
+        "subscriptionOffer.plan.switching": "Last step of the plan connection, before it is connected. {name} is Claude or ChatGPT.",
+        "subscriptionOffer.decline.cloud": "Button that declines the offer and keeps the coworkers on Rerun's own paid credits.",
+        "subscriptionOffer.decline.selfHosted": "Button that declines the offer and keeps the coworkers on the OpenRouter key already set up.",
+        "subscriptionOffer.arguments.unplug.label": "Selling point: the subscription can be disconnected at any time.",
+        "subscriptionOffer.key.add": "Button: save the pasted API key.",
+        "viewSettings.groupByRequired": "Form error of a board view: the user must pick the column whose distinct values become the board's columns.",
+        "newBox.suggestedNames": "Box names offered as chips under the Box name field: a Box groups coworkers by company division. Short, one or two words, title case where the language uses it."
+    },
+    "account": {
+        "emailChangeNeedsCurrentAddress": "This change still has to be confirmed from your current address.",
+        "emailUpdated": "Email updated",
+        "phoneUpdated": "Phone number updated",
+        "connectFailed": "Could not connect {provider}. Try again.",
+        "disconnectFailed": "Could not disconnect {provider}. Try again.",
+        "onlySignInMethod": "{provider} is the only sign-in method connected to this account.",
+        "disconnected": "{provider} disconnected",
+        "changeEmail": "Change email",
+        "addEmail": "Add email",
+        "changePhone": "Change phone number",
+        "addPhone": "Add phone number",
+        "googleNeedsBrowser": "Open Rerun in your browser to connect Google."
+    },
+    "members": {
+        "title": "Members",
+        "description": "Admins manage billing, members and settings. Members use the coworkers.",
+        "adminOnly": "Only an admin can manage members",
+        "seatsFullOne": "Your workspace is capped at one seat.",
+        "seatsFull": "Your workspace is capped at {count, plural, one {# seat} other {# seats}}.",
+        "fallbackLabel": "Member",
+        "nowAdmin": "{name} is now an admin",
+        "nowMember": "{name} is now a member",
+        "removed": "{name} removed from the workspace",
+        "unknownUser": "Unknown user",
+        "lastAdmin": "The workspace needs at least one admin",
+        "you": "You",
+        "adminBadge": "Admin",
+        "manage": "Manage {email}",
+        "makeAdmin": "Make admin",
+        "makeMember": "Make member",
+        "remove": "Remove",
+        "removeConfirm": {
+            "title": "Remove {email}?",
+            "description": "They lose access to this workspace and everything in it right away. You can invite them back later."
+        },
+        "revokeConfirm": {
+            "title": "Revoke the invitation to {email}?",
+            "description": "Their invitation link stops working. You can send a new one at any time.",
+            "confirm": "Revoke"
+        },
+        "invite": {
+            "assignLater": "assign later",
+            "pending": "Pending",
+            "revoke": "Revoke invitation",
+            "linkHint": "Send this link to {email}. It works for them only, once.",
+            "copyLink": "Copy the invitation link",
+            "emailLabel": "Invite by email",
+            "emailPlaceholder": "teammate@rerun.build",
+            "boxes": "Boxes",
+            "submit": "Invite",
+            "sent": "Invitation sent to {email}"
+        },
+        "scope": {
+            "all": {
+                "label": "All Boxes",
+                "description": "Every Box open to the workspace"
+            },
+            "assigned": {
+                "label": "None, assign later",
+                "description": "Only the Boxes you give them"
+            }
+        },
+        "boxes": {
+            "title": "Boxes of {person}",
+            "back": "Back to members",
+            "adminsSeeAll": "Admins have access to every Box",
+            "sharedField": "Boxes shared with the workspace",
+            "sharedAll": "Uses every Box open to everyone",
+            "sharedAssigned": "Uses only the Boxes named below",
+            "limit": {
+                "title": "Limit {person} to named Boxes?",
+                "confirm": "Limit"
+            },
+            "group": "Boxes",
+            "empty": "No Box yet",
+            "everyone": {
+                "label": "Everyone",
+                "description": "Can use it, the Box is open to the workspace"
+            },
+            "coworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+            "coworkersRestricted": "{count, plural, one {# coworker} other {# coworkers}} · Only selected people",
+            "accessTo": "Access to {box}",
+            "restrictBox": "Restrict this Box",
+            "restrict": {
+                "title": "Restrict {box}?",
+                "description": "Only {person}, the people already named on it and admins keep access.",
+                "confirm": "Restrict"
+            },
+            "removeAccess": {
+                "title": "Remove access to {box}?",
+                "confirm": "Remove"
+            }
+        }
+    },
+    "createWorkspace": {
+        "nameRequired": "Name is required",
+        "invitesFailed": "Workspace created, but {count, plural, one {# invitation} other {# invitations}} could not be sent. Upgrade your plan to invite teammates.",
+        "steps": {
+            "name": {
+                "title": "Name your workspace",
+                "description": "A workspace groups your Boxes, coworkers and team. You can rename it later."
+            },
+            "icon": {
+                "title": "Pick an icon",
+                "description": "Choose an illustration for your workspace. You can change it later."
+            },
+            "team": {
+                "title": "Invite your team",
+                "description": "Add teammates to collaborate in this workspace."
+            }
+        },
+        "name": "Name",
+        "namePlaceholder": "e.g. Acme Inc.",
+        "email": "Email",
+        "emailPlaceholder": "teammate@rerun.build",
+        "emailHint": "Teammates get an email invite when you create the workspace. Inviting requires a Team or Scale plan.",
+        "add": "Add",
+        "removeMember": "Remove {email}",
+        "open": "Open workspace",
+        "back": "Back",
+        "continue": "Continue",
+        "creating": "Creating",
+        "create": "Create workspace",
+        "preview": {
+            "you": "you",
+            "namePlaceholder": "Workspace name",
+            "solo": "Solo",
+            "members": "Members",
+            "owner": "Owner"
+        }
+    },
+    "deleteAccount": {
+        "title": "Delete your account?",
+        "description": "You will be signed out and will not be able to sign back into this account. Workspaces only you are in stop for good. This cannot be undone.",
+        "typeToConfirm": "Type <strong>{word}</strong> to confirm.",
+        "confirm": "Delete"
+    },
+    "deleteBox": {
+        "title": "Delete Box?",
+        "holdsCoworkers": "This Box still holds {count, plural, one {# coworker. Move it to another Box or delete it first.} other {# coworkers. Move them to another Box or delete them first.}}",
+        "description": "This action cannot be undone. The Box will be permanently removed.",
+        "typeToConfirm": "Type <strong>{name}</strong> to confirm.",
+        "confirm": "Delete"
+    },
+    "claimBox": {
+        "title": "New Box",
+        "description": "Name the Box, or pick a suggested name.",
+        "boxFirst": {
+            "heading": "Create a Box first",
+            "description": "Your new coworker lands in it, and you manage it."
+        }
+    },
+    "boxExplainer": {
+        "title": "What is a Box?",
+        "points": {
+            "room": {
+                "label": "A room of the workspace",
+                "description": "One per team, per client or per project."
+            },
+            "home": {
+                "label": "Home for many coworkers",
+                "description": "Coworkers live and work side by side inside it."
+            },
+            "shared": {
+                "label": "Nothing is walled off",
+                "description": "Every coworker shares the files and data of the workspace."
+            },
+            "free": {
+                "label": "Free and instant",
+                "description": "Make as many as the work needs."
+            }
+        }
+    },
+    "auth": {
+        "welcome": {
+            "title": "Welcome to Rerun",
+            "subtitle": "Create your account to start building your coworker team."
+        },
+        "build": {
+            "title": "Your team is ready to be built",
+            "subtitle": "Create your account and the Foreman starts building it right away."
+        },
+        "signin": {
+            "title": "Welcome",
+            "subtitle": "Sign in or create your account to get started."
+        }
+    },
+    "phoneVerification": {
+        "title": "One last step",
+        "subtitle": "Add your phone number."
+    },
+    "boxAccess": {
+        "title": "Access to {box}",
+        "description": "Access applies to every coworker in this Box",
+        "unnamedBox": "Untitled Box",
+        "visibilityField": "Who can use this Box",
+        "visibility": {
+            "workspace": "Everyone in the workspace",
+            "restricted": "Only selected people"
+        },
+        "people": "People",
+        "addPeople": "Add people",
+        "emptyRestricted": "Only admins can use this Box for now.",
+        "emptyOpen": "Name people to let them manage this Box.",
+        "restrict": {
+            "title": "Restrict {box}?",
+            "descriptionWithPeople": "Only the people listed here and admins keep access.",
+            "descriptionEmpty": "Only admins keep access until you add people.",
+            "confirm": "Restrict"
+        },
+        "admin": "Admin",
+        "createdBox": "Created this Box",
+        "accessOf": "Access of {person}",
+        "remove": {
+            "title": "Remove {person}?",
+            "confirm": "Remove",
+            "ariaLabel": "Remove {person}"
+        },
+        "add": {
+            "title": "Add people",
+            "back": "Back to access",
+            "peopleField": "People",
+            "placeholder": "Pick teammates",
+            "search": "Search by name or email",
+            "empty": "Nobody left to add",
+            "accessField": "Access",
+            "submit": "Add",
+            "submitMany": "Add {count, plural, one {# person} other {# people}}"
+        },
+        "levels": {
+            "none": {
+                "label": "No access",
+                "description": "Doesn't see this Box"
+            },
+            "use": {
+                "label": "Can use",
+                "description": "Chat with its coworkers and see their work"
+            },
+            "manage": {
+                "label": "Can manage",
+                "description": "Also edit, move and delete coworkers"
+            }
+        },
+        "teammate": "Teammate",
+        "adminOnly": "Only an admin can change who can access a Box",
+        "adminsAlways": "Admins always have access",
+        "manageReason": "Only an admin or a manager of this Box can change this",
+        "outcome": {
+            "admin": "Admins keep access to every Box; this only removes the row.",
+            "restricted": "They lose access to this Box and its coworkers right away.",
+            "manage": "They stop managing this Box. It stays open to everyone in the workspace.",
+            "use": "Their own access goes. The Box stays open to everyone in the workspace.",
+            "scope": "They keep only the Boxes named below. Every Box open to everyone goes out of their reach right away.",
+            "level": "They lose access to this Box and its coworkers right away."
+        }
+    },
+    "newBox": {
+        "heading": "Name your new Box",
+        "description": "A Box is a name on your board, a place to sort your coworkers by department.",
+        "creating": "Creating…",
+        "createNamed": "Create {name}",
+        "create": "Create Box",
+        "nameLabel": "Box name",
+        "failed": "Failed to create the Box",
+        "placeholderName": "Marketing",
+        "suggestedNames": {
+            "clients": "Clients",
+            "marketing": "Marketing",
+            "newBusiness": "New Business",
+            "operations": "Operations",
+            "finance": "Finance",
+            "personal": "Personal",
+            "store": "Store",
+            "customerCare": "Customer Care",
+            "supplyChain": "Supply Chain",
+            "product": "Product",
+            "engineering": "Engineering",
+            "support": "Support",
+            "sales": "Sales",
+            "accounts": "Accounts",
+            "recruiting": "Recruiting",
+            "listings": "Listings",
+            "legal": "Legal",
+            "compliance": "Compliance",
+            "content": "Content",
+            "business": "Business",
+            "community": "Community",
+            "sponsors": "Sponsors",
+            "work": "Work",
+            "projects": "Projects",
+            "admin": "Admin",
+            "ops": "Ops"
+        }
+    },
+    "renameBox": {
+        "title": "Rename Box",
+        "description": "The name you read on the board. Nothing else depends on it.",
+        "nameLabel": "Name",
+        "placeholder": "Untitled Box",
+        "submit": "Rename",
+        "nameRequired": "Name is required",
+        "nameTooLong": "Keep it under {max} characters"
+    },
+    "newAgent": {
+        "title": "New coworker",
+        "description": "Describe the job, or start from a suggestion or a template.",
+        "headingNamed": "What should {name} do?",
+        "heading": "What should your new coworker do?",
+        "suggestionsForBox": "Or start from one picked for {boxName}"
+    },
+    "renameAgent": {
+        "title": "Rename coworker",
+        "description": "The name shown on the board and in chats. Its @handle follows.",
+        "nameLabel": "Name",
+        "submit": "Rename",
+        "nameRequired": "Name is required",
+        "nameTooLong": "Keep it under {max} characters"
+    },
+    "deleteAgent": {
+        "title": "Delete this coworker?",
+        "description": "This will permanently delete the coworker and its data on the engine. This action cannot be undone.",
+        "typeToConfirm": "Type <b>{name}</b> to confirm.",
+        "confirm": "Delete"
+    },
+    "importAgent": {
+        "title": "Import a coworker",
+        "description": "Your agent moves itself here, with its skills, tasks and memory.",
+        "connectorUrl": "Connector URL",
+        "copyConnectorUrl": "Copy the connector URL",
+        "pasteIn": "Paste in {source}",
+        "expires": "Expires in 24 hours.",
+        "copyPrompt": "Copy the prompt",
+        "otherSource": "Other",
+        "grokConnectorStep": "Add the URL in grok.com/connectors as a custom connector, then paste the prompt."
+    },
+    "agentShare": {
+        "unavailable": "This share link is no longer available",
+        "titleNamed": "Add {name}",
+        "title": "Add this coworker",
+        "description": "Review what this coworker does, then place it on your board.",
+        "sentBy": "{name} sent you a copy of this coworker. It will run on your own Box.",
+        "sentBySomeone": "Someone sent you a copy of this coworker. It will run on your own Box.",
+        "signUp": "Sign up to add this coworker",
+        "waiting": "It will be waiting for you right after."
+    },
+    "templateDeepLink": {
+        "unavailable": "This template link is no longer available",
+        "titleNamed": "Install \"{title}\"",
+        "title": "Install this template",
+        "description": "Review what this template installs, then place its coworkers on your board."
+    },
+    "createTemplate": {
+        "defaultDescription": "Draft a template from your sandbox. The Rerun team reviews it before it goes live.",
+        "title": "New template",
+        "doneLabel": "Open template",
+        "titleField": "Title",
+        "titlePlaceholder": "e.g. Outbound SDR",
+        "helperWithSlug": "{length}/{limit} · /templates/{slug}",
+        "helperEmpty": "{length}/{limit} · The public address is derived from the title.",
+        "titleRequired": "A title is required",
+        "continue": "Continue"
+    },
+    "expertProfile": {
+        "title": "Your public profile",
+        "submit": "Save & publish",
+        "submitting": "Saving…",
+        "saved": "Your public profile has been updated."
+    },
+    "apiKeys": {
+        "title": "API keys",
+        "description": "Connect Claude Code or any MCP client to this workspace.",
+        "connectSection": "Connect a client",
+        "keysSection": "Keys",
+        "docsLink": "API keys",
+        "newKeyName": "New key name",
+        "newKeyPlaceholder": "Claude Code, MacBook",
+        "create": "Create key",
+        "revoked": "{name} revoked",
+        "adminOnly": "Only an admin can manage API keys",
+        "empty": "No key yet. A key carries the whole workspace, so treat it like a password.",
+        "lastUsed": "Used {time}",
+        "neverUsed": "Never used",
+        "revokeThisKey": "Revoke this key",
+        "created": {
+            "warning": "Copy this key now. It will never be shown again.",
+            "copyKey": "Copy the key",
+            "dismiss": "I copied it"
+        },
+        "revoke": {
+            "title": "Revoke this key?",
+            "description": "{name} stops working right away, and whatever runs on it loses its hold on the workspace. The key cannot be brought back, but you can create another one.",
+            "descriptionUnnamed": "This key stops working right away, and whatever runs on it loses its hold on the workspace. The key cannot be brought back, but you can create another one.",
+            "confirm": "Revoke"
+        }
+    },
+    "copy": {
+        "snippet": "Copy {label}",
+        "fullGuide": "Full setup guide"
+    },
+    "servers": {
+        "title": "Servers",
+        "description": "The machine your coworkers run on. One per workspace.",
+        "connected": "Connected",
+        "unreachable": "Unreachable",
+        "runningSummary": "{address} · {count, plural, other {# coworkers running}}",
+        "runningSummaryWithCommit": "{address} · {count, plural, other {# coworkers running}} · {commit}",
+        "unreachableSummary": "{address} · the app cannot reach it right now",
+        "thisWorkspace": "This workspace's server",
+        "remove": "Remove",
+        "manualSection": "Enter a server by hand",
+        "address": "Address",
+        "apiKey": "API key",
+        "apiKeyPlaceholder": "RERUN_API_KEY of the engine",
+        "back": "Back",
+        "connect": "Connect",
+        "addSection": "Add a server",
+        "addIntro": "Your coworkers run on a machine you own. Run this on it, with Docker installed. It connects by itself.",
+        "publicAddress": "Address the app reaches it at (optional)",
+        "copyCommand": "Copy the command",
+        "waiting": "Waiting for the server. The command works once, for 15 minutes.",
+        "enterManually": "Enter address and key",
+        "add": "Add server",
+        "removed": "Server removed",
+        "confirmRemove": {
+            "title": "Remove this server?",
+            "description": "Your coworkers stop answering until a server is attached again. Everything they know stays on the machine: attach it again to get them back.",
+            "confirm": "Remove"
+        }
+    },
+    "aiProviders": {
+        "title": "AI providers",
+        "description": "The plans and API keys your coworkers run on."
+    },
+    "knowledgeBase": {
+        "title": "Brain",
+        "description": "What every coworker of this workspace knows about your company, and the files and tables they share."
+    },
+    "clearMemories": {
+        "title": "Clear all memories?",
+        "description": "This permanently deletes all of this coworker's memories. This cannot be undone.",
+        "confirm": "Clear all"
+    },
+    "deleteTable": {
+        "title": "Delete table “{table}”?",
+        "description": "This permanently deletes the entire table and all of its rows. This cannot be undone.",
+        "confirm": "Delete"
+    },
+    "purgeTable": {
+        "title": "Purge table “{table}”?",
+        "description": "This deletes every row in the table, including the rows hidden by the current search. The table and its columns stay. This cannot be undone.",
+        "confirm": "Purge"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "tabs": {
+            "coworkers": "Coworkers",
+            "account": "Account"
+        },
+        "descriptions": {
+            "coworkers": "What is worth interrupting you for. Saved as you go.",
+            "account": "Choose which account emails you receive."
+        },
+        "pickCoworker": "Choose a coworker"
+    },
+    "notificationPermission": {
+        "title": "Get notified when your coworker is done?",
+        "description": "It keeps running after you close this tab. We'll let you know when it needs you.",
+        "enable": "Enable notifications",
+        "later": "Not now"
+    },
+    "confirm": {
+        "confirm": "Delete"
+    },
+    "closeRunningTab": {
+        "title": "Close this conversation?",
+        "description": "The agent is still working on this conversation. Closing the tab won't stop the run: it will keep running in the background.",
+        "confirm": "Close"
+    },
+    "shortcuts": {
+        "title": "Keyboard shortcuts",
+        "description": "Move faster around Rerun with these shortcuts.",
+        "groups": {
+            "general": "General",
+            "chat": "Chat",
+            "files": "Files"
+        },
+        "actions": {
+            "controlCenter": "Open the control center",
+            "askRerun": "Ask Rerun, outside a chat",
+            "holdToTalk": "Hold to talk to Rerun",
+            "searchInPage": "Search in the page",
+            "newConversation": "New conversation",
+            "closeTab": "Close active tab",
+            "sendMessage": "Send message",
+            "newLine": "New line",
+            "previousFile": "Previous file",
+            "nextFile": "Next file"
+        }
+    },
+    "viewSettings": {
+        "layoutDescriptions": {
+            "table": "Compare values across columns.",
+            "list": "Rows read by a name: people, companies, messages.",
+            "gallery": "Rows recognised by a picture: products, listings.",
+            "board": "Rows moving through statuses: a pipeline, tasks."
+        },
+        "editTitle": "Edit view",
+        "newTitle": "New view",
+        "description": "A view of <mono>{table}</mono>. Everyone who opens this table sees it, and the coworker can draw it in chat.",
+        "name": "Name",
+        "namePlaceholder": "e.g. Pipeline",
+        "layout": "Layout",
+        "columns": "Columns",
+        "columnsHint": "Unchecked columns stay in the table, only hidden from this view.",
+        "groupBy": "Group by",
+        "roles": {
+            "title": "Title",
+            "subtitle": "Subtitle",
+            "image": "Image",
+            "badge": "Badge",
+            "value": "Value",
+            "date": "Date"
+        },
+        "pictureShape": "Picture shape",
+        "shapes": {
+            "square": "Square",
+            "landscape": "Landscape",
+            "portrait": "Portrait"
+        },
+        "sortBy": "Sort by",
+        "insertionOrder": "Insertion order",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "formats": "Formats",
+        "formatsHint": "How each value reads: a price, a date, a rating, a status.",
+        "formatOf": "Format of {column}",
+        "plainFormat": "Plain",
+        "colors": "Colors",
+        "colorsBoardHint": "The columns listed here come first, in this order.",
+        "emptyValue": "Empty",
+        "colorOf": "Color of {value}",
+        "colorOfEmpty": "Color of empty values",
+        "automaticColor": "Automatic",
+        "create": "Create view",
+        "none": "None",
+        "pickColumn": "Pick a column",
+        "preview": "Preview",
+        "nameRequired": "Name the view",
+        "titleColumnRequired": "Pick the column each item is named by",
+        "groupByRequired": "Pick the column whose values become the columns"
+    },
+    "engineWaitlist": {
+        "title": "We're at full capacity right now",
+        "subtitle": "Too many teams joined today and every machine is taken. You're on the waitlist: your answers are saved, and this page unlocks on its own as soon as a machine frees up.",
+        "signedInAs": "Signed in as <b>{email}</b>",
+        "signOut": "Sign out"
+    },
+    "sandboxReactivation": {
+        "title": "Request reactivation",
+        "description": "Your sandbox comes back once we have approved your request.",
+        "asideTitle": "Why was my sandbox archived?",
+        "points": {
+            "archived": {
+                "label": "Archived after 30 days unused",
+                "description": "A sandbox keeps a machine running, so one nobody opens gives it back."
+            },
+            "kept": {
+                "label": "Nothing was thrown away",
+                "description": "Your coworkers, their memory and their files are saved with the archive."
+            },
+            "reviewed": {
+                "label": "We review every request",
+                "description": "Tell us what you are building and we bring your sandbox back."
+            },
+            "restored": {
+                "label": "Back exactly as you left it",
+                "description": "Once approved, the restore takes a couple of minutes."
+            }
+        },
+        "noteLabel": "What do you plan to build?",
+        "noteHint": "A sentence or two is enough.",
+        "submit": "Send request",
+        "failed": "Could not send your request. Please try again."
+    },
+    "paidApp": {
+        "slotAdded": "Slot added to your plan.",
+        "slotAddedTrial": "Slot added, {price} during your trial."
+    },
+    "linkedinPro": {
+        "description": "The LinkedIn accounts your coworkers act with.",
+        "connectDescription": "Connect the LinkedIn account your coworkers act with.",
+        "approvalNotSeen": "LinkedIn has not seen the approval yet. Tap Yes in the app, then try again.",
+        "codeResent": "A new code is on its way.",
+        "connect": {
+            "title": "Connect LinkedIn",
+            "reconnectTitle": "Reconnect LinkedIn",
+            "back": "Back to LinkedIn Pro"
+        },
+        "checkpoint": {
+            "title": "Confirm it is you",
+            "hint": "LinkedIn asks for a second step",
+            "cancel": "Cancel the sign-in"
+        }
+    },
+    "whatsappPro": {
+        "description": "The WhatsApp numbers your coworkers act with.",
+        "connectDescription": "Link the WhatsApp number your coworkers act with.",
+        "connect": {
+            "title": "Link WhatsApp",
+            "reconnectTitle": "Link WhatsApp again",
+            "back": "Back to WhatsApp Pro"
+        },
+        "link": {
+            "title": "Link the phone",
+            "hint": "WhatsApp adds Rerun as a linked device",
+            "cancel": "Cancel the link"
+        }
+    },
+    "subscriptionOffer": {
+        "title": "Run your coworkers on your Claude or ChatGPT plan",
+        "back": "Back",
+        "connect": "Connect",
+        "or": "or",
+        "useApiKey": "Use an API key",
+        "plans": {
+            "claude": "Claude Pro or Max",
+            "codex": "ChatGPT Plus or Pro"
+        },
+        "decline": {
+            "cloud": "I'd rather stay on Rerun credits",
+            "selfHosted": "I'd rather stay on OpenRouter"
+        },
+        "offer": {
+            "title": "Rerun works better with your Claude or ChatGPT subscription",
+            "description": "Connect it and your coworkers run on the plan you already pay for."
+        },
+        "arguments": {
+            "ownPlan": {
+                "label": "Everyone brings their own",
+                "description": "Each teammate connects the plan they pay for. No account passed around."
+            },
+            "password": {
+                "label": "Rerun never sees your password",
+                "description": "You approve it on Claude's or OpenAI's own page, and nowhere else."
+            },
+            "unplug": {
+                "label": "Unplug it whenever",
+                "descriptionCloud": "Disconnect in one click and your coworkers fall back on Rerun credits.",
+                "descriptionSelfHosted": "Disconnect in one click and your coworkers fall back on your OpenRouter key."
+            }
+        },
+        "board": {
+            "title": "Every coworker on a connection of yours",
+            "description": "Two subscriptions and an API key, side by side on the same board.",
+            "crew": {
+                "sales": "Sales",
+                "customer_support": "Customer Support",
+                "accounting": "Accounting"
+            }
+        },
+        "plan": {
+            "title": "Connect your {name} plan",
+            "linked": "Your coworkers run on {name}",
+            "switching": "Your coworkers switch to {name}"
+        },
+        "key": {
+            "title": "Use an API key",
+            "detail": "Your coworkers run on your key, billed per token by its provider.",
+            "opencodeTitle": "Connect OpenCode",
+            "opencodeDetail": "Paste your OpenCode key: the Go models run on your plan, the Console ones on your credits.",
+            "field": "API key",
+            "placeholder": "Paste your key",
+            "add": "Add key",
+            "connecting": "Connecting…",
+            "failed": "Failed to add the key",
+            "somethingWentWrong": "Something went wrong. Please try again."
+        },
+        "connected": {
+            "title": "{name} is connected",
+            "planDetail": "Your coworkers now run on your {name} plan.",
+            "opencodeDetail": "Your coworkers now run on your OpenCode Go plan.",
+            "keyDetail": "Your coworkers now run on this key.",
+            "done": "Done"
+        }
+    }
+}

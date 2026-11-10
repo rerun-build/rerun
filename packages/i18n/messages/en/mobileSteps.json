@@ -1,0 +1,49 @@
+{
+    "group": {
+        "steps": "{count, plural, one {# step} other {# steps}}",
+        "stepsWithFailures": "{count, plural, one {# step} other {# steps}}, {failed} failed",
+        "failed": "{failed} failed"
+    },
+    "tool": {
+        "input": "Input",
+        "error": "Error",
+        "output": "Output",
+        "completedInMs": "Completed in {ms}ms",
+        "completedInSeconds": "Completed in {seconds}s"
+    },
+    "reasoning": {
+        "thinking": "Thinking...",
+        "thought": "Thought"
+    },
+    "compaction": {
+        "running": "Compacting context…",
+        "failed": "Context compaction failed",
+        "done": "Context compacted",
+        "summarized": "{count} earlier messages summarized",
+        "recovered": "~{count} tokens recovered"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {# failure} other {# failures}}",
+        "idle": "Idle {minutes} min",
+        "stop": "Stop this task",
+        "failed": "Failed",
+        "stopped": "Stopped, partial work kept",
+        "earlier": "+{count} earlier",
+        "verbs": {
+            "web_search": "Searching {summary}",
+            "web_fetch": "Reading {summary}",
+            "browser_navigate": "Browsing {summary}",
+            "shell_exec": "Running {summary}",
+            "fs_read": "Reading {summary}",
+            "fs_write": "Writing {summary}",
+            "fs_edit": "Editing {summary}"
+        }
+    },
+    "_context": {
+        "group.steps": "A pill under a message that folds the tool calls of a coworker: how many steps it took.",
+        "compaction.recovered": "Space freed in the model's context window after older messages were summarized.",
+        "subRun.verbs.web_search": "What a delegated task is doing right now; {summary} is the query or target, written by the engine (may be empty).",
+        "subRun.idle": "A delegated task has done nothing for this many minutes.",
+        "subRun.earlier": "How many earlier steps of a running task are hidden above the last three."
+    }
+}

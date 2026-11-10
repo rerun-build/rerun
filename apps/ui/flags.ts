@@ -1,5 +1,5 @@
 import { isAdminEmail } from '@/lib/auth/admin-emails'
-import { COMPUTER_RELEASED, PUBLISHED_ACCESS_RELEASED, REWIND_RELEASED } from '@/lib/features'
+import { COMPUTER_RELEASED, I18N_RELEASED, PUBLISHED_ACCESS_RELEASED, REWIND_RELEASED } from '@/lib/features'
 import { createClient } from '@/supabase/server'
 import { dedupe, flag } from 'flags/next'
 
@@ -43,4 +43,13 @@ export const publishedAccessFlag = flag<boolean, Entities>({
     defaultValue: false,
     identify,
     decide: releasedOrEarlyAccess(PUBLISHED_ACCESS_RELEASED),
+})
+
+// `rerun.local` is the domain of the throwaway accounts `pnpm verify:ui` signs in with on the local
+// stack, so a pack can be looked at before it ships. No inbox answers there.
+export const i18nFlag = flag<boolean, Entities>({
+    key: 'i18n',
+    defaultValue: false,
+    identify,
+    decide: releasedOrEarlyAccess(I18N_RELEASED, ['rerun.local']),
 })

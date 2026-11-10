@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { dismissUpdateAvailableToast, showUpdateAvailableToast } from './showUpdateAvailableToast'
@@ -29,6 +30,7 @@ function isChunkLoadError(error: unknown) {
 }
 
 export function DeployUpdateWatcher() {
+    const t = useTranslations('layout.update')
     const [stale, setStale] = useState(false)
 
     useEffect(() => {
@@ -72,7 +74,7 @@ export function DeployUpdateWatcher() {
                 const { buildSha } = (await response.json()) as { buildSha?: string }
                 if (!buildSha || buildSha === BUILD_SHA) return
                 if (document.visibilityState === 'hidden') reloadIfUnattended()
-                else showUpdateAvailableToast()
+                else showUpdateAvailableToast({ title: t('available.title'), description: t('available.description'), reload: t('reload') })
             } catch {}
         }
 
@@ -82,7 +84,7 @@ export function DeployUpdateWatcher() {
             window.clearInterval(interval)
             document.removeEventListener('visibilitychange', checkVersion)
         }
-    }, [stale])
+    }, [stale, t])
 
     return <UpdateRequiredDialog open={stale} />
 }

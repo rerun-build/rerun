@@ -1,0 +1,125 @@
+{
+    "title": "Coworkers",
+    "loadFailed": "No pudimos cargar tus coworkers.",
+    "retry": "Reintentar",
+    "empty": "Todavía no hay coworkers.",
+    "loadingCoworkers": "Cargando coworkers",
+    "newCoworker": "Nuevo coworker",
+    "untitledBox": "Box sin nombre",
+    "teammate": "Compañero",
+    "pinned": {
+        "dragToReorder": "Arrastra para reordenar",
+        "done": "Listo",
+        "unpin": "Desfijar",
+        "details": "Detalles del coworker",
+        "edit": "Editar fijados",
+        "unreadLabel": "{name}, sin leer"
+    },
+    "row": {
+        "label": "{name}, {line}",
+        "opensConversation": "Abre la conversación",
+        "pin": "Fijar",
+        "unpin": "Desfijar",
+        "pinToTop": "Fijar arriba"
+    },
+    "line": {
+        "paused": "En pausa",
+        "waiting": "Te está esperando",
+        "error": "Algo salió mal",
+        "working": "Trabajando",
+        "workingOn": "Trabajando · {detail}",
+        "asleep": "Dormido",
+        "asleepAbout": "Dormido · {about}"
+    },
+    "foreman": {
+        "askAnything": "Pregunta lo que quieras"
+    },
+    "header": {
+        "account": "Cuenta",
+        "view": "Vista",
+        "recent": "Recientes",
+        "byBox": "Por Box"
+    },
+    "account": {
+        "preferences": "Preferencias",
+        "contactSupport": "Contactar con soporte",
+        "signOut": "Cerrar sesión",
+        "subscriptionTitle": "Cancela primero la suscripción",
+        "subscriptionMessage": "{workspaces} todavía se renueva. Cancélala desde Facturación en rerun.build y luego elimina tu cuenta.",
+        "deleteTitle": "¿Eliminar tu cuenta?",
+        "deleteMessage": "Sales de los workspaces que compartes. Un workspace en el que solo estás tú se detiene para siempre, con sus coworkers y sus archivos. Esta acción no se puede deshacer.",
+        "delete": "Eliminar",
+        "cancel": "Cancelar",
+        "reauthTitle": "Vuelve a iniciar sesión para eliminar tu cuenta",
+        "reauthMessage": "Por tu seguridad, eliminar la cuenta requiere un inicio de sesión reciente. Vuelve a iniciar sesión y elimínala desde aquí.",
+        "deleteFailedTitle": "No se pudo eliminar tu cuenta",
+        "deleteFailedMessage": "Inténtalo de nuevo en un momento.",
+        "leaveServerTitle": "¿Salir de {host}?",
+        "leaveServerMessage": "Se cerrará tu sesión y Rerun se abrirá de nuevo en Rerun Cloud.",
+        "leaveServer": "Salir"
+    },
+    "workspace": {
+        "untitled": "Mi workspace",
+        "menuLabel": "Workspace {name}"
+    },
+    "section": {
+        "label": "{label}, {count}"
+    },
+    "search": {
+        "title": "Buscar",
+        "back": "Atrás",
+        "placeholder": "Buscar coworkers y conversaciones",
+        "askRerun": "Preguntar a Rerun",
+        "quotedAsk": "“{query}”",
+        "coworkers": "Coworkers",
+        "conversations": "Conversaciones",
+        "noCoworker": "No hay ningún coworker con ese nombre.",
+        "newConversation": "Nueva conversación",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "Notificaciones",
+        "bellLabel": "Notificaciones, {count}",
+        "close": "Cerrar",
+        "settings": "Ajustes de notificaciones",
+        "markAllRead": "Marcar todo como leído",
+        "markAllTitle": "¿Marcar todo como leído?",
+        "markAllMessage": "{count, plural, one {# elemento saldrá} other {# elementos saldrán}} de esta lista. Las solicitudes que siguen esperando respuesta también se borran, sin responderse.",
+        "cancel": "Cancelar",
+        "running": "{count, plural, one {# tarea en curso} other {# tareas en curso}}",
+        "loadFailed": "No pudimos cargar tus notificaciones.",
+        "retry": "Reintentar",
+        "emptyTitle": "Nada pendiente",
+        "emptyDescription": "Cuando un coworker te necesite o termine una tarea, aparecerá aquí.",
+        "undo": "Deshacer",
+        "ok": "OK",
+        "sections": {
+            "needsYou": "Te necesitan",
+            "headsUps": "Avisos",
+            "errors": "Errores",
+            "done": "Terminadas"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} te hizo una pregunta",
+            "awaiting_approval": "{agent} necesita tu aprobación",
+            "awaiting_connector": "{agent} necesita que conectes una app",
+            "waiting_human": "{agent} te está esperando",
+            "awaiting_ack": "{agent} te señaló algo",
+            "error": "{agent} tuvo un error",
+            "done": "{agent} terminó su ejecución"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}, {detail}",
+            "read": "Leído",
+            "markRead": "Marcar como leído",
+            "opensConversation": "Abre la conversación",
+            "unfollow": "Dejar de seguir sus tareas programadas",
+            "unfollowed": "Ya no sigues las tareas programadas de {name}.",
+            "mute": "Silenciar a {name}",
+            "muted": "{name} está silenciado.",
+            "settings": "Ajustes de notificaciones",
+            "cancel": "Cancelar"
+        }
+    }
+}

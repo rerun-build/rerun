@@ -8,6 +8,7 @@
 //   pnpm verify:ui --engine --scenario …                     with a local engine behind the workspace
 //   pnpm verify:ui --fresh /                                 a brand new account, to walk the signup
 //   pnpm verify:ui --onboarded /                             an account past the onboarding
+//   pnpm verify:ui --locale fr /                             the app in a language pack (fr, es, or en-XA)
 //
 // Local stack only. The hub has to run on the Docker Supabase (`pnpm db:start`, then `pnpm cloud env:local`):
 // a hub on production provisions a real user and a real workspace on every page load, and the
@@ -60,7 +61,7 @@ function log(message) {
 }
 
 function parseArgs(argv) {
-    const options = { paths: [], widths: [375, 768, 1440], themes: ['light', 'dark'], short: true, headed: false, keep: false, engine: false, fresh: false, onboarded: false, scenario: null }
+    const options = { paths: [], widths: [375, 768, 1440], themes: ['light', 'dark'], short: true, headed: false, keep: false, engine: false, fresh: false, onboarded: false, scenario: null, locale: null }
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
         if (arg === '--widths') options.widths = argv[++i].split(',').map(Number)
@@ -72,6 +73,7 @@ function parseArgs(argv) {
         else if (arg === '--engine') options.engine = true
         else if (arg === '--fresh') options.fresh = true
         else if (arg === '--onboarded') options.onboarded = true
+        else if (arg === '--locale') options.locale = argv[++i]
         else if (arg.startsWith('/')) options.paths.push(arg)
         else fail(`Unknown argument: ${arg}`)
     }
@@ -230,7 +232,8 @@ async function skipPhoneStep(admin, userId) {
 async function signIn(context, base, account) {
     const page = await context.newPage()
     await page.goto(`${base}/auth/confirm?token_hash=${account.tokenHash}&type=magiclink`)
-    await page.getByRole('button', { name: 'Continue' }).click()
+    // The confirm page is in the browser's language: its one submit button, whatever it says.
+    await page.locator('form button[type="submit"]').first().click()
     await page.waitForURL((url) => !url.pathname.startsWith('/auth'), { timeout: 60_000 })
     await skipPhoneStep(account.admin, account.userId)
     await page.close()
@@ -371,8 +374,13 @@ const server = await ensureServer(base, outDir)
 // Chromium's Local Network Access checks hold every request the page makes to the loopback stack
 // (127.0.0.1:54421) and the dev server's HMR socket behind a permission prompt nobody answers.
 const browser = await chromium.launch({ headless: !options.headed, args: ['--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests'] })
-const context = await browser.newContext()
-await context.addCookies([{ name: 'rerun-consent', value: `v1:denied:${Date.now()}`, url: base }])
+// A language pack is picked by the cookie the Account dialog writes, and the browser asks for it too.
+// The test accounts (`@rerun.local`) are in the early access of the language packs.
+const context = await browser.newContext(options.locale ? { locale: options.locale } : {})
+await context.addCookies([
+    { name: 'rerun-consent', value: `v1:denied:${Date.now()}`, url: base },
+    ...(options.locale ? [{ name: 'NEXT_LOCALE', value: options.locale, url: base }] : []),
+])
 let failed = false
 let engine = null
 try {

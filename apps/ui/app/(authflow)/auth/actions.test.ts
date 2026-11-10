@@ -33,7 +33,7 @@ describe('completeSignupAction', () => {
     it('stamps the signup of the account behind the request, with the phone step a web signup owes', async () => {
         expect(await completeSignupAction()).toEqual({ ok: true, signedUp: true })
 
-        expect(mocks.provisionUser).toHaveBeenCalledWith(expect.objectContaining({ auth: expect.anything() }), account, { phoneStep: true, priceArm: '29' })
+        expect(mocks.provisionUser).toHaveBeenCalledWith(expect.objectContaining({ auth: expect.anything() }), account, { phoneStep: true, priceArm: '29', locale: 'en' })
     })
 
     it('asks no phone of whoever arrived by invite', async () => {
@@ -72,7 +72,7 @@ describe('prepareEmailSignIn', () => {
     it('refuses a visitor the robot check turned away, before anything is created', async () => {
         mocks.verifyCaptcha.mockResolvedValue(false)
 
-        expect(await prepareEmailSignIn({ email: 'ada@example.com' })).toEqual({ ok: false, reason: 'captcha_failed', error: 'We could not confirm you are not a robot. Try again.' })
+        expect(await prepareEmailSignIn({ email: 'ada@example.com' })).toEqual({ ok: false, reason: 'captcha_failed', error: 'We could not confirm you are not a robot. Try again.', code: 'captchaFailed' })
         expect(mocks.ensureEmailAccount).not.toHaveBeenCalled()
     })
 
@@ -84,7 +84,7 @@ describe('prepareEmailSignIn', () => {
     it('says a blocked domain is not accepted, in the words the hook uses', async () => {
         mocks.ensureEmailAccount.mockResolvedValue({ ok: false, error: 'blocked_domain' })
 
-        expect(await prepareEmailSignIn({ email: 'someone@blocked.example', captcha: { provider: 'turnstile', token: 'token' } })).toEqual({ ok: false, reason: 'blocked_domain', error: 'This email domain is not accepted. Use another address.' })
+        expect(await prepareEmailSignIn({ email: 'someone@blocked.example', captcha: { provider: 'turnstile', token: 'token' } })).toEqual({ ok: false, reason: 'blocked_domain', error: 'This email domain is not accepted. Use another address.', code: 'emailDomainBlocked' })
     })
 
     it('passes a held-back caller on', async () => {
@@ -96,7 +96,7 @@ describe('prepareEmailSignIn', () => {
     it('holds back a network that asked for too many codes, before any account is opened', async () => {
         mocks.claimEmailCodeAsk.mockResolvedValue(false)
 
-        expect(await prepareEmailSignIn({ email: 'ada@example.com', captcha: { provider: 'turnstile', token: 'token' } })).toEqual({ ok: false, reason: 'too_many_codes', error: 'Too many codes were asked from your network. Try again later.' })
+        expect(await prepareEmailSignIn({ email: 'ada@example.com', captcha: { provider: 'turnstile', token: 'token' } })).toEqual({ ok: false, reason: 'too_many_codes', error: 'Too many codes were asked from your network. Try again later.', code: 'tooManyCodesFromNetwork' })
         expect(mocks.claimEmailCodeAsk).toHaveBeenCalledWith('203.0.113.7')
         expect(mocks.ensureEmailAccount).not.toHaveBeenCalled()
     })
@@ -130,7 +130,7 @@ describe('prepareAnonymousEmailStep', () => {
     it('refuses a blocked domain the anonymous flow used to let through', async () => {
         mocks.lookupEmailForSignUp.mockResolvedValue({ ok: false, error: 'blocked_domain' })
 
-        expect(await prepareAnonymousEmailStep({ email: 'someone@blocked.example', captcha: { provider: 'turnstile', token: 'token' } })).toEqual({ ok: false, reason: 'blocked_domain', error: 'This email domain is not accepted. Use another address.' })
+        expect(await prepareAnonymousEmailStep({ email: 'someone@blocked.example', captcha: { provider: 'turnstile', token: 'token' } })).toEqual({ ok: false, reason: 'blocked_domain', error: 'This email domain is not accepted. Use another address.', code: 'emailDomainBlocked' })
     })
 
     it('refuses what is not an email', async () => {

@@ -1,11 +1,13 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import type { NotificationKind } from '@/lib/engine/types'
 import { CalendarClock } from '@/lib/icons'
 import { NotificationToast } from '@/components/notifications/NotificationToast'
 import { errorHeadline } from '@/lib/notifications/attention-details'
+import { noticeText } from '@/lib/notifications/notice-copy'
 import { ANNOUNCED_STATUS, FINISHED_STATUS } from '@/lib/notifications/announcement'
 import { playNotificationSoundOnce, showBrowserNotification } from '@/lib/notifications/browser'
 import { KIND_BEAM, KIND_ICONS, KIND_ICON_COLORS } from '@/lib/notifications/kind-visuals'
@@ -35,6 +37,17 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
     useEffect(() => {
         userIdRef.current = user?.id
     }, [user?.id])
+    const tErrors = useTranslations('chatErrors')
+    const tErrorsRef = useRef(tErrors)
+    useEffect(() => {
+        tErrorsRef.current = tErrors
+    }, [tErrors])
+    const t = useTranslations('notifications.toast')
+    const tNotices = useTranslations('notifications.notices')
+    const copyRef = useRef({ t, tNotices })
+    useEffect(() => {
+        copyRef.current = { t, tNotices }
+    }, [t, tNotices])
 
     useRealtimeSubscription('notifications', {
         channelId: `notifications-ws-${workspaceId}`,
@@ -54,9 +67,10 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             if (kind === 'done' && isWatching(row.agent_id)) return
 
             const agent = row.agent_id ? useBoardStore.getState().agents.find(a => a.id === row.agent_id) : undefined
-            const agentName = agent?.name ?? 'Coworker'
+            const agentName = agent?.name ?? copyRef.current.t('coworker')
             const scheduled = isScheduledSource(row.source)
-            const title = scheduled ? `${agentName} · Scheduled task` : agentName
+            const title = scheduled ? copyRef.current.t('scheduledTask', { name: agentName }) : agentName
+            const message = noticeText(row, copyRef.current.tNotices)
 
             const Icon = scheduled ? CalendarClock : KIND_ICONS[kind]
             const iconColor = scheduled ? 'text-violet-400' : KIND_ICON_COLORS[kind]
@@ -70,7 +84,7 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
                 toast.custom(id => (
                     <NotificationToast
                         title={title}
-                        message={row.message}
+                        message={message}
                         agentId={row.agent_id}
                         Icon={Icon}
                         iconColor={iconColor}
@@ -87,8 +101,8 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
                     id: row.id,
                     agentId: row.agent_id,
                     status,
-                    headline: kind === 'error' ? errorHeadline(row) : row.message,
-                    message: row.message,
+                    headline: kind === 'error' ? errorHeadline(row, tErrorsRef.current) : message,
+                    message,
                     engineSessionId: row.engine_session_id,
                     engineRunId: row.engine_run_id,
                     createdAt: row.created_at,
@@ -96,7 +110,7 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             }
 
             if (delivery === 'sound') playNotificationSoundOnce(row.id)
-            if (shown || delivery === 'sound') showBrowserNotification({ title, body: row.message, tag: row.id, onClick: openConversation })
+            if (shown || delivery === 'sound') showBrowserNotification({ title, body: message, tag: row.id, onClick: openConversation })
         },
     })
 }

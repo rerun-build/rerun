@@ -15,7 +15,7 @@ describe('whatsappProfile', () => {
 
 describe('whatsappSignInRefusal', () => {
     it('says what to do when the code ran out', () => {
-        expect(whatsappSignInRefusal('WHATSAPP_LINK_EXPIRED')).toMatch(/expired/)
-        expect(whatsappSignInRefusal('WHATSAPP_LINK_REFUSED')).toMatch(/refused to link this number/)
+        expect(whatsappSignInRefusal('WHATSAPP_LINK_EXPIRED').code).toBe('whatsappCodeExpired')
+        expect(whatsappSignInRefusal('WHATSAPP_LINK_REFUSED').code).toBe('whatsappLinkRefused')
     })
 })

@@ -1,15 +1,17 @@
 import type { Metadata } from 'next'
 import { AuthShell } from '@/components/auth/AuthShell'
+import { getTranslations } from 'next-intl/server'
 
-export const metadata: Metadata = {
-    title: 'Sign in',
-    description: 'Sign in or create your Rerun account and get your first AI coworker running in minutes.',
+export async function generateMetadata(): Promise<Metadata> {
+    const t = await getTranslations('auth.page')
+    return { title: t('metaTitle'), description: t('metaDescription') }
 }
 
-export default function AuthFlowLayout({ children }: { children: React.ReactNode }) {
+export default async function AuthFlowLayout({ children }: { children: React.ReactNode }) {
+    const t = await getTranslations('auth.page')
     return (
         <div className="h-dvh w-full">
-            <AuthShell title="Welcome" subtitle="Sign in or create your account to get started.">
+            <AuthShell title={t('title')} subtitle={t('subtitle')}>
                 {children}
             </AuthShell>
         </div>

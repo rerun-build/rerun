@@ -1,0 +1,51 @@
+{
+    "linkOff": {
+        "title": "Ce lien ne fonctionne plus",
+        "subtitle": "La personne qui l'a partagé l'a désactivé."
+    },
+    "unsubscribe": {
+        "title": "Préférences e-mail",
+        "subtitle": "Choisissez les e-mails que Rerun vous envoie. Aucune connexion nécessaire.",
+        "subtitleRuns": "Choisissez si vos coworkers peuvent vous écrire par e-mail. Aucune connexion nécessaire.",
+        "invalid": "Ce lien de désinscription est invalide ou a expiré.",
+        "logIn": "Connectez-vous pour gérer vos préférences"
+    },
+    "publishedView": {
+        "protectedTitle": "Page protégée",
+        "protectedDescription": "Partagée par {workspace}. Connectez-vous ou confirmez votre e-mail pour l'ouvrir.",
+        "publishedBy": "Publiée par {agent} chez {workspace}",
+        "publishedByUnknown": "Publiée par un coworker chez {workspace}"
+    },
+    "publishedAuth": {
+        "metaTitle": "Ouvrir une page",
+        "noAccess": "Vous n'avez pas accès",
+        "signedInAs": "Connecté en tant que {email}. Cette page est réservée aux membres de {workspace}.",
+        "signedInAsOther": "Connecté avec un autre compte. Cette page est réservée aux membres de {workspace}."
+    },
+    "gate": {
+        "open": "Ouvrir",
+        "errors": {
+            "limited": "Trop de tentatives. Patientez quelques minutes.",
+            "password": "Mot de passe incorrect",
+            "code": "Code erroné ou expiré",
+            "email": "Saisissez un e-mail valide"
+        },
+        "password": {
+            "subtitle": "{workspace} a protégé cette page par un mot de passe",
+            "placeholder": "Mot de passe"
+        },
+        "code": {
+            "title": "Consultez votre boîte de réception",
+            "subtitle": "Si {email} peut ouvrir cette page, un code est en route",
+            "otherEmail": "Utiliser un autre e-mail"
+        },
+        "email": {
+            "subtitle": "Confirmez votre e-mail pour l'ouvrir",
+            "submit": "Envoyer le code"
+        },
+        "members": {
+            "subtitle": "Réservée aux membres de {workspace}",
+            "continue": "Continuer avec Rerun"
+        }
+    }
+}

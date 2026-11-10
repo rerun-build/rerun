@@ -1,4 +1,4 @@
-import { cliUnavailableReason, inPlanOrder, inTierOrder, isHiddenModel, isModelLocked, livePlanWindows, modelDescription } from '@/lib/engine/ai-sources'
+import { cliUnavailableReason, inPlanOrder, inTierOrder, isHiddenModel, isModelLocked, livePlanWindows, modelDescription, type SourceCopy } from '@/lib/engine/ai-sources'
 import { modelLabel, modelPower } from '@/lib/engine/models'
 import type { BoxConnection, EngineProvider } from '@/lib/engine/types'
 import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@rerun/contracts'
@@ -34,24 +34,24 @@ export function pinFirst<T>(items: T[], match: (item: T) => boolean): T[] {
 //
 // A connection with no credential is dropped rather than shown greyed out: the connections tab is
 // where you fix that, and a picker offering a model that cannot run is a trap.
-export function toGroup(connection: BoxConnection, premiumAllowed: boolean): ConnectionGroup {
+export function toGroup(connection: BoxConnection, premiumAllowed: boolean, t: SourceCopy): ConnectionGroup {
     const offered = connection.models.filter(id => !isHiddenModel(connection.id, id))
     const catalog = offered.map(id => ({
         id,
         label: modelLabel(id),
         power: modelPower(id),
-        description: modelDescription(connection, id),
+        description: modelDescription(connection, id, t),
         locked: isModelLocked(connection.id, id, premiumAllowed),
-        unavailable: cliUnavailableReason(connection, id),
+        unavailable: cliUnavailableReason(connection, id, t),
     }))
     // Ids the catalog does not know (a custom router's own): the id is the only label there is.
-    const extra = connection.extraModels.map(id => ({ id, label: id, locked: isModelLocked(connection.id, id, premiumAllowed), unavailable: cliUnavailableReason(connection, id) }))
+    const extra = connection.extraModels.map(id => ({ id, label: id, locked: isModelLocked(connection.id, id, premiumAllowed), unavailable: cliUnavailableReason(connection, id, t) }))
     const models = inPlanOrder(connection.provider, inTierOrder(connection.id, [...catalog, ...extra]))
     // The engine skips what the plan does not run, then what the CLI does not serve, when it picks a
     // connection's default.
     const runnable = [...offered, ...connection.extraModels]
     const runsAsIs = (id: string) => !isModelLocked(connection.id, id, premiumAllowed)
-    const defaultModel = runnable.find(id => runsAsIs(id) && !cliUnavailableReason(connection, id)) ?? runnable.find(runsAsIs) ?? runnable[0] ?? ''
+    const defaultModel = runnable.find(id => runsAsIs(id) && !cliUnavailableReason(connection, id, t)) ?? runnable.find(runsAsIs) ?? runnable[0] ?? ''
     return { connectionId: connection.id, label: connection.name, provider: connection.provider, models, defaultModel, planWindows: livePlanWindows(connection) }
 }
 
@@ -64,11 +64,11 @@ export function refusedModelReason(group: Pick<ConnectionGroup, 'models'> | unde
 }
 
 // The groups every picker offers, Rerun first: shared by the web hook and the app's /api/v1 route.
-export function connectionGroups(connections: BoxConnection[], premiumAllowed: boolean): ConnectionGroup[] {
+export function connectionGroups(connections: BoxConnection[], premiumAllowed: boolean, t: SourceCopy): ConnectionGroup[] {
     return pinFirst(
         connections
             .filter(connection => connection.connected)
-            .map(connection => toGroup(connection, premiumAllowed))
+            .map(connection => toGroup(connection, premiumAllowed, t))
             .filter(group => group.models.length > 0),
         group => group.connectionId === RERUN_CONNECTION_ID
     )

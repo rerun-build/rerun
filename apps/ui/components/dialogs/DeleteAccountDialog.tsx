@@ -6,8 +6,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from '@/components/ui/input'
 import { DELETE_ACCOUNT_CONFIRMATION } from '@/lib/auth/account-deletion'
 import { Loader2Icon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 export function DeleteAccountDialog({ open, pending, onOpenChange, onConfirm }: { open: boolean; pending: boolean; onOpenChange: (open: boolean) => void; onConfirm: (confirmation: string) => void }) {
+    const t = useTranslations('dialogs.deleteAccount')
+    const tCommon = useTranslations('common')
     const [confirmText, setConfirmText] = useState('')
 
     useEffect(() => {
@@ -20,12 +23,12 @@ export function DeleteAccountDialog({ open, pending, onOpenChange, onConfirm }: 
         <AlertDialog open={open} onOpenChange={next => !pending && onOpenChange(next)}>
             <AlertDialogContent size="sm">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-                    <AlertDialogDescription>You will be signed out and will not be able to sign back into this account. Workspaces only you are in stop for good. This cannot be undone.</AlertDialogDescription>
+                    <AlertDialogTitle>{t('title')}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('description')}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="grid gap-2">
                     <p className="text-sm text-muted-foreground">
-                        Type <span className="font-medium text-foreground">{DELETE_ACCOUNT_CONFIRMATION}</span> to confirm.
+                        {t.rich('typeToConfirm', { word: DELETE_ACCOUNT_CONFIRMATION, strong: chunks => <span className="font-medium text-foreground">{chunks}</span> })}
                     </p>
                     <Input
                         value={confirmText}
@@ -40,7 +43,7 @@ export function DeleteAccountDialog({ open, pending, onOpenChange, onConfirm }: 
                     />
                 </div>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel disabled={pending}>{tCommon('cancel')}</AlertDialogCancel>
                     <AlertDialogAction
                         variant="destructive"
                         disabled={!canDelete}
@@ -50,7 +53,7 @@ export function DeleteAccountDialog({ open, pending, onOpenChange, onConfirm }: 
                         }}
                     >
                         {pending && <Loader2Icon className="animate-spin" />}
-                        Delete
+                        {t('confirm')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

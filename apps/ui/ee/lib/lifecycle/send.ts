@@ -29,6 +29,10 @@ import { formatAmount } from '@rerun/contracts'
 import { isRetriableFailure } from '@/lib/email/throttle'
 import { buildUnsubscribeUrl } from '@/lib/email/unsubscribeToken'
 import { BANNER_WARM_BACKGROUND_MS, emailBoardBanner } from '@/lib/email/board-banner'
+import { emailDateLabel, emailTimeLabel } from '@/lib/email/date-labels'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { emailTranslator, type EmailTranslator } from '@rerun/emails/i18n'
+import type { Locale } from '@rerun/i18n'
 import type { TeamStatus } from '@/lib/og/team-board'
 import { BOX_DELETION_GRACE_MS, PAYMENT_FAILED_GRACE_MS } from '@/ee/lib/billing/grace'
 import { warmTemplateEmailCards } from '@/lib/templates/email-card'
@@ -53,29 +57,17 @@ export type DeliverInput = {
 export type DeliverResult = { sent: true } | { sent: false; reason: string }
 
 // Whole days, which is the only granularity these emails ever speak in.
-function relativeLabel(from: Date, now: Date): string {
+function relativeLabel(from: Date, now: Date, t: EmailTranslator): string {
     const hours = Math.max(1, Math.round((now.getTime() - from.getTime()) / (60 * 60_000)))
-    if (hours < 24) return hours === 1 ? '1 hour ago' : `${hours} hours ago`
+    if (hours < 24) return t('agentIdle.createdHoursAgo', { count: hours })
     const days = Math.round(hours / 24)
-    return days === 1 ? 'yesterday' : `${days} days ago`
-}
-
-function dateLabel(value: Date): string {
-    return value.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' })
-}
-
-// To the minute: the trial's last notices speak in hours, and "26 September" says nothing about
-// whether there is still time.
-function timeLabel(value: Date): string {
-    const day = dateLabel(value)
-    const time = value.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
-    return `${day}, ${time} UTC`
+    return days === 1 ? t('agentIdle.createdYesterday') : t('agentIdle.createdDaysAgo', { count: days })
 }
 
 // A guess made before the archive exists: the bucket keeps it this long from upload, and the
 // upload is the pause itself.
-function keptUntilLabel(pausedAt: Date): string {
-    return dateLabel(new Date(pausedAt.getTime() + ARCHIVE_RETENTION_DAYS * 24 * 60 * 60_000))
+function keptUntilLabel(pausedAt: Date, locale: Locale): string {
+    return emailDateLabel(new Date(pausedAt.getTime() + ARCHIVE_RETENTION_DAYS * 24 * 60 * 60_000), locale)
 }
 
 // Asked of Stripe at send time: nothing in the database says which kind of trial this is. A failed
@@ -119,10 +111,10 @@ async function renewalAmountLabel(subscriptionId: string | null): Promise<string
     }
 }
 
-function periodLabel(from: Date, now: Date): string {
+function periodLabel(from: Date, now: Date, t: EmailTranslator): string {
     const days = Math.max(1, Math.round((now.getTime() - from.getTime()) / (24 * 60 * 60_000)))
-    if (days <= 7) return 'the last week'
-    return 'the last two weeks'
+    if (days <= 7) return t('automateAgent.periods.lastWeek')
+    return t('automateAgent.periods.lastTwoWeeks')
 }
 
 function unsubscribeFor(candidate: LifecycleCandidate): string | null {
@@ -141,9 +133,12 @@ function daysUntil(deadline: Date, now: Date): number {
     return Math.max(1, Math.ceil((deadline.getTime() - now.getTime()) / (24 * 60 * 60_000)))
 }
 
-async function build(supabase: Client, input: DeliverInput, recipient: LifecycleRecipient): Promise<{ send: () => Promise<SendEmailResult> } | { skip: string }> {
+async function build(supabase: Client, input: DeliverInput, recipient: LifecycleRecipient, locale: Locale): Promise<{ send: () => Promise<SendEmailResult> } | { skip: string }> {
     const { candidate, snapshot, workspace, agentName, now } = input
-    const to = { to: recipient.email, unsubscribeUrl: unsubscribeFor(candidate) }
+    const to = { to: recipient.email, unsubscribeUrl: unsubscribeFor(candidate), locale }
+    const t = emailTranslator(locale)
+    const dateLabel = (value: Date) => emailDateLabel(value, locale)
+    const timeLabel = (value: Date) => emailTimeLabel(value, locale)
     const agentUrl = candidate.agentId ? `${APP_URL}/?agent=${candidate.agentId}` : APP_URL
     const billingUrl = `${APP_URL}/?billing=1`
     // Asked for only once a case knows it sends, so a skipped candidate never costs a capture.
@@ -182,12 +177,12 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
             const agent = snapshot.idleAgents.find(entry => entry.id === candidate.agentId)
             if (!agent) return { skip: 'coworker no longer idle' }
             const boardUrl = await banner({ [agent.id]: 'idle' })
-            return { send: () => sendAgentIdleEmail(to, { agentName: agent.name, createdLabel: relativeLabel(agent.at, now), agentUrl, boardUrl }) }
+            return { send: () => sendAgentIdleEmail(to, { agentName: agent.name, createdLabel: relativeLabel(agent.at, now, t), agentUrl, boardUrl }) }
         }
 
         case 'team_invite': {
             const boardUrl = await banner('working')
-            return { send: () => sendTeamInviteEmail(to, { workspaceName: workspace?.name ?? 'your workspace', agentName: agentName ?? 'Your coworker', inviteUrl: `${APP_URL}/?members=1`, boardUrl }) }
+            return { send: () => sendTeamInviteEmail(to, { workspaceName: workspace?.name ?? t('common.yourWorkspace'), agentName: agentName ?? t('teamInvite.fallbackAgent'), inviteUrl: `${APP_URL}/?members=1`, boardUrl }) }
         }
 
         case 'automate_agent': {
@@ -199,7 +194,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                     sendAutomateAgentEmail(to, {
                         agentName: agent.name,
                         manualRuns: agent.runs ?? 2,
-                        periodLabel: periodLabel(agent.at, now),
+                        periodLabel: periodLabel(agent.at, now, t),
                         scheduleUrl: agentUrl,
                         boardUrl,
                     }),
@@ -223,7 +218,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                         workspaceName: workspace?.name ?? null,
                         trialEndedLabel: dateLabel(snapshot.trialEndsAt as Date),
                         pausedLabel: timeLabel(pausedAt),
-                        keptUntilLabel: keptUntilLabel(pausedAt),
+                        keptUntilLabel: keptUntilLabel(pausedAt, locale),
                         // Left out entirely for a workspace that produced nothing: three zeros make
                         // a worse case for coming back than saying nothing.
                         summary: snapshot.successfulRuns > 0 ? { agents: snapshot.agentCount, runs: snapshot.successfulRuns } : undefined,
@@ -249,7 +244,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                         workspaceName: workspace?.name ?? null,
                         trialEndsLabel: timeLabel(trialEndsAt),
                         pausedLabel: timeLabel(pausedAt),
-                        keptUntilLabel: keptUntilLabel(pausedAt),
+                        keptUntilLabel: keptUntilLabel(pausedAt, locale),
                         billingUrl,
                         boardUrl,
                     }),
@@ -267,7 +262,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                         workspaceName: workspace?.name ?? null,
                         trialEndsLabel: dateLabel(trialEndsAt),
                         daysLeft: daysUntil(trialEndsAt, now),
-                        keptUntilLabel: keptUntilLabel(new Date(trialEndsAt.getTime() + BOX_DELETION_GRACE_MS)),
+                        keptUntilLabel: keptUntilLabel(new Date(trialEndsAt.getTime() + BOX_DELETION_GRACE_MS), locale),
                         billingUrl,
                         boardUrl,
                     }),
@@ -293,7 +288,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                         // sees at a glance.
                         daysLeft: daysUntil(endsAt, now),
                         // A paid account is archived as soon as its subscription is over.
-                        keptUntilLabel: keptUntilLabel(endsAt),
+                        keptUntilLabel: keptUntilLabel(endsAt, locale),
                         billingUrl,
                         boardUrl,
                     }),
@@ -368,7 +363,8 @@ export async function deliverLifecycleEmail(supabase: Client, input: DeliverInpu
     const recipient = await loadRecipient(supabase, input.candidate.userId)
     if (!recipient) return { sent: false, reason: 'no address' }
 
-    const built = await build(supabase, input, recipient)
+    const locale = await recipientLocale(supabase, input.candidate.userId, input.candidate.workspaceId)
+    const built = await build(supabase, input, recipient, locale)
     if ('skip' in built) return { sent: false, reason: built.skip }
 
     const result = await built.send()

@@ -2,6 +2,8 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
 export interface BudgetExhaustedProps {
@@ -10,6 +12,7 @@ export interface BudgetExhaustedProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function BudgetExhausted({
@@ -17,30 +20,26 @@ export default function BudgetExhausted({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: BudgetExhaustedProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview="Your Rerun credits are used up"
+      preview={t("budgetExhausted.preview")}
       hero={{ scene: "budget-exhausted", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Rerun credits used up</Heading>
+      <Heading style={text.heading}>{t("budgetExhausted.heading")}</Heading>
       <Text style={text.paragraph}>
-        {workspaceName ? (
-          <>
-            The Rerun credits of <strong>{workspaceName}</strong> are used up
-            for this month.
-          </>
-        ) : (
-          <>Your workspace&apos;s Rerun credits are used up for this month.</>
-        )}{" "}
-        Scheduled and triggered runs on Rerun models are paused until they reset
-        or you add credits.
+        {workspaceName
+          ? t.rich("budgetExhausted.bodyNamed", { workspaceName, strong })
+          : t("budgetExhausted.bodyUnnamed")}
       </Text>
-      <Text style={hint}>Coworkers using their own API keys keep running.</Text>
+      <Text style={hint}>{t("budgetExhausted.ownKeys")}</Text>
       <Section style={cta}>
-        <Button href={appUrl}>Add credits</Button>
+        <Button href={appUrl}>{t("budgetExhausted.button")}</Button>
       </Section>
     </Layout>
   );

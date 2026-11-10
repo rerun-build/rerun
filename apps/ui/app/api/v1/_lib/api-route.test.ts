@@ -37,7 +37,7 @@ describe('apiRoute', () => {
     })
 
     it('answers 403 to a member on an admin route, without running it', async () => {
-        mocks.requireAdminContext.mockRejectedValue(new AuthorizationError('Only an admin of the workspace can do this'))
+        mocks.requireAdminContext.mockRejectedValue(new AuthorizationError('adminOnly'))
         const handler = vi.fn(async () => ({ ok: true }))
         const res = await apiRoute({ auth: 'admin' }, handler)(post(''), segment)
         expect(res.status).toBe(403)
@@ -75,7 +75,7 @@ describe('apiRoute', () => {
 
     it('hides a resource outside the workspace behind a 404', async () => {
         const route = apiRoute({ auth: 'member' }, async () => {
-            throw new AuthorizationError('Agent not found')
+            throw new AuthorizationError('coworkerNotFound')
         })
         expect((await route(post(''), segment)).status).toBe(404)
     })

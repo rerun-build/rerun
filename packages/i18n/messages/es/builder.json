@@ -1,0 +1,132 @@
+{
+    "contextMenu": {
+        "openChat": "Abrir chat",
+        "rename": "Renombrar",
+        "settings": "Ajustes",
+        "share": "Compartir",
+        "duplicate": "Duplicar",
+        "moveToBox": "Mover a una Box",
+        "noOtherBox": "No gestionas ninguna otra Box",
+        "delete": "Eliminar",
+        "manageAccess": "Gestionar acceso",
+        "boxAccessAdminOnly": "Solo un admin puede cambiar quién accede a una Box",
+        "manageReason": "Solo un admin o un manager de esta Box puede hacer esto",
+        "untitledBox": "Box sin nombre",
+        "thisCoworker": "este coworker"
+    },
+    "toolbar": {
+        "placementPrompt": "Toca una casilla para colocar a {name}",
+        "placementPromptDefault": "Toca una casilla para colocar a tu coworker",
+        "placementProgress": "Coworker {current} de {total}",
+        "newCoworker": "Nuevo coworker",
+        "template": "Template",
+        "create": "Crear",
+        "search": "Buscar",
+        "unplaced": "{count} sin colocar"
+    },
+    "isoBoard": {
+        "boxCta": "Explorar plantillas de {name}",
+        "boxCtaFallback": "Explorar plantillas",
+        "recruitFirst": "Haz clic para reclutar a tu primer coworker",
+        "createBox": "Haz clic para crear una Box",
+        "preparingSandbox": "Preparando tu sandbox…",
+        "settingUpTemplate": "Instalando {title}…",
+        "settingUpCoworker": "Instalando a tu coworker…",
+        "installTemplate": "Haz clic para instalar {title}",
+        "addBoxOnSide": "Añadir una Box en este lado"
+    },
+    "discoveries": {
+        "statusDigging": "Conociendo a {name}",
+        "statusDone": "{name}, de un vistazo",
+        "found": "{count} encontrados",
+        "sources": {
+            "website": "Tu sitio web",
+            "domain": "Tu dominio",
+            "registry": "Registro público",
+            "web": "La web"
+        },
+        "teasers": {
+            "profile": "Leyendo {domain}…",
+            "stack": "Mirando bajo el capó de {domain}…",
+            "dns": "Revisando cómo gestionas el correo…",
+            "registry": "Buscándote en el registro público…",
+            "site": "Leyendo cada página de {domain}…",
+            "search": "Buscando {name} en la web…",
+            "linkedinPerson": "Buscándote en LinkedIn…",
+            "linkedinCompany": "Buscando {name} en LinkedIn…",
+            "googleBusiness": "Leyendo tus reseñas de Google…",
+            "catalog": "Recorriendo la tienda de {domain}…",
+            "synthesis": "Juntando todas las piezas…"
+        },
+        "cards": {
+            "identity": {
+                "title": "Te encontramos"
+            },
+            "audience": {
+                "title": "A quién le vendes"
+            },
+            "tools": {
+                "title": "Herramientas detectadas"
+            },
+            "mail": {
+                "title": "Tu correo",
+                "runsOn": "Tu correo funciona con <b>{provider}</b>"
+            },
+            "social": {
+                "title": "Dónde apareces"
+            },
+            "brand": {
+                "title": "Tu marca"
+            },
+            "registry": {
+                "title": "Sobre el papel",
+                "since": "Desde <b>{year}</b>",
+                "people": "<b>{headcount}</b> personas"
+            },
+            "person": {
+                "title": "¿Eres tú, {firstName}?"
+            },
+            "linkedin": {
+                "title": "Tu página de LinkedIn",
+                "followers": "seguidores",
+                "team": "en el equipo"
+            },
+            "reviews": {
+                "title": "Lo que dicen tus clientes",
+                "count": "<n>{count}</n> reseñas de Google"
+            },
+            "products": {
+                "title": "Lo que vendes"
+            },
+            "competitors": {
+                "title": "Tu competencia"
+            },
+            "customers": {
+                "title": "Quién ya compra"
+            },
+            "brain": {
+                "title": "Company Brain",
+                "pages": "{count, plural, one {# página} other {# páginas}} que tus agentes leen antes de empezar",
+                "productsAndCompetitors": "+ {products, plural, one {# producto} other {# productos}}, {competitors, plural, one {# competidor} other {# competidores}}",
+                "productsOnly": "+ {products, plural, one {# producto} other {# productos}}",
+                "competitorsOnly": "+ {competitors, plural, one {# competidor} other {# competidores}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "\"{name}\" se creó, pero está inactivo",
+        "createdInactiveHint": "Tu plan no tiene ningún hueco libre para coworkers. Actívalo desde el panel del coworker.",
+        "addFailed": "No se pudo añadir este coworker",
+        "duplicateFailed": "No se pudo duplicar este coworker",
+        "importFailed": "No se pudo importar esta plantilla",
+        "importInterrupted": "La importación se interrumpió",
+        "importInterruptedHint": "Revisa tu máquina antes de volver a importar.",
+        "moveAgentFailed": "No se pudo mover este coworker",
+        "moveBoxFailed": "No se pudo mover esta Box",
+        "deleteBoxFailed": "No se pudo eliminar esta Box",
+        "checkConnection": "Revisa tu conexión e inténtalo de nuevo.",
+        "shareLinkGone": "Este enlace para compartir ya no está disponible",
+        "prepareBoxFailed": "No se pudo preparar tu Box",
+        "startCoworkerFailed": "No se pudo iniciar tu coworker"
+    }
+}

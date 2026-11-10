@@ -3,6 +3,7 @@ import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import Animated from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge, TONES } from '@/components/ui/Badge'
@@ -16,14 +17,16 @@ import { EventRow } from './EventCardView'
 
 type Copy = { headline: string; detail: string; accept?: string; dismiss?: string }
 
+type SkillTranslator = ReturnType<typeof useTranslations<'mobileCards.skill'>>
+
 // The web's copy (SkillProposalBlock), state by state.
-function copyFor({ title, summary, status, instructions, error }: SkillProposal): Copy {
+function copyFor({ title, summary, status, instructions, error }: SkillProposal, t: SkillTranslator): Copy {
     const firstRule = instructions[0] || summary
-    if (status === 'accepted') return { headline: 'Remembering', detail: firstRule }
-    if (status === 'applied') return { headline: 'Remembered', detail: title }
-    if (status === 'failed') return { headline: 'Couldn’t remember this', detail: error || title, accept: 'Retry', dismiss: 'Dismiss' }
-    if (status === 'dismissed') return { headline: 'Not remembered', detail: title }
-    return { headline: 'Remember this?', detail: firstRule, accept: 'Remember', dismiss: 'No' }
+    if (status === 'accepted') return { headline: t('remembering'), detail: firstRule }
+    if (status === 'applied') return { headline: t('remembered'), detail: title }
+    if (status === 'failed') return { headline: t('failed'), detail: error || title, accept: t('retry'), dismiss: t('dismiss') }
+    if (status === 'dismissed') return { headline: t('notRemembered'), detail: title }
+    return { headline: t('ask'), detail: firstRule, accept: t('remember'), dismiss: t('no') }
 }
 
 type SkillProposalRowProps = {
@@ -53,7 +56,8 @@ function Outcome({ status }: { status: SkillProposal['status'] }) {
 // A rule the coworker offered to remember, where the transcript raised it. It never pauses the run:
 // accepting starts the writing, and the same row reports how it went.
 export function SkillProposalRow({ proposal, pending, onDecide }: SkillProposalRowProps) {
-    const copy = copyFor(proposal)
+    const t = useTranslations('mobileCards.skill')
+    const copy = copyFor(proposal, t)
     return (
         <EventRow symbol="brain" title={copy.headline} note={copy.detail} trailing={<Outcome status={proposal.status} />}>
             <Decision proposal={proposal} pending={pending} onDecide={onDecide} copy={copy} />
@@ -64,16 +68,17 @@ export function SkillProposalRow({ proposal, pending, onDecide }: SkillProposalR
 // The same proposal pinned above the composer while it waits on a decision. Its second line unfolds
 // into the rules exactly as the coworker worded them, what accepting writes into the skill.
 export function PinnedSkillProposal({ proposal, pending, onDecide }: SkillProposalRowProps) {
+    const t = useTranslations('mobileCards.skill')
     const theme = useTheme()
     const [expanded, setExpanded] = useState(false)
-    const copy = copyFor(proposal)
+    const copy = copyFor(proposal, t)
     const failed = proposal.status === 'failed'
     const { instructions } = proposal
     return (
         <Animated.View layout={layoutTransition} style={{ padding: spacing.md, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: theme.border, backgroundColor: theme.card }}>
             <View style={{ flexDirection: 'row', alignItems: expanded ? 'flex-start' : 'center', gap: spacing.md }}>
                 <IconTile symbol="brain" />
-                <Pressable onPress={() => setExpanded(!expanded)} accessibilityRole="button" accessibilityLabel={expanded ? 'Hide details' : 'Show details'} accessibilityState={{ expanded }} style={{ flex: 1, gap: 2 }}>
+                <Pressable onPress={() => setExpanded(!expanded)} accessibilityRole="button" accessibilityLabel={expanded ? t('hideDetails') : t('showDetails')} accessibilityState={{ expanded }} style={{ flex: 1, gap: 2 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
                         <AppText variant="callout" medium numberOfLines={expanded ? undefined : 1} style={{ flexShrink: 1 }}>
                             {copy.headline}

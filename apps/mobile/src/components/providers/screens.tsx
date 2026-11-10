@@ -3,6 +3,7 @@ import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Alert } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { deleteAiConnection, fetchAiConnectionUsage, replaceAiConnectionKey, setWorkspaceDefault, updateAiConnection } from '@/api/aiConnections'
 import { AI_PROVIDERS_ADMIN_ONLY } from '@/auth/access'
@@ -22,8 +23,9 @@ const useReadOnlyReason = () => (useIsWorkspaceAdmin() ? null : AI_PROVIDERS_ADM
 
 // A step only an admin takes, reached by a link that does not know the caller's role.
 export function ProvidersAdminOnly() {
+    const t = useTranslations('mobileProviders.list')
     return (
-        <SheetFrame title="AI providers" onBack={() => leave()}>
+        <SheetFrame title={t('title')} onBack={() => leave()}>
             <ReadOnlyNote reason={AI_PROVIDERS_ADMIN_ONLY} />
         </SheetFrame>
     )
@@ -57,6 +59,7 @@ export function AddProviderScreen({ only }: { only?: Exclude<AiConnectionKind, '
 export function DefaultModelScreen() {
     const { view, caller } = useAiConnections()
     const readOnlyReason = useReadOnlyReason()
+    const t = useTranslations('mobileProviders.defaultModel')
     if (readOnlyReason) return <ProvidersAdminOnly />
     if (!view) return null
     const pick = async (choice: { connectionId: string; model: string }) => {
@@ -66,7 +69,7 @@ export function DefaultModelScreen() {
             await setWorkspaceDefault(caller, choice)
             leave()
         } catch (err) {
-            Alert.alert('Could not change the default model', messageOf(err))
+            Alert.alert(t('changeFailed'), messageOf(err))
         }
     }
     return <DefaultModelPicker view={view} onPick={pick} onBack={() => leave()} />
@@ -80,6 +83,9 @@ export function ConnectionDetailScreen({ connectionId }: { connectionId: string 
     const [keyBusy, setKeyBusy] = useState(false)
     const [keyError, setKeyError] = useState<string | null>(null)
     const readOnlyReason = useReadOnlyReason()
+    const t = useTranslations('mobileProviders.detail')
+    const tUsage = useTranslations('mobileProviders.usage')
+    const tCommon = useTranslations('mobileCommon.actions')
     const connection = view?.connections.find(candidate => candidate.id === connectionId)
     if (!view || !connection || !caller) return null
 
@@ -91,15 +97,15 @@ export function ConnectionDetailScreen({ connectionId }: { connectionId: string 
             await updateAiConnection(caller, connectionId, body)
             setError(null)
         } catch (err) {
-            setError(messageOf(err, 'Failed to save'))
+            setError(messageOf(err, t('saveFailed')))
         }
         reload()
     }
 
     const rename = () =>
         Alert.prompt(
-            'Rename',
-            "Shown in every coworker's model picker.",
+            t('renameTitle'),
+            t('renameMessage'),
             name => {
                 const trimmed = name.trim()
                 if (trimmed && trimmed !== connection.name) patch({ name: trimmed }, { name: trimmed })
@@ -123,7 +129,7 @@ export function ConnectionDetailScreen({ connectionId }: { connectionId: string 
             track('ai_connection_connected', { provider: connection.provider, method: 'api_key', surface: 'reconnect' })
             reload()
         } catch (err) {
-            setKeyError(messageOf(err, 'Failed to save the credential'))
+            setKeyError(messageOf(err, t('keySaveFailed')))
         } finally {
             setKeyBusy(false)
         }
@@ -131,17 +137,17 @@ export function ConnectionDetailScreen({ connectionId }: { connectionId: string 
 
     const remove = async () => {
         const usage = await fetchAiConnectionUsage(caller, connectionId).catch(() => null)
-        Alert.alert(`Remove ${connection.name}?`, usage ? describeUsage(usage) : undefined, [
-            { text: 'Cancel', style: 'cancel' },
+        Alert.alert(t('removeTitle', { name: connection.name }), usage ? describeUsage(usage, tUsage) : undefined, [
+            { text: tCommon('cancel'), style: 'cancel' },
             {
-                text: 'Remove',
+                text: t('removeConfirm'),
                 style: 'destructive',
                 onPress: async () => {
                     try {
                         await deleteAiConnection(caller, connectionId)
                         leave()
                     } catch (err) {
-                        setError(messageOf(err, 'Failed to delete the connection'))
+                        setError(messageOf(err, t('deleteFailed')))
                     }
                 },
             },

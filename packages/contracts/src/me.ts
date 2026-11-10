@@ -8,6 +8,9 @@ export const meSchema = z.object({
         email: z.string().nullable(),
         name: z.string().nullable(),
         avatarUrl: z.string().nullable(),
+        // The language the account picked in the app (a short BCP 47 tag), null to follow the device.
+        // Absent from a hub older than the language packs.
+        locale: z.string().nullable().optional(),
     }),
     workspace: workspaceSummarySchema,
 })

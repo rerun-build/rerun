@@ -1,5 +1,5 @@
 import type { Json } from '@/app/api/database.types'
-import { chatErrorTitle, classifyChatError, stripErrorPrefix } from '@/lib/chat-error'
+import { chatErrorTitle, classifyChatError, stripErrorPrefix, type ChatErrorCopy } from '@/lib/chat-error'
 import { recipientReason, type NotificationReason } from '@/lib/notifications/routing'
 
 export type AttentionDetail = { engineSessionId: string | null; title: string; message: string | null; updatedAt: string | null; reason: NotificationReason | 'legacy' | null }
@@ -23,11 +23,11 @@ export function attentionNotificationsFilter(sessions: AttentionSessionRow[]) {
  * The session row has no room for what the agent is waiting on: that text is the message of the notification which
  * flipped the status, and it only links back through the agent and the engine session id. `notifications` comes newest first.
  */
-export function attentionDetailsOf(sessions: AttentionSessionRow[], notifications: AttentionNotificationRow[], userId: string | null | undefined): Record<string, AttentionDetail> {
+export function attentionDetailsOf(sessions: AttentionSessionRow[], notifications: AttentionNotificationRow[], userId: string | null | undefined, tErrors: ChatErrorCopy): Record<string, AttentionDetail> {
     const latest = new Map<string, { message: string; reason: NotificationReason | 'legacy' | null }>()
     for (const n of notifications) {
         const key = `${n.agent_id}:${n.engine_session_id}`
-        if (!latest.has(key)) latest.set(key, { message: n.kind === 'error' ? errorHeadline(n) : n.message, reason: recipientReason(n.recipients, userId) })
+        if (!latest.has(key)) latest.set(key, { message: n.kind === 'error' ? errorHeadline(n, tErrors) : n.message, reason: recipientReason(n.recipients, userId) })
     }
 
     return Object.fromEntries(
@@ -40,8 +40,8 @@ export function attentionDetailsOf(sessions: AttentionSessionRow[], notification
 
 // The message of a failed run is `Schedule "<name>" failed: <provider error>`: every error row would open on the
 // same words. The row says what went wrong instead, in the chat's own words when it has some.
-export function errorHeadline(notification: { message: string; metadata: Json | null }): string {
+export function errorHeadline(notification: { message: string; metadata: Json | null }, tErrors: ChatErrorCopy): string {
     const metadata = notification.metadata as { error?: unknown } | null
     const error = typeof metadata?.error === 'string' ? metadata.error : notification.message
-    return chatErrorTitle(classifyChatError(error), error) ?? stripErrorPrefix(error)
+    return chatErrorTitle(classifyChatError(error), error, tErrors) ?? stripErrorPrefix(error)
 }

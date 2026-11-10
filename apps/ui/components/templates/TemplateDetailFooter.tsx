@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { track } from '@rerun/analytics/client'
 import { Button } from '@/components/ui/button'
 import { TemplateInstallSteps } from '@/components/templates/TemplateInstallSteps'
@@ -10,6 +11,7 @@ import { useTemplateCta } from '@/lib/templates/useTemplateCta'
 // Extracted from TemplateDetailPanel rather than grown inside it: the buy / use decision is a
 // hook's worth of rules and the panel was already long enough.
 export function TemplateDetailFooter({ template, onImported }: { template: LibraryTemplate; onImported: () => void }) {
+    const t = useTranslations('templates.detail')
     const cta = useTemplateCta(template, onImported)
     const recurring = template.pricing.model === 'recurring'
 
@@ -37,7 +39,7 @@ export function TemplateDetailFooter({ template, onImported }: { template: Libra
                     {cta.secondary.label}
                 </Button>
             )}
-            {recurring && template.access !== 'active' && <p className="mt-1 text-center text-[11px] text-muted-foreground">Cancel anytime from your billing settings.</p>}
+            {recurring && template.access !== 'active' && <p className="mt-1 text-center text-[11px] text-muted-foreground">{t('cancelAnytime')}</p>}
         </div>
     )
 }

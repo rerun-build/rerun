@@ -1,8 +1,9 @@
 'use client'
 
-import { TEMPLATE_CATEGORIES, TEMPLATE_CATEGORY_LABELS } from '@rerun/contracts'
+import { TEMPLATE_CATEGORIES } from '@rerun/contracts'
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@rerun/ui/primitives'
 import { Controller, useFormContext } from 'react-hook-form'
+import { useTranslations } from 'next-intl'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -14,6 +15,9 @@ import { EnumSelect } from './EnumSelect'
 import { PrefillButton } from './PrefillButton'
 
 export function TemplateMetaSection() {
+    const t = useTranslations('templates.authoring.meta')
+    const tCategory = useTranslations('templates.categories')
+    const categoryLabels = Object.fromEntries(TEMPLATE_CATEGORIES.map(category => [category, tCategory(category)]))
     const { control, setValue, watch } = useFormContext<TemplateFormValues>()
     const { scope, actions } = useTemplateAuthoring()
     const title = watch('title')
@@ -21,7 +25,7 @@ export function TemplateMetaSection() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Metadata</CardTitle>
+                <CardTitle>{t('title')}</CardTitle>
                 <CardAction>
                     <PrefillButton
                         run={async brief => {
@@ -46,9 +50,9 @@ export function TemplateMetaSection() {
                         name="title"
                         render={({ field, fieldState }) => (
                             <Input
-                                label="Title"
+                                label={t('titleLabel')}
                                 maxLength={TITLE_LIMIT}
-                                placeholder="Outbound SDR"
+                                placeholder={t('titlePlaceholder')}
                                 {...field}
                                 helperText={fieldState.error?.message ?? `${field.value.length}/${TITLE_LIMIT}`}
                                 aria-invalid={!!fieldState.error}
@@ -61,7 +65,7 @@ export function TemplateMetaSection() {
                             name="slug"
                             render={({ field, fieldState }) => (
                                 <Input
-                                    label="Slug"
+                                    label={t('slug')}
                                     placeholder="outbound-sdr"
                                     {...field}
                                     helperText={fieldState.error?.message ?? `/templates/${field.value || '…'}`}
@@ -77,7 +81,7 @@ export function TemplateMetaSection() {
                         control={control}
                         name="category"
                         render={({ field }) => (
-                            <EnumSelect label="Category" value={field.value} onChange={field.onChange} options={TEMPLATE_CATEGORIES} labels={TEMPLATE_CATEGORY_LABELS} />
+                            <EnumSelect label={t('category')} value={field.value} onChange={field.onChange} options={TEMPLATE_CATEGORIES} labels={categoryLabels} />
                         )}
                     />
                     <Controller
@@ -85,12 +89,12 @@ export function TemplateMetaSection() {
                         name="setupMinutes"
                         render={({ field, fieldState }) => (
                             <Input
-                                label="Setup time (minutes)"
+                                label={t('setupTime')}
                                 type="number"
                                 min={1}
                                 value={String(field.value)}
                                 onChange={e => field.onChange(Number(e.target.value) || 1)}
-                                helperText={fieldState.error?.message ?? 'Shown on the public page. Be honest about app setup.'}
+                                helperText={fieldState.error?.message ?? t('setupTimeHelp')}
                                 aria-invalid={!!fieldState.error}
                             />
                         )}
@@ -102,16 +106,16 @@ export function TemplateMetaSection() {
                     name="tags"
                     render={({ field }) => (
                         <Input
-                            label="Tags"
+                            label={t('tags')}
                             optional
-                            placeholder="outreach, sales, automation"
-                            helperText="Comma separated. Used for filtering on the public page."
+                            placeholder={t('tagsPlaceholder')}
+                            helperText={t('tagsHelp')}
                             value={field.value.join(', ')}
                             onChange={e =>
                                 field.onChange(
                                     e.target.value
                                         .split(',')
-                                        .map(t => t.trim())
+                                        .map(tag => tag.trim())
                                         .filter(Boolean),
                                 )
                             }
@@ -125,10 +129,10 @@ export function TemplateMetaSection() {
                         name="metaTitle"
                         render={({ field }) => (
                             <Input
-                                label="Meta title"
+                                label={t('metaTitle')}
                                 optional
                                 maxLength={META_TITLE_LIMIT}
-                                placeholder={title ? `${title}, AI coworker template` : 'Defaults to the title'}
+                                placeholder={title ? t('metaTitlePlaceholder', { title }) : t('metaTitleDefault')}
                                 {...field}
                             />
                         )}
@@ -138,15 +142,15 @@ export function TemplateMetaSection() {
                         name="metaDescription"
                         render={({ field, fieldState }) => (
                             <Field
-                                label="Meta description"
-                                helperText={fieldState.error?.message ?? `${field.value.length}/${META_DESCRIPTION_LIMIT}, between ${META_DESCRIPTION_MIN} and ${META_DESCRIPTION_LIMIT} characters to publish.`}
+                                label={t('metaDescription')}
+                                helperText={fieldState.error?.message ?? t('metaDescriptionHelp', { count: field.value.length, limit: META_DESCRIPTION_LIMIT, min: META_DESCRIPTION_MIN })}
                                 error={fieldState.error?.message}
                             >
                                 <Textarea
                                     {...field}
                                     rows={2}
                                     maxLength={META_DESCRIPTION_LIMIT}
-                                    placeholder="One or two sentences for search results."
+                                    placeholder={t('metaDescriptionPlaceholder')}
                                 />
                             </Field>
                         )}

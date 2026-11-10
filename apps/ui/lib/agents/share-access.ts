@@ -3,6 +3,7 @@ import { AccessDeniedError, assertAgentInWorkspace, isAdminActor, manageableSpac
 import type { Database } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { AppError } from '@/lib/i18n/action-error'
 
 // A link exports the coworker's whole setup, so it belongs to whoever manages its Box: a member sees
 // and revokes only those. A link whose coworker was deleted since is left to the admins. The dialog
@@ -17,7 +18,7 @@ export async function shareManageableAgentIds(actor: Actor): Promise<'all' | Set
 export async function assertCanManageShare(supabase: SupabaseClient<Database>, shareId: string, actor: Actor): Promise<void> {
     if (isAdminActor(actor)) return
     const { data: share } = await selectMaybeSingle(supabase, 'agent_shares', ['source_agent_id'] as const, { id: shareId, workspace_id: actor.workspaceId })
-    if (!share) throw new Error('Share link not found')
+    if (!share) throw new AppError('shareLinkNotFound')
     if (!share.source_agent_id) throw new AccessDeniedError()
     await assertAgentInWorkspace(share.source_agent_id, 'manage', actor)
 }

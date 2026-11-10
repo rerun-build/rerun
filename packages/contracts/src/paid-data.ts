@@ -76,8 +76,6 @@ type CatalogEntry = {
     unitCostMicros: number
     // The plural noun its units are counted in.
     label: string
-    // What a call shows as in the chat and the Rewind.
-    activity: string
     routeHeaders?: Readonly<Record<string, string>>
     // The fields each row of `missField` shows in the tool result when the whole answer is saved:
     // the rest of a row stays in the saved file, so a batch of searches does not fill the context.
@@ -103,7 +101,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'row',
         unitCostMicros: 10_000,
         label: 'profiles',
-        activity: 'Finding people',
     },
     'people.email.find': {
         group: 'people',
@@ -114,7 +111,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 30_000,
         label: 'work emails',
-        activity: 'Finding emails',
         // Treg refuses the in-call verification on every other route.
         routeHeaders: { 'X-Treg-Route-Verify': 'true' },
     },
@@ -126,7 +122,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'email checks',
-        activity: 'Verifying emails',
     },
     'people.phone.find': {
         group: 'people',
@@ -137,7 +132,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 100_000,
         label: 'phone numbers',
-        activity: 'Finding phone numbers',
     },
     'people.enrich': {
         group: 'people',
@@ -148,7 +142,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 15_000,
         label: 'person profiles',
-        activity: 'Enriching people',
     },
     'people.identity.resolve': {
         group: 'people',
@@ -158,7 +151,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 30_000,
         label: 'LinkedIn lookups',
-        activity: 'Finding LinkedIn profiles',
     },
     'companies.search': {
         group: 'companies',
@@ -177,7 +169,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'row',
         unitCostMicros: 10_000,
         label: 'companies',
-        activity: 'Finding companies',
     },
     'companies.enrich': {
         group: 'companies',
@@ -188,7 +179,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 15_000,
         label: 'company profiles',
-        activity: 'Enriching companies',
     },
     'companies.similar': {
         group: 'companies',
@@ -198,7 +188,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 100_000,
         label: 'lookalike searches',
-        activity: 'Finding similar companies',
     },
     'companies.jobs.search': {
         group: 'companies',
@@ -209,7 +198,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 50_000,
         label: 'job listing searches',
-        activity: 'Reading job listings',
     },
     'companies.news': {
         group: 'companies',
@@ -219,7 +207,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 20_000,
         label: 'company news searches',
-        activity: 'Reading company news',
     },
     'google.serp.organic': {
         group: 'search',
@@ -229,7 +216,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'Google rankings',
-        activity: 'Reading Google results',
     },
     'google.serp.maps': {
         group: 'search',
@@ -239,7 +225,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'Google Maps searches',
-        activity: 'Searching Google Maps',
         shownFields: ['position', 'name', 'category', 'address', 'phone', 'website', 'rating', 'review_count'],
     },
     'google.serp.local': {
@@ -250,7 +235,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'local rankings',
-        activity: 'Reading local rankings',
     },
     'google.serp.news': {
         group: 'search',
@@ -260,7 +244,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'Google News searches',
-        activity: 'Reading Google News',
     },
     'ai-search.perplexity.answer': {
         group: 'search',
@@ -270,7 +253,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 10_000,
         label: 'Perplexity answers',
-        activity: 'Asking Perplexity',
     },
     'google.keywords.volume': {
         group: 'seo',
@@ -280,7 +262,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 100_000,
         label: 'keyword volume checks',
-        activity: 'Checking search volumes',
     },
     'google.keywords.ideas': {
         group: 'seo',
@@ -290,7 +271,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'keyword idea lists',
-        activity: 'Finding keyword ideas',
     },
     'google.keywords.trends': {
         group: 'seo',
@@ -300,7 +280,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'trend charts',
-        activity: 'Reading Google Trends',
     },
     'web.backlinks.summary': {
         group: 'seo',
@@ -310,7 +289,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 20_000,
         label: 'backlink reports',
-        activity: 'Reading backlinks',
     },
     'web.backlinks.list': {
         group: 'seo',
@@ -320,7 +298,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 30_000,
         label: 'backlink lists',
-        activity: 'Listing backlinks',
     },
     'web.anchors.list': {
         group: 'seo',
@@ -330,7 +307,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'anchor text lists',
-        activity: 'Reading anchor texts',
     },
     'web.url.metrics': {
         group: 'seo',
@@ -340,7 +316,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'authority checks',
-        activity: 'Checking domain authority',
     },
     'linkedin.user.profile': {
         group: 'linkedin',
@@ -351,7 +326,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 10_000,
         label: 'LinkedIn profiles',
-        activity: 'Reading LinkedIn',
     },
     'linkedin.user.posts': {
         group: 'linkedin',
@@ -362,7 +336,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'LinkedIn post lists',
-        activity: 'Reading LinkedIn posts',
     },
     'linkedin.company.profile': {
         group: 'linkedin',
@@ -373,7 +346,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'LinkedIn company pages',
-        activity: 'Reading LinkedIn',
     },
     'linkedin.post.detail': {
         group: 'linkedin',
@@ -383,7 +355,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'LinkedIn posts',
-        activity: 'Reading LinkedIn posts',
     },
     'linkedin.post.comments': {
         group: 'linkedin',
@@ -394,7 +365,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'LinkedIn comment lists',
-        activity: 'Reading LinkedIn comments',
     },
     'linkedin.post.reactions': {
         group: 'linkedin',
@@ -405,7 +375,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'LinkedIn reaction lists',
-        activity: 'Reading LinkedIn reactions',
     },
     'tiktok.user.profile': {
         group: 'tiktok',
@@ -416,7 +385,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'TikTok profiles',
-        activity: 'Reading TikTok',
     },
     'tiktok.user.videos': {
         group: 'tiktok',
@@ -426,7 +394,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'TikTok video lists',
-        activity: 'Reading TikTok videos',
     },
     'tiktok.search.users': {
         group: 'tiktok',
@@ -436,7 +403,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'TikTok account searches',
-        activity: 'Searching TikTok',
     },
     'tiktok.search.videos': {
         group: 'tiktok',
@@ -446,7 +412,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'TikTok video searches',
-        activity: 'Searching TikTok',
     },
     'tiktok.video.detail': {
         group: 'tiktok',
@@ -457,7 +422,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'TikTok videos',
-        activity: 'Reading TikTok videos',
     },
     'tiktok.video.comments': {
         group: 'tiktok',
@@ -468,7 +432,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'TikTok comment lists',
-        activity: 'Reading TikTok comments',
     },
     'tiktok.comment.replies': {
         group: 'tiktok',
@@ -478,7 +441,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'TikTok reply lists',
-        activity: 'Reading TikTok comments',
     },
     'instagram.user.profile': {
         group: 'instagram',
@@ -489,7 +451,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 10_000,
         label: 'Instagram profiles',
-        activity: 'Reading Instagram',
     },
     'instagram.user.posts': {
         group: 'instagram',
@@ -500,7 +461,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Instagram post lists',
-        activity: 'Reading Instagram posts',
     },
     'instagram.user.reels': {
         group: 'instagram',
@@ -511,7 +471,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Instagram reel lists',
-        activity: 'Reading Instagram reels',
     },
     'instagram.search.users': {
         group: 'instagram',
@@ -521,7 +480,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Instagram account searches',
-        activity: 'Searching Instagram',
     },
     'instagram.search.reels': {
         group: 'instagram',
@@ -531,7 +489,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Instagram reel searches',
-        activity: 'Searching Instagram',
     },
     'instagram.hashtag.posts': {
         group: 'instagram',
@@ -541,7 +498,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Instagram hashtag searches',
-        activity: 'Reading Instagram hashtags',
     },
     'instagram.post.detail': {
         group: 'instagram',
@@ -552,7 +508,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 20_000,
         label: 'Instagram posts',
-        activity: 'Reading Instagram posts',
     },
     'instagram.post.comments': {
         group: 'instagram',
@@ -563,7 +518,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Instagram comment lists',
-        activity: 'Reading Instagram comments',
     },
     'x.user.profile': {
         group: 'x',
@@ -574,7 +528,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'X profiles',
-        activity: 'Reading X',
     },
     'x.user.posts': {
         group: 'x',
@@ -585,7 +538,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'X post lists',
-        activity: 'Reading X posts',
     },
     'x.search.posts': {
         group: 'x',
@@ -595,7 +547,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'X searches',
-        activity: 'Searching X',
     },
     'x.post.comments': {
         group: 'x',
@@ -605,7 +556,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'X reply lists',
-        activity: 'Reading X replies',
     },
     'youtube.channel.profile': {
         group: 'youtube',
@@ -615,7 +565,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'YouTube channels',
-        activity: 'Reading YouTube',
     },
     'youtube.channel.videos': {
         group: 'youtube',
@@ -625,7 +574,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'YouTube video lists',
-        activity: 'Reading YouTube videos',
     },
     'youtube.search.videos': {
         group: 'youtube',
@@ -635,7 +583,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'YouTube searches',
-        activity: 'Searching YouTube',
     },
     'youtube.video.detail': {
         group: 'youtube',
@@ -646,7 +593,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'YouTube videos',
-        activity: 'Reading YouTube videos',
     },
     'youtube.video.comments': {
         group: 'youtube',
@@ -657,7 +603,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'YouTube comment lists',
-        activity: 'Reading YouTube comments',
     },
     'facebook.user.profile': {
         group: 'facebook',
@@ -668,7 +613,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Facebook pages',
-        activity: 'Reading Facebook',
     },
     'facebook.user.posts': {
         group: 'facebook',
@@ -679,7 +623,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Facebook post lists',
-        activity: 'Reading Facebook posts',
     },
     'facebook.post.comments': {
         group: 'facebook',
@@ -690,7 +633,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'Facebook comment lists',
-        activity: 'Reading Facebook comments',
     },
     'reddit.subreddit.posts': {
         group: 'reddit',
@@ -700,7 +642,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 5_000,
         label: 'subreddit feeds',
-        activity: 'Reading Reddit',
     },
     'reddit.post.detail': {
         group: 'reddit',
@@ -710,7 +651,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 3_000,
         label: 'Reddit posts',
-        activity: 'Reading Reddit',
     },
 } as const satisfies Record<string, CatalogEntry>
 

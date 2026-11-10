@@ -1,6 +1,7 @@
 'use client'
 
 import type { DesktopApp } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { DialogClose } from '@/components/ui/dialog'
@@ -27,7 +28,8 @@ const SHOULDER = 'absolute top-0 size-3'
 // Everything the app adds to an agent's screen, hung from the top edge of its dialog so nothing
 // else covers the screen. Render it inside a positioned box, within the dialog it closes.
 export function DesktopNotch({ launchers, browsing, browserLockedReason, disabled, takeoverReason, onOpenApp, onToggleBrowser, onPaste, onDone }: DesktopNotchProps) {
-    const browserLabel = browsing ? 'Close browser' : 'Browser'
+    const t = useTranslations('desktop.notch')
+    const browserLabel = browsing ? t('closeBrowser') : t('browser')
 
     return (
         <div className="absolute top-0 left-1/2 z-10 flex max-w-[calc(100%-3rem)] -translate-x-1/2 items-center gap-1 rounded-b-xl bg-popover px-1.5 pt-0.5 pb-1.5 text-popover-foreground">
@@ -43,30 +45,30 @@ export function DesktopNotch({ launchers, browsing, browserLockedReason, disable
                             </Button>
                         </TooltipLabeled>
                     </TooltipDisabledReason>
-                    <TooltipLabeled label="Files" side="bottom">
-                        <Button aria-label="Files" size="icon-sm" variant="ghost" disabled={disabled} onClick={() => onOpenApp('files')}>
+                    <TooltipLabeled label={t('files')} side="bottom">
+                        <Button aria-label={t('files')} size="icon-sm" variant="ghost" disabled={disabled} onClick={() => onOpenApp('files')}>
                             <FolderIcon className="size-4" />
                         </Button>
                     </TooltipLabeled>
-                    <TooltipLabeled label="Terminal" side="bottom">
-                        <Button aria-label="Terminal" size="icon-sm" variant="ghost" disabled={disabled} onClick={() => onOpenApp('terminal')}>
+                    <TooltipLabeled label={t('terminal')} side="bottom">
+                        <Button aria-label={t('terminal')} size="icon-sm" variant="ghost" disabled={disabled} onClick={() => onOpenApp('terminal')}>
                             <TerminalIcon className="size-4" />
                         </Button>
                     </TooltipLabeled>
                 </>
             )}
-            <TooltipLabeled label="Paste" side="bottom">
-                <Button aria-label="Paste" size="icon-sm" variant="ghost" disabled={disabled} onClick={onPaste}>
+            <TooltipLabeled label={t('paste')} side="bottom">
+                <Button aria-label={t('paste')} size="icon-sm" variant="ghost" disabled={disabled} onClick={onPaste}>
                     <ClipboardPasteIcon className="size-4" />
                 </Button>
             </TooltipLabeled>
             {onDone && (
                 <Button size="sm" disabled={disabled} onClick={onDone}>
-                    Done
+                    {t('done')}
                 </Button>
             )}
             <DialogClose asChild>
-                <Button aria-label="Close" size="icon-sm" variant="ghost">
+                <Button aria-label={t('close')} size="icon-sm" variant="ghost">
                     <XIcon className="size-4" />
                 </Button>
             </DialogClose>

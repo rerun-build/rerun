@@ -1,0 +1,321 @@
+{
+    "site": {
+        "title": "Rerun: AI Employees That Run on Your ChatGPT or Claude Plan",
+        "description": "Hire AI employees for sales, support, marketing and admin. They run on your ChatGPT or Claude plan, included credits or your API key. Free {trialDays}-day trial."
+    },
+    "nav": {
+        "items": {
+            "features": "Features",
+            "useCases": "Use cases",
+            "industries": "Industries",
+            "templates": "Templates",
+            "pricing": "Pricing",
+            "community": "Community",
+            "resources": "Resources"
+        },
+        "features": {
+            "coworkers": {
+                "label": "Coworkers",
+                "description": "Hand one a job, it brings the work back done."
+            },
+            "coworker-manager": {
+                "label": "Coworker manager",
+                "description": "Say what you need, it tells the right Coworker."
+            },
+            "computer-use": {
+                "label": "Computer use",
+                "description": "It works in your apps the way a person would."
+            },
+            "tools": {
+                "label": "{count}+ tools included",
+                "description": "Gmail, Stripe, HubSpot and any MCP server."
+            },
+            "human-in-the-loop": {
+                "label": "Human in the loop",
+                "description": "They ask before anything consequential."
+            },
+            "runs-24-7": {
+                "label": "Runs 24/7, in Europe",
+                "description": "Nights, weekends, laptop shut: it still runs."
+            },
+            "second-brain": {
+                "label": "Second brain",
+                "description": "It knows your offer, your market and your tone."
+            },
+            "workspaces": {
+                "label": "Workspaces",
+                "description": "One account, a workspace per business."
+            },
+            "invite-your-team": {
+                "label": "Invite your whole team",
+                "description": "Everyone, at no extra cost, on the same board."
+            },
+            "coworkers-work-together": {
+                "label": "Coworkers work together",
+                "description": "One finds the leads, the next writes to them."
+            }
+        },
+        "industries": {
+            "agencies": {
+                "label": "Agency",
+                "description": "New business, delivery and client reporting."
+            },
+            "freelancers": {
+                "label": "Freelance",
+                "description": "The back office you never had time for."
+            },
+            "ecommerce": {
+                "label": "E-commerce",
+                "description": "Orders, stock, reviews and the competition."
+            },
+            "real-estate": {
+                "label": "Real estate",
+                "description": "Sellers, enquiries, listings and rentals."
+            },
+            "startups": {
+                "label": "Startup",
+                "description": "Pipeline, launches, metrics and support."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "Churn, feedback, releases and inbound."
+            },
+            "legal": {
+                "label": "Legal & compliance",
+                "description": "Contracts, obligations, deadlines and audits."
+            },
+            "recruiting": {
+                "label": "Recruiting & HR",
+                "description": "Screening, interviews and candidate follow-up."
+            }
+        },
+        "useCases": {
+            "findLeads": {
+                "label": "Find leads",
+                "description": "Job posts, headcount and your CRM, crossed."
+            },
+            "trackSales": {
+                "label": "Track sales",
+                "description": "Revenue, pipeline and the sheet, every morning."
+            },
+            "runAds": {
+                "label": "Run your ads",
+                "description": "Spend read daily, the ones losing money paused."
+            },
+            "watchCompetitors": {
+                "label": "Watch competitors",
+                "description": "Their prices, their launches, your keyword gaps."
+            },
+            "createContent": {
+                "label": "Create content",
+                "description": "From the slipping query to the post republished."
+            },
+            "postSocial": {
+                "label": "Post on social media",
+                "description": "A post every morning, comments answered."
+            },
+            "replyCustomers": {
+                "label": "Reply to customers",
+                "description": "Unread threads sorted and answered in your tone."
+            },
+            "triageInbox": {
+                "label": "Triage your inbox",
+                "description": "Labeled, replies drafted, two left for you."
+            },
+            "prepareMeetings": {
+                "label": "Prepare your meetings",
+                "description": "A short brief on who you meet, before each call."
+            },
+            "trackOrders": {
+                "label": "Track your orders",
+                "description": "Late ones spotted, your customers told first."
+            }
+        },
+        "community": {
+            "experts": {
+                "label": "Experts",
+                "description": "Browse vetted coworker builders and hire them."
+            },
+            "discord": {
+                "label": "Discord",
+                "description": "Join the community and get help in real time."
+            }
+        },
+        "resources": {
+            "docs": {
+                "label": "Documentation",
+                "description": "Build, connect and ship your coworkers."
+            },
+            "blog": {
+                "label": "Blog",
+                "description": "Product news, guides and coworker playbooks."
+            }
+        },
+        "faq": "FAQ",
+        "solution": "Solution",
+        "trialCta": "Start trial for $0",
+        "openMenu": "Open the menu",
+        "closeMenu": "Close the menu",
+        "menu": "Menu",
+        "main": "Main",
+        "starOnGithub": "Star on GitHub",
+        "login": "Log in",
+        "browseAll": {
+            "label": "Browse all templates",
+            "description": "The whole library, every category in one page."
+        },
+        "becomeExpert": "Become an expert",
+        "startFree": "Start for free",
+        "goToApp": "Go to app",
+        "logo": {
+            "brandKit": "View brand kit",
+            "copy": "Copy logo (SVG)",
+            "download": "Download logo"
+        }
+    },
+    "github": {
+        "star": "Star",
+        "ariaStar": "Star Rerun on GitHub",
+        "ariaCount": "Rerun on GitHub, {count} stars"
+    },
+    "heroCta": "Start now for free",
+    "finalCta": {
+        "proof": "{count}+ businesses run on Rerun",
+        "titleLead": "Hire Coworkers on the <switch></switch>",
+        "titleTail": "plan <mark>you already pay for.</mark>",
+        "steps": {
+            "plug": "Plug in your subscription",
+            "hire": "Set up your Coworkers",
+            "run": "Run your business with Coworkers"
+        },
+        "step": "{rank}. {label}"
+    },
+    "openSource": {
+        "announce": "Rerun is now open source<wide> under AGPL-3.0</wide>",
+        "cta": "Star us on GitHub"
+    },
+    "footer": {
+        "ctaTitle": "Your first coworker is<br></br>three minutes away",
+        "ctaButton": "Start for free",
+        "tagline": "Run your work on coworkers. Build them, watch them work, and keep your eyes on everything.",
+        "productHuntAlt": "Rerun - Open-source AI coworkers that actually do the work | Product Hunt",
+        "columns": {
+            "features": "Features",
+            "industries": "Industries",
+            "solutions": "Solutions",
+            "compare": "Compare",
+            "guides": "Guides",
+            "resources": "Resources",
+            "legal": "Legal"
+        },
+        "resources": {
+            "docs": "Docs",
+            "github": "GitHub",
+            "pricing": "Pricing",
+            "support": "Support",
+            "templates": "Templates",
+            "compare": "Compare",
+            "blog": "Blog",
+            "findExpert": "Find an expert",
+            "becomeExpert": "Become an expert",
+            "whatsNew": "What's new",
+            "brandKit": "Brand kit",
+            "community": "Community",
+            "affiliate": "Affiliate Program",
+            "partnerBadge": "Partner badge"
+        },
+        "compareLink": "Rerun vs {name}",
+        "guides": {
+            "aiEmployees": "AI employees",
+            "smallBusiness": "AI agents for small business",
+            "cost": "AI employee cost",
+            "noCode": "No-code AI agent builders",
+            "n8n": "n8n alternatives",
+            "personal": "Personal AI agents",
+            "hermes": "Hermes alternatives"
+        },
+        "legal": {
+            "terms": "Terms of Service",
+            "refunds": "Refund Policy",
+            "acceptableUse": "Acceptable Use",
+            "creatorTerms": "Creator Terms",
+            "privacy": "Privacy Policy",
+            "cookies": "Cookie Policy",
+            "dpa": "DPA"
+        },
+        "copyright": "© {year} Rerun by {legalName}. All rights reserved.",
+        "language": "Language",
+        "categories": {
+            "agencies": "Agencies",
+            "ecommerce": "E-commerce",
+            "saas": "SaaS",
+            "sales": "Sales",
+            "recruiting": "Recruiting",
+            "real-estate": "Real estate",
+            "legal": "Legal & compliance",
+            "creators": "Creators",
+            "productivity": "Productivity",
+            "other": "Other"
+        },
+        "cookieSettings": "Cookie settings"
+    },
+    "languageBanner": {
+        "offer": "This page is available in English.",
+        "open": "Read in English",
+        "dismiss": "Dismiss"
+    },
+    "discord": "Join our Discord",
+    "tabNudge": {
+        "firstCoworker": "3 min to your first coworker",
+        "allDay": "Coworkers that run 24/7 for you",
+        "welcomeGuest": "Welcome back. Your first coworker is 3 minutes away.",
+        "welcomeMember": "Welcome back. Your coworkers are running in the app.",
+        "start": "Start for free",
+        "goToApp": "Go to app",
+        "dismiss": "Dismiss"
+    },
+    "notFound": {
+        "homeAria": "Rerun home",
+        "title": "This page went off-script.",
+        "body": "The page you are looking for does not exist or has moved. Let's get you back on track.",
+        "back": "Back to home"
+    },
+    "crash": {
+        "title": "Something went wrong.",
+        "body": "This page hit an unexpected error. Reload it to pick up where you left off.",
+        "reload": "Reload",
+        "back": "Back to home"
+    },
+    "og": {
+        "default": {
+            "line1": "Get your tasks",
+            "line2": "done by AI",
+            "accent": "Even while you sleep."
+        },
+        "experts": {
+            "line1": "Hire the best",
+            "accent": "AI experts",
+            "cta": "Hire an expert",
+            "hire": "Hire",
+            "badges": {
+                "Studio": "Studio",
+                "Freelancer": "Freelancer",
+                "Expert": "Expert"
+            }
+        },
+        "compare": {
+            "vs": "Rerun vs",
+            "cta": "See the comparison"
+        }
+    },
+    "composerPlaceholder": "Send a message...",
+    "_context": {
+        "nav.logo": "Menu opened by a right click on the Rerun logo of the top bar.",
+        "nav.goToApp": "Top bar button shown instead of the sign-up button to a visitor who is already signed in to the app.",
+        "nav.trialCta": "The price stays in US dollars in every language.",
+        "finalCta.titleLead": "<switch></switch> is a rotating pill naming the AI provider (ChatGPT, Claude...). The title is split in two lines: titleLead then titleTail.",
+        "openSource.announce": "<wide> wraps the part hidden on small screens.",
+        "languageBanner.offer": "Shown to a visitor whose browser prefers this language, on the English version of a page. Each language says it in its own words.",
+        "og.default.line1": "The social card of the site (1200x630 image): three short lines, the last one highlighted. Keep each line short."
+    }
+}

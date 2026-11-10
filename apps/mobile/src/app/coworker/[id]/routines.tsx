@@ -2,6 +2,7 @@ import type { RoutineView } from '@rerun/contracts'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Alert } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { fetchRoutines, setRoutineEnabled } from '@/api/coworker'
 import { manageLock } from '@/auth/access'
@@ -13,6 +14,8 @@ import { useCoworkerAccess } from '@/data/useCoworkerAccess'
 export default function CoworkerRoutinesScreen() {
     const { id: agentId, name = '' } = useLocalSearchParams<{ id: string; name?: string }>()
     const { session, me } = useAuth()
+    const t = useTranslations('mobileCoworker.routines')
+    const tCommon = useTranslations('mobileCommon')
     const [routines, setRoutines] = useState<RoutineView[] | null>(() => (me ? (readCoworkerDetails(me.workspace.id, agentId).routines ?? null) : null))
     // A switch flips what the hub holds: it waits for the hub's copy, never the one kept from the last visit.
     const [fresh, setFresh] = useState(false)
@@ -43,7 +46,7 @@ export default function CoworkerRoutinesScreen() {
         setRoutineEnabled({ accessToken, workspaceId }, agentId, routine.kind, routine.slug, enabled)
             .catch(err => {
                 setRoutines(withEnabled(key, !enabled))
-                Alert.alert(`Could not ${enabled ? 'turn on' : 'turn off'} ${routine.name}`, err instanceof Error ? err.message : 'Try again in a moment.')
+                Alert.alert(enabled ? t('turnOnFailed', { name: routine.name }) : t('turnOffFailed', { name: routine.name }), err instanceof Error ? err.message : tCommon('errors.tryAgainShortly'))
             })
             .finally(() => setSavingKeys(keys => keys.filter(saving => saving !== key)))
     }

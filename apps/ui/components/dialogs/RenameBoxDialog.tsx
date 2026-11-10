@@ -5,22 +5,22 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useBoxViewer, useCanManageSpace } from '@/hooks/useBoxAccess'
-import { BOX_NAME_MAX, UNNAMED_BOX_LABEL, type SpacePublic } from '@/lib/board/types'
+import { BOX_NAME_MAX, type SpacePublic } from '@/lib/board/types'
 import { useBoardStore } from '@/stores/board.store'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const schema = z.object({
-    name: z.string().trim().min(1, 'Name is required').max(BOX_NAME_MAX, `Keep it under ${BOX_NAME_MAX} characters`),
-})
-
-type FormValues = z.infer<typeof schema>
+type FormValues = { name: string }
 
 // A Box is a rectangle on the board and a name, nothing else: renaming it is the whole of its
 // settings, so it is a dialog rather than a panel.
 export function RenameBoxDialog({ space, open, onOpenChange }: { space: SpacePublic | undefined; open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('dialogs.renameBox')
+    const tCommon = useTranslations('common')
+    const schema = useMemo(() => z.object({ name: z.string().trim().min(1, t('nameRequired')).max(BOX_NAME_MAX, t('nameTooLong', { max: BOX_NAME_MAX })) }), [t])
     const renameSpace = useBoardStore(s => s.renameSpace)
     const viewer = useBoxViewer()
     const canManage = useCanManageSpace(space?.id)
@@ -42,8 +42,8 @@ export function RenameBoxDialog({ space, open, onOpenChange }: { space: SpacePub
                 <Form {...form}>
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
                         <DialogHeader>
-                            <DialogTitle>Rename Box</DialogTitle>
-                            <DialogDescription>The name you read on the board. Nothing else depends on it.</DialogDescription>
+                            <DialogTitle>{t('title')}</DialogTitle>
+                            <DialogDescription>{t('description')}</DialogDescription>
                         </DialogHeader>
 
                         <FormField
@@ -52,7 +52,7 @@ export function RenameBoxDialog({ space, open, onOpenChange }: { space: SpacePub
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        <Input label="Name" required autoFocus placeholder={UNNAMED_BOX_LABEL} {...field} />
+                                        <Input label={t('nameLabel')} required autoFocus placeholder={t('placeholder')} {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -61,10 +61,10 @@ export function RenameBoxDialog({ space, open, onOpenChange }: { space: SpacePub
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                                Cancel
+                                {tCommon('cancel')}
                             </Button>
                             <Button type="submit" disabled={!form.watch('name').trim()}>
-                                Rename
+                                {t('submit')}
                             </Button>
                         </DialogFooter>
                     </form>

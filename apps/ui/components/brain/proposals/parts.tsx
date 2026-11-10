@@ -12,6 +12,7 @@ import { BorderBeam } from '@rerun/ui'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { Badge } from '@rerun/ui/primitives'
 import { AnimatePresence, motion } from 'motion/react'
+import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Prose } from './Prose'
@@ -43,22 +44,26 @@ function PageTag({ proposal, onOpenPage }: { proposal: BrainProposal; onOpenPage
 }
 
 export function When({ proposal }: { proposal: BrainProposal }) {
-    return <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{shortRelativeTime(proposal.createdAt)}</span>
+    const locale = useLocale()
+    return <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{shortRelativeTime(proposal.createdAt, locale)}</span>
 }
 
 function Sources({ proposal }: { proposal: BrainProposal }) {
+    const t = useTranslations('brain.proposals')
+    const tBrain = useTranslations('brain')
     if (!proposal.sources.length) return null
-    return <p className="text-xs text-muted-foreground">Based on {brainSourceLabels(proposal.sources).join(', ')}</p>
+    return <p className="text-xs text-muted-foreground">{t('basedOn', { sources: brainSourceLabels(proposal.sources, tBrain).join(', ') })}</p>
 }
 
 export function AllCaughtUp() {
+    const t = useTranslations('brain.proposals')
     return (
         <div className="flex flex-col items-center gap-2 py-24 text-center">
             <span className="flex size-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
                 <CheckCheckIcon className="size-5" />
             </span>
-            <p className="text-sm font-medium">All caught up</p>
-            <p className="max-w-xs text-xs text-muted-foreground">When a coworker learns something the Brain is missing, it lands here.</p>
+            <p className="text-sm font-medium">{t('allCaughtUp')}</p>
+            <p className="max-w-xs text-xs text-muted-foreground">{t('allCaughtUpHint')}</p>
         </div>
     )
 }
@@ -86,8 +91,6 @@ export function ProposalCardSkeleton() {
     )
 }
 
-const sectionName = (change: SectionChange) => change.heading ?? 'Intro'
-
 export function Expandable({ open, children }: { open: boolean; children: ReactNode }) {
     return (
         <AnimatePresence initial={false}>
@@ -101,14 +104,17 @@ export function Expandable({ open, children }: { open: boolean; children: ReactN
 }
 
 export function Byline({ proposal, onOpenPage }: { proposal: BrainProposal; onOpenPage: (slug: string) => void }) {
+    const t = useTranslations('brain.proposals')
     return (
         <div className="flex flex-wrap items-center gap-1.5 text-[13px] text-muted-foreground">
-            <span className="font-medium text-foreground/80">{humanAgentName(proposal.agentName)}</span>
-            <span>wants to {proposal.mode === 'create' ? 'add' : 'update'}</span>
-            <PageTag proposal={proposal} onOpenPage={onOpenPage} />
+            {t.rich(proposal.mode === 'create' ? 'bylineCreate' : 'bylineEdit', {
+                name: humanAgentName(proposal.agentName),
+                agent: chunks => <span className="font-medium text-foreground/80">{chunks}</span>,
+                page: () => <PageTag proposal={proposal} onOpenPage={onOpenPage} />,
+            })}
             {proposal.outdated && (
                 <Badge size="xs" tone="orange" glow={false}>
-                    Page changed since
+                    {t('pageChanged')}
                 </Badge>
             )}
         </div>
@@ -151,36 +157,36 @@ export function FactChanges({ proposal }: { proposal: BrainProposal }) {
 }
 
 function NowAfter({ change }: { change: SectionChange }) {
+    const t = useTranslations('brain.proposals')
     return (
         <div className="grid gap-2 sm:grid-cols-2">
             <div className="rounded-lg bg-muted/50 p-3">
-                <p className="mb-1.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">Now</p>
-                {change.before ? <Prose markdown={change.before} className="text-muted-foreground" /> : <p className="text-sm text-muted-foreground italic">Nothing yet</p>}
+                <p className="mb-1.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">{t('now')}</p>
+                {change.before ? <Prose markdown={change.before} className="text-muted-foreground" /> : <p className="text-sm text-muted-foreground italic">{t('nothingYet')}</p>}
             </div>
             <div className="relative rounded-lg bg-emerald-500/[0.02] p-3">
                 <BorderBeam pattern="arcs" tone="green" angle={beamAngle(`${change.key}:after`)} className="opacity-25" />
-                <p className="mb-1.5 text-[10px] font-medium tracking-wide text-emerald-700 uppercase dark:text-emerald-400">After</p>
-                {change.after ? <Prose markdown={change.after} /> : <p className="text-sm text-muted-foreground italic">Removed</p>}
+                <p className="mb-1.5 text-[10px] font-medium tracking-wide text-emerald-700 uppercase dark:text-emerald-400">{t('after')}</p>
+                {change.after ? <Prose markdown={change.after} /> : <p className="text-sm text-muted-foreground italic">{t('removed')}</p>}
             </div>
         </div>
     )
 }
 
 export function Details({ proposal }: { proposal: BrainProposal }) {
+    const t = useTranslations('brain.proposals')
     return (
         <div className="mt-4 space-y-4 rounded-xl bg-muted/40 p-4">
             {proposal.outdated && (
                 <p className="text-xs text-muted-foreground">
-                    {proposal.mode === 'create'
-                        ? 'This page was created while the proposal waited. What follows compares with what it says now.'
-                        : 'The page changed since the coworker read it. What follows compares with what it says now, so check nothing gets lost.'}
+                    {proposal.mode === 'create' ? t('outdatedCreate') : t('outdatedEdit')}
                 </p>
             )}
             {proposal.highlights.length > 0 && <p className="text-sm">{proposal.reason}</p>}
             <Sources proposal={proposal} />
             {proposalChanges(proposal).map(change => (
                 <div key={change.key} className="space-y-1.5">
-                    <p className="text-xs font-medium text-muted-foreground">{sectionName(change)}</p>
+                    <p className="text-xs font-medium text-muted-foreground">{change.heading ?? t('intro')}</p>
                     <NowAfter change={change} />
                 </div>
             ))}

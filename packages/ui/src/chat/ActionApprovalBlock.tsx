@@ -6,6 +6,7 @@ import { cn } from '../cn'
 import { CheckIcon, ChevronLeft, ChevronRight, ShieldAlertIcon } from '../icons'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRef, useState } from 'react'
+import { useKitTranslations } from '../locale'
 import type { ApprovalDecision, ApprovalItem } from '@rerun/contracts'
 import { DeclineReasonForm } from './DeclineReasonForm'
 import { StepDots } from './StepDots'
@@ -24,6 +25,7 @@ export type ActionApprovalBlockProps = {
 type DecisionValue = Pick<ApprovalDecision, 'decision' | 'note'>
 
 export function ActionApprovalBlock({ approvals, onSubmit, disabled, inline, className }: ActionApprovalBlockProps) {
+    const t = useKitTranslations()
     const [declining, setDeclining] = useState(false)
     const [note, setNote] = useState('')
     const [decisions, setDecisions] = useState<Record<number, DecisionValue>>({})
@@ -86,13 +88,13 @@ export function ActionApprovalBlock({ approvals, onSubmit, disabled, inline, cla
             <StepDots count={approvals.length} current={current} answered={approvals.map((_, index) => !!decisions[index])} onSelect={goTo} disabled={locked || declining} />
         ) : (
             <div className="flex items-center gap-1">
-                <Button size="icon-sm" variant="ghost" disabled={locked || declining || current === 0} onClick={() => goTo(current - 1)} aria-label="Previous approval" className="-my-1 text-muted-foreground">
+                <Button size="icon-sm" variant="ghost" disabled={locked || declining || current === 0} onClick={() => goTo(current - 1)} aria-label={t('chat.actionApproval.previous')} className="-my-1 text-muted-foreground">
                     <ChevronLeft className="size-4" />
                 </Button>
                 <span className="min-w-12 text-center text-xs tabular-nums text-muted-foreground">
                     {current + 1} / {approvals.length}
                 </span>
-                <Button size="icon-sm" variant="ghost" disabled={locked || declining || current === approvals.length - 1} onClick={() => goTo(current + 1)} aria-label="Next approval" className="-my-1 text-muted-foreground">
+                <Button size="icon-sm" variant="ghost" disabled={locked || declining || current === approvals.length - 1} onClick={() => goTo(current + 1)} aria-label={t('chat.actionApproval.next')} className="-my-1 text-muted-foreground">
                     <ChevronRight className="size-4" />
                 </Button>
             </div>
@@ -103,7 +105,7 @@ export function ActionApprovalBlock({ approvals, onSubmit, disabled, inline, cla
             <BorderBeam animated pattern="arcs" tone="orange" glow width={1} duration={7} />
             <div className="flex items-center gap-2.5 text-sm">
                 <Icon size="sm" tone="orange" icon={ShieldAlertIcon} className="bg-orange-500/10 text-foreground" />
-                <span className="font-medium text-foreground">Approval required</span>
+                <span className="font-medium text-foreground">{t('chat.actionApproval.title')}</span>
             </div>
             <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={current} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="space-y-2.5">
@@ -126,11 +128,11 @@ export function ActionApprovalBlock({ approvals, onSubmit, disabled, inline, cla
                         <div className="ml-auto flex items-center gap-2">
                             <Button size="sm" variant="destructive" disabled={locked} onClick={startDeclining} data-hitl="decline" aria-pressed={currentDecision?.decision === 'declined'}>
                                 {currentDecision?.decision === 'declined' && <CheckIcon className="size-3.5" />}
-                                Not now
+                                {t('chat.actionApproval.decline')}
                             </Button>
                             <Button size="sm" variant="default" disabled={locked} onClick={() => decide('approved')} data-hitl="approve" aria-pressed={currentDecision?.decision === 'approved'}>
                                 {currentDecision?.decision === 'approved' && <CheckIcon className="size-3.5" />}
-                                {currentDecision?.decision === 'approved' ? 'Approved' : 'Approve'}
+                                {currentDecision?.decision === 'approved' ? t('chat.actionApproval.approved') : t('chat.actionApproval.approve')}
                             </Button>
                         </div>
                     </motion.div>

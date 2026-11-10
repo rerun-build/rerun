@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import { numericColumns, parseCsv } from '@/lib/published/csv'
 import { TableIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -5,17 +6,14 @@ import { ViewerPage, ViewerTopBar } from './ViewerChrome'
 
 export const MAX_CSV_ROWS = 5000
 
-function plural(count: number, word: string): string {
-    return `${count.toLocaleString('en-US')} ${word}${count === 1 ? '' : 's'}`
-}
-
 export function CsvViewer({ slug, name, text, textTruncated }: { slug: string; name: string; text: string; textTruncated: boolean }) {
+    const t = useTranslations('published.csv')
     const { rows, truncated } = parseCsv(text, { maxRows: MAX_CSV_ROWS + 1 })
     const [header = [], ...body] = rows
     const width = Math.max(header.length, ...body.map(row => row.length))
     const numeric = numericColumns(body)
     const cut = truncated || textTruncated
-    const meta = `${plural(body.length, 'row')}${cut ? '+' : ''} · ${plural(width, 'column')}`
+    const meta = t('meta', { rows: body.length, truncated: String(cut), columns: width })
 
     return (
         <ViewerPage slug={slug} bar={<ViewerTopBar icon={TableIcon} name={name} meta={meta} />} className="pb-20">
@@ -43,7 +41,7 @@ export function CsvViewer({ slug, name, text, textTruncated }: { slug: string; n
                     ))}
                 </tbody>
             </table>
-            {cut && <p className="px-4 py-3 text-xs text-muted-foreground">Showing the first {plural(body.length, 'row')}. Download the file for the rest.</p>}
+            {cut && <p className="px-4 py-3 text-xs text-muted-foreground">{t('truncated', { rows: body.length })}</p>}
         </ViewerPage>
     )
 }

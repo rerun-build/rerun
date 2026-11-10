@@ -10,6 +10,7 @@ import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
 import { QuestionForm as QuestionFormBase, type QuestionAttachments, type QuestionFormProps as QuestionFormBaseProps, type QuestionItem } from '@rerun/ui/chat'
 import type { FileUIPart } from 'ai'
 import { nanoid } from 'nanoid'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -42,6 +43,7 @@ function revokePreview(entry: AttachedFile) {
 }
 
 export function QuestionForm({ ref, agentId, questions, onSend, onCancel, disabled, inline, textareaRef, textareaProps }: QuestionFormProps) {
+    const t = useTranslations('chat.question')
     const uploads = useFileUploads({
         target: useMemo(() => ({ kind: 'agent', agentId }) as const, [agentId]),
         nameFor: uniqueAttachmentName,
@@ -77,7 +79,7 @@ export function QuestionForm({ ref, agentId, questions, onSend, onCancel, disabl
         count: questionIndex => attached[questionIndex]?.length ?? 0,
         onPick: (questionIndex, files) => {
             const room = MAX_FILES - Object.values(attached).flat().length
-            if (files.length > room) toast.error(`You can attach up to ${MAX_FILES} files. ${files.length - Math.max(0, room)} were not added.`)
+            if (files.length > room) toast.error(t('tooManyFiles', { max: MAX_FILES, rejected: files.length - Math.max(0, room) }))
             const picked = files.slice(0, Math.max(0, room))
             // enqueue skips oversized files (and reports them), so its ids line up with the sized ones.
             const sized = picked.filter(file => file.size <= MAX_UPLOAD_FILE_BYTES)
@@ -115,8 +117,7 @@ export function QuestionForm({ ref, agentId, questions, onSend, onCancel, disabl
         const settled = new Map((entries.length > 0 ? await uploads.waitForAll() : []).map(item => [item.id, item]))
         const failed = entries.filter(entry => settled.get(entry.uploadId)?.status !== 'done')
         if (failed.length > 0) {
-            const plural = failed.length > 1
-            toast.error(`${failed.length} ${plural ? 'attachments' : 'attachment'} could not be uploaded. Retry or remove ${plural ? 'them' : 'it'} before answering.`)
+            toast.error(t('uploadsFailed', { count: failed.length }))
             throw new Error('Attachments not uploaded')
         }
         onSend(

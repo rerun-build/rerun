@@ -5,6 +5,7 @@ import { Children, useCallback, useEffect, useRef, useState, type ReactNode } fr
 
 import { cn } from '../cn'
 import { ChevronLeft, ChevronRight } from '../icons'
+import { useKitTranslations } from '../locale'
 
 // Cards fanned out behind the front one. A deeper fan buys angle rather than information.
 const DEPTH = 3
@@ -34,6 +35,7 @@ const radians = (degrees: number) => (degrees * Math.PI) / 180
  * The hand loops, so there is no end to walk back from.
  */
 export function CardStack({ label, className, children }: { label: string; className?: string; children: ReactNode }) {
+    const t = useKitTranslations()
     const items = Children.toArray(children)
     const count = items.length
     const [front, setFront] = useState(0)
@@ -127,7 +129,7 @@ export function CardStack({ label, className, children }: { label: string; class
         >
             <div className="flex items-start gap-1">
                 {count > 1 && (
-                    <button type="button" aria-label={`Previous ${label}`} onClick={recall} style={{ marginTop: arrowTop }} className={ARROW_CLASS}>
+                    <button type="button" aria-label={t('primitives.carousel.previous', { label })} onClick={recall} style={{ marginTop: arrowTop }} className={ARROW_CLASS}>
                         <ChevronLeft className="size-4" />
                     </button>
                 )}
@@ -203,7 +205,7 @@ export function CardStack({ label, className, children }: { label: string; class
                 </div>
 
                 {count > 1 && (
-                    <button type="button" aria-label={`Next ${label}`} onClick={() => deal(-1)} style={{ marginTop: arrowTop }} className={ARROW_CLASS}>
+                    <button type="button" aria-label={t('primitives.carousel.next', { label })} onClick={() => deal(-1)} style={{ marginTop: arrowTop }} className={ARROW_CLASS}>
                         <ChevronRight className="size-4" />
                     </button>
                 )}
@@ -215,7 +217,7 @@ export function CardStack({ label, className, children }: { label: string; class
                         <button
                             key={index}
                             type="button"
-                            aria-label={`Go to ${label} ${index + 1}`}
+                            aria-label={t('primitives.carousel.goTo', { label, index: index + 1 })}
                             aria-current={index === front}
                             onClick={() => {
                                 setTurning(false)

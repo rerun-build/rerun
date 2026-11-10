@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { Pressable, TextInput, View, type TextInputInstance } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { fieldOutline } from '@/theme/field'
@@ -19,6 +20,7 @@ type CodeFieldProps = {
 export function CodeField({ length, value, onChangeText, onComplete, disabled, invalid }: CodeFieldProps) {
     const theme = useTheme()
     const input = useRef<TextInputInstance>(null)
+    const t = useTranslations('mobileAuth')
 
     const change = (text: string) => {
         const digits = text.replace(/\D/g, '').slice(0, length)
@@ -27,7 +29,7 @@ export function CodeField({ length, value, onChangeText, onComplete, disabled, i
     }
 
     return (
-        <Pressable onPress={() => input.current?.focus()} accessibilityLabel="Verification code" style={{ alignSelf: 'stretch' }}>
+        <Pressable onPress={() => input.current?.focus()} accessibilityLabel={t('code.fieldLabel')} style={{ alignSelf: 'stretch' }}>
             <View style={{ flexDirection: 'row', gap: spacing.sm, justifyContent: 'center' }}>
                 {Array.from({ length }, (_, index) => {
                     const active = !disabled && index === Math.min(value.length, length - 1)

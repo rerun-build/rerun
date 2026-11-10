@@ -40,7 +40,7 @@ export function disabledAgentTileStyle(label: string): TileStyle {
     badge: "lock",
     stripes: true,
     buddy: { mood: "asleep" },
-    status: { label: DISABLED_AGENT_LABEL, tone: "neutral" },
+    status: { label: DISABLED_AGENT_LABEL, labelKey: "disabled", tone: "neutral" },
   };
 }
 
@@ -64,8 +64,9 @@ export function agentTileStyle(
         buddy: true,
         status: {
           label: AGENT_STATUS_LABEL.working,
+          labelKey: "working",
           tone: "orange",
-          pinned: { label: AGENT_STATUS_LABEL.working, spinner: true },
+          pinned: { label: AGENT_STATUS_LABEL.working, labelKey: "working", spinner: true },
         },
       };
     case "error":
@@ -79,6 +80,7 @@ export function agentTileStyle(
         buddy: true,
         status: {
           label: AGENT_STATUS_LABEL.error,
+          labelKey: "error",
           tone: "red",
           pinned: {
             icon: "warning",
@@ -94,7 +96,7 @@ export function agentTileStyle(
         label,
         stripes: "hover",
         buddy: { mood: "asleep" },
-        status: { label: AGENT_STATUS_LABEL.offline, tone: "neutral" },
+        status: { label: AGENT_STATUS_LABEL.offline, labelKey: "offline", tone: "neutral" },
       };
     case "waiting_human":
       return {
@@ -108,6 +110,7 @@ export function agentTileStyle(
         buddy: true,
         status: {
           label: AGENT_STATUS_LABEL.waiting_human,
+          labelKey: "waiting_human",
           tone: "cyan",
           pinned:
             attentionCount > 0

@@ -1,3 +1,5 @@
+import { coworkerLanguageFor } from '@/app/api/_services/coworker-language.service'
+import { languageName } from '@rerun/i18n'
 import { rewindPayloadSchema, type RewindPayload } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database, Json } from '@/app/api/database.types'
@@ -60,9 +62,10 @@ export async function buildWorkspaceRewind(supabase: Client, workspaceId: number
     // A quiet week gets no story: opening one by itself to say "nothing happened" is noise.
     if (reported.every(agent => agent.report.runs.total === 0)) return { status: 'skipped', reason: 'no runs' }
 
+    const language = await coworkerLanguageFor(supabase, workspaceId)
     const [previous, highlights, catalog] = await Promise.all([
         loadPreviousTotals(supabase, workspaceId, week),
-        writeHighlights(reported),
+        writeHighlights(reported, language ? languageName(language) : undefined),
         loadServiceCatalog(supabase, connectorSlugsOf(reported)),
     ])
     const payload = mergeRewind({ week, agents, catalog, previous, highlights })

@@ -3,6 +3,7 @@ import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useEffect, useState, type ReactNode } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import Animated, { cancelAnimation, Easing, FadeIn, FadeOut, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { Badge, TONES } from '@/components/ui/Badge'
 import { AppText } from '@/components/ui/AppText'
@@ -19,15 +20,12 @@ const INDENT = 24
 const TASK_ROW_HEIGHT = 32
 const STEP_ROW_HEIGHT = 24
 
-const STEP_VERBS: Record<string, string> = {
-    web_search: 'Searching',
-    web_fetch: 'Reading',
-    browser_navigate: 'Browsing',
-    shell_exec: 'Running',
-    fs_read: 'Reading',
-    fs_write: 'Writing',
-    fs_edit: 'Editing',
-}
+// The tools a task's live line names with a verb ("Searching ..."), each one a key of `subRun.verbs`.
+const STEP_VERBS = ['web_search', 'web_fetch', 'browser_navigate', 'shell_exec', 'fs_read', 'fs_write', 'fs_edit'] as const
+
+type StepVerbTool = (typeof STEP_VERBS)[number]
+
+const hasVerb = (tool: string): tool is StepVerbTool => (STEP_VERBS as readonly string[]).includes(tool)
 
 const STEP_SYMBOLS: Record<string, SFSymbol> = {
     web_search: 'magnifyingglass',
@@ -89,6 +87,7 @@ function TaskStatus({ task }: { task: SubRunTask }) {
 }
 
 function TaskBranch({ task, last, onStop }: { task: SubRunTask; last: boolean; onStop?: (taskId: string) => void }) {
+    const t = useTranslations('mobileSteps.subRun')
     const theme = useTheme()
     const [open, setOpen] = useState(false)
     const [stopRequested, setStopRequested] = useState(false)
@@ -117,12 +116,12 @@ function TaskBranch({ task, last, onStop }: { task: SubRunTask; last: boolean; o
                 </AppText>
                 {isSubRunFailing(task) && (
                     <View>
-                        <Badge label={`${task.failures} failures`} tone="red" size="xs" />
+                        <Badge label={t('failures', { count: task.failures ?? 0 })} tone="red" size="xs" />
                     </View>
                 )}
                 {isSubRunStalled(task) && (
                     <View>
-                        <Badge label={`Idle ${idleMinutes} min`} tone="orange" size="xs" />
+                        <Badge label={t('idle', { minutes: idleMinutes })} tone="orange" size="xs" />
                     </View>
                 )}
                 {seconds !== undefined && (
@@ -139,7 +138,7 @@ function TaskBranch({ task, last, onStop }: { task: SubRunTask; last: boolean; o
                             onStop(task.id!)
                         }}
                         accessibilityRole="button"
-                        accessibilityLabel="Stop this task"
+                        accessibilityLabel={t('stop')}
                         hitSlop={8}
                         style={({ pressed }) => ({ width: 28, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm, opacity: stopRequested ? 0.4 : 1, backgroundColor: pressed ? theme.muted : 'transparent' })}
                     >
@@ -188,17 +187,19 @@ function OutcomeLine({ symbol, size = 13, color, label }: { symbol: SFSymbol; si
 }
 
 function Outcome({ task }: { task: SubRunTask }) {
+    const t = useTranslations('mobileSteps.subRun')
     const theme = useTheme()
     if (task.status === 'done') {
         const result = subRunOutcome(task.preview)
         return result ? <OutcomeLine symbol="checkmark" color={TONES.green[theme.scheme]} label={result} /> : null
     }
-    if (task.status === 'error') return <OutcomeLine symbol="xmark" color={TONES.red[theme.scheme]} label={task.error || 'Failed'} />
-    if (task.status === 'stopped') return <OutcomeLine symbol="stop.fill" size={10} color={theme.mutedForeground} label="Stopped, partial work kept" />
+    if (task.status === 'error') return <OutcomeLine symbol="xmark" color={TONES.red[theme.scheme]} label={task.error || t('failed')} />
+    if (task.status === 'stopped') return <OutcomeLine symbol="stop.fill" size={10} color={theme.mutedForeground} label={t('stopped')} />
     return null
 }
 
 function LiveSteps({ task, tone }: { task: SubRunTask; tone: Tone }) {
+    const t = useTranslations('mobileSteps.subRun')
     const theme = useTheme()
     const calls: SubRunCall[] = task.calls?.length ? task.calls : task.activity ? [{ tool: task.activity, summary: '', elapsedMs: task.idleMs ?? 0 }] : []
     // The engine only keeps the last calls of a task, its count still has them all.
@@ -211,7 +212,7 @@ function LiveSteps({ task, tone }: { task: SubRunTask; tone: Tone }) {
         <View>
             {hidden > 0 && (
                 <AppText variant="caption" tone="muted" style={{ height: STEP_ROW_HEIGHT, lineHeight: STEP_ROW_HEIGHT, paddingLeft: INDENT, opacity: 0.7 }}>
-                    +{hidden} earlier
+                    {t('earlier', { count: hidden })}
                 </AppText>
             )}
             {visible.map((call, i) => (
@@ -249,10 +250,12 @@ function Pulsing({ active, children }: { active: boolean; children: ReactNode })
 }
 
 function StepLine({ call, tone, last }: { call: SubRunCall; tone: Tone; last: boolean }) {
+    const t = useTranslations('mobileSteps.subRun')
+    const tTools = useTranslations('tools')
     const theme = useTheme()
     const tool = stripBridgePrefix(call.tool)
     const current = call.elapsedMs !== undefined
-    const label = `${STEP_VERBS[tool] ?? toolLabelOf(tool)} ${call.summary}`.trim()
+    const label = (hasVerb(tool) ? t(`verbs.${tool}`, { summary: call.summary }) : `${toolLabelOf(tool, undefined, tTools)} ${call.summary}`).trim()
     const color = call.failed ? TONES.red[theme.scheme] : current ? theme.foreground : theme.mutedForeground
     return (
         <Branch tone={call.failed ? 'red' : tone} last={last} elbowHeight={STEP_ROW_HEIGHT / 2}>
@@ -267,7 +270,7 @@ function StepLine({ call, tone, last }: { call: SubRunCall; tone: Tone; last: bo
                 </Pulsing>
                 {call.failed && (
                     <AppText variant="caption" style={{ color }}>
-                        Failed
+                        {t('failed')}
                     </AppText>
                 )}
             </View>

@@ -13,6 +13,7 @@ import {
     saveSidePanelWidth,
 } from '@/lib/side-panel-width'
 import { GripVerticalIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 
 const KEYBOARD_RESIZE_STEP = 32
 
@@ -29,6 +30,7 @@ type DocumentStyles = {
 }
 
 export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDivElement | null> }) {
+    const t = useTranslations('layout.sidePanel')
     const handleRef = useRef<HTMLDivElement>(null)
     const dragRef = useRef<DragState | null>(null)
     const documentStylesRef = useRef<DocumentStyles | null>(null)
@@ -160,7 +162,7 @@ export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDi
         <div
             ref={handleRef}
             role="separator"
-            aria-label="Resize panel"
+            aria-label={t('resize')}
             aria-orientation="vertical"
             aria-valuemin={SIDE_PANEL_MIN_WIDTH}
             data-dragging="false"

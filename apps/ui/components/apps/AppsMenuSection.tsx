@@ -1,6 +1,7 @@
 'use client'
 
 import type { ComponentType } from 'react'
+import { useTranslations } from 'next-intl'
 import { LinkedInIcon, WhatsAppIcon } from '@rerun/ui/experts'
 import { DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { appInfo } from '@/lib/apps/catalog'
@@ -10,10 +11,11 @@ const MENU_GLYPHS: Record<AppSlug, ComponentType<{ className?: string }>> = { li
 
 // The workspace menu's own place for the paid apps it runs, each shown once it holds an account.
 export function AppsMenuSection({ apps, onOpen }: { apps: AppSlug[]; onOpen: (slug: AppSlug) => void }) {
+    const t = useTranslations('apps.menu')
     return (
         <>
             <DropdownMenuSeparator />
-            <DropdownMenuLabel className="pl-7.5 text-xs font-normal text-muted-foreground">Apps</DropdownMenuLabel>
+            <DropdownMenuLabel className="pl-7.5 text-xs font-normal text-muted-foreground">{t('label')}</DropdownMenuLabel>
             {apps.map(slug => {
                 const Glyph = MENU_GLYPHS[slug]
                 return (

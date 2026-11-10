@@ -60,6 +60,7 @@ export async function pauseForRateLimit(supabase: Client, connection: { id: stri
     await notifyWorkspace(supabase, connection.workspace_id, {
         appName: app.name,
         message: `${app.providerLabel} asked ${connection.label ?? 'one of your accounts'} to slow down. Your coworkers will not use it for 24 hours, so the account stays safe.`,
+        copy: { key: 'rateLimited', values: { provider: app.providerLabel, account: connection.label ?? 'none' } },
         email: true,
     })
 }
@@ -70,6 +71,7 @@ export async function markNeedsReconnect(supabase: Client, connection: { id: str
     await notifyWorkspace(supabase, connection.workspace_id, {
         appName: app.name,
         message: `${app.providerLabel} signed ${connection.label ?? 'one of your accounts'} out. Reconnect it from Settings → Apps so your coworkers can use it again.`,
+        copy: { key: 'signedOut', values: { provider: app.providerLabel, account: connection.label ?? 'none' } },
         email: true,
     })
 }

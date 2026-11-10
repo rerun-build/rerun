@@ -1,6 +1,7 @@
 import * as Haptics from 'expo-haptics'
 import { useState } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { HitlAction, HitlCard, HitlIcon } from '@/components/chat/hitl/HitlCard'
 import { AnswerInput, CustomOptionRow, OptionRow } from '@/components/chat/hitl/QuestionWidget'
@@ -20,6 +21,7 @@ export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 
     const [picked, setPicked] = useState<string[]>([])
     const [typed, setTyped] = useState('')
     const [open, setOpen] = useState(false)
+    const t = useTranslations('mobileOnboarding')
     const answers = [...picked, typed.trim()].filter(Boolean)
 
     const send = (values: string[]) => onAnswer({ answered: true, question, answers: values })
@@ -30,7 +32,7 @@ export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 
     }
 
     return (
-        <HitlCard symbol="questionmark.bubble" onClose={() => onAnswer({ answered: false, reason: 'dismissed' })} closeLabel="Skip this question">
+        <HitlCard symbol="questionmark.bubble" onClose={() => onAnswer({ answered: false, reason: 'dismissed' })} closeLabel={t('question.skip')}>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingRight: spacing.xl }}>
                 <HitlIcon symbol="questionmark.bubble" />
                 <View style={{ flex: 1, minHeight: 32, justifyContent: 'center' }}>
@@ -39,12 +41,12 @@ export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 
             </View>
             {multiple && (
                 <AppText variant="footnote" tone="muted">
-                    Select all that apply
+                    {t('question.selectAll')}
                 </AppText>
             )}
             {options.length === 0 ? (
                 <View style={{ flexDirection: 'row' }}>
-                    <AnswerInput value={typed} onChangeText={setTyped} onSubmit={() => answers.length && send(answers)} placeholder="Type your answer…" last autoFocus />
+                    <AnswerInput value={typed} onChangeText={setTyped} onSubmit={() => answers.length && send(answers)} placeholder={t('question.typeAnswer')} last autoFocus />
                 </View>
             ) : (
                 <View style={{ gap: spacing.sm }}>
@@ -52,13 +54,13 @@ export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 
                         <OptionRow key={option} index={position} label={option} selected={picked.includes(option)} multiple={multiple} onPress={() => pick(option)} />
                     ))}
                     <CustomOptionRow open={open} onOpen={() => setOpen(true)}>
-                        <AnswerInput value={typed} onChangeText={setTyped} onSubmit={() => answers.length && send(answers)} placeholder="Something else" last autoFocus />
+                        <AnswerInput value={typed} onChangeText={setTyped} onSubmit={() => answers.length && send(answers)} placeholder={t('question.somethingElse')} last autoFocus />
                     </CustomOptionRow>
                 </View>
             )}
             {(multiple || open || options.length === 0) && (
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                    <HitlAction label="Send" primary disabled={!answers.length} onPress={() => send(answers)} />
+                    <HitlAction label={t('question.send')} primary disabled={!answers.length} onPress={() => send(answers)} />
                 </View>
             )}
         </HitlCard>
@@ -68,6 +70,7 @@ export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 
 // ask_either: a title, the line that says why, one button per answer and a way to turn both down.
 export function EitherCard({ input, onAnswer }: CardProps) {
     const { title, description, options } = readEither(input)
+    const t = useTranslations('mobileOnboarding')
     return (
         <HitlCard symbol="arrow.left.arrow.right">
             <View style={{ gap: spacing.xs, paddingRight: spacing.xl }}>
@@ -82,7 +85,7 @@ export function EitherCard({ input, onAnswer }: CardProps) {
                 {options.map(option => (
                     <Button key={option} label={option} variant="outline" onPress={() => onAnswer({ answered: true, question: title, answers: [option] })} />
                 ))}
-                <Button label="Neither" variant="ghost" size="sm" onPress={() => onAnswer({ answered: false, reason: 'neither' })} />
+                <Button label={t('question.neither')} variant="ghost" size="sm" onPress={() => onAnswer({ answered: false, reason: 'neither' })} />
             </View>
         </HitlCard>
     )

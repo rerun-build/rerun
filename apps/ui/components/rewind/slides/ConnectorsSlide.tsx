@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 
 import { Icon } from '@/components/ui/icon'
 import { Progress } from '@/components/ui/progress'
@@ -13,6 +14,7 @@ import type { RewindSlideProps } from './types'
 const MAX_ROWS = 5
 
 export function ConnectorsSlide({ payload }: RewindSlideProps) {
+    const t = useTranslations('rewind.connectors')
     const rows = payload.connectors.slice(0, MAX_ROWS)
     const peak = rows[0]?.calls ?? 1
     const top = rows[0]
@@ -20,7 +22,7 @@ export function ConnectorsSlide({ payload }: RewindSlideProps) {
     return (
         <RewindSlideFrame
             tone="lime"
-            eyebrow="Top apps"
+            eyebrow={t('eyebrow')}
             visual={
                 <div className="flex flex-col gap-3 rewind-wide:gap-5">
                     {rows.map((connector, i) => (
@@ -36,9 +38,7 @@ export function ConnectorsSlide({ payload }: RewindSlideProps) {
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-baseline justify-between gap-2">
                                     <span className="truncate font-medium">{connector.name}</span>
-                                    <span className="text-sm text-white/70">
-                                        <RewindCount value={connector.calls} delay={0.8 + i * 0.15} /> calls
-                                    </span>
+                                    <span className="text-sm text-white/70">{t.rich('calls', { count: connector.calls, value: () => <RewindCount value={connector.calls} delay={0.8 + i * 0.15} /> })}</span>
                                 </div>
                                 <ConnectorShare share={Math.max(6, (connector.calls / peak) * 100)} delay={0.8 + i * 0.15} />
                             </div>
@@ -47,20 +47,13 @@ export function ConnectorsSlide({ payload }: RewindSlideProps) {
                 </div>
             }
         >
-            <RewindHeadline>
-                {top ? (
-                    <>
-                        {top.name} was
-                        <br />
-                        on heavy rotation.
-                    </>
-                ) : null}
-            </RewindHeadline>
+            <RewindHeadline>{top ? t.rich('headline', { name: top.name, br: () => <br /> }) : null}</RewindHeadline>
         </RewindSlideFrame>
     )
 }
 
 function ConnectorShare({ share, delay }: { share: number; delay: number }) {
+    const t = useTranslations('rewind.connectors')
     const shown = useSettledValue(share, delay)
-    return <Progress value={shown} size="md" label="Share of calls" className="mt-1.5 [&_.progress-fill]:duration-900" />
+    return <Progress value={shown} size="md" label={t('shareOfCalls')} className="mt-1.5 [&_.progress-fill]:duration-900" />
 }

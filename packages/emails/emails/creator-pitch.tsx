@@ -2,6 +2,8 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface CreatorPitchProps {
@@ -11,6 +13,7 @@ export interface CreatorPitchProps {
   creatorUrl: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 // No hero: this one is a proposition, not a report, and the band would dress it up.
@@ -20,43 +23,33 @@ export default function CreatorPitch({
   creatorUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: CreatorPitchProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview="Sell the coworkers you build on Rerun"
+      preview={t("creatorPitch.preview")}
       hero={{ scene: "creator-pitch" }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
       <Heading style={text.heading}>
-        {firstName ? `${firstName}, sell what you built` : "Sell what you built"}
+        {firstName ? t("creatorPitch.headingNamed", { firstName }) : t("creatorPitch.heading")}
       </Heading>
       <Text style={text.paragraph}>
-        {agentName ? (
-          <>
-            You built <strong>{agentName}</strong> in Rerun. If it solves a
-            problem other people have too, you can package it as a template they
-            install in one click.
-          </>
-        ) : (
-          <>
-            You built working coworkers in Rerun. If one of them solves a problem
-            other people have too, you can package it as a template they install
-            in one click.
-          </>
-        )}
+        {agentName
+          ? t.rich("creatorPitch.bodyWithAgent", { agentName, strong })
+          : t("creatorPitch.bodyWithoutAgent")}
       </Text>
-      <Text style={text.paragraph}>
-        As a Rerun Creator you set the price, we handle the checkout and the
-        payouts, and buyers land on a setup that already runs.
-      </Text>
+      <Text style={text.paragraph}>{t("creatorPitch.creator")}</Text>
       <Section style={cta}>
-        <Button href={creatorUrl}>Become a Creator</Button>
+        <Button href={creatorUrl}>{t("creatorPitch.button")}</Button>
       </Section>
       <Text style={text.footnote}>
         {agentName
-          ? `Start with ${agentName}, or build something for the marketplace from scratch.`
-          : "Start from a coworker you already have, or build something for the marketplace from scratch."}
+          ? t("creatorPitch.footnoteWithAgent", { agentName })
+          : t("creatorPitch.footnoteWithoutAgent")}
       </Text>
     </Layout>
   );

@@ -1,0 +1,122 @@
+{
+    "actions": {
+        "notNow": "Pas maintenant",
+        "skip": "Passer",
+        "connect": "Connecter",
+        "connecting": "Connexion…",
+        "continue": "Continuer",
+        "loading": "Chargement…",
+        "openOnWeb": "Ouvrir sur le web",
+        "back": "Retour",
+        "confirm": "Confirmer",
+        "send": "Envoyer",
+        "next": "Suivant",
+        "save": "Enregistrer",
+        "saving": "Enregistrement…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {Question en attente} one {Question en attente} other {# questions en attente}}",
+        "approval": "{count, plural, =0 {Validation requise} one {Validation requise} other {# validations requises}}",
+        "secret": "{count, plural, =0 {Identifiant requis} one {Identifiant requis} other {# identifiants requis}}",
+        "mcpNamed": "Se connecter à {name}",
+        "mcp": "Connexion requise",
+        "service": "{count, plural, =0 {App à connecter} one {App à connecter} other {# apps à connecter}}",
+        "takeover": "À vous de prendre l'écran",
+        "jumpTo": "{label}, y aller"
+    },
+    "alert": {
+        "label": "Notification",
+        "failed": "Impossible de la marquer comme lue. Réessayez.",
+        "marking": "En cours…",
+        "markAsRead": "Marquer comme lue"
+    },
+    "approval": {
+        "label": "Validation requise",
+        "approved": "Validé",
+        "approve": "Valider"
+    },
+    "decline": {
+        "placeholder": "Pourquoi ? (facultatif)",
+        "reason": "Raison"
+    },
+    "fallback": {
+        "replyBelow": "Répondez ci-dessous, ou",
+        "needsYou": "{name} a besoin de vous"
+    },
+    "steps": {
+        "previous": "Étape précédente",
+        "next": "Étape suivante",
+        "goTo": "Aller à l'étape {step} sur {count}",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "Connexion requise",
+        "connected": "Connecté",
+        "signInNeeded": "Connexion requise",
+        "unreachable": "Injoignable",
+        "customServer": "Serveur MCP personnalisé",
+        "customServerAt": "Serveur MCP personnalisé · {host}",
+        "signInTo": "Se connecter à {name}",
+        "loadFailed": "Impossible de charger ce serveur. Connectez-le sur le web, ou passez."
+    },
+    "question": {
+        "dismiss": "Fermer les questions",
+        "selectAll": "Sélectionnez toutes les réponses qui conviennent",
+        "typeAnswer": "Saisissez votre réponse…",
+        "somethingElse": "Autre chose",
+        "yourAnswer": "Votre réponse"
+    },
+    "secret": {
+        "labelOne": "Identifiant requis",
+        "labelMany": "Identifiants requis",
+        "dismiss": "Fermer la demande d'identifiants",
+        "storedAs": "Enregistré sous {key}",
+        "alreadySaved": "Déjà enregistré. Saisissez une valeur pour le remplacer",
+        "paste": "Collez la valeur",
+        "whereToFind": "Où le trouver",
+        "storedNote": "Enregistré sur votre Box comme variable du coworker. Jamais envoyé au modèle.",
+        "saveFailed": "Impossible d'enregistrer les identifiants"
+    },
+    "service": {
+        "label": "App à connecter",
+        "loadFailed": "Impossible de charger les apps. Connectez-les sur le web, ou passez.",
+        "loading": "Chargement des apps…",
+        "webOnly": "Cette app choisit son compte sur le web. Connectez-la là-bas, ou passez.",
+        "connectFailed": "Impossible de connecter l'app",
+        "connected": "{name} connecté",
+        "notFound": "Introuvable dans le catalogue, ignoré.",
+        "skipped": "Ignoré."
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "Vous avez passé les questions",
+            "service": "Vous avez fermé la configuration des apps",
+            "secret": "Vous avez refusé de partager les clés",
+            "mcp": "Vous avez passé la connexion",
+            "takeover": "Vous avez laissé le navigateur à votre coworker"
+        },
+        "answer": "Réponse",
+        "answers": "Réponses",
+        "answeredCount": "{answered} sur {total} répondues",
+        "skipped": "Passée",
+        "approval": "Validation",
+        "approvals": "Validations",
+        "approvalCount": "{approved} validées, {declined} pas maintenant",
+        "approved": "Validé",
+        "notNow": "Pas maintenant",
+        "quotedNote": "« {note} »",
+        "connected": "Connecté",
+        "notReconnected": "Non reconnecté",
+        "notFound": "Introuvable",
+        "apps": "Apps",
+        "appsConnected": "{connected} sur {total} connectées",
+        "instead": "{name} (à la place de {replaced})",
+        "keys": "Clés",
+        "keysStored": "{stored} sur {total} enregistrées",
+        "stored": "Enregistrée",
+        "storedOnBox": "Enregistrées sur la Box. Le coworker ne voit que les noms.",
+        "mcpServer": "Serveur MCP",
+        "handedBackOn": "Vous avez rendu le navigateur sur {url}",
+        "handedBack": "Vous avez rendu le navigateur"
+    }
+}

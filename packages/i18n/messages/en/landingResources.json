@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "Banner textures",
+        "description": "Free banner textures for your Rerun expert profile: download a ready-made background and add it to your public expert page in a minute."
+    },
+    "banners": {
+        "eyebrow": "For experts",
+        "title": "Banner textures",
+        "description": "A set of fluid-glass textures we use for Rerun expert profiles. Free to download and use however you like.",
+        "download": "Download",
+        "downloadFile": "Download {file}",
+        "alts": {
+            "lime-glass-crumple": "Bright lime-green glass, crumpled folded sheets",
+            "pastel-holographic-knot": "Holographic pastel knotted glass ribbons",
+            "blue-glass-crystal": "Electric-blue faceted crystalline glass",
+            "violet-lime-swirl": "Purple and lime-green swirling glass vortex",
+            "crimson-fluid-blob": "Glossy crimson and magenta fluid blob",
+            "amber-droplet-blob": "Amber-orange glass droplets, glossy bulges",
+            "amber-chrome-swirl": "Orange and black chrome swirls",
+            "dark-lime-crumple": "Black glass crumple veined with acid-green",
+            "pastel-iridescent-bloom": "Holographic pastel iridescent glass bloom",
+            "violet-lime-vortex": "Purple and lime-green glass vortex tunnels",
+            "lavender-glass-vortex": "Lavender glass swirling vortex",
+            "violet-lime-crystal": "Purple and green crystalline glass chunks",
+            "pink-swirl-vortex": "Hot-pink and red glass swirl vortex",
+            "violet-lime-knot": "Purple and lime-green knotted torus loops",
+            "lavender-glass-crystal": "Lavender crystalline faceted glass",
+            "blue-chrome-knot": "Blue chrome knotted torus loops",
+            "blue-plasma-smoke": "Electric-blue plasma smoke over glass",
+            "violet-iridescent-vortex": "Purple iridescent swirling vortex",
+            "dark-lime-knot": "Black glass knots glowing acid-green",
+            "pastel-holographic-vortex": "Pastel holographic swirl vortex",
+            "blue-liquid-ripple": "Iridescent blue rippled liquid glass",
+            "blue-glass-bloom": "Cobalt-blue glass ruffled petals bloom",
+            "blue-chrome-vortex": "Blue chrome swirling glass vortex",
+            "pastel-holographic-smoke": "Pastel holographic wispy smoke glass",
+            "crimson-swirl-vortex": "Deep-red and magenta swirl vortex",
+            "amethyst-crystal-facets": "Amethyst-purple crystalline facets",
+            "violet-iridescent-crumple": "Purple iridescent crumpled crystal chunks",
+            "violet-glossy-bloom": "Glossy purple glass petal bloom",
+            "violet-lime-fluid-blob": "Purple and acid-green glossy fluid blobs",
+            "dark-green-swirl-vortex": "Dark-green and black glossy swirl vortex"
+        }
+    }
+}

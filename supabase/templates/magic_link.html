@@ -1,9 +1,23 @@
 <!doctype html>
+<!-- The language is the account's `user_metadata.locale`, written by the app (Account > Language, and
+     at signup). A language added to packages/i18n gets its branch here. -->
 <html>
   <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111; padding: 24px">
+    {{ if eq .Data.locale "fr" }}
+    <p>Votre code Rerun :</p>
+    <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
+    <p>Il est valable 15 minutes. Vous pouvez aussi ouvrir ce lien sur le même appareil : <a href="{{ .ConfirmationURL }}">se connecter à Rerun</a>.</p>
+    <p style="color: #666; font-size: 13px">Si vous ne l'avez pas demandé, ignorez cet email.</p>
+    {{ else if eq .Data.locale "es" }}
+    <p>Tu código de Rerun:</p>
+    <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
+    <p>Es válido durante 15 minutos. También puedes abrir este enlace en el mismo dispositivo: <a href="{{ .ConfirmationURL }}">iniciar sesión en Rerun</a>.</p>
+    <p style="color: #666; font-size: 13px">Si no lo pediste, ignora este correo.</p>
+    {{ else }}
     <p>Your Rerun code:</p>
     <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
     <p>It works for 15 minutes. Or open this link on the same device: <a href="{{ .ConfirmationURL }}">sign in to Rerun</a>.</p>
     <p style="color: #666; font-size: 13px">If you did not ask for it, ignore this email.</p>
+    {{ end }}
   </body>
 </html>

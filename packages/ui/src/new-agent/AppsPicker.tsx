@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { SERVICE_CATEGORIES, SERVICE_CATEGORY_LABELS, type ServiceCategory } from '@rerun/contracts'
+import { SERVICE_CATEGORIES, type ServiceCategory } from '@rerun/contracts'
 
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '../forms/command'
 import { Chip } from '../primitives/chip'
@@ -14,10 +14,12 @@ import { MAX_APPS_AT_CREATION } from './reading'
 import type { ConnectorCatalog } from './types'
 
 import { AppLogo } from './marks'
+import { useKitTranslations } from '../locale'
 
 // The whole catalogue, searched by name and narrowed by category. What is ticked here is what the
 // agent starts with: the apps read in the description come ticked, and unticking one keeps it off.
 export function AppsPicker({ catalog, selected, onToggle }: { catalog: ConnectorCatalog | null; selected: string[]; onToggle: (slug: string) => void }) {
+    const t = useKitTranslations()
     const [category, setCategory] = useState<ServiceCategory | null>(null)
     const [listEl, setListEl] = useState<HTMLDivElement | null>(null)
     const mask = useScrollFade(listEl)
@@ -31,23 +33,23 @@ export function AppsPicker({ catalog, selected, onToggle }: { catalog: Connector
     const full = selected.length >= MAX_APPS_AT_CREATION
     return (
         <Command className="p-0">
-            <CommandInput placeholder="Search apps" />
+            <CommandInput placeholder={t('newAgent.appsPicker.search')} />
             {categories.length > 1 && (
                 <div className="px-2 pt-2 pb-1">
                     <HScrollFade className="gap-1">
                         <Chip selected={category === null} onClick={() => setCategory(null)}>
-                            All
+                            {t('newAgent.appsPicker.all')}
                         </Chip>
                         {categories.map(slug => (
                             <Chip key={slug} selected={category === slug} onClick={() => setCategory(slug)}>
-                                {SERVICE_CATEGORY_LABELS[slug]}
+                                {t(`newAgent.appsPicker.categories.${slug}`)}
                             </Chip>
                         ))}
                     </HScrollFade>
                 </div>
             )}
             <CommandList ref={setListEl} className="max-h-64 p-1" style={{ maskImage: mask, WebkitMaskImage: mask }}>
-                <CommandEmpty>No app by that name.</CommandEmpty>
+                <CommandEmpty>{t('newAgent.appsPicker.empty')}</CommandEmpty>
                 {(category ? apps.filter(app => app.category === category) : apps).map(app => {
                     const ticked = selected.includes(app.slug)
                     return (
@@ -59,7 +61,7 @@ export function AppsPicker({ catalog, selected, onToggle }: { catalog: Connector
                     )
                 })}
             </CommandList>
-            {full && <p className="border-t px-3 py-2 text-xs text-muted-foreground">Up to {MAX_APPS_AT_CREATION} apps to start with. Your agent can connect more later.</p>}
+            {full && <p className="border-t px-3 py-2 text-xs text-muted-foreground">{t('newAgent.appsPicker.limit', { max: MAX_APPS_AT_CREATION })}</p>}
         </Command>
     )
 }

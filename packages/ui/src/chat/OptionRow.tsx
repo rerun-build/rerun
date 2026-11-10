@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { cn } from '../cn'
 import { Pencil } from '../icons'
 import { OptionMark } from './OptionMark'
+import { useKitTranslations } from '../locale'
 
 // La ligne qu'on clique pour répondre, et la ligne « autre chose » qui ouvre un champ à la place.
 // Extraite de QuestionForm parce que la carte d'accueil du Foreman pose les mêmes questions hors
@@ -69,13 +70,14 @@ export type CustomOptionRowProps = {
     className?: string
 }
 
-export function CustomOptionRow({ open, onOpen, children, label = 'Something else', className }: CustomOptionRowProps) {
+export function CustomOptionRow({ open, onOpen, children, label, className }: CustomOptionRowProps) {
+    const t = useKitTranslations()
     return (
         <div role="button" tabIndex={0} onClick={onOpen} onKeyDown={event => activate(event, onOpen)} data-selected={open} data-hitl="custom" className={cn(ROW, className)}>
             <span className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground">
                 <Pencil className="size-3.5" />
             </span>
-            {open ? children : <span className="flex min-h-7 flex-1 items-center text-left text-muted-foreground">{label}</span>}
+            {open ? children : <span className="flex min-h-7 flex-1 items-center text-left text-muted-foreground">{label ?? t('chat.question.somethingElse')}</span>}
         </div>
     )
 }

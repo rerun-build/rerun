@@ -74,11 +74,3 @@ export async function lookUpServer(origin: string, request: Request = createApiC
     if (!reachableOverHttp(config.data.server.supabaseUrl)) return { ok: false, problem: 'insecure' }
     return { ok: true, server: { apiUrl: origin, ...config.data.server } }
 }
-
-export const SERVER_PROBLEMS: Record<ServerProblem, string> = {
-    invalid: 'Enter the address of your Rerun server.',
-    insecure: 'Use https:// outside your local network.',
-    unreachable: 'Could not reach this server.',
-    'not-rerun': 'This address is not a Rerun server.',
-    outdated: 'Update this Rerun server to use it from the app.',
-}

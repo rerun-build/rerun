@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { listWorkspaceTablesAction } from '@/app/api/_actions/workspace-db.actions'
 import { deleteBrainPageAction, listBrainProposalsAction, loadBrainAction, readBrainPageAction, revertBrainPageAction, type BrainOverview } from '@/app/api/_actions/brain.actions'
 import { BrainFileView, BrainFolderView } from '@/components/brain/BrainFiles'
@@ -14,7 +15,7 @@ import { BrainSidebar } from '@/components/brain/BrainSidebar'
 import { BrainChromeContext, BrainTopBar } from '@/components/brain/BrainTopBar'
 import { selectionDepth, selectionKey, type BrainSelection } from '@/components/brain/selection'
 import { useSharedFilesTree } from '@/components/brain/useSharedFilesTree'
-import { SHARED_TABLES_EMPTY, SharedDataPanel } from '@/components/data/SharedDataPanel'
+import { SharedDataPanel, useSharedTablesEmpty } from '@/components/data/SharedDataPanel'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PanelSteps } from '@/components/ui/panel-steps'
@@ -32,6 +33,7 @@ import { cn } from '@/lib/utils'
 import { useBrainStore } from '@/stores/brain.store'
 import type { BrainPageSummary, BrainProposal } from '@rerun/contracts'
 import { useIsMobile } from '@rerun/ui/primitives/use-is-mobile'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -73,6 +75,9 @@ const toSummary = ({ slug, title, type, hash, updatedAt, updatedBy }: BrainPageD
 // The Brain as one workspace: a sidebar holding everything the company shares with its agents, and
 // whatever is selected in it, open in the main panel.
 export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, onClose }: { request: BrainRequest | null; publishedEnabled: boolean; onRequestConsumed: () => void; onClose: () => void }) {
+    const t = useTranslations('brain')
+    const errorText = useErrorText()
+    const sharedTablesEmpty = useSharedTablesEmpty()
     const setOpenProposals = useBrainStore(s => s.setOpenProposals)
     const isMobile = useIsMobile()
     const [overview, setOverview] = useState<Overview | null>(null)
@@ -110,10 +115,10 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
             return list
         } catch (err) {
             setTables([])
-            setTablesError(err instanceof Error && err.message ? err.message : 'Could not reach the machine of this workspace.')
+            setTablesError(err instanceof Error && err.message ? err.message : t('workspace.unreachableFallback'))
             return []
         }
-    }, [])
+    }, [t])
 
     const reloadProposals = useCallback(async () => {
         const list = await listBrainProposalsAction().catch(() => [])
@@ -258,7 +263,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         async (slug: string) => {
             const result = await deleteBrainPageAction(slug)
             if (!result.ok) {
-                toast.error(result.error ?? 'Could not delete the page')
+                toast.error(errorText(result, t('workspace.deleteFailed')))
                 return
             }
             const next = await reloadOverview()
@@ -269,21 +274,21 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                 setPageState(null)
             }
         },
-        [reloadOverview, select],
+        [reloadOverview, select, t, errorText],
     )
 
     const restore = useCallback(
         async (slug: string, revisionId: string) => {
             const result = await revertBrainPageAction(slug, revisionId)
             if (!result.ok) {
-                toast.error(result.error)
+                toast.error(errorText(result))
                 return
             }
             setPageState(current => ({ slug, detail: result.detail, missing: false, version: (current?.version ?? 0) + 1 }))
             setSelection({ kind: 'page', slug })
             void reloadOverview()
         },
-        [reloadOverview],
+        [reloadOverview, errorText],
     )
 
     const tableDropped = useCallback(
@@ -329,18 +334,18 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         if (offline) {
             return (
                 <>
-                    <BrainTopBar crumbs={[{ label: 'Brain', icon: BrainIcon }]} />
+                    <BrainTopBar crumbs={[{ label: t('crumbs.brain'), icon: BrainIcon }]} />
                     {offline === 'no_machine' ? (
                         <EmptyState
                             icon={BrainIcon}
-                            title="Your Brain comes with your first coworker"
-                            description="It lives on your workspace's machine, which is set up when Rerun builds your first coworker. From then on, what every coworker knows about your company, and the files and tables they share, show up here."
+                            title={t('workspace.noMachineTitle')}
+                            description={t('workspace.noMachineDescription')}
                         />
                     ) : (
                         <EmptyState
                             icon={BrainIcon}
-                            title="Could not reach your workspace"
-                            description="The machine of this workspace did not answer. It may still be waking up."
+                            title={t('workspace.unreachableTitle')}
+                            description={t('workspace.unreachableDescription')}
                             action={
                                 <Button
                                     size="sm"
@@ -353,7 +358,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                                         })
                                     }}
                                 >
-                                    <RefreshCwIcon className="size-3.5" /> Retry
+                                    <RefreshCwIcon className="size-3.5" /> {t('workspace.retry')}
                                 </Button>
                             }
                         />
@@ -366,14 +371,12 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
             if (noPagesYet) {
                 return (
                     <>
-                        <BrainTopBar crumbs={[{ label: 'Company' }]} />
+                        <BrainTopBar crumbs={[{ label: t('crumbs.company') }]} />
                         <EmptyState
                             icon={BrainIcon}
-                            title={seeding ? 'Rerun is reading your website' : 'Your company brain is empty'}
+                            title={seeding ? t('workspace.seedingTitle') : t('workspace.emptyTitle')}
                             description={
-                                seeding
-                                    ? 'The identity card of your company shows up here in a few minutes: what you sell, to whom, your team, your voice and your tools.'
-                                    : 'It is what every coworker reads about your company before it works: what you sell, to whom, your team, your voice and your tools. Rerun can fill it from your website.'
+                                seeding ? t('workspace.seedingDescription') : t('workspace.emptyDescription')
                             }
                             action={
                                 seeding ? (
@@ -386,13 +389,13 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                                             })
                                         }
                                     >
-                                        <RefreshCwIcon className="size-3.5" /> Refresh
+                                        <RefreshCwIcon className="size-3.5" /> {t('workspace.refresh')}
                                     </Button>
                                 ) : (
                                     <div className="flex flex-col items-center gap-3">
                                         <BrainSeedForm onStarted={() => setSeeding(true)} />
                                         <Button size="sm" variant="ghost" onClick={() => select({ kind: 'new-page' })}>
-                                            Write a page yourself
+                                            {t('workspace.writeYourself')}
                                         </Button>
                                     </div>
                                 )
@@ -401,7 +404,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                     </>
                 )
             }
-            return <BrainTopBar crumbs={[{ label: 'Brain', icon: BrainIcon }]} />
+            return <BrainTopBar crumbs={[{ label: t('crumbs.brain'), icon: BrainIcon }]} />
         }
 
         switch (selection.kind) {
@@ -410,8 +413,8 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                 if (!pageState.detail) {
                     return (
                         <>
-                            <BrainTopBar crumbs={[{ label: 'Pages' }, { label: selection.slug }]} />
-                            <EmptyState icon={BrainIcon} title={`No page "${selection.slug}" yet`} description="A link points here, but nothing has been written on this page." />
+                            <BrainTopBar crumbs={[{ label: t('crumbs.pages') }, { label: selection.slug }]} />
+                            <EmptyState icon={BrainIcon} title={t('workspace.missingPageTitle', { slug: selection.slug })} description={t('workspace.missingPageDescription')} />
                         </>
                     )
                 }
@@ -462,25 +465,25 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                 if (!tables || tables.length > 0) return <PageSkeleton />
                 return (
                     <>
-                        <BrainTopBar crumbs={[{ label: 'Database', icon: DatabaseIcon }]} />
+                        <BrainTopBar crumbs={[{ label: t('crumbs.database'), icon: DatabaseIcon }]} />
                         {tablesError ? (
-                            <EmptyState icon={DatabaseIcon} title="Database unavailable" description={tablesError} />
+                            <EmptyState icon={DatabaseIcon} title={t('workspace.databaseUnavailable')} description={tablesError} />
                         ) : (
-                            <EmptyState icon={DatabaseIcon} title={SHARED_TABLES_EMPTY.title} description={SHARED_TABLES_EMPTY.description} />
+                            <EmptyState icon={DatabaseIcon} title={sharedTablesEmpty.title} description={sharedTablesEmpty.description} />
                         )}
                     </>
                 )
             case 'table': {
                 const name = selection.name
                 const crumbs = [
-                    { label: 'Database', icon: DatabaseIcon },
+                    { label: t('crumbs.database'), icon: DatabaseIcon },
                     { label: humanizeTableName(name), icon: TableIcon },
                 ]
                 if (tables && !tables.some(table => table.name === name)) {
                     return (
                         <>
                             <BrainTopBar crumbs={crumbs} />
-                            <EmptyState icon={TableIcon} title={`No table "${name}"`} description="It may have been deleted, or the coworker that mentioned it has not created it yet." />
+                            <EmptyState icon={TableIcon} title={t('workspace.missingTableTitle', { name })} description={t('workspace.missingTableDescription')} />
                         </>
                     )
                 }

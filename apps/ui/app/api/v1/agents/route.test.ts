@@ -48,7 +48,7 @@ describe('POST /api/v1/agents', () => {
 
     it('refuses a Box of another workspace and a nameless coworker', async () => {
         const { AuthorizationError } = await import('@/app/api/_auth/ownership')
-        assertSpaceOwnedBy.mockRejectedValue(new AuthorizationError('Space not found'))
+        assertSpaceOwnedBy.mockRejectedValue(new AuthorizationError('spaceNotFound'))
         expect((await create({ name: 'Scout', spaceId: SPACE })).status).toBe(404)
         expect((await create({ name: '  ', spaceId: SPACE })).status).toBe(400)
         expect(createAgentWithSetup).not.toHaveBeenCalled()

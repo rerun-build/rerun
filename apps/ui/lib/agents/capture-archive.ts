@@ -1,14 +1,15 @@
 import type { AgentArchivePlan } from '@rerun/contracts'
 import { fetchAgentArchive, planAgentArchive } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
+import { AppError } from '@/lib/i18n/action-error'
 
 // The runtime half of archiving an agent, with no idea what will receive the bytes. A template
 // capture and a share link both go through here; only what they write afterwards differs.
 
 // An engine that predates the archive routes answers 404 to a perfectly valid request, and
 // "not found" reads as "the agent is gone" rather than "this box is behind".
-export const STALE_EXPORT_HINT = 'This workspace runs on a machine whose engine is too old to export coworkers. Ask the Rerun team to update it, then try again.'
-export const STALE_IMPORT_HINT = 'This workspace runs on a machine whose engine is too old to import coworkers. Ask the Rerun team to update it, then try again.'
+export const staleExportError = () => new AppError('staleEngineExport')
+export const staleImportError = () => new AppError('staleEngineImport')
 
 export function isMissingRoute(err: unknown): boolean {
     return err instanceof Error && /failed: 404/.test(err.message)
@@ -23,7 +24,7 @@ export async function captureAgentArchive(conn: EngineConnection, engineAgentId:
     try {
         plan = await planAgentArchive(conn, engineAgentId, exclude)
     } catch (err) {
-        throw isMissingRoute(err) ? new Error(STALE_EXPORT_HINT) : err
+        throw isMissingRoute(err) ? staleExportError() : err
     }
 
     const response = await fetchAgentArchive(conn, engineAgentId, exclude)

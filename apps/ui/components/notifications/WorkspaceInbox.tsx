@@ -1,6 +1,7 @@
 'use client'
 
 import { InboxSurface as SharedInboxSurface, type InboxAnnouncement, type InboxEntry, type InboxSurfaceProps, type RowMenuProps } from '@rerun/ui/inbox'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
@@ -33,6 +34,8 @@ type View = null | 'hub' | { notification: AnnouncedNotification }
 
 /** Every agent's « To handle » list in one place, parked in the board's bottom-left corner. */
 export function WorkspaceInbox() {
+    const t = useTranslations('notifications.inbox')
+    const tReasons = useTranslations('notifications.inbox.reasons')
     const { isAnonymous } = useSession()
     const onEngine = useForemanStore(state => state.surface === 'engine')
     const agents = useBoardStore(s => s.agents)
@@ -112,13 +115,13 @@ export function WorkspaceInbox() {
         (notification: AnnouncedNotification): InboxEntry => ({
             id: notification.id,
             agentId: notification.agentId ?? '',
-            agentName: agents.find(a => a.id === notification.agentId)?.name ?? 'Coworker',
+            agentName: agents.find(a => a.id === notification.agentId)?.name ?? t('unknownCoworker'),
             status: notification.status,
             title: rowOf(notification)?.title ?? '',
             message: notification.headline,
             updatedAt: notification.createdAt,
         }),
-        [agents, rowOf]
+        [agents, rowOf, t]
     )
 
     const announcement = useMemo<InboxAnnouncement | null>(
@@ -154,7 +157,7 @@ export function WorkspaceInbox() {
         useNotificationsStore.getState().openNotifications()
     }, [])
     const [rowMenuOpen, setRowMenuOpen] = useState(false)
-    const rowReason = useCallback((item: InboxItem) => (item.reason && item.reason !== 'legacy' ? reasonSentence(item.reason, item.agentName) : null), [])
+    const rowReason = useCallback((item: InboxItem) => (item.reason && item.reason !== 'legacy' ? reasonSentence(item.reason, item.agentName, tReasons) : null), [tReasons])
 
     if (!shown) return null
 
@@ -215,6 +218,7 @@ export function WorkspaceInbox() {
 
 /** The shared surface, with « Mark all as read » asking first: the app's confirm dialog cannot live in `@rerun/ui`. */
 export function InboxSurface({ items, onMarkAllRead, keepOpen = false, ...props }: InboxSurfaceProps<InboxItem>) {
+    const t = useTranslations('notifications.inbox.markAll')
     const [confirmOpen, setConfirmOpen] = useState(false)
 
     return (
@@ -223,9 +227,9 @@ export function InboxSurface({ items, onMarkAllRead, keepOpen = false, ...props 
             <ConfirmDialog
                 open={confirmOpen}
                 onOpenChange={setConfirmOpen}
-                title="Mark everything as read?"
-                description={`${items.length} item${items.length !== 1 ? 's' : ''} will leave this list. Requests still waiting on an answer are cleared too, without being answered.`}
-                confirmLabel="Mark all as read"
+                title={t('title')}
+                description={t('description', { count: items.length })}
+                confirmLabel={t('confirm')}
                 confirmVariant="default"
                 onConfirm={onMarkAllRead}
             />

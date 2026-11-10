@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { XIcon } from '@/lib/icons'
 import { Badge } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 
 import { FileTextEditor } from './FileTextEditor'
@@ -25,6 +26,7 @@ type FileEditorDialogProps = {
 // navigated away, which unmounting it would do silently.
 export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, onClose }: FileEditorDialogProps) {
     const { draft, dirty, saving, error, conflict, setDraft, save, overwrite, dismissConflict } = useFileDraft({ initialContent, onSave, onSaved })
+    const t = useTranslations('files.editor')
     const [confirmingDiscard, setConfirmingDiscard] = useState(false)
 
     const requestClose = useCallback(() => {
@@ -48,10 +50,10 @@ export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, on
                     <DialogTitle className="min-w-0 flex-1 truncate text-left font-mono text-xs font-normal text-muted-foreground">{fileName}</DialogTitle>
                     {dirty && (
                         <Badge size="xs" tone="orange" glow={false}>
-                            Unsaved
+                            {t('unsaved')}
                         </Badge>
                     )}
-                    <Button size="icon-sm" variant="ghost" onClick={requestClose} disabled={saving} title="Close editor" aria-label="Close editor">
+                    <Button size="icon-sm" variant="ghost" onClick={requestClose} disabled={saving} title={t('close')} aria-label={t('close')}>
                         <XIcon className="size-4" />
                     </Button>
                 </div>
@@ -61,11 +63,11 @@ export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, on
                 {error && <p className="shrink-0 border-t border-border px-4 pt-2 text-xs text-destructive">{error}</p>}
                 <div className="flex shrink-0 items-center justify-end gap-2 border-t border-border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                     <Button size="sm" variant="outline" onClick={requestClose} disabled={saving}>
-                        Cancel
+                        {t('cancel')}
                     </Button>
-                    <TooltipDisabledReason reason={dirty ? undefined : 'No changes to save'}>
+                    <TooltipDisabledReason reason={dirty ? undefined : t('noChanges')}>
                         <Button size="sm" loading={saving} disabled={!dirty} onClick={save}>
-                            Save changes
+                            {t('save')}
                         </Button>
                     </TooltipDisabledReason>
                 </div>
@@ -74,10 +76,10 @@ export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, on
                 <ConfirmDialog
                     open
                     onOpenChange={open => !open && dismissConflict()}
-                    title={`${fileName} changed on the Box`}
-                    description="Someone, or a coworker, wrote to this file after you opened it. Saving now replaces their version with yours."
-                    confirmLabel="Overwrite"
-                    cancelLabel="Keep theirs"
+                    title={t('conflictTitle', { name: fileName })}
+                    description={t('conflictDescription')}
+                    confirmLabel={t('overwrite')}
+                    cancelLabel={t('keepTheirs')}
                     onConfirm={overwrite}
                 />
             )}
@@ -85,10 +87,10 @@ export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, on
                 <ConfirmDialog
                     open
                     onOpenChange={open => !open && setConfirmingDiscard(false)}
-                    title="Discard your changes?"
-                    description={`Your edits to ${fileName} are not saved yet. Closing the editor throws them away.`}
-                    confirmLabel="Discard changes"
-                    cancelLabel="Keep editing"
+                    title={t('discardTitle')}
+                    description={t('discardDescription', { name: fileName })}
+                    confirmLabel={t('discard')}
+                    cancelLabel={t('keepEditing')}
                     onConfirm={() => {
                         setConfirmingDiscard(false)
                         onClose()

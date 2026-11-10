@@ -5,6 +5,7 @@ import { redirectPendingSignInPopup } from '@/components/services/sign-in-popup'
 import { useOAuthPopupResult } from '@/hooks/useOAuthPopupResult'
 import { usePopupClosePoll } from '@/hooks/usePopupClosePoll'
 import { CheckCircle2Icon, ExternalLinkIcon, Loader2Icon, XCircleIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const RESULT_TYPES = ['mcp-oauth-success', 'mcp-oauth-error'] as const
@@ -27,6 +28,7 @@ type DiscoveryResult = {
 }
 
 export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, autoStart, pendingPopup }: McpOAuthAuthorizeProps) {
+    const t = useTranslations('agent.mcpOAuthAuthorize')
     const [state, setState] = useState<OAuthState>('idle')
     const [error, setError] = useState<string | null>(null)
     const [discovery, setDiscovery] = useState<DiscoveryResult | null>(null)
@@ -43,15 +45,15 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
                 body: JSON.stringify({ url }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Discovery failed')
+            if (!res.ok) throw new Error(data.error || t('discoveryFailed'))
             setDiscovery(data)
             setState('ready')
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : 'Discovery failed')
+            setError(err instanceof Error ? err.message : t('discoveryFailed'))
             setState('error')
         }
-    }, [url, pendingPopup])
+    }, [url, pendingPopup, t])
 
     useEffect(() => {
         if (url.trim()) discover()
@@ -62,7 +64,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
             setState('authorized')
             onAuthorized()
         } else {
-            setError(data.error || 'Authorization failed')
+            setError(data.error || t('authorizationFailed'))
             setState('error')
         }
         popupRef.current?.close()
@@ -86,7 +88,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
                 }),
             })
             const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Failed to start OAuth')
+            if (!res.ok) throw new Error(data.error || t('startFailed'))
 
             const w = 500
             const h = 600
@@ -102,7 +104,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
             watchPopup(popupRef.current)
         } catch (err) {
             pendingPopup?.close()
-            setError(err instanceof Error ? err.message : 'Failed to start OAuth')
+            setError(err instanceof Error ? err.message : t('startFailed'))
             setState('error')
         }
     }
@@ -119,7 +121,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
         return (
             <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
                 <Loader2Icon className="size-3.5 animate-spin" />
-                <span>Discovering OAuth provider...</span>
+                <span>{t('discovering')}</span>
             </div>
         )
     }
@@ -128,7 +130,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
         return (
             <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 py-1">
                 <CheckCircle2Icon className="size-3.5" />
-                <span>Connected</span>
+                <span>{t('connected')}</span>
             </div>
         )
     }
@@ -141,7 +143,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
                     <span className="truncate">{error}</span>
                 </div>
                 <Button variant="outline" size="sm" onClick={discover}>
-                    Retry
+                    {t('retry')}
                 </Button>
             </div>
         )
@@ -161,7 +163,7 @@ export function McpOAuthAuthorize({ url, agentId, serverName, onAuthorized, auto
                 ) : (
                     <ExternalLinkIcon className="size-3.5 mr-1.5" />
                 )}
-                {state === 'authorizing' ? 'Waiting for authorization…' : 'Connect'}
+                {state === 'authorizing' ? t('waiting') : t('connect')}
             </Button>
         )
     }

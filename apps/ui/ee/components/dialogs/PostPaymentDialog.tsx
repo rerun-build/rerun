@@ -7,6 +7,7 @@ import { useStartPending } from '@/lib/onboarding/useStartPending'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { Loader2Icon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 // Template titles are editorial and unbounded, so they are clamped before reaching a button.
@@ -18,6 +19,7 @@ function short(title: string): string {
 // template opened through a shared link. Once the subscription is live (webhook applied the plan,
 // surfaced via realtime), starting claims a Space from the pool and lands the parked work inside it.
 export function PostPaymentDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('billing.postPayment')
     const { workspace } = useSession()
     const startPending = useStartPending()
     const pendingTemplate = useOnboardingStore(s => s.pendingTemplate)
@@ -43,23 +45,25 @@ export function PostPaymentDialog({ open, onOpenChange }: { open: boolean; onOpe
     const needsPlacement = !!pendingTemplate?.needsPlacement
     const readyDescription = pendingTemplate
         ? needsPlacement
-            ? `Your plan is active. Place "${short(pendingTemplate.title)}" on your board.`
-            : `Your plan is active. Ready to set up "${short(pendingTemplate.title)}"?`
-        : 'Your plan is active. Ready to bring your first coworker to life?'
-    const subject = pendingTemplate && pendingTemplate.agentCount > 1 ? `your ${pendingTemplate.agentCount} coworkers` : 'your coworker'
-    const verb = needsPlacement ? { idle: 'Place', busy: 'Placing' } : { idle: 'Start', busy: 'Starting' }
+            ? t('ready.place', { title: short(pendingTemplate.title) })
+            : t('ready.setUp', { title: short(pendingTemplate.title) })
+        : t('ready.first')
+    const count = pendingTemplate?.agentCount ?? 1
+    const many = count > 1
+    const idleLabel = needsPlacement ? (many ? t('button.placeMany', { count }) : t('button.placeOne')) : many ? t('button.startMany', { count }) : t('button.startOne')
+    const busyLabel = needsPlacement ? (many ? t('button.placingMany', { count }) : t('button.placingOne')) : many ? t('button.startingMany', { count }) : t('button.startingOne')
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>You&apos;re all set</DialogTitle>
-                    <DialogDescription>{subscriptionReady ? readyDescription : 'Finalizing your subscription, this only takes a moment.'}</DialogDescription>
+                    <DialogTitle>{t('title')}</DialogTitle>
+                    <DialogDescription>{subscriptionReady ? readyDescription : t('finalizing')}</DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                     <Button onClick={handleStart} disabled={!subscriptionReady || starting}>
                         {(starting || !subscriptionReady) && <Loader2Icon className="size-4 animate-spin" />}
-                        {starting ? `${verb.busy} ${subject}` : subscriptionReady ? `${verb.idle} ${subject}` : 'Finalizing subscription'}
+                        {starting ? busyLabel : subscriptionReady ? idleLabel : t('button.finalizing')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

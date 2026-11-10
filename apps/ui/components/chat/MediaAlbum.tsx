@@ -3,6 +3,7 @@
 import { ChatVideoTile, MEDIA_CELL_ASPECT, type MediaTileShape } from '@/components/chat/ChatVideoTile'
 import { filePreviewKind } from '@/lib/files/preview'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export type MediaAlbumItem = { path: string; name: string; src: string }
 
@@ -14,6 +15,7 @@ export function isMediaAlbum(names: readonly string[]): boolean {
 }
 
 function MediaTile({ item, shape, onOpen }: { item: MediaAlbumItem; shape: MediaTileShape; onOpen: () => void }) {
+    const t = useTranslations('chat.attachments')
     if (filePreviewKind(item.name) === 'video') return <ChatVideoTile src={item.src} name={item.name} shape={shape} onOpen={onOpen} />
     const natural = shape === 'natural'
     return (
@@ -21,7 +23,7 @@ function MediaTile({ item, shape, onOpen }: { item: MediaAlbumItem; shape: Media
             type="button"
             onClick={onOpen}
             title={item.name}
-            aria-label={`Open ${item.name}`}
+            aria-label={t('open', { name: item.name })}
             className={cn('overflow-hidden rounded-2xl bg-muted transition-opacity hover:opacity-90', natural ? 'max-h-72 max-w-full' : cn('w-full', MEDIA_CELL_ASPECT[shape]))}
         >
             {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary proxied file bytes, no fixed dimensions or configured loader */}
@@ -43,6 +45,7 @@ type MediaAlbumProps = {
  * proportions, several share a two-column album whose last cell counts what did not fit.
  */
 export function MediaAlbum({ items, captions, align = 'start', onOpen }: MediaAlbumProps) {
+    const t = useTranslations('chat.attachments')
     if (items.length === 1) {
         const [only] = items
         return (
@@ -67,7 +70,7 @@ export function MediaAlbum({ items, captions, align = 'start', onOpen }: MediaAl
                             <button
                                 type="button"
                                 onClick={() => onOpen(index)}
-                                aria-label={`Open ${hidden} more`}
+                                aria-label={t('openMore', { count: hidden })}
                                 className={cn('absolute inset-x-0 top-0 grid place-items-center rounded-2xl bg-black/55 text-2xl font-medium text-white', MEDIA_CELL_ASPECT.cell)}
                             >
                                 +{hidden}

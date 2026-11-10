@@ -1,5 +1,7 @@
 'use client'
 
+import { useLocale, useTranslations } from 'next-intl'
+
 import { absoluteDate, capitalize, domainOf, externalHref, isEmpty, parseJson, plainValue, relativeDate, truthy, type ColumnKind, type FriendlyColumn } from '@/lib/data/friendly-columns'
 import {
     AlignLeftIcon,
@@ -142,12 +144,14 @@ type FriendlyCellProps = {
 
 /** One value, written the way a person would write it: no NULL, no ISO date, no raw JSON. */
 export function FriendlyCell({ value, column, currency, tones, maxTags = 2, wrap = false, className }: FriendlyCellProps) {
+    const locale = useLocale()
+    const t = useTranslations('data.cell')
     if (column.kind === 'boolean') {
         const checked = truthy(value)
         return (
             <span
                 role="img"
-                aria-label={checked ? 'Yes' : 'No'}
+                aria-label={checked ? t('yes') : t('no')}
                 className={cn('inline-flex size-4 items-center justify-center rounded border', checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border', className)}
             >
                 {checked && <CheckIcon className="size-3" />}
@@ -175,8 +179,8 @@ export function FriendlyCell({ value, column, currency, tones, maxTags = 2, wrap
         }
         case 'date':
             return (
-                <span title={absoluteDate(text)} className={cn('whitespace-nowrap text-muted-foreground', className)}>
-                    {relativeDate(text)}
+                <span title={absoluteDate(text, locale)} className={cn('whitespace-nowrap text-muted-foreground', className)}>
+                    {relativeDate(text, locale)}
                 </span>
             )
         case 'url': {
@@ -214,17 +218,17 @@ export function FriendlyCell({ value, column, currency, tones, maxTags = 2, wrap
             return column.key.toLowerCase().includes('score') && !Number.isNaN(Number(value)) ? (
                 <ScoreBar value={Number(value)} />
             ) : (
-                <span className={cn('tabular-nums', className)}>{plainValue(value, 'number')}</span>
+                <span className={cn('tabular-nums', className)}>{plainValue(value, 'number', undefined, locale)}</span>
             )
         case 'currency':
         case 'cents':
         case 'percent':
             if (Number.isNaN(Number(value))) return <span className={cn(textCell, className)}>{text}</span>
-            return <span className={cn('tabular-nums', className)}>{plainValue(value, column.kind, currency)}</span>
+            return <span className={cn('tabular-nums', className)}>{plainValue(value, column.kind, currency, locale)}</span>
         case 'json':
             return (
                 <Badge size="xs" tone="neutral" glow={false}>
-                    {plainValue(value, 'json')}
+                    {plainValue(value, 'json', undefined, locale)}
                 </Badge>
             )
         case 'longtext':

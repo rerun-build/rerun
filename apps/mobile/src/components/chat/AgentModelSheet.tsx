@@ -5,6 +5,7 @@ import { SymbolView } from 'expo-symbols'
 import { Fragment, useCallback, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { fetchAgentModels, setAgentModel } from '@/api/models'
 import { AI_PROVIDERS_ADMIN_ONLY, manageLock } from '@/auth/access'
@@ -26,6 +27,7 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const { session, me } = useAuth()
+    const t = useTranslations('mobileProviders.modelSheet')
     const [models, setModels] = useState<AgentModels | null>(null)
     const [failed, setFailed] = useState(false)
     // A coworker the caller only uses keeps the model its managers picked; the rows stay greyed until
@@ -66,16 +68,16 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <GlassButton symbol="xmark" label="Close" onPress={() => router.back()} />
+                    <GlassButton symbol="xmark" label={t('close')} onPress={() => router.back()} />
                     <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
-                        Select model
+                        {t('title')}
                     </AppText>
                     <View style={{ width: GLASS_BUTTON_SIZE }} />
                 </View>
 
                 {failed && (
                     <AppText variant="callout" tone="muted" style={{ textAlign: 'center' }}>
-                        The machine of this workspace is not answering. Try again in a moment.
+                        {t('notAnswering')}
                     </AppText>
                 )}
 
@@ -83,7 +85,7 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
 
                 {models && boxDefault && (
                     <Card>
-                        <ModelRow id="model-default" label="Workspace default" description={defaultGroup?.models.find(model => model.id === boxDefault.model)?.label ?? boxDefault.model} selected={!pinned} disabled={lock.locked} leading={<SymbolView name="square.stack.3d.up" size={16} tintColor={theme.mutedForeground} />} onPress={() => pick({ connectionId: null, model: null })} />
+                        <ModelRow id="model-default" label={t('workspaceDefault')} description={defaultGroup?.models.find(model => model.id === boxDefault.model)?.label ?? boxDefault.model} selected={!pinned} disabled={lock.locked} leading={<SymbolView name="square.stack.3d.up" size={16} tintColor={theme.mutedForeground} />} onPress={() => pick({ connectionId: null, model: null })} />
                     </Card>
                 )}
 
@@ -104,7 +106,7 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
                 {models && (
                     <View style={{ gap: spacing.sm }}>
                         <Card>
-                            <ModelRow id="model-add-provider" label="Add a provider" selected={false} disabled={!workspaceAdmin} leading={<SymbolView name="plus" size={15} weight="semibold" tintColor={theme.foreground} />} onPress={addProvider} />
+                            <ModelRow id="model-add-provider" label={t('addProvider')} selected={false} disabled={!workspaceAdmin} leading={<SymbolView name="plus" size={15} weight="semibold" tintColor={theme.foreground} />} onPress={addProvider} />
                         </Card>
                         {!workspaceAdmin && <ReadOnlyNote reason={AI_PROVIDERS_ADMIN_ONLY} />}
                     </View>

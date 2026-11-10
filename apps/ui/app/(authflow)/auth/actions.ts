@@ -4,7 +4,8 @@ import { claimEmailCodeAsk, ensureEmailAccount, lookupEmailForSignUp } from '@/a
 import { resendSignInCodeIfLive } from '@/app/api/_services/sign-in-code.service'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import { callerIp } from '@/lib/auth/caller-ip'
-import { EMAIL_PREPARATION_MESSAGES, type EmailPreparationFailure } from '@/lib/auth/email-sign-in-messages'
+import { EMAIL_PREPARATION_CODES, type EmailPreparationFailure } from '@/lib/auth/email-sign-in-messages'
+import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { verifyCaptcha } from '@/lib/auth/captcha'
 import { captchaProofSchema, type CaptchaProof } from '@/lib/auth/captcha-proof'
@@ -13,6 +14,7 @@ import { normalizeEmail } from '@/lib/email'
 import { createClient } from '@/supabase/server'
 import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
 import { CONSENT_COOKIE } from '@rerun/contracts'
+import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
 import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 
@@ -28,9 +30,9 @@ export async function resendLiveSignInCode(email: string): Promise<{ resent: boo
 
 const prepareSchema = z.object({ email: z.string().trim().email().max(320), captcha: captchaProofSchema.optional() })
 
-export type EmailSignInPreparation = { ok: true; created: boolean } | { ok: false; error: string; reason: EmailPreparationFailure }
+export type EmailSignInPreparation = { ok: true; created: boolean } | (ActionFailure & { reason: EmailPreparationFailure })
 
-const preparationRefused = (reason: EmailPreparationFailure) => ({ ok: false as const, error: EMAIL_PREPARATION_MESSAGES[reason], reason })
+const preparationRefused = (reason: EmailPreparationFailure) => ({ ...failure(EMAIL_PREPARATION_CODES[reason]), reason })
 
 // What every ask for a code goes through before Supabase hears of it: the robot check, then the pace
 // of the network behind the caller. `null` when the caller may go on.
@@ -53,7 +55,7 @@ export async function prepareEmailSignIn(input: z.input<typeof prepareSchema>): 
     return result.ok ? result : preparationRefused(result.error)
 }
 
-export type AnonymousEmailPreparation = { ok: true; exists: boolean } | { ok: false; error: string; reason: EmailPreparationFailure }
+export type AnonymousEmailPreparation = { ok: true; exists: boolean } | (ActionFailure & { reason: EmailPreparationFailure })
 
 // The address an anonymous visitor claims goes through the same gate as the auth page's, and the
 // domain rule with it. Whether the address has an account is what the visitor's browser needs next:
@@ -88,6 +90,7 @@ export async function completeSignupAction(): Promise<SignupCompletion> {
             consentCookie: cookieStore.get(CONSENT_COOKIE)?.value,
             userAgent: (await headers()).get('user-agent'),
         }),
+        locale: resolveLocale({ cookie: cookieStore.get(LOCALE_COOKIE)?.value, acceptLanguage: (await headers()).get('accept-language') }),
     })
     return provisioned ? { ok: true, signedUp: provisioned.signedUp } : { ok: false }
 }

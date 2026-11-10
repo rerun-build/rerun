@@ -1,8 +1,11 @@
+'use client'
+
 import * as React from 'react'
 
 import { cn } from '../cn'
 import { EyeIcon, EyeOffIcon } from '../icons'
 import { Field } from './field'
+import { useKitTranslations } from '../locale'
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string
@@ -13,6 +16,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, children, label, helperText, hideRequired, optional, ...props }, ref) => {
+    const t = useKitTranslations()
     const [showPassword, setShowPassword] = React.useState(false)
     const isPassword = type === 'password'
     const resolvedType = isPassword && showPassword ? 'text' : type
@@ -39,7 +43,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
                     type="button"
                     tabIndex={-1}
                     onClick={() => setShowPassword(show => !show)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? t('forms.hidePassword') : t('forms.showPassword')}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
                 >
                     {showPassword ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}

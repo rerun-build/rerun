@@ -1,16 +1,20 @@
 import * as React from "react";
 import { Link, Section, Text } from "@react-email/components";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
 export interface FooterProps {
   unsubscribeUrl?: string;
   unsubscribeLabel?: string;
+  locale?: EmailLocale;
 }
 
 export function Footer({
   unsubscribeUrl,
-  unsubscribeLabel = "Unsubscribe",
+  unsubscribeLabel,
+  locale,
 }: FooterProps) {
+  const t = emailTranslator(locale);
   return (
     <Section style={footer}>
       <table role="presentation" width="100%" cellPadding={0} cellSpacing={0} border={0} style={ruleTable}>
@@ -22,16 +26,14 @@ export function Footer({
           </tr>
         </tbody>
       </table>
-      <Text style={tagline}>
-        Run your work on coworkers. Build them, watch them work, and keep your eyes on everything.
-      </Text>
+      <Text style={tagline}>{t("common.footer.tagline")}</Text>
       <Text style={legal}>
-        © 2026 Rerun
+        {t("common.footer.copyright")}
         {unsubscribeUrl ? (
           <>
             <span style={dot}>·</span>
             <Link href={unsubscribeUrl} style={link}>
-              {unsubscribeLabel}
+              {unsubscribeLabel ?? t("common.footer.unsubscribe")}
             </Link>
           </>
         ) : null}

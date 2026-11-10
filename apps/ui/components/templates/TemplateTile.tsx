@@ -4,6 +4,7 @@ import { BorderBeam } from '@rerun/ui'
 import { hashUnit, TemplateCardBoard, useBoardOnHover } from '@rerun/ui/iso-grid'
 import { Badge } from '@rerun/ui/primitives'
 import { AnimatePresence } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'
 import { TemplateConnectorLogos } from '@/components/templates/TemplateConnectorLogos'
 import { TemplateCreatorAvatar } from '@/components/templates/TemplateCreatorAvatar'
@@ -19,6 +20,8 @@ import { cn } from '@/lib/utils'
 // Without `onSelect` the tile is a plain block: the foreman and the email capture show a template
 // they do not let anyone pick.
 export function TemplateTile({ template, selected = false, showStatus = false, onSelect, className }: { template: LibraryTemplate; selected?: boolean; showStatus?: boolean; onSelect?: () => void; className?: string }) {
+    const t = useTranslations('templates.creator')
+    const tStatus = useTranslations('templates.status')
     const { live, handlers } = useBoardOnHover(template.agents.length > 0)
     const { headline, subline } = templateHeadline(template)
 
@@ -39,7 +42,7 @@ export function TemplateTile({ template, selected = false, showStatus = false, o
                 {showStatus && template.status !== 'published' && (
                     <span className="absolute top-2 left-2 flex rounded-full bg-background/70 backdrop-blur">
                         <Badge size="xs" tone={templateStatusTone(template.status)} glow={false} className="font-medium">
-                            {templateStatusLabel(template.status)}
+                            {templateStatusLabel(template.status, tStatus)}
                         </Badge>
                     </span>
                 )}
@@ -56,7 +59,7 @@ export function TemplateTile({ template, selected = false, showStatus = false, o
             <span className="mt-2.5 flex items-center justify-between gap-3 px-0.5">
                 <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
                     <TemplateCreatorAvatar creator={template.creator} size={16} />
-                    <span className="truncate">{template.creator?.name ?? 'Rerun team'}</span>
+                    <span className="truncate">{template.creator?.name ?? t('rerunTeam')}</span>
                 </span>
                 <TemplateConnectorLogos connectors={template.connectors} />
             </span>

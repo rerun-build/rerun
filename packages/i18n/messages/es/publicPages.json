@@ -1,0 +1,51 @@
+{
+    "linkOff": {
+        "title": "Este enlace ya no funciona",
+        "subtitle": "Quien lo compartió lo desactivó."
+    },
+    "unsubscribe": {
+        "title": "Preferencias de email",
+        "subtitle": "Elige qué emails te envía Rerun. No necesitas iniciar sesión.",
+        "subtitleRuns": "Elige si tus coworkers pueden enviarte emails. No necesitas iniciar sesión.",
+        "invalid": "Este enlace para darte de baja no es válido o caducó.",
+        "logIn": "Inicia sesión para gestionar tus preferencias"
+    },
+    "publishedView": {
+        "protectedTitle": "Página protegida",
+        "protectedDescription": "Compartida por {workspace}. Inicia sesión o confirma tu email para abrirla.",
+        "publishedBy": "Publicada por {agent} en {workspace}",
+        "publishedByUnknown": "Publicada por un coworker en {workspace}"
+    },
+    "publishedAuth": {
+        "metaTitle": "Abrir una página",
+        "noAccess": "No tienes acceso",
+        "signedInAs": "Sesión iniciada como {email}. Esta página es para los miembros de {workspace}.",
+        "signedInAsOther": "Sesión iniciada con otra cuenta. Esta página es para los miembros de {workspace}."
+    },
+    "gate": {
+        "open": "Abrir",
+        "errors": {
+            "limited": "Demasiados intentos. Espera unos minutos.",
+            "password": "Contraseña incorrecta",
+            "code": "Código incorrecto o caducado",
+            "email": "Introduce un email válido"
+        },
+        "password": {
+            "subtitle": "{workspace} protegió esta página con una contraseña",
+            "placeholder": "Contraseña"
+        },
+        "code": {
+            "title": "Revisa tu bandeja de entrada",
+            "subtitle": "Si {email} puede abrir esta página, un código va en camino",
+            "otherEmail": "Usar otro email"
+        },
+        "email": {
+            "subtitle": "Confirma tu email para abrirla",
+            "submit": "Enviar código"
+        },
+        "members": {
+            "subtitle": "Para los miembros de {workspace}",
+            "continue": "Continuar con Rerun"
+        }
+    }
+}

@@ -1,5 +1,6 @@
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { HomeSkeleton } from '@/components/home/HomeSkeleton'
 import { AppText } from '@/components/ui/AppText'
@@ -12,10 +13,11 @@ import { spacing } from '@/theme/tokens'
 export function HomeBoot() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const t = useTranslations('mobileHome')
     return (
         <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm + GLASS_BUTTON_SIZE + spacing.lg }}>
             <AppText variant="largeTitle" maxFontSizeMultiplier={1} style={{ paddingHorizontal: spacing.xl, marginBottom: spacing.md }}>
-                Coworkers
+                {t('title')}
             </AppText>
             <HomeSkeleton />
         </View>

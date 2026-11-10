@@ -3,6 +3,7 @@
 import { TextShimmer } from '@rerun/ui'
 import { Badge, ScrollFade } from '@rerun/ui/primitives'
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 import { StepGlyph } from '@/components/chat/StepRow'
@@ -30,14 +31,14 @@ const BRANCH_TONE: Record<Tone, string> = {
 
 const VISIBLE_LIVE_CALLS = 3
 
-const STEP_VERBS: Record<string, string> = {
-    web_search: 'Searching',
-    web_fetch: 'Reading',
-    browser_navigate: 'Browsing',
-    shell_exec: 'Running',
-    fs_read: 'Reading',
-    fs_write: 'Writing',
-    fs_edit: 'Editing',
+const STEP_VERB_KEYS: Record<string, 'search' | 'read' | 'browse' | 'run' | 'write' | 'edit'> = {
+    web_search: 'search',
+    web_fetch: 'read',
+    browser_navigate: 'browse',
+    shell_exec: 'run',
+    fs_read: 'read',
+    fs_write: 'write',
+    fs_edit: 'edit',
 }
 
 const EASE = [0.4, 0, 0.2, 1] as const
@@ -87,6 +88,7 @@ function TaskStatus({ task }: { task: SubRunTask }) {
 }
 
 function TaskBranch({ task, last, toolDisplay, onStop }: { task: SubRunTask; last: boolean; toolDisplay: ToolDisplayOf; onStop?: (taskId: string) => void }) {
+    const t = useTranslations('chat.subRun')
     const [open, setOpen] = useState(false)
     const [stopRequested, setStopRequested] = useState(false)
     const tone = toneOf(task)
@@ -109,12 +111,12 @@ function TaskBranch({ task, last, toolDisplay, onStop }: { task: SubRunTask; las
                         <span className={cn('min-w-0 flex-1 truncate font-medium', task.status === 'queued' && 'text-muted-foreground')}>{task.title}</span>
                         {isSubRunFailing(task) && (
                             <Badge tone="red" size="xs" glow={false} className="hidden @md:inline-flex">
-                                {task.failures} failures in a row
+                                {t('failuresInARow', { count: task.failures ?? 0 })}
                             </Badge>
                         )}
                         {isSubRunStalled(task) && (
                             <Badge tone="orange" size="xs" glow={false} className="hidden @md:inline-flex">
-                                Idle {idleMinutes} min
+                                {t('idle', { minutes: idleMinutes })}
                             </Badge>
                         )}
                         {seconds !== undefined && <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{formatElapsed(seconds)}</span>}
@@ -124,7 +126,7 @@ function TaskBranch({ task, last, toolDisplay, onStop }: { task: SubRunTask; las
                         <Button
                             size="icon-sm"
                             variant="ghost"
-                            aria-label="Stop this task"
+                            aria-label={t('stopTask')}
                             disabled={stopRequested}
                             className="-my-1 size-7 shrink-0 text-muted-foreground"
                             onClick={event => {
@@ -168,6 +170,7 @@ function TaskBranch({ task, last, toolDisplay, onStop }: { task: SubRunTask; las
 }
 
 function Outcome({ task }: { task: SubRunTask }) {
+    const t = useTranslations('chat.subRun')
     if (task.status === 'done') {
         const result = subRunOutcome(task.preview)
         if (!result) return null
@@ -182,7 +185,7 @@ function Outcome({ task }: { task: SubRunTask }) {
         return (
             <p className={cn('flex h-6 items-center gap-2.5 pl-0.5 text-xs', task.status === 'error' ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground')}>
                 {task.status === 'error' ? <XIcon className="size-3.5 shrink-0" /> : <SquareIcon className="size-3 shrink-0" />}
-                <span className="truncate">{task.status === 'stopped' ? 'Stopped, partial work kept' : task.error || 'Failed'}</span>
+                <span className="truncate">{task.status === 'stopped' ? t('stopped') : task.error || t('failed')}</span>
             </p>
         )
     }
@@ -190,6 +193,7 @@ function Outcome({ task }: { task: SubRunTask }) {
 }
 
 function LiveSteps({ task, tone, toolDisplay }: { task: SubRunTask; tone: Tone; toolDisplay: ToolDisplayOf }) {
+    const t = useTranslations('chat.subRun')
     const calls: SubRunCall[] = task.calls?.length ? task.calls : task.activity ? [{ tool: task.activity, summary: '', elapsedMs: task.idleMs ?? 0 }] : []
     // The engine only keeps the last calls of a task, its count still has them all.
     const total = task.calls?.length ? Math.max(task.toolCalls ?? 0, calls.length) : calls.length
@@ -199,7 +203,7 @@ function LiveSteps({ task, tone, toolDisplay }: { task: SubRunTask; tone: Tone; 
 
     return (
         <div className="flex flex-col">
-            {hidden > 0 && <div className="flex h-6 items-center pl-6 text-[11px] text-muted-foreground/70">+{hidden} earlier</div>}
+            {hidden > 0 && <div className="flex h-6 items-center pl-6 text-[11px] text-muted-foreground/70">{t('earlier', { count: hidden })}</div>}
             <AnimatePresence initial={false}>
                 {visible.map((call, i) => (
                     <motion.div
@@ -226,16 +230,18 @@ function LiveSteps({ task, tone, toolDisplay }: { task: SubRunTask; tone: Tone; 
 }
 
 function StepLine({ call, tone, last, toolDisplay }: { call: SubRunCall; tone: Tone; last: boolean; toolDisplay: ToolDisplayOf }) {
+    const t = useTranslations('chat.subRun')
     const tool = stripBridgePrefix(call.tool)
     const display = toolDisplay(tool)
     const current = call.elapsedMs !== undefined
-    const label = `${STEP_VERBS[tool] ?? display.label} ${call.summary}`.trim()
+    const verbKey = STEP_VERB_KEYS[tool]
+    const label = (verbKey ? t(`verbs.${verbKey}`, { summary: call.summary }) : `${display.label} ${call.summary}`).trim()
     return (
         <Branch tone={call.failed ? 'red' : tone} last={last}>
             <div className={cn('flex h-6 min-w-0 items-center gap-2.5 text-xs', call.failed ? 'text-red-500 dark:text-red-400' : 'text-muted-foreground')}>
                 {call.failed ? <XIcon className="size-3.5 shrink-0" /> : <StepGlyph iconProps={display.iconProps} />}
                 <span className="min-w-0 flex-1 truncate">{current ? <TextShimmer className="block truncate text-xs">{label}</TextShimmer> : label}</span>
-                {call.failed && <span className="shrink-0">Failed</span>}
+                {call.failed && <span className="shrink-0">{t('failed')}</span>}
             </div>
         </Branch>
     )

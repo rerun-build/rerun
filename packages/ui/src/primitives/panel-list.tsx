@@ -22,16 +22,26 @@ export function PanelSection({ label, children, className }: { label: ReactNode;
     )
 }
 
-type PanelListHeaderProps = { children?: ReactNode; className?: string } & ({ count: number; noun: string } | { count?: never; noun?: never })
+// `countLabel` is the count already worded by the caller in the reader's language ("3 triggers");
+// `count` + `noun` is the older English-only form.
+type PanelListHeaderProps = { children?: ReactNode; className?: string } & (
+    | { count: number; noun: string; countLabel?: never }
+    | { countLabel: string; count?: never; noun?: never }
+    | { count?: never; noun?: never; countLabel?: never }
+)
 
-export function PanelListHeader({ count, noun, children, className }: PanelListHeaderProps) {
+export function PanelListHeader({ count, noun, countLabel, children, className }: PanelListHeaderProps) {
     return (
         <div className={cn('flex items-center justify-between gap-2 border-b border-border px-3 py-2', className)}>
-            {count !== undefined && (
-                <p className="text-xs text-muted-foreground">
-                    {count} {noun}
-                    {count !== 1 ? 's' : ''}
-                </p>
+            {countLabel !== undefined ? (
+                <p className="text-xs text-muted-foreground">{countLabel}</p>
+            ) : (
+                count !== undefined && (
+                    <p className="text-xs text-muted-foreground">
+                        {count} {noun}
+                        {count !== 1 ? 's' : ''}
+                    </p>
+                )
             )}
             {children}
         </div>

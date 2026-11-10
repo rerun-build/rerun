@@ -5,6 +5,7 @@ import { LiveWaveform } from '@/components/ui/live-waveform'
 import type { VoiceMessageStatus } from '@/hooks/useVoiceMessage'
 import type { VoiceLiveState } from '@/hooks/useVoiceRecorder'
 import { formatVoiceDuration } from '@/lib/voice/duration'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 const REFRESH_MS = 50
@@ -25,6 +26,7 @@ type VoiceRecorderBarProps = {
  * collapses to the width of its content.
  */
 export function VoiceRecorderBar({ status, stream, getLiveState }: VoiceRecorderBarProps) {
+    const t = useTranslations('chat.voice')
     const [durationMs, setDurationMs] = useState(0)
 
     useEffect(() => {
@@ -36,8 +38,8 @@ export function VoiceRecorderBar({ status, stream, getLiveState }: VoiceRecorder
     if (status === 'failed') {
         return (
             <div className="flex min-h-16 w-full items-center gap-2 px-3 py-2 text-sm">
-                <span className="text-destructive">Could not send that recording.</span>
-                <span className="text-muted-foreground">Retry, or discard it.</span>
+                <span className="text-destructive">{t('sendFailed')}</span>
+                <span className="text-muted-foreground">{t('sendFailedHint')}</span>
             </div>
         )
     }
@@ -67,7 +69,7 @@ export function VoiceRecorderBar({ status, stream, getLiveState }: VoiceRecorder
             )}
             {status === 'starting' && (
                 <Shimmer as="span" className="shrink-0 text-xs">
-                    Waiting for the microphone...
+                    {t('waitingForMicrophone')}
                 </Shimmer>
             )}
         </div>

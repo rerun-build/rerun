@@ -4,7 +4,7 @@ import { Pressable } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 import { AppText } from '@/components/ui/AppText'
-import { messageStamp } from '@/lib/time'
+import { useMessageTimes } from '@/lib/time'
 import { MOTION } from '@/theme/motion'
 import { spacing } from '@/theme/tokens'
 
@@ -14,6 +14,7 @@ const ignoreLongPress = () => {}
 
 /** Messenger's tap on a bubble: when it was sent comes up just under it, a second tap puts it away. */
 export function MessageTimeReveal({ stamp, side, children }: { stamp?: MessageStamp; side: 'left' | 'right'; children: ReactNode }) {
+    const times = useMessageTimes()
     if (!stamp) return children
     return (
         <Pressable
@@ -31,7 +32,7 @@ export function MessageTimeReveal({ stamp, side, children }: { stamp?: MessageSt
             {stamp.shown && (
                 <Animated.View entering={FadeIn.duration(MOTION.fast)} exiting={FadeOut.duration(MOTION.fast)}>
                     <AppText variant="caption" tone="muted" style={{ marginTop: spacing.xs, textAlign: side === 'right' ? 'right' : 'left' }}>
-                        {messageStamp(stamp.createdAt)}
+                        {times.stamp(stamp.createdAt)}
                     </AppText>
                 </Animated.View>
             )}

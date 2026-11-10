@@ -1,6 +1,8 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { attachAgentToConnectionAction, getAgentAppBindingAction, getAppsOverviewAction, setAgentWakeEventsAction } from '@/app/api/_actions/apps.actions'
 import type { AgentAppBinding, AppsOverview } from '@/app/api/_services/apps.service'
 import { usePaidAppEnabled } from '@/components/layout/FeatureFlagsProvider'
@@ -18,13 +20,13 @@ import { usePaidAppsStore } from '@/stores/paid-apps.store'
 
 const PICKABLE = new Set(['connected', 'paused', 'needs_reconnect'])
 
-const WAKE_ROWS: Record<AppSlug, { event: string; icon: typeof MessageSquareIcon; timing: string }[]> = {
+const WAKE_ROWS: Record<AppSlug, { event: string; icon: typeof MessageSquareIcon; timing: 'rightAway' | 'everyFewHours' }[]> = {
     linkedin: [
-        { event: 'message_received', icon: MessageSquareIcon, timing: 'Right away' },
-        { event: 'accepted_invitation', icon: UserCheck, timing: 'Checked every few hours' },
-        { event: 'invitation_received', icon: UserPlus, timing: 'Checked every few hours' },
+        { event: 'message_received', icon: MessageSquareIcon, timing: 'rightAway' },
+        { event: 'accepted_invitation', icon: UserCheck, timing: 'everyFewHours' },
+        { event: 'invitation_received', icon: UserPlus, timing: 'everyFewHours' },
     ],
-    whatsapp: [{ event: 'message_received', icon: MessageSquareIcon, timing: 'Right away' }],
+    whatsapp: [{ event: 'message_received', icon: MessageSquareIcon, timing: 'rightAway' }],
 }
 
 export type AppAccountPickerViewProps = {
@@ -43,6 +45,7 @@ export type AppAccountPickerViewProps = {
 // the coworker only picks which one it acts with, and whether its events wake it up. Picking is
 // the install, so there is nothing to confirm after it.
 export function AppAccountPickerView({ title, ...props }: AppAccountPickerViewProps) {
+    const t = useTranslations('services.appAccount')
     const accounts = props.overview?.connections.filter(connection => PICKABLE.has(connection.status)) ?? []
 
     return (
@@ -52,7 +55,7 @@ export function AppAccountPickerView({ title, ...props }: AppAccountPickerViewPr
                 {accounts.length > 0 && (
                     <Button variant="outline" size="sm" onClick={props.onConnectNew}>
                         <PlusIcon />
-                        Add account
+                        {t('addAccount')}
                     </Button>
                 )}
             </div>
@@ -72,6 +75,7 @@ function AppAccountPickerBody({
     onConnectNew,
     onWakeChange,
 }: Omit<AppAccountPickerViewProps, 'title'> & { accounts: AppsOverview['connections'] }) {
+    const t = useTranslations('services.appAccount')
     if (!overview) return <SkeletonPanelRows rows={2} className="p-0" />
 
     const { name: appName, providerLabel, wakeEventLabels } = appInfo(slug)
@@ -83,11 +87,11 @@ function AppAccountPickerBody({
             <div className="flex flex-col items-center gap-3 rounded-md border border-dashed px-4 py-6 text-center">
                 <AppIcon slug={slug} size="md" />
                 <div className="space-y-1">
-                    <p className="text-sm font-medium">Connect a {providerLabel} account</p>
-                    <p className="text-xs text-pretty text-muted-foreground">Connected once for the workspace, then any coworker can act with it.</p>
+                    <p className="text-sm font-medium">{t('connectTitle', { provider: providerLabel })}</p>
+                    <p className="text-xs text-pretty text-muted-foreground">{t('connectHint')}</p>
                 </div>
                 <Button size="sm" onClick={onConnectNew}>
-                    Connect {providerLabel}
+                    {t('connect', { provider: providerLabel })}
                 </Button>
             </div>
         )
@@ -95,11 +99,11 @@ function AppAccountPickerBody({
 
     return (
         <div className="space-y-4">
-            <Field label="Acts as">
-                <div role="radiogroup" aria-label={`${providerLabel} account`} className="space-y-1.5">
+            <Field label={t('actsAs')}>
+                <div role="radiogroup" aria-label={t('accountName', { provider: providerLabel })} className="space-y-1.5">
                     {accounts.map(account => {
                         const selected = binding?.connectionId === account.id
-                        const name = account.label ?? `${providerLabel} account`
+                        const name = account.label ?? t('accountName', { provider: providerLabel })
                         return (
                             <button
                                 key={account.id}
@@ -117,7 +121,7 @@ function AppAccountPickerBody({
                                 <AccountAvatar name={name} />
                                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                                     <span className="truncate text-sm font-medium">{name}</span>
-                                    <span className="truncate text-xs text-muted-foreground">{account.status === 'connected' ? (selected ? 'This coworker acts as this account' : `${appName} account`) : `Needs attention in ${appName}`}</span>
+                                    <span className="truncate text-xs text-muted-foreground">{account.status === 'connected' ? (selected ? t('selected') : t('appAccount', { app: appName })) : t('needsAttention', { app: appName })}</span>
                                 </span>
                                 <span className={cn('flex size-4 shrink-0 items-center justify-center rounded-full border', selected ? 'border-primary' : 'border-muted-foreground/40')}>
                                     {selected && <span className="size-2 rounded-full bg-primary" />}
@@ -129,14 +133,14 @@ function AppAccountPickerBody({
             </Field>
 
             {binding && (
-                <Field label="Wake this coworker when">
+                <Field label={t('wakeWhen')}>
                     <div className={cn(PANEL_CARD, 'divide-y')}>
                         {WAKE_ROWS[slug].map(row => (
                             <label key={row.event} className="flex cursor-pointer items-center gap-3 px-3 py-2.5">
                                 <row.icon className="size-4 shrink-0 text-muted-foreground" />
                                 <span className="flex min-w-0 flex-1 flex-col">
                                     <span className="text-sm">{wakeEventLabels[row.event]}</span>
-                                    <span className="text-[11px] text-muted-foreground">{row.timing}</span>
+                                    <span className="text-[11px] text-muted-foreground">{t(`timing.${row.timing}`)}</span>
                                 </span>
                                 <Switch checked={wake.includes(row.event)} disabled={pending !== null} onCheckedChange={on => toggleEvent(row.event, on)} aria-label={wakeEventLabels[row.event]} />
                             </label>
@@ -151,6 +155,8 @@ function AppAccountPickerBody({
 }
 
 export function AppAccountPicker({ slug, title, agentId, onAuthorized }: { slug: AppSlug; title: string; agentId: string; onAuthorized: () => void }) {
+    const t = useTranslations('services.appAccount')
+    const errorText = useErrorText()
     const enabled = usePaidAppEnabled(slug)
     const revision = usePaidAppsStore(s => s.revision)
     const openApp = usePaidAppsStore(s => s.openApp)
@@ -161,9 +167,9 @@ export function AppAccountPicker({ slug, title, agentId, onAuthorized }: { slug:
 
     const apply = useCallback((apps: Awaited<ReturnType<typeof getAppsOverviewAction>>, current: Awaited<ReturnType<typeof getAgentAppBindingAction>>) => {
         if (apps.ok) setOverview(apps.value)
-        else setError(apps.error)
+        else setError(errorText(apps))
         if (current.ok) setBinding(current.value)
-    }, [])
+    }, [errorText])
 
     const load = useCallback(async () => {
         const [apps, current] = await Promise.all([getAppsOverviewAction(slug), getAgentAppBindingAction(slug, agentId)])
@@ -185,7 +191,7 @@ export function AppAccountPicker({ slug, title, agentId, onAuthorized }: { slug:
         return (
             <div className="space-y-3">
                 <p className="text-sm font-medium">{title}</p>
-                <p className="text-xs text-muted-foreground">{appInfo(slug).name} is not available on this workspace yet.</p>
+                <p className="text-xs text-muted-foreground">{t('unavailable', { app: appInfo(slug).name })}</p>
             </div>
         )
 
@@ -194,7 +200,7 @@ export function AppAccountPicker({ slug, title, agentId, onAuthorized }: { slug:
         setError(null)
         const result = await attachAgentToConnectionAction(slug, agentId, connectionId)
         setPending(null)
-        if (!result.ok) return setError(result.error)
+        if (!result.ok) return setError(errorText(result))
         await load()
         onAuthorized()
     }
@@ -204,7 +210,7 @@ export function AppAccountPicker({ slug, title, agentId, onAuthorized }: { slug:
         setError(null)
         const result = await setAgentWakeEventsAction(slug, agentId, events)
         setPending(null)
-        if (!result.ok) return setError(result.error)
+        if (!result.ok) return setError(errorText(result))
         await load()
     }
 

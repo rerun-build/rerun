@@ -1,6 +1,7 @@
 'use client'
 
-import { OWN_ENTRY } from '@/components/foreman/intake/copy'
+import { useTranslations } from 'next-intl'
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Gauge } from '@/components/ui/gauge'
@@ -32,6 +33,7 @@ export function StarterPackWidget({ input, output, onAnswer }: StarterPackWidget
 }
 
 function StarterPackPicker({ cards, onAnswer }: { cards: StarterPackCard[]; onAnswer: (answer: StarterPackAnswer) => void }) {
+    const t = useTranslations('foreman.starterPack')
     const picks = useStarterPicks()
     const count = picks.picked.length
 
@@ -39,8 +41,8 @@ function StarterPackPicker({ cards, onAnswer }: { cards: StarterPackCard[]; onAn
         <div className="mb-2 flex flex-col gap-3">
             <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 flex-col gap-0.5">
-                    <p className="text-sm font-medium text-foreground">Your starter team</p>
-                    <p className="text-xs text-muted-foreground">Pick up to {MAX_STARTER_PICKS}. Each one sets itself up with you once it is on your board.</p>
+                    <p className="text-sm font-medium text-foreground">{t('title')}</p>
+                    <p className="text-xs text-muted-foreground">{t('subtitle', { max: MAX_STARTER_PICKS })}</p>
                 </div>
                 <PickProgress count={count} />
             </div>
@@ -50,14 +52,14 @@ function StarterPackPicker({ cards, onAnswer }: { cards: StarterPackCard[]; onAn
             {picks.blocked && (
                 <Alert variant="warning" stripes className="grid-cols-[auto_1fr] gap-x-3 gap-y-0">
                     <Icon icon={LockIcon} size="sm" className="row-span-2 self-center" />
-                    <AlertTitle className="col-start-2 leading-tight">Your trial runs {MAX_STARTER_PICKS} coworkers</AlertTitle>
-                    <AlertDescription className="col-start-2 leading-snug">Drop one to take this one instead. The others can join once you are on a plan.</AlertDescription>
+                    <AlertTitle className="col-start-2 leading-tight">{t('fullTitle', { max: MAX_STARTER_PICKS })}</AlertTitle>
+                    <AlertDescription className="col-start-2 leading-snug">{t('fullDescription')}</AlertDescription>
                 </Alert>
             )}
 
             <div className="flex justify-end">
                 <Button size="sm" disabled={!count} onClick={() => onAnswer({ answered: true, chosen: picks.picked })} className="max-sm:w-full">
-                    {count === 0 ? 'Pick at least one' : count === 1 ? 'Hire this one' : `Hire these ${count}`}
+                    {count === 0 ? t('pickAtLeastOne') : count === 1 ? t('hireOne') : t('hireMany', { count })}
                     {count > 0 && <ArrowRight data-icon="inline-end" className="size-3.5" />}
                 </Button>
             </div>
@@ -67,8 +69,9 @@ function StarterPackPicker({ cards, onAnswer }: { cards: StarterPackCard[]; onAn
 
 // The places the trial holds, filling as cards are picked: read before the fourth card is tried.
 function PickProgress({ count }: { count: number }) {
+    const t = useTranslations('foreman.starterPack')
     return (
-        <div className={cn('flex shrink-0 items-center gap-1.5 text-xs tabular-nums transition-colors', count ? 'text-primary' : 'text-muted-foreground')} aria-label={`${count} of ${MAX_STARTER_PICKS} picked`}>
+        <div className={cn('flex shrink-0 items-center gap-1.5 text-xs tabular-nums transition-colors', count ? 'text-primary' : 'text-muted-foreground')} aria-label={t('progress', { count, max: MAX_STARTER_PICKS })}>
             <Gauge ratio={count / MAX_STARTER_PICKS} complete={count >= MAX_STARTER_PICKS} className="size-6" />
             <span aria-hidden>
                 {count}/{MAX_STARTER_PICKS}
@@ -80,12 +83,13 @@ function PickProgress({ count }: { count: number }) {
 // Replayed from the transcript once answered: what was hired, as a line each, rather than an
 // invitation to choose again.
 function StarterPackVerdict({ cards, answer }: { cards: StarterPackCard[]; answer: StarterPackAnswer }) {
+    const t = useTranslations('foreman')
     if (!answer.answered) return null
-    const rows = 'custom' in answer ? [{ key: 'custom', title: OWN_ENTRY, line: answer.custom }] : cards.filter(card => answer.chosen.includes(card.slug)).map(card => ({ key: card.slug, title: card.promise, line: card.agent }))
+    const rows = 'custom' in answer ? [{ key: 'custom', title: t('ownEntry'), line: answer.custom }] : cards.filter(card => answer.chosen.includes(card.slug)).map(card => ({ key: card.slug, title: card.promise, line: card.agent }))
 
     return (
         <div className="mb-2 flex flex-col gap-1.5 rounded-lg border border-border bg-muted/20 px-3 py-2">
-            <p className="text-xs text-muted-foreground">Your starter team</p>
+            <p className="text-xs text-muted-foreground">{t('starterPack.title')}</p>
             {rows.map(row => (
                 <div key={row.key} className="flex min-w-0 items-start gap-2">
                     <Icon icon={CircleCheckIcon} size="xs" className="mt-0.5 shrink-0 text-emerald-500" />

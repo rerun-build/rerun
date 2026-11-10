@@ -11,6 +11,7 @@ import { type ScheduleChoice, scheduleLabel } from './schedule'
 import type { ConnectorCatalog } from './types'
 import type { CatalogEntry } from './types'
 import { cn } from '../cn'
+import { useKitTranslations, useUiLocale } from '../locale'
 
 import { AppsPicker } from './AppsPicker'
 import { AppLogo } from './marks'
@@ -32,8 +33,10 @@ export type FieldFooterProps = {
 // the timing it read (or "Schedule") with its planner, and the create button, which submits the
 // form the field sits in.
 export function FieldFooter({ name, nameProps, catalog, apps, onToggleApp, schedule, canCreate, creating }: FieldFooterProps) {
+    const t = useKitTranslations()
+    const locale = useUiLocale()
     const shown = apps.flatMap(slug => catalog?.get(slug) ?? [])
-    const scheduled = scheduleLabel(schedule.choice) ?? schedule.read?.label ?? null
+    const scheduled = scheduleLabel(schedule.choice, t, locale) ?? schedule.read?.label ?? null
     const [rowRef, portalContainer] = useDialogPortalContainer<HTMLDivElement>()
     return (
         <div ref={rowRef} className="@container relative flex items-center gap-1">
@@ -58,7 +61,7 @@ export function FieldFooter({ name, nameProps, catalog, apps, onToggleApp, sched
                 Where the row is too narrow for the sentence at all, on a phone, the button is its arrow
                 and the pill and the timing are the ones that give way. */}
             <Button type="submit" data-aim="create" disabled={!canCreate || creating} className="ml-auto max-w-full min-w-0 shrink @max-[24rem]:w-8 @max-[24rem]:shrink-0 @max-[24rem]:px-0">
-                <span className="truncate @max-[24rem]:sr-only">{name ? `Create ${name}` : 'Create coworker'}</span>
+                <span className="truncate @max-[24rem]:sr-only">{name ? t('newAgent.create', { name }) : t('newAgent.createCoworker')}</span>
                 <ArrowRightIcon className="size-3.5" />
             </Button>
         </div>
@@ -66,10 +69,11 @@ export function FieldFooter({ name, nameProps, catalog, apps, onToggleApp, sched
 }
 
 function AddApps(props: ComponentProps<typeof Button>) {
+    const t = useKitTranslations()
     return (
         <Button type="button" variant="ghost" size="sm" className="text-muted-foreground" {...props}>
             <PlusIcon />
-            Apps
+            {t('newAgent.apps')}
         </Button>
     )
 }
@@ -81,8 +85,9 @@ const ACTIVE_CHIP = 'border-border bg-muted/60 hover:bg-muted dark:bg-muted/40 d
 // The apps the agent starts with take the place of "+ Apps", bare logos in one lit button, which
 // still opens the picker.
 function PickedApps({ apps, ...props }: ComponentProps<typeof Button> & { apps: CatalogEntry[] }) {
+    const t = useKitTranslations()
     return (
-        <Button type="button" variant="ghost" size="sm" aria-label={`Apps: ${apps.map(app => app.name).join(', ')}`} className={cn('gap-1.5 px-2 text-muted-foreground', ACTIVE_CHIP)} {...props}>
+        <Button type="button" variant="ghost" size="sm" aria-label={t('newAgent.pickedApps', { apps: apps.map(app => app.name).join(', ') })} className={cn('gap-1.5 px-2 text-muted-foreground', ACTIVE_CHIP)} {...props}>
             {apps.map(app => (
                 <AppLogo key={app.slug} app={app} className="animate-in fade-in-0 zoom-in-75 duration-300" />
             ))}
@@ -93,10 +98,11 @@ function PickedApps({ apps, ...props }: ComponentProps<typeof Button> & { apps: 
 // Empty, a clock and "Schedule". Once the description says when the job runs, or the planner does,
 // the button says it back, a shade brighter, with the chevron that tells it can be changed.
 function ScheduleButton({ label, className, ...props }: ComponentProps<typeof Button> & { label: string | null }) {
+    const t = useKitTranslations()
     return (
         <Button type="button" variant="ghost" size="sm" className={cn(label ? ['text-foreground/85 @max-[24rem]:min-w-0 @max-[24rem]:shrink', ACTIVE_CHIP] : 'text-muted-foreground @max-[30rem]:px-1.5', className)} {...props}>
             <ClockIcon />
-            <span className={cn('max-w-44 truncate', !label && '@max-[30rem]:sr-only')}>{label ?? 'Schedule'}</span>
+            <span className={cn('max-w-44 truncate', !label && '@max-[30rem]:sr-only')}>{label ?? t('newAgent.schedule.button')}</span>
             {label && <ChevronDownIcon className="size-3 opacity-50" />}
         </Button>
     )

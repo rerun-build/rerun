@@ -84,7 +84,7 @@ describe('readPlan', () => {
     })
 
     it('holds up on anything that is not a plan', () => {
-        expect(readPlan(null)).toEqual({ title: 'Your first coworker', groups: [] })
-        expect(readPlan({ title: 42, boxes: 'Marketing', items: [null, {}, { kind: 'agent' }] })).toEqual({ title: 'Your first coworker', groups: [] })
+        expect(readPlan(null)).toEqual({ title: '', groups: [] })
+        expect(readPlan({ title: 42, boxes: 'Marketing', items: [null, {}, { kind: 'agent' }] })).toEqual({ title: '', groups: [] })
     })
 })
