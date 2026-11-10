@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
-import { BackHandler, Platform, Text } from 'react-native'
+import { BackHandler, Platform, Text, View } from 'react-native'
 
 import { LongPressMenu, MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 
@@ -151,6 +151,23 @@ describeOnAndroid('NativeMenu and the keyboard on Android', () => {
         expect(handled).toBe(true)
         expect(screen.getByTestId('menu-closed')).toBeTruthy()
         expect(listeners).toHaveLength(0)
+    })
+})
+
+describeOnAndroid('NativeMenu trigger on Android', () => {
+    it("names its button after the trigger's own label when the menu has none", async () => {
+        await render(
+            <NativeMenu
+                trigger={
+                    <View accessibilityLabel="Attach">
+                        <Text>+</Text>
+                    </View>
+                }
+            >
+                <MenuItem label="Photos" icon="images" onPress={() => {}} />
+            </NativeMenu>,
+        )
+        expect(screen.getByRole('button').props.accessibilityLabel).toBe('Attach')
     })
 })
 

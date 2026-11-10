@@ -96,14 +96,16 @@ function AnchoredMenu({ menu, items, children }: { menu: MenuState; items: React
     )
 }
 
-// The iOS system menu's Android twin: a tap on `trigger` opens a menu anchored to it.
+// The iOS system menu's Android twin: a tap on `trigger` opens a menu anchored to it. TalkBack reads the
+// pressable around the trigger, not the trigger: it takes the trigger's label when the menu has none.
 export function NativeMenu({ trigger, children, glass, label }: NativeMenuProps) {
     const theme = useTheme()
     const menu = useMenuState()
+    const triggerLabel = (trigger.props as { accessibilityLabel?: string }).accessibilityLabel
     const surface = glass ? { ...opaqueSurface(theme.scheme), borderRadius: glass === 'circle' ? GLASS_BUTTON_SIZE / 2 : radius.pill } : undefined
     return (
         <AnchoredMenu menu={menu} items={children}>
-            <Pressable onPress={menu.show} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ expanded: menu.open }} android_ripple={{ color: withAlpha(theme.foreground, 0.12), borderless: glass === 'circle', radius: glass === 'circle' ? GLASS_BUTTON_SIZE / 2 : undefined }} style={surface}>
+            <Pressable onPress={menu.show} accessibilityRole="button" accessibilityLabel={label ?? triggerLabel} accessibilityState={{ expanded: menu.open }} android_ripple={{ color: withAlpha(theme.foreground, 0.12), borderless: glass === 'circle', radius: glass === 'circle' ? GLASS_BUTTON_SIZE / 2 : undefined }} style={surface}>
                 {trigger}
             </Pressable>
         </AnchoredMenu>
