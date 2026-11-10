@@ -1,7 +1,16 @@
-// Android's web view draws text and web pages only: a PDF or an office document stays a blank page.
-const DRAWN = new Set(['txt', 'md', 'markdown', 'csv', 'tsv', 'json', 'log', 'xml', 'html', 'htm', 'svg', 'yaml', 'yml', 'css', 'js', 'ts', 'py', 'sh'])
+import type { FilePreview } from '@/components/viewer/file-preview'
 
-export function webViewPreviews(name: string): boolean {
+export type { FilePreview } from '@/components/viewer/file-preview'
+
+// Android's web view draws web pages, but hands any other file it is given by address to the download
+// manager, which refuses a local file: a text file is read and shown as text, a PDF or an office
+// document goes to another app.
+const PAGES = new Set(['html', 'htm', 'svg'])
+const TEXTS = new Set(['txt', 'md', 'markdown', 'csv', 'tsv', 'json', 'log', 'xml', 'yaml', 'yml', 'css', 'js', 'ts', 'py', 'sh'])
+
+export function filePreviewOf(name: string): FilePreview {
     const extension = name.includes('.') ? name.slice(name.lastIndexOf('.') + 1).toLowerCase() : ''
-    return DRAWN.has(extension)
+    if (PAGES.has(extension)) return 'page'
+    if (TEXTS.has(extension)) return 'text'
+    return 'none'
 }
