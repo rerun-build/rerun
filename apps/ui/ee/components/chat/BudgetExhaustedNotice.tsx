@@ -8,8 +8,9 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { useBillingStore } from '@/stores/billing.store'
+import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { BorderBeam } from '@rerun/ui'
-import { ArrowRightIcon, CheckIcon, CoinsIcon, CreditCardIcon, PauseIcon, Play, ZapOffIcon } from '@/lib/icons'
+import { ArrowRightIcon, CheckIcon, CoinsIcon, CreditCardIcon, LinkIcon, PauseIcon, Play, ZapOffIcon } from '@/lib/icons'
 import { usd } from '@/ee/components/dialogs/billing/parts'
 import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, TRIAL_CREDITS, ZERO_QUANTITIES, creditsLabel, planPriceCents, type PriceArm } from '@/ee/lib/billing/plans'
 import { NOTICE_PERKS } from '@/ee/lib/billing/pro-perks'
@@ -37,6 +38,9 @@ type SubscriptionProvider = 'claude' | 'codex'
 // `noCredit` is a workspace that never had any Rerun credit, such as a workspace added before its
 // plan: nothing was used up, so the notice does not say it was.
 //
+// `lifetime` is a workspace on the lifetime plan (an AppSumo code): it has no Rerun credit by design
+// and nothing is sold to it, so its only way out is its own AI.
+//
 // On a trial, `coworker` names who stopped, `onPaid` hands the checkout a way to pick the task back
 // up, and `resuming` is the moment between paying and the plan landing, when the notice turns into
 // the receipt. `onResumeNow` is the hand-held way back if that moment drags on.
@@ -51,8 +55,9 @@ export function BudgetExhaustedNotice({
     trialing,
     paused,
     noCredit,
+    lifetime,
     ...upgrade
-}: { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection; preTrial?: boolean; trialing?: boolean; paused?: boolean; noCredit?: boolean } & TrialUpgrade) {
+}: { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection; preTrial?: boolean; trialing?: boolean; paused?: boolean; noCredit?: boolean; lifetime?: boolean } & TrialUpgrade) {
     const openBilling = useBillingStore(s => s.openBilling)
 
     if (paused) {
@@ -86,6 +91,8 @@ export function BudgetExhaustedNotice({
             </div>
         )
     }
+
+    if (lifetime) return <LifetimeNotice onConnectProvider={onConnectProvider} ownConnection={ownConnection} />
 
     if (trialing && !noCredit) return <TrialUpgradeNotice {...upgrade} onConnectProvider={onConnectProvider} ownConnection={ownConnection} />
 
@@ -156,6 +163,48 @@ export function BudgetExhaustedNotice({
                 <>
                     <p className="text-sm">{trialing || noCredit ? `${usedUp} Subscribe to keep your coworkers working.` : `${usedUp} It resets next month.`}</p>
                     <NoticeActions actions={[paidWayOut]} />
+                </>
+            )}
+        </div>
+    )
+}
+
+function LifetimeNotice({ onConnectProvider, ownConnection }: { onConnectProvider?: (provider: SubscriptionProvider) => void; ownConnection?: BudgetNoticeOwnConnection }) {
+    const openAiProviders = useWorkspaceSettingsStore(s => s.openAiProviders)
+
+    return (
+        <div className="relative mb-2 space-y-2.5 overflow-hidden rounded-lg px-4 pt-3 pb-4">
+            <BorderBeam animated pattern="arcs" tone="red" glow width={1} duration={7} />
+            <div className="flex items-center gap-2.5 text-sm">
+                <Icon size="sm" tone="red" icon={ZapOffIcon} className="bg-red-500/10 text-foreground" />
+                <span className="font-medium">Rerun credits</span>
+            </div>
+            {ownConnection ? (
+                <>
+                    <p className="text-sm">Your lifetime plan runs on your own AI, and your {ownConnection.label} plan is connected.</p>
+                    <Button size="sm" className="w-full" onClick={ownConnection.onUse}>
+                        <ProviderIcon provider={ownConnection.provider} className="size-3.5" />
+                        <span className="truncate">Run on {ownConnection.label}</span>
+                    </Button>
+                </>
+            ) : onConnectProvider ? (
+                <>
+                    <p className="text-sm">Your lifetime plan runs on your own AI. Connect Claude or ChatGPT to keep your coworkers working.</p>
+                    <div className="grid grid-cols-2 gap-2">
+                        <Button size="sm" onClick={() => onConnectProvider('claude')}>
+                            <ProviderIcon provider="claude" className="size-3.5" />
+                            Connect Claude
+                        </Button>
+                        <Button size="sm" onClick={() => onConnectProvider('codex')}>
+                            <ProviderIcon provider="openai" className="size-3.5" />
+                            Connect ChatGPT
+                        </Button>
+                    </div>
+                </>
+            ) : (
+                <>
+                    <p className="text-sm">Your lifetime plan runs on your own AI.</p>
+                    <NoticeActions actions={[{ key: 'connect', leading: <Icon icon={LinkIcon} size="sm" />, title: 'Connect your AI', description: 'Claude, ChatGPT or an API key.', cta: 'Connect', onClick: () => openAiProviders() }]} />
                 </>
             )}
         </div>

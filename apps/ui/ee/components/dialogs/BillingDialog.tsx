@@ -11,10 +11,12 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { checkoutRouteFor, trialOffer, type CheckoutRoute } from '@/ee/lib/billing/checkout-variant'
-import { CreditCardIcon, RefreshCwIcon } from '@/lib/icons'
+import { CreditCardIcon, RefreshCwIcon, TicketIcon } from '@/lib/icons'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
+import { isLifetimePlan } from '@/ee/lib/billing/plans'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
+import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import { BillingDialogShell } from './billing/BillingDialogShell'
@@ -25,7 +27,7 @@ import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscripti
 // What the dialog shows, decided when it opens and held until it closes: a payment rewrites the
 // workspace through the webhook, and re-deciding then would swap the success panel for the next
 // dialog under the user's eyes.
-type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'error' }
+type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'error' }
 
 // Every openBilling() lands here. Two dialogs: the checkout, which sells a plan (or ends a trial),
 // and the plan dialog, which manages one that is paid.
@@ -69,6 +71,13 @@ export function BillingDialog() {
     // An entitled workspace whose Stripe read failed is not one without a plan: deciding on nothing
     // would offer a paying customer to subscribe.
     const decide = useCallback(async () => {
+        // Paid once, outside Stripe: there is nothing to sell, and a Pro subscription would overwrite
+        // the plan, so cancelling it later would take the lifetime access away.
+        if (isLifetimePlan(workspace)) {
+            setResolved({ kind: 'lifetime' })
+            track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: 'lifetime' })
+            return
+        }
         setResolved({ kind: 'loading' })
         const read = entitled ? await loadState() : null
         if (read && !read.ok) {
@@ -77,7 +86,7 @@ export function BillingDialog() {
         }
         const route = resolve(read?.state ?? null)
         track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: route?.variant ?? 'plan' })
-    }, [entitled, loadState, resolve, trigger, highlightAddon])
+    }, [workspace, entitled, loadState, resolve, trigger, highlightAddon])
 
     const opened = useRef(false)
     useEffect(() => {
@@ -102,6 +111,13 @@ export function BillingDialog() {
                 <AdminOnlyShell onClose={close} />
             ) : resolved.kind === 'loading' ? (
                 <LoadingShell />
+            ) : resolved.kind === 'lifetime' ? (
+                <LifetimeShell
+                    onConnectAi={() => {
+                        close()
+                        useWorkspaceSettingsStore.getState().openAiProviders()
+                    }}
+                />
             ) : resolved.kind === 'error' ? (
                 <ErrorShell onRetry={() => void decide()} />
             ) : resolved.kind === 'checkout' ? (
@@ -137,6 +153,24 @@ function AdminOnlyShell({ onClose }: { onClose: () => void }) {
                 action={
                     <Button size="sm" variant="outline" onClick={onClose}>
                         Got it
+                    </Button>
+                }
+            />
+        </DialogContent>
+    )
+}
+
+function LifetimeShell({ onConnectAi }: { onConnectAi: () => void }) {
+    return (
+        <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
+            <DialogTitle className="sr-only">Billing</DialogTitle>
+            <EmptyState
+                icon={TicketIcon}
+                title="Lifetime plan"
+                description="Paid once, yours for good. Unlimited coworkers and seats, running on your own AI."
+                action={
+                    <Button size="sm" variant="outline" onClick={onConnectAi}>
+                        Connect your AI
                     </Button>
                 }
             />

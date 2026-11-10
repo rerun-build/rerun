@@ -1120,6 +1120,13 @@ describe('createPlanCheckoutSession', () => {
         expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
     })
 
+    it('turns away a workspace on the lifetime plan, before anything reaches Stripe', async () => {
+        useDb({ row: { ...FRESH_WORKSPACE, plan: 'lifetime', subscription_status: 'active', stripe_customer_id: null } })
+        await expect(createPlanCheckoutSession(BASE_SELECTION)).rejects.toThrow('This workspace is on the lifetime plan.')
+        expect(stripe.customers.create).not.toHaveBeenCalled()
+        expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
+    })
+
     it('lends the placeholder of a phone account to a customer without an email', async () => {
         useDb({ row: FRESH_WORKSPACE })
         m.getServerSession.mockResolvedValue({ session: { email: '393480000000@phone.rerun.build' }, isAnonymous: false })

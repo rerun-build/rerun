@@ -26,7 +26,7 @@ import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
 import { Badge } from '@rerun/ui/primitives'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { activeAgentLimitFor, BILLING_ENABLED, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
+import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { useBrainProposalCount } from '@/hooks/useBrainProposalCount'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
@@ -67,7 +67,8 @@ function workspaceSummary(workspace: SessionWorkspace): string {
     const agents = trialing ? activeAgentLimitFor(workspace.max_agents, workspace.subscription_status) : workspace.max_agents
     const seats = workspace.max_seats == null ? 'unlimited seats' : `${workspace.max_seats} ${workspace.max_seats === 1 ? 'seat' : 'seats'}`
     const limits = `${agents ?? 'unlimited'} coworkers · ${seats}`
-    return trialing ? `Trial · ${limits}` : limits
+    if (trialing) return `Trial · ${limits}`
+    return isLifetimePlan(workspace) ? `Lifetime · ${limits}` : limits
 }
 
 export function WorkspaceSwitcher() {

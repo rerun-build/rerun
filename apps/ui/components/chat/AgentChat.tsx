@@ -69,7 +69,7 @@ import { browserPermission } from '@/lib/notifications/browser'
 import { modelContextWindow } from '@/lib/engine/models'
 import { rerunCreditOf } from '@/lib/engine/ai-sources'
 import { toGroup } from '@/lib/engine/model-groups'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
+import { isLifetimePlan, isPremiumModelEntitled } from '@rerun/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { useChat } from '@ai-sdk/react'
@@ -1034,13 +1034,13 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                             <Message from="assistant">
                                 {/* Paid data only runs on Rerun credit: connecting a Claude or ChatGPT plan would not buy it. */}
                                 <MessageContent>
-                                    <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} {...trialUpgrade} />
+                                    <BudgetExhaustedNotice trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} {...trialUpgrade} />
                                 </MessageContent>
                             </Message>
                         )}
                         {displayedError !== null && errorKind !== null && (
                             <Message from="assistant">
-                                <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
+                                <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
                             </Message>
                         )}
                     </ConversationContent>

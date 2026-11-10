@@ -27,7 +27,7 @@ import type { ForemanNextStep } from '@/lib/foreman/next-steps'
 import type { ForemanArrival } from '@/lib/foreman/phase'
 import { isForemanWidgetTool } from '@/lib/foreman/tool-defs'
 import { cn } from '@/lib/utils'
-import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { isLifetimePlan, isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import { isKickoffText, stripKickoff } from '@/lib/foreman/kickoff-marker'
@@ -165,7 +165,7 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                 <MessageContent>
                     {/* Pas de cellule « abonnement » : il n'y a pas de Box derrière le Foreman, donc
                         nulle part où brancher un plan Claude ou ChatGPT. */}
-                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} />}
+                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} />}
                 </MessageContent>
             </Message>
         )
