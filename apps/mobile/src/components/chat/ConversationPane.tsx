@@ -1,7 +1,7 @@
 import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Keyboard, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
+import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
@@ -61,6 +61,7 @@ import { Suggestions } from './Suggestions'
 import type { ThreadItem } from './threads/general-threads'
 import { ThreadBranch } from './threads/ThreadBranch'
 import { TimedTurns } from './TimedTurns'
+import { useKeyboardShown } from './useKeyboardShown'
 
 // The transcript scrolls under the suggestions and the composer, going out of focus this far above
 // them; scrolled to the end, the last message rests just above that band, sharp.
@@ -210,10 +211,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
 
     // A field in a waiting block sits above the composer: once the keyboard is up, the block's own
     // buttons are scrolled back into view.
-    useEffect(() => {
-        const subscription = Keyboard.addListener('keyboardDidShow', () => stuck.current && scroll.current?.scrollToEnd({ animated: true }))
-        return () => subscription.remove()
-    }, [])
+    useKeyboardShown(() => stuck.current && scroll.current?.scrollToEnd({ animated: true }))
 
     const followEnd = () => {
         stick(true)

@@ -3,6 +3,7 @@ import type { UIMessage } from 'ai'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
+import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Composer } from '@/components/chat/Composer'
@@ -12,6 +13,7 @@ import { MessageView } from '@/components/chat/MessageView'
 import { ForemanEmptyStateView } from '@/components/chat/EmptyStates'
 import { RunStatus } from '@/components/chat/RunStatus'
 import { Suggestions } from '@/components/chat/Suggestions'
+import { useKeyboardShown } from '@/components/chat/useKeyboardShown'
 import { CoworkerRow } from '@/components/home/CoworkerRow'
 import { ForemanRow } from '@/components/home/ForemanRow'
 import { HomeBottomBar } from '@/components/home/HomeBottomBar'
@@ -92,7 +94,7 @@ function useStreamedReply(active: boolean) {
     return { text: STREAMED.slice(0, length), done: length >= STREAMED.length }
 }
 
-// The same layout as ConversationPane, fed by mock messages.
+// The same layout as ConversationPane, fed by mock messages, lifted above the keyboard the same way.
 export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = 'Rerun' }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string }) {
     const insets = useSafeAreaInsets()
     const [draft, setDraft] = useState('')
@@ -102,30 +104,38 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
     const loading = state === 'loading'
     const messages = state === 'empty' || loading ? [] : state === 'approval' ? BEFORE_APPROVAL : state === 'conversation' ? CONVERSATION : state === 'long' ? LONG : state === 'streaming' ? [...RUNNING, ...(streamed.text ? [text('a3', 'assistant', streamed.text)] : [])] : RUNNING
     const running = state === 'running' || (state === 'streaming' && !streamed.done)
+    const blockShown = state === 'question' || state === 'approval'
+    const keyboard = useAnimatedKeyboard()
+    const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
+    useKeyboardShown(() => scroll.current?.scrollToEnd({ animated: true }))
     return (
-        <View style={{ flex: 1, paddingBottom: insets.bottom, justifyContent: 'flex-end' }}>
-            <ScrollView ref={scroll} style={StyleSheet.absoluteFill} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ flexGrow: 1, justifyContent: messages.length || loading ? 'flex-end' : 'center', paddingTop: topInset, paddingBottom: footerHeight + insets.bottom + 32, paddingHorizontal: spacing.xl - 4 }}>
-                {loading && <ConversationSkeleton />}
-                {messages.length === 0 && !loading && <ForemanEmptyStateView model={teamEmptyStateOf({ agents: coworkers.map(coworker => ({ id: coworker.id, name: coworker.name, handle: null, status: coworker.status, disabledAt: null })), nextRoutine: null, firstName: 'Clément' })} onSend={noop} onPrefill={noop} />}
-                {messages.length > 0 && (
-                    <View style={{ gap: spacing.xl }}>
-                        {messages.map((message, index) => (
-                            <MessageView key={message.id} message={message} isLastAssistant={index === messages.length - 1} running={running} agentId={null} fileOwner={null} coworkerName={coworkerName} hiddenCallId={null} />
-                        ))}
-                        {state === 'question' && <HitlBlock pending={{ kind: 'question', toolCallId: 'lab-q', input: QUESTION, output: undefined }} agentId="foreman" coworkerName="Rerun" webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
-                        {state === 'approval' && <HitlBlock pending={{ kind: 'approval', toolCallId: 'lab-a', input: APPROVAL, output: undefined }} agentId="agent-pulse" coworkerName={coworkerName} webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
-                        {running && <RunStatus coworker={FOREMAN} phase="working" />}
-                    </View>
-                )}
-            </ScrollView>
-            <ProgressiveBlur height={footerHeight + insets.bottom + 32} veiled={!seeThrough} />
-            <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, paddingTop: spacing.sm }}>
-                {(state === 'conversation' || state === 'long') && !draft && <Suggestions items={SUGGESTIONS} onPick={noop} />}
-                <View style={{ paddingHorizontal: spacing.md }}>
-                    <Composer value={draft} onChangeText={setDraft} onSend={noop} onStop={noop} running={running} placeholder={!messages.length ? 'What should we work on?' : seeThrough ? 'Ask Rerun anything' : `Message ${coworkerName}`} canAttach={!seeThrough} />
+        <Animated.View style={[{ flex: 1 }, lift]}>
+            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+                <ScrollView ref={scroll} style={StyleSheet.absoluteFill} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ flexGrow: 1, justifyContent: messages.length || loading ? 'flex-end' : 'center', paddingTop: topInset, paddingBottom: footerHeight + 32, paddingHorizontal: spacing.xl - 4 }}>
+                    {loading && <ConversationSkeleton />}
+                    {messages.length === 0 && !loading && <ForemanEmptyStateView model={teamEmptyStateOf({ agents: coworkers.map(coworker => ({ id: coworker.id, name: coworker.name, handle: null, status: coworker.status, disabledAt: null })), nextRoutine: null, firstName: 'Clément' })} onSend={noop} onPrefill={noop} />}
+                    {messages.length > 0 && (
+                        <View style={{ gap: spacing.xl }}>
+                            {messages.map((message, index) => (
+                                <MessageView key={message.id} message={message} isLastAssistant={index === messages.length - 1} running={running} agentId={null} fileOwner={null} coworkerName={coworkerName} hiddenCallId={null} />
+                            ))}
+                            {state === 'question' && <HitlBlock pending={{ kind: 'question', toolCallId: 'lab-q', input: QUESTION, output: undefined }} agentId="foreman" coworkerName="Rerun" webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
+                            {state === 'approval' && <HitlBlock pending={{ kind: 'approval', toolCallId: 'lab-a', input: APPROVAL, output: undefined }} agentId="agent-pulse" coworkerName={coworkerName} webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
+                            {running && <RunStatus coworker={FOREMAN} phase="working" />}
+                        </View>
+                    )}
+                </ScrollView>
+                <ProgressiveBlur height={footerHeight + 32} veiled={!seeThrough} />
+                <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, paddingTop: spacing.sm }}>
+                    {(state === 'conversation' || state === 'long') && !draft && <Suggestions items={SUGGESTIONS} onPick={noop} />}
+                    {!blockShown && (
+                        <View style={{ paddingHorizontal: spacing.md }}>
+                            <Composer value={draft} onChangeText={setDraft} onSend={noop} onStop={noop} running={running} placeholder={!messages.length ? 'What should we work on?' : seeThrough ? 'Ask Rerun anything' : `Message ${coworkerName}`} canAttach={!seeThrough} />
+                        </View>
+                    )}
                 </View>
             </View>
-        </View>
+        </Animated.View>
     )
 }
 
