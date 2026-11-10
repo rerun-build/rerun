@@ -19,9 +19,7 @@ export type ContextProps = {
 }
 
 function toneFor(ratio: number): string {
-    if (ratio >= 0.85) return 'text-destructive'
-    if (ratio >= 0.6) return 'text-amber-500'
-    return 'text-emerald-500'
+    return ratio >= 0.85 ? 'text-destructive' : 'text-amber-500'
 }
 
 function UsageRow({ label, value }: { label: string; value: number }) {
@@ -34,9 +32,13 @@ function UsageRow({ label, value }: { label: string; value: number }) {
     )
 }
 
+// The gauge only shows once the context is getting short: below this there is nothing to act on.
+const CONTEXT_GAUGE_FROM = 0.75
+
 export function Context({ usedTokens, maxTokens, usage, modelId }: ContextProps) {
     if (!maxTokens || usedTokens <= 0) return null
     const ratio = usedTokens / maxTokens
+    if (ratio < CONTEXT_GAUGE_FROM) return null
     const percent = Math.round(ratio * 100)
     const tone = toneFor(ratio)
 

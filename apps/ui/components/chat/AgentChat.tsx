@@ -37,7 +37,7 @@ import { acknowledgeSessionAlertAction, cancelSessionRunsAction, fetchSessionAct
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { useAgentModel } from '@/hooks/useAgentModel'
-import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
+import { refreshWorkspaceConnections, useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import { useArriveByTop } from '@/hooks/useArriveByTop'
 import { useMemberProfiles } from '@/hooks/useMemberProfiles'
 import { useMessageFeedback } from '@/hooks/useMessageFeedback'
@@ -252,6 +252,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
             if (!isAbort && !isDisconnect && !isError) {
                 completedRef.current = true
             }
+            if (!isDisconnect && !isError) void refreshWorkspaceConnections()
             // An installation ends with the agent calling install_complete, which only the engine
             // knows about: re-read it rather than infer the end of the setup from the transcript.
             onRunFinishedRef.current?.()

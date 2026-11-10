@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({ getAgentContextAction: vi.fn(), listAiConnecti
 vi.mock('@/app/api/_actions/agent.actions', () => ({ getAgentContextAction: mocks.getAgentContextAction, updateAgentConfigAction: mocks.updateAgentConfigAction }))
 vi.mock('@/app/api/_actions/workspace-connection.actions', () => ({
     listAiConnectionsAction: mocks.listAiConnectionsAction,
+    refreshAiConnectionsAction: vi.fn(),
     createAiConnectionAction: vi.fn(),
     deleteAiConnectionAction: vi.fn(),
     setDefaultModelAction: vi.fn(),

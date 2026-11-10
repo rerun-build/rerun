@@ -8,6 +8,8 @@ const { beforeEach, describe, expect, it, vi } = await import('vitest')
 
 // The Codex app-server session the connect waits for, answered from what the test posed.
 const codexCli = vi.hoisted(() => ({ models: [] as string[] }))
+// A plan-limits read a run's end left under way, as the test poses it, keyed by connection.
+const pendingReads = vi.hoisted(() => new Map<string, Promise<void>>())
 vi.mock('../../connections/codex-plan-limits.js', async () => {
     const { recordCliModels } = await import('../../connections/cli-models.js')
     return {
@@ -15,6 +17,7 @@ vi.mock('../../connections/codex-plan-limits.js', async () => {
             if (connection) recordCliModels(connection.id, codexCli.models, '0.166.0', false)
         },
         refreshStaleCodexPlanLimits: () => {},
+        pendingCodexPlanLimits: (id: string) => pendingReads.get(id),
     }
 })
 // OpenCode's live catalog, as the test poses it: null until a reading lands, like on a fresh box.
@@ -30,7 +33,7 @@ vi.mock('../../connections/opencode-catalog.js', async importOriginal => {
         liveOpencodeProviderModels: () => (opencodeLive.models ? actual.opencodeProviderModels().filter(model => opencodeLive.models!.includes(model.id)) : null),
     }
 })
-vi.mock('../../connections/opencode-plan-limits.js', () => ({ refreshOpencodePlanLimits: async () => {}, refreshStaleOpencodePlanLimits: () => {}, forgetOpencodePlanLimitsAttempt: () => {} }))
+vi.mock('../../connections/opencode-plan-limits.js', () => ({ refreshOpencodePlanLimits: async () => {}, refreshStaleOpencodePlanLimits: () => {}, forgetOpencodePlanLimitsAttempt: () => {}, pendingOpencodePlanLimits: () => undefined }))
 const { mkdir, readFile, rm, writeFile } = await import('node:fs/promises')
 const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID } = await import('@rerun/contracts')
 const { connectionRoutes } = await import('./connections.js')
@@ -374,5 +377,45 @@ describe('plan limits on the list', () => {
 
         await patch(`/${claude.id}/keys`, { set: { CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat-another-account' } })
         expect(await planLimitsOf(claude.id)).toBeNull()
+    })
+
+    it('waits for the read a run left under way, so the list carries it', async () => {
+        const { recordPlanLimits } = await import('../../connections/plan-limits.js')
+        const claude = await createClaude()
+        pendingReads.set(
+            claude.id,
+            new Promise<void>(resolve =>
+                setTimeout(() => {
+                    recordPlanLimits(claude.id, windows)
+                    resolve()
+                }, 20)
+            )
+        )
+        try {
+            expect(await planLimitsOf(claude.id)).toMatchObject({ windows })
+        } finally {
+            pendingReads.delete(claude.id)
+        }
+    })
+
+    it('answers with the reading it has when that read hangs', async () => {
+        const claude = await createClaude()
+        pendingReads.set(claude.id, new Promise<void>(() => {}))
+        // Only the cap is faked: the list reads the data-dir on the way, which needs the real loop.
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+        try {
+            let answered = false
+            const listed = planLimitsOf(claude.id).finally(() => {
+                answered = true
+            })
+            for (let tick = 0; tick < 20 && !answered; tick += 1) {
+                await new Promise<void>(resolve => setImmediate(resolve))
+                await vi.advanceTimersByTimeAsync(1_000)
+            }
+            expect(await listed).toBeNull()
+        } finally {
+            pendingReads.delete(claude.id)
+            vi.useRealTimers()
+        }
     })
 })

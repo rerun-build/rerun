@@ -1,6 +1,6 @@
 'use client'
 
-import { createAiConnectionAction, deleteAiConnectionAction, listAiConnectionsAction, setDefaultModelAction, updateAiConnectionAction, updateAiConnectionKeysAction } from '@/app/api/_actions/workspace-connection.actions'
+import { createAiConnectionAction, deleteAiConnectionAction, listAiConnectionsAction, refreshAiConnectionsAction, setDefaultModelAction, updateAiConnectionAction, updateAiConnectionKeysAction } from '@/app/api/_actions/workspace-connection.actions'
 import { invalidateLoadedAgentContexts } from '@/hooks/useAgentContext'
 import { connectionMethod, trackAiConnectionConnected, trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
 import type { BoxConnection, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
@@ -50,6 +50,24 @@ function fetchList(): Promise<void> {
             inflight = null
         })
     return inflight
+}
+
+let refreshing: Promise<void> | null = null
+
+// A plan's limits move with every run, and the engine reads them as the run ends: a chat calls
+// this when one finishes so the rings of its model pill follow. A read that fails leaves the list
+// in place: an engine that just went away must not turn every picker into "Set up a model". A
+// first load still in flight is waited for rather than reused, since it predates the run.
+export function refreshWorkspaceConnections(): Promise<void> {
+    if (refreshing) return refreshing
+    refreshing = (async () => {
+        if (inflight) await inflight
+        const list = await refreshAiConnectionsAction()
+        if (list) setState({ connections: list.connections, boxDefault: list.default, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
+    })().finally(() => {
+        refreshing = null
+    })
+    return refreshing
 }
 
 // `revalidate` is for the screen that manages the connections: it serves what the store holds and

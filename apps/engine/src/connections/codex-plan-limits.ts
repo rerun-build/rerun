@@ -117,6 +117,10 @@ export function refreshCodexPlanLimits(connection: LoadedConnection | null): Pro
     return task
 }
 
+export function pendingCodexPlanLimits(connectionId: string): Promise<void> | undefined {
+    return inFlight.get(connectionId)
+}
+
 // Called on the paths that must not wait for a process: the caller answers with the reading it
 // has, and the fresh one is there for the next ask. Paced on the last attempt rather than the last
 // reading, so a connection that cannot be read is not respawned on every list.

@@ -46,13 +46,29 @@ type CreateResult = { success: true; connection: BoxConnection } | { success: fa
 
 // `opencodeOffered`: whether this workspace may add OpenCode, behind its flag and on an engine that
 // runs it. `customOffered`: whether its engine runs custom endpoints.
-export async function listAiConnectionsAction(): Promise<BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }> {
+type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
+
+async function readAiConnections(): Promise<AiConnectionsList> {
+    const workspaceId = await requireWorkspaceId()
+    const [list, opencodeOffered, customOffered] = await Promise.all([listAiConnections(workspaceId), isOpencodeOfferedTo(workspaceId).catch(() => false), isCustomOfferedTo(workspaceId).catch(() => false)])
+    return { ...list, opencodeOffered, customOffered }
+}
+
+export async function listAiConnectionsAction(): Promise<AiConnectionsList> {
     try {
-        const workspaceId = await requireWorkspaceId()
-        const [list, opencodeOffered, customOffered] = await Promise.all([listAiConnections(workspaceId), isOpencodeOfferedTo(workspaceId).catch(() => false), isCustomOfferedTo(workspaceId).catch(() => false)])
-        return { ...list, opencodeOffered, customOffered }
+        return await readAiConnections()
     } catch {
         return { connections: [], default: null, opencodeOffered: false, customOffered: false }
+    }
+}
+
+// The same list for a store that already holds one: null when the hub or the engine did not answer,
+// so the caller keeps what it has instead of taking the empty list for the workspace's.
+export async function refreshAiConnectionsAction(): Promise<AiConnectionsList | null> {
+    try {
+        return await readAiConnections()
+    } catch {
+        return null
     }
 }
 

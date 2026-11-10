@@ -7,15 +7,34 @@ import { connectionUsage, releaseConnection } from '../../connections/release.js
 import { clearBoxDefault, readBoxDefault, writeBoxDefault } from '../../connections/default.js'
 import { servesModel } from '../../connections/resolve.js'
 import { defaultModelOf, repairBoxDefault } from '../../agents/availability.js'
-import { refreshCodexPlanLimits, refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
+import { pendingCodexPlanLimits, refreshCodexPlanLimits, refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
 import { refreshOpencodeCatalog, refreshStaleOpencodeCatalog } from '../../connections/opencode-catalog.js'
-import { refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
+import { pendingOpencodePlanLimits, refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
 import { probeCustomEndpoint, refreshCustomCatalog, refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { sendNotification } from '../../runtime/notify.js'
 import { logger } from '../../lib/logger.js'
 
 export const connectionRoutes = new Hono()
+
+// A run's end starts a read of its plan's limits and the hub asks for the list right after it: the
+// list waits for that read, so the rings it draws are the run's. Capped, since a CLI that hangs
+// must not hold the pickers; and only for reads already under way, never for a stale one started
+// by this very list.
+const PENDING_PLAN_LIMITS_MAX_WAIT_MS = 5_000
+
+async function awaitPendingPlanLimits(connections: LoadedConnection[]): Promise<void> {
+    const pending = connections.flatMap(connection => [pendingCodexPlanLimits(connection.id), pendingOpencodePlanLimits(connection.id)].filter((read): read is Promise<void> => !!read))
+    if (!pending.length) return
+    let cap: ReturnType<typeof setTimeout> | undefined
+    await Promise.race([
+        Promise.all(pending),
+        new Promise<void>(resolve => {
+            cap = setTimeout(resolve, PENDING_PLAN_LIMITS_MAX_WAIT_MS)
+        }),
+    ])
+    if (cap) clearTimeout(cap)
+}
 
 // Tells the hub the box now runs on the workspace's own AI, which ticks its getting-started step.
 // Fire and forget: an unreachable hub never fails the write that just succeeded.
@@ -31,6 +50,7 @@ connectionRoutes.get('/', async c => {
     for (const connection of connections) {
         await repairBoxDefault(connection).catch(err => logger.warn({ err: String(err), connection: connection.id }, 'box default repair failed'))
     }
+    await awaitPendingPlanLimits(connections)
     refreshStaleCodexPlanLimits(connections)
     refreshStaleOpencodePlanLimits(connections)
     if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()

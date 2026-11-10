@@ -8,13 +8,9 @@ import type { PlanLimitWindow } from '@rerun/contracts'
 
 const TONE_CLASS: Record<PlanLimitTone, string> = { brand: 'text-muted-foreground', warning: 'text-amber-500', destructive: 'text-destructive' }
 
-// How far into its plan a subscription is, beside its name in a model picker. One figure for the
-// whole group: the limits are the subscription's, every model under it draws on the same ones.
-export function PlanLimitHint({ windows, provider }: { windows: PlanLimitWindow[]; provider?: string }) {
-    const tightest = tightestPlanWindow(windows)
-    if (!tightest) return null
-
-    const detail = (
+// One line per window of a plan, with its reset: what a hover on its usage spells out.
+export function PlanLimitDetail({ windows, provider }: { windows: PlanLimitWindow[]; provider?: string }) {
+    return (
         <span className="flex flex-col gap-0.5">
             {windows.map(window => {
                 const reset = planWindowReset(window)
@@ -26,9 +22,20 @@ export function PlanLimitHint({ windows, provider }: { windows: PlanLimitWindow[
             })}
         </span>
     )
+}
+
+export function rerunCreditDetail(credit: RerunCredit): string {
+    return isCreditUsedUp(credit) ? `Monthly credits used up, back ${creditResetPhrase(credit)}` : `Monthly credits: ${credit.percent}% used, resets ${creditResetPhrase(credit)}`
+}
+
+// How far into its plan a subscription is, beside its name in a model picker. One figure for the
+// whole group: the limits are the subscription's, every model under it draws on the same ones.
+export function PlanLimitHint({ windows, provider }: { windows: PlanLimitWindow[]; provider?: string }) {
+    const tightest = tightestPlanWindow(windows)
+    if (!tightest) return null
 
     return (
-        <TooltipLabeled label={detail} side="right">
+        <TooltipLabeled label={<PlanLimitDetail windows={windows} provider={provider} />} side="right">
             <span className={cn('ml-auto shrink-0 pl-2 font-normal tabular-nums', TONE_CLASS[planLimitTone(tightest.usedPercent)])}>
                 {planWindowPercent(tightest)}
                 {tightest.resetsAt ? ` · ${shortUntil(tightest.resetsAt).replace(/^in /, '')}` : ''}
@@ -49,10 +56,8 @@ export function RerunCreditHint({ credit }: { credit: RerunCredit }) {
     }
     if (credit.budgetMicros <= 0) return null
 
-    const detail = isCreditUsedUp(credit) ? `Monthly credits used up, back ${creditResetPhrase(credit)}` : `Monthly credits: ${credit.percent}% used, resets ${creditResetPhrase(credit)}`
-
     return (
-        <TooltipLabeled label={detail} side="right">
+        <TooltipLabeled label={rerunCreditDetail(credit)} side="right">
             <span className={cn('ml-auto shrink-0 pl-2 font-normal tabular-nums', TONE_CLASS[planLimitTone(credit.percent)])}>
                 {credit.percent}%{credit.resetAt ? ` · ${shortUntil(credit.resetAt).replace(/^in /, '')}` : ''}
             </span>

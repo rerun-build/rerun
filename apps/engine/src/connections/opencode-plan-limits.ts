@@ -37,6 +37,10 @@ export function refreshOpencodePlanLimits(connection: LoadedConnection | null): 
     return task
 }
 
+export function pendingOpencodePlanLimits(connectionId: string): Promise<void> | undefined {
+    return inFlight.get(connectionId)
+}
+
 // For the paths that answer with the reading they have: paced on the last attempt, so a key that
 // cannot be read is not asked again on every list.
 export function refreshStaleOpencodePlanLimits(connections: LoadedConnection[]): void {

@@ -5,7 +5,7 @@ import { DotSpinner } from '@/components/ui/dot-spinner'
 import { AddProviderItem, SUBSCRIPTION_PROVIDERS, SubscriptionNudge, SubscriptionPitch, type AddableProvider, type SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ModelPillTrigger } from '@/components/agent/ModelPillTrigger'
-import { PlanLimitHint, RerunCreditHint } from '@/components/agent/PlanLimitHint'
+import { PlanLimitDetail, PlanLimitHint, RerunCreditHint, rerunCreditDetail } from '@/components/agent/PlanLimitHint'
 import { ModelTierRow } from '@/components/agent/ModelTierRow'
 import { PowerBars } from '@/components/ui/power-bars'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
@@ -15,7 +15,7 @@ import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { refusedModelReason } from '@/lib/engine/model-groups'
 import { useRerunCredit } from '@/hooks/useRerunCredit'
 import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
-import { PREMIUM_MODEL_BILLING_TRIGGER, RERUN_CREDIT_PAUSED_REASON } from '@/lib/engine/ai-sources'
+import { PREMIUM_MODEL_BILLING_TRIGGER, RERUN_CREDIT_PAUSED_REASON, pillUsage } from '@/lib/engine/ai-sources'
 import { modelLabel } from '@/lib/engine/models'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { ChevronDownIcon, Settings2Icon, StarIcon } from '@/lib/icons'
@@ -170,7 +170,16 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         [addProvider]
     )
 
+    const usage = active ? pillUsage(active, rerunCredit) : null
+    const usageDetail = !usage || !active ? null : active.connectionId === RERUN_CONNECTION_ID ? rerunCreditDetail(rerunCredit) : <PlanLimitDetail windows={active.planWindows} provider={active.provider} />
+
     const label = !hasAvailable ? 'Set up a model' : engineResolvesModel ? `Default · ${modelLabel(model)}` : !active ? 'Select model' : modelLabel(model)
+
+    const trigger = (
+        <PopoverTrigger asChild>
+            <ModelPillTrigger provider={active?.provider} label={label} usage={usage} className={refusedReason ? 'text-destructive hover:bg-destructive/10 hover:text-destructive aria-expanded:text-destructive' : undefined} />
+        </PopoverTrigger>
+    )
 
     if (loading) {
         return (
@@ -197,9 +206,13 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <ModelPillTrigger provider={active?.provider} label={label} className={refusedReason ? 'text-destructive hover:bg-destructive/10 hover:text-destructive aria-expanded:text-destructive' : undefined} />
-            </PopoverTrigger>
+            {usageDetail ? (
+                <TooltipLabeled label={usageDetail} side="top">
+                    {trigger}
+                </TooltipLabeled>
+            ) : (
+                trigger
+            )}
             <PopoverContent align="start" className="w-80 gap-0 p-0">
                 <Command>
                     <CommandList className="max-h-[min(32rem,70vh)]">

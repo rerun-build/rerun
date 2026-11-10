@@ -12,6 +12,7 @@ import { getRunAction } from '@/app/api/_actions/agent.actions'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import { readAgentModel, useAgentModel } from '@/hooks/useAgentModel'
 import { useRunReconnect } from '@/hooks/useRunReconnect'
+import { refreshWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import { contextStatsOf } from '@/lib/chat/context-stats'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
 import { isWorkspaceApiEntitled } from '@rerun/cloud/billing'
@@ -133,6 +134,8 @@ export function useForemanChat() {
             if (isForemanClientTool(tool)) runForemanClientTool(tool, input, gates.current)
         },
         onFinish: ({ isAbort, isDisconnect, isError }) => {
+            // Only the engine foreman has a model pill reading the store; the hub's is fixed.
+            if (selectForemanBackend(useForemanStore.getState()) === 'engine' && !isDisconnect && !isError) void refreshWorkspaceConnections()
             if (isAbort || isDisconnect || isError) return
             completedRef.current = true
             holdRun(null)
