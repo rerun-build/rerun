@@ -31,6 +31,54 @@ jobs:
       # Every mobile test runs as iOS and as Android (jest projects of apps/mobile/jest.config.js).
       - run: pnpm --filter rerun-mobile test
 
+  # The Kotlin twins of the app's native modules: their JUnit and Robolectric tests, on a pull request
+  # that touches what goes into the Android build, and on every push.
+  mobile-native-inputs:
+    if: github.repository == 'rerun-build/rerun' && github.event_name == 'pull_request'
+    name: Mobile native inputs changed
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: |
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -qE '^apps/mobile/(modules|plugins)/|^apps/mobile/(app\.json|app\.config\.ts|package\.json)$|^pnpm-lock\.yaml$|^\.github/workflows/ci\.yml$'; then
+            echo changed=true >> "$GITHUB_OUTPUT"
+          else
+            echo changed=false >> "$GITHUB_OUTPUT"
+          fi
+
+  mobile-native:
+    needs: mobile-native-inputs
+    if: >-
+      always() && github.repository == 'rerun-build/rerun' &&
+      (github.event_name == 'push' || needs.mobile-native-inputs.outputs.changed == 'true')
+    name: Mobile native modules (Android unit tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @rerun/contracts build
+      - working-directory: apps/mobile
+        run: pnpm exec expo prebuild --platform android --no-install
+        env:
+          EXPO_NO_GIT_STATUS: '1'
+      - working-directory: apps/mobile/android
+        run: ./gradlew :composer-paste:testDebugUnitTest :background-grace:testDebugUnitTest --console=plain
+
   migrations:
     # Runs in the open source repository only, not in a private clone of it.
     if: github.repository == 'rerun-build/rerun'
