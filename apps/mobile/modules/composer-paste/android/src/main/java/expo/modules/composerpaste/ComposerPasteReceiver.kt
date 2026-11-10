@@ -37,6 +37,7 @@ class ComposerPasteReceiver(
       val uris = (0 until images.clip.itemCount).mapNotNull { index -> writeJpeg(images.clip.getItemAt(index).uri, resolver) }
       if (uris.isNotEmpty()) onImages(uris)
     }
+    PasteMenuTracker.close(view)
     return split.second
   }
 
@@ -93,6 +94,7 @@ class ComposerPasteReceiver(
     fun installIfComposer(view: View, receiver: ComposerPasteReceiver) {
       if (view !is EditText || !isComposer(view)) return
       ViewCompat.setOnReceiveContentListener(view, arrayOf(IMAGE_MIME_TYPE), receiver)
+      PasteMenuTracker.install(view)
     }
   }
 }
