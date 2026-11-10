@@ -2,6 +2,7 @@
 
 import { GitHubIcon, LinkedInIcon, XIcon } from '@rerun/ui/experts'
 import type { ComponentType } from 'react'
+import { useTranslations } from 'next-intl'
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'
 import { TemplateCreatorAvatar } from '@/components/templates/TemplateCreatorAvatar'
 import { TemplateVerifiedBadge } from '@/components/templates/TemplateVerifiedBadge'
@@ -21,6 +22,8 @@ const WORK_WITH_HASH = '#work-with'
 // creator half is one link to their public profile; the template they are recognised for keeps
 // its own column and its own action.
 export function TemplateCreatorSpotlight({ creator, template, selected, onSelectTemplate }: { creator: LibraryCreatorSummary; template: LibraryTemplate; selected: boolean; onSelectTemplate: () => void }) {
+    const t = useTranslations('templates.spotlight')
+    const tKind = useTranslations('templates.creatorKind')
     const profileUrl = landingUrl(`/community/experts/${creator.slug}`)
 
     return (
@@ -30,7 +33,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                     are links of their own, and an anchor cannot hold another. Everything above it lets
                     the click through except those buttons. */}
                 <div className="group/creator relative grid transition-colors hover:bg-muted/20 @min-[40rem]/spotlight:grid-cols-[10rem_minmax(0,1fr)] @min-[56rem]/spotlight:grid-cols-[11rem_minmax(0,1fr)]">
-                    <a href={profileUrl} target="_blank" rel="noreferrer" aria-label={`View ${creator.name}’s profile`} className="absolute inset-0 rounded-l-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" />
+                    <a href={profileUrl} target="_blank" rel="noreferrer" aria-label={t('viewProfile', { name: creator.name })} className="absolute inset-0 rounded-l-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" />
                     <div className="pointer-events-none relative hidden min-h-48 bg-muted @min-[40rem]/spotlight:block">
                         {creator.avatarUrl ? (
                             <img src={creator.avatarUrl} alt="" className="absolute inset-0 size-full object-cover object-[50%_30%]" />
@@ -52,7 +55,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                                 {creator.verified && <TemplateVerifiedBadge className="size-[1.1rem]" />}
                             </h3>
                         </div>
-                        <p className="mt-0.5 truncate text-sm text-muted-foreground">{[creatorKindLabel(creator.kind), creator.location].filter(Boolean).join(' · ')}</p>
+                        <p className="mt-0.5 truncate text-sm text-muted-foreground">{[creatorKindLabel(creator.kind, tKind), creator.location].filter(Boolean).join(' · ')}</p>
                         {creator.bio && (
                             <blockquote className="mt-3 border-l-2 border-primary/50 pl-3 text-sm leading-relaxed text-foreground/80">
                                 <p className="line-clamp-2">{creator.bio}</p>
@@ -62,7 +65,7 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                             <Button asChild variant="outline" size="sm">
                                 <a href={`${profileUrl}${WORK_WITH_HASH}`} target="_blank" rel="noreferrer">
                                     <HandshakeIcon className="size-3.5" />
-                                    Work with {creator.name.split(' ')[0]}
+                                    {t('workWith', { name: creator.name.split(' ')[0] })}
                                 </a>
                             </Button>
                             <SocialLinks creator={creator} />
@@ -83,25 +86,28 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
 }
 
 function CrownBadge() {
+    const t = useTranslations('templates.spotlight')
     return (
         <span className="inline-flex h-6 w-fit items-center gap-1.5 rounded-full border border-primary/30 bg-background/70 px-2.5 text-xs font-medium text-foreground backdrop-blur">
             <CrownIcon className="size-3.5 text-primary" />
-            Creator of the week
+            {t('badge')}
         </span>
     )
 }
 
-const SOCIALS: { key: keyof LibraryCreator['links']; label: string; icon: ComponentType<{ className?: string }> }[] = [
-    { key: 'linkedin', label: 'LinkedIn', icon: LinkedInIcon },
-    { key: 'x', label: 'X', icon: XIcon },
-    { key: 'github', label: 'GitHub', icon: GitHubIcon },
-    { key: 'website', label: 'Website', icon: GlobeIcon },
+// A brand keeps its own name; only the personal website gets a translated one.
+const SOCIALS: { key: keyof LibraryCreator['links']; brand?: string; icon: ComponentType<{ className?: string }> }[] = [
+    { key: 'linkedin', brand: 'LinkedIn', icon: LinkedInIcon },
+    { key: 'x', brand: 'X', icon: XIcon },
+    { key: 'github', brand: 'GitHub', icon: GitHubIcon },
+    { key: 'website', icon: GlobeIcon },
 ]
 
 function SocialLinks({ creator }: { creator: LibraryCreator }) {
-    return SOCIALS.filter(social => creator.links[social.key]).map(({ key, label, icon: Glyph }) => (
+    const t = useTranslations('templates.spotlight')
+    return SOCIALS.filter(social => creator.links[social.key]).map(({ key, brand, icon: Glyph }) => (
         <Button key={key} asChild variant="outline" size="icon-sm">
-            <a href={creator.links[key]!} target="_blank" rel="noreferrer" aria-label={`${creator.name} on ${label}`}>
+            <a href={creator.links[key]!} target="_blank" rel="noreferrer" aria-label={t('socialLabel', { name: creator.name, network: brand ?? t('website') })}>
                 <Glyph className="size-3.5" />
             </a>
         </Button>
@@ -109,9 +115,10 @@ function SocialLinks({ creator }: { creator: LibraryCreator }) {
 }
 
 function OpenTemplateButton({ onSelect, className }: { onSelect: () => void; className?: string }) {
+    const t = useTranslations('templates.spotlight')
     return (
         <Button type="button" size="sm" onClick={onSelect} className={cn('group/open', className)}>
-            Open template
+            {t('openTemplate')}
             <ArrowRightIcon className="size-3.5 transition-transform group-hover/open:translate-x-0.5" />
         </Button>
     )
@@ -126,9 +133,10 @@ function Thumb({ template, selected, onSelect, className }: { template: LibraryT
 }
 
 function RecognizedText({ template }: { template: LibraryTemplate }) {
+    const t = useTranslations('templates.spotlight')
     return (
         <>
-            <p className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">Recognized for</p>
+            <p className="text-[11px] font-medium tracking-wider text-muted-foreground uppercase">{t('recognizedFor')}</p>
             <p className="mt-1 line-clamp-2 text-sm leading-snug font-semibold tracking-tight">{templateHeadline(template).headline}</p>
         </>
     )

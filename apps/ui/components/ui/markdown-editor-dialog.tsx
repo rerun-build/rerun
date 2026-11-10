@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Loader2Icon } from '@/lib/icons'
 import { RichTextEditor } from '@rerun/ui/rich-text-editor'
+import { useTranslations } from 'next-intl'
 import { useCallback, useRef, useState, type ReactNode } from 'react'
 
 type MarkdownEditorDialogProps = {
@@ -32,13 +33,14 @@ export function MarkdownEditorDialog({
     title,
     description,
     hint,
-    closeLabel = 'Done',
+    closeLabel,
     submitLabel,
     submitIcon,
     submitting,
     onClose,
     onSubmit,
 }: MarkdownEditorDialogProps) {
+    const t = useTranslations('ui.markdown')
     const [markdown, setMarkdown] = useState(initialValue)
     // TipTap normalizes whatever text it is given, so the first markdown it emits is the untouched
     // baseline. Comparing against it lets us hand back the original text when nothing was edited,
@@ -85,7 +87,7 @@ export function MarkdownEditorDialog({
                 <DialogFooter className="sm:items-center">
                     {hint && <span className="hidden text-xs text-muted-foreground sm:mr-auto sm:inline">{hint}</span>}
                     <Button type="button" variant={submitLabel ? 'outline' : 'default'} onClick={() => handleOpenChange(false)}>
-                        {closeLabel}
+                        {closeLabel ?? t('done')}
                     </Button>
                     {submitLabel && (
                         <Button type="button" onClick={handleSubmit} disabled={!markdown.trim() || submitting}>

@@ -26,14 +26,14 @@ describe('openDesktopAction', () => {
         vi.mocked(desktopSocketUrl).mockReturnValue('wss://host.test/box/10/desktop/ws?ticket=t')
     })
 
-    // The web shows the message; the v1 route reads the code back into the 404 or 403 a thrown refusal gives.
-    it('folds a refusal into the result with the code the route turns back into a status', async () => {
+    // The web shows the message; the v1 route reads `denied` back into the 404 or 403 a thrown refusal gives.
+    it('folds a refusal into the result with what the route turns back into a status', async () => {
         const { AuthorizationError } = await import('@/app/api/_auth/errors')
         const { AccessDeniedError } = await import('@/app/api/_auth/access')
-        vi.mocked(assertAgentInWorkspace).mockRejectedValueOnce(new AuthorizationError('Coworker not found'))
-        expect(await openDesktopAction('agent-1', 'watch')).toEqual({ ok: false, error: 'Coworker not found', code: 'not_found' })
+        vi.mocked(assertAgentInWorkspace).mockRejectedValueOnce(new AuthorizationError('coworkerNotFound'))
+        expect(await openDesktopAction('agent-1', 'watch')).toEqual({ ok: false, error: 'Coworker not found', code: 'coworkerNotFound', denied: 'not_found' })
         vi.mocked(assertAgentInWorkspace).mockRejectedValueOnce(new AccessDeniedError())
-        expect(await startTakeoverAction('agent-1')).toMatchObject({ ok: false, code: 'forbidden' })
+        expect(await startTakeoverAction('agent-1')).toMatchObject({ ok: false, code: 'boxManagerOnly', denied: 'forbidden' })
     })
 
     it('starts the screen on the viewer time zone and says whether it draws its own dock', async () => {

@@ -6,11 +6,13 @@ import { BellIcon } from '@/lib/icons'
 import { requestBrowserPermission } from '@/lib/notifications/browser'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { Stripes } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 
 // Asked once, when the onboarding ends and there is an agent to hear from: a run can outlive the
 // tab being looked at, and the browser permission is the only thing standing between a finished
 // agent and the user hearing about it. Every way out marks the question answered, Escape included.
 export function NotificationPermissionDialog() {
+    const t = useTranslations('dialogs.notificationPermission')
     const open = useNotificationsStore(state => state.permissionPromptOpen)
     const answer = useNotificationsStore(state => state.answerPermission)
 
@@ -23,8 +25,8 @@ export function NotificationPermissionDialog() {
                     <Stripes />
                     <Icon icon={BellIcon} className="relative" />
                     <div className="relative flex flex-col gap-1.5">
-                        <AlertDialogTitle>Get notified when your coworker is done?</AlertDialogTitle>
-                        <AlertDialogDescription>It keeps running after you close this tab. We&apos;ll let you know when it needs you.</AlertDialogDescription>
+                        <AlertDialogTitle>{t('title')}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('description')}</AlertDialogDescription>
                     </div>
                 </div>
 
@@ -36,10 +38,10 @@ export function NotificationPermissionDialog() {
                             answer()
                         }}
                     >
-                        Enable notifications
+                        {t('enable')}
                     </AlertDialogAction>
                     <AlertDialogCancel variant="ghost" className="w-full" onClick={answer}>
-                        Not now
+                        {t('later')}
                     </AlertDialogCancel>
                 </div>
             </AlertDialogContent>

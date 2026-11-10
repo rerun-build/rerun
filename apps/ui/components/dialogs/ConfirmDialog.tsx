@@ -14,6 +14,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import type { Button } from '@/components/ui/button'
+import { useTranslations } from 'next-intl'
 
 type ConfirmDialogBaseProps = {
     title: string
@@ -36,8 +37,8 @@ type ConfirmDialogProps = ConfirmDialogBaseProps &
 export function ConfirmDialog({
     title,
     description,
-    confirmLabel = 'Delete',
-    cancelLabel = 'Cancel',
+    confirmLabel,
+    cancelLabel,
     confirmVariant = 'destructive',
     pending = false,
     onConfirm,
@@ -45,6 +46,8 @@ export function ConfirmDialog({
     open,
     onOpenChange,
 }: ConfirmDialogProps) {
+    const t = useTranslations('dialogs.confirm')
+    const tCommon = useTranslations('common')
     const [selfOpen, setSelfOpen] = useState(false)
     const controlled = onOpenChange !== undefined
 
@@ -57,9 +60,9 @@ export function ConfirmDialog({
                     {description && <AlertDialogDescription>{description}</AlertDialogDescription>}
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={pending}>{cancelLabel}</AlertDialogCancel>
+                    <AlertDialogCancel disabled={pending}>{cancelLabel ?? tCommon('cancel')}</AlertDialogCancel>
                     <AlertDialogAction variant={confirmVariant} disabled={pending} onClick={onConfirm}>
-                        {confirmLabel}
+                        {confirmLabel ?? t('confirm')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

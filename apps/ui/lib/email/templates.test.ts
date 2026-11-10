@@ -1,7 +1,8 @@
 import { readdirSync } from 'node:fs'
 import path from 'node:path'
-import { describe, expect, it } from 'vitest'
-import { EMAIL_PREVIEWS, NEWSLETTERS, renderEmail, TONES, theme } from '@rerun/emails'
+import * as React from 'react'
+import { describe, expect, it, vi } from 'vitest'
+import { EMAIL_PREVIEWS, NEWSLETTERS, renderEmail, TONES, TrialEnded, theme } from '@rerun/emails'
 
 // The email design system only holds if the templates keep going through it. These three checks
 // are what stop the old habits from creeping back: per-file colour constants, flexbox that no
@@ -90,5 +91,42 @@ describe('email templates', () => {
                 .filter(hex => !allowed.has(hex))
             expect(strays, `${id} uses colours that are not theme tokens`).toEqual([])
         }
+    })
+})
+
+describe('email templates in the reader\'s language', () => {
+    it('renders an email in French, footer included', async () => {
+        const { html, text } = await renderEmail(
+            React.createElement(TrialEnded, {
+                reason: 'no_card',
+                workspaceName: 'Acme',
+                trialEndedLabel: '12 mars',
+                pausedLabel: '12 mars à 16:00 UTC',
+                keptUntilLabel: '10 juin',
+                summary: { agents: 3, runs: 41 },
+                billingUrl: 'https://app.rerun.build/?billing=1',
+                appUrl: 'https://app.rerun.build',
+                unsubscribeUrl: 'https://app.rerun.build/unsubscribe?token=test',
+                locale: 'fr',
+            }),
+        )
+        expect(html).toContain('lang="fr"')
+        expect(text).toContain('VOTRE ESSAI EST TERMINÉ')
+        expect(text).toContain("L'essai de Acme s'est terminé le 12 mars, et vos coworkers se sont arrêtés.")
+        expect(text).toContain('Démarrer mon abonnement')
+        expect(text).toContain('Se désabonner')
+        expect(text).not.toContain('YOUR TRIAL HAS ENDED')
+    })
+
+    // A key missing from a pack, or a message the ICU parser refuses, would print its key path.
+    it.each(['fr', 'es'] as const)('renders every preview in %s with no missing or broken message', async locale => {
+        const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+        for (const preview of EMAIL_PREVIEWS) {
+            const { html, text } = await renderEmail(React.cloneElement(preview.element as React.ReactElement<{ locale?: string }>, { locale }))
+            expect(html, preview.id).toContain(`lang="${locale}"`)
+            expect(text, preview.id).not.toMatch(/\bemails\.[a-zA-Z]/)
+        }
+        expect(errors).not.toHaveBeenCalled()
+        errors.mockRestore()
     })
 })

@@ -1,4 +1,4 @@
-import type { PhoneSendActionResult } from '@/app/api/_actions/phone.actions'
+import type { PhoneActionRefusal, PhoneSendActionResult } from '@/app/api/_actions/phone.actions'
 import type { PhoneCodeRequest } from '@/components/auth/PhoneCodeForm'
 import { CaptchaError } from '@/components/auth/captcha/captcha-error'
 import type { VerificationChannel } from '@/lib/phone/verification'
@@ -10,12 +10,13 @@ const MESSAGE_LIMIT = 200
 // A refusal from the server: `retryAfterSeconds` is how long it holds the next code back, `reason`
 // why it turned this one away.
 export class PhoneSendError extends Error {
-    constructor(
-        message: string,
-        readonly retryAfterSeconds?: number,
-        readonly reason?: string
-    ) {
-        super(message)
+    readonly retryAfterSeconds?: number
+    readonly reason?: string
+
+    constructor(readonly refusal: PhoneActionRefusal) {
+        super(refusal.error)
+        this.retryAfterSeconds = refusal.retryAfterSeconds
+        this.reason = refusal.reason
     }
 }
 
@@ -34,7 +35,7 @@ export async function sendPhoneCode(context: PhoneVerificationContext, request: 
     }
     if (!result.ok) {
         failed({ reason: result.reason })
-        throw new PhoneSendError(result.error, result.retryAfterSeconds, result.reason)
+        throw new PhoneSendError(result)
     }
     track('phone_verification_sent', { channel: result.channel, context })
     return result.channel

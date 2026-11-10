@@ -1,12 +1,13 @@
 'use client'
 
+import type { Refusal } from '@/hooks/useErrorText'
 import { getAgentDetailAction, patchAgentMcpServersAction } from '@/app/api/_actions/agent.actions'
 import { McpServerEditor } from '@/components/agent/McpServerEditor'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { invalidateConnectorServices, useConnectorServices } from '@/hooks/useConnectorServices'
 import { refreshMcpServerStatuses } from '@/hooks/useMcpServerStatuses'
 import type { EngineMcpServer } from '@/lib/engine/types'
@@ -18,6 +19,7 @@ import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel
 import { PanelRow } from '@/components/ui/panel-row'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 type AgentPanelMcpProps = {
@@ -32,6 +34,8 @@ function serverSummary(s: EngineMcpServer): string {
 }
 
 export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelMcp')
     const [servers, setServers] = useState<EngineMcpServer[]>([])
     // The connector store already joins every server name to the app or custom entry that owns it.
     const { map: connectors, loaded: connectorsLoaded } = useConnectorServices(agentId)
@@ -59,14 +63,14 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
 
     // Mutate by delta: the engine merges by name under a per-agent lock, so a stale local
     // list can never clobber servers added elsewhere (other tabs, installs, the agent itself).
-    const mutate = useCallback(async (body: { upsert?: EngineMcpServer[]; remove?: string[] }): Promise<{ success: boolean; error?: string }> => {
+    const mutate = useCallback(async (body: { upsert?: EngineMcpServer[]; remove?: string[] }): Promise<{ success: boolean } & Refusal> => {
         const result = await patchAgentMcpServersAction(agentId, body)
         if (result.success && result.detail) {
             setServers((result.detail.config.mcpServers ?? []) as EngineMcpServer[])
             invalidateConnectorServices(agentId)
             refreshMcpServerStatuses(agentId)
         }
-        return { success: result.success, error: result.error }
+        return result
     }, [agentId])
 
     const stepKey = view.mode === 'edit' ? `edit:${view.index}` : view.mode
@@ -107,14 +111,14 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
 
     if (unreachable) {
         return (
-            <EmptyState className="h-full" icon={PlugIcon} title="Engine unreachable" description="Could not reach the engine for this coworker." />
+            <EmptyState className="h-full" icon={PlugIcon} title={t('unreachableTitle')} description={t('unreachableDescription')} />
         )
     }
 
     const newButton = (
-        <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON}>
+        <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
-                <PlusIcon className="size-3.5 mr-1" /> New
+                <PlusIcon className="size-3.5 mr-1" /> {t('new')}
             </Button>
         </TooltipDisabledReason>
     )
@@ -129,8 +133,8 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
                 {servers.length === 0 ? (
                     <EmptyState
                         icon={PlugIcon}
-                        title="No MCP servers yet"
-                        description="MCP servers give your coworker extra tools beyond built-in apps. Add one to extend what it can do."
+                        title={t('emptyTitle')}
+                        description={t('emptyDescription')}
                         action={newButton}
                     />
                 ) : (
@@ -149,7 +153,7 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
                                         meta={
                                             fromApp ? (
                                                 <Badge size="xs" tone="neutral" glow={false} leading={<BlocksIcon className="size-2.5" />}>
-                                                    App
+                                                    {t('appBadge')}
                                                 </Badge>
                                             ) : undefined
                                         }

@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { useDialogPortalContainer } from '@rerun/ui/forms'
 import { useBillingStore } from '@/stores/billing.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 type DefaultModelPickerProps = {
@@ -26,6 +27,7 @@ type DefaultModelPickerProps = {
 // Grouped by source, like the chat's model picker: a model only means something next to who pays
 // for it.
 export function DefaultModelPicker({ connections, current, credit, onPick, children }: DefaultModelPickerProps) {
+    const t = useTranslations('connections')
     const [open, setOpen] = useState(false)
     const { workspace } = useSession()
     const premiumAllowed = !workspace || isPremiumModelEntitled(workspace)
@@ -45,7 +47,7 @@ export function DefaultModelPicker({ connections, current, credit, onPick, child
                             <CommandGroup key={source.id} heading={source.name}>
                                 {enabledModels(source).map(model => {
                                     const selected = current.connectionId === source.id && current.model === model.id
-                                    const description = modelDescription(source, model.id)
+                                    const description = modelDescription(source, model.id, t)
                                     const locked = isModelLocked(source.id, model.id, premiumAllowed)
                                     const pick = () => {
                                         setOpen(false)

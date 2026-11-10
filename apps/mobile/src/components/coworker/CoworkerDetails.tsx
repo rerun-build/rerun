@@ -3,6 +3,7 @@ import { disabled } from '@expo/ui/swift-ui/modifiers'
 import type { CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
 import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import type { ManageLock } from '@/auth/access'
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
@@ -15,6 +16,7 @@ import { CircleTrigger, NativeMenu } from '@/components/ui/NativeMenu'
 import type { CoworkerStatus } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 
 const BUDDY_SIZE = 96
 
@@ -47,20 +49,22 @@ type CoworkerDetailsProps = {
 
 export const needsAttention = (app: InstalledServiceView) => app.status !== 'active'
 
-function appsValue(apps: InstalledServiceView[]): string {
+type DetailsTranslator = ReturnType<typeof useTranslations<'mobileCoworker.details'>>
+
+function appsValue(apps: InstalledServiceView[], t: DetailsTranslator): string {
     const broken = apps.filter(needsAttention).length
-    if (broken > 0) return `${broken} to connect`
-    return apps.length > 0 ? `${apps.length} connected` : 'None'
+    if (broken > 0) return t('appsToConnect', { count: broken })
+    return apps.length > 0 ? t('appsConnected', { count: apps.length }) : t('none')
 }
 
-function filesValue({ files, truncated }: CoworkerFiles): string {
-    if (files.length === 0) return 'None'
-    return truncated ? `${files.length}+` : String(files.length)
+function filesValue({ files, truncated }: CoworkerFiles, t: DetailsTranslator): string {
+    if (files.length === 0) return t('none')
+    return truncated ? t('filesTruncated', { count: files.length }) : t('filesCount', { count: files.length })
 }
 
-function routinesValue(routines: RoutineView[]): string {
-    if (routines.length === 0) return 'None'
-    return `${routines.filter(routine => routine.enabled).length} on`
+function routinesValue(routines: RoutineView[], t: DetailsTranslator): string {
+    if (routines.length === 0) return t('none')
+    return t('routinesOn', { count: routines.filter(routine => routine.enabled).length })
 }
 
 // The coworker at a glance, from its conversation: what it made, what it is connected to, what runs on its own, its
@@ -68,12 +72,14 @@ function routinesValue(routines: RoutineView[]): string {
 export function CoworkerDetails({ coworker, files, apps, routines, notifications, unavailable = {}, computerUnavailable, canDelete, lock, onBack, onEdit, onDelete, onFiles, onApps, onRoutines, onComputer, onNotifications }: CoworkerDetailsProps) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const t = useTranslations('mobileCoworker.details')
+    const tAccess = useTranslations('mobileCoworker.access')
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: insets.top + spacing.xs, paddingBottom: insets.bottom + spacing.xl, paddingHorizontal: spacing.lg, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <GlassButton symbol="chevron.left" label="Back" onPress={onBack} />
-                <NativeMenu glass="circle" label="More" trigger={<CircleTrigger symbol="ellipsis" />}>
-                    <MenuButton label="Delete coworker" systemImage="trash" role="destructive" onPress={onDelete} modifiers={[disabled(!canDelete || lock.locked)]} />
+                <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} />
+                <NativeMenu glass="circle" label={t('more')} trigger={<CircleTrigger symbol="ellipsis" />}>
+                    <MenuButton label={t('delete')} systemImage="trash" role="destructive" onPress={onDelete} modifiers={[disabled(!canDelete || lock.locked)]} />
                 </NativeMenu>
             </View>
 
@@ -89,26 +95,26 @@ export function CoworkerDetails({ coworker, files, apps, routines, notifications
                         </AppText>
                     ) : null}
                 </View>
-                <Button label="Edit" variant="secondary" size="sm" onPress={onEdit} disabled={lock.locked} />
+                <Button label={t('edit')} variant="secondary" size="sm" onPress={onEdit} disabled={lock.locked} />
                 {lock.reason ? (
                     <AppText variant="footnote" tone="muted" style={{ textAlign: 'center' }}>
-                        {lock.reason}
+                        {tAccess(lock.reason, { host: webHost })}
                     </AppText>
                 ) : null}
             </View>
 
             <Card>
-                <SettingsRow icon="folder" label="Files" value={files ? filesValue(files) : undefined} loading={!files && !unavailable.files} accessory="chevron" onPress={onFiles} />
+                <SettingsRow icon="folder" label={t('files')} value={files ? filesValue(files, t) : undefined} loading={!files && !unavailable.files} accessory="chevron" onPress={onFiles} />
                 <Separator inset={ICON_ROW_INSET} />
-                <SettingsRow icon="square.grid.2x2" label="Apps" value={apps ? appsValue(apps) : undefined} loading={!apps && !unavailable.apps} accessory="chevron" onPress={onApps} />
+                <SettingsRow icon="square.grid.2x2" label={t('apps')} value={apps ? appsValue(apps, t) : undefined} loading={!apps && !unavailable.apps} accessory="chevron" onPress={onApps} />
                 <Separator inset={ICON_ROW_INSET} />
-                <SettingsRow icon="clock" label="Routines" value={routines ? routinesValue(routines) : undefined} loading={!routines && !unavailable.routines} accessory="chevron" onPress={onRoutines} />
+                <SettingsRow icon="clock" label={t('routines')} value={routines ? routinesValue(routines, t) : undefined} loading={!routines && !unavailable.routines} accessory="chevron" onPress={onRoutines} />
                 <Separator inset={ICON_ROW_INSET} />
-                <SettingsRow icon="desktopcomputer" label="Computer" value={computerUnavailable ?? (coworker.status === 'working' ? 'Working' : 'Idle')} accessory="chevron" disabled={!!computerUnavailable} onPress={onComputer} />
+                <SettingsRow icon="desktopcomputer" label={t('computer')} value={computerUnavailable ?? (coworker.status === 'working' ? t('working') : t('idle'))} accessory="chevron" disabled={!!computerUnavailable} onPress={onComputer} />
             </Card>
 
             <Card>
-                <SettingsRow testID="row-notifications" icon="bell" label="Notifications" value={notifications ?? undefined} loading={notifications === null} accessory="chevron" onPress={onNotifications} />
+                <SettingsRow testID="row-notifications" icon="bell" label={t('notifications')} value={notifications ?? undefined} loading={notifications === null} accessory="chevron" onPress={onNotifications} />
             </Card>
         </ScrollView>
     )

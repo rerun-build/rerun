@@ -11,6 +11,7 @@ import { enterSandbox } from '@/app/api/_services/sandbox.service'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
+import { failure } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
 
 // The creator side of the join link. `experts.creator_token` is the capability that turns an
@@ -45,7 +46,7 @@ type ServiceClient = ReturnType<typeof createServiceRoleClient>
 
 async function requireUserId(): Promise<string> {
     const { user } = await getServerSession()
-    if (!user?.id) throw new AuthorizationError('Not authenticated')
+    if (!user?.id) throw new AuthorizationError('notAuthenticated')
     return user.id
 }
 
@@ -112,7 +113,7 @@ export async function loadOwnCreatorInviteAction(): Promise<LoadCreatorInviteRes
 // instead of collecting a second engine.
 export async function claimCreatorSandboxAction(token?: string): Promise<ActionResult<{ workspaceId: number }>> {
     const { user, session, isAnonymous } = await getServerSession()
-    if (!user?.id || isAnonymous || !session?.email) return { ok: false, error: 'Sign in with the invited email to claim your creator profile.' }
+    if (!user?.id || isAnonymous || !session?.email) return failure('signInToClaimCreator')
     const userId = user.id
     const supabase = createServiceRoleClient()
 
@@ -120,16 +121,16 @@ export async function claimCreatorSandboxAction(token?: string): Promise<ActionR
 
     const ownProfileId = account?.expert_profile_id ?? null
     const filter = token ? { creator_token: token } : ownProfileId ? { id: ownProfileId } : null
-    if (!filter) return { ok: false, error: 'This account is not linked to a creator profile.' }
+    if (!filter) return failure('noCreatorProfile')
 
     const { data: expert } = await selectMaybeSingle(supabase, 'experts', ['id', 'slug', 'email', 'status', 'application_status'] as const, filter)
-    if (!expert) return { ok: false, error: 'This link is no longer valid.' }
-    if (!isInviteOpen(expert)) return { ok: false, error: 'This creator invitation is not open anymore.' }
+    if (!expert) return failure('linkInvalid')
+    if (!isInviteOpen(expert)) return failure('creatorInviteClosed')
 
     const owner = await linkedUserId(supabase, expert.id)
-    if (owner && owner !== userId) return { ok: false, error: 'This creator profile is already linked to another account.' }
-    if (ownProfileId && ownProfileId !== expert.id) return { ok: false, error: 'This account is already linked to another creator profile.' }
-    if (!owner && expert.email?.toLowerCase() !== session.email.toLowerCase()) return { ok: false, error: 'This invitation is for another email. Sign in with the invited address.' }
+    if (owner && owner !== userId) return failure('creatorProfileTaken')
+    if (ownProfileId && ownProfileId !== expert.id) return failure('accountHasOtherCreatorProfile')
+    if (!owner && expert.email?.toLowerCase() !== session.email.toLowerCase()) return failure('invitationOtherEmail')
 
     if (!owner) {
         const { error } = await supabase
@@ -159,11 +160,11 @@ export async function acceptCreatorTermsAction(): Promise<ActionResult> {
     const supabase = createServiceRoleClient()
 
     const { data: account } = await selectMaybeSingle(supabase, 'users', ['expert_profile_id'] as const, { id: userId })
-    if (!account?.expert_profile_id) return { ok: false, error: 'This account is not linked to a creator profile.' }
+    if (!account?.expert_profile_id) return failure('noCreatorProfile')
 
     const { data: expert } = await selectMaybeSingle(supabase, 'experts', ['id', 'slug', 'email', 'status', 'application_status'] as const, { id: account.expert_profile_id })
-    if (!expert) return { ok: false, error: 'This account is not linked to a creator profile.' }
-    if (!isInviteOpen(expert)) return { ok: false, error: 'This creator invitation is not open anymore.' }
+    if (!expert) return failure('noCreatorProfile')
+    if (!isInviteOpen(expert)) return failure('creatorInviteClosed')
 
     const now = new Date().toISOString()
     const { error } = await supabase

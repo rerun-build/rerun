@@ -91,7 +91,8 @@ export type PlanAgent = { name: string; role: string; when: string; gets: string
 
 export type PlanBox = { name: string | null; agents: PlanAgent[] }
 
-export type ShownPlan = { title: string; boxes: PlanBox[] }
+// `title` is null when the assistant gave none: the card then reads its own default.
+export type ShownPlan = { title: string | null; boxes: PlanBox[] }
 
 // Grouped the way the web card groups it: the declared Boxes in their order, then an agent filed under a
 // Box nobody declared, so no agent ever drops off the card. A Box nobody works in has nothing to say.
@@ -106,7 +107,7 @@ export function readPlan(input: unknown): ShownPlan {
     const order = [...declared, ...entries.map(entry => entry.box).filter(box => !declared.some(name => name.toLowerCase() === box.toLowerCase()))]
     const names = order.filter((name, index) => order.findIndex(other => other.toLowerCase() === name.toLowerCase()) === index)
     const boxes = names.map(name => ({ name: name || null, agents: entries.filter(entry => entry.box.toLowerCase() === name.toLowerCase()).map(entry => entry.agent) }))
-    return { title: asText(args.title) || 'Your first coworker', boxes: boxes.filter(box => box.agents.length > 0) }
+    return { title: asText(args.title) || null, boxes: boxes.filter(box => box.agents.length > 0) }
 }
 
 export type PlanOutput = { answered: true; confirmed: boolean } | { answered: false }

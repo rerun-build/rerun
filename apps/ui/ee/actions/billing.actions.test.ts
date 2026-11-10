@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { createTranslator } from 'use-intl'
+import frenchErrors from '@rerun/i18n/messages/fr/errors.json'
 
 import { requireAdminContext, requireWorkspaceId } from '@/app/api/_auth/ownership'
 import * as billing from '@/ee/services/billing.service'
@@ -23,7 +25,6 @@ vi.mock('@/ee/lib/billing/stripe', async importOriginal => ({ ...(await importOr
 vi.mock('@/app/api/_auth/ownership', () => ({ requireAdminContext: vi.fn(), requireWorkspaceId: vi.fn() }))
 vi.mock('@/app/api/_services/getting-started.service', () => ({ markPaymentMethodAdded: vi.fn() }))
 vi.mock('@/ee/services/billing.service', () => ({
-    CHARGE_REFUSED_MESSAGE: "We couldn't charge your card. Nothing was charged, try again or change your card.",
     PLAN_CARD_SETUP_KIND: 'plan_card_setup',
     acceptPlanTerms: vi.fn(),
     changePlan: vi.fn(),
@@ -86,19 +87,19 @@ describe('confirmCardSetupAction', () => {
 
     it('refuses a session that is not a card setup', async () => {
         retrieved({ status: 'complete', metadata: { kind: 'template_purchase', workspace_id: '42' } })
-        await expect(confirmCardSetupAction('cs_1')).resolves.toEqual({ ok: false, error: 'Not a card setup session.' })
+        await expect(confirmCardSetupAction('cs_1')).resolves.toEqual({ ok: false, error: 'Not a card setup session.', code: 'notCardSetupSession' })
         expect(billing.completeCardSetupSession).not.toHaveBeenCalled()
     })
 
     it('refuses a session from another workspace', async () => {
         retrieved({ status: 'complete', metadata: { kind: 'plan_card_setup', workspace_id: '7' } })
-        await expect(confirmCardSetupAction('cs_1')).resolves.toEqual({ ok: false, error: 'This session belongs to another workspace.' })
+        await expect(confirmCardSetupAction('cs_1')).resolves.toEqual({ ok: false, error: 'This session belongs to another workspace.', code: 'sessionOtherWorkspace' })
         expect(billing.completeCardSetupSession).not.toHaveBeenCalled()
     })
 
     it('refuses a card form that was not completed', async () => {
         retrieved({ status: 'open', metadata: { kind: 'plan_card_setup', workspace_id: '42' } })
-        await expect(confirmCardSetupAction('cs_1')).resolves.toEqual({ ok: false, error: 'The card form was not completed.' })
+        await expect(confirmCardSetupAction('cs_1')).resolves.toEqual({ ok: false, error: 'The card form was not completed.', code: 'cardFormIncomplete' })
         expect(billing.completeCardSetupSession).not.toHaveBeenCalled()
     })
 
@@ -151,14 +152,14 @@ describe('the thin billing actions', () => {
     })
 
     it('refuses business details without a name or a number before reaching the service', async () => {
-        await expect(saveBusinessDetailsAction({ ...BUSINESS, name: '  ' })).resolves.toEqual({ ok: false, error: 'Enter the business name' })
-        await expect(saveBusinessDetailsAction({ ...BUSINESS, value: '' })).resolves.toEqual({ ok: false, error: 'Enter the number' })
+        await expect(saveBusinessDetailsAction({ ...BUSINESS, name: '  ' })).resolves.toEqual({ ok: false, error: 'Enter the business name', code: 'businessNameRequired' })
+        await expect(saveBusinessDetailsAction({ ...BUSINESS, value: '' })).resolves.toEqual({ ok: false, error: 'Enter the number', code: 'taxNumberRequired' })
         expect(billing.saveBusinessDetails).not.toHaveBeenCalled()
     })
 
     it('falls back to a generic message when something that is not an Error is thrown', async () => {
         vi.mocked(billing.changePlan).mockRejectedValue('nope')
-        await expect(changePlanAction(SELECTION)).resolves.toEqual({ ok: false, error: 'Failed to change your plan' })
+        await expect(changePlanAction(SELECTION)).resolves.toEqual({ ok: false, error: 'Failed to change your plan', code: 'changePlanFailed' })
     })
 
     it('passes on the decline the service already worded for the customer', async () => {
@@ -177,7 +178,7 @@ describe('the thin billing actions', () => {
             code: 'subscription_payment_intent_requires_action',
         })
         vi.mocked(billing.changePlan).mockRejectedValue(requiresAction)
-        await expect(changePlanAction(SELECTION)).resolves.toEqual({ ok: false, error: "We couldn't charge your card. Nothing was charged, try again or change your card." })
+        await expect(changePlanAction(SELECTION)).resolves.toEqual({ ok: false, error: "We couldn't charge your card. Nothing was charged, try again or change your card.", code: 'chargeRefused' })
     })
 
     it('refuses a selection the schema does not know before reaching the service', async () => {
@@ -192,5 +193,14 @@ describe('the thin billing actions', () => {
         const stale = { quantities: { agent_pack: 3, credit_pack: 0, linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' } as never
         await expect(changePlanAction(stale)).resolves.toMatchObject({ ok: true })
         expect(billing.changePlan).toHaveBeenCalledWith({ quantities: { credit_pack: 0, linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' })
+    })
+
+    it('sends the refusal as a code a French screen reads in French', async () => {
+        vi.mocked(billing.changePlan).mockRejectedValue(Object.assign(new Error('requires action'), { type: 'StripeCardError', code: 'subscription_payment_intent_requires_action' }))
+        const result = await changePlanAction(SELECTION)
+        expect(result.ok).toBe(false)
+        if (result.ok || !result.code) throw new Error('expected a coded refusal')
+        const french = createTranslator({ locale: 'fr', messages: { errors: frenchErrors }, namespace: 'errors' })
+        expect(french(result.code as never, result.params as never)).toBe("Nous n'avons pas pu débiter votre carte. Rien n'a été prélevé, réessayez ou changez de carte.")
     })
 })

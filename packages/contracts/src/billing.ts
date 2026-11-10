@@ -1,4 +1,4 @@
-import { creditsFromUsd, creditsLabel } from './credits.js'
+import { creditsFromUsd } from './credits.js'
 
 // The subscription plan Rerun sells: one base plan extended by add-on quantities carried as items
 // on the same Stripe subscription. Shared rather than app-local because the landing quotes the same
@@ -33,20 +33,23 @@ export function trialEndDate(from: Date = new Date()): Date {
     return new Date(from.getTime() + TRIAL_DAYS * DAY_MS)
 }
 
-export function trialLimitsLabel(): string {
-    return `${TRIAL_ACTIVE_AGENTS} coworkers and ${creditsLabel(TRIAL_CREDITS)}`
+// The `billing.trialOffer` catalog.
+export type TrialCopy = (key: 'limitsDuringTrial' | 'chargeLine' | 'cardlessLine', values?: Record<string, string | number>) => string
+
+export function trialLimitsCaption(t: TrialCopy): string {
+    return t('limitsDuringTrial', { agents: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS })
 }
 
 // The one sentence every trial offer says, so the card form never comes as a surprise and the charge
 // is announced with its amount and its date wherever the trial is sold.
-export function trialChargeLine(price: string, chargeDate: string): string {
-    return `Card required, $0 today. ${price} charged on ${chargeDate} unless you cancel before.`
+export function trialChargeLine(t: TrialCopy, price: string, chargeDate: string): string {
+    return t('chargeLine', { price, date: chargeDate })
 }
 
 // The same sentence for the cardless arm of the trial test: nothing is asked today, and the trial
 // only turns into the plan if a card is added before it ends.
-export function cardlessTrialLine(price: string, endDate: string): string {
-    return `No card needed, $0 today. Add one before ${endDate} to keep going at ${price}/month.`
+export function cardlessTrialLine(t: TrialCopy, price: string, endDate: string): string {
+    return t('cardlessLine', { price, date: endDate })
 }
 
 export const BILLING_INTERVALS = ['monthly', 'yearly'] as const

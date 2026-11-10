@@ -30,14 +30,15 @@ export function withoutOAuthError(url: URL): URL {
 
 export type OAuthRetryCopy = { title: string; subtitle: string }
 
+export type OAuthRetryTranslator = (key: 'expiredTitle' | 'expiredWithProvider' | 'expired' | 'cancelledTitle' | 'cancelled' | 'failedTitle' | 'failed', values?: { provider: string }) => string
+
 // What the account dialog says when it reopens on a failed return. GoTrue keeps the state for five
 // minutes: past that, the provider sends the visitor back with `bad_oauth_state`, nothing to fix but
 // to pick the account again.
-export function oauthRetryCopy(code: string, providerLabel: string | null): OAuthRetryCopy {
+export function oauthRetryCopy(code: string, providerLabel: string | null, t: OAuthRetryTranslator): OAuthRetryCopy {
     if (code === 'bad_oauth_state') {
-        const what = providerLabel ? `${providerLabel} took more than 5 minutes to send you back, so it expired.` : 'Signing in took more than 5 minutes, so it expired.'
-        return { title: "Let's try that again", subtitle: `${what} Your answers are kept.` }
+        return { title: t('expiredTitle'), subtitle: providerLabel ? t('expiredWithProvider', { provider: providerLabel }) : t('expired') }
     }
-    if (code === 'access_denied') return { title: 'Sign-in was cancelled', subtitle: 'Pick a way to continue, your answers are kept.' }
-    return { title: "Sign-in didn't go through", subtitle: 'Try again, your answers are kept.' }
+    if (code === 'access_denied') return { title: t('cancelledTitle'), subtitle: t('cancelled') }
+    return { title: t('failedTitle'), subtitle: t('failed') }
 }

@@ -61,14 +61,14 @@ async function convert(supabase: Client, workspaceId: number, slug: AppSlug): Pr
     if (holding.length <= paidSlots) return 'nothing_to_charge'
 
     const newest = [...holding].sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
-    const pauseNewest = async (message: string) => {
+    const pauseNewest = async (message: string, key: 'trialEndedPlanInactive' | 'trialEndedDeclined') => {
         if (newest) await updateConnection(supabase, newest.id, { status: 'paused', pause_reason: 'trial_payment_failed', paused_until: null })
-        await notifyWorkspace(supabase, workspaceId, { appName: app.name, message, email: true })
+        await notifyWorkspace(supabase, workspaceId, { appName: app.name, message, email: true, copy: { key, values: { provider: app.providerLabel, account: newest?.label ?? 'none' } } })
     }
     const account = newest?.label ?? 'the account'
 
     if (!subscription || subscription.status !== 'active') {
-        await pauseNewest(`Your free ${app.providerLabel} slot ended while your plan is not active, so ${account} is paused. Add a slot in Billing within a week to keep it, or it will be disconnected.`)
+        await pauseNewest(`Your free ${app.providerLabel} slot ended while your plan is not active, so ${account} is paused. Add a slot in Billing within a week to keep it, or it will be disconnected.`, 'trialEndedPlanInactive')
         return 'declined'
     }
     try {
@@ -80,7 +80,7 @@ async function convert(supabase: Client, workspaceId: number, slug: AppSlug): Pr
             throw err
         }
         console.warn(`[apps:${slug}] trial conversion of workspace ${workspaceId} declined`, err instanceof Error ? err.message : err)
-        await pauseNewest(`Your free ${app.providerLabel} slot ended and the card was declined, so ${account} is paused. Add a slot in Billing within a week to keep it, or it will be disconnected.`)
+        await pauseNewest(`Your free ${app.providerLabel} slot ended and the card was declined, so ${account} is paused. Add a slot in Billing within a week to keep it, or it will be disconnected.`, 'trialEndedDeclined')
         return 'declined'
     }
 }
@@ -98,6 +98,7 @@ export async function sweepSubscriberTrials(supabase: Client, now: Date): Promis
                 await notifyWorkspace(supabase, row.workspace_id, {
                     appName: app.name,
                     message: `Your free ${app.providerLabel} slot ends on ${dateLabel(row.trial_ends_at as string)}. It then becomes a paid slot on your plan. Disconnect the account from Settings → Apps before then if you do not want to keep it.`,
+                    copy: { key: 'trialEndsSoon', values: { provider: app.providerLabel, endsAt: row.trial_ends_at as string } },
                     email: true,
                 })
                 await settle(supabase, row.workspace_id, row.app_slug, { trial_reminder_sent_at: now.toISOString() })

@@ -1,0 +1,360 @@
+{
+    "sources": {
+        "kinds": {
+            "included": "Inclus",
+            "plan": "Forfait",
+            "key": "Clé API"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro ou Max",
+                "hint": "Connectez-vous avec votre compte Claude"
+            },
+            "codex": {
+                "title": "ChatGPT Plus ou Pro",
+                "hint": "Connectez-vous avec votre compte ChatGPT"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "Modèles Claude, facturés au jeton"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "Modèles GPT, facturés au jeton"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "Modèles Gemini, facturés au jeton"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "Tous les modèles derrière une seule clé"
+            },
+            "opencode": {
+                "title": "OpenCode Go ou Console",
+                "hint": "Collez votre clé OpenCode"
+            },
+            "custom": {
+                "title": "Point d’accès personnalisé",
+                "hint": "Ollama, LM Studio, vLLM ou tout serveur compatible OpenAI"
+            }
+        },
+        "summary": "{kind} · {count, plural, one {# modèle} other {# modèles}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "Les crédits Rerun sont en pause",
+        "creditUsed": "{percent} % des crédits du mois utilisés",
+        "creditUsedUpOn": "Crédits du mois épuisés, de retour le {date}",
+        "creditUsedUpNextMonth": "Crédits du mois épuisés, de retour le mois prochain",
+        "creditBackOn": "le {date}",
+        "creditBackNextMonth": "le mois prochain",
+        "windows": {
+            "session": "Session",
+            "fiveHour": "5 heures",
+            "weekly": "Hebdomadaire",
+            "monthly": "Mensuel",
+            "modelWeekly": "{label} hebdomadaire",
+            "modelWeeklyUnnamed": "Modèle hebdomadaire"
+        },
+        "windowResets": "réinitialisation {when}",
+        "tiers": {
+            "fast": "Rapide et économique",
+            "smart": "Le plus intelligent"
+        },
+        "opencodePlan": {
+            "go": "Inclus dans Go",
+            "console": "Crédits Console"
+        },
+        "unavailable": {
+            "opencodeRetired": "N'est plus proposé par OpenCode",
+            "codexOutdated": "Codex CLI pas à jour sur cette box",
+            "notInChatgptPlan": "Pas inclus dans votre forfait ChatGPT"
+        },
+        "pricePerMillion": "{input} entrée · {output} sortie /M",
+        "guide": {
+            "anthropic": {
+                "title": "Obtenir votre clé Anthropic",
+                "step1": "Ouvrez la [console Anthropic](https://console.anthropic.com/settings/keys) et connectez-vous.",
+                "step2": "Cliquez sur **Create Key** et nommez-la, par exemple « Rerun ».",
+                "step3": "Copiez la clé (elle commence par `sk-ant-`) et collez-la ci-dessus. Elle n'est affichée qu'une fois."
+            },
+            "openai": {
+                "title": "Obtenir votre clé OpenAI",
+                "step1": "Ouvrez [OpenAI API keys](https://platform.openai.com/api-keys) et connectez-vous.",
+                "step2": "Cliquez sur **Create new secret key** et nommez-la, par exemple « Rerun ».",
+                "step3": "Copiez la clé (elle commence par `sk-`) et collez-la ci-dessus. Elle n'est affichée qu'une fois."
+            },
+            "google": {
+                "title": "Obtenir votre clé Google",
+                "step1": "Ouvrez [Google AI Studio](https://aistudio.google.com/apikey) et connectez-vous avec votre compte Google.",
+                "step2": "Cliquez sur **Create API key** et choisissez un projet Google Cloud.",
+                "step3": "Copiez la clé et collez-la ci-dessus."
+            },
+            "openrouter": {
+                "title": "Obtenir votre clé OpenRouter",
+                "step1": "Ouvrez la page des [clés OpenRouter](https://openrouter.ai/keys) et connectez-vous.",
+                "step2": "Cliquez sur **Create API Key**, puis ajoutez des crédits si votre solde est vide.",
+                "step3": "Copiez la clé (elle commence par `sk-or-`) et collez-la ci-dessus. Elle n'est affichée qu'une fois."
+            },
+            "opencode": {
+                "title": "Obtenir votre clé OpenCode",
+                "step1": "Ouvrez [OpenCode](https://opencode.ai/auth) et connectez-vous.",
+                "step2": "Abonnez-vous à **OpenCode Go**, ou ajoutez des crédits pour utiliser les modèles Console.",
+                "step3": "Créez une clé API, copiez-la (elle commence par `oc_sk_`) et collez-la ci-dessus."
+            }
+        }
+    },
+    "noPlan": {
+        "trialText": "Démarrez votre essai gratuit pour connecter votre forfait Claude, votre forfait ChatGPT ou une clé API.",
+        "subscribeText": "Abonnez-vous pour connecter votre forfait Claude, votre forfait ChatGPT ou une clé API.",
+        "startTrial": "Démarrer l’essai gratuit",
+        "subscribe": "S’abonner"
+    },
+    "baseUrl": {
+        "label": "URL de base personnalisée",
+        "helper": "Envoyer les requêtes à votre propre routeur compatible OpenRouter",
+        "inputLabel": "URL de base OpenRouter"
+    },
+    "planLimits": {
+        "title": "Utilisation du forfait",
+        "empty": "L’utilisation s’affiche ici après la prochaine exécution sur ce forfait.",
+        "updatedJustNow": "Mis à jour à l’instant",
+        "updatedAgo": "Mis à jour il y a {age}",
+        "used": "{percent} utilisés",
+        "usedWithReset": "{percent} utilisés, {reset}"
+    },
+    "meter": {
+        "planLimit": "Limite {name} utilisée",
+        "monthlyCredits": "Crédits mensuels utilisés"
+    },
+    "providerPicker": {
+        "added": "Ajouté"
+    },
+    "status": {
+        "paused": "En pause",
+        "creditsUsedUp": "Crédits épuisés",
+        "signInAgain": "Se reconnecter",
+        "keyRejected": "Clé refusée",
+        "keyMissing": "Clé manquante",
+        "ready": "Prêt"
+    },
+    "backToProviders": "Retour aux fournisseurs d’IA",
+    "subtitle": {
+        "included": "Inclus dans votre forfait",
+        "apiKey": "Clé API {provider}"
+    },
+    "key": {
+        "label": "Clé API",
+        "placeholder": "Collez votre clé"
+    },
+    "name": {
+        "label": "Nom",
+        "helper": "Affiché dans le sélecteur de modèle de chaque coworker"
+    },
+    "becomesDefault": "Elle devient le modèle par défaut du workspace : chaque coworker sans modèle propre l’utilisera.",
+    "connecting": "Connexion…",
+    "errors": {
+        "nameRequired": "Donnez un nom à cette connexion",
+        "createFailed": "Impossible de créer la connexion",
+        "renameFailed": "Impossible de renommer la connexion",
+        "saveFailed": "Échec de l’enregistrement",
+        "startFailed": "Impossible de lancer la connexion",
+        "saveTokenFailed": "Impossible d’enregistrer le jeton",
+        "saveConnectionFailed": "Impossible d’enregistrer la connexion",
+        "codeExpired": "Le code a expiré, recommencez",
+        "deleteFailed": "Impossible de supprimer la connexion",
+        "defaultFailed": "Impossible de changer le modèle par défaut"
+    },
+    "addProvider": {
+        "addKey": "Ajouter la clé"
+    },
+    "remove": {
+        "button": "Supprimer {name}",
+        "confirmTitle": "Supprimer {name} ?",
+        "confirm": "Supprimer",
+        "removed": "{name} supprimé",
+        "checking": "Vérification de ce qui l’utilise encore…",
+        "fallBack": {
+            "agents": "{agents} passeront sur le modèle par défaut du workspace.",
+            "automations": "{count, plural, one {# automatisation passera} other {# automatisations passeront}} sur le modèle par défaut du workspace.",
+            "both": "{agents} et {count, plural, one {# automatisation} other {# automatisations}} passeront sur le modèle par défaut du workspace."
+        },
+        "holdsDefault": "Elle porte le modèle par défaut du workspace, qui est retiré : chaque coworker sans modèle choisi revient sur Rerun.",
+        "nothingRuns": "L’identifiant est retiré de la Box. Rien ne l’utilise.",
+        "released": {
+            "agents": "{agents} utilisent désormais le modèle par défaut du workspace.",
+            "automations": "{count, plural, one {# automatisation utilise} other {# automatisations utilisent}} désormais le modèle par défaut du workspace.",
+            "both": "{agents} et {count, plural, one {# automatisation} other {# automatisations}} utilisent désormais le modèle par défaut du workspace."
+        },
+        "defaultCleared": "Le modèle par défaut du workspace a été retiré."
+    },
+    "customModels": {
+        "remove": "Retirer",
+        "add": "Ajouter",
+        "addCustom": "Ajouter un modèle personnalisé",
+        "openrouterHint": "Ajoutez n’importe quel identifiant de modèle OpenRouter (par ex. <mono>x-ai/grok-4</mono>).",
+        "serverHint": "Ajoutez un modèle que le serveur sert sans le lister (par ex. <mono>llama3.3:70b</mono>).",
+        "idPlaceholder": "identifiant du modèle"
+    },
+    "models": {
+        "title": "Modèles",
+        "defaultModel": "Modèle par défaut",
+        "turnOff": "Désactiver {model}",
+        "turnOn": "Activer {model}",
+        "lockDefault": "C’est le modèle par défaut. Choisissez d’abord un autre modèle par défaut.",
+        "lockLast": "Les coworkers ont besoin d’au moins un modèle de cette source.",
+        "lockCustom": "Modèle personnalisé. Retirez-le plus bas.",
+        "available": "Vos coworkers peuvent utiliser",
+        "count": "{on} sur {total}",
+        "availableEmpty": "Glissez un modèle ici pour que les coworkers puissent l’utiliser.",
+        "hidden": "Désactivés",
+        "hiddenEmpty": "Glissez un modèle ici pour que les coworkers ne l’utilisent pas."
+    },
+    "opencode": {
+        "goTitle": "Inclus dans OpenCode Go",
+        "goHint": "Payé par votre forfait Go, dans ses limites de 5 heures, hebdomadaire et mensuelle.",
+        "consoleTitle": "Console, payée avec vos crédits",
+        "consoleHint": "Facturé au jeton sur vos crédits OpenCode. Désactivé tant que vous n’en activez pas un.",
+        "included": "Inclus",
+        "credits": "Crédits",
+        "new": "Nouveau",
+        "noVision": "Sans vision",
+        "search": "Rechercher des modèles",
+        "count": "{on} sur {total} actifs",
+        "emptySection": "OpenCode ne liste aucun modèle ici pour le moment.",
+        "noMatch": "Aucun modèle ne correspond à « {query} »."
+    },
+    "detail": {
+        "readOnly": "{reason}.",
+        "keyReplaced": "Clé remplacée",
+        "signedInAgain": "Reconnecté",
+        "creditsTitle": "Crédits du mois",
+        "topUp": "Recharger",
+        "creditsUsedUpOn": "Les coworkers qui tournent sur Rerun sont en pause jusqu’au retour des crédits le {date}. Rechargez ou choisissez un autre modèle par défaut pour les relancer.",
+        "creditsUsedUpNextMonth": "Les coworkers qui tournent sur Rerun sont en pause jusqu’au retour des crédits le mois prochain. Rechargez ou choisissez un autre modèle par défaut pour les relancer.",
+        "creditsIncluded": "Inclus dans votre forfait Rerun. Pas de clé, rien à configurer.",
+        "signInRejected": "Cette connexion a été refusée. Les coworkers qui l’utilisent sont arrêtés jusqu’à ce que vous vous reconnectiez.",
+        "signInExpired": "Cette connexion a expiré. Les coworkers qui l’utilisent sont arrêtés jusqu’à ce que vous vous reconnectiez.",
+        "reconnected": "Vos coworkers redémarrent",
+        "keyRejected": "Cette clé a été refusée. Les coworkers qui l’utilisent sont arrêtés jusqu’à ce que vous en colliez une nouvelle.",
+        "keyMissing": "Aucune clé enregistrée. Les coworkers qui l’utilisent sont arrêtés jusqu’à ce que vous en colliez une."
+    },
+    "panel": {
+        "adminOnly": "Seul un admin peut modifier les fournisseurs d’IA",
+        "groups": {
+            "default": "Modèle par défaut",
+            "included": "Inclus",
+            "plans": "Vos abonnements",
+            "keys": "Vos clés API",
+            "noPlan": "Vos abonnements et clés API"
+        },
+        "pitch": {
+            "plansWithOpencode": "Vous utilisez déjà Claude Code, Codex ou OpenCode ? Vos coworkers peuvent tourner sur votre forfait.",
+            "plans": "Vous utilisez déjà Claude Code ou Codex ? Vos coworkers peuvent tourner sur votre forfait.",
+            "keysWithCustom": "Payez directement votre fournisseur, au jeton, ou faites tourner votre propre modèle.",
+            "keys": "Payez directement votre fournisseur, au jeton."
+        },
+        "default": {
+            "via": "Via {source}. Les coworkers sans modèle propre l’utilisent.",
+            "pausedPick": "Les crédits Rerun sont en pause, donc les coworkers sans modèle propre le sont aussi. Choisissez un autre modèle pour les relancer.",
+            "pausedAdd": "Les crédits Rerun sont en pause, donc les coworkers sans modèle propre le sont aussi. Ajoutez un forfait ou une clé API pour les relancer.",
+            "usedUpOnPick": "Les crédits Rerun sont épuisés jusqu’au {date}, donc les coworkers sans modèle propre sont en pause. Choisissez un autre modèle pour les relancer.",
+            "usedUpOnAdd": "Les crédits Rerun sont épuisés jusqu’au {date}, donc les coworkers sans modèle propre sont en pause. Ajoutez un forfait ou une clé API pour les relancer.",
+            "usedUpNextMonthPick": "Les crédits Rerun sont épuisés jusqu’au mois prochain, donc les coworkers sans modèle propre sont en pause. Choisissez un autre modèle pour les relancer.",
+            "usedUpNextMonthAdd": "Les crédits Rerun sont épuisés jusqu’au mois prochain, donc les coworkers sans modèle propre sont en pause. Ajoutez un forfait ou une clé API pour les relancer.",
+            "stopped": "Les coworkers sans modèle propre sont arrêtés. Réparez {source} ou choisissez un autre modèle.",
+            "noOtherModel": "Aucun autre modèle n’est prêt. Ajoutez d’abord un forfait ou une clé API.",
+            "change": "Changer"
+        },
+        "addSubscription": "Ajouter un abonnement",
+        "addApiKey": "Ajouter une clé API"
+    },
+    "chatgpt": {
+        "allowStep": "Autoriser la connexion par code dans ChatGPT",
+        "openSettings": "Ouvrir les paramètres ChatGPT",
+        "alreadyOn": "C’est déjà activé",
+        "codeStep": "Saisir le code sur OpenAI",
+        "remarks": {
+            "connected": "Tout est prêt !",
+            "starting": "Je récupère un code",
+            "expired": "Ce code a expiré.",
+            "stuck": "Toujours rien d’OpenAI.",
+            "waiting": "J’attends OpenAI",
+            "grabCode": "Récupérez maintenant un code.",
+            "turnOn": "Activez ceci une seule fois."
+        },
+        "setting": {
+            "path": "Où se trouve le réglage dans ChatGPT",
+            "settings": "Paramètres",
+            "security": "Sécurité",
+            "deviceCode": "Activer l’autorisation par code d’appareil pour Codex"
+        },
+        "adminSwitches": "L’admin de votre ChatGPT l’active pour tout le workspace. <copy></copy>",
+        "plusOrPro": "J’ai Plus ou Pro",
+        "businessQuestion": "Vous avez ChatGPT Business ou Enterprise ?",
+        "copyCode": "Copier le code",
+        "enterCode": "Saisissez-le sur <link>la page d’OpenAI</link> et approuvez. Cette fenêtre le détecte toute seule.",
+        "opening": "OpenAI s’ouvre dans un nouvel onglet",
+        "gettingCode": "Récupération du code…",
+        "newCode": "Obtenir un nouveau code",
+        "getCode": "Obtenir un code",
+        "stuck": {
+            "expiredAdmin": "Le code a expiré. Votre admin n’a sans doute pas encore autorisé la connexion par code. <copy></copy>",
+            "errorAdmin": "Une erreur sur la page d’OpenAI ? Votre admin n’a sans doute pas encore autorisé la connexion par code. <copy></copy>",
+            "expiredSelf": "Le code a expiré. La connexion par code est sans doute encore désactivée : activez-la dans <link>Paramètres → Sécurité</link>, puis obtenez un nouveau code.",
+            "errorSelf": "Une erreur sur la page d’OpenAI ? La connexion par code est sans doute encore désactivée : activez-la dans <link>Paramètres → Sécurité</link>, puis saisissez à nouveau le code."
+        },
+        "copied": "Copié",
+        "copyMessage": "Copier un message pour l’admin",
+        "adminMessage": "Bonjour ! Pourriez-vous activer « Autorisation par code d’appareil pour Codex » dans les paramètres de notre workspace ChatGPT ? J’en ai besoin pour connecter mon forfait ChatGPT à Rerun."
+    },
+    "claude": {
+        "remarks": {
+            "idle": "Je vous attends ici.",
+            "waiting": "Collez ce que Claude vous a donné.",
+            "checking": "Vérification",
+            "connected": "Tout est prêt !"
+        },
+        "approveStep": "Approuver Rerun sur Claude",
+        "opening": "Claude s’ouvre dans un nouvel onglet",
+        "openAgain": "Rouvrir Claude",
+        "open": "Ouvrir Claude",
+        "pasteStep": "Coller le code",
+        "checkingCode": "Vérification du code…",
+        "codeAccepted": "Code accepté",
+        "codePlaceholder": "Code de Claude",
+        "paste": "Coller",
+        "pasteHint": "Collez-le dans le champ avec ⌘V ou Ctrl+V."
+    },
+    "nameStep": {
+        "title": "Nommez-la",
+        "remark": "Dernière chose : un nom.",
+        "fieldLabel": "Nom de la connexion",
+        "saving": "Enregistrement…",
+        "done": "Terminé",
+        "helper": "Affiché dans le sélecteur de modèle de chaque coworker."
+    },
+    "letsGo": "C’est parti",
+    "custom": {
+        "server": "Serveur",
+        "other": "Autre",
+        "baseUrl": "URL de base",
+        "keyOptionalPlaceholder": "Aucune pour un serveur local",
+        "modelId": "Identifiant du modèle",
+        "connect": "Connecter",
+        "endpoint": "Point d’accès",
+        "contextWindow": "Fenêtre de contexte",
+        "contextWindowHelper": "En jetons, pour les modèles dont le serveur n’indique pas la taille",
+        "vision": "Les modèles voient les images",
+        "visionHelper": "Nécessaire pour les captures d’écran et l’ordinateur",
+        "probe": {
+            "unreachableCloud": "Impossible de joindre {host}. Il faut une adresse publique qui répond.",
+            "unreachableLocal": "Impossible de joindre {host}. Vérifiez que le serveur tourne et que l’engine peut le joindre.",
+            "unauthorized": "Le serveur a refusé cette clé. Vérifiez qu’elle a été copiée en entier.",
+            "notListed": "Ce serveur ne liste pas ses modèles. Saisissez l’identifiant de celui à utiliser.",
+            "refused": "Le serveur a refusé {model} : {detail}",
+            "refusedPlain": "Le serveur a refusé {model}.",
+            "refusedUnnamedDetail": "Le serveur a refusé ce modèle : {detail}",
+            "refusedUnnamed": "Le serveur a refusé ce modèle."
+        }
+    }
+}

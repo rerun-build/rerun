@@ -234,7 +234,7 @@ describe('deliverLifecycleEmail', () => {
         it('leaves it out of a mandatory end-of-access notice', async () => {
             await deliver(input('trial_ending_3d', { snapshot: { trialEndsAt: new Date(NOW.getTime() + 20 * HOUR) } }))
 
-            expect(emails.sendTrialEndingEmail).toHaveBeenCalledWith({ to: 'ada@example.com', unsubscribeUrl: null }, expect.objectContaining({ daysLeft: 1 }))
+            expect(emails.sendTrialEndingEmail).toHaveBeenCalledWith({ to: 'ada@example.com', unsubscribeUrl: null, locale: 'en' }, expect.objectContaining({ daysLeft: 1 }))
         })
 
         it('scopes it to the category of an optional email', async () => {
@@ -243,6 +243,13 @@ describe('deliverLifecycleEmail', () => {
             const [recipient] = vi.mocked(emails.sendOnboardingResumeEmail).mock.calls[0]
             expect(recipient.unsubscribeUrl).toMatch(/&category=product$/)
         })
+    })
+
+    it('writes to an account in the language it picked, dates included', async () => {
+        const db = fakeSupabase(table => (table === 'users' ? { data: { locale: 'fr' } } : undefined))
+        await deliverLifecycleEmail(db.client, input('trial_ending_3d', { snapshot: { trialEndsAt: new Date(NOW.getTime() + 20 * HOUR) } }))
+
+        expect(emails.sendTrialEndingEmail).toHaveBeenCalledWith({ to: 'ada@example.com', unsubscribeUrl: null, locale: 'fr' }, expect.objectContaining({ trialEndsLabel: '21 septembre' }))
     })
 
     it('sends the idle nudge for an agent that is still idle', async () => {
@@ -282,7 +289,7 @@ describe('deliverLifecycleEmail', () => {
         await deliver(input('workspace_archive_expiring', { snapshot: { boxesArchivedAt: archivedAt, pausedArchive, agentCount: 3 } }))
 
         expect(emails.sendArchiveExpiringEmail).toHaveBeenCalledWith(
-            { to: 'ada@example.com', unsubscribeUrl: null },
+            { to: 'ada@example.com', unsubscribeUrl: null, locale: 'en' },
             { workspaceName: 'Acme', pausedLabel: '24 June', deletionLabel: '22 September', agentCount: 3, billingUrl: expect.stringMatching(/\/\?billing=1$/), boardUrl: BANNER },
         )
         expect(emailBoardBanner).toHaveBeenCalledWith(expect.anything(), 1, 'offline', expect.any(Number))
@@ -300,7 +307,7 @@ describe('deliverLifecycleEmail', () => {
         await deliver(input('renewal_reminder_7d', { snapshot: { subscriptionPaid: true }, workspace: { current_period_end: '2026-09-27T12:00:00.000Z' } }))
 
         expect(stripe.invoices.createPreview).toHaveBeenCalledWith({ subscription: 'sub_1' })
-        expect(emails.sendRenewalReminderEmail).toHaveBeenCalledWith({ to: 'ada@example.com', unsubscribeUrl: null }, expect.objectContaining({ renewsLabel: '27 September', daysLeft: 7, amountLabel: '$58.80' }))
+        expect(emails.sendRenewalReminderEmail).toHaveBeenCalledWith({ to: 'ada@example.com', unsubscribeUrl: null, locale: 'en' }, expect.objectContaining({ renewsLabel: '27 September', daysLeft: 7, amountLabel: '$58.80' }))
     })
 
     it('still sends the renewal reminder when Stripe cannot quote the amount', async () => {

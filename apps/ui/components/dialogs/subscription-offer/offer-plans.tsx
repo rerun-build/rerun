@@ -4,15 +4,9 @@ import type { SubscriptionProvider } from '@/components/agent/ModelPickerProvide
 import type { AddableProvider } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 
-export const PLANS: Record<SubscriptionProvider, { name: string; plan: string }> = {
-    claude: {
-        name: 'Claude',
-        plan: 'Claude Pro or Max',
-    },
-    codex: {
-        name: 'ChatGPT',
-        plan: 'ChatGPT Plus or Pro',
-    },
+export const PLANS: Record<SubscriptionProvider, { name: string }> = {
+    claude: { name: 'Claude' },
+    codex: { name: 'ChatGPT' },
 }
 
 // The providers behind the API key road, shown as a logo strip so the word "key" is not the only

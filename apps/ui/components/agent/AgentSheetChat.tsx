@@ -10,6 +10,7 @@ import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { Stripes } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 type AgentSheetChatProps = {
@@ -33,6 +34,7 @@ type AgentSheetChatProps = {
 }
 
 export function AgentSheetChat({ uid, active, agentId, sessionId, onSessionCreated, initialRunId, arrival, setup, onSetupSkipped, onOpenInstall, onRunFinished, onNewConversation, kind, title, threads, onOpenThread }: AgentSheetChatProps) {
+    const t = useTranslations('agent')
     const boardAgents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
     // Every agent of the workspace answers to `call_agent`, whichever Box it sits in. Its own Box
@@ -55,7 +57,7 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, onSessionCreat
         selectMaybeSingle(createClient(), 'sessions', ['origin_agent_id'] as const, { id: sessionId })
             .then(({ data }) => setOriginAgentId(data?.origin_agent_id ?? null))
     }, [sessionId])
-    const originAgentName = originAgentId ? (boardAgents.find(a => a.id === originAgentId)?.name ?? 'another coworker') : null
+    const originAgentName = originAgentId ? (boardAgents.find(a => a.id === originAgentId)?.name ?? t('agentSheetChat.anotherCoworker')) : null
 
     const onSessionInsert = useBoardStore(s => s._onSessionInsert)
     const setSessionStatus = useBoardStore(s => s.setSessionStatus)
@@ -67,16 +69,16 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, onSessionCreat
     const sessionIdle = useBoardStore(s => s.sessions.some(entry => entry.id === sessionId && entry.status === 'idle'))
 
     const body = useMemo(() => ({ source: 'builder' as const, ...(kind === 'general' && { kind }) }), [kind])
-    const agentName = boardAgents.find(a => a.id === agentId)?.name ?? 'your coworker'
+    const agentName = boardAgents.find(a => a.id === agentId)?.name ?? t('panelsShared.yourCoworker')
     // A thread keeps the default name until the hub has named it after its first message.
-    const composerPlaceholder = kind === 'general' || !sessionId || !title || title === NEW_THREAD_TITLE ? `Message ${agentName}...` : `Reply in ${title}...`
+    const composerPlaceholder = kind === 'general' || !sessionId || !title || title === NEW_THREAD_TITLE ? t('agentSheetChat.messagePlaceholder', { name: agentName }) : t('agentSheetChat.replyPlaceholder', { title })
 
     const header = originAgentName ? (
         <div className="relative flex items-center gap-2 mx-3 mt-2 p-3 rounded-md border border-border bg-muted/50">
             <Stripes className="rounded-md" fade="right" />
             {originAgentId && <AgentBuddy agentId={originAgentId} size={20} animated={false} facing="right" className="relative" />}
             <p className="relative flex-1 min-w-0 text-xs text-muted-foreground">
-                This session was started by <span className="font-medium text-foreground">{originAgentName}</span>
+                {t.rich('agentSheetChat.startedBy', { name: originAgentName, b: chunks => <span className="font-medium text-foreground">{chunks}</span> })}
             </p>
         </div>
     ) : null

@@ -14,6 +14,7 @@ import {
 import { templateAuthorSchema, type ExpertTemplate, type ExpertTemplateDetail } from '@/lib/templates/expert'
 
 import type { ActionResult } from './space.actions'
+import { failureOf } from '@/lib/i18n/action-error'
 
 // An expert authors templates from their sandbox. Ownership is `templates.creator_id`, so every
 // action here re-resolves the caller and never trusts an id from the client for anything but the
@@ -26,7 +27,7 @@ export async function listMyTemplatesAction(): Promise<ActionResult<{ templates:
     try {
         return { ok: true, templates: await listAuthorTemplates(await requireExpertUserId()) }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to load your templates.' }
+        return failureOf(err, 'loadTemplatesFailed')
     }
 }
 
@@ -36,7 +37,7 @@ export async function getMyTemplateAction(id: string): Promise<ActionResult<{ te
     try {
         return { ok: true, template: await loadAuthorTemplate(await requireExpertUserId(), id) }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to load the template.' }
+        return failureOf(err, 'loadTemplateFailed')
     }
 }
 
@@ -45,7 +46,7 @@ export async function createMyTemplateDraftAction(title: string): Promise<Action
         const { id } = await createAuthorTemplateDraft(await requireExpertUserId(), title)
         return { ok: true, id }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to create the template.' }
+        return failureOf(err, 'createTemplateFailed')
     }
 }
 
@@ -57,7 +58,7 @@ export async function updateMyTemplateAction(input: unknown): Promise<ActionResu
         await updateAuthorTemplate(await requireExpertUserId(), id, patch)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to save the template.' }
+        return failureOf(err, 'saveTemplateFailed')
     }
 }
 
@@ -66,7 +67,7 @@ export async function submitMyTemplateAction(id: string): Promise<ActionResult> 
         await submitAuthorTemplate(await requireExpertUserId(), id)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to submit the template.' }
+        return failureOf(err, 'submitTemplateFailed')
     }
 }
 
@@ -75,7 +76,7 @@ export async function withdrawMyTemplateAction(id: string): Promise<ActionResult
         await withdrawAuthorTemplate(await requireExpertUserId(), id)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to withdraw the template.' }
+        return failureOf(err, 'withdrawTemplateFailed')
     }
 }
 
@@ -84,6 +85,6 @@ export async function deleteMyTemplateAction(id: string): Promise<ActionResult> 
         await deleteAuthorTemplate(await requireExpertUserId(), id)
         return { ok: true }
     } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : 'Failed to delete the template.' }
+        return failureOf(err, 'deleteTemplateFailed')
     }
 }

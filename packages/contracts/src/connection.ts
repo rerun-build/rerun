@@ -179,11 +179,14 @@ export const CONNECTION_TOKEN_KEY: Record<z.infer<typeof providerSchema>, string
 // What is wrong with a value about to be stored as a Claude subscription token, or null when it
 // looks like one. Saved as is, the authorization code Claude shows (`code#state`) or an API key
 // reads as "connected" and fails every run with "401 Invalid bearer token". Claude's tokens all
-// start with `sk-ant-` (`sk-ant-oat…` from the sign-in and from `claude setup-token`).
-export function claudeTokenProblem(value: string): string | null {
+// start with `sk-ant-` (`sk-ant-oat…` from the sign-in and from `claude setup-token`). The issues are
+// named after the `errors` codes the hub answers with, so a client reads them from that pack.
+export type ClaudeTokenIssue = 'claudeTokenIsApiKey' | 'claudeTokenIsCode'
+
+export function claudeTokenIssue(value: string): ClaudeTokenIssue | null {
     const token = value.trim()
-    if (token.startsWith('sk-ant-api')) return 'This is an Anthropic API key. Add it as an Anthropic (API) connection instead.'
-    if (!token.startsWith('sk-ant-') || /[\s#]/.test(token)) return "That's the code from Claude. Click Get token first, then paste the code here."
+    if (token.startsWith('sk-ant-api')) return 'claudeTokenIsApiKey'
+    if (!token.startsWith('sk-ant-') || /[\s#]/.test(token)) return 'claudeTokenIsCode'
     return null
 }
 

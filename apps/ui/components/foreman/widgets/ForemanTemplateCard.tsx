@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import { TemplateTile } from '@/components/templates/TemplateTile'
 import { TemplateTileSkeleton } from '@/components/templates/TemplateTileSkeleton'
 import { Icon } from '@/components/ui/icon'
@@ -22,11 +24,12 @@ type ForemanTemplateCardProps = {
 }
 
 function verdictOf(answer: TemplateChoice) {
-    if (!answer.answered) return { icon: MinusIcon, label: 'Skipped', className: 'text-muted-foreground' }
-    return 'custom' in answer ? { icon: Wand2, label: 'Building something else', className: 'text-muted-foreground' } : { icon: CircleCheckIcon, label: 'Installing this template', className: 'text-emerald-500' }
+    if (!answer.answered) return { icon: MinusIcon, labelKey: 'skipped', className: 'text-muted-foreground' } as const
+    return 'custom' in answer ? ({ icon: Wand2, labelKey: 'buildingElse', className: 'text-muted-foreground' } as const) : ({ icon: CircleCheckIcon, labelKey: 'installing', className: 'text-emerald-500' } as const)
 }
 
 export function ForemanTemplateCard({ loaded, answered }: ForemanTemplateCardProps) {
+    const t = useTranslations('foreman.template')
     const verdict = answered && verdictOf(answered)
     const template = loaded.status === 'found' ? loaded.template : null
 
@@ -36,7 +39,7 @@ export function ForemanTemplateCard({ loaded, answered }: ForemanTemplateCardPro
         // the message stack clips anything drawn outside it.
         <div className={cn('relative mb-2', verdict && 'mt-3')}>
             {verdict && (
-                <TooltipLabeled label={verdict.label}>
+                <TooltipLabeled label={t(verdict.labelKey)}>
                     <Icon icon={verdict.icon} size="sm" className={cn('absolute -top-3 left-2 z-10 bg-card shadow-lg shadow-black/40', verdict.className)} />
                 </TooltipLabeled>
             )}

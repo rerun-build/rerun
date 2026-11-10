@@ -1,6 +1,8 @@
 import 'server-only'
 import * as React from 'react'
 import { AgentNotification, BudgetExhausted, IncidentResolved, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, renderEmail } from '@rerun/emails'
+import { emailTranslator, type EmailTranslator } from '@rerun/emails/i18n'
+import type { Locale } from '@rerun/i18n'
 import { APP_URL, IS_PRODUCTION_MAILER, REPLY_TO, TRANSACTIONAL_FROM as FROM, getResendClient as getClient, redirectDelivery, type SendEmailResult } from '@/lib/email/client'
 import { sendThrottled } from '@/lib/email/throttle'
 import { listUnsubscribeHeaders } from '@/lib/email/unsubscribeToken'
@@ -18,6 +20,7 @@ type NotificationEmailInput = {
     boardUrl?: string
     conversationUrl?: string
     unsubscribeUrl?: string
+    locale?: Locale
 }
 
 export async function sendNotificationEmail(input: NotificationEmailInput): Promise<SendEmailResult> {
@@ -55,6 +58,7 @@ type BudgetExhaustedEmailInput = {
     workspaceName: string | null
     boardUrl?: string
     unsubscribeUrl?: string
+    locale?: Locale
 }
 
 export async function sendBudgetExhaustedEmail(input: BudgetExhaustedEmailInput): Promise<SendEmailResult> {
@@ -69,9 +73,10 @@ export async function sendBudgetExhaustedEmail(input: BudgetExhaustedEmailInput)
         boardUrl: input.boardUrl,
         appUrl: APP_URL,
         unsubscribeUrl: input.unsubscribeUrl,
+        locale: input.locale,
     })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, 'Your Rerun credits are used up')
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.budgetExhausted'))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
@@ -99,6 +104,7 @@ type IncidentResolvedEmailInput = {
     boardUrl?: string
     conversationUrl?: string
     unsubscribeUrl?: string
+    locale?: Locale
 }
 
 export async function sendIncidentResolvedEmail(input: IncidentResolvedEmailInput): Promise<SendEmailResult> {
@@ -116,9 +122,10 @@ export async function sendIncidentResolvedEmail(input: IncidentResolvedEmailInpu
         appUrl: APP_URL,
         conversationUrl: input.conversationUrl,
         unsubscribeUrl: input.unsubscribeUrl,
+        locale: input.locale,
     })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, `${input.agentName} is back to normal`)
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.incidentResolved', { agentName: input.agentName }))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
@@ -144,6 +151,7 @@ type WorkspaceInviteEmailInput = {
     inviteUrl: string
     invitedByEmail?: string
     boardUrl?: string
+    locale?: Locale
 }
 
 export async function sendWorkspaceInviteEmail(input: WorkspaceInviteEmailInput): Promise<SendEmailResult> {
@@ -159,9 +167,10 @@ export async function sendWorkspaceInviteEmail(input: WorkspaceInviteEmailInput)
         invitedByEmail: input.invitedByEmail,
         boardUrl: input.boardUrl,
         appUrl: APP_URL,
+        locale: input.locale,
     })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, `You're invited to ${input.workspaceName} on Rerun`)
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.workspaceInvite', { workspaceName: input.workspaceName }))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
@@ -180,7 +189,7 @@ export async function sendWorkspaceInviteEmail(input: WorkspaceInviteEmailInput)
     return { ok: true, id: data?.id ?? null }
 }
 
-export async function sendPublishedAccessCodeEmail(input: { to: string; code: string; workspaceName: string; pageTitle: string; expiresInMinutes: number }): Promise<SendEmailResult> {
+export async function sendPublishedAccessCodeEmail(input: { to: string; code: string; workspaceName: string; pageTitle: string; expiresInMinutes: number; locale?: Locale }): Promise<SendEmailResult> {
     const resend = getClient()
     if (!resend) {
         if (IS_PRODUCTION_MAILER) console.error('[email] RESEND_API_KEY missing, skipping published access code email')
@@ -190,7 +199,7 @@ export async function sendPublishedAccessCodeEmail(input: { to: string; code: st
 
     const element = React.createElement(PublishedAccessCode, { ...input, appUrl: APP_URL })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, `Your code to open ${input.pageTitle}: ${input.code}`)
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.publishedAccessCode', { pageTitle: input.pageTitle, code: input.code }))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
@@ -209,7 +218,7 @@ export async function sendPublishedAccessCodeEmail(input: { to: string; code: st
     return { ok: true, id: data?.id ?? null }
 }
 
-export async function sendSignInCodeEmail(input: { to: string; code: string; signInUrl?: string; expiresInMinutes: number }): Promise<SendEmailResult> {
+export async function sendSignInCodeEmail(input: { to: string; code: string; signInUrl?: string; expiresInMinutes: number; locale?: Locale }): Promise<SendEmailResult> {
     const resend = getClient()
     if (!resend) {
         // Local dev and staging send no email at all, so the log is the only way to sign in there.
@@ -219,9 +228,9 @@ export async function sendSignInCodeEmail(input: { to: string; code: string; sig
         return { ok: true, id: null }
     }
 
-    const element = React.createElement(SignInCode, { code: input.code, signInUrl: input.signInUrl, expiresInMinutes: input.expiresInMinutes, appUrl: APP_URL })
+    const element = React.createElement(SignInCode, { code: input.code, signInUrl: input.signInUrl, expiresInMinutes: input.expiresInMinutes, appUrl: APP_URL, locale: input.locale })
     const { html, text } = await renderEmail(element)
-    const delivery = redirectDelivery(input.to, `Your Rerun code: ${input.code}`)
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.signInCode', { code: input.code }))
 
     const { data, error } = await sendThrottled(() =>
         resend.emails.send({
@@ -241,11 +250,12 @@ export async function sendSignInCodeEmail(input: { to: string; code: string; sig
 }
 
 function buildNotificationEmail(input: NotificationEmailInput): { element: React.ReactElement; subject: string } {
-    const { agentName, message, kind, reason, boardUrl, conversationUrl, unsubscribeUrl } = input
+    const { agentName, message, kind, reason, boardUrl, conversationUrl, unsubscribeUrl, locale } = input
+    const t = emailTranslator(locale)
 
     if (kind === 'error') {
         return {
-            subject: `${agentName} ran into an error`,
+            subject: t('subjects.runFailed', { agentName }),
             element: React.createElement(RunFailed, {
                 agentName,
                 runId: input.runId ?? '',
@@ -255,12 +265,13 @@ function buildNotificationEmail(input: NotificationEmailInput): { element: React
                 appUrl: APP_URL,
                 conversationUrl,
                 unsubscribeUrl,
+                locale,
             }),
         }
     }
 
     return {
-        subject: subjectForKind(kind, agentName),
+        subject: subjectForKind(kind, agentName, t),
         element: React.createElement(AgentNotification, {
             agentName,
             kind,
@@ -270,19 +281,20 @@ function buildNotificationEmail(input: NotificationEmailInput): { element: React
             appUrl: APP_URL,
             conversationUrl,
             unsubscribeUrl,
+            locale,
         }),
     }
 }
 
-function subjectForKind(kind: Exclude<NotificationKind, 'error'>, agentName: string): string {
+function subjectForKind(kind: Exclude<NotificationKind, 'error'>, agentName: string, t: EmailTranslator): string {
     switch (kind) {
         case 'done':
-            return `${agentName} finished a task`
+            return t('subjects.agentDone', { agentName })
         case 'info':
-            return `${agentName} needs your attention`
+            return t('subjects.agentInfo', { agentName })
         case 'question':
         case 'approval':
         case 'connector':
-            return `${agentName} needs your input`
+            return t('subjects.agentInput', { agentName })
     }
 }

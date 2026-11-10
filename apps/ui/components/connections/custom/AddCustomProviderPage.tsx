@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { probeCustomEndpointAction } from '@/app/api/_actions/workspace-connection.actions'
 import { NoPlanNotice } from '@/components/connections/NoPlanNotice'
 import { ProviderHeader } from '@/components/connections/SourceBits'
@@ -12,11 +13,10 @@ import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { suggestName, uniqueName } from '@/lib/engine/ai-sources'
 import type { BoxConnection, CreateBoxConnectionInput } from '@/lib/engine/types'
 import { CONNECTION_TOKEN_KEY, type CustomPreset } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
 type CreateConnectionResult = { success: true; connection: BoxConnection } | { success: false; error?: string; reason?: 'no_plan' }
-
-const CONNECT_FAILED = 'Something went wrong. Please try again.'
 
 type Probe = typeof probeCustomEndpointAction
 
@@ -33,6 +33,9 @@ type AddCustomProviderPageProps = {
 // Name, address, key: the machine asks the server which models it serves before the connection
 // exists, so a typo in the address is caught here rather than on the first run.
 export function AddCustomProviderPage({ onBack, probe = probeCustomEndpointAction, onCreate, onOpen, takenNames, willBecomeBoxDefault }: AddCustomProviderPageProps) {
+    const t = useTranslations('connections')
+    const tCommon = useTranslations('common')
+    const errorText = useErrorText()
     const presets = presetsFor(RERUN_CLOUD)
     const id = useId()
     const [preset, setPreset] = useState<CustomPreset | null>(() => (RERUN_CLOUD ? null : (presets[0] ?? null)))
@@ -65,9 +68,9 @@ export function AddCustomProviderPage({ onBack, probe = probeCustomEndpointActio
             const probed = await probe({ baseUrl: baseUrl.trim(), apiKey: key || undefined, model })
             if (!probed.success) {
                 setNeedsPlan(probed.reason === 'no_plan')
-                return setError(probed.error)
+                return setError(errorText(probed))
             }
-            const problem = probeProblemMessage(probed.result, model, RERUN_CLOUD)
+            const problem = probeProblemMessage(t, probed.result, model, RERUN_CLOUD)
             if (probed.result.problem === 'not_listed') setAsksModel(true)
             if (problem) return setError(problem)
 
@@ -81,9 +84,9 @@ export function AddCustomProviderPage({ onBack, probe = probeCustomEndpointActio
             })
             setNeedsPlan(!created.success && created.reason === 'no_plan')
             if (created.success) onOpen(created.connection.id)
-            else setError(created.error ?? 'Failed to create the connection')
+            else setError(errorText(created, t('errors.createFailed')))
         } catch {
-            setError(CONNECT_FAILED)
+            setError(tCommon('somethingWentWrong'))
         } finally {
             setBusy(false)
         }
@@ -94,11 +97,11 @@ export function AddCustomProviderPage({ onBack, probe = probeCustomEndpointActio
             <ProviderHeader provider="custom" onBack={onBack} />
             <PanelScroller className="space-y-4 p-4">
                 <CustomPresetPicker id={`${id}-server`} presets={presets} selected={preset?.id ?? null} onPick={pick} />
-                <Input id={`${id}-name`} label="Name" value={name} onChange={e => setName(e.target.value)} helperText="Shown in every coworker's model picker" className="h-8" />
+                <Input id={`${id}-name`} label={t('name.label')} value={name} onChange={e => setName(e.target.value)} helperText={t('name.helper')} className="h-8" />
                 <Input
                     hideRequired
                     id={`${id}-base-url`}
-                    label="Base URL"
+                    label={t('custom.baseUrl')}
                     value={baseUrl}
                     onChange={e => setBaseUrl(e.target.value)}
                     placeholder="https://your-server.com/v1"
@@ -111,22 +114,22 @@ export function AddCustomProviderPage({ onBack, probe = probeCustomEndpointActio
                     hideRequired={keyRequired}
                     optional={!keyRequired}
                     id={`${id}-api-key`}
-                    label="API key"
+                    label={t('key.label')}
                     type="password"
                     value={apiKey}
                     onChange={e => setApiKey(e.target.value)}
-                    placeholder={keyRequired ? 'Paste your key' : 'None for a local server'}
+                    placeholder={keyRequired ? t('key.placeholder') : t('custom.keyOptionalPlaceholder')}
                     className="h-8 font-mono text-xs"
                 />
-                {asksModel && <Input id={`${id}-model`} hideRequired autoFocus label="Model id" value={modelId} onChange={e => setModelId(e.target.value)} placeholder="llama3.3:70b" spellCheck={false} className="h-8 font-mono text-xs" />}
+                {asksModel && <Input id={`${id}-model`} hideRequired autoFocus label={t('custom.modelId')} value={modelId} onChange={e => setModelId(e.target.value)} placeholder="llama3.3:70b" spellCheck={false} className="h-8 font-mono text-xs" />}
 
-                {willBecomeBoxDefault && <p className="text-[11px] text-muted-foreground">This becomes the workspace default: every coworker with no model of its own will run on it.</p>}
+                {willBecomeBoxDefault && <p className="text-[11px] text-muted-foreground">{t('becomesDefault')}</p>}
                 {needsPlan && <NoPlanNotice />}
 
                 <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
                     {error && !needsPlan && <p className="min-w-0 flex-1 text-[11px] break-words text-destructive">{error}</p>}
                     <Button size="sm" disabled={busy || !ready} onClick={() => void connect()}>
-                        {busy ? 'Connecting…' : 'Connect'}
+                        {busy ? t('connecting') : t('custom.connect')}
                     </Button>
                 </div>
             </PanelScroller>

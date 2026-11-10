@@ -1,3 +1,4 @@
+import { useErrorText } from '@/hooks/useErrorText'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -14,6 +15,7 @@ export type TakeoverAskInput = { callId: string; request: TakeoverRequest }
 export function useTakeoverRequest(agentId: string, ask: TakeoverAskInput | null, onDone: (summary: string) => void, onSkip: () => void): TakeoverRequestState | undefined {
     const openTakeover = useDesktopStore(s => s.openTakeover)
     const handBack = useDesktopStore(s => s.handBack)
+    const errorText = useErrorText()
     const callId = ask?.callId ?? null
     const handedBack = useDesktopStore(s => (callId ? s.handedBack[callId] : undefined))
     const [openedCallId, setOpenedCallId] = useState<string | null>(null)
@@ -42,7 +44,7 @@ export function useTakeoverRequest(agentId: string, ask: TakeoverAskInput | null
         setFinishing(true)
         const result = await finishTakeoverAction(agentId, { keepOpen: true })
         setFinishing(false)
-        if (!result.ok) return void toast.error(result.error)
+        if (!result.ok) return void toast.error(errorText(result))
         handBack(ask.callId, { url: result.url, open: result.open })
     }
 

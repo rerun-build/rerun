@@ -4,10 +4,12 @@ import type { Database } from '@/app/api/database.types'
 import { sendPublishedAccessCodeEmail } from '@rerun/cloud/email'
 import { callerRateKey } from '@/lib/auth/caller-ip'
 import { inviteAllows } from '@/lib/published/access'
+import { workspaceLocale } from '@/lib/i18n/recipient-locale'
 import type { PublishedEntry } from '@/lib/published/gate'
 import { loadWorkspaceBrand } from '@/lib/published/gate'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'
+import { emailTranslator } from '@rerun/emails/i18n'
 
 const CODE_TTL_MINUTES = 10
 const MAX_CODE_ATTEMPTS = 5
@@ -80,7 +82,9 @@ export async function sendAccessCode(entry: PublishedEntry, email: string, ip: s
     if (error) throw new Error(`Failed to store the access code: ${error.message}`)
 
     const brand = await loadWorkspaceBrand(entry.workspace_id)
-    await sendPublishedAccessCodeEmail({ to: email, code, workspaceName: brand.name, pageTitle: entry.title ?? 'a page', expiresInMinutes: CODE_TTL_MINUTES })
+    const locale = await workspaceLocale(supabase, entry.workspace_id)
+    const pageTitle = entry.title ?? emailTranslator(locale)('publishedAccessCode.untitledPage')
+    await sendPublishedAccessCodeEmail({ to: email, code, workspaceName: brand.name, pageTitle, expiresInMinutes: CODE_TTL_MINUTES, locale })
     return 'sent'
 }
 

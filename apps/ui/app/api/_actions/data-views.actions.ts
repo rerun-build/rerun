@@ -6,8 +6,9 @@ import * as engine from '@/lib/engine/client'
 import type { DataScope } from '@/lib/data/source'
 import type { EngineConnection } from '@/lib/engine/types'
 import type { EngineDbGroup, TableSourcesRequest, TableSourcesResult, TableView, TableViewInput } from '@rerun/contracts'
+import { refusal, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
-type ActionResult<T = object> = ({ success: true } & T) | { success: false; error: string }
+type ActionResult<T = object> = ({ success: true } & T) | ({ success: false } & ActionRefusal)
 
 // The views, groups and row edits of a table, for both databases a workspace has: an agent's private
 // one and the one its agents share. Ownership is settled here, in the scope, never by the caller.
@@ -19,17 +20,17 @@ async function resolve(scope: DataScope): Promise<{ conn: EngineConnection; base
 
 // The engine answers `{ error }` with a 400 for a refusal it can explain, and a bare 404 when it
 // predates these routes: the machine is fine, it just needs the update.
-function describe(err: unknown, fallback: string): string {
+function describe(err: unknown, fallback: ErrorCode): ActionRefusal {
     const message = err instanceof Error ? err.message : ''
-    if (/failed: 404\b/.test(message)) return 'This workspace runs on a machine that needs an engine update before it can do this.'
+    if (/failed: 404\b/.test(message)) return refusal('dataNeedsEngineUpdate')
     const body = /failed: \d+ (\{[\s\S]*\})$/.exec(message)?.[1]
     if (body) {
         try {
             const parsed = JSON.parse(body) as { error?: unknown }
-            if (typeof parsed.error === 'string' && parsed.error) return parsed.error
+            if (typeof parsed.error === 'string' && parsed.error) return { error: parsed.error }
         } catch {}
     }
-    return fallback
+    return refusal(fallback)
 }
 
 export async function listTableViewsAction(scope: DataScope, table: string): Promise<ActionResult<{ views: TableView[] }>> {
@@ -37,7 +38,7 @@ export async function listTableViewsAction(scope: DataScope, table: string): Pro
         const { conn, base } = await resolve(scope)
         return { success: true, views: await engine.listTableViews(conn, base, table) }
     } catch (err) {
-        return { success: false, error: describe(err, 'Could not read the views of this table.') }
+        return { success: false, ...describe(err, 'readViewsFailed') }
     }
 }
 
@@ -46,7 +47,7 @@ export async function saveTableViewAction(scope: DataScope, table: string, input
         const { conn, base } = await resolve(scope)
         return { success: true, view: await engine.saveTableView(conn, base, table, input, id) }
     } catch (err) {
-        return { success: false, error: describe(err, 'Could not save the view.') }
+        return { success: false, ...describe(err, 'saveViewFailed') }
     }
 }
 
@@ -56,7 +57,7 @@ export async function deleteTableViewAction(scope: DataScope, table: string, id:
         await engine.deleteTableView(conn, base, table, id)
         return { success: true }
     } catch (err) {
-        return { success: false, error: describe(err, 'Could not delete the view.') }
+        return { success: false, ...describe(err, 'deleteViewFailed') }
     }
 }
 
@@ -65,7 +66,7 @@ export async function readTableGroupsAction(scope: DataScope, table: string, par
         const { conn, base } = await resolve(scope)
         return { success: true, groups: await engine.readDbTableGroups(conn, base, table, params) }
     } catch (err) {
-        return { success: false, error: describe(err, 'Could not group the rows.') }
+        return { success: false, ...describe(err, 'groupRowsFailed') }
     }
 }
 
@@ -74,7 +75,7 @@ export async function updateTableRowAction(scope: DataScope, table: string, rowi
         const { conn, base } = await resolve(scope)
         return { success: true, row: await engine.updateDbTableRow(conn, base, table, rowid, values) }
     } catch (err) {
-        return { success: false, error: describe(err, 'Could not save the row.') }
+        return { success: false, ...describe(err, 'saveRowFailed') }
     }
 }
 

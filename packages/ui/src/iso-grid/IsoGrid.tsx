@@ -17,6 +17,7 @@ import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion'
 import { useOnScreen } from './hooks/useOnScreen'
 import { CanvasViewControls } from '../CanvasViewControls'
 import { useTransientTransition } from '../useTransientTransition'
+import { useKitTranslations } from '../locale'
 
 const DEFAULT_MASK = 'radial-gradient(ellipse 70% 70% at 50% 50%, black 60%, transparent 100%)'
 const DEFAULT_DRAW_COLOR = '#3b82f6'
@@ -188,6 +189,7 @@ function shiftedRect(c: ContainerCellRect, delta: Cell): ContainerCellRect {
 }
 
 export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
+    const t = useKitTranslations()
     const {
         tiles,
         containers,
@@ -236,7 +238,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         onCreateContainerRequest,
         onContainerAdd,
         containerAddPreview,
-        containerAddLabel = 'Add a block on this side',
+        containerAddLabel,
         onContainerContextMenu,
         onCameraChange,
         onToastExpire,
@@ -1213,7 +1215,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         <div
             ref={containerRef}
             role={interactive ? 'group' : undefined}
-            aria-label={interactive ? 'Coworker board' : undefined}
+            aria-label={interactive ? t('isoGrid.board') : undefined}
             data-iso-paused={paused || !onScreen ? '' : undefined}
             className={`absolute inset-0 overflow-hidden select-none ${cursorClass}${className ? ` ${className}` : ''}`}
             style={{
@@ -1413,7 +1415,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
                                 container={container}
                                 sides={sides}
                                 worldOffset={worldOffset}
-                                label={containerAddLabel}
+                                label={containerAddLabel ?? t('isoGrid.addBlock')}
                                 activeSide={addSide?.containerId === container.id ? addSide.side : null}
                                 onAdd={handleContainerAdd}
                                 onSideHover={handleAddSideHover}

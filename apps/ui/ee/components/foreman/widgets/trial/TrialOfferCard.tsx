@@ -1,16 +1,17 @@
 'use client'
 
 import { BorderBeam } from '@rerun/ui'
+import { useLocale, useTranslations } from 'next-intl'
 import { Badge } from '@rerun/ui/primitives'
 
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { PLAN_CURRENCY, TRIAL_DAYS, basePriceCents, cardlessTrialLine, trialChargeLine, trialEndDate, trialLimitsLabel, type PriceArm } from '@/ee/lib/billing/plans'
+import { PLAN_CURRENCY, TRIAL_DAYS, basePriceCents, trialEndDate, type PriceArm } from '@/ee/lib/billing/plans'
 import type { TrialOffer } from '@/ee/lib/billing/checkout-variant'
 import { shortDate } from '@/ee/lib/billing/dates'
 import { CalendarClockIcon, CircleCheckIcon, CreditCardIcon, type LucideIcon } from '@/lib/icons'
 import { TRIAL_ENDING_LEAD_MS } from '@/ee/lib/lifecycle/sequences'
-import { formatAmount } from '@rerun/contracts'
+import { TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, formatAmount } from '@rerun/contracts'
 
 // The trial, sold where it is asked for. On the cardless arm of the trial test the button starts it on
 // the spot, so the card has to say out loud that something starts the moment they press it. On the
@@ -30,17 +31,13 @@ type TrialOfferCardProps = {
     thenPay?: string
 }
 
-const OFFER_BADGE: Record<TrialOffer, string> = {
-    cardless: 'No card needed',
-    card_trial: `${TRIAL_DAYS}-day free trial`,
-    paid: 'Free trial already used',
-}
+type Translate = ReturnType<typeof useTranslations<'foreman.trial'>>
 
-function offerPitch(offer: TrialOffer, price: string, chargeDate: string, subject?: string): string {
-    const next = subject ? `${subject} is installed right after.` : 'Your team is built right after.'
-    if (offer === 'paid') return `${next} Cancel anytime from the workspace.`
-    const line = offer === 'cardless' ? cardlessTrialLine : trialChargeLine
-    return `${line(price, chargeDate)} ${next}`
+function offerPitch(t: Translate, offer: TrialOffer, price: string, chargeDate: string, subject?: string): string {
+    const values = { price, date: chargeDate, subject: subject ?? '' }
+    if (offer === 'paid') return subject ? t('pitchPaidInstall', values) : t('pitchPaidTeam')
+    if (offer === 'cardless') return subject ? t('pitchCardlessInstall', values) : t('pitchCardlessTeam', values)
+    return subject ? t('pitchCardInstall', values) : t('pitchCardTeam', values)
 }
 
 function TimelineStep({ icon, title, description }: { icon: LucideIcon; title: string; description: string }) {
@@ -59,12 +56,14 @@ function TimelineStep({ icon, title, description }: { icon: LucideIcon; title: s
 }
 
 export function TrialOfferCard({ offer, priceArm, submitting, error, onStart, subject, thenPay }: TrialOfferCardProps) {
+    const locale = useLocale()
+    const t = useTranslations('foreman.trial')
     const price = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY)
     const trial = offer !== 'paid'
     const cardless = offer === 'cardless'
     const chargeOn = trialEndDate()
-    const chargeDate = shortDate(chargeOn)
-    const reminderDate = shortDate(new Date(chargeOn.getTime() - TRIAL_ENDING_LEAD_MS))
+    const chargeDate = shortDate(chargeOn, locale)
+    const reminderDate = shortDate(new Date(chargeOn.getTime() - TRIAL_ENDING_LEAD_MS), locale)
 
     return (
         <div className="relative mb-2 rounded-xl border border-border bg-background">
@@ -73,39 +72,39 @@ export function TrialOfferCard({ offer, priceArm, submitting, error, onStart, su
             <div className="relative flex flex-col gap-5 p-4">
                 <div className="flex flex-col gap-2">
                     <Badge size="xs" className="self-start">
-                        {OFFER_BADGE[offer]}
+                        {t(`badge.${offer}`, { days: TRIAL_DAYS })}
                     </Badge>
-                    <h3 className="text-lg font-semibold tracking-tight text-foreground">{trial ? `Start your ${TRIAL_DAYS}-day free trial` : 'Start your plan'}</h3>
-                    <p className="text-sm text-muted-foreground">{offerPitch(offer, price, chargeDate, subject)}</p>
-                    {trial && <p className="text-xs text-muted-foreground">{`Your trial includes ${trialLimitsLabel()}.`}</p>}
-                    {thenPay && <p className="text-xs text-muted-foreground">{`Then ${thenPay} for this template, billed separately.`}</p>}
+                    <h3 className="text-lg font-semibold tracking-tight text-foreground">{trial ? t('titleTrial', { days: TRIAL_DAYS }) : t('titlePlan')}</h3>
+                    <p className="text-sm text-muted-foreground">{offerPitch(t, offer, price, chargeDate, subject)}</p>
+                    {trial && <p className="text-xs text-muted-foreground">{t('includes', { agents: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS })}</p>}
+                    {thenPay && <p className="text-xs text-muted-foreground">{t('thenPay', { price: thenPay })}</p>}
                 </div>
 
                 <dl className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-muted/20 p-3 text-sm">
                     <div className="flex flex-col gap-0.5">
-                        <dt className="text-xs text-muted-foreground">Due today</dt>
+                        <dt className="text-xs text-muted-foreground">{t('dueToday')}</dt>
                         <dd className="text-2xl font-semibold leading-none text-foreground">{trial ? formatAmount(0, PLAN_CURRENCY) : price}</dd>
                     </div>
                     <div className="flex flex-col gap-0.5">
-                        <dt className="text-xs text-muted-foreground">{cardless ? 'With a card' : trial ? `On ${chargeDate}` : 'Then'}</dt>
+                        <dt className="text-xs text-muted-foreground">{cardless ? t('withCard') : trial ? t('dueOn', { date: chargeDate }) : t('then')}</dt>
                         <dd className="text-base font-semibold text-foreground">
                             {price}
-                            <span className="text-xs font-normal text-muted-foreground">/month</span>
+                            <span className="text-xs font-normal text-muted-foreground">{t('perMonth')}</span>
                         </dd>
                     </div>
                 </dl>
 
                 {trial ? (
                     <ol className="relative before:absolute before:bottom-4 before:left-4 before:top-4 before:w-px before:bg-border">
-                        <TimelineStep icon={CircleCheckIcon} title="Today" description={subject ? `Your trial starts and ${subject} is installed.` : 'Your trial starts and your team is built.'} />
-                        <TimelineStep icon={CalendarClockIcon} title={reminderDate} description="We email you, so it never ends by surprise." />
+                        <TimelineStep icon={CircleCheckIcon} title={t('today')} description={subject ? t('todayInstall', { subject }) : t('todayTeam')} />
+                        <TimelineStep icon={CalendarClockIcon} title={reminderDate} description={t('reminder')} />
                         <TimelineStep
                             icon={CreditCardIcon}
                             title={chargeDate}
                             description={
                                 cardless
-                                    ? `Add a card to keep going at ${price}/month. Without one, your coworkers stop and nothing is charged.`
-                                    : `${price} charged to the card you added, then every month. Cancel before and nothing is charged.`
+                                    ? t('chargeCardless', { price })
+                                    : t('chargeCard', { price })
                             }
                         />
                     </ol>
@@ -114,7 +113,7 @@ export function TrialOfferCard({ offer, priceArm, submitting, error, onStart, su
                 <div className="flex flex-col gap-2">
                     {error ? <p className="text-sm text-destructive">{error}</p> : null}
                     <Button size="lg" className="h-11 w-full rounded-xl text-base" onClick={onStart} disabled={submitting}>
-                        {submitting ? (cardless ? 'Starting your trial…' : 'Opening…') : trial ? (subject ? 'Start my trial and install' : 'Start my free trial') : 'Start my plan'}
+                        {submitting ? (cardless ? t('startingTrial') : t('opening')) : trial ? (subject ? t('startAndInstall') : t('startTrial')) : t('startPlan')}
                     </Button>
                 </div>
             </div>

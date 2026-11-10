@@ -1,10 +1,11 @@
 import { FOREMAN_AGENT_ID, type AgentModels, type ForemanSurface } from '@rerun/contracts'
 import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { fetchForemanConversation, fetchForemanEngineFiles, fetchForemanSurface, type ForemanConversation } from '@/api/foreman'
 import { fetchAgentModels } from '@/api/models'
@@ -31,16 +32,12 @@ import { useOpenChats } from './useOpenChats'
 // Opens the last conversation with the Foreman, as the web column does.
 export const LAST_CONVERSATION = 'last'
 
-const FOREMAN: ChatCoworker = { id: FOREMAN_AGENT_ID, kind: 'foreman', name: 'Rerun', role: 'Your workspace assistant', status: 'idle' }
+const FOREMAN: Omit<ChatCoworker, 'role'> = { id: FOREMAN_AGENT_ID, kind: 'foreman', name: 'Rerun', status: 'idle' }
 
 const TITLE_DELAY_MS = 4000
 
 type SurfaceState = ForemanSurface | 'loading' | 'error'
 
-const AWAY: Record<'onboarding' | 'none', { title: string; body: string }> = {
-    onboarding: { title: 'Rerun is setting up your workspace', body: `Finish setting it up at ${webHost}.` },
-    none: { title: 'Rerun is not running', body: `This workspace has no machine right now. Check it at ${webHost}.` },
-}
 
 const noop = () => {}
 
@@ -59,6 +56,7 @@ function LoadingConversation() {
 
 function Notice({ title, body, onRetry }: { title: string; body: string; onRetry?: () => void }) {
     const insets = useSafeAreaInsets()
+    const t = useTranslations('mobileChat.foreman')
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.lg, paddingHorizontal: spacing.xl, paddingTop: insets.top + CHAT_HEADER_HEIGHT, paddingBottom: insets.bottom + spacing.xxl }}>
             <ForemanOrb size={64} />
@@ -70,7 +68,7 @@ function Notice({ title, body, onRetry }: { title: string; body: string; onRetry
                     {body}
                 </AppText>
             </View>
-            {onRetry && <PillButton label="Retry" variant="secondary" onPress={onRetry} />}
+            {onRetry && <PillButton label={t('retry')} variant="secondary" onPress={onRetry} />}
         </View>
     )
 }
@@ -81,6 +79,8 @@ function Notice({ title, body, onRetry }: { title: string; body: string; onRetry
 // the search left for it.
 export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.foreman')
+    const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, role: t('role') }), [t])
     const back = useChatBack()
     const { session, me } = useAuth()
     const [ask] = useState(() => (sessionId === null ? takePendingAsk() : undefined))
@@ -236,19 +236,19 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
             {surface === 'loading' && <LoadingConversation />}
-            {surface === 'engine' && <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => <ConversationPane coworker={FOREMAN} makeEndpoints={makeEndpoints} initialSessionId={page.sessionId} onSessionCreated={onSessionCreated} models={models} status={null} onStatusChange={noop} webUrl={`${environment.apiUrl}/`} onScreen={onScreen} initialMessage={page.sessionId ? undefined : ask} canAttach={filesOnEngine} />} />}
-            {(surface === 'onboarding' || surface === 'none') && <Notice {...AWAY[surface]} />}
+            {surface === 'engine' && <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => <ConversationPane coworker={foreman} makeEndpoints={makeEndpoints} initialSessionId={page.sessionId} onSessionCreated={onSessionCreated} models={models} status={null} onStatusChange={noop} webUrl={`${environment.apiUrl}/`} onScreen={onScreen} initialMessage={page.sessionId ? undefined : ask} canAttach={filesOnEngine} />} />}
+            {(surface === 'onboarding' || surface === 'none') && <Notice title={t(`away.${surface}.title`)} body={t(`away.${surface}.body`, { host: webHost })} />}
             {surface === 'error' && (
                 <Notice
-                    title="We could not reach Rerun"
-                    body="Check your connection and try again."
+                    title={t('unreachableTitle')}
+                    body={t('unreachableBody')}
                     onRetry={() => {
                         setSurface('loading')
                         setAttempt(current => current + 1)
                     }}
                 />
             )}
-            <ChatHeader coworker={FOREMAN} tabs={surface === 'engine' ? tabs : []} activeId={activeId ?? undefined} progress={progress} allSessions={surface === 'engine' ? tabs : []} onBack={back} onSelect={select} onNewSession={startNew} />
+            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={activeId ?? undefined} progress={progress} allSessions={surface === 'engine' ? tabs : []} onBack={back} onSelect={select} onNewSession={startNew} />
         </View>
     )
 }

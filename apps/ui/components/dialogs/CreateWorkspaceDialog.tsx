@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { inviteToWorkspaceAction } from '@/app/api/_actions/members.actions'
 import { createWorkspaceAction } from '@/app/api/_actions/workspace.actions'
 import { CreateWorkspacePreview } from '@/components/dialogs/CreateWorkspacePreview'
@@ -15,7 +16,8 @@ import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckIcon, Loader2Icon, XIcon } from '@/lib/icons'
-import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -25,24 +27,21 @@ const STEPS: readonly Step[] = BLOB_ILLUSTRATIONS.length > 0 ? ['Name', 'Icon', 
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const schema = z.object({
-    name: z.string().trim().min(1, 'Name is required'),
-    iconFile: z.string(),
-    members: z.array(z.string()),
-    memberDraft: z.string(),
-})
-
-type FormValues = z.infer<typeof schema>
+type FormValues = { name: string; iconFile: string; members: string[]; memberDraft: string }
 
 const defaultValues: FormValues = { name: '', iconFile: '', members: [], memberDraft: '' }
 
 export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+    const t = useTranslations('dialogs.createWorkspace')
+    const tCommon = useTranslations('common')
+    const errorText = useErrorText()
     const { index: step, direction, goForward, back, reset: resetStepper } = useStepper(STEPS.length)
     const current = STEPS[step]
     // Already the active workspace server-side: the dialog is only still open to report the
     // invitations that failed, and closing it can only lead into the new workspace.
     const [created, setCreated] = useState(false)
 
+    const schema = useMemo(() => z.object({ name: z.string().trim().min(1, t('nameRequired')), iconFile: z.string(), members: z.array(z.string()), memberDraft: z.string() }), [t])
     const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues })
     const {
         formState: { isSubmitting },
@@ -88,7 +87,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
         const result = await createWorkspaceAction(name, iconUrl)
         if (!result.ok) {
             abortWorkspaceSwitch()
-            form.setError('root', { message: result.error })
+            form.setError('root', { message: errorText(result) })
             return
         }
         setCreated(true)
@@ -99,7 +98,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
             const outcomes = await Promise.all(members.map(email => inviteToWorkspaceAction(email)))
             const failed = outcomes.filter(o => !o.ok).length
             if (failed > 0) {
-                form.setError('root', { message: `Workspace created, but ${failed} invitation${failed > 1 ? 's' : ''} could not be sent. Upgrade your plan to invite teammates.` })
+                form.setError('root', { message: t('invitesFailed', { count: failed }) })
                 return
             }
         }
@@ -117,14 +116,14 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                         <DialogHeader className="mb-4">
                             <StepTransition stepKey={step} direction={direction} variant="header" className="grid gap-1">
                                 <DialogTitle>
-                                    {current === 'Name' && 'Name your workspace'}
-                                    {current === 'Icon' && 'Pick an icon'}
-                                    {current === 'Team' && 'Invite your team'}
+                                    {current === 'Name' && t('steps.name.title')}
+                                    {current === 'Icon' && t('steps.icon.title')}
+                                    {current === 'Team' && t('steps.team.title')}
                                 </DialogTitle>
                                 <p className="text-sm text-muted-foreground">
-                                    {current === 'Name' && 'A workspace groups your Boxes, coworkers and team. You can rename it later.'}
-                                    {current === 'Icon' && 'Choose an illustration for your workspace. You can change it later.'}
-                                    {current === 'Team' && 'Add teammates to collaborate in this workspace.'}
+                                    {current === 'Name' && t('steps.name.description')}
+                                    {current === 'Icon' && t('steps.icon.description')}
+                                    {current === 'Team' && t('steps.team.description')}
                                 </p>
                             </StepTransition>
                         </DialogHeader>
@@ -139,7 +138,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input label="Name" required placeholder="e.g. Acme Inc." {...field} />
+                                                        <Input label={t('name')} required placeholder={t('namePlaceholder')} {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -176,10 +175,10 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                         <div className="flex items-end gap-2">
                                             <div className="flex-1">
                                                 <Input
-                                                    label="Email"
+                                                    label={t('email')}
                                                     type="email"
-                                                    placeholder="teammate@rerun.build"
-                                                    helperText="Teammates get an email invite when you create the workspace. Inviting requires a Team or Scale plan."
+                                                    placeholder={t('emailPlaceholder')}
+                                                    helperText={t('emailHint')}
                                                     {...form.register('memberDraft')}
                                                     onKeyDown={e => {
                                                         if (e.key === 'Enter') {
@@ -190,7 +189,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                                 />
                                             </div>
                                             <Button type="button" variant="outline" onClick={addMember} disabled={!EMAIL_RE.test(memberDraft.trim().toLowerCase())}>
-                                                Add
+                                                {t('add')}
                                             </Button>
                                         </div>
 
@@ -199,7 +198,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                                 {members.map(email => (
                                                     <li key={email} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
                                                         <span className="min-w-0 flex-1 truncate text-sm">{email}</span>
-                                                        <button type="button" onClick={() => removeMember(email)} className="text-muted-foreground hover:text-foreground">
+                                                        <button type="button" onClick={() => removeMember(email)} aria-label={t('removeMember', { email })} className="text-muted-foreground hover:text-foreground">
                                                             <XIcon className="size-4" />
                                                         </button>
                                                     </li>
@@ -216,31 +215,31 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                         <DialogFooter className="mt-auto -mx-6 -mb-6 border-t bg-muted/50 px-6 py-4">
                             {created ? (
                                 <Button type="button" onClick={enterActiveWorkspace}>
-                                    Open workspace
+                                    {t('open')}
                                 </Button>
                             ) : step > 0 ? (
                                 <Button type="button" variant="outline" onClick={back}>
-                                    Back
+                                    {t('back')}
                                 </Button>
                             ) : (
                                 <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                                    Cancel
+                                    {tCommon('cancel')}
                                 </Button>
                             )}
                             {!created && current === 'Name' && (
                                 <Button type="button" onClick={goForward} disabled={!name.trim()}>
-                                    Continue
+                                    {t('continue')}
                                 </Button>
                             )}
                             {!created && current === 'Icon' && (
                                 <Button type="button" onClick={goForward}>
-                                    Continue
+                                    {t('continue')}
                                 </Button>
                             )}
                             {!created && current === 'Team' && (
                                 <Button type="submit" disabled={isSubmitting}>
                                     {isSubmitting && <Loader2Icon className="animate-spin" />}
-                                    {isSubmitting ? 'Creating' : 'Create workspace'}
+                                    {isSubmitting ? t('creating') : t('create')}
                                 </Button>
                             )}
                         </DialogFooter>

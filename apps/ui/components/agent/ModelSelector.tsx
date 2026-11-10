@@ -5,7 +5,7 @@ import { DotSpinner } from '@/components/ui/dot-spinner'
 import { AddProviderItem, SUBSCRIPTION_PROVIDERS, SubscriptionNudge, SubscriptionPitch, type AddableProvider, type SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ModelPillTrigger } from '@/components/agent/ModelPillTrigger'
-import { PlanLimitDetail, PlanLimitHint, RerunCreditHint, rerunCreditDetail } from '@/components/agent/PlanLimitHint'
+import { PlanLimitDetail, PlanLimitHint, RerunCreditHint, usePlanWindowsSummary, useRerunCreditDetail } from '@/components/agent/PlanLimitHint'
 import { ModelTierRow } from '@/components/agent/ModelTierRow'
 import { PowerBars } from '@/components/ui/power-bars'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
@@ -14,8 +14,7 @@ import { useAvailableModels, type ConnectionGroup } from '@/hooks/useAvailableMo
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { refusedModelReason } from '@/lib/engine/model-groups'
 import { useRerunCredit } from '@/hooks/useRerunCredit'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
-import { PREMIUM_MODEL_BILLING_TRIGGER, RERUN_CREDIT_PAUSED_REASON, pillUsage } from '@/lib/engine/ai-sources'
+import { PREMIUM_MODEL_BILLING_TRIGGER, pillUsage } from '@/lib/engine/ai-sources'
 import { modelLabel } from '@/lib/engine/models'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { ChevronDownIcon, Settings2Icon, StarIcon } from '@/lib/icons'
@@ -25,6 +24,7 @@ import { useModelPickerStore } from '@/stores/model-picker.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { track } from '@rerun/analytics/client'
 import { RERUN_CONNECTION_ID } from '@rerun/contracts'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type ModelSelectorProps = {
@@ -52,6 +52,10 @@ type ModelSelectorProps = {
 // The "Box default" entry is the one exception: it is not a per-conversation choice but a statement
 // about the agent, so it clears both the override and the pin in one click.
 export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey }: ModelSelectorProps) {
+    const t = useTranslations('agent.modelSelector')
+    const tShared = useTranslations('agent.modelsShared')
+    const creditDetail = useRerunCreditDetail()
+    const windowsSummary = usePlanWindowsSummary()
     const [open, setOpen] = useState(false)
     const { availableGroups, connectionOf, pinnedModel, pinnedConnectionId, resolvedModel, resolvedConnectionId, followsBoxDefault, supportsBoxDefault, boxDefaultPick, setDefault, followBoxDefault, refreshConnections, loading } =
         useAvailableModels(agentId)
@@ -90,7 +94,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     // A pick the subscription refuses is kept, not swapped behind the user's back: the message is
     // held and the picker offers the models the plan does serve.
     const refusedReason = refusedModelReason(active, model)
-    const refusedMessage = refusedReason ? `${modelLabel(model)} · ${refusedReason}. Pick another model below.` : null
+    const modelText = model ? modelLabel(model) : t('select')
+    const refusedMessage = refusedReason ? t('refused', { model: modelText, reason: refusedReason }) : null
 
     // A pin or an override that no longer resolves (a template just imported, a connection removed)
     // is repointed at whatever the Box can actually run, the Box default first: Rerun only heads the
@@ -171,13 +176,15 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     )
 
     const usage = active ? pillUsage(active, rerunCredit) : null
-    const usageDetail = !usage || !active ? null : active.connectionId === RERUN_CONNECTION_ID ? rerunCreditDetail(rerunCredit) : <PlanLimitDetail windows={active.planWindows} provider={active.provider} />
+    const usageOfCredit = active?.connectionId === RERUN_CONNECTION_ID
+    const usageLabel = !usage || !active ? null : usageOfCredit ? creditDetail(rerunCredit) : windowsSummary(usage.windows, active.provider)
+    const usageDetail = !usage || !active ? null : usageOfCredit ? usageLabel : <PlanLimitDetail windows={active.planWindows} provider={active.provider} />
 
-    const label = !hasAvailable ? 'Set up a model' : engineResolvesModel ? `Default · ${modelLabel(model)}` : !active ? 'Select model' : modelLabel(model)
+    const label = !hasAvailable ? t('setUp') : engineResolvesModel ? t('defaultLabel', { model: modelText }) : !active ? t('select') : modelText
 
     const trigger = (
         <PopoverTrigger asChild>
-            <ModelPillTrigger provider={active?.provider} label={label} usage={usage} className={refusedReason ? 'text-destructive hover:bg-destructive/10 hover:text-destructive aria-expanded:text-destructive' : undefined} />
+            <ModelPillTrigger provider={active?.provider} label={label} usage={usage} usageLabel={usageLabel} className={refusedReason ? 'text-destructive hover:bg-destructive/10 hover:text-destructive aria-expanded:text-destructive' : undefined} />
         </PopoverTrigger>
     )
 
@@ -185,7 +192,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         return (
             <div className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground">
                 <DotSpinner variant="light" size="xs" />
-                Loading
+                {t('loading')}
                 <ChevronDownIcon className="size-3" />
             </div>
         )
@@ -216,12 +223,12 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
             <PopoverContent align="start" className="w-80 gap-0 p-0">
                 <Command>
                     <CommandList className="max-h-[min(32rem,70vh)]">
-                        <CommandEmpty>No models available</CommandEmpty>
+                        <CommandEmpty>{t('empty')}</CommandEmpty>
                         {supportsBoxDefault && boxDefaultPick && (
                             <CommandGroup>
-                                <TooltipDisabledReason reason={canSetDefault || followsBoxDefault ? undefined : BOX_MANAGE_REASON} side="right" className="flex w-full">
+                                <TooltipDisabledReason reason={canSetDefault || followsBoxDefault ? undefined : tShared('boxManageReason')} side="right" className="flex w-full">
                                     <CommandItem className="flex-1" value="workspace default model" data-checked={showingBoxDefault} disabled={!canSetDefault && !followsBoxDefault} onSelect={useBoxDefault}>
-                                        <span className="min-w-0 flex-1 truncate">Workspace default</span>
+                                        <span className="min-w-0 flex-1 truncate">{t('workspaceDefault')}</span>
                                         <span className="shrink-0 text-[11px] whitespace-nowrap text-muted-foreground">{modelLabel(boxDefaultPick.model)}</span>
                                         {/* The star says what the agent runs by default, not what this conversation picked, so
                                             it stays filled while an override is in force. */}
@@ -243,7 +250,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                             >
                                 {group.models.map(m => {
                                     const isDefault = pinnedConnectionId === group.connectionId && pinnedModel === m.id
-                                    const disabledReason = group.connectionId === RERUN_CONNECTION_ID && rerunCredit.paused ? RERUN_CREDIT_PAUSED_REASON : m.unavailable
+                                    const disabledReason = group.connectionId === RERUN_CONNECTION_ID && rerunCredit.paused ? tShared('creditPaused') : m.unavailable
                                     if (disabledReason) {
                                         return (
                                             <TooltipDisabledReason key={m.id} reason={disabledReason} side="right" className="flex w-full">
@@ -261,13 +268,13 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                         )
                                     }
                                     const defaultStar = isDefault ? (
-                                        <TooltipLabeled label="Coworker default">
+                                        <TooltipLabeled label={t('coworkerDefault')}>
                                             <span className="inline-flex shrink-0">
                                                 <StarIcon className="size-3.5 text-primary [&_polygon]:fill-current" />
                                             </span>
                                         </TooltipLabeled>
                                     ) : !canSetDefault ? (
-                                        <TooltipDisabledReason reason={BOX_MANAGE_REASON}>
+                                        <TooltipDisabledReason reason={tShared('boxManageReason')}>
                                             <span
                                                 className="inline-flex"
                                                 onClick={e => {
@@ -275,17 +282,17 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                                     e.stopPropagation()
                                                 }}
                                             >
-                                                <button type="button" tabIndex={-1} disabled aria-label={`Make ${m.label} this coworker's default`} className="shrink-0 text-muted-foreground opacity-40">
+                                                <button type="button" tabIndex={-1} disabled aria-label={t('makeDefault', { model: m.label })} className="shrink-0 text-muted-foreground opacity-40">
                                                     <StarIcon className="size-3.5" />
                                                 </button>
                                             </span>
                                         </TooltipDisabledReason>
                                     ) : (
-                                        <TooltipLabeled label="Set as coworker default">
+                                        <TooltipLabeled label={t('setCoworkerDefault')}>
                                             <button
                                                 type="button"
                                                 tabIndex={-1}
-                                                aria-label={`Make ${m.label} this coworker's default`}
+                                                aria-label={t('makeDefault', { model: m.label })}
                                                 className="shrink-0 text-muted-foreground opacity-40 transition-opacity group-hover/model:opacity-70 hover:text-foreground hover:opacity-100"
                                                 onClick={e => {
                                                     e.preventDefault()

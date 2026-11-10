@@ -4,7 +4,8 @@ import type { Database } from '@/app/api/database.types'
 import { deriveUniqueHandles, importAgent } from '@/app/api/_services/agent.service'
 import { selectMany, selectSingle } from '@/supabase/supabase-helpers'
 import { downloadPrivateFile } from '@/lib/storage/private'
-import { STALE_IMPORT_HINT } from '@/lib/agents/capture-archive'
+import { staleImportError } from '@/lib/agents/capture-archive'
+import { AppError } from '@/lib/i18n/action-error'
 import { agentsFromRow } from './document'
 import { AGENT_ARCHIVE_BUCKET, archiveAgentNames, archivesFromRow } from './archives'
 import { AGENT_SPAN, containerContainsTile } from '@/lib/board/iso'
@@ -42,7 +43,7 @@ async function anchorsInsideSpace(supabase: SupabaseClient<Database>, spaceId: s
 // the Services tab renders them with nothing new to build.
 export async function installTemplate(supabase: SupabaseClient<Database>, slug: string, target: { workspaceId: number; spaceId: string; actor: Actor; positions?: GridPosition[]; again?: boolean }): Promise<TemplateInstallOutcome> {
     const { data: template } = await selectSingle(supabase, 'templates', ['id', 'title', 'agents', 'agent_archives'] as const, { slug })
-    if (!template) throw new Error(`No template found with slug "${slug}"`)
+    if (!template) throw new AppError('templateSlugNotFound', { slug })
 
     // A replayed install (the foreman calling twice, a retry after checkout, a second tab) would land
     // a second team with the same names, each asking to be set up from scratch, so the workspace
@@ -54,7 +55,7 @@ export async function installTemplate(supabase: SupabaseClient<Database>, slug: 
 
     const agents = agentsFromRow.parse(template.agents)
     const archives = archivesFromRow.parse(template.agent_archives)
-    if (archives.length === 0) throw new Error(`"${template.title}" has no captured coworker to import yet.`)
+    if (archives.length === 0) throw new AppError('templateHasNoCoworker', { title: template.title })
 
     // Named after the editorial entry when there is one, so an admin's rename of a captured agent
     // is what the importer sees.
@@ -98,7 +99,7 @@ export async function installTemplate(supabase: SupabaseClient<Database>, slug: 
             // stopping on. Anything else is about this one archive: there is no transaction
             // between Supabase and the engine, and an agent that already landed is real and
             // visible on the grid, so the rest of the batch carries on and reports what failed.
-            if (isMissingImportRoute(err)) throw new Error(STALE_IMPORT_HINT)
+            if (isMissingImportRoute(err)) throw staleImportError()
             failed.push({ name: names[index], error: errorMessage(err) })
         }
     }

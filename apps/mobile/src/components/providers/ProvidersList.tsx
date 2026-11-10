@@ -2,6 +2,9 @@ import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnections
 import { SymbolView } from 'expo-symbols'
 import { Fragment } from 'react'
 import { Pressable, View } from 'react-native'
+import { useTranslations } from 'use-intl'
+
+import type { AccessReason } from '@/auth/access'
 
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
@@ -24,22 +27,23 @@ type ProvidersListProps = {
     onAddKind: (kind: Exclude<AiConnectionKind, 'included'>) => void
     onChangeDefault: () => void
     // Why the caller can only read the providers (a member), or null when they run them.
-    readOnlyReason?: string | null
+    readOnlyReason?: AccessReason | null
 }
 
 // The web's AI providers panel: the default model, what comes with Rerun, then the user's own plans
 // and keys. An empty group offers its providers in place, a full one ends on its Add row.
 export function ProvidersList({ view, failed, onClose, onOpen, onAdd, onAddKind, onChangeDefault, readOnlyReason }: ProvidersListProps) {
+    const t = useTranslations('mobileProviders.list')
     const readOnly = !!readOnlyReason
     const of = (kind: AiConnectionKind) => view?.connections.filter(connection => connection.kind === kind) ?? []
 
     return (
-        <SheetFrame title="AI providers" onClose={onClose}>
+        <SheetFrame title={t('title')} onClose={onClose}>
             <ReadOnlyNote reason={readOnlyReason} />
 
             {failed && (
                 <AppText variant="callout" tone="muted" style={{ textAlign: 'center' }}>
-                    The machine of this workspace is not answering. Try again in a moment.
+                    {t('notAnswering')}
                 </AppText>
             )}
 
@@ -48,11 +52,11 @@ export function ProvidersList({ view, failed, onClose, onOpen, onAdd, onAddKind,
             {view && (
                 <>
                     <View style={{ gap: spacing.sm }}>
-                        <SectionTitle>Default model</SectionTitle>
+                        <SectionTitle>{t('defaultModel')}</SectionTitle>
                         <DefaultCard view={view} readOnly={readOnly} onChange={onChangeDefault} onFix={onOpen} />
                     </View>
 
-                    <Section title="Included">
+                    <Section title={t('included')}>
                         {of('included').map(source => (
                             <ProviderRow key={source.id} id={`provider-${source.id}`} provider={source.provider} title={source.name} subtitle={source.summary} trailing={<ConnectionBadge connection={source} />} onPress={() => onOpen(source.id)}>
                                 <View style={{ marginTop: spacing.xs, maxWidth: 200 }}>
@@ -62,8 +66,8 @@ export function ProvidersList({ view, failed, onClose, onOpen, onAdd, onAddKind,
                         ))}
                     </Section>
 
-                    <SourceGroup title="Your subscriptions" kind="plan" sources={of('plan')} view={view} pitch="Already use Claude Code or Codex? Your coworkers can run on your plan." addLabel="Add subscription" readOnly={readOnly} onOpen={onOpen} onAdd={onAdd} onAddKind={onAddKind} />
-                    <SourceGroup title="Your API keys" kind="key" sources={of('key')} view={view} pitch="Pay your provider directly, per token." addLabel="Add API key" readOnly={readOnly} onOpen={onOpen} onAdd={onAdd} onAddKind={onAddKind} />
+                    <SourceGroup title={t('subscriptions')} kind="plan" sources={of('plan')} view={view} pitch={t('subscriptionsPitch')} addLabel={t('addSubscription')} readOnly={readOnly} onOpen={onOpen} onAdd={onAdd} onAddKind={onAddKind} />
+                    <SourceGroup title={t('apiKeys')} kind="key" sources={of('key')} view={view} pitch={t('apiKeysPitch')} addLabel={t('addApiKey')} readOnly={readOnly} onOpen={onOpen} onAdd={onAdd} onAddKind={onAddKind} />
                 </>
             )}
         </SheetFrame>
@@ -75,18 +79,21 @@ function DefaultCard({ view, readOnly, onChange, onFix }: { view: AiConnectionsV
     const broken = source !== undefined && source.status !== 'connected'
     const creditGone = source?.status === 'credit_used_up'
     const canChange = view.connections.some(connection => connection.status === 'connected')
+    const t = useTranslations('mobileProviders.list')
     const subtitle = !broken
-        ? `Via ${source?.name ?? 'Rerun'}`
+        ? t('via', { name: source?.name ?? 'Rerun' })
         : creditGone
-          ? `Rerun credits are used up until they are back ${view.credit.backOn}, so coworkers with no model of their own are paused. ${canChange ? 'Pick another model' : 'Add a plan or an API key'} to keep them going.`
-          : `Coworkers with no model of their own are stopped. Fix ${source.name} or pick another model.`
+          ? canChange
+              ? t('creditsUsedUpPickModel', { backOn: view.credit.backOn })
+              : t('creditsUsedUpAddSource', { backOn: view.credit.backOn })
+          : t('defaultBroken', { name: source.name })
 
     return (
         <Card>
             <ProviderRow id="provider-default" provider={source?.provider ?? 'rerun'} title={view.default.label} subtitle={subtitle} subtitleLines={broken ? 0 : 2} onPress={canChange ? onChange : undefined} disabled={readOnly} />
             {broken && !creditGone && (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
-                    <Button label={signsIn(source.provider) ? 'Sign in again' : 'Add key'} size="sm" disabled={readOnly} onPress={() => onFix(source.id)} />
+                    <Button label={signsIn(source.provider) ? t('signInAgain') : t('addKey')} size="sm" disabled={readOnly} onPress={() => onFix(source.id)} />
                 </View>
             )}
         </Card>
@@ -145,15 +152,15 @@ function SourceGroup({ title, kind, sources, view, pitch, addLabel, readOnly, on
                     </Fragment>
                 )
             })}
-            <AddRow label={addLabel} disabled={readOnly} onPress={() => onAddKind(kind)} />
+            <AddRow testID={`add-row-${kind}`} label={addLabel} disabled={readOnly} onPress={() => onAddKind(kind)} />
         </Section>
     )
 }
 
-function AddRow({ label, disabled, onPress }: { label: string; disabled: boolean; onPress: () => void }) {
+function AddRow({ testID, label, disabled, onPress }: { testID: string; label: string; disabled: boolean; onPress: () => void }) {
     const theme = useTheme()
     return (
-        <Pressable testID={`add-row-${label}`} onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT, paddingHorizontal: spacing.lg, backgroundColor: pressed ? theme.muted : 'transparent', opacity: disabled ? 0.45 : 1 })}>
+        <Pressable testID={testID} onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT, paddingHorizontal: spacing.lg, backgroundColor: pressed ? theme.muted : 'transparent', opacity: disabled ? 0.45 : 1 })}>
             <View style={{ width: LOGO_TILE, alignItems: 'center' }}>
                 <SymbolView name="plus" size={15} weight="semibold" tintColor={theme.foreground} />
             </View>

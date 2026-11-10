@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { DownloadIcon, type LucideIcon } from '@/lib/icons'
@@ -22,11 +23,12 @@ export function ViewerPage({ slug, bar, children, className }: { slug: string; b
 }
 
 export function DownloadButton({ className }: { className?: string }) {
+    const t = useTranslations('published.viewer')
     return (
         <Button variant="ghost" size="sm" className={cn('shrink-0', className)} asChild>
             <a href={DOWNLOAD_URL} download>
                 <DownloadIcon />
-                <span className="max-md:hidden">Download</span>
+                <span className="max-md:hidden">{t('download')}</span>
             </a>
         </Button>
     )
@@ -46,6 +48,7 @@ export function ViewerTopBar({ icon: FormatIcon, name, meta, children }: { icon:
 
 // The same pill lib/published/badge.ts injects into a published HTML page, drawn as React here.
 export function MadeWithRerun({ slug, className }: { slug: string; className?: string }) {
+    const t = useTranslations('published')
     const landing = `${LANDING_URL}/?utm_source=published&utm_medium=badge&utm_content=${slug}`
     const report = `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(`Report published page ${slug}`)}`
     return (
@@ -54,10 +57,10 @@ export function MadeWithRerun({ slug, className }: { slug: string; className?: s
                 <svg viewBox="0 0 512 512" aria-hidden className="size-3.5">
                     <path d={R_PATH} fill="currentColor" />
                 </svg>
-                Made with Rerun
+                {t('gate.madeWith')}
             </a>
             <a href={report} className="rounded-full px-2.5 py-1.5 text-[#fafafa]/56 hover:bg-white/8">
-                Report
+                {t('viewer.report')}
             </a>
         </div>
     )

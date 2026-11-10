@@ -1,0 +1,141 @@
+{
+    "_context": {
+        "access.short.workspace": "Short name of an access mode: only the members of the workspace can open the link.",
+        "access.short.invited": "Short name of an access mode: only the people invited by email can open the link.",
+        "access.workspaceFallback": "Stands in for the name of a workspace that has none.",
+        "access.label.workspace": "{workspace} is the name of the workspace.",
+        "access.anyoneAt": "An invite that covers a whole email domain. {domain} is a domain such as company.com.",
+        "gate.locked": "Screen reader label of the picture of a locked page. {workspace} is the workspace that owns it.",
+        "gate.madeWith": "Link to the Rerun website, at the bottom of a published page.",
+        "viewer.report": "Link at the bottom of a published page to report abusive content to Rerun.",
+        "viewer.updated": "{when} is a relative date already translated, such as 'yesterday' or '5 min ago'.",
+        "csv.meta": "Size of a table. {truncated} is true when the table goes on past what is shown: the row count is then followed by a plus sign.",
+        "row.more": "Screen reader label of the button that opens the menu of a published link.",
+        "list.filterAll": "Filter chip showing every published link, followed by their count. {count} is empty while the list loads.",
+        "list.fallbackCoworker": "Stands in for the name of a coworker that no longer exists.",
+        "chat.fallbackCoworker": "Stands in for the name of a coworker that no longer exists.",
+        "chat.copy": "Button that copies the link of a published page.",
+        "chat.madePublicByYou": "Status under a published link once the user agreed to make it public.",
+        "chat.keptFor": "Status under a published link once the user refused to make it public. {workspace} is the name of the workspace.",
+        "share.title": "Title of the dialog where the user chooses who can open a published link.",
+        "share.publicOff": "Why the Public option is greyed out. {workspace} is the name of the workspace.",
+        "share.noEmail": "Why the Invited option is greyed out: this self-hosted server is not set up to send emails.",
+        "share.passwordSet": "Placeholder of the password field when the link already has a password.",
+        "policy.label": "Workspace setting: who may make a published link public."
+    },
+    "access": {
+        "short": {
+            "public": "Public",
+            "workspace": "Workspace",
+            "password": "Password",
+            "invited": "Invited"
+        },
+        "hint": {
+            "public": "No sign-in needed",
+            "workspace": "Signed-in members only",
+            "password": "Visitors type it once",
+            "invited": "Visitors confirm their email"
+        },
+        "label": {
+            "public": "Anyone with the link",
+            "workspace": "{workspace} members",
+            "password": "Anyone with the password",
+            "invited": "Only people you invite"
+        },
+        "anyoneAt": "Anyone at {domain}",
+        "workspaceFallback": "Workspace"
+    },
+    "gate": {
+        "madeWith": "Made with Rerun",
+        "locked": "{workspace} page, locked",
+        "code": "Code",
+        "switchAccount": "Switch account"
+    },
+    "viewer": {
+        "download": "Download",
+        "report": "Report",
+        "updated": "Updated {when}",
+        "slides": "{count, plural, one {# slide} other {# slides}}",
+        "page": "Page {page}",
+        "previousSlide": "Previous slide",
+        "nextSlide": "Next slide"
+    },
+    "csv": {
+        "meta": "{rows, plural, one {# row} other {# rows}}{truncated, select, true {+} other {}} · {columns, plural, one {# column} other {# columns}}",
+        "truncated": "Showing the first {rows, plural, one {# row} other {# rows}}. Download the file for the rest."
+    },
+    "row": {
+        "more": "More",
+        "open": "Open",
+        "copyLink": "Copy link",
+        "shareSettings": "Share settings",
+        "unpublish": "Unpublish",
+        "unpublishFailed": "Could not unpublish"
+    },
+    "unpublishConfirm": {
+        "title": "Unpublish {title}?",
+        "description": "The link stops working right away, for everyone who has it.",
+        "confirm": "Unpublish"
+    },
+    "panel": {
+        "emptyTitle": "Nothing published yet",
+        "emptyDescription": "Pages, reports and files {agent} shares show up here.",
+        "updated": "Updated {when}",
+        "copyLink": "Copy link"
+    },
+    "list": {
+        "filterAll": "All {count}",
+        "emptyTitle": "Nothing published yet",
+        "emptyDescription": "Pages, reports and files your coworkers share show up here.",
+        "fallbackCoworker": "Coworker"
+    },
+    "chat": {
+        "unpublished": "Unpublished",
+        "updateFailed": "Could not update the link",
+        "copy": "Copy",
+        "open": "Open",
+        "fallbackCoworker": "Your coworker",
+        "asksPublic": "{coworker} wants anyone with the link to open it",
+        "keepPrivate": "Keep private",
+        "makePublic": "Make public",
+        "madePublicByYou": "Made public by you",
+        "madePublic": "Made public",
+        "keptFor": "Kept for {workspace} members"
+    },
+    "share": {
+        "title": "Share",
+        "description": "Choose who can open this link.",
+        "close": "Close",
+        "updateFailed": "Could not update the link",
+        "unpublishFailed": "Could not unpublish",
+        "unpublish": "Unpublish",
+        "publicOff": "Turned off for {workspace}",
+        "noEmail": "This server sends no email",
+        "passwordSet": "Password set",
+        "setPassword": "Set a password",
+        "password": "Password",
+        "invitePlaceholder": "Emails or @company.com",
+        "invite": "Invite emails or domains",
+        "removeInvite": "Remove {entry}",
+        "copyLink": "Copy link",
+        "copied": "Copied"
+    },
+    "policy": {
+        "label": "Public links",
+        "people": {
+            "title": "Only people can make a link public",
+            "hint": "Coworkers publish for {workspace} and ask before going public"
+        },
+        "anyone": {
+            "title": "Coworkers can make a link public",
+            "hint": "They pick the access themselves"
+        },
+        "never": {
+            "title": "Nothing goes public",
+            "hint": "Workspace, password and invited links only"
+        },
+        "turnOffTitle": "Turn off public links?",
+        "turnOffDescription": "{count, plural, one {# public link will switch to {workspace} members once you save.} other {# public links will switch to {workspace} members once you save.}}",
+        "turnOff": "Turn off"
+    }
+}

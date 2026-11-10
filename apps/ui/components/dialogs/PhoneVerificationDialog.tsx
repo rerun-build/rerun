@@ -3,6 +3,7 @@
 import { AuthShell } from '@/components/auth/AuthShell'
 import { PhoneVerificationStep } from '@/components/auth/PhoneVerificationStep'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { useTranslations } from 'next-intl'
 
 // The second wall of a signup: a new account enters the app once it has given a phone number or
 // skipped the step. It is driven by the account's own state rather than by the form that created it,
@@ -10,6 +11,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 // /auth) and only one of them comes back to a form. Escape and a click outside do nothing: the way
 // past it without a number is "Skip for now", and the getting-started checklist asks for it again.
 export function PhoneVerificationDialog({ open }: { open: boolean }) {
+    const t = useTranslations('dialogs.phoneVerification')
     return (
         <Dialog open={open} dismissible={false}>
             <DialogContent
@@ -19,7 +21,7 @@ export function PhoneVerificationDialog({ open }: { open: boolean }) {
                 onPointerDownOutside={event => event.preventDefault()}
                 onInteractOutside={event => event.preventDefault()}
             >
-                <AuthShell title="One last step" subtitle="Add your phone number." titleAs={DialogTitle} variant="dialog">
+                <AuthShell title={t('title')} subtitle={t('subtitle')} titleAs={DialogTitle} variant="dialog">
                     <PhoneVerificationStep active={open} />
                 </AuthShell>
             </DialogContent>

@@ -5,7 +5,8 @@ import { ClockIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { BorderBeam, TextShimmer } from '@rerun/ui'
 import { Icon, PANEL_CARD, Stripes } from '@rerun/ui/primitives'
-import type { ComponentType, SVGProps } from 'react'
+import { useTranslations } from 'next-intl'
+import type { ComponentType, ReactNode, SVGProps } from 'react'
 import { BRAND_TEXT } from './CancelTimeline'
 
 export type IconType = ComponentType<SVGProps<SVGSVGElement>>
@@ -15,18 +16,15 @@ const FEATURED_AGENTS = 3
 export function DaysLeftCard({ trial, daysLeft, agents, loading }: { trial: boolean; daysLeft: number; agents: readonly CancelFlowAgent[]; loading: boolean }) {
     const featured = agents.slice(0, FEATURED_AGENTS)
     const tiles = loading ? FEATURED_AGENTS : featured.length
-    const days = daysLeft === 1 ? '1 day' : `${daysLeft} days`
+    const t = useTranslations('billing')
+    const days = (chunks: ReactNode) => <span className={cn('font-semibold', BRAND_TEXT)}>{chunks}</span>
 
     return (
         <div className={cn('relative flex flex-col gap-3 overflow-hidden p-3', PANEL_CARD)}>
             <Stripes fade="bottom" />
             <p className="relative flex items-center gap-2 px-1 text-sm text-muted-foreground">
                 <ClockIcon className="size-4 shrink-0" />
-                <span>
-                    {trial ? 'Your trial still has ' : 'You still have '}
-                    <span className={cn('font-semibold', BRAND_TEXT)}>{days}</span>
-                    {trial ? '' : ' left in your plan'}
-                </span>
+                <span>{trial ? t.rich('cancel.daysLeft.trial', { count: daysLeft, days }) : t.rich('cancel.daysLeft.paid', { count: daysLeft, days })}</span>
             </p>
             {tiles > 0 && (
                 <div className={cn('relative grid grid-cols-2 gap-2', tiles === 3 && 'sm:grid-cols-3')}>
@@ -40,15 +38,17 @@ export function DaysLeftCard({ trial, daysLeft, agents, loading }: { trial: bool
                         : featured.map((agent, index) => (
                               <div key={agent.key} className={cn('flex min-w-0 flex-col gap-1 rounded-lg bg-muted/60 p-3', index === 2 && 'hidden sm:flex')}>
                                   <span className="truncate text-sm font-medium text-foreground">{agent.name}</span>
-                                  <span className="text-xs text-muted-foreground">
-                                      <span className="font-medium text-foreground tabular-nums">{agent.runsWeek}</span> {trial ? 'runs so far' : 'runs this week'}
-                                  </span>
+                                  <span className="text-xs text-muted-foreground">{t.rich(trial ? 'cancel.daysLeft.runsSoFar' : 'cancel.daysLeft.runsThisWeek', { count: agent.runsWeek, figure })}</span>
                               </div>
                           ))}
                 </div>
             )}
         </div>
     )
+}
+
+function figure(chunks: ReactNode) {
+    return <span className="font-medium text-foreground tabular-nums">{chunks}</span>
 }
 
 export type SunkStat = { icon: IconType; label: string; value: string | null }
@@ -89,6 +89,7 @@ export function SunkCard({ value, caption, stats, loading }: { value: string; ca
 }
 
 export function OfferCard({ headline, priceLabel, fullPriceLabel, billedOnLabel, terms }: { headline: string; priceLabel: string; fullPriceLabel: string; billedOnLabel: string; terms: string }) {
+    const t = useTranslations('billing')
     return (
         <div className={cn('relative flex flex-col gap-3 rounded-xl p-5', PANEL_CARD)}>
             <BorderBeam pattern="arcs" tone="brand" animated glow width={1} duration={7} outset={1} />
@@ -96,7 +97,7 @@ export function OfferCard({ headline, priceLabel, fullPriceLabel, billedOnLabel,
             <div className="flex items-baseline gap-2">
                 <span className={cn('text-4xl font-semibold tracking-tight tabular-nums', BRAND_TEXT)}>{priceLabel}</span>
                 <span className="text-sm text-muted-foreground line-through">{fullPriceLabel}</span>
-                <span className="text-sm text-muted-foreground">on {billedOnLabel}</span>
+                <span className="text-sm text-muted-foreground">{t('cancel.offerCard.billedOn', { date: billedOnLabel })}</span>
             </div>
             <p className="text-xs text-muted-foreground">{terms}</p>
         </div>

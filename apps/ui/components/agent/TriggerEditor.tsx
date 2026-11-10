@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { createTriggerAction, deleteTriggerAction, getTriggerAction, rotateTriggerTokenAction, updateTriggerAction } from '@/app/api/_actions/agent.actions'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { TaskNotifyField } from '@/components/agent/TaskNotifyField'
@@ -16,9 +17,10 @@ import { Switch } from '@/components/ui/switch'
 import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineTrigger, EngineTriggerMethod } from '@/lib/engine/types'
 import { HistoryIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 const ALL_METHODS: EngineTriggerMethod[] = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
@@ -33,12 +35,15 @@ type TriggerEditorProps = {
 }
 
 export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: TriggerEditorProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.triggerEditor')
+    const errorText = useErrorText()
     const isEdit = !!slug
     const { pick, setPick, availableGroups, providerFor, agentModel } = useRunModel(agentId)
     // Only the prompt is sealed: the URL, the methods and the on/off switch stay available.
     const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : boxManageReason
     const [loading, setLoading] = useState(isEdit)
     const [trigger, setTrigger] = useState<EngineTrigger | null>(null)
     const [name, setName] = useState('')
@@ -55,15 +60,15 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
         if (!slug) return
         setLoading(true)
         getTriggerAction(agentId, slug)
-            .then(t => {
-                if (!t) return
-                setTrigger(t)
-                setName(t.name)
-                setDescription(t.description ?? '')
-                setMethods(t.methods.length ? t.methods : DEFAULT_METHODS)
-                setEnabled(t.enabled ?? true)
-                setPick({ connectionId: t.connectionId ?? null, model: t.model })
-                setBody(t.body ?? '')
+            .then(loaded => {
+                if (!loaded) return
+                setTrigger(loaded)
+                setName(loaded.name)
+                setDescription(loaded.description ?? '')
+                setMethods(loaded.methods.length ? loaded.methods : DEFAULT_METHODS)
+                setEnabled(loaded.enabled ?? true)
+                setPick({ connectionId: loaded.connectionId ?? null, model: loaded.model })
+                setBody(loaded.body ?? '')
             })
             .finally(() => setLoading(false))
     }, [agentId, slug, setPick])
@@ -84,8 +89,8 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
             : await createTriggerAction(agentId, { name, description, body, methods, connectionId: pick.connectionId, provider, model: pick.model })
         setSaving(false)
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to save')
-    }, [agentId, slug, isEdit, name, description, methods, enabled, pick, body, onDone, providerFor])
+        else setError(errorText(result, t('saveFailed')))
+    }, [agentId, slug, isEdit, name, description, methods, enabled, pick, body, onDone, providerFor, t, errorText])
 
     const handleRotate = useCallback(async () => {
         if (!slug) return
@@ -94,8 +99,8 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
         const result = await rotateTriggerTokenAction(agentId, slug)
         setRotating(false)
         if (result.success && result.trigger) setTrigger(result.trigger)
-        else setError(result.error ?? 'Failed to rotate the secret')
-    }, [agentId, slug])
+        else setError(errorText(result, t('rotateFailed')))
+    }, [agentId, slug, t, errorText])
 
     const handleDelete = useCallback(async () => {
         if (!slug) return
@@ -103,8 +108,8 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
         const result = await deleteTriggerAction(agentId, slug)
         setDeleting(false)
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to delete')
-    }, [agentId, slug, onDone])
+        else setError(errorText(result, t('deleteFailed')))
+    }, [agentId, slug, onDone, t, errorText])
 
     if (loading) {
         return (
@@ -118,21 +123,21 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
 
     return (
         <PanelEditorShell>
-            <PanelEditorHeader title={isEdit ? (canManage ? 'Edit trigger' : 'Trigger') : 'New trigger'} onBack={onBack}>
+            <PanelEditorHeader title={isEdit ? (canManage ? t('titleEdit') : t('titleReadOnly')) : t('titleNew')} onBack={onBack}>
                 {isEdit && onShowHistory && (
                     <Button size="sm" variant="ghost" onClick={onShowHistory}>
-                        <HistoryIcon className="size-3.5 mr-1" /> History
+                        <HistoryIcon className="size-3.5 mr-1" /> {t('history')}
                     </Button>
                 )}
             </PanelEditorHeader>
             <PanelEditorBody>
                 {error && <p className="text-xs text-destructive">{error}</p>}
-                <Input label="Name" helperText={isEdit ? "Name can't be changed (it sets the URL)." : 'The URL is derived from this name.'} hideRequired value={name} onChange={e => setName(e.target.value)} disabled={isEdit} placeholder="GitHub push" className="h-8 text-sm" />
-                <Input label="Description" hideRequired value={description} onChange={e => setDescription(e.target.value)} disabled={!canManage} placeholder="Fires when a commit lands on main" className="h-8 text-sm" />
+                <Input label={t('name')} helperText={isEdit ? t('nameLockedHelper') : t('nameHelper')} hideRequired value={name} onChange={e => setName(e.target.value)} disabled={isEdit} placeholder={t('namePlaceholder')} className="h-8 text-sm" />
+                <Input label={t('description')} hideRequired value={description} onChange={e => setDescription(e.target.value)} disabled={!canManage} placeholder={t('descriptionPlaceholder')} className="h-8 text-sm" />
 
                 {isEdit && trigger && <TriggerUrlField agentId={agentId} slug={trigger.slug} token={trigger.token} rotating={rotating} onRotate={handleRotate} rotateDisabledReason={manageReason} />}
 
-                <Field label="Accepted methods" helperText={methods.includes('GET') ? 'GET is for services that can only call a plain URL. Link previews and browser visits are ignored.' : 'Most services send POST.'}>
+                <Field label={t('methods')} helperText={methods.includes('GET') ? t('methodsGetHelper') : t('methodsHelper')}>
                     <div className="flex flex-wrap gap-3">
                         {ALL_METHODS.map(method => (
                             <label key={method} className="flex items-center gap-1.5 text-xs cursor-pointer">
@@ -143,10 +148,10 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
                     </div>
                 </Field>
 
-                <RunModelField id="trigger-model" value={pick} onChange={setPick} availableGroups={availableGroups} agentModel={agentModel} disabled={!canManage} helperText="The model this trigger runs under when it fires. Requires the provider's API key." />
+                <RunModelField id="trigger-model" value={pick} onChange={setPick} availableGroups={availableGroups} agentModel={agentModel} disabled={!canManage} helperText={t('modelHelper')} />
 
                 {isEdit && (
-                    <Field orientation="row" label="Enabled">
+                    <Field orientation="row" label={t('enabled')}>
                         <Switch checked={enabled} disabled={!canManage} onCheckedChange={setEnabled} />
                     </Field>
                 )}
@@ -155,14 +160,14 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
 
                 <TemplateContentLock locked={promptLocked} subject="trigger prompts">
                     <MarkdownTextarea
-                        label="Trigger prompt"
-                        dialogTitle="Edit the trigger prompt"
-                        helperText="What the coworker runs when the URL is called (a fresh session each time). The caller payload is attached below it."
+                        label={t('prompt')}
+                        dialogTitle={t('promptDialogTitle')}
+                        helperText={t('promptHelper')}
                         value={body}
                         onChange={setBody}
                         disabled={promptLocked || !canManage}
                         className="text-xs min-h-32 font-mono"
-                        placeholder="A commit just landed. Review the diff in the payload and post a summary to Slack."
+                        placeholder={t('promptPlaceholder')}
                     />
                 </TemplateContentLock>
 
@@ -171,18 +176,18 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
                 {isEdit && (
                     <TooltipDisabledReason reason={manageReason}>
                         <PanelDeleteButton
-                            label="Delete trigger"
+                            label={t('delete')}
                             busy={deleting}
                             disabled={!canManage}
                             onClick={handleDelete}
-                            confirmTitle={`Delete ${name || 'this trigger'}?`}
-                            confirmDescription="Its webhook URL stops responding right away. Anything still calling it starts failing."
+                            confirmTitle={name ? t('deleteConfirm', { name }) : t('deleteConfirmUnnamed')}
+                            confirmDescription={t('deleteDescription')}
                         />
                     </TooltipDisabledReason>
                 )}
                 <TooltipDisabledReason reason={manageReason} className="flex-1">
                     <Button size="sm" className="flex-1" loading={saving} onClick={handleSave} disabled={!canSave || !canManage}>
-                        {isEdit ? 'Save changes' : 'Create trigger'}
+                        {isEdit ? t('saveChanges') : t('create')}
                     </Button>
                 </TooltipDisabledReason>
             </PanelEditorFooter>

@@ -8,9 +8,11 @@ import { TooltipLabeled } from '@/components/ui/tooltip'
 import { HeadsetIcon, HelpCircleIcon } from '@/lib/icons'
 import { openCrisp } from '@/lib/crisp'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
 export function HelpButton() {
+    const t = useTranslations('layout.help')
     const { session } = useSession()
     // The menu hands focus back to its trigger as it closes, which the checklist popover would read
     // as a click outside and close on the spot.
@@ -18,9 +20,9 @@ export function HelpButton() {
 
     return (
         <DropdownMenu>
-            <TooltipLabeled label="Help" side="bottom">
+            <TooltipLabeled label={t('label')} side="bottom">
                 <DropdownMenuTrigger asChild>
-                    <ChromePill start="icon" end="icon" aria-label="Help">
+                    <ChromePill start="icon" end="icon" aria-label={t('label')}>
                         <HelpCircleIcon className="size-4 text-muted-foreground" />
                     </ChromePill>
                 </DropdownMenuTrigger>
@@ -39,7 +41,7 @@ export function HelpButton() {
                     <>
                         <DropdownMenuItem onSelect={() => openCrisp(session?.user?.email)} className="gap-2 text-muted-foreground">
                             <HeadsetIcon className="size-4" />
-                            Contact support
+                            {t('contactSupport')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                     </>

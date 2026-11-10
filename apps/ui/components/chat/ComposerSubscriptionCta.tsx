@@ -5,6 +5,7 @@ import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { ArrowRightIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { Stripes } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 
 type ComposerSubscriptionCtaProps = {
     open: boolean
@@ -17,6 +18,7 @@ type ComposerSubscriptionCtaProps = {
 //
 // Opening and closing goes through grid rows rather than height, so no measurement is needed.
 export function ComposerSubscriptionCta({ open, onClick }: ComposerSubscriptionCtaProps) {
+    const t = useTranslations('chat')
     return (
         <div className={cn('-mt-px grid transition-[grid-template-rows] duration-300 ease-out', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
             <div className="overflow-hidden px-2">
@@ -25,9 +27,9 @@ export function ComposerSubscriptionCta({ open, onClick }: ComposerSubscriptionC
                     <Stripes className="rounded-b-lg" fade="top" />
                     <ProviderIcon provider="openai" className="relative size-3.5 shrink-0" />
                     <ProviderIcon provider="claude" className="relative size-3.5 shrink-0" />
-                    <span className="relative min-w-0 flex-1 truncate text-xs leading-normal text-muted-foreground">Already paying for an AI subscription? Run this coworker on it.</span>
+                    <span className="relative min-w-0 flex-1 truncate text-xs leading-normal text-muted-foreground">{t('composer.subscriptionCta')}</span>
                     <Button size="xs" variant="outline" onClick={onClick} className="relative">
-                        Connect
+                        {t('actions.connect')}
                         <ArrowRightIcon className="size-3" />
                     </Button>
                 </div>

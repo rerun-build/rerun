@@ -45,10 +45,12 @@ export function parseHubOutput<T = unknown>(output: unknown): T | null {
 const UNKNOWN_TOOL_ERROR = /No such tool available|tried to call unavailable tool/
 const CLI_TOOL_ERROR_TAG = /<\/?tool_use_error>/g
 
+export type ToolErrorCopy = (key: 'errors.notFound') => string
+
 // The CLI wraps a tool error in `<tool_use_error>`, and a call to a name the model got wrong comes
 // back as a sentence meant for the model (the AI SDK one lists every tool of the run). The model
 // needs them as they are; the person reading the chat does not.
-export function readableToolError(errorText: string): string {
-    if (UNKNOWN_TOOL_ERROR.test(errorText)) return 'Tool not found'
+export function readableToolError(errorText: string, t: ToolErrorCopy): string {
+    if (UNKNOWN_TOOL_ERROR.test(errorText)) return t('errors.notFound')
     return errorText.replace(CLI_TOOL_ERROR_TAG, '').trim()
 }

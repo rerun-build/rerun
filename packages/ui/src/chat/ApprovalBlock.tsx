@@ -5,14 +5,15 @@ import { cn } from '../cn'
 import { ShieldAlertIcon, type LucideIcon } from '../icons'
 import { brandIconFilter } from '../brand-icon'
 import type { ReactNode } from 'react'
+import { useKitTranslations } from '../locale'
 
 export type ApprovalChoice = 'once' | 'session' | 'always' | 'deny'
 
-export const APPROVAL_CHOICES: { value: ApprovalChoice; label: string; variant: 'default' | 'outline' | 'destructive' }[] = [
-    { value: 'once', label: 'Allow once', variant: 'default' },
-    { value: 'session', label: 'This session', variant: 'outline' },
-    { value: 'always', label: 'Always', variant: 'outline' },
-    { value: 'deny', label: 'Deny', variant: 'destructive' },
+export const APPROVAL_CHOICES: { value: ApprovalChoice; variant: 'default' | 'outline' | 'destructive' }[] = [
+    { value: 'once', variant: 'default' },
+    { value: 'session', variant: 'outline' },
+    { value: 'always', variant: 'outline' },
+    { value: 'deny', variant: 'destructive' },
 ]
 
 export type ApprovalBlockProps = {
@@ -30,6 +31,7 @@ export type ApprovalBlockProps = {
 }
 
 export function ApprovalBlock({ label, icon: ToolIcon, iconSrc, message, preview, responded, loading, onChoose, renderText = text => text, className }: ApprovalBlockProps) {
+    const t = useKitTranslations()
     return (
         <div className={cn('rounded-md border border-amber-500/30 bg-amber-500/5 p-3 space-y-2', className)}>
             <div className="flex items-center gap-2 text-sm">
@@ -39,7 +41,7 @@ export function ApprovalBlock({ label, icon: ToolIcon, iconSrc, message, preview
                 ) : (
                     ToolIcon && <ToolIcon className="size-3.5 shrink-0 text-muted-foreground" />
                 )}
-                <span className="font-medium text-foreground">Approval required: {label}</span>
+                <span className="font-medium text-foreground">{t('chat.approval.title', { label })}</span>
             </div>
 
             {message && <ScrollFade className="max-h-[20vh] text-xs text-muted-foreground">{renderText(message)}</ScrollFade>}
@@ -52,13 +54,13 @@ export function ApprovalBlock({ label, icon: ToolIcon, iconSrc, message, preview
 
             {responded ? (
                 <p className="text-xs text-muted-foreground">
-                    Responded: <span className="font-medium">{responded}</span>
+                    {t.rich('chat.approval.responded', { choice: responded, b: chunks => <span className="font-medium">{chunks}</span> })}
                 </p>
             ) : (
                 <div className="flex items-center gap-2">
-                    {APPROVAL_CHOICES.map(({ value, label, variant }) => (
+                    {APPROVAL_CHOICES.map(({ value, variant }) => (
                         <Button key={value} size="sm" variant={variant} disabled={loading} onClick={() => onChoose(value)} data-hitl={value}>
-                            {label}
+                            {t(`chat.approval.choices.${value}`)}
                         </Button>
                     ))}
                 </div>

@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
 export interface IncidentResolvedProps {
@@ -17,6 +19,7 @@ export interface IncidentResolvedProps {
   /** Opens the conversation of the run that worked. Without it the button opens the board. */
   conversationUrl?: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function IncidentResolved({
@@ -27,31 +30,33 @@ export default function IncidentResolved({
   appUrl,
   conversationUrl,
   unsubscribeUrl,
+  locale,
 }: IncidentResolvedProps) {
+  const t = emailTranslator(locale);
   return (
     <Layout
-      preview={`${sourceLabel} of ${agentName} works again`}
+      preview={t("incidentResolved.preview", { source: sourceLabel, agentName })}
       hero={{ variant: "done", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Back to normal</Heading>
+      <Heading style={text.heading}>{t("incidentResolved.heading")}</Heading>
       <Text style={text.paragraph}>
-        {sourceLabel} of <strong>{agentName}</strong> ran fine again. You
-        won't get another email about it unless it breaks again.
+        {t.rich("incidentResolved.body", { source: sourceLabel, agentName, strong })}
       </Text>
       {reason ? <Text style={reasonLine}>{reason}</Text> : null}
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Coworker", value: agentName },
-            { label: "Source", value: sourceLabel },
+            { label: t("common.meta.coworker"), value: agentName },
+            { label: t("common.meta.source"), value: sourceLabel },
           ]}
         />
       </Section>
       <Section style={cta}>
         <Button href={conversationUrl ?? appUrl}>
-          {conversationUrl ? "Open the conversation" : "Open Rerun"}
+          {conversationUrl ? t("common.openConversation") : t("common.openRerun")}
         </Button>
       </Section>
     </Layout>

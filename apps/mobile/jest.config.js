@@ -14,7 +14,7 @@ module.exports = {
         "./jest.setup.js"
     ],
     "transformIgnorePatterns": [
-        "node_modules/(?!(.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|native-base|react-native-svg|marked|remend))"
+        "node_modules/(?!(.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|native-base|react-native-svg|marked|remend|use-intl|intl-messageformat|@formatjs/.*|icu-minify|@schummar/.*))"
     ],
     "moduleNameMapper": {
         "^@rerun/cloud-mobile/(.*)$": `${CLOUD_MOBILE}/$1`,

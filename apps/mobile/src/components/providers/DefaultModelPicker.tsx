@@ -1,6 +1,7 @@
 import type { AiConnectionsView, ModelChoice } from '@rerun/contracts'
 import { Fragment } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { Card, SectionTitle, Separator } from '@/components/ui/GroupedList'
 import { ModelRow } from '@/components/ui/ModelRow'
@@ -11,9 +12,10 @@ import { SheetFrame } from './bits'
 
 // What coworkers with no model of their own run on: every model a ready connection lets them use.
 export function DefaultModelPicker({ view, onPick, onBack }: { view: AiConnectionsView; onPick: (choice: ModelChoice) => void; onBack: () => void }) {
+    const t = useTranslations('mobileProviders.defaultModel')
     const ready = view.connections.filter(connection => connection.status === 'connected' && connection.models.some(model => model.enabled))
     return (
-        <SheetFrame title="Default model" onBack={onBack}>
+        <SheetFrame title={t('title')} onBack={onBack}>
             {ready.map(connection => (
                 <View key={connection.id} style={{ gap: spacing.sm }}>
                     <SectionTitle>{connection.name}</SectionTitle>

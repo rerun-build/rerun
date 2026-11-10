@@ -1,0 +1,86 @@
+{
+    "access": {
+        "boxManage": "Solo un admin o un gestor de esta Box puede cambiar esto.",
+        "aiProvidersAdminOnly": "Solo un admin puede cambiar los proveedores de IA.",
+        "noManagedBox": "Necesitas una Box que gestiones para añadir un coworker. Crea una en {host} o pídeselo a un admin.",
+        "boxesFailed": "No pudimos cargar tus Boxes. Inténtalo de nuevo en un momento.",
+        "noBoxYet": "Este workspace aún no tiene ninguna Box. Crea una en {host}."
+    },
+    "page": {
+        "loadFailed": "No se pudo cargar. Inténtalo de nuevo en un momento."
+    },
+    "details": {
+        "back": "Atrás",
+        "more": "Más",
+        "delete": "Eliminar coworker",
+        "edit": "Editar",
+        "files": "Archivos",
+        "apps": "Apps",
+        "routines": "Rutinas",
+        "computer": "Ordenador",
+        "notifications": "Notificaciones",
+        "working": "Trabajando",
+        "idle": "Inactivo",
+        "off": "Apagado",
+        "none": "Ninguna",
+        "appsToConnect": "{count} por conectar",
+        "appsConnected": "{count, plural, one {# conectada} other {# conectadas}}",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count, plural, one {# activa} other {# activas}}",
+        "renameTitle": "Renombrar",
+        "save": "Guardar",
+        "renameFailed": "No se pudo renombrar",
+        "deleteTitle": "¿Eliminar a {name}?",
+        "deleteMessage": "Esto elimina para siempre el coworker y sus datos. No se puede deshacer.",
+        "deleteConfirm": "Eliminar",
+        "deleteFailed": "No se pudo eliminar"
+    },
+    "apps": {
+        "title": "Apps",
+        "status": {
+            "needsSignIn": "Requiere inicio de sesión",
+            "needsSetup": "Requiere configuración",
+            "error": "Error"
+        },
+        "connect": "Conectar",
+        "empty": "Aún no hay ninguna app.",
+        "askInChat": "Pídele a {name} en el chat que añada una app.",
+        "connectFailed": "No se pudo conectar {name}"
+    },
+    "files": {
+        "title": "Archivos",
+        "media": "Multimedia",
+        "docs": "Docs",
+        "earlier": "Anteriores",
+        "thisMonth": "Este mes",
+        "open": "Abrir {name}",
+        "fileFallback": "archivo",
+        "noMedia": "Sin multimedia",
+        "noDocs": "Sin docs",
+        "emptyHint": "Lo que {name} cree aparecerá aquí.",
+        "truncated": "Solo los archivos más recientes. Todos están en la web."
+    },
+    "routines": {
+        "title": "Rutinas",
+        "once": "Una vez, {date}",
+        "webhook": "Webhook",
+        "empty": "Aún no hay ninguna rutina.",
+        "askInChat": "Pídele a {name} en el chat que configure una.",
+        "turnOnFailed": "No se pudo activar {name}",
+        "turnOffFailed": "No se pudo desactivar {name}"
+    },
+    "create": {
+        "title": "Nuevo coworker",
+        "nameLabel": "Nombre",
+        "namePlaceholder": "Scout",
+        "descriptionLabel": "¿Qué debe hacer?",
+        "descriptionPlaceholder": "Busca agencias de marketing en Lyon y redacta un primer correo para cada una",
+        "descriptionHelp": "Su primera tarea. Empieza con ella enseguida.",
+        "boxLabel": "Box",
+        "submit": "Crear",
+        "pausedTitle": "{name} está en pausa",
+        "pausedMessage": "Tu plan no tiene ningún hueco libre para coworkers. Empieza Pro en rerun.build para tener coworkers ilimitados.",
+        "failed": "No se pudo crear el coworker"
+    }
+}

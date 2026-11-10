@@ -1,4 +1,4 @@
-// The iOS launch screen drawn as the Home's first frame: the "Coworkers" title and the skeleton
+// The iOS launch screen drawn as the Home's first frame: the skeleton
 // rows, at the very place the app draws them (HomeBoot, then the Home itself), in light and dark.
 // The app then fills the rows in place instead of cutting from a logo.
 //
@@ -19,26 +19,19 @@ const { withDangerousMod, withMod } = require('expo/config-plugins')
 const LAUNCH_LAYOUT = {
     background: { light: '#f8f8f8', dark: '#0a0a0a' },
     muted: { light: '#efefef', dark: '#232323' },
-    title: { image: 'LaunchTitle', left: 24, top: 68, width: 140, height: 36 },
-    listTop: 116,
+    listTop: 76,
     rows: 6,
-    rowHeight: 68,
-    avatar: { left: 24, top: 14, size: 36, radius: 12 },
-    column: { left: 76, right: 24 },
-    name: { top: 16, height: 14 },
-    status: { top: 40, height: 12 },
+    rowHeight: 76,
+    avatar: { left: 20, top: 16, size: 44, radius: 12 },
+    column: { left: 80, right: 20 },
+    name: { top: 20, height: 14 },
+    status: { top: 44, height: 12 },
     barRadius: 8,
     barWidths: index => ({ name: 40 + ((index * 17) % 30), status: 60 + ((index * 23) % 30) }),
     // A regular-width screen (an iPad, an unfolded iPhone Duo) opens on the Home as a sidebar.
     sidebar: { share: 0.32, min: 260, max: 340 },
 }
 
-const TITLE_IMAGES = [
-    { file: 'coworkers-title@2x.png', scale: 2 },
-    { file: 'coworkers-title@3x.png', scale: 3 },
-    { file: 'coworkers-title-dark@2x.png', scale: 2, dark: true },
-    { file: 'coworkers-title-dark@3x.png', scale: 3, dark: true },
-]
 // SplashScreenBackground is written by expo-splash-screen, from its light and dark backgroundColor.
 const BACKGROUND_COLOR = 'SplashScreenBackground'
 const DARK = [{ appearance: 'luminosity', value: 'dark' }]
@@ -110,11 +103,9 @@ function launchScreen(xml) {
     const compactOnly = []
     const regularOnly = []
 
-    const images = [imageView('RR-title', layout.title.image, { ...layout.title, constraints: [size('RR-title-w', 'width', layout.title.width), size('RR-title-h', 'height', layout.title.height)] })]
+    const images = []
     const columns = []
     const constraints = [
-        constraint('RR-title-left', ['RR-title', 'leading'], [containerId, 'leading'], { constant: layout.title.left }),
-        constraint('RR-title-top', ['RR-title', 'top'], [safeArea, 'top'], { constant: layout.title.top }),
         constraint(`${sidebar}-left`, [sidebar, 'leading'], [containerId, 'leading']),
         constraint(`${sidebar}-top`, [sidebar, 'top'], [containerId, 'top']),
         constraint(`${sidebar}-share`, [sidebar, 'width'], [containerId, 'width'], { multiplier: layout.sidebar.share, priority: 750 }),
@@ -174,7 +165,7 @@ function launchScreen(xml) {
     container.color = [{ $: { key: 'backgroundColor', name: BACKGROUND_COLOR } }]
 
     const resources = xml.document.resources[0]
-    resources.image = [{ $: { name: layout.title.image, width: String(layout.title.width), height: String(layout.title.height) } }, ...Object.entries(SHAPES).map(([name, shape]) => ({ $: { name, width: String(shape.width), height: String(shape.height) } }))]
+    resources.image = Object.entries(SHAPES).map(([name, shape]) => ({ $: { name, width: String(shape.width), height: String(shape.height) } }))
     delete resources.systemColor
     resources.namedColor = [namedColor(BACKGROUND_COLOR, LAUNCH_LAYOUT.background.light)]
     return xml
@@ -235,23 +226,7 @@ function writeImageset(catalog, name, images) {
     fs.writeFileSync(path.join(imageset, 'Contents.json'), JSON.stringify({ images: entries, info: { version: 1, author: 'expo' } }, null, 2))
 }
 
-// A title image re-rendered at another size would sit stretched in the frame the storyboard gives it.
-function titleImage(projectRoot, file, scale) {
-    const data = fs.readFileSync(path.join(projectRoot, 'assets/launch', file))
-    const pixels = { width: data.readUInt32BE(16), height: data.readUInt32BE(20) }
-    const expected = { width: LAUNCH_LAYOUT.title.width * scale, height: LAUNCH_LAYOUT.title.height * scale }
-    if (pixels.width !== expected.width || pixels.height !== expected.height) {
-        throw new Error(`assets/launch/${file} is ${pixels.width} x ${pixels.height} px, the launch screen expects ${expected.width} x ${expected.height}: update LAUNCH_LAYOUT.title`)
-    }
-    return data
-}
-
-function writeAssets(projectRoot, catalog) {
-    writeImageset(
-        catalog,
-        LAUNCH_LAYOUT.title.image,
-        TITLE_IMAGES.map(({ file, scale, dark }) => ({ file, scale, dark, data: titleImage(projectRoot, file, scale) }))
-    )
+function writeAssets(catalog) {
     for (const [name, shape] of Object.entries(SHAPES)) {
         const images = []
         for (const dark of [false, true]) {
@@ -277,8 +252,8 @@ function withHomeLaunchScreen(config) {
     return withDangerousMod(config, [
         'ios',
         config => {
-            const { projectRoot, platformProjectRoot, projectName } = config.modRequest
-            writeAssets(projectRoot, path.join(platformProjectRoot, projectName, 'Images.xcassets'))
+            const { platformProjectRoot, projectName } = config.modRequest
+            writeAssets(path.join(platformProjectRoot, projectName, 'Images.xcassets'))
             return config
         },
     ])

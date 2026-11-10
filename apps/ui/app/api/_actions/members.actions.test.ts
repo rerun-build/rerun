@@ -77,7 +77,7 @@ describe('inviteToWorkspaceAction', () => {
 
         const result = await inviteToWorkspaceAction('third@acme.test')
 
-        expect(result).toEqual({ ok: false, error: 'This workspace has reached its seat limit.' })
+        expect(result).toEqual({ ok: false, error: 'This workspace has reached its seat limit.', code: 'seatLimit' })
         expect(db.writes('workspace_invitations')).toHaveLength(0)
         expect(mocks.sendWorkspaceInviteEmail).not.toHaveBeenCalled()
     })
@@ -133,7 +133,7 @@ describe('inviteToWorkspaceAction', () => {
     it('refuses someone who is already a member', async () => {
         database({ workspace_members: [member(ME), member('user-2')] }, { [ME]: 'me@acme.test', 'user-2': 'two@acme.test' })
 
-        await expect(inviteToWorkspaceAction('two@acme.test')).resolves.toEqual({ ok: false, error: 'This person is already a member of the workspace.' })
+        await expect(inviteToWorkspaceAction('two@acme.test')).resolves.toEqual({ ok: false, error: 'This person is already a member of the workspace.', code: 'alreadyMember' })
     })
 
     it('invites without limit when the workspace has no seat cap', async () => {
@@ -168,7 +168,7 @@ describe('a member', () => {
 
     it('cannot invite, revoke, remove nor change a role', async () => {
         const db = database({ workspace_members: [plainMember(ME), member('user-2')], workspace_invitations: [pendingInvite()], users: [{ id: 'user-2', workspace_id: 42 }] })
-        const refused = { ok: false, error: 'Only an admin can manage members' }
+        const refused = { ok: false, error: 'Only an admin can manage members', code: 'adminOnlyMembers' }
 
         await expect(inviteToWorkspaceAction('new@acme.test')).resolves.toEqual(refused)
         await expect(revokeInvitationAction('invite-1')).resolves.toEqual(refused)
@@ -200,7 +200,7 @@ describe('setMemberRoleAction', () => {
     it('refuses to demote the last admin', async () => {
         const db = database({ workspace_members: [member(ME), plainMember('user-2')] })
 
-        await expect(setMemberRoleAction(ME, 'member')).resolves.toEqual({ ok: false, error: 'The workspace needs at least one admin' })
+        await expect(setMemberRoleAction(ME, 'member')).resolves.toEqual({ ok: false, error: 'The workspace needs at least one admin', code: 'needsAdmin' })
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
@@ -221,7 +221,7 @@ describe('setMemberRoleAction', () => {
         })
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
 
-        await expect(setMemberRoleAction(ME, 'member')).resolves.toEqual({ ok: false, error: 'The workspace needs at least one admin' })
+        await expect(setMemberRoleAction(ME, 'member')).resolves.toEqual({ ok: false, error: 'The workspace needs at least one admin', code: 'needsAdmin' })
         expect(db.writes('workspace_members').map(write => write.payload)).toEqual([{ role: 'member' }, { role: 'admin' }])
         expect(rows.workspace_members[0].role).toBe('admin')
     })
@@ -229,7 +229,7 @@ describe('setMemberRoleAction', () => {
     it('refuses someone outside the workspace', async () => {
         database({ workspace_members: [member(ME), member('user-2', 99, 'member')] })
 
-        await expect(setMemberRoleAction('user-2', 'admin')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.' })
+        await expect(setMemberRoleAction('user-2', 'admin')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.', code: 'userNotMember' })
     })
 })
 
@@ -250,21 +250,21 @@ describe('setMemberBoxScopeAction', () => {
     it('leaves an admin alone, with the reason', async () => {
         const db = database({ workspace_members: [member(ME), member('user-2')] })
 
-        await expect(setMemberBoxScopeAction('user-2', 'assigned')).resolves.toEqual({ ok: false, error: 'Admins have access to every Box' })
+        await expect(setMemberBoxScopeAction('user-2', 'assigned')).resolves.toEqual({ ok: false, error: 'Admins have access to every Box', code: 'adminsReachEveryBox' })
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
     it('refuses someone outside the workspace', async () => {
         const db = database({ workspace_members: [member(ME), member('user-2', 99, 'member')] })
 
-        await expect(setMemberBoxScopeAction('user-2', 'assigned')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.' })
+        await expect(setMemberBoxScopeAction('user-2', 'assigned')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.', code: 'userNotMember' })
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
     it('refuses a scope it does not know', async () => {
         database({ workspace_members: [member(ME), plainMember('user-2')] })
 
-        await expect(setMemberBoxScopeAction('user-2', 'everything' as never)).resolves.toEqual({ ok: false, error: 'Unknown scope' })
+        await expect(setMemberBoxScopeAction('user-2', 'everything' as never)).resolves.toEqual({ ok: false, error: 'Unknown scope', code: 'unknownScope' })
     })
 })
 
@@ -272,7 +272,7 @@ describe('revokeInvitationAction', () => {
     it('answers not found for an invitation of another workspace, without writing', async () => {
         const db = database({ workspace_members: [member(ME)], workspace_invitations: [pendingInvite({ workspace_id: 99 })] })
 
-        await expect(revokeInvitationAction('invite-1')).resolves.toEqual({ ok: false, error: 'Invitation not found' })
+        await expect(revokeInvitationAction('invite-1')).resolves.toEqual({ ok: false, error: 'Invitation not found', code: 'invitationNotFound' })
         expect(db.writes('workspace_invitations')).toHaveLength(0)
     })
 
@@ -289,21 +289,21 @@ describe('removeMemberAction', () => {
     it('refuses to remove the caller', async () => {
         const db = database({ workspace_members: [member(ME)] })
 
-        await expect(removeMemberAction(ME)).resolves.toEqual({ ok: false, error: 'You cannot remove yourself from the workspace.' })
+        await expect(removeMemberAction(ME)).resolves.toEqual({ ok: false, error: 'You cannot remove yourself from the workspace.', code: 'cannotRemoveSelf' })
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
     it('refuses a user who is not a member of the workspace', async () => {
         const db = database({ workspace_members: [member(ME), member('user-2', 99)] })
 
-        await expect(removeMemberAction('user-2')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.' })
+        await expect(removeMemberAction('user-2')).resolves.toEqual({ ok: false, error: 'This user is not a member of the workspace.', code: 'userNotMember' })
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
     it('refuses to remove a member from their only workspace', async () => {
         const db = database({ workspace_members: [member(ME), member('user-2')], users: [{ id: 'user-2', workspace_id: WORKSPACE_ID }] })
 
-        await expect(removeMemberAction('user-2')).resolves.toEqual({ ok: false, error: 'This is the only workspace of that user. They cannot be removed.' })
+        await expect(removeMemberAction('user-2')).resolves.toEqual({ ok: false, error: 'This is the only workspace of that user. They cannot be removed.', code: 'onlyWorkspaceOfUser' })
         expect(db.writes('users')).toHaveLength(0)
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
@@ -344,7 +344,7 @@ describe('acceptInvitationAction', () => {
 
         const result = await acceptInvitationAction('tok')
 
-        expect(result).toEqual({ ok: false, error: 'This invitation is for new@acme.test. Sign in with that email to accept it.' })
+        expect(result).toEqual({ ok: false, error: 'This invitation is for new@acme.test. Sign in with that email to accept it.', code: 'invitationForEmail', params: { email: 'new@acme.test' } })
         expect(db.chains.filter(chain => writeMethodOf(chain))).toHaveLength(0)
     })
 
@@ -359,7 +359,7 @@ describe('acceptInvitationAction', () => {
         signedInAs('new@acme.test')
         const db = database({ workspace_invitations: [pendingInvite({ expires_at: new Date(Date.now() - 1000).toISOString() })] })
 
-        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation has expired.' })
+        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation has expired.', code: 'invitationExpired' })
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
@@ -367,7 +367,7 @@ describe('acceptInvitationAction', () => {
         signedInAs('new@acme.test')
         const db = database({ workspace_invitations: [pendingInvite({ status: 'revoked' })] })
 
-        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is no longer valid.' })
+        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is no longer valid.', code: 'invitationInvalid' })
         expect(db.writes('workspace_members')).toHaveLength(0)
     })
 
@@ -375,7 +375,7 @@ describe('acceptInvitationAction', () => {
         mocks.getServerSession.mockResolvedValue({ user: null, session: null })
         database({ workspace_invitations: [pendingInvite()] })
 
-        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'You must be signed in to accept an invitation.' })
+        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'You must be signed in to accept an invitation.', code: 'signInToAcceptInvitation' })
     })
 
     it('adds the membership, closes the invitation and makes the workspace active', async () => {
@@ -428,7 +428,7 @@ describe('acceptInvitationAction', () => {
         const db = fakeSupabase((table, calls) => (table === 'workspace_invitations' && writeMethodOf(calls) === 'update' ? { data: null } : read(table, calls)))
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
 
-        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is no longer valid.' })
+        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is no longer valid.', code: 'invitationInvalid' })
         expect(db.writes('workspace_members')).toHaveLength(0)
         expect(db.writes('users')).toHaveLength(0)
     })
@@ -437,7 +437,7 @@ describe('acceptInvitationAction', () => {
         signedInAs('new@acme.test')
         const db = database({ workspace_invitations: [pendingInvite()], workspaces: [{ id: WORKSPACE_ID, max_seats: 2 }], workspace_members: [member('user-1'), member('user-2')] })
 
-        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This workspace has no seat left. Ask an admin to free one.' })
+        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'This workspace has no seat left. Ask an admin to free one.', code: 'noSeatLeft' })
 
         expect(db.writes('workspace_members')).toHaveLength(0)
         expect(db.writes('users')).toHaveLength(0)

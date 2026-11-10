@@ -1,11 +1,12 @@
 'use client'
 
 import type { AgentSharePreview } from '@rerun/contracts'
+import { useLocale, useTranslations } from 'next-intl'
 import { useTransition } from 'react'
 import { isSubscriptionEntitled, PLAN_CURRENCY, basePriceCents, trialOffer, trialOfferLine } from '@rerun/cloud/billing'
 import { usePriceArm, startPlan } from '@rerun/cloud/billing.client'
 import { CreditCard, LayoutGridIcon, type LucideIcon } from '@/lib/icons'
-import { TRIAL_DAYS, formatAmount, trialLimitsLabel } from '@rerun/contracts'
+import { TRIAL_DAYS, formatAmount, trialLimitsCaption } from '@rerun/contracts'
 import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -31,15 +32,19 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
     const [pending, startTransition] = useTransition()
     const beginAgentSharePlacement = useBoardStore(s => s.beginAgentSharePlacement)
 
+    const t = useTranslations('agent.shareCta')
+    const tTrial = useTranslations('billing.trialOffer')
+    const locale = useLocale()
+
     const priceArm = usePriceArm()
-    const planPrice = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY)
+    const planPrice = formatAmount(basePriceCents(priceArm), PLAN_CURRENCY, locale)
     const offer = trialOffer(workspace)
     const trialEligible = offer !== 'paid'
 
     const trialStep: ShareStep = trialEligible
-        ? { label: `Start your ${TRIAL_DAYS}-day free trial`, caption: `${trialLimitsLabel()} during the trial.`, icon: CreditCard }
-        : { label: `Subscribe ${planPrice}/mo`, caption: 'Billed today. Cancel anytime.', icon: CreditCard }
-    const placeStep: ShareStep = { label: 'Place the coworker', caption: 'Drop it on your board, ready to run.', icon: LayoutGridIcon }
+        ? { label: tTrial('startTrial', { days: TRIAL_DAYS }), caption: trialLimitsCaption(tTrial), icon: CreditCard }
+        : { label: tTrial('subscribe', { price: planPrice }), caption: tTrial('billedToday'), icon: CreditCard }
+    const placeStep: ShareStep = { label: t('placeLabel'), caption: t('placeCaption'), icon: LayoutGridIcon }
 
     const place = () => {
         beginAgentSharePlacement({ token, agentName: preview.agent.name })
@@ -59,13 +64,13 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
     if (hasSpace && !isSubscriptionEntitled(workspace?.subscription_status)) {
         return {
             gate: 'plan',
-            label: trialEligible ? 'Start free trial & add it' : `Subscribe ${planPrice}/mo & add it`,
-            note: trialEligible ? trialOfferLine(priceArm, offer) : 'Your free trial has been used. Billed today, cancel anytime.',
+            label: trialEligible ? t('trialAdd') : t('planAdd', { price: planPrice }),
+            note: trialEligible ? trialOfferLine(priceArm, offer, tTrial, locale) : tTrial('trialUsed'),
             steps: [trialStep, placeStep],
             pending,
             run: startTrial,
         }
     }
 
-    return { gate: 'place', label: 'Add to my board', note: null, steps: [], pending, run: place }
+    return { gate: 'place', label: t('add'), note: null, steps: [], pending, run: place }
 }

@@ -1,0 +1,57 @@
+{
+    "close": "Cerrar",
+    "back": "Atrás",
+    "moreOptions": "Más opciones",
+    "deleteConfirmTitle": "¿{label}?",
+    "command": {
+        "title": "Paleta de comandos",
+        "description": "Busca un comando para ejecutar..."
+    },
+    "combobox": {
+        "placeholder": "Elige una opción",
+        "placeholderMultiple": "Elige opciones",
+        "search": "Buscar…",
+        "empty": "No hay resultados",
+        "selected": "Seleccionados",
+        "remove": "Quitar {option}",
+        "reorder": "Reordenar {option}"
+    },
+    "filter": {
+        "search": "Buscar {label}…",
+        "empty": "Sin coincidencias",
+        "clear": "Borrar"
+    },
+    "phone": {
+        "code": "Prefijo del país, escribe un prefijo o un país",
+        "noCountry": "No se encontró ningún país"
+    },
+    "powerBars": "Potencia {filled} de {max}",
+    "markdown": {
+        "openEditor": "Abrir el editor completo",
+        "done": "Listo"
+    },
+    "upload": {
+        "menu": "Subir",
+        "files": "Subir archivos",
+        "folder": "Subir carpeta",
+        "failed": "Error al subir",
+        "finishing": "Finalizando",
+        "waiting": "En espera · {size}",
+        "progress": "Progreso de la subida",
+        "uploadingFile": "Subiendo {name}",
+        "totalProgress": "Progreso total de la subida",
+        "retry": "Reintentar",
+        "cancel": "Cancelar",
+        "cancelAll": "Cancelar todo",
+        "dismiss": "Cerrar",
+        "headingFailed": "{failed} de {total} archivos no se pudieron subir",
+        "headingDone": "{count, plural, one {# archivo subido} other {# archivos subidos}}",
+        "headingUploading": "Subiendo {current} de {total}",
+        "more": "+ {count} más"
+    },
+    "waveform": {
+        "live": "Onda de audio en directo",
+        "processing": "Procesando audio",
+        "idle": "Onda de audio inactiva"
+    }
+}

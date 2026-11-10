@@ -9,6 +9,7 @@ import type { OrbProps } from './Orb'
 import { OrbDefs } from './OrbDefs'
 import { BLOB_HARMONICS, blobPath } from './blob-geometry'
 import { ORB_TUNING, approachTuning, type OrbTuning } from './orb-tuning'
+import { useKitTranslations } from '../locale'
 
 const VIEW = 100
 const CENTER = VIEW / 2
@@ -41,7 +42,8 @@ const LOOK_Y = RADIUS * 0.18
  * quatre couches de néon, deux plis de verre et un regard. Les quatre états ne changent jamais la
  * forme ni les couleurs, seulement le rythme — c'est la même bête qui respire autrement.
  */
-export function NeonOrb({ state = 'idle', size, onClick, label = 'Ask Rerun', paused = false, gaze, className }: OrbProps) {
+export function NeonOrb({ state = 'idle', size, onClick, label, paused = false, gaze, className }: OrbProps) {
+    const t = useKitTranslations()
     const reducedMotion = useReducedMotion()
     // Les ids de React 19 contiennent des caractères qu'un `url(#…)` ne sait pas lire.
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
@@ -121,7 +123,7 @@ export function NeonOrb({ state = 'idle', size, onClick, label = 'Ask Rerun', pa
 
     return (
         <Root
-            {...(onClick ? { type: 'button' as const, 'aria-label': label, onClick } : { 'aria-hidden': true })}
+            {...(onClick ? { type: 'button' as const, 'aria-label': label ?? t('foreman.orbLabel'), onClick } : { 'aria-hidden': true })}
             className={cn(
                 'relative block rounded-full',
                 onClick && 'cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',

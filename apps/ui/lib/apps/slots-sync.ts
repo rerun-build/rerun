@@ -71,6 +71,7 @@ async function syncAppSlots(supabase: Client, workspaceId: number, slug: AppSlug
     await notifyWorkspace(supabase, workspaceId, {
         appName: app.name,
         message: `Your plan now has ${stripeSlots} ${app.providerLabel} slot${stripeSlots === 1 ? '' : 's'}, so ${toPause.length} connected account${toPause.length === 1 ? ' is' : 's are'} paused. Add a slot in Billing to bring ${toPause.length === 1 ? 'it' : 'them'} back.`,
+        copy: { key: 'slotsPaused', values: { slots: stripeSlots, provider: app.providerLabel, paused: toPause.length } },
         email: true,
     })
 }

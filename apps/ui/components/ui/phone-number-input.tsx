@@ -6,6 +6,7 @@ import { countryDialling, countryFlag, exampleNationalNumber, formatAsTyped, rea
 import { cn } from '@/lib/utils'
 import { useDialogPortalContainer } from '@rerun/ui/forms'
 import { getCountryCallingCode, type CountryCode } from 'libphonenumber-js/min'
+import { useTranslations } from 'next-intl'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState, type ChangeEvent, type InputHTMLAttributes, type KeyboardEvent, type ReactNode } from 'react'
 
 type PhoneNumberInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'type'> & {
@@ -22,6 +23,7 @@ type PhoneNumberInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value'
 // them, a complete code settles by itself. It also follows what is typed in the number, so `+32…`
 // or a pasted international number flips the country.
 export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputProps>(({ label, labelTrailing, value, onChange, country, onCountryChange, onKeyDown, disabled, ...props }, ref) => {
+    const t = useTranslations('ui.phone')
     const listId = useId()
     // Null while the code is at rest, a string (possibly empty) while it is being searched.
     const [query, setQuery] = useState<string | null>(null)
@@ -121,7 +123,7 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
                                     role="combobox"
                                     aria-expanded={searching}
                                     aria-controls={listId}
-                                    aria-label="Country calling code, type a code or a country"
+                                    aria-label={t('code')}
                                     autoComplete="off"
                                     disabled={disabled}
                                     placeholder={currentCode}
@@ -181,7 +183,7 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
                                 <span className="text-muted-foreground tabular-nums">+{candidate.callingCode}</span>
                             </div>
                         ))}
-                        {matches.length === 0 && <p className="px-2 py-4 text-center text-sm text-muted-foreground">No country found</p>}
+                        {matches.length === 0 && <p className="px-2 py-4 text-center text-sm text-muted-foreground">{t('noCountry')}</p>}
                     </div>
                 </PopoverContent>
             </Popover>

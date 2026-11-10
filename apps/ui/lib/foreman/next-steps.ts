@@ -23,6 +23,10 @@ type LoosePart = { type: string; state?: string; output?: unknown }
 
 type CheckoutStep = Extract<ForemanNextStep, { kind: 'checkout' }>
 
+export type ForemanNextStepCopy = (key: 'startPlan' | 'startTrial' | 'startInstalling' | 'startInstallingMine' | 'installStarted' | 'yourInstallStarted' | 'turnOn', values?: { name: string }) => string
+
+type NextStepOptions = { entitled: boolean; t: ForemanNextStepCopy }
+
 function builtAgents(message: UIMessage | undefined): BuiltAgent[] {
     if (message?.role !== 'assistant') return []
     const build = (message.parts as LoosePart[]).findLast(part => part.type === 'tool-build_team')
@@ -51,7 +55,7 @@ export function trialStep(messages: UIMessage[], { entitled }: { entitled: boole
     return output?.reason === 'trial_refused' ? 'trial_refused' : 'trial'
 }
 
-function reopenedCheckout(messages: UIMessage[], entitled: boolean): CheckoutStep | null {
+function reopenedCheckout(messages: UIMessage[], { entitled, t }: NextStepOptions): CheckoutStep | null {
     const last = messages.at(-1)
     if (last?.role !== 'assistant') return null
     if ((last.parts as LoosePart[]).some(part => part.type === 'tool-open_checkout')) return null
@@ -59,14 +63,15 @@ function reopenedCheckout(messages: UIMessage[], entitled: boolean): CheckoutSte
     if (lastCheckout(messages)?.state !== 'output-available') return null
     const step = trialStep(messages, { entitled })
     if (!step) return null
-    return step === 'trial_refused' ? { kind: 'checkout', label: 'Start my plan', trigger: 'trial_refused' } : { kind: 'checkout', label: 'Start free trial', trigger: 'foreman' }
+    return step === 'trial_refused' ? { kind: 'checkout', label: t('startPlan'), trigger: 'trial_refused' } : { kind: 'checkout', label: t('startTrial'), trigger: 'foreman' }
 }
 
 /** Only while the build, or the foreman's answer past the trial card, is the last thing said. */
-export function foremanNextSteps(messages: UIMessage[], { entitled }: { entitled: boolean }): ForemanNextStep[] {
+export function foremanNextSteps(messages: UIMessage[], options: NextStepOptions): ForemanNextStep[] {
+    const { t } = options
     const agents = builtAgents(messages.at(-1))
     if (!agents.length) {
-        const checkout = reopenedCheckout(messages, entitled)
+        const checkout = reopenedCheckout(messages, options)
         return checkout ? [checkout] : []
     }
 
@@ -75,12 +80,12 @@ export function foremanNextSteps(messages: UIMessage[], { entitled }: { entitled
         return [
             {
                 kind: 'start_lead',
-                label: lead.name ? `Start installing ${lead.name}` : 'Start installing my coworker',
-                startedLabel: lead.name ? `${lead.name}'s install has started` : "Your coworker's install has started",
+                label: lead.name ? t('startInstalling', { name: lead.name }) : t('startInstallingMine'),
+                startedLabel: lead.name ? t('installStarted', { name: lead.name }) : t('yourInstallStarted'),
                 agentId: lead.agentId,
             },
         ]
     }
     // Built without a free slot on their plan: there is nothing to start until one is opened.
-    return [{ kind: 'billing', label: 'Turn on my coworker' }]
+    return [{ kind: 'billing', label: t('turnOn') }]
 }

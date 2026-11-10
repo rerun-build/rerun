@@ -1,5 +1,7 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -14,7 +16,7 @@ import { ChevronDownIcon, ExternalLinkIcon, GlobeIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 
-import { AccessIcon, accessShort, useWorkspaceName } from './access'
+import { AccessIcon, useAccessCopy, useWorkspaceName } from './access'
 import { PublishedThumb } from './PublishedThumb'
 import { CopyLinkButton, ShareDialog } from './ShareDialog'
 
@@ -28,9 +30,12 @@ function withDefaults(result: PublishResult): PublishResult {
 // What a coworker published, drawn where it said so. The tool output only tells what the link was
 // at that moment: the card reads it again, so a change made since (here or anywhere else) shows.
 export function PublishedChatCard({ agentId, result: raw }: { agentId?: string; result: PublishResult }) {
+    const t = useTranslations('published.chat')
+    const errorText = useErrorText()
+    const accessCopy = useAccessCopy()
     const result = withDefaults(raw)
     const workspaceName = useWorkspaceName()
-    const coworkerName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name) ?? 'Your coworker'
+    const coworkerName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name) ?? t('fallbackCoworker')
     const [live, setLive] = useState<PublishedFile | null | undefined>(undefined)
     const [answer, setAnswer] = useState<Answer | null>(null)
     const [answering, setAnswering] = useState<Answer | null>(null)
@@ -52,7 +57,7 @@ export function PublishedChatCard({ agentId, result: raw }: { agentId?: string; 
         return (
             <div className={cn(PANEL_CARD, 'flex w-full max-w-sm flex-col gap-0.5 p-3')}>
                 <span className="truncate text-sm font-medium">{result.title}</span>
-                <span className="text-xs text-muted-foreground">Unpublished</span>
+                <span className="text-xs text-muted-foreground">{t('unpublished')}</span>
             </div>
         )
     }
@@ -67,12 +72,12 @@ export function PublishedChatCard({ agentId, result: raw }: { agentId?: string; 
         if (choice === 'public') {
             const outcome = await updatePublishedAccessAction(slug, { access: 'public' })
             setAnswering(null)
-            if (!outcome.ok) return toast.error('Could not update the link', { description: outcome.error })
+            if (!outcome.ok) return toast.error(t('updateFailed'), { description: errorText(outcome) })
             setLive(outcome.file)
         } else {
             const outcome = await dismissAccessRequestAction(slug)
             setAnswering(null)
-            if (!outcome.ok) return toast.error('Could not update the link', { description: outcome.error })
+            if (!outcome.ok) return toast.error(t('updateFailed'), { description: errorText(outcome) })
         }
         setAnswer(choice)
     }
@@ -90,16 +95,16 @@ export function PublishedChatCard({ agentId, result: raw }: { agentId?: string; 
                 <div className="flex flex-wrap items-center gap-1.5">
                     <Button variant="outline" size="sm" onClick={() => setShareOpen(true)} disabled={!live}>
                         <AccessIcon access={access} />
-                        {accessShort(access)}
+                        {accessCopy.short(access)}
                         {access === 'invited' && live && <span className="text-muted-foreground">· {live.invited.length}</span>}
                         <ChevronDownIcon className="text-muted-foreground" />
                     </Button>
                     <div className="ml-auto flex items-center gap-1">
-                        <CopyLinkButton url={live?.url ?? result.url} label="Copy" variant="ghost" size="sm" />
+                        <CopyLinkButton url={live?.url ?? result.url} label={t('copy')} variant="ghost" size="sm" />
                         <Button variant="outline" size="sm" asChild>
                             <a href={openPublishedHref(slug)} target="_blank" rel="noopener noreferrer">
                                 <ExternalLinkIcon />
-                                Open
+                                {t('open')}
                             </a>
                         </Button>
                     </div>
@@ -108,18 +113,18 @@ export function PublishedChatCard({ agentId, result: raw }: { agentId?: string; 
             {pending && (
                 <div className="flex flex-wrap items-center gap-2 border-t bg-muted/50 px-3 py-2.5">
                     <GlobeIcon className="size-4 shrink-0 text-muted-foreground" />
-                    <span className="min-w-0 flex-1 text-xs">{coworkerName} wants anyone with the link to open it</span>
+                    <span className="min-w-0 flex-1 text-xs">{t('asksPublic', { coworker: coworkerName })}</span>
                     <div className="flex gap-1.5 @max-sm:w-full @max-sm:justify-end">
                         <Button variant="ghost" size="sm" loading={answering === 'kept'} disabled={answering !== null} onClick={() => void respond('kept')}>
-                            Keep private
+                            {t('keepPrivate')}
                         </Button>
                         <Button size="sm" loading={answering === 'public'} disabled={answering !== null} onClick={() => void respond('public')}>
-                            Make public
+                            {t('makePublic')}
                         </Button>
                     </div>
                 </div>
             )}
-            {!pending && settled && <div className="border-t px-3 py-2.5 text-xs text-muted-foreground">{settled === 'public' ? (answer ? 'Made public by you' : 'Made public') : `Kept for ${workspaceName} members`}</div>}
+            {!pending && settled && <div className="border-t px-3 py-2.5 text-xs text-muted-foreground">{settled === 'public' ? (answer ? t('madePublicByYou') : t('madePublic')) : t('keptFor', { workspace: workspaceName })}</div>}
             <ShareDialog open={shareOpen} onOpenChange={setShareOpen} slug={slug} initial={live ?? null} onChanged={setLive} onUnpublished={() => setLive(null)} />
         </div>
     )

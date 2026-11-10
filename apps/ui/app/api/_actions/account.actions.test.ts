@@ -26,7 +26,7 @@ describe('deleteMyAccountAction', () => {
     })
 
     it('deletes nothing without the typed confirmation', async () => {
-        await expect(deleteMyAccountAction({ confirmation: 'delete' })).resolves.toEqual({ ok: false, error: 'Type DELETE to confirm.' })
+        await expect(deleteMyAccountAction({ confirmation: 'delete' })).resolves.toEqual({ ok: false, error: 'Type DELETE to confirm.', code: 'typeToConfirm', params: { word: 'DELETE' } })
         expect(mocks.anonymizeAccount).not.toHaveBeenCalled()
     })
 
@@ -38,7 +38,7 @@ describe('deleteMyAccountAction', () => {
     it('names the workspaces whose plan has to be cancelled first', async () => {
         mocks.anonymizeAccount.mockResolvedValue({ ok: false, blockers: [{ workspaceId: 2, name: 'Side project' }] })
 
-        await expect(deleteMyAccountAction({ confirmation: 'DELETE' })).resolves.toEqual({ ok: false, error: 'Cancel the subscription of Side project first.' })
+        await expect(deleteMyAccountAction({ confirmation: 'DELETE' })).resolves.toEqual({ ok: false, error: 'Cancel the subscription of Side project first.', code: 'cancelSubscriptionsFirst', params: { names: 'Side project' } })
     })
 })
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { MAX_RECORDING_MS, RECORDING_BITS_PER_SECOND, markRecordingFormatBroken, pickBackupFormat, pickRecordingFormat, type RecordingFormat } from '@/lib/voice/recording'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 // 20 samples a second: a 5-minute recording is 6000 amplitudes before they are downsampled to
@@ -58,6 +59,7 @@ type Options = {
  * captured along the way (they become the waveform stored in the message).
  */
 export function useVoiceRecorder({ onError, onLimitReached }: Options) {
+    const t = useTranslations('chat.voice')
     const [status, setStatus] = useState<VoiceRecorderStatus>('idle')
     // Handed to the waveform so it draws off the microphone we already hold instead of opening
     // a second capture of the same voice.
@@ -130,7 +132,7 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
 
         const format = pickRecordingFormat()
         if (!format || typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-            onErrorRef.current('Voice messages are not supported in this browser.')
+            onErrorRef.current(t('unsupported'))
             return
         }
 
@@ -141,7 +143,7 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
         } catch (err) {
             if (session === sessionRef.current) setStatus('idle')
             const denied = err instanceof DOMException && (err.name === 'NotAllowedError' || err.name === 'SecurityError')
-            onErrorRef.current(denied ? 'Microphone access is blocked. Allow it in your browser settings to record.' : 'No microphone available.')
+            onErrorRef.current(denied ? t('microphoneBlocked') : t('noMicrophone'))
             return
         }
 
@@ -177,9 +179,9 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
             for (const track of stream.getTracks()) track.stop()
             takesRef.current = []
             setStatus('idle')
-            onErrorRef.current('Could not start recording.')
+            onErrorRef.current(t('startFailed'))
         }
-    }, [sample])
+    }, [sample, t])
 
     const settle = useCallback(
         async (keep: boolean): Promise<VoiceRecording | null> => {

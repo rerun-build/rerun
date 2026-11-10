@@ -6,6 +6,7 @@ import { Logo } from '@rerun/ui/logo'
 import type { ElementType, ReactNode } from 'react'
 import { AuthScene } from './AuthScene'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { useTranslations } from 'next-intl'
 
 // Le cadre commun à toutes les entrées de compte : la scène iso occupe tout le fond, le
 // formulaire flotte au centre sans carte, l'en-tête (logo, titre, sous-titre) centré au-dessus,
@@ -63,19 +64,19 @@ export function AuthShell({
 }
 
 export function AuthTerms() {
+    const t = useTranslations('auth')
     // A self-hosted install has its own terms, if any: Rerun's do not bind its users.
     if (!RERUN_CLOUD) return null
-    return (
-        <>
-            By continuing, you agree to our{' '}
+    return t.rich('terms', {
+        terms: chunks => (
             <a href={landingUrl('/terms')} target="_blank" rel="noreferrer" className="underline underline-offset-4 transition-colors hover:text-foreground">
-                Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href={landingUrl('/privacy')} target="_blank" rel="noreferrer" className="underline underline-offset-4 transition-colors hover:text-foreground">
-                Privacy Policy
+                {chunks}
             </a>
-            .
-        </>
-    )
+        ),
+        privacy: chunks => (
+            <a href={landingUrl('/privacy')} target="_blank" rel="noreferrer" className="underline underline-offset-4 transition-colors hover:text-foreground">
+                {chunks}
+            </a>
+        ),
+    })
 }

@@ -3,6 +3,7 @@
 import { IMPORT_SOURCES, type ImportSourceId } from '@/lib/agent-import/sources'
 import { cn } from '@/lib/utils'
 import { MODEL_ICONS } from '@rerun/ui/beams'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import type { ReactNode } from 'react'
 
@@ -16,6 +17,7 @@ const SOURCE_MARKS: Record<ImportSourceId, ReactNode> = {
 // The sibling of McpClientPicker, so the two connect panels read the same: a wrapping row of
 // chips that survives the mobile bottom sheet.
 export function ImportSourcePicker({ value, onChange, className }: { value: ImportSourceId | null; onChange: (source: ImportSourceId) => void; className?: string }) {
+    const t = useTranslations('dialogs.importAgent')
     return (
         <div className={cn('flex flex-wrap gap-1.5', className)}>
             {IMPORT_SOURCES.map(source => {
@@ -33,7 +35,7 @@ export function ImportSourcePicker({ value, onChange, className }: { value: Impo
                         )}
                     >
                         {SOURCE_MARKS[source.id]}
-                        {source.label}
+                        {source.id === 'other' ? t('otherSource') : source.label}
                     </button>
                 )
             })}

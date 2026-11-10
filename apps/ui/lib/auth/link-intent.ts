@@ -18,9 +18,12 @@ export function forgetLinkIntent() {
     document.cookie = `${LINK_INTENT_COOKIE}=; path=/; max-age=0; samesite=lax`
 }
 
-export function linkErrorMessage(code: string, provider: OAuthProvider): string {
+// The `account.signIn.linkError` catalog.
+export type LinkErrorCopy = (key: 'identityTaken' | 'denied' | 'failed', values: { provider: string }) => string
+
+export function linkErrorMessage(code: string, provider: OAuthProvider, t: LinkErrorCopy): string {
     const { label } = OAUTH_PROVIDER_CONFIG[provider]
-    if (code === 'identity_already_exists') return `This ${label} account already signs into another Rerun account.`
-    if (code === 'access_denied') return `${label} was not connected.`
-    return `Could not connect ${label}. Try again.`
+    if (code === 'identity_already_exists') return t('identityTaken', { provider: label })
+    if (code === 'access_denied') return t('denied', { provider: label })
+    return t('failed', { provider: label })
 }

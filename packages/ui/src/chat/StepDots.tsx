@@ -3,6 +3,7 @@
 import { Button } from '../primitives'
 import { cn } from '../cn'
 import { ChevronLeft, ChevronRight } from '../icons'
+import { useKitTranslations } from '../locale'
 
 type StepDotsProps = {
     count: number
@@ -16,9 +17,10 @@ type StepDotsProps = {
 }
 
 export function StepDots({ count, current, answered, onSelect, reachable = count - 1, disabled, className }: StepDotsProps) {
+    const t = useKitTranslations()
     return (
         <div className={cn('flex items-center', className)}>
-            <Button size="icon-sm" variant="ghost" disabled={disabled || current === 0} onClick={() => onSelect(current - 1)} aria-label="Previous step" className="-my-1 text-muted-foreground">
+            <Button size="icon-sm" variant="ghost" disabled={disabled || current === 0} onClick={() => onSelect(current - 1)} aria-label={t('chat.steps.previous')} className="-my-1 text-muted-foreground">
                 <ChevronLeft className="size-4" />
             </Button>
             <div className="flex items-center gap-1.5 px-1">
@@ -30,7 +32,7 @@ export function StepDots({ count, current, answered, onSelect, reachable = count
                             type="button"
                             disabled={disabled || i > reachable}
                             onClick={() => onSelect(i)}
-                            aria-label={`Go to step ${i + 1}`}
+                            aria-label={t('chat.steps.goTo', { step: i + 1 })}
                             aria-current={isCurrent ? 'step' : undefined}
                             className={cn(
                                 'size-2 shrink-0 rounded-full transition-colors disabled:pointer-events-none',
@@ -44,7 +46,7 @@ export function StepDots({ count, current, answered, onSelect, reachable = count
                     )
                 })}
             </div>
-            <Button size="icon-sm" variant="ghost" disabled={disabled || current >= reachable} onClick={() => onSelect(current + 1)} aria-label="Next step" className="-my-1 text-muted-foreground">
+            <Button size="icon-sm" variant="ghost" disabled={disabled || current >= reachable} onClick={() => onSelect(current + 1)} aria-label={t('chat.steps.next')} className="-my-1 text-muted-foreground">
                 <ChevronRight className="size-4" />
             </Button>
         </div>

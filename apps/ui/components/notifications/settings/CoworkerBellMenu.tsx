@@ -6,9 +6,10 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { CalendarClock, SettingsIcon } from '@/lib/icons'
 import { COWORKER_MODES, type CoworkerMode, type CoworkerRule, type NotificationScope } from '@/lib/notifications/prefs'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
-import { COWORKER_MODE_META, SCOPE_META } from './scope-meta'
+import { COWORKER_MODE_META } from './scope-meta'
 
 type CoworkerBellMenuProps = {
     name: string
@@ -36,18 +37,19 @@ function ItemText({ label, hint }: { label: string; hint: string }) {
 // The glyph says the state at a glance: a plain bell follows your setting, a ringing one gets
 // everything, a crossed one is muted, and the dot is a coworker whose scheduled tasks you follow.
 export function CoworkerBellMenu({ name, rule, scope, scheduledCount, onChange, onOpenSettings, open, onOpenChange, modal, align = 'end', className }: CoworkerBellMenuProps) {
+    const t = useTranslations('notifications.settings')
     const openingSettings = useRef(false)
     const ModeIcon = COWORKER_MODE_META[rule.mode].icon
     const following = rule.follow === true
     // Someone already following can always stop, whatever the count says.
     const noSchedule = scheduledCount === 0 && !following
 
-    const hintOf = (mode: CoworkerMode) => (mode === 'default' ? `Your setting: “${SCOPE_META[scope].label}”.` : COWORKER_MODE_META[mode].hint)
+    const hintOf = (mode: CoworkerMode) => (mode === 'default' ? t('modes.default.yourSetting', { scope: t(`scopes.${scope}.label`) }) : t(`modes.${mode}.hint`))
 
     return (
         <DropdownMenu open={open} onOpenChange={onOpenChange} modal={modal}>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon-sm" aria-label={`Notifications for ${name}`} className={cn('relative', rule.mode === 'muted' ? 'text-muted-foreground' : 'text-foreground', className)}>
+                <Button variant="ghost" size="icon-sm" aria-label={t('notificationsFor', { name })} className={cn('relative', rule.mode === 'muted' ? 'text-muted-foreground' : 'text-foreground', className)}>
                     <ModeIcon className="size-4" />
                     {following && rule.mode !== 'muted' && <span className="absolute top-1 right-1 size-1.5 rounded-full bg-primary" />}
                 </Button>
@@ -61,23 +63,23 @@ export function CoworkerBellMenu({ name, rule, scope, scheduledCount, onChange, 
                     event.preventDefault()
                 }}
             >
-                <DropdownMenuLabel className="truncate">Notify me about {name}</DropdownMenuLabel>
+                <DropdownMenuLabel className="truncate">{t('bell.title', { name })}</DropdownMenuLabel>
                 <DropdownMenuRadioGroup value={rule.mode} onValueChange={mode => onChange({ ...rule, mode: mode as CoworkerMode })}>
                     {COWORKER_MODES.map(mode => {
                         const ItemIcon = COWORKER_MODE_META[mode].icon
                         return (
                             <DropdownMenuRadioItem key={mode} value={mode} className="items-start py-1.5">
                                 <ItemIcon className="mt-0.5" />
-                                <ItemText label={COWORKER_MODE_META[mode].label} hint={hintOf(mode)} />
+                                <ItemText label={t(`modes.${mode}.label`)} hint={hintOf(mode)} />
                             </DropdownMenuRadioItem>
                         )
                     })}
                 </DropdownMenuRadioGroup>
                 <DropdownMenuSeparator />
-                <TooltipDisabledReason reason={noSchedule ? `${name} has no scheduled task yet` : undefined} className="flex w-full">
+                <TooltipDisabledReason reason={noSchedule ? t('bell.noSchedule', { name }) : undefined} className="flex w-full">
                     <DropdownMenuCheckboxItem checked={following} disabled={noSchedule} onCheckedChange={checked => onChange({ ...rule, follow: checked === true })} className="w-full items-start py-1.5">
                         <CalendarClock className="mt-0.5" />
-                        <ItemText label="Follow its scheduled tasks" hint={noSchedule ? 'Nothing scheduled yet.' : `${scheduledCount} scheduled, they reach you like your own runs.`} />
+                        <ItemText label={t('bell.follow')} hint={noSchedule ? t('bell.nothingScheduled') : t('bell.scheduled', { count: scheduledCount })} />
                     </DropdownMenuCheckboxItem>
                 </TooltipDisabledReason>
                 <DropdownMenuSeparator />
@@ -89,7 +91,7 @@ export function CoworkerBellMenu({ name, rule, scope, scheduledCount, onChange, 
                     className="py-1.5"
                 >
                     <SettingsIcon />
-                    All notification settings
+                    {t('bell.allSettings')}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

@@ -11,7 +11,6 @@ import { Chip } from '@/components/ui/Chip'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { UnreadDot } from '@/components/ui/UnreadDot'
-import { timeAgo } from '@/components/ui/status'
 import { LAB_CONVERSATIONS, type LabConversation } from '@/mocks/conversations'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'
@@ -22,6 +21,13 @@ import { fonts, radius, spacing } from '@/theme/tokens'
 
 const ACTIVE_ID = 'c1'
 const PULSE = { id: 'agent-pulse', kind: 'coworker' as const, name: 'clem cv', status: 'working' as const }
+
+function timeAgo(minutes: number): string {
+    if (minutes < 1) return 'now'
+    if (minutes < 60) return `${minutes}m`
+    if (minutes < 60 * 24) return `${Math.floor(minutes / 60)}h`
+    return `${Math.floor(minutes / (60 * 24))}d`
+}
 
 function Leading({ conversation }: { conversation: LabConversation }) {
     const theme = useTheme()

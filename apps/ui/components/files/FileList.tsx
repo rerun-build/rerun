@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatBytes } from '@/lib/files/format'
 import { entriesFromDataTransfer, type UploadEntry } from '@/lib/files/upload'
 import { DownloadIcon, EllipsisIcon, FileIcon, FolderIcon, PencilIcon, Trash2Icon } from '@/lib/icons'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type DragEvent } from 'react'
 
 type FileListProps = {
@@ -23,13 +24,14 @@ type FileListProps = {
     onUpload: (entries: UploadEntry[]) => void
 }
 
-function kindLabel(entry: FileEntry): string {
-    if (entry.type === 'dir') return 'Folder'
+function kindLabel(entry: FileEntry, labels: { folder: string; file: string }): string {
+    if (entry.type === 'dir') return labels.folder
     const dot = entry.name.lastIndexOf('.')
-    return dot > 0 ? entry.name.slice(dot + 1).toUpperCase() : 'File'
+    return dot > 0 ? entry.name.slice(dot + 1).toUpperCase() : labels.file
 }
 
 function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (next: string) => void; onCancel: () => void }) {
+    const t = useTranslations('files.list')
     const [value, setValue] = useState(name)
     const ref = useRef<HTMLInputElement>(null)
 
@@ -51,7 +53,7 @@ function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (ne
         <Input
             ref={ref}
             value={value}
-            aria-label="New name"
+            aria-label={t('newName')}
             onChange={event => setValue(event.target.value)}
             onBlur={submit}
             onClick={event => event.stopPropagation()}
@@ -82,6 +84,9 @@ function ListSkeleton() {
 // A folder of the shared folder as Notion lists a database: the folder name as the page title, one
 // line per entry, actions on hover, and the whole page as a drop zone.
 export function FileList({ title, entries, onOpen, onRename, onDelete, onDownload, onUpload }: FileListProps) {
+    const locale = useLocale()
+    const t = useTranslations('files')
+    const kindLabels = { folder: t('list.folder'), file: t('list.file') }
     const [renaming, setRenaming] = useState<string | null>(null)
     const [deleting, setDeleting] = useState<FileEntry | null>(null)
     const [dragOver, setDragOver] = useState(false)
@@ -111,7 +116,7 @@ export function FileList({ title, entries, onOpen, onRename, onDelete, onDownloa
         >
             {dragOver && (
                 <div className="pointer-events-none absolute inset-2 z-10 flex items-center justify-center rounded-xl border-2 border-dashed border-primary/50 bg-primary/5">
-                    <p className="text-sm font-medium text-primary">Drop files or folders to upload here</p>
+                    <p className="text-sm font-medium text-primary">{t('list.dropHere')}</p>
                 </div>
             )}
             <div className="mx-auto w-full max-w-[900px] px-6 pb-16 pt-8 sm:px-12 sm:pt-12">
@@ -121,16 +126,16 @@ export function FileList({ title, entries, onOpen, onRename, onDelete, onDownloa
                 </div>
 
                 <div className="grid grid-cols-[minmax(0,1fr)_5rem_4rem_2rem] items-center gap-x-3 border-b border-border px-2 pb-1.5 text-xs text-muted-foreground max-sm:grid-cols-[minmax(0,1fr)_2rem]">
-                    <span>Name</span>
-                    <span className="text-right max-sm:hidden">Size</span>
-                    <span className="max-sm:hidden">Type</span>
+                    <span>{t('list.name')}</span>
+                    <span className="text-right max-sm:hidden">{t('list.size')}</span>
+                    <span className="max-sm:hidden">{t('list.type')}</span>
                     <span />
                 </div>
 
                 {!entries ? (
                     <ListSkeleton />
                 ) : entries.length === 0 ? (
-                    <p className="px-2 py-6 text-sm text-muted-foreground">Nothing here yet. Anything a coworker downloads, creates or edits for the whole workspace lands in this folder, and so does what you drop on this page.</p>
+                    <p className="px-2 py-6 text-sm text-muted-foreground">{t('list.empty')}</p>
                 ) : (
                     <div className="divide-y divide-border/60">
                         {entries.map(entry => {
@@ -159,14 +164,14 @@ export function FileList({ title, entries, onOpen, onRename, onDelete, onDownloa
                                             <span className="truncate">{entry.name}</span>
                                         )}
                                     </span>
-                                    <span className="text-right text-xs tabular-nums text-muted-foreground max-sm:hidden">{entry.type === 'dir' ? '' : formatBytes(entry.size)}</span>
-                                    <span className="truncate text-xs text-muted-foreground max-sm:hidden">{kindLabel(entry)}</span>
+                                    <span className="text-right text-xs tabular-nums text-muted-foreground max-sm:hidden">{entry.type === 'dir' ? '' : formatBytes(entry.size, locale)}</span>
+                                    <span className="truncate text-xs text-muted-foreground max-sm:hidden">{kindLabel(entry, kindLabels)}</span>
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button
                                                 size="icon-xs"
                                                 variant="ghost"
-                                                aria-label={`Actions for ${entry.name}`}
+                                                aria-label={t('list.actionsFor', { name: entry.name })}
                                                 onClick={event => event.stopPropagation()}
                                                 className="opacity-0 transition-opacity group-hover/file:opacity-100 aria-expanded:opacity-100 focus-visible:opacity-100 max-sm:opacity-100"
                                             >
@@ -176,15 +181,15 @@ export function FileList({ title, entries, onOpen, onRename, onDelete, onDownloa
                                         <DropdownMenuContent align="end" onClick={event => event.stopPropagation()}>
                                             {entry.type !== 'dir' && (
                                                 <DropdownMenuItem onSelect={() => onDownload(entry.name)}>
-                                                    <DownloadIcon /> Download
+                                                    <DownloadIcon /> {t('grid.download')}
                                                 </DropdownMenuItem>
                                             )}
                                             <DropdownMenuItem onSelect={() => setRenaming(entry.name)}>
-                                                <PencilIcon /> Rename
+                                                <PencilIcon /> {t('grid.rename')}
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem variant="destructive" onSelect={() => setDeleting(entry)}>
-                                                <Trash2Icon /> Delete
+                                                <Trash2Icon /> {t('grid.delete')}
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -198,8 +203,8 @@ export function FileList({ title, entries, onOpen, onRename, onDelete, onDownloa
             <ConfirmDialog
                 open={deleting !== null}
                 onOpenChange={open => !open && setDeleting(null)}
-                title={`Delete ${deleting?.name ?? ''}?`}
-                description={deleting?.type === 'dir' ? 'The folder and everything inside it are deleted from the box. This cannot be undone.' : 'The file is deleted from the box. This cannot be undone.'}
+                title={t('delete.title', { name: deleting?.name ?? '' })}
+                description={deleting?.type === 'dir' ? t('delete.folder') : t('delete.file')}
                 onConfirm={() => {
                     if (deleting) onDelete(deleting.name)
                     setDeleting(null)

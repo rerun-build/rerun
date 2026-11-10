@@ -3,8 +3,10 @@ import type { TableCard } from '@rerun/contracts'
 import { cn } from '../../cn'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../primitives'
 import { formatCell, isNumericFormat, type CellContext } from './format-cell'
+import { useKitTranslations } from '../../locale'
 
 export function TableLayout({ card, context, mobileColumns }: { card: TableCard; context: CellContext; mobileColumns?: number }) {
+    const t = useKitTranslations()
     const formats = card.formats ?? {}
     const hidden = (index: number) => mobileColumns !== undefined && index >= mobileColumns
 
@@ -37,7 +39,7 @@ export function TableLayout({ card, context, mobileColumns }: { card: TableCard;
                     {card.rows.length === 0 && (
                         <TableRow>
                             <TableCell colSpan={Math.max(1, card.columns.length)} className="py-6 text-center text-[12px] text-muted-foreground">
-                                No rows yet.
+                                {t('chat.table.empty')}
                             </TableCell>
                         </TableRow>
                     )}

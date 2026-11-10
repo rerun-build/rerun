@@ -3,6 +3,8 @@ import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
 import { MetaTable } from "../components/MetaTable";
+import { strong } from "../components/rich";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface TrialFinalNoticeProps {
@@ -23,6 +25,7 @@ export interface TrialFinalNoticeProps {
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
+  locale?: EmailLocale;
 }
 
 export default function TrialFinalNotice({
@@ -35,40 +38,35 @@ export default function TrialFinalNotice({
   boardUrl,
   appUrl,
   unsubscribeUrl,
+  locale,
 }: TrialFinalNoticeProps) {
-  const workspace = workspaceName ?? "your workspace";
+  const t = emailTranslator(locale);
+  const workspace = workspaceName ?? t("common.yourWorkspace");
 
   return (
     <Layout
       preview={
         hasCard
-          ? `Your Rerun plan starts at ${trialEndsLabel}`
-          : `Add a card before ${trialEndsLabel} to keep your Rerun coworkers running`
+          ? t("trialFinalNotice.previewCard", { date: trialEndsLabel })
+          : t("trialFinalNotice.previewNoCard", { date: trialEndsLabel })
       }
       hero={{ scene: "trial-ending", board: boardUrl }}
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
+      locale={locale}
     >
-      <Heading style={text.heading}>Your trial ends in 2 hours</Heading>
+      <Heading style={text.heading}>{t("trialFinalNotice.heading")}</Heading>
       {hasCard ? (
         <Text style={text.paragraph}>
-          The trial for <strong>{workspace}</strong> ends at{" "}
-          <strong>{trialEndsLabel}</strong>. Your plan starts then, and the card
-          on file is charged for your first month. Your coworkers keep running,
-          there is nothing to do.
+          {t.rich("trialFinalNotice.bodyCard", { workspace, date: trialEndsLabel, strong })}
         </Text>
       ) : (
         <>
           <Text style={text.paragraph}>
-            The trial for <strong>{workspace}</strong> ends at{" "}
-            <strong>{trialEndsLabel}</strong>, and there is no card on file.
+            {t.rich("trialFinalNotice.noCard", { workspace, date: trialEndsLabel, strong })}
           </Text>
           <Text style={text.paragraph}>
-            Without a plan, your coworkers stop at the end of the trial and your
-            workspace is <strong>paused at {pausedLabel}</strong>. Nothing is
-            deleted: your coworkers and everything they know are saved until{" "}
-            {keptUntilLabel}, and subscribing brings it all back exactly as you
-            left it.
+            {t.rich("trialFinalNotice.noCardPause", { pausedAt: pausedLabel, keptUntil: keptUntilLabel, strong })}
           </Text>
         </>
       )}
@@ -76,20 +74,21 @@ export default function TrialFinalNotice({
       <Section style={meta}>
         <MetaTable
           rows={[
-            { label: "Workspace", value: workspace },
-            { label: "Trial ends", value: trialEndsLabel },
-            ...(hasCard ? [] : [{ label: "Workspace paused", value: pausedLabel }]),
+            { label: t("common.meta.workspace"), value: workspace },
+            { label: t("common.meta.trialEnds"), value: trialEndsLabel },
+            ...(hasCard ? [] : [{ label: t("common.meta.workspacePaused"), value: pausedLabel }]),
           ]}
         />
       </Section>
 
       <Section style={cta}>
-        <Button href={billingUrl}>{hasCard ? "Review my plan" : "Start my plan"}</Button>
+        <Button href={billingUrl}>
+          {hasCard ? t("trialFinalNotice.buttonCard") : t("trialFinalNotice.buttonNoCard")}
+        </Button>
       </Section>
       {hasCard ? (
         <Text style={text.footnote}>
-          Not planning to continue? Cancel before {trialEndsLabel} from Billing,
-          in your workspace menu, and your card is not charged.
+          {t("trialFinalNotice.footnoteCard", { date: trialEndsLabel })}
         </Text>
       ) : null}
     </Layout>

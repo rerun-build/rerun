@@ -4,6 +4,7 @@ import { Image } from 'expo-image'
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AnswerInput } from '@/components/chat/hitl/QuestionWidget'
 import { usePaneSize } from '@/components/layout/PaneSize'
@@ -54,6 +55,7 @@ export function StarterPackCard({ input, onAnswer }: { input: unknown; onAnswer:
     const [full, setFull] = useState(false)
     const [writing, setWriting] = useState(false)
     const [asked, setAsked] = useState('')
+    const t = useTranslations('mobileOnboarding')
     const cardWidth = Math.min(CARD_MAX_WIDTH, Math.round(width * CARD_SHARE))
 
     const toggle = (slug: string) => {
@@ -71,9 +73,9 @@ export function StarterPackCard({ input, onAnswer }: { input: unknown; onAnswer:
         <View style={{ gap: spacing.md }}>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md }}>
                 <View style={{ flex: 1, gap: 2 }}>
-                    <AppText variant="headline">Your starter team</AppText>
+                    <AppText variant="headline">{t('starter.title')}</AppText>
                     <AppText variant="footnote" tone="muted">
-                        {full ? `Up to ${MAX_STARTER_PICKS} to start. Drop one to take this one.` : `Pick up to ${MAX_STARTER_PICKS}. Each one sets itself up with you.`}
+                        {full ? t('starter.full', { max: MAX_STARTER_PICKS }) : t('starter.pickUpTo', { max: MAX_STARTER_PICKS })}
                     </AppText>
                 </View>
                 <AppText variant="footnote" tone={picked.length ? 'default' : 'muted'} medium style={{ fontVariant: ['tabular-nums'] }}>
@@ -90,17 +92,17 @@ export function StarterPackCard({ input, onAnswer }: { input: unknown; onAnswer:
             {writing ? (
                 <View style={{ gap: spacing.sm }}>
                     <View style={{ flexDirection: 'row' }}>
-                        <AnswerInput value={asked} onChangeText={setAsked} onSubmit={() => asked.trim() && onAnswer({ answered: true, custom: asked.trim() })} placeholder="What should your coworker do?" last autoFocus />
+                        <AnswerInput value={asked} onChangeText={setAsked} onSubmit={() => asked.trim() && onAnswer({ answered: true, custom: asked.trim() })} placeholder={t('starter.customPlaceholder')} last autoFocus />
                     </View>
                     <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-                        <Button label="Back" variant="ghost" onPress={() => setWriting(false)} />
-                        <Button label="Send" stretch disabled={!asked.trim()} onPress={() => onAnswer({ answered: true, custom: asked.trim() })} />
+                        <Button label={t('starter.back')} variant="ghost" onPress={() => setWriting(false)} />
+                        <Button label={t('starter.send')} stretch disabled={!asked.trim()} onPress={() => onAnswer({ answered: true, custom: asked.trim() })} />
                     </View>
                 </View>
             ) : (
                 <View style={{ gap: spacing.sm }}>
-                    <Button label={picked.length === 0 ? 'Pick at least one' : picked.length === 1 ? 'Hire this one' : `Hire these ${picked.length}`} disabled={!picked.length} onPress={() => onAnswer({ answered: true, chosen: picked })} />
-                    <Button label="None of these, tell me what you need" variant="ghost" size="sm" onPress={() => setWriting(true)} />
+                    <Button label={t('starter.hire', { count: picked.length })} disabled={!picked.length} onPress={() => onAnswer({ answered: true, chosen: picked })} />
+                    <Button label={t('starter.custom')} variant="ghost" size="sm" onPress={() => setWriting(true)} />
                 </View>
             )}
         </View>

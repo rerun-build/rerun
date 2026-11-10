@@ -1,25 +1,26 @@
 import { pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, type HitlKind } from './chat-hitl.js'
 
-const counted = (count: number, one: string, many: string) => (count > 1 ? `${count} ${many}` : one)
+// The `chat.hitlCue` namespace, in the reader's language.
+export type HitlCueCopy = (key: 'question' | 'approval' | 'secret' | 'mcpNamed' | 'mcp' | 'service' | 'takeover', values?: Record<string, string | number>) => string
 
 // What the scroll cue says is waiting at the end of the thread, once the block is out of sight. Each
 // client draws its own glyph beside it.
-export function pendingHitlLabel(kind: HitlKind, input: Record<string, unknown>): string {
+export function pendingHitlLabel(kind: HitlKind, input: Record<string, unknown>, t: HitlCueCopy): string {
     switch (kind) {
         case 'question':
-            return counted(pendingQuestions(input).length, 'Question waiting', 'questions waiting')
+            return t('question', { count: pendingQuestions(input).length })
         case 'approval':
-            return counted(pendingApprovals(input).length, 'Approval needed', 'approvals needed')
+            return t('approval', { count: pendingApprovals(input).length })
         case 'secret':
-            return counted(pendingSecrets(input).length, 'Credential needed', 'credentials needed')
+            return t('secret', { count: pendingSecrets(input).length })
         case 'mcp': {
             const { name } = pendingMcpSignIn(input)
-            return name ? `Sign in to ${name}` : 'Sign-in needed'
+            return name ? t('mcpNamed', { name }) : t('mcp')
         }
         case 'service':
-            return counted(pendingServices(input).length, 'App to connect', 'apps to connect')
+            return t('service', { count: pendingServices(input).length })
         case 'takeover':
-            return 'Your turn on the screen'
+            return t('takeover')
     }
 }
 

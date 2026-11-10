@@ -12,7 +12,8 @@ import {
     type CaptureSelection,
     type CaptureSourceSpace,
 } from './capture'
-import { templateEditBlockReason } from './expert'
+import { AppError } from '@/lib/i18n/action-error'
+import { templateEditBlockCode } from './expert'
 
 // The ownership half of a capture: which template it writes into, which space it reads from, which
 // agents it may touch. `capture.ts` does the work and asks no questions, so every entry point goes
@@ -22,8 +23,8 @@ import { templateEditBlockReason } from './expert'
 // and is never accepted from a caller: it addresses both the update and the archive path.
 async function requireCaptureTarget(userId: string, templateId: string): Promise<string> {
     const owned = await assertTemplateOwnedBy(userId, templateId)
-    const blocked = templateEditBlockReason(owned.status)
-    if (blocked) throw new Error(blocked)
+    const blocked = templateEditBlockCode(owned.status)
+    if (blocked) throw new AppError(blocked)
     return owned.slug
 }
 
@@ -32,7 +33,7 @@ async function requireCaptureTarget(userId: string, templateId: string): Promise
 async function assertAgentsInSpace(agentIds: string[], spaceId: string, workspaceId: number): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data } = await selectMany(supabase, 'agents', ['id'] as const, { id: { in: agentIds }, space_id: spaceId, workspace_id: workspaceId })
-    if ((data?.length ?? 0) !== agentIds.length) throw new Error('One of the selected coworkers is not in this Box.')
+    if ((data?.length ?? 0) !== agentIds.length) throw new AppError('selectedCoworkerNotInBox')
 }
 
 export async function listAuthorCaptureSources(scope: TemplateAuthorScope): Promise<CaptureSourceSpace[]> {

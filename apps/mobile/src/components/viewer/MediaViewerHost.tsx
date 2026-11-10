@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Alert, Modal, StatusBar, useWindowDimensions, View, type ScrollViewInstance } from 'react-native'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { cachedFile, fileHeadersFor, isHubFileUrl } from '@/api/files'
 import { useAuth } from '@/auth/AuthProvider'
@@ -22,6 +23,7 @@ const isOnPhone = (url: string) => url.startsWith('file:') || url.startsWith('da
  * or send one on. Mounted once at the root; anything in the thread opens it through `openViewer`.
  */
 export function MediaViewerHost() {
+    const t = useTranslations('mobileCommon')
     const state = useViewerState()
     const { width } = useWindowDimensions()
     const insets = useSafeAreaInsets()
@@ -61,7 +63,7 @@ export function MediaViewerHost() {
         try {
             await Sharing.shareAsync(await localCopy(item))
         } catch {
-            Alert.alert('Could not share the file', 'Try again in a moment.')
+            Alert.alert(t('viewer.shareFailed'), t('errors.tryAgainShortly'))
         }
     }
 
@@ -92,18 +94,18 @@ export function MediaViewerHost() {
                 </ScrollView>
                 {current && (
                     <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: spacing.lg, right: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.md, opacity: 1 - drag }}>
-                        <GlassButton symbol="xmark" label="Close" onPress={closeViewer} scheme="dark" />
+                        <GlassButton symbol="xmark" label={t('actions.close')} onPress={closeViewer} scheme="dark" />
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <AppText variant="callout" medium numberOfLines={1} style={{ color: '#ffffff' }}>
                                 {current.name}
                             </AppText>
                             {items.length > 1 && (
                                 <AppText variant="caption" style={{ color: 'rgba(255,255,255,0.7)', fontVariant: ['tabular-nums'] }}>
-                                    {`${index + 1} / ${items.length}`}
+                                    {t('viewer.position', { index: index + 1, total: items.length })}
                                 </AppText>
                             )}
                         </View>
-                        <GlassButton symbol="square.and.arrow.up" label="Share" onPress={share} scheme="dark" />
+                        <GlassButton symbol="square.and.arrow.up" label={t('actions.share')} onPress={share} scheme="dark" />
                     </View>
                 )}
             </GestureHandlerRootView>

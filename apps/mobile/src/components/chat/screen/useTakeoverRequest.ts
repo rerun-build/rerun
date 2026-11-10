@@ -7,6 +7,7 @@ import { Alert } from 'react-native'
 import { finishTakeover } from '@/api/desktop'
 import { useAuth } from '@/auth/AuthProvider'
 import { awaitHandBack, handBack } from '@/desktop/hand-back'
+import { translatorFor } from '@/i18n/translator'
 import { setPendingDesktopOpen } from '@/desktop/pending-open'
 import { hostOf } from '@/lib/url'
 
@@ -64,7 +65,7 @@ export function useTakeoverRequest(agentId: string, coworkerName: string, pendin
             handBack(callId, left)
             answer(serializeTakeoverResult(left))
         } catch (err) {
-            Alert.alert('Could not hand the browser back', err instanceof Error ? err.message : 'Try again in a moment.')
+            Alert.alert(translatorFor('mobileChat')('screen.handBackFailed'), err instanceof Error ? err.message : translatorFor('mobileCommon')('errors.tryAgainShortly'))
         } finally {
             setFinishing(false)
         }

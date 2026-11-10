@@ -67,6 +67,7 @@ async function resume(supabase: Client, workspaceId: number, slug: AppSlug): Pro
     await notifyWorkspace(supabase, workspaceId, {
         appName: app.name,
         message: `Your workspace is back. Reconnect your ${app.providerLabel} account from Settings → Apps so your coworkers can use it again.`,
+        copy: { key: 'workspaceBack', values: { provider: app.providerLabel } },
         email: false,
     })
 }

@@ -4,6 +4,7 @@ import { Children, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { cn } from '../cn'
 import { ChevronLeft, ChevronRight } from '../icons'
+import { useKitTranslations } from '../locale'
 
 const FADE_CLASS = 'pointer-events-none absolute -top-2 -bottom-10 z-20 w-24 transition-opacity duration-200'
 const ARROW_CLASS =
@@ -30,6 +31,7 @@ export function CardCarousel({
     dots?: boolean
     children: ReactNode
 }) {
+    const t = useKitTranslations()
     const scrollerRef = useRef<HTMLDivElement>(null)
     const [canLeft, setCanLeft] = useState(false)
     const [canRight, setCanRight] = useState(false)
@@ -93,7 +95,7 @@ export function CardCarousel({
 
                 <button
                     type="button"
-                    aria-label={`Previous ${label}`}
+                    aria-label={t('primitives.carousel.previous', { label })}
                     onClick={() => scrollByCard(-1)}
                     className={cn(ARROW_CLASS, 'left-1 sm:left-0 sm:-translate-x-1/2', canLeft ? 'opacity-100' : 'pointer-events-none opacity-0')}
                 >
@@ -101,7 +103,7 @@ export function CardCarousel({
                 </button>
                 <button
                     type="button"
-                    aria-label={`Next ${label}`}
+                    aria-label={t('primitives.carousel.next', { label })}
                     onClick={() => scrollByCard(1)}
                     className={cn(ARROW_CLASS, 'right-1 sm:right-0 sm:translate-x-1/2', canRight ? 'opacity-100' : 'pointer-events-none opacity-0')}
                 >
@@ -115,7 +117,7 @@ export function CardCarousel({
                         <button
                             key={index}
                             type="button"
-                            aria-label={`Go to ${label} ${index + 1}`}
+                            aria-label={t('primitives.carousel.goTo', { label, index: index + 1 })}
                             aria-current={index === active}
                             onClick={() => scrollToCard(index)}
                             className={cn('h-1.5 cursor-pointer rounded-full transition-all', index === active ? 'w-5 bg-foreground' : 'w-1.5 bg-foreground/25 hover:bg-foreground/40')}

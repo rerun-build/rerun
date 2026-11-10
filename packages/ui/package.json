@@ -20,6 +20,7 @@
         "./iso-grid/card-capture": "./src/iso-grid/card-capture.ts",
         "./iso-grid/iso": "./src/iso-grid/iso.ts",
         "./kit": "./src/kit/index.ts",
+        "./locale": "./src/locale/index.tsx",
         "./logo": "./src/logo/index.ts",
         "./markdown": "./src/markdown/index.ts",
         "./primitives": "./src/primitives/index.ts",
@@ -79,6 +80,7 @@
     },
     "dependencies": {
         "@rerun/contracts": "workspace:*",
+        "@rerun/i18n": "workspace:*",
         "@tiptap/pm": "^3.32.2",
         "@tiptap/react": "^3.32.2",
         "@tiptap/starter-kit": "^3.32.2",
@@ -86,6 +88,7 @@
         "react-day-picker": "^10.0.2",
         "react-markdown": "^10.1.0",
         "remark-gfm": "^4.0.0",
-        "tiptap-markdown": "^0.9.0"
+        "tiptap-markdown": "^0.9.0",
+        "use-intl": "^4.14.9"
     }
 }

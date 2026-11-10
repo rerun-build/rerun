@@ -7,14 +7,17 @@
     "exports": {
         ".": "./src/index.ts",
         "./card": "./card.ts",
-        "./newsletter-art": "./newsletter-art.ts"
+        "./newsletter-art": "./newsletter-art.ts",
+        "./i18n": "./i18n.ts"
     },
     "scripts": {
         "dev": "EMAIL_ASSET_ORIGIN=${EMAIL_ASSET_ORIGIN:-http://localhost:${CONDUCTOR_PORT:-3050}} email dev --dir emails --port 3060",
         "ts-check": "tsc --noEmit"
     },
     "dependencies": {
-        "@react-email/components": "^1.0.12"
+        "@react-email/components": "^1.0.12",
+        "@rerun/i18n": "workspace:*",
+        "use-intl": "^4.14.9"
     },
     "peerDependencies": {
         "react": "^19",

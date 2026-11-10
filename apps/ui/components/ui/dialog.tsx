@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Dialog as DialogPrimitive } from "radix-ui"
 import { Drawer as DrawerPrimitive } from "vaul"
 import { useResolvedIsMobile } from "@rerun/ui/primitives/use-is-mobile"
@@ -137,6 +138,7 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
 }) {
+  const t = useTranslations("ui")
   const { isSheet, dismissible } = useSheetMode()
 
   if (isSheet) {
@@ -171,7 +173,7 @@ function DialogContent({
             <DrawerPrimitive.Close data-slot="dialog-close" asChild>
               <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
                 <XIcon />
-                <span className="sr-only">Close</span>
+                <span className="sr-only">{t("close")}</span>
               </Button>
             </DrawerPrimitive.Close>
           )}
@@ -201,7 +203,7 @@ function DialogContent({
             >
               <XIcon
               />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{t("close")}</span>
             </Button>
           </DialogPrimitive.Close>
         )}
@@ -245,11 +247,12 @@ function DialogFooter({
 }
 
 function DialogCloseButton() {
+  const t = useTranslations("ui")
   const { isSheet } = useSheetMode()
   const Close = isSheet ? DrawerPrimitive.Close : DialogPrimitive.Close
   return (
     <Close asChild>
-      <Button variant="outline">Close</Button>
+      <Button variant="outline">{t("close")}</Button>
     </Close>
   )
 }

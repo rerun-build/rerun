@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import type { SaveFileResult } from '@/app/api/_services/file.service'
 import { applyEol, hashText, splitEol, type Eol } from '@/lib/files/editable'
 import { useCallback, useEffect, useState } from 'react'
@@ -27,6 +28,7 @@ export function useFileDraft({ initialContent, onSave, onSaved }: UseFileDraftPr
     const [draft, setDraft] = useState(opened.text)
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const errorText = useErrorText()
     const [conflict, setConflict] = useState(false)
 
     const dirty = draft !== opened.text
@@ -53,9 +55,9 @@ export function useFileDraft({ initialContent, onSave, onSaved }: UseFileDraftPr
                 return
             }
             if (result.conflict) setConflict(true)
-            else setError(result.error)
+            else setError(errorText(result))
         },
-        [draft, onSave, onSaved],
+        [draft, onSave, onSaved, errorText],
     )
 
     const save = useCallback(() => {

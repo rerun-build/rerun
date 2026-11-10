@@ -1,13 +1,15 @@
 import { FOREMAN_AGENT_ID, type BoardAgent, type Box, type BoxAccessLevel, type WorkspaceRole } from '@rerun/contracts'
 
-import { webHost } from '@/config/environment'
-
 // The app's copy of the web's rules. They only decide which controls are open: the hub checks every
 // write again and answers 403.
 
-export const BOX_MANAGE_REASON = 'Only an admin or a manager of this Box can change this.'
-export const AI_PROVIDERS_ADMIN_ONLY = 'Only an admin can change the AI providers.'
-export const NO_MANAGED_BOX = `You need a Box you manage to add a coworker. Create one at ${webHost}, or ask an admin.`
+// Why a control is closed, as a key of `mobileCoworker.access`: the screen that shows it says it in
+// the reader's language.
+export type AccessReason = 'boxManage' | 'aiProvidersAdminOnly' | 'noManagedBox' | 'boxesFailed' | 'noBoxYet'
+
+export const BOX_MANAGE_REASON: AccessReason = 'boxManage'
+export const AI_PROVIDERS_ADMIN_ONLY: AccessReason = 'aiProvidersAdminOnly'
+export const NO_MANAGED_BOX: AccessReason = 'noManagedBox'
 
 // A hub older than roles sends none, and a copy of the account cached before them has none: both
 // meant every member ran the workspace.
@@ -16,7 +18,7 @@ export const isAdminRole = (role: WorkspaceRole | undefined): boolean => role !=
 // An older hub sends no access: every member managed every Box.
 export const canManage = (access: BoxAccessLevel | undefined): boolean => access !== 'use'
 
-export const manageReason = (access: BoxAccessLevel | undefined): string | null => (canManage(access) ? null : BOX_MANAGE_REASON)
+export const manageReason = (access: BoxAccessLevel | undefined): AccessReason | null => (canManage(access) ? null : BOX_MANAGE_REASON)
 
 export const manageableBoxes = (boxes: readonly Box[]): Box[] => boxes.filter(box => canManage(box.access))
 
@@ -29,10 +31,10 @@ export function boxForNewCoworker(manageable: readonly Box[], wanted: string | n
 
 // Why the new coworker sheet offers no form, or null when it can: the Boxes are read, and one of them
 // takes a coworker from the caller.
-export function newCoworkerBlocker({ failed, manageable, admin }: { failed: boolean; manageable: readonly Box[] | null; admin: boolean }): string | null {
-    if (failed) return 'We could not load your Boxes. Try again in a moment.'
+export function newCoworkerBlocker({ failed, manageable, admin }: { failed: boolean; manageable: readonly Box[] | null; admin: boolean }): AccessReason | null {
+    if (failed) return 'boxesFailed'
     if (!manageable || manageable.length > 0) return null
-    return admin ? `This workspace has no Box yet. Create one at ${webHost}.` : NO_MANAGED_BOX
+    return admin ? 'noBoxYet' : NO_MANAGED_BOX
 }
 
 // The caller's level on a coworker. `known` is false until a copy of the coworker, the phone's or the
@@ -55,7 +57,7 @@ export function knownCoworkerAccess(agentId: string, sources: AccessSources): Co
 
 // How a control that changes the coworker shows: greyed with no word until the level is known, greyed
 // with the reason when the caller only uses the Box, open otherwise.
-export type ManageLock = { locked: boolean; reason: string | null }
+export type ManageLock = { locked: boolean; reason: AccessReason | null }
 
 export const OPEN_LOCK: ManageLock = { locked: false, reason: null }
 

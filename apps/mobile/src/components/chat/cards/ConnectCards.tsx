@@ -1,6 +1,7 @@
 import type { McpRegisterCard, McpServerView, ResolvedService } from '@rerun/contracts'
 import { Image } from 'expo-image'
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'use-intl'
 
 import { readMcpServer } from '@/api/mcp'
 import { readService } from '@/api/services'
@@ -33,6 +34,7 @@ const humanize = (name: string) =>
 // The tool output is frozen at the time of the call, so whether the sign-in is still owed is asked
 // again: an old card in the history must not keep offering a connection made since.
 function NeedsAuthCard({ agentId, slug, name }: { agentId: string; slug: string; name: string }) {
+    const t = useTranslations('mobileCards.connect')
     const caller = useCaller()
     const [service, setService] = useState<ResolvedService | null>(null)
     const [connected, setConnected] = useState(false)
@@ -69,23 +71,25 @@ function NeedsAuthCard({ agentId, slug, name }: { agentId: string; slug: string;
         <EventRow
             symbol="link"
             icon={logoOf(service?.icon)}
-            title={`${name} added`}
-            note={error ?? (done ? 'Connected, the coworker can use it' : 'Sign in once so the coworker can use it')}
-            trailing={done ? <Badge size="xs" tone="green" label="Connected" /> : pending ? <Button size="sm" variant="outline" label={busy ? 'Signing in…' : 'Sign in'} symbol="person.crop.circle.badge.checkmark" loading={busy} onPress={connect} /> : undefined}
+            title={t('added', { name })}
+            note={error ?? (done ? t('connectedNote') : t('signInNote'))}
+            trailing={done ? <Badge size="xs" tone="green" label={t('connected')} /> : pending ? <Button size="sm" variant="outline" label={busy ? t('signingIn') : t('signIn')} symbol="person.crop.circle.badge.checkmark" loading={busy} onPress={connect} /> : undefined}
         />
     )
 }
 
 function McpStatusBadge({ status }: { status: McpServerView['status'] }) {
-    if (status === 'connected') return <Badge size="xs" tone="green" label="Connected" />
-    if (status === 'needs_auth') return <Badge size="xs" tone="orange" label="Sign-in needed" />
-    if (status === 'error') return <Badge size="xs" tone="red" label="Unreachable" />
+    const t = useTranslations('mobileCards.connect')
+    if (status === 'connected') return <Badge size="xs" tone="green" label={t('connected')} />
+    if (status === 'needs_auth') return <Badge size="xs" tone="orange" label={t('signInNeeded')} />
+    if (status === 'error') return <Badge size="xs" tone="red" label={t('unreachable')} />
     return null
 }
 
 // The tool output is frozen at the time of the call, so the server is looked up again: an old card
 // follows the sign-in made since, and shows no status once the server is gone.
 function McpServerCard({ agentId, card }: { agentId: string; card: McpRegisterCard }) {
+    const t = useTranslations('mobileCards.connect')
     const caller = useCaller()
     const [server, setServer] = useState<McpServerView | null>(null)
     const [busy, setBusy] = useState(false)
@@ -108,7 +112,7 @@ function McpServerCard({ agentId, card }: { agentId: string; card: McpRegisterCa
     const displayName = server?.displayName ?? humanize(card.name)
 
     if (!saved) {
-        return <EventRow symbol="link" title={`Couldn't connect ${displayName}`} note={card.failure} trailing={<Badge size="xs" tone="red" label="Not added" />} />
+        return <EventRow symbol="link" title={t('couldNotConnect', { name: displayName })} note={card.failure} trailing={<Badge size="xs" tone="red" label={t('notAdded')} />} />
     }
 
     const host = server?.host ?? hostOf(card.url)
@@ -127,21 +131,22 @@ function McpServerCard({ agentId, card }: { agentId: string; card: McpRegisterCa
         <EventRow
             symbol="link"
             icon={logoOf(server?.icon)}
-            title={`${displayName} added`}
-            note={error ?? (host ? `Custom MCP server · ${host}` : 'Custom MCP server')}
-            trailing={canSignIn ? <Button size="sm" variant="outline" label={busy ? 'Connecting…' : 'Connect'} symbol="person.crop.circle.badge.checkmark" loading={busy} onPress={connect} /> : server ? <McpStatusBadge status={server.status} /> : undefined}
+            title={t('added', { name: displayName })}
+            note={error ?? (host ? t('customServerAt', { host }) : t('customServer'))}
+            trailing={canSignIn ? <Button size="sm" variant="outline" label={busy ? t('connecting') : t('connect')} symbol="person.crop.circle.badge.checkmark" loading={busy} onPress={connect} /> : server ? <McpStatusBadge status={server.status} /> : undefined}
         />
     )
 }
 
 export function ConnectCardView({ card, agentId }: { card: ConnectCard; agentId: string }) {
+    const t = useTranslations('mobileCards.connect')
     switch (card.kind) {
         case 'service-installed':
             return (
-                <EventRow symbol="checkmark.circle" title={`${card.name} installed`}>
+                <EventRow symbol="checkmark.circle" title={t('installed', { name: card.name })}>
                     {card.toolNames.length > 0 && (
                         <AppText variant="footnote" tone="muted">
-                            {`Available on the next turn: ${card.toolNames.join(', ')}`}
+                            {t('availableNextTurn', { tools: card.toolNames.join(', ') })}
                         </AppText>
                     )}
                 </EventRow>

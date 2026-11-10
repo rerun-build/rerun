@@ -7,6 +7,7 @@ import { WHATSAPP_PRESENTATION, WhatsappConnectScreen, WhatsappLinkScreen, type 
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PanelSteps } from '@/components/ui/panel-steps'
+import { useTranslations } from 'next-intl'
 import type { LinkupLinkCode } from '@/lib/apps/linkup/client'
 
 export type WhatsappProScreen =
@@ -43,6 +44,7 @@ function numberInLabel(label: string | null | undefined): string {
 }
 
 export function WhatsappProDialogView(props: WhatsappProDialogViewProps) {
+    const t = useTranslations('dialogs.whatsappPro')
     const { open, onOpenChange, overview, screen, pending, error } = props
     const intro = screen.kind === 'accounts' && overview !== null && overview.connections.length === 0
 
@@ -54,13 +56,13 @@ export function WhatsappProDialogView(props: WhatsappProDialogViewProps) {
                         <AppIcon slug="whatsapp" size="md" />
                         <div className="min-w-0 space-y-0.5">
                             <DialogTitle>WhatsApp Pro</DialogTitle>
-                            <DialogDescription>The WhatsApp numbers your coworkers act with.</DialogDescription>
+                            <DialogDescription>{t('description')}</DialogDescription>
                         </div>
                     </DialogHeader>
                 ) : (
                     <DialogHeader className="sr-only">
                         <DialogTitle>WhatsApp Pro</DialogTitle>
-                        <DialogDescription>Link the WhatsApp number your coworkers act with.</DialogDescription>
+                        <DialogDescription>{t('connectDescription')}</DialogDescription>
                     </DialogHeader>
                 )}
 
@@ -80,7 +82,7 @@ export function WhatsappProDialogView(props: WhatsappProDialogViewProps) {
                         )}
                         {screen.kind === 'connect' && (
                             <>
-                                <AppPageHeader slug="whatsapp" title={screen.reconnect ? 'Link WhatsApp again' : 'Link WhatsApp'} hint={connectHint(overview, screen.reconnect?.label)} backLabel="Back to WhatsApp Pro" onBack={props.onBack} />
+                                <AppPageHeader slug="whatsapp" title={screen.reconnect ? t('connect.reconnectTitle') : t('connect.title')} hint={connectHint(overview, screen.reconnect?.label)} backLabel={t('connect.back')} onBack={props.onBack} />
                                 <WhatsappConnectScreen
                                     defaultCountry={props.defaultCountry}
                                     defaultMethod={props.defaultMethod}
@@ -93,7 +95,7 @@ export function WhatsappProDialogView(props: WhatsappProDialogViewProps) {
                         )}
                         {screen.kind === 'link' && (
                             <>
-                                <AppPageHeader slug="whatsapp" title="Link the phone" hint="WhatsApp adds Rerun as a linked device" backLabel="Cancel the link" onBack={props.onBack} />
+                                <AppPageHeader slug="whatsapp" title={t('link.title')} hint={t('link.hint')} backLabel={t('link.cancel')} onBack={props.onBack} />
                                 <WhatsappLinkScreen
                                     method={screen.method}
                                     phoneNumber={screen.phoneNumber}

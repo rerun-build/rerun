@@ -6,6 +6,7 @@ import { AccountsScreen, AccountsSkeleton, AppIcon, AppPageHeader, IntroScreen, 
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { PanelSteps } from '@/components/ui/panel-steps'
+import { useTranslations } from 'next-intl'
 
 export type LinkedinProScreen =
     | { kind: 'accounts' }
@@ -38,6 +39,7 @@ export type LinkedinProDialogViewProps = {
 }
 
 export function LinkedinProDialogView(props: LinkedinProDialogViewProps) {
+    const t = useTranslations('dialogs.linkedinPro')
     const { open, onOpenChange, overview, screen, pending, error } = props
     const intro = screen.kind === 'accounts' && overview !== null && overview.connections.length === 0
 
@@ -49,13 +51,13 @@ export function LinkedinProDialogView(props: LinkedinProDialogViewProps) {
                         <AppIcon slug="linkedin" size="md" />
                         <div className="min-w-0 space-y-0.5">
                             <DialogTitle>LinkedIn Pro</DialogTitle>
-                            <DialogDescription>The LinkedIn accounts your coworkers act with.</DialogDescription>
+                            <DialogDescription>{t('description')}</DialogDescription>
                         </div>
                     </DialogHeader>
                 ) : (
                     <DialogHeader className="sr-only">
                         <DialogTitle>LinkedIn Pro</DialogTitle>
-                        <DialogDescription>Connect the LinkedIn account your coworkers act with.</DialogDescription>
+                        <DialogDescription>{t('connectDescription')}</DialogDescription>
                     </DialogHeader>
                 )}
 
@@ -75,13 +77,13 @@ export function LinkedinProDialogView(props: LinkedinProDialogViewProps) {
                         )}
                         {screen.kind === 'connect' && (
                             <>
-                                <AppPageHeader slug="linkedin" title={screen.reconnect ? 'Reconnect LinkedIn' : 'Connect LinkedIn'} hint={connectHint(overview, screen.reconnect?.label)} backLabel="Back to LinkedIn Pro" onBack={props.onBack} />
+                                <AppPageHeader slug="linkedin" title={screen.reconnect ? t('connect.reconnectTitle') : t('connect.title')} hint={connectHint(overview, screen.reconnect?.label)} backLabel={t('connect.back')} onBack={props.onBack} />
                                 <ConnectScreen defaultCountry={props.defaultCountry} initialMethod={props.initialSignIn} pending={pending === 'connect'} error={error} onSubmit={props.onSubmitCredentials} />
                             </>
                         )}
                         {screen.kind === 'checkpoint' && (
                             <>
-                                <AppPageHeader slug="linkedin" title="Confirm it is you" hint="LinkedIn asks for a second step" backLabel="Cancel the sign-in" onBack={props.onBack} />
+                                <AppPageHeader slug="linkedin" title={t('checkpoint.title')} hint={t('checkpoint.hint')} backLabel={t('checkpoint.cancel')} onBack={props.onBack} />
                                 <CheckpointScreen
                                     checkpointType={screen.checkpointType}
                                     sentTo={screen.sentTo}

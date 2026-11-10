@@ -7,7 +7,7 @@ import { TriggerEditor } from '@/components/agent/TriggerEditor'
 import { Button } from '@/components/ui/button'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { EmptyState } from '@/components/ui/empty-state'
 import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel-list'
 import { PanelRow } from '@/components/ui/panel-row'
@@ -17,6 +17,7 @@ import { Badge } from '@rerun/ui/primitives'
 import type { EngineRun, EngineTrigger } from '@/lib/engine/types'
 import { PauseIcon, PlusIcon, WebhookIcon } from '@/lib/icons'
 import { outcomeKey, type TaskOutcome } from '@/lib/schedules/outcomes'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 type AgentPanelTriggersProps = {
@@ -26,12 +27,10 @@ type AgentPanelTriggersProps = {
 
 type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string } | { mode: 'runs'; slug: string }
 
-function triggerSummary(t: EngineTrigger): string {
-    const calls = t.fireCount === 1 ? '1 call' : `${t.fireCount} calls`
-    return `${t.methods.join('/')} · ${calls}`
-}
 
 export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTriggersProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentPanelTriggers')
     const [triggers, setTriggers] = useState<EngineTrigger[]>([])
     const [outcomes, setOutcomes] = useState<Record<string, TaskOutcome>>({})
     const [loading, setLoading] = useState(true)
@@ -88,7 +87,7 @@ export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTrigger
     if (view.mode === 'runs') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <TriggerRuns agentId={agentId} trigger={triggers.find(t => t.slug === view.slug)} slug={view.slug} onBack={() => setView({ mode: 'edit', slug: view.slug })} onOpenSession={onOpenSession} />
+                <TriggerRuns agentId={agentId} trigger={triggers.find(trigger => trigger.slug === view.slug)} slug={view.slug} onBack={() => setView({ mode: 'edit', slug: view.slug })} onOpenSession={onOpenSession} />
             </PanelSteps>
         )
     }
@@ -102,9 +101,9 @@ export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTrigger
     }
 
     const newButton = (
-        <TooltipDisabledReason reason={canManage ? undefined : BOX_MANAGE_REASON}>
+        <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
-                <PlusIcon className="size-3.5 mr-1" /> New
+                <PlusIcon className="size-3.5 mr-1" /> {t('new')}
             </Button>
         </TooltipDisabledReason>
     )
@@ -119,24 +118,24 @@ export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTrigger
                 {triggers.length === 0 ? (
                     <EmptyState
                         icon={WebhookIcon}
-                        title="No triggers yet"
-                        description="A trigger gives your coworker a public URL. Whenever another service calls it, the coworker runs with the payload it received."
+                        title={t('emptyTitle')}
+                        description={t('emptyDescription')}
                         action={newButton}
                     />
                 ) : (
                     <PanelScroller>
                         <PanelList>
-                            {triggers.map(t => (
+                            {triggers.map(trigger => (
                                 <PanelRow
-                                    key={t.slug}
-                                    onClick={() => setView({ mode: 'edit', slug: t.slug })}
-                                    title={t.name}
-                                    description={triggerSummary(t)}
-                                    footer={<TaskOutcomeFooter outcome={outcomes[outcomeKey('trigger', t.slug)]} lastStartedAt={t.lastFiredAt} />}
+                                    key={trigger.slug}
+                                    onClick={() => setView({ mode: 'edit', slug: trigger.slug })}
+                                    title={trigger.name}
+                                    description={t('summary', { methods: trigger.methods.join('/'), count: trigger.fireCount })}
+                                    footer={<TaskOutcomeFooter outcome={outcomes[outcomeKey('trigger', trigger.slug)]} lastStartedAt={trigger.lastFiredAt} />}
                                     meta={
-                                        !t.enabled && (
+                                        !trigger.enabled && (
                                             <Badge size="xs" tone="neutral" glow={false} leading={<PauseIcon className="size-3" />}>
-                                                paused
+                                                {t('paused')}
                                             </Badge>
                                         )
                                     }
@@ -151,11 +150,12 @@ export function AgentPanelTriggers({ agentId, onOpenSession }: AgentPanelTrigger
 }
 
 function TriggerRuns({ agentId, trigger, slug, onBack, onOpenSession }: { agentId: string; trigger?: EngineTrigger; slug: string; onBack: () => void; onOpenSession: (sessionId: string, title: string, runId: string | null) => void }) {
+    const t = useTranslations('agent.agentPanelTriggers')
     const loadRuns = useCallback(() => listTriggerRunsAction(agentId, slug), [agentId, slug])
     const title = trigger?.name ?? slug
     const openRun = useCallback(async (run: EngineRun) => {
         const sessionId = await adoptRunSession(agentId, run.sessionId, title)
         onOpenSession(sessionId, title, run.status === 'running' ? run.id : null)
     }, [agentId, title, onOpenSession])
-    return <RunHistoryList title={title} loadRuns={loadRuns} emptyIcon={WebhookIcon} emptyLabel="Never called yet" onBack={onBack} onSelectRun={openRun} />
+    return <RunHistoryList title={title} loadRuns={loadRuns} emptyIcon={WebhookIcon} emptyLabel={t('neverCalled')} onBack={onBack} onSelectRun={openRun} />
 }

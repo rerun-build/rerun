@@ -8,6 +8,8 @@ import { CHROME_SIZE, ChromePill } from '../chrome/ChromeSurface'
 import { cn } from '../cn'
 import { BellIcon, CheckCheckIcon, InboxIcon, Loader2Icon } from '../icons'
 import { Button, Chip, EmptyState, useScrollFade } from '../primitives'
+import { useKitTranslations, useUiLocale } from '../locale'
+import type { KitTranslator } from '../kit-translator'
 import { shortRelativeTime } from '../time'
 import { TooltipDisabledReason, TooltipLabeled } from '../Tooltip'
 import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
@@ -36,23 +38,21 @@ export type InboxAnnouncement = {
     loud: boolean
 }
 
-type InboxSection = { title: string; statuses: string[] }
+type InboxSection = { key: 'needsYou' | 'headsUps' | 'errors' | 'done'; statuses: string[] }
 
 const SECTIONS: InboxSection[] = [
-    { title: 'Needs you', statuses: ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human'] },
-    { title: 'Heads-ups', statuses: ['awaiting_ack'] },
-    { title: 'Errors', statuses: ['error'] },
-    { title: 'Done', statuses: ['done'] },
+    { key: 'needsYou', statuses: ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human'] },
+    { key: 'headsUps', statuses: ['awaiting_ack'] },
+    { key: 'errors', statuses: ['error'] },
+    { key: 'done', statuses: ['done'] },
 ]
 
-const STATUS_SENTENCE: Record<string, string> = {
-    awaiting_question: 'asked you a question',
-    awaiting_approval: 'needs your approval',
-    awaiting_connector: 'needs an app connected',
-    waiting_human: 'is waiting on you',
-    awaiting_ack: 'flagged something for you',
-    error: 'hit an error',
-    done: 'finished its run',
+const SENTENCE_STATUSES = ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human', 'awaiting_ack', 'error', 'done'] as const
+type SentenceStatus = (typeof SENTENCE_STATUSES)[number]
+
+function statusSentence(item: InboxEntry, t: KitTranslator): string {
+    const status: SentenceStatus = (SENTENCE_STATUSES as readonly string[]).includes(item.status) ? (item.status as SentenceStatus) : 'waiting_human'
+    return t(`inbox.sentences.${status}`, { agent: item.agentName })
 }
 
 const PILL_STACK_SIZE = 3
@@ -121,7 +121,7 @@ export function InboxSurface<T extends InboxEntry>({
     onMarkAllRead,
     onOpenSettings,
     showSettings = true,
-    settingsDisabledReason = 'Preferences are not available here',
+    settingsDisabledReason,
     pulse = 0,
     keepOpen = false,
     resizable = true,
@@ -136,6 +136,7 @@ export function InboxSurface<T extends InboxEntry>({
     detail = null,
     detailClassName = 'w-[calc(100vw-2rem)] sm:w-[340px]',
 }: InboxSurfaceProps<T>) {
+    const t = useKitTranslations()
     const reducedMotion = useReducedMotion()
     const cardId = useId()
     const rootRef = useRef<HTMLDivElement>(null)
@@ -204,7 +205,7 @@ export function InboxSurface<T extends InboxEntry>({
         () => SECTIONS.map(section => ({ ...section, items: items.filter(i => section.statuses.includes(i.status)) })).filter(section => section.items.length > 0),
         [items]
     )
-    const sectionKey = sections.map(section => section.title).join(',')
+    const sectionKey = sections.map(section => section.key).join(',')
 
     // A short last section can never reach the top of the list: once scrolled to the bottom, it is the one shown.
     useEffect(() => {
@@ -221,7 +222,7 @@ export function InboxSurface<T extends InboxEntry>({
         return () => listEl.removeEventListener('scroll', onScroll)
     }, [listEl, sectionKey])
 
-    const shownSection = sections.some(section => section.title === activeSection) ? activeSection : (sections[0]?.title ?? null)
+    const shownSection = sections.some(section => section.key === activeSection) ? activeSection : (sections[0]?.key ?? null)
 
     const jumpToSection = (title: string) => {
         const node = listEl?.querySelector<HTMLElement>(`[data-section="${title}"]`)
@@ -312,7 +313,7 @@ export function InboxSurface<T extends InboxEntry>({
                 end="icon"
                 aria-expanded={open}
                 aria-controls={cardId}
-                aria-label={items.length > 0 ? `Notifications: ${pillSummary(items)}` : 'Notifications: no updates'}
+                aria-label={items.length > 0 ? t('inbox.pillLabel', { summary: pillSummary(items, t) }) : t('inbox.pillLabelEmpty')}
                 onClick={togglePill}
                 className={cn('sm:pr-[15px]', (cardOpen || cardMounted) && 'invisible')}
             >
@@ -335,7 +336,7 @@ export function InboxSurface<T extends InboxEntry>({
                     <motion.div
                         id={cardId}
                         role="region"
-                        aria-label="Notifications"
+                        aria-label={t('inbox.title')}
                         initial={folded}
                         animate={{ width: 'auto', height: 'auto', borderRadius: 14 }}
                         exit={folded}
@@ -356,7 +357,7 @@ export function InboxSurface<T extends InboxEntry>({
                                 {resizable && (
                                     <button
                                         type="button"
-                                        aria-label="Resize notifications"
+                                        aria-label={t('inbox.resize')}
                                         onPointerDown={onHandlePointerDown}
                                         onPointerMove={onHandlePointerMove}
                                         onPointerUp={onHandlePointerUp}
@@ -370,28 +371,28 @@ export function InboxSurface<T extends InboxEntry>({
                                 )}
 
                                 <div className={cn('flex items-center justify-between gap-3 px-4 pb-2', resizable ? 'pt-5' : 'pt-4')}>
-                                    <h2 className="text-base font-semibold text-foreground">Notifications</h2>
+                                    <h2 className="text-base font-semibold text-foreground">{t('inbox.title')}</h2>
                                     <div className="flex items-center gap-1.5">
                                         {!showSettings ? null : onOpenSettings ? (
                                             <Button size="sm" variant="ghost" onClick={onOpenSettings}>
-                                                Preferences
+                                                {t('inbox.preferences')}
                                             </Button>
                                         ) : (
-                                            <TooltipDisabledReason reason={settingsDisabledReason}>
+                                            <TooltipDisabledReason reason={settingsDisabledReason ?? t('inbox.preferencesUnavailable')}>
                                                 <Button size="sm" variant="ghost" disabled>
-                                                    Preferences
+                                                    {t('inbox.preferences')}
                                                 </Button>
                                             </TooltipDisabledReason>
                                         )}
                                         {items.length === 0 ? (
-                                            <TooltipDisabledReason reason="Nothing to mark as read">
-                                                <Button size="icon-sm" variant="outline" aria-label="Mark all as read" disabled>
+                                            <TooltipDisabledReason reason={t('inbox.nothingToMark')}>
+                                                <Button size="icon-sm" variant="outline" aria-label={t('inbox.markAllRead')} disabled>
                                                     <CheckCheckIcon className="size-3.5" />
                                                 </Button>
                                             </TooltipDisabledReason>
                                         ) : (
-                                            <TooltipLabeled label="Mark all as read">
-                                                <Button size="icon-sm" variant="outline" aria-label="Mark all as read" onClick={onMarkAllRead}>
+                                            <TooltipLabeled label={t('inbox.markAllRead')}>
+                                                <Button size="icon-sm" variant="outline" aria-label={t('inbox.markAllRead')} onClick={onMarkAllRead}>
                                                     <CheckCheckIcon className="size-3.5" />
                                                 </Button>
                                             </TooltipLabeled>
@@ -402,8 +403,8 @@ export function InboxSurface<T extends InboxEntry>({
                                 {sections.length > 1 && (
                                     <div className="flex flex-wrap gap-1.5 px-4 pb-2">
                                         {sections.map(section => (
-                                            <Chip key={section.title} selected={section.title === shownSection} onClick={() => jumpToSection(section.title)}>
-                                                {section.title} <span className="ml-0.5 tabular-nums opacity-60">{section.items.reduce((sum, item) => sum + (item.count ?? 1), 0)}</span>
+                                            <Chip key={section.key} selected={section.key === shownSection} onClick={() => jumpToSection(section.key)}>
+                                                {t(`inbox.sections.${section.key}`)} <span className="ml-0.5 tabular-nums opacity-60">{section.items.reduce((sum, item) => sum + (item.count ?? 1), 0)}</span>
                                             </Chip>
                                         ))}
                                     </div>
@@ -418,11 +419,11 @@ export function InboxSurface<T extends InboxEntry>({
                                 >
                                     <div>
                                         {sections.length === 0 ? (
-                                            <EmptyState icon={InboxIcon} title="Nothing to handle" description="When a coworker needs you or finishes a task, it lands here." className="py-8" />
+                                            <EmptyState icon={InboxIcon} title={t('inbox.empty.title')} description={t('inbox.empty.description')} className="py-8" />
                                         ) : (
                                             sections.map(section => (
-                                                <section key={section.title} data-section={section.title} className="flex flex-col">
-                                                    <h3 className="px-2 pt-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{section.title}</h3>
+                                                <section key={section.key} data-section={section.key} className="flex flex-col">
+                                                    <h3 className="px-2 pt-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{t(`inbox.sections.${section.key}`)}</h3>
                                                     {section.items.map(item => (
                                                         <InboxRow key={item.id} item={item} onOpen={onOpenItem} onMarkRead={onMarkRead} reason={rowReason?.(item)} Menu={RowMenu} onMenuOpenChange={onRowMenuOpenChange} />
                                                     ))}
@@ -433,7 +434,7 @@ export function InboxSurface<T extends InboxEntry>({
                                 </div>
                             </motion.div>
 
-                            <button type="button" aria-label="Close notifications" onClick={closeToPill} className="flex h-[calc(var(--chrome-size)-2px)] shrink-0 items-center pr-[15px] pl-[11px] transition-colors hover:bg-accent">
+                            <button type="button" aria-label={t('inbox.close')} onClick={closeToPill} className="flex h-[calc(var(--chrome-size)-2px)] shrink-0 items-center pr-[15px] pl-[11px] transition-colors hover:bg-accent">
                                 <InboxPillContent items={items} />
                             </button>
                         </div>
@@ -447,6 +448,8 @@ export function InboxSurface<T extends InboxEntry>({
 }
 
 function AnnouncementLine({ announcement, animated }: { announcement: InboxAnnouncement; animated: boolean }) {
+    const locale = useUiLocale()
+    const t = useKitTranslations()
     const { item, bundled, loud } = announcement
     if (bundled > 1) {
         return (
@@ -458,14 +461,11 @@ function AnnouncementLine({ announcement, animated }: { announcement: InboxAnnou
                         <span className="relative size-2 rounded-full bg-red-500 ring-2 ring-card" />
                     </span>
                 </span>
-                <span>
-                    <span className="font-semibold tabular-nums">{bundled}</span> new updates
-                </span>
+                <span>{t.rich('inbox.newUpdates', { count: bundled, b: chunks => <span className="font-semibold tabular-nums">{chunks}</span> })}</span>
             </span>
         )
     }
     const meta = ATTENTION_STATUS_META[item.status] ?? ATTENTION_STATUS_META.waiting_human
-    const sentence = STATUS_SENTENCE[item.status] ?? STATUS_SENTENCE.waiting_human
     return (
         <>
             {loud && <BorderBeam pattern="arcs" tone={meta.beam} animated={animated} glow width={1} duration={4} />}
@@ -474,9 +474,9 @@ function AnnouncementLine({ announcement, animated }: { announcement: InboxAnnou
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <span className="flex items-baseline justify-between gap-2">
                         <span className="truncate text-xs text-muted-foreground">{item.title ? `${item.agentName} · ${item.title}` : item.agentName}</span>
-                        {item.updatedAt && <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{shortRelativeTime(item.updatedAt)}</span>}
+                        {item.updatedAt && <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{shortRelativeTime(item.updatedAt, locale)}</span>}
                     </span>
-                    <span className="truncate text-sm font-medium text-foreground">{item.message ?? `${item.agentName} ${sentence}`}</span>
+                    <span className="truncate text-sm font-medium text-foreground">{item.message ?? statusSentence(item, t)}</span>
                 </span>
             </span>
         </>
@@ -484,12 +484,13 @@ function AnnouncementLine({ announcement, animated }: { announcement: InboxAnnou
 }
 
 function RunningLine({ agentIds }: { agentIds: string[] }) {
+    const t = useKitTranslations()
     const stack = [...new Set(agentIds)].slice(0, PILL_STACK_SIZE)
     return (
         <div className="mx-3 mb-1 flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
             <Loader2Icon className="size-3.5 shrink-0" />
             <span className="min-w-0 flex-1 truncate">
-                <span className="tabular-nums">{agentIds.length}</span> task{agentIds.length === 1 ? '' : 's'} running
+                {t.rich('inbox.running', { count: agentIds.length, n: chunks => <span className="tabular-nums">{chunks}</span> })}
             </span>
             <span aria-hidden className="flex shrink-0 -space-x-1.5">
                 {stack.map(agentId => (
@@ -502,14 +503,15 @@ function RunningLine({ agentIds }: { agentIds: string[] }) {
 
 const doneCountOf = (items: InboxEntry[]) => items.reduce((sum, item) => sum + (item.status === 'done' ? (item.count ?? 1) : 0), 0)
 
-function pillSummary(items: InboxEntry[]): string {
+function pillSummary(items: InboxEntry[], t: KitTranslator): string {
     const needs = items.filter(item => item.status !== 'done').length
     const done = doneCountOf(items)
-    return [needs > 0 && `${needs} need${needs === 1 ? 's' : ''} you`, done > 0 && `${done} done`].filter(Boolean).join(' · ')
+    return [needs > 0 && t('inbox.needsYouCount', { count: needs }), done > 0 && t('inbox.doneCount', { count: done })].filter(Boolean).join(' · ')
 }
 
 // `compact` keeps only the bell below `sm`: the full summary crowds the bottom bar on a phone.
 function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; compact?: boolean }) {
+    const t = useKitTranslations()
     const stack = [...new Set(items.map(item => item.agentId).filter(Boolean))].slice(0, PILL_STACK_SIZE)
     return (
         <span className="relative flex items-center gap-2 text-sm font-medium text-foreground">
@@ -528,7 +530,7 @@ function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; com
                 {items.length > 0 ? (
                     <PillCounts items={items} />
                 ) : (
-                    <span className="text-muted-foreground">No updates</span>
+                    <span className="text-muted-foreground">{t('inbox.noUpdates')}</span>
                 )}
             </span>
         </span>
@@ -536,20 +538,18 @@ function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; com
 }
 
 function PillCounts({ items }: { items: InboxEntry[] }) {
+    const t = useKitTranslations()
+    const bold = (chunks: ReactNode) => <span className="font-semibold tabular-nums">{chunks}</span>
     const needs = items.filter(item => item.status !== 'done').length
     const done = doneCountOf(items)
     return (
         <span className="flex items-center gap-1.5">
             {needs > 0 && (
-                <span>
-                    <span className="font-semibold tabular-nums">{needs}</span> need{needs === 1 ? 's' : ''} you
-                </span>
+                <span>{t.rich('inbox.needsYouRich', { count: needs, b: bold })}</span>
             )}
             {needs > 0 && done > 0 && <span className="text-muted-foreground">·</span>}
             {done > 0 && (
-                <span className="text-emerald-500">
-                    <span className="font-semibold tabular-nums">{done}</span> done
-                </span>
+                <span className="text-emerald-500">{t.rich('inbox.doneRich', { count: done, b: bold })}</span>
             )}
         </span>
     )
@@ -563,8 +563,9 @@ type InboxRowProps<T extends InboxEntry> = { item: T; onOpen: (item: T) => void;
 
 // `memo` drops the type parameter: the cast gives it back, so a row hands its caller the item type it was given.
 export const InboxRow = memo(function InboxRow({ item, onOpen, onMarkRead, reason, Menu, onMenuOpenChange = noop }: InboxRowProps<InboxEntry>) {
+    const locale = useUiLocale()
+    const t = useKitTranslations()
     const meta = ATTENTION_STATUS_META[item.status] ?? ATTENTION_STATUS_META.waiting_human
-    const sentence = STATUS_SENTENCE[item.status] ?? STATUS_SENTENCE.waiting_human
     // A Radix tooltip per row made opening the card slow. The button only shows on hover or focus
     // anyway, so its tooltip is mounted the first time the row gets either.
     // Arming swaps the button for a new one: if it held the keyboard focus, the new one takes it back.
@@ -606,17 +607,17 @@ export const InboxRow = memo(function InboxRow({ item, onOpen, onMarkRead, reaso
                     <span title={item.message ?? undefined} className="truncate text-sm font-medium text-foreground">
                         {item.message ?? item.title}
                     </span>
-                    {item.updatedAt && <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{shortRelativeTime(item.updatedAt)}</span>}
+                    {item.updatedAt && <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">{shortRelativeTime(item.updatedAt, locale)}</span>}
                 </div>
                 <span className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
-                    <span className="truncate">{item.message ? `${item.agentName} · ${item.title}` : `${item.agentName} ${sentence}`}</span>
+                    <span className="truncate">{item.message ? `${item.agentName} · ${item.title}` : statusSentence(item, t)}</span>
                     {(item.count ?? 1) > 1 && <span className="shrink-0 tabular-nums">×{item.count}</span>}
                 </span>
                 {reason && <span className="truncate text-[11px] text-muted-foreground/80">{reason}</span>}
             </div>
             <RevealOnHover>
                 {tooltipArmed ? (
-                    <TooltipLabeled label="Mark as read">
+                    <TooltipLabeled label={t('inbox.markRead')}>
                         <MarkReadButton ref={markReadRef} onMarkRead={() => onMarkRead(item)} />
                     </TooltipLabeled>
                 ) : (
@@ -635,12 +636,13 @@ export const InboxRow = memo(function InboxRow({ item, onOpen, onMarkRead, reaso
 
 // Spreads what the tooltip trigger slots onto it (ref, data-state, pointer handlers) and keeps its own click.
 function MarkReadButton({ onMarkRead, onClick, onKeyDown, ...props }: { onMarkRead: () => void } & ComponentProps<typeof Button>) {
+    const t = useKitTranslations()
     return (
         <Button
             {...props}
             size="icon-sm"
             variant="outline"
-            aria-label="Mark as read"
+            aria-label={t('inbox.markRead')}
             onClick={event => {
                 event.stopPropagation()
                 onClick?.(event)

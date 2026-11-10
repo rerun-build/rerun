@@ -1,6 +1,7 @@
 'use client'
 
 import { Badge, PANEL_CARD } from '@rerun/ui/primitives'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { getServiceDetailsAction } from '@/app/api/_actions/services.actions'
@@ -15,15 +16,16 @@ import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 
 export function NotificationCard({ message }: { message: string }) {
+    const t = useTranslations('chat.setupEvents')
     return (
         <div className={cn(PANEL_CARD, 'flex items-start gap-3 px-3 py-2.5')}>
             <Icon icon={BellIcon} size="sm" />
             <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">Sent you a notification</p>
+                <p className="text-xs text-muted-foreground">{t('notificationSent')}</p>
                 <p className="mt-0.5 text-sm whitespace-pre-wrap text-foreground">{message}</p>
             </div>
             <Badge size="xs" tone="neutral" glow={false} className="mt-0.5">
-                Read
+                {t('read')}
             </Badge>
         </div>
     )
@@ -31,13 +33,14 @@ export function NotificationCard({ message }: { message: string }) {
 
 // `schedules` and `triggers` are the slugs the install switched on.
 export function SetupCompleteCard({ agentId, summary, schedules, triggers }: { agentId?: string; summary: string; schedules: string[]; triggers: string[] }) {
+    const t = useTranslations('chat.setupEvents')
     const agentName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name)
-    const activated = [schedules.length > 0 && `${schedules.length} schedule${schedules.length > 1 ? 's' : ''} on`, triggers.length > 0 && `${triggers.length} trigger${triggers.length > 1 ? 's' : ''} on`].filter((label): label is string => Boolean(label))
+    const activated = [schedules.length > 0 && t('schedulesOn', { count: schedules.length }), triggers.length > 0 && t('triggersOn', { count: triggers.length })].filter((label): label is string => Boolean(label))
     return (
         <div className={cn(PANEL_CARD, 'flex flex-col gap-2 px-3 py-3')}>
             <div className="flex items-center gap-2 text-xs">
                 <CheckCircle2Icon className="size-3.5 text-emerald-500" />
-                <span className="font-medium text-foreground">{agentName ? `${agentName} is set up` : 'Setup complete'}</span>
+                <span className="font-medium text-foreground">{agentName ? t('setUp', { name: agentName }) : t('setupComplete')}</span>
             </div>
             {summary && <p className="text-sm text-foreground/90">{summary}</p>}
             {activated.length > 0 && (
@@ -56,6 +59,7 @@ export function SetupCompleteCard({ agentId, summary, schedules, triggers }: { a
 // The tool output is frozen at the time of the call, so whether the sign-in is still owed is asked
 // again: an old card in the history must not keep offering a connection made since.
 export function NeedsAuthCard({ agentId, slug, name }: { agentId?: string; slug: string; name: string }) {
+    const t = useTranslations('chat')
     const { resolved } = useCatalogServices([slug])
     const icon = resolved.get(slug)?.icon
     const [details, setDetails] = useState<ServiceDetails | null>(null)
@@ -81,18 +85,18 @@ export function NeedsAuthCard({ agentId, slug, name }: { agentId?: string; slug:
             <div className="flex items-center gap-3">
                 {icon ? <Icon src={icon} size="sm" /> : <Icon icon={LinkIcon} size="sm" />}
                 <div className="min-w-0 flex-1">
-                    <p className="text-sm text-foreground">{name} added</p>
-                    <p className="text-xs text-muted-foreground">{done ? 'Connected, the coworker can use it' : 'Sign in once so the coworker can use it'}</p>
+                    <p className="text-sm text-foreground">{t('mcpServer.added', { name })}</p>
+                    <p className="text-xs text-muted-foreground">{done ? t('setupEvents.connectedHint') : t('setupEvents.signInHint')}</p>
                 </div>
                 {done && (
                     <Badge size="xs" tone="green" glow={false}>
-                        Connected
+                        {t('setupEvents.connected')}
                     </Badge>
                 )}
                 {pending && !connecting && (
                     <Button size="sm" variant="outline" onClick={() => setConnecting(true)}>
                         <LogInIcon />
-                        Sign in
+                        {t('setupEvents.signIn')}
                     </Button>
                 )}
             </div>

@@ -7,6 +7,7 @@ import { stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { AppError } from '@/lib/i18n/action-error'
 
 // The creator half of the marketplace. Rerun takes the charge and transfers the creator's share
 // afterwards, so the connected account never does anything but receive money.
@@ -149,7 +150,7 @@ export async function createCreatorOnboardingLink(userId: string): Promise<strin
 // rather than in the caller.
 export async function createCreatorDashboardLink(userId: string): Promise<string> {
     const account = await getCreatorAccountState(userId)
-    if (!account.stripeAccountId || !account.detailsSubmitted) throw new Error('Finish your Stripe setup first.')
+    if (!account.stripeAccountId || !account.detailsSubmitted) throw new AppError('finishStripeSetup')
 
     const link = await stripe.accounts.createLoginLink(account.stripeAccountId)
     return link.url
@@ -208,11 +209,11 @@ export async function markCreatorAccountDeauthorized(accountId: string | undefin
 // The gate every paid checkout goes through. The message says nothing about the creator's account:
 // it is the buyer who reads it.
 export async function requirePayoutReadyAccount(creatorId: string | null): Promise<string> {
-    if (!creatorId) throw new Error('This template is not available for purchase right now.')
+    if (!creatorId) throw new AppError('templateNotPurchasableNow')
 
     const account = await getCreatorAccountState(creatorId)
     if (!account.stripeAccountId || !account.payoutsEnabled) {
-        throw new Error('This template is not available for purchase right now.')
+        throw new AppError('templateNotPurchasableNow')
     }
     return account.stripeAccountId
 }

@@ -1,6 +1,9 @@
 import type { AgentConversationsOverview, AgentStatus, BoardAgent, Box } from '@rerun/contracts'
 
 import type { StatusLine } from '@/components/ui/status'
+import { translatorFor } from '@/i18n/translator'
+
+export type HomeTranslator = ReturnType<typeof translatorFor<'mobileHome'>>
 
 export type HomeCoworker = {
     id: string
@@ -16,9 +19,6 @@ export type HomeCoworker = {
 }
 
 export type SectionKey = 'needs' | 'working' | 'coworkers'
-
-// Same label as the web for a Box nobody named.
-export const UNNAMED_BOX_LABEL = 'Untitled Box'
 
 export type HomeSection = { key: string; label: string; members: HomeCoworker[] }
 
@@ -41,14 +41,17 @@ export function sectionOf(coworker: HomeCoworker): SectionKey {
 export const moodStatus = (coworker: HomeCoworker): AgentStatus => (coworker.paused ? 'offline' : coworker.status)
 
 // The one line under a coworker's name: what it needs from you, what it is doing, or where it left off.
-export function lineOf(coworker: HomeCoworker): StatusLine {
+export function lineOf(coworker: HomeCoworker, t: HomeTranslator = translatorFor('mobileHome')): StatusLine {
     const title = coworker.latest?.title?.trim()
     const about = coworker.description?.trim() ?? ''
-    if (coworker.paused) return { text: 'Paused', tone: 'muted' }
-    if (coworker.status === 'waiting_human') return { text: title || 'Waiting for you', tone: 'waiting' }
-    if (coworker.status === 'error') return { text: 'Something went wrong', tone: 'destructive' }
-    if (coworker.status === 'working') return { text: ['Working', title || about].filter(Boolean).join(' · '), tone: 'muted' }
-    if (coworker.status === 'offline') return { text: ['Asleep', about].filter(Boolean).join(' · '), tone: 'muted' }
+    if (coworker.paused) return { text: t('line.paused'), tone: 'muted' }
+    if (coworker.status === 'waiting_human') return { text: title || t('line.waiting'), tone: 'waiting' }
+    if (coworker.status === 'error') return { text: t('line.error'), tone: 'destructive' }
+    if (coworker.status === 'working') {
+        const detail = title || about
+        return { text: detail ? t('line.workingOn', { detail }) : t('line.working'), tone: 'muted' }
+    }
+    if (coworker.status === 'offline') return { text: about ? t('line.asleepAbout', { about }) : t('line.asleep'), tone: 'muted' }
     return { text: title || about, tone: 'muted' }
 }
 
@@ -69,9 +72,9 @@ export function recentCoworkers(coworkers: HomeCoworker[]): HomeCoworker[] {
 
 // The coworkers by Box, in the order the Boxes were made, as on the web board. A Box without a
 // coworker left is left out.
-export function sectionsByBox(coworkers: HomeCoworker[], boxes: Box[]): HomeSection[] {
+export function sectionsByBox(coworkers: HomeCoworker[], boxes: Box[], unnamedLabel: string): HomeSection[] {
     const ordered = [...coworkers].sort(byRecency)
-    return boxes.map(box => ({ key: box.id, label: box.name?.trim() || UNNAMED_BOX_LABEL, members: ordered.filter(coworker => coworker.spaceId === box.id) })).filter(section => section.members.length > 0)
+    return boxes.map(box => ({ key: box.id, label: box.name?.trim() || unnamedLabel, members: ordered.filter(coworker => coworker.spaceId === box.id) })).filter(section => section.members.length > 0)
 }
 
 // The coworkers pinned on this phone, in the order they were arranged, and everyone else. A pin of a

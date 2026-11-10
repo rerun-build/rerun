@@ -5,6 +5,7 @@ import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useSheetResize } from '@/components/layout/useSheetResize'
 import { SIDE_PANEL_DEFAULT_WIDTH, loadSidePanelSheetDetent, rememberSidePanelSheetDetent } from '@/lib/side-panel-width'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 import { type ComponentProps, type CSSProperties, type ReactNode, useRef } from 'react'
 
 /**
@@ -32,6 +33,7 @@ export function SidePanel({
     children: ReactNode
 }) {
     const panelRef = useRef<HTMLDivElement>(null)
+    const t = useTranslations('layout.sidePanel')
     const { onPointerDown, toggleDetent } = useSheetResize({
         panelRef,
         dragVar: '--side-sheet-drag-h',
@@ -58,7 +60,7 @@ export function SidePanel({
             <button
                 type="button"
                 data-sheet-grabber
-                aria-label="Resize panel"
+                aria-label={t('resize')}
                 onPointerDown={onPointerDown}
                 onClick={toggleDetent}
                 className="absolute top-0 left-1/2 z-10 flex h-4 w-12 -translate-x-1/2 touch-none justify-center pt-1.5 outline-none focus-visible:[&>span]:bg-ring md:hidden"

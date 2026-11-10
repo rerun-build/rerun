@@ -4,6 +4,7 @@ import { SymbolView } from 'expo-symbols'
 import { Highlight, themes } from 'prism-react-renderer'
 import { useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { HorizontalScroll } from '@/components/chat/HorizontalScroll'
 import { AppText } from '@/components/ui/AppText'
@@ -14,6 +15,7 @@ const COPIED_FOR_MS = 2000
 
 function CopyButton({ text, disabled }: { text: string; disabled?: boolean }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.markdown')
     const [copied, setCopied] = useState(false)
     useEffect(() => {
         if (!copied) return
@@ -29,13 +31,13 @@ function CopyButton({ text, disabled }: { text: string; disabled?: boolean }) {
                 setCopied(true)
             }}
             accessibilityRole="button"
-            accessibilityLabel="Copy"
+            accessibilityLabel={t('copy')}
             hitSlop={8}
             style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.sm, height: 28, opacity: disabled ? 0.4 : pressed ? 0.5 : 1 })}
         >
             <SymbolView name={copied ? 'checkmark' : 'doc.on.doc'} size={13} weight="medium" tintColor={copied ? '#10b981' : theme.mutedForeground} />
             <AppText variant="caption" tone="muted">
-                {copied ? 'Copied' : 'Copy'}
+                {copied ? t('copied') : t('copy')}
             </AppText>
         </Pressable>
     )
@@ -60,10 +62,11 @@ function Frame({ label, copyText, incomplete, children }: { label: string; copyT
 
 export function CodeBlock({ code, language }: { code: string; language: string }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.markdown')
     const text = code.replace(/\n+$/, '')
     const prismTheme = theme.scheme === 'dark' ? themes.vsDark : themes.github
     return (
-        <Frame label={language || 'code'} copyText={text}>
+        <Frame label={language || t('code')} copyText={text}>
             <HorizontalScroll contentContainerStyle={{ padding: spacing.md }}>
                 <Highlight theme={prismTheme} code={text} language={language.toLowerCase()}>
                     {({ tokens, getTokenProps }) => (
@@ -96,9 +99,10 @@ export function CodeBlock({ code, language }: { code: string; language: string }
  */
 export function DraftBlock({ code, title }: { code: string; title: string }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.markdown')
     const text = code.replace(/\n+$/, '')
     return (
-        <Frame label={title || 'Draft'} copyText={text}>
+        <Frame label={title || t('draft')} copyText={text}>
             <Text selectable style={{ padding: spacing.lg, fontFamily: fonts.regular, fontSize: 15, lineHeight: 22, color: theme.foreground }}>
                 {text}
             </Text>

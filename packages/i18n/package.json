@@ -1,0 +1,23 @@
+{
+    "name": "@rerun/i18n",
+    "license": "AGPL-3.0-only",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": "./src/index.ts",
+        "./format": "./src/format.ts",
+        "./messages": "./src/messages.ts",
+        "./messages/en": "./src/english.ts",
+        "./messages/en/*": "./messages/en/*",
+        "./messages/*": "./messages/*",
+        "./pseudo": "./src/pseudo.ts"
+    },
+    "scripts": {
+        "ts-check": "tsc --noEmit"
+    },
+    "devDependencies": {
+        "typescript": "^5"
+    }
+}

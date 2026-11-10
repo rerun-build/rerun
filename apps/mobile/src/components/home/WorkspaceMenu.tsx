@@ -3,6 +3,7 @@ import type { WorkspaceSummary } from '@rerun/contracts'
 import { SymbolView } from 'expo-symbols'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { fetchWorkspaces } from '@/api/account'
 import { useAuth } from '@/auth/AuthProvider'
@@ -23,9 +24,10 @@ export function WorkspaceMenu() {
 
 export function WorkspaceSubmenu() {
     const { me, switchWorkspace } = useAuth()
+    const t = useTranslations('mobileHome')
     const workspaces = useWorkspaces()
     return (
-        <Menu label={workspaceLabel(me?.workspace)} systemImage="square.stack">
+        <Menu label={workspaceLabel(me?.workspace, t)} systemImage="square.stack">
             <WorkspaceToggles current={me?.workspace} workspaces={workspaces} onSwitch={switchWorkspace} />
         </Menu>
     )
@@ -57,16 +59,18 @@ type WorkspaceSwitchProps = { current: WorkspaceSummary | undefined; workspaces:
 
 export function WorkspaceMenuView({ current, workspaces, onSwitch }: WorkspaceSwitchProps) {
     const theme = useTheme()
+    const t = useTranslations('mobileHome')
+    const name = workspaceLabel(current, t)
 
     return (
         <NativeMenu
             glass="capsule"
-            label={`Workspace ${workspaceLabel(current)}`}
+            label={t('workspace.menuLabel', { name })}
             trigger={
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: GLASS_BUTTON_SIZE, maxWidth: 180, paddingLeft: spacing.sm, paddingRight: spacing.md }}>
                     <WorkspaceLogo workspace={current} size={GLASS_BUTTON_SIZE - 2 * spacing.sm} />
                     <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flexShrink: 1 }}>
-                        {workspaceLabel(current)}
+                        {name}
                     </AppText>
                     <SymbolView name="chevron.up.chevron.down" size={13} weight="medium" tintColor={theme.foreground} />
                 </View>
@@ -79,11 +83,12 @@ export function WorkspaceMenuView({ current, workspaces, onSwitch }: WorkspaceSw
 
 function WorkspaceToggles({ current, workspaces, onSwitch }: WorkspaceSwitchProps) {
     const logoFiles = useWorkspaceLogoFiles(workspaces)
+    const t = useTranslations('mobileHome')
     return workspaces.map(workspace => {
         const logoFile = logoFiles.get(workspace.id)
         return (
             <Toggle key={workspace.id} isOn={workspace.id === current?.id} onIsOnChange={() => onSwitch(workspace.id)}>
-                {logoFile ? <Label title={workspaceLabel(workspace)} icon={<Image uiImage={logoFile} />} /> : <Label title={workspaceLabel(workspace)} systemImage={initialSymbolOf(workspace)} />}
+                {logoFile ? <Label title={workspaceLabel(workspace, t)} icon={<Image uiImage={logoFile} />} /> : <Label title={workspaceLabel(workspace, t)} systemImage={initialSymbolOf(workspace)} />}
             </Toggle>
         )
     })

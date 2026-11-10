@@ -1,6 +1,7 @@
 'use client'
 
-import { AGENT_TAB_LABELS } from '@/lib/board/types'
+import { useTranslations } from 'next-intl'
+
 import { useBoardStore } from '@/stores/board.store'
 
 import type { AgentPick } from './agent-picks'
@@ -20,12 +21,13 @@ export function openAgentPick({ agentId, tab, conversationId, runId }: AgentPick
 // Names are read off the live board rather than the model's arguments: the card cannot print an
 // agent the model made up, and one deleted since simply drops out.
 export function AgentPickerCard({ picks }: { picks: AgentPick[] }) {
+    const t = useTranslations('foreman.agentTabs')
     const agents = useBoardStore(s => s.agents)
     const selectedId = useBoardStore(s => s.selectedAgentId)
 
     const rows = picks.flatMap((pick): PickRow[] => {
         const agent = agents.find(entry => entry.id === pick.agentId)
-        return agent ? [{ id: agent.id, name: agent.name, disabled: !!agent.disabledAt, tab: pick.tab ? AGENT_TAB_LABELS[pick.tab] : undefined, pick }] : []
+        return agent ? [{ id: agent.id, name: agent.name, disabled: !!agent.disabledAt, tab: pick.tab ? t(pick.tab) : undefined, pick }] : []
     })
 
     return <AgentPickerList rows={rows} selectedId={selectedId} onPick={row => openAgentPick(row.pick)} />

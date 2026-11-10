@@ -1,11 +1,13 @@
 import { Host, Picker, Text } from '@expo/ui/swift-ui'
 import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers'
 import type { CoworkerFile, CoworkerFileKind, CoworkerFiles as CoworkerFilesView } from '@rerun/contracts'
+import { formatDate } from '@rerun/i18n/format'
 import { Fragment, useState } from 'react'
 import { Pressable, View } from 'react-native'
+import { useLocale, useTranslations } from 'use-intl'
 
 import { AuthedImage } from '@/components/chat/cards/CardParts'
-import { formatBytes } from '@/components/chat/cards/cards'
+import { useFileSize } from '@/components/chat/cards/FileCardView'
 import { usePaneSize } from '@/components/layout/PaneSize'
 import { columnsFor } from '@/components/layout/split'
 import { AppText } from '@/components/ui/AppText'
@@ -22,26 +24,29 @@ const GRID_GAP = 2
 const DOC_TILE = 36
 const DOC_INSET = spacing.lg + DOC_TILE + spacing.md
 
-const KINDS: { value: CoworkerFileKind; label: string }[] = [
-    { value: 'media', label: 'Media' },
-    { value: 'doc', label: 'Docs' },
+const KINDS: { value: CoworkerFileKind; label: 'media' | 'docs' }[] = [
+    { value: 'media', label: 'media' },
+    { value: 'doc', label: 'docs' },
 ]
+
+type FilesTranslator = ReturnType<typeof useTranslations<'mobileCoworker.files'>>
 
 const extensionOf = (name: string) => (name.includes('.') ? (name.split('.').pop() ?? '').toLowerCase() : '')
 
-function monthLabel(iso: string | null, now: Date): string {
-    if (!iso) return 'Earlier'
+function monthLabel(iso: string | null, now: Date, locale: string, t: FilesTranslator): string {
+    if (!iso) return t('earlier')
     const date = new Date(iso)
-    if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()) return 'This month'
-    return date.toLocaleDateString(undefined, date.getFullYear() === now.getFullYear() ? { month: 'long' } : { month: 'long', year: 'numeric' })
+    if (date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth()) return t('thisMonth')
+    const month = formatDate(date, locale, date.getFullYear() === now.getFullYear() ? { month: 'long' } : { month: 'long', year: 'numeric' })
+    return month.charAt(0).toLocaleUpperCase(locale) + month.slice(1)
 }
 
 // The files arrive newest first, so a month is a run of neighbours.
-function byMonth(files: CoworkerFile[]): { label: string; files: CoworkerFile[] }[] {
+function byMonth(files: CoworkerFile[], locale: string, t: FilesTranslator): { label: string; files: CoworkerFile[] }[] {
     const now = new Date()
     const groups: { label: string; files: CoworkerFile[] }[] = []
     for (const file of files) {
-        const label = monthLabel(file.modifiedAt, now)
+        const label = monthLabel(file.modifiedAt, now, locale, t)
         const last = groups.at(-1)
         if (last?.label === label) last.files.push(file)
         else groups.push({ label, files: [file] })
@@ -60,8 +65,9 @@ function MonthTitle({ children }: { children: string }) {
 type FileProps = { file: CoworkerFile; onOpen: () => void }
 
 function MediaTile({ file, url, size, onOpen }: FileProps & { url: string; size: number }) {
+    const t = useTranslations('mobileCoworker.files')
     return (
-        <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Open ${file.name}`} style={({ pressed }) => ({ width: size, height: size, opacity: pressed ? 0.7 : 1 })}>
+        <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={t('open', { name: file.name })} style={({ pressed }) => ({ width: size, height: size, opacity: pressed ? 0.7 : 1 })}>
             <AuthedImage url={url} style={{ width: size, height: size }} />
         </Pressable>
     )
@@ -69,11 +75,12 @@ function MediaTile({ file, url, size, onOpen }: FileProps & { url: string; size:
 
 function DocTile({ name }: { name: string }) {
     const theme = useTheme()
+    const t = useTranslations('mobileCoworker.files')
     const extension = extensionOf(name)
     return (
         <View style={{ width: DOC_TILE, height: DOC_TILE, borderRadius: radius.sm, borderCurve: 'continuous', backgroundColor: theme.muted, alignItems: 'center', justifyContent: 'center' }}>
             <AppText variant="caption" tone="muted" medium numberOfLines={1} maxFontSizeMultiplier={1} style={{ fontSize: extension.length > 4 ? 9 : 11 }}>
-                {extension || 'file'}
+                {extension || t('fileFallback')}
             </AppText>
         </View>
     )
@@ -81,10 +88,12 @@ function DocTile({ name }: { name: string }) {
 
 function DocRow({ file, onOpen }: FileProps) {
     const theme = useTheme()
+    const t = useTranslations('mobileCoworker.files')
+    const fileSize = useFileSize()
     const extension = extensionOf(file.name)
-    const detail = [formatBytes(file.size), extension.toUpperCase()].filter(Boolean).join(' · ')
+    const detail = [fileSize(file.size), extension.toUpperCase()].filter(Boolean).join(' · ')
     return (
-        <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Open ${file.name}`} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT + 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, backgroundColor: pressed ? theme.muted : 'transparent' })}>
+        <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={t('open', { name: file.name })} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT + 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <DocTile name={file.name} />
             <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
                 <AppText variant="body" numberOfLines={1}>
@@ -146,14 +155,16 @@ export function CoworkerFiles({ name, view, urlOf, onOpen, failed, onBack }: Cow
     const columns = columnsFor(inner, MIN_TILE, FEWEST_COLUMNS)
     const tile = Math.floor((inner - GRID_GAP * (columns - 1)) / columns)
     const shown = view?.files.filter(file => file.kind === kind) ?? null
+    const locale = useLocale()
+    const t = useTranslations('mobileCoworker.files')
 
     return (
-        <CoworkerPage title="Files" onBack={onBack}>
+        <CoworkerPage title={t('title')} onBack={onBack}>
             <Host matchContents={{ vertical: true }} colorScheme={theme.scheme} style={{ alignSelf: 'stretch' }}>
                 <Picker selection={kind} onSelectionChange={value => setKind(value as CoworkerFileKind)} modifiers={[pickerStyle('segmented')]}>
                     {KINDS.map(option => (
                         <Text key={option.value} modifiers={[tag(option.value)]}>
-                            {option.label}
+                            {t(option.label)}
                         </Text>
                     ))}
                 </Picker>
@@ -164,14 +175,14 @@ export function CoworkerFiles({ name, view, urlOf, onOpen, failed, onBack }: Cow
             ) : shown.length === 0 ? (
                 <View style={{ alignItems: 'center', gap: spacing.xs, paddingVertical: spacing.xxl, paddingHorizontal: spacing.xl }}>
                     <AppText variant="headline" tone="muted">
-                        {kind === 'media' ? 'No media' : 'No docs'}
+                        {kind === 'media' ? t('noMedia') : t('noDocs')}
                     </AppText>
                     <AppText variant="footnote" tone="muted" style={{ textAlign: 'center' }}>
-                        What {name} makes will show up here.
+                        {t('emptyHint', { name })}
                     </AppText>
                 </View>
             ) : (
-                byMonth(shown).map(group => (
+                byMonth(shown, locale, t).map(group => (
                     <View key={group.label} style={{ gap: spacing.sm }}>
                         <MonthTitle>{group.label}</MonthTitle>
                         {kind === 'media' ? (
@@ -196,7 +207,7 @@ export function CoworkerFiles({ name, view, urlOf, onOpen, failed, onBack }: Cow
 
             {view?.truncated ? (
                 <AppText variant="footnote" tone="muted" style={{ textAlign: 'center' }}>
-                    The newest files only. All of them are on the web.
+                    {t('truncated')}
                 </AppText>
             ) : null}
         </CoworkerPage>

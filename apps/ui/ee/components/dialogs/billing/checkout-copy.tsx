@@ -1,14 +1,17 @@
+import type { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import type { BadgeTone } from '@rerun/ui/primitives'
 
 import type { CheckoutVariant } from '@/ee/lib/billing/checkout-variant'
 import { longDate, shortDate } from '@/ee/lib/billing/dates'
-import { BASE_PLAN_CREDITS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, creditsLabel, trialChargeLine, type BillingInterval } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_CREDITS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, type BillingInterval } from '@/ee/lib/billing/plans'
 
 import type { TimelineStep } from './parts'
 
 export { longDate, shortDate }
+
+export type BillingTranslator = ReturnType<typeof useTranslations<'billing'>>
 
 export function nextInvoiceDate(interval: BillingInterval, from = new Date()): Date {
     const next = new Date(from)
@@ -47,143 +50,153 @@ export type CheckoutCopy = {
     footnote?: string
 }
 
-const CANCEL_STEP: TimelineStep = { when: 'Anytime', title: 'Cancel in a click', detail: 'No notice period' }
-
-function trialBadge(context: CheckoutContext): CheckoutCopy['badge'] {
-    if (context.trialDaysLeft == null) return { label: 'Free trial', tone: 'brand' }
-    return { label: `Free trial · ${context.trialDaysLeft <= 0 ? 'ends today' : `${context.trialDaysLeft} ${context.trialDaysLeft === 1 ? 'day' : 'days'} left`}`, tone: 'brand' }
+function cancelStep(t: BillingTranslator): TimelineStep {
+    return { when: t('checkout.timeline.anytime'), title: t('checkout.timeline.cancelTitle'), detail: t('checkout.timeline.noNotice') }
 }
 
-function upgradeTimeline(context: CheckoutContext): TimelineStep[] {
-    return [{ when: 'Today', title: 'Pro starts', detail: 'Unlimited coworkers' }, { when: context.nextInvoice, title: 'Next invoice', detail: <>{context.billed}, excl. VAT</> }, CANCEL_STEP]
+function nextInvoiceStep(t: BillingTranslator, context: CheckoutContext): TimelineStep {
+    return { when: context.nextInvoice, title: t('checkout.timeline.nextInvoice'), detail: t.rich('checkout.timeline.billedExclVat', { billed: () => context.billed }) }
+}
+
+function trialBadge(t: BillingTranslator, context: CheckoutContext): CheckoutCopy['badge'] {
+    if (context.trialDaysLeft == null) return { label: t('checkout.badge.freeTrial'), tone: 'brand' }
+    return { label: context.trialDaysLeft <= 0 ? t('checkout.badge.freeTrialEndsToday') : t('checkout.badge.freeTrialDaysLeft', { count: context.trialDaysLeft }), tone: 'brand' }
+}
+
+function upgradeTimeline(t: BillingTranslator, context: CheckoutContext): TimelineStep[] {
+    return [{ when: t('checkout.timeline.today'), title: t('checkout.timeline.proStarts'), detail: t('checkout.timeline.unlimitedCoworkers') }, nextInvoiceStep(t, context), cancelStep(t)]
 }
 
 // Subscribing during a trial ends it on the spot and bills the whole plan today: said on the first
 // step, never left for the invoice to reveal.
-function endTrialTimeline(context: CheckoutContext): TimelineStep[] {
+function endTrialTimeline(t: BillingTranslator, context: CheckoutContext): TimelineStep[] {
     return [
-        { when: 'Today', title: 'Trial ends, Pro starts', detail: <>{context.billed} charged today, unlimited coworkers</> },
-        { when: context.nextInvoice, title: 'Next invoice', detail: <>{context.billed}, excl. VAT</> },
-        CANCEL_STEP,
+        { when: t('checkout.timeline.today'), title: t('checkout.timeline.trialEndsProStarts'), detail: t.rich('checkout.timeline.chargedToday', { billed: () => context.billed }) },
+        nextInvoiceStep(t, context),
+        cancelStep(t),
     ]
 }
 
-function endTrialFootnote(trialEnds: string): string {
-    return `This ends your free trial today. To pay nothing today, keep your trial: Pro starts on ${trialEnds} on its own.`
-}
-
 // A failed end of trial leaves everything as it was: Stripe holds the change until the bank says yes.
-function trialUnchanged(message: string): string {
-    return /nothing was charged/i.test(message) ? `${message} Your trial is unchanged.` : `${message} Nothing was charged and your trial is unchanged.`
+// The test reads the server's English message, which phase 3 of the language packs turns into a code.
+function trialUnchanged(t: BillingTranslator) {
+    return (message: string) => (/nothing was charged/i.test(message) ? t('checkout.refusal.unchanged', { message }) : t('checkout.refusal.nothingCharged', { message }))
 }
 
-function parkedLabel(parked: CheckoutContext['parked']): string {
-    if (!parked) return 'Your coworker'
-    return parked.agentCount > 1 ? `${parked.title} · ${parked.agentCount} coworkers` : parked.title
+function parkedLabel(t: BillingTranslator, parked: CheckoutContext['parked']): string {
+    if (!parked) return t('checkout.badge.yourCoworker')
+    return parked.agentCount > 1 ? t('checkout.badge.parkedMany', { title: parked.title, count: parked.agentCount }) : parked.title
 }
 
 // `trial_card_pay_now` is not a route: it is the trial screen once the user asks to pay before the end.
 export type CheckoutCopyKey = CheckoutVariant | 'trial_card_pay_now'
 
-function trialTimeline(trialEnds: string, context: CheckoutContext): TimelineStep[] {
-    if (context.trialCancelled) return [{ when: 'Today', title: 'Trial running', detail: '$0 today' }, { when: trialEnds, title: 'Trial ends', detail: 'Nothing charged' }]
+function trialTimeline(t: BillingTranslator, trialEnds: string, context: CheckoutContext): TimelineStep[] {
+    const running: TimelineStep = { when: t('checkout.timeline.today'), title: t('checkout.timeline.trialRunning'), detail: t('checkout.timeline.zeroToday') }
+    if (context.trialCancelled) return [running, { when: trialEnds, title: t('checkout.timeline.trialEnds'), detail: t('checkout.timeline.nothingCharged') }]
     return [
-        { when: 'Today', title: 'Trial running', detail: '$0 today' },
-        ...(context.reminderOn ? [{ when: context.reminderOn, title: 'Reminder by email', detail: 'The day before, to decide calmly' }] : []),
-        { when: trialEnds, title: 'Pro starts', detail: <>{context.firstCharge}, cancel before and pay nothing</> },
+        running,
+        ...(context.reminderOn ? [{ when: context.reminderOn, title: t('checkout.timeline.reminder'), detail: t('checkout.timeline.reminderDetail') }] : []),
+        { when: trialEnds, title: t('checkout.timeline.proStarts'), detail: t('checkout.timeline.firstCharge', { charge: context.firstCharge }) },
     ]
 }
 
-export function checkoutCopy(variant: CheckoutCopyKey, context: CheckoutContext): CheckoutCopy {
-    const trialEnds = context.trialEnds ?? 'the end of your trial'
+export function checkoutCopy(t: BillingTranslator, variant: CheckoutCopyKey, context: CheckoutContext): CheckoutCopy {
+    const trialEnds = context.trialEnds ?? t('checkout.trialEndFallback')
     switch (variant) {
         case 'start_trial':
             return {
-                badge: { label: `${TRIAL_DAYS}-day free trial`, tone: 'green' },
-                title: 'Start your free trial',
-                subtitle: trialChargeLine(context.firstCharge, trialEnds),
+                badge: { label: t('checkout.badge.trialDays', { days: TRIAL_DAYS }), tone: 'green' },
+                title: t('checkout.variants.startTrial.title'),
+                subtitle: t('checkout.variants.startTrial.subtitle', { price: context.firstCharge, date: trialEnds }),
                 timeline: [
-                    { when: 'Today', title: 'Trial starts', detail: `$0 today, ${TRIAL_ACTIVE_AGENTS} coworkers and ${creditsLabel(TRIAL_CREDITS)} of AI usage` },
-                    { when: trialEnds, title: 'Pro starts', detail: `${context.firstCharge} charged, unlimited coworkers and ${creditsLabel(BASE_PLAN_CREDITS)} a month` },
-                    { when: 'Anytime', title: 'Cancel in a click', detail: 'Reminder the day before' },
+                    { when: t('checkout.timeline.today'), title: t('checkout.timeline.trialStarts'), detail: t('checkout.timeline.trialStartsDetail', { agents: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS }) },
+                    { when: trialEnds, title: t('checkout.timeline.proStarts'), detail: t('checkout.timeline.proStartsDetail', { charge: context.firstCharge, credits: BASE_PLAN_CREDITS }) },
+                    { when: t('checkout.timeline.anytime'), title: t('checkout.timeline.cancelTitle'), detail: t('checkout.timeline.reminderDayBefore') },
                 ],
-                cta: 'Start free trial',
-                footnote: `$0 today. Cancel before ${trialEnds} and you are not charged.`,
+                cta: t('checkout.variants.startTrial.cta'),
+                footnote: t('checkout.variants.startTrial.footnote', { date: trialEnds }),
             }
         case 'trial_cardless':
             return {
-                badge: trialBadge(context),
-                title: 'Upgrade to Pro',
-                subtitle: 'Everything you built during the trial stays and keeps running.',
-                timeline: endTrialTimeline(context),
-                cta: 'End trial & subscribe',
+                badge: trialBadge(t, context),
+                title: t('checkout.variants.trialCardless.title'),
+                subtitle: t('checkout.variants.trialCardless.subtitle'),
+                timeline: endTrialTimeline(t, context),
+                cta: t('checkout.variants.trialCardless.cta'),
             }
         case 'trial_card':
             return {
-                badge: trialBadge(context),
-                title: 'Your free trial',
+                badge: trialBadge(t, context),
+                title: t('checkout.variants.trialCard.title'),
                 subtitle: context.trialCancelled
-                    ? `You cancelled your trial. Your coworkers keep running until ${trialEnds}, and nothing is charged.`
-                    : `Nothing to pay today. Pro starts on ${trialEnds} on its own${context.reminderOn ? ', and we email you the day before' : ''}.`,
-                timeline: trialTimeline(trialEnds, context),
-                cta: 'Upgrade to Pro now',
+                    ? t('checkout.variants.trialCard.subtitleCancelled', { date: trialEnds })
+                    : context.reminderOn
+                      ? t('checkout.variants.trialCard.subtitleWithReminder', { date: trialEnds })
+                      : t('checkout.variants.trialCard.subtitle', { date: trialEnds }),
+                timeline: trialTimeline(t, trialEnds, context),
+                cta: t('checkout.variants.trialCard.cta'),
             }
         case 'trial_card_pay_now':
             return {
-                badge: trialBadge(context),
-                title: 'Upgrade to Pro',
-                subtitle: `The trial runs ${TRIAL_ACTIVE_AGENTS} coworkers. Start Pro now for unlimited coworkers, or let the trial roll into Pro on ${trialEnds}.`,
-                timeline: endTrialTimeline(context),
-                cta: 'End trial & start Pro now',
-                footnote: endTrialFootnote(trialEnds),
+                badge: trialBadge(t, context),
+                title: t('checkout.variants.trialCardPayNow.title'),
+                subtitle: t('checkout.variants.trialCardPayNow.subtitle', { agents: TRIAL_ACTIVE_AGENTS, date: trialEnds }),
+                timeline: endTrialTimeline(t, context),
+                cta: t('checkout.variants.trialCardPayNow.cta'),
+                footnote: t('checkout.variants.trialCardPayNow.footnote', { date: trialEnds }),
             }
         case 'credit_locked':
             return {
-                badge: trialBadge(context),
-                title: context.coworker ? 'Keep going with Pro' : 'Rerun credits come with Pro',
+                badge: trialBadge(t, context),
+                title: context.coworker ? t('checkout.variants.creditLocked.titleCoworker') : t('checkout.variants.creditLocked.title'),
                 subtitle: context.coworker
-                    ? `${context.coworker} picks up where it stopped.`
-                    : `Your ${TRIAL_CREDITS.toLocaleString('en-US')} trial credits are used up. Pro includes ${creditsLabel(BASE_PLAN_CREDITS)} every month, and you can add more anytime.`,
-                timeline: endTrialTimeline(context),
-                cta: context.coworker ? 'Pay & resume' : 'End trial & subscribe',
-                payCta: context.coworker ? amount => `Pay ${amount} & resume` : undefined,
-                refusal: trialUnchanged,
-                footnote: 'Close this and nothing is charged. Your trial stays as it is.',
+                    ? t('checkout.variants.creditLocked.subtitleCoworker', { coworker: context.coworker })
+                    : t('checkout.variants.creditLocked.subtitle', { trialCredits: TRIAL_CREDITS, credits: BASE_PLAN_CREDITS }),
+                timeline: endTrialTimeline(t, context),
+                cta: context.coworker ? t('checkout.variants.creditLocked.ctaCoworker') : t('checkout.variants.creditLocked.cta'),
+                payCta: context.coworker ? amount => t('checkout.variants.creditLocked.payCta', { amount }) : undefined,
+                refusal: trialUnchanged(t),
+                footnote: t('checkout.variants.creditLocked.footnote'),
             }
         case 'no_plan':
             return {
-                title: 'Subscribe to Pro',
-                subtitle: 'Unlimited coworkers, one price. Cancel anytime.',
-                timeline: upgradeTimeline(context),
-                cta: 'Subscribe',
+                title: t('checkout.variants.noPlan.title'),
+                subtitle: t('checkout.variants.noPlan.subtitle'),
+                timeline: upgradeTimeline(t, context),
+                cta: t('checkout.variants.noPlan.cta'),
             }
         case 'complimentary':
             return {
-                badge: { label: 'Complimentary access', tone: 'brand' },
-                title: 'Subscribe to Pro',
-                subtitle: 'Your workspace has complimentary access. Subscribe to add credits on top of it.',
-                timeline: upgradeTimeline(context),
-                cta: 'Subscribe',
+                badge: { label: t('checkout.badge.complimentary'), tone: 'brand' },
+                title: t('checkout.variants.complimentary.title'),
+                subtitle: t('checkout.variants.complimentary.subtitle'),
+                timeline: upgradeTimeline(t, context),
+                cta: t('checkout.variants.complimentary.cta'),
             }
         case 'paused':
             return {
-                badge: { label: context.keptUntil ? `Paused · saved until ${context.keptUntil}` : 'Paused', tone: 'orange' },
-                title: 'Restart Pro',
-                subtitle: 'Your coworkers, memories and files are archived. They come back exactly as you left them.',
-                timeline: [{ when: 'Today', title: 'Restore starts', detail: 'Coworkers back in a minute' }, { when: context.nextInvoice, title: 'Next invoice', detail: <>{context.billed}, excl. VAT</> }, CANCEL_STEP],
-                cta: 'Restart Pro',
+                badge: { label: context.keptUntil ? t('checkout.badge.pausedUntil', { date: context.keptUntil }) : t('checkout.badge.paused'), tone: 'orange' },
+                title: t('checkout.variants.paused.title'),
+                subtitle: t('checkout.variants.paused.subtitle'),
+                timeline: [{ when: t('checkout.timeline.today'), title: t('checkout.timeline.restoreStarts'), detail: t('checkout.timeline.restoreDetail') }, nextInvoiceStep(t, context), cancelStep(t)],
+                cta: t('checkout.variants.paused.cta'),
             }
         case 'template':
             return {
-                badge: { label: parkedLabel(context.parked), tone: 'brand' },
-                title: 'Get Pro to install it',
-                subtitle: 'It is ready. It lands on your board the moment you subscribe.',
+                badge: { label: parkedLabel(t, context.parked), tone: 'brand' },
+                title: t('checkout.variants.template.title'),
+                subtitle: t('checkout.variants.template.subtitle'),
                 timeline: [
-                    { when: 'Today', title: 'It installs', detail: context.parked && context.parked.agentCount > 1 ? `${context.parked.agentCount} coworkers placed` : 'Placed on your board' },
-                    { when: context.nextInvoice, title: 'Next invoice', detail: <>{context.billed}, excl. VAT</> },
-                    CANCEL_STEP,
+                    {
+                        when: t('checkout.timeline.today'),
+                        title: t('checkout.timeline.installs'),
+                        detail: context.parked && context.parked.agentCount > 1 ? t('checkout.timeline.placedCount', { count: context.parked.agentCount }) : t('checkout.timeline.placedOnBoard'),
+                    },
+                    nextInvoiceStep(t, context),
+                    cancelStep(t),
                 ],
-                cta: 'Subscribe',
+                cta: t('checkout.variants.template.cta'),
             }
     }
 }

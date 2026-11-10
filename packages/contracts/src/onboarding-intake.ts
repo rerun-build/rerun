@@ -1,5 +1,5 @@
 import type { ForemanIntakeRequest } from './foreman.js'
-import { TEMPLATE_CATEGORIES, TEMPLATE_CATEGORY_LABELS, type TemplateCategory } from './template-display.js'
+import { TEMPLATE_CATEGORIES, type TemplateCategory } from './template-display.js'
 import { TRIAL_ACTIVE_AGENTS } from './billing.js'
 
 // The welcome card of the onboarding, asked the same way on the web and in the app: its questions,
@@ -82,7 +82,7 @@ export function isTemplateCategory(value: string): value is TemplateCategory {
 
 // `other` is not offered: it is the bucket a site falls into, never a business someone recognises
 // themselves in. The card's free field is what covers it, and what they type there is classified.
-export const INTAKE_INDUSTRIES = TEMPLATE_CATEGORIES.filter(category => category !== 'other').map(category => ({ value: category, label: TEMPLATE_CATEGORY_LABELS[category] }))
+export const INTAKE_INDUSTRIES = TEMPLATE_CATEGORIES.filter(category => category !== 'other').map(category => ({ value: category }))
 
 // The roles offered under the second question. Hand written per industry, same reasoning as
 // INDUSTRY_BOX_NAMES: the point is that someone recognises their own job in four lines, and a list

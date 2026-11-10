@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { importSkillAction, listSkillsAction } from '@/app/api/_actions/agent.actions'
 import { setAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
 import { SkillEditor } from '@/components/agent/skills/SkillEditor'
@@ -7,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
 import type { EngineSkillWithSource } from '@/lib/engine/types'
 import { BlocksIcon, FileTextIcon, FolderUpIcon, Layers, Loader2Icon, PlusIcon, UploadIcon } from '@/lib/icons'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -17,6 +17,7 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
 import { Badge } from '@rerun/ui/primitives'
 import { MAX_SKILL_FILE_BYTES, readSkillFolders } from '@/lib/skills/folder-import'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -29,6 +30,9 @@ type AgentPanelSkillsProps = {
 type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string; readOnly: boolean }
 
 export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentPanelSkillsProps) {
+    const t = useTranslations('agent.agentPanelSkills')
+    const errorText = useErrorText()
+    const tShared = useTranslations('agent.modelsShared')
     const [skills, setSkills] = useState<EngineSkillWithSource[]>([])
     const [loading, setLoading] = useState(true)
     const [view, setView] = useState<View>({ mode: 'list' })
@@ -38,7 +42,7 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
     const fileInputRef = useRef<HTMLInputElement>(null)
     const folderInputRef = useRef<HTMLInputElement>(null)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : tShared('boxManageReason')
 
     // Kept in refs rather than in load's deps: the slug is honoured once, and the callback comes
     // inline from the panel, so a fresh identity on every render would refetch forever.
@@ -61,10 +65,10 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
             consumeRequestedRef.current?.()
             const skill = list.find(s => s.slug === requested)
             if (skill) setView({ mode: 'edit', slug: skill.slug, readOnly: skill.fromConnector })
-            else toast.error('Skill not found', { description: requested })
+            else toast.error(t('notFound'), { description: requested })
         }
         setLoading(false)
-    }, [agentId])
+    }, [agentId, t])
 
     useEffect(() => {
         load()
@@ -77,15 +81,15 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
         setImportError(null)
         setImportNotice(null)
         if (file.size > MAX_SKILL_FILE_BYTES) {
-            setImportError('File is too large (max 10 MB)')
+            setImportError(t('fileTooLarge'))
             return
         }
         setImporting(true)
         const result = await importSkillAction(agentId, await file.text())
         setImporting(false)
         if (result.success) load()
-        else setImportError(result.error ?? 'Failed to import skill')
-    }, [agentId, load])
+        else setImportError(errorText(result, t('importFailed')))
+    }, [agentId, load, t, errorText])
 
     const handleUploadFolder = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files ?? [])
@@ -105,22 +109,18 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
                     imported += 1
                     skipped += folder.skipped.length
                 } else {
-                    failures.push(`${folder.name}: ${result.error ?? 'failed to import'}`)
+                    failures.push(t('folderFailure', { name: folder.name, error: errorText(result, t('folderImportFailed')) }))
                 }
             }
-            if (imported) {
-                const notice = [`Imported ${imported} skill${imported === 1 ? '' : 's'}`]
-                if (skipped) notice.push(`skipped ${skipped} non-text file${skipped === 1 ? '' : 's'}`)
-                setImportNotice(notice.join(', '))
-            }
+            if (imported) setImportNotice(skipped ? t('importedSkipped', { count: imported, skipped }) : t('imported', { count: imported }))
             if (failures.length) setImportError(failures.join('\n'))
             load()
         } catch (err) {
-            setImportError(err instanceof Error ? err.message : 'Failed to read the folder')
+            setImportError(err instanceof Error ? err.message : t('readFolderFailed'))
         } finally {
             setImporting(false)
         }
-    }, [agentId, load])
+    }, [agentId, load, t, errorText])
 
     const actionButtons = (
         <div className="flex items-center gap-1.5">
@@ -128,24 +128,24 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
                 <TooltipDisabledReason reason={manageReason}>
                     <DropdownMenuTrigger asChild>
                         <Button size="sm" variant="outline" disabled={importing || !canManage}>
-                            {importing ? <Loader2Icon className="size-3.5 mr-1 animate-spin" /> : <UploadIcon className="size-3.5 mr-1" />} Upload
+                            {importing ? <Loader2Icon className="size-3.5 mr-1 animate-spin" /> : <UploadIcon className="size-3.5 mr-1" />} {t('upload')}
                         </Button>
                     </DropdownMenuTrigger>
                 </TooltipDisabledReason>
                 <DropdownMenuContent align="end">
                     <DropdownMenuItem className="whitespace-nowrap" onSelect={() => fileInputRef.current?.click()}>
                         <FileTextIcon />
-                        Markdown file
+                        {t('markdownFile')}
                     </DropdownMenuItem>
                     <DropdownMenuItem className="whitespace-nowrap" onSelect={() => folderInputRef.current?.click()}>
                         <FolderUpIcon />
-                        Skill folder
+                        {t('skillFolder')}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
             <TooltipDisabledReason reason={manageReason}>
                 <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
-                    <PlusIcon className="size-3.5 mr-1" /> New
+                    <PlusIcon className="size-3.5 mr-1" /> {t('newSkill')}
                 </Button>
             </TooltipDisabledReason>
         </div>
@@ -187,8 +187,8 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
                 {skills.length === 0 ? (
                     <EmptyState
                         icon={Layers}
-                        title="No skills yet"
-                        description="Skills are reusable step-by-step instructions your coworker learns, so it performs recurring tasks the same way every time."
+                        title={t('emptyTitle')}
+                        description={t('emptyDescription')}
                         action={actionButtons}
                     />
                 ) : (
@@ -209,7 +209,7 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
                                             )}
                                             {skill.fromConnector && (
                                                 <Badge size="xs" tone="neutral" glow={false} leading={<BlocksIcon className="size-2.5" />}>
-                                                    App
+                                                    {t('appBadge')}
                                                 </Badge>
                                             )}
                                         </>

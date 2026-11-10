@@ -1,5 +1,6 @@
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslations } from 'use-intl'
 
 import { AccountMenu } from '@/components/home/AccountMenu'
 import { WorkspaceMenu } from '@/components/home/WorkspaceMenu'
@@ -13,6 +14,7 @@ import { spacing } from '@/theme/tokens'
 export function NoPlan() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const t = useTranslations('mobileOnboarding')
     return (
         <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.xs }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.lg }}>
@@ -24,10 +26,10 @@ export function NoPlan() {
                 <ForemanOrb size={64} />
                 <View style={{ alignItems: 'center', gap: spacing.xs }}>
                     <AppText variant="title" style={{ textAlign: 'center' }}>
-                        This workspace is paused
+                        {t('noPlan.title')}
                     </AppText>
                     <AppText variant="callout" tone="muted" style={{ textAlign: 'center' }}>
-                        Switch workspace or account from the menus above.
+                        {t('noPlan.body')}
                     </AppText>
                 </View>
             </View>

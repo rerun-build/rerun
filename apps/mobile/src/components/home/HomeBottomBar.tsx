@@ -1,13 +1,14 @@
 import { View } from 'react-native'
 
-import { InboxButton } from '@/components/home/InboxButton'
+import { HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { SearchBar } from '@/components/home/SearchBar'
-import { spacing } from '@/theme/tokens'
+import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 
-export function HomeBottomBar({ count, onSearch, onInbox }: { count: number; onSearch: () => void; onInbox: () => void }) {
+export const BOTTOM_BAR_SIZE = GLASS_BUTTON_SIZE
+
+export function HomeBottomBar({ onSearch }: { onSearch: () => void }) {
     return (
-        <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.lg }}>
-            <InboxButton count={count} onPress={onInbox} />
+        <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: HOME_GUTTER }}>
             <SearchBar onPress={onSearch} />
         </View>
     )

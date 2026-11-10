@@ -1,5 +1,6 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { DeleteTableDialog } from '@/components/dialogs/DeleteTableDialog'
 import { PurgeTableDialog } from '@/components/dialogs/PurgeTableDialog'
 import { ViewSettingsDialog } from '@/components/dialogs/ViewSettingsDialog'
@@ -26,8 +27,10 @@ import type { EngineDbRows, EngineDbTable } from '@/lib/engine/types'
 import { CheckIcon, ChevronDownIcon, DatabaseIcon, TableIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { CardLayout, TableView } from '@rerun/contracts'
+import { formatNumber } from '@rerun/i18n/format'
 import type { CellContext } from '@rerun/ui/chat'
 import { type ColumnDef, type SortingState, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -48,6 +51,10 @@ type ViewDialog = { open: boolean; view?: TableView; layout?: CardLayout }
 const NO_ROWS: DbRow[] = []
 
 export function DataBrowser({ source, initial, onInitialConsumed, onExpand, table: pinnedTable, onTableDropped }: DataBrowserProps) {
+    const locale = useLocale()
+    const t = useTranslations('data.browser')
+    const tLayouts = useTranslations('data.layouts')
+    const errorText = useErrorText()
     const [requested] = useState(() => initial ?? null)
     const requestedTableRef = useRef(requested?.table ?? null)
     const requestedViewRef = useRef(requested?.view)
@@ -83,8 +90,10 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
     // Kept out of loadTables' deps: callers pass this callback inline, and a fresh identity on every
     // render would make the effect below refetch forever.
     const consumeRequestedRef = useRef(onInitialConsumed)
+    const tableNotFoundRef = useRef(t('tableNotFound'))
     useEffect(() => {
         consumeRequestedRef.current = onInitialConsumed
+        tableNotFoundRef.current = t('tableNotFound')
     })
 
     const loadTables = useCallback(() => {
@@ -100,15 +109,15 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
                 if (requestedTable) {
                     requestedTableRef.current = null
                     consumeRequestedRef.current?.()
-                    if (result.some(t => t.name === requestedTable)) {
+                    if (result.some(table => table.name === requestedTable)) {
                         setSelected(requestedTable)
                         return
                     }
                     // Only worth saying when another table opens in its place: an empty database
                     // already shows its own empty state.
-                    if (result.length > 0) toast.error('Table not found', { description: requestedTable })
+                    if (result.length > 0) toast.error(tableNotFoundRef.current, { description: requestedTable })
                 }
-                setSelected(prev => pinnedTable ?? (prev && result.some(t => t.name === prev) ? prev : (result[0]?.name ?? null)))
+                setSelected(prev => pinnedTable ?? (prev && result.some(table => table.name === prev) ? prev : (result[0]?.name ?? null)))
             })
             .catch((e: unknown) => setError(e instanceof Error && e.message ? e.message : source.unreachableMessage))
             .finally(() => setLoadingTables(false))
@@ -140,7 +149,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
             if (cancelled) return
             const list = result.success ? result.views : []
             setViews(list)
-            setViewsError(result.success ? null : result.error)
+            setViewsError(result.success ? null : errorText(result))
             const wanted = requestedViewRef.current
             requestedViewRef.current = undefined
             const remembered = readLastView(source.storageKey, selected)
@@ -150,7 +159,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
         return () => {
             cancelled = true
         }
-    }, [source, selected])
+    }, [source, selected, errorText])
 
     const activeView = activeId && activeId !== ALL_ROWS ? views.find(view => view.id === activeId) : undefined
     const boardView = activeView?.layout === 'board' && activeView.groupBy ? (activeView as TableView & { groupBy: string }) : undefined
@@ -193,7 +202,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
         }
     }, [source, selected, activeId, activeView?.where, pageIndex, pageSize, sorting, query, refreshKey])
 
-    const tableMeta = tables.find(t => t.name === selected)
+    const tableMeta = tables.find(table => table.name === selected)
     const allColumns = useMemo(() => tableMeta?.columns.map(c => c.name) ?? [], [tableMeta])
     const sampleRows = kindSample?.key === `${selected}\u0000${activeId}` ? kindSample.rows : undefined
     const friendly = useMemo(() => friendlyColumns(tableMeta?.columns ?? [], sampleRows ?? []), [tableMeta, sampleRows])
@@ -283,14 +292,14 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
             const result = await source.deleteRows(selected, ids)
             setBusy(false)
             if (!result.success) {
-                setActionError(result.error ?? 'Failed to delete rows')
+                setActionError(errorText(result, t('deleteRowsFailed')))
                 return
             }
             setSelectedRowIds(new Set())
             setPageIndex(0)
             setRefreshKey(k => k + 1)
         },
-        [source, selected],
+        [source, selected, t, errorText],
     )
 
     const saveRow = useCallback(
@@ -299,13 +308,13 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
             if (!selected || id === null) return null
             const result = await source.updateRow(selected, id, values)
             if (!result.success) {
-                toast.error('Could not save this row', { description: result.error })
+                toast.error(t('saveRowFailed'), { description: errorText(result) })
                 return null
             }
             setData(current => current && { ...current, rows: current.rows.map(r => (rowKey(r as DbRow) === id ? result.row : r)) })
             return result.row as DbRow
         },
-        [source, selected],
+        [source, selected, t, errorText],
     )
 
     const editCell = useCallback(
@@ -321,12 +330,12 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
         const result = await source.dropTable(selected)
         setBusy(false)
         if (!result.success) {
-            setActionError(result.error ?? 'Failed to delete table')
+            setActionError(errorText(result, t('deleteTableFailed')))
             return
         }
         if (onTableDropped) onTableDropped()
         else await loadTables()
-    }, [source, selected, loadTables, onTableDropped])
+    }, [source, selected, loadTables, onTableDropped, t, errorText])
 
     const confirmPurgeTable = useCallback(async () => {
         setPurgeDialogOpen(false)
@@ -336,13 +345,13 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
         const result = await source.purgeTable(selected)
         setBusy(false)
         if (!result.success) {
-            setActionError(result.error ?? 'Failed to purge table')
+            setActionError(errorText(result, t('purgeTableFailed')))
             return
         }
         setSelectedRowIds(new Set())
         setPageIndex(0)
         setRefreshKey(k => k + 1)
-    }, [source, selected])
+    }, [source, selected, t, errorText])
 
     const exportTable = useCallback(
         (format: 'csv' | 'json') => {
@@ -375,7 +384,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
 
     const addView = async (layout: CardLayout) => {
         if (!selected) return
-        const input = quickViewInput(layout, { columns: allColumns, rows, takenNames: views.map(view => view.name) })
+        const input = quickViewInput(layout, { columns: allColumns, rows, takenNames: views.map(view => view.name), baseName: tLayouts(layout) })
         if (!input) {
             setViewDialog({ open: true, layout })
             return
@@ -384,7 +393,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
         const result = await source.saveView(selected, input)
         setAddingView(false)
         if (!result.success) {
-            toast.error('Could not add this view', { description: result.error })
+            toast.error(t('addViewFailed'), { description: errorText(result) })
             return
         }
         onViewSaved(result.view)
@@ -394,7 +403,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
         if (!selected) return
         const result = await source.deleteView(selected, view.id)
         if (!result.success) {
-            toast.error('Could not delete this view', { description: result.error })
+            toast.error(t('deleteViewFailed'), { description: errorText(result) })
             return
         }
         setViews(current => current.filter(v => v.id !== view.id))
@@ -408,11 +417,11 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
             <EmptyState
                 className="h-full"
                 icon={DatabaseIcon}
-                title="Database unavailable"
+                title={t('unavailable')}
                 description={error}
                 action={
                     <Button variant="outline" size="sm" onClick={() => void loadTables()}>
-                        Try again
+                        {t('tryAgain')}
                     </Button>
                 }
             />
@@ -441,18 +450,18 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start" className="max-h-80 min-w-56 overflow-y-auto">
-                                {tables.map(t => (
-                                    <DropdownMenuItem key={t.name} onSelect={() => setSelected(t.name)}>
+                                {tables.map(entry => (
+                                    <DropdownMenuItem key={entry.name} onSelect={() => setSelected(entry.name)}>
                                         <TableIcon />
-                                        <span className="min-w-0 flex-1 truncate">{humanizeTableName(t.name)}</span>
-                                        {selected === t.name && <CheckIcon />}
+                                        <span className="min-w-0 flex-1 truncate">{humanizeTableName(entry.name)}</span>
+                                        {selected === entry.name && <CheckIcon />}
                                     </DropdownMenuItem>
                                 ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     )}
                 </div>
-                <p className="mt-1 text-xs text-muted-foreground">{data ? `${total.toLocaleString('en-US')} ${total === 1 ? 'row' : 'rows'}${query ? ' found' : ''}` : '\u00a0'}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{data ? t(query ? 'rowCountFound' : 'rowCount', { count: total, total: formatNumber(total, locale) }) : '\u00a0'}</p>
                 {activeId !== null && (
                     <div className="mt-4">
                         <DataViewBar
@@ -493,7 +502,7 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
                 ) : (loadingRows && !data) || activeId === null ? (
                     <SkeletonGrid />
                 ) : rows.length === 0 ? (
-                    <EmptyState className="h-full" icon={DatabaseIcon} title="No rows" description={search ? 'No row matches this search.' : 'This table is empty.'} />
+                    <EmptyState className="h-full" icon={DatabaseIcon} title={t('noRows')} description={search ? t('noSearchMatch') : t('tableEmpty')} />
                 ) : activeView?.layout === 'list' ? (
                     <ViewList view={activeView} rows={rows} context={cellContext} onOpenRow={setOpenRow} />
                 ) : activeView?.layout === 'gallery' ? (

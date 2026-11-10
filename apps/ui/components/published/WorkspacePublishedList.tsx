@@ -1,6 +1,7 @@
 'use client'
 
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type KeyboardEvent } from 'react'
 
 import { listWorkspacePublishedAction } from '@/app/api/_actions/publish.actions'
@@ -15,7 +16,7 @@ import { GlobeIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 
-import { ACCESS_ORDER, AccessBadge, accessShort } from './access'
+import { ACCESS_ORDER, AccessBadge, useAccessCopy } from './access'
 import { PublishedRowMenu } from './PublishedRowMenu'
 import { PublishedThumb } from './PublishedThumb'
 import { ShareDialog } from './ShareDialog'
@@ -26,6 +27,8 @@ const SKELETON_CARDS = 6
 
 // Every link the coworkers of the workspace shared, filtered by who can open it. Shown in the Brain.
 export function WorkspacePublishedList() {
+    const t = useTranslations('published.list')
+    const accessCopy = useAccessCopy()
     const [files, setFiles] = useState<PublishedFile[] | null>(null)
     const [filter, setFilter] = useState<Filter>('all')
     const [sharing, setSharing] = useState<PublishedFile | null>(null)
@@ -49,16 +52,16 @@ export function WorkspacePublishedList() {
         <>
             <div className="flex shrink-0 gap-1.5 overflow-x-auto border-b px-4 py-2.5">
                 <Chip selected={filter === 'all'} onClick={() => setFilter('all')}>
-                    All {files?.length ?? ''}
+                    {t('filterAll', { count: files?.length ?? '' })}
                 </Chip>
                 {ACCESS_ORDER.map(access => (
                     <Chip key={access} selected={filter === access} onClick={() => setFilter(access)}>
-                        {accessShort(access)}
+                        {accessCopy.short(access)}
                     </Chip>
                 ))}
             </div>
             {files?.length === 0 ? (
-                <EmptyState icon={GlobeIcon} title="Nothing published yet" description="Pages, reports and files your coworkers share show up here." />
+                <EmptyState icon={GlobeIcon} title={t('emptyTitle')} description={t('emptyDescription')} />
             ) : (
                 <div className="@container min-h-0 flex-1 overflow-y-auto p-3">
                     <div className="grid grid-cols-1 gap-2 @lg:grid-cols-2 @3xl:grid-cols-3">
@@ -72,7 +75,9 @@ export function WorkspacePublishedList() {
 }
 
 function GridCard({ file, onShare, onUnpublished }: { file: PublishedFile; onShare: () => void; onUnpublished: (slug: string) => void }) {
-    const coworkerName = useBoardStore(s => s.agents.find(agent => agent.id === file.agentId)?.name) ?? 'Coworker'
+    const t = useTranslations('published.list')
+    const locale = useLocale()
+    const coworkerName = useBoardStore(s => s.agents.find(agent => agent.id === file.agentId)?.name) ?? t('fallbackCoworker')
     const activate = (event: KeyboardEvent<HTMLDivElement>) => {
         if (event.key !== 'Enter' && event.key !== ' ') return
         event.preventDefault()
@@ -90,7 +95,7 @@ function GridCard({ file, onShare, onUnpublished }: { file: PublishedFile; onSha
                     <AccessBadge access={file.access} />
                     <AgentBuddy agentId={file.agentId} size={12} animated={false} facing="right" />
                     <span className="truncate">
-                        {coworkerName} · {relativeDate(file.updatedAt)}
+                        {coworkerName} · {relativeDate(file.updatedAt, locale)}
                     </span>
                 </div>
             </div>

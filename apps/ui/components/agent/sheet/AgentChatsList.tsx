@@ -2,6 +2,7 @@
 
 import { InboxRow } from '@rerun/ui/inbox'
 import { Badge } from '@rerun/ui/primitives'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
 import { adoptEngineSessionAction, listAgentSessionsAction } from '@/app/api/_actions/session.actions'
@@ -36,6 +37,7 @@ type AgentChatsListProps = {
  * tab, always there. The filter replaces the inbox the panel used to carry beside the chat.
  */
 export function AgentChatsList({ agentId, agentName, activeSessionId, initialFilter, onSelect, onCreateNew, onClose }: AgentChatsListProps) {
+    const t = useTranslations('agent.agentChatsList')
     const [filter, setFilter] = useState<ChatsFilter>(initialFilter)
     const [history, setHistory] = useState<SessionHistoryEntry[] | null>(null)
     const [adopting, setAdopting] = useState<string | null>(null)
@@ -61,7 +63,8 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
     const inboxItems = attention.map(item => ({ ...item, agentName }))
     const listsHistory = filter !== 'needs'
     const shown = others.filter(entry => (filter === 'chats' ? !isAutomated(entry) : filter === 'automations' ? isAutomated(entry) : true))
-    const days = groupByDay(shown)
+    const locale = useLocale()
+    const days = groupByDay(shown, locale)
 
     const open = async (entry: SessionHistoryEntry) => {
         if (entry.id) {
@@ -83,42 +86,42 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
             <div className="flex shrink-0 items-center justify-between gap-2 px-3 pb-1 pt-3">
                 <span className="flex items-center gap-2 pl-1 text-sm font-semibold">
                     <MessageCircle className="size-4 text-muted-foreground" />
-                    Threads
+                    {t('title')}
                 </span>
                 <div className="flex items-center gap-1.5">
                     <Button variant="outline" size="sm" onClick={onCreateNew}>
                         <PlusIcon className="size-3.5" />
-                        New thread
+                        {t('newThread')}
                     </Button>
-                    <Button aria-label="Close" variant="ghost" size="icon-sm" onClick={onClose}>
+                    <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
                         <XIcon className="size-4" />
                     </Button>
                 </div>
             </div>
             <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto px-3 py-2">
                 <Chip selected={filter === 'all'} onClick={() => setFilter('all')}>
-                    All
+                    {t('filters.all')}
                 </Chip>
                 <Chip selected={filter === 'chats'} onClick={() => setFilter('chats')}>
-                    Chats
+                    {t('filters.chats')}
                 </Chip>
                 <Chip selected={filter === 'automations'} onClick={() => setFilter('automations')}>
-                    Automations
+                    {t('filters.automations')}
                 </Chip>
                 <Chip selected={filter === 'needs'} onClick={() => setFilter('needs')}>
-                    Needs you <span className={cn('ml-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{attention.length}</span>
+                    {t('filters.needs')} <span className={cn('ml-1 tabular-nums', filter === 'needs' ? 'text-background/60' : 'text-muted-foreground/70')}>{attention.length}</span>
                 </Chip>
                 {filter === 'needs' && attention.length > 0 && (
                     <ConfirmDialog
-                        title="Mark everything as read?"
-                        description={`${attention.length} thread${attention.length !== 1 ? 's' : ''} will leave this list. Requests still waiting on an answer are cleared too, without being answered.`}
-                        confirmLabel="Mark all as read"
+                        title={t('markAllRead.title')}
+                        description={t('markAllRead.description', { count: attention.length })}
+                        confirmLabel={t('markAllRead.confirm')}
                         confirmVariant="default"
                         onConfirm={() => markSessionsHandled(attention.map(item => item.id))}
                     >
                         <Button size="xs" variant="ghost" className="ml-auto text-muted-foreground">
                             <CheckCheckIcon className="size-3.5" />
-                            Mark all as read
+                            {t('markAllRead.confirm')}
                         </Button>
                     </ConfirmDialog>
                 )}
@@ -126,7 +129,7 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
             <div className="max-h-[420px] min-h-0 space-y-0.5 overflow-y-auto px-2 pb-2">
                 {(filter === 'all' || filter === 'needs') &&
                     inboxItems.map(item => <InboxRow key={item.id} item={item} onOpen={() => onSelect(item.id, item.title)} onMarkRead={() => setSessionStatus(item.id, 'idle')} />)}
-                {filter === 'needs' && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">Nothing waits on you.</p>}
+                {filter === 'needs' && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('emptyNeeds')}</p>}
                 {listsHistory && history === null && <ChatsSkeleton />}
                 {listsHistory &&
                     days.map(({ day, entries }) => (
@@ -144,9 +147,9 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                             ))}
                         </div>
                     ))}
-                {filter === 'all' && history !== null && shown.length === 0 && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">No thread yet.</p>}
+                {filter === 'all' && history !== null && shown.length === 0 && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('emptyThreads')}</p>}
                 {(filter === 'chats' || filter === 'automations') && history !== null && shown.length === 0 && (
-                    <p className="px-3 py-6 text-center text-xs text-muted-foreground">{filter === 'chats' ? 'No thread yet.' : 'No automated run yet.'}</p>
+                    <p className="px-3 py-6 text-center text-xs text-muted-foreground">{filter === 'chats' ? t('emptyThreads') : t('emptyAutomations')}</p>
                 )}
             </div>
         </div>
@@ -154,11 +157,11 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
 }
 
 // `history` arrives most recent first, so the days come out in order too.
-export function groupByDay(entries: SessionHistoryEntry[]) {
+export function groupByDay(entries: SessionHistoryEntry[], locale?: string) {
     const now = new Date()
     const days: { day: string; entries: SessionHistoryEntry[] }[] = []
     for (const entry of entries) {
-        const day = messageDayLabel(entry.updatedAt, now)
+        const day = messageDayLabel(entry.updatedAt, locale, now)
         const last = days.at(-1)
         if (last?.day === day) last.entries.push(entry)
         else days.push({ day, entries: [entry] })
@@ -167,6 +170,8 @@ export function groupByDay(entries: SessionHistoryEntry[]) {
 }
 
 export function ChatRow({ entry, active, running, adopting, onOpen }: { entry: SessionHistoryEntry; active: boolean; running: boolean; adopting: boolean; onOpen: () => void }) {
+    const t = useTranslations('agent.agentChatsList')
+    const locale = useLocale()
     const SourceIcon = entry.source === 'trigger' ? WebhookIcon : CalendarClock
     // A run titled before the hub retitled them, or by an engine that sends no final answer, is still
     // named after its routine: the routine line would only repeat it.
@@ -184,7 +189,7 @@ export function ChatRow({ entry, active, running, adopting, onOpen }: { entry: S
                     <span className={cn('truncate text-sm font-medium', entry.outcome === 'failed' && 'text-destructive', entry.outcome === 'nothing' && 'text-muted-foreground')}>{entry.title}</span>
                     {running && (
                         <Badge size="xs" tone="green" glow={false}>
-                            Running
+                            {t('running')}
                         </Badge>
                     )}
                 </span>
@@ -194,9 +199,9 @@ export function ChatRow({ entry, active, running, adopting, onOpen }: { entry: S
                         <span className="truncate">{routine}</span>
                     </span>
                 )}
-                {entry.originAgentName && <span className="truncate text-xs text-muted-foreground">Started by {entry.originAgentName}</span>}
+                {entry.originAgentName && <span className="truncate text-xs text-muted-foreground">{t('startedBy', { name: entry.originAgentName })}</span>}
             </span>
-            {adopting ? <LoaderIcon className="size-3.5 shrink-0 animate-spin text-muted-foreground" /> : <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{messageTime(entry.updatedAt)}</span>}
+            {adopting ? <LoaderIcon className="size-3.5 shrink-0 animate-spin text-muted-foreground" /> : <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{messageTime(entry.updatedAt, locale)}</span>}
         </button>
     )
 }

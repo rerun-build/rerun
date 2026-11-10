@@ -12,6 +12,7 @@ import { GATE_EMAIL_PARAM, GATE_ERROR_PARAM, loadPublished, loadWorkspaceBrand, 
 import { extractPublishedSlug, publishedSiteOrigin } from '@/lib/published/host'
 import { openPublishedHref } from '@/lib/published/links'
 import { KeyIcon, LogInIcon, MailIcon } from '@/lib/icons'
+import { getTranslations } from 'next-intl/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,8 +41,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const { slug } = await params
     const origin = publishedSiteOrigin(slug)
     const { entry, brand } = await gateContext(slug)
-    const title = entry ? 'Protected page' : 'This link no longer works'
-    const description = entry ? `Shared by ${brand.name}. Sign in or confirm your email to open it.` : 'Whoever shared it turned it off.'
+    const t = await getTranslations('publicPages')
+    const title = entry ? t('publishedView.protectedTitle') : t('linkOff.title')
+    const description = entry ? t('publishedView.protectedDescription', { workspace: brand.name }) : t('linkOff.subtitle')
     const images = entry ? ['/__rerun/og.png'] : undefined
     return {
         title: { absolute: title },
@@ -53,16 +55,18 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
 }
 
-function errorText(error: GateError | undefined, expected: GateError): string | null {
-    if (error === 'limited') return 'Too many tries. Wait a few minutes.'
+type GateTranslator = Awaited<ReturnType<typeof getTranslations<'publicPages.gate'>>>
+
+function errorText(error: GateError | undefined, expected: GateError, t: GateTranslator): string | null {
+    if (error === 'limited') return t('errors.limited')
     if (error !== expected) return null
     switch (expected) {
         case 'password':
-            return 'Wrong password'
+            return t('errors.password')
         case 'code':
-            return 'Wrong or expired code'
+            return t('errors.code')
         case 'email':
-            return 'Enter a valid email'
+            return t('errors.email')
         default:
             return null
     }
@@ -82,23 +86,25 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     const error = isGateError(rawError) ? rawError : undefined
     const email = param(search, GATE_EMAIL_PARAM)?.trim()
     const { entry, brand } = await gateContext(slug)
+    const tPages = await getTranslations('publicPages')
+    const t = await getTranslations('publicPages.gate')
 
     if (!entry || param(search, 'gate') === 'gone') {
-        return <GateScreen brand={brand} lock={null} mark={<RerunTile />} title="This link no longer works" subtitle="Whoever shared it turned it off." />
+        return <GateScreen brand={brand} lock={null} mark={<RerunTile />} title={tPages('linkOff.title')} subtitle={tPages('linkOff.subtitle')} />
     }
 
-    const title = entry.title ?? 'Protected page'
+    const title = entry.title ?? tPages('publishedView.protectedTitle')
 
     if (entry.access === 'password') {
-        const message = errorText(error, 'password')
+        const message = errorText(error, 'password', t)
         return (
-            <GateScreen brand={brand} lock={<Icon icon={KeyIcon} size="lg" />} title={title} subtitle={`${brand.name} protected this page with a password`}>
+            <GateScreen brand={brand} lock={<Icon icon={KeyIcon} size="lg" />} title={title} subtitle={t('password.subtitle', { workspace: brand.name })}>
                 <form method="post" action="/__rerun/password" className="flex flex-col gap-2.5">
                     <input type="hidden" name="next" value={next} />
-                    <GateInput type="password" name="password" placeholder="Password" autoComplete="current-password" autoFocus required aria-invalid={!!message || undefined} />
+                    <GateInput type="password" name="password" placeholder={t('password.placeholder')} autoComplete="current-password" autoFocus required aria-invalid={!!message || undefined} />
                     {message && <GateMessage>{message}</GateMessage>}
                     <Button type="submit" size="lg">
-                        Open
+                        {t('open')}
                     </Button>
                 </form>
             </GateScreen>
@@ -106,19 +112,19 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     }
 
     if (entry.access === 'invited' && email) {
-        const message = errorText(error, 'code')
+        const message = errorText(error, 'code', t)
         return (
-            <GateScreen brand={brand} lock={<Icon icon={MailIcon} size="lg" />} title="Check your inbox" subtitle={`If ${email} can open this page, a code is on its way`}>
+            <GateScreen brand={brand} lock={<Icon icon={MailIcon} size="lg" />} title={t('code.title')} subtitle={t('code.subtitle', { email })}>
                 <form method="post" action="/__rerun/code/verify" className="flex flex-col gap-2.5">
                     <input type="hidden" name="email" value={email} />
                     <input type="hidden" name="next" value={next} />
                     <GateCodeField invalid={!!message} />
                     {message && <GateMessage>{message}</GateMessage>}
                     <Button type="submit" size="lg">
-                        Open
+                        {t('open')}
                     </Button>
                     <Button variant="ghost" asChild>
-                        <a href={next}>Use another email</a>
+                        <a href={next}>{t('code.otherEmail')}</a>
                     </Button>
                 </form>
             </GateScreen>
@@ -126,15 +132,15 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     }
 
     if (entry.access === 'invited') {
-        const message = errorText(error, 'email')
+        const message = errorText(error, 'email', t)
         return (
-            <GateScreen brand={brand} lock={<Icon icon={MailIcon} size="lg" />} title={title} subtitle="Confirm your email to open it">
+            <GateScreen brand={brand} lock={<Icon icon={MailIcon} size="lg" />} title={title} subtitle={t('email.subtitle')}>
                 <form method="post" action="/__rerun/code/send" className="flex flex-col gap-2.5">
                     <input type="hidden" name="next" value={next} />
                     <GateInput type="email" name="email" placeholder="you@company.com" autoComplete="email" autoFocus required aria-invalid={!!message || undefined} />
                     {message && <GateMessage>{message}</GateMessage>}
                     <Button type="submit" size="lg">
-                        Send code
+                        {t('email.submit')}
                     </Button>
                 </form>
             </GateScreen>
@@ -142,11 +148,11 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     }
 
     return (
-        <GateScreen brand={brand} lock={<Logo size="lg" />} title={title} subtitle={`For ${brand.name} members`}>
+        <GateScreen brand={brand} lock={<Logo size="lg" />} title={title} subtitle={t('members.subtitle', { workspace: brand.name })}>
             <Button size="lg" asChild>
                 <a href={`${APP_URL}${openPublishedHref(slug, next)}`}>
                     <LogInIcon />
-                    Continue with Rerun
+                    {t('members.continue')}
                 </a>
             </Button>
         </GateScreen>

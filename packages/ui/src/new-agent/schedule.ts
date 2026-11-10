@@ -1,3 +1,7 @@
+import { formatDate } from '@rerun/i18n/format'
+
+import { englishKitTranslator, type KitTranslator } from '../kit-translator'
+
 // When the new agent runs, as chosen in the planner. Nothing here is written anywhere: the choice
 // only words a line of the agent's first message, and the agent sets its own schedule up from it.
 //
@@ -6,16 +10,25 @@ export type ScheduleChoice = { kind: 'described' } | { kind: 'preset'; id: Sched
 
 export type SchedulePresetId = 'weekday' | 'monday'
 
-export const SCHEDULE_PRESETS: { id: SchedulePresetId; label: string; detail: string; phrase: string }[] = [
-    { id: 'weekday', label: 'Every weekday at 9:00', detail: 'Monday to Friday', phrase: 'every weekday at 9:00' },
-    { id: 'monday', label: 'Every Monday at 9:00', detail: 'Once a week', phrase: 'every Monday at 9:00' },
+// `phrase` words the agent's first message, which stays in English: the label is the reader's.
+export const SCHEDULE_PRESETS: { id: SchedulePresetId; phrase: string }[] = [
+    { id: 'weekday', phrase: 'every weekday at 9:00' },
+    { id: 'monday', phrase: 'every Monday at 9:00' },
 ]
 
 export const DESCRIBED: ScheduleChoice = { kind: 'described' }
-export const ON_DEMAND_LABEL = 'Only when I ask'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-export const DAY_INITIALS = DAYS.map(day => day[0])
+
+function dayNames(locale: string): string[] {
+    if (locale === 'en') return DAYS
+    // 2024-01-01 is a Monday.
+    return DAYS.map((_, index) => formatDate(Date.UTC(2024, 0, 1 + index), locale, { weekday: 'long', timeZone: 'UTC' }))
+}
+
+export function dayInitials(locale: string): string[] {
+    return dayNames(locale).map(day => day.charAt(0).toUpperCase())
+}
 
 // A custom week opens on the working days, the way most agents of a team run.
 export const DEFAULT_CUSTOM: Extract<ScheduleChoice, { kind: 'custom' }> = { kind: 'custom', days: [true, true, true, true, true, false, false], time: '09:00' }
@@ -46,11 +59,17 @@ function phrase(choice: Extract<ScheduleChoice, { kind: 'preset' | 'custom' }>):
 
 // What the Schedule button says back once a choice is made. `described` has no words of its own:
 // the button then shows the timing read in the description, or its plain name.
-export function scheduleLabel(choice: ScheduleChoice): string | null {
+export function scheduleLabel(choice: ScheduleChoice, t: KitTranslator = englishKitTranslator, locale = 'en'): string | null {
     if (choice.kind === 'described') return null
-    if (choice.kind === 'on-demand') return ON_DEMAND_LABEL
-    const words = phrase(choice)
-    return words.charAt(0).toUpperCase() + words.slice(1)
+    if (choice.kind === 'on-demand') return t('newAgent.schedule.onDemand')
+    if (choice.kind === 'preset') return t(`newAgent.schedule.presets.${choice.id}.label`)
+    const time = clock(choice.time)
+    const on = dayNames(locale).filter((_, index) => choice.days[index])
+    if (on.length === DAYS.length) return t('newAgent.schedule.everyDay', { time })
+    if (on.length === 5 && !choice.days[5] && !choice.days[6]) return t('newAgent.schedule.everyWeekday', { time })
+    // British English joins the last day with a bare "and", as the label always read.
+    const days = new Intl.ListFormat(locale === 'en' ? 'en-GB' : locale, { type: 'conjunction' }).format(on)
+    return t('newAgent.schedule.everyDays', { days, time })
 }
 
 // The agent's first message: the description as typed, then the planner's choice as an instruction.

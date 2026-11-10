@@ -11,7 +11,7 @@ import { Composer } from '@/components/chat/Composer'
 import { ConversationSkeleton } from '@/components/chat/ConversationSkeleton'
 import { ModelChip, RoundButton } from '@/components/chat/ComposerControls'
 import { RunStatus } from '@/components/chat/RunStatus'
-import type { VoiceSender } from '@/components/chat/useVoiceMessage'
+import type { VoiceMessageError, VoiceSender } from '@/components/chat/useVoiceMessage'
 import { VoiceUserMessage } from '@/components/chat/VoiceUserMessage'
 import { VoiceRecorderBar } from '@/components/chat/VoiceRecorderBar'
 import { EventCardView } from '@/components/chat/cards/EventCardView'
@@ -218,7 +218,7 @@ const labLiveState = () => {
 }
 const LAB_VOICE_MESSAGE = { transcript: MOCK_TRANSCRIPT, src: 'chat-uploads/lab-voice.m4a', durationMs: 12_480, peaks: MOCK_VOICE_PEAKS }
 
-function LabRecorderRow({ status, error = null }: { status: 'starting' | 'recording' | 'processing' | 'failed'; error?: string | null }) {
+function LabRecorderRow({ status, error = null }: { status: 'starting' | 'recording' | 'processing' | 'failed'; error?: VoiceMessageError | null }) {
     return (
         <View style={{ gap: spacing.sm }}>
             <VoiceRecorderBar status={status} error={error} getLiveState={labLiveState} />
@@ -238,7 +238,7 @@ function Voice({ scheme }: { scheme: ColorScheme }) {
                 <LabRecorderRow status="recording" />
                 <LabRecorderRow status="processing" />
                 <LabRecorderRow status="starting" />
-                <LabRecorderRow status="failed" error="Couldn't hear anything in that recording." />
+                <LabRecorderRow status="failed" error="silent" />
                 <VoiceUserMessage voice={LAB_VOICE_MESSAGE} owner={null} defaultTranscriptOpen />
                 <VoiceUserMessage voice={{ ...LAB_VOICE_MESSAGE, durationMs: 3_200, peaks: [], transcript: 'Perfect, send them.' }} owner={null} media={[{ url: blobLogo('green-energy-blob.webp'), name: 'Photo', image: true }]} />
                 <VoiceUserMessage voice={{ ...LAB_VOICE_MESSAGE, src: 'chat-uploads/from-chrome-voice.webm', durationMs: 64_000, transcript: '' }} owner={null} />

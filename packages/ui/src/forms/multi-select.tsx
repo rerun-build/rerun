@@ -6,6 +6,7 @@ import { Popover as PopoverPrimitive } from 'radix-ui'
 import { cn } from '../cn'
 import { Check, ChevronDown, SearchIcon, XIcon } from '../icons'
 import { Field } from './field'
+import { useKitTranslations } from '../locale'
 
 interface MultiSelectProps {
     options: readonly string[]
@@ -18,7 +19,8 @@ interface MultiSelectProps {
     disabled?: boolean
 }
 
-export function MultiSelect({ options, value, onChange, label, optional, helperText, placeholder = 'Select…', disabled }: MultiSelectProps) {
+export function MultiSelect({ options, value, onChange, label, optional, helperText, placeholder, disabled }: MultiSelectProps) {
+    const t = useKitTranslations()
     const [open, setOpen] = React.useState(false)
     const [query, setQuery] = React.useState('')
 
@@ -51,7 +53,7 @@ export function MultiSelect({ options, value, onChange, label, optional, helperT
                         )}
                     >
                         {value.length === 0 ? (
-                            <span className="px-1 text-sm text-muted-foreground">{placeholder}</span>
+                            <span className="px-1 text-sm text-muted-foreground">{placeholder ?? t('forms.select')}</span>
                         ) : (
                             value.map(item => (
                                 <span key={item} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
@@ -59,7 +61,7 @@ export function MultiSelect({ options, value, onChange, label, optional, helperT
                                     <span
                                         role="button"
                                         tabIndex={-1}
-                                        aria-label={`Remove ${item}`}
+                                        aria-label={t('forms.remove', { item })}
                                         onClick={event => {
                                             event.stopPropagation()
                                             remove(item)
@@ -87,14 +89,14 @@ export function MultiSelect({ options, value, onChange, label, optional, helperT
                                 autoFocus
                                 value={query}
                                 onChange={event => setQuery(event.target.value)}
-                                placeholder="Type to search…"
+                                placeholder={t('forms.search')}
                                 className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                             />
                         </div>
 
                         <div className="mt-1 max-h-56 overflow-y-auto py-1">
                             {filtered.length === 0 ? (
-                                <p className="px-3 py-6 text-center text-sm text-muted-foreground">No results</p>
+                                <p className="px-3 py-6 text-center text-sm text-muted-foreground">{t('forms.noResults')}</p>
                             ) : (
                                 filtered.map(option => {
                                     const selected = value.includes(option)

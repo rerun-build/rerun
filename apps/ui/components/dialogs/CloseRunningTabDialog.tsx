@@ -10,6 +10,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { useTranslations } from 'next-intl'
 
 type CloseRunningTabDialogProps = {
     open: boolean
@@ -18,19 +19,19 @@ type CloseRunningTabDialogProps = {
 }
 
 export function CloseRunningTabDialog({ open, onOpenChange, onConfirm }: CloseRunningTabDialogProps) {
+    const t = useTranslations('dialogs.closeRunningTab')
+    const tCommon = useTranslations('common')
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
             <AlertDialogContent size="sm">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Close this conversation?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        The agent is still working on this conversation. Closing the tab won&apos;t stop the run — it will keep running in the background.
-                    </AlertDialogDescription>
+                    <AlertDialogTitle>{t('title')}</AlertDialogTitle>
+                    <AlertDialogDescription>{t('description')}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel>{tCommon('cancel')}</AlertDialogCancel>
                     <AlertDialogAction onClick={onConfirm}>
-                        Close
+                        {t('confirm')}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

@@ -3,6 +3,7 @@
 import { Input } from '@/components/ui/input'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { GlobeIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 type RenameInputProps = {
@@ -58,6 +59,7 @@ type FileTileProps = {
 }
 
 export function FileTile({ name, glyph, title, published, renaming, onOpen, onContextMenu, onRenameSubmit, onRenameCancel }: FileTileProps) {
+    const t = useTranslations('files')
     return (
         <div
             role="button"
@@ -75,9 +77,9 @@ export function FileTile({ name, glyph, title, published, renaming, onOpen, onCo
             <div className="relative">
                 {glyph}
                 {published && (
-                    <TooltipLabeled label="Public link">
+                    <TooltipLabeled label={t('publish.publicLink')}>
                         <span className="absolute -right-0.5 -top-0.5 flex size-3.5 items-center justify-center rounded-full bg-background">
-                            <GlobeIcon className="size-3 text-emerald-400" aria-label="Published" />
+                            <GlobeIcon className="size-3 text-emerald-400" aria-label={t('grid.published')} />
                         </span>
                     </TooltipLabeled>
                 )}

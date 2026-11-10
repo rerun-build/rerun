@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "Bureau de {name}",
+        "titleFallback": "Bureau",
+        "description": "L’écran sur lequel ce coworker travaille. Ce que vous faites ici, il le retrouve ensuite.",
+        "takeoverDescription": "Vous êtes dans le navigateur de votre coworker. Appuyez sur Terminé quand il peut reprendre.",
+        "takeoverHoldsBrowser": "Le navigateur de votre coworker est déjà ouvert pour cette demande.",
+        "clipboardDenied": "Votre navigateur n’a pas autorisé Rerun à lire le presse-papiers.",
+        "disconnectedDescription": "La connexion à la machine s’est fermée. Rien n’y a été perdu.",
+        "reconnect": "Se reconnecter",
+        "tryAgain": "Réessayer"
+    },
+    "screen": {
+        "connecting": "Connexion à l’écran...",
+        "unavailable": "L’écran n’est pas disponible",
+        "wentAway": "L’écran s’est déconnecté",
+        "resize": "Redimensionner l’écran"
+    },
+    "notch": {
+        "browser": "Navigateur",
+        "closeBrowser": "Fermer le navigateur",
+        "files": "Fichiers",
+        "terminal": "Terminal",
+        "paste": "Coller",
+        "done": "Terminé",
+        "close": "Fermer"
+    },
+    "screenCard": {
+        "openBrowser": "Ouvrir le navigateur",
+        "takeControl": "Prendre la main"
+    }
+}

@@ -20,6 +20,11 @@ export class CaptchaError extends Error {
         super(detectInAppBrowser(navigator.userAgent) ? FAILED_IN_APP : FAILED)
     }
 
+    // The message stays in English for analytics; the forms translate from this.
+    get inAppBrowser() {
+        return Boolean(detectInAppBrowser(navigator.userAgent))
+    }
+
     get superseded() {
         return this.code === 'superseded'
     }

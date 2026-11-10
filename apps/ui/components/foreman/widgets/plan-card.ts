@@ -14,8 +14,6 @@ export type PlanGroup = { key: string; name: string | null; role: string; items:
 
 export type ShownPlan = { title: string; groups: PlanGroup[] }
 
-const DEFAULT_TITLE = 'Your first coworker'
-
 function asRecord(value: unknown): Record<string, unknown> {
     return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {}
 }
@@ -55,7 +53,7 @@ function readBoxes(input: unknown): { name: string; role: string }[] {
 
 export function readPlan(input: unknown): ShownPlan {
     const args = asRecord(input)
-    const title = asText(args.title) || DEFAULT_TITLE
+    const title = asText(args.title)
     const entries = readItems(args.items)
     const boxes = readBoxes(args.boxes)
 

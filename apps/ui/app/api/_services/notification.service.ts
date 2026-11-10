@@ -9,11 +9,12 @@ import { BANNER_WARM_INLINE_MS, buildUnsubscribeUrl, emailBoardBanner, pushNotif
 import { notificationUrl } from '@/lib/app-url'
 import type { NotificationPayload } from '@/lib/engine/types'
 import { RERUN_BUDGET_ERROR_CODE, suppressesErrorEmail } from '@/lib/notifications/budget-notice'
-import { announcesRecovery, describeSourceKey, incidentKeyFor, resolvedIncidentKeysFor } from '@/lib/notifications/incidents'
+import { recipientLocale } from '@/lib/i18n/recipient-locale'
+import { announcesRecovery, emailSourceLabel, incidentKeyFor, resolvedIncidentKeysFor } from '@/lib/notifications/incidents'
 import { automatedRunOutcome, automatedRunReport, completionStatus, isRunCompletion, storedKind, type StoredNotification } from '@/lib/notifications/inbound'
 import { NOTIFICATION_EMAILS_PAUSED, coworkerRuleOf, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { isPresent } from '@/lib/notifications/presence'
-import { reasonSentence } from '@/lib/notifications/reason-copy'
+import { emailReasonSentence } from '@/lib/notifications/reason-copy'
 import { computeRecipients, needsOwnerFollow, wantsIncidentEmail, wantsRecoveryEmail, type NotificationRecipients, type RoutedEvent, type RoutedMember } from '@/lib/notifications/routing'
 import { boardStatusOfKind } from '@/lib/og/team-board'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
@@ -25,6 +26,7 @@ import { loadPresence } from './presence.service'
 import { authenticateEngineToken } from './workspace-engine.service'
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner } from './workspace-owner.service'
 import { captureServer, deterministicUuid } from '@rerun/analytics/server'
+import { emailTranslator } from '@rerun/emails/i18n'
 
 type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
 type SessionUpdate = Database['public']['Tables']['sessions']['Update']
@@ -99,7 +101,7 @@ export async function recordNotification(token: string, payload: NotificationPay
     if (!engine.isSandbox && !NOTIFICATION_EMAILS_PAUSED) await emailIncidents(supabase, { workspaceId: engine.workspaceId, notificationId: stored.id, agentId: agent?.id ?? null, agentName: agent?.name ?? 'your coworker', notification, recipients, members: audience.members })
     if (!engine.isSandbox) {
         const sourceKey = incidentKeyFor({ event: notification.event, kind: notification.kind, agentId: notification.agentId, source: notification.source, metadata: notification.metadata, sessionId: notification.sessionId })
-        await pushNotification(supabase, { agentId: agent?.id ?? null, agentName: agent?.name ?? 'your coworker', conversationId: audience.conversationId, sourceKey, notification, recipients, members: audience.members })
+        await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: agent?.id ?? null, agentName: agent?.name ?? 'your coworker', conversationId: audience.conversationId, sourceKey, notification, recipients, members: audience.members })
     }
 
     return { ok: true }
@@ -305,6 +307,7 @@ async function emailIncidents(supabase: ServiceRoleClient, context: IncidentCont
                 if (error) throw new Error(error.message)
                 if (!opened) return
                 const to = await emailOf(supabase, userId)
+                const locale = await recipientLocale(supabase, userId, context.workspaceId)
                 const sent = to
                     ? await sendNotificationEmail({
                           to,
@@ -312,10 +315,11 @@ async function emailIncidents(supabase: ServiceRoleClient, context: IncidentCont
                           agentName: context.agentName,
                           message: notification.message,
                           runId: notification.runId ?? null,
-                          reason: `${reasonSentence(reason, context.agentName)}.`,
+                          reason: emailReasonSentence(reason, context.agentName, emailTranslator(locale)),
                           boardUrl: await banner(),
                           conversationUrl: notificationUrl(context.notificationId),
                           unsubscribeUrl: buildUnsubscribeUrl(userId, undefined, 'runs'),
+                          locale,
                       })
                     : null
                 // An incident stays open only once its email has left: otherwise the next failure
@@ -351,14 +355,17 @@ async function resolveIncidents(supabase: ServiceRoleClient, context: IncidentCo
                         const to = await emailOf(supabase, userId)
                         if (!to) return
                         const reason = context.recipients[userId]
+                        const locale = await recipientLocale(supabase, userId, context.workspaceId)
+                        const t = emailTranslator(locale)
                         await sendIncidentResolvedEmail({
                             to,
                             agentName: context.agentName,
-                            sourceLabel: describeSourceKey(key),
-                            reason: reason ? `${reasonSentence(reason, context.agentName)}.` : undefined,
+                            sourceLabel: emailSourceLabel(key, t),
+                            reason: reason ? emailReasonSentence(reason, context.agentName, t) : undefined,
                             boardUrl: await banner(),
                             conversationUrl: notificationUrl(context.notificationId),
                             unsubscribeUrl: buildUnsubscribeUrl(userId, undefined, 'runs'),
+                            locale,
                         })
                     }),
             )

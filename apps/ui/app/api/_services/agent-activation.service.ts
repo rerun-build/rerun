@@ -5,6 +5,7 @@ import { selectAll, selectSingle } from '@/supabase/supabase-helpers'
 import { pauseAgentSchedules, resumeAgentSchedules } from './agent.service'
 import { PLAN_LIMIT_REASON, activeAgentLimit, hasFreeAgentSlot, isPlanLimited } from './capacity.service'
 import { getSpaceConnection } from './space.service'
+import { AppError } from '@/lib/i18n/action-error'
 
 // Losing a plan never destroys work: a downgrade or a cancellation switches agents off and leaves
 // them where they are, and buying the capacity back is what lets the user switch them on again.
@@ -73,7 +74,6 @@ export async function reactivateAgentsAfterRestore(workspaceId: number): Promise
 }
 
 export const NO_FREE_SLOT_ERROR = 'No free coworker slot on your plan. Start Pro for unlimited coworkers, or delete a coworker to make room.'
-const TEMPLATE_REVOKED_ERROR = 'This coworker came from a template subscription that has ended. Buy the template again to bring it back.'
 
 // The only way an agent is ever switched back on. There is no matching "deactivate": the plan
 // decides how many agents run, the user decides which ones, and letting them toggle freely would
@@ -81,10 +81,10 @@ const TEMPLATE_REVOKED_ERROR = 'This coworker came from a template subscription 
 export async function activateAgent(agentId: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'disabled_at', 'disabled_reason'] as const, { id: agentId })
-    if (!agent) throw new Error('Coworker not found')
+    if (!agent) throw new AppError('coworkerNotFound')
     if (!agent.disabled_at) return
-    if (!isPlanLimited(agent.disabled_reason)) throw new Error(TEMPLATE_REVOKED_ERROR)
-    if (!(await hasFreeAgentSlot(agent.workspace_id))) throw new Error(NO_FREE_SLOT_ERROR)
+    if (!isPlanLimited(agent.disabled_reason)) throw new AppError('templateSubscriptionEnded')
+    if (!(await hasFreeAgentSlot(agent.workspace_id))) throw new AppError('noFreeCoworkerSlot')
 
     await supabase.from('agents').update<AgentUpdate>({ disabled_at: null, disabled_reason: null }).eq('id', agentId)
 

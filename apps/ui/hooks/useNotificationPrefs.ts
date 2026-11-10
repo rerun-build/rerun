@@ -1,5 +1,7 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { create } from 'zustand'
@@ -21,6 +23,8 @@ export function useNotificationPrefs() {
     const { user } = useSession()
     const stored = user?.email_notification_prefs
     const pending = usePendingPrefs(s => s.pending)
+    const t = useTranslations('notifications.settings')
+    const errorText = useErrorText()
 
     useEffect(() => {
         const { basis, inFlight } = usePendingPrefs.getState()
@@ -36,14 +40,14 @@ export function useNotificationPrefs() {
             usePendingPrefs.setState(s => ({ pending: mergeNotificationPrefs(current, patch), basis: stored, inFlight: s.inFlight + 1 }))
             saving = saving
                 .then(async () => {
-                    const result = await updateNotificationPrefsAction(patch).catch(() => ({ ok: false as const, error: 'Network error' }))
+                    const result = await updateNotificationPrefsAction(patch).catch(() => ({ ok: false as const, error: t('networkError') }))
                     if (result.ok) return
                     usePendingPrefs.setState({ pending: null })
-                    toast.error('Could not save your notification settings', { description: result.error })
+                    toast.error(t('saveFailed'), { description: errorText(result) })
                 })
                 .finally(() => usePendingPrefs.setState(s => ({ inFlight: s.inFlight - 1 })))
         },
-        [stored]
+        [stored, t, errorText]
     )
 
     const setCoworkerRule = useCallback((agentId: string, rule: CoworkerRule) => update({ coworkers: { [agentId]: rule } }), [update])

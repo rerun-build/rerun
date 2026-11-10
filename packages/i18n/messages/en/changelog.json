@@ -1,0 +1,11 @@
+{
+    "_context": {
+        "eyebrow": "Small caps line above a product announcement. {date} is a short date (\"Nov 9\").",
+        "seeAll": "Link to the public changelog page."
+    },
+    "eyebrow": "What's new · {date}",
+    "seeAll": "See all updates",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done"
+}

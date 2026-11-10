@@ -1,21 +1,21 @@
 'use client'
 
+import { useErrorText } from '@/hooks/useErrorText'
 import { createSkillAction, deleteSkillAction, downloadSkillArchiveAction, getSkillAction, updateSkillAction } from '@/app/api/_actions/agent.actions'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkillFileEditor } from '@/components/agent/skills/SkillFileEditor'
 import { SkillFilesSection } from '@/components/agent/skills/SkillFilesSection'
 import { TemplateContentLock } from '@/components/agent/TemplateContentLock'
-import { templateLockTooltip } from '@/lib/templates/content-lock'
 import { useTemplateContentLock } from '@/hooks/useTemplateContentLock'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MarkdownTextarea } from '@/components/ui/markdown-textarea'
 import { DownloadIcon } from '@/lib/icons'
 import { SkeletonRows } from '@/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 
 type SkillEditorProps = {
@@ -27,6 +27,9 @@ type SkillEditorProps = {
 }
 
 export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onBack }: SkillEditorProps) {
+    const t = useTranslations('agent.skillEditor')
+    const errorText = useErrorText()
+    const tShared = useTranslations('agent.modelsShared')
     const isEdit = !!slug
     // Only an existing skill is sealed: writing a new one on a template's agent stays open, and an
     // empty form has nothing to hide anyway.
@@ -34,10 +37,10 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
     // A sealed skill is shown, never edited: the body in this form is the filler the server sent,
     // so saving it would write that filler over the real procedure.
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : BOX_MANAGE_REASON
+    const manageReason = canManage ? undefined : tShared('boxManageReason')
     const readOnly = readOnlyProp || locked || !canManage
-    const saveReason = locked ? templateLockTooltip('Editing this skill') : manageReason
-    const deleteReason = locked ? templateLockTooltip('Deleting this skill') : manageReason
+    const saveReason = locked ? t('locks.edit') : manageReason
+    const deleteReason = locked ? t('locks.delete') : manageReason
     const [loading, setLoading] = useState(isEdit)
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
@@ -71,8 +74,8 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
         const result = isEdit ? await updateSkillAction(agentId, slug!, { description, body }) : await createSkillAction(agentId, { name, description, body })
         setSaving(false)
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to save')
-    }, [agentId, slug, isEdit, name, description, body, onDone])
+        else setError(errorText(result, t('saveFailed')))
+    }, [agentId, slug, isEdit, name, description, body, onDone, t, errorText])
 
     const handleDownload = useCallback(async () => {
         if (files.length === 0) {
@@ -85,20 +88,20 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
         const result = await downloadSkillArchiveAction(agentId, slug!)
         setDownloading(false)
         if (!result.success || !result.base64) {
-            setError(result.error ?? 'Failed to download skill')
+            setError(errorText(result, t('downloadFailed')))
             return
         }
         const bytes = Uint8Array.from(atob(result.base64), char => char.charCodeAt(0))
         downloadBlob(new Blob([bytes], { type: 'application/gzip' }), `${slug}.tar.gz`)
-    }, [agentId, slug, name, description, body, files.length])
+    }, [agentId, slug, name, description, body, files.length, t, errorText])
 
     const handleDelete = useCallback(async () => {
         setDeleting(true)
         const result = await deleteSkillAction(agentId, slug!)
         setDeleting(false)
         if (result.success) onDone()
-        else setError(result.error ?? 'Failed to delete')
-    }, [agentId, slug, onDone])
+        else setError(errorText(result, t('deleteFailed')))
+    }, [agentId, slug, onDone, t, errorText])
 
     if (loading) {
         return (
@@ -128,12 +131,12 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
     return (
         <PanelSteps stepKey="skill" depth={0}>
             <PanelEditorShell>
-                <PanelEditorHeader title={readOnly ? 'Skill' : isEdit ? 'Edit skill' : 'New skill'} onBack={onBack}>
+                <PanelEditorHeader title={readOnly ? t('titleView') : isEdit ? t('titleEdit') : t('titleNew')} onBack={onBack}>
                     {isEdit && !readOnlyProp && (
                         // Kept in place when sealed rather than removed: a button that disappears never
                         // says why it went.
-                        <TooltipDisabledReason reason={locked ? templateLockTooltip('Downloading this skill') : undefined}>
-                            <Button size="icon-sm" variant="ghost" loading={downloading} disabled={locked} onClick={handleDownload} title="Download skill" aria-label="Download skill">
+                        <TooltipDisabledReason reason={locked ? t('locks.download') : undefined}>
+                            <Button size="icon-sm" variant="ghost" loading={downloading} disabled={locked} onClick={handleDownload} title={t('download')} aria-label={t('download')}>
                                 <DownloadIcon className="size-4" />
                             </Button>
                         </TooltipDisabledReason>
@@ -141,31 +144,31 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
                 </PanelEditorHeader>
                 <PanelEditorBody>
                     {error && <p className="text-xs text-destructive">{error}</p>}
-                    {readOnlyProp && <p className="text-xs text-muted-foreground">This skill is provided by an app and is managed automatically.</p>}
-                    <Input label="Name" helperText={isEdit && !readOnly ? "Name can't be changed (it sets the slug)." : undefined} hideRequired value={name} onChange={e => setName(e.target.value)} disabled={isEdit || readOnly} placeholder="Web Research" className="h-8 text-sm" />
-                    <Input label="Description" hideRequired value={description} onChange={e => setDescription(e.target.value)} disabled={readOnly} placeholder="How to research a topic" className="h-8 text-sm" />
+                    {readOnlyProp && <p className="text-xs text-muted-foreground">{t('connectorManaged')}</p>}
+                    <Input label={t('name')} helperText={isEdit && !readOnly ? t('nameLocked') : undefined} hideRequired value={name} onChange={e => setName(e.target.value)} disabled={isEdit || readOnly} placeholder={t('namePlaceholder')} className="h-8 text-sm" />
+                    <Input label={t('description')} hideRequired value={description} onChange={e => setDescription(e.target.value)} disabled={readOnly} placeholder={t('descriptionPlaceholder')} className="h-8 text-sm" />
                     <TemplateContentLock locked={locked} subject="skills">
-                        <MarkdownTextarea label="Procedure" dialogTitle="Edit the procedure" value={body} onChange={setBody} disabled={readOnly} className="text-xs min-h-48 font-mono" placeholder={'1. Identify sources\n2. Fetch\n3. Summarize'} />
+                        <MarkdownTextarea label={t('procedure')} dialogTitle={t('procedureDialogTitle')} value={body} onChange={setBody} disabled={readOnly} className="text-xs min-h-48 font-mono" placeholder={t('procedurePlaceholder')} />
                     </TemplateContentLock>
-                    {isEdit && <SkillFilesSection agentId={agentId} slug={slug!} files={files} readOnly={readOnlyProp} addLockedReason={locked ? templateLockTooltip('Adding a bundled file') : manageReason} deleteLockedReason={locked ? templateLockTooltip('Deleting a bundled file') : manageReason} onOpen={setOpenFile} onChanged={load} />}
+                    {isEdit && <SkillFilesSection agentId={agentId} slug={slug!} files={files} readOnly={readOnlyProp} addLockedReason={locked ? t('locks.addFile') : manageReason} deleteLockedReason={locked ? t('locks.deleteFile') : manageReason} onOpen={setOpenFile} onChanged={load} />}
                 </PanelEditorBody>
                 {!readOnlyProp && (
                     <PanelEditorFooter>
                         {isEdit && (
                             <TooltipDisabledReason reason={deleteReason}>
                                 <PanelDeleteButton
-                                    label="Delete skill"
+                                    label={t('delete')}
                                     busy={deleting}
                                     disabled={!!deleteReason}
                                     onClick={handleDelete}
-                                    confirmTitle={`Delete ${name || 'this skill'}?`}
-                                    confirmDescription="The skill and every file bundled with it are removed from the coworker. This cannot be undone."
+                                    confirmTitle={name ? t('deleteTitle', { name }) : t('deleteTitleUnnamed')}
+                                    confirmDescription={t('deleteDescription')}
                                 />
                             </TooltipDisabledReason>
                         )}
                         <TooltipDisabledReason reason={saveReason} className="flex-1">
                             <Button size="sm" className="flex-1" loading={saving} onClick={handleSave} disabled={!!saveReason || !name.trim()}>
-                                {isEdit ? 'Save changes' : 'Create skill'}
+                                {isEdit ? t('saveChanges') : t('create')}
                             </Button>
                         </TooltipDisabledReason>
                     </PanelEditorFooter>

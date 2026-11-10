@@ -1,6 +1,7 @@
 'use client'
 
 import type { UIMessage } from 'ai'
+import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 
 import { useToolDisplay } from '@/hooks/useToolDisplay'
@@ -15,8 +16,10 @@ type Options = { messages: UIMessage[]; busy: boolean; open: boolean; pending: P
  * the render and written on change only: `messages` moves at every token, the feed a few times a turn.
  */
 export function useForemanDockFeed({ messages, busy, open, pending, failed }: Options) {
+    const t = useTranslations('chat.activity')
+    const tSubRuns = useTranslations('subRuns')
     const toolDisplay = useToolDisplay()
-    const feed = foremanDockFeed({ messages, busy, pending, failed, toolLabel: toolName => toolDisplay(toolName).label })
+    const feed = foremanDockFeed({ messages, busy, pending, failed, copy: { t, subRuns: tSubRuns, toolLabel: toolName => toolDisplay(toolName).label } })
     const { label, pending: question } = feed
     const replyId = feed.reply?.id ?? null
     const replyText = feed.reply?.text ?? null

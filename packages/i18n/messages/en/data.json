@@ -1,0 +1,116 @@
+{
+    "_context": {
+        "browser.rowCount": "Under the table name. {total} is {count} already formatted for the locale.",
+        "browser.rowCountFound": "Under the table name while a search is active. {total} is {count} already formatted for the locale.",
+        "browser.purgeTableFailed": "Purge = delete every row of the table but keep the table itself.",
+        "pagination.count": "Footer of a table: the total number of rows. <value> wraps the number.",
+        "pagination.range": "Footer of a table: the rows shown on this page, out of the total. {range} is a span of row numbers such as 26 to 50.",
+        "toolbar.purgeTable": "Menu item: delete every row of the table but keep the table itself.",
+        "toolbar.export": "Heading of a menu section listing export formats (CSV, JSON).",
+        "viewBar.allRows": "Tab showing the plain table with every row, next to the saved views.",
+        "viewBar.expand": "Button that opens the table in a larger panel.",
+        "layouts.board": "A kanban board layout for a table view.",
+        "sources.cellLabel": "Accessible label of a cell listing the paid data providers a row came from. {names} is a comma-separated list.",
+        "sources.verified": "Accessible label of a check icon: the email address of this field was verified.",
+        "sources.row": "Fallback title of the side sheet of a row that has no readable name.",
+        "shared.emptyDescription": "Empty state of the database shared by every AI coworker of the workspace."
+    },
+    "browser": {
+        "tableNotFound": "Table not found",
+        "deleteRowsFailed": "Failed to delete rows",
+        "saveRowFailed": "Could not save this row",
+        "deleteTableFailed": "Failed to delete table",
+        "purgeTableFailed": "Failed to purge table",
+        "addViewFailed": "Could not add this view",
+        "deleteViewFailed": "Could not delete this view",
+        "unavailable": "Database unavailable",
+        "tryAgain": "Try again",
+        "rowCount": "{count, plural, one {{total} row} other {{total} rows}}",
+        "rowCountFound": "{count, plural, one {{total} row found} other {{total} rows found}}",
+        "noRows": "No rows",
+        "noSearchMatch": "No row matches this search.",
+        "tableEmpty": "This table is empty."
+    },
+    "pagination": {
+        "count": "Count <value>{count}</value>",
+        "rowsPerPage": "Rows per page",
+        "perPage": "{size} per page",
+        "range": "{range} of {total}",
+        "firstPage": "First page",
+        "previousPage": "Previous page",
+        "nextPage": "Next page",
+        "lastPage": "Last page"
+    },
+    "toolbar": {
+        "selected": "{count, plural, other {# selected}}",
+        "deleteRowTitle": "Delete this row?",
+        "deleteRowsTitle": "Delete {count} rows?",
+        "deleteRowDescription": "The row is removed from the table for good. This cannot be undone.",
+        "deleteRowsDescription": "The rows are removed from the table for good. This cannot be undone.",
+        "delete": "Delete",
+        "clearSelection": "Clear selection",
+        "search": "Search",
+        "searchRows": "Search rows",
+        "clearSearch": "Clear search",
+        "tableActions": "Table actions",
+        "export": "Export",
+        "purgeTable": "Purge table",
+        "deleteTable": "Delete table"
+    },
+    "viewBar": {
+        "allRows": "All rows",
+        "viewOptions": "Options of {name}",
+        "editView": "Edit view",
+        "deleteView": "Delete view",
+        "addView": "Add view",
+        "addNewView": "Add a new view",
+        "expand": "Expand",
+        "deleteViewTitle": "Delete the view \"{name}\"?",
+        "deleteViewDescription": "Only the view goes away. The rows of the table are untouched."
+    },
+    "layouts": {
+        "table": "Table",
+        "list": "List",
+        "gallery": "Gallery",
+        "board": "Board"
+    },
+    "table": {
+        "selectAllRows": "Select all rows on this page",
+        "selectRow": "Select row",
+        "sources": "Sources"
+    },
+    "cell": {
+        "yes": "Yes",
+        "no": "No"
+    },
+    "board": {
+        "moveFailed": "Could not move this row",
+        "unavailable": "Board unavailable",
+        "showMore": "Show {count} more"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "Verified",
+                "detail": "Mailbox exists"
+            },
+            "unconfirmed": {
+                "label": "Unconfirmed",
+                "detail": "Mailbox not confirmed"
+            },
+            "invalid": {
+                "label": "Invalid",
+                "detail": "Mailbox does not exist"
+            }
+        },
+        "openSource": "Open the source",
+        "verified": "Verified",
+        "row": "Row",
+        "cellLabel": "Sources: {names}"
+    },
+    "shared": {
+        "emptyTitle": "No shared tables yet",
+        "emptyDescription": "Every coworker of the workspace reads and writes this database. When they need a common record (a catalog, a queue, a list several coworkers work through), they create tables here that you can browse anytime.",
+        "unreachable": "Could not reach the machine of this workspace."
+    }
+}

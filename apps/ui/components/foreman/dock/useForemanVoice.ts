@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -16,6 +17,7 @@ export type ForemanVoiceStatus = 'idle' | 'listening' | 'transcribing'
  * they had been typed in the pill. Only the transcript travels: the recording is not kept.
  */
 export function useForemanVoice(enabled: boolean) {
+    const t = useTranslations('foreman.voice')
     const [listening, setListening] = useState(false)
     const [transcribing, setTranscribing] = useState(false)
 
@@ -45,16 +47,16 @@ export function useForemanVoice(enabled: boolean) {
             if (!recording) return
             const transcript = await transcribeVoiceRecording(recording.blob, recording.format.transcriptionFormat)
             if (!transcript) {
-                toast.error("Couldn't hear anything in that recording.")
+                toast.error(t('nothingHeard'))
                 return
             }
             useForemanStore.getState().sendToForeman(transcript)
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : 'Could not send your voice message.')
+            toast.error(err instanceof Error ? err.message : t('sendFailed'))
         } finally {
             setTranscribing(false)
         }
-    }, [stop])
+    }, [stop, t])
 
     useEffect(() => {
         finishRef.current = () => void finish()

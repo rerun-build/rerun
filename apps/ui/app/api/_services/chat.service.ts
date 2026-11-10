@@ -46,7 +46,7 @@ export async function getAgentChatTarget(agentId: string, access: AccessLevel = 
 export async function resolveRunTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
     if (agentId !== FOREMAN_AGENT_ID) return getAgentChatTarget(agentId, access)
     const ctx = await requireWorkspaceContext()
-    if (ctx.authUser.is_anonymous) throw new AuthorizationError('Coworker not found')
+    if (ctx.authUser.is_anonymous) throw new AuthorizationError('coworkerNotFound')
     const engine = await findWorkspaceEngine(ctx.workspace.id)
     if (!engine) throw new NoEngineError()
     return { conn: engine.conn, engineAgentId: FOREMAN_AGENT_ID, contentLocked: false }

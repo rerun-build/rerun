@@ -12,7 +12,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { getCookie, setSharedCookie, track } from '@rerun/analytics/client'
 import { StepTransition } from '@rerun/ui/steps'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
-import { useEffect, useState, type ReactNode } from 'react'
+import { CaptchaError } from '@/components/auth/captcha/captcha-error'
+import { useTranslations } from 'next-intl'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -29,8 +31,10 @@ const RESEND_COOLDOWN_SECONDS = 60
 
 export type EmailSendOutcome = 'held' | void
 
-const emailSchema = z.object({ email: z.string().trim().email('Enter a valid email') })
-const codeSchema = z.object({ code: z.string().length(SIGN_IN_CODE_LENGTH, `Enter the ${SIGN_IN_CODE_LENGTH}-digit code`) })
+type EmailTranslator = ReturnType<typeof useTranslations<'auth.email'>>
+
+const emailSchemaFor = (t: EmailTranslator) => z.object({ email: z.string().trim().email(t('errors.invalidEmail')) })
+const codeSchemaFor = (t: EmailTranslator) => z.object({ code: z.string().length(SIGN_IN_CODE_LENGTH, t('errors.codeLength', { length: SIGN_IN_CODE_LENGTH })) })
 
 function markVerificationSent() {
     track('email_verification_sent', {})
@@ -42,7 +46,7 @@ function markVerificationCompleted() {
     track('email_verification_completed', { via: 'code', delay_seconds: sentAt ? Math.round((Date.now() - sentAt) / 1000) : undefined })
 }
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : 'Something went wrong. Please try again.')
+const analyticsMessage = (error: unknown) => (error instanceof Error ? error.message : 'Something went wrong. Please try again.')
 
 // Supabase answers a wrong code and an expired one with the same error, so the copy covers both.
 const isInvalidCode = (error: unknown) => error instanceof Error && /expired|invalid/i.test(error.message)
@@ -67,6 +71,14 @@ export function EmailCodeForm({
     purpose?: EmailCodePurpose
     initialSentTo?: string
 }) {
+    const t = useTranslations('auth.email')
+    const tCaptcha = useTranslations('auth.captcha')
+    const emailSchema = useMemo(() => emailSchemaFor(t), [t])
+    const codeSchema = useMemo(() => codeSchemaFor(t), [t])
+    const errorMessage = (error: unknown) => {
+        if (error instanceof CaptchaError) return tCaptcha(error.inAppBrowser ? 'failedInApp' : 'failed')
+        return error instanceof Error ? error.message : t('errors.generic')
+    }
     const [step, setStep] = useState<EmailCodeStep>(initialSentTo ? 'code' : 'email')
     const [email, setEmail] = useState(initialSentTo ?? '')
     const signingIn = purpose === 'sign-in'
@@ -112,8 +124,8 @@ export function EmailCodeForm({
             await verifyCode(email, code)
             if (signingIn) markVerificationCompleted()
         } catch (error) {
-            if (signingIn) track('signup_field_error', { field: 'code', error_type: errorMessage(error) })
-            codeForm.setError('code', { message: isInvalidCode(error) ? 'This code is wrong or has expired.' : errorMessage(error) })
+            if (signingIn) track('signup_field_error', { field: 'code', error_type: analyticsMessage(error) })
+            codeForm.setError('code', { message: isInvalidCode(error) ? t('errors.invalidCode') : errorMessage(error) })
         }
     })
 
@@ -124,7 +136,7 @@ export function EmailCodeForm({
             if (signingIn) markVerificationSent()
             codeForm.reset({ code: '' })
             setCooldown(RESEND_COOLDOWN_SECONDS)
-            toast.success(outcome === 'held' ? 'Your last code left less than a minute ago. Check your inbox and spam folder.' : 'We sent the code again')
+            toast.success(outcome === 'held' ? t('code.held') : t('code.resent'))
         } catch (error) {
             toast.error(errorMessage(error))
         } finally {
@@ -150,14 +162,14 @@ export function EmailCodeForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormControl>
-                                            <Input type="email" label="Email" placeholder="you@rerun.build" autoComplete="email" {...field} />
+                                            <Input type="email" label={t('label')} placeholder="you@rerun.build" autoComplete="email" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
                             <Button type="submit" className="w-full" loading={emailForm.formState.isSubmitting}>
-                                {signingIn ? 'Continue with email' : 'Send code'}
+                                {signingIn ? t('continue') : t('sendCode')}
                             </Button>
                         </form>
                     </Form>
@@ -166,8 +178,11 @@ export function EmailCodeForm({
                 <Form {...codeForm}>
                     <form onSubmit={submitCode} className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                            We sent a {SIGN_IN_CODE_LENGTH}-digit code to <span className="font-medium text-foreground">{email}</span>. Enter it below
-                            {signingIn && ', or use the button in the email'}.
+                            {t.rich(signingIn ? 'code.sentSignIn' : 'code.sent', {
+                                length: SIGN_IN_CODE_LENGTH,
+                                email,
+                                address: chunks => <span className="font-medium text-foreground">{chunks}</span>,
+                            })}
                         </p>
                         <FormField
                             control={codeForm.control}
@@ -197,23 +212,23 @@ export function EmailCodeForm({
                         />
                         <Alert variant="warning" beam={false}>
                             <AlertTriangle />
-                            <AlertDescription>Not in your inbox? Check your spam or promotions folder.</AlertDescription>
+                            <AlertDescription>{t('code.spamHint')}</AlertDescription>
                         </Alert>
                         <Button type="submit" className="w-full" loading={codeForm.formState.isSubmitting}>
-                            Continue
+                            {t('code.submit')}
                         </Button>
                         <div className="flex items-center justify-between text-sm text-muted-foreground">
                             <button type="button" onClick={changeEmail} className="transition-colors hover:text-foreground">
-                                Use a different email
+                                {t('code.changeEmail')}
                             </button>
-                            <TooltipDisabledReason reason={cooldown > 0 ? `You can ask for a new code in ${cooldown}s` : undefined}>
+                            <TooltipDisabledReason reason={cooldown > 0 ? t('code.resendIn', { seconds: cooldown }) : undefined}>
                                 <button
                                     type="button"
                                     onClick={resend}
                                     disabled={cooldown > 0 || resending}
                                     className="transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
                                 >
-                                    {cooldown > 0 ? `Resend code (${cooldown}s)` : 'Resend code'}
+                                    {cooldown > 0 ? t('code.resendWait', { seconds: cooldown }) : t('code.resend')}
                                 </button>
                             </TooltipDisabledReason>
                         </div>

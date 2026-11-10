@@ -1,0 +1,111 @@
+{
+    "start": {
+        "title": "Welcome to Rerun",
+        "continueWithApple": "Continue with Apple",
+        "continueWithGoogle": "Continue with Google",
+        "continueWithPhone": "Continue with phone",
+        "continueWithEmail": "Continue with email",
+        "or": "Or",
+        "welcome": "Welcome to Rerun",
+        "ownServer": "Use your own server",
+        "useCloud": "Use Rerun Cloud"
+    },
+    "back": "Back",
+    "phone": {
+        "title": "Your phone number",
+        "unsupportedCountry": "We can't send codes to this country yet.",
+        "consent": "By continuing, you agree to be contacted by Rerun on WhatsApp or SMS.",
+        "sendByWhatsapp": "Send by WhatsApp",
+        "sendBySms": "Send by SMS",
+        "countryLabel": "Country, {name}",
+        "numberLabel": "Phone number"
+    },
+    "email": {
+        "title": "Continue with email",
+        "label": "Email",
+        "placeholder": "you@company.com",
+        "send": "Send code"
+    },
+    "code": {
+        "title": "Enter the code",
+        "sentByPhone": "Sent by {channel} to {number}",
+        "sentByEmail": "Sent to {email}",
+        "fieldLabel": "Verification code",
+        "continue": "Continue",
+        "resendIn": "Resend code in {seconds}s",
+        "resend": "Resend code",
+        "switchChannel": "Send by {channel} instead",
+        "differentNumber": "Use a different number",
+        "differentEmail": "Use a different email"
+    },
+    "country": {
+        "search": "Search",
+        "searchLabel": "Search countries"
+    },
+    "errors": {
+        "generic": "Something went wrong. Try again.",
+        "offline": "We could not reach Rerun. Check your connection and try again.",
+        "session": "We could not open your session. Try again.",
+        "apple": "We could not sign you in with Apple. Try again.",
+        "google": "We could not sign you in with Google. Try again.",
+        "phone": {
+            "taken": "This number already signs into another Rerun account.",
+            "same_number": "This is already the number of your account.",
+            "not_required": "Your phone number is already verified.",
+            "too_soon": "A code is already on its way. Wait a moment before asking for a new one.",
+            "too_many": "Too many codes requested for this number. Try again later.",
+            "invalid_number": "Enter a valid mobile number.",
+            "unsupported_country": "We can't send codes to this country yet. Use email or Google instead.",
+            "undeliverable": "We couldn't deliver a code to this number. Try the other channel, or use email or Google.",
+            "blocked": "We can't send a code to this number. Use email or Google instead.",
+            "rate_limited": "Too many attempts on this number. Try again later.",
+            "wrong_code": "This code is wrong or has expired.",
+            "expired": "This code has expired. Ask for a new one.",
+            "unavailable": "We could not reach your phone. Try again, or use the other channel.",
+            "busy": "Phone sign-in is busy right now. Use email or Google instead.",
+            "captcha_failed": "We could not confirm you are not a robot. Try again.",
+            "signed_out": "Create your account first."
+        },
+        "email": {
+            "invalid_email": "Enter a valid email",
+            "captcha_failed": "We could not confirm you are not a robot. Try again.",
+            "blocked_domain": "This email domain is not accepted. Use another address.",
+            "too_many": "Too many accounts were created from your network. Try again later.",
+            "too_many_codes": "Too many codes were asked from your network. Try again later.",
+            "unavailable": "We could not send your code. Try again.",
+            "rate_limited": "Too many codes asked for this address. Try again later.",
+            "wrong_code": "This code is wrong or has expired."
+        }
+    },
+    "consent": {
+        "title": "Your coworkers run on AI",
+        "body": "To do your tasks, Rerun sends your messages, photos, voice messages, files and website to AI providers: OpenAI, Anthropic and Google through OpenRouter, and any provider you connect yourself.",
+        "noTraining": "Rerun's providers don't train on your data.",
+        "privacy": "Privacy Policy",
+        "notNow": "Not now",
+        "agree": "Agree and continue"
+    },
+    "_context": {
+        "code.sentByPhone": "{channel} is WhatsApp or SMS, {number} the phone number in international format.",
+        "code.resendIn": "{seconds} is a countdown in seconds, shown on a link.",
+        "code.switchChannel": "{channel} is WhatsApp or SMS: send the code through the other channel.",
+        "phone.countryLabel": "VoiceOver label of the country picker button; {name} is the country name.",
+        "errors.phone.taken": "The errors.phone.* and errors.email.* keys mirror the hub's sign-in refusals, keyed by their reason.",
+        "start.welcome": "Title of the sign-in screen when the app is connected to a self-hosted Rerun server.",
+        "start.ownServer": "Link under the sign-in buttons: connect the app to a self-hosted Rerun server.",
+        "start.useCloud": "Link that leaves a self-hosted server and goes back to Rerun Cloud.",
+        "server.address": "VoiceOver label of the field where the person types the address of their Rerun server."
+    },
+    "server": {
+        "title": "Your Rerun server",
+        "address": "Server address",
+        "connect": "Connect",
+        "problems": {
+            "invalid": "Enter the address of your Rerun server.",
+            "insecure": "Use https:// outside your local network.",
+            "unreachable": "Could not reach this server.",
+            "not-rerun": "This address is not a Rerun server.",
+            "outdated": "Update this Rerun server to use it from the app."
+        }
+    }
+}

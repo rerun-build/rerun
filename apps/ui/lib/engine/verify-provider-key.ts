@@ -1,8 +1,11 @@
 import 'server-only'
 
 import { CONNECTION_TOKEN_KEY, OPENCODE_USAGE_URL, type Provider } from '@rerun/contracts'
+import type { ErrorCode, ErrorParams } from '@/lib/i18n/action-error'
 
 const VERIFY_TIMEOUT_MS = 5000
+
+export type KeyProblem = { code: ErrorCode; params?: ErrorParams }
 
 type KeyCheck = { name: string; request: (key: string) => [string, RequestInit]; rejects: (res: Response) => Promise<boolean> }
 
@@ -54,18 +57,18 @@ const KEY_CHECKS: Partial<Record<Provider, KeyCheck>> = {
 
 // What is wrong with an API key about to be stored, or null when its provider took it (or could
 // not be asked). Saved unchecked, a mistyped key reads as "Ready" and fails every run.
-export async function providerKeyProblem(provider: Provider, keys: Record<string, string> | undefined, baseUrl?: string): Promise<string | null> {
+export async function providerKeyProblem(provider: Provider, keys: Record<string, string> | undefined, baseUrl?: string): Promise<KeyProblem | null> {
     const check = KEY_CHECKS[provider]
     const key = keys?.[CONNECTION_TOKEN_KEY[provider]]?.trim()
     if (!check || !key) return null
-    if (provider === 'anthropic' && key.startsWith('sk-ant-oat')) return 'This is a Claude plan token. Add it under Claude Pro or Max instead.'
+    if (provider === 'anthropic' && key.startsWith('sk-ant-oat')) return { code: 'claudePlanTokenAsApiKey' }
     // A router of the user's own answers for its own keys, not openrouter.ai.
     if (provider === 'openrouter' && baseUrl) return null
 
     try {
         const [url, init] = check.request(key)
         const res = await fetch(url, { ...init, signal: AbortSignal.timeout(VERIFY_TIMEOUT_MS) })
-        if (await check.rejects(res)) return `${check.name} turned this key down. Check it was copied in full and is still active.`
+        if (await check.rejects(res)) return { code: 'providerKeyRejected', params: { provider: check.name } }
     } catch {
         return null
     }

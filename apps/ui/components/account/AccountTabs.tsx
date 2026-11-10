@@ -2,20 +2,19 @@
 
 import { DialogTabs } from '@/components/dialogs/DialogTabs'
 import type { AccountTab } from '@/stores/account.store'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
-export const ACCOUNT_TABS: Record<AccountTab, { label: string; description: string }> = {
-    profile: { label: 'Profile', description: 'Your photo and your name, as your teammates see them.' },
-    'sign-in': { label: 'Sign-in', description: 'The ways you can sign into this account.' },
-    delete: { label: 'Delete account', description: 'Close your Rerun account for good.' },
+const TAB_KEYS = { profile: 'profile', 'sign-in': 'signIn', language: 'language', delete: 'delete' } as const satisfies Record<AccountTab, string>
+
+export function useAccountTabText(tab: AccountTab) {
+    const t = useTranslations('account.tabs')
+    return { label: t(`${TAB_KEYS[tab]}.label`), description: t(`${TAB_KEYS[tab]}.description`) }
 }
 
-const TABS = [
-    { value: 'profile', label: ACCOUNT_TABS.profile.label },
-    { value: 'sign-in', label: ACCOUNT_TABS['sign-in'].label },
-    { value: 'delete', label: ACCOUNT_TABS.delete.label },
-] as const
-
-export function AccountTabs(props: { tab: AccountTab; onTabChange: (tab: AccountTab) => void; header: ReactNode; children: ReactNode }) {
-    return <DialogTabs tabs={TABS} {...props} />
+// The language tab only shows once the language packs are out: before that every account reads English.
+export function AccountTabs({ showLanguage, ...props }: { tab: AccountTab; onTabChange: (tab: AccountTab) => void; header: ReactNode; children: ReactNode; showLanguage: boolean }) {
+    const t = useTranslations('account.tabs')
+    const tabs = (['profile', 'sign-in', ...(showLanguage ? (['language'] as const) : []), 'delete'] as const satisfies readonly AccountTab[]).map(value => ({ value, label: t(`${TAB_KEYS[value]}.label`) }))
+    return <DialogTabs tabs={tabs} {...props} />
 }

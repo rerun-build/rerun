@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "Texturas de banner",
+        "description": "Texturas de banner gratis para tu perfil de experto en Rerun: descarga un fondo listo para usar y añádelo a tu página pública en un minuto."
+    },
+    "banners": {
+        "eyebrow": "Para expertos",
+        "title": "Texturas de banner",
+        "description": "Una colección de texturas de vidrio fluido que usamos en los perfiles de expertos de Rerun. Descárgalas gratis y úsalas como quieras.",
+        "download": "Descargar",
+        "downloadFile": "Descargar {file}",
+        "alts": {
+            "lime-glass-crumple": "Vidrio verde lima brillante, láminas arrugadas y plegadas",
+            "pastel-holographic-knot": "Cintas de vidrio anudadas en tonos pastel holográficos",
+            "blue-glass-crystal": "Vidrio cristalino facetado azul eléctrico",
+            "violet-lime-swirl": "Vórtice de vidrio en espiral morado y verde lima",
+            "crimson-fluid-blob": "Forma fluida brillante carmesí y magenta",
+            "amber-droplet-blob": "Gotas de vidrio naranja ámbar, relieves brillantes",
+            "amber-chrome-swirl": "Espirales de cromo naranja y negro",
+            "dark-lime-crumple": "Vidrio negro arrugado con vetas verde ácido",
+            "pastel-iridescent-bloom": "Flor de vidrio iridiscente en tonos pastel holográficos",
+            "violet-lime-vortex": "Túneles de vidrio en vórtice morado y verde lima",
+            "lavender-glass-vortex": "Vórtice de vidrio lavanda en espiral",
+            "violet-lime-crystal": "Bloques de vidrio cristalino morado y verde",
+            "pink-swirl-vortex": "Vórtice de vidrio en espiral rosa intenso y rojo",
+            "violet-lime-knot": "Bucles toroidales anudados morado y verde lima",
+            "lavender-glass-crystal": "Vidrio cristalino facetado lavanda",
+            "blue-chrome-knot": "Bucles toroidales anudados de cromo azul",
+            "blue-plasma-smoke": "Humo de plasma azul eléctrico sobre vidrio",
+            "violet-iridescent-vortex": "Vórtice en espiral morado iridiscente",
+            "dark-lime-knot": "Nudos de vidrio negro con brillo verde ácido",
+            "pastel-holographic-vortex": "Vórtice en espiral holográfico pastel",
+            "blue-liquid-ripple": "Vidrio líquido azul iridiscente ondulado",
+            "blue-glass-bloom": "Flor de pétalos de vidrio azul cobalto",
+            "blue-chrome-vortex": "Vórtice de vidrio en espiral de cromo azul",
+            "pastel-holographic-smoke": "Vidrio de humo tenue holográfico pastel",
+            "crimson-swirl-vortex": "Vórtice en espiral rojo intenso y magenta",
+            "amethyst-crystal-facets": "Facetas cristalinas morado amatista",
+            "violet-iridescent-crumple": "Bloques de cristal arrugado morado iridiscente",
+            "violet-glossy-bloom": "Flor de pétalos de vidrio morado brillante",
+            "violet-lime-fluid-blob": "Formas fluidas brillantes morado y verde ácido",
+            "dark-green-swirl-vortex": "Vórtice en espiral brillante verde oscuro y negro"
+        }
+    }
+}

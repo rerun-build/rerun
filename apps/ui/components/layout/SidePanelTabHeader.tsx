@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { AnimatePresence, motion } from 'motion/react'
 import { XIcon } from '@/lib/icons'
+import { useTranslations } from 'next-intl'
 import type { ComponentType, ReactNode } from 'react'
 
 export type SidePanelTab = {
@@ -44,6 +45,7 @@ function RevealLine({ text, base, className }: { text: string; base: number; cla
 }
 
 export function SidePanelTabHeader({ tab, onClose, leading, title }: SidePanelTabHeaderProps) {
+    const t = useTranslations('layout.sidePanel')
     if (title) {
         return (
             <div className="flex items-center justify-between gap-3 p-4 border-b border-border">
@@ -58,7 +60,7 @@ export function SidePanelTabHeader({ tab, onClose, leading, title }: SidePanelTa
                         </AnimatePresence>
                     </div>
                 </div>
-                <Button aria-label="Close panel" variant="ghost" size="icon-sm" onClick={onClose}>
+                <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
                     <XIcon className="size-4" />
                 </Button>
             </div>
@@ -81,7 +83,7 @@ export function SidePanelTabHeader({ tab, onClose, leading, title }: SidePanelTa
                     </div>
                 </motion.div>
             </AnimatePresence>
-            <Button aria-label="Close panel" variant="ghost" size="icon-sm" onClick={onClose}>
+            <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
                 <XIcon className="size-4" />
             </Button>
         </div>

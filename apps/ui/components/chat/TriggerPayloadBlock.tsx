@@ -6,7 +6,9 @@ import { CheckIcon, ChevronRightIcon, CopyIcon, WebhookIcon } from '@/lib/icons'
 import { type TriggerPayload } from '@/lib/triggers/trigger-payload'
 import { formatBytes } from '@/lib/files/format'
 import { cn } from '@/lib/utils'
+import { formatDate } from '@rerun/i18n/format'
 import { Badge, type BadgeTone } from '@rerun/ui/primitives'
+import { useLocale, useTranslations } from 'next-intl'
 import { type ReactNode, useState } from 'react'
 
 const METHOD_TONES: Record<string, BadgeTone> = {
@@ -44,6 +46,8 @@ export function TriggerPayloadBlock({ payload }: { payload: TriggerPayload }) {
 }
 
 export function TriggerPayloadSummary({ payload }: { payload: TriggerPayload }) {
+    const t = useTranslations('chat.triggerPayload')
+    const locale = useLocale()
     return (
         <>
             <Badge tone={METHOD_TONES[payload.method] ?? 'neutral'} size="xs" glow={false} className="shrink-0 font-mono uppercase">
@@ -51,30 +55,32 @@ export function TriggerPayloadSummary({ payload }: { payload: TriggerPayload }) 
             </Badge>
             {payload.truncated && (
                 <Badge tone="orange" size="xs" glow={false} className="shrink-0">
-                    truncated
+                    {t('truncated')}
                 </Badge>
             )}
             {payload.body.length > 0 ? (
-                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{formatBytes(payload.bytes)}</span>
+                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">{formatBytes(payload.bytes, locale)}</span>
             ) : (
-                <span className="shrink-0 text-xs text-muted-foreground">No payload</span>
+                <span className="shrink-0 text-xs text-muted-foreground">{t('empty')}</span>
             )}
         </>
     )
 }
 
 export function TriggerPayloadDetails({ payload, bodyClassName }: { payload: TriggerPayload; bodyClassName?: string }) {
+    const t = useTranslations('chat.triggerPayload')
+    const locale = useLocale()
     return (
         <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-muted-foreground">
-                {payload.receivedAt && <span className="tabular-nums">{formatReceivedAt(payload.receivedAt)}</span>}
+                {payload.receivedAt && <span className="tabular-nums">{formatReceivedAt(payload.receivedAt, locale)}</span>}
                 {payload.contentType && <span>{payload.contentType}</span>}
                 {payload.query && <span className="break-all">?{payload.query}</span>}
             </div>
             {payload.body.length > 0 && (
                 <div>
                     <div className="flex items-center justify-between gap-2">
-                        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">Payload</span>
+                        <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{t('payload')}</span>
                         <CopyPayloadButton text={payload.body} />
                     </div>
                     <pre className={cn('mt-0.5 max-h-60 overflow-auto whitespace-pre-wrap break-all rounded bg-background px-2 py-1.5 text-xs font-mono text-foreground', bodyClassName)}>
@@ -86,12 +92,13 @@ export function TriggerPayloadDetails({ payload, bodyClassName }: { payload: Tri
     )
 }
 
-function formatReceivedAt(iso: string): string {
+function formatReceivedAt(iso: string, locale: string): string {
     const date = new Date(iso)
-    return Number.isNaN(date.getTime()) ? iso : date.toLocaleString()
+    return Number.isNaN(date.getTime()) ? iso : formatDate(date, locale)
 }
 
 function CopyPayloadButton({ text }: { text: string }) {
+    const t = useTranslations('chat.actions')
     const [copied, setCopied] = useState(false)
     return (
         <button
@@ -105,7 +112,7 @@ function CopyPayloadButton({ text }: { text: string }) {
             }}
         >
             {copied ? <CheckIcon className="size-3" /> : <CopyIcon className="size-3" />}
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? t('copied') : t('copy')}
         </button>
     )
 }

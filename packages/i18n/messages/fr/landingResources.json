@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "Textures de bannière",
+        "description": "Des textures de bannière gratuites pour votre profil d'expert Rerun : téléchargez un fond prêt à l'emploi et ajoutez-le à votre page publique en une minute."
+    },
+    "banners": {
+        "eyebrow": "Pour les experts",
+        "title": "Textures de bannière",
+        "description": "Une série de textures en verre fluide que nous utilisons pour les profils d'experts Rerun. Libres de téléchargement et d'utilisation.",
+        "download": "Télécharger",
+        "downloadFile": "Télécharger {file}",
+        "alts": {
+            "lime-glass-crumple": "Verre vert citron vif, feuilles froissées et pliées",
+            "pastel-holographic-knot": "Rubans de verre noués aux reflets holographiques pastel",
+            "blue-glass-crystal": "Verre cristallin à facettes bleu électrique",
+            "violet-lime-swirl": "Vortex de verre tourbillonnant violet et vert citron",
+            "crimson-fluid-blob": "Forme fluide brillante cramoisie et magenta",
+            "amber-droplet-blob": "Gouttes de verre orange ambré, renflements brillants",
+            "amber-chrome-swirl": "Tourbillons de chrome orange et noir",
+            "dark-lime-crumple": "Verre noir froissé veiné de vert acide",
+            "pastel-iridescent-bloom": "Éclosion de verre irisé aux reflets holographiques pastel",
+            "violet-lime-vortex": "Tunnels de verre en vortex violet et vert citron",
+            "lavender-glass-vortex": "Vortex de verre lavande tourbillonnant",
+            "violet-lime-crystal": "Blocs de verre cristallin violet et vert",
+            "pink-swirl-vortex": "Vortex de verre tourbillonnant rose vif et rouge",
+            "violet-lime-knot": "Boucles toriques nouées violet et vert citron",
+            "lavender-glass-crystal": "Verre cristallin lavande à facettes",
+            "blue-chrome-knot": "Boucles toriques nouées en chrome bleu",
+            "blue-plasma-smoke": "Fumée de plasma bleu électrique sur verre",
+            "violet-iridescent-vortex": "Vortex tourbillonnant violet irisé",
+            "dark-lime-knot": "Nœuds de verre noir aux reflets vert acide",
+            "pastel-holographic-vortex": "Vortex tourbillonnant holographique pastel",
+            "blue-liquid-ripple": "Verre liquide bleu irisé ondulé",
+            "blue-glass-bloom": "Éclosion de pétales de verre bleu cobalt",
+            "blue-chrome-vortex": "Vortex de verre tourbillonnant en chrome bleu",
+            "pastel-holographic-smoke": "Verre en volutes de fumée holographique pastel",
+            "crimson-swirl-vortex": "Vortex tourbillonnant rouge profond et magenta",
+            "amethyst-crystal-facets": "Facettes cristallines violet améthyste",
+            "violet-iridescent-crumple": "Blocs de cristal froissé violet irisé",
+            "violet-glossy-bloom": "Éclosion de pétales de verre violet brillant",
+            "violet-lime-fluid-blob": "Formes fluides brillantes violet et vert acide",
+            "dark-green-swirl-vortex": "Vortex tourbillonnant brillant vert foncé et noir"
+        }
+    }
+}

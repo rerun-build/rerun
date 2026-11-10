@@ -16,11 +16,13 @@ const mocks = vi.hoisted(() => ({
     updateSchedule: vi.fn(),
     updateTrigger: vi.fn(),
     listFiles: vi.fn(),
+    recipientLocale: vi.fn(),
 }))
 vi.mock('@/app/api/_auth/access', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/access')>()), assertAgentAccess: mocks.assertAgentAccess }))
 vi.mock('@/app/api/_services/agent.service', () => ({ renameAgent: mocks.renameAgent, deleteAgent: mocks.deleteAgent }))
 vi.mock('@/app/api/_services/notification-prefs.service', () => ({ patchNotificationPrefs: mocks.patchNotificationPrefs, readNotificationPrefs: mocks.readNotificationPrefs }))
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: mocks.resolveAgentTarget }))
+vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: mocks.recipientLocale }))
 vi.mock('@/lib/engine/client', () => ({ listFiles: mocks.listFiles, listSchedules: mocks.listSchedules, listTriggers: mocks.listTriggers, updateSchedule: mocks.updateSchedule, updateTrigger: mocks.updateTrigger }))
 
 const { AccessDeniedError } = await import('@/app/api/_auth/access')
@@ -34,7 +36,7 @@ const actor = { kind: 'user', userId: 'u1', workspaceId: 7, role: 'member', boxS
 // of a Box closed to them, or one that is gone.
 function rowsAre({ access = 'manage', prefs = null }: { access?: 'none' | 'use' | 'manage'; prefs?: unknown }) {
     mocks.assertAgentAccess.mockImplementation(async (_agentId: string, need: 'use' | 'manage') => {
-        if (access === 'none') throw new AuthorizationError('Coworker not found')
+        if (access === 'none') throw new AuthorizationError('coworkerNotFound')
         if (need === 'manage' && access !== 'manage') throw new AccessDeniedError()
         return { actor, access, agent: { workspace_id: 7, space_id: 'box', engine_agent_id: 'eng-1' } }
     })
@@ -47,6 +49,7 @@ describe('coworker details', () => {
     beforeEach(() => {
         Object.values(mocks).forEach(mock => mock.mockReset())
         mocks.resolveAgentTarget.mockResolvedValue({ conn: { host: 'box' }, engineAgentId: 'eng-1', contentLocked: false })
+        mocks.recipientLocale.mockResolvedValue('en')
         rowsAre({})
     })
 
@@ -80,6 +83,10 @@ describe('coworker details', () => {
             { kind: 'schedule', slug: 'once', name: 'Reminder', enabled: false, cronLabel: null, runAt: '2026-11-01T08:00:00.000Z', timezone: null },
             { kind: 'trigger', slug: 'stripe', name: 'Stripe webhook', enabled: true, cronLabel: null, runAt: null, timezone: null },
         ])
+        expect(mocks.recipientLocale).toHaveBeenCalledWith(ctx.supabase, 'u1', 7)
+
+        mocks.recipientLocale.mockResolvedValueOnce('fr')
+        expect((await listCoworkerRoutines(ctx, 'a1')).routines[0].cronLabel).toBe('À 09:00')
     })
 
     it('switches a schedule or a trigger with nothing but its enabled flag', async () => {

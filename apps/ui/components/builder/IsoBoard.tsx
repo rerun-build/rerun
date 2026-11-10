@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useIsMobile } from '@rerun/ui/primitives/use-is-mobile'
 import { AnimatePresence, motion } from 'motion/react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { type PlacementQueue, placementLabel, refuseUnmanagedBox, useBoardStore } from '@/stores/board.store'
 import { useBoardCoverStore } from '@/stores/board-cover.store'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -27,15 +28,17 @@ import { useTeamCursors } from '@/supabase/useTeamCursors'
 import { useWindowFocused } from '@/hooks/useWindowFocused'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { useBoxViewer, useManageableSpaceIds } from '@/hooks/useBoxAccess'
-import { MEMBER_EMPTY_BOARD_LABEL, boxContainerFor, boxTileFor, emptyBoardOffersBox, placementNeedsBoxFirst } from '@/lib/board/box-controls'
+import { boxContainerFor, boxTileFor, emptyBoardOffersBox, placementNeedsBoxFirst } from '@/lib/board/box-controls'
 import { flushCamera, readCamera, writeCamera } from '@/lib/camera-storage'
 import { attentionCountByAgent } from '@/lib/board/attention'
 import { useNextRuns } from '@/hooks/useNextRuns'
 import { useUnseenGroups } from '@/hooks/useUnseenGroups'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { containerFromSpace, linksFromSessions, tileFromAgent } from '@/lib/board/iso-adapter'
+import { useKitTranslations } from '@rerun/ui/locale'
 import { useAgentIdeas } from '@/lib/agent-ideas/useAgentIdeas'
 import { boxCtaExamples, boxCtaLabel } from '@/lib/onboarding/box-themes'
+import { localizeSuggestion } from '@/lib/onboarding/localize-suggestion'
 import { useOnboardingIndustry } from '@/lib/onboarding/useOnboardingIndustry'
 import { AGENT_SPAN } from '@/lib/board/iso'
 import { freeRectOnSide } from '@/lib/board/space-layout'
@@ -49,10 +52,10 @@ const PLACEHOLDER_ID = '__placeholder__'
 // (space.actions.ts) pour que le placeholder ait la même taille que le space réellement créé. Le
 // losange s'étend de col_start à col_end+1, donc (2 → 9) ⇒ centre = (2 + 10) / 2 = 6 = GRID_SIZE / 2,
 // il apparaît au milieu de l'écran.
-const PLACEHOLDER_CONTAINER: Container = { id: PLACEHOLDER_ID, label: null, color: SPACE_COLOR, col_start: 2, row_start: 2, col_end: 9, row_end: 9, variant: 'placeholder', placeholderLabel: 'Click to recruit your first coworker' }
+const PLACEHOLDER_CONTAINER: Container = { id: PLACEHOLDER_ID, label: null, color: SPACE_COLOR, col_start: 2, row_start: 2, col_end: 9, row_end: 9, variant: 'placeholder' }
 // A member with no Box open to them starts from a Box of their own, not from the workspace's first
 // coworker: nothing can be dropped on it, a click names the Box.
-const MEMBER_PLACEHOLDER_CONTAINER: Container = { ...PLACEHOLDER_CONTAINER, placeholderLabel: MEMBER_EMPTY_BOARD_LABEL, readOnly: true }
+const MEMBER_PLACEHOLDER_CONTAINER: Container = { ...PLACEHOLDER_CONTAINER, readOnly: true }
 
 // SidePanel's `md:` breakpoint.
 const PANEL_SHEET_QUERY = '(max-width: 767.98px)'
@@ -64,6 +67,9 @@ function clampLabel(title: string): string {
 }
 
 export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpaces = [] }: { onRequestRecruitAgent?: () => void; onRequestBoxAgent?: (spaceId: string) => void; initialSpaces?: SpacePublic[] }) {
+    const t = useTranslations('builder.isoBoard')
+    const tKit = useKitTranslations()
+    const tErrors = useTranslations('errors')
     const { workspace, isAnonymous } = useSession()
     const { access: workspaceAccess, needsMachineReason } = useWorkspaceAccess()
     const { cursors, onPointerWorldMove } = useTeamCursors(workspace?.id)
@@ -170,6 +176,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     // toolbar est lui-même fermé.
     const agentIdeas = useAgentIdeas()
     const industry = useOnboardingIndustry()
+    const tSuggestions = useTranslations('agentSuggestions')
     const invitesAgents = hydrated && !!workspace && !isSandbox && !isAnonymous && !needsMachineReason && !guidedByForeman && !startingFirstAgent && !placement && !placingAgentId && !previewing && mode !== 'space'
     const boxInvites = useMemo(() => {
         const invites = new Map<string, Pick<Container, 'cta' | 'ctaExamples'>>()
@@ -178,12 +185,12 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         for (const space of realSpaces) {
             if (agents.some(a => a.spaceId === space.id)) continue
             invites.set(space.id, {
-                cta: boxCtaLabel(space.name),
-                ctaExamples: boxCtaExamples({ boxName: space.name, industry, ideas: agentIdeas, agentNames }),
+                cta: boxCtaLabel(space.name, t),
+                ctaExamples: boxCtaExamples({ boxName: space.name, industry, ideas: agentIdeas, agentNames }, suggestion => localizeSuggestion(suggestion, tSuggestions)),
             })
         }
         return invites
-    }, [invitesAgents, agents, realSpaces, agentIdeas, industry])
+    }, [invitesAgents, agents, realSpaces, agentIdeas, industry, t, tSuggestions])
 
     const boardContainers = useMemo<Container[]>(
         () =>
@@ -194,22 +201,22 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                           isSandbox
                               ? workspaceAccess === 'paused'
                                   ? { ...PLACEHOLDER_CONTAINER, variant: 'default' as const, placeholderLabel: undefined }
-                                  : { ...PLACEHOLDER_CONTAINER, variant: 'loading' as const, placeholderLabel: 'Preparing your sandbox…' }
+                                  : { ...PLACEHOLDER_CONTAINER, variant: 'loading' as const, placeholderLabel: t('preparingSandbox') }
                               : startingFirstAgent
-                                ? { ...PLACEHOLDER_CONTAINER, variant: 'loading' as const, placeholderLabel: parkedTitle ? `Setting up ${parkedTitle}…` : 'Setting up your coworker…' }
+                                ? { ...PLACEHOLDER_CONTAINER, variant: 'loading' as const, placeholderLabel: parkedTitle ? t('settingUpTemplate', { title: parkedTitle }) : t('settingUpCoworker') }
                                 : placing
                                   ? { ...PLACEHOLDER_CONTAINER, variant: 'default' as const, placeholderLabel: undefined, readOnly: memberWithoutBox }
                                   : parkedTitle
-                                    ? { ...PLACEHOLDER_CONTAINER, placeholderLabel: `Click to install ${parkedTitle}` }
+                                    ? { ...PLACEHOLDER_CONTAINER, placeholderLabel: t('installTemplate', { title: parkedTitle }) }
                                     : memberWithoutBox
-                                      ? MEMBER_PLACEHOLDER_CONTAINER
-                                      : PLACEHOLDER_CONTAINER,
+                                      ? { ...MEMBER_PLACEHOLDER_CONTAINER, placeholderLabel: t('createBox') }
+                                      : { ...PLACEHOLDER_CONTAINER, placeholderLabel: t('recruitFirst') },
                       ]
                 : realSpaces.map(space => {
                       const invite = boxInvites.get(space.id)
-                      return boxContainerFor(invite ? { ...containerFromSpace(space), ...invite } : containerFromSpace(space), manageableSpaceIds.has(space.id))
+                      return boxContainerFor(invite ? { ...containerFromSpace(space, tKit), ...invite } : containerFromSpace(space, tKit), manageableSpaceIds.has(space.id), tErrors('boxManagerOnly'))
                   }),
-        [showPlaceholder, emptyOnboardingBoard, isSandbox, workspaceAccess, startingFirstAgent, placing, parkedTitle, memberWithoutBox, realSpaces, boxInvites, manageableSpaceIds]
+        [showPlaceholder, emptyOnboardingBoard, isSandbox, workspaceAccess, startingFirstAgent, placing, parkedTitle, memberWithoutBox, realSpaces, boxInvites, manageableSpaceIds, t, tKit, tErrors]
     )
     const containers = useMemo(() => (planPreview ? [...boardContainers, ...planPreview.containers] : boardContainers), [planPreview, boardContainers])
 
@@ -395,7 +402,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
         return byAgent
     }, [unseenGroups])
     const boardTiles = useMemo(() => {
-        const placed = agents.map(a => boxTileFor(tileFromAgent(a, a.id === justPlacedAgentId, attentionCounts[a.id] ?? 0, workspaceAccess, nextRuns[a.id], resultsByAgent[a.id]), manageableSpaceIds.has(a.spaceId)))
+        const placed = agents.map(a => boxTileFor(tileFromAgent(a, a.id === justPlacedAgentId, attentionCounts[a.id] ?? 0, workspaceAccess, nextRuns[a.id], resultsByAgent[a.id], tKit), manageableSpaceIds.has(a.spaceId)))
         if (!placement) return placed
 
         const reserved = placement.placed
@@ -403,7 +410,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
             .filter(({ position }) => !agents.some(a => a.position.col === position.col && a.position.row === position.row))
             .map(({ position, index }) => ({ id: `__reserved__${index}`, position, span: AGENT_SPAN, style: { ...agentTileStyle('idle', placement.labels[index]), opacity: 0.6 }, selectable: false, draggable: false }))
         return [...placed, ...reserved]
-    }, [agents, attentionCounts, justPlacedAgentId, placement, workspaceAccess, nextRuns, resultsByAgent, manageableSpaceIds])
+    }, [agents, attentionCounts, justPlacedAgentId, placement, workspaceAccess, nextRuns, resultsByAgent, manageableSpaceIds, tKit])
     const tiles = useMemo(() => (planPreview ? [...boardTiles, ...planPreview.tiles] : boardTiles), [planPreview, boardTiles])
     const computedLinks = useMemo(() => linksFromSessions(sessions, liveLinks), [sessions, liveLinks])
     const placingTile = useMemo(() => (placement ? { span: AGENT_SPAN, style: agentTileStyle('idle', placementLabel(placement)) } : undefined), [placement])
@@ -490,7 +497,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                     onContainerMove={showPlaceholder || previewing ? undefined : handleContainerMove}
                     onContainerAdd={canAddSpace ? handleContainerAdd : undefined}
                     containerAddPreview={canAddSpace ? handleContainerAddPreview : undefined}
-                    containerAddLabel="Add a Box on this side"
+                    containerAddLabel={t('addBoxOnSide')}
                     onTileContextMenu={handleTileContextMenu}
                     onContainerContextMenu={showPlaceholder || previewing ? undefined : handleContainerContextMenu}
                     onPointerWorldMove={onPointerWorldMove}

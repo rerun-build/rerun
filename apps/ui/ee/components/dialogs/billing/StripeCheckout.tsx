@@ -2,6 +2,7 @@
 
 import { BillingAddressElement, CheckoutElementsProvider, ExpressCheckoutElement, PaymentElement, TaxIdElement, useCheckout } from '@stripe/react-stripe-js/checkout'
 import type { Appearance, StripeCheckoutExpressCheckoutElementOptions, StripeExpressCheckoutElementConfirmEvent } from '@stripe/stripe-js'
+import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { useState, type ReactNode } from 'react'
 
@@ -79,6 +80,7 @@ export type WalletPayment = {
 // it, and a wallet hands over its own. The tax ID sits behind Stripe's own "purchasing as a business"
 // box: in this mode `tax_id_collection` on the session draws nothing by itself.
 export function StripePaymentFields({ wallet }: { wallet?: WalletPayment }) {
+    const t = useTranslations('billing.stripe')
     const checkout = useCheckout()
     const [walletsShown, setWalletsShown] = useState(false)
     if (checkout.type === 'loading') return <StripePaymentFieldsSkeleton />
@@ -109,7 +111,7 @@ export function StripePaymentFields({ wallet }: { wallet?: WalletPayment }) {
                     </div>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                         <span className="h-px flex-1 bg-border" />
-                        or pay with card
+                        {t('orPayWithCard')}
                         <span className="h-px flex-1 bg-border" />
                     </div>
                 </div>
@@ -124,6 +126,7 @@ export function StripePaymentFields({ wallet }: { wallet?: WalletPayment }) {
 // The session takes promotion codes, but in this mode Stripe draws no field for them. The discount
 // reads off the next invoice when nothing is due today, which is every trial.
 export function StripePromoCode({ disabled }: { disabled?: boolean }) {
+    const t = useTranslations('billing.stripe')
     const checkout = useCheckout()
     if (checkout.type !== 'success') return null
 
@@ -131,7 +134,7 @@ export function StripePromoCode({ disabled }: { disabled?: boolean }) {
     const discount = session.discountAmounts?.find(amount => amount.promotionCode)
     const discountCents = Math.max(discount?.minorUnitsAmount ?? 0, session.recurring?.dueNext.discount.minorUnitsAmount ?? 0)
     const applied = discount?.promotionCode
-        ? { code: discount.promotionCode, discount: discount.percentOff != null ? `${discount.percentOff}% off` : `${usd(discountCents)} off` }
+        ? { code: discount.promotionCode, discount: discount.percentOff != null ? t('percentOff', { percent: discount.percentOff }) : t('amountOff', { amount: usd(discountCents) }) }
         : null
 
     return (

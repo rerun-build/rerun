@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "Table introuvable",
+        "deleteRowsFailed": "Échec de la suppression des lignes",
+        "saveRowFailed": "Impossible d'enregistrer cette ligne",
+        "deleteTableFailed": "Échec de la suppression de la table",
+        "purgeTableFailed": "Échec du vidage de la table",
+        "addViewFailed": "Impossible d'ajouter cette vue",
+        "deleteViewFailed": "Impossible de supprimer cette vue",
+        "unavailable": "Base de données indisponible",
+        "tryAgain": "Réessayer",
+        "rowCount": "{count, plural, one {{total} ligne} other {{total} lignes}}",
+        "rowCountFound": "{count, plural, one {{total} ligne trouvée} other {{total} lignes trouvées}}",
+        "noRows": "Aucune ligne",
+        "noSearchMatch": "Aucune ligne ne correspond à cette recherche.",
+        "tableEmpty": "Cette table est vide."
+    },
+    "pagination": {
+        "count": "Total <value>{count}</value>",
+        "rowsPerPage": "Lignes par page",
+        "perPage": "{size} par page",
+        "range": "{range} sur {total}",
+        "firstPage": "Première page",
+        "previousPage": "Page précédente",
+        "nextPage": "Page suivante",
+        "lastPage": "Dernière page"
+    },
+    "toolbar": {
+        "selected": "{count, plural, one {# sélectionnée} other {# sélectionnées}}",
+        "deleteRowTitle": "Supprimer cette ligne ?",
+        "deleteRowsTitle": "Supprimer {count} lignes ?",
+        "deleteRowDescription": "La ligne est retirée de la table définitivement. Cette action est irréversible.",
+        "deleteRowsDescription": "Les lignes sont retirées de la table définitivement. Cette action est irréversible.",
+        "delete": "Supprimer",
+        "clearSelection": "Effacer la sélection",
+        "search": "Rechercher",
+        "searchRows": "Rechercher des lignes",
+        "clearSearch": "Effacer la recherche",
+        "tableActions": "Actions de la table",
+        "export": "Exporter",
+        "purgeTable": "Vider la table",
+        "deleteTable": "Supprimer la table"
+    },
+    "viewBar": {
+        "allRows": "Toutes les lignes",
+        "viewOptions": "Options de {name}",
+        "editView": "Modifier la vue",
+        "deleteView": "Supprimer la vue",
+        "addView": "Ajouter une vue",
+        "addNewView": "Ajouter une nouvelle vue",
+        "expand": "Agrandir",
+        "deleteViewTitle": "Supprimer la vue « {name} » ?",
+        "deleteViewDescription": "Seule la vue disparaît. Les lignes de la table ne sont pas touchées."
+    },
+    "layouts": {
+        "table": "Tableau",
+        "list": "Liste",
+        "gallery": "Galerie",
+        "board": "Kanban"
+    },
+    "table": {
+        "selectAllRows": "Sélectionner toutes les lignes de cette page",
+        "selectRow": "Sélectionner la ligne",
+        "sources": "Sources"
+    },
+    "cell": {
+        "yes": "Oui",
+        "no": "Non"
+    },
+    "board": {
+        "moveFailed": "Impossible de déplacer cette ligne",
+        "unavailable": "Kanban indisponible",
+        "showMore": "Afficher {count} de plus"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "Vérifié",
+                "detail": "La boîte mail existe"
+            },
+            "unconfirmed": {
+                "label": "Non confirmé",
+                "detail": "Boîte mail non confirmée"
+            },
+            "invalid": {
+                "label": "Invalide",
+                "detail": "La boîte mail n'existe pas"
+            }
+        },
+        "openSource": "Ouvrir la source",
+        "verified": "Vérifié",
+        "row": "Ligne",
+        "cellLabel": "Sources : {names}"
+    },
+    "shared": {
+        "emptyTitle": "Aucune table partagée pour l'instant",
+        "emptyDescription": "Chaque coworker du workspace lit et écrit dans cette base. Quand ils ont besoin d'un registre commun (un catalogue, une file d'attente, une liste que plusieurs coworkers traitent), ils créent ici des tables que vous pouvez consulter à tout moment.",
+        "unreachable": "Impossible de joindre la machine de ce workspace."
+    }
+}

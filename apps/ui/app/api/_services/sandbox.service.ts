@@ -2,9 +2,10 @@ import type { Database } from '@/app/api/database.types'
 import { BASE_PLAN_SLUG, MICROS_PER_USD } from '@rerun/cloud/billing'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { ensureWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
-import { isSandboxLocked, SANDBOX_LOCKED_ERROR } from '@/lib/sandbox-idle/lock'
+import { isSandboxLocked } from '@/lib/sandbox-idle/lock'
 import { loadSandboxArchive } from '@/lib/sandbox-idle/store'
 import { selectMany } from '@/supabase/supabase-helpers'
+import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 
 import type { ActionResult } from '@/app/api/_actions/space.actions'
 
@@ -91,7 +92,7 @@ async function findSandboxWorkspaceId(userId: string): Promise<number | null> {
     return sandboxes?.[0]?.id ?? null
 }
 
-async function createSandboxWorkspace(userId: string): Promise<number | { ok: false; error: string }> {
+async function createSandboxWorkspace(userId: string): Promise<number | ActionFailure> {
     const supabase = createServiceRoleClient()
 
     const { data: workspace, error: workspaceError } = await supabase
@@ -114,7 +115,7 @@ async function createSandboxWorkspace(userId: string): Promise<number | { ok: fa
         .select('id')
         .single()
 
-    if (workspaceError || !workspace) return { ok: false, error: workspaceError?.message ?? 'Failed to create the sandbox' }
+    if (workspaceError || !workspace) return workspaceError ? { ok: false, error: workspaceError.message } : failure('sandboxCreateFailed')
 
     const workspaceId = (workspace as { id: number }).id
 
@@ -132,12 +133,12 @@ async function createSandboxWorkspace(userId: string): Promise<number | { ok: fa
 // result when the pool is empty (nothing is claimed, so re-entry retries cleanly); returns null on
 // success or when the sandbox is already set up. Self-healing: the machine is looked up by
 // workspace, so a Box row lost on its own does not leave the engine stranded.
-export async function ensureSandboxSpace(workspaceId: number): Promise<{ ok: false; error: string; locked?: true } | null> {
+export async function ensureSandboxSpace(workspaceId: number): Promise<(ActionFailure & { locked?: true }) | null> {
     const supabase = createServiceRoleClient()
 
     // Before any claim, and not left to `ensureWorkspaceEngine`: once an expired archive is purged
     // the workspace is no longer flagged archived, and this is the only door still shut.
-    if (isSandboxLocked(await loadSandboxArchive(supabase, workspaceId))) return { ok: false, error: SANDBOX_LOCKED_ERROR, locked: true }
+    if (isSandboxLocked(await loadSandboxArchive(supabase, workspaceId))) return { ...failure('sandboxLocked'), locked: true }
 
     const engine = await ensureWorkspaceEngine(workspaceId)
     if (!engine.ok) return engine

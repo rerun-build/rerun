@@ -1,4 +1,5 @@
 import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors'
+import type { ErrorCode } from '@/lib/i18n/action-error'
 import { toBoxScope, type BoxScope } from '@/app/api/_auth/box-scope'
 import { requireWorkspaceContext, type WorkspaceContext, type WorkspaceRole } from '@/app/api/_auth/ownership'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -23,15 +24,15 @@ export type SpaceVisibility = 'workspace' | 'restricted'
 // turn with no person behind it. The workspace stands for its admins, so it reaches every Box.
 export type Actor = { kind: 'user'; userId: string; workspaceId: number; role: WorkspaceRole; boxScope: BoxScope } | { kind: 'workspace'; workspaceId: number }
 
-export const BOX_MANAGE_ONLY = 'Only an admin or a manager of this Box can do this'
-export const COWORKER_NOT_FOUND = 'Coworker not found'
-export const BOX_NOT_FOUND = 'Box not found'
+export const BOX_MANAGE_ONLY = 'boxManagerOnly' satisfies ErrorCode
+export const COWORKER_NOT_FOUND = 'coworkerNotFound' satisfies ErrorCode
+export const BOX_NOT_FOUND = 'boxNotFound' satisfies ErrorCode
 
 // Reached the resource but may not do this to it. The v1 API answers it with a 403, where any other
 // AuthorizationError past authentication reads as a 404.
 export class AccessDeniedError extends AuthorizationError {
-    constructor(message = BOX_MANAGE_ONLY) {
-        super(message)
+    constructor(code: ErrorCode = BOX_MANAGE_ONLY) {
+        super(code)
         this.name = 'AccessDeniedError'
     }
 }
@@ -74,7 +75,7 @@ export async function requireSessionActor(): Promise<Actor> {
 // The same as requireSessionActor in a single read: the membership row the session already proves.
 export async function requireLightSessionActor(): Promise<Actor> {
     const { user, workspaceRefused, membership } = await getSessionWorkspace()
-    if (workspaceRefused) throw new AuthorizationError('You are not a member of this workspace')
+    if (workspaceRefused) throw new AuthorizationError('notMember')
     if (!user?.id || !user.workspace_id || !membership) throw new UnauthenticatedError()
     return { kind: 'user', userId: user.id, workspaceId: user.workspace_id, role: membership.role, boxScope: toBoxScope(membership.box_scope) }
 }
@@ -118,7 +119,7 @@ export async function readAgentAccess(actor: Actor, agentId: string): Promise<Bo
 
 // Throws the way the caller expects: a Box the actor cannot see does not exist, a Box it only uses
 // refuses the change with a reason it can show.
-export function enforce(have: BoxAccess, need: AccessLevel, notFound: string): void {
+export function enforce(have: BoxAccess, need: AccessLevel, notFound: ErrorCode): void {
     if (have === 'none') throw new AuthorizationError(notFound)
     if (!hasAccess(have, need)) throw new AccessDeniedError()
 }
@@ -220,8 +221,8 @@ type OwnedSession = { id: string; agent_id: string; engine_session_id: string | 
 // passed in by a caller that already started resolving it.
 export async function assertSessionInWorkspace(sessionId: string, actor?: Promise<Actor> | Actor): Promise<OwnedSession> {
     const [callerActor, session] = await Promise.all([actor ?? requireLightSessionActor(), readSessionWithAgent(sessionId)])
-    if (!session?.agent || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('Session not found')
-    if (!hasAccess(await readSpaceAccess(callerActor, session.agent.space_id), 'use')) throw new AuthorizationError('Session not found')
+    if (!session?.agent || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('sessionNotFound')
+    if (!hasAccess(await readSpaceAccess(callerActor, session.agent.space_id), 'use')) throw new AuthorizationError('sessionNotFound')
     return { id: session.id, agent_id: session.agent_id, engine_session_id: session.engine_session_id, engine_agent_id: session.agent.engine_agent_id }
 }
 

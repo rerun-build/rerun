@@ -15,6 +15,7 @@ export { buildUnsubscribeUrl, verifyUnsubscribeToken } from '@/lib/email/unsubsc
 export const EMAIL_DELIVERY = Boolean(process.env.RESEND_API_KEY)
 
 export type PushContext = {
+    workspaceId: number
     agentId: string | null
     agentName: string
     conversationId: string | null

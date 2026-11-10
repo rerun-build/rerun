@@ -2,6 +2,7 @@ import * as React from "react";
 import { Heading, Section, Text } from "@react-email/components";
 import { Layout } from "../components/Layout";
 import { Button } from "../components/Button";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { text, theme } from "../theme";
 
 export interface SignInCodeProps {
@@ -11,6 +12,7 @@ export interface SignInCodeProps {
   signInUrl?: string;
   expiresInMinutes: number;
   appUrl: string;
+  locale?: EmailLocale;
 }
 
 export default function SignInCode({
@@ -18,29 +20,29 @@ export default function SignInCode({
   signInUrl,
   expiresInMinutes,
   appUrl,
+  locale,
 }: SignInCodeProps) {
+  const t = emailTranslator(locale);
   return (
-    <Layout preview={`Your Rerun code is ${code}`} appUrl={appUrl}>
+    <Layout preview={t("signInCode.preview", { code })} appUrl={appUrl} locale={locale}>
       <Heading style={text.heading}>
-        {signInUrl ? "Sign in to Rerun" : "Confirm your new email"}
+        {signInUrl ? t("signInCode.headingSignIn") : t("signInCode.headingConfirm")}
       </Heading>
       <Text style={text.paragraph}>
-        {signInUrl
-          ? "Enter this code in the tab where you asked for it, or use the button below to sign in right away."
-          : "Enter this code in your Rerun account settings to make this the email of your account."}
+        {signInUrl ? t("signInCode.bodySignIn") : t("signInCode.bodyConfirm")}
       </Text>
       <Section style={codeBox}>
         <Text style={codeText}>{code}</Text>
       </Section>
       {signInUrl ? (
         <Section style={cta}>
-          <Button href={signInUrl}>Sign in to Rerun</Button>
+          <Button href={signInUrl}>{t("signInCode.button")}</Button>
         </Section>
       ) : null}
       <Text style={text.footnote}>
         {signInUrl
-          ? `The code and the button expire in ${expiresInMinutes} minutes and work once. If you didn't ask for them, you can safely ignore this email.`
-          : `The code expires in ${expiresInMinutes} minutes and works once. If you didn't ask for it, you can safely ignore this email.`}
+          ? t("signInCode.footnoteSignIn", { minutes: expiresInMinutes })
+          : t("signInCode.footnoteConfirm", { minutes: expiresInMinutes })}
       </Text>
     </Layout>
   );

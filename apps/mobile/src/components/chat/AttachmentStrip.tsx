@@ -2,6 +2,7 @@ import { Image } from 'expo-image'
 import { SymbolView } from 'expo-symbols'
 import { Pressable, ScrollView, View } from 'react-native'
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { useTheme } from '@/theme/theme'
@@ -15,6 +16,7 @@ const REMOVE = 22
 
 export function AttachmentStrip({ attachments, onRemove }: { attachments: ComposerAttachment[]; onRemove: (uri: string) => void }) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.composer')
     return (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: spacing.sm, paddingTop: spacing.xs, paddingRight: spacing.xs }}>
             {attachments.map(attachment => (
@@ -29,7 +31,7 @@ export function AttachmentStrip({ attachments, onRemove }: { attachments: Compos
                             </AppText>
                         </View>
                     )}
-                    <Pressable onPress={() => onRemove(attachment.uri)} accessibilityRole="button" accessibilityLabel={`Remove ${attachment.name}`} hitSlop={10} style={{ position: 'absolute', top: -spacing.xs, right: -spacing.xs }}>
+                    <Pressable onPress={() => onRemove(attachment.uri)} accessibilityRole="button" accessibilityLabel={t('removeAttachment', { name: attachment.name })} hitSlop={10} style={{ position: 'absolute', top: -spacing.xs, right: -spacing.xs }}>
                         <View style={{ width: REMOVE, height: REMOVE, borderRadius: REMOVE / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.primary, borderWidth: 2, borderColor: theme.card }}>
                             <SymbolView name="xmark" size={9} weight="bold" tintColor={theme.primaryForeground} />
                         </View>

@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 type PowerBarsProps = {
     // Capability rating on a 1..max scale. Undefined/0 renders nothing.
@@ -11,11 +12,12 @@ type PowerBarsProps = {
 // Ascending signal-style bars showing a model's relative power. The first `power`
 // bars are filled; the rest are faint. Bar heights grow left-to-right.
 export function PowerBars({ power, max = 6, size = 'sm', className }: PowerBarsProps) {
+    const t = useTranslations('ui')
     if (!power) return null
     const filled = Math.min(power, max)
 
     return (
-        <span role="img" aria-label={`Power ${filled} of ${max}`} className={cn('flex items-end', size === 'sm' ? 'gap-px' : 'gap-0.5', className)}>
+        <span role="img" aria-label={t('powerBars', { filled, max })} className={cn('flex items-end', size === 'sm' ? 'gap-px' : 'gap-0.5', className)}>
             {Array.from({ length: max }).map((_, i) => (
                 <span
                     key={i}

@@ -1,6 +1,7 @@
 'use client'
 
 import { Badge, Stripes } from '@rerun/ui/primitives'
+import { useLocale, useTranslations } from 'next-intl'
 
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { StateDot } from '@/components/agent/sheet/OpenChatsTabs'
@@ -28,9 +29,9 @@ const BRANCH_TONE: Record<ThreadState, string> = {
     done: 'border-border',
 }
 
-const STATE_BADGE: Record<Exclude<ThreadState, 'done' | 'live'>, { label: string; tone: 'orange' | 'red' }> = {
-    needs: { label: 'Needs you', tone: 'orange' },
-    error: { label: 'Error', tone: 'red' },
+const STATE_BADGE_TONE: Record<Exclude<ThreadState, 'done' | 'live'>, 'orange' | 'red'> = {
+    needs: 'orange',
+    error: 'red',
 }
 
 const THREAD_STRIPES_INK = 'color-mix(in oklab, var(--foreground) 6%, transparent)'
@@ -39,11 +40,11 @@ const isAutomated = (thread: ThreadRow) => thread.source === 'schedule' || threa
 
 // What stands in for the opening message when the hub never saw one: a run the engine started, a
 // coworker's request, or a thread older than the column that keeps it.
-function genericOpener(thread: ThreadRow, originAgentName: string | null): string {
-    if (thread.source === 'schedule') return `Scheduled run · ${thread.automationName ?? thread.title}`
-    if (thread.source === 'trigger') return `Webhook · ${thread.automationName ?? thread.title}`
-    if (thread.source === 'agent' || thread.source === 'delegate') return `Asked by ${originAgentName ?? 'another coworker'}`
-    return 'Started a thread'
+function genericOpener(thread: ThreadRow, originAgentName: string | null, t: ReturnType<typeof useTranslations<'agent.threadBranch.opener'>>): string {
+    if (thread.source === 'schedule') return t('schedule', { name: thread.automationName ?? thread.title })
+    if (thread.source === 'trigger') return t('trigger', { name: thread.automationName ?? thread.title })
+    if (thread.source === 'agent' || thread.source === 'delegate') return originAgentName ? t('askedBy', { name: originAgentName }) : t('askedByUnknown')
+    return t('started')
 }
 
 /**
@@ -53,11 +54,14 @@ function genericOpener(thread: ThreadRow, originAgentName: string | null): strin
  * click on it opens the thread in its tab.
  */
 export function ThreadBranch({ thread, onOpen }: { thread: ThreadRow; onOpen: () => void }) {
+    const t = useTranslations('agent.threadBranch')
+    const tOpener = useTranslations('agent.threadBranch.opener')
+    const locale = useLocale()
     const state = threadStateOf(thread.status)
-    const badge = state === 'needs' || state === 'error' ? STATE_BADGE[state] : null
+    const badge = state === 'needs' || state === 'error' ? { label: t(state), tone: STATE_BADGE_TONE[state] } : null
     const SourceIcon = thread.source === 'trigger' ? WebhookIcon : CalendarClock
     const originAgentName = useBoardStore(s => (thread.originAgentId ? (s.agents.find(agent => agent.id === thread.originAgentId)?.name ?? null) : null))
-    const opener = thread.firstMessage ?? genericOpener(thread, originAgentName)
+    const opener = thread.firstMessage ?? genericOpener(thread, originAgentName, tOpener)
     return (
         <div className="flex w-full flex-col gap-2" data-thread-row={thread.id}>
             {/* The clamp sits on an inner span: on the padded box itself, a third line would show through the bottom padding. Its right padding keeps the overhang of a last italic glyph. */}
@@ -77,7 +81,7 @@ export function ThreadBranch({ thread, onOpen }: { thread: ThreadRow; onOpen: ()
                             {badge.label}
                         </Badge>
                     )}
-                    <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{shortRelativeTime(thread.createdAt)}</span>
+                    <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{shortRelativeTime(thread.createdAt, locale)}</span>
                     <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                 </button>
             </div>

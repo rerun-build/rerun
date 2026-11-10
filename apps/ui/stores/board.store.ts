@@ -15,6 +15,8 @@ import { clearPendingKickoff, readPendingKickoff, readPendingKickoffs, savePendi
 import { reportDuplicate, reportInstall, reportShareInstall } from '@/lib/templates/install-feedback'
 import { track } from '@rerun/analytics/client'
 import { toast } from 'sonner'
+import type { ReactNode } from 'react'
+import { refusalText, translated } from '@/lib/i18n/toast-text'
 import type { Database } from '@/app/api/database.types'
 import { createClient } from '@/supabase/client'
 import { selectMany } from '@/supabase/supabase-helpers'
@@ -46,7 +48,7 @@ function managesBoxes(state: { spaces: SpacePublic[]; spaceGrants: SpaceGrant[] 
 export const BOX_REFUSAL_TOAST_ID = 'box-manage-refused'
 
 export function refuseUnmanagedBox() {
-    toast.error(BOX_MANAGE_ACTION_REASON, { id: BOX_REFUSAL_TOAST_ID })
+    toast.error(refusalText({ error: BOX_MANAGE_ACTION_REASON, code: 'boxManagerOnly' }), { id: BOX_REFUSAL_TOAST_ID })
 }
 
 // Brouillon d'agent en attente de placement : le modal récolte ces champs, puis on entre en
@@ -412,7 +414,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                         if (!res.ok) return
                         // Le plan plafonne les agents actifs, pas les agents créés : celui-ci est
                         // complet mais ne tournera pas tant qu'un slot ne s'est pas libéré.
-                        if (!res.active) toast.warning(`"${draft.name}" was created but is inactive`, { description: 'Your plan has no free coworker slot. Activate it from the coworker panel.' })
+                        if (!res.active) toast.warning(translated('builder.boardToasts.createdInactive', { name: draft.name }), { description: translated('builder.boardToasts.createdInactiveHint') })
                         get().finalizeAgentCreation(res.agentId, draft.description, draft.kickoff)
                         return
                     }
@@ -420,7 +422,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                     if (source.kind === 'share') {
                         const res = await installSharedAgentAction({ token: source.token, spaceId: space.id, position: pos })
                         if (!res.ok) {
-                            toast.error('Could not add this coworker', { description: res.error })
+                            toast.error(translated('builder.boardToasts.addFailed'), { description: refusalText(res) })
                             return
                         }
                         track('agent_share_installed', { inactive: res.inactive })
@@ -432,7 +434,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                     if (source.kind === 'duplicate') {
                         const res = await duplicateAgentAction({ agentId: source.agentId, spaceId: space.id, position: pos })
                         if (!res.ok) {
-                            toast.error('Could not duplicate this coworker', { description: res.error })
+                            toast.error(translated('builder.boardToasts.duplicateFailed'), { description: refusalText(res) })
                             return
                         }
                         track('agent_duplicated', { schedules: res.schedules.length, triggers: res.triggers.length })
@@ -443,7 +445,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
                     const res = await installTemplateAction({ slug: source.slug, spaceId: space.id, positions: step.positions, again: source.again })
                     if (!res.ok) {
-                        toast.error('Could not import this template', { description: res.error })
+                        toast.error(translated('builder.boardToasts.importFailed'), { description: refusalText(res) })
                         return
                     }
                     track('template_import_completed', { slug: source.slug, imported: res.imported, failed: res.failed.length })
@@ -454,7 +456,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                     // à nettoyer. Un import est plus long et peut mourir en vol (timeout, déploiement)
                     // après avoir posé une partie du lot, donc on le dit plutôt que d'inviter à
                     // réimporter par-dessus.
-                    if (source.kind !== 'scratch') toast.error('The import was interrupted', { description: err instanceof Error ? err.message : 'Check your machine before importing again.' })
+                    if (source.kind !== 'scratch') toast.error(translated('builder.boardToasts.importInterrupted'), { description: err instanceof Error ? err.message : translated('builder.boardToasts.importInterruptedHint') })
                 } finally {
                     set({ placement: null })
                 }
@@ -527,7 +529,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                 set(state => ({
                     agents: state.agents.map(a => (a.id === id && a.position.col === pos.col && a.position.row === pos.row ? { ...a, position: previous.position, spaceId: previous.spaceId } : a)),
                 }))
-                toast.error('Could not move this coworker')
+                toast.error(translated('builder.boardToasts.moveAgentFailed'))
             })
     },
 
@@ -540,7 +542,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
         // la connaître ferait sauter la tuile deux fois.
         moveAgentAction({ agentId: id, spaceId }).then(res => {
             if (!res.ok) {
-                toast.error('Could not move this coworker', { description: res.error })
+                toast.error(translated('builder.boardToasts.moveAgentFailed'), { description: refusalText(res) })
                 return
             }
             set(state => ({ agents: state.agents.map(a => (a.id === id ? { ...a, spaceId, position: res.position } : a)) }))
@@ -785,7 +787,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                         return moved && a.position.col === moved.to.col && a.position.row === moved.to.row ? { ...a, position: moved.from } : a
                     }),
                 }))
-                toast.error('Could not move this Box', { description: 'Check your connection and try again.' })
+                toast.error(translated('builder.boardToasts.moveBoxFailed'), { description: translated('builder.boardToasts.checkConnection') })
             })
             .finally(() => set(state => (state._movingSpaceId === id ? { _movingSpaceId: null } : {})))
     },
@@ -824,15 +826,15 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             spaces: state.spaces.filter(s => s.id !== id),
             selectedSpaceId: state.selectedSpaceId === id ? null : state.selectedSpaceId,
         }))
-        const restore = (error: string) => {
+        const restore = (error: ReactNode) => {
             if (removed) set(state => (state.spaces.some(s => s.id === id) ? {} : { spaces: [...state.spaces, removed] }))
-            toast.error('Could not delete this Box', { description: error })
+            toast.error(translated('builder.boardToasts.deleteBoxFailed'), { description: error })
         }
         deleteSpaceAction(id)
             .then(res => {
-                if (!res.ok) restore(res.error)
+                if (!res.ok) restore(refusalText(res))
             })
-            .catch(err => restore(err instanceof Error ? err.message : 'Check your connection and try again.'))
+            .catch(err => restore(err instanceof Error ? err.message : translated('builder.boardToasts.checkConnection')))
     },
 
     setSpaceGrants: grants => set({ spaceGrants: grants }),

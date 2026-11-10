@@ -1,7 +1,8 @@
 'use client'
 
-import type { TemplateConnector } from '@rerun/contracts'
+import { TRIAL_DAYS, type TemplateConnector } from '@rerun/contracts'
 import { StepperBar, StepTransition } from '@rerun/ui/steps'
+import { useTranslations } from 'next-intl'
 
 import { TemplateCardThumbnail } from '@/components/templates/TemplateCardThumbnail'
 import { TemplateConnectorLogos } from '@/components/templates/TemplateConnectorLogos'
@@ -9,7 +10,7 @@ import { Check } from '@/lib/icons'
 import type { TemplateCardImage } from '@/lib/templates/card-image'
 import { cn } from '@/lib/utils'
 
-import { arrivalGestures, arrivalHeading, gestureIndex, type ArrivalStep } from './flow'
+import { arrivalGestures, gestureIndex, type ArrivalStep } from './flow'
 
 // `name` is what the headings call it: the coworker's own name when there is one to give.
 export type ArrivalPick = { title: string; name?: string; by?: string | null; image?: TemplateCardImage | null; connectors?: TemplateConnector[] }
@@ -17,15 +18,16 @@ export type ArrivalPick = { title: string; name?: string; by?: string | null; im
 // What the visitor came for, carried on every screen until it is running: the one thing that tells
 // them this account, this card and this wait are all about what they picked.
 export function ArrivalPassport({ pick, className }: { pick: ArrivalPick; className?: string }) {
+    const t = useTranslations('foreman.arrival')
     return (
         <div className={cn('flex items-center gap-3', className)}>
             {pick.image && <TemplateCardThumbnail image={pick.image} className="aspect-[1200/630] w-24 shrink-0 rounded-lg ring-1 ring-foreground/10" />}
             <div className="min-w-0">
-                <p className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase">You picked</p>
+                <p className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground uppercase">{t('youPicked')}</p>
                 <p className="truncate text-sm font-semibold text-foreground">{pick.title}</p>
                 {(pick.by || !!pick.connectors?.length) && (
                     <p className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                        {pick.by && <span className="truncate">{`by ${pick.by}`}</span>}
+                        {pick.by && <span className="truncate">{t('by', { name: pick.by })}</span>}
                         {!!pick.connectors?.length && <TemplateConnectorLogos connectors={pick.connectors} />}
                     </p>
                 )}
@@ -35,6 +37,7 @@ export function ArrivalPassport({ pick, className }: { pick: ArrivalPick; classN
 }
 
 export function GestureRail({ step, paid = false, className }: { step: ArrivalStep; paid?: boolean; className?: string }) {
+    const t = useTranslations('foreman.arrival.gestures')
     const gestures = arrivalGestures(paid)
     const current = gestureIndex(step, paid)
 
@@ -45,7 +48,7 @@ export function GestureRail({ step, paid = false, className }: { step: ArrivalSt
                 {gestures.map((gesture, index) => (
                     <li key={gesture} className={cn('flex flex-1 items-center gap-1 text-[11px]', index === current ? 'font-medium text-foreground' : 'text-muted-foreground')}>
                         {index < current && <Check className="size-3" />}
-                        {gesture}
+                        {t(gesture)}
                     </li>
                 ))}
             </ol>
@@ -55,7 +58,10 @@ export function GestureRail({ step, paid = false, className }: { step: ArrivalSt
 
 /** The top of the column for the whole arrival: where they are, what they picked, and what this step is for. */
 export function ArrivalHeader({ pick, step, paid, className }: { pick: ArrivalPick; step: ArrivalStep; paid?: boolean; className?: string }) {
-    const { title, description } = arrivalHeading(step, pick.name ?? pick.title)
+    const t = useTranslations('foreman.arrival.headings')
+    const name = pick.name ?? pick.title
+    const title = t(`${step}.title`, { name, days: TRIAL_DAYS })
+    const description = t(`${step}.description`, { name })
 
     return (
         <div className={cn('flex shrink-0 flex-col gap-4', className)}>

@@ -1,10 +1,12 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
 import { useAgentIdeas } from '@/lib/agent-ideas/useAgentIdeas'
 import type { AgentSuggestion } from '@/lib/onboarding/agent-suggestions'
 import { boxSuggestions, boxTheme } from '@/lib/onboarding/box-themes'
+import { localizeSuggestion } from '@/lib/onboarding/localize-suggestion'
 import { useOnboardingIndustry } from '@/lib/onboarding/useOnboardingIndustry'
 import { useBoardStore } from '@/stores/board.store'
 
@@ -15,9 +17,11 @@ export function useBoxAgentSuggestions(spaceId: string | null, open: boolean): {
     const ideas = useAgentIdeas(open)
     const boxName = useBoardStore(s => (spaceId ? (s.spaces.find(space => space.id === spaceId)?.name ?? null) : null))
     const agents = useBoardStore(s => s.agents)
+    const t = useTranslations('dialogs.newAgent')
+    const tSuggestions = useTranslations('agentSuggestions')
 
     return useMemo(() => {
-        const suggestions = boxSuggestions({ boxName, industry, ideas, agentNames: agents.map(agent => agent.name) })
-        return { suggestions, heading: boxName && boxTheme(boxName) ? `Or start from one picked for ${boxName}` : undefined }
-    }, [boxName, industry, ideas, agents])
+        const suggestions = boxSuggestions({ boxName, industry, ideas, agentNames: agents.map(agent => agent.name) }).map(suggestion => localizeSuggestion(suggestion, tSuggestions))
+        return { suggestions, heading: boxName && boxTheme(boxName) ? t('suggestionsForBox', { boxName }) : undefined }
+    }, [boxName, industry, ideas, agents, t, tSuggestions])
 }

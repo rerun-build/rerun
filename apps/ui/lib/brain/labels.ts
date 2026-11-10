@@ -1,58 +1,47 @@
 import { BRAIN_CARD_TYPES, FOREMAN_AGENT_ID, type BrainPageType } from '@rerun/contracts'
 
-export const BRAIN_PAGE_TYPE_LABELS: Record<BrainPageType, string> = {
-    company: 'Company',
-    offering: 'Offering',
-    market: 'Market',
-    team: 'Team',
-    voice: 'Voice',
-    stack: 'Tools',
-    priorities: 'Priorities',
-    customer: 'Customer',
-    competitor: 'Competitor',
-    person: 'Person',
-    product: 'Product',
-    decision: 'Decision',
-    note: 'Note',
-}
-
 export const isCardType = (type: BrainPageType) => (BRAIN_CARD_TYPES as readonly string[]).includes(type)
+
+const SITE_PAGE_KEYS = {
+    about: 'sitePages.about',
+    team: 'sitePages.team',
+    pricing: 'sitePages.pricing',
+    customers: 'sitePages.customers',
+    product: 'sitePages.product',
+    catalog: 'catalog',
+    legal: 'sitePages.legal',
+    careers: 'sitePages.careers',
+    contact: 'sitePages.contact',
+    privacy: 'sitePages.privacy',
+    blog: 'sitePages.blog',
+} as const
+
+const SOURCE_KEYS = {
+    dns: 'dns',
+    stack: 'stack',
+    search: 'search',
+    catalog: 'catalog',
+    registry: 'registry',
+    linkedin: 'linkedin',
+    'linkedin:company': 'linkedinCompany',
+    'linkedin:person': 'linkedinPerson',
+    google: 'google',
+    'google:business': 'googleBusiness',
+} as const
+
+type BrainSourceKey = `sources.${'website' | (typeof SITE_PAGE_KEYS)[keyof typeof SITE_PAGE_KEYS] | (typeof SOURCE_KEYS)[keyof typeof SOURCE_KEYS]}`
+
+// The `brain` namespace, as far as these labels read it.
+export type BrainLabelCopy = (key: BrainSourceKey | 'authors.seed' | 'authors.foreman') => string
 
 // The engine stores who wrote a page as `seed`, `user:<email>` or `agent:<name>`. The foreman
 // writes as `agent:foreman`, a name the user never sees.
-export function brainAuthorLabel(author: string): string {
-    if (author === 'seed') return 'Rerun, from your website'
-    if (author === `agent:${FOREMAN_AGENT_ID}`) return 'Rerun coworker'
+export function brainAuthorLabel(author: string, t: BrainLabelCopy): string {
+    if (author === 'seed') return t('authors.seed')
+    if (author === `agent:${FOREMAN_AGENT_ID}`) return t('authors.foreman')
     if (author.startsWith('agent:')) return author.slice('agent:'.length)
     if (author.startsWith('user:')) return author.slice('user:'.length)
     return author
-}
-
-const SITE_PAGE_LABELS: Record<string, string> = {
-    about: 'About page',
-    team: 'Team page',
-    pricing: 'Pricing page',
-    customers: 'Customers page',
-    product: 'Product page',
-    catalog: 'Product catalog',
-    legal: 'Legal notice',
-    careers: 'Careers page',
-    contact: 'Contact page',
-    privacy: 'Privacy policy',
-    blog: 'Blog',
-}
-
-const SOURCE_LABELS: Record<string, string> = {
-    dns: 'Email setup',
-    stack: 'Website tools',
-    search: 'Web search',
-    catalog: 'Product catalog',
-    registry: 'Company registry',
-    linkedin: 'LinkedIn',
-    'linkedin:company': 'LinkedIn page',
-    'linkedin:person': 'Your LinkedIn',
-    google: 'Google',
-    'google:business': 'Google Business Profile',
 }
 
 const URL_LABEL_MAX = 40
@@ -69,16 +58,36 @@ function urlLabel(tag: string): string | null {
     }
 }
 
+const hasKey = <T extends object>(map: T, key: string): key is Extract<keyof T, string> => Object.hasOwn(map, key)
+
+type BrainSource = { key: BrainSourceKey } | { text: string }
+
 // The website research tags its facts `site:<what>`, `linkedin:company`… A link is shown by its
 // host and path; anything else, such as a source an agent cited, is shown as written.
-export function brainSourceLabel(tag: string): string {
+function brainSourceOf(tag: string): BrainSource {
     const normalized = tag.trim().toLowerCase()
-    if (normalized === 'site' || normalized.startsWith('site:')) return SITE_PAGE_LABELS[normalized.slice('site:'.length)] ?? 'Website'
-    return SOURCE_LABELS[normalized] ?? urlLabel(tag) ?? tag
+    if (normalized === 'site' || normalized.startsWith('site:')) {
+        const page = normalized.slice('site:'.length)
+        return { key: hasKey(SITE_PAGE_KEYS, page) ? `sources.${SITE_PAGE_KEYS[page]}` : 'sources.website' }
+    }
+    if (hasKey(SOURCE_KEYS, normalized)) return { key: `sources.${SOURCE_KEYS[normalized]}` }
+    return { text: urlLabel(tag) ?? tag }
 }
 
-export function brainSourceLabels(tags: readonly string[]): string[] {
-    return [...new Set(tags.map(brainSourceLabel))]
+const sourceLabel = (source: BrainSource, t: BrainLabelCopy) => ('key' in source ? t(source.key) : source.text)
+
+export function brainSourceLabel(tag: string, t: BrainLabelCopy): string {
+    return sourceLabel(brainSourceOf(tag), t)
+}
+
+export function brainSourceLabels(tags: readonly string[], t: BrainLabelCopy): string[] {
+    const sources = new Map<string, BrainSource>()
+    for (const tag of tags) {
+        const source = brainSourceOf(tag)
+        const identity = 'key' in source ? source.key : `text:${source.text}`
+        if (!sources.has(identity)) sources.set(identity, source)
+    }
+    return [...sources.values()].map(source => sourceLabel(source, t))
 }
 
 export function brainSlugify(input: string): string {

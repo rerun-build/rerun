@@ -6,6 +6,7 @@ import { Popover as PopoverPrimitive } from 'radix-ui'
 import { cn } from '../cn'
 import { Check, ChevronDown } from '../icons'
 import { Field } from './field'
+import { useKitTranslations } from '../locale'
 
 interface SelectProps {
     options: readonly string[]
@@ -18,7 +19,8 @@ interface SelectProps {
     disabled?: boolean
 }
 
-export function Select({ options, value, onChange, label, optional, helperText, placeholder = 'Select…', disabled }: SelectProps) {
+export function Select({ options, value, onChange, label, optional, helperText, placeholder, disabled }: SelectProps) {
+    const t = useKitTranslations()
     const [open, setOpen] = React.useState(false)
 
     const handleSelect = (option: string) => {
@@ -38,7 +40,7 @@ export function Select({ options, value, onChange, label, optional, helperText, 
                             !value && 'text-muted-foreground',
                         )}
                     >
-                        <span className="truncate">{value || placeholder}</span>
+                        <span className="truncate">{value || placeholder || t('forms.select')}</span>
                         <ChevronDown className={cn('size-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} />
                     </button>
                 </PopoverPrimitive.Trigger>

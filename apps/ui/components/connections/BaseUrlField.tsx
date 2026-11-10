@@ -3,6 +3,7 @@
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 // Points an OpenRouter connection at a router of the user's own: same wire format, different host.
@@ -10,6 +11,7 @@ import { useState } from 'react'
 export function BaseUrlField({ baseUrl, onCommit }: { baseUrl: string; onCommit: (value: string) => void }) {
     // Its own state rather than `Boolean(baseUrl)`, which would snap the switch back off the moment
     // the revealed field is emptied to be retyped.
+    const t = useTranslations('connections.baseUrl')
     const [custom, setCustom] = useState(Boolean(baseUrl))
     const [value, setValue] = useState(baseUrl)
 
@@ -23,7 +25,7 @@ export function BaseUrlField({ baseUrl, onCommit }: { baseUrl: string; onCommit:
 
     return (
         <div className="space-y-1.5">
-            <Field orientation="row" label="Custom base URL" helperText="Send requests to your own OpenRouter-compatible router" htmlFor="openrouter-custom-base-url">
+            <Field orientation="row" label={t('label')} helperText={t('helper')} htmlFor="openrouter-custom-base-url">
                 <Switch
                     id="openrouter-custom-base-url"
                     checked={custom}
@@ -38,7 +40,7 @@ export function BaseUrlField({ baseUrl, onCommit }: { baseUrl: string; onCommit:
                 />
             </Field>
             {custom && (
-                <Input hideRequired autoFocus aria-label="OpenRouter base URL" value={value} onChange={e => setValue(e.target.value)} onBlur={commit} placeholder="https://router.example.com/v1" className="h-8 font-mono text-xs" />
+                <Input hideRequired autoFocus aria-label={t('inputLabel')} value={value} onChange={e => setValue(e.target.value)} onBlur={commit} placeholder="https://router.example.com/v1" className="h-8 font-mono text-xs" />
             )}
         </div>
     )

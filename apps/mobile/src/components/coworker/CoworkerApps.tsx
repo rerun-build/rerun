@@ -2,6 +2,7 @@ import type { InstalledServiceView } from '@rerun/contracts'
 import { Image } from 'expo-image'
 import { Fragment } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { OPEN_LOCK, type ManageLock } from '@/auth/access'
 import { AppText } from '@/components/ui/AppText'
@@ -11,6 +12,7 @@ import { Card, GROUPED_ROW_HEIGHT, Separator } from '@/components/ui/GroupedList
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
+import { webHost } from '@/config/environment'
 
 import { CoworkerPage, LoadFailed } from './CoworkerPage'
 
@@ -18,10 +20,10 @@ const ICON_SIZE = 32
 const ROW_INSET = spacing.lg + ICON_SIZE + spacing.md
 
 // The web's ServiceList words.
-const ATTENTION: Partial<Record<InstalledServiceView['status'], { label: string; tone: 'orange' | 'red' }>> = {
-    needs_auth: { label: 'Needs sign-in', tone: 'orange' },
-    needs_config: { label: 'Needs setup', tone: 'orange' },
-    error: { label: 'Error', tone: 'red' },
+const ATTENTION: Partial<Record<InstalledServiceView['status'], { label: 'needsSignIn' | 'needsSetup' | 'error'; tone: 'orange' | 'red' }>> = {
+    needs_auth: { label: 'needsSignIn', tone: 'orange' },
+    needs_config: { label: 'needsSetup', tone: 'orange' },
+    error: { label: 'error', tone: 'red' },
 }
 
 function AppIcon({ app }: { app: InstalledServiceView }) {
@@ -42,6 +44,7 @@ function AppIcon({ app }: { app: InstalledServiceView }) {
 type AppRowProps = { app: InstalledServiceView; connecting: boolean; readOnly: boolean; onConnect: () => void }
 
 function AppRow({ app, connecting, readOnly, onConnect }: AppRowProps) {
+    const t = useTranslations('mobileCoworker.apps')
     const attention = ATTENTION[app.status]
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT + 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm }}>
@@ -51,14 +54,14 @@ function AppRow({ app, connecting, readOnly, onConnect }: AppRowProps) {
                     {app.name}
                 </AppText>
                 {attention ? (
-                    <Badge label={attention.label} tone={attention.tone} size="xs" />
+                    <Badge label={t(`status.${attention.label}`)} tone={attention.tone} size="xs" />
                 ) : app.label ? (
                     <AppText variant="footnote" tone="muted" numberOfLines={1}>
                         {app.label}
                     </AppText>
                 ) : null}
             </View>
-            {app.status === 'needs_auth' && <Button label="Connect" variant="outline" size="sm" loading={connecting} disabled={readOnly} onPress={onConnect} />}
+            {app.status === 'needs_auth' && <Button label={t('connect')} variant="outline" size="sm" loading={connecting} disabled={readOnly} onPress={onConnect} />}
         </View>
     )
 }
@@ -94,8 +97,10 @@ type CoworkerAppsProps = {
 // What the coworker is connected to. Adding an app goes through the chat: the coworker picks it, and
 // its card connects it.
 export function CoworkerApps({ name, apps, connectingKey, onConnect, failed, lock = OPEN_LOCK, onBack }: CoworkerAppsProps) {
+    const t = useTranslations('mobileCoworker.apps')
+    const tAccess = useTranslations('mobileCoworker.access')
     return (
-        <CoworkerPage title="Apps" onBack={onBack}>
+        <CoworkerPage title={t('title')} onBack={onBack}>
             <View style={{ gap: spacing.sm }}>
                 {!apps ? (
                     failed ? <LoadFailed /> : <AppsSkeleton />
@@ -103,7 +108,7 @@ export function CoworkerApps({ name, apps, connectingKey, onConnect, failed, loc
                     <Card>
                         <View style={{ padding: spacing.lg }}>
                             <AppText variant="body" tone="muted">
-                                No app yet.
+                                {t('empty')}
                             </AppText>
                         </View>
                     </Card>
@@ -121,7 +126,7 @@ export function CoworkerApps({ name, apps, connectingKey, onConnect, failed, loc
                     </Card>
                 )}
                 <AppText variant="footnote" tone="muted" style={{ paddingHorizontal: spacing.lg }}>
-                    {lock.reason ?? `Ask ${name} in the chat to add an app.`}
+                    {lock.reason ? tAccess(lock.reason, { host: webHost }) : t('askInChat', { name })}
                 </AppText>
             </View>
         </CoworkerPage>

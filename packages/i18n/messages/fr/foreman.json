@@ -1,0 +1,408 @@
+{
+    "welcome": {
+        "title": "Prêt à confier votre première tâche ?",
+        "preparing": "Préparation de votre workspace...",
+        "gateTitle": "Votre équipe est prête à être créée",
+        "gateSubtitle": "Créez votre compte et le Foreman commence à la créer tout de suite."
+    },
+    "header": {
+        "closeDisabled": "Terminez la configuration pour fermer le chat",
+        "move": "Déplacer",
+        "moveChat": "Déplacer le chat",
+        "position": {
+            "dockLeft": "Ancrer à gauche",
+            "dockRight": "Ancrer à droite",
+            "float": "Flottant"
+        },
+        "signIn": "Se connecter",
+        "newTask": "Nouvelle tâche"
+    },
+    "resize": "Redimensionner le chat",
+    "modelPill": {
+        "hubReason": "Ce chat tourne toujours sur Rerun Balanced"
+    },
+    "signupGate": {
+        "teamAt": "Votre équipe chez {domain}",
+        "team": "Votre équipe",
+        "perks": {
+            "trial": "Essai gratuit de {days} jours",
+            "cancel": "Résiliable à tout moment",
+            "kept": "Vos réponses sont conservées"
+        },
+        "createAccount": "Créer mon compte"
+    },
+    "signInLink": {
+        "prompt": "Vous avez déjà un compte ? <link>Se connecter</link>"
+    },
+    "nextSteps": {
+        "turnOn": "Activer mon coworker",
+        "yourInstallStarted": "L'installation de votre coworker a commencé",
+        "installStarted": "L'installation de {name} a commencé",
+        "startInstallingMine": "Lancer l'installation de mon coworker",
+        "startInstalling": "Lancer l'installation de {name}",
+        "startTrial": "Démarrer l'essai gratuit",
+        "startPlan": "Lancer mon forfait",
+        "starting": "Démarrage…",
+        "openChat": "Ouvrir le chat",
+        "installFailed": "Impossible de lancer l'installation"
+    },
+    "notification": {
+        "waiting": "Le Foreman vous attend."
+    },
+    "dock": {
+        "tooltip": "Rechercher ou demander à Rerun <key>{shortcut}</key>",
+        "failedReply": "Un problème est survenu sur celle-ci."
+    },
+    "nudge": {
+        "approval": "Attend votre validation",
+        "question": "Attend votre réponse",
+        "more": "+{count} de plus",
+        "review": "Examiner",
+        "answer": "Répondre",
+        "later": "Plus tard"
+    },
+    "reply": {
+        "open": "Ouvrir la conversation",
+        "dismiss": "Fermer"
+    },
+    "voice": {
+        "listening": "À l'écoute · relâchez Espace pour envoyer",
+        "transcribing": "Transcription...",
+        "nothingHeard": "Rien n'a été entendu dans cet enregistrement.",
+        "sendFailed": "Impossible d'envoyer votre message vocal."
+    },
+    "pill": {
+        "prompts": {
+            "lastNight": "Qu'est-ce qui a tourné cette nuit ?",
+            "failedRun": "Pourquoi ce run a échoué ?",
+            "newCoworker": "Crée-moi un nouveau coworker"
+        },
+        "ask": "Demander à Rerun",
+        "send": "Envoyer"
+    },
+    "routines": {
+        "resumeFailed": "Impossible de reprendre {name}",
+        "pauseFailed": "Impossible de mettre {name} en pause",
+        "renameFailed": "Impossible de renommer {name}",
+        "runFailed": "Impossible de lancer {name}",
+        "started": "{name} a démarré",
+        "emptyTitle": "Aucune routine pour l'instant",
+        "emptyDescription": "Demandez à un coworker de faire quelque chose à heure fixe (un rapport quotidien, un récap hebdo) et elle apparaîtra ici.",
+        "unknownCoworker": "Coworker inconnu",
+        "options": "Options de {name}",
+        "rename": "Renommer",
+        "edit": "Modifier",
+        "runNow": "Lancer maintenant"
+    },
+    "ownEntry": "Je sais ce qu'il me faut",
+    "ownEntryPlaceholder": "Je sais ce qu'il me faut…",
+    "intake": {
+        "steps": {
+            "company": {
+                "title": "Quel est le site de votre entreprise ?",
+                "description": "Nous le lisons pour savoir ce que vous vendez et à qui."
+            },
+            "industry": {
+                "title": "Dans quel secteur travaillez-vous ?",
+                "description": "Il décide des équipes que nous dessinons sur votre board."
+            },
+            "role": {
+                "title": "Et quel est votre rôle ?",
+                "description": "Il décide de qui est créé en premier pour vous."
+            },
+            "name": {
+                "title": "Dernière question : votre prénom ?",
+                "description": "Pour ne pas parler à un workspace."
+            }
+        },
+        "settingUp": "Configuration de <highlight>{title}</highlight>",
+        "website": {
+            "label": "Site de l'entreprise"
+        },
+        "industry": {
+            "label": "Secteur",
+            "other": "Autre",
+            "placeholder": "Boulangerie, cabinet dentaire, salle de sport…"
+        },
+        "industries": {
+            "agencies": "Agences",
+            "ecommerce": "E-commerce",
+            "saas": "SaaS",
+            "sales": "Ventes",
+            "recruiting": "Recrutement",
+            "real-estate": "Immobilier",
+            "legal": "Juridique et conformité",
+            "creators": "Créateurs",
+            "productivity": "Productivité",
+            "other": "Autre"
+        },
+        "role": {
+            "label": "Votre rôle",
+            "placeholder": "Responsable croissance"
+        },
+        "name": {
+            "label": "Prénom",
+            "placeholder": "Jean"
+        },
+        "skip": "Passer",
+        "next": "Suivant",
+        "answerToContinue": "Répondez à cette étape pour continuer",
+        "saveFailed": "Impossible d'enregistrer. Réessayez."
+    },
+    "gettingStarted": {
+        "title": "Premiers pas",
+        "hide": "Masquer",
+        "pillLabel": "Premiers pas : {done} sur {total} terminées",
+        "steps": {
+            "phone": {
+                "title": "Vérifiez votre numéro de téléphone",
+                "description": "Sécurisez votre compte et recevez les messages de vos coworkers sur WhatsApp ou par SMS."
+            },
+            "first_agent": {
+                "title": "Créez votre premier coworker",
+                "description": "Un coéquipier qui travaille pendant votre absence."
+            },
+            "ai_provider": {
+                "title": "Branchez votre abonnement IA",
+                "description": "Claude, ChatGPT, Gemini ou votre propre clé API."
+            },
+            "invite": {
+                "title": "Invitez un coéquipier",
+                "description": "Partagez vos coworkers avec les personnes avec qui vous travaillez."
+            },
+            "schedule": {
+                "title": "Planifiez une tâche récurrente",
+                "description": "Mettez l'un de vos coworkers en pilote automatique."
+            },
+            "payment_method": {
+                "title": "Ajoutez un moyen de paiement",
+                "description": "Vos coworkers continuent de tourner à la fin de l'essai. Rien n'est débité aujourd'hui."
+            }
+        },
+        "reward": {
+            "grantedTitle": "{days} jours ajoutés à votre essai",
+            "grantedDescription": "Votre workspace est prêt. Profitez du temps en plus.",
+            "claimingTitle": "Ajout de {days} jours à votre essai",
+            "claimingDescription": "Un instant.",
+            "doneTitle": "Votre workspace est prêt",
+            "doneDescription": "Vos coworkers peuvent désormais tourner seuls.",
+            "lockedTitle": "Gagnez {days} jours d'essai gratuit en plus",
+            "lockedDescription": "Terminez les {total} étapes ci-dessus. Plus que {remaining}."
+        },
+        "prompts": {
+            "first_agent": "Aide-moi à créer mon premier coworker",
+            "ai_provider": "Aide-moi à connecter mon abonnement Claude ou ChatGPT, ou une clé API",
+            "invite": "Aide-moi à inviter un collègue dans mon workspace",
+            "schedule": "Planifie une tâche récurrente pour l'un de mes coworkers"
+        }
+    },
+    "contact": {
+        "defaultSummary": "Je suis bloqué en configurant mon premier coworker et j'ai besoin d'aide.",
+        "sentWithEmail": "Envoyé à l'équipe Rerun. Elle répond dans le chat et à {email}.",
+        "sent": "Envoyé à l'équipe Rerun. Elle répond dans le chat.",
+        "openChat": "Ouvrir le chat",
+        "stillStuck": "Toujours bloqué ? Quelqu'un de l'équipe peut vous aider.",
+        "send": "Envoyer à l'équipe",
+        "title": "Parler à quelqu'un chez Rerun",
+        "description": "Ceci part à l'équipe avec votre compte, et elle vous répond dans le chat.",
+        "notNow": "Pas maintenant"
+    },
+    "template": {
+        "skipped": "Ignoré",
+        "buildingElse": "Autre chose en cours de création",
+        "installing": "Installation de ce template",
+        "install": "Installer ce template",
+        "buildElse": "Crée-moi autre chose",
+        "buildElseDescription": "Aucun ne convient. Pars de ce que je t'ai dit et conçois-le.",
+        "notNow": "Pas maintenant",
+        "somethingCustom": "Quelque chose sur mesure",
+        "label": "Template",
+        "agents": "{count, plural, one {# agent} other {# agents}}"
+    },
+    "question": {
+        "fallback": "Une question",
+        "skipped": "Ignorée",
+        "neither": "Aucune des deux",
+        "typed": "Répondu dans le chat"
+    },
+    "plan": {
+        "defaultTitle": "Votre premier coworker",
+        "skipped": "Ignoré",
+        "confirmed": "Confirmé",
+        "askedChanges": "Modifications demandées",
+        "goesAfter": "<label>Cible :</label> {need}",
+        "thisWeek": "Ce que vous obtenez cette semaine",
+        "previousBox": "Box précédente",
+        "nextBox": "Box suivante",
+        "build": "Créer mon coworker",
+        "change": "Changer quelque chose",
+        "standingBy": "En attente",
+        "lifeWorking": "En cours",
+        "lifeDelivered": "Remis entre vos mains"
+    },
+    "starterPack": {
+        "title": "Votre équipe de départ",
+        "subtitle": "Choisissez-en jusqu'à {max}. Chacun se configure avec vous une fois sur votre board.",
+        "fullTitle": "Votre essai fait tourner {max} coworkers",
+        "fullDescription": "Retirez-en un pour prendre celui-ci. Les autres pourront rejoindre une fois votre plan souscrit.",
+        "pickAtLeastOne": "Choisissez-en au moins un",
+        "hireOne": "Recruter celui-ci",
+        "hireMany": "Recruter ces {count}",
+        "progress": "{count} sur {max} choisis",
+        "picked": "Choisi",
+        "trialFull": "Essai complet",
+        "pick": "Choisir"
+    },
+    "agentTabs": {
+        "chat": "Chat",
+        "actions": "À traiter",
+        "services": "Apps",
+        "mcp": "MCP",
+        "skills": "Skills",
+        "data": "Base de données",
+        "memories": "Connaissances",
+        "files": "Fichiers",
+        "published": "Publié",
+        "scheduled": "Routines",
+        "triggers": "Déclencheurs",
+        "tools": "Capacités",
+        "monitoring": "Suivi",
+        "logs": "Journaux",
+        "setup": "Installation",
+        "settings": "Réglages"
+    },
+    "arrival": {
+        "youPicked": "Votre choix",
+        "by": "par {name}",
+        "gestures": {
+            "account": "Compte",
+            "trial": "Essai gratuit",
+            "template": "Template",
+            "installed": "Installé"
+        },
+        "headings": {
+            "account": {
+                "title": "Mettez {name} au travail",
+                "description": "Créez votre compte et {name} est installé pour vous. Pas de formulaire, pas de questions d'abord."
+            },
+            "phone": {
+                "title": "Une dernière étape",
+                "description": "Ajoutez votre numéro de téléphone. {name} arrive juste après."
+            },
+            "trial": {
+                "title": "Essayez {name} pendant {days} jours",
+                "description": "{name} est installé dès le début de votre essai."
+            },
+            "purchase": {
+                "title": "Obtenez {name}",
+                "description": "Votre essai est actif. Ce template a son propre prix, et il est installé juste après."
+            },
+            "installing": {
+                "title": "Installation de {name}",
+                "description": "Rien à faire ici. Cela prend moins d'une minute."
+            }
+        }
+    },
+    "teamPulse": {
+        "coworkers": "{count, plural, one {# coworker} other {# coworkers}}",
+        "working": "{count} au travail"
+    },
+    "trialGate": {
+        "plan": "Souscrivez votre plan pour continuer.",
+        "trial": "Démarrez votre essai gratuit pour continuer.",
+        "talk": "Parler à l'équipe"
+    },
+    "trial": {
+        "badge": {
+            "cardless": "Sans carte",
+            "card_trial": "Essai gratuit de {days} jours",
+            "paid": "Essai gratuit déjà utilisé"
+        },
+        "titleTrial": "Démarrez votre essai gratuit de {days} jours",
+        "titlePlan": "Souscrivez votre plan",
+        "pitchPaidInstall": "{subject} est installé juste après. Résiliable à tout moment depuis le workspace.",
+        "pitchPaidTeam": "Votre équipe est créée juste après. Résiliable à tout moment depuis le workspace.",
+        "pitchCardInstall": "Carte requise, 0 $ aujourd'hui. {price} débités le {date} sauf résiliation avant. {subject} est installé juste après.",
+        "pitchCardTeam": "Carte requise, 0 $ aujourd'hui. {price} débités le {date} sauf résiliation avant. Votre équipe est créée juste après.",
+        "pitchCardlessInstall": "Sans carte, 0 $ aujourd'hui. Ajoutez-en une avant le {date} pour continuer à {price}/mois. {subject} est installé juste après.",
+        "pitchCardlessTeam": "Sans carte, 0 $ aujourd'hui. Ajoutez-en une avant le {date} pour continuer à {price}/mois. Votre équipe est créée juste après.",
+        "includes": "Votre essai comprend {agents} coworkers et {credits, plural, one {# crédit} other {# crédits}}.",
+        "thenPay": "Puis {price} pour ce template, facturé à part.",
+        "dueToday": "À payer aujourd'hui",
+        "withCard": "Avec une carte",
+        "dueOn": "Le {date}",
+        "then": "Ensuite",
+        "perMonth": "/mois",
+        "today": "Aujourd'hui",
+        "todayInstall": "Votre essai démarre et {subject} est installé.",
+        "todayTeam": "Votre essai démarre et votre équipe est créée.",
+        "reminder": "Nous vous écrivons, pour que la fin ne soit jamais une surprise.",
+        "chargeCardless": "Ajoutez une carte pour continuer à {price}/mois. Sans carte, vos coworkers s'arrêtent et rien n'est débité.",
+        "chargeCard": "{price} débités sur la carte ajoutée, puis chaque mois. Résiliez avant et rien n'est débité.",
+        "startingTrial": "Démarrage de votre essai…",
+        "opening": "Ouverture…",
+        "startAndInstall": "Démarrer mon essai et installer",
+        "startTrial": "Démarrer mon essai gratuit",
+        "startPlan": "Souscrire mon plan"
+    },
+    "checkout": {
+        "started": "Essai démarré",
+        "cardUsed": "Cette carte a déjà servi pour un essai",
+        "startPlan": "Souscrire mon plan",
+        "pending": "Toujours en attente de Stripe",
+        "notStarted": "Essai non démarré. Rien ne peut être créé tant qu'il ne l'est pas.",
+        "startTrial": "Démarrer l'essai gratuit"
+    },
+    "purchase": {
+        "owned": "{title} est à vous",
+        "recurring": "Facturé chaque mois",
+        "oneTime": "Achat unique",
+        "billedTo": "Facturé à {name}, en plus de votre plan Rerun. Il est installé dès que le paiement passe.",
+        "billedToWorkspace": "Facturé à votre workspace, en plus de votre plan Rerun. Il est installé dès que le paiement passe.",
+        "dueToday": "À payer aujourd'hui",
+        "perMonth": "/mois",
+        "opening": "Ouverture…",
+        "subscribe": "S'abonner {price}",
+        "pay": "Payer {price}"
+    },
+    "teamEmptyState": {
+        "greeting": "Bonjour, je suis Rerun",
+        "greetingNamed": "Bonjour {firstName}, je suis Rerun",
+        "greetingWithTeam": "{greeting}. Voici votre équipe.",
+        "emptySubtitle": "Vous n'avez pas encore de coworker. Décrivez-moi une tâche à déléguer et je crée le premier.",
+        "buildPrompt": "Crée-moi un coworker qui ",
+        "buildFirst": {
+            "title": "Créer mon premier coworker",
+            "description": "Décrivez la tâche en une phrase"
+        },
+        "template": {
+            "title": "Partir d'un template",
+            "description": "Des coworkers prêts à l'emploi pour votre activité",
+            "send": "Montre-moi des templates adaptés à mon activité"
+        },
+        "guide": {
+            "title": "Comment ça marche ?",
+            "description": "Coworkers, Boxes, routines, en deux minutes",
+            "send": "Comment fonctionne Rerun ?"
+        },
+        "checkWorking": {
+            "title": "Que fait {name} ?",
+            "description": "En train de travailler",
+            "send": "Que fait {mention} en ce moment ?"
+        },
+        "checkIdle": {
+            "title": "Qu'a fait {name} aujourd'hui ?",
+            "description": "Ses dernières exécutions en bref",
+            "send": "Qu'a fait {mention} aujourd'hui ?"
+        },
+        "handOff": {
+            "title": "Confier une tâche à {name}",
+            "description": "Je le briefe et je suis le travail",
+            "prefill": "Demande à {mention} de "
+        },
+        "build": {
+            "title": "Créer un nouveau coworker",
+            "description": "Pour une tâche que personne ne fait encore"
+        }
+    }
+}

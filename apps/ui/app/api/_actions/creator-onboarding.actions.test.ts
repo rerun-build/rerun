@@ -44,7 +44,7 @@ describe('claimCreatorSandboxAction', () => {
     it('refuses a creator profile already linked to another account', async () => {
         const db = database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }, { id: 'user-other', expert_profile_id: 'expert-1' }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This creator profile is already linked to another account.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This creator profile is already linked to another account.', code: 'creatorProfileTaken' })
         expect(db.writes('users')).toHaveLength(0)
         expect(mocks.enterSandbox).not.toHaveBeenCalled()
     })
@@ -52,7 +52,7 @@ describe('claimCreatorSandboxAction', () => {
     it('refuses an account already linked to a different creator profile', async () => {
         const db = database({ experts: [expert(), expert({ id: 'expert-2', creator_token: 'other' })], users: [{ id: ME, expert_profile_id: 'expert-2' }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This account is already linked to another creator profile.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This account is already linked to another creator profile.', code: 'accountHasOtherCreatorProfile' })
         expect(db.writes('users')).toHaveLength(0)
         expect(mocks.enterSandbox).not.toHaveBeenCalled()
     })
@@ -60,26 +60,26 @@ describe('claimCreatorSandboxAction', () => {
     it('refuses an invitation that was declined', async () => {
         database({ experts: [expert({ status: 'declined' })], users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This creator invitation is not open anymore.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This creator invitation is not open anymore.', code: 'creatorInviteClosed' })
         expect(mocks.enterSandbox).not.toHaveBeenCalled()
     })
 
     it('refuses an invitation whose application was rejected', async () => {
         database({ experts: [expert({ application_status: 'rejected' })], users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This creator invitation is not open anymore.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This creator invitation is not open anymore.', code: 'creatorInviteClosed' })
     })
 
     it('refuses an unknown token', async () => {
         database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction('forged')).resolves.toEqual({ ok: false, error: 'This link is no longer valid.' })
+        await expect(claimCreatorSandboxAction('forged')).resolves.toEqual({ ok: false, error: 'This link is no longer valid.', code: 'linkInvalid' })
     })
 
     it('refuses an account without a profile when no token is given', async () => {
         database({ users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction()).resolves.toEqual({ ok: false, error: 'This account is not linked to a creator profile.' })
+        await expect(claimCreatorSandboxAction()).resolves.toEqual({ ok: false, error: 'This account is not linked to a creator profile.', code: 'noCreatorProfile' })
     })
 
     it('links the profile to the caller, flags the account expert and opens the sandbox', async () => {
@@ -104,7 +104,7 @@ describe('claimCreatorSandboxAction', () => {
         mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'someone@else.test' }, isAnonymous: false })
         const db = database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is for another email. Sign in with the invited address.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is for another email. Sign in with the invited address.', code: 'invitationOtherEmail' })
         expect(db.writes('users')).toHaveLength(0)
         expect(db.writes('experts')).toHaveLength(0)
         expect(mocks.enterSandbox).not.toHaveBeenCalled()
@@ -113,7 +113,7 @@ describe('claimCreatorSandboxAction', () => {
     it('refuses to link a profile that has no email on file', async () => {
         const db = database({ experts: [expert({ email: null })], users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is for another email. Sign in with the invited address.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is for another email. Sign in with the invited address.', code: 'invitationOtherEmail' })
         expect(db.writes('users')).toHaveLength(0)
     })
 
@@ -129,7 +129,7 @@ describe('claimCreatorSandboxAction', () => {
         mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'jane@studio.test', is_anonymous: true }, isAnonymous: true })
         const db = database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'Sign in with the invited email to claim your creator profile.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'Sign in with the invited email to claim your creator profile.', code: 'signInToClaimCreator' })
         expect(db.calls).toHaveLength(0)
         expect(mocks.enterSandbox).not.toHaveBeenCalled()
     })
@@ -138,7 +138,7 @@ describe('claimCreatorSandboxAction', () => {
         mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: undefined }, isAnonymous: false })
         database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
-        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'Sign in with the invited email to claim your creator profile.' })
+        await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'Sign in with the invited email to claim your creator profile.', code: 'signInToClaimCreator' })
         expect(mocks.enterSandbox).not.toHaveBeenCalled()
     })
 })

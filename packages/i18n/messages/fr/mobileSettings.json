@@ -1,0 +1,109 @@
+{
+    "preferences": {
+        "title": "Préférences",
+        "close": "Fermer",
+        "yourAccount": "Votre compte",
+        "workspace": "Workspace",
+        "aiProviders": "Fournisseurs d'IA",
+        "appearance": "Apparence",
+        "appearanceSystem": "Système",
+        "appearanceLight": "Clair",
+        "appearanceDark": "Sombre",
+        "coworkers": "Coworkers",
+        "groupRecent": "Récents",
+        "groupByBox": "Par Box",
+        "language": "Langue",
+        "notifications": "Notifications",
+        "pushOff": "Push désactivé",
+        "support": "Assistance",
+        "contactSupport": "Contacter le support",
+        "privacy": "Politique de confidentialité",
+        "terms": "Conditions d'utilisation",
+        "about": "À propos",
+        "version": "Version",
+        "environment": "Environnement",
+        "signOut": "Se déconnecter",
+        "deleteAccount": "Supprimer le compte",
+        "server": "Serveur"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "saveFailed": "Enregistrement impossible",
+        "tryAgainShortly": "Réessayez dans un instant.",
+        "loadFailed": "Impossible de charger vos paramètres. Réessayez dans un instant.",
+        "push": {
+            "label": "Notifications push",
+            "off": "Désactivées",
+            "turnOn": "Activer",
+            "openIosSettings": "Ouvrir les Réglages iOS",
+            "footnote": "Rien de ce qui suit n'arrive sur cet iPhone tant que le push est désactivé."
+        },
+        "scopeTitle": "Me notifier pour",
+        "recommended": "Recommandé",
+        "scopes": {
+            "everything": {
+                "label": "Tout",
+                "detail": "Chaque exécution du workspace, quel que soit son auteur."
+            },
+            "mine": {
+                "label": "Mes exécutions et ce que je suis",
+                "detail": "Les exécutions que je lance, les conversations où je suis, les coworkers que je suis."
+            },
+            "needed": {
+                "label": "Seulement quand on a besoin de moi",
+                "detail": "Questions, validations et erreurs dans mes exécutions. Une exécution terminée reste silencieuse."
+            },
+            "nothing": {
+                "label": "Rien",
+                "detail": "Je consulte la boîte de réception moi-même."
+            }
+        },
+        "email": {
+            "label": "E-mail",
+            "footnote": "Quand on a besoin de vous pendant votre absence. Un e-mail par incident, jamais un par exécution."
+        },
+        "perCoworker": {
+            "title": "Par coworker",
+            "add": "Ajouter un coworker",
+            "pickTitle": "Chaque exécution de ce coworker vous parvient",
+            "cancel": "Annuler",
+            "empty": "Chaque coworker suit la règle ci-dessus.",
+            "detail": "Se règle aussi depuis les détails de chaque coworker.",
+            "rowLabel": "{name}, {value}",
+            "followsTasks": "Suit ses tâches",
+            "yourSetting": "Votre réglage"
+        },
+        "accountEmails": {
+            "title": "E-mails du compte",
+            "billing": "Essai et facturation",
+            "product": "Nouveautés produit"
+        },
+        "modes": {
+            "default": {
+                "label": "Par défaut",
+                "hint": "Suit votre réglage."
+            },
+            "everything": {
+                "label": "Toute l'activité",
+                "hint": "Chaque exécution, quel que soit son auteur."
+            },
+            "muted": {
+                "label": "En sourdine",
+                "hint": "Rien. Le board l'affiche toujours."
+            }
+        },
+        "coworker": {
+            "title": "Me notifier pour {name}",
+            "yourSetting": "Votre réglage",
+            "quotedScope": "« {scope} »",
+            "follow": "Suivre ses tâches planifiées",
+            "nothingScheduled": "Rien de planifié pour l'instant.",
+            "scheduled": "{count} planifiées, elles vous parviennent comme vos propres exécutions.",
+            "reachYou": "Elles vous parviennent comme vos propres exécutions.",
+            "tasksTitle": "Tâches planifiées",
+            "tasksFailed": "Impossible de charger ses tâches. Réessayez dans un instant.",
+            "taskSwitch": "Me notifier pour {name}",
+            "muted": "{name} est en sourdine."
+        }
+    }
+}

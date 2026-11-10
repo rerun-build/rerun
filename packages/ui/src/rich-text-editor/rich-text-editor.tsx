@@ -8,6 +8,7 @@ import { Bold, CodeIcon, Heading2, Heading3, Italic, LinkIcon, ListIcon, ListOrd
 
 import { cn } from '../cn'
 import { richTextClassName } from './rich-text-styles'
+import { useKitTranslations } from '../locale'
 
 interface RichTextEditorProps {
     value: string
@@ -91,6 +92,7 @@ export function RichTextEditor({ value, onChange, placeholder, id, contentClassN
 }
 
 function Toolbar({ editor }: { editor: Editor | null }) {
+    const t = useKitTranslations()
     const active = useEditorState({
         editor,
         selector: ({ editor }) => ({
@@ -111,7 +113,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
     const setLink = () => {
         const previous = editor.getAttributes('link').href as string | undefined
-        const url = window.prompt('Link URL', previous ?? 'https://')
+        const url = window.prompt(t('richText.linkPrompt'), previous ?? 'https://')
         if (url === null) return
         if (url === '') {
             editor.chain().focus().extendMarkRange('link').unsetLink().run()
@@ -122,20 +124,20 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
     return (
         <div className="flex flex-wrap items-center gap-0.5 border-b border-input p-1">
-            <ToolbarButton icon={Bold} label="Bold" active={active.bold} onClick={() => editor.chain().focus().toggleBold().run()} />
-            <ToolbarButton icon={Italic} label="Italic" active={active.italic} onClick={() => editor.chain().focus().toggleItalic().run()} />
+            <ToolbarButton icon={Bold} label={t('richText.bold')} active={active.bold} onClick={() => editor.chain().focus().toggleBold().run()} />
+            <ToolbarButton icon={Italic} label={t('richText.italic')} active={active.italic} onClick={() => editor.chain().focus().toggleItalic().run()} />
             <Divider />
-            <ToolbarButton icon={Heading2} label="Heading" active={active.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} />
-            <ToolbarButton icon={Heading3} label="Subheading" active={active.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} />
+            <ToolbarButton icon={Heading2} label={t('richText.heading')} active={active.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} />
+            <ToolbarButton icon={Heading3} label={t('richText.subheading')} active={active.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} />
             <Divider />
-            <ToolbarButton icon={ListIcon} label="Bullet list" active={active.bulletList} onClick={() => editor.chain().focus().toggleBulletList().run()} />
-            <ToolbarButton icon={ListOrdered} label="Numbered list" active={active.orderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()} />
-            <ToolbarButton icon={Quote} label="Quote" active={active.blockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()} />
+            <ToolbarButton icon={ListIcon} label={t('richText.bulletList')} active={active.bulletList} onClick={() => editor.chain().focus().toggleBulletList().run()} />
+            <ToolbarButton icon={ListOrdered} label={t('richText.numberedList')} active={active.orderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()} />
+            <ToolbarButton icon={Quote} label={t('richText.quote')} active={active.blockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()} />
             <Divider />
-            <ToolbarButton icon={CodeIcon} label="Inline code" active={active.code} onClick={() => editor.chain().focus().toggleCode().run()} />
-            <ToolbarButton icon={SquareCode} label="Code block" active={active.codeBlock} onClick={() => editor.chain().focus().toggleCodeBlock().run()} />
+            <ToolbarButton icon={CodeIcon} label={t('richText.inlineCode')} active={active.code} onClick={() => editor.chain().focus().toggleCode().run()} />
+            <ToolbarButton icon={SquareCode} label={t('richText.codeBlock')} active={active.codeBlock} onClick={() => editor.chain().focus().toggleCodeBlock().run()} />
             <Divider />
-            <ToolbarButton icon={LinkIcon} label="Link" active={active.link} onClick={setLink} />
+            <ToolbarButton icon={LinkIcon} label={t('richText.link')} active={active.link} onClick={setLink} />
         </div>
     )
 }

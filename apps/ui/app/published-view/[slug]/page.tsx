@@ -15,6 +15,7 @@ import { fileNameOf, isMarkdownDeck, viewerKindOf } from '@/lib/published/viewer
 import { PUBLISHED_BUCKET } from '@/lib/services/publish'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { getTranslations } from 'next-intl/server'
 
 // The root of a published host when the link is a single file a browser would only download or
 // show raw: a reader for it instead. Reached through the rewrite in proxy.ts, which already let the
@@ -46,10 +47,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const origin = publishedSiteOrigin(slug)
     if (!entry || !origin) return { robots: { index: false, follow: false } }
 
-    const [brand, { data: agent }] = await Promise.all([loadWorkspaceBrand(entry.workspace_id), selectMaybeSingle(createServiceRoleClient(), 'agents', ['name'] as const, { id: entry.agent_id })])
+    const [brand, { data: agent }, t] = await Promise.all([loadWorkspaceBrand(entry.workspace_id), selectMaybeSingle(createServiceRoleClient(), 'agents', ['name'] as const, { id: entry.agent_id }), getTranslations('publicPages.publishedView')])
     const isPublic = entry.access === 'public'
-    const title = isPublic ? (entry.title ?? fileNameOf(entry.source_path)) : 'Protected page'
-    const description = isPublic ? `Published by ${agent?.name ?? 'a coworker'} at ${brand.name}` : `Shared by ${brand.name}. Sign in or confirm your email to open it.`
+    const title = isPublic ? (entry.title ?? fileNameOf(entry.source_path)) : t('protectedTitle')
+    const description = isPublic ? (agent?.name ? t('publishedBy', { agent: agent.name, workspace: brand.name }) : t('publishedByUnknown', { workspace: brand.name })) : t('protectedDescription', { workspace: brand.name })
     const image = previewImageUrl(entry, origin)
 
     return {

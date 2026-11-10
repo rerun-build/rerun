@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
   Command,
   CommandEmpty,
@@ -90,9 +92,12 @@ const withinSize = (maxFileSize?: number) => (file: File) =>
 
 // Every file the size gate drops has to be named. Reporting only when the whole batch is rejected
 // let a single oversized file vanish out of a valid drop with nothing said about it.
+type PromptInputTranslator = ReturnType<typeof useTranslations<"chat.promptInput">>;
+
 const reportOversized = (
   accepted: File[],
   sized: File[],
+  t: PromptInputTranslator,
   onError?: (err: {
     code: "max_files" | "max_file_size" | "accept";
     message: string;
@@ -106,10 +111,9 @@ const reportOversized = (
     .slice(0, 2)
     .map((file) => file.name)
     .join(", ");
-  const rest = rejected.length > 2 ? ` and ${rejected.length - 2} more` : "";
   onError?.({
     code: "max_file_size",
-    message: `${names}${rest} ${rejected.length > 1 ? "are" : "is"} too large to attach.`,
+    message: t("tooLarge", { count: rejected.length, names, more: rejected.length - 2 }),
   });
 };
 
@@ -435,9 +439,10 @@ export type PromptInputActionAddAttachmentsProps = ComponentProps<
 };
 
 export const PromptInputActionAddAttachments = ({
-  label = "Add photos or files",
+  label,
   ...props
 }: PromptInputActionAddAttachmentsProps) => {
+  const t = useTranslations("chat.promptInput");
   const attachments = usePromptInputAttachments();
 
   const handleSelect = useCallback(
@@ -450,7 +455,7 @@ export const PromptInputActionAddAttachments = ({
 
   return (
     <DropdownMenuItem {...props} onSelect={handleSelect}>
-      <ImageIcon className="mr-2 size-4" /> {label}
+      <ImageIcon className="mr-2 size-4" /> {label ?? t("addFiles")}
     </DropdownMenuItem>
   );
 };
@@ -462,10 +467,11 @@ export type PromptInputActionAddScreenshotProps = ComponentProps<
 };
 
 export const PromptInputActionAddScreenshot = ({
-  label = "Take screenshot",
+  label,
   onSelect,
   ...props
 }: PromptInputActionAddScreenshotProps) => {
+  const t = useTranslations("chat.promptInput");
   const attachments = usePromptInputAttachments();
 
   const handleSelect = useCallback(
@@ -496,7 +502,7 @@ export const PromptInputActionAddScreenshot = ({
   return (
     <DropdownMenuItem {...props} onSelect={handleSelect}>
       <Monitor className="mr-2 size-4" />
-      {label}
+      {label ?? t("takeScreenshot")}
     </DropdownMenuItem>
   );
 };
@@ -554,6 +560,7 @@ export const PromptInput = ({
   children,
   ...props
 }: PromptInputProps) => {
+  const t = useTranslations("chat.promptInput");
   // Try to use a provider controller if present
   const controller = useOptionalPromptInputController();
   const usingProvider = !!controller;
@@ -612,7 +619,7 @@ export const PromptInput = ({
       if (entries.length && accepted.length === 0) {
         onError?.({
           code: "accept",
-          message: "No files match the accepted types.",
+          message: t("noMatchingFiles"),
         });
         return;
       }
@@ -621,6 +628,7 @@ export const PromptInput = ({
       reportOversized(
         accepted.map(({ file }) => file),
         sized.map(({ file }) => file),
+        t,
         onError
       );
       if (sized.length === 0) {
@@ -636,7 +644,7 @@ export const PromptInput = ({
       if (typeof capacity === "number" && sized.length > capacity) {
         onError?.({
           code: "max_files",
-          message: `You can attach up to ${maxFiles} files. ${sized.length - capacity} were not added.`,
+          message: t("tooManyFiles", { max: maxFiles ?? 0, rejected: sized.length - capacity }),
         });
       }
       if (capped.length === 0) {
@@ -659,7 +667,7 @@ export const PromptInput = ({
       ]);
       onAttach?.(attached);
     },
-    [matchesAccept, maxFiles, maxFileSize, onAttach, onError]
+    [matchesAccept, maxFiles, maxFileSize, onAttach, onError, t]
   );
 
   const addLocal = useCallback(
@@ -690,12 +698,12 @@ export const PromptInput = ({
       if (incoming.length && accepted.length === 0) {
         onError?.({
           code: "accept",
-          message: "No files match the accepted types.",
+          message: t("noMatchingFiles"),
         });
         return;
       }
       const sized = accepted.filter(withinSize(maxFileSize));
-      reportOversized(accepted, sized, onError);
+      reportOversized(accepted, sized, t, onError);
       if (sized.length === 0) {
         return;
       }
@@ -710,7 +718,7 @@ export const PromptInput = ({
       if (typeof capacity === "number" && sized.length > capacity) {
         onError?.({
           code: "max_files",
-          message: `You can attach up to ${maxFiles} files. ${sized.length - capacity} were not added.`,
+          message: t("tooManyFiles", { max: maxFiles ?? 0, rejected: sized.length - capacity }),
         });
       }
 
@@ -718,7 +726,7 @@ export const PromptInput = ({
         controller?.attachments.add(capped);
       }
     },
-    [matchesAccept, maxFileSize, maxFiles, onError, files.length, controller]
+    [matchesAccept, maxFileSize, maxFiles, onError, files.length, controller, t]
   );
 
   const clearAttachments = useCallback(
@@ -987,12 +995,12 @@ export const PromptInput = ({
     <TooltipProvider>
       <input
         accept={accept}
-        aria-label="Upload files"
+        aria-label={t("uploadFiles")}
         className="hidden"
         multiple={multiple}
         onChange={handleChange}
         ref={inputRef}
-        title="Upload files"
+        title={t("uploadFiles")}
         type="file"
       />
       <form
@@ -1024,7 +1032,8 @@ export const PromptInput = ({
   );
 };
 
-export const PromptInputDropOverlay = ({ label = "Drop files to attach" }: { label?: string }) => {
+export const PromptInputDropOverlay = ({ label }: { label?: string }) => {
+  const t = useTranslations("chat.promptInput");
   const dragOver = usePromptInputDragOver();
   if (!dragOver) {
     return null;
@@ -1033,7 +1042,7 @@ export const PromptInputDropOverlay = ({ label = "Drop files to attach" }: { lab
     <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-[inherit] border border-dashed border-brand bg-background/85">
       <span className="flex items-center gap-2 text-sm font-medium text-brand">
         <UploadIcon className="size-4" />
-        {label}
+        {label ?? t("dropFiles")}
       </span>
     </div>
   );
@@ -1057,9 +1066,10 @@ export const PromptInputTextarea = ({
   onKeyDown,
   onPaste,
   className,
-  placeholder = "What would you like to know?",
+  placeholder,
   ...props
 }: PromptInputTextareaProps) => {
+  const t = useTranslations("chat.promptInput");
   const controller = useOptionalPromptInputController();
   const attachments = usePromptInputAttachments();
   const [isComposing, setIsComposing] = useState(false);
@@ -1167,7 +1177,7 @@ export const PromptInputTextarea = ({
       onCompositionStart={handleCompositionStart}
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
-      placeholder={placeholder}
+      placeholder={placeholder ?? t("placeholder")}
       {...props}
       {...controlledProps}
     />
@@ -1329,6 +1339,7 @@ export const PromptInputSubmit = ({
   children,
   ...props
 }: PromptInputSubmitProps) => {
+  const t = useTranslations("chat.promptInput");
   const isGenerating = status === "submitted" || status === "streaming";
 
   let Icon = <CornerDownLeftIcon className="size-4 rotate-90" />;
@@ -1355,7 +1366,7 @@ export const PromptInputSubmit = ({
 
   return (
     <InputGroupButton
-      aria-label={isGenerating ? "Stop" : "Submit"}
+      aria-label={isGenerating ? t("stop") : t("submit")}
       className={cn(className)}
       onClick={handleClick}
       size={size}

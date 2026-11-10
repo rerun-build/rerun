@@ -1,0 +1,623 @@
+{
+    "installFeedback": {
+        "noLongerAvailable": "\"{title}\" is no longer available",
+        "buyFailed": "Could not buy \"{title}\"",
+        "alreadyOnBoard": "\"{title}\" is already on your board",
+        "alreadyOnBoardHint": "Its coworkers are opening where you left them.",
+        "notImported": "{name} could not be imported.",
+        "inactiveCount": "{count, plural, one {# of them are inactive: your plan has no free coworker slot.} other {# of them are inactive: your plan has no free coworker slot.}}",
+        "landed": "{count, plural, one {# coworker from \"{title}\" landed on your board} other {# coworkers from \"{title}\" landed on your board}}",
+        "openOne": "Open one and start its installation: it connects what it needs with you.",
+        "landedInactive": "It landed inactive: your plan has no free coworker slot.",
+        "agentLanded": "\"{name}\" landed on your board",
+        "openIt": "Open it and start its installation: it connects what it needs with you.",
+        "webhooksMoved": "{count, plural, one {# webhook got a new URL: point your services at the copy's own address.} other {# webhooks got a new URL: point your services at the copy's own address.}}",
+        "schedulesDoubled": "{count, plural, one {# schedule runs on the copy too. Turn it off if the work should not happen twice.} other {# schedules run on the copy too. Turn them off if the work should not happen twice.}}",
+        "copyReady": "It carries everything the original had and is ready to run.",
+        "prepareBoxFailed": "Could not prepare your Box",
+        "settingUp": "Setting up \"{title}\"",
+        "settingUpHint": "Your coworkers will appear on the board in a moment.",
+        "setUpFailed": "Could not set up \"{title}\""
+    },
+    "_context": {
+        "price.free": "Price of a template that costs nothing.",
+        "price.monthly": "{amount} is a price in its currency, like \"$29\". /mo = per month.",
+        "price.useForFree": "Button on a free template.",
+        "price.hire": "Button on a paid template's page. {count} is the number of coworkers it installs, {price} its price like \"$29\" or \"$29/mo\".",
+        "price.hireCard": "Short button revealed on a paid template card. {price} is its price like \"$29\" or \"$29/mo\".",
+        "status.in_review": "A template its author submitted to the Rerun team, not published yet.",
+        "status.unlisted": "A template reachable by its link but shown in no listing.",
+        "creatorKind.studio": "The kind of creator who sells templates: a small agency.",
+        "cta.place": "Button: drop the template's coworkers on the board.",
+        "cta.trialThenSubscribe": "Button. {price} is the template's monthly price like \"$29\".",
+        "cta.planInstall": "Button. {plan} is the plan's monthly price like \"$49\".",
+        "cta.planThenSubscribe": "Button. {plan} is the plan's monthly price, {price} the template's.",
+        "cta.planThenPay": "Button. {plan} is the plan's monthly price, {price} the template's one-time price.",
+        "cta.trialBilledSeparately": "{terms} is the trial sentence, like \"Card required, $0 today. $49 charged on 12/11 unless you cancel before.\"",
+        "cta.billedTo": "{workspace} is the name of the workspace paying for the template.",
+        "price.renew": "Call to action on a card of a paid template whose subscription lapsed.",
+        "price.install": "Call to action on a card of a template the workspace already bought.",
+        "connectors.label": "Accessible label of the row of app logos on a template card. {names} is the list of app names, separated by commas.",
+        "creator.templateCount": "Under a template creator's name on their card.",
+        "spotlight.workWith": "Button that opens the creator's contact form. {name} is the creator's first name.",
+        "spotlight.socialLabel": "{network} is LinkedIn, X, GitHub or spotlight.website.",
+        "spotlight.recognizedFor": "Small heading above the title of the template the creator of the week is known for.",
+        "agentCard.comesWith": "Section of a coworker card: what travels with a shared copy (memories, files, keys).",
+        "agentCard.more": "Under a list cut short: how many more items it holds.",
+        "detail.minutes": "Setup time of a template, in minutes.",
+        "detail.carousel": "Accessible label of the carousel of coworker cards, read as \"carousel of ...\".",
+        "library.heading.results": "Title of the library while searching. {query} is what the person typed.",
+        "library.heading.count": "Subtitle of a list of templates.",
+        "library.heading.appSubtitle": "Subtitle of the templates that use one app. {total} is a library.heading.count sentence, {app} the app's name or library.heading.thisApp.",
+        "library.nav.all": "Short tab of the compact navigation that lists every template.",
+        "library.nav.stack": "Group of apps the viewer said they use.",
+        "library.empty.become": "Link to the program for people who build and sell templates on Rerun.",
+        "section.filterBy": "Accessible label of a section heading that narrows the library to that section. {title} is the section's title.",
+        "authoring.prefill": "Button that fills the fields of a section from what the template already says, with AI.",
+        "authoring.meta.metaTitlePlaceholder": "{title} is the template's title.",
+        "authoring.meta.titlePlaceholder": "An example of a template title.",
+        "authoring.media.cover": "Badge on the first gallery image, the one used as the cover.",
+        "capture.review.files": "{size} is an already formatted size (\"1.2 MB\").",
+        "capture.review.flaggedKept": "{kept} and {total} count files that look like they hold a password or a key.",
+        "capture.review.flaggedTravel": "Written with (s) on purpose: the count is not known to agree with the noun.",
+        "capture.review.removed": "Group title: what the capture stripped from the coworker's folder before archiving it.",
+        "capture.review.toProvide": "Group title: secrets a person installing the template has to enter again.",
+        "capture.stages.done.title": "Name of the last stage of the wizard: archiving the coworkers into the template.",
+        "capture.panel.capture": "Button that archives the selected coworkers into the template.",
+        "capture.select.boxFallback": "Name shown for a Box that has none.",
+        "expert.agents.title": "Field title followed by how many coworkers the template holds.",
+        "expert.footer.checklistLabel": "Accessible label of the button that opens the submission checklist.",
+        "pricing.priceLabel": "Field title of the price, in US dollars.",
+        "pricing.priceHelp": "{min} is the minimum price, already formatted with its currency sign.",
+        "pricing.payout.yourPrice": "Row of the payout preview. {recurring} is true for a monthly subscription, which adds \" per month\".",
+        "pricing.payout.fee": "{fee} is the marketplace fee, already formatted (\"10%\").",
+        "payouts.terms": "<link> wraps the name of the terms document.",
+        "revenue.subscriptions": "Label of a row whose value is the monthly revenue of those subscriptions.",
+        "revenue.ranges.30d": "Revenue period: the last 30 days.",
+        "pricing.payout.earn": "Same as pricing.payout.yourPrice, for what the creator earns.",
+        "payouts.states.not_started.body": "{fee} is the marketplace fee, already formatted (\"10%\").",
+        "expert.row.agents": "How many coworkers the template holds (\"agent\" is the word this screen uses).",
+        "payouts.stateLabels.not_started": "Badge of a creator's Stripe payout account: payouts not configured yet.",
+        "payouts.requirements": "What Stripe still needs from a template creator before paying them, one item of a list.",
+        "payouts.saleKinds.recurring": "Badge of a sale in the creator's revenue table: a monthly subscription payment."
+    },
+    "price": {
+        "free": "Free",
+        "monthly": "{amount}/mo",
+        "useForFree": "Use for free",
+        "hire": "{count, plural, one {Hire this coworker · {price}} other {Hire these # coworkers · {price}}}",
+        "hireCard": "Hire · {price}",
+        "purchased": "Purchased",
+        "expired": "Expired",
+        "install": "Install",
+        "renew": "Renew"
+    },
+    "connectors": {
+        "none": "No apps needed",
+        "label": "Apps: {names}"
+    },
+    "creator": {
+        "templateCount": "{count, plural, one {# template} other {# templates}}",
+        "rerunTeam": "Rerun team",
+        "verified": "Verified creator"
+    },
+    "spotlight": {
+        "viewProfile": "View {name}’s profile",
+        "workWith": "Work with {name}",
+        "badge": "Creator of the week",
+        "website": "Website",
+        "socialLabel": "{name} on {network}",
+        "openTemplate": "Open template",
+        "recognizedFor": "Recognized for"
+    },
+    "about": {
+        "showMore": "Show more",
+        "showLess": "Show less"
+    },
+    "agentCard": {
+        "comesWith": "Comes with",
+        "apps": "Apps",
+        "skills": "Skills",
+        "schedules": "Scheduled tasks",
+        "webhooks": "Webhooks",
+        "more": "+{count} more"
+    },
+    "detail": {
+        "price": "Price",
+        "coworkers": "Coworkers",
+        "apps": "Apps",
+        "setupTime": "Setup time",
+        "minutes": "{minutes} min",
+        "category": "Category",
+        "about": "About",
+        "whatYouNeed": "What you'll need",
+        "carousel": "coworkers in this template",
+        "securityTitle": "Security",
+        "securityBody": "Credentials and private data were stripped from this template. Apps arrive disconnected, you authorize them after the import.",
+        "cancelAnytime": "Cancel anytime from your billing settings."
+    },
+    "library": {
+        "title": "Template library",
+        "templates": "Templates",
+        "hideDetails": "Hide details",
+        "newCoworker": "New coworker",
+        "createCoworker": "Create New Coworker",
+        "viewProfile": "View profile",
+        "filters": {
+            "app": "App",
+            "status": "Status"
+        },
+        "search": {
+            "placeholder": "Search templates",
+            "clear": "Clear search"
+        },
+        "nav": {
+            "discover": "Discover",
+            "forYou": "For you",
+            "all": "All",
+            "allTemplates": "All templates",
+            "mine": "My library",
+            "stack": "Your stack",
+            "popularApps": "Popular apps",
+            "categories": "Categories"
+        },
+        "heading": {
+            "count": "{count, plural, one {# template} other {# templates}}",
+            "results": "Results for “{query}”",
+            "discoverEmpty": "The templates you create land here.",
+            "discover": "Ready-made coworkers, built by people who run them.",
+            "forYou": "Matched to your industry and the apps you use first.",
+            "mine": "The templates this workspace owns.",
+            "app": "App",
+            "appSubtitle": "{total} using {app}",
+            "thisApp": "this app",
+            "creator": "Creator"
+        },
+        "discover": {
+            "seeAll": "See all",
+            "creators": "Creators",
+            "creatorsSubtitle": "The people behind the templates.",
+            "allCreators": "All creators",
+            "forYou": "For you",
+            "forYouSubtitle": "Matched to your industry and the apps you use.",
+            "featured": "Featured",
+            "featuredSubtitle": "Hand-picked setups worth a look first.",
+            "justAdded": "Just added",
+            "justAddedSubtitle": "The latest templates published on Rerun."
+        },
+        "empty": {
+            "filtered": "No template matches these filters",
+            "none": "No template here yet",
+            "selfHosted": "Recruit a coworker, then save it as a template.",
+            "cloud": "Build it yourself and sell it on Rerun.",
+            "become": "Become a Rerun expert"
+        }
+    },
+    "scratch": {
+        "title": "Start from scratch",
+        "description": "No template. Name your coworker and drop it on the grid."
+    },
+    "section": {
+        "back": "Back to all templates",
+        "filterBy": "Filter by {title}"
+    },
+    "authoring": {
+        "prefill": "Magic prefill",
+        "altText": "Write the alt text",
+        "content": {
+            "title": "Content",
+            "tagline": "Tagline",
+            "taglineHelp": "{count}/{limit}, one sentence.",
+            "taglinePlaceholder": "Finds prospects, writes the first touch and follows up until they reply.",
+            "longDescription": "Long description",
+            "longDescriptionPlaceholder": "What this template does, who it is for, and what it needs to run."
+        },
+        "faq": {
+            "title": "FAQ",
+            "hint": "Shown on the public page and sent to search engines as FAQ structured data.",
+            "empty": "No question yet. Prefill them, or add one by hand.",
+            "question": "Question",
+            "questionPlaceholder": "Which accounts do I need to connect?",
+            "answer": "Answer",
+            "answerPlaceholder": "Two or three sentences answering it on its own.",
+            "remove": "Remove this question",
+            "add": "Add a question"
+        },
+        "media": {
+            "title": "Media",
+            "videoUrl": "Video URL",
+            "videoPlaceholder": "https://youtube.com/watch?v=… or a Loom link",
+            "ogImage": "OG image override",
+            "ogImagePlaceholder": "Leave empty to generate one",
+            "ogImageHelp": "Only set this for a bespoke social card.",
+            "gallery": "Gallery",
+            "galleryHelp": "Optional: cards draw the coworker board instead. These illustrate the detail page, the first one leading and a generated one landing there. Save to persist. Alt text is recommended: these end up on an indexed page.",
+            "altCover": "Alt text (cover)",
+            "alt": "Alt text",
+            "cover": "Cover",
+            "remove": "Remove",
+            "dropOverlay": "Drop images",
+            "uploading": "Uploading…",
+            "drop": "Drop images here or click to choose"
+        },
+        "meta": {
+            "title": "Metadata",
+            "titleLabel": "Title",
+            "titlePlaceholder": "Outbound SDR",
+            "slug": "Slug",
+            "category": "Category",
+            "setupTime": "Setup time (minutes)",
+            "setupTimeHelp": "Shown on the public page. Be honest about app setup.",
+            "tags": "Tags",
+            "tagsPlaceholder": "outreach, sales, automation",
+            "tagsHelp": "Comma separated. Used for filtering on the public page.",
+            "metaTitle": "Meta title",
+            "metaTitlePlaceholder": "{title}, AI coworker template",
+            "metaTitleDefault": "Defaults to the title",
+            "metaDescription": "Meta description",
+            "metaDescriptionHelp": "{count}/{limit}, between {min} and {limit} characters to publish.",
+            "metaDescriptionPlaceholder": "One or two sentences for search results."
+        }
+    },
+    "capture": {
+        "failedRequest": "The request did not go through. Check your connection and try again.",
+        "steps": {
+            "select": {
+                "title": "Capture coworkers",
+                "description": "Pick the coworkers whose folder should become this template."
+            },
+            "review": {
+                "title": "Security review",
+                "description": "Check what each coworker carries, then confirm it before capturing."
+            },
+            "done": {
+                "title": "Captured",
+                "description": "The archives are stored and the template now describes these coworkers."
+            }
+        },
+        "stages": {
+            "title": {
+                "title": "Name your template",
+                "description": "The draft is saved as soon as you confirm.",
+                "points": {
+                    "private": "Private until published",
+                    "signed": "Signed with your name"
+                }
+            },
+            "select": {
+                "title": "Pick your coworkers",
+                "description": "The coworker folder is snapshotted as it stands.",
+                "points": {
+                    "snapshot": "A snapshot, not a link",
+                    "edits": "Later edits stay on your side"
+                }
+            },
+            "review": {
+                "title": "Security review",
+                "description": "Secrets are stripped before anything leaves the box.",
+                "points": {
+                    "env": "Env values cleared",
+                    "apps": "Apps reset",
+                    "scan": "Secret scan on files and paths",
+                    "memories": "Memories left behind"
+                }
+            },
+            "done": {
+                "title": "Capture",
+                "description": "The archive is stored privately and describes the template.",
+                "points": {
+                    "stored": "Stored out of reach",
+                    "warnings": "Warnings, not surprises"
+                }
+            }
+        },
+        "select": {
+            "emptyTitle": "No coworker to capture",
+            "emptyDescription": "Create a coworker in a Box first, then come back here.",
+            "box": "Box",
+            "boxPlaceholder": "Pick the Box holding the coworkers",
+            "boxFallback": "Box",
+            "coworkers": "Coworkers",
+            "coworkersIn": "Coworkers in {box}",
+            "search": "Search by name or handle",
+            "selected": "{selected} of {total} selected",
+            "clear": "Clear",
+            "selectAll": "Select all",
+            "noMatch": "No coworker matches this search."
+        },
+        "review": {
+            "reviewed": "{approved} of {total, plural, one {# coworker} other {# coworkers}} reviewed",
+            "files": "{kept} of {total} files, {size}",
+            "tools": "Tools",
+            "apps": "Apps",
+            "skills": "Skills",
+            "schedules": "Schedules",
+            "oneShot": "One-shot",
+            "webhooks": "Webhooks",
+            "memories": "Memories",
+            "memoriesNote": "{count} recorded, excluded from the archive by default",
+            "removed": "Removed on the way out",
+            "toProvide": "To provide again on a copy",
+            "envKeys": "Env keys",
+            "flagged": "Flagged files",
+            "flaggedKept": "{kept} of {total} files that look like they carry a credential are still included. They will travel inside the archive.",
+            "flaggedOut": "{count, plural, one {# file} other {# files}} look like they carry a credential. They stay out of the archive.",
+            "install": "Install",
+            "filesGroup": "Files",
+            "hideFolder": "Hide the folder",
+            "showFolder": "Show the folder",
+            "kept": "{kept} of {total} kept",
+            "confirm": "I reviewed what this coworker carries",
+            "answerFirst": "Answer the install question above first.",
+            "writeFirst": "Write the install instructions above first.",
+            "flaggedTravel": "{count} flagged file(s) will travel inside the archive.",
+            "nothingSecret": "Nothing on this list is a secret that should not ship.",
+            "more": "+{count} more"
+        },
+        "tree": {
+            "collapse": "Collapse",
+            "expand": "Expand",
+            "flagged": "{count} flagged"
+        },
+        "done": "{count, plural, one {# coworker} other {# coworkers}} captured. Their skills, schedules and apps now describe this template.",
+        "panel": {
+            "inspect": "Inspect {count, plural, =0 {coworkers} one {# coworker} other {# coworkers}}",
+            "reviewEach": "Review each agent to enable the capture ({approved}/{total})",
+            "back": "Back",
+            "capture": "Capture"
+        },
+        "dialog": {
+            "cancel": "Cancel",
+            "done": "Done"
+        }
+    },
+    "expert": {
+        "agents": {
+            "title": "Coworkers ({count})",
+            "empty": "No coworker captured yet. Capture one from your sandbox so people can install this setup.",
+            "noRole": "No role yet",
+            "connectors": "{count, plural, one {# connector} other {# connectors}}",
+            "setup": {
+                "guided": "Guided install",
+                "none": "No install",
+                "missing": "Install answer missing"
+            },
+            "removeTitle": "Remove {name}?",
+            "removeDescription": "The archive captured from its folder is deleted too. Adding the coworker back means capturing it again.",
+            "removeConfirm": "Remove",
+            "removeLabel": "Remove {name}",
+            "capture": "Capture from your sandbox",
+            "removeNote": "Removing a coworker also deletes the archive captured from its folder. Adding it back means capturing it again."
+        },
+        "list": {
+            "newTemplate": "New template",
+            "emptyTitle": "No templates yet",
+            "emptyDescription": "Describe a coworker setup once, and we review it before it reaches the marketplace."
+        },
+        "row": {
+            "agents": "{count, plural, one {# agent} other {# agents}}"
+        },
+        "tabs": {
+            "details": "Details",
+            "pricing": "Pricing",
+            "media": "Media",
+            "faq": "FAQ",
+            "agents": "Coworkers"
+        },
+        "dialog": {
+            "title": "My templates",
+            "description": "Draft a template from your sandbox, then hand it over. We review it before it goes live.",
+            "pickTitle": "Pick a template",
+            "pickDescription": "Or start a new one to capture a coworker from your sandbox into it."
+        },
+        "toasts": {
+            "saved": "Template saved.",
+            "submitted": "Submitted. We will get back to you."
+        },
+        "footer": {
+            "requirements": {
+                "title": "A title",
+                "tagline": "A tagline",
+                "description": "A description",
+                "metaDescription": "A meta description of {min} to {max} characters",
+                "agent": "At least one captured coworker",
+                "installAnswers": "An install answer for every coworker",
+                "payouts": "A Stripe account that can receive payouts"
+            },
+            "live": "This template is live on the marketplace. Reach out to the Rerun team to change it.",
+            "inReview": "We are reviewing this template. Withdraw it to keep editing.",
+            "withdraw": "Withdraw",
+            "completeChecklist": "Complete the checklist first",
+            "saveFirst": "Save your changes first",
+            "sentBack": "We sent this one back",
+            "deleteTitle": "Delete this template for good?",
+            "deleteDescription": "The template, its media and every coworker captured for it are removed. This cannot be undone.",
+            "deleteTooltip": "Delete this template for good",
+            "deleteLabel": "Delete template",
+            "checklistLabel": "Submission checklist: {met} of {total} done",
+            "ready": "Ready to submit",
+            "checklistHint": "What a template needs before we review it.",
+            "setUpPayouts": "Set up payouts",
+            "save": "Save",
+            "submit": "Submit for review"
+        }
+    },
+    "pricing": {
+        "title": "Pricing",
+        "models": {
+            "free": "Free",
+            "one_time": "One-time purchase",
+            "recurring": "Monthly subscription"
+        },
+        "helpers": {
+            "free": "Anyone on a Rerun plan can install it.",
+            "one_time": "Charged once. The buyer keeps it for good.",
+            "recurring": "Charged every month. Access ends when the buyer cancels."
+        },
+        "modelHelp": "{helper} Buyers still need an active Rerun plan to install a template.",
+        "priceLabel": "Price (USD)",
+        "priceHelp": "Minimum {min}. Changing it later only applies to new buyers.",
+        "payoutsTitle": "Payouts are not enabled",
+        "payoutsBody": "You can save this price now, but a paid template cannot be submitted for review until Stripe payouts are enabled.",
+        "setUpPayouts": "Set up payouts",
+        "payout": {
+            "yourPrice": "Your price{recurring, select, true { per month} other {}}",
+            "fee": "Rerun fee ({fee})",
+            "earn": "You earn{recurring, select, true { per month} other {}}",
+            "vat": "VAT is added on top of your price at checkout and paid by the buyer, so it never comes out of your side. What you earn is the same wherever they are."
+        }
+    },
+    "payouts": {
+        "expired": "Your setup link expired, reopening Stripe.",
+        "title": "Payouts",
+        "subtitle": "Where the money from your paid templates lands.",
+        "yourPrice": "Your price",
+        "yourPriceValue": "You set it per template, excluding VAT",
+        "commission": "Rerun commission",
+        "schedule": "Payout schedule",
+        "scheduleValue": "Stripe standard",
+        "planNote": "Buyers still need an active Rerun plan to install a template, so a purchase unlocks the template and nothing else.",
+        "states": {
+            "not_started": {
+                "headline": "Get paid for your templates",
+                "body": "Rerun keeps {fee} of each sale. It lands on your bank account through Stripe.",
+                "cta": "Set up payouts"
+            },
+            "incomplete": {
+                "headline": "Finish your Stripe setup",
+                "body": "Stripe still needs a few details before it can pay you.",
+                "cta": "Finish setup"
+            },
+            "pending_verification": {
+                "headline": "Stripe is verifying your details",
+                "body": "This usually takes a few minutes. You can keep drafting templates in the meantime.",
+                "cta": "Check status"
+            },
+            "restricted": {
+                "headline": "Payouts are paused",
+                "body": "Stripe has restricted this account. Your published templates stay online, but nobody can buy them until this is resolved.",
+                "cta": "Fix on Stripe"
+            },
+            "ready": {
+                "headline": "You are set up for payouts",
+                "body": "Price a template and it goes on sale once we review it. Rerun keeps {fee} of each sale.",
+                "cta": "Open Stripe dashboard"
+            }
+        },
+        "stripeReported": "Stripe reported: {reason}",
+        "terms": "Continuing means you accept the <link>Marketplace Creator Terms</link>, including how refunds and chargebacks are settled.",
+        "sidebar": {
+            "payouts": "Payouts",
+            "revenue": "Revenue"
+        },
+        "stateLabels": {
+            "not_started": "Not set up",
+            "incomplete": "Action needed",
+            "pending_verification": "In review",
+            "restricted": "Restricted",
+            "ready": "Ready"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "A business website",
+                "mcc": "Your line of business"
+            },
+            "external_account": "A bank account",
+            "individual": {
+                "verification": {
+                    "document": "An identity document",
+                    "additional_document": "A proof of address"
+                },
+                "id_number": "Your national ID number",
+                "address": {
+                    "line1": "Your address"
+                },
+                "dob": {
+                    "day": "Your date of birth"
+                }
+            },
+            "tos_acceptance": {
+                "date": "Accepting the Stripe terms"
+            }
+        },
+        "saleKinds": {
+            "one_time": "One-time",
+            "recurring": "Monthly",
+            "refund": "Refund"
+        }
+    },
+    "revenue": {
+        "ranges": {
+            "30d": "30 days",
+            "12m": "12 months",
+            "all": "All time"
+        },
+        "noAccountTitle": "No payouts account yet",
+        "noAccountDescription": "Set up payouts to start selling your templates.",
+        "setUpPayouts": "Set up payouts",
+        "title": "Revenue",
+        "openDashboard": "Open Stripe dashboard",
+        "youEarned": "You earned",
+        "noSales": "No sales in this period.",
+        "recentSales": "Recent sales",
+        "date": "Date",
+        "template": "Template",
+        "type": "Type",
+        "sales": "Sales",
+        "gross": "Gross",
+        "fee": "Rerun fee",
+        "pending": "Pending payout",
+        "available": "Available now",
+        "subscriptions": "{count, plural, one {# active subscription} other {# active subscriptions}}",
+        "perMonth": "{amount}/mo"
+    },
+    "categories": {
+        "agencies": "Agencies",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Sales",
+        "recruiting": "Recruiting",
+        "real-estate": "Real estate",
+        "legal": "Legal & compliance",
+        "creators": "Creators",
+        "productivity": "Productivity",
+        "other": "Other"
+    },
+    "status": {
+        "draft": "Draft",
+        "in_review": "In review",
+        "published": "Published",
+        "unlisted": "Unlisted",
+        "archived": "Archived"
+    },
+    "creatorKind": {
+        "studio": "Studio",
+        "freelancer": "Freelancer",
+        "expert": "Expert"
+    },
+    "cta": {
+        "place": "{count, plural, one {Place # coworker} other {Place # coworkers}}",
+        "placeCaption": "{count, plural, one {Drag it onto your board, ready to run.} other {Drag them onto your board, ready to run.}}",
+        "trialInstall": "Start free trial & install",
+        "trialThenSubscribe": "Start free trial, then subscribe {price}/mo",
+        "trialThenPay": "Start free trial, then pay {price}",
+        "planInstall": "Subscribe {plan}/mo & install",
+        "planThenSubscribe": "Subscribe {plan}/mo, then subscribe {price}/mo",
+        "planThenPay": "Subscribe {plan}/mo, then pay {price}",
+        "subscribe": "Subscribe {price}/mo",
+        "pay": "Pay {price}",
+        "payCaption": "This template, billed separately.",
+        "useTemplate": "Use this template",
+        "nothingCaptured": "No coworker has been captured into this template yet.",
+        "open": "Open {name}",
+        "alreadyOnBoard": "Already on your board.",
+        "installAgain": "Install again",
+        "sandboxCannotBuy": "Switch to a workspace to buy templates.",
+        "trialBilledSeparately": "{terms} This template is billed separately.",
+        "trialUsedBilledSeparately": "Your free trial has been used. Billed today; this template is billed separately.",
+        "resubscribe": "Resubscribe {price}/mo",
+        "lapsed": "Your subscription ended. The coworkers this template installed are disabled.",
+        "billedTo": "Billed to {workspace}. Your Rerun plan is already active.",
+        "yours": "Your template, no charge."
+    }
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 // The geometry and the alpha ramp of the web's waveforms (components/ui/live-waveform and
 // chat/VoiceWaveform), so a message plays back in the same visual language on both.
@@ -62,6 +63,7 @@ type LiveWaveformProps = {
 
 /** The waveform of a recording in progress, then of the recording on its way out. */
 export function LiveWaveform({ processing, getLevel, color, height = 48 }: LiveWaveformProps) {
+    const t = useTranslations('mobileChat.voice')
     const [width, setWidth] = useState(0)
     const [bars, setBars] = useState<number[]>([])
     const lastLiveRef = useRef<number[]>([])
@@ -93,7 +95,7 @@ export function LiveWaveform({ processing, getLevel, color, height = 48 }: LiveW
     }, [processing, count])
 
     return (
-        <View accessibilityLabel={processing ? 'Sending the recording' : 'Recording'} onLayout={event => setWidth(event.nativeEvent.layout.width)} style={{ flex: 1, height, flexDirection: 'row', alignItems: 'center', gap: BAR_GAP }}>
+        <View accessibilityLabel={processing ? t('sending') : t('recording')} onLayout={event => setWidth(event.nativeEvent.layout.width)} style={{ flex: 1, height, flexDirection: 'row', alignItems: 'center', gap: BAR_GAP }}>
             {bars.slice(0, count).map((value, i) => (
                 <View key={i} style={{ width: BAR_WIDTH, height: barHeightOf(value, height), borderRadius: BAR_RADIUS, backgroundColor: color, opacity: alphaOf(value) * edgeFade(i, count) }} />
             ))}

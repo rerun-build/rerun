@@ -1,4 +1,5 @@
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
+import { formatNumber } from '@rerun/i18n/format'
 
 import { filePreviewKind } from './preview'
 
@@ -24,14 +25,17 @@ export function fileEditBlockReason(input: { name: string; truncated: boolean; c
     return null
 }
 
-export function editDisabledTooltip(reason: EditBlockReason): string {
+// The `files.detail` catalog.
+export type EditBlockCopy = (key: 'editNotText' | 'editTruncated' | 'editBinary', values?: { limit: string }) => string
+
+export function editDisabledTooltip(reason: EditBlockReason, locale: string, t: EditBlockCopy): string {
     switch (reason) {
         case 'not-text':
-            return 'Only text files can be edited here.'
+            return t('editNotText')
         case 'truncated':
-            return `This file is over ${TEXT_FILE_PAGE_CHARS.toLocaleString('en-US')} characters and cannot be edited here. Download it, or ask the coworker to edit it.`
+            return t('editTruncated', { limit: formatNumber(TEXT_FILE_PAGE_CHARS, locale) })
         case 'binary':
-            return 'This file is not text, so editing it here would corrupt it.'
+            return t('editBinary')
     }
 }
 

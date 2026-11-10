@@ -1,6 +1,7 @@
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { hostOf, openExternalUrl } from '@/lib/url'
@@ -11,9 +12,10 @@ export type Source = { url: string; title?: string }
 
 // The pages a message drew on, folded under it.
 export function Sources({ sources }: { sources: Source[] }) {
+    const t = useTranslations('mobileCards.sources')
     const theme = useTheme()
     const [open, setOpen] = useState(false)
-    const label = sources.length > 1 ? `${sources.length} sources` : '1 source'
+    const label = t('count', { count: sources.length })
     return (
         <View style={{ gap: spacing.xs }}>
             <Pressable onPress={() => setOpen(current => !current)} accessibilityRole="button" accessibilityState={{ expanded: open }} accessibilityLabel={label} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>

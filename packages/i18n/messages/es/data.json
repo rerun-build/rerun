@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "Tabla no encontrada",
+        "deleteRowsFailed": "No se pudieron eliminar las filas",
+        "saveRowFailed": "No se pudo guardar esta fila",
+        "deleteTableFailed": "No se pudo eliminar la tabla",
+        "purgeTableFailed": "No se pudo vaciar la tabla",
+        "addViewFailed": "No se pudo añadir esta vista",
+        "deleteViewFailed": "No se pudo eliminar esta vista",
+        "unavailable": "Base de datos no disponible",
+        "tryAgain": "Reintentar",
+        "rowCount": "{count, plural, one {{total} fila} other {{total} filas}}",
+        "rowCountFound": "{count, plural, one {{total} fila encontrada} other {{total} filas encontradas}}",
+        "noRows": "Sin filas",
+        "noSearchMatch": "Ninguna fila coincide con esta búsqueda.",
+        "tableEmpty": "Esta tabla está vacía."
+    },
+    "pagination": {
+        "count": "Total <value>{count}</value>",
+        "rowsPerPage": "Filas por página",
+        "perPage": "{size} por página",
+        "range": "{range} de {total}",
+        "firstPage": "Primera página",
+        "previousPage": "Página anterior",
+        "nextPage": "Página siguiente",
+        "lastPage": "Última página"
+    },
+    "toolbar": {
+        "selected": "{count, plural, one {# seleccionada} other {# seleccionadas}}",
+        "deleteRowTitle": "¿Eliminar esta fila?",
+        "deleteRowsTitle": "¿Eliminar {count} filas?",
+        "deleteRowDescription": "La fila se elimina de la tabla para siempre. Esto no se puede deshacer.",
+        "deleteRowsDescription": "Las filas se eliminan de la tabla para siempre. Esto no se puede deshacer.",
+        "delete": "Eliminar",
+        "clearSelection": "Quitar selección",
+        "search": "Buscar",
+        "searchRows": "Buscar filas",
+        "clearSearch": "Borrar búsqueda",
+        "tableActions": "Acciones de la tabla",
+        "export": "Exportar",
+        "purgeTable": "Vaciar tabla",
+        "deleteTable": "Eliminar tabla"
+    },
+    "viewBar": {
+        "allRows": "Todas las filas",
+        "viewOptions": "Opciones de {name}",
+        "editView": "Editar vista",
+        "deleteView": "Eliminar vista",
+        "addView": "Añadir vista",
+        "addNewView": "Añadir una vista nueva",
+        "expand": "Ampliar",
+        "deleteViewTitle": "¿Eliminar la vista \"{name}\"?",
+        "deleteViewDescription": "Solo desaparece la vista. Las filas de la tabla no se tocan."
+    },
+    "layouts": {
+        "table": "Tabla",
+        "list": "Lista",
+        "gallery": "Galería",
+        "board": "Tablero"
+    },
+    "table": {
+        "selectAllRows": "Seleccionar todas las filas de esta página",
+        "selectRow": "Seleccionar fila",
+        "sources": "Fuentes"
+    },
+    "cell": {
+        "yes": "Sí",
+        "no": "No"
+    },
+    "board": {
+        "moveFailed": "No se pudo mover esta fila",
+        "unavailable": "Tablero no disponible",
+        "showMore": "Mostrar {count} más"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "Verificado",
+                "detail": "El buzón existe"
+            },
+            "unconfirmed": {
+                "label": "Sin confirmar",
+                "detail": "Buzón sin confirmar"
+            },
+            "invalid": {
+                "label": "No válido",
+                "detail": "El buzón no existe"
+            }
+        },
+        "openSource": "Abrir la fuente",
+        "verified": "Verificado",
+        "row": "Fila",
+        "cellLabel": "Fuentes: {names}"
+    },
+    "shared": {
+        "emptyTitle": "Aún no hay tablas compartidas",
+        "emptyDescription": "Todos los coworkers del workspace leen y escriben en esta base de datos. Cuando necesitan un registro común (un catálogo, una cola, una lista que varios coworkers trabajan), crean aquí tablas que puedes consultar cuando quieras.",
+        "unreachable": "No se pudo contactar con la máquina de este workspace."
+    }
+}

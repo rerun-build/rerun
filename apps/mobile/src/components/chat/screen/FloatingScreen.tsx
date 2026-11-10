@@ -5,6 +5,7 @@ import { View, type LayoutChangeEvent } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import Animated, { Keyframe, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
+import { useTranslations } from 'use-intl'
 
 import { useTheme } from '@/theme/theme'
 import { radius } from '@/theme/tokens'
@@ -66,6 +67,7 @@ type FloatingScreenProps = {
 // corner resizes it, a handle always drawn since a phone has no hover. A tap takes control.
 export function FloatingScreen({ top, label, onTakeControl, children }: FloatingScreenProps) {
     const theme = useTheme()
+    const t = useTranslations('mobileChat.screen')
     const [initial] = useState(loadPlace)
     const [side, setSide] = useState<ScreenSide>(initial.side)
     const track = useSharedValue(0)
@@ -131,7 +133,7 @@ export function FloatingScreen({ top, label, onTakeControl, children }: Floating
                     <Animated.View entering={ENTER} exiting={EXIT} style={{ aspectRatio: 16 / 9, borderRadius: radius.md, borderCurve: 'continuous', overflow: 'hidden', borderWidth: 1, borderColor: theme.border, backgroundColor: theme.card, transformOrigin: side === 'left' ? 'top left' : 'top right' }}>
                         {children}
                         <GestureDetector gesture={resize}>
-                            <View accessibilityLabel="Resize the screen" style={{ position: 'absolute', bottom: 0, width: HANDLE, height: HANDLE, padding: 6, justifyContent: 'flex-end', alignItems: handleOnRight ? 'flex-end' : 'flex-start', ...(handleOnRight ? { right: 0 } : { left: 0 }) }}>
+                            <View accessibilityLabel={t('resize')} style={{ position: 'absolute', bottom: 0, width: HANDLE, height: HANDLE, padding: 6, justifyContent: 'flex-end', alignItems: handleOnRight ? 'flex-end' : 'flex-start', ...(handleOnRight ? { right: 0 } : { left: 0 }) }}>
                                 <View style={{ width: 10, height: 10, borderBottomWidth: 2, borderColor: 'rgba(255,255,255,0.9)', ...(handleOnRight ? { borderRightWidth: 2, borderBottomRightRadius: 3 } : { borderLeftWidth: 2, borderBottomLeftRadius: 3 }), shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 2, shadowOffset: { width: 0, height: 0 } }} />
                             </View>
                         </GestureDetector>

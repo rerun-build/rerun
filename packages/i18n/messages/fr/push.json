@@ -1,0 +1,12 @@
+{
+    "states": {
+        "done": "Terminé",
+        "error": "Échec",
+        "question": "Question",
+        "approval": "À valider",
+        "connector": "App requise",
+        "info": "Mise à jour"
+    },
+    "subtitle": "{source} · {state}",
+    "fallbackAgent": "votre coworker"
+}

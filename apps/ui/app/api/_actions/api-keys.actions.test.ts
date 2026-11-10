@@ -41,7 +41,7 @@ describe('createApiKeyAction', () => {
     it('refuses a member who is not an admin', async () => {
         const db = database(() => ({ count: 0 }), 'member')
 
-        await expect(createApiKeyAction('CI')).resolves.toEqual({ ok: false, error: 'Only an admin can manage API keys' })
+        await expect(createApiKeyAction('CI')).resolves.toEqual({ ok: false, error: 'Only an admin can manage API keys', code: 'adminOnlyApiKeys' })
         expect(db.writes('api_keys')).toHaveLength(0)
     })
 
@@ -72,7 +72,7 @@ describe('createApiKeyAction', () => {
     it('refuses a twenty-first active key', async () => {
         const db = database((table, calls) => (table === 'api_keys' && !writeMethodOf(calls) ? { count: 20 } : undefined))
 
-        await expect(createApiKeyAction('CI')).resolves.toEqual({ ok: false, error: 'This workspace already has 20 active keys. Revoke one to create another.' })
+        await expect(createApiKeyAction('CI')).resolves.toEqual({ ok: false, error: 'This workspace already has 20 active keys. Revoke one to create another.', code: 'tooManyActiveKeys', params: { max: 20 } })
         expect(db.writes('api_keys')).toHaveLength(0)
     })
 
@@ -104,7 +104,7 @@ describe('createApiKeyAction', () => {
         database(() => ({ count: 0 }))
 
         await expect(createApiKeyAction('   ')).resolves.toMatchObject({ ok: false })
-        await expect(createApiKeyAction('x'.repeat(61))).resolves.toEqual({ ok: false, error: 'Keep the name under 60 characters.' })
+        await expect(createApiKeyAction('x'.repeat(61))).resolves.toEqual({ ok: false, error: 'Keep the name under 60 characters.', code: 'nameTooLongDot', params: { max: 60 } })
     })
 })
 
@@ -112,21 +112,21 @@ describe('revokeApiKeyAction', () => {
     it('refuses a member who is not an admin', async () => {
         const db = database(() => ({ data: { workspace_id: WORKSPACE_ID } }), 'member')
 
-        await expect(revokeApiKeyAction('key-1')).resolves.toEqual({ ok: false, error: 'Only an admin can manage API keys' })
+        await expect(revokeApiKeyAction('key-1')).resolves.toEqual({ ok: false, error: 'Only an admin can manage API keys', code: 'adminOnlyApiKeys' })
         expect(db.writes('api_keys')).toHaveLength(0)
     })
 
     it('answers Key not found for a key of another workspace and writes nothing', async () => {
         const db = database(table => (table === 'api_keys' ? { data: { workspace_id: 99 } } : undefined))
 
-        await expect(revokeApiKeyAction('key-1')).resolves.toEqual({ ok: false, error: 'Key not found' })
+        await expect(revokeApiKeyAction('key-1')).resolves.toEqual({ ok: false, error: 'Key not found', code: 'keyNotFound' })
         expect(db.writes('api_keys')).toHaveLength(0)
     })
 
     it('answers Key not found for a key that does not exist', async () => {
         const db = database()
 
-        await expect(revokeApiKeyAction('key-1')).resolves.toEqual({ ok: false, error: 'Key not found' })
+        await expect(revokeApiKeyAction('key-1')).resolves.toEqual({ ok: false, error: 'Key not found', code: 'keyNotFound' })
         expect(db.writes('api_keys')).toHaveLength(0)
     })
 
@@ -179,8 +179,8 @@ describe('createImportKeyAction', () => {
         const db = database(spaces([{ id: 'box-1' }]), 'member')
         vi.mocked(manageableSpaceIds).mockResolvedValueOnce(new Set())
 
-        await expect(createImportKeyAction('grok')).resolves.toEqual({ ok: false, error: 'You manage no Box in this workspace yet. Create one first.' })
-        await expect(createImportKeyAction('nope' as 'grok')).resolves.toEqual({ ok: false, error: 'Unknown source' })
+        await expect(createImportKeyAction('grok')).resolves.toEqual({ ok: false, error: 'You manage no Box in this workspace yet. Create one first.', code: 'noManagedBox' })
+        await expect(createImportKeyAction('nope' as 'grok')).resolves.toEqual({ ok: false, error: 'Unknown source', code: 'unknownSource' })
         expect(db.writes('api_keys')).toHaveLength(0)
     })
 

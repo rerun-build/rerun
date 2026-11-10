@@ -1,12 +1,13 @@
 'use client'
 
 import { useStepper } from '@rerun/ui/steps'
+import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 import { CreateTemplateTitleStep } from '@/components/dialogs/CreateTemplateTitleStep'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
 import { StepDialogHeader } from '@/components/dialogs/StepDialogHeader'
 import { CaptureProgressPanel } from '@/components/templates/capture/CaptureProgressPanel'
-import { CAPTURE_STEP_COPY } from '@/components/templates/capture/CaptureStepBody'
+import { useCaptureStepCopy } from '@/components/templates/capture/CaptureStepBody'
 import { CaptureStepPanel } from '@/components/templates/capture/CaptureStepPanel'
 import type { CaptureActions } from '@/components/templates/capture/types'
 import { useCaptureFlow, type CaptureStep } from '@/components/templates/capture/useCaptureFlow'
@@ -15,8 +16,6 @@ import { Dialog } from '@/components/ui/dialog'
 const STEPS = ['title', 'select', 'review', 'done'] as const
 
 type Stepper = ReturnType<typeof useStepper>
-
-const DEFAULT_DESCRIPTION = 'Draft a template from your sandbox. The Rerun team reviews it before it goes live.'
 
 type CreateTemplateDialogProps = {
     open: boolean
@@ -34,6 +33,7 @@ type CreateTemplateDialogProps = {
 // The expert panel and the admin console mount the same wizard: what a template is addressed by (an
 // id there, a slug here) only ever reaches this component through `captureActions`.
 export function CreateTemplateDialog({ open, onOpenChange, onCreate, captureActions, onDone, description }: CreateTemplateDialogProps) {
+    const t = useTranslations('dialogs.createTemplate')
     const [createdKey, setCreatedKey] = useState<string | null>(null)
     // Held here rather than in the flow because the progress panel is passed as `aside` and reads
     // the step too.
@@ -60,7 +60,7 @@ export function CreateTemplateDialog({ open, onOpenChange, onCreate, captureActi
                     onCreate={onCreate}
                     captureActions={captureActions}
                     onClose={close}
-                    description={description ?? DEFAULT_DESCRIPTION}
+                    description={description ?? t('defaultDescription')}
                 />
             </SplitDialogContent>
         </Dialog>
@@ -78,6 +78,8 @@ type CreateTemplateFlowProps = {
 }
 
 function CreateTemplateFlow({ stepper, createdKey, onCreated, onCreate, captureActions, onClose, description }: CreateTemplateFlowProps) {
+    const t = useTranslations('dialogs.createTemplate')
+    const captureCopy = useCaptureStepCopy()
     const { goTo } = stepper
 
     // The flow is held here rather than inside the capture panel, because StepTransition keys its
@@ -88,7 +90,7 @@ function CreateTemplateFlow({ stepper, createdKey, onCreated, onCreate, captureA
     const flow = useCaptureFlow(actions)
 
     const step = STEPS[stepper.index]
-    const copy = step === 'title' ? { title: 'New template', description } : CAPTURE_STEP_COPY[step]
+    const copy = step === 'title' ? { title: t('title'), description } : captureCopy[step]
 
     return (
         <div className="flex min-h-0 flex-col p-6">
@@ -111,7 +113,7 @@ function CreateTemplateFlow({ stepper, createdKey, onCreated, onCreate, captureA
                     direction={stepper.direction}
                     onStepChange={next => goTo(STEPS.indexOf(next))}
                     onClose={onClose}
-                    doneLabel="Open template"
+                    doneLabel={t('doneLabel')}
                 />
             )}
         </div>

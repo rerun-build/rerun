@@ -2,6 +2,7 @@ import { rerunCreditTotalMicros, type RerunCreditColumns } from '@rerun/cloud/bi
 import { catalogFor, modelLabel, modelPower, type CatalogModel } from '@/lib/engine/models'
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { shortUntil } from '@/lib/time'
+import { formatNumber, shortDate } from '@rerun/i18n/format'
 import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isPremiumModel, opencodePlanOf, opencodeServesModel, toProviderModel, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
 
 // The AI providers dialog sorts every connection by who pays for it: the credit included with
@@ -33,61 +34,39 @@ export function connectMethod(provider: string): ConnectMethod {
     return 'key'
 }
 
-export const KIND_LABEL: Record<SourceKind, string> = { included: 'Included', plan: 'Plan', key: 'API key' }
+type PlanWindowCopy = 'session' | 'fiveHour' | 'weekly' | 'monthly' | 'modelWeekly' | 'modelWeeklyUnnamed'
+type CliUnavailableCopy = 'opencodeRetired' | 'codexOutdated' | 'notInChatgptPlan'
 
-export const PROVIDER_PITCH: Record<AddableProvider, { title: string; hint: string }> = {
-    claude: { title: 'Claude Pro or Max', hint: 'Sign in with your Claude account' },
-    codex: { title: 'ChatGPT Plus or Pro', hint: 'Sign in with your ChatGPT account' },
-    anthropic: { title: 'Anthropic', hint: 'Claude models, billed per token' },
-    openai: { title: 'OpenAI', hint: 'GPT models, billed per token' },
-    google: { title: 'Google', hint: 'Gemini models, billed per token' },
-    openrouter: { title: 'OpenRouter', hint: 'Every model behind one key' },
-    opencode: { title: 'OpenCode Go or Console', hint: 'Paste your OpenCode key' },
-    custom: { title: 'Custom endpoint', hint: 'Ollama, LM Studio, vLLM or any OpenAI-compatible server' },
+export type SourceCopy = (
+    key:
+        | `sources.kinds.${SourceKind}`
+        | `sources.pitch.${AddableProvider}.${'title' | 'hint'}`
+        | `sources.guide.${GuidedProvider}.${'title' | 'step1' | 'step2' | 'step3'}`
+        | `sources.windows.${PlanWindowCopy}`
+        | `sources.tiers.${'fast' | 'smart'}`
+        | `sources.opencodePlan.${OpencodePlan}`
+        | `sources.unavailable.${CliUnavailableCopy}`
+        | 'sources.summary'
+        | 'sources.summaryWindow'
+        | 'sources.creditPaused'
+        | 'sources.creditUsed'
+        | 'sources.creditUsedUpOn'
+        | 'sources.creditUsedUpNextMonth'
+        | 'sources.creditBackOn'
+        | 'sources.creditBackNextMonth'
+        | 'sources.windowResets'
+        | 'sources.pricePerMillion',
+    values?: Record<string, string | number>
+) => string
+
+export function providerPitch(provider: AddableProvider, t: SourceCopy): { title: string; hint: string } {
+    return { title: t(`sources.pitch.${provider}.title`), hint: t(`sources.pitch.${provider}.hint`) }
 }
 
 // Numbered steps rendered by CredentialGuide, the same fold the service credentials use.
-export const PROVIDER_GUIDE: Record<GuidedProvider, { title: string; steps: string }> = {
-    anthropic: {
-        title: 'How to get your Anthropic key',
-        steps: [
-            '1. Open the [Anthropic Console](https://console.anthropic.com/settings/keys) and sign in.',
-            '2. Click **Create Key** and name it, for example "Rerun".',
-            '3. Copy the key (it starts with `sk-ant-`) and paste it above. It is shown only once.',
-        ].join('\n'),
-    },
-    openai: {
-        title: 'How to get your OpenAI key',
-        steps: [
-            '1. Open [OpenAI API keys](https://platform.openai.com/api-keys) and sign in.',
-            '2. Click **Create new secret key** and name it, for example "Rerun".',
-            '3. Copy the key (it starts with `sk-`) and paste it above. It is shown only once.',
-        ].join('\n'),
-    },
-    google: {
-        title: 'How to get your Google key',
-        steps: [
-            '1. Open [Google AI Studio](https://aistudio.google.com/apikey) and sign in with your Google account.',
-            '2. Click **Create API key** and pick a Google Cloud project.',
-            '3. Copy the key and paste it above.',
-        ].join('\n'),
-    },
-    openrouter: {
-        title: 'How to get your OpenRouter key',
-        steps: [
-            '1. Open [OpenRouter keys](https://openrouter.ai/keys) and sign in.',
-            '2. Click **Create API Key**, and add credits if your balance is empty.',
-            '3. Copy the key (it starts with `sk-or-`) and paste it above. It is shown only once.',
-        ].join('\n'),
-    },
-    opencode: {
-        title: 'How to get your OpenCode key',
-        steps: [
-            '1. Open [OpenCode](https://opencode.ai/auth) and sign in.',
-            '2. Subscribe to **OpenCode Go**, or add credits to use the Console models.',
-            '3. Create an API key, copy it (it starts with `oc_sk_`) and paste it above.',
-        ].join('\n'),
-    },
+export function providerGuide(provider: GuidedProvider, t: SourceCopy): { title: string; steps: string } {
+    const steps = ([1, 2, 3] as const).map(step => `${step}. ${t(`sources.guide.${provider}.step${step}`)}`)
+    return { title: t(`sources.guide.${provider}.title`), steps: steps.join('\n') }
 }
 
 export const PLAN_PROVIDERS: AddableProvider[] = ['claude', 'codex']
@@ -125,14 +104,13 @@ export function rerunCreditOf(workspace: (RerunCreditColumns & { current_period_
     return { usedMicros, budgetMicros, resetAt: workspace?.current_period_end ?? null, percent, paused: !!workspace?.rerun_credit_paused_at }
 }
 
-export const RERUN_CREDIT_PAUSED_REASON = 'Rerun credits are paused'
-
 export function isCreditUsedUp(credit: RerunCredit) {
     return credit.budgetMicros > 0 && credit.usedMicros >= credit.budgetMicros
 }
 
-export function creditResetPhrase(credit: RerunCredit) {
-    return credit.resetAt ? `on ${new Date(credit.resetAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : 'next month'
+// Set inside a sentence of the iOS app ("back {backOn}"), which is why it carries its own preposition.
+export function creditResetPhrase(credit: RerunCredit, t: SourceCopy, locale: string) {
+    return credit.resetAt ? t('sources.creditBackOn', { date: shortDate(credit.resetAt, locale) }) : t('sources.creditBackNextMonth')
 }
 
 // Rerun offers Balanced alone for now, shown as "Rerun". The boxes still list Fast and Smart and the
@@ -189,34 +167,29 @@ export function isModelLocked(connectionId: string, model: string, premiumAllowe
 // when it has not been asked yet, or for Claude, whose list is its picker rather than the account.
 // OpenCode's counterpart is a model it stopped publishing: its own wording, since no plan of the
 // user's is at stake.
-export function cliUnavailableReason(connection: Pick<BoxConnection, 'provider' | 'cliModels'> & Partial<Pick<BoxConnection, 'providerModels'>>, model: string): string | undefined {
-    if (!opencodeServesModel(connection.provider, connection.providerModels, model)) return 'No longer offered by OpenCode'
+export function cliUnavailableReason(connection: Pick<BoxConnection, 'provider' | 'cliModels'> & Partial<Pick<BoxConnection, 'providerModels'>>, model: string, t: SourceCopy): string | undefined {
+    if (!opencodeServesModel(connection.provider, connection.providerModels, model)) return t('sources.unavailable.opencodeRetired')
     if (cliServesModel(connection.provider, connection.cliModels, model)) return undefined
-    return connection.cliModels?.outdated ? 'Codex CLI outdated on this box' : 'Not in your ChatGPT plan'
+    return connection.cliModels?.outdated ? t('sources.unavailable.codexOutdated') : t('sources.unavailable.notInChatgptPlan')
 }
 
 // What the billing dialog is told opened it, for the funnel.
 export const PREMIUM_MODEL_BILLING_TRIGGER = 'premium_model'
 
 // None for Balanced: alone in its list, it reads as a plain "Rerun" row.
-const RERUN_TIER_DESCRIPTION: Partial<Record<RerunTier, string>> = {
-    fast: 'Quick and cheap',
-    smart: 'The smartest',
-}
+const RERUN_TIER_DESCRIPTION: Partial<Record<RerunTier, 'fast' | 'smart'>> = { fast: 'fast', smart: 'smart' }
 
 // What an OpenCode model costs on top of the plan, beside its name in every picker: a Go model is
 // paid by the subscription, a Console one by the account's credits. Plan-scoped ids only.
-const OPENCODE_PLAN_DESCRIPTION: Record<OpencodePlan, string> = { go: 'Included in Go', console: 'Console credits' }
-
-export function opencodePlanDescription(provider: string, model: string): string | undefined {
+export function opencodePlanDescription(provider: string, model: string, t: SourceCopy): string | undefined {
     if (provider !== 'opencode') return undefined
     const plan = opencodePlanOf(model)
-    return plan ? OPENCODE_PLAN_DESCRIPTION[plan] : undefined
+    return plan ? t(`sources.opencodePlan.${plan}`) : undefined
 }
 
 // The line under a model's name in a picker: a Rerun tier's hint, or what an OpenCode model is paid with.
-export function modelDescription(connection: Pick<BoxConnection, 'id' | 'provider'>, model: string): string | undefined {
-    return rerunTierDescription(connection.id, model) ?? opencodePlanDescription(connection.provider, model)
+export function modelDescription(connection: Pick<BoxConnection, 'id' | 'provider'>, model: string, t: SourceCopy): string | undefined {
+    return rerunTierDescription(connection.id, model, t) ?? opencodePlanDescription(connection.provider, model, t)
 }
 
 // Go before Console, each in the order it came: the models the plan pays for come first.
@@ -235,7 +208,7 @@ const SNAPSHOT_IDS = new Set(OPENCODE_SNAPSHOT.map(model => model.id))
 // What an OpenCode connection lists: the box's live catalog, or the snapshot this build was cut with.
 // A model newer than that snapshot is "New": OpenCode published it after the connection was set up,
 // so it was not switched on with the others.
-export function opencodeModelRows(source: BoxConnection): OpencodeModelRow[] {
+export function opencodeModelRows(source: BoxConnection, t: SourceCopy): OpencodeModelRow[] {
     const catalog = source.providerModels ?? OPENCODE_SNAPSHOT.map(toProviderModel)
     const listed = new Set(catalog.map(model => model.id))
     const retired = source.models.filter(id => !listed.has(id) && opencodePlanOf(id))
@@ -243,22 +216,23 @@ export function opencodeModelRows(source: BoxConnection): OpencodeModelRow[] {
         ...catalog.map(info => ({ id: info.id, label: info.label, plan: info.plan, info, isNew: !SNAPSHOT_IDS.has(info.id) })),
         ...retired.map(id => ({ id, label: modelLabel(id), plan: opencodePlanOf(id)!, info: null, isNew: false })),
     ]
-    return rows.map(row => ({ ...row, enabled: isModelEnabled(source, row.id), unavailable: cliUnavailableReason(source, row.id) }))
+    return rows.map(row => ({ ...row, enabled: isModelEnabled(source, row.id), unavailable: cliUnavailableReason(source, row.id, t) }))
 }
 
 // USD per million tokens, the way OpenCode's own pricing reads.
-export function pricePerMillion(price: ProviderModel['price']): string {
-    const usd = (value: number) => `$${Number(value.toFixed(3))}`
-    return `${usd(price.input)} in · ${usd(price.output)} out /M`
+export function pricePerMillion(price: ProviderModel['price'], t: SourceCopy, locale: string): string {
+    const usd = (value: number) => formatNumber(value, locale, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 3 })
+    return t('sources.pricePerMillion', { input: usd(price.input), output: usd(price.output) })
 }
 
 // The hint beside a Rerun tier's name. Nothing for any other model: only the tiers get one, a
 // provider's own list is too long for it.
-export function rerunTierDescription(connectionId: string, model: string): string | undefined {
+export function rerunTierDescription(connectionId: string, model: string, t: SourceCopy): string | undefined {
     if (connectionId !== RERUN_CONNECTION_ID) return undefined
     const id = canonicalModelId(model)
     const tier = RERUN_TIERS.find(candidate => RERUN_MODELS[candidate] === id)
-    return tier && RERUN_TIER_DESCRIPTION[tier]
+    const described = tier && RERUN_TIER_DESCRIPTION[tier]
+    return described ? t(`sources.tiers.${described}`) : undefined
 }
 
 // Fast, Balanced, Smart, whatever order the box stores them in: its own list starts with Balanced,
@@ -297,20 +271,20 @@ export function tightestPlanWindow(windows: PlanLimitWindow[]): PlanLimitWindow 
 
 // What the model pill draws around its logo: the session inside, and outside the longer window that
 // runs out first. A plan with a single window, or the Rerun credit, fills one ring on its own.
-export type PillUsage = { inner: number; outer: number | null; summary: string }
+// `windows` are the plan windows the rings stand for, empty for the Rerun credit.
+export type PillUsage = { inner: number; outer: number | null; windows: PlanLimitWindow[] }
 
-export function pillUsage(group: { connectionId: string; provider?: string; planWindows: PlanLimitWindow[] }, credit: RerunCredit): PillUsage | null {
+export function pillUsage(group: { connectionId: string; planWindows: PlanLimitWindow[] }, credit: RerunCredit): PillUsage | null {
     if (group.connectionId === RERUN_CONNECTION_ID) {
         if (credit.paused || credit.budgetMicros <= 0) return null
-        return { inner: credit.percent, outer: null, summary: `Monthly credits ${credit.percent}% used` }
+        return { inner: credit.percent, outer: null, windows: [] }
     }
     const session = group.planWindows.find(window => window.kind === 'session')
     const longest = tightestPlanWindow(group.planWindows.filter(window => window.kind !== 'session'))
     const inner = session ?? longest
     if (!inner) return null
     const outer = session ? longest : null
-    const summary = [inner, outer].flatMap(window => (window ? [`${planWindowName(window, group.provider)} ${planWindowPercent(window)} used`] : [])).join(', ')
-    return { inner: inner.usedPercent, outer: outer?.usedPercent ?? null, summary }
+    return { inner: inner.usedPercent, outer: outer?.usedPercent ?? null, windows: outer ? [inner, outer] : [inner] }
 }
 
 export type PlanLimitTone = 'brand' | 'warning' | 'destructive'
@@ -322,29 +296,33 @@ export function planLimitTone(usedPercent: number): PlanLimitTone {
 }
 
 // OpenCode Go's rolling window is five hours long, and its plan says so.
-export function planWindowName(window: PlanLimitWindow, provider?: string): string {
-    if (window.kind === 'session') return provider === 'opencode' ? '5-hour' : 'Session'
-    if (window.kind === 'weekly') return 'Weekly'
-    if (window.kind === 'monthly') return 'Monthly'
-    return window.label ? `${window.label} weekly` : 'Model weekly'
+export function planWindowName(window: PlanLimitWindow, t: SourceCopy, provider?: string): string {
+    if (window.kind === 'session') return provider === 'opencode' ? t('sources.windows.fiveHour') : t('sources.windows.session')
+    if (window.kind === 'weekly') return t('sources.windows.weekly')
+    if (window.kind === 'monthly') return t('sources.windows.monthly')
+    return window.label ? t('sources.windows.modelWeekly', { label: window.label }) : t('sources.windows.modelWeeklyUnnamed')
 }
 
 export function planWindowPercent(window: PlanLimitWindow): string {
     return `${Math.round(window.usedPercent)}%`
 }
 
-export function planWindowReset(window: PlanLimitWindow): string | null {
-    return window.resetsAt ? `resets ${shortUntil(window.resetsAt)}` : null
+export function planWindowReset(window: PlanLimitWindow, t: SourceCopy, locale: string): string | null {
+    return window.resetsAt ? t('sources.windowResets', { when: shortUntil(window.resetsAt, locale) }) : null
 }
 
-export function sourceSummary(source: BoxConnection, credit: RerunCredit): string {
-    if (source.id === RERUN_CONNECTION_ID && credit.paused) return RERUN_CREDIT_PAUSED_REASON
-    if (source.id === RERUN_CONNECTION_ID) return isCreditUsedUp(credit) ? `Monthly credits used up, back ${creditResetPhrase(credit)}` : `${credit.percent}% of this month's credits used`
+function creditSummary(credit: RerunCredit, t: SourceCopy, locale: string): string {
+    if (credit.paused) return t('sources.creditPaused')
+    if (!isCreditUsedUp(credit)) return t('sources.creditUsed', { percent: credit.percent })
+    return credit.resetAt ? t('sources.creditUsedUpOn', { date: shortDate(credit.resetAt, locale) }) : t('sources.creditUsedUpNextMonth')
+}
+
+export function sourceSummary(source: BoxConnection, credit: RerunCredit, t: SourceCopy, locale: string): string {
+    if (source.id === RERUN_CONNECTION_ID) return creditSummary(credit, t, locale)
     const planWindows = livePlanWindows(source).filter(window => window.kind !== 'model')
-    if (planWindows.length) return planWindows.map(window => `${planWindowName(window, source.provider)} ${planWindowPercent(window)}`).join(' · ')
-    const count = enabledModels(source).length
-    const models = count === 1 ? '1 model' : `${count} models`
-    return `${source.provider === 'custom' ? PROVIDER_PITCH.custom.title : KIND_LABEL[sourceKind(source.provider)]} · ${models}`
+    if (planWindows.length) return planWindows.map(window => t('sources.summaryWindow', { name: planWindowName(window, t, source.provider), percent: planWindowPercent(window) })).join(' · ')
+    const kind = source.provider === 'custom' ? t('sources.pitch.custom.title') : t(`sources.kinds.${sourceKind(source.provider)}`)
+    return t('sources.summary', { kind, count: enabledModels(source).length })
 }
 
 // "Claude", then "Claude 2": a name is what tells two subscriptions of the same provider apart in

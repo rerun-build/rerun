@@ -3,6 +3,7 @@ import { Image } from 'expo-image'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -51,6 +52,7 @@ export function AuthorAvatar({ author, size = SIZE }: { author: AuthorProfile; s
 export function AuthoredGroup({ author, children }: { author: AuthorProfile | null; children: ReactNode }) {
     const theme = useTheme()
     const [named, setNamed] = useState(false)
+    const t = useTranslations('mobileChat.messages')
     useEffect(() => {
         if (!named) return
         const timer = setTimeout(() => setNamed(false), NAMED_FOR_MS)
@@ -61,7 +63,7 @@ export function AuthoredGroup({ author, children }: { author: AuthorProfile | nu
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm }}>
             <View style={{ flex: 1, minWidth: 0, gap: spacing.sm }}>{children}</View>
             {author ? (
-                <Pressable onLongPress={() => setNamed(true)} delayLongPress={250} accessibilityRole="image" accessibilityLabel={`Sent by ${author.name}`}>
+                <Pressable onLongPress={() => setNamed(true)} delayLongPress={250} accessibilityRole="image" accessibilityLabel={t('sentBy', { name: author.name })}>
                     {named && (
                         <Animated.View entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} pointerEvents="none" style={{ position: 'absolute', bottom: SIZE + 6, right: 0, width: 200, alignItems: 'flex-end' }}>
                             <View style={{ paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: radius.sm, backgroundColor: theme.foreground }}>

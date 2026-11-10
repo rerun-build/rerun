@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useCallback } from 'react'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
 import { resolveConnectorTool } from '@/lib/chat/connector-tools'
@@ -17,14 +18,15 @@ export type ToolDisplay = { label: string; iconProps: ToolIconProps }
 // else keeps the static tool map, which names a few tools after their input.
 export function useToolDisplay(agentId?: string): (toolName: string, input?: unknown) => ToolDisplay {
     const { map } = useConnectorServices(agentId)
+    const t = useTranslations('tools')
 
     return useCallback(
         (toolName: string, input?: unknown) => {
             const connector = resolveConnectorTool(toolName, map, isKnownTool)
             if (connector) return { label: connector.label, iconProps: serviceIconProps(connector.service.icon, connector.service.category) }
-            const meta = getToolMeta(toolName, input)
+            const meta = getToolMeta(toolName, input, t)
             return { label: meta.label, iconProps: { icon: meta.icon } }
         },
-        [map],
+        [map, t],
     )
 }

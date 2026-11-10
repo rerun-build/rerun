@@ -2,10 +2,11 @@
 // les types génériques de l'isogrid (Tile/Container/TileLink). Le package ne connaît que tiles &
 // containers ; toute la sémantique « agent » vit ici.
 
-import { AGENT_STATUS_LABEL, DISABLED_AGENT_LABEL, SPACE_COLOR, agentTileStyle, disabledAgentTileStyle } from '@rerun/ui/iso-grid'
+import { SPACE_COLOR, agentTileStyle, disabledAgentTileStyle } from '@rerun/ui/iso-grid'
+import { englishKitTranslator, type KitTranslator } from '@rerun/ui/locale'
 import type { Container, Tile, TileCountdown, TileLink, TileResults, TileStyle } from '@rerun/ui/iso-grid'
 import type { WorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { UNNAMED_BOX_LABEL, type AgentLink, type IsoAgent, type SessionEntry, type SpacePublic } from './types'
+import { type AgentLink, type IsoAgent, type SessionEntry, type SpacePublic } from './types'
 import { isPlaced } from './iso'
 
 // Une tile = un agent 2×2, stylé par son statut. Les agents non placés ne sont pas draggables.
@@ -16,20 +17,19 @@ import { isPlaced } from './iso'
 // them back. Either way the tile says so instead of the agent's own last state.
 function pausedAgentTileStyle(name: string, access: Exclude<WorkspaceAccess, 'live'>): TileStyle {
     const locked = disabledAgentTileStyle(name)
-    if (access === 'paused') return { ...locked, status: { label: 'Paused', tone: 'neutral' } }
-    return { ...locked, badge: null, opacity: 0.55, status: { label: 'Restoring', tone: 'neutral', pinned: { label: 'Restoring', spinner: true } } }
+    if (access === 'paused') return { ...locked, status: { label: 'Paused', labelKey: 'paused', tone: 'neutral' } }
+    return { ...locked, badge: null, opacity: 0.55, status: { label: 'Restoring', labelKey: 'restoring', tone: 'neutral', pinned: { label: 'Restoring', labelKey: 'restoring', spinner: true } } }
 }
 
 // `nextRun` is the agent's soonest scheduled run. One that is switched off or unreachable runs
 // nothing, so it announces nothing. `results` is what it finished that you have not opened, held
-// back while it works on the next thing.
-export function tileFromAgent(a: IsoAgent, justPlaced = false, attentionCount = 0, access: WorkspaceAccess = 'live', nextRun: TileCountdown | null = null, results: TileResults | null = null): Tile {
+// back while it works on the next thing. `t` writes what a screen reader says of the tile.
+export function tileFromAgent(a: IsoAgent, justPlaced = false, attentionCount = 0, access: WorkspaceAccess = 'live', nextRun: TileCountdown | null = null, results: TileResults | null = null, t: KitTranslator = englishKitTranslator): Tile {
     const disabled = !!a.disabledAt || access !== 'live'
     const style = access !== 'live' ? pausedAgentTileStyle(a.name, access) : disabled ? disabledAgentTileStyle(a.name) : agentTileStyle(a.status, a.name, attentionCount)
     const countdown = !disabled && a.status !== 'offline' ? nextRun : null
     const shownResults = !disabled && a.status !== 'working' && results && results.count > 0 ? results : null
-    const state = access === 'paused' ? 'Paused' : access === 'restoring' ? 'Restoring' : disabled ? DISABLED_AGENT_LABEL : AGENT_STATUS_LABEL[a.status]
-    const pending = (!disabled && attentionCount > 0 ? `, ${attentionCount} to handle` : '') + (shownResults ? `, ${shownResults.count} new result${shownResults.count === 1 ? '' : 's'}` : '')
+    const state = t(`isoGrid.status.${access === 'paused' ? 'paused' : access === 'restoring' ? 'restoring' : disabled ? 'disabled' : a.status}`)
     return {
         id: a.id,
         position: a.position,
@@ -39,12 +39,12 @@ export function tileFromAgent(a: IsoAgent, justPlaced = false, attentionCount = 
         selectable: true,
         draggable: isPlaced(a.position),
         justPlaced,
-        ariaLabel: `${a.name}, ${state}${pending}`,
+        ariaLabel: t('isoGrid.tileAria', { name: a.name, state, toHandle: disabled ? 0 : attentionCount, results: shownResults?.count ?? 0 }),
     }
 }
 
-export function containerFromSpace(s: SpacePublic): Container {
-    const label = s.name || UNNAMED_BOX_LABEL
+export function containerFromSpace(s: SpacePublic, t: KitTranslator = englishKitTranslator): Container {
+    const label = s.name || t('isoGrid.untitledBox')
     return {
         id: s.id,
         label,
@@ -53,7 +53,7 @@ export function containerFromSpace(s: SpacePublic): Container {
         row_start: s.row_start,
         col_end: s.col_end,
         row_end: s.row_end,
-        ariaLabel: `Box: ${label}`,
+        ariaLabel: t('isoGrid.boxAria', { name: label }),
     }
 }
 

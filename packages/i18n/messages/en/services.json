@@ -1,0 +1,156 @@
+{
+    "_context": {
+        "appAccount.actsAs": "Field title: which account of the paid app the coworker acts as.",
+        "appAccount.appAccount": "{app} is the paid app's name (LinkedIn Pro, WhatsApp Pro).",
+        "appAccount.wakeWhen": "Field title, followed by a list of events (a message arrives, an invitation is accepted...).",
+        "authMethod.label.oauth": "Name of a way to connect an app: signing in through the app's own page.",
+        "authMethod.label.stdio": "Name of a way to connect an app: a server that runs on the coworker's own machine.",
+        "credentialGuide.title": "{label} is the name of the credential as the app calls it (\"API key\", \"secret key\"), already lower-cased when it is a common word.",
+        "customMcp.custom": "Badge of an app server the user added by hand.",
+        "configForm.setUp": "Title of the step where the user picks the account of a paid app. {name} is the app's name.",
+        "installed.nextTurn": "{tools} is the list of tool names, separated by commas.",
+        "list.needsSetup": "Badge of an app installed but not configured yet.",
+        "suggestion.notNow": "Button that skips connecting this app for now.",
+        "suggestion.skipped": "State of an app the user chose not to connect.",
+        "categories": "Filter chips over the catalog of apps a coworker can connect: the kind of app."
+    },
+    "appAccount": {
+        "addAccount": "Add account",
+        "connectTitle": "Connect a {provider} account",
+        "connectHint": "Connected once for the workspace, then any coworker can act with it.",
+        "connect": "Connect {provider}",
+        "actsAs": "Acts as",
+        "accountName": "{provider} account",
+        "selected": "This coworker acts as this account",
+        "appAccount": "{app} account",
+        "needsAttention": "Needs attention in {app}",
+        "wakeWhen": "Wake this coworker when",
+        "timing": {
+            "rightAway": "Right away",
+            "everyFewHours": "Checked every few hours"
+        },
+        "unavailable": "{app} is not available on this workspace yet."
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "Sign in",
+            "key": "API key",
+            "stdio": "Local",
+            "app": "Workspace account",
+            "other": "Connect"
+        },
+        "description": {
+            "oauth": "Sign in through a secure popup.",
+            "key": "Paste an API key from the service.",
+            "stdio": "Runs locally on your engine.",
+            "app": "Pick an account connected to the workspace.",
+            "other": "No credentials required."
+        }
+    },
+    "connect": {
+        "authorizationFailed": "Authorization failed",
+        "startFailed": "Failed to start the connection",
+        "startOAuthFailed": "Failed to start OAuth",
+        "connectedAs": "Connected as {account}",
+        "connected": "Connected",
+        "retry": "Retry",
+        "secureTitle": "Secure connection",
+        "secureBody": "This connection is handled by one of our trusted partners.",
+        "waiting": "Waiting for authorization…",
+        "connect": "Connect"
+    },
+    "credentialGuide": {
+        "title": "How to get your {label}"
+    },
+    "customMcp": {
+        "custom": "Custom",
+        "connect": "Connect",
+        "edit": "Edit {name}",
+        "remove": "Remove {name}",
+        "removeTitle": "Remove {name}?",
+        "removeDescription": "The coworker loses every tool this server exposes, and its sign-in is cleared.",
+        "removeConfirm": "Remove",
+        "status": {
+            "connected": "Connected · {count, plural, one {# tool} other {# tools}}",
+            "needsAuth": "Sign-in needed",
+            "unreachable": "Unreachable",
+            "noAnswer": "The server did not answer."
+        }
+    },
+    "requestApp": {
+        "required": "Please describe the app you need",
+        "sent": "Request sent. Thanks, we will look into it.",
+        "title": "Request an app",
+        "description": "Tell us which app you need and how you would use it. We will take it from there.",
+        "placeholder": "Describe the app you need…",
+        "cancel": "Cancel",
+        "send": "Send request"
+    },
+    "alternatives": {
+        "label": "Also works with"
+    },
+    "configForm": {
+        "configured": "{name} configured",
+        "connectTitle": "Connect {name}",
+        "signInOAuth": "Sign in to {name} so your agent can use it.",
+        "signInManaged": "Sign in with {name} so your agent can use it. Rerun handles the connection for you.",
+        "setUp": "Set up {name}",
+        "authentication": "Authentication",
+        "backToMethods": "Back to methods",
+        "connecting": "Connecting…",
+        "connect": "Connect",
+        "installing": "Installing…",
+        "chooseAccount": "Choose an account",
+        "install": "Install",
+        "noTarget": "This service needs sign-in but returned no connection target.",
+        "missingFields": "Some required fields are still missing."
+    },
+    "fields": {
+        "selectPlaceholder": "Select…"
+    },
+    "installed": {
+        "title": "{name} installed",
+        "nextTurn": "Available on the next turn: {tools}"
+    },
+    "list": {
+        "emptyTitle": "No apps found",
+        "emptyDescription": "We could not find an app matching your search.",
+        "request": "Request an app",
+        "installed": "Installed",
+        "addAccount": "Add account",
+        "needsSignIn": "Needs sign-in",
+        "needsSetup": "Needs setup",
+        "removeApp": "Remove app",
+        "finishSetup": "Finish setup",
+        "install": "Install"
+    },
+    "suggestion": {
+        "loading": "Loading suggested apps…",
+        "loadFailed": "{name} could not be loaded.",
+        "notFoundSkipped": "Not found in the catalog, skipped.",
+        "notNow": "Not now",
+        "connect": "Connect",
+        "cancel": "Cancel",
+        "connected": "{name} connected",
+        "reconnect": "Reconnect",
+        "notFound": "Not found in the catalog.",
+        "skipped": "Skipped.",
+        "skip": "Skip",
+        "finish": "Finish",
+        "nextApp": "Next app"
+    },
+    "signInPopup": {
+        "connecting": "Connecting to {name}…"
+    },
+    "categories": {
+        "payments": "Payments",
+        "ecommerce": "E-commerce",
+        "crm": "CRM",
+        "marketing": "Marketing",
+        "seo": "SEO",
+        "analytics": "Analytics",
+        "dev": "Developer",
+        "productivity": "Productivity",
+        "other": "Other"
+    }
+}

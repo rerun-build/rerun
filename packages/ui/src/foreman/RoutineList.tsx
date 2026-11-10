@@ -9,10 +9,13 @@ import { ChevronDownIcon } from '../icons'
 import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
 import { ScrollFade, Switch } from '../primitives'
 import { TooltipDisabledReason } from '../Tooltip'
-import { groupByPeriod, isWithinTheHour, PERIOD_LABELS, shortCountdown, shortElapsed } from './periods'
+import { groupByPeriod, isWithinTheHour } from './periods'
+import { useKitTranslations } from '../locale'
+import type { KitTranslator } from '../kit-translator'
 
 const EASE = [0.22, 1, 0.36, 1] as const
-const SETUP_REASON = 'Finish the setup first'
+const MINUTE = 60_000
+const HOUR = 60 * MINUTE
 
 export type RoutineEntry = {
     slug: string
@@ -57,6 +60,7 @@ function byNextRun(a: RoutineEntry, b: RoutineEntry): number {
 }
 
 export function RoutineList<T extends RoutineEntry>({ routines, now, docked = false, className, ...rowProps }: RoutineListProps<T>) {
+    const t = useKitTranslations()
     const [pausedOpen, setPausedOpen] = useState(false)
     const groups = useMemo(() => groupByPeriod([...routines].sort(byNextRun), now), [routines, now])
 
@@ -70,7 +74,7 @@ export function RoutineList<T extends RoutineEntry>({ routines, now, docked = fa
                     const open = !isPaused || pausedOpen
                     const heading = (
                         <>
-                            {PERIOD_LABELS[group.key]}
+                            {t(`foreman.periods.${group.key}`)}
                             <span className="text-sm font-normal text-muted-foreground tabular-nums">{group.routines.length}</span>
                         </>
                     )
@@ -122,6 +126,7 @@ export function RoutineList<T extends RoutineEntry>({ routines, now, docked = fa
 type RoutineRowProps<T extends RoutineEntry> = Omit<RoutineListProps<T>, 'routines' | 'docked' | 'className'> & { routine: T }
 
 function RoutineRow<T extends RoutineEntry>({ routine, now, agentNameOf, onOpen, onToggle, isSaving, renderMenu, renamingKey, onRename, onCancelRename }: RoutineRowProps<T>) {
+    const t = useKitTranslations()
     const renaming = renamingKey === routineKey(routine)
     const open = () => !renaming && onOpen(routine)
     const rule = [routine.frequency, agentNameOf(routine.agentId)].filter(Boolean).join(' · ')
@@ -148,12 +153,12 @@ function RoutineRow<T extends RoutineEntry>({ routine, now, agentNameOf, onOpen,
             </div>
             <span className="flex shrink-0 items-center gap-1" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
                 {onToggle ? (
-                    <TooltipDisabledReason reason={blockedBySetup ? SETUP_REASON : undefined} side="left" className="rounded-full">
+                    <TooltipDisabledReason reason={blockedBySetup ? t('foreman.routines.setupFirst') : undefined} side="left" className="rounded-full">
                         <Switch
                             checked={routine.enabled}
                             disabled={blockedBySetup || isSaving?.(routine)}
                             onCheckedChange={enabled => onToggle(routine, enabled)}
-                            aria-label={`${routine.enabled ? 'Pause' : 'Resume'} ${routine.name}`}
+                            aria-label={routine.enabled ? t('foreman.routines.pause', { name: routine.name }) : t('foreman.routines.resume', { name: routine.name })}
                         />
                     </TooltipDisabledReason>
                 ) : (
@@ -167,16 +172,31 @@ function RoutineRow<T extends RoutineEntry>({ routine, now, agentNameOf, onOpen,
 
 type RoutineStatus = { tone: 'running' | 'soon'; label: string }
 
-function statusOf(routine: RoutineEntry, now: number): RoutineStatus | null {
-    if (routine.runningSince) return { tone: 'running', label: `Running · ${shortElapsed(routine.runningSince, now)}` }
-    if (routine.enabled && routine.nextRunAt && isWithinTheHour(routine.nextRunAt, now)) return { tone: 'soon', label: `Starts ${shortCountdown(routine.nextRunAt, now)}` }
+function runningLabel(since: string, now: number, t: KitTranslator): string {
+    const ms = Math.max(0, now - new Date(since).getTime())
+    if (ms < MINUTE) return t('foreman.routines.runningJustNow')
+    if (ms < HOUR) return t('foreman.routines.runningMinutes', { minutes: Math.floor(ms / MINUTE) })
+    return t('foreman.routines.runningHours', { hours: Math.floor(ms / HOUR) })
+}
+
+function startsLabel(at: string, now: number, t: KitTranslator): string {
+    const ms = new Date(at).getTime() - now
+    if (ms < MINUTE) return t('foreman.routines.startsNow')
+    if (ms < HOUR) return t('foreman.routines.startsInMinutes', { minutes: Math.floor(ms / MINUTE) })
+    return t('foreman.routines.startsInHours', { hours: Math.floor(ms / HOUR) })
+}
+
+function statusOf(routine: RoutineEntry, now: number, t: KitTranslator): RoutineStatus | null {
+    if (routine.runningSince) return { tone: 'running', label: runningLabel(routine.runningSince, now, t) }
+    if (routine.enabled && routine.nextRunAt && isWithinTheHour(routine.nextRunAt, now)) return { tone: 'soon', label: startsLabel(routine.nextRunAt, now, t) }
     return null
 }
 
 // A live status takes the line; hovering it (or focusing the row) brings the rule back in its place.
 function StatusSubline({ routine, now, rule }: { routine: RoutineEntry; now: number; rule: string }) {
+    const t = useKitTranslations()
     const ruleText = <span className="truncate text-muted-foreground">{rule}</span>
-    const status = statusOf(routine, now)
+    const status = statusOf(routine, now, t)
     if (!status) return <span className="flex min-w-0 text-xs">{ruleText}</span>
 
     return (
@@ -207,6 +227,7 @@ function LiveDot({ tone }: { tone: RoutineStatus['tone'] }) {
 
 // Mounted only while renaming, so the current name is the initial state.
 function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (name: string) => void; onCancel: () => void }) {
+    const t = useKitTranslations()
     const [value, setValue] = useState(name)
     const inputRef = useRef<HTMLInputElement>(null)
 
@@ -240,7 +261,7 @@ function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (na
             ref={inputRef}
             value={value}
             maxLength={120}
-            aria-label="Routine name"
+            aria-label={t('foreman.routines.nameLabel')}
             onChange={event => setValue(event.target.value)}
             onBlur={submit}
             onClick={event => event.stopPropagation()}

@@ -1,7 +1,8 @@
 'use client'
 
 import { useBoxViewer } from '@/hooks/useBoxAccess'
-import { ACCESS_LOST_MESSAGE, boxAccessFor } from '@/lib/board/box-access'
+import { boxAccessFor } from '@/lib/board/box-access'
+import { translated } from '@/lib/i18n/toast-text'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
@@ -39,7 +40,7 @@ export function useSpaceAccessSync(workspaceId: number | undefined) {
             }
             const remaining = spaceGrants.filter(grant => grant.space_id !== row.space_id || grant.user_id !== userId)
             if (boxAccessFor(viewer, space, remaining) === 'none') {
-                if (dropSpaces([row.space_id])) toast(ACCESS_LOST_MESSAGE)
+                if (dropSpaces([row.space_id])) toast(translated('errors.boxAccessLost'))
                 return
             }
             setSpaceGrants(remaining)

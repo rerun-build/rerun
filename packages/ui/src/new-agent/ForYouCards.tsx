@@ -3,6 +3,7 @@
 import type { ComponentProps } from 'react'
 
 import { cn } from '../cn'
+import { useKitTranslations } from '../locale'
 import { RefreshCwIcon } from '../icons'
 import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
 import { Button } from '../primitives/button'
@@ -24,16 +25,17 @@ export type ForYouCardsProps = { suggestions: AgentSuggestion[]; catalog: Connec
 //
 // The card under the cursor is previewed in the field. While a description of one's own is typed,
 // only the card close to it stays lit and the others step back.
-export function ForYouCards({ suggestions, catalog, picked, closest, onPick, onPreview, onReload, heading = 'Or start from one picked for you', className }: ForYouCardsProps) {
+export function ForYouCards({ suggestions, catalog, picked, closest, onPick, onPreview, onReload, heading, className }: ForYouCardsProps) {
+    const t = useKitTranslations()
     const comparing = !picked && closest !== null
     return (
         <div className={className}>
             <div className="flex h-7 items-center justify-between">
-                <p className="text-sm text-muted-foreground">{comparing ? 'Close to your idea' : heading}</p>
+                <p className="text-sm text-muted-foreground">{comparing ? t('newAgent.forYou.closeToIdea') : (heading ?? t('newAgent.forYou.heading'))}</p>
                 {onReload && (
                     <Button type="button" variant="ghost" size="xs" data-aim="reload" onClick={onReload} className="group text-muted-foreground">
                         <RefreshCwIcon className="transition-transform duration-300 group-hover:-rotate-180" />
-                        Other ideas
+                        {t('newAgent.forYou.otherIdeas')}
                     </Button>
                 )}
             </div>

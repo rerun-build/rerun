@@ -43,9 +43,9 @@ describe('/api/v1/conversations/:id/skill-proposals', () => {
     })
 
     it('answers 403 to a member who only uses the Box, and 404 for a conversation they cannot see', async () => {
-        decideSkillProposalAction.mockResolvedValue({ success: false, error: 'Only an admin or a manager of this Box can do this', code: 'forbidden' })
+        decideSkillProposalAction.mockResolvedValue({ success: false, error: 'Only an admin or a manager of this Box can do this', code: 'boxManagerOnly', denied: 'forbidden' })
         expect((await route.POST(request('POST', { proposalId: 'p1', decision: 'accept' }), segment)).status).toBe(403)
-        decideSkillProposalAction.mockResolvedValue({ success: false, error: 'Session not found', code: 'not_found' })
+        decideSkillProposalAction.mockResolvedValue({ success: false, error: 'Session not found', code: 'sessionNotFound', denied: 'not_found' })
         expect((await route.POST(request('POST', { proposalId: 'p1', decision: 'accept' }), segment)).status).toBe(404)
     })
 

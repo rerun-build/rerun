@@ -1,5 +1,6 @@
 import { deleteTableViewAction, listTableViewsAction, readTableGroupsAction, readTableSourcesAction, saveTableViewAction, updateTableRowAction } from '@/app/api/_actions/data-views.actions'
 import type { EngineDbRows, EngineDbTable } from '@/lib/engine/types'
+import type { ActionRefusal } from '@/lib/i18n/action-error'
 import type { EngineDbGroup, RowFilter, TableSourcesRequest, TableSourcesResult, TableView, TableViewInput } from '@rerun/contracts'
 
 export type DataScope = { kind: 'agent'; agentId: string } | { kind: 'shared' }
@@ -12,7 +13,7 @@ export type SqlValue = string | number | boolean | null
 /** Where a chat card asks the browser to land: a table, and the view it was drawn from. */
 export type DataFocus = { table: string; view?: string }
 
-type Result<T = object> = ({ success: true } & T) | { success: false; error: string }
+type Result<T = object> = ({ success: true } & T) | ({ success: false } & ActionRefusal)
 
 // Returned rather than thrown: Next.js redacts the message of an error thrown by a Server Action in
 // production, and an empty list would read as a database with no tables.

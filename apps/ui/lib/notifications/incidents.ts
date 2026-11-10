@@ -1,3 +1,4 @@
+import type { EmailTranslator } from '@rerun/emails/i18n'
 import type { NotificationKind } from '@/lib/engine/types'
 
 export type SourceKeyInput = {
@@ -55,9 +56,10 @@ export function announcesRecovery(key: string): boolean {
     return segment === 'schedule' || segment === 'trigger'
 }
 
-export function describeSourceKey(key: string): string {
+// What recovered, named for the email that says so.
+export function emailSourceLabel(key: string, t: EmailTranslator): string {
     const { segment, slug } = segmentsOf(key)
-    if (segment === 'schedule') return slug === 'run' ? 'A scheduled task' : `Schedule "${slug}"`
-    if (segment === 'trigger') return slug === 'run' ? 'A trigger' : `Trigger "${slug}"`
-    return 'A conversation'
+    if (segment === 'schedule') return slug === 'run' ? t('incidentResolved.sources.anySchedule') : t('incidentResolved.sources.schedule', { slug })
+    if (segment === 'trigger') return slug === 'run' ? t('incidentResolved.sources.anyTrigger') : t('incidentResolved.sources.trigger', { slug })
+    return t('incidentResolved.sources.conversation')
 }

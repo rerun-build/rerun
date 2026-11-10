@@ -2,6 +2,7 @@
 
 import { listFilesAction, type FileEntry } from '@/app/api/_actions/file.actions'
 import { useFileNavigation } from '@/components/files/useFileNavigation'
+import { useTranslations } from 'next-intl'
 import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -26,6 +27,7 @@ type UseAgentFileNavigationProps = {
 
 /** Owns directory loading and the one-shot navigation requested by a chat file link. */
 export function useAgentFileNavigation({ agentId, focusPath, onFocusConsumed, onOpenFile }: UseAgentFileNavigationProps) {
+    const t = useTranslations('agent.agentFileNavigation')
     const [initialFocus] = useState(() => focusedFile(focusPath))
     const initialFocusRef = useRef<FocusedFile | null>(initialFocus)
 
@@ -39,11 +41,11 @@ export function useAgentFileNavigation({ agentId, focusPath, onFocusConsumed, on
 
         const target = entries.find(entry => entry.name === focused.name && entry.type !== 'dir')
         if (!target) {
-            toast.error('File not found', { description: focused.path })
+            toast.error(t('notFound'), { description: focused.path })
             return
         }
         onOpenFile(focused.path, focused.name)
-    }, [onFocusConsumed, onOpenFile])
+    }, [onFocusConsumed, onOpenFile, t])
 
     return useFileNavigation<FileEntry>({
         list,

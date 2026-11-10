@@ -5,7 +5,8 @@ import { Icon } from '@/components/ui/icon'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { BorderBeam } from '@rerun/ui'
 import { AlertTriangleIcon, GaugeIcon, MessagePlusIcon, MessageSquareIcon, PlugIcon, RotateCwIcon, ScrollTextIcon, ServerIcon, SquareIcon, UnplugIcon } from '@/lib/icons'
-import { chatErrorTitle, describeSubscriptionLimit, friendlyError, type ChatErrorKind } from '@/lib/chat-error'
+import { chatErrorTitle, describeSubscriptionLimit, friendlyError, type ChatErrorCopy, type ChatErrorKind } from '@/lib/chat-error'
+import { useTranslations } from 'next-intl'
 import type { ComponentType } from 'react'
 
 type NoticeKind = Exclude<ChatErrorKind, 'budget'>
@@ -31,8 +32,8 @@ const ICONS: Record<NoticeKind, ComponentType<{ className?: string }>> = {
 // Claude plan and a ChatGPT plan at once, and only one of them is out. The brand mark carries that
 // faster than any wording, and the title names the window (session, week, Opus) rather than
 // repeating "usage limit".
-function header(kind: NoticeKind, message: string): { title: string; icon: ComponentType<{ className?: string }> } {
-    const title = chatErrorTitle(kind, message) ?? 'Something went wrong'
+function header(kind: NoticeKind, message: string, fallbackTitle: string, tErrors: ChatErrorCopy): { title: string; icon: ComponentType<{ className?: string }> } {
+    const title = chatErrorTitle(kind, message, tErrors) ?? fallbackTitle
     if (kind !== 'usage_limit') return { title, icon: ICONS[kind] }
     const plan = describeSubscriptionLimit(message).plan
     if (!plan) return { title, icon: ICONS.usage_limit }
@@ -43,16 +44,18 @@ function header(kind: NoticeKind, message: string): { title: string; icon: Compo
 // conversation." with nothing to click. Every kind here says what happened and, where there is one,
 // offers the move that fixes it.
 export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnections, onReconnect, onStopRun, onContinue, onRetry, onNewConversation }: { kind: NoticeKind; message: string; onSwitchModel?: () => void; onOpenConnections?: () => void; onReconnect?: () => void; onStopRun?: () => void; onContinue?: () => void; onRetry?: () => void; onNewConversation?: () => void }) {
-    const { title, icon } = header(kind, message)
+    const t = useTranslations('chat.providerError')
+    const tErrors = useTranslations('chatErrors')
+    const { title, icon } = header(kind, message, t('fallbackTitle'), tErrors)
 
     const actions: NoticeAction[] = []
     if (kind === 'run_in_flight' && onStopRun) {
         actions.push({
             key: 'stop',
             leading: <Icon icon={SquareIcon} size="sm" />,
-            title: 'Stop this run',
-            cta: 'Stop run',
-            description: 'Frees the conversation for your message.',
+            title: t('stop.title'),
+            cta: t('stop.cta'),
+            description: t('stop.description'),
             onClick: onStopRun,
         })
     }
@@ -60,9 +63,9 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
         actions.push({
             key: 'new-conversation',
             leading: <Icon icon={MessagePlusIcon} size="sm" />,
-            title: 'Start a new conversation',
-            cta: 'New conversation',
-            description: 'Opens a fresh conversation with this coworker.',
+            title: t('newConversation.title'),
+            cta: t('newConversation.cta'),
+            description: t('newConversation.description'),
             onClick: onNewConversation,
         })
     }
@@ -70,9 +73,9 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
         actions.push({
             key: 'continue',
             leading: <Icon icon={RotateCwIcon} size="sm" />,
-            title: 'Continue the run',
-            cta: 'Continue',
-            description: 'Picks up where the coworker was cut off.',
+            title: t('continue.title'),
+            cta: t('continue.cta'),
+            description: t('continue.description'),
             onClick: onContinue,
         })
     }
@@ -82,9 +85,9 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
         actions.push({
             key: 'retry',
             leading: <Icon icon={RotateCwIcon} size="sm" />,
-            title: 'Try again',
-            cta: 'Retry',
-            description: 'Sends your last message again.',
+            title: t('retry.title'),
+            cta: t('retry.cta'),
+            description: t('retry.description'),
             onClick: onRetry,
         })
     }
@@ -93,9 +96,9 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
         actions.push({
             key: 'switch',
             leading: <Icon icon={GaugeIcon} size="sm" />,
-            title: 'Switch to another model',
-            cta: 'Switch',
-            description: onSwitchModel ? 'Pick another model for this conversation.' : 'Pick another connection of this workspace.',
+            title: t('switch.title'),
+            cta: t('switch.cta'),
+            description: onSwitchModel ? t('switch.descriptionModel') : t('switch.descriptionConnection'),
             onClick: switchModel,
         })
     }
@@ -103,9 +106,9 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
         actions.push({
             key: 'reconnect',
             leading: <Icon icon={PlugIcon} size="sm" />,
-            title: 'Reconnect',
-            cta: 'Reconnect',
-            description: 'Sign in again on the connection this coworker runs on.',
+            title: t('reconnect.title'),
+            cta: t('reconnect.cta'),
+            description: t('reconnect.description'),
             onClick: onReconnect,
         })
     }
@@ -117,7 +120,7 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
                 <Icon size="sm" tone="red" icon={icon} className="bg-red-500/10 text-foreground" />
                 <span className="font-medium">{title}</span>
             </div>
-            <p className="text-sm">{kind === 'run_in_flight' ? 'A run started earlier is still holding this conversation. Stop it to send your message.' : friendlyError(message)}</p>
+            <p className="text-sm">{kind === 'run_in_flight' ? t('runInFlight') : friendlyError(message, tErrors)}</p>
             <NoticeActions actions={actions} />
         </div>
     )

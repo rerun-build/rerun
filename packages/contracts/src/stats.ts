@@ -55,56 +55,43 @@ export const statsResponseSchema = z.object({ points: z.array(statsPointSchema) 
 export type StatsUnit = 'count' | 'tokens' | 'costMicros' | 'ms' | 'ratio'
 export type StatsAgg = 'sum' | 'avg'
 
-export const STATS_METRIC_META: Record<StatsMetric, { label: string; unit: StatsUnit; agg: StatsAgg }> = {
-    count: { label: 'Count', unit: 'count', agg: 'sum' },
-    totalTokens: { label: 'Total tokens', unit: 'tokens', agg: 'sum' },
-    inputTokens: { label: 'Input tokens', unit: 'tokens', agg: 'sum' },
-    outputTokens: { label: 'Output tokens', unit: 'tokens', agg: 'sum' },
-    cachedInputTokens: { label: 'Cached tokens', unit: 'tokens', agg: 'sum' },
-    reasoningTokens: { label: 'Reasoning tokens', unit: 'tokens', agg: 'sum' },
-    cost: { label: 'Cost', unit: 'costMicros', agg: 'sum' },
-    avgDurationMs: { label: 'Avg duration', unit: 'ms', agg: 'avg' },
-    errorCount: { label: 'Errors', unit: 'count', agg: 'sum' },
-    errorRate: { label: 'Error rate', unit: 'ratio', agg: 'avg' },
-}
-
-export const STATS_TIME_RANGE_META: Record<StatsTimeRange, { label: string }> = {
-    '24h': { label: 'Last 24 hours' },
-    '7d': { label: 'Last 7 days' },
-    '30d': { label: 'Last 30 days' },
-    '90d': { label: 'Last 90 days' },
-    all: { label: 'All time' },
+export const STATS_METRIC_META: Record<StatsMetric, { unit: StatsUnit; agg: StatsAgg }> = {
+    count: { unit: 'count', agg: 'sum' },
+    totalTokens: { unit: 'tokens', agg: 'sum' },
+    inputTokens: { unit: 'tokens', agg: 'sum' },
+    outputTokens: { unit: 'tokens', agg: 'sum' },
+    cachedInputTokens: { unit: 'tokens', agg: 'sum' },
+    reasoningTokens: { unit: 'tokens', agg: 'sum' },
+    cost: { unit: 'costMicros', agg: 'sum' },
+    avgDurationMs: { unit: 'ms', agg: 'avg' },
+    errorCount: { unit: 'count', agg: 'sum' },
+    errorRate: { unit: 'ratio', agg: 'avg' },
 }
 
 export const STATS_DATASETS: Record<
     StatsDataset,
     {
-        label: string
         metrics: StatsMetric[]
         groupBys: Exclude<StatsGroupBy, 'none'>[]
         supportsStatusFilter: boolean
     }
 > = {
     runs: {
-        label: 'Runs',
         metrics: ['count', 'totalTokens', 'inputTokens', 'outputTokens', 'cachedInputTokens', 'reasoningTokens', 'cost', 'avgDurationMs', 'errorCount', 'errorRate'],
         groupBys: ['model', 'status', 'triggerSource'],
         supportsStatusFilter: true,
     },
     runSteps: {
-        label: 'Run steps',
         metrics: ['count', 'totalTokens', 'inputTokens', 'outputTokens', 'avgDurationMs'],
         groupBys: ['model', 'finishReason', 'stepNumber'],
         supportsStatusFilter: false,
     },
     toolCalls: {
-        label: 'Tool calls',
         metrics: ['count', 'errorCount', 'errorRate', 'avgDurationMs'],
         groupBys: ['toolName'],
         supportsStatusFilter: false,
     },
     sessions: {
-        label: 'Sessions',
         metrics: ['count'],
         groupBys: ['source', 'status'],
         supportsStatusFilter: false,

@@ -1,0 +1,430 @@
+{
+    "sources": {
+        "kinds": {
+            "included": "Included",
+            "plan": "Plan",
+            "key": "API key"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro or Max",
+                "hint": "Sign in with your Claude account"
+            },
+            "codex": {
+                "title": "ChatGPT Plus or Pro",
+                "hint": "Sign in with your ChatGPT account"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "Claude models, billed per token"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "GPT models, billed per token"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "Gemini models, billed per token"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "Every model behind one key"
+            },
+            "opencode": {
+                "title": "OpenCode Go or Console",
+                "hint": "Paste your OpenCode key"
+            },
+            "custom": {
+                "title": "Custom endpoint",
+                "hint": "Ollama, LM Studio, vLLM or any OpenAI-compatible server"
+            }
+        },
+        "summary": "{kind} · {count, plural, one {# model} other {# models}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "Rerun credits are paused",
+        "creditUsed": "{percent}% of this month's credits used",
+        "creditUsedUpOn": "Monthly credits used up, back on {date}",
+        "creditUsedUpNextMonth": "Monthly credits used up, back next month",
+        "creditBackOn": "on {date}",
+        "creditBackNextMonth": "next month",
+        "windows": {
+            "session": "Session",
+            "fiveHour": "5-hour",
+            "weekly": "Weekly",
+            "monthly": "Monthly",
+            "modelWeekly": "{label} weekly",
+            "modelWeeklyUnnamed": "Model weekly"
+        },
+        "windowResets": "resets {when}",
+        "tiers": {
+            "fast": "Quick and cheap",
+            "smart": "The smartest"
+        },
+        "opencodePlan": {
+            "go": "Included in Go",
+            "console": "Console credits"
+        },
+        "unavailable": {
+            "opencodeRetired": "No longer offered by OpenCode",
+            "codexOutdated": "Codex CLI outdated on this box",
+            "notInChatgptPlan": "Not in your ChatGPT plan"
+        },
+        "pricePerMillion": "{input} in · {output} out /M",
+        "guide": {
+            "anthropic": {
+                "title": "How to get your Anthropic key",
+                "step1": "Open the [Anthropic Console](https://console.anthropic.com/settings/keys) and sign in.",
+                "step2": "Click **Create Key** and name it, for example \"Rerun\".",
+                "step3": "Copy the key (it starts with `sk-ant-`) and paste it above. It is shown only once."
+            },
+            "openai": {
+                "title": "How to get your OpenAI key",
+                "step1": "Open [OpenAI API keys](https://platform.openai.com/api-keys) and sign in.",
+                "step2": "Click **Create new secret key** and name it, for example \"Rerun\".",
+                "step3": "Copy the key (it starts with `sk-`) and paste it above. It is shown only once."
+            },
+            "google": {
+                "title": "How to get your Google key",
+                "step1": "Open [Google AI Studio](https://aistudio.google.com/apikey) and sign in with your Google account.",
+                "step2": "Click **Create API key** and pick a Google Cloud project.",
+                "step3": "Copy the key and paste it above."
+            },
+            "openrouter": {
+                "title": "How to get your OpenRouter key",
+                "step1": "Open [OpenRouter keys](https://openrouter.ai/keys) and sign in.",
+                "step2": "Click **Create API Key**, and add credits if your balance is empty.",
+                "step3": "Copy the key (it starts with `sk-or-`) and paste it above. It is shown only once."
+            },
+            "opencode": {
+                "title": "How to get your OpenCode key",
+                "step1": "Open [OpenCode](https://opencode.ai/auth) and sign in.",
+                "step2": "Subscribe to **OpenCode Go**, or add credits to use the Console models.",
+                "step3": "Create an API key, copy it (it starts with `oc_sk_`) and paste it above."
+            }
+        }
+    },
+    "_context": {
+        "panel.groups.included": "Heading of the group of AI sources that come with the Rerun plan (the Rerun credit).",
+        "panel.default.change": "Button that opens the picker to change the workspace default model.",
+        "panel.default.via": "{source} is the name of the connection the default model runs through.",
+        "panel.default.stopped": "{source} is the name of the broken connection.",
+        "status.paused": "Badge: the Rerun credit is paused.",
+        "status.ready": "Badge: the connection works.",
+        "subtitle.apiKey": "{provider} is a provider name such as OpenAI or Anthropic.",
+        "planLimits.updatedAgo": "{age} is a short duration already localized, such as 5m, 3h, 2d, or a short date.",
+        "planLimits.used": "{percent} is a percentage already formatted, such as 42%.",
+        "planLimits.usedWithReset": "{percent} is a percentage already formatted. {reset} says when the limit resets, already localized.",
+        "meter.planLimit": "Accessible label of a progress bar. {name} is the name of a plan window, such as 5-hour or Weekly.",
+        "models.count": "How many of the models of this connection the coworkers can use, for example 3 of 8.",
+        "opencode.count": "How many models of this catalog are switched on, for example 3 of 8 on.",
+        "remove.fallBack.agents": "{agents} is a comma-separated list of coworker names.",
+        "remove.fallBack.both": "{agents} is a comma-separated list of coworker names.",
+        "remove.released.agents": "{agents} is a comma-separated list of coworker names.",
+        "remove.released.both": "{agents} is a comma-separated list of coworker names.",
+        "chatgpt.setting.settings": "Must match the label of the Settings menu in ChatGPT's own interface, in this language.",
+        "chatgpt.setting.security": "Must match the label of the Security section in ChatGPT's own settings, in this language.",
+        "chatgpt.setting.deviceCode": "Must match the label of the setting in ChatGPT's own security settings, in this language.",
+        "chatgpt.adminMessage": "A message the user copies and sends to their ChatGPT workspace admin. The quoted setting name must match ChatGPT's own label.",
+        "chatgpt.stuck.expiredSelf": "<link> points at ChatGPT's security settings; the path must match ChatGPT's own labels.",
+        "chatgpt.stuck.errorSelf": "<link> points at ChatGPT's security settings; the path must match ChatGPT's own labels.",
+        "chatgpt.remarks.grabCode": "Said by the Foreman, the assistant: now get a sign-in code.",
+        "claude.remarks.checking": "Said by the Foreman while the code is being checked; animated dots follow it.",
+        "nameStep.title": "Title of the last step: give the connection a name.",
+        "custom.probe.unreachableCloud": "{host} is a host name and port, such as localhost:11434.",
+        "custom.probe.unreachableLocal": "{host} is a host name and port, such as localhost:11434.",
+        "custom.probe.refused": "{model} is a model id. {detail} is the error the server sent back, in English.",
+        "custom.probe.refusedUnnamedDetail": "{detail} is the error the server sent back, in English.",
+        "detail.readOnly": "{reason} is a sentence without a final period that explains why the controls are disabled.",
+        "sources.summary": "One line under a connection in the AI providers list. {kind} is already translated, such as Plan, API key or Custom endpoint.",
+        "sources.summaryWindow": "One usage figure of a subscription, in the line under it. {name} is a plan window such as Session or Weekly, {percent} is already formatted, such as 42%. Several are joined with ' · '.",
+        "sources.creditPaused": "Line under the Rerun connection: a member paused the Rerun credit.",
+        "sources.creditUsed": "Line under the Rerun connection. {percent} is a whole number from 0 to 100.",
+        "sources.creditUsedUpOn": "Line under the Rerun connection. {date} is a short date already localized, such as Nov 12.",
+        "sources.creditBackOn": "A fragment the iOS app sets inside its own sentence \"credits used up, back {backOn}\". {date} is a short date already localized, such as Nov 12. Keep the preposition the target sentence needs.",
+        "sources.creditBackNextMonth": "A fragment the iOS app sets inside its own sentence \"credits used up, back {backOn}\", in place of a date.",
+        "sources.windows.session": "Name of a usage window of a Claude or ChatGPT subscription: the rolling limit of a few hours.",
+        "sources.windows.fiveHour": "Name of OpenCode Go's rolling usage window, five hours long. Used as an adjective before 'limit' elsewhere, such as '5-hour limit used'.",
+        "sources.windows.weekly": "Name of the weekly usage window of a subscription.",
+        "sources.windows.monthly": "Name of the monthly usage window of a subscription.",
+        "sources.windows.modelWeekly": "Name of the weekly usage window of one model of a subscription. {label} is a model family such as Opus.",
+        "sources.windows.modelWeeklyUnnamed": "Name of the weekly usage window of one model of a subscription, when the model is not named.",
+        "sources.windowResets": "Follows a usage figure, such as '42% used, resets in 3h'. {when} is a short relative time already localized, such as 'in 3h'.",
+        "sources.tiers.fast": "Hint under the Rerun Fast model in a model picker.",
+        "sources.tiers.smart": "Hint under the Rerun Smart model in a model picker.",
+        "sources.opencodePlan.go": "Hint under an OpenCode model in a model picker: paid by the OpenCode Go subscription.",
+        "sources.opencodePlan.console": "Hint under an OpenCode model in a model picker: paid with the OpenCode Console credits.",
+        "sources.unavailable.codexOutdated": "Why a model cannot be picked: the Codex command line tool on the user's machine is too old for it.",
+        "sources.unavailable.notInChatgptPlan": "Why a model cannot be picked: the user's ChatGPT subscription does not include it.",
+        "sources.unavailable.opencodeRetired": "Why a model cannot be picked: OpenCode stopped offering it.",
+        "sources.pricePerMillion": "Price of an OpenCode model per million tokens. {input} and {output} are amounts already formatted, such as $2.",
+        "sources.guide.anthropic.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.anthropic.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.anthropic.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openai.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openai.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openai.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.google.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.google.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.google.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openrouter.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openrouter.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.openrouter.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.opencode.step1": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.opencode.step2": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English.",
+        "sources.guide.opencode.step3": "Markdown, one numbered step of a guide shown under the API key field. Keep the [link](url), the **bold** and the `code` marks as they are. The bold text is the label of a button in the provider's own console, which is in English: keep it in English."
+    },
+    "noPlan": {
+        "trialText": "Start your free trial to connect your own Claude plan, ChatGPT plan or API key.",
+        "subscribeText": "Subscribe to connect your own Claude plan, ChatGPT plan or API key.",
+        "startTrial": "Start free trial",
+        "subscribe": "Subscribe"
+    },
+    "baseUrl": {
+        "label": "Custom base URL",
+        "helper": "Send requests to your own OpenRouter-compatible router",
+        "inputLabel": "OpenRouter base URL"
+    },
+    "planLimits": {
+        "title": "Plan usage",
+        "empty": "Usage shows up here after the next run on this plan.",
+        "updatedJustNow": "Updated just now",
+        "updatedAgo": "Updated {age} ago",
+        "used": "{percent} used",
+        "usedWithReset": "{percent} used, {reset}"
+    },
+    "meter": {
+        "planLimit": "{name} limit used",
+        "monthlyCredits": "Monthly credits used"
+    },
+    "providerPicker": {
+        "added": "Added"
+    },
+    "status": {
+        "paused": "Paused",
+        "creditsUsedUp": "Credits used up",
+        "signInAgain": "Sign in again",
+        "keyRejected": "Key rejected",
+        "keyMissing": "Key missing",
+        "ready": "Ready"
+    },
+    "backToProviders": "Back to AI providers",
+    "subtitle": {
+        "included": "Included with your plan",
+        "apiKey": "{provider} API key"
+    },
+    "key": {
+        "label": "API key",
+        "placeholder": "Paste your key"
+    },
+    "name": {
+        "label": "Name",
+        "helper": "Shown in every coworker's model picker"
+    },
+    "becomesDefault": "This becomes the workspace default: every coworker with no model of its own will run on it.",
+    "connecting": "Connecting…",
+    "errors": {
+        "nameRequired": "Give this connection a name",
+        "createFailed": "Failed to create the connection",
+        "renameFailed": "Failed to rename the connection",
+        "saveFailed": "Failed to save",
+        "startFailed": "Could not start the connection",
+        "saveTokenFailed": "Failed to save the token",
+        "saveConnectionFailed": "Failed to save the connection",
+        "codeExpired": "The code expired, start again",
+        "deleteFailed": "Failed to delete the connection",
+        "defaultFailed": "Failed to change the default model"
+    },
+    "addProvider": {
+        "addKey": "Add key"
+    },
+    "remove": {
+        "button": "Remove {name}",
+        "confirmTitle": "Remove {name}?",
+        "confirm": "Remove",
+        "removed": "{name} removed",
+        "checking": "Checking what still runs on it…",
+        "fallBack": {
+            "agents": "{agents} will fall back to the workspace default model.",
+            "automations": "{count, plural, one {# automation} other {# automations}} will fall back to the workspace default model.",
+            "both": "{agents} and {count, plural, one {# automation} other {# automations}} will fall back to the workspace default model."
+        },
+        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to Rerun.",
+        "nothingRuns": "The credential is removed from the Box. Nothing runs on it.",
+        "released": {
+            "agents": "{agents} now run on the workspace default model.",
+            "automations": "{count, plural, one {# automation} other {# automations}} now run on the workspace default model.",
+            "both": "{agents} and {count, plural, one {# automation} other {# automations}} now run on the workspace default model."
+        },
+        "defaultCleared": "The workspace default was cleared."
+    },
+    "customModels": {
+        "remove": "Remove",
+        "add": "Add",
+        "addCustom": "Add custom model",
+        "openrouterHint": "Add any OpenRouter model id (e.g. <mono>x-ai/grok-4</mono>).",
+        "serverHint": "Add a model the server serves but does not list (e.g. <mono>llama3.3:70b</mono>).",
+        "idPlaceholder": "model id"
+    },
+    "models": {
+        "title": "Models",
+        "defaultModel": "Default model",
+        "turnOff": "Turn off {model}",
+        "turnOn": "Turn on {model}",
+        "lockDefault": "This is the default model. Pick another default first.",
+        "lockLast": "Coworkers need at least one model from this source.",
+        "lockCustom": "Custom model. Remove it below.",
+        "available": "Your coworkers can use",
+        "count": "{on} of {total}",
+        "availableEmpty": "Drag a model here so coworkers can use it.",
+        "hidden": "Turned off",
+        "hiddenEmpty": "Drag a model here to keep coworkers off it."
+    },
+    "opencode": {
+        "goTitle": "Included in OpenCode Go",
+        "goHint": "Paid by your Go plan, within its 5-hour, weekly and monthly limits.",
+        "consoleTitle": "Console, paid with your credits",
+        "consoleHint": "Billed per token from your OpenCode credits. Off until you switch one on.",
+        "included": "Included",
+        "credits": "Credits",
+        "new": "New",
+        "noVision": "No vision",
+        "search": "Search models",
+        "count": "{on} of {total} on",
+        "emptySection": "OpenCode lists no model here right now.",
+        "noMatch": "No model matches “{query}”."
+    },
+    "detail": {
+        "readOnly": "{reason}.",
+        "keyReplaced": "Key replaced",
+        "signedInAgain": "Signed in again",
+        "creditsTitle": "This month's credits",
+        "topUp": "Top up",
+        "creditsUsedUpOn": "Coworkers running on Rerun are paused until the credits are back on {date}. Top up or pick another default model to keep them going.",
+        "creditsUsedUpNextMonth": "Coworkers running on Rerun are paused until the credits are back next month. Top up or pick another default model to keep them going.",
+        "creditsIncluded": "Comes with your Rerun plan. No key, nothing to set up.",
+        "signInRejected": "This sign-in was rejected. Coworkers using it are stopped until you sign in again.",
+        "signInExpired": "This sign-in expired. Coworkers using it are stopped until you sign in again.",
+        "reconnected": "Your coworkers start again",
+        "keyRejected": "This key was rejected. Coworkers using it are stopped until you paste a new one.",
+        "keyMissing": "No key on file. Coworkers using it are stopped until you paste one."
+    },
+    "panel": {
+        "adminOnly": "Only an admin can change the AI providers",
+        "groups": {
+            "default": "Default model",
+            "included": "Included",
+            "plans": "Your subscriptions",
+            "keys": "Your API keys",
+            "noPlan": "Your subscriptions and API keys"
+        },
+        "pitch": {
+            "plansWithOpencode": "Already use Claude Code, Codex or OpenCode? Your coworkers can run on your plan.",
+            "plans": "Already use Claude Code or Codex? Your coworkers can run on your plan.",
+            "keysWithCustom": "Pay your provider directly, per token, or run your own model.",
+            "keys": "Pay your provider directly, per token."
+        },
+        "default": {
+            "via": "Via {source}. Coworkers with no model of their own run on it.",
+            "pausedPick": "Rerun credits are paused, so coworkers with no model of their own are paused too. Pick another model to keep them going.",
+            "pausedAdd": "Rerun credits are paused, so coworkers with no model of their own are paused too. Add a plan or an API key to keep them going.",
+            "usedUpOnPick": "Rerun credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+            "usedUpOnAdd": "Rerun credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+            "usedUpNextMonthPick": "Rerun credits are used up until they are back next month, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+            "usedUpNextMonthAdd": "Rerun credits are used up until they are back next month, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+            "stopped": "Coworkers with no model of their own are stopped. Fix {source} or pick another model.",
+            "noOtherModel": "No other model is ready. Add a plan or an API key first.",
+            "change": "Change"
+        },
+        "addSubscription": "Add subscription",
+        "addApiKey": "Add API key"
+    },
+    "chatgpt": {
+        "allowStep": "Allow sign-in by code in ChatGPT",
+        "openSettings": "Open ChatGPT settings",
+        "alreadyOn": "It's already on",
+        "codeStep": "Enter the code on OpenAI",
+        "remarks": {
+            "connected": "All set!",
+            "starting": "Getting a code",
+            "expired": "That code ran out.",
+            "stuck": "Still nothing from OpenAI.",
+            "waiting": "Waiting for OpenAI",
+            "grabCode": "Now grab a code.",
+            "turnOn": "Turn this on once."
+        },
+        "setting": {
+            "path": "Where the setting is in ChatGPT",
+            "settings": "Settings",
+            "security": "Security",
+            "deviceCode": "Enable device code authorization for Codex"
+        },
+        "adminSwitches": "Your ChatGPT admin switches it on for the whole workspace. <copy></copy>",
+        "plusOrPro": "I’m on Plus or Pro",
+        "businessQuestion": "On ChatGPT Business or Enterprise?",
+        "copyCode": "Copy code",
+        "enterCode": "Enter it on <link>OpenAI's page</link> and approve. This window picks it up on its own.",
+        "opening": "OpenAI is opening in a new tab",
+        "gettingCode": "Getting code…",
+        "newCode": "Get a new code",
+        "getCode": "Get code",
+        "stuck": {
+            "expiredAdmin": "The code expired. Your admin has probably not allowed sign-in by code yet. <copy></copy>",
+            "errorAdmin": "Error on OpenAI’s page? Your admin has probably not allowed sign-in by code yet. <copy></copy>",
+            "expiredSelf": "The code expired. Sign-in by code is probably still off: turn it on in <link>Settings → Security</link>, then get a new code.",
+            "errorSelf": "Error on OpenAI’s page? Sign-in by code is probably still off: turn it on in <link>Settings → Security</link>, then enter the code again."
+        },
+        "copied": "Copied",
+        "copyMessage": "Copy a message for them",
+        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Rerun."
+    },
+    "claude": {
+        "remarks": {
+            "idle": "I’ll wait right here.",
+            "waiting": "Paste what Claude gave you.",
+            "checking": "Checking",
+            "connected": "All set!"
+        },
+        "approveStep": "Approve Rerun on Claude",
+        "opening": "Claude is opening in a new tab",
+        "openAgain": "Open Claude again",
+        "open": "Open Claude",
+        "pasteStep": "Paste the code",
+        "checkingCode": "Checking the code…",
+        "codeAccepted": "Code accepted",
+        "codePlaceholder": "Code from Claude",
+        "paste": "Paste",
+        "pasteHint": "Paste it in the field with ⌘V or Ctrl+V."
+    },
+    "nameStep": {
+        "title": "Name it",
+        "remark": "Last thing: a name.",
+        "fieldLabel": "Connection name",
+        "saving": "Saving…",
+        "done": "Done",
+        "helper": "Shown in every coworker's model picker."
+    },
+    "letsGo": "Let's go",
+    "custom": {
+        "server": "Server",
+        "other": "Other",
+        "baseUrl": "Base URL",
+        "keyOptionalPlaceholder": "None for a local server",
+        "modelId": "Model id",
+        "connect": "Connect",
+        "endpoint": "Endpoint",
+        "contextWindow": "Context window",
+        "contextWindowHelper": "In tokens, for models the server does not size itself",
+        "vision": "Models see images",
+        "visionHelper": "Screenshots and the computer need it",
+        "probe": {
+            "unreachableCloud": "Could not reach {host}. It has to be a public address that answers.",
+            "unreachableLocal": "Could not reach {host}. Check the server is running and reachable from the engine.",
+            "unauthorized": "The server turned this key down. Check it was copied in full.",
+            "notListed": "This server does not list its models. Type the id of the one to run.",
+            "refused": "The server refused {model}: {detail}",
+            "refusedPlain": "The server refused {model}.",
+            "refusedUnnamedDetail": "The server refused this model: {detail}",
+            "refusedUnnamed": "The server refused this model."
+        }
+    }
+}

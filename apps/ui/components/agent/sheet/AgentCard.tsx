@@ -1,6 +1,7 @@
 'use client'
 
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { useTranslations } from 'next-intl'
 import { type ComponentType, type MouseEvent, useEffect, useRef, useState } from 'react'
 
 import { AgentComputerThumbnail } from '@/components/agent/sheet/AgentComputerThumbnail'
@@ -10,9 +11,9 @@ import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useAgentBuddyMood } from '@/hooks/useAgentBuddyMood'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { BOX_MANAGE_REASON } from '@/lib/board/box-access'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { AgentViewTab } from '@/lib/board/agent-sheet-views'
-import { type IsoAgent, UNNAMED_BOX_LABEL } from '@/lib/board/types'
+import type { IsoAgent } from '@/lib/board/types'
 import { BlocksIcon, BrainIcon, CalendarClockIcon, ChevronRightIcon, FolderIcon, GaugeIcon, Layers, Link2, SettingsIcon, TableIcon, Trash2Icon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
@@ -24,15 +25,20 @@ export type CardDestinationShape = 'tile' | 'row' | 'button'
 
 export type CardDestination = Extract<AgentViewTab, 'services' | 'skills' | 'memories' | 'scheduled' | 'files' | 'data' | 'monitoring' | 'settings'>
 
-const DESTINATIONS: Record<CardDestination, { label: string; icon: IconType }> = {
-    services: { label: 'Apps', icon: BlocksIcon },
-    skills: { label: 'Skills', icon: Layers },
-    memories: { label: 'Knowledge', icon: BrainIcon },
-    scheduled: { label: 'Routines', icon: CalendarClockIcon },
-    files: { label: 'Files', icon: FolderIcon },
-    data: { label: 'Database', icon: TableIcon },
-    monitoring: { label: 'Activity', icon: GaugeIcon },
-    settings: { label: 'Settings', icon: SettingsIcon },
+const DESTINATION_ICONS: Record<CardDestination, IconType> = {
+    services: BlocksIcon,
+    skills: Layers,
+    memories: BrainIcon,
+    scheduled: CalendarClockIcon,
+    files: FolderIcon,
+    data: TableIcon,
+    monitoring: GaugeIcon,
+    settings: SettingsIcon,
+}
+
+function useDestination(tab: CardDestination) {
+    const t = useTranslations('agent.agentCard.destinations')
+    return { label: t(tab), icon: DESTINATION_ICONS[tab] }
 }
 
 const TILES: CardDestination[] = ['services', 'skills', 'memories', 'scheduled']
@@ -60,18 +66,20 @@ type AgentCardProps = {
  * screen: a destination picked here grows out of its button to fill the panel, the card waiting behind.
  */
 export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, computerEnabled, working, servicesNeedConfig, needsMachineReason }: AgentCardProps) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentCard')
     const canManage = useCanManageAgent(agent.id)
-    const manageDisabledReason = needsMachineReason ?? (canManage ? null : BOX_MANAGE_REASON)
+    const manageDisabledReason = needsMachineReason ?? (canManage ? null : boxManageReason)
     return (
         <div className="flex min-h-0 flex-col overflow-y-auto">
             <CardIdentity agent={agent} canRename={canManage} onClose={onClose} onShare={onShare} shareDisabledReason={manageDisabledReason} />
             <div className="grid shrink-0 grid-cols-4 gap-1.5 px-3 pb-3">
                 {TILES.map(tab => {
-                    const { label, icon: Glyph } = DESTINATIONS[tab]
+                    const Glyph = DESTINATION_ICONS[tab]
                     return (
                         <Button key={tab} variant="outline" onClick={event => onOpen(tab, event.currentTarget, 'tile')} className="relative h-auto flex-col gap-1 py-2 text-[11px]">
                             <Glyph className="size-4" />
-                            {label}
+                            {t(`destinations.${tab}`)}
                             {tab === 'services' && servicesNeedConfig && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
                         </Button>
                     )
@@ -88,11 +96,11 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
             <div className="shrink-0 space-y-2 border-t border-border p-3">
                 <div className="grid grid-cols-2 gap-2">
                     {FOOTER.map(tab => {
-                        const { label, icon: Glyph } = DESTINATIONS[tab]
+                        const Glyph = DESTINATION_ICONS[tab]
                         return (
                             <Button key={tab} variant="outline" size="sm" className="w-full" onClick={event => onOpen(tab, event.currentTarget, 'button')}>
                                 <Glyph className="size-4" />
-                                {label}
+                                {t(`destinations.${tab}`)}
                             </Button>
                         )
                     })}
@@ -105,7 +113,7 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
                         className="flex w-full items-center justify-center gap-2 rounded-lg bg-destructive/10 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/15 disabled:opacity-50 disabled:hover:bg-destructive/10"
                     >
                         <Trash2Icon className="size-4" />
-                        Delete this coworker
+                        {t('delete')}
                     </button>
                 </TooltipDisabledReason>
             </div>
@@ -115,8 +123,11 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
 
 /** The name is the field that renames it: one click, Enter or a click away keeps it, Escape drops it. */
 function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason }: { agent: IsoAgent; canRename: boolean; onClose: () => void; onShare: () => void; shareDisabledReason: string | null }) {
+    const boxManageReason = useBoxManageReason()
+    const t = useTranslations('agent.agentCard')
+    const tAgent = useTranslations('agent')
     const renameAgent = useBoardStore(s => s.renameAgent)
-    const boxName = useBoardStore(s => s.spaces.find(space => space.id === agent.spaceId)?.name) || UNNAMED_BOX_LABEL
+    const boxName = useBoardStore(s => s.spaces.find(space => space.id === agent.spaceId)?.name) || tAgent('untitledBox')
     const mood = useAgentBuddyMood(agent.id)
     const [editing, setEditing] = useState(false)
     const [name, setName] = useState(agent.name)
@@ -140,12 +151,12 @@ function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason 
                 <TooltipDisabledReason reason={shareDisabledReason ?? undefined}>
                     <Button variant="ghost" size="sm" disabled={!!shareDisabledReason} onClick={onShare} className="text-muted-foreground">
                         <Link2 className="size-4" />
-                        Share
+                        {t('share')}
                     </Button>
                 </TooltipDisabledReason>
             </div>
             <div className="absolute right-3 top-3">
-                <Button aria-label="Close the card" variant="ghost" size="icon-sm" onClick={onClose}>
+                <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
                     <XIcon className="size-4" />
                 </Button>
             </div>
@@ -153,7 +164,7 @@ function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason 
             {editing ? (
                 <Input
                     ref={inputRef}
-                    aria-label="Coworker name"
+                    aria-label={t('nameField')}
                     hideRequired
                     value={name}
                     onChange={event => setName(event.target.value)}
@@ -168,10 +179,10 @@ function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason 
                     className="-mt-1 h-8 w-48 text-center text-base font-semibold"
                 />
             ) : (
-                <TooltipDisabledReason reason={canRename ? undefined : BOX_MANAGE_REASON} className="-mt-1 max-w-full">
+                <TooltipDisabledReason reason={canRename ? undefined : boxManageReason} className="-mt-1 max-w-full">
                     <button
                         type="button"
-                        aria-label={`Rename ${agent.name}`}
+                        aria-label={t('rename', { name: agent.name })}
                         disabled={!canRename}
                         onClick={() => {
                             setName(agent.name)
@@ -189,7 +200,7 @@ function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason 
 }
 
 function DestinationRow({ tab, onClick }: { tab: CardDestination; onClick: (event: MouseEvent<HTMLButtonElement>) => void }) {
-    const { label, icon: Glyph } = DESTINATIONS[tab]
+    const { label, icon: Glyph } = useDestination(tab)
     return (
         <button type="button" onClick={onClick} className="flex w-full items-center gap-3 rounded-lg bg-muted/60 px-3 py-2.5 text-left transition-colors hover:bg-muted">
             <Glyph className="size-4 shrink-0 text-muted-foreground" />
@@ -201,7 +212,7 @@ function DestinationRow({ tab, onClick }: { tab: CardDestination; onClick: (even
 
 /** The button as it sat on the card, drawn over the surface while it leaves its place. */
 export function CardDestinationGhost({ tab, shape }: { tab: CardDestination; shape: CardDestinationShape }) {
-    const { label, icon: Glyph } = DESTINATIONS[tab]
+    const { label, icon: Glyph } = useDestination(tab)
 
     if (shape === 'tile') {
         return (

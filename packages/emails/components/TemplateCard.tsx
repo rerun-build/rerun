@@ -2,6 +2,7 @@ import * as React from "react";
 import { Img, Link, Section, Text } from "@react-email/components";
 import { ItemCard } from "./ItemCard";
 import { EMAIL_CARD_WIDTH } from "../card";
+import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
 export interface TemplateCardProps {
@@ -14,6 +15,7 @@ export interface TemplateCardProps {
   meta?: React.ReactNode;
   /** The card of the template, captured at the width of this column. */
   imageUrl?: string;
+  locale?: EmailLocale;
 }
 
 /**
@@ -31,7 +33,9 @@ export function TemplateCard({
   line,
   meta,
   imageUrl,
+  locale,
 }: TemplateCardProps) {
+  const actionLabel = emailTranslator(locale)("common.useThisCoworker");
   if (!imageUrl) {
     return (
       <ItemCard
@@ -39,7 +43,7 @@ export function TemplateCard({
         href={href}
         meta={meta}
         body={line}
-        action={{ href, label: "Use this coworker" }}
+        action={{ href, label: actionLabel }}
       />
     );
   }
@@ -55,7 +59,7 @@ export function TemplateCard({
       <Text style={cardBody}>{line}</Text>
       <Text style={cardAction}>
         <Link href={href} style={cardActionLink}>
-          Use this coworker
+          {actionLabel}
         </Link>
       </Text>
     </Section>

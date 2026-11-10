@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'motion/react'
+import { useTranslations } from 'next-intl'
 import { useId } from 'react'
 
 import { Field } from '@/components/ui/field'
@@ -34,10 +35,11 @@ const ADORNMENT_MOTION = {
 }
 
 export function IntakeCompanyStep({ draft, siteRead, disabled, autoFocus, onChange, onEnter }: IntakeCompanyStepProps) {
+    const t = useTranslations('foreman.intake')
     const siteId = useId()
 
     return (
-        <Field label="Company website" htmlFor={siteId}>
+        <Field label={t('website.label')} htmlFor={siteId}>
             <div className="relative">
                 <Input
                     id={siteId}
