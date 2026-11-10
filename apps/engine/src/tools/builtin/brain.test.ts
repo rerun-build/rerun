@@ -10,7 +10,7 @@ const { brainTools, foremanBrainTools, FOREMAN_BRAIN_AUTHOR } = await import('./
 const { sharedTools } = await import('./shared.js')
 const { writePage, readPageFile, listRevisions, revertPage } = await import('../../brain/pages.js')
 const { acceptProposal, dismissProposal, listProposals, countOpenProposals, getProposal } = await import('../../brain/proposals.js')
-const { buildBrainSection, buildForemanBrainSection, BRAIN_NOTE, FOREMAN_BRAIN_NOTE, EMPTY_FOR_AGENTS } = await import('../../brain/prompt.js')
+const { buildBrainSection, buildForemanBrainSection, BRAIN_NOTE, FOREMAN_BRAIN_NOTE, EMPTY_FOR_AGENTS, EMPTY_WHEN_CALLED } = await import('../../brain/prompt.js')
 
 const ctxFor = (id: string, name: string) => ({ agent: { id, config: { name } }, sessionId: 'session-1' }) as any
 const tools = brainTools(ctxFor('agent-sales', 'Sales'))
@@ -24,6 +24,11 @@ describe('the company brain section of the prompt', () => {
     it('says the brain is empty before anything is written', async () => {
         expect(await buildBrainSection()).toBe(`${BRAIN_NOTE}\n\n${EMPTY_FOR_AGENTS}`)
         expect(await buildForemanBrainSection()).toBe(`${FOREMAN_BRAIN_NOTE}\n\nThe company brain is still empty.`)
+    })
+
+    it('keeps a coworker called by another one from passing the question on', async () => {
+        expect(await buildBrainSection(true)).toBe(`${BRAIN_NOTE}\n\n${EMPTY_WHEN_CALLED}`)
+        expect(EMPTY_WHEN_CALLED).not.toContain('call_agent')
     })
 })
 

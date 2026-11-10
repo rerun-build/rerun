@@ -75,7 +75,7 @@ function accessSentence(access: PublishedAccess, invited: readonly string[]): st
 // What the publish tool tells the coworker. A public link refused outright says so, or the coworker
 // makes up a way it could still go public.
 export function coworkerAccessMessage(requested: PublishedAccess | undefined, resolution: AccessResolution, invited: readonly string[]): string {
-    if (resolution.requestedAccess === 'public') return 'Live for the workspace members only: its policy keeps a coworker from opening a link to everyone. A person was asked in the chat to make it public. Tell the user it waits for their click.'
+    if (resolution.requestedAccess === 'public') return 'Live for the workspace members only: its policy keeps a coworker from opening a link to everyone. The card of the link under your message asks the user, with a button that makes it public, which any member can click: no setting and no admin needed. Tell them to click it there. Nothing typed in the chat makes it public and publishing again changes nothing, so offer no quick reply and no approval card for it.'
     const sentence = accessSentence(resolution.access, invited)
     if (requested === 'public' && resolution.access !== 'public') return `Public links are turned off for this workspace, so the link was not made public and nobody was asked to. Tell the user plainly; only a workspace admin can turn public links back on, in the workspace settings. ${sentence}`
     return sentence

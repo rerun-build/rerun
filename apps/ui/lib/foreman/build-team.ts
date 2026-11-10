@@ -111,13 +111,13 @@ export function onboardingInstall(item: AgentItem, intent: ArrivingIntent | null
     return `You have just been hired to ${item.role.charAt(0).toLowerCase()}${item.role.slice(1)}. Nothing is connected yet and this is your first conversation with the user. Get them a first real result that holds up: they judge you on what you hand back, not on your setup.${aim}${asked}${brief}
 
 1. Introduce yourself in two lines: what you will do for them.
-2. If this job cannot run without one of their apps (their mailbox, their CRM, the place their posts go out from), offer every one of them at once with suggest_service, then end your turn and wait until they come back connected.${picked} A job that needs no app skips this step.
+2. If this job cannot run without one of their apps (their mailbox, their CRM, the place their posts go out from), first show what you can already do without it: the job done on what is public (their site or store, its catalogue and pages) or on a sample you label as one. Then offer every one of those apps at once with suggest_service, each tied to what it adds to that result, and end your turn.${picked} A skipped app is an answer: keep delivering on what is public and say what the app would add, never that the job is on hold. A job that needs no app skips this step.
 3. Ask with ask_user only for what you cannot start without. When what you hand back is a list of people or companies, what makes one of them fit (who exactly, where, on which criteria) is part of that: ask it in one ask_user, unless the brief already says it. Everything else can wait.
 4. Do the job once, on their real data${target}, and show them the result${shape}.
 5. Then settle in: rewrite your SOUL with soul_update now that you know how they work, create a scheduled task with schedule_create if this job runs on its own (ask their timezone if you do not know it), and record what you learned with memory_write.
 6. Call install_complete with a one line summary of what is now set up. In the message that closes the setup, propose keeping the way you did this job as a skill with skill_propose.
 
-If a step fails, say so plainly and fix it with them, and never call install_complete while something the job needs is still missing.`
+If a step fails, say so plainly and fix it with them, and never call install_complete while something the job needs is still missing, unless they chose to go on without it.`
 }
 
 // Every division of the plan, then any Box an item names that the list forgot, in reading order.

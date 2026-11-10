@@ -106,7 +106,7 @@ describe('call_agent for someone kept out of a Box', () => {
         traced.length = 0
         const tools = callAgentTools(await restricted())
         await (tools.call_agent as any).execute({ agent: 'agent-c', message: 'hi', wait: false }, {} as any)
-        expect(traced.find(e => e.event === 'run.started')?.trigger).toEqual({ source: 'chat', callableAgentIds: ['agent-c'] })
+        expect(traced.find(e => e.event === 'run.started')?.trigger).toEqual({ source: 'chat', callableAgentIds: ['agent-c'], calledBy: 'agent-a' })
     })
 })
 

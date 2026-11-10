@@ -19,6 +19,9 @@ export const FOREMAN_BRAIN_NOTE =
 
 const EMPTY = 'The company brain is still empty.'
 export const EMPTY_FOR_AGENTS = `${EMPTY} Before you ask the user what the company does or sells, ask the coworkers of the workspace who may already know (call_agent): one that worked on its website or its marketing has usually read it.`
+// A coworker asked by another one passing the question on is how an empty brain turned into a loop
+// of coworkers asking each other (649 sessions in 7 minutes on one trial).
+export const EMPTY_WHEN_CALLED = `${EMPTY} Another coworker is asking you: answer it from what you already hold, even if that is nothing, and never pass its question on to another coworker.`
 
 function cardExcerpt(content: string): string {
     return content
@@ -31,8 +34,8 @@ function cardExcerpt(content: string): string {
 
 // Lives in the system prompt rather than in the per-turn recall: it changes when a person accepts
 // something, not on every message, so the prompt stays cacheable.
-export async function buildBrainSection(): Promise<string> {
-    return [BRAIN_NOTE, ...(await brainIndex(EMPTY_FOR_AGENTS))].join('\n\n')
+export async function buildBrainSection(calledByCoworker = false): Promise<string> {
+    return [BRAIN_NOTE, ...(await brainIndex(calledByCoworker ? EMPTY_WHEN_CALLED : EMPTY_FOR_AGENTS))].join('\n\n')
 }
 
 export async function buildForemanBrainSection(): Promise<string> {

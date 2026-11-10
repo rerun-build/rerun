@@ -196,6 +196,13 @@ describe('onboardingInstall', () => {
         expect(onboardingInstall(scout)).toContain('When what you hand back is a list of people or companies, what makes one of them fit (who exactly, where, on which criteria) is part of that: ask it in one ask_user, unless the brief already says it.')
     })
 
+    it('shows what works without an app before offering it, and keeps delivering when it is skipped', () => {
+        const install = onboardingInstall(scout)
+        expect(install).toContain('first show what you can already do without it')
+        expect(install).toContain('A skipped app is an answer')
+        expect(install).not.toContain('wait until they come back connected')
+    })
+
     it('proposes its first skill instead of writing one, as the engine prompt requires', () => {
         const install = onboardingInstall(scout)
         expect(install).not.toContain('skill_create')

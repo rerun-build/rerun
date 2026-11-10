@@ -99,4 +99,11 @@ describe('coworkerAccessMessage', () => {
         expect(coworkerAccessMessage('public', resolveCoworkerAccess({ policy: 'people', requested: 'public' }), [])).toMatch(/^Live for the workspace members only/)
         expect(coworkerAccessMessage(undefined, resolveCoworkerAccess({ policy: 'never' }), [])).toBe('Only the members of this workspace can open it, once signed in.')
     })
+
+    it('points the coworker at the button of the card rather than a reply or an admin', () => {
+        const message = coworkerAccessMessage('public', resolveCoworkerAccess({ policy: 'people', requested: 'public' }), [])
+        expect(message).toContain('button that makes it public')
+        expect(message).toContain('no admin needed')
+        expect(message).toContain('offer no quick reply')
+    })
 })
