@@ -1,11 +1,11 @@
 import type { FileCard } from '@rerun/contracts'
 import { formatNumber } from '@rerun/i18n/format'
-import { SymbolView } from 'expo-symbols'
 import { Pressable, View } from 'react-native'
 import { useLocale, useTranslations } from 'use-intl'
 
 import { rawFileUrl } from '@/api/files'
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { isImageItem, openViewer, type ViewerItem } from '@/components/viewer/viewer-store'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -65,14 +65,14 @@ export function FileCardView({ card, agentId }: { card: FileCard; agentId: strin
     if (items.every(isImageItem)) return <Album items={items} />
 
     return (
-        <CardFrame symbol="doc.on.doc" title={t('title', { count: card.files.length })}>
+        <CardFrame symbol="copy" title={t('title', { count: card.files.length })}>
             {card.files.map((file, index) => (
                 <Pressable key={`${file.scope}:${file.path}`} onPress={() => openViewer(items, index)} accessibilityRole="button" accessibilityLabel={t('open', { name: file.name })} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderTopWidth: index > 0 ? 1 : 0, borderTopColor: theme.border, backgroundColor: pressed ? theme.muted : 'transparent' })}>
                     {isImageItem(items[index]) ? (
                         <AuthedImage url={items[index].url} style={{ width: 40, height: 40, borderRadius: radius.sm }} />
                     ) : (
                         <View style={{ width: 40, height: 40, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.muted }}>
-                            <SymbolView name="doc.text" size={16} tintColor={theme.mutedForeground} />
+                            <Icon name="file-text" size={16} color={theme.mutedForeground} />
                         </View>
                     )}
                     <View style={{ flex: 1, gap: 2 }}>
@@ -83,7 +83,7 @@ export function FileCardView({ card, agentId }: { card: FileCard; agentId: strin
                             {fileSize(file.size)}
                         </AppText>
                     </View>
-                    <SymbolView name="chevron.right" size={12} weight="semibold" tintColor={theme.mutedForeground} />
+                    <Icon name="chevron-right" size={12} bold color={theme.mutedForeground} />
                 </Pressable>
             ))}
         </CardFrame>

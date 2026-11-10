@@ -73,7 +73,7 @@ function NeedsAuthCard({ agentId, slug, name }: { agentId: string; slug: string;
             icon={logoOf(service?.icon)}
             title={t('added', { name })}
             note={error ?? (done ? t('connectedNote') : t('signInNote'))}
-            trailing={done ? <Badge size="xs" tone="green" label={t('connected')} /> : pending ? <Button size="sm" variant="outline" label={busy ? t('signingIn') : t('signIn')} symbol="person.crop.circle.badge.checkmark" loading={busy} onPress={connect} /> : undefined}
+            trailing={done ? <Badge size="xs" tone="green" label={t('connected')} /> : pending ? <Button size="sm" variant="outline" label={busy ? t('signingIn') : t('signIn')} symbol="user-check" loading={busy} onPress={connect} /> : undefined}
         />
     )
 }
@@ -133,7 +133,7 @@ function McpServerCard({ agentId, card }: { agentId: string; card: McpRegisterCa
             icon={logoOf(server?.icon)}
             title={t('added', { name: displayName })}
             note={error ?? (host ? t('customServerAt', { host }) : t('customServer'))}
-            trailing={canSignIn ? <Button size="sm" variant="outline" label={busy ? t('connecting') : t('connect')} symbol="person.crop.circle.badge.checkmark" loading={busy} onPress={connect} /> : server ? <McpStatusBadge status={server.status} /> : undefined}
+            trailing={canSignIn ? <Button size="sm" variant="outline" label={busy ? t('connecting') : t('connect')} symbol="user-check" loading={busy} onPress={connect} /> : server ? <McpStatusBadge status={server.status} /> : undefined}
         />
     )
 }
@@ -143,7 +143,7 @@ export function ConnectCardView({ card, agentId }: { card: ConnectCard; agentId:
     switch (card.kind) {
         case 'service-installed':
             return (
-                <EventRow symbol="checkmark.circle" title={t('installed', { name: card.name })}>
+                <EventRow symbol="circle-check" title={t('installed', { name: card.name })}>
                     {card.toolNames.length > 0 && (
                         <AppText variant="footnote" tone="muted">
                             {t('availableNextTurn', { tools: card.toolNames.join(', ') })}

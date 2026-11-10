@@ -2,7 +2,6 @@ import { Button, Image, Menu, Section, Text, Toggle } from '@expo/ui/swift-ui'
 import { disabled } from '@expo/ui/swift-ui/modifiers'
 import type { SessionKind, SessionStatus } from '@rerun/contracts'
 import { GlassView } from 'expo-glass-effect'
-import { SymbolView } from 'expo-symbols'
 import { View } from 'react-native'
 import Animated, { Extrapolation, FadeIn, interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -14,8 +13,10 @@ import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { GlassButton, GLASS_BUTTON_SIZE, useGlassStyle } from '@/components/ui/GlassButton'
+import { Icon } from '@/components/ui/Icon'
 import { NativeMenu } from '@/components/ui/NativeMenu'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { systemSymbolOf } from '@/components/ui/system-symbols'
 import { useMessageTimes } from '@/lib/time'
 import type { Coworker } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
@@ -72,7 +73,7 @@ export function ChipPage({ coworker, session, active, width, progress, index = 0
                     <Skeleton style={{ width: 96, height: 12, marginVertical: 3 }} />
                 ) : (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, maxWidth: '100%' }}>
-                        {general && <SymbolView name="bubble.left.and.bubble.right.fill" size={12} tintColor={theme.foreground} />}
+                        {general && <Icon name="messages-square-fill" size={12} color={theme.foreground} />}
                         <Animated.Text key={title} entering={FadeIn.duration(400)} numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flexShrink: 1, fontFamily: fonts.medium, fontSize: 14, lineHeight: 18, letterSpacing: -0.2, textAlign: 'center', color: general || session.title ? theme.foreground : theme.mutedForeground }}>
                             {title}
                         </Animated.Text>
@@ -91,7 +92,7 @@ function ConversationItem({ session, active, untitled, onSelect }: { session: Ch
     const subtitle = (stateOf(session) === 'needs-you' ? session.ask : null) ?? automationLine(session, times.stamp)
     return (
         <Button onPress={() => onSelect(session.id)}>
-            {glyph ? <Image systemName={glyph} /> : <Text>{''}</Text>}
+            {glyph ? <Image systemName={systemSymbolOf(glyph)} /> : <Text>{''}</Text>}
             <Text>{title}</Text>
             {subtitle ? <Text>{subtitle}</Text> : <Text>{''}</Text>}
         </Button>
@@ -187,7 +188,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
                     </Animated.View>
                     {menuOpens && (
                         <View pointerEvents="none" style={{ position: 'absolute', right: spacing.sm + 2, top: 0, bottom: 0, justifyContent: 'center' }}>
-                            <SymbolView name="chevron.right" size={11} weight="semibold" tintColor={theme.mutedForeground} />
+                            <Icon name="chevron-right" size={11} bold color={theme.mutedForeground} />
                         </View>
                     )}
                 </View>
@@ -199,7 +200,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
         <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
             <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} />
             <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
-                {onBack ? <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
+                {onBack ? <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
                 <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>
                     {menuOpens ? (
                         <NativeMenu label={t('menuLabel', { name: coworker.name, title: activeTitle })} trigger={identity}>

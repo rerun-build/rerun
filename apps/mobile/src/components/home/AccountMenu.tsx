@@ -1,7 +1,6 @@
 import { Button } from '@expo/ui/swift-ui'
 import { Image } from 'expo-image'
 import { router } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { useTranslations } from 'use-intl'
 
@@ -9,6 +8,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { contactSupport, initialsOf } from '@/components/home/account-actions'
 import { WorkspaceSubmenu } from '@/components/home/WorkspaceMenu'
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { CircleTrigger, NativeMenu } from '@/components/ui/NativeMenu'
 import { onCustomServer } from '@/config/environment'
 import { useTheme } from '@/theme/theme'
@@ -33,7 +33,7 @@ export function AccountMenu() {
                                 {initials}
                             </AppText>
                         ) : (
-                            <SymbolView name="person.fill" size={17} weight="medium" tintColor={theme.foreground} />
+                            <Icon name="user" size={17} color={theme.foreground} />
                         )}
                 </CircleTrigger>
             }

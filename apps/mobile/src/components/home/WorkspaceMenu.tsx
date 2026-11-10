@@ -1,6 +1,5 @@
 import { Image, Label, Menu, Toggle } from '@expo/ui/swift-ui'
 import type { WorkspaceSummary } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -11,6 +10,7 @@ import { WorkspaceLogo } from '@/components/home/WorkspaceLogo'
 import { initialSymbolOf, useWorkspaceLogoFiles, workspaceLabel } from '@/components/home/workspace-logos'
 import { AppText } from '@/components/ui/AppText'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
+import { Icon } from '@/components/ui/Icon'
 import { NativeMenu } from '@/components/ui/NativeMenu'
 import { cachedWorkspaces } from '@/data/local-cache'
 import { useTheme } from '@/theme/theme'
@@ -72,7 +72,7 @@ export function WorkspaceMenuView({ current, workspaces, onSwitch }: WorkspaceSw
                     <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flexShrink: 1 }}>
                         {name}
                     </AppText>
-                    <SymbolView name="chevron.up.chevron.down" size={13} weight="medium" tintColor={theme.foreground} />
+                    <Icon name="chevrons-up-down" size={13} color={theme.foreground} />
                 </View>
             }
         >

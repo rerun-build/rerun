@@ -130,6 +130,7 @@ function App() {
                                         <Stack.Screen name="lab-chat" />
                                         <Stack.Screen name="lab-threads" />
                                         <Stack.Screen name="lab-message-times" />
+                                        <Stack.Screen name="lab-icons" />
                                         <Stack.Screen name="lab-sign-in" />
                                         <Stack.Screen name="lab-hitl" />
                                         <Stack.Screen name="lab-screen" />

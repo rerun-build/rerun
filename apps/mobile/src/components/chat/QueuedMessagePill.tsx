@@ -1,27 +1,31 @@
-import { Button, Host, Image } from '@expo/ui/swift-ui'
-import { accessibilityLabel, buttonStyle, disabled as disabledModifier, font, frame } from '@expo/ui/swift-ui/modifiers'
 import { queuedPreview } from '@rerun/contracts'
 import { GlassView } from 'expo-glass-effect'
-import { SymbolView } from 'expo-symbols'
-import { StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { useGlassStyle } from '@/components/ui/GlassButton'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { brand, radius, spacing, withAlpha } from '@/theme/tokens'
 
 import { GLASS_SHADOW, GLASS_TINT_ALPHA } from './glass'
 
 // Borderless: the strip is glass already, a glass button on it would be glass on glass.
-function StripButton({ symbol, label, disabled, onPress }: { symbol: 'arrow.up' | 'xmark'; label: string; disabled: boolean; onPress: () => void }) {
+function StripButton({ symbol, label, disabled, onPress }: { symbol: 'arrow-up' | 'x'; label: string; disabled: boolean; onPress: () => void }) {
     const theme = useTheme()
     return (
-        <Host matchContents colorScheme={theme.scheme}>
-            <Button onPress={onPress} modifiers={[buttonStyle('borderless'), disabledModifier(disabled), accessibilityLabel(label)]}>
-                <Image systemName={symbol} color={theme.mutedForeground} modifiers={[font({ size: 13, weight: 'semibold' }), frame({ width: 30, height: 30 })]} />
-            </Button>
-        </Host>
+        <Pressable
+            onPress={onPress}
+            disabled={disabled}
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            accessibilityState={{ disabled }}
+            hitSlop={6}
+            style={({ pressed }) => ({ width: 30, height: 30, alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.4 : pressed ? 0.5 : 1 })}
+        >
+            <Icon name={symbol} size={15} bold color={theme.mutedForeground} />
+        </Pressable>
     )
 }
 
@@ -38,7 +42,7 @@ export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }:
     return (
         <GlassView key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingLeft: spacing.md, paddingRight: spacing.xs, paddingVertical: 4, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme] }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 1, borderRadius: radius.pill, borderWidth: 1, borderColor: withAlpha(accent, 0.3), backgroundColor: withAlpha(accent, 0.1) }}>
-                <SymbolView name="clock" size={10} weight="semibold" tintColor={accent} />
+                <Icon name="clock" size={10} bold color={accent} />
                 <AppText style={{ fontSize: 11, lineHeight: 15, color: accent }}>{t('badge')}</AppText>
             </View>
             <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
@@ -46,14 +50,14 @@ export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }:
             </AppText>
             {preview.attachments.length > 0 && (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-                    <SymbolView name="paperclip" size={11} tintColor={theme.mutedForeground} />
+                    <Icon name="paperclip" size={11} color={theme.mutedForeground} />
                     <AppText variant="caption" tone="muted">
                         {preview.attachments.length}
                     </AppText>
                 </View>
             )}
-            <StripButton symbol="arrow.up" label={busy ? t('sendNowStops') : t('sendNow')} disabled={pending} onPress={onSendNow} />
-            <StripButton symbol="xmark" label={t('remove')} disabled={pending} onPress={onDiscard} />
+            <StripButton symbol="arrow-up" label={busy ? t('sendNowStops') : t('sendNow')} disabled={pending} onPress={onSendNow} />
+            <StripButton symbol="x" label={t('remove')} disabled={pending} onPress={onDiscard} />
         </GlassView>
     )
 }

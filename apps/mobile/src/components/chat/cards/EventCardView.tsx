@@ -1,5 +1,4 @@
 import { brainChangeHeadline, type BrainChange } from '@rerun/contracts'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useState, type ReactNode } from 'react'
 import { Alert, View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -10,6 +9,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -17,12 +17,12 @@ import type { EventCard } from './cards'
 
 // One thing the coworker did, on the muted surface of the thread's cards: its glyph (or the app's
 // logo), what happened, a note, and on the right what the person can still do about it.
-export function EventRow({ symbol, icon, title, note, trailing, children }: { symbol: SFSymbol; icon?: ReactNode; title: string; note?: string; trailing?: ReactNode; children?: ReactNode }) {
+export function EventRow({ symbol, icon, title, note, trailing, children }: { symbol: IconName; icon?: ReactNode; title: string; note?: string; trailing?: ReactNode; children?: ReactNode }) {
     const theme = useTheme()
     return (
         <View style={{ flexDirection: 'row', gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, borderCurve: 'continuous', backgroundColor: theme.muted }}>
             <View style={{ width: 28, height: 28, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: theme.card }}>
-                {icon ?? <SymbolView name={symbol} size={14} weight="medium" tintColor={theme.foreground} />}
+                {icon ?? <Icon name={symbol} size={14} color={theme.foreground} />}
             </View>
             <View style={{ flex: 1, gap: 2 }}>
                 <AppText variant="callout" medium>
@@ -72,7 +72,7 @@ export function EventCardView({ card, coworkerName }: { card: EventCard; coworke
             return <EventRow symbol="bell" title={t('notification')} note={card.message} />
         case 'setup':
             return (
-                <EventRow symbol="checkmark.seal" title={coworkerName ? t('setUp', { name: coworkerName }) : t('setupComplete')} note={card.summary || undefined}>
+                <EventRow symbol="badge-check" title={coworkerName ? t('setUp', { name: coworkerName }) : t('setupComplete')} note={card.summary || undefined}>
                     {(card.schedules > 0 || card.triggers > 0) && (
                         <View style={{ flexDirection: 'row', gap: spacing.xs, marginTop: spacing.xs }}>
                             {card.schedules > 0 && <Badge size="xs" label={t('schedules', { count: card.schedules })} tone="green" />}

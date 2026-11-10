@@ -1,11 +1,11 @@
 import { Button, Menu, Toggle } from '@expo/ui/swift-ui'
 import type { SkillSummary } from '@rerun/contracts'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { NativeMenu } from '@/components/ui/NativeMenu'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import type { Coworker } from '@/mocks/data'
@@ -17,7 +17,7 @@ import { spacing } from '@/theme/tokens'
 export const CONTROL = 36
 
 // `busy` keeps the button's shape and colour while its action is under way, the glyph a spinner.
-export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: disabledProp, busy = false }: { symbol: SFSymbol; label: string; onPress: () => void; tone?: 'primary' | 'muted' | 'plain'; disabled?: boolean; busy?: boolean }) {
+export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: disabledProp, busy = false }: { symbol: IconName; label: string; onPress: () => void; tone?: 'primary' | 'muted' | 'plain'; disabled?: boolean; busy?: boolean }) {
     const theme = useTheme()
     const disabled = disabledProp || busy
     const lit = tone === 'primary' && (!disabled || busy)
@@ -42,7 +42,7 @@ export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: 
                 boxShadow: lit ? ctaRelief[theme.scheme][pressed ? 'pressed' : 'rest'] : undefined,
             })}
         >
-            {busy ? <ActivityIndicator size="small" color={tint} /> : <SymbolView name={symbol} size={tone === 'plain' ? 20 : 15} weight={tone === 'primary' ? 'bold' : 'medium'} tintColor={tint} />}
+            {busy ? <ActivityIndicator size="small" color={tint} /> : <Icon name={symbol} size={tone === 'plain' ? 20 : 15} bold={tone === 'primary'} color={tint} />}
         </Pressable>
     )
 }
@@ -54,7 +54,7 @@ export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill }
         <NativeMenu
             trigger={
                 <View accessibilityLabel={t('attach')} style={{ width: CONTROL, height: CONTROL, alignItems: 'center', justifyContent: 'center' }}>
-                    <SymbolView name="plus" size={20} weight="regular" tintColor={theme.foreground} />
+                    <Icon name="plus" size={20} color={theme.foreground} />
                 </View>
             }
         >
@@ -96,7 +96,7 @@ export function TargetPicker({ target, choices, onPick }: { target: Coworker; ch
                     <AppText variant="footnote" tone="muted" medium numberOfLines={1} maxFontSizeMultiplier={1.2}>
                         {target.name}
                     </AppText>
-                    <SymbolView name="chevron.down" size={10} weight="semibold" tintColor={theme.mutedForeground} />
+                    <Icon name="chevron-down" size={10} bold color={theme.mutedForeground} />
                 </View>
             }
         >

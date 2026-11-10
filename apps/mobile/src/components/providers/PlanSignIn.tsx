@@ -1,5 +1,4 @@
 import * as Clipboard from 'expo-clipboard'
-import { SymbolView } from 'expo-symbols'
 import * as WebBrowser from 'expo-web-browser'
 import { useState, type ReactNode } from 'react'
 import { ActivityIndicator, Pressable, View } from 'react-native'
@@ -8,6 +7,7 @@ import { useTranslations } from 'use-intl'
 import { AppText } from '@/components/ui/AppText'
 import { TONES } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/ui/Icon'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import { TextField } from '@/components/ui/TextField'
 import { useTheme } from '@/theme/theme'
@@ -84,7 +84,7 @@ export function ClaudeSignIn({ phase, error, code, onCode, onOpenClaude, onPaste
                             <View style={{ gap: spacing.sm }}>
                                 <TextField id="claude-code" label={t('codeLabel')} value={code} onChangeText={onCode} placeholder={busy ? t('checking') : t('codeLabel')} secret />
                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-                                    <Button label={t('paste')} symbol="doc.on.clipboard" variant={code.trim() ? 'outline' : 'default'} onPress={onPaste} disabled={busy} />
+                                    <Button label={t('paste')} symbol="clipboard-paste" variant={code.trim() ? 'outline' : 'default'} onPress={onPaste} disabled={busy} />
                                     {code.trim() !== '' && <Button label={t('connect')} onPress={onSubmit} loading={busy} />}
                                 </View>
                                 <ErrorLine error={error} />
@@ -139,8 +139,8 @@ export function ChatGptSignIn({ phase, pending, expired, stuck, error, onGetCode
                         body: (
                             <View style={{ gap: spacing.md }}>
                                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
-                                    <Button label={t('openSettings')} symbol="arrow.up.right" onPress={openSettings} />
-                                    <Button label={t('alreadyOn')} symbol="checkmark" variant="outline" onPress={onGetCode} />
+                                    <Button label={t('openSettings')} symbol="arrow-up-right" onPress={openSettings} />
+                                    <Button label={t('alreadyOn')} symbol="check" variant="outline" onPress={onGetCode} />
                                 </View>
                                 {workspacePlan ? (
                                     <AppText variant="footnote" tone="muted">
@@ -169,7 +169,7 @@ function SettingPath() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.xs }}>
             {SETTING_PATH.map((segment, index) => (
                 <View key={segment} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, maxWidth: '100%' }}>
-                    {index > 0 && <SymbolView name="chevron.right" size={10} weight="semibold" tintColor={theme.mutedForeground} />}
+                    {index > 0 && <Icon name="chevron-right" size={10} bold color={theme.mutedForeground} />}
                     <View style={{ flexShrink: 1, borderRadius: radius.sm, paddingHorizontal: 6, paddingVertical: 2, backgroundColor: theme.muted }}>
                         <AppText variant="caption" medium={index === SETTING_PATH.length - 1} tone={index === SETTING_PATH.length - 1 ? 'default' : 'muted'}>
                             {segment}
@@ -219,7 +219,7 @@ function CodeStep({ phase, pending, expired, stuck, error, workspacePlan, onGetC
                         <AppText numberOfLines={1} adjustsFontSizeToFit maxFontSizeMultiplier={1.2} style={{ flex: 1, fontFamily: fonts.mono, fontSize: 22, lineHeight: 28, letterSpacing: 4, color: theme.foreground }}>
                             {pending.userCode}
                         </AppText>
-                        <SymbolView name={copied ? 'checkmark' : 'doc.on.doc'} size={17} tintColor={theme.foreground} />
+                        <Icon name={copied ? 'check' : 'copy'} size={17} color={theme.foreground} />
                     </Pressable>
                     <View style={{ alignSelf: 'flex-start' }}>
                         <Button label={t('openOpenAI')} icon={<ProviderLogo provider="codex" size={16} color={theme.primaryForeground} />} onPress={() => {
@@ -255,7 +255,7 @@ function StuckHint({ expired, workspacePlan }: { expired: boolean; workspacePlan
     )
     return (
         <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-            <SymbolView name="exclamationmark.triangle" size={14} tintColor={TONES.yellow[theme.scheme]} style={{ marginTop: 2 }} />
+            <Icon name="triangle-alert" size={14} color={TONES.yellow[theme.scheme]} style={{ marginTop: 2 }} />
             <AppText variant="footnote" tone="muted" style={{ flex: 1 }}>
                 {workspacePlan ? (
                     <>

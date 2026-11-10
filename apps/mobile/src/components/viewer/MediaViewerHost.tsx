@@ -96,7 +96,7 @@ export function MediaViewerHost() {
                 </ScrollView>
                 {current && (
                     <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: spacing.lg + pane.left, right: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'center', gap: spacing.md, opacity: 1 - drag }}>
-                        <GlassButton symbol="xmark" label={t('actions.close')} onPress={closeViewer} scheme="dark" />
+                        <GlassButton symbol="x" label={t('actions.close')} onPress={closeViewer} scheme="dark" />
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <AppText variant="callout" medium numberOfLines={1} style={{ color: '#ffffff' }}>
                                 {current.name}
@@ -107,7 +107,7 @@ export function MediaViewerHost() {
                                 </AppText>
                             )}
                         </View>
-                        <GlassButton symbol="square.and.arrow.up" label={t('actions.share')} onPress={share} scheme="dark" />
+                        <GlassButton symbol="share" label={t('actions.share')} onPress={share} scheme="dark" />
                     </View>
                 )}
             </GestureHandlerRootView>

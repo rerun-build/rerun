@@ -1,6 +1,5 @@
 import type { AiConnectionView, ConnectionUsage, Provider } from '@rerun/contracts'
 import * as WebBrowser from 'expo-web-browser'
-import { SymbolView } from 'expo-symbols'
 import type { ReactNode } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -12,6 +11,7 @@ import { AppText } from '@/components/ui/AppText'
 import { Badge, TONES } from '@/components/ui/Badge'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { GROUPED_ROW_HEIGHT } from '@/components/ui/GroupedList'
+import { Icon } from '@/components/ui/Icon'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
@@ -25,7 +25,7 @@ export function SheetHeader({ title, onBack, onClose }: { title: string; onBack?
     const t = useTranslations('mobileProviders.sheet')
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {onBack ? <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} /> : onClose ? <GlassButton symbol="xmark" label={t('close')} onPress={onClose} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
+            {onBack ? <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} /> : onClose ? <GlassButton symbol="x" label={t('close')} onPress={onClose} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
             <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center', paddingHorizontal: spacing.sm }}>
                 {title}
             </AppText>
@@ -94,7 +94,7 @@ export function ProviderRow({ id, provider, title, subtitle, subtitleLines = 2, 
                 {children}
             </View>
             {trailing ? <View style={{ alignSelf: 'center' }}>{trailing}</View> : null}
-            {onPress && <SymbolView name="chevron.right" size={13} weight="semibold" tintColor={theme.mutedForeground} />}
+            {onPress && <Icon name="chevron-right" size={13} bold color={theme.mutedForeground} />}
         </Pressable>
     )
 }
@@ -135,7 +135,7 @@ export function StepTrack({ steps, at, done }: { steps: TrackStep[]; at: number;
                     <View key={step.title} style={{ flexDirection: 'row', gap: spacing.md, opacity: ticked || current ? 1 : 0.5 }}>
                         <View style={{ width: 26, height: 26, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: ticked ? withAlpha(TONES.green[theme.scheme], 0.15) : current ? theme.primary : theme.muted }}>
                             {ticked ? (
-                                <SymbolView name="checkmark" size={12} weight="bold" tintColor={TONES.green[theme.scheme]} />
+                                <Icon name="check" size={12} bold color={TONES.green[theme.scheme]} />
                             ) : (
                                 <AppText variant="caption" medium maxFontSizeMultiplier={1.2} style={{ color: current ? theme.primaryForeground : theme.mutedForeground }}>
                                     {index + 1}

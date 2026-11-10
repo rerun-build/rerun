@@ -32,9 +32,9 @@ export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 
     }
 
     return (
-        <HitlCard symbol="questionmark.bubble" onClose={() => onAnswer({ answered: false, reason: 'dismissed' })} closeLabel={t('question.skip')}>
+        <HitlCard symbol="message-circle-question" onClose={() => onAnswer({ answered: false, reason: 'dismissed' })} closeLabel={t('question.skip')}>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingRight: spacing.xl }}>
-                <HitlIcon symbol="questionmark.bubble" />
+                <HitlIcon symbol="message-circle-question" />
                 <View style={{ flex: 1, minHeight: 32, justifyContent: 'center' }}>
                     <Markdown text={question} />
                 </View>
@@ -72,7 +72,7 @@ export function EitherCard({ input, onAnswer }: CardProps) {
     const { title, description, options } = readEither(input)
     const t = useTranslations('mobileOnboarding')
     return (
-        <HitlCard symbol="arrow.left.arrow.right">
+        <HitlCard symbol="arrow-left-right">
             <View style={{ gap: spacing.xs, paddingRight: spacing.xl }}>
                 <AppText variant="headline">{title}</AppText>
                 {description.length > 0 && (

@@ -1,4 +1,3 @@
-import { SymbolView } from 'expo-symbols'
 import { useEffect, useRef, useState } from 'react'
 import { ActivityIndicator, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -6,6 +5,7 @@ import { WebView } from 'react-native-webview'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 
 // Below the viewer's close button, title and counter.
 const HEADER_ROOM = 64
@@ -38,7 +38,7 @@ export function FilePage({ url, name, load }: { url: string; name: string; load:
     if (failed) {
         return (
             <View style={{ width, height, alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 32 }}>
-                <SymbolView name="doc" size={28} tintColor="#a1a1a1" />
+                <Icon name="file" size={28} color="#a1a1a1" />
                 <AppText variant="callout" numberOfLines={2} style={{ color: '#ffffff', textAlign: 'center' }}>
                     {name}
                 </AppText>

@@ -1,10 +1,10 @@
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useEffect, useId, useState, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 import Animated, { cancelAnimation, Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing } from '@/theme/tokens'
 
@@ -61,13 +61,13 @@ function WaveLine({ side, flowing }: { side: 'left' | 'right'; flowing: boolean 
 // What the divider reads, in the web's order: what happened, then names and links one dot apart.
 export type DividerPiece = { kind: 'text'; text: string } | { kind: 'name'; text: string } | { kind: 'link'; text: string; onPress: () => void }
 
-export function ThreadDivider({ symbol, symbolTint, flowing = false, pieces, accessory }: { symbol: SFSymbol; symbolTint?: string; flowing?: boolean; pieces: DividerPiece[]; accessory?: ReactNode }) {
+export function ThreadDivider({ symbol, symbolTint, flowing = false, pieces, accessory }: { symbol: IconName; symbolTint?: string; flowing?: boolean; pieces: DividerPiece[]; accessory?: ReactNode }) {
     const theme = useTheme()
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.xs }}>
             <WaveLine side="left" flowing={flowing} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 }}>
-                {accessory ?? <SymbolView name={symbol} size={13} tintColor={symbolTint ?? theme.mutedForeground} />}
+                {accessory ?? <Icon name={symbol} size={13} color={symbolTint ?? theme.mutedForeground} />}
                 {pieces.map((piece, i) => (
                     <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: piece.kind === 'name' ? 1 : 0, minWidth: piece.kind === 'name' ? 64 : undefined }}>
                         {i > 0 && (

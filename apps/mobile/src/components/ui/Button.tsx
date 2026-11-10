@@ -1,8 +1,8 @@
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import type { ReactNode } from 'react'
 import { ActivityIndicator, Pressable, View, type ViewStyle } from 'react-native'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { ctaRelief, destructiveRelief, solidRelief, subtleRelief } from '@/theme/relief'
 import { useTheme } from '@/theme/theme'
 import { controlSize, fonts, spacing, withAlpha, type ControlSize } from '@/theme/tokens'
@@ -14,8 +14,8 @@ type ButtonProps = {
     onPress: () => void
     variant?: ButtonVariant
     size?: ControlSize
-    symbol?: SFSymbol
-    // For a glyph that is not an SF Symbol (a provider logo).
+    symbol?: IconName
+    // For a glyph outside the icon set (a provider logo, the Apple logo).
     icon?: ReactNode
     iconOnly?: boolean
     // Shares the row's width with its siblings, iconOnly included.
@@ -102,7 +102,7 @@ export function Button({ label, onPress, variant = 'default', size = 'md', symbo
                 const { color } = lookOf(theme, variant, size, pressed)
                 return (
                     <>
-                        {loading ? <ActivityIndicator size="small" color={color} /> : symbol ? <SymbolView name={symbol} size={text.symbol} weight="medium" tintColor={color} /> : icon && <View>{icon}</View>}
+                        {loading ? <ActivityIndicator size="small" color={color} /> : symbol ? <Icon name={symbol} size={text.symbol} color={color} /> : icon && <View>{icon}</View>}
                         {!iconOnly && (
                             <AppText numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ fontFamily: fonts.medium, fontSize: text.fontSize, lineHeight: text.lineHeight, letterSpacing: -0.2, color, flexShrink: 1 }}>
                                 {label}

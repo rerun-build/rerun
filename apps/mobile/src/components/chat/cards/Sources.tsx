@@ -1,9 +1,9 @@
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { hostOf, openExternalUrl } from '@/lib/url'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -19,11 +19,11 @@ export function Sources({ sources }: { sources: Source[] }) {
     return (
         <View style={{ gap: spacing.xs }}>
             <Pressable onPress={() => setOpen(current => !current)} accessibilityRole="button" accessibilityState={{ expanded: open }} accessibilityLabel={label} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                <SymbolView name="link" size={13} weight="medium" tintColor={theme.mutedForeground} />
+                <Icon name="link" size={13} color={theme.mutedForeground} />
                 <AppText variant="footnote" tone="muted">
                     {label}
                 </AppText>
-                <SymbolView name={open ? 'chevron.up' : 'chevron.down'} size={10} weight="semibold" tintColor={theme.mutedForeground} />
+                <Icon name={open ? 'chevron-up' : 'chevron-down'} size={10} bold color={theme.mutedForeground} />
             </Pressable>
             {open &&
                 sources.map(source => (

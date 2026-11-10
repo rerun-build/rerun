@@ -1,6 +1,5 @@
 import { agentIdOf, argsOf, readableToolError, toolHeadline, toolLabelOf } from '@rerun/contracts'
 import { formatNumber } from '@rerun/i18n/format'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewInstance } from 'react-native'
 import Animated, { Easing, FadeIn, FadeInUp, FadeOut, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
@@ -9,6 +8,7 @@ import { useLocale, useTranslations } from 'use-intl'
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { AppText } from '@/components/ui/AppText'
 import { EdgeFade } from '@/components/ui/EdgeFade'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
@@ -17,7 +17,7 @@ import { formatElapsed, useElapsed } from './useElapsed'
 
 export type StepStatus = 'done' | 'error' | 'running'
 
-export type StepItem = { key: string; symbol: SFSymbol; node: ReactNode; status: StepStatus; runningLabel?: string }
+export type StepItem = { key: string; symbol: IconName; node: ReactNode; status: StepStatus; runningLabel?: string }
 
 export type ToolState = 'input-streaming' | 'input-available' | 'output-available' | 'output-error' | 'output-denied' | 'approval-requested' | 'approval-responded'
 
@@ -47,7 +47,7 @@ function Breathing({ children }: { children: ReactNode }) {
 }
 
 // Distinct tools in order of first use, so a new one lands at the end of the stack instead of reshuffling it.
-const usedSymbols = (items: StepItem[]): SFSymbol[] => [...new Set(items.map(item => item.symbol))]
+const usedSymbols = (items: StepItem[]): IconName[] => [...new Set(items.map(item => item.symbol))]
 
 function ToolStack({ items }: { items: StepItem[] }) {
     const theme = useTheme()
@@ -58,7 +58,7 @@ function ToolStack({ items }: { items: StepItem[] }) {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {shown.map((symbol, i) => (
                 <Animated.View key={symbol} entering={FadeIn.duration(250)} style={{ width: STACKED_SIZE, height: STACKED_SIZE, marginLeft: i > 0 ? -4 : 0, alignItems: 'center', justifyContent: 'center', borderRadius: STACKED_SIZE / 2, borderWidth: 2, borderColor: theme.background, backgroundColor: theme.muted }}>
-                    <SymbolView name={symbol} size={10} tintColor={theme.mutedForeground} />
+                    <Icon name={symbol} size={10} color={theme.mutedForeground} />
                 </Animated.View>
             ))}
             {hidden > 0 && (
@@ -163,7 +163,7 @@ export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: stri
                             {t('failed', { failed })}
                         </AppText>
                     )}
-                    <SymbolView name="chevron.right" size={10} weight="semibold" tintColor={theme.mutedForeground} style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }} />
+                    <Icon name="chevron-right" size={10} bold color={theme.mutedForeground} style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }} />
                 </Pressable>
             </View>
             {open && (
@@ -178,7 +178,7 @@ export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: stri
 /** One step of an agent's work on a single line, which opens on what went in and what came out. */
 // `defaultOpen`: a step that opens on its own while it runs (a delegation and its tasks), and folds
 // back once it settles.
-export function StepRow({ symbol, label, detail, status, elapsed, defaultOpen = false, children }: { symbol: SFSymbol; label: string; detail?: string; status: StepStatus; elapsed?: ReactNode; defaultOpen?: boolean; children?: ReactNode }) {
+export function StepRow({ symbol, label, detail, status, elapsed, defaultOpen = false, children }: { symbol: IconName; label: string; detail?: string; status: StepStatus; elapsed?: ReactNode; defaultOpen?: boolean; children?: ReactNode }) {
     const theme = useTheme()
     const [open, setOpen] = useState(defaultOpen)
     const wasOpenByDefault = useRef(defaultOpen)
@@ -195,13 +195,13 @@ export function StepRow({ symbol, label, detail, status, elapsed, defaultOpen = 
     return (
         <View>
             <Pressable disabled={!expandable} onPress={() => setOpen(current => !current)} accessibilityRole="button" accessibilityState={{ expanded: open }} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, minHeight: ROW_HEIGHT, paddingHorizontal: 6, borderRadius: radius.sm, backgroundColor: pressed ? theme.muted : 'transparent' })}>
-                <SymbolView name={symbol} size={13} tintColor={theme.mutedForeground} />
+                <Icon name={symbol} size={13} color={theme.mutedForeground} />
                 <View style={{ flexShrink: 0, maxWidth: '60%' }}>{status === 'running' ? <Breathing>{title}</Breathing> : title}</View>
                 <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
                     {detail}
                 </AppText>
                 {elapsed}
-                {expandable && <SymbolView name="chevron.right" size={10} weight="semibold" tintColor={theme.mutedForeground} style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }} />}
+                {expandable && <Icon name="chevron-right" size={10} bold color={theme.mutedForeground} style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }} />}
             </Pressable>
             {open && expandable && <View style={{ gap: 6, marginHorizontal: 6, marginBottom: spacing.xs }}>{children}</View>}
         </View>
@@ -313,5 +313,5 @@ export function CompactionStep({ data }: { data: CompactionData }) {
     const summarized = settled && typeof data.messagesCompacted === 'number' ? t('summarized', { count: formatNumber(data.messagesCompacted, locale) }) : undefined
     const recovered = settled && typeof data.tokensRecovered === 'number' ? t('recovered', { count: formatNumber(data.tokensRecovered, locale) }) : undefined
     const label = data.status === 'running' ? t('running') : data.status === 'error' ? t('failed') : t('done')
-    return <StepRow symbol="arrow.down.right.and.arrow.up.left" label={label} detail={[summarized, recovered].filter(Boolean).join(' · ')} status={data.status} />
+    return <StepRow symbol="minimize" label={label} detail={[summarized, recovered].filter(Boolean).join(' · ')} status={data.status} />
 }

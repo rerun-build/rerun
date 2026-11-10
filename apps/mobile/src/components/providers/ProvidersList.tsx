@@ -1,5 +1,4 @@
 import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnectionsView } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { Fragment } from 'react'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -9,6 +8,7 @@ import type { AccessReason } from '@/auth/access'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { Card, GROUPED_ROW_HEIGHT, Section, SectionTitle, Separator } from '@/components/ui/GroupedList'
+import { Icon } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -162,7 +162,7 @@ function AddRow({ testID, label, disabled, onPress }: { testID: string; label: s
     return (
         <Pressable testID={testID} onPress={onPress} disabled={disabled} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled }} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT, paddingHorizontal: spacing.lg, backgroundColor: pressed ? theme.muted : 'transparent', opacity: disabled ? 0.45 : 1 })}>
             <View style={{ width: LOGO_TILE, alignItems: 'center' }}>
-                <SymbolView name="plus" size={15} weight="semibold" tintColor={theme.foreground} />
+                <Icon name="plus" size={15} bold color={theme.foreground} />
             </View>
             <AppText variant="body">{label}</AppText>
         </Pressable>

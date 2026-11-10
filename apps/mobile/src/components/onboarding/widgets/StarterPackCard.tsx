@@ -1,7 +1,6 @@
 import { MAX_STARTER_PICKS } from '@rerun/contracts'
 import * as Haptics from 'expo-haptics'
 import { Image } from 'expo-image'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -10,6 +9,7 @@ import { AnswerInput } from '@/components/chat/hitl/QuestionWidget'
 import { usePaneSize } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -28,7 +28,7 @@ function PackCard({ card, width, picked, onToggle }: { card: StarterCard; width:
                 {image && <Image source={{ uri: image }} contentFit="cover" style={{ flex: 1 }} />}
                 {picked && (
                     <View style={{ position: 'absolute', top: spacing.sm, right: spacing.sm, width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.foreground }}>
-                        <SymbolView name="checkmark" size={11} weight="bold" tintColor={theme.background} />
+                        <Icon name="check" size={11} bold color={theme.background} />
                     </View>
                 )}
             </View>

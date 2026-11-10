@@ -3,7 +3,6 @@ import { fireEvent, render, screen } from '@testing-library/react-native'
 import { ApprovalWidget } from './ApprovalWidget'
 
 jest.mock('expo-haptics', () => ({ selectionAsync: jest.fn() }))
-jest.mock('expo-symbols', () => ({ SymbolView: () => null }))
 jest.mock('@/components/ui/BorderBeam', () => ({ BorderBeam: () => null }))
 
 const props = (kind: 'approval', input: Record<string, unknown>, output?: unknown) => ({ pending: { kind, toolCallId: 'call-1', input, output }, onAnswer: jest.fn(), onDismiss: jest.fn(), agentId: 'a1', coworkerName: 'Scout', webUrl: '' })

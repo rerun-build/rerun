@@ -1,10 +1,10 @@
 import { Host, Menu, RNHostView } from '@expo/ui/swift-ui'
 import { accessibilityLabel, glassEffect } from '@expo/ui/swift-ui/modifiers'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import type { ReactElement, ReactNode } from 'react'
 import { View } from 'react-native'
 
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 
 type NativeMenuProps = {
@@ -30,12 +30,12 @@ export function NativeMenu({ trigger, children, glass, label }: NativeMenuProps)
     )
 }
 
-// What a round glass trigger holds: an SF Symbol, or an avatar cut to the circle.
-export function CircleTrigger({ symbol, children }: { symbol?: SFSymbol; children?: ReactNode }) {
+// What a round glass trigger holds: an icon, or an avatar cut to the circle.
+export function CircleTrigger({ symbol, children }: { symbol?: IconName; children?: ReactNode }) {
     const theme = useTheme()
     return (
         <View style={{ width: GLASS_BUTTON_SIZE, height: GLASS_BUTTON_SIZE, borderRadius: GLASS_BUTTON_SIZE / 2, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-            {symbol ? <SymbolView name={symbol} size={18} weight="medium" tintColor={theme.foreground} /> : children}
+            {symbol ? <Icon name={symbol} size={18} color={theme.foreground} /> : children}
         </View>
     )
 }

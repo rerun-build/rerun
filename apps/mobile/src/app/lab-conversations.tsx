@@ -10,6 +10,7 @@ import { AppText } from '@/components/ui/AppText'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { GlassButton, GLASS_BUTTON_SIZE, useGlassStyle } from '@/components/ui/GlassButton'
 import { NativeMenu } from '@/components/ui/NativeMenu'
+import { systemSymbolOf } from '@/components/ui/system-symbols'
 import { LAB_CONVERSATIONS, type LabConversation } from '@/mocks/conversations'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -29,7 +30,7 @@ function MenuRow({ conversation }: { conversation: LabConversation }) {
     const detail = stateOf(conversation) === 'needs-you' ? conversation.ask : undefined
     return (
         <Button onPress={() => {}}>
-            {glyph ? <Image systemName={glyph} /> : <Text>{''}</Text>}
+            {glyph ? <Image systemName={systemSymbolOf(glyph)} /> : <Text>{''}</Text>}
             <Text>{conversation.title}</Text>
             {detail ? <Text>{detail}</Text> : <Text>{''}</Text>}
         </Button>
@@ -69,7 +70,7 @@ export default function ConversationsLab() {
             <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
                 <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} />
                 <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingHorizontal: spacing.lg, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                    <GlassButton symbol="chevron.left" label="Back" onPress={() => router.back()} />
+                    <GlassButton symbol="chevron-left" label="Back" onPress={() => router.back()} />
                     <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>
                         {variant === 'a' ? (
                             <NativeMenu glass="capsule" label={`${COWORKER.name}, conversations`} trigger={chip}>

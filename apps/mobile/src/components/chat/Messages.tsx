@@ -1,7 +1,6 @@
 import type { MessageFeedbackRating } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
 import * as Haptics from 'expo-haptics'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Pressable, Share, View, type ViewStyle } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
@@ -9,6 +8,7 @@ import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import type { Coworker } from '@/mocks/data'
 import { EASE_OUT, MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
@@ -50,7 +50,7 @@ function ExpandableText({ children }: { children: ReactNode }) {
                     <AppText variant="caption" style={{ color: '#ffffff', fontSize: 11, lineHeight: 15 }}>
                         {expanded ? t('showLess') : t('showMore')}
                     </AppText>
-                    <SymbolView name={expanded ? 'chevron.up' : 'chevron.down'} size={9} weight="semibold" tintColor="#ffffff" />
+                    <Icon name={expanded ? 'chevron-up' : 'chevron-down'} size={9} bold color="#ffffff" />
                 </Pressable>
             )}
         </View>
@@ -82,7 +82,7 @@ export function UserBubble({ text, media, owner = null, stamp, children, footer 
                     )}
                     {files.map((file, index) => (
                         <Pressable key={file.url} onPress={() => openViewer(files, index)} accessibilityRole="button" accessibilityLabel={t('open', { name: file.name })} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, maxWidth: '100%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: theme.border, backgroundColor: pressed ? theme.muted : theme.card })}>
-                            <SymbolView name="doc.text" size={15} tintColor={theme.mutedForeground} />
+                            <Icon name="file-text" size={15} color={theme.mutedForeground} />
                             <AppText variant="footnote" medium numberOfLines={1} style={{ flexShrink: 1 }}>
                                 {file.name}
                             </AppText>
@@ -104,11 +104,11 @@ export function UserBubble({ text, media, owner = null, stamp, children, footer 
     )
 }
 
-export function Action({ symbol, label, onPress, selected }: { symbol: SFSymbol; label: string; onPress: () => void; selected?: boolean }) {
+export function Action({ symbol, label, onPress, selected }: { symbol: IconName; label: string; onPress: () => void; selected?: boolean }) {
     const theme = useTheme()
     return (
         <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} accessibilityState={selected === undefined ? undefined : { selected }} hitSlop={8} style={({ pressed }) => ({ width: 36, height: 36, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.5 : 1 })}>
-            <SymbolView name={symbol} size={17} tintColor={selected ? theme.foreground : theme.mutedForeground} />
+            <Icon name={symbol} size={17} color={selected ? theme.foreground : theme.mutedForeground} />
         </Pressable>
     )
 }
@@ -154,19 +154,19 @@ export function AssistantMessage({ text, showActions, streaming = false, owner =
             {showActions && (
                 <View style={{ flexDirection: 'row', marginLeft: -spacing.sm }}>
                     <Action
-                        symbol="doc.on.doc"
+                        symbol="copy"
                         label={t('copy')}
                         onPress={() => {
                             Clipboard.setStringAsync(plain)
                             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
                         }}
                     />
-                    <Action symbol="square.and.arrow.up" label={t('share')} onPress={() => Share.share({ message: plain })} />
-                    {actions?.onRegenerate && <Action symbol="arrow.clockwise" label={t('regenerate')} onPress={actions.onRegenerate} />}
+                    <Action symbol="share" label={t('share')} onPress={() => Share.share({ message: plain })} />
+                    {actions?.onRegenerate && <Action symbol="rotate-cw" label={t('regenerate')} onPress={actions.onRegenerate} />}
                     {actions?.onRate && (
                         <>
-                            <Action symbol={actions.rating === 'up' ? 'hand.thumbsup.fill' : 'hand.thumbsup'} label={t('goodResponse')} selected={actions.rating === 'up'} onPress={() => rate('up')} />
-                            <Action symbol={actions.rating === 'down' ? 'hand.thumbsdown.fill' : 'hand.thumbsdown'} label={t('badResponse')} selected={actions.rating === 'down'} onPress={() => rate('down')} />
+                            <Action symbol={actions.rating === 'up' ? 'thumbs-up-fill' : 'thumbs-up'} label={t('goodResponse')} selected={actions.rating === 'up'} onPress={() => rate('up')} />
+                            <Action symbol={actions.rating === 'down' ? 'thumbs-down-fill' : 'thumbs-down'} label={t('badResponse')} selected={actions.rating === 'down'} onPress={() => rate('down')} />
                         </>
                     )}
                 </View>

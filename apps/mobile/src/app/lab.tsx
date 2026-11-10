@@ -94,6 +94,9 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Viewer: photos, PDF', href: '/lab-markdown?part=viewer' },
     { label: 'Message times, light', href: '/lab-message-times' },
     { label: 'Message times, dark', href: '/lab-message-times?scheme=dark' },
+    { label: 'Icons', href: '/lab-icons' },
+    { label: 'Icons, dark', href: '/lab-icons?scheme=dark' },
+    { label: 'Icons, 24 pt', href: '/lab-icons?size=24' },
     { label: 'Rerun on the Home', href: '/lab-foreman' },
     { label: 'Rerun chat, conversation', href: '/lab-chat?coworker=foreman&tabs=1&state=conversation' },
     { label: 'Rerun chat, running', href: '/lab-chat?coworker=foreman&tabs=1&state=running' },
@@ -234,9 +237,9 @@ function LabRecorderRow({ status, error = null }: { status: 'starting' | 'record
         <View style={{ gap: spacing.sm }}>
             <VoiceRecorderBar status={status} error={error} getLiveState={labLiveState} />
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <RoundButton symbol="xmark" label="Discard recording" tone="plain" disabled={status === 'processing'} onPress={noop} />
+                <RoundButton symbol="x" label="Discard recording" tone="plain" disabled={status === 'processing'} onPress={noop} />
                 <View style={{ flex: 1 }} />
-                {status === 'failed' ? <RoundButton symbol="arrow.clockwise" label="Retry" tone="primary" onPress={noop} /> : <RoundButton symbol="arrow.up" label="Send" tone="primary" busy={status !== 'recording'} onPress={noop} />}
+                {status === 'failed' ? <RoundButton symbol="rotate-cw" label="Retry" tone="primary" onPress={noop} /> : <RoundButton symbol="arrow-up" label="Send" tone="primary" busy={status !== 'recording'} onPress={noop} />}
             </View>
         </View>
     )
@@ -314,7 +317,7 @@ function Controls({ scheme }: { scheme: ColorScheme }) {
                 ))}
                 <View style={{ gap: spacing.sm }}>
                     <Button label="New chat" symbol="plus" size="lg" onPress={noop} />
-                    <Button label="Continue with email" variant="outline" size="lg" symbol="envelope" onPress={noop} />
+                    <Button label="Continue with email" variant="outline" size="lg" symbol="mail" onPress={noop} />
                     <Button label="Sending" size="lg" loading onPress={noop} />
                     <Button label="Disabled" size="lg" disabled onPress={noop} />
                     <Button label="Disabled" variant="outline" size="lg" disabled onPress={noop} />

@@ -5,7 +5,6 @@ import { runMcpConnect } from '@/lib/oauth-connect'
 
 import { McpWidget } from './McpWidget'
 
-jest.mock('expo-symbols', () => ({ SymbolView: () => null }))
 jest.mock('@/components/ui/BorderBeam', () => ({ BorderBeam: () => null }))
 jest.mock('expo-image', () => ({ Image: () => null }))
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: { access_token: 't' }, me: { workspace: { id: 7 } } }) }))

@@ -6,7 +6,6 @@ import { keyScript, mirrorScript, typeScript, viewerUrl } from '@/desktop/viewer
 
 import { TakeoverWidget } from './TakeoverWidget'
 
-jest.mock('expo-symbols', () => ({ SymbolView: () => null }))
 jest.mock('@/components/ui/BorderBeam', () => ({ BorderBeam: () => null }))
 jest.mock('@/config/environment', () => ({ environment: { apiUrl: 'https://hub.test' } }))
 jest.mock('react-native-webview', () => ({ WebView: () => null }))

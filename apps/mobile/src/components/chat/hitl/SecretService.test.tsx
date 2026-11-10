@@ -7,7 +7,6 @@ import { runConnect } from '@/lib/oauth-connect'
 import { SecretWidget } from './SecretWidget'
 import { ServiceWidget } from './ServiceWidget'
 
-jest.mock('expo-symbols', () => ({ SymbolView: () => null }))
 jest.mock('@/components/ui/BorderBeam', () => ({ BorderBeam: () => null }))
 jest.mock('expo-image', () => ({ Image: () => null }))
 jest.mock('expo-web-browser', () => ({ openBrowserAsync: jest.fn() }))

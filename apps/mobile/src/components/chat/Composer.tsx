@@ -143,22 +143,22 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     const actions = running ? (
         canSend ? (
             <>
-                <RoundButton symbol="stop.fill" label={t('stop')} onPress={stop} />
-                <RoundButton symbol="arrow.up" label={t('send')} tone="primary" onPress={() => onSend()} />
+                <RoundButton symbol="stop-fill" label={t('stop')} onPress={stop} />
+                <RoundButton symbol="arrow-up" label={t('send')} tone="primary" onPress={() => onSend()} />
             </>
         ) : (
-            <RoundButton symbol="stop.fill" label={t('stop')} tone="primary" onPress={stop} />
+            <RoundButton symbol="stop-fill" label={t('stop')} tone="primary" onPress={stop} />
         )
     ) : !canSend ? (
         canRecord ? (
             <RoundButton symbol="mic" label={t('recordVoice')} tone="primary" onPress={startRecording} />
         ) : (
-            <RoundButton symbol="arrow.up" label={t('send')} tone="primary" disabled onPress={() => onSend()} />
+            <RoundButton symbol="arrow-up" label={t('send')} tone="primary" disabled onPress={() => onSend()} />
         )
     ) : (
         <>
             {!hasText && canRecord && <RoundButton symbol="mic" label={t('recordVoice')} onPress={startRecording} />}
-            <RoundButton symbol="arrow.up" label={t('send')} tone="primary" onPress={() => onSend()} />
+            <RoundButton symbol="arrow-up" label={t('send')} tone="primary" onPress={() => onSend()} />
         </>
     )
 
@@ -193,9 +193,9 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                         {recording ? (
                             <>
-                                <RoundButton symbol="xmark" label={t('discardRecording')} tone="plain" disabled={recorder.status === 'processing'} onPress={() => void recorder.discard()} />
+                                <RoundButton symbol="x" label={t('discardRecording')} tone="plain" disabled={recorder.status === 'processing'} onPress={() => void recorder.discard()} />
                                 <View style={{ flex: 1 }} />
-                                {recorder.status === 'failed' ? <RoundButton symbol="arrow.clockwise" label={t('retryRecording')} tone="primary" onPress={recorder.retry} /> : <RoundButton symbol="arrow.up" label={t('sendRecording')} tone="primary" busy={recorder.status !== 'recording'} onPress={() => void recorder.finish()} />}
+                                {recorder.status === 'failed' ? <RoundButton symbol="rotate-cw" label={t('retryRecording')} tone="primary" onPress={recorder.retry} /> : <RoundButton symbol="arrow-up" label={t('sendRecording')} tone="primary" busy={recorder.status !== 'recording'} onPress={() => void recorder.finish()} />}
                             </>
                         ) : (
                             <>

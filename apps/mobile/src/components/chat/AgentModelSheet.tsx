@@ -1,7 +1,6 @@
 import type { AgentModels, SetAgentModelInput } from '@rerun/contracts'
 import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
 import { Fragment, useCallback, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -14,6 +13,7 @@ import { ReadOnlyNote } from '@/components/providers/bits'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { Card, SectionTitle, Separator } from '@/components/ui/GroupedList'
+import { Icon } from '@/components/ui/Icon'
 import { ModelRow } from '@/components/ui/ModelRow'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import { useCoworkerAccess } from '@/data/useCoworkerAccess'
@@ -68,7 +68,7 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <GlassButton symbol="xmark" label={t('close')} onPress={() => router.back()} />
+                    <GlassButton symbol="x" label={t('close')} onPress={() => router.back()} />
                     <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
                         {t('title')}
                     </AppText>
@@ -85,7 +85,7 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
 
                 {models && boxDefault && (
                     <Card>
-                        <ModelRow id="model-default" label={t('workspaceDefault')} description={defaultGroup?.models.find(model => model.id === boxDefault.model)?.label ?? boxDefault.model} selected={!pinned} disabled={lock.locked} leading={<SymbolView name="square.stack.3d.up" size={16} tintColor={theme.mutedForeground} />} onPress={() => pick({ connectionId: null, model: null })} />
+                        <ModelRow id="model-default" label={t('workspaceDefault')} description={defaultGroup?.models.find(model => model.id === boxDefault.model)?.label ?? boxDefault.model} selected={!pinned} disabled={lock.locked} leading={<Icon name="layers" size={16} color={theme.mutedForeground} />} onPress={() => pick({ connectionId: null, model: null })} />
                     </Card>
                 )}
 
@@ -106,7 +106,7 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
                 {models && (
                     <View style={{ gap: spacing.sm }}>
                         <Card>
-                            <ModelRow id="model-add-provider" label={t('addProvider')} selected={false} disabled={!workspaceAdmin} leading={<SymbolView name="plus" size={15} weight="semibold" tintColor={theme.foreground} />} onPress={addProvider} />
+                            <ModelRow id="model-add-provider" label={t('addProvider')} selected={false} disabled={!workspaceAdmin} leading={<Icon name="plus" size={15} bold color={theme.foreground} />} onPress={addProvider} />
                         </Card>
                         {!workspaceAdmin && <ReadOnlyNote reason={AI_PROVIDERS_ADMIN_ONLY} />}
                     </View>

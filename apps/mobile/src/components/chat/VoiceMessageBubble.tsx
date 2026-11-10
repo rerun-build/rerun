@@ -1,9 +1,9 @@
 import { PEAK_COUNT, type VoiceMessage } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { fonts, spacing } from '@/theme/tokens'
 
 import type { VoicePlayback } from './useVoicePlayback'
@@ -23,7 +23,7 @@ export function VoiceMessageBubble({ voice, playback }: { voice: VoiceMessage; p
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm + 2 }}>
             <Pressable onPress={toggle} disabled={!playable || loading} accessibilityRole="button" accessibilityLabel={playing ? t('pause') : t('play')} accessibilityState={{ disabled: !playable, busy: loading }} hitSlop={6} style={({ pressed }) => ({ width: BUTTON, height: BUTTON, borderRadius: BUTTON / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: `rgba(255,255,255,${pressed ? 0.25 : 0.15})`, opacity: readable ? 1 : 0.5 })}>
-                {loading ? <ActivityIndicator size="small" color="#ffffff" /> : <SymbolView name={playing ? 'pause.fill' : 'play.fill'} size={13} tintColor="#ffffff" />}
+                {loading ? <ActivityIndicator size="small" color="#ffffff" /> : <Icon name={playing ? 'pause-fill' : 'play-fill'} size={13} color="#ffffff" />}
             </Pressable>
             <Pressable onPress={event => seekAt(event.nativeEvent.locationX / WAVE_WIDTH)} disabled={!loaded} accessibilityLabel={t('seek')}>
                 <VoiceWaveform peaks={peaks} progress={progress} color="#ffffff" width={WAVE_WIDTH} />

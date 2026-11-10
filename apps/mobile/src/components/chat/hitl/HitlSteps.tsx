@@ -1,11 +1,11 @@
 import * as Haptics from 'expo-haptics'
-import { SymbolView } from 'expo-symbols'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 import Animated, { interpolateColor, useAnimatedRef, useAnimatedScrollHandler, useAnimatedStyle, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { spacing, withAlpha } from '@/theme/tokens'
 
@@ -29,7 +29,7 @@ function Chevron({ direction, disabled, onPress }: { direction: 'left' | 'right'
             hitSlop={6}
             style={({ pressed }) => ({ width: CHEVRON, height: CHEVRON, alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.35 : pressed ? 0.5 : 1 })}
         >
-            <SymbolView name={direction === 'left' ? 'chevron.left' : 'chevron.right'} size={12} weight="semibold" tintColor={theme.mutedForeground} />
+            <Icon name={direction === 'left' ? 'chevron-left' : 'chevron-right'} size={12} bold color={theme.mutedForeground} />
         </Pressable>
     )
 }

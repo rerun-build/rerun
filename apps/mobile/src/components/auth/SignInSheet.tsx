@@ -100,7 +100,7 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
                 <Foreman thinking={thinking} />
                 {step.name !== 'start' && (
                     <View style={{ position: 'absolute', top: spacing.lg, left: spacing.lg, zIndex: 1 }}>
-                        <GlassButton symbol="chevron.left" label={t('back')} onPress={back} />
+                        <GlassButton symbol="chevron-left" label={t('back')} onPress={back} />
                     </View>
                 )}
                 <Animated.View style={[{ overflow: 'hidden' }, frame]}>

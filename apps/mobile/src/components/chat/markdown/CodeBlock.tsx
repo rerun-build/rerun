@@ -1,6 +1,5 @@
 import * as Clipboard from 'expo-clipboard'
 import * as Haptics from 'expo-haptics'
-import { SymbolView } from 'expo-symbols'
 import { Highlight, themes } from 'prism-react-renderer'
 import { useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
@@ -8,6 +7,7 @@ import { useTranslations } from 'use-intl'
 
 import { HorizontalScroll } from '@/components/chat/HorizontalScroll'
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing, withAlpha } from '@/theme/tokens'
 
@@ -35,7 +35,7 @@ function CopyButton({ text, disabled }: { text: string; disabled?: boolean }) {
             hitSlop={8}
             style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: spacing.sm, height: 28, opacity: disabled ? 0.4 : pressed ? 0.5 : 1 })}
         >
-            <SymbolView name={copied ? 'checkmark' : 'doc.on.doc'} size={13} weight="medium" tintColor={copied ? '#10b981' : theme.mutedForeground} />
+            <Icon name={copied ? 'check' : 'copy'} size={13} color={copied ? '#10b981' : theme.mutedForeground} />
             <AppText variant="caption" tone="muted">
                 {copied ? t('copied') : t('copy')}
             </AppText>

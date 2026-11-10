@@ -1,5 +1,4 @@
 import * as Haptics from 'expo-haptics'
-import { SymbolView } from 'expo-symbols'
 import { useRef, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
@@ -7,6 +6,7 @@ import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
+import { Icon } from '@/components/ui/Icon'
 import { UnreadDot } from '@/components/ui/UnreadDot'
 import type { StatusLine } from '@/components/ui/status'
 import { useTimeAgo } from '@/lib/time'
@@ -59,7 +59,7 @@ export function PinSwipe({ pin, children }: { pin: PinControl; children: ReactNo
             onSwipeableOpen={toggle}
             renderRightActions={() => (
                 <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden style={{ width: PIN_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
-                    <SymbolView name={pin.pinned ? 'pin.slash.fill' : 'pin.fill'} size={18} weight="semibold" tintColor="#ffffff" />
+                    <Icon name={pin.pinned ? 'pin-off' : 'pin'} size={18} bold color="#ffffff" />
                     <AppText variant="caption" medium maxFontSizeMultiplier={1.2} style={{ color: '#ffffff' }}>
                         {label}
                     </AppText>

@@ -1,6 +1,5 @@
 import type { CoworkerRule, InboxItem } from '@rerun/contracts'
 import * as Haptics from 'expo-haptics'
-import { SymbolView } from 'expo-symbols'
 import { useRef } from 'react'
 import { ActionSheetIOS, Pressable, View } from 'react-native'
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
@@ -11,6 +10,7 @@ import { minutesSince } from '@/components/home/board'
 import { moodOfInbox } from '@/components/inbox/inbox'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
+import { Icon } from '@/components/ui/Icon'
 import { useTimeAgo } from '@/lib/time'
 import { useTheme } from '@/theme/theme'
 import { brand, spacing } from '@/theme/tokens'
@@ -60,7 +60,7 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
             onSwipeableOpen={markRead}
             renderRightActions={() => (
                 <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden style={{ width: ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
-                    <SymbolView name="checkmark" size={18} weight="semibold" tintColor="#ffffff" />
+                    <Icon name="check" size={18} bold color="#ffffff" />
                     <AppText variant="caption" medium maxFontSizeMultiplier={1.2} style={{ color: '#ffffff' }}>
                         {t('row.read')}
                     </AppText>

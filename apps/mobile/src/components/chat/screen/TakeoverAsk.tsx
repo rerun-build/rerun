@@ -1,9 +1,9 @@
-import { SymbolView } from 'expo-symbols'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { HitlAction, HitlIcon } from '@/components/chat/hitl/HitlCard'
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
@@ -18,7 +18,7 @@ export function TakeoverAsk({ takeover }: { takeover: TakeoverRequestState }) {
     return (
         <View style={{ gap: spacing.md, padding: spacing.md }}>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm + 2 }}>
-                <HitlIcon symbol="display" />
+                <HitlIcon symbol="monitor" />
                 <View style={{ flex: 1, gap: 2 }}>
                     <AppText variant="callout" medium>
                         {takeover.reason}
@@ -28,7 +28,7 @@ export function TakeoverAsk({ takeover }: { takeover: TakeoverRequestState }) {
                     </AppText>
                 </View>
                 <Pressable onPress={takeover.onSkip} disabled={locked} accessibilityRole="button" accessibilityLabel={t('skipTakeover')} hitSlop={12} style={({ pressed }) => ({ paddingTop: 4, opacity: locked ? 0.4 : pressed ? 0.5 : 1 })}>
-                    <SymbolView name="xmark" size={13} weight="semibold" tintColor={theme.mutedForeground} />
+                    <Icon name="x" size={13} bold color={theme.mutedForeground} />
                 </Pressable>
             </View>
             <AppText variant="caption" style={{ color: theme.mutedForeground, opacity: 0.7 }}>

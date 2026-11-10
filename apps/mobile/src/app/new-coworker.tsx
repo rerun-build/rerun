@@ -1,7 +1,6 @@
 import type { Box } from '@rerun/contracts'
 import * as Haptics from 'expo-haptics'
 import { router, useLocalSearchParams } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
 import { useEffect, useState } from 'react'
 import { Alert, Pressable, ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -12,6 +11,7 @@ import { boxForNewCoworker, manageableBoxes, newCoworkerBlocker } from '@/auth/a
 import { useAuth, useIsWorkspaceAdmin } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
+import { Icon } from '@/components/ui/Icon'
 import { PillButton } from '@/components/ui/PillButton'
 import { TextField } from '@/components/ui/TextField'
 import { useTheme } from '@/theme/theme'
@@ -26,11 +26,11 @@ function BoxRow({ box, selected, onPress, divided }: { box: Box; selected: boole
     const label = box.name || t('untitledBox')
     return (
         <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected }} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 48, paddingHorizontal: spacing.lg, borderTopWidth: divided ? 1 : 0, borderTopColor: theme.border, backgroundColor: pressed ? theme.muted : 'transparent' })}>
-            <SymbolView name="square.dashed" size={16} tintColor={theme.mutedForeground} />
+            <Icon name="square-dashed" size={16} color={theme.mutedForeground} />
             <AppText variant="body" numberOfLines={1} style={{ flex: 1 }}>
                 {label}
             </AppText>
-            {selected && <SymbolView name="checkmark" size={16} weight="semibold" tintColor={theme.scheme === 'dark' ? brand.soft : brand.base} />}
+            {selected && <Icon name="check" size={16} bold color={theme.scheme === 'dark' ? brand.soft : brand.base} />}
         </Pressable>
     )
 }
@@ -86,7 +86,7 @@ export default function NewCoworker() {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <GlassButton symbol="xmark" label={tCommon('actions.close')} onPress={() => router.back()} />
+                <GlassButton symbol="x" label={tCommon('actions.close')} onPress={() => router.back()} />
                 <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
                     {t('title')}
                 </AppText>

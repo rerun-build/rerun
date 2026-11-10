@@ -64,7 +64,7 @@ export function PreferencesSheet() {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <GlassButton symbol="xmark" label={t('close')} onPress={() => router.back()} />
+                <GlassButton symbol="x" label={t('close')} onPress={() => router.back()} />
                 <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
                     {t('title')}
                 </AppText>

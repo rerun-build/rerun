@@ -1,12 +1,12 @@
 import { EMAIL_CATEGORIES, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@rerun/contracts'
 import type { PermissionStatus } from 'expo-notifications'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { ActionSheetIOS, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CheckRow, GROUPED_ROW_HEIGHT, ICON_ROW_INSET, Section, SectionTitle, Separator, SettingsRow, SwitchRow } from '@/components/ui/GroupedList'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { translatorFor } from '@/i18n/translator'
 import { useTheme } from '@/theme/theme'
@@ -14,11 +14,11 @@ import { spacing } from '@/theme/tokens'
 
 export type CoworkerOption = { id: string; name: string }
 
-export const SCOPE_SYMBOLS: Record<NotificationScope, SFSymbol> = {
-    everything: 'person.3',
-    mine: 'person.crop.circle.badge.checkmark',
+export const SCOPE_SYMBOLS: Record<NotificationScope, IconName> = {
+    everything: 'users',
+    mine: 'user-check',
     needed: 'bell',
-    nothing: 'bell.slash',
+    nothing: 'bell-off',
 }
 
 export type SettingsTranslator = ReturnType<typeof translatorFor<'mobileSettings'>>
@@ -52,7 +52,7 @@ function PushOff({ push, onEnablePush, onOpenIosSettings }: Pick<NotificationCen
     return (
         <View style={{ gap: spacing.sm }}>
             <Card>
-                <SettingsRow icon="bell.slash" label={t('label')} value={t('off')} />
+                <SettingsRow icon="bell-off" label={t('label')} value={t('off')} />
                 <Separator inset={ICON_ROW_INSET} />
                 {push === 'undetermined' ? <SettingsRow label={t('turnOn')} onPress={onEnablePush} /> : <SettingsRow label={t('openIosSettings')} accessory="external" onPress={onOpenIosSettings} />}
             </Card>
@@ -73,7 +73,7 @@ function CoworkerRuleRow({ name, value, onPress }: { name: string; value: string
             <AppText variant="body" tone="muted" numberOfLines={1}>
                 {value}
             </AppText>
-            <SymbolView name="chevron.right" size={13} weight="medium" tintColor={theme.mutedForeground} />
+            <Icon name="chevron-right" size={13} color={theme.mutedForeground} />
         </Pressable>
     )
 }

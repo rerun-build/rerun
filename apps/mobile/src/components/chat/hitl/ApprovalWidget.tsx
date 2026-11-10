@@ -55,7 +55,7 @@ export function ApprovalWidget({ pending, onAnswer }: HitlWidgetProps) {
     if (!item) return null
 
     return (
-        <HitlCard symbol="checkmark.shield" beam="orange" label={t('approval.label')}>
+        <HitlCard symbol="shield-check" beam="orange" label={t('approval.label')}>
             <HitlSteps
                 count={approvals.length}
                 index={index}

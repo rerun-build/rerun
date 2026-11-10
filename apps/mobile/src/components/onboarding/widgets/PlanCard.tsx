@@ -1,10 +1,10 @@
-import { SymbolView } from 'expo-symbols'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -27,7 +27,7 @@ function Agent({ agent }: { agent: PlanAgent }) {
             </View>
             {agent.when.length > 0 && (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                    <SymbolView name="clock" size={12} tintColor={theme.mutedForeground} />
+                    <Icon name="clock" size={12} color={theme.mutedForeground} />
                     <AppText variant="footnote" tone="muted">
                         {agent.when}
                     </AppText>
@@ -37,7 +37,7 @@ function Agent({ agent }: { agent: PlanAgent }) {
                 <View style={{ gap: spacing.xs }}>
                     {agent.gets.map(line => (
                         <View key={line} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
-                            <SymbolView name="checkmark" size={11} weight="semibold" tintColor={theme.foreground} style={{ marginTop: 4 }} />
+                            <Icon name="check" size={11} bold color={theme.foreground} style={{ marginTop: 4 }} />
                             <AppText variant="callout" style={{ flex: 1 }}>
                                 {line}
                             </AppText>
@@ -64,7 +64,7 @@ export function PlanCard({ input, answered, onAnswer }: { input: unknown; answer
                 <View key={box.name ?? 'all'} style={{ gap: spacing.md }}>
                     {box.name && (
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                            <SymbolView name="square.dashed" size={12} tintColor={theme.mutedForeground} />
+                            <Icon name="square-dashed" size={12} color={theme.mutedForeground} />
                             <AppText variant="caption" tone="muted">
                                 {box.name}
                             </AppText>
@@ -77,7 +77,7 @@ export function PlanCard({ input, answered, onAnswer }: { input: unknown; answer
             ))}
             {answered ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                    <SymbolView name={answered.answered && answered.confirmed ? 'checkmark.circle.fill' : 'pencil'} size={13} tintColor={theme.mutedForeground} />
+                    <Icon name={answered.answered && answered.confirmed ? 'circle-check-fill' : 'pencil'} size={13} color={theme.mutedForeground} />
                     <AppText variant="footnote" tone="muted">
                         {answered.answered && answered.confirmed ? t('plan.confirmed') : answered.answered ? t('plan.changesAsked') : t('plan.skipped')}
                     </AppText>
