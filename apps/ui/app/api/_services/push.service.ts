@@ -6,7 +6,7 @@ import { pushCopyOf } from '@/lib/notifications/push-copy'
 import { pushAllowed, pushWindowStart } from '@/lib/notifications/push-limits'
 import { wantsPush, type NotificationRecipients, type RoutedMember } from '@/lib/notifications/routing'
 import { selectCount, selectMany } from '@/supabase/supabase-helpers'
-import type { PushData } from '@rerun/contracts'
+import { ANDROID_PUSH_CHANNELS, type AndroidPushChannel, type PushData } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 type DispatchInsert = Database['public']['Tables']['notification_push_dispatches']['Insert']
@@ -14,9 +14,15 @@ type DeviceTokenUpdate = Database['public']['Tables']['device_tokens']['Update']
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send'
 
-// Expo holds the APNs credentials, so the hub sends a plain POST rather than keeping an HTTP/2
+// Expo holds the APNs and FCM credentials, so the hub sends a plain POST rather than keeping an HTTP/2
 // connection open to Apple, which a route handler is in no position to do.
-type ExpoMessage = { to: string; title: string; subtitle: string; body?: string; sound?: 'default'; data: PushData }
+type ExpoMessage = { to: string; title: string; subtitle?: string; body?: string; sound?: 'default'; channelId?: AndroidPushChannel; priority?: 'high'; data: PushData }
+
+// On Android the channel, not the message, decides whether a push rings, and a normal-priority FCM
+// message waits for a sleeping phone to wake on its own: a question would sit unseen for minutes.
+function androidFieldsOf(silent: boolean): Pick<ExpoMessage, 'channelId' | 'priority'> {
+    return silent ? { channelId: ANDROID_PUSH_CHANNELS.silent } : { channelId: ANDROID_PUSH_CHANNELS.messages, priority: 'high' }
+}
 
 export type PushContext = {
     workspaceId: number
@@ -54,19 +60,20 @@ async function pushToUser(supabase: SupabaseClient<Database>, userId: string, no
     ])
     if (!pushAllowed({ sourceCount: sourceCount.data ?? 0, userCount: userCount.data ?? 0 })) return
 
-    const { data: devices } = await selectMany(supabase, 'device_tokens', ['token'] as const, { user_id: userId, revoked_at: { isNull: true } })
+    const { data: devices } = await selectMany(supabase, 'device_tokens', ['token', 'platform'] as const, { user_id: userId, revoked_at: { isNull: true } })
     if (!devices?.length) return
 
     const { notification } = context
     const locale = await recipientLocale(supabase, userId, context.workspaceId)
     const [t, tErrors] = await Promise.all([translatorFor(locale, 'push'), translatorFor(locale, 'chatErrors')])
-    const { silent, ...copy } = pushCopyOf({ agentName: context.agentName, notification, t, tErrors })
-    const message = {
-        ...copy,
-        ...(silent ? {} : { sound: 'default' as const }),
-        data: { agentId: context.agentId, conversationId: context.conversationId, kind: notification.kind },
-    }
-    const sent = await sendToExpo(supabase, devices.map(device => ({ ...message, to: device.token })))
+    const { title, subtitle, androidTitle, body, silent } = pushCopyOf({ agentName: context.agentName, notification, t, tErrors })
+    const data = { agentId: context.agentId, conversationId: context.conversationId, kind: notification.kind }
+    const iosMessage = { title, subtitle, body, ...(silent ? {} : { sound: 'default' as const }), data }
+    const androidMessage = { title: androidTitle, body, ...androidFieldsOf(silent), data }
+    const sent = await sendToExpo(
+        supabase,
+        devices.map(device => ({ ...(device.platform === 'android' ? androidMessage : iosMessage), to: device.token })),
+    )
     if (!sent) return
 
     const { error } = await supabase.from('notification_push_dispatches').insert<DispatchInsert>({ user_id: userId, source_key: context.sourceKey })

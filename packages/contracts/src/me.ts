@@ -51,3 +51,9 @@ export const pushDataSchema = z.object({
     kind: z.string(),
 })
 export type PushData = z.infer<typeof pushDataSchema>
+
+// The Android notification channels the app creates before it asks for a token, and the hub names on
+// each Android push. A push naming a channel the phone does not know is dropped, and only the
+// channel's importance decides whether an Android push rings.
+export const ANDROID_PUSH_CHANNELS = { messages: 'messages', silent: 'silent' } as const
+export type AndroidPushChannel = (typeof ANDROID_PUSH_CHANNELS)[keyof typeof ANDROID_PUSH_CHANNELS]

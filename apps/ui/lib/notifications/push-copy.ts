@@ -2,10 +2,12 @@ import { friendlyError, type ChatErrorCopy } from '@/lib/chat-error'
 import type { NotificationKind } from '@/lib/engine/types'
 import type { StoredNotification } from '@/lib/notifications/inbound'
 
-export type PushCopy = { title: string; subtitle: string; body?: string; silent: boolean }
+// Android shows no subtitle, so its title carries what happened: a finished routine has no body and
+// would otherwise land as the coworker's name alone.
+export type PushCopy = { title: string; subtitle: string; androidTitle: string; body?: string; silent: boolean }
 
 // The `push` namespace, in the language of whoever receives it.
-export type PushTranslator = (key: `states.${NotificationKind}` | 'subtitle', values?: Record<string, string>) => string
+export type PushTranslator = (key: `states.${NotificationKind}` | 'subtitle' | 'androidTitle', values?: Record<string, string>) => string
 
 const BODY_LIMIT = 180
 
@@ -49,9 +51,11 @@ function oneLine(text: string | undefined): string | undefined {
 export function pushCopyOf({ agentName, notification, t, tErrors }: { agentName: string; notification: StoredNotification; t: PushTranslator; tErrors: ChatErrorCopy }): PushCopy {
     const sourceName = sourceNameOf(notification)
     const state = t(`states.${notification.kind}`)
+    const subtitle = sourceName ? t('subtitle', { source: sourceName, state }) : state
     return {
         title: agentName,
-        subtitle: sourceName ? t('subtitle', { source: sourceName, state }) : state,
+        subtitle,
+        androidTitle: t('androidTitle', { agent: agentName, subtitle }),
         body: oneLine(bodyOf(notification, tErrors)),
         silent: notification.kind === 'done',
     }

@@ -32,7 +32,7 @@ export function NotificationCenterScreen() {
     const t = useTranslations('mobileSettings.notifications')
     return (
         <SettingsSheet title={t('title')}>
-            <NotificationCenter prefs={prefs} failed={failed} coworkers={agents?.map(agent => ({ id: agent.id, name: agent.name })) ?? null} push={push.status} onEnablePush={push.enable} onOpenIosSettings={() => Linking.openSettings()} onPatch={update} onOpenCoworker={coworker => router.push({ pathname: '/settings/coworker/[id]', params: { id: coworker.id, name: coworker.name } })} />
+            <NotificationCenter prefs={prefs} failed={failed} coworkers={agents?.map(agent => ({ id: agent.id, name: agent.name })) ?? null} push={push.status} onEnablePush={push.enable} onOpenSettings={() => Linking.openSettings()} onPatch={update} onOpenCoworker={coworker => router.push({ pathname: '/settings/coworker/[id]', params: { id: coworker.id, name: coworker.name } })} />
         </SettingsSheet>
     )
 }
