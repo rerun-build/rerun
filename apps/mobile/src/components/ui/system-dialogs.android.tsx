@@ -1,5 +1,5 @@
-import { useState, useSyncExternalStore } from 'react'
-import { Modal, Pressable, StyleSheet, TextInput, View } from 'react-native'
+import { useRef, useState, useSyncExternalStore } from 'react'
+import { Modal, Pressable, StyleSheet, TextInput, View, type TextInputInstance } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { AppText } from '@/components/ui/AppText'
@@ -44,6 +44,7 @@ export function promptText(request: TextPromptRequest): void {
 const GRABBER = { width: 36, height: 4 }
 const ROW_HEIGHT = 52
 const DIALOG_MAX_WIDTH = 420
+const KEYBOARD_DELAY_MS = 250
 
 function ActionSheet({ request, onSelect }: { request: ActionSheetRequest; onSelect: (index: number) => void }) {
     const theme = useTheme()
@@ -92,6 +93,7 @@ function TextPrompt({ request }: { request: TextPromptRequest }) {
     const theme = useTheme()
     const [text, setText] = useState(request.defaultValue ?? '')
     const [focused, setFocused] = useState(false)
+    const input = useRef<TextInputInstance>(null)
     const t = translatorFor('mobileCommon')
     const cancel = () => {
         show(null)
@@ -102,7 +104,9 @@ function TextPrompt({ request }: { request: TextPromptRequest }) {
         request.onSubmit(text)
     }
     return (
-        <Modal visible transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={cancel}>
+        // The keyboard only opens once the modal's window has the focus, a moment after it shows: autoFocus,
+        // or a focus right on onShow, leaves the field focused with the keyboard closed.
+        <Modal visible transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={cancel} onShow={() => setTimeout(() => input.current?.focus(), KEYBOARD_DELAY_MS)}>
             <Pressable testID="prompt-backdrop" accessibilityLabel={request.cancelLabel ?? t('actions.cancel')} onPress={cancel} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
             <View style={{ flex: 1, alignItems: 'center', paddingTop: '28%', paddingHorizontal: spacing.xl }} pointerEvents="box-none">
                 <View accessibilityViewIsModal style={{ width: '100%', maxWidth: DIALOG_MAX_WIDTH, backgroundColor: theme.card, borderRadius: radius.xl, borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, padding: spacing.xl, gap: spacing.md }}>
@@ -115,10 +119,10 @@ function TextPrompt({ request }: { request: TextPromptRequest }) {
                         </AppText>
                     ) : null}
                     <TextInput
+                        ref={input}
                         testID="prompt-input"
                         value={text}
                         onChangeText={setText}
-                        autoFocus
                         selectTextOnFocus
                         accessibilityLabel={request.title}
                         onSubmitEditing={submit}
