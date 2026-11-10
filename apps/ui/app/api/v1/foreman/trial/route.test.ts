@@ -18,7 +18,7 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => ({
 const { POST } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
-const request = () => new Request('https://app.rerun.build/api/v1/foreman/trial', { method: 'POST' })
+const request = (client?: string) => new Request('https://app.rerun.build/api/v1/foreman/trial', { method: 'POST', headers: client ? { 'x-rerun-client': client } : {} })
 
 describe('POST /api/v1/foreman/trial', () => {
     beforeEach(() => {
@@ -31,6 +31,15 @@ describe('POST /api/v1/foreman/trial', () => {
         expect(await (await POST(request(), segment)).json()).toEqual({ entitled: true })
         expect(startCardlessTrial).toHaveBeenCalledWith('ios')
         expect(mergeForeman).toHaveBeenCalledWith(expect.anything(), { trialStartedIn: 'ios' })
+    })
+
+    it.each([
+        ['ios/1.4.0 (41)', 'ios'],
+        ['android/1.0.0 (3)', 'android'],
+    ])('starts it as the platform of %s', async (client, platform) => {
+        expect(await (await POST(request(client), segment)).json()).toEqual({ entitled: true })
+        expect(startCardlessTrial).toHaveBeenCalledWith(platform)
+        expect(mergeForeman).toHaveBeenCalledWith(expect.anything(), { trialStartedIn: platform })
     })
 
     it('marks nothing for a workspace that was already on', async () => {

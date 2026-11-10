@@ -15,8 +15,9 @@ const { POST } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
 
-function ask(body: object) {
-    return POST(new Request('https://app.rerun.build/api/v1/auth/phone/code', { method: 'POST', body: JSON.stringify(body), headers: { 'x-forwarded-for': '203.0.113.7', 'accept-language': 'fr-FR' } }), segment)
+function ask(body: object, client?: string) {
+    const headers: Record<string, string> = { 'x-forwarded-for': '203.0.113.7', 'accept-language': 'fr-FR', ...(client ? { 'x-rerun-client': client } : {}) }
+    return POST(new Request('https://app.rerun.build/api/v1/auth/phone/code', { method: 'POST', body: JSON.stringify(body), headers }), segment)
 }
 
 describe('POST /api/v1/auth/phone/code', () => {
@@ -35,6 +36,15 @@ describe('POST /api/v1/auth/phone/code', () => {
         expect(res.status).toBe(200)
         expect(await res.json()).toEqual({ channel: 'sms' })
         expect(startPhoneSignIn).toHaveBeenCalledWith('+33612345678', 'sms', '203.0.113.7', 'fr-FR', null, 'ios')
+    })
+
+    it.each([
+        ['ios/1.4.0 (41)', 'ios'],
+        ['android/1.0.0 (3)', 'android'],
+        ['curl/8', 'ios'],
+    ])('counts a code asked by %s in the window of %s', async (client, app) => {
+        expect((await ask({ phone: '0612345678', country: 'FR', channel: 'sms' }, client)).status).toBe(200)
+        expect(startPhoneSignIn).toHaveBeenCalledWith('+33612345678', 'sms', '203.0.113.7', 'fr-FR', null, app)
     })
 
     it('turns a number that is not one away before anything is sent', async () => {

@@ -4,7 +4,7 @@ import { BILLING_ENABLED } from '@rerun/cloud/billing'
 
 vi.mock('server-only', () => ({}))
 
-const { foremanEngineInstructions, foremanSystemPrompt } = await import('./prompt')
+const { MOBILE_APP_BLOCK, foremanEngineInstructions, foremanSystemPrompt } = await import('./prompt')
 import type { ForemanPlan, ForemanState } from './phase'
 
 const ASKED = 'Je cherche un worker capable de trouver des décisionnaires capables de me recruter en alternance'
@@ -79,23 +79,36 @@ describe('foremanSystemPrompt', () => {
 describe('foremanSystemPrompt in the app', () => {
     const PRICE = /\$\d|a month|card required|free trial|Start free trial|Talk to the team/i
 
-    it('keeps every price, card and trial out of the plan and trial steps', () => {
+    it.each(['ios', 'android'] as const)('keeps every price, card and trial out of the plan and trial steps on %s', client => {
         for (const phase of ['plan', 'trial'] as const) {
             for (const trialSpent of [false, true]) {
-                const prompt = foremanSystemPrompt(stateWith({ phase, entitled: false, trialSpent, client: 'ios', foreman: { ...stateWith({}).foreman, plan: PLAN } }))
-                expect(prompt).toContain('They are in the Rerun iPhone app.')
+                const prompt = foremanSystemPrompt(stateWith({ phase, entitled: false, trialSpent, client, foreman: { ...stateWith({}).foreman, plan: PLAN } }))
+                expect(prompt).toContain(MOBILE_APP_BLOCK)
+                expect(prompt).toContain('They are in the Rerun mobile app.')
                 expect(prompt).not.toMatch(PRICE)
             }
         }
     })
 
-    it.skipIf(!BILLING_ENABLED)('sends a spent trial to the web, and anything else back to the button', () => {
-        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, trialSpent: true, client: 'ios' }))).toContain('finish setting it up at rerun.build')
-        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, trialSpent: false, client: 'ios' }))).toContain('"Build my team" button right under your reply tries again')
+    it.each(['ios', 'android'] as const)('leaves the build to the button of the app at the plan step on %s', client => {
+        const prompt = foremanSystemPrompt(stateWith({ phase: 'plan', entitled: false, client, onboardingCompletedAt: null }))
+        expect(prompt).toContain('the app asks them to start the build')
+        expect(prompt).not.toContain('the app puts the free trial in front of them')
+    })
+
+    it.skipIf(!BILLING_ENABLED).each(['ios', 'android'] as const)('sends a spent trial to the web on %s, and anything else back to the button', client => {
+        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, trialSpent: true, client }))).toContain('finish setting it up at rerun.build')
+        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, trialSpent: false, client }))).toContain('"Build my team" button right under your reply tries again')
+    })
+
+    it('says nothing of the mobile app on the web', () => {
+        const prompt = foremanSystemPrompt(stateWith({ phase: 'plan', entitled: false, client: 'web', onboardingCompletedAt: null }))
+        expect(prompt).not.toContain(MOBILE_APP_BLOCK)
+        expect(prompt).toContain('the app puts the free trial in front of them')
     })
 
     it.skipIf(!BILLING_ENABLED)('still quotes the price on the web', () => {
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).toMatch(/\$49 a month/)
-        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).not.toContain('iPhone app')
+        expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).not.toContain('mobile app')
     })
 })

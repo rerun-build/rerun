@@ -7,6 +7,7 @@ import * as SecureStore from 'expo-secure-store'
 
 import { api, appBuild } from '@/api/client'
 import { onCustomServer } from '@/config/environment'
+import { clientPlatform } from '@/lib/client-platform'
 
 type Caller = { accessToken: string; workspaceId: number }
 
@@ -45,7 +46,7 @@ export async function registerDevice(caller: Caller): Promise<void> {
     const { status } = await Notifications.getPermissionsAsync()
     if (status !== 'granted') return
     const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId: Constants.expoConfig?.extra?.eas?.projectId })
-    await api('/api/v1/me/devices', { ...caller, method: 'POST', body: { token, platform: 'ios', appVersion: `${Application.nativeApplicationVersion ?? '0.0.0'} (${appBuild})` } })
+    await api('/api/v1/me/devices', { ...caller, method: 'POST', body: { token, platform: clientPlatform, appVersion: `${Application.nativeApplicationVersion ?? '0.0.0'} (${appBuild})` } })
     registeredToken = token
 }
 
@@ -72,7 +73,7 @@ export async function turnOnPush(caller: Caller): Promise<Notifications.Permissi
 // Signing out stops this phone ringing for that account.
 export async function unregisterDevice(caller: Caller): Promise<void> {
     if (!registeredToken) return
-    await api('/api/v1/me/devices', { ...caller, method: 'DELETE', body: { token: registeredToken, platform: 'ios' } })
+    await api('/api/v1/me/devices', { ...caller, method: 'DELETE', body: { token: registeredToken, platform: clientPlatform } })
     registeredToken = null
 }
 

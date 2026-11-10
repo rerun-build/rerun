@@ -3,6 +3,7 @@ import * as Application from 'expo-application'
 
 import { environment } from '@/config/environment'
 import { translatorFor } from '@/i18n/translator'
+import { clientPlatform } from '@/lib/client-platform'
 
 const WORKSPACE_HEADER = 'x-workspace-id'
 
@@ -56,6 +57,6 @@ export function createApiClient({ baseUrl, clientHeader, fetch: fetchImpl = fetc
 
 export const appBuild = Number(Application.nativeBuildVersion ?? 0)
 
-export const clientHeader = formatClientHeader({ platform: 'ios', version: Application.nativeApplicationVersion ?? '0.0.0', build: appBuild })
+export const clientHeader = formatClientHeader({ platform: clientPlatform, version: Application.nativeApplicationVersion ?? '0.0.0', build: appBuild })
 
 export const api = createApiClient({ baseUrl: environment.apiUrl, clientHeader })

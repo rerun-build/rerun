@@ -17,8 +17,8 @@ async function clientConfig(url = 'https://app.rerun.build/api/v1/client', heade
     return res.json()
 }
 
-async function minBuild(): Promise<number> {
-    return (await clientConfig()).minBuild
+async function minBuild(client?: string): Promise<number> {
+    return (await clientConfig(undefined, client ? { 'x-rerun-client': client } : {})).minBuild
 }
 
 describe('GET /api/v1/client', () => {
@@ -36,6 +36,29 @@ describe('GET /api/v1/client', () => {
         expect(await minBuild()).toBe(0)
         vi.stubEnv('MOBILE_IOS_MIN_BUILD', 'twelve')
         expect(await minBuild()).toBe(0)
+        vi.stubEnv('MOBILE_ANDROID_MIN_BUILD', '')
+        expect(await minBuild('android/1.0.0 (3)')).toBe(0)
+        vi.stubEnv('MOBILE_ANDROID_MIN_BUILD', 'three')
+        expect(await minBuild('android/1.0.0 (3)')).toBe(0)
+    })
+
+    it('answers each platform with its own minimum, read off the header the app sends', async () => {
+        vi.stubEnv('MOBILE_IOS_MIN_BUILD', '40')
+        vi.stubEnv('MOBILE_ANDROID_MIN_BUILD', '7')
+        expect(await minBuild('ios/1.4.0 (41)')).toBe(40)
+        expect(await minBuild('android/1.0.0 (8)')).toBe(7)
+    })
+
+    it('holds a call without a readable header to the iOS minimum: the iOS builds from before the header send none', async () => {
+        vi.stubEnv('MOBILE_IOS_MIN_BUILD', '40')
+        vi.stubEnv('MOBILE_ANDROID_MIN_BUILD', '7')
+        expect(await minBuild()).toBe(40)
+        expect(await minBuild('curl/8')).toBe(40)
+    })
+
+    it('never holds an Android build to the iOS minimum', async () => {
+        vi.stubEnv('MOBILE_IOS_MIN_BUILD', '40')
+        expect(await minBuild('android/1.0.0 (3)')).toBe(0)
     })
 
     it('names the Supabase project the hub signs people in with', async () => {

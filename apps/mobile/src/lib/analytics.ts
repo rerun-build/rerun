@@ -2,6 +2,7 @@ import type { AnalyticsEventMap, EventName } from '@rerun/analytics'
 import PostHog from 'posthog-react-native'
 
 import { environment } from '@/config/environment'
+import { clientPlatform } from '@/lib/client-platform'
 import { POSTHOG_TOKEN } from '@rerun/cloud-mobile/environments'
 
 // The client refuses an empty key; a build without a project gets this one, and is disabled.
@@ -11,7 +12,7 @@ const UNSET_TOKEN = 'phc_unset'
 // EXPO_PUBLIC_POSTHOG=1 asks for it, to check an event by hand.
 const enabled = Boolean(POSTHOG_TOKEN) && (environment.name === 'production' || process.env.EXPO_PUBLIC_POSTHOG === '1')
 
-const SUPER_PROPERTIES = { platform: 'ios', app_environment: environment.name }
+const SUPER_PROPERTIES = { platform: clientPlatform, app_environment: environment.name }
 
 // A JS error the app does not catch is fatal on iOS, and the crash report Apple keeps holds only the
 // native stack: the message reaches PostHog this way.

@@ -1,4 +1,4 @@
-import { Linking, View } from 'react-native'
+import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
@@ -7,7 +7,7 @@ import { PillButton } from '@/components/ui/PillButton'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-const APP_STORE_URL = 'https://apps.apple.com/app/id6825274993'
+import { openStoreListing } from './store-listing'
 
 export function UpdateRequired() {
     const theme = useTheme()
@@ -24,7 +24,7 @@ export function UpdateRequired() {
                     {t('update.body')}
                 </AppText>
             </View>
-            <PillButton label={common('actions.update')} onPress={() => Linking.openURL(APP_STORE_URL)} />
+            <PillButton label={common('actions.update')} onPress={() => void openStoreListing()} />
         </View>
     )
 }
