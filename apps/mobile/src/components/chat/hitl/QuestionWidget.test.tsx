@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native'
 
 import { QuestionWidget } from './QuestionWidget'
 
-jest.mock('expo-haptics', () => ({ selectionAsync: jest.fn() }))
+jest.mock('@/lib/haptics', () => ({ selectionAsync: jest.fn() }))
 jest.mock('@/components/ui/BorderBeam', () => ({ BorderBeam: () => null }))
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: null, me: null }) }))
 

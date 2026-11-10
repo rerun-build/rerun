@@ -1,4 +1,5 @@
-import { initialSymbolOf, logoUrlOf, workspaceInitials } from '@/components/home/workspace-logos'
+import { logoUrlOf, workspaceInitials } from '@/components/home/workspace-logos'
+import { initialSymbol } from '@/components/ui/system-symbols'
 
 jest.mock('expo-file-system', () => ({ Directory: class {}, File: class {}, Paths: {} }))
 
@@ -23,9 +24,9 @@ describe('logoUrlOf', () => {
     })
 })
 
-describe('initialSymbolOf', () => {
+describe('initialSymbol', () => {
     it('picks the lettered symbol of the first initial, and a building when it is not a letter', () => {
-        expect(initialSymbolOf({ name: 'Acme' })).toBe('a.circle.fill')
-        expect(initialSymbolOf({ name: '🚀 Launch' })).toBe('building.2')
+        expect(initialSymbol(workspaceInitials({ name: 'Acme' }))).toBe('a.circle.fill')
+        expect(initialSymbol(workspaceInitials({ name: '🚀 Launch' }))).toBe('building.2')
     })
 })

@@ -1,11 +1,11 @@
 import { pendingQuestions, serializeAnswers } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { useRef, useState, type ReactNode } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
+import * as Haptics from '@/lib/haptics'
 import { fieldOutline } from '@/theme/field'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'

@@ -1,12 +1,12 @@
 import type { VoiceMessage } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
-import * as Haptics from 'expo-haptics'
 import { useState } from 'react'
 import Animated from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
 import type { FileOwner } from '@/api/files'
 import type { ViewerItem } from '@/components/viewer/viewer-store'
+import * as Haptics from '@/lib/haptics'
 import { layoutTransition } from '@/theme/motion'
 import { spacing } from '@/theme/tokens'
 

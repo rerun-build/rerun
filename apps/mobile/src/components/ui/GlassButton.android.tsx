@@ -2,6 +2,7 @@ import { createContext, use } from 'react'
 import { Pressable } from 'react-native'
 
 import { Icon, type IconName } from '@/components/ui/Icon'
+import { opaqueSurface } from '@/components/ui/surface'
 import { useTheme } from '@/theme/theme'
 import { palette, withAlpha } from '@/theme/tokens'
 
@@ -44,10 +45,7 @@ export function GlassButton({ symbol, label, onPress, disabled = false, size = G
                 borderRadius: size / 2,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: withAlpha(colors.card, 0.92),
-                borderWidth: 1,
-                borderColor: withAlpha(colors.foreground, 0.08),
-                boxShadow: `0 1px 3px ${withAlpha('#000000', 0.12)}`,
+                ...opaqueSurface(scheme ?? theme.scheme),
                 opacity: disabled ? 0.4 : 1,
             }}
         >

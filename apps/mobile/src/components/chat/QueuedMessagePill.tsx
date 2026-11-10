@@ -1,10 +1,10 @@
 import { queuedPreview } from '@rerun/contracts'
-import { GlassView } from 'expo-glass-effect'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { useGlassStyle } from '@/components/ui/GlassButton'
+import { GlassSurface } from '@/components/ui/GlassSurface'
 import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { brand, radius, spacing, withAlpha } from '@/theme/tokens'
@@ -40,7 +40,7 @@ export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }:
     const preview = queuedPreview(text)
     const accent = theme.scheme === 'dark' ? brand.soft : brand.base
     return (
-        <GlassView key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingLeft: spacing.md, paddingRight: spacing.xs, paddingVertical: 4, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme] }}>
+        <GlassSurface key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingLeft: spacing.md, paddingRight: spacing.xs, paddingVertical: 4, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme] }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 7, paddingVertical: 1, borderRadius: radius.pill, borderWidth: 1, borderColor: withAlpha(accent, 0.3), backgroundColor: withAlpha(accent, 0.1) }}>
                 <Icon name="clock" size={10} bold color={accent} />
                 <AppText style={{ fontSize: 11, lineHeight: 15, color: accent }}>{t('badge')}</AppText>
@@ -58,6 +58,6 @@ export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }:
             )}
             <StripButton symbol="arrow-up" label={busy ? t('sendNowStops') : t('sendNow')} disabled={pending} onPress={onSendNow} />
             <StripButton symbol="x" label={t('remove')} disabled={pending} onPress={onDiscard} />
-        </GlassView>
+        </GlassSurface>
     )
 }

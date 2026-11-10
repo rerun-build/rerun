@@ -1,8 +1,7 @@
-import * as Haptics from 'expo-haptics'
 import { ROUTE_ID_PATTERN } from '@rerun/contracts'
 import { Redirect, router, useLocalSearchParams } from 'expo-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Pressable, TextInput, View } from 'react-native'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { BackHandler, Pressable, TextInput, View } from 'react-native'
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
@@ -18,6 +17,7 @@ import { environment } from '@/config/environment'
 import { handBack } from '@/desktop/hand-back'
 import { takePendingDesktopOpen } from '@/desktop/pending-open'
 import { DESKTOP_KEYS, keyScript, typeScript, viewerUrl } from '@/desktop/viewer'
+import * as Haptics from '@/lib/haptics'
 import { fonts, radius, spacing } from '@/theme/tokens'
 
 const SCREEN_BACKGROUND = '#000000'
@@ -118,6 +118,17 @@ export default function Desktop() {
             setFinishing(false)
         }
     }
+
+    // Android's back is Done: a takeover is handed back to the coworker rather than left waiting on a
+    // screen nobody holds any more.
+    const onBack = useEffectEvent(() => {
+        if (!finishing) void done()
+        return true
+    })
+    useEffect(() => {
+        const subscription = BackHandler.addEventListener('hardwareBackPress', onBack)
+        return () => subscription.remove()
+    }, [])
 
     const typeText = () => {
         if (!text) return

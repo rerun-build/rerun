@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics'
 import { useEffect, useState, type ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -6,6 +5,7 @@ import Animated, { interpolateColor, useAnimatedRef, useAnimatedScrollHandler, u
 
 import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
+import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { spacing, withAlpha } from '@/theme/tokens'
 

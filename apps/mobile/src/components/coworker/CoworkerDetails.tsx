@@ -1,5 +1,3 @@
-import { Button as MenuButton } from '@expo/ui/swift-ui'
-import { disabled } from '@expo/ui/swift-ui/modifiers'
 import type { CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
 import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -13,7 +11,7 @@ import { moodOf } from '@/components/ui/CoworkerAvatar'
 import { usePaneInsets } from '@/components/layout/PaneSize'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { Card, ICON_ROW_INSET, Separator, SettingsRow } from '@/components/ui/GroupedList'
-import { CircleTrigger, NativeMenu } from '@/components/ui/NativeMenu'
+import { CircleTrigger, MenuItem, NativeMenu } from '@/components/ui/NativeMenu'
 import type { CoworkerStatus } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -81,7 +79,7 @@ export function CoworkerDetails({ coworker, files, apps, routines, notifications
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} />
                 <NativeMenu glass="circle" label={t('more')} trigger={<CircleTrigger symbol="ellipsis" />}>
-                    <MenuButton label={t('delete')} systemImage="trash" role="destructive" onPress={onDelete} modifiers={[disabled(!canDelete || lock.locked)]} />
+                    <MenuItem label={t('delete')} icon="trash" destructive onPress={onDelete} disabled={!canDelete || lock.locked} />
                 </NativeMenu>
             </View>
 

@@ -1,0 +1,137 @@
+import { fireEvent, render, screen } from '@testing-library/react-native'
+import { Platform, Text } from 'react-native'
+
+import { LongPressMenu, MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
+
+// Compose views need the native ExpoUI module: each is drawn here as the plain view it stands for, the
+// menu's rows shown only while the menu is expanded.
+jest.mock('@expo/ui/jetpack-compose', () => {
+    const { createContext, use } = jest.requireActual('react')
+    const { Pressable, Text: RNText, View } = jest.requireActual('react-native')
+    const Expanded = createContext(false)
+    const passThrough = ({ children }: { children?: React.ReactNode }) => <>{children}</>
+    const DropdownMenu = ({ expanded, children }: { expanded: boolean; children: React.ReactNode }) => <View testID={expanded ? 'menu-open' : 'menu-closed'}>{children}</View>
+    const Items = ({ children }: { children: React.ReactNode }) => (use(Expanded) ? <View>{children}</View> : null)
+    DropdownMenu.Trigger = passThrough
+    DropdownMenu.Items = Items
+    const DropdownMenuItem = ({ onClick, enabled = true, children }: { onClick: () => void; enabled?: boolean; children: React.ReactNode }) => (
+        <Pressable accessibilityRole="menuitem" accessibilityState={{ disabled: !enabled }} disabled={!enabled} onPress={onClick}>
+            {children}
+        </Pressable>
+    )
+    DropdownMenuItem.Text = passThrough
+    DropdownMenuItem.LeadingIcon = passThrough
+    DropdownMenuItem.TrailingIcon = function TrailingIcon({ children }: { children: React.ReactNode }) {
+        return <View testID="trailing">{children}</View>
+    }
+    return {
+        Host: passThrough,
+        RNHostView: passThrough,
+        Column: passThrough,
+        HorizontalDivider: () => <View testID="divider" />,
+        Text: ({ children }: { children: React.ReactNode }) => <RNText>{children}</RNText>,
+        DropdownMenu: Object.assign(
+            ({ expanded, children }: { expanded: boolean; children: React.ReactNode }) => (
+                <Expanded value={expanded}>
+                    <DropdownMenu expanded={expanded}>{children}</DropdownMenu>
+                </Expanded>
+            ),
+            { Trigger: passThrough, Items },
+        ),
+        DropdownMenuItem,
+    }
+})
+jest.mock('@expo/ui/jetpack-compose/modifiers', () => ({ padding: () => ({}) }))
+
+const describeOnAndroid = Platform.OS === 'android' ? describe : describe.skip
+
+describeOnAndroid('NativeMenu on Android', () => {
+    it('opens anchored to its trigger, and a row closes it before running its action', async () => {
+        const onPreferences = jest.fn()
+        await render(
+            <NativeMenu label="Account" trigger={<Text>Me</Text>}>
+                <MenuItem label="Preferences" icon="settings" onPress={onPreferences} />
+            </NativeMenu>,
+        )
+        expect(screen.queryByText('Preferences')).toBeNull()
+        await fireEvent.press(screen.getByRole('button', { name: 'Account' }))
+        expect(screen.getByTestId('menu-open')).toBeTruthy()
+        await fireEvent.press(screen.getByText('Preferences'))
+        expect(onPreferences).toHaveBeenCalledTimes(1)
+        expect(screen.getByTestId('menu-closed')).toBeTruthy()
+    })
+
+    it('keeps a disabled row from running', async () => {
+        const onNew = jest.fn()
+        await render(
+            <NativeMenu label="Conversations" trigger={<Text>Chat</Text>}>
+                <MenuItem label="New conversation" icon="plus" disabled onPress={onNew} />
+            </NativeMenu>,
+        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Conversations' }))
+        const row = screen.getByRole('menuitem')
+        expect(row).toBeDisabled()
+        await fireEvent.press(row)
+        expect(onNew).not.toHaveBeenCalled()
+    })
+
+    it('checks the chosen row at its end, and unfolds a submenu in place', async () => {
+        const onSwitch = jest.fn()
+        await render(
+            <NativeMenu label="Account" trigger={<Text>Me</Text>}>
+                <MenuSection title="Needs you">
+                    <MenuItem label="CV to send" subtitle="Which CV should I send?" onPress={() => {}} />
+                </MenuSection>
+                <SubMenu label="Workspaces" icon="layers">
+                    <MenuToggle label="Acme" badge={{ initials: 'A' }} isOn onChange={() => {}} />
+                    <MenuToggle label="Atelier Nord" badge={{ initials: 'AN' }} isOn={false} onChange={onSwitch} />
+                </SubMenu>
+            </NativeMenu>,
+        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Account' }))
+        expect(screen.getByText('Needs you')).toBeTruthy()
+        expect(screen.getByText('Which CV should I send?')).toBeTruthy()
+        expect(screen.getByTestId('divider')).toBeTruthy()
+        expect(screen.queryByText('Acme')).toBeNull()
+        await fireEvent.press(screen.getByText('Workspaces'))
+        expect(screen.getByText('Acme')).toBeTruthy()
+        expect(screen.getAllByTestId('trailing')).toHaveLength(2)
+        await fireEvent.press(screen.getByText('Atelier Nord'))
+        expect(onSwitch).toHaveBeenCalledTimes(1)
+    })
+
+    it('folds a submenu again the next time the menu opens', async () => {
+        await render(
+            <NativeMenu label="Account" trigger={<Text>Me</Text>}>
+                <SubMenu label="Workspaces">
+                    <MenuToggle label="Acme" isOn onChange={() => {}} />
+                </SubMenu>
+            </NativeMenu>,
+        )
+        const trigger = screen.getByRole('button', { name: 'Account' })
+        await fireEvent.press(trigger)
+        await fireEvent.press(screen.getByText('Workspaces'))
+        await fireEvent.press(screen.getByText('Acme'))
+        await fireEvent.press(trigger)
+        expect(screen.queryByText('Acme')).toBeNull()
+    })
+})
+
+describeOnAndroid('LongPressMenu on Android', () => {
+    it('opens on a tap, shows its menu on a long press', async () => {
+        const onOpen = jest.fn()
+        const onUnpin = jest.fn()
+        await render(
+            <LongPressMenu label="Scout" onPress={onOpen} items={<MenuItem label="Unpin" icon="pin-off" onPress={onUnpin} />}>
+                <Text>Scout</Text>
+            </LongPressMenu>,
+        )
+        const cell = screen.getByRole('button', { name: 'Scout' })
+        await fireEvent.press(cell)
+        expect(onOpen).toHaveBeenCalledTimes(1)
+        expect(screen.queryByText('Unpin')).toBeNull()
+        await fireEvent(cell, 'longPress')
+        await fireEvent.press(screen.getByText('Unpin'))
+        expect(onUnpin).toHaveBeenCalledTimes(1)
+    })
+})
