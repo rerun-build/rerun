@@ -1,8 +1,9 @@
-import * as Haptics from 'expo-haptics'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { View } from 'react-native'
 import Animated, { useAnimatedReaction, useAnimatedRef, useAnimatedScrollHandler, useReducedMotion, useSharedValue, type SharedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
+
+import * as Haptics from '@/lib/haptics'
 
 import type { ConversationPage } from './conversation-pages'
 

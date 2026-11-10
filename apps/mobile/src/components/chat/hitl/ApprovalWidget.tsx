@@ -1,10 +1,10 @@
 import { pendingApprovals, serializeApprovalDecisions, type ApprovalDecision } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { useRef, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'
 

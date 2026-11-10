@@ -1,5 +1,4 @@
 import type { InboxItem, SkillProposal, SkillProposalStatus, WorkspaceSummary } from '@rerun/contracts'
-import { GlassView } from 'expo-glass-effect'
 import { Link, type Href } from 'expo-router'
 import type { ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'
@@ -31,6 +30,7 @@ import { BUDDY_MOODS } from '@/components/buddy/look'
 import { CodeField } from '@/components/auth/CodeField'
 import { PhoneField } from '@/components/auth/PhoneField'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
+import { GlassSurface } from '@/components/ui/GlassSurface'
 import { PillButton } from '@/components/ui/PillButton'
 import { UpdateRequired } from '@/components/update/UpdateRequired'
 import { AppText } from '@/components/ui/AppText'
@@ -97,6 +97,8 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Icons', href: '/lab-icons' },
     { label: 'Icons, dark', href: '/lab-icons?scheme=dark' },
     { label: 'Icons, 24 pt', href: '/lab-icons?size=24' },
+    { label: 'Controls: menus, picker, pills', href: '/lab-controls' },
+    { label: 'Controls, dark', href: '/lab-controls?scheme=dark' },
     { label: 'Rerun on the Home', href: '/lab-foreman' },
     { label: 'Rerun chat, conversation', href: '/lab-chat?coworker=foreman&tabs=1&state=conversation' },
     { label: 'Rerun chat, running', href: '/lab-chat?coworker=foreman&tabs=1&state=running' },
@@ -346,9 +348,9 @@ function Controls({ scheme }: { scheme: ColorScheme }) {
 
 function LabChip({ coworker, session, active }: { coworker: Coworker; session: ChatTab; active: boolean }) {
     return (
-        <GlassView style={{ borderRadius: GLASS_BUTTON_SIZE / 2, overflow: 'hidden' }}>
+        <GlassSurface style={{ borderRadius: GLASS_BUTTON_SIZE / 2, overflow: 'hidden' }}>
             <ChipPage coworker={coworker} session={session} active={active} width={170} />
-        </GlassView>
+        </GlassSurface>
     )
 }
 

@@ -1,5 +1,3 @@
-import { Host, Picker, Text } from '@expo/ui/swift-ui'
-import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers'
 import type { Locale } from '@rerun/i18n'
 import * as Application from 'expo-application'
 import { router } from 'expo-router'
@@ -16,6 +14,7 @@ import { workspaceLabel } from '@/components/home/workspace-logos'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { Card, Section, SectionTitle, Separator, SettingsRow } from '@/components/ui/GroupedList'
+import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { environment, onCustomServer, webHost } from '@/config/environment'
 import { track } from '@/lib/analytics'
 import { usePushPermission } from '@/notifications/usePushPermission'
@@ -97,28 +96,12 @@ export function PreferencesSheet() {
 
             <View style={{ gap: spacing.sm }}>
                 <SectionTitle>{t('appearance')}</SectionTitle>
-                <Host matchContents={{ vertical: true }} colorScheme={theme.scheme} style={{ alignSelf: 'stretch' }}>
-                    <Picker selection={appearance} onSelectionChange={chooseAppearance} modifiers={[pickerStyle('segmented')]}>
-                        {APPEARANCES.map(option => (
-                            <Text key={option.value} modifiers={[tag(option.value)]}>
-                                {t(option.label)}
-                            </Text>
-                        ))}
-                    </Picker>
-                </Host>
+                <SegmentedControl options={APPEARANCES.map(option => ({ value: option.value, label: t(option.label) }))} value={appearance} onChange={chooseAppearance} />
             </View>
 
             <View style={{ gap: spacing.sm }}>
                 <SectionTitle>{t('coworkers')}</SectionTitle>
-                <Host matchContents={{ vertical: true }} colorScheme={theme.scheme} style={{ alignSelf: 'stretch' }}>
-                    <Picker selection={group} onSelectionChange={chooseGroup} modifiers={[pickerStyle('segmented')]}>
-                        {GROUPINGS.map(option => (
-                            <Text key={option.value} modifiers={[tag(option.value)]}>
-                                {t(option.label)}
-                            </Text>
-                        ))}
-                    </Picker>
-                </Host>
+                <SegmentedControl options={GROUPINGS.map(option => ({ value: option.value, label: t(option.label) }))} value={group} onChange={chooseGroup} />
             </View>
 
             <Section>

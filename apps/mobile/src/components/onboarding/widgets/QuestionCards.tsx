@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -8,6 +7,7 @@ import { AnswerInput, CustomOptionRow, OptionRow } from '@/components/chat/hitl/
 import { Markdown } from '@/components/chat/Markdown'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
+import * as Haptics from '@/lib/haptics'
 import { spacing } from '@/theme/tokens'
 
 import { readEither, readQuestion, type QuestionOutput } from '../parts'

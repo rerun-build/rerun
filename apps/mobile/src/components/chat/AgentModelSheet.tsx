@@ -1,5 +1,4 @@
 import type { AgentModels, SetAgentModelInput } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
 import { Fragment, useCallback, useState } from 'react'
 import { ScrollView, View } from 'react-native'
@@ -18,6 +17,7 @@ import { ModelRow } from '@/components/ui/ModelRow'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import { useCoworkerAccess } from '@/data/useCoworkerAccess'
 import { track } from '@/lib/analytics'
+import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 

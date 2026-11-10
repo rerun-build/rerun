@@ -1,5 +1,4 @@
 import { MAX_STARTER_PICKS } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { Image } from 'expo-image'
 import { useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
@@ -10,6 +9,7 @@ import { usePaneSize } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 

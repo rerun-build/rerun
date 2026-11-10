@@ -1,6 +1,4 @@
-import { Button, Image, Menu, Section, Text, Toggle } from '@expo/ui/swift-ui'
 import { router, useLocalSearchParams } from 'expo-router'
-import { GlassView } from 'expo-glass-effect'
 import { Pressable, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -9,8 +7,8 @@ import { CONVERSATION_SECTIONS, glyphOf, stateOf } from '@/components/chat/conve
 import { AppText } from '@/components/ui/AppText'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { GlassButton, GLASS_BUTTON_SIZE, useGlassStyle } from '@/components/ui/GlassButton'
-import { NativeMenu } from '@/components/ui/NativeMenu'
-import { systemSymbolOf } from '@/components/ui/system-symbols'
+import { GlassSurface } from '@/components/ui/GlassSurface'
+import { MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { LAB_CONVERSATIONS, type LabConversation } from '@/mocks/conversations'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -25,16 +23,9 @@ const COWORKER = { id: 'agent-pulse', kind: 'coworker' as const, name: 'clem cv'
 const CHIP_MAX_WIDTH = 220
 
 function MenuRow({ conversation }: { conversation: LabConversation }) {
-    if (conversation.id === ACTIVE.id) return <Toggle label={conversation.title} isOn onIsOnChange={() => {}} />
-    const glyph = glyphOf(conversation)
+    if (conversation.id === ACTIVE.id) return <MenuToggle label={conversation.title} isOn onChange={() => {}} />
     const detail = stateOf(conversation) === 'needs-you' ? conversation.ask : undefined
-    return (
-        <Button onPress={() => {}}>
-            {glyph ? <Image systemName={systemSymbolOf(glyph)} /> : <Text>{''}</Text>}
-            <Text>{conversation.title}</Text>
-            {detail ? <Text>{detail}</Text> : <Text>{''}</Text>}
-        </Button>
-    )
+    return <MenuItem label={conversation.title} icon={glyphOf(conversation)} subtitle={detail ?? null} onPress={() => {}} />
 }
 
 // What waits elsewhere, on the chip: the count of the other conversations that need the person.
@@ -74,32 +65,32 @@ export default function ConversationsLab() {
                     <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>
                         {variant === 'a' ? (
                             <NativeMenu glass="capsule" label={`${COWORKER.name}, conversations`} trigger={chip}>
-                                <Button label="Coworker details" systemImage="info.circle" onPress={() => {}} />
-                                <Button label="New conversation" systemImage="square.and.pencil" onPress={() => {}} />
+                                <MenuItem label="Coworker details" icon="info" onPress={() => {}} />
+                                <MenuItem label="New conversation" icon="square-pen" onPress={() => {}} />
                                 {CONVERSATION_SECTIONS.map(section => {
                                     const conversations = LAB_CONVERSATIONS.filter(conversation => stateOf(conversation) === section.state)
                                     if (conversations.length === 0) return null
                                     return (
-                                        <Section key={section.state} title={SECTION_TITLES[section.state]}>
+                                        <MenuSection key={section.state} title={SECTION_TITLES[section.state]}>
                                             {conversations.map(conversation => (
                                                 <MenuRow key={conversation.id} conversation={conversation} />
                                             ))}
-                                        </Section>
+                                        </MenuSection>
                                     )
                                 })}
-                                <Section title="Earlier">
-                                    <Menu label={`${earlier.length} conversations`}>
+                                <MenuSection title="Earlier">
+                                    <SubMenu label={`${earlier.length} conversations`}>
                                         {earlier.map(conversation => (
                                             <MenuRow key={conversation.id} conversation={conversation} />
                                         ))}
-                                    </Menu>
-                                </Section>
+                                    </SubMenu>
+                                </MenuSection>
                             </NativeMenu>
                         ) : (
                             <Pressable onPress={() => router.push({ pathname: '/lab-conversations-sheet', params: { variant } })} accessibilityRole="button" accessibilityLabel={`${COWORKER.name}, conversations`}>
-                                <GlassView colorScheme={theme.scheme} glassEffectStyle={glass} isInteractive style={{ borderRadius: GLASS_BUTTON_SIZE / 2 }}>
+                                <GlassSurface colorScheme={theme.scheme} glassEffectStyle={glass} isInteractive style={{ borderRadius: GLASS_BUTTON_SIZE / 2 }}>
                                     {chip}
-                                </GlassView>
+                                </GlassSurface>
                                 <ChipBadge count={waiting} />
                             </Pressable>
                         )}

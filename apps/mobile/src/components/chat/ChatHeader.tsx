@@ -1,7 +1,4 @@
-import { Button, Image, Menu, Section, Text, Toggle } from '@expo/ui/swift-ui'
-import { disabled } from '@expo/ui/swift-ui/modifiers'
 import type { SessionKind, SessionStatus } from '@rerun/contracts'
-import { GlassView } from 'expo-glass-effect'
 import { View } from 'react-native'
 import Animated, { Extrapolation, FadeIn, interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -13,10 +10,10 @@ import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { GlassButton, GLASS_BUTTON_SIZE, useGlassStyle } from '@/components/ui/GlassButton'
+import { GlassSurface } from '@/components/ui/GlassSurface'
 import { Icon } from '@/components/ui/Icon'
-import { NativeMenu } from '@/components/ui/NativeMenu'
+import { MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { systemSymbolOf } from '@/components/ui/system-symbols'
 import { useMessageTimes } from '@/lib/time'
 import type { Coworker } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
@@ -87,16 +84,9 @@ export function ChipPage({ coworker, session, active, width, progress, index = 0
 function ConversationItem({ session, active, untitled, onSelect }: { session: ChatTab; active: boolean; untitled: string; onSelect: (sessionId: string) => void }) {
     const times = useMessageTimes()
     const title = session.title ?? untitled
-    if (active) return <Toggle label={title} isOn onIsOnChange={() => {}} />
-    const glyph = glyphOf(session)
+    if (active) return <MenuToggle label={title} isOn onChange={() => {}} />
     const subtitle = (stateOf(session) === 'needs-you' ? session.ask : null) ?? automationLine(session, times.stamp)
-    return (
-        <Button onPress={() => onSelect(session.id)}>
-            {glyph ? <Image systemName={systemSymbolOf(glyph)} /> : <Text>{''}</Text>}
-            <Text>{title}</Text>
-            {subtitle ? <Text>{subtitle}</Text> : <Text>{''}</Text>}
-        </Button>
-    )
+    return <MenuItem label={title} icon={glyphOf(session)} subtitle={subtitle} onPress={() => onSelect(session.id)} />
 }
 
 // "Daily missions apply · Yesterday 4:30 PM". The routine is left out while the title still is its name.
@@ -111,30 +101,30 @@ function ConversationsMenu({ sessions, activeId, threaded, onSelect }: { session
     const untitled = threaded ? t('newThread') : t('newConversation')
     if (sections.length === 0) {
         return (
-            <Menu label={threaded ? t('threads') : t('conversations')}>
+            <SubMenu label={threaded ? t('threads') : t('conversations')}>
                 {sessions.map(session => (
-                    <Toggle key={session.id} label={session.title ?? untitled} isOn={session.id === activeId} onIsOnChange={() => onSelect(session.id)} />
+                    <MenuToggle key={session.id} label={session.title ?? untitled} isOn={session.id === activeId} onChange={() => onSelect(session.id)} />
                 ))}
-            </Menu>
+            </SubMenu>
         )
     }
     return (
         <>
             {sections.map(section => (
-                <Section key={section.state} title={t(`sections.${section.state}`)}>
+                <MenuSection key={section.state} title={t(`sections.${section.state}`)}>
                     {section.conversations.map(session => (
                         <ConversationItem key={session.id} session={session} active={session.id === activeId} untitled={untitled} onSelect={onSelect} />
                     ))}
-                </Section>
+                </MenuSection>
             ))}
             {earlier.length > 0 && (
-                <Section title={t('earlier')}>
-                    <Menu label={threaded ? t('threadCount', { count: earlier.length }) : t('conversationCount', { count: earlier.length })}>
+                <MenuSection title={t('earlier')}>
+                    <SubMenu label={threaded ? t('threadCount', { count: earlier.length }) : t('conversationCount', { count: earlier.length })}>
                         {earlier.map(session => (
                             <ConversationItem key={session.id} session={session} active={session.id === activeId} untitled={untitled} onSelect={onSelect} />
                         ))}
-                    </Menu>
-                </Section>
+                    </SubMenu>
+                </MenuSection>
             )}
         </>
     )
@@ -179,7 +169,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     const identity = (
         <View style={{ alignItems: 'center' }}>
             <CoworkerAvatar coworker={{ ...coworker, status: running ? 'working' : coworker.status === 'working' ? 'idle' : coworker.status }} size={AVATAR} />
-            <GlassView colorScheme={theme.scheme} glassEffectStyle={glass} style={{ borderRadius: PILL_HEIGHT / 2, marginTop: -PILL_OVERLAP }}>
+            <GlassSurface colorScheme={theme.scheme} glassEffectStyle={glass} style={{ borderRadius: PILL_HEIGHT / 2, marginTop: -PILL_OVERLAP }}>
                 <View style={{ width: chipWidth, height: PILL_HEIGHT, overflow: 'hidden' }}>
                     <Animated.View style={[{ flexDirection: 'row', width: pages.length * chipWidth }, track]}>
                         {pages.map((session, index) => (
@@ -192,7 +182,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
                         </View>
                     )}
                 </View>
-            </GlassView>
+            </GlassSurface>
         </View>
     )
 
@@ -204,9 +194,9 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
                 <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>
                     {menuOpens ? (
                         <NativeMenu label={t('menuLabel', { name: coworker.name, title: activeTitle })} trigger={identity}>
-                            {onOpenDetails && <Button label={t('coworkerDetails')} systemImage="info.circle" onPress={onOpenDetails} />}
-                            {hasConversations && <Button label={untitled} systemImage="plus" onPress={onNewSession} modifiers={[disabled(!activeId)]} />}
-                            {general && <Toggle label={t('general')} systemImage="bubble.left.and.bubble.right" isOn={activeId === general.id} onIsOnChange={() => onSelect(general.id)} />}
+                            {onOpenDetails && <MenuItem label={t('coworkerDetails')} icon="info" onPress={onOpenDetails} />}
+                            {hasConversations && <MenuItem label={untitled} icon="plus" onPress={onNewSession} disabled={!activeId} />}
+                            {general && <MenuToggle label={t('general')} icon="messages-square" isOn={activeId === general.id} onChange={() => onSelect(general.id)} />}
                             {listed.length > 0 && <ConversationsMenu sessions={listed} activeId={activeId} threaded={Boolean(general)} onSelect={onSelect} />}
                         </NativeMenu>
                     ) : (

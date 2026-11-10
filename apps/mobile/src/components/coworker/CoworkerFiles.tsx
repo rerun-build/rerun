@@ -1,5 +1,3 @@
-import { Host, Picker, Text } from '@expo/ui/swift-ui'
-import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers'
 import type { CoworkerFile, CoworkerFileKind, CoworkerFiles as CoworkerFilesView } from '@rerun/contracts'
 import { formatDate } from '@rerun/i18n/format'
 import { Fragment, useState } from 'react'
@@ -12,6 +10,7 @@ import { usePaneSize } from '@/components/layout/PaneSize'
 import { columnsFor } from '@/components/layout/split'
 import { AppText } from '@/components/ui/AppText'
 import { Card, GROUPED_ROW_HEIGHT, Separator } from '@/components/ui/GroupedList'
+import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -148,7 +147,6 @@ type CoworkerFilesProps = {
 // What the coworker made and keeps in its folder, newest first, the way a chat app shows what a
 // contact sent: pictures in a grid, everything else as a list.
 export function CoworkerFiles({ name, view, urlOf, onOpen, failed, onBack }: CoworkerFilesProps) {
-    const theme = useTheme()
     const { width } = usePaneSize()
     const [kind, setKind] = useState<CoworkerFileKind>('media')
     const inner = width - spacing.lg * 2
@@ -160,15 +158,7 @@ export function CoworkerFiles({ name, view, urlOf, onOpen, failed, onBack }: Cow
 
     return (
         <CoworkerPage title={t('title')} onBack={onBack}>
-            <Host matchContents={{ vertical: true }} colorScheme={theme.scheme} style={{ alignSelf: 'stretch' }}>
-                <Picker selection={kind} onSelectionChange={value => setKind(value as CoworkerFileKind)} modifiers={[pickerStyle('segmented')]}>
-                    {KINDS.map(option => (
-                        <Text key={option.value} modifiers={[tag(option.value)]}>
-                            {t(option.label)}
-                        </Text>
-                    ))}
-                </Picker>
-            </Host>
+            <SegmentedControl options={KINDS.map(option => ({ value: option.value, label: t(option.label) }))} value={kind} onChange={setKind} />
 
             {!shown ? (
                 failed ? <LoadFailed /> : <FilesSkeleton kind={kind} tile={tile} />

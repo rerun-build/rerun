@@ -1,5 +1,4 @@
 import type { AgentModels, AgentView, Conversation } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { View } from 'react-native'
@@ -14,6 +13,7 @@ import { coworkerEndpoints } from '@/chat/endpoints'
 import { useChatBack } from '@/components/layout/useChatBack'
 import { environment } from '@/config/environment'
 import { readCoworkerScreen, saveCoworkerScreen } from '@/data/local-cache'
+import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 
 import { ChatHeader, type ChatTab } from './ChatHeader'

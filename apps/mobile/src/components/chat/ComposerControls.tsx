@@ -1,4 +1,3 @@
-import { Button, Menu, Toggle } from '@expo/ui/swift-ui'
 import type { SkillSummary } from '@rerun/contracts'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -6,7 +5,7 @@ import { useTranslations } from 'use-intl'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { Icon, type IconName } from '@/components/ui/Icon'
-import { NativeMenu } from '@/components/ui/NativeMenu'
+import { MenuItem, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import type { Coworker } from '@/mocks/data'
 import type { Model } from '@/mocks/models'
@@ -58,15 +57,15 @@ export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill }
                 </View>
             }
         >
-            <Button label={t('photos')} systemImage="photo.on.rectangle" onPress={onPhotos} />
-            <Button label={t('camera')} systemImage="camera" onPress={onCamera} />
-            <Button label={t('files')} systemImage="folder" onPress={onFiles} />
+            <MenuItem label={t('photos')} icon="images" onPress={onPhotos} />
+            <MenuItem label={t('camera')} icon="camera" onPress={onCamera} />
+            <MenuItem label={t('files')} icon="folder" onPress={onFiles} />
             {skills.length > 0 && onSkill && (
-                <Menu label={t('skills')} systemImage="book">
+                <SubMenu label={t('skills')} icon="book">
                     {skills.map(skill => (
-                        <Button key={skill.slug} label={skill.name} onPress={() => onSkill(skill.slug)} />
+                        <MenuItem key={skill.slug} label={skill.name} onPress={() => onSkill(skill.slug)} />
                     ))}
-                </Menu>
+                </SubMenu>
             )}
         </NativeMenu>
     )
@@ -101,7 +100,7 @@ export function TargetPicker({ target, choices, onPick }: { target: Coworker; ch
             }
         >
             {choices.map(coworker => (
-                <Toggle key={coworker.id} label={coworker.name} isOn={coworker.id === target.id} onIsOnChange={() => onPick(coworker.id)} />
+                <MenuToggle key={coworker.id} label={coworker.name} isOn={coworker.id === target.id} onChange={() => onPick(coworker.id)} />
             ))}
         </NativeMenu>
     )

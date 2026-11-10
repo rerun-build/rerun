@@ -1,4 +1,3 @@
-import { GlassView } from 'expo-glass-effect'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
@@ -6,6 +5,7 @@ import { useTranslations } from 'use-intl'
 import { usePaneSize } from '@/components/layout/PaneSize'
 import { useGlassStyle } from '@/components/ui/GlassButton'
 import { AppText } from '@/components/ui/AppText'
+import { GlassSurface } from '@/components/ui/GlassSurface'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing, withAlpha } from '@/theme/tokens'
 
@@ -25,7 +25,7 @@ export function MentionSuggestions({ trigger, items, onPick }: { trigger: '@' | 
     const maxHeight = Math.min(ROW * MAX_ROWS, height * 0.3)
     return (
         <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutDown.duration(200)}>
-            <GlassView key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme], overflow: 'hidden' }}>
+            <GlassSurface key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme], overflow: 'hidden' }}>
                 <AppText variant="caption" tone="muted" medium style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.sm }}>
                     {trigger === '/' ? t('skills') : t('coworkers')}
                 </AppText>
@@ -43,7 +43,7 @@ export function MentionSuggestions({ trigger, items, onPick }: { trigger: '@' | 
                         </Pressable>
                     ))}
                 </ScrollView>
-            </GlassView>
+            </GlassSurface>
         </Animated.View>
     )
 }

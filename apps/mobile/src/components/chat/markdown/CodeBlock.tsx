@@ -1,5 +1,4 @@
 import * as Clipboard from 'expo-clipboard'
-import * as Haptics from 'expo-haptics'
 import { Highlight, themes } from 'prism-react-renderer'
 import { useEffect, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
@@ -8,6 +7,7 @@ import { useTranslations } from 'use-intl'
 import { HorizontalScroll } from '@/components/chat/HorizontalScroll'
 import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
+import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing, withAlpha } from '@/theme/tokens'
 

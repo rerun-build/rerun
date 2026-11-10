@@ -1,5 +1,4 @@
 import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnectionsView, UpdateConnectionInput } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Alert } from 'react-native'
@@ -10,6 +9,7 @@ import { AI_PROVIDERS_ADMIN_ONLY } from '@/auth/access'
 import { useIsWorkspaceAdmin } from '@/auth/AuthProvider'
 import { messageOf, useAiConnections } from '@/data/useAiConnections'
 import { track } from '@/lib/analytics'
+import * as Haptics from '@/lib/haptics'
 
 import { AddProvider } from './AddProvider'
 import { describeUsage, ReadOnlyNote, SheetFrame } from './bits'
