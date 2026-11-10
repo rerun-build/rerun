@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
-import { BackHandler, Platform, Text, View } from 'react-native'
+import { BackHandler, Keyboard, Platform, Text, View } from 'react-native'
 
 import { LongPressMenu, MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 
@@ -127,7 +127,19 @@ describeOnAndroid('NativeMenu on Android', () => {
 describeOnAndroid('NativeMenu and the keyboard on Android', () => {
     afterEach(() => jest.restoreAllMocks())
 
-    it('leaves the focus to the text field, and closes on the back gesture', async () => {
+    it('takes the focus when no keyboard is up, so a tap outside only closes it', async () => {
+        jest.spyOn(Keyboard, 'isVisible').mockReturnValue(false)
+        await render(
+            <NativeMenu label="Account" trigger={<Text>Me</Text>}>
+                <MenuItem label="Preferences" icon="settings" onPress={() => {}} />
+            </NativeMenu>,
+        )
+        await fireEvent.press(screen.getByRole('button', { name: 'Account' }))
+        expect(screen.getByTestId('popup-takes-focus')).toBeTruthy()
+    })
+
+    it('leaves the focus to the text field over the keyboard, and closes on the back gesture', async () => {
+        jest.spyOn(Keyboard, 'isVisible').mockReturnValue(true)
         type BackListener = Parameters<typeof BackHandler.addEventListener>[1]
         let listeners: BackListener[] = []
         jest.spyOn(BackHandler, 'addEventListener').mockImplementation((_event, listener) => {
@@ -139,11 +151,11 @@ describeOnAndroid('NativeMenu and the keyboard on Android', () => {
                 <MenuItem label="Photos" icon="images" onPress={() => {}} />
             </NativeMenu>,
         )
-        expect(screen.getByTestId('popup-keeps-focus-away')).toBeTruthy()
         expect(listeners).toHaveLength(0)
 
         await fireEvent.press(screen.getByRole('button', { name: 'Attach' }))
         expect(screen.getByTestId('menu-open')).toBeTruthy()
+        expect(screen.getByTestId('popup-keeps-focus-away')).toBeTruthy()
         let handled = false
         await act(async () => {
             handled = listeners.toReversed().some(listener => listener({} as Parameters<BackListener>[0]))
