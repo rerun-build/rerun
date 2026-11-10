@@ -26,6 +26,7 @@ import { posthog } from '@/lib/analytics'
 import { MockStore } from '@/mocks/store'
 import { PushRouting } from '@/notifications/PushRouting'
 import { useAppearanceLoaded } from '@/theme/appearance'
+import { ReducedMotionOverride } from '@/theme/ReducedMotionOverride'
 import { useColorSchemeName } from '@/theme/theme'
 import { brand, palette } from '@/theme/tokens'
 
@@ -86,6 +87,7 @@ function App() {
         <ThemeProvider value={navigationTheme}>
             {/* iOS picks the bar's ink from the appearance on its own; Android keeps light icons unless told. */}
             <StatusBar barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'} />
+            <ReducedMotionOverride />
             <BuddyClock>
                 {updateRequired ? (
                     <UpdateRequired />
