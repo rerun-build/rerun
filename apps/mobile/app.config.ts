@@ -69,8 +69,10 @@ function withAndroidDevClient(config: ConfigContext['config']): ConfigContext['c
 // the notifications plugin out: the app runs, it just never gets a push token.
 const personalTeam = process.env.RERUN_PERSONAL_TEAM === '1'
 
-// The languages iOS offers in the app's own settings, and the permission prompts in each of them. The
-// English prompts of app.json stay the default for any other language.
+// The languages iOS and Android offer in the app's own settings, and the permission prompts in each of
+// them. The English prompts of app.json stay the default for any other language. Android only lists an
+// app under its per-app language setting once the app declares them (localeConfig), and switches the
+// language in place rather than restarting the screen.
 const APP_LANGUAGES = ['en', 'fr', 'es', 'pt-BR', 'de'] as const
 
 function withLanguages(config: ConfigContext['config']): ConfigContext['config'] {
@@ -78,6 +80,7 @@ function withLanguages(config: ConfigContext['config']): ConfigContext['config']
         ...config,
         locales: Object.fromEntries(APP_LANGUAGES.map(language => [language, `./locales/${language}.json`])),
         ios: { ...config.ios, infoPlist: { ...config.ios?.infoPlist, CFBundleLocalizations: [...APP_LANGUAGES] } },
+        plugins: [...(config.plugins ?? []), ['expo-localization', { supportedLocales: { android: [...APP_LANGUAGES] }, allowDynamicLocaleChangesAndroid: true }]],
     }
 }
 
