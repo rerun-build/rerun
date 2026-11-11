@@ -1,10 +1,10 @@
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { ActivityIndicator, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { webHost } from '@/config/environment'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -26,7 +26,7 @@ export function TeamStartCard({ state, onRetry }: { state: TeamStartState; onRet
     if (state === 'started') {
         return (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                <SymbolView name="checkmark.circle.fill" size={13} tintColor={theme.mutedForeground} />
+                <Icon name="circle-check-fill" size={13} color={theme.mutedForeground} />
                 <AppText variant="footnote" tone="muted">
                     {t('team.ready')}
                 </AppText>
@@ -49,13 +49,13 @@ export function TeamStartCard({ state, onRetry }: { state: TeamStartState; onRet
     )
 }
 
-const TASK_LOOK: Record<BuildTask['status'], { symbol: SFSymbol | null; tone: 'default' | 'muted' | 'destructive' }> = {
-    queued: { symbol: 'circle.dashed', tone: 'muted' },
-    dispatched: { symbol: 'circle.dashed', tone: 'muted' },
+const TASK_LOOK: Record<BuildTask['status'], { symbol: IconName | null; tone: 'default' | 'muted' | 'destructive' }> = {
+    queued: { symbol: 'circle-dashed', tone: 'muted' },
+    dispatched: { symbol: 'circle-dashed', tone: 'muted' },
     running: { symbol: null, tone: 'default' },
-    done: { symbol: 'checkmark.circle.fill', tone: 'default' },
-    error: { symbol: 'exclamationmark.circle.fill', tone: 'destructive' },
-    stopped: { symbol: 'minus.circle', tone: 'muted' },
+    done: { symbol: 'circle-check-fill', tone: 'default' },
+    error: { symbol: 'circle-alert-fill', tone: 'destructive' },
+    stopped: { symbol: 'circle-minus', tone: 'muted' },
 }
 
 function TaskRow({ task }: { task: BuildTask }) {
@@ -64,7 +64,7 @@ function TaskRow({ task }: { task: BuildTask }) {
     const color = look.tone === 'destructive' ? theme.destructive : look.tone === 'muted' ? theme.mutedForeground : theme.foreground
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 28 }}>
-            <View style={{ width: 18, alignItems: 'center' }}>{look.symbol ? <SymbolView name={look.symbol} size={16} tintColor={color} /> : <ActivityIndicator size="small" color={theme.mutedForeground} />}</View>
+            <View style={{ width: 18, alignItems: 'center' }}>{look.symbol ? <Icon name={look.symbol} size={16} color={color} /> : <ActivityIndicator size="small" color={theme.mutedForeground} />}</View>
             <AppText variant="callout" tone={look.tone === 'muted' ? 'muted' : 'default'} numberOfLines={1} style={{ flex: 1 }}>
                 {task.title}
             </AppText>

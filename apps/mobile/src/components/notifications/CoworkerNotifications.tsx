@@ -1,20 +1,21 @@
 import { COWORKER_MODES, coworkerRuleOf, taskNotifies, type CoworkerMode, type CoworkerRule, type NotificationPrefs, type RoutineKind, type RoutineView } from '@rerun/contracts'
-import type { SFSymbol } from 'expo-symbols'
 import { Fragment } from 'react'
-import { Switch, View } from 'react-native'
+import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { routineKey, whenOf } from '@/components/coworker/CoworkerRoutines'
 import { Footnote } from '@/components/notifications/NotificationCenter'
 import { AppText } from '@/components/ui/AppText'
 import { Card, CheckRow, GROUPED_ROW_HEIGHT, ICON_ROW_INSET, Section, Separator, SwitchRow } from '@/components/ui/GroupedList'
+import type { IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Switch } from '@/components/ui/Switch'
 import { spacing } from '@/theme/tokens'
 
-const MODE_SYMBOLS: Record<CoworkerMode, SFSymbol> = {
+const MODE_SYMBOLS: Record<CoworkerMode, IconName> = {
     default: 'bell',
-    everything: 'bell.badge',
-    muted: 'bell.slash',
+    everything: 'bell-dot',
+    muted: 'bell-off',
 }
 
 type CoworkerNotificationsProps = {

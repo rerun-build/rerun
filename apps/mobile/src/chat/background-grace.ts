@@ -5,5 +5,5 @@ type BackgroundGraceModule = {
     end(): Promise<boolean>
 }
 
-// iOS only, and only in a binary built with it: null elsewhere, where the stream is let go at once.
+// Only in a binary built with it: null elsewhere, where the stream is let go at once.
 export const BackgroundGrace = requireOptionalNativeModule<BackgroundGraceModule>('BackgroundGrace')

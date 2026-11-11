@@ -1,11 +1,11 @@
 import { Image } from 'expo-image'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { fileHeadersFor } from '@/api/files'
 import { useAuth } from '@/auth/AuthProvider'
+import { Icon } from '@/components/ui/Icon'
 import { openViewer } from '@/components/viewer/viewer-store'
 import { useTheme } from '@/theme/theme'
 
@@ -39,7 +39,7 @@ export function MarkdownImage({ url, alt }: { url: string | null; alt: string })
                     style={{ width: '100%', height: '100%' }}
                 />
             ) : (
-                <SymbolView name="photo" size={18} tintColor={theme.mutedForeground} />
+                <Icon name="image" size={18} color={theme.mutedForeground} />
             )}
         </Pressable>
     )

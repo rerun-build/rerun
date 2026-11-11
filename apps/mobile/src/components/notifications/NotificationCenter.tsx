@@ -1,24 +1,25 @@
 import { EMAIL_CATEGORIES, NOTIFICATION_SCOPES, coworkerRuleOf, hasOwnRule, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch, type NotificationScope } from '@rerun/contracts'
 import type { PermissionStatus } from 'expo-notifications'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
-import { ActionSheetIOS, Pressable, View } from 'react-native'
+import { Platform, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CheckRow, GROUPED_ROW_HEIGHT, ICON_ROW_INSET, Section, SectionTitle, Separator, SettingsRow, SwitchRow } from '@/components/ui/GroupedList'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { showActionSheet } from '@/components/ui/system-dialogs'
 import { translatorFor } from '@/i18n/translator'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
 export type CoworkerOption = { id: string; name: string }
 
-export const SCOPE_SYMBOLS: Record<NotificationScope, SFSymbol> = {
-    everything: 'person.3',
-    mine: 'person.crop.circle.badge.checkmark',
+export const SCOPE_SYMBOLS: Record<NotificationScope, IconName> = {
+    everything: 'users',
+    mine: 'user-check',
     needed: 'bell',
-    nothing: 'bell.slash',
+    nothing: 'bell-off',
 }
 
 export type SettingsTranslator = ReturnType<typeof translatorFor<'mobileSettings'>>
@@ -34,7 +35,7 @@ type NotificationCenterProps = {
     coworkers: CoworkerOption[] | null
     push: PermissionStatus | null
     onEnablePush: () => void
-    onOpenIosSettings: () => void
+    onOpenSettings: () => void
     onPatch: (patch: NotificationPrefsPatch) => void
     onOpenCoworker: (coworker: CoworkerOption) => void
 }
@@ -47,16 +48,16 @@ export function Footnote({ children }: { children: string }) {
     )
 }
 
-function PushOff({ push, onEnablePush, onOpenIosSettings }: Pick<NotificationCenterProps, 'onEnablePush' | 'onOpenIosSettings'> & { push: PermissionStatus }) {
+function PushOff({ push, onEnablePush, onOpenSettings }: Pick<NotificationCenterProps, 'onEnablePush' | 'onOpenSettings'> & { push: PermissionStatus }) {
     const t = useTranslations('mobileSettings.notifications.push')
     return (
         <View style={{ gap: spacing.sm }}>
             <Card>
-                <SettingsRow icon="bell.slash" label={t('label')} value={t('off')} />
+                <SettingsRow icon="bell-off" label={t('label')} value={t('off')} />
                 <Separator inset={ICON_ROW_INSET} />
-                {push === 'undetermined' ? <SettingsRow label={t('turnOn')} onPress={onEnablePush} /> : <SettingsRow label={t('openIosSettings')} accessory="external" onPress={onOpenIosSettings} />}
+                {push === 'undetermined' ? <SettingsRow label={t('turnOn')} onPress={onEnablePush} /> : <SettingsRow label={t('openSettings', { platform: Platform.OS })} accessory="external" onPress={onOpenSettings} />}
             </Card>
-            <Footnote>{t('footnote')}</Footnote>
+            <Footnote>{t('footnote', { platform: Platform.OS })}</Footnote>
         </View>
     )
 }
@@ -73,7 +74,7 @@ function CoworkerRuleRow({ name, value, onPress }: { name: string; value: string
             <AppText variant="body" tone="muted" numberOfLines={1}>
                 {value}
             </AppText>
-            <SymbolView name="chevron.right" size={13} weight="medium" tintColor={theme.mutedForeground} />
+            <Icon name="chevron-right" size={13} color={theme.mutedForeground} />
         </Pressable>
     )
 }
@@ -99,10 +100,10 @@ function CenterSkeleton() {
 
 // The web's notification settings: which runs are worth hearing about, the email, a rule for a
 // coworker apart, and the account emails. Toast and sound live in the browser, so they stay there.
-export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePush, onOpenIosSettings, onPatch, onOpenCoworker }: NotificationCenterProps) {
+export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePush, onOpenSettings, onPatch, onOpenCoworker }: NotificationCenterProps) {
     const t = useTranslations('mobileSettings.notifications')
     const tSettings = useTranslations('mobileSettings')
-    const pushOff = push !== null && push !== 'granted' && <PushOff push={push} onEnablePush={onEnablePush} onOpenIosSettings={onOpenIosSettings} />
+    const pushOff = push !== null && push !== 'granted' && <PushOff push={push} onEnablePush={onEnablePush} onOpenSettings={onOpenSettings} />
 
     if (!prefs) {
         return (
@@ -118,7 +119,7 @@ export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePus
     const addable = (coworkers ?? []).filter(coworker => !listed.includes(coworker))
 
     const pickCoworker = () =>
-        ActionSheetIOS.showActionSheetWithOptions({ title: t('perCoworker.pickTitle'), options: [...addable.map(coworker => coworker.name), t('perCoworker.cancel')], cancelButtonIndex: addable.length }, index => {
+        showActionSheet({ title: t('perCoworker.pickTitle'), options: [...addable.map(coworker => coworker.name), t('perCoworker.cancel')], cancelButtonIndex: addable.length }, index => {
             const coworker = addable[index]
             if (coworker) onPatch({ coworkers: { [coworker.id]: { ...coworkerRuleOf(prefs, coworker.id), mode: 'everything' } } })
         })

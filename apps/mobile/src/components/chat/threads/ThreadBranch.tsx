@@ -1,5 +1,4 @@
 import { needsHuman, type SessionStatus } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { useId } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import Svg, { Defs, LinearGradient, Mask, Path, Pattern, Rect, Stop } from 'react-native-svg'
@@ -7,6 +6,7 @@ import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { Badge, TONES } from '@/components/ui/Badge'
+import { Icon } from '@/components/ui/Icon'
 import { useTimeAgo } from '@/lib/time'
 import { useTheme } from '@/theme/theme'
 import { brand, fonts, radius, spacing, withAlpha } from '@/theme/tokens'
@@ -96,7 +96,7 @@ export function ThreadBranch({ thread, onOpen }: { thread: ThreadItem; onOpen: (
                     style={({ pressed }) => ({ alignSelf: 'flex-start', maxWidth: '100%', height: ROW_HEIGHT, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.md, borderRadius: radius.sm + 2, borderWidth: 1, borderColor: theme.border, overflow: 'hidden', opacity: pressed ? 0.6 : 1 })}>
                     <Hatch />
                     {state === 'live' && <View accessibilityLabel={t('running')} style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: live }} />}
-                    {isAutomated(thread) && <SymbolView name={thread.source === 'trigger' ? 'point.3.connected.trianglepath.dotted' : 'calendar.badge.clock'} size={13} tintColor={theme.mutedForeground} />}
+                    {isAutomated(thread) && <Icon name={thread.source === 'trigger' ? 'webhook' : 'calendar-clock'} size={13} color={theme.mutedForeground} />}
                     <AppText variant="callout" medium numberOfLines={1} style={{ flexShrink: 1, color: titleColor }}>
                         {thread.title}
                     </AppText>
@@ -108,7 +108,7 @@ export function ThreadBranch({ thread, onOpen }: { thread: ThreadItem; onOpen: (
                     <AppText variant="caption" tone="muted" style={{ fontVariant: ['tabular-nums'] }}>
                         {timeAgo(minutesSince(thread.createdAt))}
                     </AppText>
-                    <SymbolView name="chevron.right" size={11} weight="semibold" tintColor={theme.mutedForeground} />
+                    <Icon name="chevron-right" size={11} bold color={theme.mutedForeground} />
                 </Pressable>
             </View>
         </View>

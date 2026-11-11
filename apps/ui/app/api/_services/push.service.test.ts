@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const counts = { source: 0, user: 0 }
-let devices: { token: string }[] = []
+let devices: { token: string; platform: string }[] = []
 let userLocale: string | null = null
 vi.mock('@/supabase/supabase-helpers', () => ({
     selectMaybeSingle: async (_supabase: unknown, table: string) => ({ data: table === 'users' ? { locale: userLocale } : { locale: 'en' } }),
@@ -46,7 +46,7 @@ describe('pushNotification', () => {
     beforeEach(() => {
         counts.source = 0
         counts.user = 0
-        devices = [{ token: 'ExponentPushToken[a]' }]
+        devices = [{ token: 'ExponentPushToken[a]', platform: 'ios' }]
         userLocale = null
         inserted.length = 0
         revoked.length = 0
@@ -89,6 +89,38 @@ describe('pushNotification', () => {
         await pushNotification(supabase, context())
         expect(revoked).toEqual([['ExponentPushToken[a]']])
         expect(inserted).toEqual([])
+    })
+
+    it('sends an Android phone its channel, a high priority and the state in the title, and leaves iOS as it was', async () => {
+        devices = [
+            { token: 'ExponentPushToken[ios]', platform: 'ios' },
+            { token: 'ExponentPushToken[android]', platform: 'android' },
+        ]
+        expo.mockResolvedValue(new Response(JSON.stringify({ data: [{ status: 'ok' }, { status: 'ok' }] })))
+        await pushNotification(supabase, context())
+        const [ios, android] = JSON.parse(expo.mock.calls[0][1].body)
+        expect(ios).toEqual({ to: 'ExponentPushToken[ios]', title: 'Scout', subtitle: 'Question', body: 'Which list first?', sound: 'default', data: { agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } })
+        expect(android).toEqual({ to: 'ExponentPushToken[android]', title: 'Scout · Question', body: 'Which list first?', channelId: 'messages', priority: 'high', data: { agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } })
+    })
+
+    it('lands a finished run on the silent Android channel, at the normal priority', async () => {
+        devices = [{ token: 'ExponentPushToken[android]', platform: 'android' }]
+        await pushNotification(supabase, context({ notification: { kind: 'done', message: 'Here is the list.', event: 'agent.message.completed' } }))
+        const [android] = JSON.parse(expo.mock.calls[0][1].body)
+        expect(android).toMatchObject({ title: 'Scout · Done', channelId: 'silent' })
+        expect(android).not.toHaveProperty('priority')
+        expect(android).not.toHaveProperty('sound')
+    })
+
+    it('revokes a dead Android token and keeps the live iOS one', async () => {
+        devices = [
+            { token: 'ExponentPushToken[ios]', platform: 'ios' },
+            { token: 'ExponentPushToken[android]', platform: 'android' },
+        ]
+        expo.mockResolvedValue(new Response(JSON.stringify({ data: [{ status: 'ok' }, { status: 'error', details: { error: 'DeviceNotRegistered' } }] })))
+        await pushNotification(supabase, context())
+        expect(revoked).toEqual([['ExponentPushToken[android]']])
+        expect(inserted).toHaveLength(1)
     })
 
     it('never throws when Expo is unreachable', async () => {

@@ -1,5 +1,5 @@
 import { needsHuman, type SessionStatus } from '@rerun/contracts'
-import type { SFSymbol } from 'expo-symbols'
+import type { SystemSymbolIcon } from '@/components/ui/system-symbols'
 
 export type ConversationState = 'needs-you' | 'running' | 'new' | 'earlier'
 
@@ -16,20 +16,20 @@ export function stateOf({ status, unseen }: Stateful): ConversationState {
 
 export const CONVERSATION_SECTIONS = [{ state: 'needs-you' }, { state: 'running' }, { state: 'new' }] as const satisfies readonly { state: ConversationState }[]
 
-export const WAITING_GLYPH: Partial<Record<SessionStatus, SFSymbol>> = {
-    awaiting_question: 'questionmark.bubble.fill',
-    awaiting_approval: 'checkmark.shield.fill',
+export const WAITING_GLYPH: Partial<Record<SessionStatus, SystemSymbolIcon>> = {
+    awaiting_question: 'message-circle-question-fill',
+    awaiting_approval: 'shield-check-fill',
     awaiting_connector: 'link',
-    awaiting_ack: 'exclamationmark.bubble.fill',
-    waiting_human: 'hand.raised.fill',
-    error: 'exclamationmark.triangle.fill',
+    awaiting_ack: 'message-circle-warning-fill',
+    waiting_human: 'hand-fill',
+    error: 'triangle-alert-fill',
 }
 
-export function glyphOf(conversation: Stateful): SFSymbol | undefined {
+export function glyphOf(conversation: Stateful): SystemSymbolIcon | undefined {
     const state = stateOf(conversation)
     if (state === 'needs-you') return conversation.status && WAITING_GLYPH[conversation.status]
-    if (state === 'running') return 'arrow.triangle.2.circlepath'
-    if (state === 'new') return 'circle.fill'
+    if (state === 'running') return 'refresh-cw'
+    if (state === 'new') return 'circle-fill'
     return undefined
 }
 

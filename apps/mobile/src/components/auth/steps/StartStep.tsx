@@ -3,6 +3,7 @@ import { router } from 'expo-router'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
+import { AppleLogo } from '@/components/auth/AppleLogo'
 import { OrDivider } from '@/components/auth/OrDivider'
 import { PhoneField } from '@/components/auth/PhoneField'
 import { useSignInFlow } from '@/components/auth/SignInFlow'
@@ -70,9 +71,9 @@ function PhoneFirst() {
             )}
             <OrDivider />
             <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-                <Button label={t('start.continueWithApple')} variant="outline" size="lg" iconOnly stretch symbol="apple.logo" loading={oauth.signingIn === 'apple'} onPress={() => oauth.continueWith('apple')} />
+                <Button label={t('start.continueWithApple')} variant="outline" size="lg" iconOnly stretch icon={<AppleLogo />} loading={oauth.signingIn === 'apple'} onPress={() => oauth.continueWith('apple')} />
                 <Button label={t('start.continueWithGoogle')} variant="outline" size="lg" iconOnly stretch icon={<ProviderLogo provider="google" size={17} />} loading={oauth.signingIn === 'google'} onPress={() => oauth.continueWith('google')} />
-                <Button label={t('start.continueWithEmail')} variant="outline" size="lg" iconOnly stretch symbol="envelope" onPress={() => goTo({ name: 'email' })} />
+                <Button label={t('start.continueWithEmail')} variant="outline" size="lg" iconOnly stretch symbol="mail" onPress={() => goTo({ name: 'email' })} />
             </View>
             <OAuthError message={oauth.error} />
             <AppText variant="caption" tone="muted" style={{ textAlign: 'center' }}>
@@ -99,7 +100,7 @@ function Choices() {
             />
             <Button label={t('start.continueWithGoogle')} variant="outline" size="lg" icon={<ProviderLogo provider="google" size={17} />} loading={oauth.signingIn === 'google'} onPress={() => oauth.continueWith('google')} />
             <Button label={t('start.continueWithPhone')} variant="outline" size="lg" symbol="phone" onPress={() => goTo({ name: 'phone' })} />
-            <Button label={t('start.continueWithEmail')} variant="outline" size="lg" symbol="envelope" onPress={() => goTo({ name: 'email' })} />
+            <Button label={t('start.continueWithEmail')} variant="outline" size="lg" symbol="mail" onPress={() => goTo({ name: 'email' })} />
             <OAuthError message={oauth.error} />
         </View>
     )
@@ -113,7 +114,7 @@ function OwnServer() {
     return (
         <View style={{ gap: spacing.lg, alignItems: 'center' }}>
             <View style={{ alignSelf: 'stretch' }}>
-                <Button label={t('start.continueWithEmail')} size="lg" symbol="envelope" onPress={() => goTo({ name: 'email' })} />
+                <Button label={t('start.continueWithEmail')} size="lg" symbol="mail" onPress={() => goTo({ name: 'email' })} />
             </View>
             <TextLink label={t('start.useCloud')} onPress={() => switchServer(null)} />
         </View>

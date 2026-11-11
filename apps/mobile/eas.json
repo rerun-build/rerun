@@ -12,8 +12,14 @@
       "developmentClient": true,
       "distribution": "internal",
       "channel": "development",
+      "env": {
+        "RERUN_ANDROID_DEV_CLIENT": "1"
+      },
       "ios": {
         "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "staging": {
@@ -21,24 +27,38 @@
       "distribution": "store",
       "channel": "staging",
       "environment": "preview",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      }
     },
     "production": {
       "extends": "base",
       "distribution": "store",
       "channel": "production",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {
     "staging": {
       "ios": {
         "ascAppId": "6825274993"
+      },
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
       }
     },
     "production": {
       "ios": {
         "ascAppId": "6825274993"
+      },
+      "android": {
+        "track": "internal",
+        "releaseStatus": "draft"
       }
     }
   }

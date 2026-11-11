@@ -36,14 +36,43 @@ function assertStoreBuildHasHub(): void {
     throw new Error(`Store build "${process.env.EAS_BUILD_PROFILE}" has no hub to point at: set ${missing.join(', ')} in its EAS environment.`)
 }
 
+// Firebase's file for Android push: Rerun's in the private cloud/ folder, and on the EAS builder, which
+// never receives cloud/, the GOOGLE_SERVICES_JSON file variable of the build's EAS environment. Without
+// it the app builds and runs on Android, it just never gets a push token (the same as iOS without an EAS
+// project). The Google Services Gradle plugin refuses a file that does not name the app's package, so a
+// build whose package the file does not list goes without it too.
+const RERUN_GOOGLE_SERVICES = process.env.GOOGLE_SERVICES_JSON ?? `${__dirname}/../../cloud/apps/mobile/google-services.json`
+
+type GoogleServices = { client?: { client_info?: { android_client_info?: { package_name?: string } } }[] }
+
+function googleServicesName(androidPackage: string | undefined): boolean {
+    const { client = [] } = JSON.parse(readFileSync(RERUN_GOOGLE_SERVICES, 'utf8')) as GoogleServices
+    return client.some(entry => entry.client_info?.android_client_info?.package_name === androidPackage)
+}
+
+function withGoogleServices(config: ConfigContext['config']): ConfigContext['config'] {
+    if (!existsSync(RERUN_GOOGLE_SERVICES) || !googleServicesName(config.android?.package)) return config
+    return { ...config, android: { ...config.android, googleServicesFile: RERUN_GOOGLE_SERVICES } }
+}
+
+// The Android development client installs beside the store app, as `build.rerun.app.dev`.
+const androidDevClient = process.env.RERUN_ANDROID_DEV_CLIENT === '1'
+
+function withAndroidDevClient(config: ConfigContext['config']): ConfigContext['config'] {
+    if (!androidDevClient) return config
+    return { ...config, android: { ...config.android, package: `${config.android?.package}.dev` } }
+}
+
 // A free Apple ID (personal team) cannot claim a bundle ID some other team may own. Local dev builds
 // set RERUN_PERSONAL_TEAM=1 so they install on a real iPhone without a paid Apple Developer account.
 // Store builds leave it unset. Such a team cannot sign the push capability either, so its builds leave
 // the notifications plugin out: the app runs, it just never gets a push token.
 const personalTeam = process.env.RERUN_PERSONAL_TEAM === '1'
 
-// The languages iOS offers in the app's own settings, and the permission prompts in each of them. The
-// English prompts of app.json stay the default for any other language.
+// The languages iOS and Android offer in the app's own settings, and the permission prompts in each of
+// them. The English prompts of app.json stay the default for any other language. Android only lists an
+// app under its per-app language setting once the app declares them (localeConfig), and switches the
+// language in place rather than restarting the screen.
 const APP_LANGUAGES = ['en', 'fr', 'es', 'pt-BR', 'de'] as const
 
 function withLanguages(config: ConfigContext['config']): ConfigContext['config'] {
@@ -51,19 +80,20 @@ function withLanguages(config: ConfigContext['config']): ConfigContext['config']
         ...config,
         locales: Object.fromEntries(APP_LANGUAGES.map(language => [language, `./locales/${language}.json`])),
         ios: { ...config.ios, infoPlist: { ...config.ios?.infoPlist, CFBundleLocalizations: [...APP_LANGUAGES] } },
+        plugins: [...(config.plugins ?? []), ['expo-localization', { supportedLocales: { android: [...APP_LANGUAGES] }, allowDynamicLocaleChangesAndroid: true }]],
     }
 }
 
 export default ({ config: base }: ConfigContext): ExpoConfig => {
     assertStoreBuildHasHub()
-    const config = withLanguages(withEasProject(base))
+    const config = withGoogleServices(withAndroidDevClient(withLanguages(withEasProject(base))))
     if (!personalTeam) return config as ExpoConfig
 
     return {
         ...config,
         name: config.name!,
         slug: config.slug!,
-        plugins: config.plugins?.filter(plugin => plugin !== 'expo-notifications'),
+        plugins: config.plugins?.filter(plugin => (Array.isArray(plugin) ? plugin[0] : plugin) !== 'expo-notifications'),
         ios: {
             ...config.ios,
             bundleIdentifier: process.env.RERUN_IOS_BUNDLE_ID ?? `${config.ios?.bundleIdentifier}.dev`,

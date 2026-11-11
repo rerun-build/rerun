@@ -1,5 +1,4 @@
 import type { SkillProposal, SkillProposalDecision } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import Animated from 'react-native-reanimated'
@@ -8,6 +7,7 @@ import { useTranslations } from 'use-intl'
 import { AppText } from '@/components/ui/AppText'
 import { Badge, TONES } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/ui/Icon'
 import { IconTile } from '@/components/ui/IconTile'
 import { layoutTransition } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
@@ -48,8 +48,8 @@ function Decision({ proposal, pending, onDecide, copy }: SkillProposalRowProps &
 function Outcome({ status }: { status: SkillProposal['status'] }) {
     const theme = useTheme()
     if (status === 'accepted') return <ActivityIndicator size="small" color={theme.mutedForeground} />
-    if (status === 'applied') return <SymbolView name="checkmark.circle.fill" size={18} tintColor={TONES.green[theme.scheme]} />
-    if (status === 'dismissed') return <SymbolView name="xmark.circle.fill" size={18} tintColor={theme.mutedForeground} />
+    if (status === 'applied') return <Icon name="circle-check-fill" size={18} color={TONES.green[theme.scheme]} />
+    if (status === 'dismissed') return <Icon name="circle-x-fill" size={18} color={theme.mutedForeground} />
     return null
 }
 
@@ -83,7 +83,7 @@ export function PinnedSkillProposal({ proposal, pending, onDecide }: SkillPropos
                         <AppText variant="callout" medium numberOfLines={expanded ? undefined : 1} style={{ flexShrink: 1 }}>
                             {copy.headline}
                         </AppText>
-                        <SymbolView name="chevron.down" size={11} weight="semibold" tintColor={theme.mutedForeground} style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }} />
+                        <Icon name="chevron-down" size={11} bold color={theme.mutedForeground} style={{ transform: [{ rotate: expanded ? '180deg' : '0deg' }] }} />
                     </View>
                     {expanded ? (
                         <View style={{ gap: spacing.xs }}>

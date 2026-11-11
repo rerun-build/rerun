@@ -1,5 +1,4 @@
 import { agentImageRef, agentWorkspacePathFromHref } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { Lexer, type Token, type Tokens } from 'marked'
 import { createContext, use, useMemo, type ReactNode } from 'react'
 import { Text, View, type TextStyle } from 'react-native'
@@ -8,6 +7,7 @@ import remend from 'remend'
 
 import { ownedFileUrl, rawFileUrl, type FileOwner } from '@/api/files'
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { EASE_OUT } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing, withAlpha } from '@/theme/tokens'
@@ -201,7 +201,7 @@ function ListBlock({ token, streaming }: { token: Tokens.List; streaming: boolea
                 <View key={i} style={{ flexDirection: 'row', gap: spacing.sm }}>
                     {item.task ? (
                         <View style={{ height: 24, justifyContent: 'center' }}>
-                            <SymbolView name={item.checked ? 'checkmark.square.fill' : 'square'} size={16} tintColor={item.checked ? ink.text : ink.muted} />
+                            <Icon name={item.checked ? 'square-check-fill' : 'square'} size={16} color={item.checked ? ink.text : ink.muted} />
                         </View>
                     ) : (
                         <AppText variant="body" style={{ color: ink.text, minWidth: token.ordered ? 18 : 10, fontVariant: ['tabular-nums'] }}>

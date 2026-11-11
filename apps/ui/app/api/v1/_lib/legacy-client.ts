@@ -1,10 +1,11 @@
-import { CLIENT_HEADER, type AgentModels, type AgentView, type AiConnectionsView, type Provider } from '@rerun/contracts'
+import { type AgentModels, type AgentView, type AiConnectionsView, type Provider } from '@rerun/contracts'
+import { clientOf } from './client-platform'
 
 // The iOS builds already in people's hands parse `providerSchema` strictly: one provider they do not
 // know anywhere in a response fails the whole parse, and with it as the machine's default that is
 // every coworker's sheet. Until the build that knows a provider is the minimum, the routes those
 // builds read leave it out. Each provider names the env var holding its first build; unset, every
-// build is treated as one that does not know it.
+// build is treated as one that does not know it. The Android app was born after every one of them.
 const FIRST_IOS_BUILD_ENV: Partial<Record<Provider, string>> = {
     opencode: 'MOBILE_IOS_OPENCODE_BUILD',
     custom: 'MOBILE_IOS_CUSTOM_BUILD',
@@ -18,15 +19,14 @@ function firstIosBuild(provider: Provider): number | null {
     return Number.isInteger(build) && build > 0 ? build : null
 }
 
-const IOS_CLIENT = /^ios\/[^ ]+ \((\d+)\)$/
-
-// A request without the header is an old build: only the app sends it, and only recent ones do.
+// A request without the header is an old iOS build: only the app sends it, and only recent ones do.
 export function clientKnowsProvider(req: Request, provider: Provider): boolean {
     if (!FIRST_IOS_BUILD_ENV[provider]) return true
-    const match = IOS_CLIENT.exec(req.headers.get(CLIENT_HEADER) ?? '')
+    const client = clientOf(req)
+    if (client?.platform === 'android') return true
     const firstBuild = firstIosBuild(provider)
-    if (!match || firstBuild === null) return false
-    return Number(match[1]) >= firstBuild
+    if (!client || firstBuild === null) return false
+    return client.build >= firstBuild
 }
 
 function unknownTo(req: Request): ((provider: Provider | null | undefined) => boolean) | null {

@@ -52,6 +52,17 @@ describe('reportSubscriptionTransition', () => {
         expect(captureServer).toHaveBeenCalledWith('owner@rerun.test', 'trial_started', expect.objectContaining({ trial_type: 'no_card_5d' }), expect.anything())
     })
 
+    it.each([
+        ['ios', 'ios'],
+        ['android', 'android'],
+        ['web', 'web'],
+        [undefined, 'web'],
+        ['somewhere', 'web'],
+    ])('reports a trial started from %s as started from %s', async (origin, reported) => {
+        await reportSubscriptionTransition(subscription({ status: 'trialing', metadata: { plan: 'base', ...(origin ? { origin } : {}) } }), WORKSPACE_ID, null)
+        expect(captureServer).toHaveBeenCalledWith('owner@rerun.test', 'trial_started', expect.objectContaining({ origin: reported }), expect.anything())
+    })
+
     it('reports the monthly revenue of the arm the subscription was sold on', async () => {
         await reportSubscriptionTransition(subscription({ items: { data: [{ price: { id: 'price_base_29', recurring: { interval: 'month' } }, quantity: 1 }] } }), WORKSPACE_ID, null)
         await reportSubscriptionTransition(subscription({ id: 'sub_2', items: { data: [{ price: { id: 'price_base_29_yearly', recurring: { interval: 'year' } }, quantity: 1 }] } }), WORKSPACE_ID, null)

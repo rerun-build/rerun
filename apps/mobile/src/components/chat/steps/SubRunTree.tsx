@@ -1,5 +1,4 @@
 import { formatElapsed, isSubRunFailing, isSubRunLive, isSubRunStalled, stripBridgePrefix, subRunOutcome, toolLabelOf, type SubRunCall, type SubRunTask } from '@rerun/contracts'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useEffect, useState, type ReactNode } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 import Animated, { cancelAnimation, Easing, FadeIn, FadeOut, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
@@ -7,6 +6,7 @@ import { useTranslations } from 'use-intl'
 
 import { Badge, TONES } from '@/components/ui/Badge'
 import { AppText } from '@/components/ui/AppText'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useTheme } from '@/theme/theme'
 import { layoutTransition, MOTION } from '@/theme/motion'
@@ -27,14 +27,14 @@ type StepVerbTool = (typeof STEP_VERBS)[number]
 
 const hasVerb = (tool: string): tool is StepVerbTool => (STEP_VERBS as readonly string[]).includes(tool)
 
-const STEP_SYMBOLS: Record<string, SFSymbol> = {
-    web_search: 'magnifyingglass',
-    web_fetch: 'doc.text',
+const STEP_SYMBOLS: Record<string, IconName> = {
+    web_search: 'search',
+    web_fetch: 'file-text',
     browser_navigate: 'globe',
     shell_exec: 'terminal',
-    fs_read: 'doc.text',
-    fs_write: 'square.and.pencil',
-    fs_edit: 'square.and.pencil',
+    fs_read: 'file-text',
+    fs_write: 'square-pen',
+    fs_edit: 'square-pen',
 }
 
 function toneOf(task: SubRunTask): Tone {
@@ -76,13 +76,13 @@ function Branch({ tone, last, children, elbowHeight = TASK_ROW_HEIGHT / 2 }: { t
 
 function TaskStatus({ task }: { task: SubRunTask }) {
     const theme = useTheme()
-    const glyph = (name: SFSymbol, color: string) => <SymbolView name={name} size={16} tintColor={color} />
+    const glyph = (name: IconName, color: string) => <Icon name={name} size={16} color={color} />
     let node: ReactNode
     if (task.status === 'running') node = <ActivityIndicator size="small" color={TONES[isSubRunFailing(task) ? 'red' : 'brand'][theme.scheme]} style={{ transform: [{ scale: 0.8 }] }} />
-    else if (task.status === 'error') node = glyph('xmark.circle.fill', TONES.red[theme.scheme])
-    else if (task.status === 'stopped') node = glyph('stop.circle', theme.mutedForeground)
+    else if (task.status === 'error') node = glyph('circle-x-fill', TONES.red[theme.scheme])
+    else if (task.status === 'stopped') node = glyph('circle-stop', theme.mutedForeground)
     else if (task.status === 'queued') node = glyph('clock', theme.mutedForeground)
-    else node = glyph('checkmark.circle.fill', TONES.green[theme.scheme])
+    else node = glyph('circle-check-fill', TONES.green[theme.scheme])
     return <View style={{ width: 18, alignItems: 'center' }}>{node}</View>
 }
 
@@ -129,7 +129,7 @@ function TaskBranch({ task, last, onStop }: { task: SubRunTask; last: boolean; o
                         {formatElapsed(seconds)}
                     </AppText>
                 )}
-                {expandable && <SymbolView name={expanded ? 'chevron.up' : 'chevron.down'} size={10} weight="semibold" tintColor={theme.mutedForeground} />}
+                {expandable && <Icon name={expanded ? 'chevron-up' : 'chevron-down'} size={10} bold color={theme.mutedForeground} />}
                 {canStop && (
                     <Pressable
                         disabled={stopRequested}
@@ -142,7 +142,7 @@ function TaskBranch({ task, last, onStop }: { task: SubRunTask; last: boolean; o
                         hitSlop={8}
                         style={({ pressed }) => ({ width: 28, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm, opacity: stopRequested ? 0.4 : 1, backgroundColor: pressed ? theme.muted : 'transparent' })}
                     >
-                        <SymbolView name="stop.fill" size={11} tintColor={theme.mutedForeground} />
+                        <Icon name="stop-fill" size={11} color={theme.mutedForeground} />
                     </Pressable>
                 )}
             </Pressable>
@@ -173,11 +173,11 @@ function TaskBranch({ task, last, onStop }: { task: SubRunTask; last: boolean; o
     )
 }
 
-function OutcomeLine({ symbol, size = 13, color, label }: { symbol: SFSymbol; size?: number; color: string; label: string }) {
+function OutcomeLine({ symbol, size = 13, color, label }: { symbol: IconName; size?: number; color: string; label: string }) {
     return (
         <View style={{ minHeight: STEP_ROW_HEIGHT, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingLeft: 2, paddingVertical: 4 }}>
             <View style={{ width: 13, height: 16, alignItems: 'center', justifyContent: 'center' }}>
-                <SymbolView name={symbol} size={size} tintColor={color} />
+                <Icon name={symbol} size={size} color={color} />
             </View>
             <AppText variant="caption" numberOfLines={2} style={{ flex: 1, color }}>
                 {label}
@@ -191,10 +191,10 @@ function Outcome({ task }: { task: SubRunTask }) {
     const theme = useTheme()
     if (task.status === 'done') {
         const result = subRunOutcome(task.preview)
-        return result ? <OutcomeLine symbol="checkmark" color={TONES.green[theme.scheme]} label={result} /> : null
+        return result ? <OutcomeLine symbol="check" color={TONES.green[theme.scheme]} label={result} /> : null
     }
-    if (task.status === 'error') return <OutcomeLine symbol="xmark" color={TONES.red[theme.scheme]} label={task.error || t('failed')} />
-    if (task.status === 'stopped') return <OutcomeLine symbol="stop.fill" size={10} color={theme.mutedForeground} label={t('stopped')} />
+    if (task.status === 'error') return <OutcomeLine symbol="x" color={TONES.red[theme.scheme]} label={task.error || t('failed')} />
+    if (task.status === 'stopped') return <OutcomeLine symbol="stop-fill" size={10} color={theme.mutedForeground} label={t('stopped')} />
     return null
 }
 
@@ -261,7 +261,7 @@ function StepLine({ call, tone, last }: { call: SubRunCall; tone: Tone; last: bo
         <Branch tone={call.failed ? 'red' : tone} last={last} elbowHeight={STEP_ROW_HEIGHT / 2}>
             <View style={{ height: STEP_ROW_HEIGHT, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                 <View style={{ width: 13, alignItems: 'center' }}>
-                    <SymbolView name={call.failed ? 'xmark' : (STEP_SYMBOLS[tool] ?? 'gearshape')} size={12} tintColor={call.failed ? color : theme.mutedForeground} />
+                    <Icon name={call.failed ? 'x' : (STEP_SYMBOLS[tool] ?? 'settings')} size={12} color={call.failed ? color : theme.mutedForeground} />
                 </View>
                 <Pulsing active={current}>
                     <AppText variant="caption" numberOfLines={1} style={{ color }}>

@@ -1,7 +1,5 @@
 import { MAX_UPLOAD_FILE_BYTES, type SkillSummary } from '@rerun/contracts'
 import * as DocumentPicker from 'expo-document-picker'
-import * as Haptics from 'expo-haptics'
-import { GlassView } from 'expo-glass-effect'
 import * as ImagePicker from 'expo-image-picker'
 import { type Ref, useEffect, useEffectEvent, useImperativeHandle, useRef, useState } from 'react'
 import { Alert, Text, TextInput, View, type TextInputInstance } from 'react-native'
@@ -9,6 +7,8 @@ import { useTranslations } from 'use-intl'
 
 import { addPasteImagesListener } from '@/chat/composer-paste'
 import { useGlassStyle } from '@/components/ui/GlassButton'
+import { GlassSurface } from '@/components/ui/GlassSurface'
+import * as Haptics from '@/lib/haptics'
 import type { Coworker } from '@/mocks/data'
 import type { Model } from '@/mocks/models'
 import { useTheme } from '@/theme/theme'
@@ -143,29 +143,29 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     const actions = running ? (
         canSend ? (
             <>
-                <RoundButton symbol="stop.fill" label={t('stop')} onPress={stop} />
-                <RoundButton symbol="arrow.up" label={t('send')} tone="primary" onPress={() => onSend()} />
+                <RoundButton symbol="stop-fill" label={t('stop')} onPress={stop} />
+                <RoundButton symbol="arrow-up" label={t('send')} tone="primary" onPress={() => onSend()} />
             </>
         ) : (
-            <RoundButton symbol="stop.fill" label={t('stop')} tone="primary" onPress={stop} />
+            <RoundButton symbol="stop-fill" label={t('stop')} tone="primary" onPress={stop} />
         )
     ) : !canSend ? (
         canRecord ? (
             <RoundButton symbol="mic" label={t('recordVoice')} tone="primary" onPress={startRecording} />
         ) : (
-            <RoundButton symbol="arrow.up" label={t('send')} tone="primary" disabled onPress={() => onSend()} />
+            <RoundButton symbol="arrow-up" label={t('send')} tone="primary" disabled onPress={() => onSend()} />
         )
     ) : (
         <>
             {!hasText && canRecord && <RoundButton symbol="mic" label={t('recordVoice')} onPress={startRecording} />}
-            <RoundButton symbol="arrow.up" label={t('send')} tone="primary" onPress={() => onSend()} />
+            <RoundButton symbol="arrow-up" label={t('send')} tone="primary" onPress={() => onSend()} />
         </>
     )
 
     return (
         <View style={{ gap: spacing.sm }}>
             {mention && suggestions.length > 0 && <MentionSuggestions trigger={mention.trigger} items={suggestions} onPick={pickMention} />}
-            <GlassView key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} style={{ borderRadius: expanded ? radius.xl : radius.pill, borderCurve: 'continuous', paddingHorizontal: expanded ? spacing.md : spacing.sm, paddingTop: expanded ? spacing.md : spacing.sm, paddingBottom: spacing.sm, gap: spacing.sm }}>
+            <GlassSurface key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} style={{ borderRadius: expanded ? radius.xl : radius.pill, borderCurve: 'continuous', paddingHorizontal: expanded ? spacing.md : spacing.sm, paddingTop: expanded ? spacing.md : spacing.sm, paddingBottom: spacing.sm, gap: spacing.sm }}>
                 {expanded && target && (
                     <View style={{ paddingHorizontal: spacing.xs }}>
                         <TargetPicker target={target.coworker} choices={target.choices} onPick={target.onPick} />
@@ -193,9 +193,9 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                         {recording ? (
                             <>
-                                <RoundButton symbol="xmark" label={t('discardRecording')} tone="plain" disabled={recorder.status === 'processing'} onPress={() => void recorder.discard()} />
+                                <RoundButton symbol="x" label={t('discardRecording')} tone="plain" disabled={recorder.status === 'processing'} onPress={() => void recorder.discard()} />
                                 <View style={{ flex: 1 }} />
-                                {recorder.status === 'failed' ? <RoundButton symbol="arrow.clockwise" label={t('retryRecording')} tone="primary" onPress={recorder.retry} /> : <RoundButton symbol="arrow.up" label={t('sendRecording')} tone="primary" busy={recorder.status !== 'recording'} onPress={() => void recorder.finish()} />}
+                                {recorder.status === 'failed' ? <RoundButton symbol="rotate-cw" label={t('retryRecording')} tone="primary" onPress={recorder.retry} /> : <RoundButton symbol="arrow-up" label={t('sendRecording')} tone="primary" busy={recorder.status !== 'recording'} onPress={() => void recorder.finish()} />}
                             </>
                         ) : (
                             <>
@@ -207,7 +207,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                         )}
                     </View>
                 )}
-            </GlassView>
+            </GlassSurface>
         </View>
     )
 }

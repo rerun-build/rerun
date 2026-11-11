@@ -1,9 +1,7 @@
-import * as Haptics from 'expo-haptics'
 import { ROUTE_ID_PATTERN } from '@rerun/contracts'
 import { Redirect, router, useLocalSearchParams } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Pressable, TextInput, View } from 'react-native'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { BackHandler, Pressable, TextInput, View } from 'react-native'
 import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
@@ -13,11 +11,13 @@ import { finishTakeover, openDesktop, startTakeover } from '@/api/desktop'
 import { useAuth } from '@/auth/AuthProvider'
 import { usePaneInsets } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { PillButton } from '@/components/ui/PillButton'
 import { environment } from '@/config/environment'
 import { handBack } from '@/desktop/hand-back'
 import { takePendingDesktopOpen } from '@/desktop/pending-open'
 import { DESKTOP_KEYS, keyScript, typeScript, viewerUrl } from '@/desktop/viewer'
+import * as Haptics from '@/lib/haptics'
 import { fonts, radius, spacing } from '@/theme/tokens'
 
 const SCREEN_BACKGROUND = '#000000'
@@ -119,6 +119,17 @@ export default function Desktop() {
         }
     }
 
+    // Android's back is Done: a takeover is handed back to the coworker rather than left waiting on a
+    // screen nobody holds any more.
+    const onBack = useEffectEvent(() => {
+        if (!finishing) void done()
+        return true
+    })
+    useEffect(() => {
+        const subscription = BackHandler.addEventListener('hardwareBackPress', onBack)
+        return () => subscription.remove()
+    }, [])
+
     const typeText = () => {
         if (!text) return
         web.current?.injectJavaScript(typeScript(text))
@@ -132,7 +143,7 @@ export default function Desktop() {
     return (
         <View style={{ flex: 1, backgroundColor: SCREEN_BACKGROUND }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingTop: insets.top + spacing.sm, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, paddingBottom: spacing.sm }}>
-                <SymbolView name="display" size={16} tintColor="#a1a1a1" />
+                <Icon name="monitor" size={16} color="#a1a1a1" />
                 <AppText variant="headline" numberOfLines={1} style={{ flex: 1, color: '#fafafa' }}>
                     {name ? t('screenOf', { name }) : t('screen')}
                 </AppText>
@@ -185,7 +196,7 @@ export default function Desktop() {
                         style={{ flex: 1, height: 40, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: '#262626', color: '#fafafa', fontFamily: fonts.regular, fontSize: 16 }}
                     />
                     <Pressable onPress={typeText} accessibilityRole="button" accessibilityLabel={t('type')} style={({ pressed }) => ({ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa', opacity: pressed ? 0.7 : 1 })}>
-                        <SymbolView name="arrow.up" size={16} weight="semibold" tintColor="#0a0a0a" />
+                        <Icon name="arrow-up" size={16} bold color="#0a0a0a" />
                     </Pressable>
                 </View>
             </Animated.View>

@@ -1,6 +1,4 @@
-import { Button, ContextMenu, Host, RNHostView } from '@expo/ui/swift-ui'
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
-import { accessibilityLabel, buttonStyle } from '@expo/ui/swift-ui/modifiers'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
@@ -11,6 +9,7 @@ import { columnsFor } from '@/components/layout/split'
 import { HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar, moodOf } from '@/components/ui/CoworkerAvatar'
+import { LongPressMenu, MenuItem } from '@/components/ui/NativeMenu'
 import { UnreadDot } from '@/components/ui/UnreadDot'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -60,30 +59,27 @@ type PinnedGridProps = {
 }
 
 // The pinned coworkers in a grid at the top of the Home. A tap opens the chat, a long press the
-// system's context menu. The cell is a SwiftUI button around an inert RN view, so both gestures stay native.
+// system's context menu.
 export function PinnedGrid({ coworkers, onOpen, onUnpin, onDetails, onEdit }: PinnedGridProps) {
-    const theme = useTheme()
     const cell = usePinnedCell()
     const t = useTranslations('mobileHome')
     return (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: HOME_GUTTER }}>
             {coworkers.map(coworker => (
-                <Host key={coworker.id} matchContents colorScheme={theme.scheme}>
-                    <ContextMenu>
-                        <ContextMenu.Items>
-                            <Button label={t('pinned.unpin')} systemImage="pin.slash" onPress={() => onUnpin(coworker)} />
-                            {coworker.id === FOREMAN_AGENT_ID ? null : <Button label={t('pinned.details')} systemImage="info.circle" onPress={() => onDetails(coworker)} />}
-                            {onEdit ? <Button label={t('pinned.edit')} systemImage="arrow.up.arrow.down" onPress={onEdit} /> : null}
-                        </ContextMenu.Items>
-                        <ContextMenu.Trigger>
-                            <Button onPress={() => onOpen(coworker)} modifiers={[buttonStyle('plain'), accessibilityLabel(coworker.pending > 0 ? t('pinned.unreadLabel', { name: coworker.name }) : coworker.name)]}>
-                                <RNHostView matchContents>
-                                    <PinnedAvatar coworker={coworker} cell={cell} />
-                                </RNHostView>
-                            </Button>
-                        </ContextMenu.Trigger>
-                    </ContextMenu>
-                </Host>
+                <LongPressMenu
+                    key={coworker.id}
+                    onPress={() => onOpen(coworker)}
+                    label={coworker.pending > 0 ? t('pinned.unreadLabel', { name: coworker.name }) : coworker.name}
+                    items={
+                        <>
+                            <MenuItem label={t('pinned.unpin')} icon="pin-off" onPress={() => onUnpin(coworker)} />
+                            {coworker.id === FOREMAN_AGENT_ID ? null : <MenuItem label={t('pinned.details')} icon="info" onPress={() => onDetails(coworker)} />}
+                            {onEdit ? <MenuItem label={t('pinned.edit')} icon="arrow-up-down" onPress={onEdit} /> : null}
+                        </>
+                    }
+                >
+                    <PinnedAvatar coworker={coworker} cell={cell} />
+                </LongPressMenu>
             ))}
         </View>
     )

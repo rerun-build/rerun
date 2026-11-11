@@ -1,12 +1,12 @@
 import type { VoiceMessage } from '@rerun/contracts'
 import * as Clipboard from 'expo-clipboard'
-import * as Haptics from 'expo-haptics'
 import { useState } from 'react'
 import Animated from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
 import type { FileOwner } from '@/api/files'
 import type { ViewerItem } from '@/components/viewer/viewer-store'
+import * as Haptics from '@/lib/haptics'
 import { layoutTransition } from '@/theme/motion'
 import { spacing } from '@/theme/tokens'
 
@@ -38,7 +38,7 @@ export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscript
             {open && <VoiceTranscript transcript={transcript} heardUpTo={started ? playback.progress : null} />}
             <Animated.View layout={layoutTransition} style={{ flexDirection: 'row', marginRight: -spacing.sm }}>
                 <Action
-                    symbol={open ? 'captions.bubble.fill' : 'captions.bubble'}
+                    symbol={open ? 'captions-fill' : 'captions'}
                     label={open ? t('hideTranscript') : t('transcript')}
                     selected={open}
                     onPress={() => {
@@ -47,7 +47,7 @@ export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscript
                     }}
                 />
                 <Action
-                    symbol="doc.on.doc"
+                    symbol="copy"
                     label={t('copyTranscript')}
                     onPress={() => {
                         Clipboard.setStringAsync(transcript)

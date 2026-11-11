@@ -1,9 +1,9 @@
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useId } from 'react'
 import { View } from 'react-native'
 import Svg, { Defs, Mask, Path, Pattern, RadialGradient, Rect, Stop } from 'react-native-svg'
 
 import { BorderBeam } from '@/components/ui/BorderBeam'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { mix } from '@/theme/tokens'
 
@@ -57,9 +57,9 @@ function GridAndGlint({ id }: { id: string }) {
     )
 }
 
-// Port of the web `<Icon size="sm">` for an SF Symbol: a small box whose border is a static beam, a
+// Port of the web `<Icon size="sm">`: a small box whose border is a static beam, a
 // faint grid fading out from the center and a soft glint behind the glyph.
-export function IconTile({ symbol, tone = 'neutral' }: { symbol: SFSymbol; tone?: IconTileTone }) {
+export function IconTile({ symbol, tone = 'neutral' }: { symbol: IconName; tone?: IconTileTone }) {
     const theme = useTheme()
     const id = useId().replace(/[^a-zA-Z0-9]/g, '')
     const surface = tone === 'orange' ? mix(theme.card, ORANGE, 0.1) : mix(theme.card, theme.primary, 0.05)
@@ -69,7 +69,7 @@ export function IconTile({ symbol, tone = 'neutral' }: { symbol: SFSymbol; tone?
             <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, borderRadius: CORNER - 1, borderCurve: 'continuous', overflow: 'hidden' }}>
                 <GridAndGlint id={id} />
             </View>
-            <SymbolView name={symbol} size={GLYPH} weight="medium" tintColor={theme.foreground} />
+            <Icon name={symbol} size={GLYPH} color={theme.foreground} />
         </View>
     )
 }

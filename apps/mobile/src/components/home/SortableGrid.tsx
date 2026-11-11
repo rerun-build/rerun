@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics'
 import { useEffect, useState, type ReactNode } from 'react'
 import { View } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -6,6 +5,7 @@ import Animated, { cancelAnimation, runOnJS, useAnimatedStyle, useSharedValue, w
 import { useTranslations } from 'use-intl'
 
 import { hashUnit } from '@/components/buddy/look'
+import * as Haptics from '@/lib/haptics'
 
 type Item = { id: string }
 type Size = { width: number; height: number }

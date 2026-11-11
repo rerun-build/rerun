@@ -1,5 +1,4 @@
 import { teamEmptyStateOf, type TeamEmptyStateAction, type TeamEmptyStateCopy, type TeamEmptyStateModel, type TeamEmptyStateRow, type TeamPulse } from '@rerun/contracts'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useMemo } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -9,6 +8,7 @@ import { AgentBuddy } from '@/components/buddy/AgentBuddy'
 import type { BuddyMood } from '@/components/buddy/look'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
 import { useTheme } from '@/theme/theme'
@@ -16,7 +16,7 @@ import { radius, spacing } from '@/theme/tokens'
 
 const PULSE_BUDDIES = 6
 const STARTER_KEYS = ['capabilities', 'recentWork', 'projectFiles', 'tools'] as const
-const ROW_SYMBOLS: Record<Exclude<TeamEmptyStateRow['leading'], 'agent'>, SFSymbol> = { build: 'wand.and.rays', template: 'square.stack.3d.up', guide: 'book' }
+const ROW_SYMBOLS: Record<Exclude<TeamEmptyStateRow['leading'], 'agent'>, IconName> = { build: 'wand', template: 'layers', guide: 'book' }
 
 function StarterChip({ text, onPress }: { text: string; onPress: () => void }) {
     const theme = useTheme()
@@ -80,7 +80,7 @@ function RowLeading({ row }: { row: TeamEmptyStateRow }) {
     if (row.leading === 'agent') return <AgentBuddy agentId={row.agentId} size={32} mood={row.working ? 'working' : 'idle'} animated={false} facing="right" />
     return (
         <View style={{ width: 32, height: 32, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.muted }}>
-            <SymbolView name={ROW_SYMBOLS[row.leading]} size={15} tintColor={theme.mutedForeground} />
+            <Icon name={ROW_SYMBOLS[row.leading]} size={15} color={theme.mutedForeground} />
         </View>
     )
 }

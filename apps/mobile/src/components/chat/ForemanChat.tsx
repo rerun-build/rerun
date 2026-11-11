@@ -1,5 +1,4 @@
 import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentModels, type ForemanSurface } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
@@ -18,6 +17,7 @@ import { AppText } from '@/components/ui/AppText'
 import { PillButton } from '@/components/ui/PillButton'
 import { environment, webHost } from '@/config/environment'
 import { cachedForeman } from '@/data/local-cache'
+import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 

@@ -1,6 +1,5 @@
 import type { CoworkerRule, InboxItem } from '@rerun/contracts'
 import { router } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
 import { Alert, ScrollView, View } from 'react-native'
 import Animated, { FadeOut } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -11,6 +10,7 @@ import { inboxSections } from '@/components/inbox/inbox'
 import { InboxRow } from '@/components/inbox/InboxRow'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton, GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
+import { Icon } from '@/components/ui/Icon'
 import { PillButton } from '@/components/ui/PillButton'
 import { useInbox } from '@/data/InboxProvider'
 import { useNotificationPrefs } from '@/data/useNotificationPrefs'
@@ -55,13 +55,13 @@ export function InboxSheet() {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl }}>
             <View collapsable={false} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, marginBottom: spacing.md }}>
-                <GlassButton symbol="xmark" label={t('close')} onPress={() => router.back()} />
+                <GlassButton symbol="x" label={t('close')} onPress={() => router.back()} />
                 <View style={{ width: GLASS_BUTTON_SIZE }} />
                 <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flex: 1, textAlign: 'center' }}>
                     {t('notifications')}
                 </AppText>
-                <GlassButton symbol="gearshape" label={t('settings')} onPress={() => router.push('/settings/notifications')} />
-                <GlassButton symbol="checkmark" label={t('markAllRead')} disabled={items.length === 0 || !fresh} onPress={confirmMarkAll} />
+                <GlassButton symbol="settings" label={t('settings')} onPress={() => router.push('/settings/notifications')} />
+                <GlassButton symbol="check" label={t('markAllRead')} disabled={items.length === 0 || !fresh} onPress={confirmMarkAll} />
             </View>
 
             {running > 0 && (
@@ -83,7 +83,7 @@ export function InboxSheet() {
 
             {inbox.state === 'ready' && items.length === 0 && (
                 <View style={{ alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.xl, paddingTop: spacing.xxl }}>
-                    <SymbolView name="tray" size={28} tintColor={theme.mutedForeground} />
+                    <Icon name="inbox" size={28} color={theme.mutedForeground} />
                     <AppText variant="headline">{t('emptyTitle')}</AppText>
                     <AppText variant="callout" tone="muted" style={{ textAlign: 'center' }}>
                         {t('emptyDescription')}

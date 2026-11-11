@@ -1,9 +1,9 @@
-import * as Haptics from 'expo-haptics'
 import type { ReactNode } from 'react'
 import { Pressable } from 'react-native'
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
 
 import { AppText } from '@/components/ui/AppText'
+import * as Haptics from '@/lib/haptics'
 import { useMessageTimes } from '@/lib/time'
 import { MOTION } from '@/theme/motion'
 import { spacing } from '@/theme/tokens'

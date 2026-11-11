@@ -1,13 +1,6 @@
-const { existsSync } = require('node:fs')
-const path = require('node:path')
-
-// `@rerun/cloud-mobile/*` is Rerun Cloud's side when the private cloud/ folder is in the checkout, and
-// the open source side in src/cloud-oss/ otherwise: the same fallback as the `paths` of tsconfig.json.
-const CLOUD_SOURCE = path.resolve(__dirname, '../../cloud/apps/mobile/src')
-const CLOUD_MOBILE = existsSync(CLOUD_SOURCE) ? CLOUD_SOURCE : path.resolve(__dirname, 'src/cloud-oss')
-
-module.exports = {
-    "preset": "jest-expo",
+// `@rerun/cloud-mobile/*` resolves in jest.resolver.js, module by module, like the `paths` of tsconfig.json.
+// Every test runs as iOS and as Android: a control with a `.android.tsx` twin is tested on both sides.
+const shared = {
     "resolver": "./jest.resolver.js",
     "setupFiles": [
         "react-native-gesture-handler/jestSetup.js",
@@ -17,7 +10,13 @@ module.exports = {
         "node_modules/(?!(.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|native-base|react-native-svg|marked|remend|use-intl|intl-messageformat|@formatjs/.*|icu-minify|@schummar/.*))"
     ],
     "moduleNameMapper": {
-        "^@rerun/cloud-mobile/(.*)$": `${CLOUD_MOBILE}/$1`,
         "^remend$": "<rootDir>/node_modules/remend/dist/index.js"
     }
+}
+
+module.exports = {
+    "projects": [
+        { ...shared, "displayName": "ios", "preset": "jest-expo/ios" },
+        { ...shared, "displayName": "android", "preset": "jest-expo/android" }
+    ]
 }

@@ -1,7 +1,6 @@
 import type { ScheduledRun, TriggerPayload } from '@rerun/contracts'
 import { fullDateTime } from '@rerun/i18n/format'
 import * as Clipboard from 'expo-clipboard'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { useState, type ReactNode } from 'react'
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -11,6 +10,7 @@ import type { FileOwner } from '@/api/files'
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { GlassButton } from '@/components/ui/GlassButton'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'
 
@@ -21,7 +21,7 @@ import { ThreadDivider } from './ThreadDivider'
 const METHOD_TONES: Record<string, string> = { GET: 'cyan', POST: 'green', PUT: 'orange', PATCH: 'orange', DELETE: 'red' }
 
 // The web's `ThreadDividerDialog`, as an iOS sheet: what the divider only names, read in full.
-function OriginSheet({ open, onClose, symbol, title, aside, children }: { open: boolean; onClose: () => void; symbol: SFSymbol; title: string; aside?: ReactNode; children: ReactNode }) {
+function OriginSheet({ open, onClose, symbol, title, aside, children }: { open: boolean; onClose: () => void; symbol: IconName; title: string; aside?: ReactNode; children: ReactNode }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const tc = useTranslations('mobileCommon.actions')
@@ -29,11 +29,11 @@ function OriginSheet({ open, onClose, symbol, title, aside, children }: { open: 
         <Modal visible={open} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
             <View style={{ flex: 1, backgroundColor: theme.background }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.md }}>
-                    <SymbolView name={symbol} size={15} tintColor={theme.mutedForeground} />
+                    <Icon name={symbol} size={15} color={theme.mutedForeground} />
                     <AppText variant="headline" numberOfLines={1} style={{ flex: 1 }}>
                         {title}
                     </AppText>
-                    <GlassButton symbol="xmark" label={tc('close')} onPress={onClose} />
+                    <GlassButton symbol="x" label={tc('close')} onPress={onClose} />
                 </View>
                 {aside ? <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.md }}>{aside}</View> : null}
                 <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: insets.bottom + spacing.xl }}>{children}</ScrollView>
@@ -98,7 +98,7 @@ function PayloadDetails({ payload }: { payload: TriggerPayload }) {
                             hitSlop={8}
                             style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
                         >
-                            <SymbolView name={copied ? 'checkmark' : 'doc.on.doc'} size={11} tintColor={theme.mutedForeground} />
+                            <Icon name={copied ? 'check' : 'copy'} size={11} color={theme.mutedForeground} />
                             <AppText variant="caption" tone="muted">
                                 {copied ? t('copied') : t('copy')}
                             </AppText>
@@ -123,14 +123,14 @@ export function WebhookRunDivider({ payload, owner }: { payload: TriggerPayload;
     return (
         <>
             <ThreadDivider
-                symbol="point.3.connected.trianglepath.dotted"
+                symbol="webhook"
                 pieces={[
                     { kind: 'text', text: t('webhookReceived') },
                     { kind: 'name', text: payload.slug },
                     { kind: 'link', text: payload.prompt ? t('viewDetails') : t('viewPayload'), onPress: () => setOpen(true) },
                 ]}
             />
-            <OriginSheet open={open} onClose={() => setOpen(false)} symbol="point.3.connected.trianglepath.dotted" title={payload.slug} aside={<PayloadSummary payload={payload} />}>
+            <OriginSheet open={open} onClose={() => setOpen(false)} symbol="webhook" title={payload.slug} aside={<PayloadSummary payload={payload} />}>
                 <View style={{ gap: spacing.xl }}>
                     {payload.prompt ? (
                         <View style={{ gap: spacing.xs }}>
@@ -154,14 +154,14 @@ export function ScheduledRunDivider({ run, owner }: { run: Pick<ScheduledRun, 'n
     return (
         <>
             <ThreadDivider
-                symbol="calendar.badge.clock"
+                symbol="calendar-clock"
                 pieces={[
                     { kind: 'text', text: t('scheduledRun') },
                     { kind: 'name', text: run.name },
                     { kind: 'link', text: t('viewPrompt'), onPress: () => setOpen(true) },
                 ]}
             />
-            <OriginSheet open={open} onClose={() => setOpen(false)} symbol="calendar.badge.clock" title={t('promptOf', { name: run.name })}>
+            <OriginSheet open={open} onClose={() => setOpen(false)} symbol="calendar-clock" title={t('promptOf', { name: run.name })}>
                 <Markdown text={run.prompt} owner={owner} />
             </OriginSheet>
         </>
@@ -175,7 +175,7 @@ export function InstallDivider({ agentName, guide, installing, owner }: { agentN
     return (
         <>
             <ThreadDivider
-                symbol={installing ? 'shippingbox' : 'checkmark.circle'}
+                symbol={installing ? 'package' : 'circle-check'}
                 symbolTint={installing ? undefined : '#10b981'}
                 flowing={installing}
                 pieces={[
@@ -183,7 +183,7 @@ export function InstallDivider({ agentName, guide, installing, owner }: { agentN
                     { kind: 'link', text: t('viewGuide'), onPress: () => setOpen(true) },
                 ]}
             />
-            <OriginSheet open={open} onClose={() => setOpen(false)} symbol="shippingbox" title={t('installGuideOf', { name: agentName })}>
+            <OriginSheet open={open} onClose={() => setOpen(false)} symbol="package" title={t('installGuideOf', { name: agentName })}>
                 <Markdown text={guide} owner={owner} />
             </OriginSheet>
         </>

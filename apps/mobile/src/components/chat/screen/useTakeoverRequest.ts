@@ -1,5 +1,4 @@
 import { HITL_CANCELLED, pendingTakeover, serializeTakeoverResult, type PendingHitl } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
 import { useRef, useState } from 'react'
 import { Alert } from 'react-native'
@@ -9,6 +8,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { awaitHandBack, handBack } from '@/desktop/hand-back'
 import { translatorFor } from '@/i18n/translator'
 import { setPendingDesktopOpen } from '@/desktop/pending-open'
+import * as Haptics from '@/lib/haptics'
 import { hostOf } from '@/lib/url'
 
 export type TakeoverRequestState = {

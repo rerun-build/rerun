@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics'
 import { useState } from 'react'
 import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from 'react-native'
 import Animated, { FadeInLeft, FadeInRight, FadeOut, useAnimatedKeyboard, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated'
@@ -15,6 +14,8 @@ import { StartStep, type StartLayout } from '@/components/auth/steps/StartStep'
 import { FORM_COLUMN_MAX_WIDTH } from '@/components/layout/split'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { GlassButton } from '@/components/ui/GlassButton'
+import { useFocusedSystemBack } from '@/lib/focused-system-back'
+import * as Haptics from '@/lib/haptics'
 import { EASE_OUT, MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -49,9 +50,12 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const { height: windowHeight } = useWindowDimensions()
-    const { step, direction, back, thinking } = useSignInFlow()
+    const { step, direction, back, canGoBack, thinking } = useSignInFlow()
     const keyboard = useAnimatedKeyboard()
     const t = useTranslations('mobileAuth')
+    // Android's back gesture walks the steps back as the sheet's own back button does, rather than leave
+    // the app; the country sheet pushed over this screen takes the gesture back while it is open.
+    useFocusedSystemBack(canGoBack, back)
 
     const paddingTop = FOREMAN_SIZE / 2 + spacing.lg
     const paddingBottom = insets.bottom + spacing.lg
@@ -66,7 +70,9 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
         setRestingContent(measured)
     }
 
-    const lift = useAnimatedStyle(() => ({ transform: [{ translateY: -Math.max(0, keyboard.height.get() - insets.bottom) }] }))
+    // A layout prop rather than a transform: iOS keeps the accessibility frames of a transformed view where
+    // they were, so the Back button would be found, by VoiceOver and by UI tests, off the sheet it rides on.
+    const lift = useAnimatedStyle(() => ({ bottom: Math.max(0, keyboard.height.get() - insets.bottom) - SHEET_RUNOFF }))
     const frame = useAnimatedStyle(() => {
         const covered = Math.max(paddingBottom, keyboard.height.get() + spacing.lg)
         return { height: Math.min(contentHeight.get(), windowHeight - topRoom - paddingTop - covered) }
@@ -85,7 +91,6 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
                         position: 'absolute',
                         left: 0,
                         right: 0,
-                        bottom: -SHEET_RUNOFF,
                         paddingTop,
                         paddingBottom: paddingBottom + SHEET_RUNOFF,
                         borderTopLeftRadius: radius.xl,
@@ -100,7 +105,7 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
                 <Foreman thinking={thinking} />
                 {step.name !== 'start' && (
                     <View style={{ position: 'absolute', top: spacing.lg, left: spacing.lg, zIndex: 1 }}>
-                        <GlassButton symbol="chevron.left" label={t('back')} onPress={back} />
+                        <GlassButton symbol="chevron-left" label={t('back')} onPress={back} />
                     </View>
                 )}
                 <Animated.View style={[{ overflow: 'hidden' }, frame]}>

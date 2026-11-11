@@ -21,7 +21,7 @@ vi.mock('@/lib/foreman/tools', () => ({ foremanActiveTools: vi.fn(() => []), for
 vi.mock('@/lib/foreman/turn', () => ({ createForemanTurn: vi.fn() }))
 vi.mock('@/lib/foreman/prompt', () => ({ foremanSystemPrompt: vi.fn() }))
 
-const request = (messages: unknown[] = []) => new Request('https://rerun.test/api/chat/foreman', { method: 'POST', body: JSON.stringify({ sessionId: 'session', messages }) })
+const request = (messages: unknown[] = [], client?: string) => new Request('https://rerun.test/api/chat/foreman', { method: 'POST', body: JSON.stringify({ sessionId: 'session', messages, client }) })
 const hello = [{ id: 'm1', role: 'user', parts: [{ type: 'text', text: 'Hello' }] }]
 
 describe('POST /api/chat/foreman', () => {
@@ -49,6 +49,17 @@ describe('POST /api/chat/foreman', () => {
 
         expect(response.status).toBe(423)
         expect(loadForemanState).toHaveBeenCalledOnce()
+    })
+
+    it.each([
+        ['ios', 'ios'],
+        ['android', 'android'],
+        [undefined, 'web'],
+        ['windows', 'web'],
+    ])('walks a conversation the client %s opened as %s', async (client, walkedAs) => {
+        vi.mocked(isPhoneStepPending).mockResolvedValue(false)
+        await POST(request([], client))
+        expect(loadForemanState).toHaveBeenCalledWith(expect.anything(), null, null, walkedAs)
     })
 
     describe('a turn the model answers', () => {

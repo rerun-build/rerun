@@ -1,9 +1,9 @@
-import { SymbolView } from 'expo-symbols'
 import type { ReactNode } from 'react'
 import { Pressable, View } from 'react-native'
 
 import { AppText } from '@/components/ui/AppText'
 import { GROUPED_ROW_HEIGHT } from '@/components/ui/GroupedList'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { brand, spacing } from '@/theme/tokens'
 
@@ -25,7 +25,7 @@ export function ModelRow({ id, label, description, selected, locked, disabled, l
                     </AppText>
                 ) : null}
             </View>
-            {locked ? <SymbolView name="lock" size={14} tintColor={theme.mutedForeground} /> : selected ? <SymbolView name="checkmark" size={16} weight="semibold" tintColor={theme.scheme === 'dark' ? brand.soft : brand.base} /> : null}
+            {locked ? <Icon name="lock" size={14} color={theme.mutedForeground} /> : selected ? <Icon name="check" size={16} bold color={theme.scheme === 'dark' ? brand.soft : brand.base} /> : null}
         </Pressable>
     )
 }

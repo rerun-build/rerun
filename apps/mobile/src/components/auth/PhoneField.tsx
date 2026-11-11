@@ -1,10 +1,10 @@
 import type { CountryCode } from 'libphonenumber-js/min'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useLocale, useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { countryByCode, examplePlaceholder, formatAsTyped } from '@/lib/phone'
 import { fieldOutline } from '@/theme/field'
 import { useTheme } from '@/theme/theme'
@@ -38,7 +38,7 @@ export function PhoneField({ country, value, onChangeText, onPickCountry, onSubm
                 <AppText variant="body" maxFontSizeMultiplier={1.2}>
                     +{callingCode}
                 </AppText>
-                <SymbolView name="chevron.down" size={11} weight="semibold" tintColor={theme.mutedForeground} />
+                <Icon name="chevron-down" size={11} bold color={theme.mutedForeground} />
             </Pressable>
             <View style={{ width: 1, height: 24, backgroundColor: theme.border }} />
             <TextInput

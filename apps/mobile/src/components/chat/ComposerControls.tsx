@@ -1,12 +1,11 @@
-import { Button, Menu, Toggle } from '@expo/ui/swift-ui'
 import type { SkillSummary } from '@rerun/contracts'
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import { ActivityIndicator, Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
-import { NativeMenu } from '@/components/ui/NativeMenu'
+import { Icon, type IconName } from '@/components/ui/Icon'
+import { MenuItem, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { ProviderLogo } from '@/components/ui/ProviderLogo'
 import type { Coworker } from '@/mocks/data'
 import type { Model } from '@/mocks/models'
@@ -17,7 +16,7 @@ import { spacing } from '@/theme/tokens'
 export const CONTROL = 36
 
 // `busy` keeps the button's shape and colour while its action is under way, the glyph a spinner.
-export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: disabledProp, busy = false }: { symbol: SFSymbol; label: string; onPress: () => void; tone?: 'primary' | 'muted' | 'plain'; disabled?: boolean; busy?: boolean }) {
+export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: disabledProp, busy = false }: { symbol: IconName; label: string; onPress: () => void; tone?: 'primary' | 'muted' | 'plain'; disabled?: boolean; busy?: boolean }) {
     const theme = useTheme()
     const disabled = disabledProp || busy
     const lit = tone === 'primary' && (!disabled || busy)
@@ -42,7 +41,7 @@ export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: 
                 boxShadow: lit ? ctaRelief[theme.scheme][pressed ? 'pressed' : 'rest'] : undefined,
             })}
         >
-            {busy ? <ActivityIndicator size="small" color={tint} /> : <SymbolView name={symbol} size={tone === 'plain' ? 20 : 15} weight={tone === 'primary' ? 'bold' : 'medium'} tintColor={tint} />}
+            {busy ? <ActivityIndicator size="small" color={tint} /> : <Icon name={symbol} size={tone === 'plain' ? 20 : 15} bold={tone === 'primary'} color={tint} />}
         </Pressable>
     )
 }
@@ -54,19 +53,19 @@ export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill }
         <NativeMenu
             trigger={
                 <View accessibilityLabel={t('attach')} style={{ width: CONTROL, height: CONTROL, alignItems: 'center', justifyContent: 'center' }}>
-                    <SymbolView name="plus" size={20} weight="regular" tintColor={theme.foreground} />
+                    <Icon name="plus" size={20} color={theme.foreground} />
                 </View>
             }
         >
-            <Button label={t('photos')} systemImage="photo.on.rectangle" onPress={onPhotos} />
-            <Button label={t('camera')} systemImage="camera" onPress={onCamera} />
-            <Button label={t('files')} systemImage="folder" onPress={onFiles} />
+            <MenuItem label={t('photos')} icon="images" onPress={onPhotos} />
+            <MenuItem label={t('camera')} icon="camera" onPress={onCamera} />
+            <MenuItem label={t('files')} icon="folder" onPress={onFiles} />
             {skills.length > 0 && onSkill && (
-                <Menu label={t('skills')} systemImage="book">
+                <SubMenu label={t('skills')} icon="book">
                     {skills.map(skill => (
-                        <Button key={skill.slug} label={skill.name} onPress={() => onSkill(skill.slug)} />
+                        <MenuItem key={skill.slug} label={skill.name} onPress={() => onSkill(skill.slug)} />
                     ))}
-                </Menu>
+                </SubMenu>
             )}
         </NativeMenu>
     )
@@ -96,12 +95,12 @@ export function TargetPicker({ target, choices, onPick }: { target: Coworker; ch
                     <AppText variant="footnote" tone="muted" medium numberOfLines={1} maxFontSizeMultiplier={1.2}>
                         {target.name}
                     </AppText>
-                    <SymbolView name="chevron.down" size={10} weight="semibold" tintColor={theme.mutedForeground} />
+                    <Icon name="chevron-down" size={10} bold color={theme.mutedForeground} />
                 </View>
             }
         >
             {choices.map(coworker => (
-                <Toggle key={coworker.id} label={coworker.name} isOn={coworker.id === target.id} onIsOnChange={() => onPick(coworker.id)} />
+                <MenuToggle key={coworker.id} label={coworker.name} isOn={coworker.id === target.id} onChange={() => onPick(coworker.id)} />
             ))}
         </NativeMenu>
     )

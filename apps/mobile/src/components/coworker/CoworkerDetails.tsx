@@ -1,5 +1,3 @@
-import { Button as MenuButton } from '@expo/ui/swift-ui'
-import { disabled } from '@expo/ui/swift-ui/modifiers'
 import type { CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
 import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -13,7 +11,7 @@ import { moodOf } from '@/components/ui/CoworkerAvatar'
 import { usePaneInsets } from '@/components/layout/PaneSize'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { Card, ICON_ROW_INSET, Separator, SettingsRow } from '@/components/ui/GroupedList'
-import { CircleTrigger, NativeMenu } from '@/components/ui/NativeMenu'
+import { CircleTrigger, MenuItem, NativeMenu } from '@/components/ui/NativeMenu'
 import type { CoworkerStatus } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -79,9 +77,9 @@ export function CoworkerDetails({ coworker, files, apps, routines, notifications
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: insets.top + spacing.xs, paddingBottom: insets.bottom + spacing.xl, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <GlassButton symbol="chevron.left" label={t('back')} onPress={onBack} />
+                <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} />
                 <NativeMenu glass="circle" label={t('more')} trigger={<CircleTrigger symbol="ellipsis" />}>
-                    <MenuButton label={t('delete')} systemImage="trash" role="destructive" onPress={onDelete} modifiers={[disabled(!canDelete || lock.locked)]} />
+                    <MenuItem label={t('delete')} icon="trash" destructive onPress={onDelete} disabled={!canDelete || lock.locked} />
                 </NativeMenu>
             </View>
 
@@ -108,11 +106,11 @@ export function CoworkerDetails({ coworker, files, apps, routines, notifications
             <Card>
                 <SettingsRow icon="folder" label={t('files')} value={files ? filesValue(files, t) : undefined} loading={!files && !unavailable.files} accessory="chevron" onPress={onFiles} />
                 <Separator inset={ICON_ROW_INSET} />
-                <SettingsRow icon="square.grid.2x2" label={t('apps')} value={apps ? appsValue(apps, t) : undefined} loading={!apps && !unavailable.apps} accessory="chevron" onPress={onApps} />
+                <SettingsRow icon="layout-grid" label={t('apps')} value={apps ? appsValue(apps, t) : undefined} loading={!apps && !unavailable.apps} accessory="chevron" onPress={onApps} />
                 <Separator inset={ICON_ROW_INSET} />
                 <SettingsRow icon="clock" label={t('routines')} value={routines ? routinesValue(routines, t) : undefined} loading={!routines && !unavailable.routines} accessory="chevron" onPress={onRoutines} />
                 <Separator inset={ICON_ROW_INSET} />
-                <SettingsRow icon="desktopcomputer" label={t('computer')} value={computerUnavailable ?? (coworker.status === 'working' ? t('working') : t('idle'))} accessory="chevron" disabled={!!computerUnavailable} onPress={onComputer} />
+                <SettingsRow icon="monitor" label={t('computer')} value={computerUnavailable ?? (coworker.status === 'working' ? t('working') : t('idle'))} accessory="chevron" disabled={!!computerUnavailable} onPress={onComputer} />
             </Card>
 
             <Card>

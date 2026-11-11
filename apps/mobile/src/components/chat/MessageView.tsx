@@ -171,7 +171,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
         }
         if (part.type === 'data-compaction') {
             const data = (part as unknown as { data: CompactionData }).data
-            addStep({ key: `k${index}`, symbol: 'arrow.down.right.and.arrow.up.left', status: data.status, runningLabel: t('compacting'), node: <CompactionStep data={data} /> }, index)
+            addStep({ key: `k${index}`, symbol: 'minimize', status: data.status, runningLabel: t('compacting'), node: <CompactionStep data={data} /> }, index)
             return
         }
         if (!isToolPart(part)) return

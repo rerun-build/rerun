@@ -1,5 +1,5 @@
 import { checkoutTerms } from './checkout-terms'
-import type { ForemanState } from '@/lib/foreman/phase'
+import { isMobileApp, type ForemanState } from '@/lib/foreman/phase'
 import type { PhaseSpec } from '@/lib/foreman/phases/spec'
 
 // The step between an agent the user has agreed to and the agent being built. The offer itself is the
@@ -17,7 +17,7 @@ export const TRIAL_PHASE: PhaseSpec = {
         const team = plan?.items.length ? `What they agreed to: ${plan.items.map(item => (item.kind === 'template' ? (item.title ?? item.slug) : item.kind === 'share' ? (item.name ?? 'a shared coworker') : item.name)).join(', ')}.` : ''
         const divisions = plan?.boxes?.length ? ` Laid out across ${plan.boxes.length} Boxes: ${plan.boxes.map(box => box.name).join(', ')}.` : ''
 
-        if (state.client === 'ios') return iosInstructions(state, `${team}${divisions}`)
+        if (isMobileApp(state)) return mobileAppInstructions(state, `${team}${divisions}`)
 
         return `Right now: their first coworker is agreed and nothing has been created. ${team}${divisions}
 
@@ -35,7 +35,7 @@ How to run this:
 // In the app the card is a "Build my team" button that starts the trial without a card, and nothing
 // about paying is ever said there: what can stop it is a trial already spent, which only the web can
 // take further, or a hiccup the button simply retries.
-function iosInstructions(state: ForemanState, agreed: string): string {
+function mobileAppInstructions(state: ForemanState, agreed: string): string {
     const blocked = state.trialSpent
         ? 'This workspace cannot be started from the app. Say so in one line, and that they can finish setting it up at rerun.build. Nothing else.'
         : 'The build did not start. Say in one line that it did not go through and that the "Build my team" button right under your reply tries again.'

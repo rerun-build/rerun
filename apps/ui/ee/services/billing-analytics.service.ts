@@ -5,6 +5,7 @@ import { intervalOfItems, legacyBaseDiscountCents, priceArmOfItems, quantitiesFr
 import { resolveWorkspaceMemberEmail, resolveWorkspaceOwner, type WorkspaceOwner } from '@/app/api/_services/workspace-owner.service'
 import { captureServer, deterministicUuid } from '@rerun/analytics/server'
 import type { BillingPeriod, SubscriptionLifecycleProps } from '@rerun/analytics'
+import { foremanClientSchema, type ForemanClient } from '@rerun/contracts'
 import type Stripe from 'stripe'
 import { findWorkspaceId } from './billing.service'
 
@@ -14,6 +15,10 @@ import { findWorkspaceId } from './billing.service'
 // guard, and a deterministic uuid per (event, object) that makes PostHog dedupe whatever slips.
 
 export { resolveWorkspaceMemberEmail, resolveWorkspaceOwner }
+
+function trialOrigin(origin: string | undefined): ForemanClient {
+    return foremanClientSchema.catch('web').parse(origin)
+}
 
 function lifecycleProps(subscription: Stripe.Subscription, workspaceId: number, owner: WorkspaceOwner): SubscriptionLifecycleProps {
     const items = subscription.items?.data ?? []
@@ -62,7 +67,7 @@ export async function reportSubscriptionTransition(subscription: Stripe.Subscrip
 
         const props = lifecycleProps(subscription, workspaceId, owner)
         const uuid = deterministicUuid(`${event}:${subscription.id}`)
-        if (event === 'trial_started') await captureServer(owner.email, event, { ...props, trial_type: subscription.trial_settings?.end_behavior?.missing_payment_method === 'cancel' ? 'no_card_5d' : 'card_required_5d', origin: subscription.metadata?.origin === 'ios' ? 'ios' : 'web' }, { uuid })
+        if (event === 'trial_started') await captureServer(owner.email, event, { ...props, trial_type: subscription.trial_settings?.end_behavior?.missing_payment_method === 'cancel' ? 'no_card_5d' : 'card_required_5d', origin: trialOrigin(subscription.metadata?.origin) }, { uuid })
         else await captureServer(owner.email, event, props, { uuid })
     } catch (err) {
         console.error('[billing analytics] subscription transition capture failed', err)

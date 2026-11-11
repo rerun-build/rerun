@@ -27,6 +27,7 @@ describe('pushCopyOf', () => {
     it('reads the routine name the engine sends on its own, and writes in the reader\'s language', () => {
         const copy = copyOf({ event: 'agent.schedule.completed', kind: 'done', message: 'Schedule "daily" completed', metadata: { scheduleSlug: 'daily', sourceName: 'Morning brief' } }, french)
         expect(copy.subtitle).toBe('Morning brief · Terminé')
+        expect(copy.androidTitle).toBe('Prospect Research · Morning brief · Terminé')
     })
 
     it('names the trigger and says what broke in words, not the provider JSON', () => {
@@ -62,7 +63,7 @@ describe('pushCopyOf', () => {
     })
 
     it('leaves a finished schedule without a body, and silent', () => {
-        expect(copyOf({ event: 'agent.schedule.completed', kind: 'done', message: 'Schedule "Daily digest" completed' })).toEqual({ title: 'Prospect Research', subtitle: 'Daily digest · Done', body: undefined, silent: true })
+        expect(copyOf({ event: 'agent.schedule.completed', kind: 'done', message: 'Schedule "Daily digest" completed' })).toEqual({ title: 'Prospect Research', subtitle: 'Daily digest · Done', androidTitle: 'Prospect Research · Daily digest · Done', body: undefined, silent: true })
     })
 
     it('shows the reply of a finished chat, silent', () => {
@@ -75,7 +76,7 @@ describe('pushCopyOf', () => {
         ['connector', 'Needs an app'],
         ['info', 'Update'],
     ] as const)('puts what the %s is about in the body', (kind, subtitle) => {
-        expect(copyOf({ kind, message: 'Which list first?' })).toEqual({ title: 'Prospect Research', subtitle, body: 'Which list first?', silent: false })
+        expect(copyOf({ kind, message: 'Which list first?' })).toEqual({ title: 'Prospect Research', subtitle, androidTitle: `Prospect Research · ${subtitle}`, body: 'Which list first?', silent: false })
     })
 
     it('keeps the body on one short line', () => {

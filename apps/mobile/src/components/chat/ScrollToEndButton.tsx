@@ -13,5 +13,5 @@ export const SINK_OUT = new Keyframe({ 0: { transform: [{ translateY: 0 }, { sca
 // one tap away.
 export function ScrollToEndButton({ onPress }: { onPress: () => void }) {
     const t = useTranslations('mobileChat.messages')
-    return <GlassButton symbol="arrow.down" label={t('scrollToLatest')} size={SIZE} onPress={onPress} />
+    return <GlassButton symbol="arrow-down" label={t('scrollToLatest')} size={SIZE} onPress={onPress} />
 }

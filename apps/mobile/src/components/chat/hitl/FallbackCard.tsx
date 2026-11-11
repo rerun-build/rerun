@@ -1,16 +1,16 @@
 import * as WebBrowser from 'expo-web-browser'
-import type { SFSymbol } from 'expo-symbols'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import type { IconName } from '@/components/ui/Icon'
 import { spacing } from '@/theme/tokens'
 
 import { HitlAction, HitlCard } from './HitlCard'
 
 // What a block asks, as text, for a block the app cannot draw: answered in the composer, or on the web
 // where every block is drawn.
-export function FallbackCard({ symbol, label, ask, webUrl }: { symbol: SFSymbol; label: string; ask: string | null; webUrl: string }) {
+export function FallbackCard({ symbol, label, ask, webUrl }: { symbol: IconName; label: string; ask: string | null; webUrl: string }) {
     const t = useTranslations('mobileHitl')
     return (
         <HitlCard symbol={symbol} label={label}>

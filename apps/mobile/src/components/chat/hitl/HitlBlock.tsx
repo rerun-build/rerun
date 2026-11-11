@@ -20,5 +20,5 @@ export function HitlBlock(props: HitlWidgetProps) {
 // A call from an engine newer than the app, which the app cannot even name.
 export function UnknownCallBlock({ call, coworkerName, webUrl }: { call: UnknownPendingCall; coworkerName: string; webUrl: string }) {
     const t = useTranslations('mobileHitl')
-    return <FallbackCard symbol="hand.raised" label={t('fallback.needsYou', { name: coworkerName })} ask={askOf(call.input)} webUrl={webUrl} />
+    return <FallbackCard symbol="hand" label={t('fallback.needsYou', { name: coworkerName })} ask={askOf(call.input)} webUrl={webUrl} />
 }

@@ -1,5 +1,4 @@
 import { router, useLocalSearchParams } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -10,6 +9,7 @@ import { AppText } from '@/components/ui/AppText'
 import { Chip } from '@/components/ui/Chip'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { GlassButton } from '@/components/ui/GlassButton'
+import { Icon } from '@/components/ui/Icon'
 import { UnreadDot } from '@/components/ui/UnreadDot'
 import { LAB_CONVERSATIONS, type LabConversation } from '@/mocks/conversations'
 import { useTheme } from '@/theme/theme'
@@ -34,7 +34,7 @@ function Leading({ conversation }: { conversation: LabConversation }) {
     const state = stateOf(conversation)
     return (
         <View style={{ width: 20, alignItems: 'center', paddingTop: 3 }}>
-            {state === 'needs-you' && <SymbolView name={WAITING_GLYPH[conversation.status] ?? 'circle.fill'} size={15} tintColor={conversation.status === 'error' ? theme.destructive : theme.waiting} />}
+            {state === 'needs-you' && <Icon name={WAITING_GLYPH[conversation.status] ?? 'circle-fill'} size={15} color={conversation.status === 'error' ? theme.destructive : theme.waiting} />}
             {state === 'running' && <ActivityIndicator size="small" color={theme.mutedForeground} style={{ transform: [{ scale: 0.8 }] }} />}
             {state === 'new' && <UnreadDot style={{ marginTop: 4 }} />}
         </View>
@@ -66,7 +66,7 @@ export function ConversationRow({ conversation, active, count, expanded, onPress
                     <AppText variant="footnote" tone="muted" maxFontSizeMultiplier={1.4}>
                         {state === 'running' ? 'now' : timeAgo(conversation.minutesAgo)}
                     </AppText>
-                    {count !== undefined && count > 1 && <SymbolView name={expanded ? 'chevron.up' : 'chevron.down'} size={11} weight="semibold" tintColor={theme.mutedForeground} />}
+                    {count !== undefined && count > 1 && <Icon name={expanded ? 'chevron-up' : 'chevron-down'} size={11} bold color={theme.mutedForeground} />}
                 </View>
                 {detail && (
                     <AppText variant="footnote" tone={detail.tone} numberOfLines={1} maxFontSizeMultiplier={1.4}>
@@ -168,19 +168,19 @@ export default function ConversationsSheetLab() {
     return (
         <ScrollView style={{ backgroundColor: theme.background }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl }}>
             <View collapsable={false} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, marginBottom: spacing.md }}>
-                <GlassButton symbol="xmark" label="Close" onPress={close} />
+                <GlassButton symbol="x" label="Close" onPress={close} />
                 <Pressable onPress={close} accessibilityRole="button" accessibilityLabel="Coworker details" style={({ pressed }) => ({ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm, opacity: pressed ? 0.6 : 1 })}>
                     <CoworkerAvatar coworker={PULSE} size={22} facing="right" animated={false} />
                     <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2}>
                         {PULSE.name}
                     </AppText>
-                    <SymbolView name="chevron.right" size={12} weight="semibold" tintColor={theme.mutedForeground} />
+                    <Icon name="chevron-right" size={12} bold color={theme.mutedForeground} />
                 </Pressable>
-                <GlassButton symbol="square.and.pencil" label="New conversation" onPress={close} />
+                <GlassButton symbol="square-pen" label="New conversation" onPress={close} />
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 40, marginHorizontal: spacing.lg, marginBottom: spacing.md, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: theme.muted }}>
-                <SymbolView name="magnifyingglass" size={15} tintColor={theme.mutedForeground} />
+                <Icon name="search" size={15} color={theme.mutedForeground} />
                 <TextInput value={query} onChangeText={setQuery} placeholder="Search conversations" placeholderTextColor={theme.mutedForeground} autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" style={{ flex: 1, fontFamily: fonts.regular, fontSize: 16, color: theme.foreground }} />
             </View>
 

@@ -1,6 +1,5 @@
 import { parseQuery, searchItems, type Box, type ConversationHit } from '@rerun/contracts'
 import { router } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
 import { useEffect, useMemo, useState } from 'react'
 import { Pressable, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -18,6 +17,7 @@ import { SectionHeader } from '@/components/home/SectionHeader'
 import { usePaneInsets } from '@/components/layout/PaneSize'
 import { AppText } from '@/components/ui/AppText'
 import { GlassButton } from '@/components/ui/GlassButton'
+import { Icon } from '@/components/ui/Icon'
 import { cachedBoard } from '@/data/local-cache'
 import { useTimeAgo } from '@/lib/time'
 import { fonts, radius, spacing } from '@/theme/tokens'
@@ -127,9 +127,9 @@ export default function Search() {
     return (
         <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm, paddingLeft: pane.left, paddingRight: pane.right }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.md }}>
-                <GlassButton symbol="chevron.left" label={t('search.back')} onPress={() => router.back()} />
+                <GlassButton symbol="chevron-left" label={t('search.back')} onPress={() => router.back()} />
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 44, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: theme.muted }}>
-                    <SymbolView name="magnifyingglass" size={15} tintColor={theme.mutedForeground} />
+                    <Icon name="search" size={15} color={theme.mutedForeground} />
                     <TextInput value={query} onChangeText={setQuery} placeholder={t('search.placeholder')} placeholderTextColor={theme.mutedForeground} autoFocus autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing" style={{ flex: 1, fontFamily: fonts.regular, fontSize: 16, color: theme.foreground }} />
                 </View>
             </View>

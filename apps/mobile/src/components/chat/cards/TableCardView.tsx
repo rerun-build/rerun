@@ -1,6 +1,5 @@
 import { cellText, formatText, isNumericFormat, isTruthyCell, type TableCard } from '@rerun/contracts'
 import { formatNumber } from '@rerun/i18n/format'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { useLocale, useTranslations } from 'use-intl'
@@ -9,6 +8,7 @@ import { mediaUrl } from '@/api/files'
 import { HorizontalScroll } from '@/components/chat/HorizontalScroll'
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
@@ -28,7 +28,7 @@ function Cell({ value, format, tones, agentId }: { value: unknown; format?: stri
             </AppText>
         )
     }
-    if (format === 'boolean') return <SymbolView name={isTruthyCell(value) ? 'checkmark' : 'minus'} size={12} weight="semibold" tintColor={isTruthyCell(value) ? theme.foreground : theme.mutedForeground} />
+    if (format === 'boolean') return <Icon name={isTruthyCell(value) ? 'check' : 'minus'} size={12} bold color={isTruthyCell(value) ? theme.foreground : theme.mutedForeground} />
     if (format === 'tag') return <Badge size="xs" label={cellText(value)} tone={toneOf(cellText(value), tones)} />
     if (format === 'image') return <AuthedImage url={mediaUrl(value, agentId)} style={{ width: 24, height: 24, borderRadius: 4 }} />
     if (format === 'rating') return <AppText variant="footnote">{'★'.repeat(Math.max(0, Math.min(5, Math.round(Number(value)))))}</AppText>
@@ -53,7 +53,7 @@ function ListRows({ card, agentId }: { card: TableCard; agentId: string }) {
                 const title = cellText(fields.title ? row[fields.title] : '')
                 return (
                     <View key={index} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderTopWidth: index > 0 ? 1 : 0, borderTopColor: theme.border }}>
-                        {fields.image && <AuthedImage url={mediaUrl(row[fields.image], agentId)} fallback="person" style={{ width: 32, height: 32, borderRadius: 16 }} />}
+                        {fields.image && <AuthedImage url={mediaUrl(row[fields.image], agentId)} fallback="user" style={{ width: 32, height: 32, borderRadius: 16 }} />}
                         <View style={{ flex: 1, gap: 2 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
                                 <AppText variant="callout" medium numberOfLines={1} style={{ flexShrink: 1 }}>
@@ -123,7 +123,7 @@ export function TableCardView({ card, agentId }: { card: TableCard; agentId: str
     const asList = card.layout !== undefined && card.layout !== 'table' && Boolean(card.fields?.title)
     const meta = card.rows.length < card.total ? t('partial', { shown: card.rows.length, total: card.total }) : formatNumber(card.total, locale)
     return (
-        <CardFrame symbol="tablecells" title={titleOf(card.table)} meta={meta}>
+        <CardFrame symbol="table" title={titleOf(card.table)} meta={meta}>
             {asList ? <ListRows card={card} agentId={agentId} /> : <Grid card={card} agentId={agentId} />}
         </CardFrame>
     )

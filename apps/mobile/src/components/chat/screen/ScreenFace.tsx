@@ -1,9 +1,9 @@
-import { SymbolView } from 'expo-symbols'
 import { View } from 'react-native'
 import Animated, { FadeOut } from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { mix, spacing } from '@/theme/tokens'
 
@@ -23,7 +23,7 @@ export function ScreenFace({ status }: { status: ScreenStatus }) {
                 <ScreenLoader />
             ) : (
                 <View style={{ alignItems: 'center', gap: 6 }}>
-                    <SymbolView name="display" size={20} tintColor={theme.mutedForeground} />
+                    <Icon name="monitor" size={20} color={theme.mutedForeground} />
                     <AppText variant="footnote" tone="muted" style={{ textAlign: 'center' }}>
                         {t(status)}
                     </AppText>

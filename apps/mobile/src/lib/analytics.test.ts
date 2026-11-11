@@ -1,3 +1,5 @@
+import { Platform } from 'react-native'
+
 import { forgetPerson, identifyPerson, posthog, track } from '@/lib/analytics'
 
 jest.mock('posthog-react-native', () =>
@@ -29,6 +31,6 @@ describe('analytics', () => {
         client.register.mockClear()
         await forgetPerson()
         expect(client.flush.mock.invocationCallOrder[0]).toBeLessThan(client.reset.mock.invocationCallOrder[0])
-        expect(client.register).toHaveBeenCalledWith({ platform: 'ios', app_environment: 'local' })
+        expect(client.register).toHaveBeenCalledWith({ platform: Platform.OS, app_environment: 'local' })
     })
 })

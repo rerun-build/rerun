@@ -1,6 +1,4 @@
-import { Image, Label, Menu, Toggle } from '@expo/ui/swift-ui'
 import type { WorkspaceSummary } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -8,10 +6,11 @@ import { useTranslations } from 'use-intl'
 import { fetchWorkspaces } from '@/api/account'
 import { useAuth } from '@/auth/AuthProvider'
 import { WorkspaceLogo } from '@/components/home/WorkspaceLogo'
-import { initialSymbolOf, useWorkspaceLogoFiles, workspaceLabel } from '@/components/home/workspace-logos'
+import { useWorkspaceLogoFiles, workspaceInitials, workspaceLabel } from '@/components/home/workspace-logos'
 import { AppText } from '@/components/ui/AppText'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
-import { NativeMenu } from '@/components/ui/NativeMenu'
+import { Icon } from '@/components/ui/Icon'
+import { MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { cachedWorkspaces } from '@/data/local-cache'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -27,9 +26,9 @@ export function WorkspaceSubmenu() {
     const t = useTranslations('mobileHome')
     const workspaces = useWorkspaces()
     return (
-        <Menu label={workspaceLabel(me?.workspace, t)} systemImage="square.stack">
+        <SubMenu label={workspaceLabel(me?.workspace, t)} icon="layers">
             <WorkspaceToggles current={me?.workspace} workspaces={workspaces} onSwitch={switchWorkspace} />
-        </Menu>
+        </SubMenu>
     )
 }
 
@@ -72,7 +71,7 @@ export function WorkspaceMenuView({ current, workspaces, onSwitch }: WorkspaceSw
                     <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flexShrink: 1 }}>
                         {name}
                     </AppText>
-                    <SymbolView name="chevron.up.chevron.down" size={13} weight="medium" tintColor={theme.foreground} />
+                    <Icon name="chevrons-up-down" size={13} color={theme.foreground} />
                 </View>
             }
         >
@@ -86,10 +85,6 @@ function WorkspaceToggles({ current, workspaces, onSwitch }: WorkspaceSwitchProp
     const t = useTranslations('mobileHome')
     return workspaces.map(workspace => {
         const logoFile = logoFiles.get(workspace.id)
-        return (
-            <Toggle key={workspace.id} isOn={workspace.id === current?.id} onIsOnChange={() => onSwitch(workspace.id)}>
-                {logoFile ? <Label title={workspaceLabel(workspace, t)} icon={<Image uiImage={logoFile} />} /> : <Label title={workspaceLabel(workspace, t)} systemImage={initialSymbolOf(workspace)} />}
-            </Toggle>
-        )
+        return <MenuToggle key={workspace.id} label={workspaceLabel(workspace, t)} badge={logoFile ? { imageUri: logoFile } : { initials: workspaceInitials(workspace) }} isOn={workspace.id === current?.id} onChange={() => onSwitch(workspace.id)} />
     })
 }

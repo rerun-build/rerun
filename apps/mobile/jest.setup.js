@@ -15,3 +15,13 @@ jest.mock('use-intl', () => {
         useTranslations: namespace => actual.createTranslator({ locale: 'en', messages, namespace }),
     }
 })
+
+// The haptics are native calls: Jest's automock leaves out AndroidHaptics and the system feedback the
+// Android twin plays, so the whole module is stubbed with its real enums.
+jest.mock('expo-haptics', () => ({
+    ...jest.requireActual('expo-haptics'),
+    selectionAsync: jest.fn(async () => {}),
+    impactAsync: jest.fn(async () => {}),
+    notificationAsync: jest.fn(async () => {}),
+    performAndroidHapticsAsync: jest.fn(async () => {}),
+}))

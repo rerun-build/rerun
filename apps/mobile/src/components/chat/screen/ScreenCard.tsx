@@ -1,10 +1,10 @@
-import { SymbolView } from 'expo-symbols'
 import type { ReactNode } from 'react'
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import { BorderBeam } from '@/components/ui/BorderBeam'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { mix, radius, spacing } from '@/theme/tokens'
 
@@ -13,10 +13,10 @@ import type { TakeoverRequestState } from './useTakeoverRequest'
 
 const OVERLAY = 'rgba(0,0,0,0.55)'
 
-function ScreenPill({ symbol, label }: { symbol: 'globe' | 'cursorarrow'; label: string }) {
+function ScreenPill({ symbol, label }: { symbol: 'globe' | 'mouse-pointer'; label: string }) {
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: '100%', paddingHorizontal: 7, paddingVertical: 3, borderRadius: radius.pill, backgroundColor: OVERLAY }}>
-            <SymbolView name={symbol} size={11} tintColor="#ffffff" />
+            <Icon name={symbol} size={11} color="#ffffff" />
             <AppText variant="caption" medium numberOfLines={1} style={{ color: '#ffffff', fontSize: 11, lineHeight: 14, flexShrink: 1 }}>
                 {label}
             </AppText>
@@ -58,7 +58,7 @@ export function ScreenCard({ live, site, screen, takeover, onTakeControl, onLayo
                             )}
                             {!takeover?.locked && (
                                 <View style={{ position: 'absolute', bottom: spacing.sm, left: spacing.sm }}>
-                                    <ScreenPill symbol="cursorarrow" label={label} />
+                                    <ScreenPill symbol="mouse-pointer" label={label} />
                                 </View>
                             )}
                         </Pressable>

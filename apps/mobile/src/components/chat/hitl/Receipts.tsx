@@ -1,9 +1,9 @@
 import { HITL_CANCELLED, type ApprovalDecision, type QuestionAnswer, type ServiceSetupEntry } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -45,7 +45,7 @@ export function QuestionReceipt({ answers }: { answers: QuestionAnswer[] }) {
                     ) : (
                         answer.answers.map(value => (
                             <View key={value} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                                <SymbolView name="checkmark" size={11} weight="bold" tintColor={theme.foreground} />
+                                <Icon name="check" size={11} bold color={theme.foreground} />
                                 <AppText variant="body" style={{ flexShrink: 1 }}>
                                     {value}
                                 </AppText>
@@ -63,7 +63,7 @@ export function CancelledReceipt({ of }: { of: keyof typeof HITL_CANCELLED }) {
     const theme = useTheme()
     return (
         <View style={{ alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-            <SymbolView name="xmark" size={11} weight="semibold" tintColor={theme.mutedForeground} />
+            <Icon name="x" size={11} bold color={theme.mutedForeground} />
             <AppText variant="footnote" tone="muted">
                 {t(of)}
             </AppText>
@@ -75,7 +75,7 @@ function Decision({ approved, label }: { approved: boolean; label: string }) {
     const theme = useTheme()
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <SymbolView name={approved ? 'checkmark' : 'xmark'} size={10} weight="bold" tintColor={approved ? theme.foreground : theme.destructive} />
+            <Icon name={approved ? 'check' : 'x'} size={10} bold color={approved ? theme.foreground : theme.destructive} />
             <AppText variant="caption" medium tone={approved ? 'default' : 'destructive'}>
                 {label}
             </AppText>
@@ -173,7 +173,7 @@ export function TakeoverReceipt({ url }: { url: string | null }) {
     const theme = useTheme()
     return (
         <View style={{ alignSelf: 'flex-end', flexDirection: 'row', alignItems: 'center', gap: spacing.xs, maxWidth: '86%' }}>
-            <SymbolView name="display" size={11} weight="semibold" tintColor={theme.mutedForeground} />
+            <Icon name="monitor" size={11} bold color={theme.mutedForeground} />
             <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flexShrink: 1 }}>
                 {url ? t('handedBackOn', { url }) : t('handedBack')}
             </AppText>

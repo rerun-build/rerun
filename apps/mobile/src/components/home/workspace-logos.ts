@@ -1,6 +1,5 @@
 import type { WorkspaceSummary } from '@rerun/contracts'
 import { Directory, File, Paths } from 'expo-file-system'
-import type { SFSymbol } from 'expo-symbols'
 import { useEffect, useState } from 'react'
 
 import type { HomeTranslator } from '@/components/home/board'
@@ -21,13 +20,6 @@ export function workspaceInitials(workspace: Pick<WorkspaceSummary, 'name'> | un
 export function logoUrlOf(iconUrl: string | null | undefined): string | null {
     const value = iconUrl?.trim()
     return value && /^https?:\/\//i.test(value) ? value : null
-}
-
-// The system menu draws neither text nor a remote image as an icon, so a row without a logo gets the
-// lettered symbol of its first initial.
-export function initialSymbolOf(workspace: Pick<WorkspaceSummary, 'name'>): SFSymbol {
-    const letter = workspaceInitials(workspace)[0]?.toLowerCase()
-    return letter && /^[a-z]$/.test(letter) ? (`${letter}.circle.fill` as SFSymbol) : 'building.2'
 }
 
 function hashOf(value: string): string {

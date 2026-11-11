@@ -1,13 +1,13 @@
-import { SymbolView } from 'expo-symbols'
-import { Linking, View } from 'react-native'
+import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { PillButton } from '@/components/ui/PillButton'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-const APP_STORE_URL = 'https://apps.apple.com/app/id6825274993'
+import { openStoreListing } from './store-listing'
 
 export function UpdateRequired() {
     const theme = useTheme()
@@ -15,7 +15,7 @@ export function UpdateRequired() {
     const common = useTranslations('mobileCommon')
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.xl, paddingHorizontal: spacing.xl, backgroundColor: theme.background }}>
-            <SymbolView name="arrow.down.app" size={56} weight="regular" tintColor={theme.mutedForeground} />
+            <Icon name="download" size={56} color={theme.mutedForeground} />
             <View style={{ alignItems: 'center', gap: spacing.xs }}>
                 <AppText variant="title" style={{ textAlign: 'center' }}>
                     {t('update.title')}
@@ -24,7 +24,7 @@ export function UpdateRequired() {
                     {t('update.body')}
                 </AppText>
             </View>
-            <PillButton label={common('actions.update')} onPress={() => Linking.openURL(APP_STORE_URL)} />
+            <PillButton label={common('actions.update')} onPress={() => void openStoreListing()} />
         </View>
     )
 }

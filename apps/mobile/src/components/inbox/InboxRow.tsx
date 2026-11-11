@@ -1,8 +1,6 @@
 import type { CoworkerRule, InboxItem } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
-import { SymbolView } from 'expo-symbols'
 import { useRef } from 'react'
-import { ActionSheetIOS, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
 import { useTranslations } from 'use-intl'
 
@@ -11,6 +9,9 @@ import { minutesSince } from '@/components/home/board'
 import { moodOfInbox } from '@/components/inbox/inbox'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
+import { Icon } from '@/components/ui/Icon'
+import { showActionSheet } from '@/components/ui/system-dialogs'
+import * as Haptics from '@/lib/haptics'
 import { useTimeAgo } from '@/lib/time'
 import { useTheme } from '@/theme/theme'
 import { brand, spacing } from '@/theme/tokens'
@@ -48,7 +49,7 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
         if (rule?.follow) actions.push({ label: t('row.unfollow'), run: () => onRule(item, { ...rule, follow: false }, t('row.unfollowed', { name: item.agentName })) })
         if (rule && rule.mode !== 'muted') actions.push({ label: t('row.mute', { name: item.agentName }), run: () => onRule(item, { ...rule, mode: 'muted' }, t('row.muted', { name: item.agentName })) })
         actions.push({ label: t('row.settings'), run: () => onSettings(item) })
-        ActionSheetIOS.showActionSheetWithOptions({ options: [...actions.map(action => action.label), t('row.cancel')], cancelButtonIndex: actions.length }, index => actions[index]?.run())
+        showActionSheet({ options: [...actions.map(action => action.label), t('row.cancel')], cancelButtonIndex: actions.length }, index => actions[index]?.run())
     }
 
     return (
@@ -59,8 +60,8 @@ export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }:
             overshootRight={false}
             onSwipeableOpen={markRead}
             renderRightActions={() => (
-                <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden style={{ width: ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
-                    <SymbolView name="checkmark" size={18} weight="semibold" tintColor="#ffffff" />
+                <Pressable onPress={() => swipeable.current?.close()} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ width: ACTION_WIDTH, alignItems: 'center', justifyContent: 'center', gap: 2, backgroundColor: brand.base }}>
+                    <Icon name="check" size={18} bold color="#ffffff" />
                     <AppText variant="caption" medium maxFontSizeMultiplier={1.2} style={{ color: '#ffffff' }}>
                         {t('row.read')}
                     </AppText>

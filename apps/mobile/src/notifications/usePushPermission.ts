@@ -5,7 +5,7 @@ import { AppState } from 'react-native'
 import { useAuth } from '@/auth/AuthProvider'
 import { pushAvailable, pushPermission, turnOnPush } from '@/notifications/push'
 
-// Read again each time the app comes back, the person may have just flipped it in iOS Settings. Left
+// Read again each time the app comes back, the person may have just flipped it in the phone's settings. Left
 // unknown where push is not offered, so nothing asks to turn it on.
 export function usePushPermission() {
     const { session, me } = useAuth()

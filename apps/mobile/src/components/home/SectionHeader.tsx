@@ -1,9 +1,9 @@
-import { SymbolView } from 'expo-symbols'
 import { Pressable, View } from 'react-native'
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
 import { EASE_OUT, MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { HOME_GUTTER } from '@/components/home/CoworkerRow'
@@ -42,7 +42,7 @@ export function SectionHeader({ label, count, collapsed, onToggle, divided, acti
                 )}
                 <Pressable onPress={onToggle} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" hitSlop={10} style={({ pressed }) => ({ paddingVertical: spacing.sm, opacity: pressed ? 0.6 : 1 })}>
                     <Animated.View style={chevron}>
-                        <SymbolView name="chevron.down" size={13} weight="medium" tintColor={theme.mutedForeground} />
+                        <Icon name="chevron-down" size={13} color={theme.mutedForeground} />
                     </Animated.View>
                 </Pressable>
             </View>

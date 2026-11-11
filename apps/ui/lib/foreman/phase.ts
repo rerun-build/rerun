@@ -1,4 +1,4 @@
-import { FOREMAN_PHASES, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
+import { FOREMAN_PHASES, isMobileClient, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
 
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
 import type { PriceArm } from '@rerun/cloud/billing'
@@ -151,6 +151,11 @@ export function foremanPhase({ foreman, onboardingCompletedAt, entitled, trialin
 // `coworker` is the one coworker a template installs, when it installs exactly one: the name the
 // arrival speaks of, where a template's title reads as a sentence.
 export type ArrivingIntent = KickoffIntent & { description?: string; title?: string; paid?: TemplatePricing; coworker?: string }
+
+// The iOS and Android apps sell nothing: what the foreman says there leaves out every price and payment.
+export function isMobileApp(state: Pick<ForemanState, 'client'>): boolean {
+    return isMobileClient(state.client)
+}
 
 export function isReadyMade(intent: KickoffIntent | null): boolean {
     return intent?.kind === 'template' || intent?.kind === 'share'

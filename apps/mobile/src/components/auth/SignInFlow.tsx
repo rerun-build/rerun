@@ -25,6 +25,7 @@ type SignInFlow = {
     direction: 'forward' | 'back'
     goTo: (step: SignInStep) => void
     back: () => void
+    canGoBack: boolean
     // Something is on its way to the hub: the Foreman thinks while it is.
     thinking: boolean
     setThinking: (thinking: boolean) => void
@@ -51,7 +52,7 @@ export function SignInFlowProvider({ initialStep = { name: 'start' }, children }
     }
 
     const step = history[history.length - 1]
-    return <SignInFlowContext.Provider value={{ country, setCountry, phone, setPhone, email, setEmail, step, direction, goTo, back, thinking, setThinking }}>{children}</SignInFlowContext.Provider>
+    return <SignInFlowContext.Provider value={{ country, setCountry, phone, setPhone, email, setEmail, step, direction, goTo, back, canGoBack: history.length > 1, thinking, setThinking }}>{children}</SignInFlowContext.Provider>
 }
 
 export function useSignInFlow(): SignInFlow {

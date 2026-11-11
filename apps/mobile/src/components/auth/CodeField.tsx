@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Pressable, TextInput, View, type TextInputInstance } from 'react-native'
+import { Platform, Pressable, TextInput, View, type TextInputInstance } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
@@ -50,7 +50,7 @@ export function CodeField({ length, value, onChangeText, onComplete, disabled, i
                 autoFocus
                 keyboardType="number-pad"
                 textContentType="oneTimeCode"
-                autoComplete="one-time-code"
+                autoComplete={Platform.OS === 'android' ? 'sms-otp' : 'one-time-code'}
                 maxLength={length}
                 caretHidden
                 style={{ position: 'absolute', width: 1, height: 1, opacity: 0 }}

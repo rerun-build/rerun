@@ -2,7 +2,7 @@ import { NativeModule, requireOptionalNativeModule } from 'expo'
 
 declare class ComposerPasteModule extends NativeModule<{ onPasteImages: (event: { uris: string[] }) => void }> {}
 
-// iOS only, and only in a binary built with it: elsewhere a pasted image is ignored, as before.
+// Only in a binary built with it: elsewhere a pasted image is ignored, as before.
 const ComposerPaste = requireOptionalNativeModule<ComposerPasteModule>('ComposerPaste')
 
 // The images pasted into the composer, as JPEG files on the phone.

@@ -1,8 +1,9 @@
-import { Button, Host, Image } from '@expo/ui/swift-ui'
-import { accessibilityLabel, buttonBorderShape, buttonStyle, disabled as disabledModifier, font, frame } from '@expo/ui/swift-ui/modifiers'
-import type { SFSymbol } from 'expo-symbols'
+import { Button, Host, RNHostView } from '@expo/ui/swift-ui'
+import { accessibilityLabel, buttonBorderShape, buttonStyle, disabled as disabledModifier } from '@expo/ui/swift-ui/modifiers'
 import { createContext, use } from 'react'
+import { View } from 'react-native'
 
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 
 export const GLASS_BUTTON_SIZE = 44
@@ -19,7 +20,7 @@ export function useGlassStyle() {
 }
 
 type GlassButtonProps = {
-    symbol: SFSymbol
+    symbol: IconName
     label: string
     onPress: () => void
     disabled?: boolean
@@ -28,14 +29,18 @@ type GlassButtonProps = {
     scheme?: 'light' | 'dark'
 }
 
-// The system's own glass button (SwiftUI `.buttonStyle(.glass)`), round, with an SF Symbol.
+// The system's own glass button (SwiftUI `.buttonStyle(.glass)`), round, around the app's `Icon`.
 export function GlassButton({ symbol, label, onPress, disabled = false, size = GLASS_BUTTON_SIZE, scheme }: GlassButtonProps) {
     const theme = useTheme()
     const colorScheme = scheme ?? theme.scheme
     return (
         <Host matchContents colorScheme={colorScheme}>
             <Button onPress={onPress} modifiers={[buttonStyle('glass'), buttonBorderShape('circle'), disabledModifier(disabled), accessibilityLabel(label)]}>
-                <Image systemName={symbol} color={colorScheme === 'dark' ? '#fafafa' : theme.foreground} modifiers={[font({ size: Math.round(size * 0.4), weight: 'medium' }), frame({ width: size - 2 * GLASS_INSET, height: size - 2 * GLASS_INSET })]} />
+                <RNHostView matchContents>
+                    <View style={{ width: size - 2 * GLASS_INSET, height: size - 2 * GLASS_INSET, alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name={symbol} size={Math.round(size * 0.45)} color={colorScheme === 'dark' ? '#fafafa' : theme.foreground} />
+                    </View>
+                </RNHostView>
             </Button>
         </Host>
     )

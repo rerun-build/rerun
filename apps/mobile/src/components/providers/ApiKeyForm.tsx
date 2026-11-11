@@ -1,5 +1,4 @@
 import type { AiConnectionsView } from '@rerun/contracts'
-import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -7,6 +6,7 @@ import { useTranslations } from 'use-intl'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/GroupedList'
+import { Icon } from '@/components/ui/Icon'
 import { TextField } from '@/components/ui/TextField'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -55,7 +55,7 @@ export function ApiKeyForm({ entry, name, onName, apiKey, onApiKey, baseUrl, onB
                         <AppText variant="callout" medium style={{ flex: 1 }}>
                             {entry.guide.title}
                         </AppText>
-                        <SymbolView name={guideOpen ? 'chevron.up' : 'chevron.down'} size={12} weight="semibold" tintColor={theme.mutedForeground} />
+                        <Icon name={guideOpen ? 'chevron-up' : 'chevron-down'} size={12} bold color={theme.mutedForeground} />
                     </Pressable>
                     {guideOpen && (
                         <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>

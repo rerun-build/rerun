@@ -1,9 +1,10 @@
-import { SymbolView, type SFSymbol } from 'expo-symbols'
 import type { ReactNode } from 'react'
-import { Pressable, Switch, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Switch } from '@/components/ui/Switch'
 import { useTheme } from '@/theme/theme'
 import { brand, radius, spacing } from '@/theme/tokens'
 
@@ -41,7 +42,7 @@ type SettingsRowProps = {
     value?: string
     // The value is still on its way: a placeholder holds its place.
     loading?: boolean
-    icon?: SFSymbol
+    icon?: IconName
     accessory?: 'external' | 'chevron'
     tone?: 'default' | 'destructive'
     disabled?: boolean
@@ -56,12 +57,12 @@ export const ICON_ROW_INSET = spacing.lg + 24 + spacing.md
 
 export function SettingsRow({ label, value, loading, icon, accessory, tone = 'default', disabled, onPress, testID }: SettingsRowProps) {
     const theme = useTheme()
-    const trailingSymbol: SFSymbol | null = accessory === 'external' ? 'arrow.up.right' : accessory === 'chevron' ? 'chevron.right' : null
+    const trailingSymbol: IconName | null = accessory === 'external' ? 'arrow-up-right' : accessory === 'chevron' ? 'chevron-right' : null
     const content = (
         <>
             {icon && (
                 <View style={{ width: 24, alignItems: 'center' }}>
-                    <SymbolView name={icon} size={18} weight="regular" tintColor={theme.mutedForeground} />
+                    <Icon name={icon} size={18} color={theme.mutedForeground} />
                 </View>
             )}
             <AppText variant="body" tone={tone} numberOfLines={1} style={{ flexShrink: 0, maxWidth: '70%' }}>
@@ -75,7 +76,7 @@ export function SettingsRow({ label, value, loading, icon, accessory, tone = 'de
                     {value}
                 </AppText>
             ) : null}
-            {trailingSymbol && <SymbolView name={trailingSymbol} size={13} weight="medium" tintColor={theme.mutedForeground} />}
+            {trailingSymbol && <Icon name={trailingSymbol} size={13} color={theme.mutedForeground} />}
         </>
     )
 
@@ -109,7 +110,7 @@ export function SwitchRow({ label, value, onValueChange, disabled, testID }: Swi
 type CheckRowProps = {
     label: string
     detail?: string
-    icon?: SFSymbol
+    icon?: IconName
     // Drawn after the label, a « Recommended » badge for one.
     badge?: ReactNode
     checked: boolean
@@ -133,7 +134,7 @@ export function CheckRow({ label, detail, icon, badge, checked, disabled, onPres
         >
             {icon && (
                 <View style={{ width: 24, alignItems: 'center', paddingTop: detail ? 2 : 0 }}>
-                    <SymbolView name={icon} size={18} weight="regular" tintColor={theme.mutedForeground} />
+                    <Icon name={icon} size={18} color={theme.mutedForeground} />
                 </View>
             )}
             <View style={{ flex: 1, gap: 2 }}>
@@ -149,7 +150,7 @@ export function CheckRow({ label, detail, icon, badge, checked, disabled, onPres
                     </AppText>
                 ) : null}
             </View>
-            <View style={{ width: 20, alignItems: 'center', paddingTop: detail ? 3 : 0 }}>{checked && <SymbolView name="checkmark" size={16} weight="semibold" tintColor={theme.scheme === 'dark' ? brand.soft : brand.base} />}</View>
+            <View style={{ width: 20, alignItems: 'center', paddingTop: detail ? 3 : 0 }}>{checked && <Icon name="check" size={16} bold color={theme.scheme === 'dark' ? brand.soft : brand.base} />}</View>
         </Pressable>
     )
 }

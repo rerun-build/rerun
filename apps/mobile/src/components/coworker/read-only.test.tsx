@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native'
 
 import { BOX_MANAGE_REASON, type ManageLock } from '@/auth/access'
 import { MOCK_APPS_TO_CONNECT, MOCK_ROUTINES } from '@/mocks/coworkerDetails'
+import { isSwitchDisabled } from '@/test/switch'
 
 import { CoworkerApps } from './CoworkerApps'
 import { CoworkerRoutines } from './CoworkerRoutines'
@@ -19,13 +20,13 @@ describe('a coworker the caller only uses', () => {
         const onToggle = jest.fn()
         await render(<CoworkerRoutines name="Scout" routines={MOCK_ROUTINES} savingKeys={[]} lock={USE_ONLY} onToggle={onToggle} onBack={() => {}} />)
         expect(screen.getByText(BOX_MANAGE_TEXT)).toBeTruthy()
-        for (const routine of MOCK_ROUTINES) expect(screen.getByLabelText(routine.name).props.disabled).toBe(true)
+        for (const routine of MOCK_ROUTINES) expect(isSwitchDisabled(screen.getByLabelText(routine.name))).toBe(true)
     })
 
     it('keeps the routine switches open to a manager', async () => {
         await render(<CoworkerRoutines name="Scout" routines={MOCK_ROUTINES} savingKeys={[]} onToggle={() => {}} onBack={() => {}} />)
         expect(screen.queryByText(BOX_MANAGE_TEXT)).toBeNull()
-        expect(screen.getByLabelText(MOCK_ROUTINES[0].name).props.disabled).toBeFalsy()
+        expect(isSwitchDisabled(screen.getByLabelText(MOCK_ROUTINES[0].name))).toBe(false)
     })
 
     it('shows the apps to connect with a greyed Connect that does nothing', async () => {
@@ -45,7 +46,7 @@ describe('a coworker whose level is not known yet', () => {
         await render(<CoworkerRoutines name="Scout" routines={MOCK_ROUTINES} savingKeys={[]} lock={UNKNOWN} onToggle={onToggle} onBack={() => {}} />)
         expect(screen.queryByText(BOX_MANAGE_TEXT)).toBeNull()
         expect(screen.getByText('Ask Scout in the chat to set one up.')).toBeTruthy()
-        for (const routine of MOCK_ROUTINES) expect(screen.getByLabelText(routine.name).props.disabled).toBe(true)
+        for (const routine of MOCK_ROUTINES) expect(isSwitchDisabled(screen.getByLabelText(routine.name))).toBe(true)
     })
 
     it('keeps Connect greyed without saying why', async () => {

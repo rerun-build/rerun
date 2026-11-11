@@ -1,5 +1,4 @@
 import type { AddableProvider, AiConnectionKind, AiConnectionView, AiConnectionsView, UpdateConnectionInput } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { Alert } from 'react-native'
@@ -8,8 +7,10 @@ import { useTranslations } from 'use-intl'
 import { deleteAiConnection, fetchAiConnectionUsage, replaceAiConnectionKey, setWorkspaceDefault, updateAiConnection } from '@/api/aiConnections'
 import { AI_PROVIDERS_ADMIN_ONLY } from '@/auth/access'
 import { useIsWorkspaceAdmin } from '@/auth/AuthProvider'
+import { promptText } from '@/components/ui/system-dialogs'
 import { messageOf, useAiConnections } from '@/data/useAiConnections'
 import { track } from '@/lib/analytics'
+import * as Haptics from '@/lib/haptics'
 
 import { AddProvider } from './AddProvider'
 import { describeUsage, ReadOnlyNote, SheetFrame } from './bits'
@@ -103,16 +104,15 @@ export function ConnectionDetailScreen({ connectionId }: { connectionId: string 
     }
 
     const rename = () =>
-        Alert.prompt(
-            t('renameTitle'),
-            t('renameMessage'),
-            name => {
+        promptText({
+            title: t('renameTitle'),
+            message: t('renameMessage'),
+            defaultValue: connection.name,
+            onSubmit: name => {
                 const trimmed = name.trim()
                 if (trimmed && trimmed !== connection.name) patch({ name: trimmed }, { name: trimmed })
             },
-            'plain-text',
-            connection.name
-        )
+        })
 
     const onModels = (models: string[]) => {
         const enabled = new Set([...models, ...connection.extraModels])

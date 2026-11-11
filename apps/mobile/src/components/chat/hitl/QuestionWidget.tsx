@@ -1,11 +1,11 @@
 import { pendingQuestions, serializeAnswers } from '@rerun/contracts'
-import * as Haptics from 'expo-haptics'
-import { SymbolView } from 'expo-symbols'
 import { useRef, useState, type ReactNode } from 'react'
 import { Pressable, TextInput, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
+import * as Haptics from '@/lib/haptics'
 import { fieldOutline } from '@/theme/field'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'
@@ -29,7 +29,7 @@ export function OptionRow({ index, label, description, selected, multiple, onPre
         <Pressable onPress={onPress} accessibilityRole={multiple ? 'checkbox' : 'button'} accessibilityLabel={label} accessibilityState={{ checked: multiple ? selected : undefined, selected }} style={({ pressed }) => ({ ...ROW, borderColor: selected ? theme.foreground : theme.border, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <View style={{ width: 22, height: 22, borderRadius: multiple ? 6 : 11, alignItems: 'center', justifyContent: 'center', backgroundColor: selected ? theme.foreground : theme.muted }}>
                 {selected ? (
-                    <SymbolView name="checkmark" size={11} weight="bold" tintColor={theme.background} />
+                    <Icon name="check" size={11} bold color={theme.background} />
                 ) : (
                     <AppText variant="caption" tone="muted" medium>
                         {index + 1}
@@ -67,7 +67,7 @@ export function CustomOptionRow({ open, onOpen, children }: { open: boolean; onO
     return (
         <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={t('somethingElse')} style={({ pressed }) => ({ ...ROW, borderColor: theme.border, backgroundColor: pressed ? theme.muted : 'transparent' })}>
             <View style={{ width: 22, height: 22, borderRadius: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.muted }}>
-                <SymbolView name="pencil" size={11} weight="semibold" tintColor={theme.mutedForeground} />
+                <Icon name="pencil" size={11} bold color={theme.mutedForeground} />
             </View>
             <AppText variant="body" tone="muted" style={{ flex: 1 }}>
                 {t('somethingElse')}
@@ -132,7 +132,7 @@ export function QuestionWidget({ pending, onAnswer, onDismiss }: HitlWidgetProps
     if (!question) return null
 
     return (
-        <HitlCard symbol="questionmark.bubble" onClose={onDismiss} closeLabel={t('question.dismiss')}>
+        <HitlCard symbol="message-circle-question" onClose={onDismiss} closeLabel={t('question.dismiss')}>
             <HitlSteps
                 count={questions.length}
                 index={index}
@@ -145,7 +145,7 @@ export function QuestionWidget({ pending, onAnswer, onDismiss }: HitlWidgetProps
                     return (
                         <>
                             <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, paddingRight: spacing.xl }}>
-                                <HitlIcon symbol="questionmark.bubble" />
+                                <HitlIcon symbol="message-circle-question" />
                                 <View style={{ flex: 1, minHeight: 32, justifyContent: 'center' }}>
                                     {step.header && (
                                         <AppText variant="footnote" tone="muted" medium numberOfLines={1}>

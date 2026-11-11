@@ -1,3 +1,6 @@
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import { Platform } from 'react-native'
+
 import { signInWithGoogle } from '@/auth/google'
 import { SignInError } from '@/auth/sign-in'
 
@@ -13,6 +16,12 @@ jest.mock('@/auth/supabase', () => ({ supabase: { auth: { signInWithIdToken: (..
 jest.mock('@/api/client', () => ({ api: jest.fn(), ApiError: class extends Error {} }))
 
 describe('signInWithGoogle', () => {
+    it('asks iOS for its own client and Android for a token minted for the web client', () => {
+        const config = (GoogleSignin.configure as jest.Mock).mock.calls[0][0]
+        if (Platform.OS === 'android') expect(config).toEqual({ webClientId: expect.stringMatching(/^530380179314-.+\.apps\.googleusercontent\.com$/) })
+        else expect(config).toEqual({ iosClientId: expect.stringMatching(/^530380179314-.+\.apps\.googleusercontent\.com$/) })
+    })
+
     beforeEach(() => {
         mockSignIn.mockReset()
         mockSignInWithIdToken.mockReset()

@@ -1,6 +1,5 @@
 import type { PaidSource, PaidSourceLine, PaidTurnSources } from '@rerun/contracts'
 import { Image } from 'expo-image'
-import { SymbolView } from 'expo-symbols'
 import { Fragment, useState } from 'react'
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -10,6 +9,7 @@ import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { Card, Separator } from '@/components/ui/GroupedList'
+import { Icon } from '@/components/ui/Icon'
 import { faviconUrl } from '@/lib/url'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -25,7 +25,7 @@ function SourceLogo({ source, size, ring }: { source: PaidSource; size: number; 
     if (!source.domain) {
         return (
             <View style={[frame, { alignItems: 'center', justifyContent: 'center', backgroundColor: theme.muted }]}>
-                <SymbolView name="globe" size={size * 0.62} tintColor={theme.mutedForeground} />
+                <Icon name="globe" size={size * 0.62} color={theme.mutedForeground} />
             </View>
         )
     }
@@ -84,7 +84,7 @@ function SourcesSheet({ turn, open, onClose }: { turn: PaidTurnSources; open: bo
                     <AppText variant="headline" numberOfLines={1} style={{ flex: 1 }}>
                         {t('title')}
                     </AppText>
-                    <GlassButton symbol="xmark" label={tc('close')} onPress={onClose} />
+                    <GlassButton symbol="x" label={tc('close')} onPress={onClose} />
                 </View>
                 <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.lg, paddingBottom: insets.bottom + spacing.xl, gap: spacing.md }}>
                     <Card>

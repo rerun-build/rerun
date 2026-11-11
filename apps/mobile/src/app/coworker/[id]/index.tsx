@@ -11,6 +11,7 @@ import { knownCoworkerAccess, manageLock } from '@/auth/access'
 import { useAuth } from '@/auth/AuthProvider'
 import { CoworkerDetails } from '@/components/coworker/CoworkerDetails'
 import { ruleValue } from '@/components/notifications/NotificationCenter'
+import { promptText } from '@/components/ui/system-dialogs'
 import { cachedBoard, loadCoworkerDetail, readCoworkerDetails, type CoworkerDetailsRead } from '@/data/local-cache'
 import { useNotificationPrefs } from '@/data/useNotificationPrefs'
 import { setPendingDesktopOpen } from '@/desktop/pending-open'
@@ -76,28 +77,22 @@ export default function CoworkerDetailsScreen() {
 
     const rename = () => {
         if (!caller || lock.locked) return
-        Alert.prompt(
-            t('renameTitle'),
-            undefined,
-            [
-                { text: tCommon('actions.cancel'), style: 'cancel' },
-                {
-                    text: t('save'),
-                    onPress: (value?: string) => {
-                        const next = value?.trim()
-                        if (!next || next === name) return
-                        const previous = name
-                        setName(next)
-                        renameCoworker(caller, agentId, next).catch(err => {
-                            setName(previous)
-                            Alert.alert(t('renameFailed'), errorText(err))
-                        })
-                    },
-                },
-            ],
-            'plain-text',
-            name
-        )
+        promptText({
+            title: t('renameTitle'),
+            defaultValue: name,
+            cancelLabel: tCommon('actions.cancel'),
+            submitLabel: t('save'),
+            onSubmit: value => {
+                const next = value.trim()
+                if (!next || next === name) return
+                const previous = name
+                setName(next)
+                renameCoworker(caller, agentId, next).catch(err => {
+                    setName(previous)
+                    Alert.alert(t('renameFailed'), errorText(err))
+                })
+            },
+        })
     }
 
     const remove = () => {

@@ -2,17 +2,20 @@ import { useFonts } from 'expo-font'
 import { DarkTheme, DefaultTheme, router, Stack, ThemeProvider, usePathname } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect, useState } from 'react'
+import { StatusBar } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { AuthProvider, useAuth } from '@/auth/AuthProvider'
 import { BuddyClock } from '@/components/buddy/motion'
 import { AiConsent } from '@/components/consent/AiConsent'
 import { NoPlan } from '@/components/home/NoPlan'
+import { sheetOptions } from '@/components/layout/sheet-options'
 import { SplitShell } from '@/components/layout/SplitShell'
 import { Onboarding, type LeadStarted } from '@/components/onboarding/Onboarding'
 import { OnboardingShell } from '@/components/onboarding/OnboardingShell'
 import { useOnboardingRoute } from '@/components/onboarding/useOnboardingRoute'
 import { WaitlistNotice } from '@/components/onboarding/widgets/TeamCards'
+import { SystemDialogHost } from '@/components/ui/system-dialogs'
 import { UpdateRequired } from '@/components/update/UpdateRequired'
 import { useUpdateRequired } from '@/components/update/useUpdateRequired'
 import { MediaViewerHost } from '@/components/viewer/MediaViewerHost'
@@ -23,6 +26,7 @@ import { posthog } from '@/lib/analytics'
 import { MockStore } from '@/mocks/store'
 import { PushRouting } from '@/notifications/PushRouting'
 import { useAppearanceLoaded } from '@/theme/appearance'
+import { ReducedMotionOverride } from '@/theme/ReducedMotionOverride'
 import { useColorSchemeName } from '@/theme/theme'
 import { brand, palette } from '@/theme/tokens'
 
@@ -81,6 +85,8 @@ function App() {
 
     return (
         <ThemeProvider value={navigationTheme}>
+            {/* iOS picks the bar's ink from the appearance on its own; Android keeps light icons unless told. */}
+            <StatusBar barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'} />
             <BuddyClock>
                 {updateRequired ? (
                     <UpdateRequired />
@@ -115,12 +121,12 @@ function App() {
                                         <Stack.Screen name="coworker/[id]/apps" />
                                         <Stack.Screen name="coworker/[id]/routines" />
                                         <Stack.Screen name="coworker/[id]/notifications" />
-                                        <Stack.Screen name="inbox" options={{ presentation: 'formSheet', sheetAllowedDetents: [0.6, 1], sheetGrabberVisible: true, contentStyle: { backgroundColor: palette[scheme].background } }} />
-                                        <Stack.Screen name="model" options={{ presentation: 'formSheet', sheetAllowedDetents: [0.6, 1], sheetGrabberVisible: true, contentStyle: { backgroundColor: palette[scheme].background } }} />
+                                        <Stack.Screen name="inbox" options={sheetOptions(scheme, [0.6, 1])} />
+                                        <Stack.Screen name="model" options={sheetOptions(scheme, [0.6, 1])} />
                                         <Stack.Screen name="desktop" options={{ presentation: 'fullScreenModal' }} />
-                                        <Stack.Screen name="settings" options={{ presentation: 'formSheet', sheetAllowedDetents: [1], sheetGrabberVisible: true, contentStyle: { backgroundColor: palette[scheme].background } }} />
-                                        <Stack.Screen name="new-coworker" options={{ presentation: 'formSheet', sheetAllowedDetents: [1], sheetGrabberVisible: true, contentStyle: { backgroundColor: palette[scheme].background } }} />
-                                        <Stack.Screen name="providers" options={{ presentation: 'formSheet', sheetAllowedDetents: [1], sheetGrabberVisible: true, contentStyle: { backgroundColor: palette[scheme].background } }} />
+                                        <Stack.Screen name="settings" options={sheetOptions(scheme, [1])} />
+                                        <Stack.Screen name="new-coworker" options={sheetOptions(scheme, [1])} />
+                                        <Stack.Screen name="providers" options={sheetOptions(scheme, [1])} />
                                     </Stack.Protected>
                                     <Stack.Protected guard={!signedIn} redirectTo="/">
                                         <Stack.Screen name="sign-in" />
@@ -130,6 +136,8 @@ function App() {
                                         <Stack.Screen name="lab-chat" />
                                         <Stack.Screen name="lab-threads" />
                                         <Stack.Screen name="lab-message-times" />
+                                        <Stack.Screen name="lab-icons" />
+                                        <Stack.Screen name="lab-controls" />
                                         <Stack.Screen name="lab-sign-in" />
                                         <Stack.Screen name="lab-hitl" />
                                         <Stack.Screen name="lab-screen" />
@@ -146,12 +154,13 @@ function App() {
                                         <Stack.Screen name="lab-coworker" />
                                         <Stack.Screen name="lab-notifications" />
                                         <Stack.Screen name="lab-conversations" />
-                                        <Stack.Screen name="lab-conversations-sheet" options={{ presentation: 'formSheet', sheetAllowedDetents: [0.6, 1], sheetGrabberVisible: true, contentStyle: { backgroundColor: palette[scheme].background } }} />
-                                        <Stack.Screen name="lab-providers" options={{ presentation: 'formSheet', sheetAllowedDetents: [1], sheetGrabberVisible: true, contentStyle: { backgroundColor: palette[scheme].background } }} />
+                                        <Stack.Screen name="lab-conversations-sheet" options={sheetOptions(scheme, [0.6, 1])} />
+                                        <Stack.Screen name="lab-providers" options={sheetOptions(scheme, [1])} />
                                     </Stack.Protected>
                                 </Stack>
                             </SplitShell>
                             <MediaViewerHost />
+                            <SystemDialogHost />
                         </InboxProvider>
                     </MockStore>
                 )}
@@ -163,6 +172,8 @@ function App() {
 export default function RootLayout() {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
+            {/* Before App, whose first render waits on the fonts: the screens it mounts then already read it. */}
+            <ReducedMotionOverride />
             <AuthProvider>
                 <I18nProvider>
                     <App />

@@ -1,3 +1,5 @@
+import { Platform } from 'react-native'
+
 import { signInWithApple } from '@/auth/apple'
 import { SignInError } from '@/auth/sign-in'
 
@@ -11,7 +13,9 @@ const mockUpdateUser = jest.fn()
 jest.mock('@/auth/supabase', () => ({ supabase: { auth: { signInWithIdToken: (...args: unknown[]) => mockSignInWithIdToken(...args), updateUser: (...args: unknown[]) => mockUpdateUser(...args) } } }))
 jest.mock('@/api/client', () => ({ api: jest.fn(), ApiError: class extends Error {} }))
 
-describe('signInWithApple', () => {
+const describeOnIos = Platform.OS === 'ios' ? describe : describe.skip
+
+describeOnIos('signInWithApple on iOS', () => {
     beforeEach(() => {
         mockSignInAsync.mockReset()
         mockSignInWithIdToken.mockReset().mockResolvedValue({ error: null })

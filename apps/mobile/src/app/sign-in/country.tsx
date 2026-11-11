@@ -1,6 +1,4 @@
-import * as Haptics from 'expo-haptics'
 import { router } from 'expo-router'
-import { SymbolView } from 'expo-symbols'
 import { useMemo, useState } from 'react'
 import { FlatList, Pressable, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -8,6 +6,8 @@ import { useLocale, useTranslations } from 'use-intl'
 
 import { useSignInFlow } from '@/components/auth/SignInFlow'
 import { AppText } from '@/components/ui/AppText'
+import { Icon } from '@/components/ui/Icon'
+import * as Haptics from '@/lib/haptics'
 import { searchCountries, type PhoneCountry } from '@/lib/phone'
 import { useTheme } from '@/theme/theme'
 import { brand, fonts, radius, spacing } from '@/theme/tokens'
@@ -35,7 +35,7 @@ export default function PickCountry() {
         <>
             <View collapsable={false} style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.md }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 44, paddingHorizontal: spacing.md, borderRadius: radius.md, backgroundColor: theme.muted }}>
-                    <SymbolView name="magnifyingglass" size={15} weight="medium" tintColor={theme.mutedForeground} />
+                    <Icon name="search" size={15} color={theme.mutedForeground} />
                     <TextInput value={query} onChangeText={setQuery} placeholder={t('country.search')} placeholderTextColor={theme.mutedForeground} autoCorrect={false} accessibilityLabel={t('country.searchLabel')} style={{ flex: 1, height: '100%', fontFamily: fonts.regular, fontSize: 16, color: theme.foreground }} />
                 </View>
             </View>
@@ -53,7 +53,7 @@ export default function PickCountry() {
                         <AppText variant="body" tone="muted">
                             +{item.callingCode}
                         </AppText>
-                        <View style={{ width: 18 }}>{item.code === country && <SymbolView name="checkmark" size={16} weight="semibold" tintColor={theme.scheme === 'dark' ? brand.soft : brand.base} />}</View>
+                        <View style={{ width: 18 }}>{item.code === country && <Icon name="check" size={16} bold color={theme.scheme === 'dark' ? brand.soft : brand.base} />}</View>
                     </Pressable>
                 )}
             />
