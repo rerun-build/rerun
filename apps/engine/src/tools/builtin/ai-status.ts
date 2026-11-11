@@ -1,6 +1,6 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { PROVIDER_LABELS, creditsFromMicros, type Provider } from '@rerun/contracts'
+import { PROVIDER_LABELS, creditsFromMicros, type HubRerunCredit, type Provider } from '@rerun/contracts'
 import { isUsable } from '../../agents/availability.js'
 import { answeringModel } from '../../agents/rerun-upstream.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
@@ -15,8 +15,6 @@ import type { RunContext } from '../../runtime/context.js'
 import { callHub } from '../../runtime/hub.js'
 
 const SUBSCRIPTION_PROVIDERS: ReadonlySet<Provider> = new Set(['claude', 'codex', 'opencode'])
-
-type HubCredit = { remainingMicros: number; usedMicros: number; totalMicros: number; paused: boolean; resetsAt: string | null }
 
 function billing(provider: Provider): 'rerun_credit' | 'subscription' | 'api_key' {
     if (provider === 'rerun') return 'rerun_credit'
@@ -41,7 +39,7 @@ function describeConnection(connection: LoadedConnection) {
 // The credit lives on the hub: a hub that does not answer leaves it out rather than failing the read.
 async function readRerunCredit(ctx: RunContext) {
     try {
-        const { credit } = (await callHub(ctx.agent, 'rerun_credit', {})) as { credit?: HubCredit | null }
+        const { credit } = (await callHub(ctx.agent, 'rerun_credit', {})) as { credit?: HubRerunCredit | null }
         if (!credit) return null
         return {
             remainingCredits: creditsFromMicros(credit.remainingMicros),
@@ -63,6 +61,8 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
             inputSchema: z.object({}),
             execute: async () => {
                 const connections = await listConnections()
+                // Deliberately before the wait, unlike the connections list: the question is about
+                // the quota, so the coworker waits (capped) for the reading it starts here.
                 refreshStaleCodexPlanLimits(connections)
                 refreshStaleOpencodePlanLimits(connections)
                 const [, boxDefault, rerunCredit, answering] = await Promise.all([awaitPendingPlanLimits(connections), readBoxDefault(), readRerunCredit(ctx), answeringModel(ctx.provider, ctx.model)])

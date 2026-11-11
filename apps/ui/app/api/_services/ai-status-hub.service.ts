@@ -1,7 +1,6 @@
 import { BILLING_ENABLED, rerunCreditTotalMicros } from '@rerun/cloud/billing'
+import type { HubRerunCredit } from '@rerun/contracts'
 import { ensureCurrentPeriod, getWorkspaceBudget, remainingMicros } from '@/ee/services/rerunBudget.service'
-
-export type HubRerunCredit = { remainingMicros: number; usedMicros: number; totalMicros: number; paused: boolean; resetsAt: string | null }
 
 export function isAiStatusHubTool(name: string): name is 'rerun_credit' {
     return name === 'rerun_credit'
