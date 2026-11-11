@@ -87,11 +87,18 @@ export function opencodeUpstreamId(id: string): string {
     return plan ? id.slice(plan.length + 1) : id
 }
 
+// A model OpenCode serves for nothing (`beam-free`, `longcat-2.5-free`, `big-pickle`). Takes a
+// price, so it reads a catalog entry and a `ProviderModel` from a box alike.
+export function isFreeOpencodeModel(price: Pick<OpencodeModel['price'], 'input' | 'output'>): boolean {
+    return price.input === 0 && price.output === 0
+}
+
 function entryToModel(entry: z.infer<typeof catalogEntrySchema>, plan: OpencodePlan): OpencodeModel | null {
     if (entry.type !== 'chat' || !entry.capabilities.tools.supported) return null
     const { input, output } = entry.cost.text
-    // Free models (`*-free`, `big-pickle`) are reserved to OpenCode's own client.
-    if (input.price === 0 && output.price === 0) return null
+    // A free model is served to a Go subscription ("Free models work in OpenCode; subscribe to
+    // OpenCode Go" is what Console answers one, with a 429), so only Console drops them.
+    if (plan === 'console' && isFreeOpencodeModel({ input: input.price, output: output.price })) return null
     const styles = Object.entries(entry.api).filter(([style]) => WIRE_OF_STYLE[style])
     if (styles.length !== 1) return null
     const [style, { base_url: baseUrl }] = styles[0]!

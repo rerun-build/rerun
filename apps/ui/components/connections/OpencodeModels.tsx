@@ -34,8 +34,8 @@ function ModelRow({ row, isDefault, lockReason, onToggle }: { row: OpencodeModel
                 <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                     <span className={cn('truncate text-xs font-medium', row.enabled && 'text-foreground')}>{row.label}</span>
                     {isDefault && <StarIcon aria-label={t('models.defaultModel')} className="size-3 shrink-0 text-yellow-400 [&_polygon]:fill-current" />}
-                    <Badge size="xs" tone={row.plan === 'go' ? 'green' : 'cyan'} className="shrink-0">
-                        {row.plan === 'go' ? t('opencode.included') : t('opencode.credits')}
+                    <Badge size="xs" tone={row.free ? 'yellow' : row.plan === 'go' ? 'green' : 'cyan'} className="shrink-0">
+                        {row.free ? t('opencode.free') : row.plan === 'go' ? t('opencode.included') : t('opencode.credits')}
                     </Badge>
                     {row.isNew && (
                         <Badge size="xs" tone="brand" className="shrink-0">

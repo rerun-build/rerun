@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_CONNECTION_MODELS, MODEL_CONTEXT_WINDOW, MODEL_LABEL, OPENCODE_SNAPSHOT, isPremiumModel, providerSchema, trialModelFor } from '@rerun/contracts'
+import { DEFAULT_CONNECTION_MODELS, MODEL_CONTEXT_WINDOW, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, isPremiumModel, providerSchema, trialModelFor } from '@rerun/contracts'
 import { ENGINE_MODEL_CATALOG, catalogFor } from './models'
 
 describe('ENGINE_MODEL_CATALOG', () => {
@@ -41,9 +41,17 @@ describe('the OpenCode catalog', () => {
         expect(catalog.slice(firstConsole).every(id => id.startsWith('console/'))).toBe(true)
     })
 
-    it('switches on the Go models alone, DeepSeek V4 Pro first', () => {
+    // A free Go model is listed, so a picker can name one a member switched on, but it is not
+    // seeded: free endpoints can train on what they are sent.
+    it('switches on the paid Go models alone, DeepSeek V4 Pro first', () => {
         expect(DEFAULT_CONNECTION_MODELS.opencode[0]).toBe('go/deepseek-v4-pro')
-        expect([...DEFAULT_CONNECTION_MODELS.opencode].sort()).toEqual(OPENCODE_SNAPSHOT.filter(m => m.plan === 'go').map(m => m.id).sort())
+        expect([...DEFAULT_CONNECTION_MODELS.opencode].sort()).toEqual(
+            OPENCODE_SNAPSHOT.filter(m => m.plan === 'go' && !isFreeOpencodeModel(m.price))
+                .map(m => m.id)
+                .sort(),
+        )
+        expect(catalog).toContain('go/beam-free')
+        expect(DEFAULT_CONNECTION_MODELS.opencode).not.toContain('go/beam-free')
     })
 
     it('has a window and a label for every id, so compaction and the pickers work', () => {

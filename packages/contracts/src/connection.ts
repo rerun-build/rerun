@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { RERUN_MODELS, providerSchema, type Provider } from './agent.js'
-import { OPENCODE_DEFAULT_MODEL, providerModelSchema, type ProviderModel } from './opencode.js'
+import { OPENCODE_DEFAULT_MODEL, isFreeOpencodeModel, providerModelSchema, type ProviderModel } from './opencode.js'
 import { OPENCODE_SNAPSHOT } from './opencode-snapshot.js'
 
 // A named credential held by the box rather than by an agent. Agents point at one through
@@ -269,9 +269,13 @@ export const DEFAULT_CONNECTION_MODELS: Record<z.infer<typeof providerSchema>, s
         'qwen/qwen3.8-flash',
         'minimax/minimax-m3.1-flash',
     ],
-    // Every model the Go plan includes, the default first. Console models are paid per token from
-    // the account's credits, so they start switched off.
-    opencode: [OPENCODE_DEFAULT_MODEL, ...OPENCODE_SNAPSHOT.filter(model => model.plan === 'go' && model.id !== OPENCODE_DEFAULT_MODEL).map(model => model.id)],
+    // Every model the Go plan charges for, the default first. Console models are paid per token
+    // from the account's credits, and a free Go model can train on what it is sent, so both start
+    // switched off: they are listed, and switched on one by one.
+    opencode: [
+        OPENCODE_DEFAULT_MODEL,
+        ...OPENCODE_SNAPSHOT.filter(model => model.plan === 'go' && !isFreeOpencodeModel(model.price) && model.id !== OPENCODE_DEFAULT_MODEL).map(model => model.id),
+    ],
     // Only the endpoint knows what it serves: the models arrive with the connection, read off it.
     custom: [],
 }

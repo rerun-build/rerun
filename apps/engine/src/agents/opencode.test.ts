@@ -263,4 +263,12 @@ describe('how an OpenCode model behaves', () => {
         expect(opencodeVisionModel(agentOn('go/deepseek-v4-pro', undefined, ['go/deepseek-v4-pro', 'go/glm-5.3']).resolved.connection)).toBeNull()
         expect(opencodeVisionModel(null)).toBeNull()
     })
+
+    // A free Go model can train on what it is sent: switched on, it still never takes the images of
+    // a run that picked another model.
+    it('never hands vision to a free Go model, even the only one that sees', () => {
+        const connectionOn = (models: string[]) => agentOn('go/deepseek-v4-pro', undefined, models).resolved.connection
+        expect(opencodeVisionModel(connectionOn(['go/deepseek-v4-pro', 'go/longcat-2.5-free']))).toBeNull()
+        expect(opencodeVisionModel(connectionOn(['go/deepseek-v4-pro', 'go/longcat-2.5-free', 'go/claude-haiku-5-5']))).toBe('go/claude-haiku-5-5')
+    })
 })

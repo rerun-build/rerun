@@ -3,7 +3,7 @@ import { catalogFor, modelLabel, modelPower, type CatalogModel } from '@/lib/eng
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { shortUntil } from '@/lib/time'
 import { formatNumber, shortDate } from '@rerun/i18n/format'
-import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isPremiumModel, opencodePlanOf, opencodeServesModel, toProviderModel, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
+import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, isPremiumModel, opencodePlanOf, opencodeServesModel, toProviderModel, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@rerun/contracts'
 
 // The AI providers dialog sorts every connection by who pays for it: the credit included with
 // Rerun, the user's own subscription, or the user's own API key.
@@ -44,7 +44,7 @@ export type SourceCopy = (
         | `sources.guide.${GuidedProvider}.${'title' | 'step1' | 'step2' | 'step3'}`
         | `sources.windows.${PlanWindowCopy}`
         | `sources.tiers.${'fast' | 'smart'}`
-        | `sources.opencodePlan.${OpencodePlan}`
+        | `sources.opencodePlan.${OpencodePlan | 'free'}`
         | `sources.unavailable.${CliUnavailableCopy}`
         | 'sources.summary'
         | 'sources.summaryWindow'
@@ -180,16 +180,20 @@ export const PREMIUM_MODEL_BILLING_TRIGGER = 'premium_model'
 const RERUN_TIER_DESCRIPTION: Partial<Record<RerunTier, 'fast' | 'smart'>> = { fast: 'fast', smart: 'smart' }
 
 // What an OpenCode model costs on top of the plan, beside its name in every picker: a Go model is
-// paid by the subscription, a Console one by the account's credits. Plan-scoped ids only.
-export function opencodePlanDescription(provider: string, model: string, t: SourceCopy): string | undefined {
-    if (provider !== 'opencode') return undefined
+// paid by the subscription, a Console one by the account's credits, and a free one by nobody, which
+// the connection dialog already badges. Plan-scoped ids only.
+export function opencodePlanDescription(connection: Pick<BoxConnection, 'provider' | 'providerModels'>, model: string, t: SourceCopy): string | undefined {
+    if (connection.provider !== 'opencode') return undefined
     const plan = opencodePlanOf(model)
-    return plan ? t(`sources.opencodePlan.${plan}`) : undefined
+    if (!plan) return undefined
+    const catalog = connection.providerModels ?? OPENCODE_SNAPSHOT.map(toProviderModel)
+    const info = catalog.find(entry => entry.id === model)
+    return t(`sources.opencodePlan.${info && isFreeOpencodeModel(info.price) ? 'free' : plan}`)
 }
 
 // The line under a model's name in a picker: a Rerun tier's hint, or what an OpenCode model is paid with.
-export function modelDescription(connection: Pick<BoxConnection, 'id' | 'provider'>, model: string, t: SourceCopy): string | undefined {
-    return rerunTierDescription(connection.id, model, t) ?? opencodePlanDescription(connection.provider, model, t)
+export function modelDescription(connection: Pick<BoxConnection, 'id' | 'provider' | 'providerModels'>, model: string, t: SourceCopy): string | undefined {
+    return rerunTierDescription(connection.id, model, t) ?? opencodePlanDescription(connection, model, t)
 }
 
 // Go before Console, each in the order it came: the models the plan pays for come first.
@@ -201,7 +205,7 @@ export function inPlanOrder<T extends { id: string }>(provider: string, models: 
 
 // One row of an OpenCode connection's model list. `info` is null for a model the catalog no longer
 // lists, still switched on: it stays there to be switched off.
-export type OpencodeModelRow = { id: string; label: string; plan: OpencodePlan; info: ProviderModel | null; isNew: boolean; enabled: boolean; unavailable?: string }
+export type OpencodeModelRow = { id: string; label: string; plan: OpencodePlan; info: ProviderModel | null; isNew: boolean; free: boolean; enabled: boolean; unavailable?: string }
 
 const SNAPSHOT_IDS = new Set(OPENCODE_SNAPSHOT.map(model => model.id))
 
@@ -213,8 +217,8 @@ export function opencodeModelRows(source: BoxConnection, t: SourceCopy): Opencod
     const listed = new Set(catalog.map(model => model.id))
     const retired = source.models.filter(id => !listed.has(id) && opencodePlanOf(id))
     const rows = [
-        ...catalog.map(info => ({ id: info.id, label: info.label, plan: info.plan, info, isNew: !SNAPSHOT_IDS.has(info.id) })),
-        ...retired.map(id => ({ id, label: modelLabel(id), plan: opencodePlanOf(id)!, info: null, isNew: false })),
+        ...catalog.map(info => ({ id: info.id, label: info.label, plan: info.plan, info, isNew: !SNAPSHOT_IDS.has(info.id), free: isFreeOpencodeModel(info.price) })),
+        ...retired.map(id => ({ id, label: modelLabel(id), plan: opencodePlanOf(id)!, info: null, isNew: false, free: false })),
     ]
     return rows.map(row => ({ ...row, enabled: isModelEnabled(source, row.id), unavailable: cliUnavailableReason(source, row.id, t) }))
 }

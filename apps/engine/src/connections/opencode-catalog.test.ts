@@ -30,11 +30,15 @@ describe('parseOpencodeCatalog', () => {
         expect([...parseOpencodeCatalog(goCatalog, 'go'), ...parseOpencodeCatalog(consoleCatalog, 'console')]).toEqual(OPENCODE_SNAPSHOT)
     })
 
-    it('keeps the paid chat models with tools, and drops the free ones', () => {
+    // A Go subscription is served the free models; Console answers one with a 429 that tells the
+    // caller to subscribe to Go, so they are worth listing on one side and not on the other.
+    it('keeps the free models of Go, and drops those of Console', () => {
         const go = parseOpencodeCatalog(goCatalog, 'go')
-        expect(go).toHaveLength(26)
-        expect(go.some(model => /free|big-pickle/.test(model.id))).toBe(false)
-        expect(parseOpencodeCatalog(consoleCatalog, 'console').some(model => model.id === 'console/big-pickle')).toBe(false)
+        expect(go).toHaveLength(30)
+        expect(go.map(model => model.id)).toContain('go/beam-free')
+        expect(go.find(model => model.id === 'go/longcat-2.5-free')).toMatchObject({ price: { input: 0, output: 0 }, images: true })
+        const consoleModels = parseOpencodeCatalog(consoleCatalog, 'console')
+        expect(consoleModels.some(model => /-free$|big-pickle/.test(model.id))).toBe(false)
     })
 
     it('prefixes each id with its plan, so a model sold on both sides is two picks', () => {
@@ -60,7 +64,7 @@ describe('parseOpencodeCatalog', () => {
     })
 
     it('skips an entry it cannot read rather than the whole catalog', () => {
-        expect(parseOpencodeCatalog({ data: [{ id: 'broken' }, ...goCatalog.data] }, 'go')).toHaveLength(26)
+        expect(parseOpencodeCatalog({ data: [{ id: 'broken' }, ...goCatalog.data] }, 'go')).toHaveLength(30)
         expect(parseOpencodeCatalog(null, 'go')).toEqual([])
         expect(parseOpencodeCatalog({ data: 'nope' }, 'go')).toEqual([])
     })

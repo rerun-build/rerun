@@ -45,6 +45,15 @@ describe('the OpenCode model list of a connection', () => {
         expect(rows.some(row => row.isNew)).toBe(false)
     })
 
+    // Free on the Go plan, so listed with the models it pays for, but switched off: a free endpoint
+    // can train on what it is sent, and the member says when to use one.
+    it('lists the free Go models, switched off', () => {
+        const rows = opencodeModelRows(opencode(), englishTranslator('connections'))
+        expect(rows.find(row => row.id === 'go/beam-free')).toMatchObject({ free: true, enabled: false, plan: 'go' })
+        expect(rows.filter(row => row.free).every(row => !row.enabled)).toBe(true)
+        expect(rows.find(row => row.id === 'go/deepseek-v4-pro')).toMatchObject({ free: false, enabled: true })
+    })
+
     it('marks a model newer than the snapshot as new, and keeps a retired one to be switched off', () => {
         const live = [...OPENCODE_SNAPSHOT.map(toProviderModel).filter(model => model.id !== 'go/glm-5.2'), fresh]
         const rows = opencodeModelRows(opencode({ providerModels: live }), englishTranslator('connections'))
@@ -73,14 +82,16 @@ describe('the OpenCode model list of a connection', () => {
 })
 
 describe('OpenCode in the model pickers', () => {
-    const connection = opencode({ models: ['console/claude-sonnet-5-5', 'go/deepseek-v4-pro', 'console/gpt-6-sol', 'go/glm-5.3'] })
+    const connection = opencode({ models: ['console/claude-sonnet-5-5', 'go/deepseek-v4-pro', 'console/gpt-6-sol', 'go/longcat-2.5-free', 'go/glm-5.3'] })
 
     // One group for the connection, whatever its two catalogs: the iOS app keys the running model on it.
+    // A free Go model says so, as the connection dialog does, rather than "Included in Go".
     it('lists one group, Go before Console, with what each costs as its description', () => {
         const groups = connectionGroups([connection], true, englishTranslator('connections'))
         expect(groups).toHaveLength(1)
         expect(groups[0].models.map(model => [model.id, model.description])).toEqual([
             ['go/deepseek-v4-pro', 'Included in Go'],
+            ['go/longcat-2.5-free', 'Free'],
             ['go/glm-5.3', 'Included in Go'],
             ['console/claude-sonnet-5-5', 'Console credits'],
             ['console/gpt-6-sol', 'Console credits'],

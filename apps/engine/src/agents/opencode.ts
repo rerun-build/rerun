@@ -2,7 +2,7 @@ import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAI } from '@ai-sdk/openai'
 import type { LanguageModelMiddleware, wrapLanguageModel } from 'ai'
-import { CONNECTION_TOKEN_KEY, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_SESSION_HEADER, type OpencodeModel, type OpencodeWire, type PlanLimitWindow, type Provider } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, OPENCODE_SESSION_HEADER, isFreeOpencodeModel, type OpencodeModel, type OpencodeWire, type PlanLimitWindow, type Provider } from '@rerun/contracts'
 import { forceOpencodeCatalogRefresh, opencodeModel } from '../connections/opencode-catalog.js'
 import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.js'
 import { spentPlanWindow } from '../connections/plan-limits.js'
@@ -43,11 +43,12 @@ export function modelSeesImages(provider: Provider, model: string, connection?: 
 }
 
 // The model a `vision_analyze` call goes to when the run's own model cannot see: the cheapest Go
-// model switched on for this connection that can, since Go is already paid for.
+// model switched on for this connection that can, since Go is already paid for. Never a free one:
+// its endpoint can train on what it is sent, so it only runs when a member picks it on purpose.
 export function opencodeVisionModel(connection: LoadedConnection | null): string | null {
     const seeing = (connection?.config.models ?? [])
         .map(opencodeModel)
-        .filter((model): model is OpencodeModel => !!model && model.images)
+        .filter((model): model is OpencodeModel => !!model && model.images && !isFreeOpencodeModel(model.price))
         .sort((a, b) => Number(b.plan === 'go') - Number(a.plan === 'go') || a.price.input + a.price.output - (b.price.input + b.price.output))
     return seeing[0]?.id ?? null
 }

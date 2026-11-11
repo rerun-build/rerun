@@ -62,7 +62,8 @@
         },
         "opencodePlan": {
             "go": "Incluido en Go",
-            "console": "Créditos de Console"
+            "console": "Créditos de Console",
+            "free": "Gratis"
         },
         "unavailable": {
             "opencodeRetired": "OpenCode ya no lo ofrece",
@@ -211,11 +212,12 @@
     },
     "opencode": {
         "goTitle": "Incluido en OpenCode Go",
-        "goHint": "Lo paga tu plan Go, dentro de sus límites de 5 horas, semanal y mensual.",
+        "goHint": "Lo paga tu plan Go, dentro de sus límites de 5 horas, semanal y mensual. Los gratuitos están desactivados hasta que los actives.",
         "consoleTitle": "Console, pagado con tus créditos",
         "consoleHint": "Se cobra por token de tus créditos de OpenCode. Desactivado hasta que actives uno.",
         "included": "Incluido",
         "credits": "Créditos",
+        "free": "Gratis",
         "new": "Nuevo",
         "noVision": "Sin visión",
         "search": "Buscar modelos",

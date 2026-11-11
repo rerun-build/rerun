@@ -6,7 +6,7 @@
 // per-agent API key that must be set for its models to be "available". Edit freely to
 // add/remove models.
 
-import { DEFAULT_CONNECTION_MODELS, MODEL_LABEL, OPENCODE_SNAPSHOT, modelLabel } from '@rerun/contracts'
+import { DEFAULT_CONNECTION_MODELS, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, modelLabel } from '@rerun/contracts'
 
 import { RERUN_DEMO_MODEL_IDS } from './constants'
 
@@ -172,13 +172,19 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
     {
         // Read from the snapshot OpenCode published when this build was cut; a connection reads the
         // box's live catalog instead (`providerModels`). The Go models first, the default leading,
-        // then the Console ones. No power bars: OpenCode lists dozens of models we never rated.
+        // then the Console ones. The free Go models are in here though they start switched off: a
+        // picker still has to name one a member has switched on. No power bars: OpenCode lists
+        // dozens of models we never rated.
         provider: 'opencode',
         label: 'OpenCode',
         keyName: 'OPENCODE_API_KEY',
         section: 'subscription',
         apiKeyUrl: 'https://opencode.ai/auth',
-        models: [...DEFAULT_CONNECTION_MODELS.opencode, ...OPENCODE_SNAPSHOT.filter(m => m.plan === 'console').map(m => m.id)].map(id => model(id)),
+        models: [
+            ...DEFAULT_CONNECTION_MODELS.opencode,
+            ...OPENCODE_SNAPSHOT.filter(m => m.plan === 'go' && isFreeOpencodeModel(m.price)).map(m => m.id),
+            ...OPENCODE_SNAPSHOT.filter(m => m.plan === 'console').map(m => m.id),
+        ].map(id => model(id)),
     },
 ]
 

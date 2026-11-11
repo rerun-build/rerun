@@ -90,6 +90,8 @@ Paste an OpenCode key (it starts with `oc_sk_`, get one at [opencode.ai/auth](ht
 - **Go**, the subscription: its models are switched on when you connect, and cost nothing on top of the plan. The picker shows them with an **Included** badge, and the connection shows the plan's 5-hour, weekly and monthly limits.
 - **Console**, paid per token from your OpenCode credits: its models (Claude, GPT, Gemini and more) start switched off, with a **Credits** badge and their price per million tokens.
 
+The Go catalog also carries models OpenCode serves for nothing, marked **Free**. They are listed but start switched off, because a free endpoint can train on what it is sent: switch on the ones you want your coworkers to use for rough work. One of them, Iceman Contributor Free, answers with an error until the OpenCode account allows endpoints that train on request data, in its own console. The free models of the Console catalog are not offered: OpenCode refuses them to an API key and answers "subscribe to OpenCode Go".
+
 A model sold on both sides appears twice, once per catalog. OpenCode runs inside the engine itself, with no command-line tool. Your app only offers it once `NEXT_PUBLIC_OPENCODE_ENABLED=1` is set and the engine is recent enough to run it.
 
 ## Choose the model per coworker

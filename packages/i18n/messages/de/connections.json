@@ -62,7 +62,8 @@
         },
         "opencodePlan": {
             "go": "In Go enthalten",
-            "console": "Console-Guthaben"
+            "console": "Console-Guthaben",
+            "free": "Kostenlos"
         },
         "unavailable": {
             "opencodeRetired": "Von OpenCode nicht mehr angeboten",
@@ -211,11 +212,12 @@
     },
     "opencode": {
         "goTitle": "In OpenCode Go enthalten",
-        "goHint": "Bezahlt über deinen Go-Tarif, innerhalb seiner 5-Stunden-, Wochen- und Monatslimits.",
+        "goHint": "Bezahlt über deinen Go-Tarif, innerhalb seiner 5-Stunden-, Wochen- und Monatslimits. Die kostenlosen sind aus, bis du sie einschaltest.",
         "consoleTitle": "Console, mit deinem Guthaben bezahlt",
         "consoleHint": "Pro Token von deinem OpenCode-Guthaben abgerechnet. Aus, bis du eines einschaltest.",
         "included": "Inklusive",
         "credits": "Guthaben",
+        "free": "Kostenlos",
         "new": "Neu",
         "noVision": "Keine Bilderkennung",
         "search": "Modelle suchen",
