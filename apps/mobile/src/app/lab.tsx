@@ -273,7 +273,7 @@ function Pieces({ scheme }: { scheme: ColorScheme }) {
                     {['agent-scout', 'agent-ledger', 'agent-pulse', 'agent-inbox', 'agent-recap'].map(id => (
                         <CoworkerRow key={id} coworker={byId(id)} line={statusLine(byId(id), latestOf(id))} minutesAgo={byId(id).updatedMinutesAgo} unread={byId(id).unread} onPress={noop} />
                     ))}
-                    <SectionHeader label="Coworkers" count={3} collapsed onToggle={noop} divided />
+                    <SectionHeader label="Coworkers" count={3} collapsed onToggle={noop} />
                 </View>
                 <View style={{ flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg }}>
                     <LabChip coworker={byId('agent-pulse')} session={{ id: 'pulse-1', title: 'LinkedIn post on pricing', running: true, empty: false }} active />

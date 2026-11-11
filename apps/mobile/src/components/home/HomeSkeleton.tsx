@@ -1,7 +1,7 @@
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
-import { AVATAR, COWORKER_ROW_HEIGHT, HOME_GUTTER } from '@/components/home/CoworkerRow'
+import { AVATAR, COWORKER_ROW_HEIGHT, HOME_GUTTER, ROW_LINE_GAP, ROW_PADDING, ROW_TITLE } from '@/components/home/CoworkerRow'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -10,11 +10,11 @@ export const SKELETON_ROWS = 6
 // Where a CoworkerRow draws its avatar, its name and its status line. The native launch screen
 // draws the same shapes (plugins/with-home-launch-screen.js), so the app takes over without a jump.
 export const SKELETON = {
-    avatarTop: spacing.lg,
+    avatarTop: (COWORKER_ROW_HEIGHT - AVATAR) / 2,
     textLeft: HOME_GUTTER + AVATAR + spacing.lg,
-    nameTop: spacing.lg + 4,
+    nameTop: ROW_PADDING + 5,
     nameHeight: 14,
-    statusTop: spacing.lg + 28,
+    statusTop: ROW_PADDING + ROW_TITLE.lineHeight + ROW_LINE_GAP + 4,
     statusHeight: 12,
 } as const
 

@@ -6,7 +6,7 @@ import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
 import { EASE_OUT, MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
-import { HOME_GUTTER } from '@/components/home/CoworkerRow'
+import { HOME_GUTTER, ROW_LINE } from '@/components/home/CoworkerRow'
 import { spacing } from '@/theme/tokens'
 
 type SectionHeaderProps = {
@@ -14,38 +14,34 @@ type SectionHeaderProps = {
     count: number
     collapsed: boolean
     onToggle: () => void
-    divided?: boolean
     action?: { label: string; onPress: () => void }
 }
 
-export function SectionHeader({ label, count, collapsed, onToggle, divided, action }: SectionHeaderProps) {
+// As Grok draws a group: the label alone, its chevron right after it. The count is only read aloud.
+export function SectionHeader({ label, count, collapsed, onToggle, action }: SectionHeaderProps) {
     const theme = useTheme()
     const t = useTranslations('mobileHome')
     const chevron = useAnimatedStyle(() => ({ transform: [{ rotate: withTiming(collapsed ? '-90deg' : '0deg', { duration: MOTION.fast, easing: EASE_OUT }) }] }))
     return (
-        <View style={{ paddingHorizontal: HOME_GUTTER, paddingTop: divided ? spacing.md : 0 }}>
-            {divided && <View style={{ height: 1, backgroundColor: theme.border, marginBottom: spacing.md }} />}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: HOME_GUTTER }}>
             {/* The action sits beside the toggle, not inside it, so VoiceOver reaches both. */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-                <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: !collapsed }} accessibilityLabel={t('section.label', { label, count })} hitSlop={6} style={({ pressed }) => ({ flex: 1, paddingVertical: spacing.sm, opacity: pressed ? 0.6 : 1 })}>
-                    <AppText variant="footnote" tone="muted" medium maxFontSizeMultiplier={1.4}>
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+                <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: !collapsed }} accessibilityLabel={t('section.label', { label, count })} hitSlop={6} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', flexShrink: 1, gap: spacing.sm, paddingTop: 18, paddingBottom: spacing.sm, opacity: pressed ? 0.6 : 1 })}>
+                    <AppText variant="callout" tone="muted" numberOfLines={1} maxFontSizeMultiplier={1.4} style={[ROW_LINE, { flexShrink: 1 }]}>
                         {label}
-                        <AppText variant="footnote" tone="muted">{`  ${count}`}</AppText>
                     </AppText>
-                </Pressable>
-                {action && (
-                    <Pressable onPress={action.onPress} accessibilityRole="button" hitSlop={10} style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}>
-                        <AppText variant="footnote" medium maxFontSizeMultiplier={1.4}>
-                            {action.label}
-                        </AppText>
-                    </Pressable>
-                )}
-                <Pressable onPress={onToggle} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" hitSlop={10} style={({ pressed }) => ({ paddingVertical: spacing.sm, opacity: pressed ? 0.6 : 1 })}>
                     <Animated.View style={chevron}>
-                        <Icon name="chevron-down" size={13} color={theme.mutedForeground} />
+                        <Icon name="chevron-down" size={14} color={theme.mutedForeground} />
                     </Animated.View>
                 </Pressable>
             </View>
+            {action && (
+                <Pressable onPress={action.onPress} accessibilityRole="button" hitSlop={10} style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}>
+                    <AppText variant="footnote" medium maxFontSizeMultiplier={1.4}>
+                        {action.label}
+                    </AppText>
+                </Pressable>
+            )}
         </View>
     )
 }

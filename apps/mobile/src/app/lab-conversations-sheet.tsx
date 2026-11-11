@@ -129,11 +129,11 @@ function ByState({ conversations, onOpen }: { conversations: LabConversation[]; 
     const sections = SECTIONS.map(section => ({ ...section, conversations: conversations.filter(conversation => stateOf(conversation) === section.state) })).filter(section => section.conversations.length > 0)
     return (
         <>
-            {sections.map((section, index) => {
+            {sections.map(section => {
                 const groups = section.state === 'earlier' ? foldRoutines(section.conversations) : section.conversations.map(conversation => ({ head: conversation, runs: [conversation] }))
                 return (
                     <View key={section.state} style={{ paddingBottom: spacing.xs }}>
-                        <SectionHeader label={section.label} count={section.conversations.length} collapsed={collapsed.includes(section.state)} onToggle={() => setCollapsed(toggle(collapsed, section.state))} divided={index > 0} />
+                        <SectionHeader label={section.label} count={section.conversations.length} collapsed={collapsed.includes(section.state)} onToggle={() => setCollapsed(toggle(collapsed, section.state))} />
                         {!collapsed.includes(section.state) &&
                             groups.map(({ head, runs }) => {
                                 const isUnfolded = unfolded.includes(head.id)

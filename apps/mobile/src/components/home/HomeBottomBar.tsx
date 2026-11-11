@@ -2,14 +2,19 @@ import { View } from 'react-native'
 
 import { HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { SearchBar } from '@/components/home/SearchBar'
-import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
+import { spacing } from '@/theme/tokens'
 
-export const BOTTOM_BAR_SIZE = GLASS_BUTTON_SIZE
+export const BOTTOM_BAR_SIZE = 48
+
+// The bar sits a little into the home indicator's inset, as Grok's does, and never under the edge.
+export function bottomBarInset(bottom: number) {
+    return Math.max(bottom - 6, spacing.sm)
+}
 
 export function HomeBottomBar({ onSearch }: { onSearch: () => void }) {
     return (
         <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: HOME_GUTTER }}>
-            <SearchBar onPress={onSearch} />
+            <SearchBar height={BOTTOM_BAR_SIZE} onPress={onSearch} />
         </View>
     )
 }

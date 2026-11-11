@@ -14,7 +14,7 @@ import { GENERAL_PAGE_ID } from '@/components/chat/conversation-pages'
 import { LAST_CONVERSATION } from '@/components/chat/ForemanChat'
 import { CoworkerRow, HOME_GUTTER } from '@/components/home/CoworkerRow'
 import { ForemanRow } from '@/components/home/ForemanRow'
-import { HomeBottomBar } from '@/components/home/HomeBottomBar'
+import { HomeBottomBar, bottomBarInset } from '@/components/home/HomeBottomBar'
 import { HomeHeader } from '@/components/home/HomeHeader'
 import { HomeSkeleton } from '@/components/home/HomeSkeleton'
 import { PinnedAvatar, PinnedGrid, usePinnedCell } from '@/components/home/PinnedGrid'
@@ -109,7 +109,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
 
                 <View>
                     {pinned.length > 0 && (
-                        <Animated.View layout={layout} entering={fill.playing ? fill.rowEntering(0) : undefined} style={{ marginBottom: spacing.sm }}>
+                        <Animated.View layout={layout} entering={fill.playing ? fill.rowEntering(0) : undefined} style={{ marginTop: spacing.md, marginBottom: spacing.lg }}>
                             {reordering && (
                                 <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: HOME_GUTTER, paddingVertical: spacing.sm }}>
                                     <AppText variant="footnote" tone="muted" medium style={{ flex: 1 }}>
@@ -151,8 +151,8 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
                     ))}
 
                     {sections.map((section, index) => (
-                        <Animated.View key={`box:${section.key}`} layout={layout} entering={fill.playing ? fill.rowEntering(index + 1) : undefined} style={{ marginTop: spacing.sm }}>
-                            <SectionHeader label={section.label} count={section.members.length} collapsed={collapsed.includes(section.key)} onToggle={() => toggle(section.key)} divided={index > 0} />
+                        <Animated.View key={`box:${section.key}`} layout={layout} entering={fill.playing ? fill.rowEntering(index + 1) : undefined}>
+                            <SectionHeader label={section.label} count={section.members.length} collapsed={collapsed.includes(section.key)} onToggle={() => toggle(section.key)} />
                             {!collapsed.includes(section.key) &&
                                 section.members.map(coworker => (
                                     <Animated.View key={coworker.id} layout={layout} entering={fill.playing ? undefined : FadeIn.duration(180)} exiting={FadeOut.duration(120)}>
@@ -171,7 +171,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
             <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: pane.left, right: pane.right }}>
                 <HomeHeader inboxCount={inbox.state === 'ready' ? inboxCount(inbox.items) : 0} onInbox={() => router.push('/inbox')} onNewCoworker={() => router.push('/new-coworker')} />
             </Animated.View>
-            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: insets.bottom + spacing.sm }}>
+            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: bottomBarInset(insets.bottom) }}>
                 <HomeBottomBar onSearch={() => router.push('/search')} />
             </Animated.View>
         </View>

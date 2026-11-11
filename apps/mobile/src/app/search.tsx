@@ -149,7 +149,7 @@ export default function Search() {
                 )}
                 {foundCoworkers.length > 0 && (
                     <>
-                        <SectionHeader label={t('search.coworkers')} count={foundCoworkers.length} collapsed={collapsed.includes('coworkers')} onToggle={() => toggle('coworkers')} divided={asked.length > 0 && scope !== 'agents'} />
+                        <SectionHeader label={t('search.coworkers')} count={foundCoworkers.length} collapsed={collapsed.includes('coworkers')} onToggle={() => toggle('coworkers')} />
                         {!collapsed.includes('coworkers') && foundCoworkers.map(coworker => (
                             <CoworkerRow key={coworker.id} coworker={{ id: coworker.id, kind: 'coworker', name: coworker.name, status: moodStatus(coworker) }} line={lineOf(coworker, t)} minutesAgo={minutesSince(coworker.latest?.updatedAt)} unread={coworker.pending > 0} onPress={() => openCoworker(coworker)} />
                         ))}
@@ -157,7 +157,7 @@ export default function Search() {
                 )}
                 {hits.length > 0 && (
                     <>
-                        <SectionHeader label={t('search.conversations')} count={hits.length} collapsed={collapsed.includes('conversations')} onToggle={() => toggle('conversations')} divided />
+                        <SectionHeader label={t('search.conversations')} count={hits.length} collapsed={collapsed.includes('conversations')} onToggle={() => toggle('conversations')} />
                         {!collapsed.includes('conversations') && hits.map(hit => (
                             <ConversationRow key={hit.id} hit={hit} coworker={byId.get(hit.agentId)} onPress={() => router.push({ pathname: '/chat/[id]', params: { id: hit.id, to: hit.agentId } })} />
                         ))}

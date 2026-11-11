@@ -15,8 +15,8 @@ export function SearchBar({ height = GLASS_BUTTON_SIZE, onPress }: { height?: nu
     return (
         <View style={{ flex: 1, height, borderRadius: radius.pill, overflow: 'hidden', ...opaqueSurface(theme.scheme) }}>
             <Pressable onPress={onPress} accessibilityRole="search" accessibilityLabel={t('search.title')} android_ripple={{ color: withAlpha(theme.foreground, 0.1), borderless: false }} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg }}>
-                <Icon name="search" size={17} color={theme.mutedForeground} />
-                <AppText variant="body" tone="muted" numberOfLines={1} maxFontSizeMultiplier={1.2}>
+                <Icon name="search" size={19} color={theme.mutedForeground} />
+                <AppText variant="body" tone="muted" numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ fontSize: 19, lineHeight: 24 }}>
                     {t('search.title')}
                 </AppText>
             </Pressable>

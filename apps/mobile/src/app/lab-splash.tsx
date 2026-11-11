@@ -8,7 +8,7 @@ import { CoworkerRow } from '@/components/home/CoworkerRow'
 import { HomeBoot } from '@/components/home/HomeBoot'
 import { HomeHeader } from '@/components/home/HomeHeader'
 import { HomeSkeleton } from '@/components/home/HomeSkeleton'
-import { BOTTOM_BAR_SIZE, HomeBottomBar } from '@/components/home/HomeBottomBar'
+import { BOTTOM_BAR_SIZE, HomeBottomBar, bottomBarInset } from '@/components/home/HomeBottomBar'
 import { AppText } from '@/components/ui/AppText'
 import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { statusLine } from '@/components/ui/status'
@@ -88,7 +88,7 @@ function MockHome({ ready, pace }: { ready: boolean; pace: number }) {
             <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: 0, right: 0 }}>
                 <HomeHeader inboxCount={2} onInbox={() => {}} onNewCoworker={() => {}} />
             </Animated.View>
-            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + spacing.sm }}>
+            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: 0, right: 0, bottom: bottomBarInset(insets.bottom) }}>
                 <HomeBottomBar onSearch={() => {}} />
             </Animated.View>
         </View>
@@ -109,7 +109,7 @@ function Controls({ shown, slow, onReplay, onSlow }: ControlsProps) {
         </Pressable>
     )
     return (
-        <View style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + spacing.sm + BOTTOM_BAR_SIZE + spacing.lg, alignItems: 'center' }}>
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: bottomBarInset(insets.bottom) + BOTTOM_BAR_SIZE + spacing.lg, alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', padding: spacing.xs, borderRadius: radius.pill, backgroundColor: theme.card, borderWidth: 1, borderColor: theme.border }}>
                 {chip('Replay', false, onReplay)}
                 {chip('Slow', slow, onSlow)}

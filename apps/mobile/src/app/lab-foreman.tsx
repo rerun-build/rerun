@@ -69,11 +69,11 @@ function MockHome({ onForeman }: { onForeman: () => void }) {
                 <View style={{ marginBottom: spacing.lg }}>
                     <ForemanRow last={{ title: 'Overnight catch-up', running: false }} onPress={onForeman} />
                 </View>
-                <SectionHeader label="Needs you" count={2} collapsed={false} onToggle={noop} divided />
+                <SectionHeader label="Needs you" count={2} collapsed={false} onToggle={noop} />
                 {['agent-scout', 'agent-ledger'].map(id => (
                     <CoworkerRow key={id} coworker={byId(id)} line={statusLine(byId(id), latestOf(id))} minutesAgo={byId(id).updatedMinutesAgo} unread={byId(id).unread} onPress={noop} />
                 ))}
-                <SectionHeader label="Working" count={3} collapsed={false} onToggle={noop} divided />
+                <SectionHeader label="Working" count={3} collapsed={false} onToggle={noop} />
                 {['agent-pulse', 'agent-inbox', 'agent-recap'].map(id => (
                     <CoworkerRow key={id} coworker={byId(id)} line={statusLine(byId(id), latestOf(id))} minutesAgo={byId(id).updatedMinutesAgo} unread={byId(id).unread} onPress={noop} />
                 ))}
