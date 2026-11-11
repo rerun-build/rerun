@@ -38,7 +38,9 @@ const eslintConfig = defineConfig([
   },
   // The React Compiler rules of eslint-plugin-react-hooks 6 flag patterns the app relies on without the
   // compiler, and the vendored hairline kernel is checked by its own upstream. Reported, not blocking.
+  // Scoped to the files eslint-config-next loads the plugins for: a `.cjs` file would find no plugin.
   {
+    files: ["**/*.{js,jsx,mjs,ts,tsx,mts,cts}"],
     rules: {
       'react-hooks/set-state-in-effect': 'warn',
       'react-hooks/refs': 'warn',
@@ -47,6 +49,11 @@ const eslintConfig = defineConfig([
       'react-hooks/use-memo': 'warn',
       'react/no-unescaped-entities': 'warn',
     },
+  },
+  // A CommonJS module (the end-to-end suite's helpers, shared with a plain Node script) imports with require.
+  {
+    files: ["**/*.cjs"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
   },
   globalIgnores(['lib/hairline/*.js']),
   // Override default ignores of eslint-config-next.

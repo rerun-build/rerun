@@ -10,7 +10,8 @@
     "lint": "eslint",
     "ts-check": "pnpm tsc --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.48",
@@ -102,6 +103,7 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4",
     "@trigger.dev/build": "4.7.7",
     "@types/canvas-confetti": "^1.9.0",

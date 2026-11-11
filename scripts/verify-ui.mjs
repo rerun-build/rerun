@@ -34,11 +34,26 @@
 import { execFileSync, spawn } from 'node:child_process'
 import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { basename, dirname, join, resolve } from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { basename, join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
-const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const UI_DIR = join(REPO_ROOT, 'apps/ui')
+import {
+    adminClient,
+    assertRunningHubIsLocal,
+    CHROMIUM_ARGS,
+    cleanServerEnv,
+    deleteAccount,
+    linkEngine,
+    listeningPid,
+    markOnboarded,
+    mintSignInLink,
+    readLocalStack,
+    REPO_ROOT,
+    signIn,
+    UI_DIR,
+    workspaceOf,
+} from '../apps/ui/e2e/support/local-stack.cjs'
+
 const PORT = Number(process.env.CONDUCTOR_PORT ?? 3050)
 const ENGINE_PORT = PORT + 1
 const WORKSPACE_NAME = (process.env.CONDUCTOR_WORKSPACE_NAME || basename(REPO_ROOT)).toLowerCase().replace(/[^a-z0-9-]/g, '-')
@@ -47,9 +62,7 @@ const SHORT_VIEWPORT = { width: 1440, height: 700 }
 const SERVER_READY_TIMEOUT_MS = 180_000
 
 const fromEngine = createRequire(join(REPO_ROOT, 'apps/engine/package.json'))
-const fromUi = createRequire(join(UI_DIR, 'package.json'))
 const { chromium } = fromEngine('patchright')
-const { createClient } = fromUi('@supabase/supabase-js')
 
 function fail(message) {
     console.error(`\n[verify] ${message}\n`)
@@ -82,17 +95,6 @@ function parseArgs(argv) {
     return options
 }
 
-function localStack() {
-    let status
-    try {
-        status = execFileSync('pnpm', ['exec', 'supabase', 'status', '-o', 'env'], { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
-    } catch {
-        fail('The local Supabase stack is not running. Start it with `pnpm db:start`.')
-    }
-    const read = (key) => status.match(new RegExp(`^${key}="?([^"\n]*)"?$`, 'm'))?.[1]
-    return { url: read('API_URL'), secretKey: read('SECRET_KEY') ?? read('SERVICE_ROLE_KEY') }
-}
-
 // The Docker stack is shared by every worktree of the Mac and lags behind the branch: a column the
 // code selects and the stack lacks answers 400 and the page renders as broken.
 function assertMigrated() {
@@ -111,28 +113,6 @@ function assertLocalProfile(stack) {
     if (profile !== 'local') fail(`apps/ui/.env is on the "${profile ?? 'unknown'}" profile. Run \`pnpm cloud env:local\` first, never test against production.`)
     const configured = dotenv.match(/^NEXT_PUBLIC_SUPABASE_URL=(.*)$/m)?.[1]?.trim()
     if (configured !== stack.url) fail(`apps/ui/.env points at ${configured}, the running stack is ${stack.url}. Run \`pnpm cloud env:local\` again.`)
-}
-
-function listeningPid(port) {
-    try {
-        return execFileSync('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).trim().split('\n')[0] || null
-    } catch {
-        return null
-    }
-}
-
-function processCwd(pid) {
-    const out = execFileSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8' })
-    return out.split('\n').find((line) => line.startsWith('n'))?.slice(1) ?? ''
-}
-
-// Variables the process environment would hand Next ahead of `.env`: a session that exports
-// production's Supabase or Bird keys would otherwise put the local hub back on production.
-function cleanServerEnv() {
-    const env = { ...process.env }
-    for (const key of Object.keys(env)) if (/SUPABASE|STRIPE|EXPO_PUBLIC/.test(key)) delete env[key]
-    env.BIRD_API_KEY = ''
-    return env
 }
 
 async function waitFor(url) {
@@ -157,12 +137,7 @@ function spawnLogged(command, args, options, logPath) {
 }
 
 async function ensureServer(base, outDir) {
-    const pid = listeningPid(PORT)
-    if (pid) {
-        const cwd = processCwd(pid)
-        if (!cwd.startsWith(REPO_ROOT)) fail(`Port ${PORT} is served from ${cwd}, another worktree. Stop it or set CONDUCTOR_PORT.`)
-        const environ = execFileSync('ps', ['eww', '-o', 'command=', '-p', pid], { encoding: 'utf8' })
-        if (/NEXT_PUBLIC_SUPABASE_URL=https:/.test(environ)) fail(`The server on port ${PORT} was started with a remote NEXT_PUBLIC_SUPABASE_URL in its environment. Restart it.`)
+    if (assertRunningHubIsLocal(PORT)) {
         log(`Reusing the hub already running on port ${PORT}.`)
         return null
     }
@@ -172,24 +147,6 @@ async function ensureServer(base, outDir) {
     return server
 }
 
-async function linkTestEngine(admin, userId) {
-    const { data: user, error } = await admin.from('users').select('workspace_id').eq('id', userId).single()
-    if (error) fail(`Could not read the test account's workspace: ${error.message}`)
-    const workspaceId = user.workspace_id
-    const apiKey = `verify-${WORKSPACE_NAME}-${workspaceId}`
-    const { data: existing } = await admin.from('engine_pool').select('id').eq('claimed_by_workspace_id', workspaceId).maybeSingle()
-    const row = { engine_host: `127.0.0.1:${ENGINE_PORT}`, engine_api_key: apiKey, status: 'claimed', claimed_by_workspace_id: workspaceId, provider: 'incus' }
-    const write = existing ? admin.from('engine_pool').update(row).eq('id', existing.id) : admin.from('engine_pool').insert(row)
-    const { error: writeError } = await write
-    if (writeError) fail(`Could not link an engine to workspace ${workspaceId}: ${writeError.message}`)
-    return { workspaceId, apiKey }
-}
-
-async function markOnboarded(admin, workspaceId) {
-    const { error } = await admin.from('workspaces').update({ onboarded_at: new Date().toISOString() }).eq('id', workspaceId).is('onboarded_at', null)
-    if (error) fail(`Could not mark workspace ${workspaceId} onboarded: ${error.message}`)
-}
-
 async function startEngine(base, apiKey, outDir) {
     if (listeningPid(ENGINE_PORT)) fail(`Port ${ENGINE_PORT} is already taken, the local engine needs it.`)
     log(`Starting the engine on port ${ENGINE_PORT}.`)
@@ -197,46 +154,6 @@ async function startEngine(base, apiKey, outDir) {
     const engine = spawnLogged('pnpm', ['--filter', 'rerun-engine', 'dev'], { cwd: REPO_ROOT, env }, join(outDir, 'engine.log'))
     await waitFor(`http://127.0.0.1:${ENGINE_PORT}/health`)
     return engine
-}
-
-async function testAccount(stack, { fresh }) {
-    const admin = createClient(stack.url, stack.secretKey, { auth: { persistSession: false } })
-    const email = `verify-${WORKSPACE_NAME}@rerun.local`
-    if (fresh) await deleteTestAccount(admin, email)
-    const created = await admin.auth.admin.createUser({ email, email_confirm: true })
-    if (created.error && !/already/i.test(created.error.message)) fail(`Could not create ${email}: ${created.error.message}`)
-    const link = await admin.auth.admin.generateLink({ type: 'magiclink', email })
-    if (link.error) fail(`Could not mint a sign-in link for ${email}: ${link.error.message}`)
-    return { admin, email, userId: link.data.user.id, tokenHash: link.data.properties.hashed_token }
-}
-
-async function deleteTestAccount(admin, email) {
-    const { data: listed, error: listError } = await admin.auth.admin.listUsers({ perPage: 1000 })
-    if (listError) fail(`Could not list the local accounts for --fresh: ${listError.message}`)
-    const account = listed.users.find((user) => user.email === email)
-    if (!account) return
-    const { data: row } = await admin.from('users').select('workspace_id').eq('id', account.id).maybeSingle()
-    if (row) await admin.from('engine_pool').delete().eq('claimed_by_workspace_id', row.workspace_id)
-    const { error } = await admin.auth.admin.deleteUser(account.id)
-    if (error) fail(`Could not delete ${email} for --fresh: ${error.message}`)
-    log(`Deleted ${email} and its pool row.`)
-}
-
-// The web asks every new account for a phone number before the app opens. The throwaway account
-// takes the wall's own "Skip for now".
-async function skipPhoneStep(admin, userId) {
-    const { error } = await admin.from('user_phones').update({ skipped_at: new Date().toISOString() }).eq('user_id', userId).is('skipped_at', null)
-    if (error) log(`Could not skip the phone step: ${error.message}`)
-}
-
-async function signIn(context, base, account) {
-    const page = await context.newPage()
-    await page.goto(`${base}/auth/confirm?token_hash=${account.tokenHash}&type=magiclink`)
-    // The confirm page is in the browser's language: its one submit button, whatever it says.
-    await page.locator('form button[type="submit"]').first().click()
-    await page.waitForURL((url) => !url.pathname.startsWith('/auth'), { timeout: 60_000 })
-    await skipPhoneStep(account.admin, account.userId)
-    await page.close()
 }
 
 function watch(page, report) {
@@ -362,7 +279,7 @@ async function runScenario(context, base, options, outDir, seed) {
 }
 
 const options = parseArgs(process.argv.slice(2))
-const stack = localStack()
+const stack = readLocalStack()
 assertLocalProfile(stack)
 assertMigrated()
 
@@ -371,9 +288,7 @@ const outDir = join(REPO_ROOT, '.context/verify', new Date().toISOString().repla
 mkdirSync(outDir, { recursive: true })
 const server = await ensureServer(base, outDir)
 
-// Chromium's Local Network Access checks hold every request the page makes to the loopback stack
-// (127.0.0.1:54421) and the dev server's HMR socket behind a permission prompt nobody answers.
-const browser = await chromium.launch({ headless: !options.headed, args: ['--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests'] })
+const browser = await chromium.launch({ headless: !options.headed, args: CHROMIUM_ARGS })
 // A language pack is picked by the cookie the Account dialog writes, and the browser asks for it too.
 // The test accounts (`@rerun.local`) are in the early access of the language packs.
 const context = await browser.newContext(options.locale ? { locale: options.locale } : {})
@@ -384,16 +299,21 @@ await context.addCookies([
 let failed = false
 let engine = null
 try {
-    const account = await testAccount(stack, options)
-    await signIn(context, base, account)
-    const engineLink = await linkTestEngine(account.admin, account.userId)
-    if (options.onboarded) await markOnboarded(account.admin, engineLink.workspaceId)
-    if (options.engine) engine = await startEngine(base, engineLink.apiKey, outDir)
-    log(`Signed in as ${account.email}, workspace ${engineLink.workspaceId}.`)
+    const admin = adminClient(stack)
+    const email = `verify-${WORKSPACE_NAME}@rerun.local`
+    if (options.fresh && (await deleteAccount(admin, email))) log(`Deleted ${email} and its pool row.`)
+    const link = await mintSignInLink(admin, email)
+    await signIn(context, base, admin, link)
+    const workspaceId = await workspaceOf(admin, link.userId)
+    const apiKey = `verify-${WORKSPACE_NAME}-${workspaceId}`
+    await linkEngine(admin, workspaceId, { engineHost: `127.0.0.1:${ENGINE_PORT}`, apiKey })
+    if (options.onboarded) await markOnboarded(admin, workspaceId)
+    if (options.engine) engine = await startEngine(base, apiKey, outDir)
+    log(`Signed in as ${email}, workspace ${workspaceId}.`)
 
     const pages = options.paths.length > 0 ? await capturePaths(context, base, options, outDir) : []
-    const scenario = options.scenario ? await runScenario(context, base, options, outDir, { admin: account.admin, workspaceId: engineLink.workspaceId }) : null
-    writeFileSync(join(outDir, 'report.json'), JSON.stringify({ base, account: account.email, pages, scenario }, null, 2))
+    const scenario = options.scenario ? await runScenario(context, base, options, outDir, { admin, workspaceId }) : null
+    writeFileSync(join(outDir, 'report.json'), JSON.stringify({ base, account: email, pages, scenario }, null, 2))
     failed = Boolean(scenario?.error) || pages.some((page) => page.pageErrors.length > 0)
     log(`Report: ${join(outDir, 'report.json')}`)
 } finally {
