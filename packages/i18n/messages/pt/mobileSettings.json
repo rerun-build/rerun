@@ -35,8 +35,18 @@
             "label": "Notificações push",
             "off": "Desativadas",
             "turnOn": "Ativar",
-            "openIosSettings": "Abrir Ajustes do iOS",
-            "footnote": "Nada abaixo chega a este iPhone até o push ser ativado."
+            "openSettings": "{platform, select, android {Abrir configurações do Android} other {Abrir Ajustes do iOS}}",
+            "footnote": "{platform, select, android {Nada abaixo chega a este telefone até o push ser ativado.} other {Nada abaixo chega a este iPhone até o push ser ativado.}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "Mensagens dos coworkers",
+                "description": "Quando um coworker precisa de você ou tem algo a dizer."
+            },
+            "silent": {
+                "name": "Tarefas concluídas",
+                "description": "Quando um coworker conclui uma tarefa, sem som."
+            }
         },
         "scopeTitle": "Me avisar sobre",
         "recommended": "Recomendado",

@@ -8,5 +8,6 @@
         "info": "Update"
     },
     "subtitle": "{source} · {state}",
+    "androidTitle": "{agent} · {subtitle}",
     "fallbackAgent": "dein Coworker"
 }
