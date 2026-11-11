@@ -231,7 +231,9 @@
         "startFailed": "Impossible de démarrer l'enregistrement.",
         "nothingHeard": "Rien n'a été entendu dans cet enregistrement.",
         "voiceMessageFailed": "Impossible d'envoyer votre message vocal.",
-        "nothingRecorded": "Rien n'a été enregistré."
+        "nothingRecorded": "Rien n'a été enregistré.",
+        "microphone": "Micro...",
+        "transcribing": "Transcription..."
     },
     "agentInstall": {
         "started": "Installation lancée",

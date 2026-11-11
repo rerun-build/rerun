@@ -1,32 +1,41 @@
 'use client'
 
 import { deleteFileAction } from '@/app/api/_actions/file.actions'
+import { deleteForemanFileAction } from '@/app/api/_actions/foreman-file.actions'
 import { MessageResponse } from '@/components/ai-elements/message'
 import { QuestionAttachmentStack } from '@/components/chat/QuestionAttachmentStack'
 import { useFileUploads } from '@/hooks/useFileUploads'
+import { useQuestionVoice } from '@/hooks/useQuestionVoice'
 import { CHAT_ATTACHMENTS_DIR, uniqueAttachmentName } from '@/lib/chat/attachments-marker'
 import { serializeAnswers } from '@/lib/chat-hitl'
+import type { UploadTarget } from '@/lib/files/upload-url'
 import { MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
 import { QuestionForm as QuestionFormBase, type QuestionAttachments, type QuestionFormProps as QuestionFormBaseProps, type QuestionItem } from '@rerun/ui/chat'
 import type { FileUIPart } from 'ai'
 import { nanoid } from 'nanoid'
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 const MAX_FILES = 10
+const MB = 1024 * 1024
 
 const renderMarkdown = (text: string) => <MessageResponse>{text}</MessageResponse>
 
 type AttachedFile = { uploadId: string; file: FileUIPart & { id: string } }
 
 type QuestionFormProps = Pick<QuestionFormBaseProps, 'ref' | 'textareaRef' | 'textareaProps' | 'inline'> & {
-    agentId: string
+    /** Where a joined file lands. Null when none can reach the coworker: no paperclip then. */
+    target: UploadTarget | null
+    maxFileSize?: number
     questions: QuestionItem[]
     onSend: (text: string) => void
     onCancel: () => void
     disabled?: boolean
 }
+
+// The upload hook needs a target on every render, including the ones where attachments are off.
+const NO_UPLOADS: UploadTarget = { kind: 'shared' }
 
 function toFilePart(file: File): AttachedFile['file'] {
     return {
@@ -42,13 +51,15 @@ function revokePreview(entry: AttachedFile) {
     if (entry.file.url) URL.revokeObjectURL(entry.file.url)
 }
 
-export function QuestionForm({ ref, agentId, questions, onSend, onCancel, disabled, inline, textareaRef, textareaProps }: QuestionFormProps) {
+export function QuestionForm({ ref, target, maxFileSize = MAX_UPLOAD_FILE_BYTES, questions, onSend, onCancel, disabled, inline, textareaRef, textareaProps }: QuestionFormProps) {
     const t = useTranslations('chat.question')
+    const tUpload = useTranslations('files.uploadOutcome')
     const uploads = useFileUploads({
-        target: useMemo(() => ({ kind: 'agent', agentId }) as const, [agentId]),
+        target: target ?? NO_UPLOADS,
         nameFor: uniqueAttachmentName,
         onRejected: message => toast.error(message),
     })
+    const voice = useQuestionVoice()
     const [attached, setAttached] = useState<Record<number, AttachedFile[]>>({})
 
     const attachedRef = useRef(attached)
@@ -62,7 +73,10 @@ export function QuestionForm({ ref, agentId, questions, onSend, onCancel, disabl
     const discard = (entries: AttachedFile[]) => {
         for (const entry of entries) {
             const item = uploads.byId.get(entry.uploadId)
-            if (item?.status === 'done') deleteFileAction(agentId, item.path).catch(() => {})
+            if (item?.status === 'done' && target) {
+                if (target.kind === 'agent') deleteFileAction(target.agentId, item.path).catch(() => {})
+                else if (target.kind === 'foreman') deleteForemanFileAction(target.sessionId, item.path).catch(() => {})
+            }
             uploads.cancel(entry.uploadId)
             revokePreview(entry)
         }
@@ -81,10 +95,15 @@ export function QuestionForm({ ref, agentId, questions, onSend, onCancel, disabl
             const room = MAX_FILES - Object.values(attached).flat().length
             if (files.length > room) toast.error(t('tooManyFiles', { max: MAX_FILES, rejected: files.length - Math.max(0, room) }))
             const picked = files.slice(0, Math.max(0, room))
-            // enqueue skips oversized files (and reports them), so its ids line up with the sized ones.
-            const sized = picked.filter(file => file.size <= MAX_UPLOAD_FILE_BYTES)
+            // Only the sized ones are enqueued, so the ids come back lined up with them. The cap is
+            // the target's, which is lower on the hub than on a Box.
+            const sized = picked.filter(file => file.size <= maxFileSize)
+            const oversized = picked.filter(file => file.size > maxFileSize)
+            if (oversized.length > 0) {
+                toast.error(tUpload('oversized', { names: oversized.slice(0, 2).map(file => file.name).join(', '), more: Math.max(0, oversized.length - 2), count: oversized.length, limit: maxFileSize / MB }))
+            }
             const uploadIds = uploads.enqueue(
-                picked.map(file => ({ file, subDir: '' })),
+                sized.map(file => ({ file, subDir: '' })),
                 CHAT_ATTACHMENTS_DIR,
             )
             const added = sized.map((file, index) => ({ uploadId: uploadIds[index], file: toFilePart(file) }))
@@ -136,5 +155,5 @@ export function QuestionForm({ ref, agentId, questions, onSend, onCancel, disabl
         onCancel()
     }
 
-    return <QuestionFormBase ref={ref} questions={questions} onSubmit={submit} onCancel={cancel} disabled={disabled} inline={inline} renderText={renderMarkdown} attachments={attachments} textareaRef={textareaRef} textareaProps={textareaProps} />
+    return <QuestionFormBase ref={ref} questions={questions} onSubmit={submit} onCancel={cancel} disabled={disabled} inline={inline} renderText={renderMarkdown} attachments={target ? attachments : undefined} voice={voice} textareaRef={textareaRef} textareaProps={textareaProps} />
 }

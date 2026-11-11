@@ -23,6 +23,7 @@ import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { hitlCallBefore } from '@/lib/chat/hitl-receipts'
 import type { MessageFeedbackRating } from '@rerun/contracts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
+import type { UploadTarget } from '@/lib/files/upload-url'
 import { isEngineHitl, type PendingWidget } from '@/lib/foreman/pending-widget'
 import type { ForemanNextStep } from '@/lib/foreman/next-steps'
 import type { ForemanArrival } from '@/lib/foreman/phase'
@@ -74,6 +75,8 @@ type ForemanChatLayerProps = {
     // The widget the conversation is stopped on. An engine question is drawn after the last message;
     // any other one is already in the stack, inside the message that called it.
     pending?: PendingWidget | null
+    /** Where a file joined to an engine question lands. Null when none could reach the foreman. */
+    answerAttachments?: { target: UploadTarget; maxFileSize: number } | null
     // What a finished build leaves to press, drawn after the last message the way an engine question is.
     nextSteps?: ForemanNextStep[]
     onSuggestion?: (text: string) => void
@@ -99,7 +102,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, nextSteps, onSuggestion, onPrefill, onStop, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onStackElement, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onStackElement, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -232,7 +235,13 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                         {engineHitl && onWidgetAnswer && (
                             <motion.div key={engineHitl.toolCallId} ref={pendingRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
                                 {engineHitl.toolName === 'ask_user' ? (
-                                    <EngineQuestionWidget input={engineHitl.input} onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)} onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))} />
+                                    <EngineQuestionWidget
+                                        input={engineHitl.input}
+                                        target={answerAttachments?.target ?? null}
+                                        maxFileSize={answerAttachments?.maxFileSize}
+                                        onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)}
+                                        onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))}
+                                    />
                                 ) : (
                                     <ActionApprovalBlock inline approvals={pendingApprovals((engineHitl.input ?? {}) as Record<string, unknown>)} onSubmit={decisions => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, serializeApprovalDecisions(decisions))} />
                                 )}

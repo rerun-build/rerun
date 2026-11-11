@@ -231,7 +231,9 @@
         "startFailed": "No se pudo iniciar la grabación.",
         "nothingHeard": "No se oyó nada en esa grabación.",
         "voiceMessageFailed": "No se pudo enviar tu mensaje de voz.",
-        "nothingRecorded": "No se grabó nada."
+        "nothingRecorded": "No se grabó nada.",
+        "microphone": "Micrófono...",
+        "transcribing": "Transcribiendo..."
     },
     "agentInstall": {
         "started": "Instalación iniciada",

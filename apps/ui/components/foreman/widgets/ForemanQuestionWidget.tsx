@@ -4,6 +4,7 @@ import { QuestionForm } from '@rerun/ui/chat'
 import { useTranslations } from 'next-intl'
 
 import { MessageResponse } from '@/components/ai-elements/message'
+import { useQuestionVoice } from '@/hooks/useQuestionVoice'
 import { asStringArray } from '@/lib/mcp/args'
 import { readQuestionOutput, type QuestionAnswer } from './question-answer'
 
@@ -42,6 +43,9 @@ export function QuestionRecap({ question, answer }: { question: string; answer: 
 
 export function ForemanQuestionWidget({ input, output, onAnswer, onDismiss }: ForemanQuestionWidgetProps) {
     const t = useTranslations('foreman.question')
+    // The microphone, but no paperclip: this answer leaves as a tool result, and only a user message
+    // gets its files handed to the model (lib/foreman/inline-attachments.ts).
+    const voice = useQuestionVoice()
     const args = input && typeof input === 'object' ? (input as Record<string, unknown>) : {}
     const question = typeof args.question === 'string' ? args.question : t('fallback')
     const options = asStringArray(args.options).map(label => ({ label }))
@@ -49,5 +53,5 @@ export function ForemanQuestionWidget({ input, output, onAnswer, onDismiss }: Fo
     const answered = readQuestionOutput(output)
     if (answered) return <QuestionRecap question={question} answer={answered} />
 
-    return <QuestionForm inline questions={[{ question, options, multiple: args.multiple === true }]} renderText={renderMarkdown} onSubmit={answers => onAnswer({ answered: true, question, answers: answers[0]?.answers ?? [] })} onCancel={onDismiss} />
+    return <QuestionForm inline questions={[{ question, options, multiple: args.multiple === true }]} renderText={renderMarkdown} voice={voice} onSubmit={answers => onAnswer({ answered: true, question, answers: answers[0]?.answers ?? [] })} onCancel={onDismiss} />
 }

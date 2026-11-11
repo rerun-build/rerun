@@ -2,7 +2,7 @@
 
 import { type PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { track } from '@rerun/analytics/client'
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
 import { cancelSubRunAction } from '@/app/api/_actions/agent.actions'
 import { readFileAction } from '@/app/api/_actions/file.actions'
 import { readWorkspaceFileAction } from '@/app/api/_actions/workspace-file.actions'
@@ -320,6 +320,9 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     const rawUrlFor = useCallback((path: string) => (engineFiles ? agentFileRawUrl(FOREMAN_AGENT_ID, path) : foremanFileRawUrl(sessionId, path)), [engineFiles, sessionId])
     const readFile = useCallback((path: string) => (engineFiles ? readFileAction(FOREMAN_AGENT_ID, path) : readForemanFileAction(sessionId, path)), [engineFiles, sessionId])
     const sharedFiles = useMemo(() => (engineFiles ? { rawUrlFor: sharedFileRawUrl, readFile: readWorkspaceFileAction } : undefined), [engineFiles])
+    // A file joined to an engine question has to land where the foreman's tools can open it, which is
+    // its own workspace on the Box. Until the engine can take them, the question carries no paperclip.
+    const answerAttachments = useMemo(() => (engineFiles ? { target: { kind: 'agent', agentId: FOREMAN_AGENT_ID } as const, maxFileSize: MAX_UPLOAD_FILE_BYTES } : null), [engineFiles])
 
     const stopTask = useMemo(() => (activeRunId ? (taskId: string) => void cancelSubRunAction(FOREMAN_AGENT_ID, activeRunId, taskId) : undefined), [activeRunId])
 
@@ -456,6 +459,7 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
                         onWidgetAnswer={answerWidget}
                         onWidgetDismiss={dismissWidget}
                         pending={pendingWidget}
+                        answerAttachments={answerAttachments}
                         nextSteps={nextSteps}
                         onSuggestion={sendOrQueue}
                         onPrefill={prefill}

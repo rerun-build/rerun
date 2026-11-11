@@ -231,7 +231,9 @@
         "startFailed": "Aufnahme konnte nicht gestartet werden.",
         "nothingHeard": "In dieser Aufnahme war nichts zu hören.",
         "voiceMessageFailed": "Deine Sprachnachricht konnte nicht gesendet werden.",
-        "nothingRecorded": "Es wurde nichts aufgenommen."
+        "nothingRecorded": "Es wurde nichts aufgenommen.",
+        "microphone": "Mikrofon...",
+        "transcribing": "Wird transkribiert..."
     },
     "agentInstall": {
         "started": "Installation gestartet",

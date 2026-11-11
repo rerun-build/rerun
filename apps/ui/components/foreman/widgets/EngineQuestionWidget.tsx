@@ -1,14 +1,11 @@
 'use client'
 
-import { QuestionForm } from '@rerun/ui/chat'
+import { QuestionForm } from '@/components/chat/QuestionForm'
+import { pendingQuestions } from '@/lib/chat-hitl'
+import type { UploadTarget } from '@/lib/files/upload-url'
 
-import { MessageResponse } from '@/components/ai-elements/message'
-import { pendingQuestions, serializeAnswers } from '@/lib/chat-hitl'
-
-const renderMarkdown = (text: string) => <MessageResponse>{text}</MessageResponse>
-
-// The engine foreman's ask_user. The same form as an agent's, without attachments: the foreman has
-// no Box to drop them on. Answering sends the answers as the next message, which is what resumes it.
-export function EngineQuestionWidget({ input, onAnswer, onDismiss }: { input: unknown; onAnswer: (text: string) => void; onDismiss?: () => void }) {
-    return <QuestionForm inline questions={pendingQuestions((input ?? {}) as Record<string, unknown>)} onSubmit={answers => onAnswer(serializeAnswers(answers))} onCancel={onDismiss} renderText={renderMarkdown} />
+// The engine foreman's ask_user: the same form as an agent's, answered the same way. Answering sends
+// the answers as the next message, which is what resumes the foreman.
+export function EngineQuestionWidget({ input, target, maxFileSize, onAnswer, onDismiss }: { input: unknown; target: UploadTarget | null; maxFileSize?: number; onAnswer: (text: string) => void; onDismiss?: () => void }) {
+    return <QuestionForm inline target={target} maxFileSize={maxFileSize} questions={pendingQuestions((input ?? {}) as Record<string, unknown>)} onSend={onAnswer} onCancel={() => onDismiss?.()} />
 }
