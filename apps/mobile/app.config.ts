@@ -36,12 +36,12 @@ function assertStoreBuildHasHub(): void {
     throw new Error(`Store build "${process.env.EAS_BUILD_PROFILE}" has no hub to point at: set ${missing.join(', ')} in its EAS environment.`)
 }
 
-// Firebase's file for Android push, Rerun's in the private cloud/ folder. Without it the app builds and
-// runs on Android, it just never gets a push token (the same as iOS without an EAS project). The Google
-// Services Gradle plugin refuses a file that does not name the app's package, so a build whose package
-// the file does not list (the development client, until it is declared in the Firebase project) goes
-// without it too.
-const RERUN_GOOGLE_SERVICES = `${__dirname}/../../cloud/apps/mobile/google-services.json`
+// Firebase's file for Android push: Rerun's in the private cloud/ folder, and on the EAS builder, which
+// never receives cloud/, the GOOGLE_SERVICES_JSON file variable of the build's EAS environment. Without
+// it the app builds and runs on Android, it just never gets a push token (the same as iOS without an EAS
+// project). The Google Services Gradle plugin refuses a file that does not name the app's package, so a
+// build whose package the file does not list goes without it too.
+const RERUN_GOOGLE_SERVICES = process.env.GOOGLE_SERVICES_JSON ?? `${__dirname}/../../cloud/apps/mobile/google-services.json`
 
 type GoogleServices = { client?: { client_info?: { android_client_info?: { package_name?: string } } }[] }
 
