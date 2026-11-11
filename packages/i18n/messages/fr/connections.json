@@ -211,15 +211,14 @@
     },
     "opencode": {
         "goTitle": "Inclus dans OpenCode Go",
-        "goHint": "Payé par votre forfait Go, dans ses limites de 5 heures, hebdomadaire et mensuelle.",
+        "goHint": "Payé par votre forfait Go.",
         "consoleTitle": "Console, payée avec vos crédits",
-        "consoleHint": "Facturé au jeton sur vos crédits OpenCode. Désactivé tant que vous n’en activez pas un.",
+        "consoleHint": "Facturé au jeton, désactivé tant que vous n’en activez pas un.",
         "included": "Inclus",
         "credits": "Crédits",
         "new": "Nouveau",
         "noVision": "Sans vision",
         "search": "Rechercher des modèles",
-        "count": "{on} sur {total} actifs",
         "emptySection": "OpenCode ne liste aucun modèle ici pour le moment.",
         "noMatch": "Aucun modèle ne correspond à « {query} »."
     },

@@ -93,15 +93,7 @@ export function OpencodeModels({ connection, defaultModel, onModelsChange }: Ope
                 const shown = inPlan.filter(row => matches(row, trimmed))
                 if (trimmed && shown.length === 0) return null
                 return (
-                    <DetailBlock
-                        key={section.plan}
-                        title={t(`opencode.${section.title}`)}
-                        aside={
-                            <span className="text-[11px] text-muted-foreground tabular-nums">
-                                {t('opencode.count', { on: inPlan.filter(row => row.enabled).length, total: inPlan.length })}
-                            </span>
-                        }
-                    >
+                    <DetailBlock key={section.plan} title={t(`opencode.${section.title}`)}>
                         <p className="text-[11px] text-muted-foreground">{t(`opencode.${section.hint}`)}</p>
                         {shown.length === 0 ? (
                             <p className="rounded-md border border-dashed px-3 py-2.5 text-[11px] text-muted-foreground">{t('opencode.emptySection')}</p>

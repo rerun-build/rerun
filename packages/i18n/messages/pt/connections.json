@@ -211,15 +211,14 @@
     },
     "opencode": {
         "goTitle": "Incluído no OpenCode Go",
-        "goHint": "Pago pelo seu plano Go, dentro dos limites de 5 horas, semanal e mensal.",
+        "goHint": "Pago pelo seu plano Go.",
         "consoleTitle": "Console, pago com seus créditos",
-        "consoleHint": "Cobrado por token dos seus créditos OpenCode. Desativado até você ativar um.",
+        "consoleHint": "Cobrado por token, desativado até você ativar um.",
         "included": "Incluído",
         "credits": "Créditos",
         "new": "Novo",
         "noVision": "Sem visão",
         "search": "Buscar modelos",
-        "count": "{on} de {total} ativos",
         "emptySection": "O OpenCode não lista nenhum modelo aqui agora.",
         "noMatch": "Nenhum modelo corresponde a “{query}”."
     },
