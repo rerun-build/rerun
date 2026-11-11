@@ -17,7 +17,22 @@ function isReanimatedWebOnly(request) {
     return request.startsWith('.') && REANIMATED_WEB_ONLY.some(entry => (entry.includes('/') ? request.endsWith(entry) : basename === entry))
 }
 
+// `@rerun/cloud-mobile/<module>` is Rerun Cloud's side when the private cloud/ folder holds the module,
+// and the open source side in src/cloud-oss/ otherwise: the fallback of the `paths` of tsconfig.json,
+// module by module, so a module the public tree gets before cloud/ resolves in both checkouts.
+const CLOUD_MOBILE = '@rerun/cloud-mobile/'
+
+function resolveCloudMobile(request, options) {
+    const module = request.slice(CLOUD_MOBILE.length)
+    try {
+        return presetResolver(path.resolve(options.rootDir, '../../cloud/apps/mobile/src', module), options)
+    } catch {
+        return presetResolver(path.resolve(options.rootDir, 'src/cloud-oss', module), options)
+    }
+}
+
 module.exports = (request, options) => {
+    if (request.startsWith(CLOUD_MOBILE)) return resolveCloudMobile(request, options)
     const packages = options.basedir.split(path.sep)
     const worklets = packages.includes('react-native-worklets') || request === 'react-native-worklets' || request.startsWith('react-native-worklets/')
     const reanimatedWebOnly = packages.includes('react-native-reanimated') && isReanimatedWebOnly(request)
