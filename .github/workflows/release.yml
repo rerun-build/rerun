@@ -57,5 +57,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=engine
+          # The second one is what the CI of the same push already built for linux/amd64.
+          cache-from: |
+            type=gha,scope=engine
+            type=registry,ref=ghcr.io/${{ github.repository_owner }}/rerun-buildcache:engine
           cache-to: type=gha,mode=max,scope=engine
