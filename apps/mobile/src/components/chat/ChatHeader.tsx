@@ -1,5 +1,5 @@
 import type { SessionKind, SessionStatus } from '@rerun/contracts'
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import Animated, { Extrapolation, FadeIn, interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
@@ -12,19 +12,19 @@ import { EdgeFade } from '@/components/ui/EdgeFade'
 import { GlassButton, GLASS_BUTTON_SIZE, useGlassStyle } from '@/components/ui/GlassButton'
 import { GlassSurface } from '@/components/ui/GlassSurface'
 import { Icon } from '@/components/ui/Icon'
-import { MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
+import { CircleTrigger, MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useMessageTimes } from '@/lib/time'
 import type { Coworker } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing } from '@/theme/tokens'
 
-const AVATAR = GLASS_BUTTON_SIZE
-const PILL_HEIGHT = 40
-const PILL_OVERLAP = 8
-const CHEVRON_SPACE = 18
-export const CHAT_HEADER_HEIGHT = AVATAR - PILL_OVERLAP + PILL_HEIGHT + spacing.sm
-const CHIP_MAX_WIDTH = 220
+const PILL_HEIGHT = GLASS_BUTTON_SIZE
+const AVATAR = 32
+const AVATAR_INSET = (PILL_HEIGHT - AVATAR) / 2
+const AVATAR_SPACE = AVATAR_INSET + AVATAR + spacing.sm
+export const CHAT_HEADER_HEIGHT = PILL_HEIGHT + spacing.sm
+const CHIP_MAX_WIDTH = 240
 
 // A conversation as the header shows it. `title` is null until the first message names it, and
 // `loading` while the hub has not said yet what the conversation is called. `status`, `unseen` and
@@ -49,7 +49,7 @@ type ChipPageProps = {
     untitled?: string
 }
 
-// One conversation inside the header's pill: the coworker's name over the conversation's title.
+// One conversation inside the header's pill, beside the coworker's face: its name over the conversation's title.
 export function ChipPage({ coworker, session, active, width, progress, index = 0, untitled }: ChipPageProps) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.header')
@@ -61,9 +61,9 @@ export function ChipPage({ coworker, session, active, width, progress, index = 0
         return { opacity: interpolate(distance, [0, 0.6], [1, 0], Extrapolation.CLAMP) }
     })
     return (
-        <Animated.View style={[{ width, height: PILL_HEIGHT, alignItems: 'center', justifyContent: 'center', paddingLeft: CHEVRON_SPACE, paddingRight: CHEVRON_SPACE }, fade]}>
-            <View style={{ maxWidth: '100%', alignItems: 'center' }}>
-                <AppText variant="caption" tone="muted" medium numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ textAlign: 'center' }}>
+        <Animated.View style={[{ width, height: PILL_HEIGHT, justifyContent: 'center', paddingRight: spacing.md }, fade]}>
+            <View style={{ maxWidth: '100%', alignItems: 'flex-start' }}>
+                <AppText variant="caption" tone="muted" medium numberOfLines={1} maxFontSizeMultiplier={1.2}>
                     {coworker.name}
                 </AppText>
                 {session.loading ? (
@@ -71,7 +71,7 @@ export function ChipPage({ coworker, session, active, width, progress, index = 0
                 ) : (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, maxWidth: '100%' }}>
                         {general && <Icon name="messages-square-fill" size={12} color={theme.foreground} />}
-                        <Animated.Text key={title} entering={FadeIn.duration(400)} numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flexShrink: 1, fontFamily: fonts.medium, fontSize: 14, lineHeight: 18, letterSpacing: -0.2, textAlign: 'center', color: general || session.title ? theme.foreground : theme.mutedForeground }}>
+                        <Animated.Text key={title} entering={FadeIn.duration(400)} numberOfLines={1} maxFontSizeMultiplier={1.2} style={{ flexShrink: 1, fontFamily: fonts.medium, fontSize: 14, lineHeight: 18, letterSpacing: -0.2, color: general || session.title ? theme.foreground : theme.mutedForeground }}>
                             {title}
                         </Animated.Text>
                     </View>
@@ -154,6 +154,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     const t = useTranslations('mobileChat.header')
     const { width: paneWidth } = usePaneSize()
     const chipWidth = Math.min(CHIP_MAX_WIDTH, paneWidth - 2 * (spacing.lg + GLASS_BUTTON_SIZE + spacing.sm))
+    const titleWidth = chipWidth - AVATAR_SPACE
     const hasConversations = tabs.length > 0
     const general = tabs[0]?.kind === 'general' ? tabs[0] : null
     const untitled = general ? t('newThread') : t('newConversation')
@@ -163,47 +164,49 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     const activeIndex = hasConversations && activeId ? tabs.findIndex(session => session.id === activeId) : tabs.length
     const activeTitle = tabs[activeIndex]?.kind === 'general' ? t('general') : (tabs[activeIndex]?.title ?? untitled)
     const running = tabs[activeIndex]?.running ?? false
-    const track = useAnimatedStyle(() => ({ transform: [{ translateX: hasConversations ? -progress.value * chipWidth : 0 }] }))
-    const menuOpens = hasConversations || Boolean(onOpenDetails)
-    // The coworker's face over a glass pill with its name and the conversation, as iMessage heads a chat.
-    const identity = (
-        <View style={{ alignItems: 'center' }}>
-            <CoworkerAvatar coworker={{ ...coworker, status: running ? 'working' : coworker.status === 'working' ? 'idle' : coworker.status }} size={AVATAR} />
-            <GlassSurface colorScheme={theme.scheme} glassEffectStyle={glass} style={{ borderRadius: PILL_HEIGHT / 2, marginTop: -PILL_OVERLAP }}>
-                <View style={{ width: chipWidth, height: PILL_HEIGHT, overflow: 'hidden' }}>
-                    <Animated.View style={[{ flexDirection: 'row', width: pages.length * chipWidth }, track]}>
-                        {pages.map((session, index) => (
-                            <ChipPage key={session.id} coworker={coworker} session={hasConversations ? session : { ...session, title: t('newChat') }} active={index === activeIndex} width={chipWidth} progress={hasConversations ? progress : undefined} index={index} untitled={untitled} />
-                        ))}
-                    </Animated.View>
-                    {menuOpens && (
-                        <View pointerEvents="none" style={{ position: 'absolute', right: spacing.sm + 2, top: 0, bottom: 0, justifyContent: 'center' }}>
-                            <Icon name="chevron-right" size={11} bold color={theme.mutedForeground} />
-                        </View>
-                    )}
-                </View>
-            </GlassSurface>
-        </View>
+    const track = useAnimatedStyle(() => ({ transform: [{ translateX: hasConversations ? -progress.value * titleWidth : 0 }] }))
+    const identityLabel = t('identityLabel', { name: coworker.name, title: hasConversations ? activeTitle : t('newChat') })
+    // The coworker's face beside its name and the conversation, in one glass pill; a tap opens the coworker.
+    const pill = (
+        <GlassSurface isInteractive={Boolean(onOpenDetails)} colorScheme={theme.scheme} glassEffectStyle={glass} style={{ width: chipWidth, height: PILL_HEIGHT, flexDirection: 'row', alignItems: 'center', borderRadius: PILL_HEIGHT / 2, overflow: 'hidden' }}>
+            <View style={{ marginLeft: AVATAR_INSET, marginRight: spacing.sm }}>
+                <CoworkerAvatar coworker={{ ...coworker, status: running ? 'working' : coworker.status === 'working' ? 'idle' : coworker.status }} size={AVATAR} />
+            </View>
+            <View style={{ width: titleWidth, height: PILL_HEIGHT, overflow: 'hidden' }}>
+                <Animated.View style={[{ flexDirection: 'row', width: pages.length * titleWidth }, track]}>
+                    {pages.map((session, index) => (
+                        <ChipPage key={session.id} coworker={coworker} session={hasConversations ? session : { ...session, title: t('newChat') }} active={index === activeIndex} width={titleWidth} progress={hasConversations ? progress : undefined} index={index} untitled={untitled} />
+                    ))}
+                </Animated.View>
+            </View>
+        </GlassSurface>
     )
 
     return (
         <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
             <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} />
-            <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm }}>
+            <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                 {onBack ? <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
                 <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>
-                    {menuOpens ? (
-                        <NativeMenu label={t('menuLabel', { name: coworker.name, title: activeTitle })} trigger={identity}>
-                            {onOpenDetails && <MenuItem label={t('coworkerDetails')} icon="info" onPress={onOpenDetails} />}
-                            {hasConversations && <MenuItem label={untitled} icon="plus" onPress={onNewSession} disabled={!activeId} />}
-                            {general && <MenuToggle label={t('general')} icon="messages-square" isOn={activeId === general.id} onChange={() => onSelect(general.id)} />}
-                            {listed.length > 0 && <ConversationsMenu sessions={listed} activeId={activeId} threaded={Boolean(general)} onSelect={onSelect} />}
-                        </NativeMenu>
+                    {onOpenDetails ? (
+                        <Pressable onPress={onOpenDetails} accessibilityRole="button" accessibilityLabel={identityLabel} accessibilityHint={t('coworkerDetails')}>
+                            {pill}
+                        </Pressable>
                     ) : (
-                        identity
+                        <View accessible accessibilityLabel={identityLabel}>
+                            {pill}
+                        </View>
                     )}
                 </View>
-                {general && activeIndex !== 0 ? <GlassButton symbol="messages-square" label={t('general')} onPress={() => onSelect(general.id)} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
+                {hasConversations ? (
+                    <NativeMenu glass="circle" label={general ? t('threads') : t('conversations')} trigger={<CircleTrigger symbol="messages-square" />}>
+                        <MenuItem label={untitled} icon="plus" onPress={onNewSession} disabled={!activeId} />
+                        {general && <MenuToggle label={t('general')} icon="messages-square" isOn={activeId === general.id} onChange={() => onSelect(general.id)} />}
+                        {listed.length > 0 && <ConversationsMenu sessions={listed} activeId={activeId} threaded={Boolean(general)} onSelect={onSelect} />}
+                    </NativeMenu>
+                ) : (
+                    <View style={{ width: GLASS_BUTTON_SIZE }} />
+                )}
             </View>
         </View>
     )

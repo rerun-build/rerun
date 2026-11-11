@@ -146,7 +146,7 @@
         "coworkerDetails": "Coworker-Details",
         "earlier": "Früher",
         "general": "Allgemein",
-        "menuLabel": "{name}, {title}, Unterhaltungen",
+        "identityLabel": "{name}, {title}",
         "newChat": "Neuer Chat",
         "newConversation": "Neue Unterhaltung",
         "newThread": "Neuer Thread",
