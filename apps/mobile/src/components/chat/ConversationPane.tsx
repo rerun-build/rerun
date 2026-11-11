@@ -504,12 +504,15 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                             <QueuedMessagePill text={queue.queued.text} busy={chat.busy} pending={stopping} onSendNow={sendQueuedNow} onDiscard={queue.clear} />
                         </Animated.View>
                     )}
-                    {!replacesComposer && (
-                        // Slides rather than fades: the composer's glass goes blank under a parent below full opacity.
-                        <Animated.View entering={SlideInDown.duration(280)} exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                            <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} />
-                        </Animated.View>
-                    )}
+                    {/* The composer's glass goes blank under a parent below full opacity, and when it mounts mid-slide:
+                        it slides rather than fades, and the page opens with it already in place. */}
+                    <LayoutAnimationConfig skipEntering>
+                        {!replacesComposer && (
+                            <Animated.View entering={SlideInDown.duration(280)} exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
+                                <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} />
+                            </Animated.View>
+                        )}
+                    </LayoutAnimationConfig>
                 </View>
             </View>
         </Animated.View>
