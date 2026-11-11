@@ -1,12 +1,12 @@
 {
     "_context": {
         "welcome.preparing": "Shimmering line under the welcome title while the first turn of the onboarding starts.",
-        "header.newTask": "Button that starts a new conversation with the Foreman.",
+        "header.newTask": "Button that starts a new conversation with the Chief of Staff.",
         "header.position.float": "Menu option: the chat floats in a corner of the screen instead of being docked.",
         "modelPill.hubReason": "Tooltip on the disabled model picker. Rerun Balanced is the name of a model, keep it as is.",
         "signupGate.perks.trial": "{days} is the length of the free trial in days.",
         "signInLink.prompt": "<link> wraps the clickable part that opens the sign-in dialog.",
-        "dock.tooltip": "Tooltip of the Foreman orb. <key> wraps the keyboard shortcut, {shortcut} is that shortcut (e.g. ⌘F).",
+        "dock.tooltip": "Tooltip of the Chief of Staff orb. <key> wraps the keyboard shortcut, {shortcut} is that shortcut (e.g. ⌘F).",
         "nudge.more": "Count of other questions waiting besides the one shown.",
         "nudge.answer": "Button: go and answer the question.",
         "nudge.later": "Button: dismiss the card for now.",
@@ -44,7 +44,7 @@
         "title": "Hey, ready to hand off your first task?",
         "preparing": "Getting your workspace ready...",
         "gateTitle": "Your team is ready to be built",
-        "gateSubtitle": "Create your account and the Foreman starts building it right away."
+        "gateSubtitle": "Create your account and the Chief of Staff starts building it right away."
     },
     "header": {
         "closeDisabled": "Finish the setup to close the chat",
@@ -88,10 +88,11 @@
         "installFailed": "Could not start the installation"
     },
     "notification": {
-        "waiting": "Foreman is waiting for you."
+        "title": "Chief of Staff",
+        "waiting": "Your Chief of Staff is waiting for you."
     },
     "dock": {
-        "tooltip": "Search or ask Rerun <key>{shortcut}</key>",
+        "tooltip": "Search or ask your Chief of Staff <key>{shortcut}</key>",
         "failedReply": "Something went wrong on that one."
     },
     "nudge": {
@@ -118,7 +119,7 @@
             "failedRun": "Why did that run fail?",
             "newCoworker": "Build me a new coworker"
         },
-        "ask": "Ask Rerun",
+        "ask": "Ask your Chief of Staff",
         "send": "Send"
     },
     "routines": {
@@ -407,8 +408,8 @@
         "pay": "Pay {price}"
     },
     "teamEmptyState": {
-        "greeting": "Hi, I'm Rerun",
-        "greetingNamed": "Hi {firstName}, I'm Rerun",
+        "greeting": "Hi, I'm your Chief of Staff",
+        "greetingNamed": "Hi {firstName}, I'm your Chief of Staff",
         "greetingWithTeam": "{greeting}. Here is your team.",
         "emptySubtitle": "You have no coworkers yet. Tell me a job you would hand off and I'll build the first one.",
         "buildPrompt": "Build me a coworker that ",

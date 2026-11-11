@@ -228,7 +228,7 @@
                 },
                 "third": {
                     "question": "What happens if nobody answers?",
-                    "answer": "The run waits, and the question stays on the board. If you turn autopilot on, the workspace manager answers it by the rules you wrote so the run finishes without you."
+                    "answer": "The run waits, and the question stays on the board. If you turn autopilot on, your Chief of Staff answers it by the rules you wrote so the run finishes without you."
                 }
             },
             "templatesTitle": "Coworkers you want to keep on a leash."
@@ -409,7 +409,7 @@
                 },
                 "second": {
                     "question": "Do I have to wire the chain myself?",
-                    "answer": "No. You say what each one is responsible for; the workspace manager knows who handles what and routes between them. You can also name the next Coworker in a Coworker’s instructions if the order matters."
+                    "answer": "No. You say what each one is responsible for; your Chief of Staff knows who handles what and routes between them. You can also name the next Coworker in a Coworker’s instructions if the order matters."
                 },
                 "third": {
                     "question": "Is this the same as a multi-agent workflow?",

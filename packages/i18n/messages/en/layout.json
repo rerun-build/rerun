@@ -12,7 +12,7 @@
         "workspaceMenu.brain": "Name of the workspace knowledge base feature.",
         "menu.weeklyRewind": "Name of a weekly recap feature (Rewind).",
         "controlCenter.title": "Command palette of the app (search agents, settings, conversations).",
-        "controlCenter.quotedQuery": "What the person typed, quoted, beside \"Ask Rerun\".",
+        "controlCenter.quotedQuery": "What the person typed, quoted, beside \"Ask your Chief of Staff\".",
         "controlCenter.hints.searchPage": "Footer hint. <keys></keys> is replaced by the keyboard keys (⌘ F): pressing them again opens the browser's own find in page.",
         "controlCenter.hints.open": "Footer hint next to the Enter key: opens the selected row.",
         "controlCenter.hints.more": "Footer hint next to the Tab key: opens more options for the selected row.",
@@ -160,9 +160,9 @@
     },
     "controlCenter": {
         "title": "Control center",
-        "description": "Jump to an agent, a setting or a conversation, or ask Rerun.",
+        "description": "Jump to an agent, a setting or a conversation, or ask your Chief of Staff.",
         "back": "Back",
-        "askRerun": "Ask Rerun",
+        "askRerun": "Ask your Chief of Staff",
         "quotedQuery": "“{query}”",
         "unnamedBox": "Untitled Box",
         "pro": "Pro",
@@ -183,7 +183,7 @@
             "boxes": "Boxes",
             "conversations": "Conversations",
             "recentConversations": "Recent conversations",
-            "assistant": "Assistant",
+            "assistant": "Chief of Staff",
             "open": "Open",
             "moveTo": "Move to"
         },
@@ -195,7 +195,7 @@
             "notificationsDetail": "When this agent reaches you"
         },
         "placeholder": {
-            "rootAssistant": "Search or ask Rerun…",
+            "rootAssistant": "Search or ask your Chief of Staff…",
             "root": "Search agents, settings, conversations…",
             "agent": "Search in {name}…",
             "agentUnknown": "Search in this agent…",
@@ -215,7 +215,7 @@
             "new_agent": "New agent",
             "browse_templates": "Browse templates",
             "new_box": "New Box",
-            "ask_assistant": "Ask the assistant",
+            "ask_assistant": "Ask your Chief of Staff",
             "contact_support": "Contact Support",
             "recenter_board": "Recenter the board",
             "toggle_theme_light": "Switch to light theme",

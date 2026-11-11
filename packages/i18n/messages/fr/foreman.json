@@ -3,7 +3,7 @@
         "title": "Prêt à confier votre première tâche ?",
         "preparing": "Préparation de votre workspace...",
         "gateTitle": "Votre équipe est prête à être créée",
-        "gateSubtitle": "Créez votre compte et le Foreman commence à la créer tout de suite."
+        "gateSubtitle": "Créez votre compte et le Chief of Staff commence à la monter tout de suite."
     },
     "header": {
         "closeDisabled": "Terminez la configuration pour fermer le chat",
@@ -47,10 +47,11 @@
         "installFailed": "Impossible de lancer l'installation"
     },
     "notification": {
-        "waiting": "Le Foreman vous attend."
+        "title": "Chief of Staff",
+        "waiting": "Votre Chief of Staff vous attend."
     },
     "dock": {
-        "tooltip": "Rechercher ou demander à Rerun <key>{shortcut}</key>",
+        "tooltip": "Rechercher ou demander à votre Chief of Staff <key>{shortcut}</key>",
         "failedReply": "Un problème est survenu sur celle-ci."
     },
     "nudge": {
@@ -77,7 +78,7 @@
             "failedRun": "Pourquoi ce run a échoué ?",
             "newCoworker": "Crée-moi un nouveau coworker"
         },
-        "ask": "Demander à Rerun",
+        "ask": "Demander à votre Chief of Staff",
         "send": "Envoyer"
     },
     "routines": {
@@ -366,8 +367,8 @@
         "pay": "Payer {price}"
     },
     "teamEmptyState": {
-        "greeting": "Bonjour, je suis Rerun",
-        "greetingNamed": "Bonjour {firstName}, je suis Rerun",
+        "greeting": "Bonjour, je suis votre Chief of Staff",
+        "greetingNamed": "Bonjour {firstName}, je suis votre Chief of Staff",
         "greetingWithTeam": "{greeting}. Voici votre équipe.",
         "emptySubtitle": "Vous n'avez pas encore de coworker. Décrivez-moi une tâche à déléguer et je crée le premier.",
         "buildPrompt": "Crée-moi un coworker qui ",

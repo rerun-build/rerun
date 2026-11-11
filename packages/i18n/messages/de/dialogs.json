@@ -180,7 +180,7 @@
         },
         "build": {
             "title": "Dein Team kann gebaut werden",
-            "subtitle": "Erstelle dein Konto und der Foreman legt sofort los."
+            "subtitle": "Erstelle dein Konto und der Chief of Staff beginnt sofort mit dem Aufbau."
         },
         "signin": {
             "title": "Willkommen",
@@ -488,8 +488,8 @@
         },
         "actions": {
             "controlCenter": "Kontrollzentrum öffnen",
-            "askRerun": "Rerun fragen, außerhalb eines Chats",
-            "holdToTalk": "Halten, um mit Rerun zu sprechen",
+            "askRerun": "Deinen Chief of Staff fragen, außerhalb eines Chats",
+            "holdToTalk": "Halten, um mit deinem Chief of Staff zu sprechen",
             "searchInPage": "Auf der Seite suchen",
             "newConversation": "Neue Unterhaltung",
             "closeTab": "Aktiven Tab schließen",

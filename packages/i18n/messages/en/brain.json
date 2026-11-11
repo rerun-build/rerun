@@ -31,7 +31,7 @@
         "sources.stack": "A source of facts: the tools detected on the company's website (analytics, CRM...).",
         "sources.registry": "A source of facts: the official register of companies.",
         "authors.seed": "Author of a page Rerun filled by reading the company's website.",
-        "authors.foreman": "Author of a page written by Rerun's own assistant coworker.",
+        "authors.foreman": "Author of a page written by the Chief of Staff, the workspace's own assistant.",
         "proposals.headlineEdit": "Title of a card proposing a change to a Brain page (the company's knowledge base). {title} is the page name."
     },
     "unavailable": {
@@ -265,6 +265,6 @@
     },
     "authors": {
         "seed": "Rerun, from your website",
-        "foreman": "Rerun coworker"
+        "foreman": "Chief of Staff"
     }
 }

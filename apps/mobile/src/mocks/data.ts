@@ -1,6 +1,8 @@
 // Mock data for the design phase: no API is wired yet. Shapes follow what the hub already serves
 // (agents and their `sessions`), so swapping in /api/v1 later changes the source, not the UI.
 
+import { FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
+
 export type CoworkerStatus = 'idle' | 'working' | 'waiting_human' | 'error' | 'offline'
 
 export type Message = { id: string; role: 'user' | 'assistant'; text: string; images?: string[] }
@@ -38,8 +40,8 @@ export const coworkers: Coworker[] = [
     {
         id: FOREMAN_ID,
         kind: 'foreman',
-        name: 'Rerun',
-        role: 'Your workspace assistant',
+        name: FOREMAN_DISPLAY_NAME,
+        role: 'Your Chief of Staff',
         status: 'idle',
         unread: false,
         updatedMinutesAgo: 35,

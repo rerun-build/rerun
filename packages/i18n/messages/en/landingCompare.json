@@ -943,7 +943,7 @@
                 "5": {
                     "label": "Ready-made agents",
                     "them": "An AI Chief of Staff designs your squad with you.",
-                    "rerun": "{templates}+ ready-made agents to install, and the Foreman builds your team from a short brief."
+                    "rerun": "{templates}+ ready-made agents to install, or a team built for you from a short brief."
                 },
                 "6": {
                     "label": "Help building it",
@@ -982,11 +982,11 @@
                 },
                 "3": {
                     "title": "A team, not one assistant",
-                    "desc": "Tell the Foreman, the assistant that runs your agents, what you have in mind: it hands each task to the agent that owns the job, or proposes a new one. Agents share one folder, one database and one company brain, so the inbox agent can hand a new lead to the sales agent."
+                    "desc": "Tell the Chief of Staff, the assistant that runs your agents, what you have in mind: it hands each task to the agent that owns the job, or proposes a new one. Agents share one folder, one database and one company brain, so the inbox agent can hand a new lead to the sales agent."
                 },
                 "4": {
                     "title": "The whole team answers",
-                    "desc": "On Claude, each person works with their own plan, from $20 a seat. On Rerun every agent belongs to the workspace, seats are free and unlimited, teammates see what it did and any of them can answer when it stops to ask. With Autopilot on, the Foreman answers within your rules while everyone is away."
+                    "desc": "On Claude, each person works with their own plan, from $20 a seat. On Rerun every agent belongs to the workspace, seats are free and unlimited, teammates see what it did and any of them can answer when it stops to ask. With Autopilot on, the Chief of Staff answers within your rules while everyone is away."
                 }
             },
             "switchSteps": {
@@ -1015,7 +1015,7 @@
                 },
                 "3": {
                     "question": "Can I hand Rerun a to-do list?",
-                    "answer": "Yes. Write or dictate what you have in mind to the Foreman, the assistant that runs your agents, or hold Space and say it. It hands each task to the right agent, proposes a new agent when none can do it, and keeps what only you can do in your task list."
+                    "answer": "Yes. Write or dictate what you have in mind to the Chief of Staff, the assistant that runs your agents, or hold Space and say it. It hands each task to the right agent, proposes a new agent when none can do it, and keeps what only you can do in your task list."
                 },
                 "4": {
                     "question": "Does Claude Cowork still exist?",
@@ -1055,7 +1055,7 @@
                 },
                 "3": {
                     "title": "A team of agents",
-                    "desc": "Manus keeps context by running a schedule inside the same task, or by sharing a Project’s files and connectors. On Rerun, several agents each own a job, keep their own memory and skills, and share one folder, one database and one company brain. Tell the Foreman what you have in mind and it hands each task to the right agent."
+                    "desc": "Manus keeps context by running a schedule inside the same task, or by sharing a Project’s files and connectors. On Rerun, several agents each own a job, keep their own memory and skills, and share one folder, one database and one company brain. Tell the Chief of Staff what you have in mind and it hands each task to the right agent."
                 },
                 "4": {
                     "title": "One board for the whole team",
@@ -1088,7 +1088,7 @@
                 },
                 "3": {
                     "question": "Can I hand Rerun a to-do list?",
-                    "answer": "Yes. Write or dictate what you have in mind to the Foreman, the assistant that runs your agents. It hands each task to the right agent, proposes a new agent when none can do it, and keeps what only you can do in your task list."
+                    "answer": "Yes. Write or dictate what you have in mind to the Chief of Staff, the assistant that runs your agents. It hands each task to the right agent, proposes a new agent when none can do it, and keeps what only you can do in your task list."
                 },
                 "4": {
                     "question": "How many scheduled tasks can I run on Rerun?",
@@ -1128,7 +1128,7 @@
                 },
                 "3": {
                     "title": "Approvals the whole team can answer",
-                    "desc": "Bots come back to the person who owns them when they need an approval. On Rerun, agents stop before anything risky and ask in the app, seats are free, and anyone on the workspace can answer. With Autopilot on, the Foreman answers within your rules while you are away, never for spending or deleting."
+                    "desc": "Bots come back to the person who owns them when they need an approval. On Rerun, agents stop before anything risky and ask in the app, seats are free, and anyone on the workspace can answer. With Autopilot on, the Chief of Staff answers within your rules while you are away, never for spending or deleting."
                 },
                 "4": {
                     "title": "A plan of its own",
@@ -1275,7 +1275,7 @@
                 },
                 "3": {
                     "title": "Approvals for the whole team",
-                    "desc": "Agents stop before anything consequential and ask in the app, seats are free, and any teammate can answer. With Autopilot on, the Foreman answers within your rules while you are away, never for spending or deleting."
+                    "desc": "Agents stop before anything consequential and ask in the app, seats are free, and any teammate can answer. With Autopilot on, the Chief of Staff answers within your rules while you are away, never for spending or deleting."
                 },
                 "4": {
                     "title": "Apps and models from the browser",
@@ -1567,7 +1567,7 @@
                 },
                 "3": {
                     "title": "Approvals that don’t wait for you",
-                    "desc": "n8n can pause an agent before a tool runs and wait on Slack, Gmail, Teams or its own chat until a person answers. Rerun stops to ask in the app too, and with Autopilot on, the Foreman, the assistant that runs your agents, answers within your rules while you’re away, never for spending or deleting, then recaps the work and the hours it saved you."
+                    "desc": "n8n can pause an agent before a tool runs and wait on Slack, Gmail, Teams or its own chat until a person answers. Rerun stops to ask in the app too, and with Autopilot on, the Chief of Staff, the assistant that runs your agents, answers within your rules while you’re away, never for spending or deleting, then recaps the work and the hours it saved you."
                 },
                 "4": {
                     "title": "Executions are not counted",
@@ -1608,7 +1608,7 @@
                 },
                 "5": {
                     "question": "What happens when an agent needs an approval while I’m away?",
-                    "answer": "It stops and asks, you get an email, and you answer in the app. On paid plans you can also turn on Autopilot: while you are away, the Foreman, the assistant that runs your agents, answers their questions and approves routine actions within your rules. Spending money and deleting always wait for you, and every decision is logged."
+                    "answer": "It stops and asks, you get an email, and you answer in the app. On paid plans you can also turn on Autopilot: while you are away, the Chief of Staff, the assistant that runs your agents, answers their questions and approves routine actions within your rules. Spending money and deleting always wait for you, and every decision is logged."
                 },
                 "6": {
                     "question": "Do I need to write code with Rerun?",
@@ -1681,7 +1681,7 @@
                 },
                 "4": {
                     "question": "What happens when an agent needs an approval while I’m away?",
-                    "answer": "It stops and asks, you get an email, and you answer in the app. On paid plans you can also turn on Autopilot: while you are away, the Foreman, the assistant that runs your agents, answers their questions and approves routine actions within your rules. Spending money and deleting always wait for you, and every decision is logged."
+                    "answer": "It stops and asks, you get an email, and you answer in the app. On paid plans you can also turn on Autopilot: while you are away, the Chief of Staff, the assistant that runs your agents, answers their questions and approves routine actions within your rules. Spending money and deleting always wait for you, and every decision is logged."
                 },
                 "5": {
                     "question": "Does Rerun work inside Slack like Lindy?",
@@ -1721,7 +1721,7 @@
                 },
                 "3": {
                     "title": "Your team, not only your clients",
-                    "desc": "Twin invites up to 5 customers, each with a dashboard, and says only you need to use it. On Rerun, seats are free and unlimited: your teammates share the same board, any of them can answer an agent that stops to ask, and with Autopilot on, the Foreman answers within your rules when nobody is around."
+                    "desc": "Twin invites up to 5 customers, each with a dashboard, and says only you need to use it. On Rerun, seats are free and unlimited: your teammates share the same board, any of them can answer an agent that stops to ask, and with Autopilot on, the Chief of Staff answers within your rules when nobody is around."
                 },
                 "4": {
                     "title": "Lead data with a price tag you approve",
@@ -1871,7 +1871,7 @@
                 },
                 "4": {
                     "title": "Your team on the same board",
-                    "desc": "Invite your team at no extra cost, split agents by Box, and everyone watches the same live board. When an agent stops to ask before something consequential, any teammate can answer, and with Autopilot on, the Foreman answers within your rules when nobody is around."
+                    "desc": "Invite your team at no extra cost, split agents by Box, and everyone watches the same live board. When an agent stops to ask before something consequential, any teammate can answer, and with Autopilot on, the Chief of Staff answers within your rules when nobody is around."
                 }
             },
             "switchSteps": {

@@ -891,7 +891,7 @@
             "pitch": "Squad kostet $99 im Monat zusätzlich zu dem KI-Abo, das du mitbringst. Rerun kostet weniger, enthält Modell-Guthaben und hat Agenten, die du sofort installieren kannst.",
             "scorecard": {
                 "easeOfUse": {
-                    "them": "Ein KI-Chief-of-Staff entwirft deinen Squad, und du kaufst ein KI-Abo, bevor das erste Teammitglied läuft.",
+                    "them": "Ein KI-Chief of Staff entwirft deinen Squad, und du kaufst ein KI-Abo, bevor das erste Teammitglied läuft.",
                     "rerun": "{templates}+ fertige Agenten, KI inklusive, oder ein Experte baut deinen."
                 },
                 "getTheJobDone": {
@@ -942,8 +942,8 @@
                 },
                 "5": {
                     "label": "Fertige Agenten",
-                    "them": "Ein KI-Chief-of-Staff entwirft deinen Squad mit dir.",
-                    "rerun": "{templates}+ fertige Agenten zum Installieren, und der Foreman baut dein Team aus einem kurzen Briefing."
+                    "them": "Ein KI-Chief of Staff entwirft deinen Squad mit dir.",
+                    "rerun": "{templates}+ fertige Agenten zum Installieren, oder ein Team, das aus einem kurzen Briefing für dich gebaut wird."
                 },
                 "6": {
                     "label": "Hilfe beim Aufbau",
@@ -982,11 +982,11 @@
                 },
                 "3": {
                     "title": "Ein Team, nicht ein Assistent",
-                    "desc": "Sag dem Foreman, dem Assistenten, der deine Agenten führt, was du vorhast: Er gibt jede Aufgabe an den zuständigen Agenten weiter oder schlägt einen neuen vor. Agenten teilen einen Ordner, eine Datenbank und ein Firmenwissen, sodass der Posteingangs-Agent einen neuen Lead an den Vertriebs-Agenten übergeben kann."
+                    "desc": "Sag dem Chief of Staff, dem Assistenten, der deine Agenten führt, was du vorhast: Er gibt jede Aufgabe an den zuständigen Agenten weiter oder schlägt einen neuen vor. Agenten teilen einen Ordner, eine Datenbank und ein Firmenwissen, sodass der Posteingangs-Agent einen neuen Lead an den Vertriebs-Agenten übergeben kann."
                 },
                 "4": {
                     "title": "Das ganze Team antwortet",
-                    "desc": "Bei Claude arbeitet jede Person mit ihrem eigenen Abo, ab $20 pro Platz. Bei Rerun gehört jeder Agent dem Workspace, Plätze sind kostenlos und unbegrenzt, Teammitglieder sehen, was er getan hat, und jedes kann antworten, wenn er anhält und fragt. Mit Autopilot antwortet der Foreman nach deinen Regeln, während alle weg sind."
+                    "desc": "Bei Claude arbeitet jede Person mit ihrem eigenen Abo, ab $20 pro Platz. Bei Rerun gehört jeder Agent dem Workspace, Plätze sind kostenlos und unbegrenzt, Teammitglieder sehen, was er getan hat, und jedes kann antworten, wenn er anhält und fragt. Mit Autopilot antwortet der Chief of Staff nach deinen Regeln, während alle weg sind."
                 }
             },
             "switchSteps": {
@@ -1015,7 +1015,7 @@
                 },
                 "3": {
                     "question": "Kann ich Rerun eine To-do-Liste geben?",
-                    "answer": "Ja. Schreib oder diktiere dem Foreman, dem Assistenten, der deine Agenten führt, was du vorhast, oder halte die Leertaste gedrückt und sprich. Er gibt jede Aufgabe an den richtigen Agenten weiter, schlägt einen neuen Agenten vor, wenn keiner es kann, und behält, was nur du tun kannst, in deiner Aufgabenliste."
+                    "answer": "Ja. Schreib oder diktiere dem Chief of Staff, dem Assistenten, der deine Agenten führt, was du vorhast, oder halte die Leertaste gedrückt und sprich. Er gibt jede Aufgabe an den richtigen Agenten weiter, schlägt einen neuen Agenten vor, wenn keiner es kann, und behält, was nur du tun kannst, in deiner Aufgabenliste."
                 },
                 "4": {
                     "question": "Gibt es Claude Cowork noch?",
@@ -1055,7 +1055,7 @@
                 },
                 "3": {
                     "title": "Ein Team von Agenten",
-                    "desc": "Manus behält Kontext, indem ein Zeitplan in derselben Aufgabe läuft oder ein Project Dateien und Connectoren teilt. Bei Rerun hat jeder von mehreren Agenten eine eigene Aufgabe, ein eigenes Gedächtnis und eigene Skills, und sie teilen einen Ordner, eine Datenbank und ein Firmenwissen. Sag dem Foreman, was du vorhast, und er gibt jede Aufgabe an den richtigen Agenten weiter."
+                    "desc": "Manus behält Kontext, indem ein Zeitplan in derselben Aufgabe läuft oder ein Project Dateien und Konnektoren teilt. Bei Rerun haben mehrere Agenten je eine eigene Aufgabe, ein eigenes Gedächtnis und eigene Skills und teilen einen Ordner, eine Datenbank und ein Firmenwissen. Sag dem Chief of Staff, was du vorhast, und er gibt jede Aufgabe an den richtigen Agenten weiter."
                 },
                 "4": {
                     "title": "Ein Board für das ganze Team",
@@ -1088,7 +1088,7 @@
                 },
                 "3": {
                     "question": "Kann ich Rerun eine To-do-Liste geben?",
-                    "answer": "Ja. Schreib oder diktiere dem Foreman, dem Assistenten, der deine Agenten führt, was du vorhast. Er gibt jede Aufgabe an den richtigen Agenten weiter, schlägt einen neuen Agenten vor, wenn keiner es kann, und behält, was nur du tun kannst, in deiner Aufgabenliste."
+                    "answer": "Ja. Schreib oder diktiere dem Chief of Staff, dem Assistenten, der deine Agenten führt, was du vorhast. Er gibt jede Aufgabe an den richtigen Agenten weiter, schlägt einen neuen Agenten vor, wenn keiner es kann, und behält, was nur du tun kannst, in deiner Aufgabenliste."
                 },
                 "4": {
                     "question": "Wie viele geplante Aufgaben kann ich auf Rerun laufen lassen?",
@@ -1128,7 +1128,7 @@
                 },
                 "3": {
                     "title": "Freigaben, die das ganze Team erteilen kann",
-                    "desc": "Bots melden sich bei ihrer Besitzerin oder ihrem Besitzer, wenn sie eine Freigabe brauchen. Bei Rerun halten Agenten vor allem Riskanten an und fragen in der App, Plätze sind kostenlos, und jede Person im Workspace kann antworten. Mit Autopilot antwortet der Foreman nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen."
+                    "desc": "Bots melden sich bei der Person, der sie gehören, wenn sie eine Freigabe brauchen. Bei Rerun halten Agenten vor jedem riskanten Schritt an und fragen in der App, Plätze sind kostenlos, und jede Person im Workspace kann antworten. Mit Autopilot antwortet der Chief of Staff nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen."
                 },
                 "4": {
                     "title": "Ein eigener Tarif",
@@ -1275,7 +1275,7 @@
                 },
                 "3": {
                     "title": "Freigaben für das ganze Team",
-                    "desc": "Agenten halten vor allem Folgenreichen an und fragen in der App, Plätze sind kostenlos, und jedes Teammitglied kann antworten. Mit Autopilot antwortet der Foreman nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen."
+                    "desc": "Agenten halten vor jedem folgenreichen Schritt an und fragen in der App, Plätze sind kostenlos, und jedes Teammitglied kann antworten. Mit Autopilot antwortet der Chief of Staff nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen."
                 },
                 "4": {
                     "title": "Apps und Modelle im Browser",
@@ -1567,7 +1567,7 @@
                 },
                 "3": {
                     "title": "Freigaben, die nicht auf dich warten",
-                    "desc": "n8n kann einen Agenten anhalten, bevor ein Tool läuft, und in Slack, Gmail, Teams oder seinem eigenen Chat warten, bis ein Mensch antwortet. Auch Rerun hält an und fragt in der App, und mit Autopilot antwortet der Foreman, der Assistent, der deine Agenten führt, nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen, und fasst dann die Arbeit und die gesparten Stunden zusammen."
+                    "desc": "n8n kann einen Agenten anhalten, bevor ein Tool läuft, und in Slack, Gmail, Teams oder seinem eigenen Chat warten, bis ein Mensch antwortet. Auch Rerun hält an und fragt in der App, und mit Autopilot antwortet der Chief of Staff, der Assistent, der deine Agenten führt, nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen, und fasst dann die Arbeit und die Stunden zusammen, die er dir gespart hat."
                 },
                 "4": {
                     "title": "Ausführungen werden nicht gezählt",
@@ -1608,7 +1608,7 @@
                 },
                 "5": {
                     "question": "Was passiert, wenn ein Agent eine Freigabe braucht, während ich weg bin?",
-                    "answer": "Er hält an und fragt, du bekommst eine E-Mail und antwortest in der App. In bezahlten Tarifen kannst du auch Autopilot einschalten: Während du weg bist, beantwortet der Foreman, der Assistent, der deine Agenten führt, ihre Fragen und gibt Routineaktionen nach deinen Regeln frei. Geld ausgeben und Löschen warten immer auf dich, und jede Entscheidung wird protokolliert."
+                    "answer": "Er hält an und fragt, du bekommst eine E-Mail und antwortest in der App. In bezahlten Tarifen kannst du auch Autopilot einschalten: Während du weg bist, beantwortet der Chief of Staff, der Assistent, der deine Agenten führt, ihre Fragen und gibt Routineaktionen nach deinen Regeln frei. Geld ausgeben und Löschen warten immer auf dich, und jede Entscheidung wird protokolliert."
                 },
                 "6": {
                     "question": "Muss ich mit Rerun Code schreiben?",
@@ -1681,7 +1681,7 @@
                 },
                 "4": {
                     "question": "Was passiert, wenn ein Agent eine Freigabe braucht, während ich weg bin?",
-                    "answer": "Er hält an und fragt, du bekommst eine E-Mail und antwortest in der App. In bezahlten Tarifen kannst du auch Autopilot einschalten: Während du weg bist, beantwortet der Foreman, der Assistent, der deine Agenten führt, ihre Fragen und gibt Routineaktionen nach deinen Regeln frei. Geld ausgeben und Löschen warten immer auf dich, und jede Entscheidung wird protokolliert."
+                    "answer": "Er hält an und fragt, du bekommst eine E-Mail und antwortest in der App. In bezahlten Tarifen kannst du auch Autopilot einschalten: Während du weg bist, beantwortet der Chief of Staff, der Assistent, der deine Agenten führt, ihre Fragen und gibt Routineaktionen nach deinen Regeln frei. Geld ausgeben und Löschen warten immer auf dich, und jede Entscheidung wird protokolliert."
                 },
                 "5": {
                     "question": "Funktioniert Rerun wie Lindy direkt in Slack?",
@@ -1721,7 +1721,7 @@
                 },
                 "3": {
                     "title": "Dein Team, nicht nur deine Kunden",
-                    "desc": "Twin lädt bis zu 5 Kunden ein, jeden mit eigenem Dashboard, und sagt, dass nur du es nutzen musst. Bei Rerun sind Plätze kostenlos und unbegrenzt: Deine Teammitglieder teilen dasselbe Board, jedes kann einem Agenten antworten, der anhält und fragt, und mit Autopilot antwortet der Foreman nach deinen Regeln, wenn niemand da ist."
+                    "desc": "Twin lädt bis zu 5 Kunden ein, jeden mit eigenem Dashboard, und sagt, dass nur du es nutzen musst. Bei Rerun sind Plätze kostenlos und unbegrenzt: Deine Teammitglieder teilen dasselbe Board, jedes kann einem Agenten antworten, der anhält und fragt, und mit Autopilot antwortet der Chief of Staff nach deinen Regeln, wenn niemand da ist."
                 },
                 "4": {
                     "title": "Lead-Daten mit einem Preis, den du freigibst",
@@ -1854,7 +1854,7 @@
             "chooseThem": {
                 "1": "Du willst mehrere KI-Konten stapeln und umschalten, wenn eines sein Limit erreicht",
                 "2": "Jedes Teammitglied soll eine eigene E-Mail-Adresse und ein eigenes Postfach haben",
-                "3": "Ein KI-Chief-of-Staff soll deine Besetzung mit dir entwerfen"
+                "3": "Ein KI-Chief of Staff soll deine Besetzung mit dir entwerfen"
             },
             "differences": {
                 "1": {
@@ -1871,7 +1871,7 @@
                 },
                 "4": {
                     "title": "Dein Team auf demselben Board",
-                    "desc": "Lade dein Team ohne Aufpreis ein, teile Agenten nach Box auf, und alle verfolgen dasselbe Live-Board. Wenn ein Agent vor etwas Folgenreichem anhält und fragt, kann jedes Teammitglied antworten, und mit Autopilot antwortet der Foreman nach deinen Regeln, wenn niemand da ist."
+                    "desc": "Lade dein Team ohne Aufpreis ein, teile Agenten nach Box auf, und alle verfolgen dasselbe Live-Board. Wenn ein Agent vor etwas Folgenreichem anhält und fragt, kann jedes Teammitglied antworten, und mit Autopilot antwortet der Chief of Staff nach deinen Regeln, wenn niemand da ist."
                 }
             },
             "switchSteps": {

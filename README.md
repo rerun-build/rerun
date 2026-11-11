@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset=".github/assets/banner-night.jpg">
-    <img alt="Rerun: the Foreman presenting a team of coworkers on the board" src=".github/assets/banner-cream.jpg" width="100%">
+    <img alt="Rerun: the Chief of Staff presenting a team of coworkers on the board" src=".github/assets/banner-cream.jpg" width="100%">
   </picture>
 </p>
 
@@ -73,7 +73,7 @@
 
 ## 👋 Meet your new team
 
-You tell Rerun what you need done, in plain words. The **Foreman** interviews you, plans a team and
+You tell Rerun what you need done, in plain words. The **Chief of Staff** interviews you, plans a team and
 builds it. Each coworker gets a job, its own memory, its own skills and its own computer. You see
 them all on one board, you talk to any of them like to a colleague, and they ask before they send,
 pay or delete anything.
@@ -124,10 +124,10 @@ A few coworkers people hire on day one, each a ready-made template:
 ## ✨ Features
 
 <p align="center">
-  <img alt="The Foreman, taking requests by voice, hiring a coworker and running the team on autopilot" src=".github/assets/features/foreman.gif" width="100%">
+  <img alt="The Chief of Staff, taking requests by voice, hiring a coworker and running the team on autopilot" src=".github/assets/features/foreman.gif" width="100%">
 </p>
 
-**🧑‍✈️ The Foreman runs your team.** Say what you need, out loud if you like. It spots what needs doing,
+**🧑‍✈️ The Chief of Staff runs your team.** Say what you need, out loud if you like. It spots what needs doing,
 hires the coworker for it, and answers your coworkers by your rules while you are away.
 
 <table>
@@ -191,7 +191,7 @@ node scripts/self-host-check.mjs
 docker compose up -d --build  # then open http://localhost:3000
 ```
 
-That's it, say hi to the Foreman. 🎉
+That's it, say hi to the Chief of Staff. 🎉
 
 The [self-hosting guide](https://docs.rerun.build/self-host) walks through every step, including
 Supabase on your own machine, adding servers, HTTPS and updates.

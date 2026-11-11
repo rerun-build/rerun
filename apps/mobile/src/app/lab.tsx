@@ -280,7 +280,7 @@ function Pieces({ scheme }: { scheme: ColorScheme }) {
                     <RunStatus coworker={byId('agent-pulse')} phase="working" />
                 </View>
                 <View style={{ gap: spacing.sm, paddingHorizontal: spacing.md }}>
-                    <LabComposer placeholder="Ask Rerun anything" />
+                    <LabComposer placeholder="Ask your Chief of Staff anything" />
                     <LabComposer placeholder="Message Pulse" running />
                     <LabComposer placeholder="Message Pulse" value="Make it weekly instead" />
                     <LabComposer placeholder="Message Pulse" value="And add the Q1 renewals" running />

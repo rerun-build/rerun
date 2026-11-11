@@ -1,3 +1,4 @@
+import { FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { useRef, useState } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
@@ -87,7 +88,7 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
     const [footerHeight, setFooterHeight] = useState(0)
     const keyboard = useAnimatedKeyboard()
     const t = useTranslations('mobileOnboarding')
-    const foreman = { id: 'foreman', kind: 'foreman' as const, name: 'Rerun', role: t('conversation.foremanRole'), status: 'working' as const }
+    const foreman = { id: 'foreman', kind: 'foreman' as const, name: FOREMAN_DISPLAY_NAME, role: t('conversation.foremanRole'), status: 'working' as const }
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
 
     const pending = busy ? null : pendingWidget(messages)
@@ -131,7 +132,7 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
                                             {render(segment.widget, message)}
                                         </Animated.View>
                                     ) : (
-                                        <MessageView key={`${message.id}-${at}`} message={{ ...message, id: `${message.id}-${at}`, parts: segment.parts }} isLastAssistant={index === shown.length - 1} running={busy} agentId={null} fileOwner={null} coworkerName="Rerun" hiddenCallId={null} />
+                                        <MessageView key={`${message.id}-${at}`} message={{ ...message, id: `${message.id}-${at}`, parts: segment.parts }} isLastAssistant={index === shown.length - 1} running={busy} agentId={null} fileOwner={null} coworkerName={FOREMAN_DISPLAY_NAME} hiddenCallId={null} />
                                     )
                                 )}
                             </View>

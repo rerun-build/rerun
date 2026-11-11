@@ -256,7 +256,7 @@
         },
         "build": {
             "title": "Your team is ready to be built",
-            "subtitle": "Create your account and the Foreman starts building it right away."
+            "subtitle": "Create your account and the Chief of Staff starts building it right away."
         },
         "signin": {
             "title": "Welcome",
@@ -564,8 +564,8 @@
         },
         "actions": {
             "controlCenter": "Open the control center",
-            "askRerun": "Ask Rerun, outside a chat",
-            "holdToTalk": "Hold to talk to Rerun",
+            "askRerun": "Ask your Chief of Staff, outside a chat",
+            "holdToTalk": "Hold to talk to your Chief of Staff",
             "searchInPage": "Search in the page",
             "newConversation": "New conversation",
             "closeTab": "Close active tab",

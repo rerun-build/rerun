@@ -1,4 +1,4 @@
-import { appendVoiceMarker, buildVoiceMarker, teamEmptyStateOf } from '@rerun/contracts'
+import { appendVoiceMarker, buildVoiceMarker, FOREMAN_DISPLAY_NAME, teamEmptyStateOf } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
@@ -28,7 +28,7 @@ import { spacing } from '@/theme/tokens'
 export type LabState = 'loading' | 'empty' | 'conversation' | 'long' | 'running' | 'streaming' | 'question' | 'approval'
 
 const noop = () => {}
-const FOREMAN = { id: 'foreman', kind: 'foreman' as const, name: 'Rerun', role: 'Your workspace assistant', status: 'idle' as const }
+const FOREMAN = { id: 'foreman', kind: 'foreman' as const, name: FOREMAN_DISPLAY_NAME, role: 'Your Chief of Staff', status: 'idle' as const }
 
 const text = (id: string, role: 'user' | 'assistant', body: string): UIMessage => ({ id, role, parts: [{ type: 'text', text: body }] })
 const CONVERSATION: UIMessage[] = [
@@ -93,7 +93,7 @@ function useStreamedReply(active: boolean) {
 }
 
 // The same layout as ConversationPane, fed by mock messages.
-export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = 'Rerun' }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string }) {
+export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = FOREMAN_DISPLAY_NAME }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string }) {
     const insets = useSafeAreaInsets()
     const [draft, setDraft] = useState('')
     const [footerHeight, setFooterHeight] = useState(0)
@@ -112,7 +112,7 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
                         {messages.map((message, index) => (
                             <MessageView key={message.id} message={message} isLastAssistant={index === messages.length - 1} running={running} agentId={null} fileOwner={null} coworkerName={coworkerName} hiddenCallId={null} />
                         ))}
-                        {state === 'question' && <HitlBlock pending={{ kind: 'question', toolCallId: 'lab-q', input: QUESTION, output: undefined }} agentId="foreman" coworkerName="Rerun" webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
+                        {state === 'question' && <HitlBlock pending={{ kind: 'question', toolCallId: 'lab-q', input: QUESTION, output: undefined }} agentId="foreman" coworkerName={FOREMAN_DISPLAY_NAME} webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
                         {state === 'approval' && <HitlBlock pending={{ kind: 'approval', toolCallId: 'lab-a', input: APPROVAL, output: undefined }} agentId="agent-pulse" coworkerName={coworkerName} webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
                         {running && <RunStatus coworker={FOREMAN} phase="working" />}
                     </View>
@@ -122,7 +122,7 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
             <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, paddingTop: spacing.sm }}>
                 {(state === 'conversation' || state === 'long') && !draft && <Suggestions items={SUGGESTIONS} onPick={noop} />}
                 <View style={{ paddingHorizontal: spacing.md }}>
-                    <Composer value={draft} onChangeText={setDraft} onSend={noop} onStop={noop} running={running} placeholder={!messages.length ? 'What should we work on?' : seeThrough ? 'Ask Rerun anything' : `Message ${coworkerName}`} canAttach={!seeThrough} />
+                    <Composer value={draft} onChangeText={setDraft} onSend={noop} onStop={noop} running={running} placeholder={!messages.length ? 'What should we work on?' : seeThrough ? 'Ask your Chief of Staff anything' : `Message ${coworkerName}`} canAttach={!seeThrough} />
                 </View>
             </View>
         </View>

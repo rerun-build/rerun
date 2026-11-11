@@ -218,7 +218,7 @@ describe('foreman routes', () => {
 
         await ensureForeman()
         const foreman = await getAgent(FOREMAN_AGENT_ID)
-        expect(foreman.config).toMatchObject({ ...pin, kind: 'foreman', displayName: 'Foreman' })
+        expect(foreman.config).toMatchObject({ ...pin, kind: 'foreman', displayName: 'Chief of Staff' })
 
         expect((await request('PATCH', '/agents/foreman', { connectionId: null, provider: null, model: null })).status).toBe(200)
         expect((await getAgent(FOREMAN_AGENT_ID)).config.model).toBeNull()

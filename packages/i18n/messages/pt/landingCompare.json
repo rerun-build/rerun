@@ -943,7 +943,7 @@
                 "5": {
                     "label": "Agentes prontos",
                     "them": "Um AI Chief of Staff desenha seu squad com você.",
-                    "rerun": "Mais de {templates} agentes prontos para instalar, e o Foreman monta sua equipe a partir de um breve resumo."
+                    "rerun": "Mais de {templates} agentes prontos para instalar, ou uma equipe montada para você a partir de um briefing curto."
                 },
                 "6": {
                     "label": "Ajuda para montar",
@@ -982,11 +982,11 @@
                 },
                 "3": {
                     "title": "Uma equipe, não um único assistente",
-                    "desc": "Diga ao Foreman, o assistente que gerencia seus agentes, o que você tem em mente: ele entrega cada tarefa ao agente responsável por ela, ou propõe um novo. Os agentes compartilham uma pasta, um banco de dados e um cérebro da empresa, então o agente da caixa de entrada pode passar um novo lead para o agente de vendas."
+                    "desc": "Diga ao Chief of Staff, o assistente que gerencia seus agentes, o que você tem em mente: ele entrega cada tarefa ao agente responsável por ela, ou propõe um novo. Os agentes compartilham uma pasta, um banco de dados e um cérebro da empresa, então o agente da caixa de entrada pode passar um novo lead para o agente de vendas."
                 },
                 "4": {
                     "title": "Toda a equipe responde",
-                    "desc": "No Claude, cada pessoa trabalha com o próprio plano, a partir de $20 por assento. No Rerun, cada agente pertence ao workspace, os assentos são gratuitos e ilimitados, os colegas veem o que ele fez e qualquer um pode responder quando ele para para perguntar. Com o Autopilot ligado, o Foreman responde dentro das suas regras enquanto todos estão fora."
+                    "desc": "No Claude, cada pessoa trabalha com o próprio plano, a partir de $20 por assento. No Rerun, cada agente pertence ao workspace, os assentos são gratuitos e ilimitados, os colegas veem o que ele fez e qualquer um pode responder quando ele para para perguntar. Com o Autopilot ligado, o Chief of Staff responde dentro das suas regras enquanto todos estão fora."
                 }
             },
             "switchSteps": {
@@ -1015,7 +1015,7 @@
                 },
                 "3": {
                     "question": "Posso dar uma lista de tarefas ao Rerun?",
-                    "answer": "Sim. Escreva ou dite o que você tem em mente para o Foreman, o assistente que gerencia seus agentes, ou segure a barra de espaço e fale. Ele entrega cada tarefa ao agente certo, propõe um novo agente quando nenhum consegue fazer, e mantém na sua lista de tarefas o que só você pode fazer."
+                    "answer": "Sim. Escreva ou dite o que você tem em mente para o Chief of Staff, o assistente que gerencia seus agentes, ou segure a barra de espaço e fale. Ele entrega cada tarefa ao agente certo, propõe um novo agente quando nenhum consegue fazer, e mantém na sua lista de tarefas o que só você pode fazer."
                 },
                 "4": {
                     "question": "O Claude Cowork ainda existe?",
@@ -1055,7 +1055,7 @@
                 },
                 "3": {
                     "title": "Uma equipe de agentes",
-                    "desc": "O Manus mantém o contexto rodando um agendamento dentro da mesma tarefa, ou compartilhando os arquivos e conectores de um Project. No Rerun, vários agentes têm cada um sua função, guardam a própria memória e as próprias skills, e compartilham uma pasta, um banco de dados e um cérebro da empresa. Diga ao Foreman o que você tem em mente e ele entrega cada tarefa ao agente certo."
+                    "desc": "O Manus mantém o contexto rodando um agendamento dentro da mesma tarefa, ou compartilhando os arquivos e conectores de um Project. No Rerun, vários agentes têm cada um sua função, guardam a própria memória e as próprias skills, e compartilham uma pasta, um banco de dados e um cérebro da empresa. Diga ao Chief of Staff o que você tem em mente e ele entrega cada tarefa ao agente certo."
                 },
                 "4": {
                     "title": "Um quadro para toda a equipe",
@@ -1088,7 +1088,7 @@
                 },
                 "3": {
                     "question": "Posso dar uma lista de tarefas ao Rerun?",
-                    "answer": "Sim. Escreva ou dite o que você tem em mente para o Foreman, o assistente que gerencia seus agentes. Ele entrega cada tarefa ao agente certo, propõe um novo agente quando nenhum consegue fazer, e mantém na sua lista de tarefas o que só você pode fazer."
+                    "answer": "Sim. Escreva ou dite o que você tem em mente para o Chief of Staff, o assistente que gerencia seus agentes. Ele entrega cada tarefa ao agente certo, propõe um novo agente quando nenhum consegue fazer, e mantém na sua lista de tarefas o que só você pode fazer."
                 },
                 "4": {
                     "question": "Quantas tarefas agendadas posso rodar no Rerun?",
@@ -1128,7 +1128,7 @@
                 },
                 "3": {
                     "title": "Aprovações que toda a equipe pode responder",
-                    "desc": "Os Bots voltam para a pessoa dona deles quando precisam de uma aprovação. No Rerun, os agentes param antes de qualquer ação arriscada e perguntam no app, os assentos são gratuitos, e qualquer pessoa do workspace pode responder. Com o Autopilot ligado, o Foreman responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir."
+                    "desc": "Os Bots voltam para a pessoa dona deles quando precisam de uma aprovação. No Rerun, os agentes param antes de qualquer ação arriscada e perguntam no app, os assentos são gratuitos, e qualquer pessoa do workspace pode responder. Com o Autopilot ligado, o Chief of Staff responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir."
                 },
                 "4": {
                     "title": "Um plano próprio",
@@ -1275,7 +1275,7 @@
                 },
                 "3": {
                     "title": "Aprovações para toda a equipe",
-                    "desc": "Os agentes param antes de qualquer ação importante e perguntam no app, os assentos são gratuitos, e qualquer colega pode responder. Com o Autopilot ligado, o Foreman responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir."
+                    "desc": "Os agentes param antes de qualquer ação importante e perguntam no app, os assentos são gratuitos, e qualquer colega pode responder. Com o Autopilot ligado, o Chief of Staff responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir."
                 },
                 "4": {
                     "title": "Apps e modelos pelo navegador",
@@ -1567,7 +1567,7 @@
                 },
                 "3": {
                     "title": "Aprovações que não esperam por você",
-                    "desc": "O n8n pode pausar um agente antes de uma ferramenta rodar e esperar no Slack, Gmail, Teams ou no próprio chat até uma pessoa responder. O Rerun também para e pergunta no app, e com o Autopilot ligado, o Foreman, o assistente que gerencia seus agentes, responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir, e depois resume o trabalho e as horas que ele poupou."
+                    "desc": "O n8n pode pausar um agente antes de uma ferramenta rodar e esperar no Slack, Gmail, Teams ou no próprio chat até uma pessoa responder. O Rerun também para e pergunta no app, e com o Autopilot ligado, o Chief of Staff, o assistente que gerencia seus agentes, responde dentro das suas regras enquanto você está fora, nunca para gastar ou excluir, e depois resume o trabalho e as horas que ele poupou para você."
                 },
                 "4": {
                     "title": "Execuções não são contadas",
@@ -1608,7 +1608,7 @@
                 },
                 "5": {
                     "question": "O que acontece quando um agente precisa de uma aprovação enquanto estou fora?",
-                    "answer": "Ele para e pergunta, você recebe um e-mail e responde no app. Nos planos pagos você também pode ligar o Autopilot: enquanto você está fora, o Foreman, o assistente que gerencia seus agentes, responde às perguntas deles e aprova ações de rotina dentro das suas regras. Gastar dinheiro e excluir sempre esperam por você, e cada decisão fica registrada."
+                    "answer": "Ele para e pergunta, você recebe um e-mail e responde no app. Nos planos pagos você também pode ligar o Autopilot: enquanto você está fora, o Chief of Staff, o assistente que gerencia seus agentes, responde às perguntas deles e aprova ações de rotina dentro das suas regras. Gastar dinheiro e excluir sempre esperam por você, e cada decisão fica registrada."
                 },
                 "6": {
                     "question": "Preciso escrever código com o Rerun?",
@@ -1681,7 +1681,7 @@
                 },
                 "4": {
                     "question": "O que acontece quando um agente precisa de uma aprovação enquanto estou fora?",
-                    "answer": "Ele para e pergunta, você recebe um e-mail e responde no app. Nos planos pagos você também pode ligar o Autopilot: enquanto você está fora, o Foreman, o assistente que gerencia seus agentes, responde às perguntas deles e aprova ações de rotina dentro das suas regras. Gastar dinheiro e excluir sempre esperam por você, e cada decisão fica registrada."
+                    "answer": "Ele para e pergunta, você recebe um e-mail e responde no app. Nos planos pagos você também pode ligar o Autopilot: enquanto você está fora, o Chief of Staff, o assistente que gerencia seus agentes, responde às perguntas deles e aprova ações de rotina dentro das suas regras. Gastar dinheiro e excluir sempre esperam por você, e cada decisão fica registrada."
                 },
                 "5": {
                     "question": "O Rerun funciona dentro do Slack como o Lindy?",
@@ -1721,7 +1721,7 @@
                 },
                 "3": {
                     "title": "Sua equipe, não só seus clientes",
-                    "desc": "O Twin convida até 5 clientes, cada um com um painel, e diz que só você precisa usá-lo. No Rerun, os assentos são gratuitos e ilimitados: seus colegas compartilham o mesmo quadro, qualquer um pode responder a um agente que pare para perguntar, e com o Autopilot ligado, o Foreman responde dentro das suas regras quando não há ninguém por perto."
+                    "desc": "O Twin convida até 5 clientes, cada um com um painel, e diz que só você precisa usá-lo. No Rerun, os assentos são gratuitos e ilimitados: seus colegas compartilham o mesmo quadro, qualquer um pode responder a um agente que pare para perguntar, e com o Autopilot ligado, o Chief of Staff responde dentro das suas regras quando não há ninguém por perto."
                 },
                 "4": {
                     "title": "Dados de leads com um preço que você aprova",
@@ -1871,7 +1871,7 @@
                 },
                 "4": {
                     "title": "Sua equipe no mesmo quadro",
-                    "desc": "Convide sua equipe sem custo extra, divida os agentes por Box, e todos acompanham o mesmo quadro ao vivo. Quando um agente para e pergunta antes de algo importante, qualquer colega pode responder, e com o Autopilot ligado, o Foreman responde dentro das suas regras quando não há ninguém por perto."
+                    "desc": "Convide sua equipe sem custo extra, divida os agentes por Box, e todos acompanham o mesmo quadro ao vivo. Quando um agente para e pergunta antes de algo importante, qualquer colega pode responder, e com o Autopilot ligado, o Chief of Staff responde dentro das suas regras quando não há ninguém por perto."
                 }
             },
             "switchSteps": {

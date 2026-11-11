@@ -1,8 +1,8 @@
 # Trademark policy
 
 The code of Rerun is licensed under the [GNU Affero General Public License v3.0](LICENSE). The
-license covers the code. It does not cover the name **Rerun**, the Rerun logo, the coworker
-characters or the Foreman, which remain trademarks of Rerun.
+license covers the code. It does not cover the name **Rerun**, the Rerun logo and the coworker
+characters, which remain trademarks of Rerun.
 
 ## What you can do without asking
 

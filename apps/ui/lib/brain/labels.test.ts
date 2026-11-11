@@ -54,7 +54,7 @@ describe('labels', () => {
     it('names the author of a page', () => {
         expect(brainAuthorLabel('seed')).toBe('Rerun, from your website')
         expect(brainAuthorLabel('agent:Sales')).toBe('Sales')
-        expect(brainAuthorLabel('agent:foreman')).toBe('Rerun coworker')
+        expect(brainAuthorLabel('agent:foreman')).toBe('Chief of Staff')
         expect(brainAuthorLabel('user:ana@acme.com')).toBe('ana@acme.com')
         expect(brainAuthorLabel('user')).toBe('user')
     })

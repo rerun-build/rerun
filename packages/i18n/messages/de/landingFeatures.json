@@ -221,7 +221,7 @@
                 },
                 "third": {
                     "question": "Was passiert, wenn niemand antwortet?",
-                    "answer": "Die Ausführung wartet, und die Frage bleibt auf dem Board. Wenn du den Autopilot einschaltest, beantwortet der Workspace-Manager sie nach deinen Regeln, damit die Ausführung ohne dich fertig wird."
+                    "answer": "Die Ausführung wartet, und die Frage bleibt auf dem Board. Wenn du den Autopilot einschaltest, beantwortet dein Chief of Staff sie nach den Regeln, die du festgelegt hast, damit die Ausführung ohne dich fertig wird."
                 }
             },
             "templatesTitle": "Coworker, die du an der Leine halten willst."
@@ -402,7 +402,7 @@
                 },
                 "second": {
                     "question": "Muss ich die Kette selbst verdrahten?",
-                    "answer": "Nein. Du sagst, wofür jeder zuständig ist; der Workspace-Manager weiß, wer was erledigt, und leitet zwischen ihnen weiter. Du kannst den nächsten Coworker auch in den Anweisungen eines Coworkers nennen, wenn die Reihenfolge wichtig ist."
+                    "answer": "Nein. Du sagst, wofür jeder zuständig ist; dein Chief of Staff weiß, wer was erledigt, und leitet zwischen ihnen weiter. Du kannst den nächsten Coworker auch in den Anweisungen eines Coworkers nennen, wenn die Reihenfolge wichtig ist."
                 },
                 "third": {
                     "question": "Ist das dasselbe wie ein Multi-Agenten-Workflow?",

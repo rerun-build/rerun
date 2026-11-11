@@ -131,9 +131,9 @@
     },
     "controlCenter": {
         "title": "Kontrollzentrum",
-        "description": "Spring zu einem Agenten, einer Einstellung oder einer Unterhaltung, oder frag Rerun.",
+        "description": "Spring zu einem Agenten, einer Einstellung oder einer Unterhaltung, oder frag deinen Chief of Staff.",
         "back": "Zurück",
-        "askRerun": "Rerun fragen",
+        "askRerun": "Deinen Chief of Staff fragen",
         "quotedQuery": "„{query}“",
         "unnamedBox": "Box ohne Namen",
         "pro": "Pro",
@@ -154,7 +154,7 @@
             "boxes": "Boxes",
             "conversations": "Unterhaltungen",
             "recentConversations": "Letzte Unterhaltungen",
-            "assistant": "Assistent",
+            "assistant": "Chief of Staff",
             "open": "Öffnen",
             "moveTo": "Verschieben nach"
         },
@@ -166,7 +166,7 @@
             "notificationsDetail": "Wann dich dieser Agent erreicht"
         },
         "placeholder": {
-            "rootAssistant": "Suchen oder Rerun fragen…",
+            "rootAssistant": "Suchen oder deinen Chief of Staff fragen…",
             "root": "Agenten, Einstellungen, Unterhaltungen suchen…",
             "agent": "In {name} suchen…",
             "agentUnknown": "In diesem Agenten suchen…",
@@ -186,7 +186,7 @@
             "new_agent": "Neuer Agent",
             "browse_templates": "Vorlagen durchsuchen",
             "new_box": "Neue Box",
-            "ask_assistant": "Assistenten fragen",
+            "ask_assistant": "Deinen Chief of Staff fragen",
             "contact_support": "Support kontaktieren",
             "recenter_board": "Board zentrieren",
             "toggle_theme_light": "Zum hellen Design wechseln",

@@ -489,7 +489,7 @@
         }
     },
     "foreman": {
-        "role": "Le manager de votre workspace",
+        "role": "Votre Chief of Staff",
         "title": "Votre nouveau collègue préféré.",
         "powers": {
             "voice": {

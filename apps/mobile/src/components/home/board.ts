@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type AgentConversationsOverview, type AgentStatus, type BoardAgent, type Box } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentConversationsOverview, type AgentStatus, type BoardAgent, type Box } from '@rerun/contracts'
 
 import type { StatusLine } from '@/components/ui/status'
 import { translatorFor } from '@/i18n/translator'
@@ -81,7 +81,7 @@ export function sectionsByBox(coworkers: HomeCoworker[], boxes: Box[], unnamedLa
 // coworker deleted since is simply skipped.
 // The Foreman as a cell of the pinned grid: it can be pinned like a coworker, never listed among them.
 export function foremanOnBoard(running: boolean): HomeCoworker {
-    return { id: FOREMAN_AGENT_ID, name: 'Rerun', handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0 }
+    return { id: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0 }
 }
 
 export function withPinned(coworkers: HomeCoworker[], pinnedIds: readonly string[], foreman?: HomeCoworker): { pinned: HomeCoworker[]; others: HomeCoworker[] } {

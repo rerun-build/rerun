@@ -32,7 +32,7 @@ export type TeamEmptyStateCopy = {
 }
 
 export const ENGLISH_TEAM_EMPTY_STATE_COPY: TeamEmptyStateCopy = {
-    greeting: firstName => (firstName ? `Hi ${firstName}, I'm Rerun` : "Hi, I'm Rerun"),
+    greeting: firstName => (firstName ? `Hi ${firstName}, I'm your Chief of Staff` : "Hi, I'm your Chief of Staff"),
     greetingWithTeam: greeting => `${greeting}. Here is your team.`,
     emptySubtitle: "You have no coworkers yet. Tell me a job you would hand off and I'll build the first one.",
     buildPrompt: 'Build me a coworker that ',

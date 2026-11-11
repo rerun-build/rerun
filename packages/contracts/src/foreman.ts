@@ -7,6 +7,9 @@ import { TEMPLATE_CATEGORIES } from './template-display.js'
 // `call_agent` roster and `GET /agents` never see it.
 export const FOREMAN_AGENT_ID = 'foreman'
 
+// What the user calls it. `foreman` stays the id, the kind and the route everywhere.
+export const FOREMAN_DISPLAY_NAME = 'Chief of Staff'
+
 // Carries the brief's `hubToken` on the foreman's calls to the hub, which signed it: the engine key
 // alone does not prove the caller is the foreman.
 export const FOREMAN_HUB_TOKEN_HEADER = 'x-rerun-foreman-token'

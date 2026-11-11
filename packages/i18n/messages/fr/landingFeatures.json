@@ -221,7 +221,7 @@
                 },
                 "third": {
                     "question": "Que se passe-t-il si personne ne répond ?",
-                    "answer": "L’exécution attend, et la question reste sur le tableau. Si vous activez le pilote automatique, le manager du workspace y répond selon les règles que vous avez écrites, et l’exécution va au bout sans vous."
+                    "answer": "L’exécution attend, et la question reste sur le tableau. Si vous activez le pilote automatique, votre Chief of Staff y répond selon les règles que vous avez écrites, et l’exécution va au bout sans vous."
                 }
             },
             "templatesTitle": "Des Coworkers à garder sous contrôle."
@@ -402,7 +402,7 @@
                 },
                 "second": {
                     "question": "Dois-je câbler la chaîne moi-même ?",
-                    "answer": "Non. Vous dites de quoi chacun est responsable ; le manager du workspace sait qui s’occupe de quoi et fait le lien entre eux. Vous pouvez aussi nommer le Coworker suivant dans les consignes d’un Coworker si l’ordre compte."
+                    "answer": "Non. Vous dites de quoi chacun est responsable ; votre Chief of Staff sait qui s’occupe de quoi et fait le lien entre eux. Vous pouvez aussi nommer le Coworker suivant dans les consignes d’un Coworker si l’ordre compte."
                 },
                 "third": {
                     "question": "Est-ce la même chose qu’un workflow multi-agents ?",

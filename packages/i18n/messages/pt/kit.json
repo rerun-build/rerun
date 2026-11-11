@@ -212,10 +212,11 @@
         }
     },
     "foreman": {
-        "orbLabel": "Pergunte ao Rerun",
+        "orbLabel": "Pergunte ao seu Chief of Staff",
+        "tabsLabel": "Chief of Staff",
         "empty": {
             "title": "Pergunte qualquer coisa sobre seu workspace",
-            "description": "O Rerun cria e roda seus coworkers com você"
+            "description": "Seu Chief of Staff cria e roda seus coworkers com você"
         },
         "header": {
             "closeChat": "Fechar o chat",

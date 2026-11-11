@@ -55,10 +55,10 @@
         "retry": "Erneut versuchen"
     },
     "conversation": {
-        "foremanRole": "Dein Workspace-Assistent",
+        "foremanRole": "Dein Chief of Staff",
         "failed": "Das hat nicht geklappt.",
         "tryAgain": "Erneut versuchen",
-        "composerPlaceholder": "Rerun antworten"
+        "composerPlaceholder": "Deinem Chief of Staff antworten"
     },
     "starter": {
         "title": "Dein Starter-Team",

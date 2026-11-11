@@ -221,7 +221,7 @@
                 },
                 "third": {
                     "question": "O que acontece se ninguém responder?",
-                    "answer": "A execução espera, e a pergunta fica no quadro. Se você ativar o piloto automático, o gestor do workspace responde pelas regras que você escreveu, e a execução termina sem você."
+                    "answer": "A execução espera, e a pergunta fica no quadro. Se você ativar o Autopilot, seu Chief of Staff responde pelas regras que você escreveu, e a execução termina sem você."
                 }
             },
             "templatesTitle": "Coworkers que você quer manter na rédea curta."
@@ -402,7 +402,7 @@
                 },
                 "second": {
                     "question": "Preciso montar a cadeia eu mesmo?",
-                    "answer": "Não. Você diz pelo que cada um é responsável; o gestor do workspace sabe quem cuida do quê e faz a ponte entre eles. Você também pode citar o próximo Coworker nas instruções de um Coworker se a ordem importar."
+                    "answer": "Não. Você diz pelo que cada um é responsável; seu Chief of Staff sabe quem cuida do quê e faz a ponte entre eles. Você também pode citar o próximo Coworker nas instruções de um Coworker se a ordem importar."
                 },
                 "third": {
                     "question": "É o mesmo que um fluxo multiagente?",

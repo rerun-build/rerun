@@ -25,13 +25,14 @@ export function useForemanTurnNotification({ messages, status, guided }: { messa
     const t = useTranslations('foreman.notification')
     const busy = status === 'submitted' || status === 'streaming'
     const waitingText = t('waiting')
+    const titleText = t('title')
 
     // Read when the turn starts: the turn that builds the team leaves the funnel before it ends.
     const turnGuided = useRef(false)
     const wasBusy = useRef(false)
-    const latest = useRef({ messages, guided, waitingText })
+    const latest = useRef({ messages, guided, waitingText, titleText })
     useEffect(() => {
-        latest.current = { messages, guided, waitingText }
+        latest.current = { messages, guided, waitingText, titleText }
     })
 
     useEffect(() => {
@@ -46,7 +47,7 @@ export function useForemanTurnNotification({ messages, status, guided }: { messa
 
         const timer = setTimeout(() => {
             showBrowserNotification({
-                title: 'Foreman',
+                title: latest.current.titleText,
                 body: lastAssistantText(latest.current.messages) ?? latest.current.waitingText,
                 tag: 'foreman',
                 onClick: () => useForemanStore.getState().openForFunnel(),

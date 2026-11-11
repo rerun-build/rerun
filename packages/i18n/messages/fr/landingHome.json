@@ -66,7 +66,7 @@
         "screen": {
             "hint": {
                 "tap": "Touchez un coworker pour le voir travailler",
-                "click": "Cliquez sur un coworker pour le voir travailler, ou demandez à Rerun"
+                "click": "Cliquez sur un coworker pour le voir travailler, ou demandez au Chief of Staff"
             },
             "inboxSettings": "Préférences : disponibles dans votre propre workspace",
             "useCases": {

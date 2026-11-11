@@ -1,7 +1,7 @@
 # Install Rerun: a guide for AI assistants
 
 You are helping someone install Rerun, an open source app where AI coworkers do work for a team.
-This file tells you how to get them from nothing to the Foreman, Rerun's guide, answering in their
+This file tells you how to get them from nothing to the Chief of Staff, Rerun's guide, answering in their
 browser. The full human guide is https://docs.rerun.build/self-host/install: read it when a step
 here is not enough.
 
@@ -25,8 +25,8 @@ here is not enough.
    - *A free project on supabase.com*: recommended on a server.
    - *Open source Supabase on their own server*: only if they ask for everything on their
      machines. Follow the "Open source Supabase on your server" tab of the human guide.
-3. **Do they have an OpenRouter key?** It runs the Foreman's guided onboarding. They get one at
-   https://openrouter.ai/keys. Without it the Foreman skips the onboarding and runs on the AI they
+3. **Do they have an OpenRouter key?** It runs the Chief of Staff's guided onboarding. They get one at
+   https://openrouter.ai/keys. Without it the Chief of Staff skips the onboarding and runs on the AI they
    connect in the app, their Claude or ChatGPT subscription included.
 
 ## 2. Check the machine
@@ -138,7 +138,7 @@ engine`, fix what it says, and check https://docs.rerun.build/self-host/troubles
 ## 8. Hand over
 
 Tell them to open `NEXT_PUBLIC_APP_URL`, sign in with their email and the 6-digit code, and say
-hi to the Foreman: it asks what they need done and builds the team. Their coworkers use the AI
+hi to the Chief of Staff: it asks what they need done and builds the team. Their coworkers use the AI
 they connect in the app: an Anthropic, OpenAI, Gemini or OpenRouter key, or their Claude or ChatGPT
 subscription.
 

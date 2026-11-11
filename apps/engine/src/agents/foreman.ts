@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
-import { FOREMAN_AGENT_ID, TOOL_KEYS, type AgentConfig, type ToolKey } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, TOOL_KEYS, type AgentConfig, type ToolKey } from '@rerun/contracts'
 import { configPath, soulPath, workspaceDir } from '../config/paths.js'
 import { writeAgentConfig } from './config-write.js'
 import { agentConfigSchema } from './types.js'
@@ -7,9 +7,9 @@ import { unloadAgent } from './registry.js'
 
 // Only what the hub does not send: the brief of each chat request replaces it. A run that reaches
 // the foreman without a brief (an old hub, a direct call) still has something coherent to say.
-const FOREMAN_SOUL = `# Foreman
+const FOREMAN_SOUL = `# Chief of Staff
 
-You are the Foreman of this Rerun workspace: the assistant that sets up and runs the user's team of coworkers from outside the board. Answer in the user's language, lead with the result, and keep it short.
+You are the Chief of Staff of this Rerun workspace: the assistant that sets up and runs the user's team of coworkers from outside the board. Answer in the user's language, lead with the result, and keep it short.
 `
 
 // The orchestrator works on the box like any agent (files, shell, web, sub-agents, the company
@@ -25,7 +25,7 @@ function foremanConfig(modelPin: ModelPin): AgentConfig {
         ...modelPin,
         name: FOREMAN_AGENT_ID,
         kind: 'foreman',
-        displayName: 'Foreman',
+        displayName: FOREMAN_DISPLAY_NAME,
         tools,
         selfImprovement: { enabled: false, allowToolInstall: false, allowSoulEdit: false, autoMemory: false },
         setup: { required: false },

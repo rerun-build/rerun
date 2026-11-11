@@ -131,9 +131,9 @@
     },
     "controlCenter": {
         "title": "Central de controle",
-        "description": "Vá direto para um agente, uma configuração ou uma conversa, ou pergunte ao Rerun.",
+        "description": "Vá direto para um agente, uma configuração ou uma conversa, ou pergunte ao seu Chief of Staff.",
         "back": "Voltar",
-        "askRerun": "Perguntar ao Rerun",
+        "askRerun": "Pergunte ao seu Chief of Staff",
         "quotedQuery": "“{query}”",
         "unnamedBox": "Box sem nome",
         "pro": "Pro",
@@ -154,7 +154,7 @@
             "boxes": "Boxes",
             "conversations": "Conversas",
             "recentConversations": "Conversas recentes",
-            "assistant": "Assistente",
+            "assistant": "Chief of Staff",
             "open": "Abrir",
             "moveTo": "Mover para"
         },
@@ -166,7 +166,7 @@
             "notificationsDetail": "Quando este agente fala com você"
         },
         "placeholder": {
-            "rootAssistant": "Busque ou pergunte ao Rerun…",
+            "rootAssistant": "Busque ou pergunte ao seu Chief of Staff…",
             "root": "Buscar agentes, configurações, conversas…",
             "agent": "Buscar em {name}…",
             "agentUnknown": "Buscar neste agente…",
@@ -186,7 +186,7 @@
             "new_agent": "Novo agente",
             "browse_templates": "Ver templates",
             "new_box": "Nova Box",
-            "ask_assistant": "Perguntar ao assistente",
+            "ask_assistant": "Pergunte ao seu Chief of Staff",
             "contact_support": "Falar com o suporte",
             "recenter_board": "Recentralizar o quadro",
             "toggle_theme_light": "Mudar para o tema claro",

@@ -943,7 +943,7 @@
                 "5": {
                     "label": "Agents prêts à l’emploi",
                     "them": "Un AI Chief of Staff conçoit votre squad avec vous.",
-                    "rerun": "{templates}+ agents prêts à installer, et le Foreman construit votre équipe à partir d’un court brief."
+                    "rerun": "{templates}+ agents prêts à installer, ou une équipe construite pour vous à partir d’un court brief."
                 },
                 "6": {
                     "label": "De l’aide pour le créer",
@@ -982,11 +982,11 @@
                 },
                 "3": {
                     "title": "Une équipe, pas un seul assistant",
-                    "desc": "Dites au Foreman, l’assistant qui gère vos agents, ce que vous avez en tête : il confie chaque tâche à l’agent chargé de cette mission, ou en propose un nouveau. Les agents partagent un dossier, une base de données et un cerveau de l’entreprise, si bien que l’agent de la boîte de réception peut passer un nouveau prospect à l’agent commercial."
+                    "desc": "Dites au Chief of Staff, l’assistant qui pilote vos agents, ce que vous avez en tête : il confie chaque tâche à l’agent chargé de cette mission, ou en propose un nouveau. Les agents partagent un dossier, une base de données et un cerveau de l’entreprise, si bien que l’agent de la boîte de réception peut passer un nouveau prospect à l’agent commercial."
                 },
                 "4": {
                     "title": "Toute l’équipe répond",
-                    "desc": "Sur Claude, chacun travaille avec son propre abonnement, dès $20 par siège. Sur Rerun, chaque agent appartient au workspace, les sièges sont gratuits et illimités, les coéquipiers voient ce qu’il a fait et n’importe lequel peut répondre quand il s’arrête pour poser une question. Avec Autopilot activé, le Foreman répond selon vos règles pendant que tout le monde est absent."
+                    "desc": "Sur Claude, chacun travaille avec son propre abonnement, dès 20 $ par siège. Sur Rerun, chaque agent appartient au workspace, les sièges sont gratuits et illimités, les coéquipiers voient ce qu’il a fait et n’importe lequel peut répondre quand il s’arrête pour poser une question. Avec Autopilot activé, le Chief of Staff répond selon vos règles pendant que tout le monde est absent."
                 }
             },
             "switchSteps": {
@@ -1015,7 +1015,7 @@
                 },
                 "3": {
                     "question": "Puis-je confier une liste de tâches à Rerun ?",
-                    "answer": "Oui. Écrivez ou dictez ce que vous avez en tête au Foreman, l’assistant qui gère vos agents, ou maintenez Espace enfoncé et dites-le. Il confie chaque tâche au bon agent, propose un nouvel agent quand aucun ne peut s’en charger, et garde dans votre liste de tâches ce que vous seul pouvez faire."
+                    "answer": "Oui. Écrivez ou dictez ce que vous avez en tête au Chief of Staff, l’assistant qui pilote vos agents, ou maintenez Espace enfoncé et dites-le. Il confie chaque tâche au bon agent, propose un nouvel agent quand aucun ne peut s’en charger, et garde dans votre liste de tâches ce que vous seul pouvez faire."
                 },
                 "4": {
                     "question": "Claude Cowork existe-t-il encore ?",
@@ -1055,7 +1055,7 @@
                 },
                 "3": {
                     "title": "Une équipe d’agents",
-                    "desc": "Manus garde le contexte en exécutant une planification dans la même tâche, ou en partageant les fichiers et connecteurs d’un Project. Sur Rerun, plusieurs agents ont chacun leur poste, gardent leur propre mémoire et leurs skills, et partagent un dossier, une base de données et un cerveau de l’entreprise. Dites au Foreman ce que vous avez en tête et il confie chaque tâche au bon agent."
+                    "desc": "Manus garde le contexte en exécutant une planification dans la même tâche, ou en partageant les fichiers et connecteurs d’un Project. Sur Rerun, plusieurs agents ont chacun leur poste, gardent leur propre mémoire et leurs skills, et partagent un dossier, une base de données et un cerveau de l’entreprise. Dites au Chief of Staff ce que vous avez en tête et il confie chaque tâche au bon agent."
                 },
                 "4": {
                     "title": "Un tableau pour toute l’équipe",
@@ -1088,7 +1088,7 @@
                 },
                 "3": {
                     "question": "Puis-je confier une liste de choses à faire à Rerun ?",
-                    "answer": "Oui. Écrivez ou dictez ce que vous avez en tête au Foreman, l’assistant qui dirige vos agents. Il confie chaque tâche au bon agent, propose un nouvel agent quand aucun ne peut s’en charger, et garde dans votre liste de tâches ce que vous seul pouvez faire."
+                    "answer": "Oui. Écrivez ou dictez ce que vous avez en tête au Chief of Staff, l’assistant qui pilote vos agents. Il confie chaque tâche au bon agent, propose un nouvel agent quand aucun ne peut s’en charger, et garde dans votre liste de tâches ce que vous seul pouvez faire."
                 },
                 "4": {
                     "question": "Combien de tâches planifiées puis-je lancer sur Rerun ?",
@@ -1128,7 +1128,7 @@
                 },
                 "3": {
                     "title": "Des validations auxquelles toute l’équipe peut répondre",
-                    "desc": "Les bots reviennent vers la personne à qui ils appartiennent quand ils ont besoin d’une validation. Sur Rerun, les agents s’arrêtent avant toute action risquée et demandent dans l’app, les places sont gratuites, et n’importe qui dans le workspace peut répondre. Avec Autopilot activé, le Foreman répond selon vos règles pendant votre absence, jamais pour une dépense ou une suppression."
+                    "desc": "Les bots reviennent vers la personne à qui ils appartiennent quand ils ont besoin d’une validation. Sur Rerun, les agents s’arrêtent avant toute action risquée et demandent dans l’app, les sièges sont gratuits, et n’importe qui dans le workspace peut répondre. Avec Autopilot activé, le Chief of Staff répond selon vos règles pendant votre absence, jamais pour une dépense ou une suppression."
                 },
                 "4": {
                     "title": "Un forfait à part entière",
@@ -1275,7 +1275,7 @@
                 },
                 "3": {
                     "title": "Des validations pour toute l’équipe",
-                    "desc": "Les agents s’arrêtent avant toute action qui compte et demandent dans l’app, les places sont gratuites, et n’importe quel coéquipier peut répondre. Avec Autopilot activé, le Foreman répond selon vos règles pendant votre absence, jamais pour une dépense ou une suppression."
+                    "desc": "Les agents s’arrêtent avant toute action importante et demandent dans l’app, les sièges sont gratuits, et n’importe quel coéquipier peut répondre. Avec Autopilot activé, le Chief of Staff répond selon vos règles pendant votre absence, jamais pour une dépense ou une suppression."
                 },
                 "4": {
                     "title": "Apps et modèles depuis le navigateur",
@@ -1567,7 +1567,7 @@
                 },
                 "3": {
                     "title": "Des validations qui ne vous attendent pas",
-                    "desc": "n8n peut mettre un agent en pause avant l’exécution d’un outil et attendre sur Slack, Gmail, Teams ou son propre chat qu’une personne réponde. Rerun s’arrête aussi pour demander dans l’app, et avec Autopilot activé, le Foreman, l’assistant qui pilote vos agents, répond selon vos règles pendant votre absence, jamais pour une dépense ou une suppression, puis récapitule le travail et les heures qu’il vous a fait gagner."
+                    "desc": "n8n peut mettre un agent en pause avant l’exécution d’un outil et attendre sur Slack, Gmail, Teams ou son propre chat qu’une personne réponde. Rerun s’arrête aussi pour demander dans l’app, et avec Autopilot activé, le Chief of Staff, l’assistant qui pilote vos agents, répond selon vos règles pendant votre absence, jamais pour une dépense ou une suppression, puis récapitule le travail et les heures qu’il vous a fait gagner."
                 },
                 "4": {
                     "title": "Les exécutions ne sont pas comptées",
@@ -1608,7 +1608,7 @@
                 },
                 "5": {
                     "question": "Que se passe-t-il quand un agent a besoin d’une validation pendant mon absence ?",
-                    "answer": "Il s’arrête et demande, vous recevez un e-mail, et vous répondez dans l’app. Sur les offres payantes, vous pouvez aussi activer Autopilot : pendant votre absence, le Foreman, l’assistant qui pilote vos agents, répond à leurs questions et valide les actions courantes selon vos règles. Les dépenses et les suppressions vous attendent toujours, et chaque décision est consignée."
+                    "answer": "Il s’arrête et demande, vous recevez un e-mail, et vous répondez dans l’app. Sur les offres payantes, vous pouvez aussi activer Autopilot : pendant votre absence, le Chief of Staff, l’assistant qui pilote vos agents, répond à leurs questions et valide les actions courantes selon vos règles. Les dépenses et les suppressions vous attendent toujours, et chaque décision est consignée."
                 },
                 "6": {
                     "question": "Faut-il écrire du code avec Rerun ?",
@@ -1681,7 +1681,7 @@
                 },
                 "4": {
                     "question": "Que se passe-t-il quand un agent a besoin d’une validation pendant mon absence ?",
-                    "answer": "Il s’arrête et demande, vous recevez un e-mail, et vous répondez dans l’app. Sur les offres payantes, vous pouvez aussi activer Autopilot : pendant votre absence, le Foreman, l’assistant qui pilote vos agents, répond à leurs questions et valide les actions courantes selon vos règles. Les dépenses et les suppressions vous attendent toujours, et chaque décision est consignée."
+                    "answer": "Il s’arrête et demande, vous recevez un e-mail, et vous répondez dans l’app. Sur les offres payantes, vous pouvez aussi activer Autopilot : pendant votre absence, le Chief of Staff, l’assistant qui pilote vos agents, répond à leurs questions et valide les actions courantes selon vos règles. Les dépenses et les suppressions vous attendent toujours, et chaque décision est consignée."
                 },
                 "5": {
                     "question": "Rerun fonctionne-t-il dans Slack comme Lindy ?",
@@ -1721,7 +1721,7 @@
                 },
                 "3": {
                     "title": "Votre équipe, pas seulement vos clients",
-                    "desc": "Twin invite jusqu’à 5 clients, chacun avec un tableau de bord, et précise que vous seul avez besoin de l’utiliser. Sur Rerun, les sièges sont gratuits et illimités : vos coéquipiers partagent le même tableau, chacun peut répondre à un agent qui s’arrête pour poser une question, et avec Autopilot activé, le Foreman répond selon vos règles quand personne n’est là."
+                    "desc": "Twin invite jusqu’à 5 clients, chacun avec un tableau de bord, et précise que vous seul avez besoin de l’utiliser. Sur Rerun, les sièges sont gratuits et illimités : vos coéquipiers partagent le même tableau, chacun peut répondre à un agent qui s’arrête pour poser une question, et avec Autopilot activé, le Chief of Staff répond selon vos règles quand personne n’est là."
                 },
                 "4": {
                     "title": "Des données de prospection à un prix que vous validez",
@@ -1871,7 +1871,7 @@
                 },
                 "4": {
                     "title": "Votre équipe sur le même tableau",
-                    "desc": "Invitez votre équipe sans surcoût, répartissez les agents par Box, et tout le monde suit le même tableau en direct. Quand un agent s’arrête pour demander avant une action importante, n’importe quel coéquipier peut répondre, et avec Autopilot activé, le Foreman répond selon vos règles quand personne n’est là."
+                    "desc": "Invitez votre équipe sans surcoût, répartissez les agents par Box, et tout le monde suit le même tableau en direct. Quand un agent s’arrête pour demander avant une action importante, n’importe quel coéquipier peut répondre, et avec Autopilot activé, le Chief of Staff répond selon vos règles quand personne n’est là."
                 }
             },
             "switchSteps": {

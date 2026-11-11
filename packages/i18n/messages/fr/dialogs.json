@@ -180,7 +180,7 @@
         },
         "build": {
             "title": "Votre équipe est prête à être créée",
-            "subtitle": "Créez votre compte et le Foreman commence à la monter tout de suite."
+            "subtitle": "Créez votre compte et le Chief of Staff commence à la monter tout de suite."
         },
         "signin": {
             "title": "Bienvenue",
@@ -488,8 +488,8 @@
         },
         "actions": {
             "controlCenter": "Ouvrir le centre de contrôle",
-            "askRerun": "Demander à Rerun, hors d'un chat",
-            "holdToTalk": "Maintenir pour parler à Rerun",
+            "askRerun": "Demander à votre Chief of Staff, hors d'un chat",
+            "holdToTalk": "Maintenir pour parler à votre Chief of Staff",
             "searchInPage": "Rechercher dans la page",
             "newConversation": "Nouvelle conversation",
             "closeTab": "Fermer l'onglet actif",

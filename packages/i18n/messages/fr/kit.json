@@ -212,10 +212,11 @@
         }
     },
     "foreman": {
-        "orbLabel": "Demander à Rerun",
+        "orbLabel": "Demander à votre Chief of Staff",
+        "tabsLabel": "Chief of Staff",
         "empty": {
             "title": "Posez n'importe quelle question sur votre workspace",
-            "description": "Rerun construit et fait tourner vos coworkers avec vous"
+            "description": "Votre Chief of Staff construit et pilote vos coworkers avec vous"
         },
         "header": {
             "closeChat": "Fermer le chat",

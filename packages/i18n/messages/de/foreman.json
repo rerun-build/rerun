@@ -3,7 +3,7 @@
         "title": "Hey, bereit, deine erste Aufgabe abzugeben?",
         "preparing": "Dein Workspace wird vorbereitet...",
         "gateTitle": "Dein Team kann gebaut werden",
-        "gateSubtitle": "Erstelle dein Konto und der Foreman legt sofort los."
+        "gateSubtitle": "Erstelle dein Konto und der Chief of Staff beginnt sofort mit dem Aufbau."
     },
     "header": {
         "closeDisabled": "Erst die Einrichtung abschließen",
@@ -47,10 +47,11 @@
         "installFailed": "Installation konnte nicht gestartet werden"
     },
     "notification": {
-        "waiting": "Der Foreman wartet auf dich."
+        "title": "Chief of Staff",
+        "waiting": "Dein Chief of Staff wartet auf dich."
     },
     "dock": {
-        "tooltip": "Suchen oder Rerun fragen <key>{shortcut}</key>",
+        "tooltip": "Suchen oder deinen Chief of Staff fragen <key>{shortcut}</key>",
         "failedReply": "Da ist etwas schiefgelaufen."
     },
     "nudge": {
@@ -77,7 +78,7 @@
             "failedRun": "Warum ist das fehlgeschlagen?",
             "newCoworker": "Bau mir einen neuen Coworker"
         },
-        "ask": "Rerun fragen",
+        "ask": "Deinen Chief of Staff fragen",
         "send": "Senden"
     },
     "routines": {
@@ -366,8 +367,8 @@
         "pay": "{price} bezahlen"
     },
     "teamEmptyState": {
-        "greeting": "Hi, ich bin Rerun",
-        "greetingNamed": "Hi {firstName}, ich bin Rerun",
+        "greeting": "Hallo, ich bin dein Chief of Staff",
+        "greetingNamed": "Hallo {firstName}, ich bin dein Chief of Staff",
         "greetingWithTeam": "{greeting}. Das ist dein Team.",
         "emptySubtitle": "Du hast noch keine Coworker. Nenn mir eine Aufgabe, die du abgeben würdest, und ich baue den ersten.",
         "buildPrompt": "Bau mir einen Coworker, der ",

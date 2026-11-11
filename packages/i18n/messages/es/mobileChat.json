@@ -50,8 +50,8 @@
             "tools": "¿A qué herramientas tienes acceso?"
         },
         "team": {
-            "greeting": "Hola, soy Rerun",
-            "greetingNamed": "Hola {firstName}, soy Rerun",
+            "greeting": "Hola, soy tu Chief of Staff",
+            "greetingNamed": "Hola {firstName}, soy tu Chief of Staff",
             "greetingWithTeam": "{greeting}. Este es tu equipo.",
             "emptySubtitle": "Aún no tienes coworkers. Cuéntame un trabajo que delegarías y crearé el primero.",
             "buildPrompt": "Créame un coworker que ",
@@ -135,7 +135,7 @@
             }
         },
         "retry": "Reintentar",
-        "role": "El asistente de tu workspace",
+        "role": "Tu Chief of Staff",
         "unreachableBody": "Revisa tu conexión e inténtalo de nuevo.",
         "unreachableTitle": "No pudimos conectar con Rerun"
     },
@@ -166,7 +166,7 @@
         "image": "Imagen"
     },
     "messages": {
-        "askRerun": "Pregunta a Rerun",
+        "askRerun": "Pregunta a tu Chief of Staff",
         "badResponse": "Mala respuesta",
         "compacting": "Compactando",
         "copy": "Copiar",
@@ -212,7 +212,7 @@
         "answerPlaceholder": "Responder a {name}",
         "attachFailed": "No se pudieron adjuntar los archivos",
         "defaultModel": "Predeterminado · {model}",
-        "foremanPlaceholder": "Pregúntale lo que quieras a Rerun",
+        "foremanPlaceholder": "Pregunta lo que quieras a tu Chief of Staff",
         "loadFailed": "No pudimos cargar esta conversación.",
         "loading": "Cargando la conversación",
         "messagePlaceholder": "Escribir a {name}",

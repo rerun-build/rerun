@@ -55,10 +55,10 @@
         "retry": "Reintentar"
     },
     "conversation": {
-        "foremanRole": "El asistente de tu workspace",
+        "foremanRole": "Tu Chief of Staff",
         "failed": "No se pudo enviar.",
         "tryAgain": "Intentar de nuevo",
-        "composerPlaceholder": "Responder a Rerun"
+        "composerPlaceholder": "Responde a tu Chief of Staff"
     },
     "starter": {
         "title": "Tu equipo inicial",

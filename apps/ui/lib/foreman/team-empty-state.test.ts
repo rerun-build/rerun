@@ -14,7 +14,7 @@ const stateOf = (agents: ReturnType<typeof agent>[], schedules: AgentSchedule[] 
 describe('teamEmptyStateOf', () => {
     it('pushes toward a first coworker when the workspace has none', () => {
         const state = stateOf([])
-        expect(state.title).toBe("Hi Alex, I'm Rerun")
+        expect(state.title).toBe("Hi Alex, I'm your Chief of Staff")
         expect(state.pulse).toBeNull()
         expect(state.rows.map(row => [row.title, row.action.type])).toEqual([
             ['Build my first coworker', 'prefill'],
@@ -24,7 +24,7 @@ describe('teamEmptyStateOf', () => {
     })
 
     it('greets without a name when the account has none', () => {
-        expect(stateOf([], [], '').title).toBe("Hi, I'm Rerun")
+        expect(stateOf([], [], '').title).toBe("Hi, I'm your Chief of Staff")
     })
 
     it('leaves switched-off coworkers out of the team', () => {
@@ -35,7 +35,7 @@ describe('teamEmptyStateOf', () => {
 
     it('features the coworker at work and hands the task to another one', () => {
         const state = stateOf([agent('seo', { name: 'SEO Writer' }), agent('inbox', { name: 'Inbox Triage', handle: 'inbox', status: 'working' })])
-        expect(state.title).toBe("Hi Alex, I'm Rerun. Here is your team.")
+        expect(state.title).toBe("Hi Alex, I'm your Chief of Staff. Here is your team.")
         expect(state.pulse).toMatchObject({
             working: 1,
             agents: [

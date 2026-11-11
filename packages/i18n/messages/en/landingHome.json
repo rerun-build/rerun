@@ -11,7 +11,7 @@
         "coworker.tools.gmail.typed1": "Typed letter by letter in a fixed-width window: 43 characters at most.",
         "coworker.tools.gmail.typed2": "Typed letter by letter in a fixed-width window: 33 characters at most.",
         "coworker.always.place": "Where the Coworker's machine runs: a box id, then a city and its country.",
-        "hero.screen": "A demo of the product playing inside a screen on the home page: Coworkers on a board, their chat threads, an inbox, the workspace assistant. Names of companies and people are fictional and stay as they are.",
+        "hero.screen": "A demo of the product playing inside a screen on the home page: Coworkers on a board, their chat threads, an inbox, the Chief of Staff. Names of companies and people are fictional and stay as they are.",
         "hero.screen.foreman": "{writer}, {social}, {research}, {invoices} are Coworker job titles (hero.tiles.*.job) used as names: \"the Content Marketer\"."
     },
     "hero": {
@@ -81,7 +81,7 @@
         "screen": {
             "hint": {
                 "tap": "Tap a coworker to see it work",
-                "click": "Click a coworker to see it work, or ask Rerun"
+                "click": "Click a coworker to see it work, or ask your Chief of Staff"
             },
             "inboxSettings": "Preferences: Available in your own workspace",
             "useCases": {

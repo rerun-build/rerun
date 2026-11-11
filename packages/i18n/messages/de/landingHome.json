@@ -66,7 +66,7 @@
         "screen": {
             "hint": {
                 "tap": "Tipp einen Coworker an, um ihn zu sehen",
-                "click": "Klick einen Coworker an oder frag Rerun"
+                "click": "Klick einen Coworker an und sieh ihm zu, oder frag deinen Chief of Staff"
             },
             "inboxSettings": "Einstellungen: In deinem eigenen Workspace verfügbar",
             "useCases": {

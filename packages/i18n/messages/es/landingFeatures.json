@@ -221,7 +221,7 @@
                 },
                 "third": {
                     "question": "¿Qué pasa si nadie responde?",
-                    "answer": "La ejecución espera y la pregunta sigue en el tablero. Si activas el piloto automático, el mánager del workspace la responde según las reglas que escribiste para que la ejecución termine sin ti."
+                    "answer": "La ejecución espera y la pregunta sigue en el tablero. Si activas el piloto automático, tu Chief of Staff la responde según las reglas que escribiste para que la ejecución termine sin ti."
                 }
             },
             "templatesTitle": "Coworkers que conviene tener bajo control."
@@ -402,7 +402,7 @@
                 },
                 "second": {
                     "question": "¿Tengo que conectar la cadena yo mismo?",
-                    "answer": "No. Dices de qué se encarga cada uno; el mánager del workspace sabe quién lleva qué y reparte entre ellos. También puedes nombrar al siguiente Coworker en las instrucciones de un Coworker si el orden importa."
+                    "answer": "No. Dices de qué se encarga cada uno; tu Chief of Staff sabe quién lleva qué y reparte entre ellos. También puedes nombrar al siguiente Coworker en las instrucciones de un Coworker si el orden importa."
                 },
                 "third": {
                     "question": "¿Es lo mismo que un workflow multiagente?",

@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, type AgentModels, type ForemanSurface } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentModels, type ForemanSurface } from '@rerun/contracts'
 import * as Haptics from 'expo-haptics'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -32,7 +32,7 @@ import { useOpenChats } from './useOpenChats'
 // Opens the last conversation with the Foreman, as the web column does.
 export const LAST_CONVERSATION = 'last'
 
-const FOREMAN: Omit<ChatCoworker, 'role'> = { id: FOREMAN_AGENT_ID, kind: 'foreman', name: 'Rerun', status: 'idle' }
+const FOREMAN: Omit<ChatCoworker, 'role'> = { id: FOREMAN_AGENT_ID, kind: 'foreman', name: FOREMAN_DISPLAY_NAME, status: 'idle' }
 
 const TITLE_DELAY_MS = 4000
 

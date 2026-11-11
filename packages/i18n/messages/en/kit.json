@@ -24,13 +24,13 @@
         "experts.card.status": "Label on a holographic profile card, followed by the profile type (Studio, Freelancer).",
         "experts.availability.tooltip": "{label} is the availability (Available, Not available), {hint} its short explanation.",
         "experts.images.drop": "Overlay shown while a file is dragged over the upload tile.",
-        "foreman.tabs.assistant": "Tab of the Foreman chat where you ask it questions.",
+        "foreman.tabs.assistant": "Tab of the Chief of Staff chat where you ask it questions.",
         "foreman.periods.running": "Heading of the routines that are running right now.",
         "foreman.routines.runningMinutes": "A routine running for {minutes} minutes; m is the short unit for minutes.",
         "foreman.routines.startsInMinutes": "A routine that starts in {minutes} minutes; m is the short unit for minutes.",
         "foreman.routines.runningJustNow": "A routine that started less than a minute ago.",
         "foreman.routines.pause": "Accessible label of the switch that pauses the routine {name}.",
-        "foreman.orbLabel": "Accessible label of the round button that opens the Foreman chat.",
+        "foreman.orbLabel": "Accessible label of the round button that opens the Chief of Staff chat.",
         "forms.optional": "Shown next to the title of a form field that can be left empty.",
         "forms.select": "Placeholder of a dropdown with nothing picked yet.",
         "monitoring.live": "Small badge: the data updates in real time.",
@@ -288,10 +288,11 @@
         }
     },
     "foreman": {
-        "orbLabel": "Ask Rerun",
+        "orbLabel": "Ask your Chief of Staff",
+        "tabsLabel": "Chief of Staff",
         "empty": {
             "title": "Ask anything about your workspace",
-            "description": "Rerun builds and runs your coworkers with you"
+            "description": "Your Chief of Staff builds and runs your coworkers with you"
         },
         "header": {
             "closeChat": "Close the chat",

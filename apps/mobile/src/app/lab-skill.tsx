@@ -1,4 +1,4 @@
-import type { MessageFeedbackRating, SkillProposal, SkillProposalStatus } from '@rerun/contracts'
+import { FOREMAN_DISPLAY_NAME, type MessageFeedbackRating, type SkillProposal, type SkillProposalStatus } from '@rerun/contracts'
 import { useLocalSearchParams } from 'expo-router'
 import { useState, type ReactNode } from 'react'
 import { ScrollView, View } from 'react-native'
@@ -94,7 +94,7 @@ export default function LabSkill() {
                     ))}
                 </Group>
                 <Group title="Brain change with Undo">
-                    <EventCardView card={{ kind: 'brain-change', change: { status: 'saved', slug: 'pricing', title: 'Pricing', mode: 'edit', undoRevisionId: 'rev-1', hash: 'h1' } }} coworkerName="Rerun" />
+                    <EventCardView card={{ kind: 'brain-change', change: { status: 'saved', slug: 'pricing', title: 'Pricing', mode: 'edit', undoRevisionId: 'rev-1', hash: 'h1' } }} coworkerName={FOREMAN_DISPLAY_NAME} />
                 </Group>
                 <Group title="Delegation, a task can be stopped">
                     <SubRunTree tasks={RUNNING} onStopTask={() => {}} />

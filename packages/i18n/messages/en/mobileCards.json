@@ -79,7 +79,7 @@
         "partial": "{shown} of {total}"
     },
     "_context": {
-        "agentPicker.open": "A chip under a message of the workspace assistant: opens one screen of a coworker. The words after Open are the names of the coworker's tabs.",
+        "agentPicker.open": "A chip under a message of the Chief of Staff: opens one screen of a coworker. The words after Open are the names of the coworker's tabs.",
         "event.schedules": "A badge on the card that says a coworker finished its setup: how many schedules are turned on.",
         "event.triggers": "A badge on the card that says a coworker finished its setup: how many triggers are turned on.",
         "skill.ask": "A coworker offers to remember a rule it learned in the conversation.",
