@@ -65,7 +65,13 @@
         "selectAll": "Select all that apply",
         "typeAnswer": "Type your answer…",
         "somethingElse": "Something else",
-        "yourAnswer": "Your answer"
+        "yourAnswer": "Your answer",
+        "attach": "Attach files",
+        "record": "Answer with your voice",
+        "useRecording": "Use this recording",
+        "discardRecording": "Discard the recording",
+        "retryRecording": "Try transcribing again",
+        "uploadFailed": "Could not attach those files. Try again."
     },
     "secret": {
         "labelOne": "Credential needed",

@@ -8,7 +8,8 @@ export type VoiceMessageError = 'silent' | 'sendFailed'
 
 // What a recording needs from its conversation to leave: a place for the audio, what was said, the send.
 export type VoiceSender = {
-    upload: (uri: string) => Promise<string>
+    /** Absent when the voice is a dictation: nothing is kept, and `send` gets the bare transcript. */
+    upload?: (uri: string) => Promise<string>
     transcribe: (uri: string) => Promise<string>
     send: (text: string) => Promise<void>
 }
@@ -49,13 +50,16 @@ export function useVoiceMessage(sender: VoiceSender | undefined) {
         setError(null)
         setStatus('processing')
         try {
+            const upload = current.upload
             // A retry after a failed transcription reuses the file already uploaded instead of leaving an orphan copy.
             const [path, transcript] = await Promise.all([
-                recording.path ??
-                    current.upload(recording.uri).then(path => {
-                        recording.path = path
-                        return path
-                    }),
+                upload
+                    ? (recording.path ??
+                      upload(recording.uri).then(uploaded => {
+                          recording.path = uploaded
+                          return uploaded
+                      }))
+                    : null,
                 current.transcribe(recording.uri),
             ])
             if (!transcript.trim()) {
@@ -63,7 +67,7 @@ export function useVoiceMessage(sender: VoiceSender | undefined) {
                 setStatus('failed')
                 return
             }
-            await current.send(appendVoiceMarker(transcript, buildVoiceMarker({ src: path, durationMs: recording.durationMs, levels: recording.levels })))
+            await current.send(path === null ? transcript.trim() : appendVoiceMarker(transcript, buildVoiceMarker({ src: path, durationMs: recording.durationMs, levels: recording.levels })))
             pendingRef.current = null
             setStatus('idle')
         } catch {

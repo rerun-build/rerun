@@ -65,7 +65,13 @@
         "selectAll": "Sélectionnez toutes les réponses qui conviennent",
         "typeAnswer": "Saisissez votre réponse…",
         "somethingElse": "Autre chose",
-        "yourAnswer": "Votre réponse"
+        "yourAnswer": "Votre réponse",
+        "attach": "Joindre des fichiers",
+        "record": "Répondre à la voix",
+        "useRecording": "Utiliser cet enregistrement",
+        "discardRecording": "Supprimer l'enregistrement",
+        "retryRecording": "Réessayer la transcription",
+        "uploadFailed": "Impossible de joindre ces fichiers. Réessayez."
     },
     "secret": {
         "labelOne": "Identifiant requis",

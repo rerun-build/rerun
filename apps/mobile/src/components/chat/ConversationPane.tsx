@@ -8,7 +8,7 @@ import { useTranslations } from 'use-intl'
 
 import { acknowledgeAlert, cancelSubRun } from '@/api/chat'
 import { runningModel } from '@/api/models'
-import { transcribeRecording, uploadVoiceRecording } from '@/api/uploads'
+import { transcribeRecording, uploadChatFile, uploadVoiceRecording } from '@/api/uploads'
 import { useAuth } from '@/auth/AuthProvider'
 import { setPendingDesktopOpen } from '@/desktop/pending-open'
 import { track } from '@/lib/analytics'
@@ -436,6 +436,8 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                                             agentId={coworker.id}
                                             coworkerName={coworker.name}
                                             webUrl={webUrl}
+                                            upload={canAttach && caller ? attachment => uploadChatFile(caller, coworker.id, attachment.uri, attachment.name) : undefined}
+                                            transcribe={caller ? uri => transcribeRecording(caller, uri) : undefined}
                                             onAnswer={text => send(text)}
                                             onDismiss={() => {
                                                 setDismissedCallId(pending.toolCallId)
