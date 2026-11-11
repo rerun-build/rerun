@@ -155,6 +155,10 @@ form a GitHub stack, so each diff shows one step and the chain stays reviewable 
 - Merge from the bottom up. After a squash merge, rebase the next one with
   `git rebase --onto origin/<base> <old tip of the merged branch> <next branch>`, then retarget it on
   the base (`gh pr edit --base <base>`).
+- Merge one pull request at a time: the next one is merged only once it targets the base
+  (`gh pr view <n> --json baseRefName`). Merged while it still targets the branch below, it lands in
+  that branch instead of the base (#85 and #86, 11/11/2026). The repository deletes a merged branch,
+  so GitHub retargets the next pull request on its own.
 
 # Security fixes
 
