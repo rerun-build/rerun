@@ -13,7 +13,7 @@ import type { WorkspaceRole } from '@/supabase/session/SessionProvider'
 import { Badge } from '@rerun/ui/primitives'
 import { CardAvatar } from '@rerun/ui/chat'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useState, type ComponentProps } from 'react'
 
 const asIs = (path: string) => path
 
@@ -128,10 +128,12 @@ export function WorkspaceInviteRowView({ invite, viewerIsAdmin, onRevoke }: { in
     )
 }
 
-function RevokeButton({ disabled }: { disabled?: boolean }) {
+// Spreads what the confirm dialog's trigger hands it (its click and its ref): without them the
+// button would never open the confirmation.
+function RevokeButton(props: ComponentProps<typeof Button>) {
     const t = useTranslations('dialogs.members')
     return (
-        <Button type="button" variant="ghost" size="icon-xs" disabled={disabled} aria-label={t('invite.revoke')} className="text-muted-foreground">
+        <Button type="button" variant="ghost" size="icon-xs" aria-label={t('invite.revoke')} className="text-muted-foreground" {...props}>
             <XIcon className="size-4" />
         </Button>
     )
