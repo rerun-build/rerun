@@ -35,8 +35,18 @@
             "label": "Push-Benachrichtigungen",
             "off": "Aus",
             "turnOn": "Einschalten",
-            "openIosSettings": "iOS-Einstellungen öffnen",
-            "footnote": "Solange Push aus ist, kommt nichts davon auf diesem iPhone an."
+            "openSettings": "{platform, select, android {Android-Einstellungen öffnen} other {iOS-Einstellungen öffnen}}",
+            "footnote": "{platform, select, android {Solange Push aus ist, kommt nichts davon auf diesem Telefon an.} other {Solange Push aus ist, kommt nichts davon auf diesem iPhone an.}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "Nachrichten von Coworkern",
+                "description": "Wenn ein Coworker dich braucht oder etwas zu sagen hat."
+            },
+            "silent": {
+                "name": "Erledigte Aufgaben",
+                "description": "Wenn ein Coworker eine Aufgabe erledigt, ohne Ton."
+            }
         },
         "scopeTitle": "Benachrichtige mich über",
         "recommended": "Empfohlen",
