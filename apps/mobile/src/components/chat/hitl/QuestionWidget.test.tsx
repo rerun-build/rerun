@@ -113,6 +113,19 @@ describe('QuestionWidget', () => {
         expect(upload).toHaveBeenCalledWith(expect.objectContaining({ name: 'skill.zip' }))
     })
 
+    it('puts the paperclip and the microphone to rest while the files are on their way out', async () => {
+        const upload = jest.fn(() => new Promise<string>(() => {}))
+        const transcribe = jest.fn(async () => '')
+        await setup({ questions: [{ question: 'Which folder?', options: [] }] }, { upload, transcribe })
+        await fireEvent.press(screen.getByLabelText('Files'))
+        await waitFor(() => expect(screen.getByText('skill.zip')).toBeTruthy())
+        await fireEvent.press(screen.getByLabelText('Send'))
+        await waitFor(() => expect(screen.getByLabelText('Answer with your voice')).toBeDisabled())
+        expect(screen.getByLabelText('Attach')).toBeDisabled()
+        expect(screen.getByLabelText('Send')).toBeDisabled()
+        expect(upload).toHaveBeenCalledTimes(1)
+    })
+
     it('adds what was dictated to what was already typed', async () => {
         const transcribe = jest.fn(async () => 'and the three replies at its root')
         const { onAnswer } = await setup({ questions: [{ question: 'What is in it?', options: [] }] }, { transcribe })

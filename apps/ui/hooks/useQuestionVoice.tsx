@@ -39,8 +39,7 @@ export function useQuestionVoice(): QuestionVoice {
         try {
             // Null when the recording was stopped before the microphone came up: nothing was said.
             const recording = await stop()
-            if (!recording) return
-            const transcript = await transcribeVoiceRecording(recording.blob, recording.format.transcriptionFormat)
+            const transcript = recording ? await transcribeVoiceRecording(recording.blob, recording.format.transcriptionFormat) : ''
             if (!transcript) {
                 toast.error(t('nothingHeard'))
                 return

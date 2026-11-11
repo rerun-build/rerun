@@ -107,8 +107,12 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
 
     const isMultiple = (i: number) => questions[i].multiple === true && questions[i].options.length > 0
 
+    // While the microphone is on, the answer field is the recording bar: moving to another question or
+    // picking an option would leave the words with nowhere to land.
+    const recording = voice !== undefined && voice.status !== 'idle'
+
     const chooseOption = (i: number, opt: string) => {
-        if (locked) return
+        if (locked || recording) return
         const value = answerAt(i)
         if (isMultiple(i)) {
             setAnswer(i, { ...value, selected: value.selected.includes(opt) ? value.selected.filter(o => o !== opt) : [...value.selected, opt] })
@@ -121,7 +125,7 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
     }
 
     const openCustom = (i: number) => {
-        if (locked || customOpen[i]) return
+        if (locked || recording || customOpen[i]) return
         setCustomOpen(prev => ({ ...prev, [i]: true }))
         if (isMultiple(i)) return
         setAnswer(i, EMPTY_ANSWER)
@@ -138,8 +142,6 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
         if (locked) return
         setAnswer(i, { ...answerAt(i), custom })
     }
-
-    const recording = voice !== undefined && voice.status !== 'idle'
 
     const startVoice = (i: number) => {
         if (locked || !voice || recording) return
@@ -348,7 +350,7 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
                                             description={opt.description && renderText(opt.description)}
                                             selected={value.selected.includes(opt.label)}
                                             multi={multi}
-                                            disabled={locked}
+                                            disabled={locked || recording}
                                             onChoose={() => chooseOption(current, opt.label)}
                                         />
                                     ))}
@@ -370,9 +372,9 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
                         current={current}
                         answered={questions.map((_, i) => hasAnswer(i))}
                         onSelect={i => {
-                            if (!locked) setCurrent(i)
+                            if (!locked && !recording) setCurrent(i)
                         }}
-                        disabled={locked}
+                        disabled={locked || recording}
                     />
                 ) : (
                     <div />

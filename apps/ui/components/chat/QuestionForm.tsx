@@ -30,7 +30,7 @@ type QuestionFormProps = Pick<QuestionFormBaseProps, 'ref' | 'textareaRef' | 'te
     maxFileSize?: number
     questions: QuestionItem[]
     onSend: (text: string) => void
-    onCancel: () => void
+    onCancel?: () => void
     disabled?: boolean
 }
 
@@ -152,8 +152,8 @@ export function QuestionForm({ ref, target, maxFileSize = MAX_UPLOAD_FILE_BYTES,
     const cancel = () => {
         discard(Object.values(attached).flat())
         setAttached({})
-        onCancel()
+        onCancel?.()
     }
 
-    return <QuestionFormBase ref={ref} questions={questions} onSubmit={submit} onCancel={cancel} disabled={disabled} inline={inline} renderText={renderMarkdown} attachments={target ? attachments : undefined} voice={voice} textareaRef={textareaRef} textareaProps={textareaProps} />
+    return <QuestionFormBase ref={ref} questions={questions} onSubmit={submit} onCancel={onCancel ? cancel : undefined} disabled={disabled} inline={inline} renderText={renderMarkdown} attachments={target ? attachments : undefined} voice={voice} textareaRef={textareaRef} textareaProps={textareaProps} />
 }

@@ -186,8 +186,8 @@ export function QuestionWidget({ pending, onAnswer, onDismiss, upload, transcrib
         </>
     ) : (
         <>
-            {upload && <AttachMenu onPhotos={picker.pickPhotos} onCamera={picker.takePhoto} onFiles={picker.pickFiles} />}
-            {transcribe && <RoundButton symbol="mic" label={t('question.record')} tone="plain" onPress={() => void startRecording()} />}
+            {upload && <AttachMenu onPhotos={picker.pickPhotos} onCamera={picker.takePhoto} onFiles={picker.pickFiles} disabled={sending} />}
+            {transcribe && <RoundButton symbol="mic" label={t('question.record')} tone="plain" disabled={sending} onPress={() => void startRecording()} />}
             <HitlAction label={t('actions.skip')} onPress={skip} disabled={sending} />
             <HitlAction label={last ? t('actions.send') : t('actions.next')} primary onPress={() => advance(answers)} disabled={sending} />
         </>

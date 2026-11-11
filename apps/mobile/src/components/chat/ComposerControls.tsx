@@ -46,20 +46,21 @@ export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: 
     )
 }
 
-export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill }: { onPhotos: () => void; onCamera: () => void; onFiles: () => void; skills?: SkillSummary[]; onSkill?: (slug: string) => void }) {
+export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill, disabled = false }: { onPhotos: () => void; onCamera: () => void; onFiles: () => void; skills?: SkillSummary[]; onSkill?: (slug: string) => void; disabled?: boolean }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.composer')
+    const trigger = (
+        <View accessibilityLabel={t('attach')} accessibilityState={{ disabled }} style={{ width: CONTROL, height: CONTROL, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="plus" size={20} color={disabled ? theme.mutedForeground : theme.foreground} />
+        </View>
+    )
+    // The menu is a SwiftUI host with no disabled state of its own: the bare trigger is drawn instead.
+    if (disabled) return trigger
     // Sized here: Android's menu host is measured by Compose a frame late, and until then it stretched
     // the composer's row to twice its height.
     return (
         <View style={{ width: CONTROL, height: CONTROL }}>
-            <NativeMenu
-                trigger={
-                    <View accessibilityLabel={t('attach')} style={{ width: CONTROL, height: CONTROL, alignItems: 'center', justifyContent: 'center' }}>
-                        <Icon name="plus" size={20} color={theme.foreground} />
-                    </View>
-                }
-            >
+            <NativeMenu trigger={trigger}>
                 <MenuItem label={t('photos')} icon="images" onPress={onPhotos} />
                 <MenuItem label={t('camera')} icon="camera" onPress={onCamera} />
                 <MenuItem label={t('files')} icon="folder" onPress={onFiles} />
