@@ -3,7 +3,6 @@ import type { CountryCode } from 'libphonenumber-js/min'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
 import { deviceCountry } from '@/lib/phone'
-import { useSystemBack } from '@/lib/system-back'
 
 export type SignInStep =
     | { name: 'start' }
@@ -26,6 +25,7 @@ type SignInFlow = {
     direction: 'forward' | 'back'
     goTo: (step: SignInStep) => void
     back: () => void
+    canGoBack: boolean
     // Something is on its way to the hub: the Foreman thinks while it is.
     thinking: boolean
     setThinking: (thinking: boolean) => void
@@ -51,11 +51,8 @@ export function SignInFlowProvider({ initialStep = { name: 'start' }, children }
         setHistory(previous => (previous.length > 1 ? previous.slice(0, -1) : previous))
     }
 
-    // Android's back gesture walks the steps back as the sheet's own back button does, rather than leave the app.
-    useSystemBack(history.length > 1, back)
-
     const step = history[history.length - 1]
-    return <SignInFlowContext.Provider value={{ country, setCountry, phone, setPhone, email, setEmail, step, direction, goTo, back, thinking, setThinking }}>{children}</SignInFlowContext.Provider>
+    return <SignInFlowContext.Provider value={{ country, setCountry, phone, setPhone, email, setEmail, step, direction, goTo, back, canGoBack: history.length > 1, thinking, setThinking }}>{children}</SignInFlowContext.Provider>
 }
 
 export function useSignInFlow(): SignInFlow {

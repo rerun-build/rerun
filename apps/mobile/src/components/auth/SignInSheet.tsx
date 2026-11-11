@@ -14,6 +14,7 @@ import { StartStep, type StartLayout } from '@/components/auth/steps/StartStep'
 import { FORM_COLUMN_MAX_WIDTH } from '@/components/layout/split'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { GlassButton } from '@/components/ui/GlassButton'
+import { useFocusedSystemBack } from '@/lib/focused-system-back'
 import * as Haptics from '@/lib/haptics'
 import { EASE_OUT, MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
@@ -49,9 +50,12 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const { height: windowHeight } = useWindowDimensions()
-    const { step, direction, back, thinking } = useSignInFlow()
+    const { step, direction, back, canGoBack, thinking } = useSignInFlow()
     const keyboard = useAnimatedKeyboard()
     const t = useTranslations('mobileAuth')
+    // Android's back gesture walks the steps back as the sheet's own back button does, rather than leave
+    // the app; the country sheet pushed over this screen takes the gesture back while it is open.
+    useFocusedSystemBack(canGoBack, back)
 
     const paddingTop = FOREMAN_SIZE / 2 + spacing.lg
     const paddingBottom = insets.bottom + spacing.lg
