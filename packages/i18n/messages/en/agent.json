@@ -378,13 +378,17 @@
             "paidData": {
                 "label": "Leads, SEO & social data",
                 "blurb": "Paid from your Rerun credits",
-                "help": "Lets the coworker find prospects, their work emails and phone numbers and company data, check search volumes, keyword ideas and backlinks, read Google results and local businesses, and read public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, without an Apollo, Semrush or scraping subscription. Each call is paid from your Rerun credits, spent by the coworker when a task needs it."
+                "help": "Lets the coworker find prospects, their work emails and phone numbers and company data, check search volumes, keyword ideas and backlinks, read Google results and local businesses, and read public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, without an Apollo, Semrush or scraping subscription. Each call is paid from your Rerun credits, and the coworker asks you to approve an estimated cost first."
             },
             "requestSecret": {
                 "label": "Ask for a credential",
                 "blurb": "Pause for a key, entered securely",
                 "help": "Lets the coworker pause and ask you for an API key or token in a masked form. The value is stored as a coworker variable and never enters the conversation."
             }
+        },
+        "paidDataAlwaysAllow": {
+            "label": "Spend without asking",
+            "description": "Skip the cost approval, so scheduled runs and delegated tasks can use paid data while you are away."
         }
     },
     "agentPanelTriggers": {

@@ -31,4 +31,7 @@ export type RunContext = {
     partialResults?: PartialResult[]
     skillProposals?: SkillProposalNotice[]
     screenshots?: ScreenshotStore
+    // The user's turn goes to the database without holding the run up: a tool that reads the
+    // session history back waits on it first.
+    userTurnStored?: Promise<unknown>
 }

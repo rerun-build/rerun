@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { findUnknownPendingCall, hitlVersionOf, withHitlVersion } from '@rerun/contracts'
-import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeTakeoverResult } from './chat-hitl'
+import { findPendingAlert, findPendingHitl, HITL_CANCELLED, hitlInputIsUsable, hitlKindOf, parseHitlReply, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, pendingSpend, pendingTakeover, serializeAnswers, serializeApprovalDecisions, serializeMcpSignInResult, serializeSecretResult, serializeServiceSetupResult, serializeSpendDecision, serializeTakeoverResult } from './chat-hitl'
 import { parseAttachments } from './chat/attachments-marker'
 
 describe('pendingQuestions', () => {
@@ -424,8 +424,31 @@ describe('request_mcp_sign_in', () => {
 })
 
 describe('request_spend', () => {
-    it('is no longer a card: an old call in a transcript renders as a plain step', () => {
-        expect(hitlKindOf('mcp__rerun__request_spend')).toBeNull()
+    it('is a spend card, usable once it names what it is for', () => {
+        expect(hitlKindOf('mcp__rerun__request_spend')).toBe('spend')
+        expect(hitlInputIsUsable('spend', { purpose: 'Find 40 emails', calls: [] })).toBe(true)
+        expect(hitlInputIsUsable('spend', {})).toBe(false)
+    })
+
+    it('reads the purpose, and what an earlier spend got on a top-up', () => {
+        expect(pendingSpend({ purpose: 'Find the last 9 emails', soFar: '31 of 40 found so far' })).toEqual({ purpose: 'Find the last 9 emails', soFar: '31 of 40 found so far' })
+        expect(pendingSpend({ purpose: 'Find 40 emails', soFar: ' ' })).toEqual({ purpose: 'Find 40 emails' })
+    })
+
+    it('reads back each answer of the spend card', () => {
+        const purpose = 'Find 40 emails\nin Bordeaux'
+        expect(parseHitlReply(serializeSpendDecision({ purpose, decision: 'approved' }))).toEqual({ kind: 'spend', purpose: 'Find 40 emails in Bordeaux', decision: 'approved' })
+        expect(parseHitlReply(serializeSpendDecision({ purpose, decision: 'approved', always: true }))).toEqual({ kind: 'spend', purpose: 'Find 40 emails in Bordeaux', decision: 'approved', always: true })
+        expect(parseHitlReply(serializeSpendDecision({ purpose, decision: 'declined', always: true }))).toEqual({ kind: 'spend', purpose: 'Find 40 emails in Bordeaux', decision: 'declined' })
+    })
+
+    it('tells the coworker not to work around a declined spend', () => {
+        expect(serializeSpendDecision({ purpose: 'Find 40 emails', decision: 'declined' })).toBe('Spend decision: **DECLINED** — Find 40 emails\n\nDo not call any paid data tool for this. Go on with the free tools if they can do part of it, or ask me what to change.')
+    })
+
+    it('still reads a decline written when the card asked why, the reason left out', () => {
+        const withReason = 'Spend decision: **DECLINED** — Find 40 emails\nReason: Only 20,\nthe others are in the CRM\n\nDo not call any paid data tool for this plan. If my reason asks for a different plan, call request_spend again with it; otherwise go on with the free tools if they can do part of it, or ask me what to change.'
+        expect(parseHitlReply(withReason)).toEqual({ kind: 'spend', purpose: 'Find 40 emails', decision: 'declined' })
     })
 })
 

@@ -22,7 +22,8 @@
         "mcp": "Anmeldung nötig",
         "service": "{count, plural, =0 {App zu verbinden} one {App zu verbinden} other {# Apps zu verbinden}}",
         "takeover": "Du bist am Bildschirm dran",
-        "jumpTo": "{label}, hingehen"
+        "jumpTo": "{label}, hingehen",
+        "spend": "Ausgabe freizugeben"
     },
     "alert": {
         "label": "Benachrichtigung",
@@ -117,6 +118,18 @@
         "storedOnBox": "Auf der Box gespeichert. Der Coworker sieht nur die Namen.",
         "mcpServer": "MCP-Server",
         "handedBackOn": "Du hast den Browser auf {url} zurückgegeben",
-        "handedBack": "Du hast den Browser zurückgegeben"
+        "handedBack": "Du hast den Browser zurückgegeben",
+        "spend": "Kostenpflichtige Daten",
+        "approvedOnce": "Einmal freigegeben",
+        "alwaysAllowed": "Immer erlaubt"
+    },
+    "spend": {
+        "estimatedTotal": "Geschätzte Summe",
+        "creditsUnit": "{count, plural, one {Credit} other {Credits}}",
+        "creditsShort": "Nur noch {amount} {count, plural, one {Credit} other {Credits}} übrig: füge im Web Credits hinzu oder antworte mit Nicht jetzt.",
+        "alwaysAllow": "Immer erlauben",
+        "approveOnce": "Einmal freigeben",
+        "addCredits": "Credits hinzufügen",
+        "alwaysAllowFailed": "„Ohne Nachfrage ausgeben“ konnte nicht aktiviert werden. Diese Freigabe gilt weiter, bis zu ihrer Schätzung."
     }
 }

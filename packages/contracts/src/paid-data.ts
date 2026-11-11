@@ -812,6 +812,21 @@ const plannedCallsSchema = z.array(z.object({ capability: z.enum(PAID_DATA_CAPAB
 export const paidDataEstimateSchema = z.object({ calls: plannedCallsSchema })
 export type PaidDataEstimateInput = z.infer<typeof paidDataEstimateSchema>
 
+// The tool names the capability as a plain string: the enum of every id would ride along in the
+// tool's schema on each step, and the hub refuses an unknown one when it prices the spend anyway.
+const plannedCallsInputSchema = z.array(z.object({ capability: z.string().min(1).describe('A capability id from paid_data_catalog, e.g. people.email.find.'), ...plannedCallShape })).min(1)
+
+export const requestSpendSchema = z.object({
+    purpose: z.string().min(1).describe('What the user gets for the spend, in one short line, e.g. "Find the work emails of 40 restaurant owners in Bordeaux".'),
+    calls: plannedCallsInputSchema.describe('Every paid_data call the task needs, by capability, with how many times you will make it.'),
+    soFar: z.string().min(1).optional().describe('Only when asking again after an approval ran out: what the previous spend already got, in one short line, e.g. "31 of 40 found so far".'),
+})
+export type RequestSpendInput = z.infer<typeof requestSpendSchema>
+
+// The "Always allow" of a spend card, written on the coworker from the app.
+export const paidDataAlwaysAllowSchema = z.object({ alwaysAllow: z.boolean() })
+export type PaidDataAlwaysAllowInput = z.infer<typeof paidDataAlwaysAllowSchema>
+
 // `units` is what the user is billed for: calls, or rows for a search that returns several.
 export type PaidDataEstimateLine = { capability: PaidDataCapability; count: number; units: number; micros: number }
 
@@ -819,6 +834,10 @@ export type PaidDataEstimate = {
     totalMicros: number
     lines: PaidDataEstimateLine[]
 }
+
+// What a workspace is expected to pay for a batch of paid data calls, as the hub priced it when the
+// coworker asked, next to the credit the workspace had left then.
+export type SpendQuote = PaidDataEstimate & { creditLeftMicros: number }
 
 // What Treg is expected to charge us, before the hub's price multiplier. A rough figure on purpose:
 // a routed call costs whatever the provider that served it bills, so this only gives an order of
@@ -833,6 +852,22 @@ export function estimatePaidDataProviderCost(input: PaidDataEstimateInput, multi
 }
 
 const isCount = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0
+
+// A quote line stored before the catalog named capabilities carries the tool instead.
+function readQuoteLine(line: unknown): PaidDataEstimateLine | null {
+    const raw = line as { capability?: unknown; tool?: unknown; count?: unknown; units?: unknown; micros?: unknown } | null
+    const capability = isPaidDataCapability(raw?.capability) ? raw.capability : legacyPaidDataCapability(String(raw?.tool))
+    if (!capability || !isCount(raw?.units) || !isCount(raw?.micros)) return null
+    return { capability, count: isCount(raw?.count) ? raw.count : raw.units, units: raw.units, micros: raw.micros }
+}
+
+// The quote request_spend returned, read back from its stored tool output.
+export function readSpendQuote(output: unknown): SpendQuote | null {
+    const quote = (unwrapToolOutputEnvelope(output) as { quote?: Partial<SpendQuote> } | null | undefined)?.quote
+    if (!quote || !isCount(quote.totalMicros) || !Array.isArray(quote.lines)) return null
+    const lines = quote.lines.map(readQuoteLine).filter(line => line !== null)
+    return { totalMicros: quote.totalMicros, lines, creditLeftMicros: isCount(quote.creditLeftMicros) ? quote.creditLeftMicros : 0 }
+}
 
 // What one paid data call billed, read back from its tool output.
 export function billedMicrosOf(output: unknown): number {

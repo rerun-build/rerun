@@ -6,7 +6,7 @@ import type { AgentConfig } from '../../agents/types.js'
 import { desktopAvailable } from '../../desktop/session.js'
 import { publicHttpUrl } from '../url.js'
 
-export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover'] as const
+export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend'] as const
 export type HitlToolName = (typeof HITL_TOOL_NAMES)[number]
 export const HITL_TOOL_SET = new Set<string>(HITL_TOOL_NAMES)
 
@@ -68,7 +68,7 @@ export function findPendingHitl(messages: ModelMessage[]): PendingHitl | null {
 // given the next step to fix it, instead of ending the turn on a question nobody was asked.
 type StepLike = { text?: string; toolCalls?: ReadonlyArray<{ toolName: string; toolCallId?: string; invalid?: boolean }>; content?: ReadonlyArray<{ type: string; toolCallId?: string }> }
 
-// A HITL call that threw delivered no card either: the model has to read the error and go on
+// A HITL call that threw (request_spend when the hub cannot price it) delivered no card either: the model has to read the error and go on
 // rather than end its turn on nothing.
 export function lastStepHasHitlCall(steps: ReadonlyArray<StepLike>): boolean {
     const last = steps[steps.length - 1]

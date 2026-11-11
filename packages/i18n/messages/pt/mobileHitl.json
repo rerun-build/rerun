@@ -22,7 +22,8 @@
         "mcp": "Login necessário",
         "service": "{count, plural, =0 {App para conectar} one {App para conectar} other {# apps para conectar}}",
         "takeover": "Sua vez na tela",
-        "jumpTo": "{label}, ir até lá"
+        "jumpTo": "{label}, ir até lá",
+        "spend": "Gasto para aprovar"
     },
     "alert": {
         "label": "Notificação",
@@ -117,6 +118,18 @@
         "storedOnBox": "Salvas na Box. O coworker só vê os nomes.",
         "mcpServer": "Servidor MCP",
         "handedBackOn": "Você devolveu o navegador em {url}",
-        "handedBack": "Você devolveu o navegador"
+        "handedBack": "Você devolveu o navegador",
+        "spend": "Dados pagos",
+        "approvedOnce": "Aprovado desta vez",
+        "alwaysAllowed": "Sempre permitido"
+    },
+    "spend": {
+        "estimatedTotal": "Total estimado",
+        "creditsUnit": "{count, plural, one {crédito} other {créditos}}",
+        "creditsShort": "Só {count, plural, one {resta {amount} crédito} other {restam {amount} créditos}}: adicione créditos na web ou responda agora não.",
+        "alwaysAllow": "Sempre permitir",
+        "approveOnce": "Aprovar desta vez",
+        "addCredits": "Adicionar créditos",
+        "alwaysAllowFailed": "Não foi possível ativar \"Gastar sem perguntar\". Esta aprovação continua valendo, até a estimativa."
     }
 }

@@ -16,7 +16,11 @@ import {
     paidDataGroupIndex,
     paidDataOverview,
     parsePaidDataParams,
+    requestSpendSchema,
     type PaidDataCatalogLookup,
+    type PaidDataEstimate,
+    type RequestSpendInput,
+    type SpendQuote,
 } from '@rerun/contracts'
 import { env } from '../../config/env.js'
 import { deadlineSignal } from '../../lib/abort.js'
@@ -27,19 +31,25 @@ import { hubPriceMultiplier } from '../../paid-data/price.js'
 import { paidCallVerdict } from '../../paid-data/sources.js'
 import { outlineOf, PAID_ANSWERS_DIR, readPaidAnswer, savePaidAnswer, type FullPaidAnswer } from './paid-data-file.js'
 import type { RunContext } from '../../runtime/context.js'
+import { cardCallTiming } from '../../agents/turn-order.js'
+import { hitlAck } from './hitl.js'
+import { checkSpendConsent, recordSpend } from './spend-consent.js'
 import { HOST_FAILURE_THRESHOLD, HostBreaker } from '../host-breaker.js'
 
 // The hub waits up to 90 seconds on Treg, which walks several providers before it gives up.
 const PAID_CALL_TIMEOUT_MS = 100_000
+const ESTIMATE_TIMEOUT_MS = 15_000
+// The 402 body the hub answers while a member keeps the credit paused (`RERUN_CREDIT_PAUSED_ERROR`).
+const CREDIT_PAUSED_ERROR = 'rerun_credit_paused'
 const MAX_RESULT_CHARS = 40_000
 const PAID_DATA_READ_TOOL = 'paid_data_read'
 
 // Both descriptions stay short on purpose: the Claude Code bridge truncates a tool description past
 // 2,048 characters and OpenAI's chat API refuses one past 1,024, so the catalog is read through its
 // own tool rather than listed here.
-const PAID_DATA_DESCRIPTION = `Buy live data on the workspace's Rerun credit. Groups: people (prospects, work emails, phones, enrichment), companies (search, enrich, lookalikes, jobs, news), search (Google organic, Maps, local pack, News, Perplexity), seo (search volumes, keyword ideas, trends, backlinks, authority), linkedin (profiles, company pages, posts, comments, reactions), tiktok (profiles, videos, searches, comments), instagram (profiles, posts, reels, hashtags, comments), x (profiles, posts, searches, replies), youtube (channels, videos, searches, comments), facebook (pages, posts, comments), reddit (subreddit feeds, posts with comments). Pass a capability id and its params. Before the first call of a group in a task, read that group in ${PAID_DATA_CATALOG_TOOL}, free: it lists each capability id, its inputs and what it returns. A call that finds nothing is often billed too: never repeat the same lookup.`
+const PAID_DATA_DESCRIPTION = `Buy live data on the workspace's Rerun credit. Groups: people (prospects, work emails, phones, enrichment), companies (search, enrich, lookalikes, jobs, news), search (Google organic, Maps, local pack, News, Perplexity), seo (search volumes, keyword ideas, trends, backlinks, authority), linkedin (profiles, company pages, posts, comments, reactions), tiktok (profiles, videos, searches, comments), instagram (profiles, posts, reels, hashtags, comments), x (profiles, posts, searches, replies), youtube (channels, videos, searches, comments), facebook (pages, posts, comments), reddit (subreddit feeds, posts with comments). Pass a capability id and its params. Before the first call of a group in a task, read that group in ${PAID_DATA_CATALOG_TOOL}, free: it lists each capability id, its inputs and what it returns. Runs only once the user approved the spend. A call that finds nothing is often billed too: never repeat the same lookup.`
 
-const PAID_DATA_CATALOG_DESCRIPTION = `Read the ${PAID_DATA_TOOL} catalog. Free, nothing is billed. Call it with a group before the first ${PAID_DATA_TOOL} call of that group in a task, to plan the calls: one line per capability with its id, its inputs and what it returns. Call it with a capability id for its full input schema. With neither, it lists every group with its capability ids. Read it as soon as a task involves people, contacts, companies, social or SEO data, to plan the batch before you search the web.`
+const PAID_DATA_CATALOG_DESCRIPTION = `Read the ${PAID_DATA_TOOL} catalog. Free, nothing is billed, no approval needed. Call it with a group before the first ${PAID_DATA_TOOL} call of that group in a task, and before request_spend, to plan the calls: one line per capability with its id, its inputs and what it returns. Call it with a capability id for its full input schema. With neither, it lists every group with its capability ids. Read it as soon as a task involves people, contacts, companies, social or SEO data, to plan the batch before you search the web.`
 
 // The runtime checks stay beside the schema: a call through a CLI bridge can reach here unparsed.
 async function readCatalog({ group, capability }: PaidDataCatalogLookup): Promise<string> {
@@ -61,6 +71,23 @@ async function postHub(agentId: string, path: string, payload: unknown, timeout:
         signal: timeout,
     })
     return { status: res.status, body: (await res.json().catch(() => null)) as Record<string, unknown> | null }
+}
+
+// The card the user decides on is priced by the hub, not by the model: a failed estimate throws, so
+// no card goes out and the model reads why.
+async function requestSpend(ctx: RunContext, input: RequestSpendInput): Promise<ReturnType<typeof hitlAck> & { quote: SpendQuote; priced: string }> {
+    const unknown = input.calls.map(call => call.capability).find(capability => !isPaidDataCapability(capability))
+    if (unknown !== undefined) throw new Error(`Unknown capability "${unknown}", nothing was asked: pick ids from ${PAID_DATA_CATALOG_TOOL}.`)
+    const { status, body } = await postHub(ctx.agent.id, '/api/paid-data/estimate', { calls: input.calls }, AbortSignal.timeout(ESTIMATE_TIMEOUT_MS))
+    if (status === 402 && body?.error === CREDIT_PAUSED_ERROR) throw new Error('Could not ask for this spend: the workspace Rerun credit is paused. Tell the user to resume it in Settings before asking again.')
+    if (status !== 200 || !body) throw new Error(`Could not price this spend, nothing was asked: ${String(body?.error ?? `the Rerun hub answered ${status}`)}`)
+    const estimate = body as unknown as PaidDataEstimate & { remainingMicros?: number }
+    const creditLeftMicros = estimate.remainingMicros ?? 0
+    return {
+        ...hitlAck(ctx.turnOrder),
+        quote: { totalMicros: estimate.totalMicros, lines: estimate.lines, creditLeftMicros },
+        priced: `Priced at about ${formatCreditsLabel(estimate.totalMicros)}, ${formatCreditsLabel(creditLeftMicros)} left on the workspace. Quote these figures in credits, never the micros.`,
+    }
 }
 
 type PaidCallStatus = 'found' | 'nothing_found' | 'pending' | 'failed' | 'not_run'
@@ -128,6 +155,9 @@ async function runPaid(ctx: RunContext, breaker: HostBreaker, capability: string
     if (!parsed.ok) return notRun(`Not run, nothing was billed: ${parsed.error}`)
     if (!breaker.check(PAID_DATA_BREAKER_KEY).open) return notRun(SOURCE_CLOSED_MESSAGE)
 
+    const consent = await checkSpendConsent(ctx)
+    if (!consent.granted) return notRun(consent.reason)
+
     let answer: HubAnswer
     try {
         answer = await postHub(ctx.agent.id, '/api/paid-data', { capability, params: parsed.params }, deadlineSignal(PAID_CALL_TIMEOUT_MS, ctx.abortSignal), { [PAID_DATA_FULL_ANSWER_HEADER]: '1' })
@@ -140,6 +170,7 @@ async function runPaid(ctx: RunContext, breaker: HostBreaker, capability: string
     const sourceDown = status === 503
     const consecutiveDown = breaker.record(PAID_DATA_BREAKER_KEY, !sourceDown)
     const billedMicros = Number(body?.costMicros ?? 0) || 0
+    recordSpend(consent.approvalId, billedMicros)
     const cost = billedMicros > 0 ? `Billed ${formatCreditsLabel(billedMicros)}.` : 'Nothing was billed.'
 
     if (status === 402) return { ...notRun(OUT_OF_CREDIT_MESSAGE), reason: PAID_DATA_OUT_OF_CREDIT }
@@ -174,9 +205,19 @@ const paidDataReadSchema = z.object({
 
 const PAID_DATA_READ_DESCRIPTION = `Read back a paid_data answer saved in full, free: nothing is billed. Every paid_data answer is saved whole at its "saved" path (output, and the provider's raw body under raw); one too big for a result only shows its outline. Call it for the rows, a slide, a media URL or a nested field you need from there, before concluding anything is missing. Without a path it outlines the keys; a list reads a page at a time with offset.`
 
+// request_spend only exists where someone can answer it: never once the user allowed paid data
+// without asking, nor where approvals are off (a delegate, whose session nobody reads).
 export function paidDataTools(ctx: RunContext): ToolSet {
     const tools: ToolSet = {}
     const breaker = ctx.hostBreaker ?? new HostBreaker()
+    const config = ctx.agent.config
+    if (config.tools.requestApproval && !config.paidDataAlwaysAllow) {
+        tools.request_spend = tool({
+            description: `Ask the user to approve spending Rerun credit on paid_data, and pause the run until they answer. Call it before the first paid call of a task, with every paid_data call the task needs, by capability: the Rerun hub prices them and the user sees one card with the cost per line and the total. Then end your turn. An approval covers about its estimate. One card per task is the normal way to use paid_data, not a last resort: call it as soon as you know the batch, including to offer the step that completes a result your free tools left partial. ${cardCallTiming(ctx.turnOrder)}`,
+            inputSchema: requestSpendSchema,
+            execute: async input => requestSpend(ctx, input),
+        })
+    }
     tools[PAID_DATA_CATALOG_TOOL] = tool({ description: PAID_DATA_CATALOG_DESCRIPTION, inputSchema: paidDataCatalogLookupSchema, execute: async input => readCatalog(input) })
     tools[PAID_DATA_TOOL] = tool({ description: PAID_DATA_DESCRIPTION, inputSchema: paidDataCallSchema, execute: async ({ capability, params }, { toolCallId }) => runPaid(ctx, breaker, capability, params, toolCallId) })
     tools[PAID_DATA_READ_TOOL] = tool({

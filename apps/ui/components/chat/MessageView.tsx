@@ -106,6 +106,9 @@ export type MessageViewProps = {
     pendingMcpSignIn?: string
     // On a user reply to a setup block: the call it answers, which fills in what the reply leaves out.
     hitlCall?: HitlCallPart
+    // On a spend reply: what the run it started has billed so far, and whether it is still going.
+    spentMicros?: number
+    spendRunning?: boolean
     pendingAlertToolCallId?: string
     activeRunId?: string | null
     onStopTask?: (taskId: string) => void
@@ -156,7 +159,7 @@ export function UnderText({ children }: { children: ReactNode }) {
     return children
 }
 
-function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
+function MessageViewInner({ message, isActive = false, isLastAssistant = false, agentId, pendingHitlToolCallId, pendingMcpSignIn, hitlCall, spentMicros, spendRunning, pendingAlertToolCallId, activeRunId, onStopTask: stopTaskOverride, onSendMessage, onDraftReply, showQuickReplies = false, onRegenerate, onRateMessage, feedbackRating = null, rawUrlFor, readFile, sharedFiles, skillProposals, decidingProposalId, onDecideProposal, pinnedProposalIds, renderToolPart, installing, mentions, assistantLayout, createdAt, paidSources }: MessageViewProps) {
     const t = useTranslations('chat')
     const tTools = useTranslations('tools')
     const toolDisplay = useToolDisplay(agentId)
@@ -375,7 +378,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
     if (triggerPayload) return <WebhookRunBlock agentId={agentId} payload={triggerPayload} />
 
     // A setup block answered: what the user decided, not the reply written for the agent.
-    if (hitlReply) return <HitlReceipt reply={hitlReply} call={hitlCall} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} />
+    if (hitlReply) return <HitlReceipt reply={hitlReply} call={hitlCall} spentMicros={spentMicros} spendRunning={spendRunning} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} />
 
     return (
         <Message from={message.role}>

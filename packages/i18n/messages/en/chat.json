@@ -89,7 +89,18 @@
         "voice.transcript": "Tooltip of a button that shows the text transcribed from a voice message.",
         "webhookRun.label": "Divider in the thread where an incoming webhook started a run.",
         "webhookRun.promptTitle": "{name} is the webhook's slug.",
-        "agentChat.continueWhereLeftOff": "Message sent to the coworker in the user's name when they resume a run that was cut off. The user speaking to the coworker."
+        "agentChat.continueWhereLeftOff": "Message sent to the coworker in the user's name when they resume a run that was cut off. The user speaking to the coworker.",
+        "agentChat.alwaysAllowFailed": "Toast after the user picked \"Always allow\" on a paid data spend card and saving that setting failed. \"Spend without asking\" is the name of the setting in the coworker's Tools tab.",
+        "hitlCue.spend": "Pill at the bottom of the chat when the coworker waits for the user to approve spending credits on paid data further up the thread.",
+        "spend.addCredits": "Button shown instead of the approve buttons when the workspace has not enough credits: opens the purchase of more credits.",
+        "spend.alwaysAllow": "Button: approve this spend and let this coworker spend credits on paid data without asking again.",
+        "spend.approveOnce": "Button: approve this one spend only.",
+        "spend.creditsLeft": "Under the spend card when the workspace lacks credits: what it has left. {amount} is an already formatted number.",
+        "spend.creditsMissing": "Under the spend card when the workspace lacks credits: how many credits it lacks for this spend. {amount} is an already formatted number.",
+        "spend.creditsUnit": "The unit after a credit amount, e.g. \"~141 credits\". Credits are the Rerun credit the workspace pays with.",
+        "spend.estimatedTotal": "On a card where the coworker asks to spend Rerun credits on paid data (leads, emails, SEO data): label next to the estimated total cost.",
+        "spend.notNow": "Button: decline this spend, without giving a reason.",
+        "spend.receipt.ofTotal": "After a live counter of credits spent so far, e.g. \"37 / 141 credits\". {amount} is the approved estimate, already formatted."
     },
     "actions": {
         "copy": "Copy",
@@ -226,7 +237,8 @@
         "mcpNamed": "Sign in to {name}",
         "mcp": "Sign-in needed",
         "service": "{count, plural, =0 {App to connect} one {App to connect} other {# apps to connect}}",
-        "takeover": "Your turn on the screen"
+        "takeover": "Your turn on the screen",
+        "spend": "Spend to approve"
     },
     "pendingHitl": {
         "goTo": "{label}, go to it"
@@ -573,7 +585,8 @@
         "emptyTitle": "Start a conversation",
         "emptyDescription": "Send a message to this coworker",
         "runStoppedResponding": "The run stopped responding. Stop it to send another message.",
-        "continueWhereLeftOff": "Continue where you left off."
+        "continueWhereLeftOff": "Continue where you left off.",
+        "alwaysAllowFailed": "Could not switch on \"Spend without asking\". This approval still stands, up to its estimate."
     },
     "promptInput": {
         "tooLarge": "{count, plural, one {{names} is too large to attach.} =2 {{names} are too large to attach.} other {{names} and {more} more are too large to attach.}}",
@@ -586,5 +599,21 @@
         "placeholder": "What would you like to know?",
         "stop": "Stop",
         "submit": "Submit"
+    },
+    "spend": {
+        "estimatedTotal": "Estimated total",
+        "creditsUnit": "{count, plural, one {credit} other {credits}}",
+        "creditsLeft": "{amount} {count, plural, one {credit} other {credits}} left",
+        "creditsMissing": "{amount} missing",
+        "notNow": "Not now",
+        "alwaysAllow": "Always allow",
+        "approveOnce": "Approve once",
+        "addCredits": "Add credits",
+        "receipt": {
+            "approvedOnce": "Approved once",
+            "alwaysAllowed": "Always allowed",
+            "notNow": "Not now",
+            "ofTotal": "/ {amount} {count, plural, one {credit} other {credits}}"
+        }
     }
 }

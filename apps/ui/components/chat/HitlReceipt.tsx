@@ -1,5 +1,6 @@
 'use client'
 
+import { readSpendQuote } from '@rerun/contracts'
 import { Badge, PANEL_CARD, type BadgeTone } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState, type ComponentType, type ReactNode } from 'react'
@@ -7,6 +8,7 @@ import { useEffect, useState, type ComponentType, type ReactNode } from 'react'
 import { getServiceAlternativesAction } from '@/app/api/_actions/services.actions'
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
 import { MessageAttachments } from '@/components/chat/MessageAttachments'
+import { SpendReceipt } from '@/components/chat/spend/SpendReceipt'
 import { Icon } from '@/components/ui/icon'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
@@ -25,13 +27,15 @@ type HitlReceiptProps = {
     // The call the reply answers, when the thread still holds it: it adds what the reply text drops
     // (icons, key labels, approval details, the options a question offered).
     call?: HitlCallPart
+    spentMicros?: number
+    spendRunning?: boolean
     agentId?: string
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
 }
 
 // What the user decided in a setup block, drawn in place of the reply written for the agent.
-export function HitlReceipt({ reply, call, agentId, rawUrlFor, readFile }: HitlReceiptProps) {
+export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false, agentId, rawUrlFor, readFile }: HitlReceiptProps) {
     const input = hitlCallInput(call)
     switch (reply.kind) {
         case 'service':
@@ -46,6 +50,8 @@ export function HitlReceipt({ reply, call, agentId, rawUrlFor, readFile }: HitlR
             return <McpSignInReceipt agentId={agentId} name={reply.name} />
         case 'takeover':
             return <TakeoverReceipt url={reply.url} />
+        case 'spend':
+            return <SpendReceipt decision={reply} totalMicros={readSpendQuote(call?.output)?.totalMicros ?? null} progress={{ spentMicros, running: spendRunning }} />
         case 'cancelled':
             return <DismissedLine of={reply.of} />
     }

@@ -12,7 +12,7 @@ export const LOADING_ACTIVITIES = ['thinking', 'processing', 'crafting'] as cons
 
 export type LiveActivityCopy = { t: ActivityCopy; subRuns: SubRunCopy; toolLabel: (toolName: string, input?: unknown) => string }
 
-const HITL_TOOLS = new Set(['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover'])
+const HITL_TOOLS = new Set(['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend'])
 const TERMINAL_TOOL_STATES = new Set(['output-available', 'output-error', 'output-denied'])
 
 type PartLike = { type: string; id?: string; state?: string; toolName?: string; toolCallId?: string; input?: unknown; data?: unknown }

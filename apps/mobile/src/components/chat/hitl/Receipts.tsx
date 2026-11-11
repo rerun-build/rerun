@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, type ApprovalDecision, type QuestionAnswer, type ServiceSetupEntry } from '@rerun/contracts'
+import { HITL_CANCELLED, type ApprovalDecision, type QuestionAnswer, type ServiceSetupEntry, type SpendDecision } from '@rerun/contracts'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
@@ -110,6 +110,17 @@ export function ApprovalReceipt({ decisions }: { decisions: Omit<ApprovalDecisio
             {decisions.map((entry, index) => (
                 <DecidedRow key={index} text={entry.action} approved={entry.decision === 'approved'} label={entry.decision === 'approved' ? t('approved') : t('notNow')} note={entry.note} />
             ))}
+        </ReceiptCard>
+    )
+}
+
+// What the user answered on a spend card. The web adds what the run then billed; the app keeps to the decision.
+export function SpendReceipt({ decision }: { decision: SpendDecision }) {
+    const t = useTranslations('mobileHitl.receipts')
+    const approved = decision.decision === 'approved'
+    return (
+        <ReceiptCard title={t('spend')}>
+            <DecidedRow text={decision.purpose} approved={approved} label={!approved ? t('notNow') : decision.always ? t('alwaysAllowed') : t('approvedOnce')} />
         </ReceiptCard>
     )
 }

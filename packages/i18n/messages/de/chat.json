@@ -134,7 +134,8 @@
         "mcpNamed": "Bei {name} anmelden",
         "mcp": "Anmeldung nötig",
         "service": "{count, plural, =0 {App zu verbinden} one {App zu verbinden} other {# Apps zu verbinden}}",
-        "takeover": "Du bist am Bildschirm dran"
+        "takeover": "Du bist am Bildschirm dran",
+        "spend": "Ausgabe freizugeben"
     },
     "pendingHitl": {
         "goTo": "{label}, dorthin springen"
@@ -481,7 +482,8 @@
         "emptyTitle": "Starte eine Unterhaltung",
         "emptyDescription": "Sende diesem Coworker eine Nachricht",
         "runStoppedResponding": "Die Ausführung reagiert nicht mehr. Stoppe sie, um eine weitere Nachricht zu senden.",
-        "continueWhereLeftOff": "Mach da weiter, wo du aufgehört hast."
+        "continueWhereLeftOff": "Mach da weiter, wo du aufgehört hast.",
+        "alwaysAllowFailed": "„Ohne Nachfrage ausgeben“ konnte nicht aktiviert werden. Diese Freigabe gilt weiter, bis zu ihrer Schätzung."
     },
     "promptInput": {
         "tooLarge": "{count, plural, one {{names} ist zu groß zum Anhängen.} =2 {{names} sind zu groß zum Anhängen.} other {{names} und {more} weitere sind zu groß zum Anhängen.}}",
@@ -494,5 +496,21 @@
         "placeholder": "Was möchtest du wissen?",
         "stop": "Stoppen",
         "submit": "Senden"
+    },
+    "spend": {
+        "estimatedTotal": "Geschätzte Summe",
+        "creditsUnit": "{count, plural, one {Credit} other {Credits}}",
+        "creditsLeft": "{amount} {count, plural, one {Credit} other {Credits}} übrig",
+        "creditsMissing": "{amount} fehlen",
+        "notNow": "Nicht jetzt",
+        "alwaysAllow": "Immer erlauben",
+        "approveOnce": "Einmal freigeben",
+        "addCredits": "Credits hinzufügen",
+        "receipt": {
+            "approvedOnce": "Einmal freigegeben",
+            "alwaysAllowed": "Immer erlaubt",
+            "notNow": "Nicht jetzt",
+            "ofTotal": "/ {amount} {count, plural, one {Credit} other {Credits}}"
+        }
     }
 }

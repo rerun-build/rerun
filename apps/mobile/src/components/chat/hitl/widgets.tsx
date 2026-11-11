@@ -4,6 +4,7 @@ import { QuestionWidget } from './QuestionWidget'
 import type { HitlWidgets } from './registry'
 import { SecretWidget } from './SecretWidget'
 import { ServiceWidget } from './ServiceWidget'
+import { SpendWidget } from './SpendWidget'
 import { TakeoverWidget } from './TakeoverWidget'
 
 // Filled kind by kind. Shipping a widget is a JavaScript change, so an EAS update carries it to the
@@ -15,4 +16,5 @@ export const HITL_WIDGETS: HitlWidgets = {
     service: { maxVersion: 1, render: props => <ServiceWidget {...props} /> },
     takeover: { maxVersion: 1, render: props => <TakeoverWidget {...props} /> },
     mcp: { maxVersion: 1, render: props => <McpWidget {...props} /> },
+    spend: { maxVersion: 1, render: props => <SpendWidget {...props} /> },
 }

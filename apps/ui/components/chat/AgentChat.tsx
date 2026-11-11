@@ -30,9 +30,10 @@ import { AuthoredGroup } from '@/components/chat/AuthoredGroup'
 import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
 import { MessageView } from '@/components/chat/MessageView'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
+import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
 import { SkeletonChat } from '@/components/ui/skeleton'
 
-import { cancelRunAction, getRunAction } from '@/app/api/_actions/agent.actions'
+import { cancelRunAction, getRunAction, updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
 import { acknowledgeSessionAlertAction, cancelSessionRunsAction, fetchSessionActiveRun, fetchSessionMessages, finalizeSessionAction, openSessionAction } from '@/app/api/_actions/session.actions'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
@@ -55,14 +56,14 @@ import { stepGroupShowsActivity } from '@/lib/agent-chat-loader'
 import { buildInstallMessage } from '@/lib/chat/install-marker'
 import { contextStatsOf } from '@/lib/chat/context-stats'
 import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
-import { hitlCallBefore } from '@/lib/chat/hitl-receipts'
+import { hitlCallBefore, hitlCallKind, isLatestUserMessage, spentAfter } from '@/lib/chat/hitl-receipts'
 import { turnRanOutOfPaidCredit } from '@/lib/chat/paid-data-credit'
 import { authorTurnsOf } from '@/lib/chat/message-author'
 import { splitTurnsAtBreaks, timeBreaksOf } from '@/lib/chat/message-times'
 import { threadsByMessage } from '@/lib/chat/thread-rows'
 import { shouldFlush, shouldKeepQueued } from '@/lib/chat/queued-message'
 import { classifyChatError, installInFlightOf, teammateRunOf, unwrapChatError } from '@/lib/chat-error'
-import { findPendingAlert, findPendingHitl, HITL_CANCELLED, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingTakeover, serializeApprovalDecisions } from '@/lib/chat-hitl'
+import { findPendingAlert, findPendingHitl, HITL_CANCELLED, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingTakeover, serializeApprovalDecisions, serializeSpendDecision, type SpendDecision } from '@/lib/chat-hitl'
 import { lastUserText } from '@/lib/chat-payload'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
 import { browserPermission } from '@/lib/notifications/browser'
@@ -611,6 +612,25 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
         void stopRun()
     }, [stopRun])
 
+    // "Always allow" is written before the reply goes out, so the run the reply starts already reads
+    // it. A failed write leaves the approval itself standing, scoped to its estimate, and the reply
+    // drops the flag: the coworker would otherwise read that paid data no longer asks while the
+    // engine still holds it to this estimate.
+    const submitSpend = useCallback(
+        async (decision: SpendDecision) => {
+            let granted = decision
+            if (decision.always && agentId) {
+                const result = await updateAgentConfigAction(agentId, { paidDataAlwaysAllow: true })
+                if (!result.success) {
+                    toast.error(t('alwaysAllowFailed'))
+                    granted = { purpose: decision.purpose, decision: 'approved' }
+                }
+            }
+            sendMessage({ text: serializeSpendDecision(granted) })
+        },
+        [agentId, sendMessage, t]
+    )
+
     const dismissHitl = useCallback(
         (toolCallId: string) => {
             setDismissedHitlCallId(toolCallId)
@@ -966,6 +986,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                                 const isLast = mi === messages.length - 1
                                 const isActive = isLast && (status === 'streaming' || status === 'submitted')
                                 const hitlCall = hitlCallBefore(messages, mi)
+                                const spendReply = hitlCallKind(hitlCall) === 'spend'
                                 const branches = threadBranches(threadRows.after.get(mi))
                                 const view = (
                                     <MessageView
@@ -977,6 +998,8 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                                         pendingHitlToolCallId={pendingHitl?.toolCallId}
                                         pendingMcpSignIn={pendingHitl?.kind === 'mcp' ? pendingMcpSignIn(pendingHitl.input).name : undefined}
                                         hitlCall={hitlCall}
+                                        spentMicros={spendReply ? spentAfter(messages, mi) : undefined}
+                                        spendRunning={spendReply && (status === 'streaming' || status === 'submitted') && isLatestUserMessage(messages, mi)}
                                         pendingAlertToolCallId={pendingAlert?.toolCallId ?? undefined}
                                         activeRunId={activeRunIdRef.current}
                                         onSendMessage={sendMessage}
@@ -1016,6 +1039,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                                 {pendingHitl.kind === 'question' && <QuestionForm inline ref={questionFormRef} agentId={agentId} questions={pendingQuestions(pendingHitl.input)} onSend={text => sendMessage({ text })} onCancel={() => dismissHitl(pendingHitl.toolCallId)} textareaRef={inputRef} textareaProps={mentionTextareaProps} />}
                                 {pendingHitl.kind === 'approval' && <ActionApprovalBlock inline approvals={pendingApprovals(pendingHitl.input)} onSubmit={decisions => sendMessage({ text: serializeApprovalDecisions(decisions) })} />}
                                 {pendingHitl.kind === 'secret' && agentId && <SecretRequestBlock inline agentId={agentId} sessionId={sessionId ?? null} secrets={pendingSecrets(pendingHitl.input)} reason={typeof pendingHitl.input.reason === 'string' ? pendingHitl.input.reason : undefined} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.secret })} onDismiss={() => dismissHitl(pendingHitl.toolCallId)} />}
+                                {pendingHitl.kind === 'spend' && <SpendRequestBlock input={pendingHitl.input} output={pendingHitl.output} onSubmit={decision => void submitSpend(decision)} />}
                                 {pendingHitl.kind === 'mcp' && agentId && <McpSignInBlock inline agentId={agentId} {...pendingMcpSignIn(pendingHitl.input)} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.mcp })} />}
                                 {pendingHitl.kind === 'service' && agentId && <ServiceSuggestionBlock inline agentId={agentId} services={(Array.isArray(pendingHitl.input.services) ? pendingHitl.input.services : []) as { slug: string; reason?: string }[]} onDone={summary => sendMessage({ text: summary })} />}
                             </motion.div>

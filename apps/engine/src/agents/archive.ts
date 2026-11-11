@@ -151,7 +151,9 @@ export function scrubConfig(config: AgentConfig, agentId?: string): { config: Ag
     // A connection id means nothing on the box that receives the copy. `provider` and `model` are
     // left alone because the capture review reads them off the plan, not because the copy runs on
     // them: the import drops all three and starts the copy on the receiving box's default.
-    return { config: { ...config, mcpServers, connectionId: null }, strippedKeys }
+    // Letting a coworker spend credit without asking is a choice its owner made for their own
+    // workspace, never one a copy carries to someone else's.
+    return { config: { ...config, mcpServers, connectionId: null, paidDataAlwaysAllow: false }, strippedKeys }
 }
 
 // The copy holds each connector's shape but neither its secrets nor its tokens, so leaving an

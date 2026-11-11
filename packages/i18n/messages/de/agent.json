@@ -299,13 +299,17 @@
             "paidData": {
                 "label": "Leads-, SEO- & Social-Daten",
                 "blurb": "Bezahlt aus deinem Rerun-Guthaben",
-                "help": "Erlaubt dem Coworker, Interessenten samt geschäftlicher E-Mail-Adressen, Telefonnummern und Firmendaten zu finden, Suchvolumen, Keyword-Ideen und Backlinks zu prüfen, Google-Ergebnisse und lokale Unternehmen zu lesen sowie öffentliche Profile und Beiträge auf LinkedIn, TikTok, Instagram, X, YouTube, Facebook und Reddit zu lesen, ohne Apollo-, Semrush- oder Scraping-Abo. Jeder Aufruf wird aus deinem Rerun-Guthaben bezahlt, das der Coworker ausgibt, wenn eine Aufgabe es erfordert."
+                "help": "Erlaubt dem Coworker, Interessenten samt geschäftlicher E-Mail-Adressen, Telefonnummern und Firmendaten zu finden, Suchvolumen, Keyword-Ideen und Backlinks zu prüfen, Google-Ergebnisse und lokale Unternehmen zu lesen sowie öffentliche Profile und Beiträge auf LinkedIn, TikTok, Instagram, X, YouTube, Facebook und Reddit zu lesen, ohne Apollo-, Semrush- oder Scraping-Abo. Jeder Aufruf wird aus deinem Rerun-Guthaben bezahlt, und der Coworker bittet dich vorher, geschätzte Kosten freizugeben."
             },
             "requestSecret": {
                 "label": "Nach Zugangsdaten fragen",
                 "blurb": "Sicher nach einem Schlüssel fragen",
                 "help": "Erlaubt dem Coworker, anzuhalten und dich in einem maskierten Formular nach einem API-Schlüssel oder Token zu fragen. Der Wert wird als Coworker-Variable gespeichert und gelangt nie in die Unterhaltung."
             }
+        },
+        "paidDataAlwaysAllow": {
+            "label": "Ohne Nachfrage ausgeben",
+            "description": "Überspringt die Kostenfreigabe, damit geplante und delegierte Aufgaben kostenpflichtige Daten nutzen können, während du weg bist."
         }
     },
     "agentPanelTriggers": {
