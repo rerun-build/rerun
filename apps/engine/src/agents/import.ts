@@ -149,7 +149,9 @@ async function readConfig(staging: string, id: string, name: string, displayName
     // ten times what this owner picked, or not be offered here at all. All three fields go, which is
     // what `followBoxDefault` writes when someone asks for the box default by hand, and it leaves a
     // copy exactly where an agent created from scratch starts.
-    return rebindAgentId({ ...parsed, kind: 'user', name, displayName: displayName || parsed.displayName, setup, connectionId: null, provider: null, model: null }, id)
+    // Spending credit without asking is the source owner's choice for their own workspace: the
+    // copy asks its new owner first, whatever an archive made before the scrub says.
+    return rebindAgentId({ ...parsed, kind: 'user', name, displayName: displayName || parsed.displayName, setup, connectionId: null, provider: null, model: null, paidDataAlwaysAllow: false }, id)
 }
 
 async function readManifestMcpAuth(id: string): Promise<AgentArchiveMcpAuth[] | null> {

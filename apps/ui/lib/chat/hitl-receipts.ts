@@ -1,6 +1,6 @@
-import { toolNameOf } from '@rerun/contracts'
+import { billedMicrosOf, isPaidDataTool, toolNameOf } from '@rerun/contracts'
 
-import { hitlKindOf } from '@/lib/chat-hitl'
+import { hitlKindOf, type HitlKind } from '@/lib/chat-hitl'
 
 export type HitlCallPart = { type: string; toolName?: string; input?: unknown; output?: unknown }
 
@@ -21,4 +21,24 @@ export function hitlCallBefore(messages: readonly MessageLike[], index: number):
 
 export function hitlCallInput(call: HitlCallPart | undefined): Record<string, unknown> {
     return (call?.input ?? {}) as Record<string, unknown>
+}
+
+export function hitlCallKind(call: HitlCallPart | undefined): HitlKind | null {
+    return call ? hitlKindOf(toolNameOf(call)) : null
+}
+
+// What the paid data calls billed between a spend reply and the user's next message: the run the
+// approval started, so its receipt fills as the calls land.
+export function spentAfter(messages: readonly MessageLike[], index: number): number {
+    let total = 0
+    for (let i = index + 1; i < messages.length && messages[i].role !== 'user'; i++) {
+        for (const part of messages[i].parts as readonly HitlCallPart[]) {
+            if (isPaidDataTool(toolNameOf(part))) total += billedMicrosOf(part.output)
+        }
+    }
+    return total
+}
+
+export function isLatestUserMessage(messages: readonly MessageLike[], index: number): boolean {
+    return messages[index]?.role === 'user' && messages.slice(index + 1).every(message => message.role !== 'user')
 }

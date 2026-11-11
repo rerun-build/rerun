@@ -1,7 +1,7 @@
 import { pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingServices, type HitlKind } from './chat-hitl.js'
 
 // The `chat.hitlCue` namespace, in the reader's language.
-export type HitlCueCopy = (key: 'question' | 'approval' | 'secret' | 'mcpNamed' | 'mcp' | 'service' | 'takeover', values?: Record<string, string | number>) => string
+export type HitlCueCopy = (key: 'question' | 'approval' | 'secret' | 'mcpNamed' | 'mcp' | 'service' | 'takeover' | 'spend', values?: Record<string, string | number>) => string
 
 // What the scroll cue says is waiting at the end of the thread, once the block is out of sight. Each
 // client draws its own glyph beside it.
@@ -21,6 +21,8 @@ export function pendingHitlLabel(kind: HitlKind, input: Record<string, unknown>,
             return t('service', { count: pendingServices(input).length })
         case 'takeover':
             return t('takeover')
+        case 'spend':
+            return t('spend')
     }
 }
 

@@ -9,6 +9,16 @@ process.env.RERUN_HUB_BASE_URL = 'https://hub.example.test/'
 
 const { afterEach, beforeEach, describe, expect, it, vi } = await import('vitest')
 
+const consent = vi.hoisted(() => ({ value: { granted: true, approvalId: 'approval-1' } as { granted: true; approvalId: string | null } | { granted: false; reason: string }, spent: [] as [string | null, number][], checks: 0 }))
+
+vi.mock('./spend-consent.js', () => ({
+    checkSpendConsent: async () => {
+        consent.checks += 1
+        return consent.value
+    },
+    recordSpend: (id: string | null, micros: number) => consent.spent.push([id, micros]),
+}))
+
 const { paidDataTools } = await import('./paid-data.js')
 const { PAID_DATA_CAPABILITIES } = await import('@rerun/contracts')
 const { workspaceDir } = await import('../../config/paths.js')
@@ -24,7 +34,11 @@ function mockFetch(status: number, body: unknown) {
     return fn
 }
 
-const ctx = { agent: { id: 'prospector', env: {}, config: { tools: { requestApproval: true } } }, sessionId: 's1', logger: { warn: () => {} } } as any
+function makeCtx(config: { requestApproval?: boolean; paidDataAlwaysAllow?: boolean } = {}) {
+    return { agent: { id: 'prospector', env: {}, config: { tools: { requestApproval: config.requestApproval ?? true }, paidDataAlwaysAllow: config.paidDataAlwaysAllow ?? false } }, sessionId: 's1', logger: { warn: () => {} } } as any
+}
+
+const ctx = makeCtx()
 
 async function run(name: string, args: Record<string, unknown>): Promise<any> {
     return await (paidDataTools(ctx)[name] as any).execute(args, { toolCallId: 'call-1', messages: [] })
@@ -34,25 +48,81 @@ async function buy(capability: string, params: Record<string, unknown>, toolCall
     return await (paidDataTools(ctx).paid_data as any).execute({ capability, params }, { toolCallId, messages: [] })
 }
 
+beforeEach(() => {
+    consent.value = { granted: true, approvalId: 'approval-1' }
+    consent.spent = []
+    consent.checks = 0
+})
+
 afterEach(() => {
     globalThis.fetch = originalFetch
 })
 
 describe('paidDataTools', () => {
-    it('offers the catalog and the one paid_data tool, with descriptions short enough for every provider, and no spend to ask for', () => {
+    it('offers the spend request, the catalog and the one paid_data tool, with descriptions short enough for every provider', () => {
         const tools = paidDataTools(ctx)
-        expect(Object.keys(tools).sort()).toEqual(['paid_data', 'paid_data_catalog', 'paid_data_read'])
+        expect(Object.keys(tools).sort()).toEqual(['paid_data', 'paid_data_catalog', 'paid_data_read', 'request_spend'])
         const description = (tools.paid_data as any).description as string
         expect(description.length).toBeLessThan(1000)
         expect(description).toContain('paid_data_catalog')
-        expect(description).not.toContain('approv')
+        expect(description).toContain('once the user approved the spend')
+        expect(((tools.request_spend as any).description as string).length).toBeLessThan(1000)
         expect(description).not.toContain('- tiktok.user.profile')
         expect(((tools.paid_data_catalog as any).description as string).length).toBeLessThan(1000)
         expect(((tools.paid_data_read as any).description as string).length).toBeLessThan(1000)
     })
 
-    it('presents the catalog as the first read of a data task', () => {
-        expect((paidDataTools(ctx).paid_data_catalog as any).description).toContain('before you search the web')
+    it('presents the spend card as the normal path and the catalog as the first read of a data task', () => {
+        const tools = paidDataTools(ctx)
+        expect((tools.request_spend as any).description).toContain('One card per task')
+        expect((tools.paid_data_catalog as any).description).toContain('before you search the web')
+    })
+
+    it('offers no spend request once paid data runs without asking, nor where nobody can answer it', () => {
+        for (const config of [{ paidDataAlwaysAllow: true }, { requestApproval: false }]) {
+            expect(Object.keys(paidDataTools(makeCtx(config))).sort()).toEqual(['paid_data', 'paid_data_catalog', 'paid_data_read'])
+        }
+    })
+
+    it('calls nothing and bills nothing without the user approval', async () => {
+        consent.value = { granted: false, reason: 'Not run: ask first.' }
+        const fetchMock = mockFetch(200, {})
+
+        expect(await buy('people.email.find', { full_name: 'Jane Doe', domain: 'acme.com' })).toEqual({ status: 'not_run', billedMicros: 0, message: 'Not run: ask first.' })
+        expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('prices a spend request on the hub and hands the quote to the card', async () => {
+        const lines = [{ capability: 'people.email.find', count: 30, units: 30, micros: 900_000 }]
+        const fetchMock = mockFetch(200, { totalMicros: 900_000, lines, remainingMicros: 4_200_000 })
+
+        const output = await run('request_spend', { purpose: 'Find 30 emails', calls: [{ capability: 'people.email.find', count: 30 }] })
+
+        const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit]
+        expect(url).toBe('https://hub.example.test/api/paid-data/estimate')
+        expect(JSON.parse(String(init.body))).toEqual({ calls: [{ capability: 'people.email.find', count: 30 }] })
+        expect(output).toMatchObject({ status: 'delivered', quote: { totalMicros: 900_000, lines, creditLeftMicros: 4_200_000 }, priced: 'Priced at about 90 credits, 420 credits left on the workspace. Quote these figures in credits, never the micros.' })
+    })
+
+    it('throws when the hub cannot price the spend, so no card goes out', async () => {
+        mockFetch(500, { error: 'boom' })
+
+        await expect(run('request_spend', { purpose: 'Find 30 emails', calls: [{ capability: 'people.email.find', count: 30 }] })).rejects.toThrow('Could not price this spend')
+    })
+
+    it('says the credit is paused in plain words instead of the hub code, so no card goes out', async () => {
+        mockFetch(402, { error: 'rerun_credit_paused' })
+
+        await expect(run('request_spend', { purpose: 'Find 30 emails', calls: [{ capability: 'people.email.find', count: 30 }] })).rejects.toThrow('the workspace Rerun credit is paused')
+    })
+
+    // The schema takes any string so the catalog does not travel in it on every step: the check
+    // happens here, before the hub is asked.
+    it('refuses an unknown capability in a spend request before pricing it', async () => {
+        const fetchMock = mockFetch(200, {})
+
+        await expect(run('request_spend', { purpose: 'Find followers', calls: [{ capability: 'tiktok.followers', count: 1 }] })).rejects.toThrow('Unknown capability "tiktok.followers"')
+        expect(fetchMock).not.toHaveBeenCalled()
     })
 
     describe('paid_data_catalog', () => {
@@ -142,7 +212,7 @@ describe('paidDataTools', () => {
         expect(fetchMock).not.toHaveBeenCalled()
     })
 
-    it('sends the call to the hub with the engine key and the agent, with nothing to approve first', async () => {
+    it('sends the call to the hub with the engine key and the agent, and counts its cost against the approval', async () => {
         const fetchMock = mockFetch(200, { outcome: 'ok', result: { output: { email: 'jane@acme.com' } }, costMicros: 36_000, servedBy: 'hunter' })
 
         const output = await buy('people.email.find', { full_name: 'Jane Doe', domain: 'acme.com' })
@@ -152,6 +222,7 @@ describe('paidDataTools', () => {
         expect(init.headers).toMatchObject({ Authorization: 'Bearer engine-secret', 'x-rerun-agent': 'prospector', 'x-rerun-paid-data-full': '1' })
         expect(JSON.parse(String(init.body))).toEqual({ capability: 'people.email.find', params: { full_name: 'Jane Doe', domain: 'acme.com' } })
         expect(output).toEqual({ status: 'found', billedMicros: 36_000, message: 'Found. Billed 4 credits.', servedBy: 'hunter', result: { output: { email: 'jane@acme.com' } } })
+        expect(consent.spent).toEqual([['approval-1', 36_000]])
     })
 
     it('says in the message how many rows the provider sent past the limit and which filters it ignored', async () => {

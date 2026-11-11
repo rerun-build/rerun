@@ -134,7 +134,8 @@
         "mcpNamed": "Inicia sesión en {name}",
         "mcp": "Inicio de sesión necesario",
         "service": "{count, plural, =0 {App por conectar} one {App por conectar} other {# apps por conectar}}",
-        "takeover": "Tu turno en la pantalla"
+        "takeover": "Tu turno en la pantalla",
+        "spend": "Gasto por aprobar"
     },
     "pendingHitl": {
         "goTo": "{label}, ir allí"
@@ -481,7 +482,8 @@
         "emptyTitle": "Inicia una conversación",
         "emptyDescription": "Envía un mensaje a este coworker",
         "runStoppedResponding": "La ejecución dejó de responder. Detenla para enviar otro mensaje.",
-        "continueWhereLeftOff": "Sigue donde lo dejaste."
+        "continueWhereLeftOff": "Sigue donde lo dejaste.",
+        "alwaysAllowFailed": "No se pudo activar «Gastar sin preguntar». Esta aprobación sigue vigente, hasta su estimación."
     },
     "promptInput": {
         "tooLarge": "{count, plural, one {{names} es demasiado grande para adjuntarlo.} =2 {{names} son demasiado grandes para adjuntarlos.} other {{names} y {more} más son demasiado grandes para adjuntarlos.}}",
@@ -494,5 +496,21 @@
         "placeholder": "¿Qué te gustaría saber?",
         "stop": "Detener",
         "submit": "Enviar"
+    },
+    "spend": {
+        "estimatedTotal": "Total estimado",
+        "creditsUnit": "{count, plural, one {crédito} other {créditos}}",
+        "creditsLeft": "{amount} {count, plural, one {crédito restante} other {créditos restantes}}",
+        "creditsMissing": "Faltan {amount}",
+        "notNow": "Ahora no",
+        "alwaysAllow": "Permitir siempre",
+        "approveOnce": "Aprobar esta vez",
+        "addCredits": "Añadir créditos",
+        "receipt": {
+            "approvedOnce": "Aprobado esta vez",
+            "alwaysAllowed": "Permitido siempre",
+            "notNow": "Ahora no",
+            "ofTotal": "/ {amount} {count, plural, one {crédito} other {créditos}}"
+        }
     }
 }

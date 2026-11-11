@@ -284,16 +284,15 @@
     },
     "opencode": {
         "goTitle": "Included in OpenCode Go",
-        "goHint": "Paid by your Go plan, within its 5-hour, weekly and monthly limits. The free ones are off until you switch them on.",
+        "goHint": "Paid by your Go plan. The free ones are off until you switch them on.",
         "consoleTitle": "Console, paid with your credits",
-        "consoleHint": "Billed per token from your OpenCode credits. Off until you switch one on.",
+        "consoleHint": "Billed per token, off until you switch one on.",
         "included": "Included",
         "credits": "Credits",
         "free": "Free",
         "new": "New",
         "noVision": "No vision",
         "search": "Search models",
-        "count": "{on} of {total} on",
         "emptySection": "OpenCode lists no model here right now.",
         "noMatch": "No model matches “{query}”."
     },

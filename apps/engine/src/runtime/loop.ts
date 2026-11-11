@@ -122,6 +122,7 @@ function hitlMessage(toolName: string, input: Record<string, unknown> | undefine
     if (toolName === 'request_secret') return secretSummary(input)
     if (toolName === 'request_mcp_sign_in') return `Sign in to ${String(input?.name ?? 'an MCP server')}`
     if (toolName === 'request_takeover') return takeoverSummary(input)
+    if (toolName === 'request_spend') return typeof input?.purpose === 'string' && input.purpose.trim() ? input.purpose : 'Approve a paid data spend'
     return approvalSummary(input)
 }
 
@@ -460,6 +461,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const context = suffix ? [contextTextPart(suffix)] : []
         appendP = appendMessage(agent.id, sessionId, { role: 'user', content: [{ type: 'text', text: userText }, ...context] }, author)
         appendP.catch(err => logger.error({ err: String(err), agent: agent.id }, 'append user message failed'))
+        ctx.userTurnStored = appendP.catch(() => {})
 
         const turnText = shared ? signText(userText, author) : userText
         const turnMessages: ModelMessage[] = [...history, { role: 'user', content: [{ type: 'text', text: turnText }, ...context] }]

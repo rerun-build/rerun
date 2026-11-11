@@ -4,6 +4,7 @@
 import { appendAttachmentsRef, attachmentDisplayName, buildAttachmentsRef, parseAttachments } from './chat-attachments.js'
 import { stripBridgePrefix, toolNameOf } from './chat-tool-name.js'
 import type { TakeoverResult } from './desktop.js'
+import { readSpendQuote } from './paid-data.js'
 
 export type QuestionOption = { label: string; description?: string }
 
@@ -32,7 +33,12 @@ export type TakeoverRequest = { url: string; reason: string }
 
 export type McpSignInRequest = { name: string; reason?: string }
 
-export type HitlKind = 'question' | 'approval' | 'secret' | 'service' | 'mcp' | 'takeover'
+// A spend request is the coworker asking to spend Rerun credit on paid data, priced by the hub.
+export type SpendRequest = { purpose: string; soFar?: string }
+
+export type SpendDecision = { purpose: string; decision: 'approved' | 'declined'; always?: boolean }
+
+export type HitlKind = 'question' | 'approval' | 'secret' | 'service' | 'mcp' | 'takeover' | 'spend'
 
 export const HITL_TOOL_NAMES = {
     ask_user: 'question',
@@ -41,6 +47,7 @@ export const HITL_TOOL_NAMES = {
     suggest_service: 'service',
     request_mcp_sign_in: 'mcp',
     request_takeover: 'takeover',
+    request_spend: 'spend',
 } as const satisfies Record<string, HitlKind>
 
 export function hitlKindOf(toolName: string): HitlKind | null {
@@ -74,6 +81,7 @@ const HITL_INPUT_KEYS: Record<HitlKind, string[]> = {
     service: ['services'],
     mcp: ['name'],
     takeover: ['url'],
+    spend: ['purpose', 'calls'],
 }
 
 // A rejected tool call reaches the UI with its input stripped, and the forms below would then render
@@ -284,6 +292,8 @@ export function findPendingHitl(messages: readonly { role: string; parts: readon
         const input = (part.input ?? part.rawInput ?? {}) as Record<string, unknown>
         if (!hitlInputIsUsable(kind, input)) return null
         if (part.toolCallId === dismissedCallId) return null
+        // A spend the hub could not price never reached the user: the coworker read the error instead.
+        if (kind === 'spend' && !readSpendQuote(part.output)) return null
         return { kind, toolCallId: part.toolCallId, input, output: part.output }
     }
     return null
@@ -418,6 +428,33 @@ export function parseApprovalDecisions(text: string): Omit<ApprovalDecision, 'de
     return (blocks as RegExpExecArray[]).map(([, status, action, note]): Omit<ApprovalDecision, 'detail'> => (note === undefined ? { action, decision: status === 'APPROVED' ? 'approved' : 'declined' } : { action, decision: 'declined', note }))
 }
 
+export function pendingSpend(input: Record<string, unknown>): SpendRequest {
+    const purpose = typeof input.purpose === 'string' && input.purpose.trim() ? input.purpose : 'Use paid data'
+    return typeof input.soFar === 'string' && input.soFar.trim() ? { purpose, soFar: input.soFar } : { purpose }
+}
+
+const SPEND_ALWAYS_LINE = 'Always allowed: paid data tools no longer ask for this coworker.'
+const SPEND_APPROVED_NEXT = 'Go on with the paid calls you planned, and stay close to the estimate.'
+const SPEND_DECLINED_NEXT = 'Do not call any paid data tool for this. Go on with the free tools if they can do part of it, or ask me what to change.'
+
+export function serializeSpendDecision({ purpose, decision, always }: SpendDecision): string {
+    const head = `Spend decision: **${decision === 'approved' ? 'APPROVED' : 'DECLINED'}** — ${purpose.replace(/\s*\n\s*/g, ' ')}`
+    if (decision === 'declined') return `${head}\n\n${SPEND_DECLINED_NEXT}`
+    return `${head}${always ? `\n${SPEND_ALWAYS_LINE}` : ''}\n\n${SPEND_APPROVED_NEXT}`
+}
+
+// A decline written between 14 and 22 October 2026 could carry a reason, up to the blank line before
+// the closing instruction: still read as a decline, the reason left out.
+const SPEND_RESULT = /^Spend decision: \*\*(APPROVED|DECLINED)\*\* — ([^\n]*)(?:\nReason: [\s\S]*?)?(\nAlways allowed: paid data tools no longer ask for this coworker\.)?\n\n(?:Go on with the paid calls|Do not call any paid data tool)/
+
+export function parseSpendDecision(text: string): SpendDecision | null {
+    const match = SPEND_RESULT.exec(text.trim())
+    if (!match) return null
+    const [, status, purpose, always] = match
+    if (status === 'DECLINED') return { purpose, decision: 'declined' }
+    return always ? { purpose, decision: 'approved', always: true } : { purpose, decision: 'approved' }
+}
+
 const ANSWERS_HEADER = 'Here are my answers:\n\n'
 const QUESTION_LINE = /^\*\*(.+)\*\*$/
 const ATTACHED_LINE = /^Attached: (.+)$/
@@ -459,6 +496,7 @@ export type HitlReply =
     | { kind: 'mcp'; name: string }
     | { kind: 'approval'; decisions: Omit<ApprovalDecision, 'detail'>[] }
     | { kind: 'takeover'; url: string | null }
+    | ({ kind: 'spend' } & SpendDecision)
     | { kind: 'cancelled'; of: keyof typeof HITL_CANCELLED }
 
 export function parseHitlReply(text: string): HitlReply | null {
@@ -477,5 +515,7 @@ export function parseHitlReply(text: string): HitlReply | null {
     if (decisions) return { kind: 'approval', decisions }
     const takeover = parseTakeoverResult(trimmed)
     if (takeover) return { kind: 'takeover', url: takeover.url }
+    const spend = parseSpendDecision(trimmed)
+    if (spend) return { kind: 'spend', ...spend }
     return null
 }

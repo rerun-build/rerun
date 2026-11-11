@@ -22,7 +22,8 @@
         "mcp": "Sign-in needed",
         "service": "{count, plural, =0 {App to connect} one {App to connect} other {# apps to connect}}",
         "takeover": "Your turn on the screen",
-        "jumpTo": "{label}, go to it"
+        "jumpTo": "{label}, go to it",
+        "spend": "Spend to approve"
     },
     "alert": {
         "label": "Notification",
@@ -117,13 +118,34 @@
         "storedOnBox": "Stored on the Box. The coworker only sees the names.",
         "mcpServer": "MCP server",
         "handedBackOn": "You handed the browser back on {url}",
-        "handedBack": "You handed the browser back"
+        "handedBack": "You handed the browser back",
+        "spend": "Paid data",
+        "approvedOnce": "Approved once",
+        "alwaysAllowed": "Always allowed"
     },
     "_context": {
         "actions.notNow": "Declines an ask of a coworker for now (an approval, a sign-in, an app to connect).",
         "steps.position": "Which step of a multi-step card is shown, e.g. 3 / 8.",
         "receipts.approvalCount": "Summary of approval decisions: how many were approved and how many were declined ('not now').",
         "receipts.cancelled.takeover": "The person gave the remote browser back to the coworker without doing anything.",
-        "fallback.replyBelow": "Followed by a button 'Open on the web': reply in the composer below, or open the conversation on the web."
+        "fallback.replyBelow": "Followed by a button 'Open on the web': reply in the composer below, or open the conversation on the web.",
+        "pending.spend": "Pill at the bottom of the chat: the coworker waits for the user to approve spending Rerun credits on paid data (leads, emails, SEO data).",
+        "receipts.spend": "Title of the receipt of a spend card: what the user decided about buying paid data.",
+        "spend.addCredits": "Button: opens the website to buy more credits.",
+        "spend.alwaysAllow": "Button: approve this spend and let this coworker spend credits on paid data without asking again.",
+        "spend.alwaysAllowFailed": "\"Spend without asking\" is the name of the setting in the coworker's Tools tab.",
+        "spend.approveOnce": "Button: approve this one spend only.",
+        "spend.creditsShort": "The workspace lacks credits for this spend. {amount} is what it has left, already formatted. Adding credits happens on the website.",
+        "spend.creditsUnit": "The unit after a credit amount, e.g. \"~141 credits\". Credits are the Rerun credit the workspace pays with.",
+        "spend.estimatedTotal": "On the card where the coworker asks to spend Rerun credits on paid data: label next to the estimated total cost."
+    },
+    "spend": {
+        "estimatedTotal": "Estimated total",
+        "creditsUnit": "{count, plural, one {credit} other {credits}}",
+        "creditsShort": "Only {amount} {count, plural, one {credit} other {credits}} left: add credits on the web, or say not now.",
+        "alwaysAllow": "Always allow",
+        "approveOnce": "Approve once",
+        "addCredits": "Add credits",
+        "alwaysAllowFailed": "Could not switch on \"Spend without asking\". This approval still stands, up to its estimate."
     }
 }

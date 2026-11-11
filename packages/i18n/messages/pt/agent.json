@@ -299,13 +299,17 @@
             "paidData": {
                 "label": "Leads, SEO e dados sociais",
                 "blurb": "Pago com seus créditos Rerun",
-                "help": "Permite que o coworker encontre prospects, seus e-mails corporativos e telefones e dados de empresas, consulte volumes de busca, ideias de palavras-chave e backlinks, leia resultados do Google e negócios locais, e leia perfis e posts públicos no LinkedIn, TikTok, Instagram, X, YouTube, Facebook e Reddit, sem assinatura de Apollo, Semrush ou scraping. Cada chamada é paga com seus créditos Rerun, gastos pelo coworker quando uma tarefa precisa."
+                "help": "Permite que o coworker encontre prospects, seus e-mails corporativos e telefones e dados de empresas, consulte volumes de busca, ideias de palavras-chave e backlinks, leia resultados do Google e negócios locais, e leia perfis e posts públicos no LinkedIn, TikTok, Instagram, X, YouTube, Facebook e Reddit, sem assinatura de Apollo, Semrush ou scraping. Cada chamada é paga com seus créditos Rerun, e o coworker pede antes que você aprove um custo estimado."
             },
             "requestSecret": {
                 "label": "Pedir uma credencial",
                 "blurb": "Pausa por uma chave, digitada com segurança",
                 "help": "Permite que o coworker pause e peça uma chave de API ou token em um formulário mascarado. O valor é guardado como variável do coworker e nunca entra na conversa."
             }
+        },
+        "paidDataAlwaysAllow": {
+            "label": "Gastar sem perguntar",
+            "description": "Pula a aprovação do custo, para que tarefas agendadas e delegadas usem dados pagos enquanto você está fora."
         }
     },
     "agentPanelTriggers": {

@@ -89,7 +89,7 @@ describe('delegate_tasks', () => {
             connectionId: 'conn-1',
             provider: 'openrouter',
             model: 'acme/large',
-            tools: { delegate: false, cards: false, askUser: false, requestApproval: false, suggestService: false, requestSecret: false, hub: false, trigger: false, schedule: false, callAgent: false, notify: false, paidData: true, shell: true, web: true, brain: true },
+            tools: { delegate: false, cards: false, askUser: false, requestApproval: false, suggestService: false, requestSecret: false, hub: false, trigger: false, schedule: false, callAgent: false, notify: false, paidData: false, shell: true, web: true, brain: true },
             selfImprovement: { enabled: false },
         })
         expect(child.soul).toBe('Boss soul')
@@ -98,8 +98,9 @@ describe('delegate_tasks', () => {
         expect(ctx.agent.config.selfImprovement.enabled).toBe(true)
     })
 
-    it('keeps paid data for the child', async () => {
+    it('keeps paid data for the child only where the user waived the asking', async () => {
         const { ctx } = ctxWith()
+        ctx.agent.config.paidDataAlwaysAllow = true
         await delegate(ctx, [{ task: 't' }])
         expect(runs.started[0].child.config.tools.paidData).toBe(true)
     })

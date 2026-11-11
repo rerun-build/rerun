@@ -84,10 +84,11 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <DetailHeader source={connection} credit={credit} onBack={onBack} onRename={readOnlyReason ? undefined : name => void patch({ name })} />
-            <PanelScroller className="space-y-5 p-4">
+            <PanelScroller className="p-4">
+                {/* `display: contents` drops the fieldset's own box, so the spacing has to live on it rather than on the scroller. */}
+                <fieldset disabled={!!readOnlyReason} className="contents space-y-5">
                 {readOnlyReason && <p className="text-xs text-muted-foreground">{t('detail.readOnly', { reason: readOnlyReason })}</p>}
                 {error && <p className="text-[11px] text-destructive">{error}</p>}
-                <fieldset disabled={!!readOnlyReason} className="contents">
                 <SourceAlert connection={connection} credit={credit} reconnectRequested={rejected} onKeys={applyKeys} />
                 {sourceKind(connection.provider) === 'plan' && connection.connected && <PlanLimitsBlock connection={connection} />}
                 {connection.provider === 'opencode' ? (

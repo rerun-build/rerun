@@ -25,12 +25,14 @@ describe('summarizePendingHitl', () => {
         expect(summarizePendingHitl('mcp', {}, t).label).toBe('Sign-in needed')
     })
 
-    it('says what the takeover waits for', () => {
+    it('says what the spend and the takeover wait for', () => {
+        expect(summarizePendingHitl('spend', { purpose: 'Enrich 40 leads' }, t).label).toBe('Spend to approve')
         expect(summarizePendingHitl('takeover', { url: 'https://example.com' }, t).label).toBe('Your turn on the screen')
     })
 
     it('tints a decision apart from a question', () => {
         expect(summarizePendingHitl('approval', { action: 'A' }, t).tone).not.toBe(summarizePendingHitl('question', { question: 'A?' }, t).tone)
+        expect(summarizePendingHitl('approval', { action: 'A' }, t).tone).toBe(summarizePendingHitl('spend', { purpose: 'A' }, t).tone)
     })
 })
 

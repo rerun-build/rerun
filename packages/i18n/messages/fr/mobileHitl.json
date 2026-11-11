@@ -22,7 +22,8 @@
         "mcp": "Connexion requise",
         "service": "{count, plural, =0 {App à connecter} one {App à connecter} other {# apps à connecter}}",
         "takeover": "À vous de prendre l'écran",
-        "jumpTo": "{label}, y aller"
+        "jumpTo": "{label}, y aller",
+        "spend": "Dépense à valider"
     },
     "alert": {
         "label": "Notification",
@@ -117,6 +118,18 @@
         "storedOnBox": "Enregistrées sur la Box. Le coworker ne voit que les noms.",
         "mcpServer": "Serveur MCP",
         "handedBackOn": "Vous avez rendu le navigateur sur {url}",
-        "handedBack": "Vous avez rendu le navigateur"
+        "handedBack": "Vous avez rendu le navigateur",
+        "spend": "Données payantes",
+        "approvedOnce": "Validé cette fois",
+        "alwaysAllowed": "Toujours autorisé"
+    },
+    "spend": {
+        "estimatedTotal": "Total estimé",
+        "creditsUnit": "{count, plural, one {crédit} other {crédits}}",
+        "creditsShort": "Il ne reste que {amount} {count, plural, one {crédit} other {crédits}} : ajoutez des crédits sur le web, ou répondez pas maintenant.",
+        "alwaysAllow": "Toujours autoriser",
+        "approveOnce": "Valider cette fois",
+        "addCredits": "Ajouter des crédits",
+        "alwaysAllowFailed": "Impossible d'activer « Dépenser sans demander ». Cette validation reste valable, dans la limite de son estimation."
     }
 }

@@ -84,6 +84,7 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
     const capabilities = useCapabilityMeta()
     const [families, setFamilies] = useState<EngineToolFamily[]>([])
     const [selfImprovement, setSelfImprovement] = useState<EngineSelfImprovement | null>(null)
+    const [paidDataAlwaysAllow, setPaidDataAlwaysAllow] = useState(false)
     const [loading, setLoading] = useState(true)
     const [pending, setPending] = useState<Set<string>>(new Set())
     const [error, setError] = useState<string | null>(null)
@@ -101,6 +102,7 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                 }
                 setFamilies(tools)
                 setSelfImprovement(detail.config.selfImprovement)
+                setPaidDataAlwaysAllow(detail.config.paidDataAlwaysAllow)
             })
             .catch(() => setError(t('unreachable')))
             .finally(() => setLoading(false))
@@ -160,6 +162,18 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
         [withPending]
     )
 
+    const handlePaidDataAlwaysAllow = useCallback(
+        async (value: boolean) => {
+            await withPending(
+                'paidDataAlwaysAllow',
+                () => setPaidDataAlwaysAllow(value),
+                () => setPaidDataAlwaysAllow(!value),
+                { paidDataAlwaysAllow: value }
+            )
+        },
+        [withPending]
+    )
+
     if (loading) {
         return <SkeletonCardGrid rows={6} className="p-3" />
     }
@@ -181,7 +195,8 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                     const isPending = pending.has(family.family)
                     const meta = metaFor(family, capabilities)
                     const isSelf = family.family === 'self'
-                    const expanded = isSelf && checked
+                    const isPaidData = family.family === 'paidData'
+                    const expanded = (isSelf || isPaidData) && checked
                     return (
                         <div key={family.family} className={cn('flex flex-col gap-2 p-3', PANEL_CARD, PANEL_CARD_INTERACTIVE, expanded && 'col-span-2')}>
                             <div className="flex items-start justify-between gap-2">
@@ -222,6 +237,23 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                                 </div>
                                 <span className="text-xs text-muted-foreground block line-clamp-2">{meta.blurb}</span>
                             </div>
+                            {expanded && isPaidData && (
+                                <div className="mt-1 flex flex-col border-t border-border pt-1">
+                                    <label className="flex items-center gap-2 py-1.5 px-1 rounded-md hover:bg-accent/40 transition-colors cursor-pointer">
+                                        <span className="flex-1 min-w-0">
+                                            <span className="text-sm block truncate">{t('paidDataAlwaysAllow.label')}</span>
+                                            <span className="text-xs text-muted-foreground block">{t('paidDataAlwaysAllow.description')}</span>
+                                        </span>
+                                        {pending.has('paidDataAlwaysAllow') ? (
+                                            <Loader2Icon className="size-3.5 animate-spin text-muted-foreground shrink-0" />
+                                        ) : (
+                                            <TooltipDisabledReason reason={manageReason} className="shrink-0">
+                                                <Switch checked={paidDataAlwaysAllow} disabled={!canManage} onCheckedChange={handlePaidDataAlwaysAllow} className="shrink-0" />
+                                            </TooltipDisabledReason>
+                                        )}
+                                    </label>
+                                </div>
+                            )}
                             {expanded && isSelf && selfImprovement && (
                                 <div className="mt-1 flex flex-col border-t border-border pt-1">
                                     {SELF_IMPROVEMENT_SUBKEYS.map(key => (

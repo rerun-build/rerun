@@ -212,16 +212,15 @@
     },
     "opencode": {
         "goTitle": "In OpenCode Go enthalten",
-        "goHint": "Bezahlt über deinen Go-Tarif, innerhalb seiner 5-Stunden-, Wochen- und Monatslimits. Die kostenlosen sind aus, bis du sie einschaltest.",
+        "goHint": "Bezahlt über deinen Go-Tarif. Die kostenlosen sind aus, bis du sie einschaltest.",
         "consoleTitle": "Console, mit deinem Guthaben bezahlt",
-        "consoleHint": "Pro Token von deinem OpenCode-Guthaben abgerechnet. Aus, bis du eines einschaltest.",
+        "consoleHint": "Pro Token abgerechnet, aus, bis du eines einschaltest.",
         "included": "Inklusive",
         "credits": "Guthaben",
         "free": "Kostenlos",
         "new": "Neu",
         "noVision": "Keine Bilderkennung",
         "search": "Modelle suchen",
-        "count": "{on} von {total} an",
         "emptySection": "OpenCode listet hier gerade kein Modell.",
         "noMatch": "Kein Modell passt zu „{query}“."
     },

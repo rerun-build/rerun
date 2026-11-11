@@ -134,7 +134,8 @@
         "mcpNamed": "Se connecter à {name}",
         "mcp": "Connexion requise",
         "service": "{count, plural, =0 {App à connecter} one {App à connecter} other {# apps à connecter}}",
-        "takeover": "À vous de prendre l'écran"
+        "takeover": "À vous de prendre l'écran",
+        "spend": "Dépense à valider"
     },
     "pendingHitl": {
         "goTo": "{label}, y aller"
@@ -481,7 +482,8 @@
         "emptyTitle": "Démarrer une conversation",
         "emptyDescription": "Envoyez un message à ce coworker",
         "runStoppedResponding": "L'exécution ne répond plus. Arrêtez-la pour envoyer un autre message.",
-        "continueWhereLeftOff": "Reprends là où tu t'es arrêté."
+        "continueWhereLeftOff": "Reprends là où tu t'es arrêté.",
+        "alwaysAllowFailed": "Impossible d'activer « Dépenser sans demander ». Cette validation reste valable, dans la limite de son estimation."
     },
     "promptInput": {
         "tooLarge": "{count, plural, one {{names} est trop volumineux pour être joint.} =2 {{names} sont trop volumineux pour être joints.} other {{names} et {more} autres sont trop volumineux pour être joints.}}",
@@ -494,5 +496,21 @@
         "placeholder": "Que voulez-vous savoir ?",
         "stop": "Arrêter",
         "submit": "Envoyer"
+    },
+    "spend": {
+        "estimatedTotal": "Total estimé",
+        "creditsUnit": "{count, plural, one {crédit} other {crédits}}",
+        "creditsLeft": "{amount} {count, plural, one {crédit restant} other {crédits restants}}",
+        "creditsMissing": "{amount} manquants",
+        "notNow": "Pas maintenant",
+        "alwaysAllow": "Toujours autoriser",
+        "approveOnce": "Valider cette fois",
+        "addCredits": "Ajouter des crédits",
+        "receipt": {
+            "approvedOnce": "Validé cette fois",
+            "alwaysAllowed": "Toujours autorisé",
+            "notNow": "Pas maintenant",
+            "ofTotal": "/ {amount} {count, plural, one {crédit} other {crédits}}"
+        }
     }
 }
