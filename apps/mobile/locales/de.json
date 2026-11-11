@@ -1,5 +1,7 @@
 {
-    "NSPhotoLibraryUsageDescription": "Rerun nutzt deine Fotomediathek, um Fotos an eine Nachricht anzuhängen.",
-    "NSCameraUsageDescription": "Rerun nutzt die Kamera, um ein Foto an eine Nachricht anzuhängen.",
-    "NSMicrophoneUsageDescription": "Rerun nutzt das Mikrofon, um Sprachnachrichten aufzunehmen."
+    "ios": {
+        "NSPhotoLibraryUsageDescription": "Rerun nutzt deine Fotomediathek, um Fotos an eine Nachricht anzuhängen.",
+        "NSCameraUsageDescription": "Rerun nutzt die Kamera, um ein Foto an eine Nachricht anzuhängen.",
+        "NSMicrophoneUsageDescription": "Rerun nutzt das Mikrofon, um Sprachnachrichten aufzunehmen."
+    }
 }
