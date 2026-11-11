@@ -62,6 +62,8 @@ function member(userId: string, workspaceId = WORKSPACE_ID, role: 'admin' | 'mem
 
 const plainMember = (userId: string) => member(userId, WORKSPACE_ID, 'member')
 
+const linkedIdentity = (email: string, emailVerified = true) => ({ provider: 'google', identity_data: { email, email_verified: emailVerified } })
+
 function pendingInvite(overrides: Row = {}): Row {
     return { id: 'invite-1', workspace_id: WORKSPACE_ID, email: 'new@acme.test', token: 'tok', status: 'pending', box_scope: 'all', expires_at: new Date(Date.now() + DAY_MS).toISOString(), ...overrides }
 }
@@ -334,8 +336,8 @@ describe('removeMemberAction', () => {
 })
 
 describe('acceptInvitationAction', () => {
-    function signedInAs(email: string) {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: 1 }, session: { id: ME, email } })
+    function signedInAs(email: string, identities: Row[] = []) {
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: 1 }, session: { id: ME, email, identities } })
     }
 
     it('refuses an invitation meant for another email', async () => {
@@ -353,6 +355,22 @@ describe('acceptInvitationAction', () => {
         database({ workspace_invitations: [pendingInvite()] })
 
         await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: true, workspaceId: WORKSPACE_ID })
+    })
+
+    it('accepts an invitation sent to the verified address of a Google account linked to the one signed in', async () => {
+        signedInAs('primary@acme.test', [linkedIdentity('new@acme.test')])
+        const db = database({ workspace_invitations: [pendingInvite()] })
+
+        await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: true, workspaceId: WORKSPACE_ID })
+        expect(db.writes('workspace_members')[0].payload).toMatchObject({ user_id: ME, workspace_id: WORKSPACE_ID })
+    })
+
+    it('refuses an invitation sent to a linked address nobody verified', async () => {
+        signedInAs('primary@acme.test', [linkedIdentity('new@acme.test', false)])
+        const db = database({ workspace_invitations: [pendingInvite()] })
+
+        await expect(acceptInvitationAction('tok')).resolves.toMatchObject({ ok: false, code: 'invitationForEmail' })
+        expect(db.chains.filter(chain => writeMethodOf(chain))).toHaveLength(0)
     })
 
     it('refuses an expired invitation', async () => {
@@ -469,8 +487,8 @@ describe('acceptInvitationAction', () => {
 })
 
 describe('joinedWorkspaceForInvitationAction', () => {
-    function signedInAs(email: string) {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: WORKSPACE_ID }, session: { id: ME, email } })
+    function signedInAs(email: string, identities: Row[] = []) {
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: WORKSPACE_ID }, session: { id: ME, email, identities } })
     }
 
     const acceptedInvite = (overrides: Row = {}) => pendingInvite({ status: 'accepted', ...overrides })
@@ -481,6 +499,13 @@ describe('joinedWorkspaceForInvitationAction', () => {
 
         await expect(joinedWorkspaceForInvitationAction('tok')).resolves.toBe(WORKSPACE_ID)
         expect(db.chains.filter(chain => writeMethodOf(chain))).toHaveLength(0)
+    })
+
+    it('lets in the member who accepted through a linked Google account', async () => {
+        signedInAs('primary@acme.test', [linkedIdentity('new@acme.test')])
+        database({ workspace_invitations: [acceptedInvite()], workspace_members: [member(ME)] })
+
+        await expect(joinedWorkspaceForInvitationAction('tok')).resolves.toBe(WORKSPACE_ID)
     })
 
     it('keeps a revoked invitation closed', async () => {

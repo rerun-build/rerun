@@ -5,6 +5,7 @@ import { requireAdminContext, requireWorkspaceContext, toBoxScope, type BoxScope
 import type { Database } from '@/app/api/database.types'
 import { demoteKeepingAnAdmin, isLastAdmin, LAST_ADMIN, listMemberProfiles, resolveMemberIdentities, setMemberRole } from '@/app/api/_services/members.service'
 import { BANNER_WARM_BACKGROUND_MS, EMAIL_DELIVERY, emailBoardBanner, sendWorkspaceInviteEmail } from '@rerun/cloud/email'
+import { ownsEmail } from '@/lib/auth/account-emails'
 import { workspaceLocale } from '@/lib/i18n/recipient-locale'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { emailTranslator } from '@rerun/emails/i18n'
@@ -224,7 +225,7 @@ export async function joinedWorkspaceForInvitationAction(token: string): Promise
     const supabase = createServiceRoleClient()
     const { data: invite } = await selectMaybeSingle(supabase, 'workspace_invitations', ['workspace_id', 'email', 'status'] as const, { token })
     if (!invite || invite.status !== 'accepted') return null
-    if (invite.email.toLowerCase() !== session.email.toLowerCase()) return null
+    if (!ownsEmail(session, invite.email)) return null
 
     const { data: membership } = await selectMaybeSingle(supabase, 'workspace_members', ['user_id'] as const, { user_id: user.id, workspace_id: invite.workspace_id })
     return membership ? invite.workspace_id : null
@@ -239,7 +240,7 @@ export async function acceptInvitationAction(token: string): Promise<ActionResul
     if (!invite) return failure('invitationNotFound')
     if (invite.status !== 'pending') return failure('invitationInvalid')
     if (new Date(invite.expires_at).getTime() < Date.now()) return failure('invitationExpired')
-    if (invite.email.toLowerCase() !== session.email.toLowerCase()) {
+    if (!ownsEmail(session, invite.email)) {
         return failure('invitationForEmail', { email: invite.email })
     }
 

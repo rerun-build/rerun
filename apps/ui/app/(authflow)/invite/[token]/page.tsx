@@ -1,3 +1,4 @@
+import { ownsEmail } from '@/lib/auth/account-emails'
 import { accountLabel } from '@/lib/auth/placeholder-email'
 import { acceptInvitationAction, joinedWorkspaceForInvitationAction, loadInvitationAction } from '@/app/api/_actions/members.actions'
 import { Card } from '@/components/ui/card'
@@ -35,7 +36,7 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     const { session } = await getServerSession()
 
     if (!session?.email) return <InviteRedirect token={token} email={invite.email} workspaceName={invite.workspaceName} />
-    if (session.email.toLowerCase() !== invite.email.toLowerCase()) return <InviteMismatch inviteEmail={invite.email} currentEmail={accountLabel(session.email) ?? session.email} workspaceName={invite.workspaceName} />
+    if (!ownsEmail(session, invite.email)) return <InviteMismatch inviteEmail={invite.email} currentEmail={accountLabel(session.email) ?? session.email} workspaceName={invite.workspaceName} />
 
     const result = await acceptInvitationAction(token)
     if (!result.ok) return <Shell title={t('joinFailed')} message={result.code ? tErrors(result.code, result.params as never) : result.error} />
