@@ -138,6 +138,24 @@ of `apps/ui/vitest.config.ts` for the tests. A checkout without `cloud/` builds 
 The repository is public: commit messages, pull request titles and descriptions are written in
 English, whatever the language of the conversation.
 
+## A plan delivered in several pull requests ships as a stack
+
+A plan that needs more than one pull request never opens them side by side on the base branch: they
+form a GitHub stack, so each diff shows one step and the chain stays reviewable and trackable.
+
+- The plan announces the stack before any code is written: one pull request per step, in merge order,
+  each one reviewable on its own.
+- One branch per step, each branched off the previous one. Step 1 targets the base
+  (`gh pr create --base dev`), step N targets the branch of step N-1 (`gh pr create --base <branch N-1>`),
+  so a diff only ever shows its own step.
+- Every description opens with the stack, the current pull request in bold
+  (`1/3 #101 ← 2/3 #102 ← **3/3 #103**`), and every description is updated as soon as one is added.
+- A fix on a lower step lands on that step's branch, then the branches above it are rebased on it and
+  pushed with `--force-with-lease`.
+- Merge from the bottom up. After a squash merge, rebase the next one with
+  `git rebase --onto origin/<base> <old tip of the merged branch> <next branch>`, then retarget it on
+  the base (`gh pr edit --base <base>`).
+
 # Security fixes
 
 Every branch pushed to `origin` is public at once, even without a pull request. A vulnerability fix
