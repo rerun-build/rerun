@@ -175,6 +175,7 @@ import {
     MessageSquareIcon as LucideMessageSquareIcon,
     MessageSquareTextIcon as LucideMessageSquareTextIcon,
     MessagesSquare as LucideMessagesSquare,
+    MicIcon as LucideMicIcon,
     MinusIcon as LucideMinusIcon,
     Monitor as LucideMonitor,
     Moon as LucideMoon,
@@ -455,6 +456,7 @@ export const MessageCircle: LucideIcon = LucideMessageCircle
 export const MessageCircleQuestionIcon: LucideIcon = LucideMessageCircleQuestionIcon
 export const MessageSquareIcon: LucideIcon = LucideMessageSquareIcon
 export const MessagesSquare: LucideIcon = LucideMessagesSquare
+export const MicIcon: LucideIcon = LucideMicIcon
 export const MinusIcon: LucideIcon = LucideMinusIcon
 export const Monitor: LucideIcon = LucideMonitor
 export const Moon: LucideIcon = LucideMoon

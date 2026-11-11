@@ -3,7 +3,7 @@
 import { Button, ScrollFade } from '../primitives'
 import { BorderBeam } from '../BorderBeam'
 import { cn } from '../cn'
-import { ArrowRight, PaperclipIcon, X } from '../icons'
+import { ArrowRight, Check, MicIcon, PaperclipIcon, X } from '../icons'
 import { AnimatePresence, motion } from 'motion/react'
 import { useImperativeHandle, useRef, useState, type ComponentProps, type ReactNode, type Ref, type RefObject } from 'react'
 import { useForm } from 'react-hook-form'
@@ -25,6 +25,21 @@ export type QuestionAttachments = {
     accept?: string
 }
 
+export type QuestionVoiceStatus = 'idle' | 'starting' | 'recording' | 'transcribing'
+
+// Same split as the attachments: the host owns the microphone and the transcription, the form owns
+// where the button sits and what the transcript does to the answer.
+export type QuestionVoice = {
+    status: QuestionVoiceStatus
+    // The form hands over where the words go. The host writes there when the user validates the
+    // recording, and on its own when the recording hits the length cap the recorder stops at.
+    start: (deliver: (transcript: string) => void) => void
+    finish: () => void
+    discard: () => void
+    // Drawn in place of the answer field while recording: the live waveform and its timer.
+    render: () => ReactNode
+}
+
 export type QuestionFormHandle = {
     // Re-reads the answer after the host wrote into the textarea directly (picking a mention does).
     sync: (text: string) => void
@@ -39,6 +54,7 @@ export type QuestionFormProps = {
     disabled?: boolean
     renderText?: (text: string) => ReactNode
     attachments?: QuestionAttachments
+    voice?: QuestionVoice
     // Rendered in the conversation's own scroll rather than pinned above the composer: no dock
     // margin, and no autofocus, which would yank the thread down to the block.
     inline?: boolean
@@ -51,7 +67,7 @@ type QuestionAnswer = { selected: string[]; custom: string }
 
 const EMPTY_ANSWER: QuestionAnswer = { selected: [], custom: '' }
 
-export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, renderText = text => text, attachments, inline, className, textareaRef, textareaProps }: QuestionFormProps) {
+export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, renderText = text => text, attachments, voice, inline, className, textareaRef, textareaProps }: QuestionFormProps) {
     const t = useKitTranslations()
     const form = useForm<Record<string, QuestionAnswer>>({ defaultValues: {} })
     const answers = form.watch()
@@ -123,6 +139,18 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
         setAnswer(i, { ...answerAt(i), custom })
     }
 
+    const recording = voice !== undefined && voice.status !== 'idle'
+
+    const startVoice = (i: number) => {
+        if (locked || !voice || recording) return
+        if (questions[i].options.length > 0) openCustom(i)
+        voice.start(transcript => {
+            // Read back at delivery time: the answer can have been typed into while the microphone was on.
+            const typed = answerAt(i, form.getValues()).custom.trim()
+            setCustom(i, typed ? `${typed} ${transcript}` : transcript)
+        })
+    }
+
     useImperativeHandle(ref, () => ({ sync: text => setCustom(current, text) }))
 
     const submit = async () => {
@@ -161,7 +189,58 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
     const freeText = q.options.length === 0
     const multi = isMultiple(current)
 
-    const answerInput = (
+    // Both buttons live in the footer rather than in the answer field: on a question with options the
+    // field only exists once "Something else" is open, which is exactly when a coworker asking for a
+    // file would have left the answer no way to carry one.
+    const attachButton = attachments && (
+        <Button
+            size="icon-sm"
+            variant="ghost"
+            disabled={locked || recording}
+            onClick={e => {
+                e.stopPropagation()
+                fileInputRef.current?.click()
+            }}
+            aria-label={t('chat.question.attachFiles')}
+            data-hitl="attach"
+            className="shrink-0 text-muted-foreground"
+        >
+            <PaperclipIcon className="size-4" />
+        </Button>
+    )
+
+    const recordButton = voice && (
+        <Button
+            size="icon-sm"
+            variant="ghost"
+            disabled={locked || recording}
+            onClick={e => {
+                e.stopPropagation()
+                startVoice(current)
+            }}
+            aria-label={t('chat.question.record')}
+            data-hitl="record"
+            className="shrink-0 text-muted-foreground"
+        >
+            <MicIcon className="size-4" />
+        </Button>
+    )
+
+    const recordingBar = voice && (
+        <div className="flex min-w-0 flex-1 items-center gap-2" onClick={e => e.stopPropagation()}>
+            {voice.render()}
+            <Button size="icon-sm" variant="ghost" disabled={voice.status === 'transcribing'} onClick={voice.discard} aria-label={t('chat.question.discardRecording')} data-hitl="record-discard" className="shrink-0 text-muted-foreground">
+                <X className="size-4" />
+            </Button>
+            <Button size="icon-sm" disabled={voice.status !== 'recording'} onClick={voice.finish} aria-label={t('chat.question.useRecording')} data-hitl="record-stop" className="shrink-0">
+                <Check className="size-4" />
+            </Button>
+        </div>
+    )
+
+    const answerInput = recording ? (
+        recordingBar
+    ) : (
         <>
             <textarea
                 ref={textareaRef}
@@ -194,22 +273,6 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
                 className="field-sizing-content max-h-40 min-h-7 flex-1 resize-none bg-transparent py-1 text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
             {attachments?.render(current)}
-            {attachments && (
-                <Button
-                    size="icon-sm"
-                    variant="ghost"
-                    disabled={locked}
-                    onClick={e => {
-                        e.stopPropagation()
-                        fileInputRef.current?.click()
-                    }}
-                    aria-label={t('chat.question.attachFiles')}
-                    data-hitl="attach"
-                    className="shrink-0 text-muted-foreground"
-                >
-                    <PaperclipIcon className="size-4" />
-                </Button>
-            )}
         </>
     )
 
@@ -315,10 +378,16 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
                     <div />
                 )}
                 <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" disabled={locked} onClick={skip} data-hitl="skip">
+                    {(attachments || voice) && (
+                        <div className="flex items-center">
+                            {attachButton}
+                            {recordButton}
+                        </div>
+                    )}
+                    <Button size="sm" variant="outline" disabled={locked || recording} onClick={skip} data-hitl="skip">
                         {t('chat.question.skip')}
                     </Button>
-                    <Button size="icon-sm" disabled={locked} onClick={() => advance()} aria-label={current === last ? t('chat.question.submit') : t('chat.question.next')} data-hitl="next">
+                    <Button size="icon-sm" disabled={locked || recording} onClick={() => advance()} aria-label={current === last ? t('chat.question.submit') : t('chat.question.next')} data-hitl="next">
                         <ArrowRight className="size-4" />
                     </Button>
                 </div>

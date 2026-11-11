@@ -1,5 +1,5 @@
 export { QuestionForm } from './QuestionForm'
-export type { QuestionAttachments, QuestionFormHandle, QuestionFormProps, QuestionItem } from './QuestionForm'
+export type { QuestionAttachments, QuestionFormHandle, QuestionFormProps, QuestionItem, QuestionVoice, QuestionVoiceStatus } from './QuestionForm'
 export { ActionApprovalBlock } from './ActionApprovalBlock'
 export type { ActionApprovalBlockProps, ApprovalDecision, ApprovalItem } from './ActionApprovalBlock'
 export { DeclineReasonForm } from './DeclineReasonForm'
