@@ -31,6 +31,21 @@ jobs:
       # Every mobile test runs as iOS and as Android (jest projects of apps/mobile/jest.config.js).
       - run: pnpm --filter rerun-mobile test
 
+  # No network and no install: the check only reads packages/i18n, so it answers in seconds instead of
+  # waiting behind the typecheck.
+  i18n:
+    # Runs in the open source repository only, not in a private clone of it.
+    if: github.repository == 'rerun-build/rerun'
+    name: Language packs match the English source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm i18n:check
+
   # The Kotlin twins of the app's native modules: their JUnit and Robolectric tests, on a pull request
   # that touches what goes into the Android build, and on every push.
   mobile-native-inputs:
