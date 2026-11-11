@@ -94,6 +94,44 @@ jobs:
       - working-directory: apps/mobile/android
         run: ./gradlew :composer-paste:testDebugUnitTest :background-grace:testDebugUnitTest --console=plain
 
+  # The web app in a real browser, on a fresh local stack: what `pnpm test:e2e` runs on a laptop.
+  e2e:
+    # Runs in the open source repository only, not in a private clone of it.
+    if: github.repository == 'rerun-build/rerun'
+    name: End-to-end tests (apps/ui)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @rerun/contracts build
+      # Mailpit stays: the sign-up specs read the code the stack mails.
+      - run: pnpm exec supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
+      - name: Point the app at the local stack
+        run: |
+          eval "$(pnpm exec supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}"
+            echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}"
+          } > apps/ui/.env.local
+      - run: pnpm --filter rerun build
+      - run: pnpm --filter rerun exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+        env:
+          E2E_BUILT_HUB: '1'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/ui/playwright-report
+          retention-days: 14
+
   migrations:
     # Runs in the open source repository only, not in a private clone of it.
     if: github.repository == 'rerun-build/rerun'
