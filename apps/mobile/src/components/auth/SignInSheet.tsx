@@ -66,7 +66,9 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
         setRestingContent(measured)
     }
 
-    const lift = useAnimatedStyle(() => ({ transform: [{ translateY: -Math.max(0, keyboard.height.get() - insets.bottom) }] }))
+    // A layout prop rather than a transform: iOS keeps the accessibility frames of a transformed view where
+    // they were, so the Back button would be found, by VoiceOver and by UI tests, off the sheet it rides on.
+    const lift = useAnimatedStyle(() => ({ bottom: Math.max(0, keyboard.height.get() - insets.bottom) - SHEET_RUNOFF }))
     const frame = useAnimatedStyle(() => {
         const covered = Math.max(paddingBottom, keyboard.height.get() + spacing.lg)
         return { height: Math.min(contentHeight.get(), windowHeight - topRoom - paddingTop - covered) }
@@ -85,7 +87,6 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
                         position: 'absolute',
                         left: 0,
                         right: 0,
-                        bottom: -SHEET_RUNOFF,
                         paddingTop,
                         paddingBottom: paddingBottom + SHEET_RUNOFF,
                         borderTopLeftRadius: radius.xl,
