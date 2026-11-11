@@ -59,6 +59,18 @@ function dotenvValue(key) {
 const remoteApiUrl = process.env.EXPO_PUBLIC_API_URL || dotenvValue('EXPO_PUBLIC_API_URL')
 const usesLocalApi = !remoteApiUrl
 
+// A hub on the Mac given by URL (say, one already running on the staging database) is the emulator's
+// localhost only through `adb reverse`, like the hub this script starts.
+function macPortOf(url) {
+    try {
+        const { hostname, port, protocol } = new URL(url)
+        if (hostname !== 'localhost' && hostname !== '127.0.0.1') return null
+        return Number(port || (protocol === 'https:' ? 443 : 80))
+    } catch {
+        return null
+    }
+}
+
 function javaHome() {
     if (process.env.JAVA_HOME) return process.env.JAVA_HOME
     const brewJdk = spawnSync('brew', ['--prefix', 'openjdk@17'], { encoding: 'utf8' }).stdout?.trim()
@@ -280,7 +292,8 @@ export async function runAndroid() {
     install(client)
 
     // The emulator's localhost is its own: these make the Mac's Metro and Next answer there.
-    for (const port of [METRO_PORT, ...(usesLocalApi ? [API_PORT] : [])]) adb('reverse', `tcp:${port}`, `tcp:${port}`)
+    const apiPort = usesLocalApi ? API_PORT : macPortOf(remoteApiUrl)
+    for (const port of [METRO_PORT, ...(apiPort ? [apiPort] : [])]) adb('reverse', `tcp:${port}`, `tcp:${port}`)
 
     if (usesLocalApi) {
         log('waiting for the API to answer')
