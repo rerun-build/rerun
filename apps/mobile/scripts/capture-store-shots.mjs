@@ -9,8 +9,10 @@
 //   pnpm dev:mobile --android                         first, so the app runs in this workspace's AVD
 //   node apps/mobile/scripts/capture-store-shots.mjs --android [only-this-capture ...]
 //
-// On Android the status bar goes into demo mode (9:41, full battery and signal, no notification icons)
-// for the run and comes back after.
+// On Android the status bar goes into demo mode (9:41, full battery and wifi, no notification icons)
+// for the run and comes back after. The lab routes only open signed out, and the dev menu's button and
+// onboarding must be off: `adb shell run-as build.rerun.app.dev` and set `showFab` false and
+// `isOnboardingFinished` true in shared_prefs/expo.modules.devmenu.sharedpreferences.xml.
 //
 // The Expo dev menu's floating button and its launch onboarding must be off, or they land in every
 // shot: `xcrun simctl spawn <udid> defaults write build.rerun.app.dev EXDevMenuShowFloatingActionButton
@@ -37,7 +39,7 @@ const SETTLE_MS = 5000
 
 const CAPTURES = [
     { id: 'home', url: 'rerun://lab-foreman?state=conversation' },
-    { id: 'manager', url: 'rerun://lab-foreman?state=conversation&open=1' },
+    { id: 'manager', over: 'rerun://lab-foreman?state=conversation', url: 'rerun://lab-chat?coworker=foreman&tabs=1&state=conversation' },
     { id: 'working', url: 'rerun://lab-chat?tabs=3&active=0&state=running' },
     { id: 'approval', url: 'rerun://lab-chat?tabs=3&active=1&state=approval' },
     // A sheet, opened over the home as in the app rather than over the launch screen.
@@ -95,6 +97,14 @@ async function captureIos(captures) {
 // The emulator of the Mac's single running AVD (dev-mobile-android.mjs).
 const ANDROID_SERIAL = 'emulator-5554'
 const ANDROID_OUT_DIR = join(OUT_DIR, 'android')
+// The dev client reloads its bundle from Metro on every launch, slower on the emulator than on the
+// simulator and slower still on a busy Mac: rather than a fixed wait, the run waits for the app to start.
+const ANDROID_READY_TIMEOUT_MS = 180_000
+// From the JS start to the first screen: a deep link sent sooner is lost.
+const ANDROID_FIRST_SCREEN_MS = 15_000
+// Once the UI is up, the time for a chat to scroll to its end, the composer to take its height and a
+// header to fetch its title.
+const ANDROID_SETTLE_MS = 10_000
 
 function adb(...args) {
     const result = spawnSync('adb', ['-s', ANDROID_SERIAL, ...args], { encoding: args[0] === 'exec-out' ? 'buffer' : 'utf8', maxBuffer: 64 * 1024 * 1024 })
@@ -110,8 +120,20 @@ function enterDemoMode() {
     demo('clock', '-e', 'hhmm', '0941')
     demo('battery', '-e', 'level', '100', '-e', 'plugged', 'false')
     demo('network', '-e', 'wifi', 'show', '-e', 'level', '4')
-    demo('network', '-e', 'mobile', 'show', '-e', 'datatype', 'none', '-e', 'level', '4')
+    demo('network', '-e', 'mobile', 'hide')
     demo('notifications', '-e', 'visible', 'false')
+}
+
+// React Native logs this line once the app's JS runs, after the dev client has loaded its bundle.
+const appStarted = () => adb('logcat', '-d', '-s', 'ReactNativeJS:I').includes('Running "main"')
+
+async function waitForAppStart() {
+    const deadline = Date.now() + ANDROID_READY_TIMEOUT_MS
+    while (Date.now() < deadline) {
+        if (appStarted()) return
+        await wait(2000)
+    }
+    throw new Error(`the app did not start within ${ANDROID_READY_TIMEOUT_MS / 1000} s`)
 }
 
 // Opens a URL in the app; the dev client takes its bundle from Metro through the same intent. adb hands
@@ -129,14 +151,16 @@ async function captureAndroid(captures) {
             mkdirSync(join(ANDROID_OUT_DIR, appearance), { recursive: true })
             for (const capture of captures) {
                 adb('shell', 'am', 'force-stop', DEV_BUNDLE_ID)
+                adb('logcat', '-c')
                 openAndroidUrl(devClientUrl)
-                await wait(LAUNCH_MS)
+                await waitForAppStart()
+                await wait(ANDROID_FIRST_SCREEN_MS)
                 if (capture.over) {
                     openAndroidUrl(capture.over)
                     await wait(SETTLE_MS)
                 }
                 openAndroidUrl(capture.url)
-                await wait(SETTLE_MS)
+                await wait(ANDROID_SETTLE_MS)
                 const file = join(ANDROID_OUT_DIR, appearance, `${capture.id}.png`)
                 writeFileSync(file, adb('exec-out', 'screencap', '-p'))
                 console.log(`android/${appearance}/${capture.id}.png`)
