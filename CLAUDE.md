@@ -43,6 +43,44 @@ Every design and every UI implementation is responsive from the first version, n
 
 When a design is proposed (mockup, preview, screenshot), it shows the small-screen version too.
 
+# Test the change you are building, inside out
+
+The feature or the bug fix being built is tested inside out before it is called done, without being
+asked. Take the time and the tokens it needs: the goal is the best product, and a change that only
+works on the happy path is not finished.
+
+1. **List what to try** before trying it, in `.context/test-plan.md`: every way in (button, link,
+   keyboard, URL, mobile), every state (empty, one, many, loading, long text, French), every person
+   (owner, member, visitor, someone from another workspace), both editions (Rerun Cloud and
+   self-hosted), every failure (refusal, server error, double click, reload or back in the middle,
+   expired session), and the neighbours that share its code.
+2. **Try every line** in the running app (`verify-in-app`) and in tests, and try to break it on purpose.
+3. **A bug fix** starts by seeing the bug (in the app, or a test that fails), then sees it gone, then
+   looks for the same mistake in the sibling files and walks the paths around it.
+4. What the change broke is fixed and tried again. The final message gives the list: what passed, what
+   failed and was fixed, what could not be tried and why.
+
+## What stays: unit and end-to-end tests
+
+What was tried stays as tests in the same pull request, so it holds on every pull request after it:
+unit tests for the logic, and an end-to-end spec that walks it in a real browser.
+
+- **Unit**: next to the code (`*.test.ts`): Vitest in `apps/ui` and `apps/engine`, Jest in `apps/mobile`.
+  Cover the edge cases, the refusals and the failures, not only the path that works.
+- **End-to-end**: a spec in `apps/ui/e2e/` (Playwright, `pnpm test:e2e`) that does what a person
+  would: selectors by role and visible text, then a check of what the change left behind (the screen
+  after a reload, the row in the database through the typed helpers). The fixtures of
+  `apps/ui/e2e/fixtures.ts` give each test a throwaway account, signed in and deleted after, and fail
+  it on any uncaught exception in the page. Run it at 375px and 1440px (the two projects of the config).
+  CI runs the self-hosted edition and a checkout with `cloud/` runs Rerun Cloud's: a behaviour that
+  differs between them (guest mode, onboarding, invitations, waitlist) is pinned with `RERUN_CLOUD`
+  and `test.skip`, so the spec passes on both.
+- **Mobile**: the Jest tests, and a Maestro flow next to the others in Rerun Cloud's checkout.
+- **A bug fix** comes with the test that fails without it.
+- Run `pnpm test:e2e` on the local stack before the pull request; CI runs it on every pull request.
+- Only a change nobody can see or call (docs, CI, a refactor with no change of behaviour) has no
+  end-to-end spec, and its pull request says so.
+
 # Verify in the app before calling it done
 
 Rerun has paying customers: a change that shows anywhere (a screen, a dialog, a button, a flow, an
@@ -51,7 +89,8 @@ app. Tests and the typecheck are not enough. Follow the `verify-in-app` skill wi
 
 - run it on the local stack only (`pnpm db:start`, `pnpm cloud env:local`), never on production
 - `pnpm verify:ui` signs in, captures every width in both themes and reports console errors,
-  failed requests and load timings; a scenario in `.context/verify/` clicks the path that changed
+  failed requests and load timings; a scenario in `.context/verify/` clicks the path that changed,
+  and that walk is then written as a spec in `apps/ui/e2e/` so it runs on every pull request
 - look at every capture, fix what the change broke, run it again
 - the final message shows the captures, what was clicked, the errors found, and says plainly what
   could not be tested
