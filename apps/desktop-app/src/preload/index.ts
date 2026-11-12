@@ -66,6 +66,9 @@ if (bootstrap?.audience === 'app') {
         locale: {
             set: (locale) => void ipcRenderer.invoke(IPC.localeSet, String(locale)),
         },
+        server: {
+            openPicker: () => void ipcRenderer.invoke(IPC.serverOpenPicker),
+        },
         quickAsk: {
             shortcut: QUICK_ASK_SHORTCUT,
             close: () => void ipcRenderer.invoke(IPC.quickAskClose),

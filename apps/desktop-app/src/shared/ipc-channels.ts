@@ -20,6 +20,7 @@ export const IPC = {
     settingsGet: 'rerun-shell:settings:get',
     settingsSet: 'rerun-shell:settings:set',
     localeSet: 'rerun-shell:locale:set',
+    serverOpenPicker: 'rerun-shell:server:open-picker',
     quickAskClose: 'rerun-shell:quick-ask:close',
     quickAskSent: 'rerun-shell:quick-ask:sent',
     localServerInfo: 'rerun-shell:local:server-info',

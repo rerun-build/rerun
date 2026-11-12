@@ -11,7 +11,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -175,6 +175,10 @@ export type DesktopShellApi = {
     locale: {
         // The language of the app's menus, as the person picked it in Rerun.
         set(locale: string): void
+    }
+    server: {
+        // Opens "Connect to your server", for a person whose Rerun is self-hosted.
+        openPicker(): void
     }
     quickAsk: {
         // The keys of the shortcut, as Electron writes them (`CommandOrControl+Shift+Space`).

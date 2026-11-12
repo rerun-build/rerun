@@ -12,7 +12,8 @@
         "settings.version": "Under the Updates row of the desktop app settings. {version} is like 0.4.0.",
         "openInApp.title": "Toast in the web browser, offering to open the current page in the Rerun desktop app. {app} is the app name.",
         "quickAsk.placeholder": "Placeholder of the small floating window of the desktop app where the person types a question for the Chief of Staff (the workspace assistant).",
-        "settings.quickAskHint": "{shortcut} is the keyboard shortcut, like ⌘⇧Space."
+        "settings.quickAskHint": "{shortcut} is the keyboard shortcut, like ⌘⇧Space.",
+        "server.otherServer": "Discreet link on the sign-in page of the desktop app, for people whose company hosts Rerun itself."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -77,5 +78,8 @@
         "placeholder": "Ask your Chief of Staff…",
         "hint": "Enter to send, Esc to close",
         "send": "Send"
+    },
+    "server": {
+        "otherServer": "Use another Rerun server"
     }
 }

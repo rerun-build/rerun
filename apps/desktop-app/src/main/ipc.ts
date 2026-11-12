@@ -1,6 +1,6 @@
 import { ipcMain, type IpcMainEvent, type IpcMainInvokeEvent, type WebFrameMain } from 'electron'
 import { senderAudience, type SenderAudience } from './ipc-guard'
-import { serverOrigin } from './server'
+import { currentServer } from './main-window'
 import { LOCAL_ORIGIN } from './url-policy'
 
 function frameOf(event: IpcMainEvent | IpcMainInvokeEvent): { url: string; isMainFrame: boolean } | null {
@@ -9,8 +9,10 @@ function frameOf(event: IpcMainEvent | IpcMainInvokeEvent): { url: string; isMai
     return { url: frame.url, isMainFrame: frame === event.sender.mainFrame }
 }
 
+// Checked against the server the window shows now: after "Change Server…" that is the new one, which
+// the configured server (an environment override, the saved setting) may not be yet.
 export function audienceOf(event: IpcMainEvent | IpcMainInvokeEvent): SenderAudience | null {
-    return senderAudience(frameOf(event), serverOrigin(), LOCAL_ORIGIN)
+    return senderAudience(frameOf(event), currentServer(), LOCAL_ORIGIN)
 }
 
 // A handler answers the audiences it names and throws for anyone else, before reading its arguments.

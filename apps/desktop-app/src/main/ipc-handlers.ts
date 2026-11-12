@@ -6,7 +6,7 @@ import { showDownload } from './downloads'
 import { closeFindBar, find, openFindBar } from './find-bar'
 import { bootstrapPayload, shellPlatform } from './identity'
 import { audienceOf, handle } from './ipc'
-import { currentServer, getMainWindow, openExternal, reloadApp, replaceMainWindow, setTitleBarColors, windowState } from './main-window'
+import { currentServer, getMainWindow, openExternal, reloadApp, replaceMainWindow, showServerPicker, setTitleBarColors, windowState } from './main-window'
 import { setShellLocale, shellLocale } from './messages'
 import { changeDesktopSettings, desktopSettings, setBadge, showNotification } from './native'
 import { hideQuickAsk, quickAskSent, resetQuickAsk } from './quick-ask'
@@ -51,6 +51,7 @@ export function registerIpcHandlers(): void {
     handle(IPC.badgeSet, ['app'], (_event, count: number) => setBadge(Number(count)))
     handle(IPC.settingsGet, ['app'], () => desktopSettings())
     handle(IPC.settingsSet, ['app'], (_event, patch: Partial<DesktopSettings>) => changeDesktopSettings({ openAtLogin: patch?.openAtLogin, closeToTray: patch?.closeToTray, quickAsk: patch?.quickAsk }))
+    handle(IPC.serverOpenPicker, ['app'], () => showServerPicker())
     handle(IPC.quickAskClose, ['app'], () => hideQuickAsk())
     handle(IPC.quickAskSent, ['app'], (_event, path: string) => {
         const target = String(path ?? '/')
@@ -72,8 +73,9 @@ export function registerIpcHandlers(): void {
     })
 
     handle(IPC.localServerInfo, ['local'], (): ServerInfo => {
-        const current = serverOrigin()
-        return { current, defaultServer: normalizeServerUrl(__RERUN_DEFAULT_SERVER_URL__ || ''), canCancel: !!current && !!getMainWindow() && currentServer() === current }
+        const shown = currentServer()
+        const current = shown ?? serverOrigin()
+        return { current, defaultServer: normalizeServerUrl(__RERUN_DEFAULT_SERVER_URL__ || ''), canCancel: !!shown && !!getMainWindow() }
     })
     handle(IPC.localServerConnect, ['local'], async (_event, address: string): Promise<ServerConnectResult> => {
         const origin = normalizeServerUrl(String(address ?? ''))

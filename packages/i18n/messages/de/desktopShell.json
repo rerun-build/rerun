@@ -62,5 +62,8 @@
         "placeholder": "Frag deinen Chief of Staff…",
         "hint": "Enter zum Senden, Esc zum Schließen",
         "send": "Senden"
+    },
+    "server": {
+        "otherServer": "Anderen Rerun-Server nutzen"
     }
 }
