@@ -13,6 +13,8 @@ const m = vi.hoisted(() => ({
     syncWorkspaceAppSlots: vi.fn(),
     reportStoreSubscriptionTransition: vi.fn(),
     requestBoxRestore: vi.fn(),
+    fetchGoogleSubscription: vi.fn(),
+    acknowledgeGoogleSubscription: vi.fn(),
 }))
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: m.createServiceRoleClient }))
@@ -22,6 +24,7 @@ vi.mock('@/app/api/_services/workspace-engine.service', () => ({ syncEnginePlan:
 vi.mock('@/lib/apps/slots-sync', () => ({ syncWorkspaceAppSlots: m.syncWorkspaceAppSlots }))
 vi.mock('./billing-analytics.service', () => ({ reportStoreSubscriptionTransition: m.reportStoreSubscriptionTransition }))
 vi.mock('@rerun/cloud/engines', () => ({ requestBoxRestore: m.requestBoxRestore }))
+vi.mock('@/ee/lib/billing/google/client', () => ({ fetchGoogleSubscription: m.fetchGoogleSubscription, acknowledgeGoogleSubscription: m.acknowledgeGoogleSubscription }))
 // Rerun Cloud's answer, so the suite runs the same with and without cloud/.
 vi.mock('@rerun/cloud/billing', () => ({ BILLING_ENABLED: true }))
 // The production verifiers trust Apple's root; these trust the test chain the payloads are signed with.
@@ -35,7 +38,8 @@ vi.mock('@/ee/lib/billing/apple/verify', async importOriginal => {
     }
 })
 
-import { getStoreOffer, handleAppleNotification, recordStorePurchase, sweepStoreSubscriptions } from './store-billing.service'
+import { TEST_GOOGLE_ACCOUNT_TOKEN, TEST_GOOGLE_CONFIG, googlePaidPurchase, googlePurchase } from '@/ee/test/google-payloads'
+import { getStoreOffer, handleAppleNotification, handleGooglePlayNotification, recordStorePurchase, sweepStoreSubscriptions } from './store-billing.service'
 
 const NOW = new Date('2026-11-12T10:00:00.000Z')
 const DAY = 86_400_000
@@ -129,7 +133,7 @@ describe('getStoreOffer', () => {
         expect(await getStoreOffer(ctx(1), 'apple')).toEqual({ available: false, reason: 'not_sold' })
     })
 
-    it('sells nothing through Google Play before it is wired', async () => {
+    it('sells nothing through Google Play while it is not configured', async () => {
         useWorkspaces(workspace(1))
         expect(await getStoreOffer(ctx(1), 'google')).toEqual({ available: false, reason: 'not_sold' })
     })
@@ -349,5 +353,114 @@ describe('sweepStoreSubscriptions', () => {
         useWorkspaces(workspace(1, { billing_provider: 'apple', store_subscription_id: '2000000001', subscription_status: 'past_due', current_period_end: NOW.toISOString() }))
         const fetchApple = vi.fn().mockRejectedValue(new Error('Apple is down'))
         expect(await sweepStoreSubscriptions(NOW, { fetchApple })).toEqual({ considered: 1, applied: 0, unchanged: 0, failed: ['1: Apple is down'] })
+    })
+})
+
+describe('Google Play', () => {
+    const googlePurchaseRequest = (purchaseToken = 'token-1') => ({ store: 'google' as const, purchaseToken, productId: 'rerun.base.monthly' })
+
+    beforeEach(() => {
+        vi.stubEnv('GOOGLE_PLAY_PRODUCT_ID', TEST_GOOGLE_CONFIG.productId)
+        vi.stubEnv('GOOGLE_PLAY_SERVICE_ACCOUNT_JSON', JSON.stringify(TEST_GOOGLE_CONFIG.serviceAccount))
+        m.acknowledgeGoogleSubscription.mockResolvedValue(undefined)
+    })
+
+    it('offers the plan through Google Play once configured', async () => {
+        useWorkspaces(workspace(1))
+        expect(await getStoreOffer(ctx(1), 'google')).toMatchObject({ available: true, provider: 'google', productId: 'rerun.base.monthly', trialEligible: true })
+    })
+
+    it('starts the trial from the purchase token, then acknowledges it', async () => {
+        useWorkspaces(workspace(1, { store_account_token: TEST_GOOGLE_ACCOUNT_TOKEN }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePurchase({}, {}, NOW.getTime()))
+        expect(await recordStorePurchase(ctx(1), googlePurchaseRequest(), NOW)).toEqual({ ok: true, entitled: true, status: 'trialing' })
+        expect(row(1)).toMatchObject({ billing_provider: 'google', store_subscription_id: 'token-1', store_environment: 'production', subscription_status: 'trialing' })
+        expect(m.fetchGoogleSubscription).toHaveBeenCalledWith(expect.objectContaining({ packageName: 'build.rerun.app' }), 'token-1')
+        expect(m.acknowledgeGoogleSubscription).toHaveBeenCalledWith(expect.anything(), 'token-1', 'rerun.base.monthly')
+    })
+
+    it('acknowledges nothing it did not apply', async () => {
+        useWorkspaces(workspace(1, { billing_provider: 'stripe', subscription_status: 'active' }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePurchase({ externalAccountIdentifiers: {} }, {}, NOW.getTime()))
+        expect(await recordStorePurchase(ctx(1), googlePurchaseRequest(), NOW)).toEqual({ ok: false, reason: 'billed_on_web' })
+        expect(m.acknowledgeGoogleSubscription).not.toHaveBeenCalled()
+    })
+
+    it('grants nothing for a payment still pending', async () => {
+        useWorkspaces(workspace(1))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePurchase({ subscriptionState: 'SUBSCRIPTION_STATE_PENDING' }, {}, NOW.getTime()))
+        expect(await recordStorePurchase(ctx(1), googlePurchaseRequest(), NOW)).toEqual({ ok: false, reason: 'pending' })
+        expect(row(1).subscription_status).toBeNull()
+    })
+
+    it('rejects a token Google does not know, and a product it does not sell', async () => {
+        useWorkspaces(workspace(1))
+        m.fetchGoogleSubscription.mockResolvedValue(null)
+        await expect(recordStorePurchase(ctx(1), googlePurchaseRequest(), NOW)).rejects.toThrow(/does not know/)
+        await expect(recordStorePurchase(ctx(1), { ...googlePurchaseRequest(), productId: 'rerun.other' }, NOW)).rejects.toThrow(/unknown product/)
+    })
+
+    it('moves the workspace to the new token of a re-signup (linkedPurchaseToken)', async () => {
+        useWorkspaces(workspace(1, { billing_provider: 'google', store_subscription_id: 'token-0', subscription_status: 'active', current_period_end: NOW.toISOString(), first_paid_at: '2026-10-01T00:00:00.000Z' }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePaidPurchase({ linkedPurchaseToken: 'token-0', externalAccountIdentifiers: {} }, NOW.getTime()))
+        expect(await recordStorePurchase(ctx(1), googlePurchaseRequest('token-1'), NOW)).toMatchObject({ ok: true, status: 'active' })
+        expect(row(1).store_subscription_id).toBe('token-1')
+    })
+
+    it('ignores the expiry of the token a re-signup replaced', async () => {
+        useWorkspaces(workspace(1, { billing_provider: 'google', store_subscription_id: 'token-1', store_account_token: TEST_GOOGLE_ACCOUNT_TOKEN, subscription_status: 'active' }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePaidPurchase({ subscriptionState: 'SUBSCRIPTION_STATE_EXPIRED' }, NOW.getTime() - 40 * DAY))
+        const outcome = await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { packageName: 'build.rerun.app', subscriptionNotification: { notificationType: 13, purchaseToken: 'token-0', subscriptionId: 'rerun.base.monthly' } }, NOW)
+        expect(outcome).toBe('conflict')
+        expect(row(1).subscription_status).toBe('active')
+    })
+
+    it('applies a notification by reading the purchase again, then acknowledges it', async () => {
+        useWorkspaces(workspace(1, { store_account_token: TEST_GOOGLE_ACCOUNT_TOKEN }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePurchase({}, {}, NOW.getTime()))
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { packageName: 'build.rerun.app', subscriptionNotification: { notificationType: 4, purchaseToken: 'token-1', subscriptionId: 'rerun.base.monthly' } }, NOW)).toBe('applied')
+        expect(row(1).subscription_status).toBe('trialing')
+        expect(m.acknowledgeGoogleSubscription).toHaveBeenCalledTimes(1)
+    })
+
+    it('reads a revocation as a refund', async () => {
+        useWorkspaces(workspace(1, { billing_provider: 'google', store_subscription_id: 'token-1', subscription_status: 'active' }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePaidPurchase({ subscriptionState: 'SUBSCRIPTION_STATE_EXPIRED' }, NOW.getTime()))
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { subscriptionNotification: { notificationType: 12, purchaseToken: 'token-1', subscriptionId: 'rerun.base.monthly' } }, NOW)).toBe('applied')
+        expect(row(1).subscription_status).toBe('canceled')
+        expect(m.reportStoreSubscriptionTransition).toHaveBeenCalledWith(expect.objectContaining({ revoked: true }), 1, 'active', false)
+    })
+
+    it('reads a voided subscription purchase as a refund, and leaves a voided one-time product alone', async () => {
+        useWorkspaces(workspace(1, { billing_provider: 'google', store_subscription_id: 'token-1', subscription_status: 'active' }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePaidPurchase({ subscriptionState: 'SUBSCRIPTION_STATE_EXPIRED' }, NOW.getTime()))
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { voidedPurchaseNotification: { purchaseToken: 'token-x', productType: 2 } }, NOW)).toBe('ignored')
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { voidedPurchaseNotification: { purchaseToken: 'token-1', productType: 1 } }, NOW)).toBe('applied')
+        expect(row(1).subscription_status).toBe('canceled')
+    })
+
+    it('answers unknown for a purchase of the other environment, without a write or an acknowledgement', async () => {
+        useWorkspaces(workspace(1))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePurchase({ externalAccountIdentifiers: { obfuscatedExternalAccountId: 'token-of-staging' } }, {}, NOW.getTime()))
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { subscriptionNotification: { notificationType: 4, purchaseToken: 'token-9', subscriptionId: 'rerun.base.monthly' } }, NOW)).toBe('unknown')
+        m.fetchGoogleSubscription.mockResolvedValue(null)
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { subscriptionNotification: { notificationType: 4, purchaseToken: 'gone', subscriptionId: 'rerun.base.monthly' } }, NOW)).toBe('unknown')
+        expect(m.acknowledgeGoogleSubscription).not.toHaveBeenCalled()
+    })
+
+    it('ignores the test notification, another app and another product', async () => {
+        useWorkspaces(workspace(1))
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { testNotification: { version: '1.0' } }, NOW)).toBe('ignored')
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { packageName: 'com.other', subscriptionNotification: { purchaseToken: 't' } }, NOW)).toBe('ignored')
+        expect(await handleGooglePlayNotification(TEST_GOOGLE_CONFIG, { subscriptionNotification: { purchaseToken: 't', subscriptionId: 'rerun.other' } }, NOW)).toBe('ignored')
+        expect(m.fetchGoogleSubscription).not.toHaveBeenCalled()
+    })
+
+    it('reads Google again in the sweep and acknowledges a purchase left pending', async () => {
+        useWorkspaces(workspace(1, { billing_provider: 'google', store_subscription_id: 'token-1', subscription_status: 'trialing', current_period_end: NOW.toISOString() }))
+        m.fetchGoogleSubscription.mockResolvedValue(googlePaidPurchase({ acknowledgementState: 'ACKNOWLEDGEMENT_STATE_PENDING' }, NOW.getTime()))
+        expect(await sweepStoreSubscriptions(NOW)).toEqual({ considered: 1, applied: 1, unchanged: 0, failed: [] })
+        expect(row(1)).toMatchObject({ subscription_status: 'active', first_paid_at: NOW.toISOString() })
+        expect(m.acknowledgeGoogleSubscription).toHaveBeenCalledWith(expect.anything(), 'token-1', 'rerun.base.monthly')
     })
 })

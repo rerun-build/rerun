@@ -62,9 +62,10 @@ export const storePurchaseRequestSchema = z.discriminatedUnion('store', [
 export type StorePurchaseRequest = z.infer<typeof storePurchaseRequestSchema>
 
 // `linked_elsewhere`: the subscription already runs another workspace. `expired`: the store says it is
-// over (a restore of a lapsed subscription). `billed_on_web`, `other_store`, `not_sold`: the same
-// refusals as the offer, met at purchase time.
-export const STORE_PURCHASE_REFUSALS = ['linked_elsewhere', 'expired', 'billed_on_web', 'other_store', 'not_sold'] as const
+// over (a restore of a lapsed subscription). `pending`: the payment has not gone through yet (Google
+// Play's slow payment methods), nothing is granted before it does. `billed_on_web`, `other_store`,
+// `not_sold`: the same refusals as the offer, met at purchase time.
+export const STORE_PURCHASE_REFUSALS = ['linked_elsewhere', 'expired', 'pending', 'billed_on_web', 'other_store', 'not_sold'] as const
 export const storePurchaseRefusalSchema = z.enum(STORE_PURCHASE_REFUSALS)
 export type StorePurchaseRefusal = z.infer<typeof storePurchaseRefusalSchema>
 

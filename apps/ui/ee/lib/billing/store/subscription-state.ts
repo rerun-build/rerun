@@ -16,6 +16,9 @@ export type StoreSubscriptionState = {
     provider: StoreProvider
     // Apple's originalTransactionId, Google's purchase token: the same for every renewal.
     subscriptionId: string
+    // The subscription this one takes over: Google mints a new purchase token for a re-signup
+    // before the old one lapsed and for a plan change, and names the old one here.
+    replacesSubscriptionId?: string | null
     // The uuid the app passed to the purchase, null when the store gave none back.
     accountToken: string | null
     environment: string

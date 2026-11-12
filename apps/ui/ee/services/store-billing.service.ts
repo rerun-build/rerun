@@ -7,6 +7,10 @@ import { reconcileAgentActivation, wakePlanLimitedAgents } from '@/app/api/_serv
 import { syncEnginePlan } from '@/app/api/_services/workspace-engine.service'
 import { appleIapConfig, appleServerApiKey, type AppleIapConfig } from '@/ee/lib/billing/apple/config'
 import { fetchAppleSubscription } from '@/ee/lib/billing/apple/server-api'
+import { acknowledgeGoogleSubscription, fetchGoogleSubscription } from '@/ee/lib/billing/google/client'
+import { googlePlayConfig, type GooglePlayConfig } from '@/ee/lib/billing/google/config'
+import type { DeveloperNotification } from '@/ee/lib/billing/google/push'
+import { GOOGLE_SUBSCRIPTION_REVOKED, googleSubscriptionState, needsAcknowledgement } from '@/ee/lib/billing/google/state'
 import { appleSubscriptionState } from '@/ee/lib/billing/apple/state'
 import { verifyAppleRenewalInfo, verifyAppleTransaction, type AppleEnvironment, type AppleVerifierOptions } from '@/ee/lib/billing/apple/verify'
 import { isMachineEntitled, isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
@@ -50,7 +54,7 @@ export class InvalidStorePurchaseError extends Error {}
 function storeProductId(provider: StoreProvider): string | null {
     if (!BILLING_ENABLED) return null
     if (provider === 'apple') return appleIapConfig()?.productId ?? null
-    return null
+    return googlePlayConfig()?.productId ?? null
 }
 
 async function loadStoreWorkspace(filter: { id: number } | { store_subscription_id: string } | { store_account_token: string }): Promise<StoreWorkspace | null> {
@@ -58,11 +62,15 @@ async function loadStoreWorkspace(filter: { id: number } | { store_subscription_
     return data
 }
 
-// The workspace a subscription belongs to: the one already holding it, else the one whose token the
-// app handed to the purchase.
+// The workspace a subscription belongs to: the one already holding it or the subscription it
+// replaces, else the one whose token the app handed to the purchase.
 async function workspaceOfSubscription(state: StoreSubscriptionState): Promise<StoreWorkspace | null> {
     const holder = await loadStoreWorkspace({ store_subscription_id: state.subscriptionId })
     if (holder) return holder
+    if (state.replacesSubscriptionId) {
+        const previous = await loadStoreWorkspace({ store_subscription_id: state.replacesSubscriptionId })
+        if (previous) return previous
+    }
     if (!state.accountToken) return null
     return loadStoreWorkspace({ store_account_token: state.accountToken.toLowerCase() })
 }
@@ -70,9 +78,10 @@ async function workspaceOfSubscription(state: StoreSubscriptionState): Promise<S
 // Whether this store subscription may bill the workspace, or something else already does: a Stripe
 // plan in force (refuseSecondPlanSubscription's rule, the other way round), the other store, or
 // another subscription of the same store. A workspace whose plan has ended takes any of them.
-function billingConflict(workspace: StoreWorkspace, provider: StoreProvider, subscriptionId: string | null): Extract<StorePurchaseRefusal, 'billed_on_web' | 'other_store'> | null {
+function billingConflict(workspace: StoreWorkspace, provider: StoreProvider, subscription: Pick<StoreSubscriptionState, 'subscriptionId' | 'replacesSubscriptionId'> | null): Extract<StorePurchaseRefusal, 'billed_on_web' | 'other_store'> | null {
     if (!isSubscriptionEntitled(workspace.subscription_status)) return null
-    if (workspace.billing_provider === provider && (!subscriptionId || workspace.store_subscription_id === subscriptionId)) return null
+    const sameSubscription = !subscription || workspace.store_subscription_id === subscription.subscriptionId || (!!subscription.replacesSubscriptionId && workspace.store_subscription_id === subscription.replacesSubscriptionId)
+    if (workspace.billing_provider === provider && sameSubscription) return null
     if (isStoreProvider(workspace.billing_provider)) return 'other_store'
     return 'billed_on_web'
 }
@@ -110,14 +119,31 @@ async function mintAccountToken(workspaceId: number): Promise<string> {
     return data.store_account_token
 }
 
-// Reads a transaction the app sent, verified with its store.
-async function readStorePurchase(request: StorePurchaseRequest, now: Date): Promise<StoreSubscriptionState> {
+// What the app sent, read with its store: the state, null for a purchase whose payment is still
+// pending, and what to do once it is applied (Google wants every purchase acknowledged).
+type StorePurchaseReading = { state: StoreSubscriptionState | null; afterApply: () => Promise<void> }
+
+const NOTHING_AFTER = async () => {}
+
+async function readStorePurchase(request: StorePurchaseRequest, now: Date): Promise<StorePurchaseReading> {
     if (request.store === 'apple') {
         const config = appleIapConfig()
         if (!config) throw new InvalidStorePurchaseError('The App Store is not configured')
-        return readAppleTransaction(config, request.jws, null, now)
+        return { state: await readAppleTransaction(config, request.jws, null, now), afterApply: NOTHING_AFTER }
     }
-    throw new InvalidStorePurchaseError('Google Play is not configured')
+    const config = googlePlayConfig()
+    if (!config) throw new InvalidStorePurchaseError('Google Play is not configured')
+    if (request.productId !== config.productId) throw new InvalidStorePurchaseError(`Google Play purchase for an unknown product: ${request.productId}`)
+    return readGooglePurchase(config, request.purchaseToken, now)
+}
+
+export async function readGooglePurchase(config: GooglePlayConfig, purchaseToken: string, now: Date, options: { revoked?: boolean } = {}): Promise<StorePurchaseReading> {
+    const purchase = await fetchGoogleSubscription(config, purchaseToken)
+    if (!purchase) throw new InvalidStorePurchaseError('Google Play does not know this purchase token')
+    const state = googleSubscriptionState(purchaseToken, purchase, config.productId, now, options)
+    if (state && state.productId !== config.productId) throw new InvalidStorePurchaseError(`Google Play purchase for an unknown product: ${state.productId}`)
+    const afterApply = needsAcknowledgement(purchase) ? () => acknowledgeGoogleSubscription(config, purchaseToken, config.productId) : NOTHING_AFTER
+    return { state, afterApply }
 }
 
 // A signed transaction and, when Apple sent one beside it, the signed renewal info, both verified.
@@ -140,18 +166,22 @@ export async function readAppleTransaction(config: AppleIapConfig, signedTransac
 // same idempotent write when it lands.
 export async function recordStorePurchase(ctx: WorkspaceContext, request: StorePurchaseRequest, now = new Date()): Promise<StorePurchaseResult> {
     if (!storeProductId(request.store)) return { ok: false, reason: 'not_sold' }
-    const state = await readStorePurchase(request, now)
+    const { state, afterApply } = await readStorePurchase(request, now)
+    if (!state) return { ok: false, reason: 'pending' }
 
     const holder = await workspaceOfSubscription(state)
     if (holder && holder.id !== ctx.workspace.id) {
         // Bought from another workspace (its token) or already running it: that workspace gets it.
-        if (!billingConflict(holder, state.provider, state.subscriptionId)) await applyStoreState(holder, state, now)
+        if (!billingConflict(holder, state.provider, state)) {
+            await applyStoreState(holder, state, now)
+            await afterApply()
+        }
         return { ok: false, reason: 'linked_elsewhere' }
     }
 
     const workspace = holder ?? (await loadStoreWorkspace({ id: ctx.workspace.id }))
     if (!workspace) return { ok: false, reason: 'not_sold' }
-    const conflict = billingConflict(workspace, state.provider, state.subscriptionId)
+    const conflict = billingConflict(workspace, state.provider, state)
     if (conflict) return { ok: false, reason: conflict }
     // A lapsed subscription sent by Restore purchases has nothing left to give a workspace that does
     // not hold it yet.
@@ -165,6 +195,7 @@ export async function recordStorePurchase(ctx: WorkspaceContext, request: StoreP
         throw err
     }
     if (!isSubscriptionEntitled(status)) return { ok: false, reason: 'expired' }
+    await afterApply()
     return { ok: true, entitled: true, status: status ?? state.status }
 }
 
@@ -208,7 +239,7 @@ export type StoreApplyOutcome = 'applied' | 'unknown' | 'conflict'
 export async function applyStoreSubscription(state: StoreSubscriptionState, now = new Date()): Promise<StoreApplyOutcome> {
     const workspace = await workspaceOfSubscription(state)
     if (!workspace) return 'unknown'
-    if (billingConflict(workspace, state.provider, state.subscriptionId)) {
+    if (billingConflict(workspace, state.provider, state)) {
         console.warn(`[store billing] ${state.provider} subscription ${state.subscriptionId} ignored on workspace ${workspace.id}, billed by ${workspace.billing_provider}`)
         return 'conflict'
     }
@@ -224,6 +255,32 @@ export async function applyStoreSubscription(state: StoreSubscriptionState, now 
 // An App Store Server Notification V2, already verified. Every type that carries a transaction is the
 // same full-state reading; TEST, a summary of a renewal extension and the consumption requests carry
 // none and only need to be acknowledged.
+// A Google Play real-time developer notification, already authenticated. It only names the purchase:
+// the state is read again from the Play Developer API, then applied and acknowledged. The topic is
+// shared by production and staging, so a token this hub does not hold is answered without a write.
+export async function handleGooglePlayNotification(config: GooglePlayConfig, notification: DeveloperNotification, now = new Date()): Promise<StoreApplyOutcome | 'ignored'> {
+    if (notification.packageName && notification.packageName !== config.packageName) return 'ignored'
+    const subscription = notification.subscriptionNotification
+    const voided = notification.voidedPurchaseNotification
+    // productType 1 is a subscription; a voided one-time product is none of this hub's business.
+    const purchaseToken = subscription?.purchaseToken ?? (voided?.productType === 1 ? voided.purchaseToken : undefined)
+    if (!purchaseToken) return 'ignored'
+    if (subscription?.subscriptionId && subscription.subscriptionId !== config.productId) return 'ignored'
+
+    const revoked = subscription?.notificationType === GOOGLE_SUBSCRIPTION_REVOKED || !!voided
+    let reading: StorePurchaseReading
+    try {
+        reading = await readGooglePurchase(config, purchaseToken, now, { revoked })
+    } catch (err) {
+        if (err instanceof InvalidStorePurchaseError) return 'unknown'
+        throw err
+    }
+    if (!reading.state) return 'ignored'
+    const outcome = await applyStoreSubscription(reading.state, now)
+    if (outcome === 'applied') await reading.afterApply()
+    return outcome
+}
+
 export async function handleAppleNotification(config: AppleIapConfig, notification: ResponseBodyV2DecodedPayload, now = new Date(), options?: AppleVerifierOptions): Promise<StoreApplyOutcome | 'ignored'> {
     const signedTransaction = notification.data?.signedTransactionInfo
     if (!signedTransaction) return 'ignored'
@@ -233,10 +290,10 @@ export async function handleAppleNotification(config: AppleIapConfig, notificati
 
 // --- The hourly sweep: what a missed notification would have said ---
 
-// A notification can be lost (an outage of ours past Apple's retries) or sent to the other hub (a
+// A notification can be lost (an outage of ours past the store's retries) or sent to the other hub (a
 // TestFlight build talks to production while sandbox notifications go to staging). The sweep reads
 // the store again for every store subscription whose period is over or ends within the hour, and
-// for the ones Apple is retrying, and applies what it reads.
+// for the ones being retried, applies what it reads, and acknowledges a Google purchase left pending.
 const SWEEP_HORIZON_MS = 60 * 60_000
 
 export type StoreSweepResult = { considered: number; applied: number; unchanged: number; failed: string[] }
@@ -245,16 +302,19 @@ export type StoreSweepOptions = { workspaceIds?: number[]; dryRun?: boolean; fet
 
 export async function sweepStoreSubscriptions(now = new Date(), { workspaceIds, dryRun = false, fetchApple = fetchAppleSubscription, verifierOptions }: StoreSweepOptions = {}): Promise<StoreSweepResult> {
     const result: StoreSweepResult = { considered: 0, applied: 0, unchanged: 0, failed: [] }
+    if (!BILLING_ENABLED) return result
     const apple = appleIapConfig()
     const appleKey = appleServerApiKey()
-    if (!BILLING_ENABLED || !apple || !appleKey) return result
+    const google = googlePlayConfig()
+    const providers = [...(apple && appleKey ? ['apple'] : []), ...(google ? ['google'] : [])]
+    if (!providers.length) return result
 
     const { data: due } = await selectMany(
         createServiceRoleClient(),
         'workspaces',
-        ['id', 'store_subscription_id', 'store_environment', 'subscription_status'] as const,
+        ['id', 'billing_provider', 'store_subscription_id', 'store_environment', 'subscription_status'] as const,
         {
-            billing_provider: 'apple',
+            billing_provider: providers,
             store_subscription_id: { notNull: true },
             subscription_status: ['trialing', 'active', 'past_due'],
             current_period_end: { lte: new Date(now.getTime() + SWEEP_HORIZON_MS).toISOString() },
@@ -262,21 +322,29 @@ export async function sweepStoreSubscriptions(now = new Date(), { workspaceIds, 
         },
     )
 
+    async function readAppleSubscription(originalTransactionId: string, environment: string | null): Promise<StorePurchaseReading | null> {
+        if (!apple || !appleKey) return null
+        const signed = await fetchApple(apple, appleKey, originalTransactionId, environment ?? 'Production')
+        if (!signed) return null
+        return { state: await readAppleTransaction(apple, signed.signedTransactionInfo, signed.signedRenewalInfo, now, verifierOptions), afterApply: NOTHING_AFTER }
+    }
+
     for (const workspace of due ?? []) {
         result.considered++
         try {
-            const signed = await fetchApple(apple, appleKey, workspace.store_subscription_id!, workspace.store_environment ?? 'Production')
-            if (!signed) {
+            const reading = workspace.billing_provider === 'google' && google ? await readGooglePurchase(google, workspace.store_subscription_id!, now) : await readAppleSubscription(workspace.store_subscription_id!, workspace.store_environment)
+            if (!reading?.state) {
                 result.unchanged++
                 continue
             }
-            const state = await readAppleTransaction(apple, signed.signedTransactionInfo, signed.signedRenewalInfo, now, verifierOptions)
             if (dryRun) {
-                console.info(`[store sweep] workspace ${workspace.id}: ${workspace.subscription_status} -> ${state.status}`)
+                console.info(`[store sweep] workspace ${workspace.id}: ${workspace.subscription_status} -> ${reading.state.status}`)
                 continue
             }
-            if ((await applyStoreSubscription(state, now)) === 'applied') result.applied++
-            else result.unchanged++
+            if ((await applyStoreSubscription(reading.state, now)) === 'applied') {
+                result.applied++
+                await reading.afterApply()
+            } else result.unchanged++
         } catch (err) {
             result.failed.push(`${workspace.id}: ${err instanceof Error ? err.message : String(err)}`)
         }

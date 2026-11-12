@@ -29,6 +29,11 @@ describe('POST /api/v1/billing/store/purchases', () => {
         expect(recordStorePurchase).toHaveBeenCalledWith(context, { store: 'apple', jws: 'a.b.c' })
     })
 
+    it('records a Google Play purchase token with its product', async () => {
+        await POST(request({ store: 'google', purchaseToken: 'token-1', productId: 'rerun.base.monthly' }), segment)
+        expect(recordStorePurchase).toHaveBeenCalledWith(context, { store: 'google', purchaseToken: 'token-1', productId: 'rerun.base.monthly' })
+    })
+
     it('answers a refusal the app explains as a 200 with its reason', async () => {
         recordStorePurchase.mockResolvedValue({ ok: false, reason: 'linked_elsewhere' })
         const res = await POST(request({ store: 'apple', jws: 'a.b.c', restore: true }), segment)
