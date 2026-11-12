@@ -1,0 +1,119 @@
+{
+    "_context": {
+        "menu.app.about": "macOS application menu item. {name} is the app name (Rerun, Rerun Staging).",
+        "menu.app.hide": "macOS application menu item that hides the app. {name} is the app name.",
+        "menu.app.hideOthers": "macOS application menu item that hides every other app.",
+        "menu.app.quit": "Menu item quitting the app. {name} is the app name.",
+        "menu.view.reload": "Menu item reloading the page shown in the window.",
+        "menu.view.actualSize": "Menu item resetting the zoom of the page to 100%.",
+        "menu.help.docs": "Menu item opening the documentation website in the browser.",
+        "offline.title": "Shown in the app window when the Rerun server cannot be reached.",
+        "offline.body": "{host} is the server address, for example app.rerun.build.",
+        "offline.unavailable": "Shown when the server answered with an error (during a deploy, for example).",
+        "unload.message": "Native dialog shown when the person closes or reloads the window while a coworker is working or a file has unsaved edits.",
+        "find.matches": "Find in page bar: position of the highlighted match among all matches.",
+        "server.title": "Page where a person who hosts Rerun themselves enters the address of their server.",
+        "server.notRerun": "The address answered, but it is not a Rerun server.",
+        "server.tooOld": "The server runs a Rerun version too old for this app. {version} is the oldest app version it accepts, or the server's own version.",
+        "server.insecure": "Warning under the address field when the address uses http:// on another machine.",
+        "incompatible.title": "Shown when the desktop app is older than the oldest version the server accepts.",
+        "updates.upToDateDetail": "Native dialog after Check for Updates. {version} is like 0.4.0.",
+        "updates.readyToInstall": "Native dialog title when an update was downloaded. {version} is like 0.4.0."
+    },
+    "menu": {
+        "app": {
+            "about": "About {name}",
+            "hide": "Hide {name}",
+            "hideOthers": "Hide Others",
+            "showAll": "Show All",
+            "quit": "Quit {name}",
+            "checkForUpdates": "Check for Updates…",
+            "changeServer": "Change Server…"
+        },
+        "file": {
+            "title": "File",
+            "closeWindow": "Close Window"
+        },
+        "edit": {
+            "title": "Edit",
+            "undo": "Undo",
+            "redo": "Redo",
+            "cut": "Cut",
+            "copy": "Copy",
+            "paste": "Paste",
+            "pasteAndMatchStyle": "Paste and Match Style",
+            "delete": "Delete",
+            "selectAll": "Select All",
+            "find": "Find…"
+        },
+        "view": {
+            "title": "View",
+            "reload": "Reload",
+            "forceReload": "Force Reload",
+            "toggleDevTools": "Toggle Developer Tools",
+            "actualSize": "Actual Size",
+            "zoomIn": "Zoom In",
+            "zoomOut": "Zoom Out",
+            "toggleFullScreen": "Toggle Full Screen"
+        },
+        "window": {
+            "title": "Window",
+            "minimize": "Minimize",
+            "zoom": "Zoom",
+            "front": "Bring All to Front"
+        },
+        "help": {
+            "title": "Help",
+            "docs": "Documentation"
+        }
+    },
+    "offline": {
+        "title": "Can’t reach Rerun",
+        "body": "Check your connection. The app reconnects to {host} on its own.",
+        "unavailable": "{host} is not answering right now. The app tries again on its own.",
+        "retry": "Try again"
+    },
+    "incompatible": {
+        "title": "Update Rerun to continue",
+        "body": "This version of the app is too old for {host}.",
+        "download": "Download the latest version",
+        "downloading": "Downloading the update… {percent}%",
+        "restart": "Restart to update"
+    },
+    "unload": {
+        "message": "Leave this page?",
+        "detail": "A coworker is still working or a file has unsaved changes.",
+        "leave": "Leave",
+        "stay": "Stay"
+    },
+    "find": {
+        "placeholder": "Find in page",
+        "matches": "{active} of {total}",
+        "noMatches": "No results",
+        "previous": "Previous match",
+        "next": "Next match",
+        "close": "Close"
+    },
+    "server": {
+        "title": "Connect to your server",
+        "description": "Enter the address of the Rerun server you use.",
+        "label": "Server address",
+        "connect": "Connect",
+        "invalid": "Enter an address like rerun.example.com.",
+        "unreachable": "Nothing answered at this address.",
+        "notRerun": "This address is not a Rerun server.",
+        "tooOld": "This server needs version {version} of the app or later.",
+        "insecure": "This address is not encrypted. Use https:// unless the server runs on this computer.",
+        "useRerunCloud": "Use Rerun Cloud",
+        "cancel": "Cancel"
+    },
+    "updates": {
+        "upToDate": "You’re up to date",
+        "upToDateDetail": "Rerun {version} is the latest version.",
+        "failed": "Couldn’t check for updates",
+        "readyToInstall": "Rerun {version} is ready to install",
+        "readyDetail": "The app restarts to finish the update.",
+        "restartNow": "Restart Now",
+        "later": "Later"
+    }
+}

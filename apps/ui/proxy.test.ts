@@ -130,6 +130,11 @@ describe('proxy matcher', () => {
         expect(matches('/api/v1/agents')).toBe(false)
     })
 
+    it('stays off the desktop app configuration, asked before any session exists', () => {
+        expect(matches('/api/desktop/config')).toBe(false)
+        expect(matches('/api/desktop/auth/exchange')).toBe(true)
+    })
+
     it('stays off uploads, the model proxy, captures and static assets', () => {
         expect(matches('/api/files/upload')).toBe(false)
         expect(matches('/api/llm/v1/messages')).toBe(false)

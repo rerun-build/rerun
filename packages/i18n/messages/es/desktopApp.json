@@ -1,0 +1,98 @@
+{
+    "menu": {
+        "app": {
+            "about": "Acerca de {name}",
+            "hide": "Ocultar {name}",
+            "hideOthers": "Ocultar otros",
+            "showAll": "Mostrar todo",
+            "quit": "Salir de {name}",
+            "checkForUpdates": "Buscar actualizaciones…",
+            "changeServer": "Cambiar de servidor…"
+        },
+        "file": {
+            "title": "Archivo",
+            "closeWindow": "Cerrar ventana"
+        },
+        "edit": {
+            "title": "Edición",
+            "undo": "Deshacer",
+            "redo": "Rehacer",
+            "cut": "Cortar",
+            "copy": "Copiar",
+            "paste": "Pegar",
+            "pasteAndMatchStyle": "Pegar con el mismo estilo",
+            "delete": "Eliminar",
+            "selectAll": "Seleccionar todo",
+            "find": "Buscar…"
+        },
+        "view": {
+            "title": "Ver",
+            "reload": "Recargar",
+            "forceReload": "Forzar recarga",
+            "toggleDevTools": "Herramientas de desarrollo",
+            "actualSize": "Tamaño real",
+            "zoomIn": "Acercar",
+            "zoomOut": "Alejar",
+            "toggleFullScreen": "Pantalla completa"
+        },
+        "window": {
+            "title": "Ventana",
+            "minimize": "Minimizar",
+            "zoom": "Zoom",
+            "front": "Traer todo al frente"
+        },
+        "help": {
+            "title": "Ayuda",
+            "docs": "Documentación"
+        }
+    },
+    "offline": {
+        "title": "No se puede conectar con Rerun",
+        "body": "Revisa tu conexión. La app vuelve a conectarse a {host} sola.",
+        "unavailable": "{host} no responde en este momento. La app lo vuelve a intentar sola.",
+        "retry": "Reintentar"
+    },
+    "incompatible": {
+        "title": "Actualiza Rerun para continuar",
+        "body": "Esta versión de la app es demasiado antigua para {host}.",
+        "download": "Descargar la última versión",
+        "downloading": "Descargando la actualización… {percent} %",
+        "restart": "Reiniciar para actualizar"
+    },
+    "unload": {
+        "message": "¿Salir de esta página?",
+        "detail": "Un coworker sigue trabajando o un archivo tiene cambios sin guardar.",
+        "leave": "Salir",
+        "stay": "Quedarme"
+    },
+    "find": {
+        "placeholder": "Buscar en la página",
+        "matches": "{active} de {total}",
+        "noMatches": "Sin resultados",
+        "previous": "Resultado anterior",
+        "next": "Resultado siguiente",
+        "close": "Cerrar"
+    },
+    "server": {
+        "title": "Conéctate a tu servidor",
+        "description": "Escribe la dirección del servidor Rerun que usas.",
+        "label": "Dirección del servidor",
+        "connect": "Conectar",
+        "invalid": "Escribe una dirección como rerun.example.com.",
+        "unreachable": "Nada responde en esta dirección.",
+        "notRerun": "Esta dirección no es un servidor Rerun.",
+        "tooOld": "Este servidor necesita la versión {version} de la app o una posterior.",
+        "insecure": "Esta dirección no está cifrada. Usa https:// salvo que el servidor esté en esta computadora.",
+        "useRerunCloud": "Usar Rerun Cloud",
+        "cancel": "Cancelar"
+    },
+    "updates": {
+        "upToDate": "Estás al día",
+        "upToDateDetail": "Rerun {version} es la última versión.",
+        "failed": "No se pudieron buscar actualizaciones",
+        "readyToInstall": "Rerun {version} está listo para instalarse",
+        "readyDetail": "La app se reinicia para terminar la actualización.",
+        "restartNow": "Reiniciar ahora",
+        "later": "Más tarde"
+    }
+}

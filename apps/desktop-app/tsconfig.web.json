@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "ES2023",
+        "lib": ["ES2023", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "jsx": "react-jsx",
+        "strict": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "forceConsistentCasingInFileNames": true,
+        "types": ["vite/client"],
+        "paths": {
+            "@rerun/cloud/*": ["../../cloud/packages/cloud/src/*", "../ui/cloud-oss/*"]
+        }
+    },
+    "include": ["src/env.d.ts", "src/renderer/**/*", "src/shared/**/*"]
+}

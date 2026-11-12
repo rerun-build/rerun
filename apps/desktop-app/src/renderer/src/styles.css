@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@import "../../../../../packages/ui/src/styles.css";
+
+@source "../../../../../packages/ui/src";
+@source "./";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, "Inter", sans-serif;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+}
+
+/* The shell's pages have no web app strip to drag the window by: the top of the page is the strip. */
+.shell-drag {
+    app-region: drag;
+}
+
+.shell-drag button,
+.shell-drag input,
+.shell-drag a {
+    app-region: no-drag;
+}

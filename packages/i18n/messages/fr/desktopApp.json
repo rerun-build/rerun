@@ -1,0 +1,98 @@
+{
+    "menu": {
+        "app": {
+            "about": "À propos de {name}",
+            "hide": "Masquer {name}",
+            "hideOthers": "Masquer les autres",
+            "showAll": "Tout afficher",
+            "quit": "Quitter {name}",
+            "checkForUpdates": "Rechercher des mises à jour…",
+            "changeServer": "Changer de serveur…"
+        },
+        "file": {
+            "title": "Fichier",
+            "closeWindow": "Fermer la fenêtre"
+        },
+        "edit": {
+            "title": "Édition",
+            "undo": "Annuler",
+            "redo": "Rétablir",
+            "cut": "Couper",
+            "copy": "Copier",
+            "paste": "Coller",
+            "pasteAndMatchStyle": "Coller et adapter le style",
+            "delete": "Supprimer",
+            "selectAll": "Tout sélectionner",
+            "find": "Rechercher…"
+        },
+        "view": {
+            "title": "Présentation",
+            "reload": "Recharger",
+            "forceReload": "Forcer le rechargement",
+            "toggleDevTools": "Outils de développement",
+            "actualSize": "Taille réelle",
+            "zoomIn": "Zoom avant",
+            "zoomOut": "Zoom arrière",
+            "toggleFullScreen": "Plein écran"
+        },
+        "window": {
+            "title": "Fenêtre",
+            "minimize": "Réduire",
+            "zoom": "Zoom",
+            "front": "Tout ramener au premier plan"
+        },
+        "help": {
+            "title": "Aide",
+            "docs": "Documentation"
+        }
+    },
+    "offline": {
+        "title": "Impossible de joindre Rerun",
+        "body": "Vérifiez votre connexion. L’app se reconnecte à {host} toute seule.",
+        "unavailable": "{host} ne répond pas pour le moment. L’app réessaie toute seule.",
+        "retry": "Réessayer"
+    },
+    "incompatible": {
+        "title": "Mettez Rerun à jour pour continuer",
+        "body": "Cette version de l’app est trop ancienne pour {host}.",
+        "download": "Télécharger la dernière version",
+        "downloading": "Téléchargement de la mise à jour… {percent} %",
+        "restart": "Redémarrer pour mettre à jour"
+    },
+    "unload": {
+        "message": "Quitter cette page ?",
+        "detail": "Un coworker travaille encore ou un fichier a des modifications non enregistrées.",
+        "leave": "Quitter",
+        "stay": "Rester"
+    },
+    "find": {
+        "placeholder": "Rechercher dans la page",
+        "matches": "{active} sur {total}",
+        "noMatches": "Aucun résultat",
+        "previous": "Résultat précédent",
+        "next": "Résultat suivant",
+        "close": "Fermer"
+    },
+    "server": {
+        "title": "Connectez-vous à votre serveur",
+        "description": "Saisissez l’adresse du serveur Rerun que vous utilisez.",
+        "label": "Adresse du serveur",
+        "connect": "Se connecter",
+        "invalid": "Saisissez une adresse comme rerun.example.com.",
+        "unreachable": "Rien ne répond à cette adresse.",
+        "notRerun": "Cette adresse n’est pas un serveur Rerun.",
+        "tooOld": "Ce serveur demande la version {version} de l’app ou plus récente.",
+        "insecure": "Cette adresse n’est pas chiffrée. Utilisez https:// sauf si le serveur tourne sur cet ordinateur.",
+        "useRerunCloud": "Utiliser Rerun Cloud",
+        "cancel": "Annuler"
+    },
+    "updates": {
+        "upToDate": "Vous êtes à jour",
+        "upToDateDetail": "Rerun {version} est la dernière version.",
+        "failed": "Impossible de rechercher les mises à jour",
+        "readyToInstall": "Rerun {version} est prêt à être installé",
+        "readyDetail": "L’app redémarre pour terminer la mise à jour.",
+        "restartNow": "Redémarrer maintenant",
+        "later": "Plus tard"
+    }
+}

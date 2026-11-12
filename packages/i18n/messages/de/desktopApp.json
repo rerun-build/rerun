@@ -1,0 +1,98 @@
+{
+    "menu": {
+        "app": {
+            "about": "Über {name}",
+            "hide": "{name} ausblenden",
+            "hideOthers": "Andere ausblenden",
+            "showAll": "Alle einblenden",
+            "quit": "{name} beenden",
+            "checkForUpdates": "Nach Updates suchen…",
+            "changeServer": "Server wechseln…"
+        },
+        "file": {
+            "title": "Ablage",
+            "closeWindow": "Fenster schließen"
+        },
+        "edit": {
+            "title": "Bearbeiten",
+            "undo": "Widerrufen",
+            "redo": "Wiederholen",
+            "cut": "Ausschneiden",
+            "copy": "Kopieren",
+            "paste": "Einsetzen",
+            "pasteAndMatchStyle": "Einsetzen und Stil anpassen",
+            "delete": "Löschen",
+            "selectAll": "Alles auswählen",
+            "find": "Suchen…"
+        },
+        "view": {
+            "title": "Darstellung",
+            "reload": "Neu laden",
+            "forceReload": "Neu laden erzwingen",
+            "toggleDevTools": "Entwicklertools",
+            "actualSize": "Originalgröße",
+            "zoomIn": "Vergrößern",
+            "zoomOut": "Verkleinern",
+            "toggleFullScreen": "Vollbild"
+        },
+        "window": {
+            "title": "Fenster",
+            "minimize": "Im Dock ablegen",
+            "zoom": "Zoomen",
+            "front": "Alle nach vorne bringen"
+        },
+        "help": {
+            "title": "Hilfe",
+            "docs": "Dokumentation"
+        }
+    },
+    "offline": {
+        "title": "Rerun ist nicht erreichbar",
+        "body": "Prüfe deine Verbindung. Die App verbindet sich von selbst wieder mit {host}.",
+        "unavailable": "{host} antwortet gerade nicht. Die App versucht es von selbst erneut.",
+        "retry": "Erneut versuchen"
+    },
+    "incompatible": {
+        "title": "Aktualisiere Rerun, um weiterzumachen",
+        "body": "Diese Version der App ist zu alt für {host}.",
+        "download": "Neueste Version laden",
+        "downloading": "Update wird geladen… {percent} %",
+        "restart": "Neu starten und aktualisieren"
+    },
+    "unload": {
+        "message": "Diese Seite verlassen?",
+        "detail": "Ein Coworker arbeitet noch oder eine Datei hat ungesicherte Änderungen.",
+        "leave": "Verlassen",
+        "stay": "Bleiben"
+    },
+    "find": {
+        "placeholder": "Auf der Seite suchen",
+        "matches": "{active} von {total}",
+        "noMatches": "Keine Treffer",
+        "previous": "Vorheriger Treffer",
+        "next": "Nächster Treffer",
+        "close": "Schließen"
+    },
+    "server": {
+        "title": "Mit deinem Server verbinden",
+        "description": "Gib die Adresse des Rerun-Servers ein, den du nutzt.",
+        "label": "Serveradresse",
+        "connect": "Verbinden",
+        "invalid": "Gib eine Adresse wie rerun.example.com ein.",
+        "unreachable": "Unter dieser Adresse antwortet nichts.",
+        "notRerun": "Diese Adresse ist kein Rerun-Server.",
+        "tooOld": "Dieser Server braucht Version {version} der App oder neuer.",
+        "insecure": "Diese Adresse ist nicht verschlüsselt. Nutze https://, außer der Server läuft auf diesem Computer.",
+        "useRerunCloud": "Rerun Cloud nutzen",
+        "cancel": "Abbrechen"
+    },
+    "updates": {
+        "upToDate": "Alles auf dem neuesten Stand",
+        "upToDateDetail": "Rerun {version} ist die neueste Version.",
+        "failed": "Suche nach Updates fehlgeschlagen",
+        "readyToInstall": "Rerun {version} ist bereit zur Installation",
+        "readyDetail": "Die App startet neu, um das Update abzuschließen.",
+        "restartNow": "Jetzt neu starten",
+        "later": "Später"
+    }
+}

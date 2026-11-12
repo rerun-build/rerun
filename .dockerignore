@@ -13,3 +13,7 @@ dist
 .env
 .env.*
 !.env.example
+
+# The desktop app's builds and installers.
+apps/desktop-app/out
+apps/desktop-app/release

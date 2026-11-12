@@ -18,6 +18,8 @@
         "dev:ui:full": "concurrently -k -n next,engine -c cyan,green \"pnpm --filter rerun dev\" \"pnpm --filter rerun-engine dev\"",
         "dev:mobile": "node scripts/dev-mobile.mjs",
         "verify:ui": "node scripts/verify-ui.mjs",
+        "verify:desktop": "node scripts/verify-desktop.mjs",
+        "dev:desktop": "pnpm --filter @rerun/contracts build && pnpm --filter rerun-desktop dev",
         "i18n:check": "node scripts/i18n-check.mjs",
         "i18n:index": "node scripts/i18n-index.mjs",
         "i18n:translate": "node scripts/i18n-translate.mjs",

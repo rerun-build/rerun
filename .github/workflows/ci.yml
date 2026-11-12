@@ -30,6 +30,9 @@ jobs:
       - run: pnpm --filter rerun-engine test
       # Every mobile test runs as iOS and as Android (jest projects of apps/mobile/jest.config.js).
       - run: pnpm --filter rerun-mobile test
+      # The desktop app: its rules (URLs, permissions, IPC senders) and its three bundles.
+      - run: pnpm --filter rerun-desktop test
+      - run: pnpm --filter rerun-desktop build
 
   # No network and no install: the check only reads packages/i18n, so it answers in seconds instead of
   # waiting behind the typecheck.
