@@ -9,7 +9,8 @@
         "handoff.codeHint": "Shown after confirming, in case the desktop app did not open by itself.",
         "signIn.waitingTitle": "Shown in the desktop app after it opened the web browser to sign in.",
         "signIn.codeLabel": "Label of the field where the person pastes the code shown by the browser.",
-        "settings.version": "Under the Updates row of the desktop app settings. {version} is like 0.4.0."
+        "settings.version": "Under the Updates row of the desktop app settings. {version} is like 0.4.0.",
+        "openInApp.title": "Toast in the web browser, offering to open the current page in the Rerun desktop app. {app} is the app name."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -63,5 +64,9 @@
         "updateFailed": "Couldn’t check for updates.",
         "check": "Check for updates",
         "restart": "Restart to update to {version}"
+    },
+    "openInApp": {
+        "title": "Open this page in {app}?",
+        "open": "Open"
     }
 }

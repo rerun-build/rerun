@@ -83,6 +83,18 @@ export type DesktopOAuthReturn = { status: 'success'; claim?: string } | { statu
 
 export const DESKTOP_OAUTH_RETURN_HOST = 'oauth'
 
+// `rerun-desktop://open?path=/…`: a page of the server, opened in the app from a browser.
+export const DESKTOP_OPEN_HOST = 'open'
+
+// Set in a browser that signed a desktop app in, valued with its channel: that browser offers to open
+// the pages of Rerun in the app. It says nothing else, and nothing a page could not already guess.
+export const DESKTOP_APP_COOKIE = 'rr_desktop_app'
+
+// A path of the server and nothing else: no scheme, no host, no protocol-relative `//`, printable.
+export function isDesktopOpenPath(path: string): boolean {
+    return path.length <= 2000 && path.startsWith('/') && !path.startsWith('//') && !path.startsWith('/\\') && /^[\x21-\x7e]+$/.test(path)
+}
+
 // A notification the app shows through the system. `id` comes back on the click, the page knows
 // what it opens.
 export type DesktopNotification = { id: string; title: string; body?: string; silent?: boolean }

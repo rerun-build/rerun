@@ -7,7 +7,7 @@ import { writeAuthReturnCookie } from '@/lib/auth/auth-return'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { startOAuthSignIn } from '@/lib/auth/oauth-sign-in'
 import { createClient } from '@/supabase/client'
-import { DESKTOP_AUTH_CALLBACK_HOST, DESKTOP_AUTH_CALLBACK_PATH, desktopShellScheme, type DesktopShellChannel, type DesktopSignInProvider } from '@rerun/contracts'
+import { DESKTOP_APP_COOKIE, DESKTOP_AUTH_CALLBACK_HOST, DESKTOP_AUTH_CALLBACK_PATH, desktopShellScheme, type DesktopShellChannel, type DesktopSignInProvider } from '@rerun/contracts'
 import { Skeleton } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
@@ -60,6 +60,8 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
         }
         setCode(approval.code)
         setStatus('done')
+        // This browser now offers to open Rerun's pages in the app (OpenInDesktopPrompt).
+        document.cookie = `${DESKTOP_APP_COOKIE}=${channel}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
         const link = new URL(`${desktopShellScheme(channel)}://${DESKTOP_AUTH_CALLBACK_HOST}${DESKTOP_AUTH_CALLBACK_PATH}`)
         link.searchParams.set('code', approval.code)
         link.searchParams.set('state', state)

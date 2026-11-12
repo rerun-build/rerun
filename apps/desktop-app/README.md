@@ -72,6 +72,9 @@ chain: a ticket, the browser, a claim back through the scheme.
 - A tray icon (menu bar on macOS): open, what waits, open at login, updates, quit. On Windows and
   Linux, closing the window leaves the app there (a setting); macOS keeps the app in the Dock.
 - Open at login, started hidden; settings in the Desktop tab of the account (`settings.get/set`).
+- A browser that signed the app in (cookie `rr_desktop_app`) offers once per tab to open the page in
+  the app (`rerun-desktop://open?path=/…`, a path of the server and nothing else): the link of an
+  email lands in the browser, the work happens in the app.
 - Menus and tray in the language the person reads Rerun in (`locale.set`), a right-click menu
   (editing, spelling, links, images).
 
@@ -96,6 +99,7 @@ pnpm verify:desktop --native --scenario apps/desktop-app/e2e/title-bar.mjs
 pnpm verify:desktop --signed-out --scenario apps/desktop-app/e2e/sign-in.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/links.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/native.mjs
+pnpm verify:desktop --scenario apps/desktop-app/e2e/open-links.mjs
 pnpm verify:desktop --packaged --scenario apps/desktop-app/e2e/shell.mjs # the packaged app, fuses on
 CSC_NAME="<a signing identity>" node apps/desktop-app/e2e/update-loop.mjs # 0.0.1 updates itself to 0.0.2
 ```

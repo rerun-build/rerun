@@ -40,3 +40,16 @@ describe('the service sign-in return', () => {
         expect(parseDeepLink('rerun-desktop://oauth/callback?status=maybe', 'rerun-desktop')).toBeNull()
     })
 })
+
+describe('opening a page in the app', () => {
+    it('takes a path of the server', () => {
+        expect(parseDeepLink('rerun-desktop://open?path=%2Fagents%2Fabc%3Ftab%3Dchat', 'rerun-desktop')).toEqual({ kind: 'open', path: '/agents/abc?tab=chat' })
+        expect(parseDeepLink('rerun-desktop://open?path=/', 'rerun-desktop')).toEqual({ kind: 'open', path: '/' })
+    })
+
+    it('refuses anything that would leave the server', () => {
+        for (const path of ['https://evil.example/', '//evil.example/', '/\\evil.example', 'javascript:alert(1)', '/a b', '/\tx', '']) {
+            expect(parseDeepLink(`rerun-desktop://open?path=${encodeURIComponent(path)}`, 'rerun-desktop')).toBeNull()
+        }
+    })
+})

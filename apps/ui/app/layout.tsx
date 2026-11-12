@@ -10,6 +10,7 @@ import { AppChrome } from "@/components/layout/AppChrome";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { DeployUpdateWatcher } from "@/components/deploy-update/DeployUpdateWatcher";
 import { DesktopShellBridge } from "@/components/desktop-shell/DesktopShellBridge";
+import { OpenInDesktopPrompt } from "@/components/desktop-shell/OpenInDesktopPrompt";
 import { ShellTitleBar } from "@/components/desktop-shell/ShellTitleBar";
 import { requestDesktopShell } from "@/lib/desktop-shell/server";
 import { DESKTOP_SHELL_ATTRIBUTE } from "@rerun/contracts";
@@ -115,6 +116,7 @@ export default async function RootLayout({
                   <AffiliateTracking />
                   <DeployUpdateWatcher />
                   <DesktopShellBridge />
+                  <OpenInDesktopPrompt />
                   <RegisterSW />
                 </AppChrome>
               </TooltipProvider>

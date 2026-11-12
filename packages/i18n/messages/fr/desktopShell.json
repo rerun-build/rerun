@@ -51,5 +51,9 @@
         "updateFailed": "Impossible de rechercher les mises à jour.",
         "check": "Rechercher des mises à jour",
         "restart": "Redémarrer pour passer à {version}"
+    },
+    "openInApp": {
+        "title": "Ouvrir cette page dans {app} ?",
+        "open": "Ouvrir"
     }
 }

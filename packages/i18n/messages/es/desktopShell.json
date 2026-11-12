@@ -51,5 +51,9 @@
         "updateFailed": "No se pudieron buscar actualizaciones.",
         "check": "Buscar actualizaciones",
         "restart": "Reiniciar para actualizar a {version}"
+    },
+    "openInApp": {
+        "title": "¿Abrir esta página en {app}?",
+        "open": "Abrir"
     }
 }

@@ -7,7 +7,7 @@ import { registerIpcHandlers } from './ipc-handlers'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { registerLocalScheme } from './local-pages'
 import { closeFindBar, openFindBar } from './find-bar'
-import { createMainWindow, getMainWindow, openExternal, reloadApp, showIncompatiblePage, showMainWindow, showServerPicker } from './main-window'
+import { createMainWindow, getMainWindow, loadAppPath, openExternal, reloadApp, showIncompatiblePage, showMainWindow, showServerPicker } from './main-window'
 import { installMenu } from './menu'
 import { onLocaleChange } from './messages'
 import { partitionFor, serverOrigin } from './server'
@@ -34,6 +34,10 @@ function receiveLink(raw: string): void {
     }
     const link = parseDeepLink(raw, SCHEME)
     if (link?.kind === 'auth-callback') void completeFromLink(link.code, link.state)
+    if (link?.kind === 'open') {
+        showMainWindow()
+        loadAppPath(link.path)
+    }
     if (link?.kind === 'oauth-return') {
         showMainWindow()
         getMainWindow()?.webContents.send(IPC_EVENTS.oauthReturn, link.result)

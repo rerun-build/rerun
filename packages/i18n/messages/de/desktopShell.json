@@ -51,5 +51,9 @@
         "updateFailed": "Suche nach Updates fehlgeschlagen.",
         "check": "Nach Updates suchen",
         "restart": "Neu starten für Version {version}"
+    },
+    "openInApp": {
+        "title": "Diese Seite in {app} öffnen?",
+        "open": "Öffnen"
     }
 }
