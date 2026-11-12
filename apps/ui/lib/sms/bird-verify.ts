@@ -6,7 +6,8 @@ import { countryOfE164 } from '@/lib/phone/normalize'
 import { reachableChannels } from '@/lib/phone/reach'
 import { isVerificationChannel, VERIFICATION_CODE_LENGTH, type VerificationChannel } from '@/lib/phone/verification'
 
-export type VerificationFailure = 'invalid_number' | 'unsupported_country' | 'undeliverable' | 'blocked' | 'rate_limited' | 'too_soon' | 'wrong_code' | 'expired' | 'unavailable'
+// `channel_unavailable`: the channel asked for is not in the plan Bird keeps for the number's country.
+export type VerificationFailure = 'invalid_number' | 'unsupported_country' | 'undeliverable' | 'blocked' | 'rate_limited' | 'too_soon' | 'channel_unavailable' | 'wrong_code' | 'expired' | 'unavailable'
 export type VerificationRefusal = { ok: false; error: VerificationFailure; retryAfterSeconds?: number }
 export type VerificationResult = { ok: true } | VerificationRefusal
 // `channel` is where Bird says the code went, which is not always where it was asked to go.
@@ -53,12 +54,17 @@ type BirdBody = {
     reason?: string | null
     status?: string
     last_channel?: string | null
+    // The plan Bird resolved for the number: the channels asked for that its country allows, in order.
+    channels?: { channel?: string }[]
     error?: BirdError
 }
 
 type BirdAnswer = { status: number; body: BirdBody; retryAfterSeconds?: number }
 
 const errorCode = (answer: BirdAnswer) => answer.body.error?.code
+
+// An answer without its plan leaves the channel possible: nothing says Bird dropped it.
+const planLeavesOut = (answer: BirdAnswer, channel: VerificationChannel) => !!answer.body.channels && !answer.body.channels.some(entry => entry.channel === channel)
 
 const sendsNothing = () => process.env.NODE_ENV !== 'production'
 
@@ -132,23 +138,29 @@ export async function sendVerification(to: string, picked: VerificationChannel, 
         return { ok: true, channel }
     }
     try {
+        let nowhereToMove = false
         if (previousChannel && previousChannel !== channel) {
             const switched = await switchChannel(config, to, channel)
             if (typeof switched === 'object') return switched
-            if (switched === 'no_next_channel') {
-                const retryAfterSeconds = resendHeldFor(lastSentAt)
-                if (retryAfterSeconds) return { ok: false, error: 'too_soon', retryAfterSeconds }
-            }
+            nowhereToMove = switched === 'no_next_channel'
         }
         // Left to itself Bird tries WhatsApp before SMS in most countries: the plan starts on the
         // channel the visitor picked. Meta turns a WhatsApp code away after Bird has accepted it,
-        // so SMS follows it in the plan and Bird moves on by itself.
+        // so SMS follows it in the plan and Bird moves on by itself, but only where the country's
+        // Verify settings allow SMS: Bird drops from the plan any channel they leave out.
         const answer = await post(config, '', {
             to: { phone_number: to },
             options: { channels: plan, code_length: VERIFICATION_CODE_LENGTH, ...(language ? { language } : {}) },
             ...(metadata ? { metadata } : {}),
         })
-        return sendOutcome(answer, channel)
+        const outcome = sendOutcome(answer, channel)
+        if (!outcome.ok || !nowhereToMove) return outcome
+        // Nowhere to move means Bird is already on the channel asked for, or never had it. Past its
+        // resend wait Bird has just sent a fresh code on its own channel, and `outcome` says where.
+        // Within it Bird sends nothing and answers with the verification in progress.
+        const retryAfterSeconds = resendHeldFor(lastSentAt)
+        if (!retryAfterSeconds) return outcome
+        return planLeavesOut(answer, channel) ? { ok: false, error: 'channel_unavailable' } : { ok: false, error: 'too_soon', retryAfterSeconds }
     } catch (error) {
         console.error('[bird-verify] send failed', error)
         return { ok: false, error: 'unavailable' }

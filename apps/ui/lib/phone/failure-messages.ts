@@ -9,6 +9,7 @@ export const PHONE_FAILURE_CODES = {
     same_number: 'samePhone',
     not_required: 'phoneAlreadyVerified',
     too_soon: 'codeOnItsWay',
+    channel_unavailable: 'phoneChannelUnavailable',
     too_many: 'tooManyPhoneCodes',
     invalid_number: 'invalidMobileNumber',
     unsupported_country: 'phoneCountryUnsupported',

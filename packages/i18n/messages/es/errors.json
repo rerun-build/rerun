@@ -345,6 +345,7 @@
     "samePhone": "Ya es el número de tu cuenta.",
     "phoneAlreadyVerified": "Tu número de teléfono ya está verificado.",
     "codeOnItsWay": "Ya hay un código en camino. Espera un momento antes de pedir otro.",
+    "phoneChannelUnavailable": "Este número no puede recibir códigos por ese canal. Usa el código que ya enviamos.",
     "tooManyPhoneCodes": "Se pidieron demasiados códigos para este número. Inténtalo más tarde.",
     "invalidMobileNumber": "Introduce un número de móvil válido.",
     "phoneCountryUnsupported": "Todavía no podemos enviar códigos a este país. Usa el correo o Google.",

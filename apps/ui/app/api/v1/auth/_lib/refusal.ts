@@ -10,6 +10,7 @@ const STATUS_BY_REASON: Partial<Record<PhoneFailure | EmailPreparationFailure, n
     unavailable: 503,
     unsupported_country: 422,
     undeliverable: 422,
+    channel_unavailable: 422,
     blocked: 422,
     blocked_domain: 422,
 }

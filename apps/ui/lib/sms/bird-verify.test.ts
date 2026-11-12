@@ -122,22 +122,40 @@ describe('sendVerification', () => {
         expect(urls().at(-1)).toBe('https://eu1.platform.bird.com/v1/verify/verifications')
     })
 
-    it('holds a switch with nowhere to go while Bird would hold the resend, instead of asking for nothing', async () => {
+    it('holds a switch with nowhere to go while Bird would hold the resend, the channel asked for being the one Bird is on', async () => {
         vi.useFakeTimers({ now: NOW })
-        answersInTurn([422, birdError('E13020', 'NoNextChannel')])
+        answersInTurn([422, birdError('E13020', 'NoNextChannel')], [200, { status: 'pending', last_channel: 'whatsapp', channels: [{ channel: 'sms' }, { channel: 'whatsapp' }] }])
 
         expect(await sendVerification('+32492000000', 'whatsapp', { previousChannel: 'sms', lastSentAt: secondsAgo(30) })).toEqual({ ok: false, error: 'too_soon', retryAfterSeconds: 30 })
 
-        expect(urls()).toEqual(['https://eu1.platform.bird.com/v1/verify/verifications/next-channel'])
+        expect(urls()).toEqual(['https://eu1.platform.bird.com/v1/verify/verifications/next-channel', 'https://eu1.platform.bird.com/v1/verify/verifications'])
     })
 
     it('holds an SMS asked for after Bird already fell back from WhatsApp to SMS by itself', async () => {
         vi.useFakeTimers({ now: NOW })
-        answersInTurn([422, birdError('E13020', 'NoNextChannel')])
+        answersInTurn([422, birdError('E13020', 'NoNextChannel')], [200, { status: 'pending', last_channel: 'sms', channels: [{ channel: 'whatsapp' }, { channel: 'sms' }] }])
 
         expect(await sendVerification('+33640000000', 'sms', { previousChannel: 'whatsapp', lastSentAt: secondsAgo(23) })).toEqual({ ok: false, error: 'too_soon', retryAfterSeconds: 37 })
 
-        expect(urls()).toEqual(['https://eu1.platform.bird.com/v1/verify/verifications/next-channel'])
+        expect(urls()).toEqual(['https://eu1.platform.bird.com/v1/verify/verifications/next-channel', 'https://eu1.platform.bird.com/v1/verify/verifications'])
+    })
+
+    it('refuses a switch to a channel the country leaves out of the plan, instead of saying a code is on its way', async () => {
+        vi.useFakeTimers({ now: NOW })
+        answersInTurn([422, birdError('E13020', 'NoNextChannel')], [200, { status: 'pending', last_channel: 'whatsapp', channels: [{ channel: 'whatsapp' }] }])
+
+        expect(await sendVerification('+639171234567', 'sms', { previousChannel: 'whatsapp', lastSentAt: secondsAgo(27) })).toEqual({ ok: false, error: 'channel_unavailable' })
+
+        expect(urls()).toEqual(['https://eu1.platform.bird.com/v1/verify/verifications/next-channel', 'https://eu1.platform.bird.com/v1/verify/verifications'])
+    })
+
+    it('says where the code went when that switch comes past the resend wait, Bird having resent on its own channel', async () => {
+        vi.useFakeTimers({ now: NOW })
+        answersInTurn([422, birdError('E13020', 'NoNextChannel')], [200, { status: 'pending', last_channel: 'whatsapp', channels: [{ channel: 'whatsapp' }] }])
+
+        expect(await sendVerification('+639171234567', 'sms', { previousChannel: 'whatsapp', lastSentAt: secondsAgo(70) })).toEqual({ ok: true, channel: 'whatsapp' })
+
+        expect(urls()).toEqual(['https://eu1.platform.bird.com/v1/verify/verifications/next-channel', 'https://eu1.platform.bird.com/v1/verify/verifications'])
     })
 
     it('does not move anything for a code asked again on the same channel', async () => {

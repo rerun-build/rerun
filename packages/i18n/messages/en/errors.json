@@ -349,6 +349,7 @@
     "samePhone": "This is already the number of your account.",
     "phoneAlreadyVerified": "Your phone number is already verified.",
     "codeOnItsWay": "A code is already on its way. Wait a moment before asking for a new one.",
+    "phoneChannelUnavailable": "This number can't get codes on that channel. Use the code we already sent.",
     "tooManyPhoneCodes": "Too many codes requested for this number. Try again later.",
     "invalidMobileNumber": "Enter a valid mobile number.",
     "phoneCountryUnsupported": "We can't send codes to this country yet. Use email or Google instead.",
