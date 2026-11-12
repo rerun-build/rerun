@@ -1,0 +1,52 @@
+{
+    "_context": {
+        "update.ready": "Toast inside the desktop app when a new version of the app was downloaded. {version} is like 0.4.0.",
+        "update.restart": "Button of that toast: restarts the desktop app to install the new version.",
+        "downloads.done": "Toast inside the desktop app when a file finished downloading. {filename} is the file name.",
+        "downloads.show": "Button of that toast: shows the file in Finder (macOS) or Explorer (Windows).",
+        "handoff.title": "Page opened in the web browser by the Rerun desktop app to sign it in. {app} is the app name (Rerun, Rerun Staging).",
+        "handoff.body": "{account} is the email address (or phone number) of the signed-in account.",
+        "handoff.codeHint": "Shown after confirming, in case the desktop app did not open by itself.",
+        "signIn.waitingTitle": "Shown in the desktop app after it opened the web browser to sign in.",
+        "signIn.codeLabel": "Label of the field where the person pastes the code shown by the browser."
+    },
+    "update": {
+        "ready": "Rerun {version} is ready",
+        "description": "Restart the app to use the new version.",
+        "restart": "Restart"
+    },
+    "downloads": {
+        "done": "Downloaded {filename}",
+        "failed": "Couldn’t download {filename}",
+        "show": "Show in folder"
+    },
+    "handoff": {
+        "title": "Sign in to {app}",
+        "body": "Continue to {app} as {account}?",
+        "continue": "Continue",
+        "switchAccount": "Use another account",
+        "doneTitle": "Back to {app}",
+        "doneBody": "{app} finishes signing in on its own. You can close this tab.",
+        "codeHint": "If {app} did not open, paste this code into it:",
+        "copyCode": "Copy the code",
+        "failed": "Couldn’t sign the app in. Try again.",
+        "invalidTitle": "This link has expired",
+        "invalidBody": "Start the sign-in again from the desktop app."
+    },
+    "signIn": {
+        "waitingTitle": "Continue in your browser",
+        "waitingBody": "Sign in in the browser window that opened, then come back here.",
+        "reopen": "Open the browser again",
+        "pasteCode": "Paste a code instead",
+        "codeLabel": "Code from the browser",
+        "submit": "Sign in",
+        "back": "Back",
+        "errors": {
+            "expired": "This code has expired. Start again.",
+            "invalid": "This code isn’t valid. Start again.",
+            "state-mismatch": "This sign-in was started from another window. Start again.",
+            "network": "Couldn’t reach Rerun. Check your connection.",
+            "cancelled": "The sign-in was cancelled."
+        }
+    }
+}

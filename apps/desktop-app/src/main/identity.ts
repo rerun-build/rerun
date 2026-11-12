@@ -16,7 +16,7 @@ export const PRODUCT_NAMES = { stable: 'Rerun', staging: 'Rerun Staging', dev: '
 
 export const PRODUCT_NAME = PRODUCT_NAMES[CHANNEL]
 
-export const CAPABILITIES: readonly DesktopShellCapability[] = ['window', 'find', 'links', 'downloads']
+export const BASE_CAPABILITIES: readonly DesktopShellCapability[] = ['window', 'find', 'links', 'downloads']
 
 export function shellPlatform(): DesktopShellPlatform {
     if (process.platform === 'darwin') return 'mac'
@@ -28,8 +28,8 @@ export function shellIdentity(): DesktopShellIdentity {
     return { version: app.getVersion(), platform: shellPlatform(), channel: CHANNEL }
 }
 
-export function bootstrapPayload() {
-    return { apiVersion: DESKTOP_SHELL_API_VERSION, ...shellIdentity(), capabilities: CAPABILITIES }
+export function bootstrapPayload(extra: readonly DesktopShellCapability[]) {
+    return { apiVersion: DESKTOP_SHELL_API_VERSION, ...shellIdentity(), capabilities: [...BASE_CAPABILITIES, ...extra] }
 }
 
 // Chrome's own User-Agent with the shell's token at the end. Electron's default also names the app

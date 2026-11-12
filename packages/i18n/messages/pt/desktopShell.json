@@ -1,0 +1,41 @@
+{
+    "update": {
+        "ready": "O Rerun {version} está pronto",
+        "description": "Reinicie o app para usar a nova versão.",
+        "restart": "Reiniciar"
+    },
+    "downloads": {
+        "done": "{filename} baixado",
+        "failed": "Não foi possível baixar {filename}",
+        "show": "Mostrar na pasta"
+    },
+    "handoff": {
+        "title": "Entrar no {app}",
+        "body": "Continuar no {app} como {account}?",
+        "continue": "Continuar",
+        "switchAccount": "Usar outra conta",
+        "doneTitle": "Volte para o {app}",
+        "doneBody": "O {app} conclui o login sozinho. Você pode fechar esta aba.",
+        "codeHint": "Se o {app} não abriu, cole este código nele:",
+        "copyCode": "Copiar o código",
+        "failed": "Não foi possível conectar o app. Tente de novo.",
+        "invalidTitle": "Este link expirou",
+        "invalidBody": "Comece o login de novo pelo app para desktop."
+    },
+    "signIn": {
+        "waitingTitle": "Continue no seu navegador",
+        "waitingBody": "Entre na janela do navegador que abriu e depois volte aqui.",
+        "reopen": "Abrir o navegador de novo",
+        "pasteCode": "Colar um código",
+        "codeLabel": "Código do navegador",
+        "submit": "Entrar",
+        "back": "Voltar",
+        "errors": {
+            "expired": "Este código expirou. Comece de novo.",
+            "invalid": "Este código não é válido. Comece de novo.",
+            "state-mismatch": "Este login foi iniciado em outra janela. Comece de novo.",
+            "network": "Não foi possível acessar o Rerun. Verifique sua conexão.",
+            "cancelled": "O login foi cancelado."
+        }
+    }
+}

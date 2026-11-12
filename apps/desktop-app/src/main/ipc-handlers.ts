@@ -9,13 +9,14 @@ import { currentServer, getMainWindow, openExternal, reloadApp, replaceMainWindo
 import { shellLocale } from './messages'
 import { partitionFor, serverOrigin, setServerOrigin } from './server'
 import { checkServer } from './server-check'
+import { checkForUpdates, installUpdate, updatesEnabled, updateState } from './updater'
 import { normalizeServerUrl } from './url-policy'
 
 export function registerIpcHandlers(): void {
     ipcMain.on(IPC.bootstrap, (event) => {
         const audience = audienceOf(event)
         let payload: ShellBootstrap = null
-        if (audience === 'app') payload = { audience, ...bootstrapPayload() }
+        if (audience === 'app') payload = { audience, ...bootstrapPayload(updatesEnabled() ? ['update'] : []) }
         if (audience === 'local') payload = { audience, locale: shellLocale(), platform: shellPlatform() }
         event.returnValue = payload
     })
@@ -30,7 +31,9 @@ export function registerIpcHandlers(): void {
     })
     handle(IPC.linksOpenExternal, ['app'], (_event, url: string) => openExternal(String(url)))
     handle(IPC.downloadsShow, ['app'], (_event, id: string) => showDownload(String(id)))
-    handle(IPC.updateGetState, ['app'], (): DesktopUpdateState => ({ status: 'idle' }))
+    handle(IPC.updateGetState, ['app', 'local'], (): DesktopUpdateState => updateState())
+    handle(IPC.updateCheck, ['app', 'local'], () => checkForUpdates(false))
+    handle(IPC.updateInstall, ['app', 'local'], () => installUpdate())
 
     handle(IPC.localFind, ['local'], (_event, request: FindRequest) => find({ text: String(request?.text ?? '').slice(0, 500), forward: request?.forward !== false, findNext: !!request?.findNext }))
     handle(IPC.localFindClose, ['local'], () => closeFindBar())

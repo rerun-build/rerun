@@ -1,0 +1,41 @@
+{
+    "update": {
+        "ready": "Rerun {version} ist bereit",
+        "description": "Starte die App neu, um die neue Version zu nutzen.",
+        "restart": "Neu starten"
+    },
+    "downloads": {
+        "done": "{filename} geladen",
+        "failed": "{filename} konnte nicht geladen werden",
+        "show": "Im Ordner zeigen"
+    },
+    "handoff": {
+        "title": "Bei {app} anmelden",
+        "body": "Als {account} mit {app} fortfahren?",
+        "continue": "Fortfahren",
+        "switchAccount": "Anderes Konto verwenden",
+        "doneTitle": "Zurück zu {app}",
+        "doneBody": "{app} schließt die Anmeldung von selbst ab. Du kannst diesen Tab schließen.",
+        "codeHint": "Falls sich {app} nicht geöffnet hat, füge diesen Code dort ein:",
+        "copyCode": "Code kopieren",
+        "failed": "Die App konnte nicht angemeldet werden. Versuch es noch einmal.",
+        "invalidTitle": "Dieser Link ist abgelaufen",
+        "invalidBody": "Starte die Anmeldung erneut in der Desktop-App."
+    },
+    "signIn": {
+        "waitingTitle": "Weiter in deinem Browser",
+        "waitingBody": "Melde dich im geöffneten Browserfenster an und komm dann hierher zurück.",
+        "reopen": "Browser erneut öffnen",
+        "pasteCode": "Stattdessen Code einfügen",
+        "codeLabel": "Code aus dem Browser",
+        "submit": "Anmelden",
+        "back": "Zurück",
+        "errors": {
+            "expired": "Dieser Code ist abgelaufen. Fang neu an.",
+            "invalid": "Dieser Code ist ungültig. Fang neu an.",
+            "state-mismatch": "Diese Anmeldung wurde in einem anderen Fenster gestartet. Fang neu an.",
+            "network": "Rerun ist nicht erreichbar. Prüfe deine Verbindung.",
+            "cancelled": "Die Anmeldung wurde abgebrochen."
+        }
+    }
+}

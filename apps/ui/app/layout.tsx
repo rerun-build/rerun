@@ -9,6 +9,7 @@ import { AffiliateTracking } from "@rerun/cloud/support";
 import { AppChrome } from "@/components/layout/AppChrome";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { DeployUpdateWatcher } from "@/components/deploy-update/DeployUpdateWatcher";
+import { DesktopShellBridge } from "@/components/desktop-shell/DesktopShellBridge";
 import { DomMutationGuard } from "@rerun/ui/dom-guard";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
 import { ThemeCookieBootstrap, ThemeProvider } from "@rerun/ui/theme";
@@ -108,6 +109,7 @@ export default async function RootLayout({
                   <CookieConsent />
                   <AffiliateTracking />
                   <DeployUpdateWatcher />
+                  <DesktopShellBridge />
                   <RegisterSW />
                 </AppChrome>
               </TooltipProvider>

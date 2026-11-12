@@ -1,0 +1,41 @@
+{
+    "update": {
+        "ready": "Rerun {version} está listo",
+        "description": "Reinicia la app para usar la nueva versión.",
+        "restart": "Reiniciar"
+    },
+    "downloads": {
+        "done": "{filename} descargado",
+        "failed": "No se pudo descargar {filename}",
+        "show": "Mostrar en la carpeta"
+    },
+    "handoff": {
+        "title": "Inicia sesión en {app}",
+        "body": "¿Continuar en {app} como {account}?",
+        "continue": "Continuar",
+        "switchAccount": "Usar otra cuenta",
+        "doneTitle": "Vuelve a {app}",
+        "doneBody": "{app} termina de iniciar sesión solo. Puedes cerrar esta pestaña.",
+        "codeHint": "Si {app} no se abrió, pega este código en la app:",
+        "copyCode": "Copiar el código",
+        "failed": "No se pudo iniciar sesión en la app. Inténtalo de nuevo.",
+        "invalidTitle": "Este enlace caducó",
+        "invalidBody": "Vuelve a iniciar sesión desde la app de escritorio."
+    },
+    "signIn": {
+        "waitingTitle": "Continúa en tu navegador",
+        "waitingBody": "Inicia sesión en la ventana del navegador que se abrió y luego vuelve aquí.",
+        "reopen": "Abrir el navegador de nuevo",
+        "pasteCode": "Pegar un código en su lugar",
+        "codeLabel": "Código del navegador",
+        "submit": "Iniciar sesión",
+        "back": "Volver",
+        "errors": {
+            "expired": "Este código caducó. Empieza de nuevo.",
+            "invalid": "Este código no es válido. Empieza de nuevo.",
+            "state-mismatch": "Este inicio de sesión se empezó desde otra ventana. Empieza de nuevo.",
+            "network": "No se puede conectar con Rerun. Revisa tu conexión.",
+            "cancelled": "Se canceló el inicio de sesión."
+        }
+    }
+}

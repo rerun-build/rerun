@@ -9,6 +9,7 @@ import { installMenu } from './menu'
 import { onLocaleChange } from './messages'
 import { partitionFor, serverOrigin } from './server'
 import { checkServer } from './server-check'
+import { checkForUpdates, startUpdater } from './updater'
 
 // Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
@@ -45,7 +46,7 @@ function menu(): void {
             const window = getMainWindow()
             if (window) openFindBar(window)
         },
-        checkForUpdates: () => {},
+        checkForUpdates: () => void checkForUpdates(true),
         changeServer: () => {
             closeFindBar()
             showMainWindow()
@@ -72,4 +73,5 @@ function start(): void {
     const origin = serverOrigin()
     createMainWindow(origin)
     if (origin) void verifyServer(origin)
+    startUpdater()
 }

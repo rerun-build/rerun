@@ -7,6 +7,7 @@
 //   pnpm verify:desktop --signed-out                          a first launch, before any sign-in
 //   pnpm verify:desktop --sizes 1440x900,820x640 --themes dark --native
 //   pnpm verify:desktop --no-build                            reuses the last build of apps/desktop-app/out
+//   pnpm verify:desktop --packaged                            the packaged app (asar, fuses), as installed
 //
 // Local stack only, with the same checks as verify:ui (scripts/verify/shared.mjs). The app is the
 // development channel ("Rerun Dev") pointed at the hub through RERUN_DESKTOP_URL, with a data folder
@@ -53,7 +54,7 @@ const fromDesktop = createRequire(join(DESKTOP_DIR, 'package.json'))
 const { _electron: electron } = fromDesktop('playwright')
 
 function parseArgs(argv) {
-    const options = { sizes: ['1440x900', '1024x700', '820x640'], themes: ['light', 'dark'], scenario: null, signedOut: false, native: false, build: true, keep: false, fresh: false, onboarded: false, paths: [] }
+    const options = { sizes: ['1440x900', '1024x700', '820x640'], themes: ['light', 'dark'], scenario: null, signedOut: false, native: false, build: true, packaged: false, keep: false, fresh: false, onboarded: false, paths: [] }
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
         if (arg === '--sizes') options.sizes = argv[++i].split(',')
@@ -62,6 +63,7 @@ function parseArgs(argv) {
         else if (arg === '--signed-out') options.signedOut = true
         else if (arg === '--native') options.native = true
         else if (arg === '--no-build') options.build = false
+        else if (arg === '--packaged') options.packaged = true
         else if (arg === '--keep') options.keep = true
         else if (arg === '--fresh') options.fresh = true
         else if (arg === '--onboarded') options.onboarded = true
@@ -73,16 +75,21 @@ function parseArgs(argv) {
     return options
 }
 
-function buildShell() {
-    log('Building apps/desktop-app (development channel).')
+// The packaged app is the development channel built with RERUN_DESKTOP_E2E=1: the same asar and fuses as
+// a release, except the inspector fuse Playwright needs. Unsigned.
+const PACKAGED_APP = join(DESKTOP_DIR, `release/dev/mac-${process.arch}/Rerun Dev.app/Contents/MacOS/Rerun Dev`)
+
+function buildShell(packaged) {
+    log(`Building apps/desktop-app (development channel${packaged ? ', packaged' : ''}).`)
     execFileSync('pnpm', ['--filter', '@rerun/contracts', 'build'], { cwd: REPO_ROOT, stdio: ['ignore', 'ignore', 'inherit'] })
-    execFileSync('pnpm', ['exec', 'electron-vite', 'build'], { cwd: DESKTOP_DIR, stdio: ['ignore', 'ignore', 'inherit'], env: { ...process.env, RERUN_DESKTOP_CHANNEL: 'dev' } })
+    const env = { ...process.env, RERUN_DESKTOP_CHANNEL: 'dev', RERUN_DESKTOP_E2E: '1', CSC_IDENTITY_AUTO_DISCOVERY: 'false' }
+    execFileSync('pnpm', ['run', packaged ? 'package:dir' : 'build'], { cwd: DESKTOP_DIR, stdio: ['ignore', 'ignore', 'inherit'], env })
 }
 
-async function launchShell(base, userData) {
+async function launchShell(base, userData, packaged) {
     const app = await electron.launch({
-        executablePath: fromDesktop('electron'),
-        args: [DESKTOP_DIR],
+        executablePath: packaged ? PACKAGED_APP : fromDesktop('electron'),
+        args: packaged ? [] : [DESKTOP_DIR],
         cwd: DESKTOP_DIR,
         env: { ...process.env, RERUN_DESKTOP_URL: base, RERUN_DESKTOP_USER_DATA: userData },
         timeout: 60_000,
@@ -188,9 +195,9 @@ const base = `http://localhost:${PORT}`
 const outDir = join(REPO_ROOT, '.context/verify', `${new Date().toISOString().replace(/[:.]/g, '-')}-desktop`)
 mkdirSync(outDir, { recursive: true })
 const server = await ensureServer(base, outDir)
-if (options.build) buildShell()
+if (options.build) buildShell(options.packaged)
 
-const { app, page } = await launchShell(base, join(outDir, 'user-data'))
+const { app, page } = await launchShell(base, join(outDir, 'user-data'), options.packaged)
 app.process().stdout?.on('data', (chunk) => process.env.VERIFY_DESKTOP_VERBOSE && process.stdout.write(chunk))
 const shell = shellHelpers(app, page)
 let failed = false

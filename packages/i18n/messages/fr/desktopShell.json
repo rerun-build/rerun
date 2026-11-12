@@ -1,0 +1,41 @@
+{
+    "update": {
+        "ready": "Rerun {version} est prêt",
+        "description": "Redémarrez l’app pour utiliser la nouvelle version.",
+        "restart": "Redémarrer"
+    },
+    "downloads": {
+        "done": "{filename} téléchargé",
+        "failed": "Impossible de télécharger {filename}",
+        "show": "Afficher dans le dossier"
+    },
+    "handoff": {
+        "title": "Se connecter à {app}",
+        "body": "Continuer vers {app} en tant que {account} ?",
+        "continue": "Continuer",
+        "switchAccount": "Utiliser un autre compte",
+        "doneTitle": "Retour à {app}",
+        "doneBody": "{app} termine la connexion tout seul. Vous pouvez fermer cet onglet.",
+        "codeHint": "Si {app} ne s’est pas ouvert, collez-y ce code :",
+        "copyCode": "Copier le code",
+        "failed": "Impossible de connecter l’app. Réessayez.",
+        "invalidTitle": "Ce lien a expiré",
+        "invalidBody": "Recommencez la connexion depuis l’app de bureau."
+    },
+    "signIn": {
+        "waitingTitle": "Continuez dans votre navigateur",
+        "waitingBody": "Connectez-vous dans la fenêtre du navigateur qui s’est ouverte, puis revenez ici.",
+        "reopen": "Rouvrir le navigateur",
+        "pasteCode": "Coller un code à la place",
+        "codeLabel": "Code du navigateur",
+        "submit": "Se connecter",
+        "back": "Retour",
+        "errors": {
+            "expired": "Ce code a expiré. Recommencez.",
+            "invalid": "Ce code n’est pas valide. Recommencez.",
+            "state-mismatch": "Cette connexion a été lancée depuis une autre fenêtre. Recommencez.",
+            "network": "Impossible de joindre Rerun. Vérifiez votre connexion.",
+            "cancelled": "La connexion a été annulée."
+        }
+    }
+}

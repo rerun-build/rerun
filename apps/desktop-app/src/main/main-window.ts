@@ -25,9 +25,13 @@ let currentOrigin: string | null = null
 let lastAppUrl: string | null = null
 let quitting = false
 
-app.on('before-quit', () => {
+// Set before anything that quits: a window closed then really closes instead of hiding (Squirrel's
+// install closes every window first and never sends `before-quit`).
+export function markQuitting(): void {
     quitting = true
-})
+}
+
+app.on('before-quit', markQuitting)
 
 export function getMainWindow(): BrowserWindow | null {
     return mainWindow && !mainWindow.isDestroyed() ? mainWindow : null

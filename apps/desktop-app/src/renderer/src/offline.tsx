@@ -1,4 +1,5 @@
 import { Button } from '@rerun/ui/primitives'
+import type { DesktopUpdateState } from '@rerun/contracts'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'use-intl'
 import { mount } from './mount'
@@ -42,21 +43,7 @@ function OfflinePage() {
         }
     }, [reason, retry])
 
-    if (reason === 'incompatible') {
-        return (
-            <ShellFrame>
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-lg font-semibold text-balance">{t('incompatible.title')}</h1>
-                    <p className="text-sm text-muted-foreground text-balance">{t('incompatible.body', { host })}</p>
-                </div>
-                <Button asChild>
-                    <a href={DOWNLOAD_URL} target="_blank" rel="noreferrer">
-                        {t('incompatible.download')}
-                    </a>
-                </Button>
-            </ShellFrame>
-        )
-    }
+    if (reason === 'incompatible') return <UpdateRequired host={host} />
 
     return (
         <ShellFrame>
@@ -67,6 +54,41 @@ function OfflinePage() {
             <Button onClick={() => void retry(true)} loading={retrying}>
                 {t('offline.retry')}
             </Button>
+        </ShellFrame>
+    )
+}
+
+// The server no longer serves this version: the update is fetched at once, and installed on a click.
+function UpdateRequired({ host }: { host: string }) {
+    const t = useTranslations('desktopApp')
+    const [update, setUpdate] = useState<DesktopUpdateState>({ status: 'idle' })
+
+    useEffect(() => {
+        const local = shellLocal()
+        if (!local) return
+        void local.updateState().then(setUpdate)
+        const off = local.onUpdateState(setUpdate)
+        local.checkForUpdates()
+        return off
+    }, [])
+
+    return (
+        <ShellFrame>
+            <div className="flex flex-col gap-2">
+                <h1 className="text-lg font-semibold text-balance">{t('incompatible.title')}</h1>
+                <p className="text-sm text-muted-foreground text-balance">{t('incompatible.body', { host })}</p>
+            </div>
+            {update.status === 'ready' ? (
+                <Button onClick={() => shellLocal()?.installUpdate()}>{t('incompatible.restart')}</Button>
+            ) : update.status === 'downloading' ? (
+                <p className="text-sm tabular-nums text-muted-foreground">{t('incompatible.downloading', { percent: update.percent })}</p>
+            ) : (
+                <Button asChild>
+                    <a href={DOWNLOAD_URL} target="_blank" rel="noreferrer">
+                        {t('incompatible.download')}
+                    </a>
+                </Button>
+            )}
         </ShellFrame>
     )
 }
