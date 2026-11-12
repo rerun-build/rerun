@@ -1,0 +1,61 @@
+# Konductor flow for a Linear issue labeled Harness Use Case: replay the case, plan (approved by the flow), review, fix the review
+# (plan approved by you), PR, summary on the issue, then wait for your merge.
+# Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
+name = "Harness"
+match = { labels = ["Harness Use Case"] }
+
+[[steps]]
+id = "investigate"
+title = "Investigate"
+attach_issue = true
+prompt = """
+/harness-use-case {{issue.url}}
+
+Le ticket Linear complet (description, images) est dans {{issue.file}}.
+"""
+
+[[steps]]
+id = "plan"
+title = "Plan the fix"
+plan = true
+approve = "auto"
+prompt = "Planifie le fix à partir du cas rejoué : la cause, la couche où le corriger (hub, prompt du moteur, template), et la mesure avant / après qui le prouve."
+
+[[steps]]
+id = "review"
+title = "Review"
+kind = "review"
+
+[[steps]]
+id = "fixes"
+title = "Review fixes"
+plan = true
+approve = "human"
+comments = ["blocking", "major", "minor", "nit"]
+skip_if_no_comments = true
+prompt = """
+Voici les {{comments.count}} remarques de la review, chacune avec sa sévérité.
+Planifie la correction de toutes les remarques blocking et major, et des minor / nit qui sont des quick wins.
+Pour chaque remarque que tu écartes, dis pourquoi.
+"""
+
+[[steps]]
+id = "pr"
+title = "Pull request"
+kind = "create_pr"
+
+[[steps]]
+id = "summary"
+title = "Summary"
+chat = "summary"
+linear_comment = true
+prompt = """
+Lis {{issue.file}}, le diff de ce workspace (GetWorkspaceDiff) et la PR ouverte.
+Écris un résumé pour la personne qui va relire et merger : le cas client, la cause, la couche corrigée et comment,
+la mesure avant / après, et ce qu'il reste à vérifier avant de merger. Court, en français.
+"""
+
+[[steps]]
+id = "merge"
+title = "Merge"
+kind = "wait_merge"
