@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react-native'
 
 import type { BoardRead } from '@/api/board'
 import { cachedBoard, clearLocalCache } from '@/data/local-cache'
+import { realtime } from '@/test/realtime'
 
 import { useBoard } from './useBoard'
 
@@ -11,35 +12,26 @@ const mockFetchBoard = jest.fn<Promise<BoardRead>, []>()
 jest.mock('expo-file-system', () => ({ Directory: class {}, File: class {}, Paths: {} }))
 jest.mock('@/api/board', () => ({ fetchBoard: () => mockFetchBoard() }))
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: { access_token: 't' }, me: { user: { id: 'u1' }, workspace: { id: 7 } } }) }))
+jest.mock('@/auth/supabase', () => ({ supabase: require('@/test/realtime').fakeSupabase }))
 
-const mockSubscriptions: { table: string; filter?: string }[] = []
-
-jest.mock('@/auth/supabase', () => {
-    const channel = {
-        on: (_event: string, spec: { table: string; filter?: string }) => {
-            mockSubscriptions.push(spec)
-            return channel
-        },
-        subscribe: () => channel,
-    }
-    return { supabase: { channel: () => channel, removeChannel: () => {} } }
-})
-
-const agent = (id: string, name: string): BoardAgent => ({ id, name, handle: null, description: null, templateId: null, status: 'idle', workspaceId: 7, spaceId: 's1', disabledAt: null, disabledReason: null })
+const agent = (id: string, name: string, status: BoardAgent['status'] = 'idle'): BoardAgent => ({ id, name, handle: null, description: null, templateId: null, status, workspaceId: 7, spaceId: 's1', disabledAt: null, disabledReason: null })
 const boardWith = (...agents: BoardAgent[]): BoardRead => ({ agents, overview: [], boxes: [] })
+
+// Several rows move at once when a run starts: the home reads once for the burst.
+const BURST_MS = 400
 
 describe('useBoard', () => {
     beforeEach(() => {
         clearLocalCache()
         mockFetchBoard.mockReset()
-        mockSubscriptions.length = 0
+        realtime.reset()
     })
 
     it('listens to the Boxes named to the caller, so one handed over or taken back reaches the home', async () => {
         mockFetchBoard.mockResolvedValue(boardWith())
         await renderHook(() => useBoard())
         await act(async () => {})
-        expect(mockSubscriptions).toContainEqual(expect.objectContaining({ table: 'space_members', filter: 'user_id=eq.u1' }))
+        expect(realtime.live().flatMap(channel => channel.bindings)).toContainEqual(expect.objectContaining({ table: 'space_members', filter: 'user_id=eq.u1' }))
     })
 
     it('opens on the rows kept from the last visit, then on the hub copy', async () => {
@@ -73,5 +65,43 @@ describe('useBoard', () => {
         await act(async () => {})
 
         expect(result.current.state).toBe('error')
+    })
+
+    describe('a chat started on the web while Realtime was away (RER-7)', () => {
+        beforeEach(() => jest.useFakeTimers())
+        afterEach(() => jest.useRealTimers())
+
+        it('reads the board again when the channel joins again after a drop, as Realtime does not replay what it missed', async () => {
+            mockFetchBoard.mockResolvedValueOnce(boardWith(agent('a1', 'Scout'))).mockResolvedValue(boardWith(agent('a1', 'Scout', 'working')))
+            const { result } = await renderHook(() => useBoard())
+            await act(async () => realtime.report('SUBSCRIBED'))
+            await act(async () => jest.advanceTimersByTime(BURST_MS))
+            expect(mockFetchBoard).toHaveBeenCalledTimes(1)
+
+            await act(async () => realtime.report('SUBSCRIBED'))
+            await act(async () => jest.advanceTimersByTime(BURST_MS))
+
+            expect(mockFetchBoard).toHaveBeenCalledTimes(2)
+            expect(result.current.state === 'ready' && result.current.coworkers[0].status).toBe('working')
+        })
+
+        it('opens a channel again when the server closed it, and hears the changes on it', async () => {
+            mockFetchBoard.mockResolvedValueOnce(boardWith(agent('a1', 'Scout'))).mockResolvedValue(boardWith(agent('a1', 'Scout', 'working')))
+            const { result } = await renderHook(() => useBoard())
+            await act(async () => realtime.report('SUBSCRIBED'))
+            const [closed] = realtime.live()
+
+            await act(async () => realtime.report('CLOSED'))
+            await act(async () => jest.advanceTimersByTime(15_000))
+
+            const [reopened] = realtime.live()
+            expect(closed.removed).toBe(true)
+            expect(reopened).toBeDefined()
+            expect(reopened.bindings.map(({ event, table, filter }) => ({ event, table, filter }))).toEqual(closed.bindings.map(({ event, table, filter }) => ({ event, table, filter })))
+
+            await act(async () => realtime.change('sessions'))
+            await act(async () => jest.advanceTimersByTime(BURST_MS))
+            expect(result.current.state === 'ready' && result.current.coworkers[0].status).toBe('working')
+        })
     })
 })

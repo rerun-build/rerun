@@ -1,14 +1,13 @@
 import type { AgentModels, AgentView, Conversation } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
-import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { View } from 'react-native'
 import { useSharedValue } from 'react-native-reanimated'
 
-import { fetchAgentConversations, fetchAgentView } from '@/api/chat'
+import { fetchAgentView } from '@/api/chat'
 import { markInboxRead } from '@/api/inbox'
 import { fetchAgentModels } from '@/api/models'
 import { useAuth } from '@/auth/AuthProvider'
-import { supabase } from '@/auth/supabase'
 import { coworkerEndpoints } from '@/chat/endpoints'
 import { useChatBack } from '@/components/layout/useChatBack'
 import { environment } from '@/config/environment'
@@ -23,6 +22,7 @@ import { ConversationPager } from './ConversationPager'
 import { ConversationPane, type ChatCoworker } from './ConversationPane'
 import { generalThreadsOf } from './threads/general-threads'
 import type { StartedBy } from './origins/StartedByBanner'
+import { useCoworkerConversations } from './useCoworkerConversations'
 import { useOpenChats } from './useOpenChats'
 
 function coworkerOf(agentId: string, view: AgentView | null): ChatCoworker {
@@ -46,34 +46,16 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
     const [kept] = useState(() => (me ? readCoworkerScreen(me.workspace.id, agentId) : null))
     const [view, setView] = useState<AgentView | null>(kept?.view ?? null)
     const [models, setModels] = useState<AgentModels | null>(kept?.models ?? null)
-    const [conversations, setConversations] = useState<Conversation[]>(kept?.conversations ?? [])
-    const [conversationsLoaded, setConversationsLoaded] = useState(!!kept?.conversations)
+    const { conversations, loaded: conversationsLoaded, reload: loadConversations } = useCoworkerConversations(agentId)
     const [draftKey, setDraftKey] = useState(() => `new-${Date.now()}`)
     const [bornKeys, setBornKeys] = useState<Record<string, string>>({})
     const [activeId, setActiveId] = useState(sessionId)
-    // Two chats of the same coworker can be stacked (a push opens a second one): each needs its own
-    // channel, supabase.channel() hands back the existing instance for a topic already taken.
-    const channelId = useId()
     const [openIds, openChat] = useOpenChats(agentId, sessionId === GENERAL_PAGE_ID ? null : sessionId)
     const coworker = coworkerOf(agentId, view)
     const generalId = conversations.find(conversation => conversation.kind === 'general')?.id ?? null
     const generalThreads = useMemo(() => generalThreadsOf(conversations), [conversations])
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
-
-    const loadConversations = useCallback(() => {
-        if (!accessToken || !workspaceId) return
-        fetchAgentConversations({ accessToken, workspaceId }, agentId)
-            .then(list => {
-                const sorted = [...list].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-                setConversations(sorted)
-                saveCoworkerScreen(workspaceId, agentId, { conversations: sorted })
-            })
-            .catch(() => {})
-            .finally(() => setConversationsLoaded(true))
-    }, [accessToken, workspaceId, agentId])
-
-    useEffect(loadConversations, [loadConversations])
 
     // Read again when the model sheet closes on a new pick, or the details come back on a new name.
     useFocusEffect(
@@ -93,21 +75,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
                 .catch(() => {})
         }, [accessToken, workspaceId, agentId])
     )
-
-    // The status moves on the hub while the page is open (a run ends on a question, another one starts
-    // on a schedule): the header's menu sorts them by state, so every row of the coworker is followed live.
-    // A new one (a routine's run, a webhook, another coworker's request) takes its place in General.
-    useEffect(() => {
-        const sessions = { schema: 'public', table: 'sessions', filter: `agent_id=eq.${agentId}` } as const
-        const channel = supabase
-            .channel(`conversations:${agentId}:${channelId}`)
-            .on('postgres_changes', { event: 'INSERT', ...sessions }, loadConversations)
-            .on('postgres_changes', { event: 'UPDATE', ...sessions }, loadConversations)
-            .subscribe()
-        return () => {
-            supabase.removeChannel(channel)
-        }
-    }, [agentId, channelId, loadConversations])
 
     // On screen is read: a finished run leaves Unread once its conversation is the open one. Only an
     // Unread one: the inbox's read also sends a waiting conversation back to idle.

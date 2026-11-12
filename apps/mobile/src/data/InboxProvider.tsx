@@ -1,11 +1,10 @@
 import type { InboxItem } from '@rerun/contracts'
 import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { AppState } from 'react-native'
 
 import { fetchInbox, markInboxRead } from '@/api/inbox'
 import { useAuth } from '@/auth/AuthProvider'
-import { supabase } from '@/auth/supabase'
 import { cachedInbox } from '@/data/local-cache'
+import { useLiveReload } from '@/data/useLiveReload'
 
 // `fresh`: read from the hub since the app opened, not the copy the phone kept from the last visit.
 type InboxState = { state: 'loading' } | { state: 'error' } | { state: 'ready'; items: InboxItem[]; running: number; fresh: boolean }
@@ -65,26 +64,22 @@ export function InboxProvider({ children }: { children: ReactNode }) {
         }
     }, [accessToken, workspaceId, version])
 
-    useEffect(() => {
-        const foreground = AppState.addEventListener('change', state => {
-            if (state === 'active') reload()
-        })
-        return () => foreground.remove()
-    }, [reload])
-
-    useEffect(() => {
-        if (!workspaceId || !userId) return
-        const channel = supabase
-            .channel(`inbox:${workspaceId}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, reloadSoon)
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `workspace_id=eq.${workspaceId}` }, reloadSoon)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'session_reads', filter: `user_id=eq.${userId}` }, reloadSoon)
-            .subscribe()
-        return () => {
-            supabase.removeChannel(channel)
+    useLiveReload(
+        workspaceId && userId ? `inbox:${workspaceId}:${userId}` : null,
+        (channel, changed) => {
+            channel
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, changed)
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `workspace_id=eq.${workspaceId}` }, changed)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'session_reads', filter: `user_id=eq.${userId}` }, changed)
+        },
+        reloadSoon
+    )
+    useEffect(
+        () => () => {
             if (timer.current) clearTimeout(timer.current)
-        }
-    }, [workspaceId, userId, reloadSoon])
+        },
+        []
+    )
 
     const write = useCallback(
         (sessionIds: string[] | 'all', rowIds: string[]) => {
