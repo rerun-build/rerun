@@ -27,3 +27,16 @@ describe('deepLinkInArgv', () => {
         expect(deepLinkInArgv(['/Applications/Rerun.exe', '--flag'], 'rerun-desktop')).toBeNull()
     })
 })
+
+describe('the service sign-in return', () => {
+    it('carries the claim or the error back to the page', () => {
+        expect(parseDeepLink('rerun-desktop://oauth/callback?status=success&claim=abcdefghijklmnopqrstuv', 'rerun-desktop')).toEqual({ kind: 'oauth-return', result: { status: 'success', claim: 'abcdefghijklmnopqrstuv' } })
+        expect(parseDeepLink('rerun-desktop://oauth/callback?status=success', 'rerun-desktop')).toEqual({ kind: 'oauth-return', result: { status: 'success' } })
+        expect(parseDeepLink('rerun-desktop://oauth/callback?status=error&message=Access%20denied', 'rerun-desktop')).toEqual({ kind: 'oauth-return', result: { status: 'error', message: 'Access denied' } })
+    })
+
+    it('drops a malformed claim or status', () => {
+        expect(parseDeepLink('rerun-desktop://oauth/callback?status=success&claim=../../x', 'rerun-desktop')).toBeNull()
+        expect(parseDeepLink('rerun-desktop://oauth/callback?status=maybe', 'rerun-desktop')).toBeNull()
+    })
+})

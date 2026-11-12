@@ -4,6 +4,7 @@ import { completeFromLink } from './browser-sign-in'
 import { deepLinkInArgv, parseDeepLink } from './deep-links'
 import { CHANNEL, PRODUCT_NAME, SCHEME, shellUserAgent } from './identity'
 import { registerIpcHandlers } from './ipc-handlers'
+import { IPC_EVENTS } from '../shared/ipc-channels'
 import { registerLocalScheme } from './local-pages'
 import { closeFindBar, openFindBar } from './find-bar'
 import { createMainWindow, getMainWindow, openExternal, reloadApp, showIncompatiblePage, showMainWindow, showServerPicker } from './main-window'
@@ -32,6 +33,10 @@ function receiveLink(raw: string): void {
     }
     const link = parseDeepLink(raw, SCHEME)
     if (link?.kind === 'auth-callback') void completeFromLink(link.code, link.state)
+    if (link?.kind === 'oauth-return') {
+        showMainWindow()
+        getMainWindow()?.webContents.send(IPC_EVENTS.oauthReturn, link.result)
+    }
 }
 
 app.on('open-url', (event, url) => {

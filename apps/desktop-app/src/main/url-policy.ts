@@ -51,6 +51,16 @@ export function isExternalUrl(raw: string): boolean {
     return !!url && EXTERNAL_PROTOCOLS.has(url.protocol)
 }
 
+// Stripe's hosted pages (Checkout for a template, Connect onboarding for a creator) take the whole
+// window and come back to the app: they open in a window of the app's session, which closes when
+// Stripe sends the person back.
+const PAYMENT_HOSTS = new Set(['checkout.stripe.com', 'connect.stripe.com'])
+
+export function isPaymentPage(raw: string): boolean {
+    const url = parseUrl(raw)
+    return !!url && url.protocol === 'https:' && PAYMENT_HOSTS.has(url.hostname)
+}
+
 export type NavigationDecision = 'stay' | 'external' | 'deny'
 
 // A navigation of the main window: the server's own pages stay, the web leaves for the browser,

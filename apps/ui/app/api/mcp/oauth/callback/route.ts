@@ -8,6 +8,7 @@ import { parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import type { DesktopShellChannel } from '@rerun/contracts'
 
 type CallbackResult = { ok: true; claim?: string } | { ok: false; error: string }
 
@@ -35,10 +36,12 @@ export async function GET(req: Request) {
 
     // Only known once the context is decoded, and `finish` is what every exit path goes through.
     let mobile = false
+    // The desktop app's channel, when it started the sign-in: where the browser goes back to.
+    let desktop: DesktopShellChannel | undefined
     let serverName: string | undefined
 
     const finish = (result: CallbackResult): NextResponse => {
-        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result) } }) : htmlResult(result, serverName)
+        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } }) : htmlResult(result, serverName)
         if (state) res.cookies.delete({ name: OAUTH_COOKIE_PREFIX + state, path: OAUTH_COOKIE_PATH })
         return res
     }
@@ -55,6 +58,7 @@ export async function GET(req: Request) {
         mobile = ctx.mobileGrant !== undefined
         serverName = ctx.serverName
         const grant = callbackGrant(ctx)
+        desktop = grant?.desktop
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)

@@ -194,6 +194,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
                     url={authStep.url}
                     agentId={agentId}
                     serverName={authStep.serverName}
+                    serviceKey={connectKey}
                     autoStart={signInStart !== null}
                     pendingPopup={signInStart?.popup}
                     onAuthorized={async () => {

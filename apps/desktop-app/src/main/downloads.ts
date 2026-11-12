@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
-import { app, shell, type DownloadItem, type Session } from 'electron'
+import { app, BrowserWindow, shell, type DownloadItem, type Session } from 'electron'
 import type { DesktopDownloadEvent } from '@rerun/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { uniqueDownloadPath } from './download-path'
@@ -16,7 +16,10 @@ function report(item: DownloadItem, id: string, state: DesktopDownloadEvent['sta
 // Every download (a link with `download`, a blob, an attachment the server sends) goes straight to
 // the Downloads folder, without a save dialog, as a browser does, and the web app shows its toast.
 export function trackDownloads(session: Session): void {
-    session.on('will-download', (_event, item) => {
+    session.on('will-download', (_event, item, contents) => {
+        // A window opened only to fetch a file (a data export) has nothing left to show.
+        const opener = BrowserWindow.fromWebContents(contents)
+        if (opener && opener !== getMainWindow() && !contents.navigationHistory.canGoBack()) item.once('done', () => opener.close())
         const id = randomUUID()
         const path = uniqueDownloadPath(app.getPath('downloads'), item.getFilename(), existsSync)
         item.setSavePath(path)

@@ -16,7 +16,7 @@ export const PRODUCT_NAMES = { stable: 'Rerun', staging: 'Rerun Staging', dev: '
 
 export const PRODUCT_NAME = PRODUCT_NAMES[CHANNEL]
 
-export const BASE_CAPABILITIES: readonly DesktopShellCapability[] = ['window', 'find', 'links', 'downloads', 'auth']
+export const BASE_CAPABILITIES: readonly DesktopShellCapability[] = ['window', 'find', 'links', 'downloads', 'auth', 'oauth']
 
 export function shellPlatform(): DesktopShellPlatform {
     if (process.platform === 'darwin') return 'mac'

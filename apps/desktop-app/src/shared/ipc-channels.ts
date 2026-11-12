@@ -29,6 +29,7 @@ export const IPC_EVENTS = {
     download: 'rerun-shell:event:download',
     findResult: 'rerun-shell:event:find-result',
     findFocus: 'rerun-shell:event:find-focus',
+    oauthReturn: 'rerun-shell:event:oauth-return',
 } as const
 
 export type AppBootstrap = {

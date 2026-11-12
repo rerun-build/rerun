@@ -4,7 +4,7 @@ import { getCatalogServicesBySlugs, getServiceDetails } from '@/app/api/_service
 import { appOrigin } from '@/lib/managed/oauth'
 import { mintConnectTicket } from '@/lib/oauth/mobile-ticket'
 import type { InstallResult, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
-import { type InstallResultView, type PendingAuth, type ResolvedService, type ServiceSearchResultView, parseServiceRegistryKey } from '@rerun/contracts'
+import { type DesktopShellChannel, type InstallResultView, type PendingAuth, type ResolvedService, type ServiceSearchResultView, parseDesktopShellUserAgent, parseServiceRegistryKey } from '@rerun/contracts'
 
 // The app never holds a sign-in target: it gets which flow is waiting, and the hub reads the target
 // back from the registry when the flow starts.
@@ -62,13 +62,19 @@ export function serviceKeyParam(params: Record<string, string>): string {
     return decodeURIComponent(params.slug)
 }
 
+// The desktop app asks from its own window, its User-Agent naming its channel: the sign-in returns
+// to its URL scheme instead of the iOS app's.
+export function requestingDesktop(req: Request): DesktopShellChannel | undefined {
+    return parseDesktopShellUserAgent(req.headers.get('user-agent'))?.channel
+}
+
 export function connectUrl(req: Request, ctx: WorkspaceContext, agentId: string, key: string): string {
-    const ticket = mintConnectTicket({ agentId, key, workspaceId: ctx.workspace.id, userId: ctx.userId })
+    const ticket = mintConnectTicket({ agentId, key, workspaceId: ctx.workspace.id, userId: ctx.userId, desktop: requestingDesktop(req) })
     return `${appOrigin(req)}/api/oauth/mobile/start?t=${encodeURIComponent(ticket)}`
 }
 
 export function mcpConnectUrl(req: Request, ctx: WorkspaceContext, agentId: string, server: string): string {
-    const ticket = mintConnectTicket({ agentId, server, workspaceId: ctx.workspace.id, userId: ctx.userId })
+    const ticket = mintConnectTicket({ agentId, server, workspaceId: ctx.workspace.id, userId: ctx.userId, desktop: requestingDesktop(req) })
     return `${appOrigin(req)}/api/oauth/mobile/start?t=${encodeURIComponent(ticket)}`
 }
 

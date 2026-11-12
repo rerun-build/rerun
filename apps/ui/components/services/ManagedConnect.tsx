@@ -7,6 +7,7 @@ import { usePopupClosePoll } from '@/hooks/usePopupClosePoll'
 import { CheckCircle2Icon, ExternalLinkIcon, Loader2Icon, XCircleIcon } from '@/lib/icons'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { desktopServiceSignInAvailable, signInThroughBrowser } from '@/lib/desktop-shell/service-sign-in'
 
 const RESULT_TYPES = ['managed-oauth-success', 'managed-oauth-error'] as const
 
@@ -52,6 +53,17 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
     const startAuth = async () => {
         setState('authorizing')
         setError(null)
+        if (desktopServiceSignInAvailable()) {
+            const result = await signInThroughBrowser({ agentId, key: instanceKey }, t('authorizationFailed'))
+            if (result.ok) {
+                setState('authorized')
+                onAuthorized()
+            } else {
+                setError(result.error)
+                setState('error')
+            }
+            return
+        }
         armResult()
         try {
             const res = await fetch(`/api/oauth/managed/${provider}/start`, {
@@ -77,7 +89,7 @@ export function ManagedConnect({ agentId, instanceKey, provider, serverName, nam
 
     const autoStartedRef = useRef(false)
     useEffect(() => {
-        if (!autoStart || autoStartedRef.current || !pendingPopup || pendingPopup.closed) return
+        if (!autoStart || autoStartedRef.current || (!desktopServiceSignInAvailable() && (!pendingPopup || pendingPopup.closed))) return
         autoStartedRef.current = true
         startAuth()
         // eslint-disable-next-line react-hooks/exhaustive-deps

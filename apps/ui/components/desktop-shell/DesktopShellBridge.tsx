@@ -64,5 +64,20 @@ export function DesktopShellBridge() {
         return () => observer.disconnect()
     }, [])
 
+    // ⌘F that nothing on the page took (the second one, past the Control Center) is the browser's
+    // find in page, which the desktop app draws itself.
+    useEffect(() => {
+        const shell = desktopShell('find')
+        if (!shell) return
+        const onKey = (event: KeyboardEvent) => {
+            if (event.defaultPrevented || event.key?.toLowerCase() !== 'f' || event.shiftKey || event.altKey) return
+            if (shell.platform === 'mac' ? !event.metaKey || event.ctrlKey : !event.ctrlKey || event.metaKey) return
+            event.preventDefault()
+            shell.find.open()
+        }
+        window.addEventListener('keydown', onKey)
+        return () => window.removeEventListener('keydown', onKey)
+    }, [])
+
     return null
 }

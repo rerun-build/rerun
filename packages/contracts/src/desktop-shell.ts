@@ -11,7 +11,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -77,6 +77,12 @@ export type DesktopDownloadEvent = {
     totalBytes: number
 }
 
+// A service sign-in (Gmail, an MCP server…) the page started in the system browser, as the
+// browser hands it back to the app: `claim` names what the callback parked for the page to claim.
+export type DesktopOAuthReturn = { status: 'success'; claim?: string } | { status: 'error'; message: string }
+
+export const DESKTOP_OAUTH_RETURN_HOST = 'oauth'
+
 export type DesktopSignInProvider = 'google' | 'apple'
 
 export type DesktopSignInResult = { status: 'signed-in' } | { status: 'error'; reason: DesktopSignInError }
@@ -119,6 +125,9 @@ export type DesktopShellApi = {
     downloads: {
         onEvent(callback: (event: DesktopDownloadEvent) => void): Unsubscribe
         show(id: string): void
+    }
+    oauth: {
+        onReturn(callback: (result: DesktopOAuthReturn) => void): Unsubscribe
     }
 }
 

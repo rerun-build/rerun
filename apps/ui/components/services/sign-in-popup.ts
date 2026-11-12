@@ -1,3 +1,5 @@
+import { desktopServiceSignInAvailable } from '@/lib/desktop-shell/service-sign-in'
+
 const WIDTH = 500
 const HEIGHT = 640
 
@@ -6,6 +8,8 @@ const HEIGHT = 640
 // authorization URL once it is known. `label` is what the empty window shows meanwhile, already in
 // the viewer's language; a caller with no translator gets the English one.
 export function openPendingSignInPopup(name: string, label = `Connecting to ${name}…`): Window | null {
+    // The desktop app runs the sign-in in the system browser: no window to open here.
+    if (desktopServiceSignInAvailable()) return null
     const left = window.screenX + (window.outerWidth - WIDTH) / 2
     const top = window.screenY + (window.outerHeight - HEIGHT) / 2
     const popup = window.open('about:blank', 'rerun-sign-in', `width=${WIDTH},height=${HEIGHT},left=${left},top=${top},popup=yes`)

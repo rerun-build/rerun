@@ -1,3 +1,4 @@
+import type { DesktopShellChannel } from '@rerun/contracts'
 import { createHmac, randomBytes, timingSafeEqual } from 'crypto'
 
 // The in-app browser carries neither the bearer token nor a Supabase session, so the sign-in entry
@@ -8,12 +9,14 @@ import { createHmac, randomBytes, timingSafeEqual } from 'crypto'
 // The service is either an account of a catalog app (`key`, its registry key: the bare slug or
 // `<slug>@<instanceId>`) or a server registered outside the catalog (`server`, its engine name).
 type ConnectSubject = { key: string; server?: undefined } | { server: string; key?: undefined }
-export type ConnectTicket = { kind: 'ticket'; jti: string; agentId: string; workspaceId: number; userId: string; exp: number } & ConnectSubject
+// `desktop` is the channel of the desktop app that asked, whose URL scheme the sign-in returns to;
+// absent, it returns to the iOS app.
+export type ConnectTicket = { kind: 'ticket'; jti: string; agentId: string; workspaceId: number; userId: string; exp: number; desktop?: DesktopShellChannel } & ConnectSubject
 
 // What the callback authorizes itself with, for the same reason: it runs in that session-less
 // browser too. It rides in the OAuth context cookie, which the browser holds, hence the signature.
 // It names the same row as the ticket, where the callback leaves what the provider handed over.
-export type CallbackGrant = { kind: 'grant'; jti: string; agentId: string; workspaceId: number; userId: string; exp: number }
+export type CallbackGrant = { kind: 'grant'; jti: string; agentId: string; workspaceId: number; userId: string; exp: number; desktop?: DesktopShellChannel }
 
 const TICKET_TTL_MS = 120_000
 // The provider's own screens (password, 2FA) sit between start and callback, so the grant lives
@@ -46,7 +49,7 @@ export function open<T extends { exp: number }>(raw: string | null | undefined, 
     return claims
 }
 
-export function mintConnectTicket(ticket: { agentId: string; workspaceId: number; userId: string } & ConnectSubject): string {
+export function mintConnectTicket(ticket: { agentId: string; workspaceId: number; userId: string; desktop?: DesktopShellChannel } & ConnectSubject): string {
     return seal({ ...ticket, kind: 'ticket', jti: randomBytes(16).toString('base64url') }, TICKET_TTL_MS)
 }
 

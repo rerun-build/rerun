@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { decideNavigation, decideWindowOpen, isInsecureServer, normalizeServerUrl } from '../src/main/url-policy'
+import { decideNavigation, decideWindowOpen, isInsecureServer, isPaymentPage, normalizeServerUrl } from '../src/main/url-policy'
 
 const SERVER = 'https://app.rerun.build'
 
@@ -64,5 +64,15 @@ describe('isInsecureServer', () => {
         expect(isInsecureServer('http://localhost:3050')).toBe(false)
         expect(isInsecureServer('http://127.0.0.1:3050')).toBe(false)
         expect(isInsecureServer('https://rerun.example.com')).toBe(false)
+    })
+})
+
+describe('isPaymentPage', () => {
+    it('knows Stripe’s hosted pages and nothing else', () => {
+        expect(isPaymentPage('https://checkout.stripe.com/c/pay/cs_test_123')).toBe(true)
+        expect(isPaymentPage('https://connect.stripe.com/setup/e/acct_1/abc')).toBe(true)
+        expect(isPaymentPage('http://checkout.stripe.com/c/pay')).toBe(false)
+        expect(isPaymentPage('https://checkout.stripe.com.evil.com/c/pay')).toBe(false)
+        expect(isPaymentPage('https://dashboard.stripe.com/')).toBe(false)
     })
 })

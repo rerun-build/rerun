@@ -10,6 +10,7 @@ import { parkSignIn } from '@/lib/oauth/pending-grant'
 import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import type { DesktopShellChannel } from '@rerun/contracts'
 
 type CallbackResult = { ok: true; email?: string; claim?: string } | { ok: false; error: string }
 
@@ -36,10 +37,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
 
     // Only known once the context is decoded, and `finish` is what every exit path goes through.
     let mobile = false
+    // The desktop app's channel, when it started the sign-in: where the browser goes back to.
+    let desktop: DesktopShellChannel | undefined
     let key: string | undefined
 
     const finish = (result: CallbackResult): NextResponse => {
-        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result) } }) : htmlResult(result, key)
+        const res = mobile ? new NextResponse(null, { status: 302, headers: { Location: appReturnUrl(result, desktop) } }) : htmlResult(result, key)
         if (state) res.cookies.delete({ name: MANAGED_COOKIE_PREFIX + state, path: MANAGED_COOKIE_PATH })
         return res
     }
@@ -68,6 +71,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
         key = ctx.key
         if (ctx.provider !== providerId) return finish({ ok: false, error: 'Provider mismatch, please retry' })
         const grant = callbackGrant(ctx)
+        desktop = grant?.desktop
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)

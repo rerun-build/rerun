@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
-import type { DesktopDownloadEvent, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
+import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
 // Runs before any script of the page, in an isolated world, in the main frame only. It asks the
@@ -47,6 +47,9 @@ if (bootstrap?.audience === 'app') {
         downloads: {
             onEvent: (callback) => subscribe<DesktopDownloadEvent>(IPC_EVENTS.download, callback),
             show: (id) => void ipcRenderer.invoke(IPC.downloadsShow, String(id)),
+        },
+        oauth: {
+            onReturn: (callback) => subscribe<DesktopOAuthReturn>(IPC_EVENTS.oauthReturn, callback),
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)

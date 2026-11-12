@@ -7,7 +7,7 @@ import { localPageUrl } from './local-pages'
 import { t } from './messages'
 import { partitionFor } from './server'
 import { prepareSession } from './session'
-import { decideNavigation, decideWindowOpen, isExternalUrl, isSameOrigin, parseUrl } from './url-policy'
+import { decideNavigation, decideWindowOpen, isExternalUrl, isPaymentPage, isSameOrigin, parseUrl } from './url-policy'
 import { restoredBounds, trackBounds } from './window-state'
 
 export const PRELOAD_PATH = join(import.meta.dirname, '../preload/index.cjs')
@@ -70,31 +70,64 @@ export async function openExternal(url: string): Promise<boolean> {
     return true
 }
 
-// Popups the web app opens on the server's own pages (a sign-in popup pointed at its provider, a
-// page that needs the session) live in the same session, with the browser's defaults.
+// A page of the server opened in a new window (the hop to a published page, a data export) lives in
+// the app's session. Once it heads for another site, the site opens in the browser and the window
+// goes: the hop to a published page hands its one-minute ticket over to the browser that way.
 function guardChildWindow(contents: WebContents, origin: string): void {
     contents.setWindowOpenHandler(({ url }) => {
         if (isExternalUrl(url)) void openExternal(url)
         return { action: 'deny' }
     })
-    contents.on('will-navigate', (event, url) => {
-        if (!isExternalUrl(url) && !isSameOrigin(url, origin)) event.preventDefault()
+    const leave = (event: Electron.Event, url: string) => {
+        if (isSameOrigin(url, origin)) return
+        event.preventDefault()
+        if (isExternalUrl(url)) void openExternal(url)
+        BrowserWindow.fromWebContents(contents)?.close()
+    }
+    contents.on('will-navigate', leave)
+    contents.on('will-redirect', leave)
+}
+
+// Stripe's page in a window of its own, the app's session included (Checkout reads the customer's
+// cookie-less session from its URL, the return lands on the app). When Stripe sends the person back
+// to the server, the window closes and the app opens the return page.
+function openPaymentWindow(url: string, origin: string): void {
+    const parent = getMainWindow()
+    const payment = new BrowserWindow({
+        width: 560,
+        height: 780,
+        parent: parent ?? undefined,
+        autoHideMenuBar: true,
+        backgroundColor: themeColors().background,
+        webPreferences: { partition: partitionFor(origin), sandbox: true, contextIsolation: true, nodeIntegration: false },
     })
+    const contents = payment.webContents
+    const back = (event: Electron.Event, target: string) => {
+        if (!isSameOrigin(target, origin)) return
+        event.preventDefault()
+        payment.close()
+        void parent?.loadURL(target)
+    }
+    contents.on('will-navigate', back)
+    contents.on('will-redirect', back)
+    contents.setWindowOpenHandler(({ url: opened }) => {
+        if (isExternalUrl(opened)) void openExternal(opened)
+        return { action: 'deny' }
+    })
+    void payment.loadURL(url)
 }
 
 function guardNavigation(window: BrowserWindow, origin: string): void {
     const contents = window.webContents
-    contents.on('will-navigate', (event, url) => {
+    const away = (event: Electron.Event, url: string) => {
         const decision = decideNavigation(url, origin)
         if (decision === 'stay') return
         event.preventDefault()
-        if (decision === 'external') void openExternal(url)
-    })
-    contents.on('will-redirect', (event, url) => {
-        if (decideNavigation(url, origin) === 'stay') return
-        event.preventDefault()
-        if (isExternalUrl(url)) void openExternal(url)
-    })
+        if (isPaymentPage(url)) openPaymentWindow(url, origin)
+        else if (decision === 'external') void openExternal(url)
+    }
+    contents.on('will-navigate', away)
+    contents.on('will-redirect', away)
     contents.setWindowOpenHandler(({ url }) => {
         const decision = decideWindowOpen(url, origin)
         if (decision === 'external') void openExternal(url)
