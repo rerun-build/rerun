@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
@@ -8,10 +8,12 @@ import { buildDefines } from './build-config'
 // Three bundles: the main process (ESM), the preload (CommonJS, because a sandboxed preload is run as
 // a plain script that may only `require('electron')`), and the shell's own pages (React, served from
 // the `rerun-shell://` scheme). The channel and the default server are baked in at build time.
-// `@rerun/cloud/*` as in apps/ui: Rerun Cloud's code when the private `cloud/` folder is in the
-// checkout (its icons come from there), the self-hosted twin in `apps/ui/cloud-oss/` otherwise.
-const CLOUD_SOURCE = resolve(import.meta.dirname, '../../cloud/packages/cloud/src')
-const CLOUD_IMPLEMENTATION = existsSync(CLOUD_SOURCE) ? CLOUD_SOURCE : resolve(import.meta.dirname, '../ui/cloud-oss')
+
+// `@rerun/ui` draws its icons through `@rerun/cloud/ui-icons`: the shell always takes the self-hosted
+// set (lucide, MIT) from `apps/ui/cloud-oss`, whatever the checkout holds, so its binary carries no
+// licensed icon pack and builds from the desktop app's own dependencies.
+const ICONS = resolve(import.meta.dirname, '../ui/cloud-oss/ui-icons.ts')
+const require = createRequire(import.meta.url)
 
 export default defineConfig(() => {
     const define = buildDefines()
@@ -38,7 +40,13 @@ export default defineConfig(() => {
             define,
             plugins: [react(), tailwindcss()],
             resolve: {
-                alias: [{ find: /^@rerun\/cloud\/(.*)$/, replacement: `${CLOUD_IMPLEMENTATION}/$1` }],
+                alias: [
+                    { find: '@rerun/cloud/ui-icons', replacement: ICONS },
+                    // What that file imports, resolved from here: a CI install of the shell alone has no
+                    // apps/ui/node_modules to find them in.
+                    { find: /^lucide-react$/, replacement: require.resolve('lucide-react') },
+                    { find: '@rerun/ui/primitives/spinner', replacement: require.resolve('@rerun/ui/primitives/spinner') },
+                ],
                 dedupe: ['react', 'react-dom'],
             },
             build: {

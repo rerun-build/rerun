@@ -110,6 +110,75 @@ jobs:
       - run: supabase db start
       - run: supabase db reset --local
 
+  # The desktop app's installers on each system it ships to: a pull request builds them when it touches
+  # the app or what goes into it, every push builds them anyway. Unsigned (ad hoc on macOS): the signed
+  # release runs in Rerun Cloud's private repository.
+  desktop-inputs:
+    if: github.repository == 'rerun-build/rerun' && github.event_name == 'pull_request'
+    name: Desktop inputs changed
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: |
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -qE '^apps/desktop-app/|^packages/(contracts|ui|i18n)/|^apps/ui/cloud-oss/ui-icons\.ts$|^pnpm-lock\.yaml$|^\.github/workflows/ci\.yml$'; then
+            echo changed=true >> "$GITHUB_OUTPUT"
+          else
+            echo changed=false >> "$GITHUB_OUTPUT"
+          fi
+
+  desktop-packages:
+    needs: desktop-inputs
+    if: >-
+      always() && github.repository == 'rerun-build/rerun' &&
+      (github.event_name == 'push' || needs.desktop-inputs.outputs.changed == 'true')
+    name: Desktop app (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-15
+            targets: --mac dir --arm64
+          - name: Windows
+            os: windows-latest
+            targets: --win nsis --x64
+          - name: Linux
+            os: ubuntu-latest
+            targets: --linux AppImage deb --x64
+    env:
+      RERUN_DESKTOP_CHANNEL: staging
+      RERUN_DESKTOP_DEFAULT_URL: https://staging.rerun.build
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      # No install scripts: the root postinstall is POSIX shell that cmd.exe cannot run, and nothing the
+      # desktop app builds with needs one (native bindings come prebuilt, electron-builder fetches Electron).
+      - run: pnpm install --frozen-lockfile --ignore-scripts --filter rerun-desktop...
+      - run: pnpm --filter @rerun/contracts build
+      - run: pnpm --filter rerun-desktop test
+      - run: pnpm --filter rerun-desktop exec electron-vite build
+      - run: pnpm --filter rerun-desktop exec electron-builder --config electron-builder.config.ts --publish never ${{ matrix.targets }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.name }}
+          path: |
+            apps/desktop-app/release/staging/*.exe
+            apps/desktop-app/release/staging/*.AppImage
+            apps/desktop-app/release/staging/*.deb
+          if-no-files-found: ignore
+          retention-days: 3
+
   # An image takes ~10 minutes to build: a pull request only builds them when it touches what
   # goes into them beyond the code the other jobs already check, and every push to master and
   # staging builds them anyway before anything ships.

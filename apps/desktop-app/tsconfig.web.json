@@ -14,7 +14,7 @@
         "forceConsistentCasingInFileNames": true,
         "types": ["vite/client"],
         "paths": {
-            "@rerun/cloud/*": ["../../cloud/packages/cloud/src/*", "../ui/cloud-oss/*"]
+            "@rerun/cloud/ui-icons": ["../ui/cloud-oss/ui-icons.ts"]
         }
     },
     "include": ["src/env.d.ts", "src/renderer/**/*", "src/shared/**/*"]

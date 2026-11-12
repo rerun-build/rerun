@@ -116,6 +116,9 @@ pnpm verify:desktop --packaged --scenario apps/desktop-app/e2e/shell.mjs # the p
 CSC_NAME="<a signing identity>" node apps/desktop-app/e2e/update-loop.mjs # 0.0.1 updates itself to 0.0.2
 ```
 
+CI builds the installers of every pull request that touches the app on macOS, Windows (NSIS) and
+Linux (AppImage, deb), unsigned, and keeps them three days as artifacts of the run.
+
 Playwright cannot click a system notification or a native menu, and under Playwright macOS does
 not draw the traffic lights in a capture: those are checked by hand. Windows and Linux are built in
 CI and need a real machine for the last look.

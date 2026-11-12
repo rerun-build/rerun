@@ -1,4 +1,5 @@
 import { app } from 'electron'
+import { CHANNEL_IDENTITIES } from '../shared/channels'
 import {
     DESKTOP_SHELL_API_VERSION,
     desktopShellScheme,
@@ -12,9 +13,9 @@ export const CHANNEL = __RERUN_CHANNEL__
 
 export const SCHEME = desktopShellScheme(CHANNEL)
 
-export const PRODUCT_NAMES = { stable: 'Rerun', staging: 'Rerun Staging', dev: 'Rerun Dev' } as const
+export const PRODUCT_NAME = CHANNEL_IDENTITIES[CHANNEL].productName
 
-export const PRODUCT_NAME = PRODUCT_NAMES[CHANNEL]
+export const APP_ID = CHANNEL_IDENTITIES[CHANNEL].appId
 
 export const BASE_CAPABILITIES: readonly DesktopShellCapability[] = ['window', 'find', 'links', 'downloads', 'auth', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server']
 

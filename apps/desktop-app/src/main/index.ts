@@ -2,7 +2,8 @@ import { app, globalShortcut, session as electronSession } from 'electron'
 import { join, resolve } from 'node:path'
 import { completeFromLink } from './browser-sign-in'
 import { deepLinkInArgv, parseDeepLink } from './deep-links'
-import { CHANNEL, PRODUCT_NAME, SCHEME, shellUserAgent } from './identity'
+import { CHANNEL_IDENTITIES } from '../shared/channels'
+import { APP_ID, CHANNEL, PRODUCT_NAME, SCHEME, shellUserAgent } from './identity'
 import { registerIpcHandlers } from './ipc-handlers'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { registerLocalScheme } from './local-pages'
@@ -18,6 +19,10 @@ import { setQuickAskShortcut, toggleQuickAsk } from './quick-ask'
 
 // Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
+// Windows shows a notification only for the app its shortcut names, by this id.
+if (process.platform === 'win32') app.setAppUserModelId(APP_ID)
+// Linux docks match the badge and the global shortcut portal by the app's desktop entry.
+if (process.platform === 'linux') app.setDesktopName(`${CHANNEL_IDENTITIES[CHANNEL].executableName}.desktop`)
 const userDataOverride = !app.isPackaged || CHANNEL !== 'stable' ? process.env.RERUN_DESKTOP_USER_DATA : undefined
 app.setPath('userData', userDataOverride ?? join(app.getPath('appData'), PRODUCT_NAME))
 

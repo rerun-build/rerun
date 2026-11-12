@@ -1,6 +1,7 @@
 import type { Configuration } from 'electron-builder'
 import { desktopShellScheme } from '@rerun/contracts'
 import { buildSettings } from './build-config'
+import { CHANNEL_IDENTITIES } from './src/shared/channels'
 
 // Packaging of the three apps (Rerun, Rerun Staging, Rerun Dev), one per `RERUN_DESKTOP_CHANNEL`,
 // each with its own id, name, icon, URL scheme, data folder and update feed:
@@ -21,13 +22,7 @@ const settings = buildSettings()
 const channel = settings.channel
 const e2e = process.env.RERUN_DESKTOP_E2E === '1'
 
-const IDENTITIES = {
-    stable: { appId: 'build.rerun.desktop', productName: 'Rerun', executableName: 'rerun' },
-    staging: { appId: 'build.rerun.desktop.staging', productName: 'Rerun Staging', executableName: 'rerun-staging' },
-    dev: { appId: 'build.rerun.desktop.dev', productName: 'Rerun Dev', executableName: 'rerun-dev' },
-} as const
-
-const identity = IDENTITIES[channel]
+const identity = CHANNEL_IDENTITIES[channel]
 const icon = `resources/icons/${channel}/icon.png`
 const updateFeed = process.env.RERUN_DESKTOP_UPDATE_URL ?? `https://downloads.rerun.build/desktop/${channel}`
 // Without a Developer ID (CI, a build from the sources) the app is signed ad hoc: Apple Silicon refuses
