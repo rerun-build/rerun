@@ -66,4 +66,9 @@ describe('isNewConversation', () => {
         vi.mocked(runAction).mockRejectedValue(new LinkupError('ACCOUNT_INACTIVE', 'NOT_CONNECTED', 401))
         await expect(isNewConversation('acc', { phone_number: '+33612345678' })).rejects.toThrow('NOT_CONNECTED')
     })
+
+    it('lets a closed linked device fail the call instead of counting a new conversation', async () => {
+        vi.mocked(runAction).mockRejectedValue(new LinkupError('CHANNEL_ERROR', 'Connection Closed', 400))
+        await expect(isNewConversation('acc', { phone_number: '+33612345678' })).rejects.toThrow('Connection Closed')
+    })
 })

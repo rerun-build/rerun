@@ -100,8 +100,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
             await pauseForRateLimit(supabase, connection, slug)
             return toolError(id, `${app.providerLabel} asked this account to slow down. It rests for 24 hours: stop every ${app.providerLabel} action for today and tell the user.`)
         }
-        if (err.code === 'ACCOUNT_INACTIVE' || err.code === 'INVALID_ACCOUNT') {
-            await markNeedsReconnect(supabase, connection, slug, err.code.toLowerCase())
+        const sessionClosed = app.sessionClosed?.(err) === true
+        if (sessionClosed || err.code === 'ACCOUNT_INACTIVE' || err.code === 'INVALID_ACCOUNT') {
+            await markNeedsReconnect(supabase, connection, slug, sessionClosed ? 'connection_closed' : err.code.toLowerCase())
             return toolError(id, `This ${app.providerLabel} account was signed out. The user has been asked to reconnect it. Nothing was sent.`)
         }
         if (err.code === 'INVALID_PARAMS' || err.code === 'CHANNEL_ERROR') return toolError(id, `${app.providerLabel} refused: ${err.message}`)

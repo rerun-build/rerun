@@ -1,6 +1,7 @@
 import { attachmentTool } from '@/lib/apps/attachment-tool'
 import { LinkupError, runAction } from '@/lib/apps/linkup/client'
 import type { AppTool } from '@/lib/apps/tools'
+import { whatsappSessionClosed } from './connect'
 import type { QuotaAction } from './quotas'
 
 // The WhatsApp tools a coworker gets. Linkup documents list_inbox for LinkedIn and email only, but
@@ -22,6 +23,7 @@ export async function isNewConversation(accountId: string, params: Record<string
         const known = (page.total_message_count ?? page.messages?.length ?? 0) > 0
         return known ? null : 'new_conversation'
     } catch (err) {
+        if (err instanceof LinkupError && whatsappSessionClosed(err)) throw err
         if (err instanceof LinkupError && (err.code === 'CHANNEL_ERROR' || err.code === 'INVALID_PARAMS')) return 'new_conversation'
         throw err
     }
