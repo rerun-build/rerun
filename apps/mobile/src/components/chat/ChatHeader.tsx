@@ -1,6 +1,6 @@
 import type { SessionKind, SessionStatus } from '@rerun/contracts'
-import { Pressable, View } from 'react-native'
-import Animated, { Extrapolation, FadeIn, interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
+import { Platform, Pressable, View } from 'react-native'
+import Animated, { Extrapolation, FadeIn, interpolate, LayoutAnimationConfig, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
@@ -173,18 +173,22 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
                 <CoworkerAvatar coworker={{ ...coworker, status: running ? 'working' : coworker.status === 'working' ? 'idle' : coworker.status }} size={AVATAR} />
             </View>
             <View style={{ width: titleWidth, height: PILL_HEIGHT, overflow: 'hidden' }}>
-                <Animated.View style={[{ flexDirection: 'row', width: pages.length * titleWidth }, track]}>
-                    {pages.map((session, index) => (
-                        <ChipPage key={session.id} coworker={coworker} session={hasConversations ? session : { ...session, title: t('newChat') }} active={index === activeIndex} width={titleWidth} progress={hasConversations ? progress : undefined} index={index} untitled={untitled} />
-                    ))}
-                </Animated.View>
+                {/* A title known when the chat opens is there at once; on Android its fade could hold it hidden for seconds. */}
+                <LayoutAnimationConfig skipEntering>
+                    <Animated.View style={[{ flexDirection: 'row', width: pages.length * titleWidth }, track]}>
+                        {pages.map((session, index) => (
+                            <ChipPage key={session.id} coworker={coworker} session={hasConversations ? session : { ...session, title: t('newChat') }} active={index === activeIndex} width={titleWidth} progress={hasConversations ? progress : undefined} index={index} untitled={untitled} />
+                        ))}
+                    </Animated.View>
+                </LayoutAnimationConfig>
             </View>
         </GlassSurface>
     )
 
     return (
         <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-            <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} />
+            {/* Android's pill is opaque, not glass: what scrolls under it is hidden down to its bottom, then fades. */}
+            <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} solid={Platform.OS === 'android' ? insets.top + spacing.xs + PILL_HEIGHT : undefined} />
             <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                 {onBack ? <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
                 <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>

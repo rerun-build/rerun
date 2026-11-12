@@ -49,25 +49,29 @@ export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: 
 export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill }: { onPhotos: () => void; onCamera: () => void; onFiles: () => void; skills?: SkillSummary[]; onSkill?: (slug: string) => void }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.composer')
+    // Sized here: Android's menu host is measured by Compose a frame late, and until then it stretched
+    // the composer's row to twice its height.
     return (
-        <NativeMenu
-            trigger={
-                <View accessibilityLabel={t('attach')} style={{ width: CONTROL, height: CONTROL, alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name="plus" size={20} color={theme.foreground} />
-                </View>
-            }
-        >
-            <MenuItem label={t('photos')} icon="images" onPress={onPhotos} />
-            <MenuItem label={t('camera')} icon="camera" onPress={onCamera} />
-            <MenuItem label={t('files')} icon="folder" onPress={onFiles} />
-            {skills.length > 0 && onSkill && (
-                <SubMenu label={t('skills')} icon="book">
-                    {skills.map(skill => (
-                        <MenuItem key={skill.slug} label={skill.name} onPress={() => onSkill(skill.slug)} />
-                    ))}
-                </SubMenu>
-            )}
-        </NativeMenu>
+        <View style={{ width: CONTROL, height: CONTROL }}>
+            <NativeMenu
+                trigger={
+                    <View accessibilityLabel={t('attach')} style={{ width: CONTROL, height: CONTROL, alignItems: 'center', justifyContent: 'center' }}>
+                        <Icon name="plus" size={20} color={theme.foreground} />
+                    </View>
+                }
+            >
+                <MenuItem label={t('photos')} icon="images" onPress={onPhotos} />
+                <MenuItem label={t('camera')} icon="camera" onPress={onCamera} />
+                <MenuItem label={t('files')} icon="folder" onPress={onFiles} />
+                {skills.length > 0 && onSkill && (
+                    <SubMenu label={t('skills')} icon="book">
+                        {skills.map(skill => (
+                            <MenuItem key={skill.slug} label={skill.name} onPress={() => onSkill(skill.slug)} />
+                        ))}
+                    </SubMenu>
+                )}
+            </NativeMenu>
+        </View>
     )
 }
 
