@@ -425,7 +425,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             ctx.callTargets = callTargets
             return buildTools(ctx)
         })
-        const preparedP = CLI_PROVIDERS.has(provider) ? Promise.all(agent.config.mcpServers.map(s => prepareMcpServer(agent.id, s, agent.env))) : Promise.resolve([])
+        const preparedP = CLI_PROVIDERS.has(provider) ? Promise.all(agent.config.mcpServers.map(s => prepareMcpServer(agent.id, s, agent.env, agent.hubAgentId))) : Promise.resolve([])
         // Claude reaches its servers through the engine's connections; Codex starts its own without
         // holding up the model, so it keeps dialing them as declared.
         const mcpServersP = provider === 'claude' ? preparedP.then(servers => withPooledRelays(agent, servers)) : preparedP

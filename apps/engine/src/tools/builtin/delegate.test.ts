@@ -98,6 +98,14 @@ describe('delegate_tasks', () => {
         expect(ctx.agent.config.selfImprovement.enabled).toBe(true)
     })
 
+    it('makes the hub know the child as the coworker that delegated', async () => {
+        const { ctx } = ctxWith()
+        await delegate(ctx, [{ task: 't' }])
+        const { child } = runs.started[0] as { child: Child & { hubAgentId?: string } }
+        expect(child.id).not.toBe('boss')
+        expect(child.hubAgentId).toBe('boss')
+    })
+
     it('keeps paid data for the child only where the user waived the asking', async () => {
         const { ctx } = ctxWith()
         ctx.agent.config.paidDataAlwaysAllow = true

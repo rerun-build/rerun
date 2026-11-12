@@ -6,6 +6,7 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-mcp-'))
 process.env.RERUN_API_KEY = ''
 process.env.RERUN_LOG_LEVEL = 'fatal'
+process.env.RERUN_HUB_BASE_URL = 'https://hub.example'
 
 type FakeTransport = { kind: 'stdio' | 'sse' | 'http'; target: string; options: unknown }
 type Behaviour = { connectError?: string; connectCode?: number; closeError?: string; hang?: boolean; tools?: Array<{ name: string; description?: string; inputSchema?: unknown }> }
@@ -199,6 +200,19 @@ describe('pooledMcpTools', () => {
         const tools = await pooledMcpTools(agentWith([server({ name: 'odd', transport: 'http', command: 'npx' }), server({ name: 'odd2', transport: 'stdio', url: 'https://x.io/mcp' })]))
         expect(tools).toEqual({})
         expect(mcp.transports).toHaveLength(0)
+    })
+
+    // RER-80: the hub resolves x-rerun-agent to a coworker of the workspace, and a delegate exists
+    // only on the engine, so under its own id every hub app (Gmail through Composio) refused it.
+    it('dials a hub app as the coworker that delegated, not as the delegate', async () => {
+        const gmail = server({ name: 'gmail', url: 'https://hub.example/api/mcp/composio/gmail' })
+        await pooledMcpTools({ ...agentWith([gmail]), id: 'delegate-1', hubAgentId: 'boss' })
+        expect(mcp.transports[0]).toMatchObject({ target: 'https://hub.example/api/mcp/composio/gmail', options: { requestInit: { headers: { 'x-rerun-agent': 'boss' } } } })
+    })
+
+    it('dials a hub app under its own id when it acts for nobody else', async () => {
+        await pooledMcpTools(agentWith([server({ name: 'gmail', url: 'https://hub.example/api/mcp/composio/gmail' })]))
+        expect(mcp.transports[0]).toMatchObject({ options: { requestInit: { headers: { 'x-rerun-agent': 'mcp-agent' } } } })
     })
 })
 

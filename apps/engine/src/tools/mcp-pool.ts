@@ -130,7 +130,7 @@ export function agentMcpSpawn(agent: Pick<LoadedAgent, 'id' | 'env' | 'config'>)
 // For the providers the engine drives itself: the agent's MCP tools, served by the pooled connections.
 export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
     const spawn = agentMcpSpawn(agent)
-    const prepared = await Promise.all(agent.config.mcpServers.map(server => prepareMcpServer(agent.id, server, agent.env)))
+    const prepared = await Promise.all(agent.config.mcpServers.map(server => prepareMcpServer(agent.id, server, agent.env, agent.hubAgentId)))
     const pooled = await Promise.all(prepared.map(server => acquireMcp(agent.id, server, spawn)))
     const tools: ToolSet = {}
     for (const server of pooled)

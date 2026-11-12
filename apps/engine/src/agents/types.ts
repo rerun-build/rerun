@@ -29,4 +29,8 @@ export type LoadedAgent = {
     // The foreman's instructions and tools for this one run, handed over by the hub with the chat
     // request. Never on disk, and absent on every other agent.
     brief?: ForemanBrief
+    // The coworker the hub knows this agent as, when it is not itself: a delegate exists only on
+    // the engine, so it calls the hub's apps as the coworker that spawned it. Set at runtime, never
+    // read from the config, which the agent can edit.
+    hubAgentId?: string
 }

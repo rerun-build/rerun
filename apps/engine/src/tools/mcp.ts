@@ -93,9 +93,10 @@ export function mcpToolSet(serverName: string, tools: McpTool[], call: McpCall):
 // as ours — then the hub identity headers last, so they are literal and final. An `npx` launch is
 // swapped for the package installed once, when it is. `${RERUN_WORKSPACE}` names the agent's own
 // workspace, for a server that needs an absolute folder (the mail server's attachment root).
-export async function prepareMcpServer(agentId: string, server: McpServer, env: Record<string, string>): Promise<McpServer> {
+// `hubAgentId` is who the hub sees calling: the agent itself, or the coworker a delegate works for.
+export async function prepareMcpServer(agentId: string, server: McpServer, env: Record<string, string>, hubAgentId = agentId): Promise<McpServer> {
     const resolvable = { ...env, RERUN_WORKSPACE: workspaceDir(agentId) }
-    return withInstalledPackage(withHubHeaders(resolveServerSecrets(await withAuth(agentId, server), resolvable), agentId))
+    return withInstalledPackage(withHubHeaders(resolveServerSecrets(await withAuth(agentId, server), resolvable), hubAgentId))
 }
 
 export class McpProbeTimeoutError extends Error {

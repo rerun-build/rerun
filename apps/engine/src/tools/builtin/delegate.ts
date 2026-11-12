@@ -88,6 +88,7 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     config.provider = ctx.provider
                     config.model = ctx.model
                     const child = await createAgent({ config, soul: ctx.agent.soul, keys: ctx.agent.env })
+                    child.hubAgentId = ctx.agent.id
                     const taskSignal = registerSubRunStop(current.id)
                     try {
                         const session = await createSession(child.id, `delegated: ${task.slice(0, 80)}`, undefined, 'delegate')

@@ -40,6 +40,14 @@ describe('prepareMcpServer', () => {
         expect(prepared).toMatchObject({ url: 'https://hub.example/api/mcp/x', headers: { Authorization: 'Bearer oauth', 'x-rerun-agent': 'agent-1' } })
     })
 
+    it('stamps the hub headers with the coworker a delegate acts for, keeping its own auth and workspace', async () => {
+        steps.length = 0
+        await prepareMcpServer('delegate-1', { name: 'gmail', url: 'https://hub.example/api/mcp/composio/gmail', args: [], env: {}, headers: {} }, {}, 'boss')
+        expect(steps[0]).toBe('auth:delegate-1:https://hub.example/api/mcp/composio/gmail')
+        expect(steps.at(-1)).toBe('hub:https://hub.example/api/mcp/composio/gmail:boss')
+        expect(resolvedWith.at(-1)?.RERUN_WORKSPACE).toBe(workspaceDir('delegate-1'))
+    })
+
     it("resolves ${RERUN_WORKSPACE} to the agent's own workspace, whatever its env says", async () => {
         await prepareMcpServer('agent-2', { name: 'mail', command: 'npx', args: [], env: { MAIL_ALLOWED_ROOTS: '${RERUN_WORKSPACE}' }, headers: {} }, { RERUN_WORKSPACE: '/' })
         expect(resolvedWith.at(-1)?.RERUN_WORKSPACE).toBe(workspaceDir('agent-2'))
