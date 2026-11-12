@@ -11,7 +11,8 @@
         },
         "file": {
             "title": "Ablage",
-            "closeWindow": "Fenster schließen"
+            "closeWindow": "Fenster schließen",
+            "newWindow": "Neues Fenster"
         },
         "edit": {
             "title": "Bearbeiten",

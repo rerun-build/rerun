@@ -34,7 +34,7 @@
         "groups": [
           {
             "group": "Get started",
-            "pages": ["index", "quickstart", "concepts"]
+            "pages": ["index", "quickstart", "concepts", "desktop-app"]
           },
           {
             "group": "Build a coworker",
@@ -87,7 +87,8 @@
               "self-host/services",
               "self-host/coworkers",
               "self-host/administration",
-              "self-host/mobile"
+              "self-host/mobile",
+              "self-host/desktop"
             ]
           },
           {

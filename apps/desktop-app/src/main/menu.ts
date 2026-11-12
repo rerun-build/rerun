@@ -10,6 +10,7 @@ export type MenuActions = {
     changeServer: () => void
     reload: () => void
     quickAsk: () => void
+    newWindow: () => void
 }
 
 const DOCS_URL = 'https://docs.rerun.build'
@@ -38,6 +39,7 @@ export function buildMenu(actions: MenuActions): Menu {
     const fileMenu: MenuItemConstructorOptions = {
         label: t('menu.file.title'),
         submenu: [
+            { id: 'new-window', label: t('menu.file.newWindow'), accelerator: 'CmdOrCtrl+Shift+N', click: actions.newWindow },
             // The shortcut is global (registered by quick-ask.ts): the menu only shows it.
             { id: 'quick-ask', label: t('tray.quickAsk'), accelerator: QUICK_ASK_SHORTCUT, registerAccelerator: false, click: actions.quickAsk },
             { type: 'separator' },

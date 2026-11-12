@@ -8,7 +8,7 @@ import { registerIpcHandlers } from './ipc-handlers'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { registerLocalScheme } from './local-pages'
 import { closeFindBar, openFindBar } from './find-bar'
-import { createMainWindow, getMainWindow, loadAppPath, openExternal, reloadApp, showIncompatiblePage, showMainWindow, showServerPicker } from './main-window'
+import { createMainWindow, getMainWindow, loadAppPath, openExternal, openNewWindow, reloadApp, showIncompatiblePage, showMainWindow, showServerPicker } from './main-window'
 import { installMenu } from './menu'
 import { onLocaleChange } from './messages'
 import { partitionFor, serverOrigin } from './server'
@@ -107,6 +107,7 @@ function menu(): void {
         },
         reload: () => reloadApp(),
         quickAsk: () => toggleQuickAsk(),
+        newWindow: () => void openNewWindow(),
     })
 }
 

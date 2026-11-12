@@ -37,7 +37,8 @@
         },
         "file": {
             "title": "File",
-            "closeWindow": "Close Window"
+            "closeWindow": "Close Window",
+            "newWindow": "New Window"
         },
         "edit": {
             "title": "Edit",

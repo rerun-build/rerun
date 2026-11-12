@@ -11,7 +11,8 @@
         },
         "file": {
             "title": "Fichier",
-            "closeWindow": "Fermer la fenêtre"
+            "closeWindow": "Fermer la fenêtre",
+            "newWindow": "Nouvelle fenêtre"
         },
         "edit": {
             "title": "Édition",

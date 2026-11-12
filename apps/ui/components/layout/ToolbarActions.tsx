@@ -13,7 +13,11 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { selectHasUnseenLatest, useRewindStore } from '@rerun/cloud/rewind.client'
 import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { Badge } from '@rerun/ui/primitives'
-import { BookOpenIcon, DownloadIcon, HandshakeIcon, KeyboardIcon, ListTodoIcon, MegaphoneIcon, RewindIcon, UsersIcon } from '@/lib/icons'
+import { BookOpenIcon, DownloadIcon, HandshakeIcon, KeyboardIcon, ListTodoIcon, MegaphoneIcon, MonitorIcon, RewindIcon, UsersIcon } from '@/lib/icons'
+import { isDesktopShell } from '@/lib/desktop-shell/client'
+import { detectMobileOs } from '@/lib/in-app-browser'
+import { RERUN_CLOUD } from '@rerun/cloud/edition'
+import { useSyncExternalStore } from 'react'
 import { docsUrl, landingUrl } from '@/lib/site'
 import { useTranslations } from 'next-intl'
 
@@ -56,11 +60,15 @@ export function WhatsNewMenuItem() {
     )
 }
 
+const noSubscription = () => () => {}
+
 export function HelpMenuItems({ onOpenGettingStarted }: { onOpenGettingStarted: () => void }) {
     const t = useTranslations('layout.menu')
     const openShortcuts = useShortcutsStore(s => s.openShortcuts)
     const { canInstall, promptInstall } = useInstallPrompt()
     const gettingStartedAvailable = useForemanStore(s => s.gettingStartedAvailable)
+    // Rerun Cloud publishes the desktop app; it is offered on a computer's browser, never inside it.
+    const offerDesktopApp = useSyncExternalStore(noSubscription, () => RERUN_CLOUD && !isDesktopShell() && detectMobileOs(navigator.userAgent) === null, () => false)
 
     return (
         <>
@@ -96,6 +104,14 @@ export function HelpMenuItems({ onOpenGettingStarted }: { onOpenGettingStarted: 
                 <DropdownMenuItem onSelect={promptInstall} className="gap-2 text-muted-foreground">
                     <DownloadIcon className="size-4" />
                     {t('installApp')}
+                </DropdownMenuItem>
+            )}
+            {offerDesktopApp && (
+                <DropdownMenuItem asChild className="gap-2 text-muted-foreground">
+                    <a href={landingUrl('/download')} target="_blank" rel="noopener noreferrer">
+                        <MonitorIcon className="size-4" />
+                        {t('desktopApp')}
+                    </a>
                 </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />

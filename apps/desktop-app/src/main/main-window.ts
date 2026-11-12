@@ -217,17 +217,8 @@ export function loadAppPath(path: string): void {
     void window.loadURL(new URL(path, currentOrigin).toString())
 }
 
-// Without a server yet (a build from the sources, a person who has to pick theirs), the window opens
-// on the server picker, in a session of its own.
-const NO_SERVER_PARTITION = 'persist:no-server'
-
-export function createMainWindow(origin: string | null, options: { hidden?: boolean } = {}): BrowserWindow {
-    currentOrigin = origin
-    lastAppUrl = null
-    const partition = origin ? partitionFor(origin) : NO_SERVER_PARTITION
-    prepareSession(partition, origin)
-    const bounds = restoredBounds()
-    const window = new BrowserWindow({
+function appWindowOptions(partition: string, bounds: { x?: number; y?: number; width: number; height: number }): Electron.BrowserWindowConstructorOptions {
+    return {
         x: bounds.x,
         y: bounds.y,
         width: bounds.width,
@@ -251,7 +242,42 @@ export function createMainWindow(origin: string | null, options: { hidden?: bool
             // `document.visibilityState`.
             backgroundThrottling: false,
         },
-    })
+    }
+}
+
+const CASCADE = 28
+
+// Another window of the app, on the page the main one shows: same session, same rules. Each window
+// keeps its own workspace (the web holds it per tab, in sessionStorage). The main window stays the
+// one notifications, links and Quick ask come back to.
+export function openNewWindow(): BrowserWindow | null {
+    const origin = currentOrigin
+    const main = getMainWindow()
+    if (!origin || !main) return null
+    const from = BrowserWindow.getFocusedWindow() ?? main
+    const { x, y, width, height } = from.getBounds()
+    const window = new BrowserWindow(appWindowOptions(partitionFor(origin), { x: x + CASCADE, y: y + CASCADE, width, height }))
+    guardNavigation(window, origin)
+    confirmUnload(window)
+    broadcastWindowState(window)
+    attachContextMenu(window.webContents)
+    window.once('ready-to-show', () => window.show())
+    const page = from.webContents.getURL()
+    void window.loadURL(isSameOrigin(page, origin) ? page : origin)
+    return window
+}
+
+// Without a server yet (a build from the sources, a person who has to pick theirs), the window opens
+// on the server picker, in a session of its own.
+const NO_SERVER_PARTITION = 'persist:no-server'
+
+export function createMainWindow(origin: string | null, options: { hidden?: boolean } = {}): BrowserWindow {
+    currentOrigin = origin
+    lastAppUrl = null
+    const partition = origin ? partitionFor(origin) : NO_SERVER_PARTITION
+    prepareSession(partition, origin)
+    const bounds = restoredBounds()
+    const window = new BrowserWindow(appWindowOptions(partition, bounds))
     mainWindow = window
     if (bounds.maximized) window.maximize()
     trackBounds(window)

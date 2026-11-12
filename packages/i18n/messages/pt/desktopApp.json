@@ -11,7 +11,8 @@
         },
         "file": {
             "title": "Arquivo",
-            "closeWindow": "Fechar janela"
+            "closeWindow": "Fechar janela",
+            "newWindow": "Nova janela"
         },
         "edit": {
             "title": "Editar",

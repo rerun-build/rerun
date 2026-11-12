@@ -1,0 +1,38 @@
+---
+title: "Desktop app"
+description: "Use the Rerun desktop app with your own install."
+---
+
+The Rerun desktop app works with your install. It loads your app's pages, so it follows your updates without a new download.
+
+## Connect
+
+<Steps>
+  <Step title="Open the app">
+    Install Rerun from [rerun.build/download](https://rerun.build/download) and open it. Under the sign-in methods, click **Use another Rerun server**. Later, the **Change Server…** menu item does the same.
+  </Step>
+  <Step title="Type your address">
+    Type the address you open Rerun at in a browser, for example `rerun.example.com`, then click **Connect**. The app checks that the address is a Rerun install that serves its version, then opens on it.
+  </Step>
+  <Step title="Sign in">
+    Sign in as you do in a browser. Google and Apple go through your browser, see [Desktop app](/desktop-app#sign-in).
+  </Step>
+</Steps>
+
+Each server keeps its own session: moving to another server and back does not sign you out of either. **Use Rerun Cloud** on the same screen goes back to Rerun Cloud.
+
+## What the app needs from your install
+
+- **`https://`** on the internet. Plain `http://` only works for an install on the same computer: the app warns you otherwise.
+- **`GET /api/desktop/config`**, which every recent install answers. If **Connect** says the address is not a Rerun server, update your install.
+- **`DESKTOP_MIN_SHELL_VERSION`** (optional): the oldest app version your install accepts. Older apps update before they open anything.
+
+## Build it yourself
+
+The app lives in `apps/desktop-app` of the repository. A build from the sources opens on **Connect to your server**, unless you set the address it starts on:
+
+```bash
+RERUN_DESKTOP_DEFAULT_URL=https://rerun.example.com pnpm --filter rerun-desktop package
+```
+
+The build is unsigned. To ship it to others, sign it with your own certificates and give it your own name and icon, see `TRADEMARK.md`.
