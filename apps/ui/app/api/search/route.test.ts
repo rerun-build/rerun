@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
-import { searchBrave } from '@/lib/search/brave'
 import { readCachedSearch, storeSearch } from '@/lib/search/cache'
+import { searchTheWeb } from '@/lib/search/web-search'
 
 import { POST } from './route'
 
@@ -10,8 +10,8 @@ const insert = vi.fn()
 const from = vi.fn(() => ({ insert }))
 
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn() }))
-vi.mock('@/lib/search/brave', () => ({ BRAVE_MAX_COUNT: 20, searchBrave: vi.fn() }))
 vi.mock('@/lib/search/cache', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/search/cache')>()), readCachedSearch: vi.fn(), storeSearch: vi.fn() }))
+vi.mock('@/lib/search/web-search', () => ({ WEB_SEARCH_PAGE_SIZE: 20, searchTheWeb: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn(() => ({ from })) }))
 
 const WORKSPACE_ID = 7
@@ -29,7 +29,7 @@ describe('POST /api/search', () => {
         vi.clearAllMocks()
         vi.spyOn(console, 'error').mockImplementation(() => undefined)
         vi.mocked(authenticateEngineToken).mockImplementation(async token => (token === 'engine-key' ? { workspaceId: WORKSPACE_ID, isSandbox: false } : null))
-        vi.mocked(searchBrave).mockResolvedValue({ status: 200, ok: true, results: RESULTS })
+        vi.mocked(searchTheWeb).mockResolvedValue({ status: 200, ok: true, results: RESULTS })
         insert.mockResolvedValue({ error: null })
         vi.mocked(readCachedSearch).mockResolvedValue(null)
         vi.mocked(storeSearch).mockResolvedValue(undefined)
@@ -39,25 +39,25 @@ describe('POST /api/search', () => {
         const response = await POST(searchRequest({ token: null }))
 
         expect(response.status).toBe(401)
-        expect(searchBrave).not.toHaveBeenCalled()
+        expect(searchTheWeb).not.toHaveBeenCalled()
     })
 
     it('refuses an engine key that names no workspace', async () => {
         const response = await POST(searchRequest({ token: 'stolen' }))
 
         expect(response.status).toBe(401)
-        expect(searchBrave).not.toHaveBeenCalled()
+        expect(searchTheWeb).not.toHaveBeenCalled()
     })
 
     it('refuses a body that is not JSON, or carries no query', async () => {
         expect((await POST(searchRequest({ body: 'not json' }))).status).toBe(400)
         expect((await POST(searchRequest({ body: { query: '' } }))).status).toBe(400)
         expect((await POST(searchRequest({ body: { query: 'rerun', maxResults: 21 } }))).status).toBe(400)
-        expect(searchBrave).not.toHaveBeenCalled()
+        expect(searchTheWeb).not.toHaveBeenCalled()
     })
 
     it('answers 503 and records nothing when no search key is configured', async () => {
-        vi.mocked(searchBrave).mockResolvedValue(null)
+        vi.mocked(searchTheWeb).mockResolvedValue(null)
 
         const response = await POST(searchRequest())
 
@@ -70,13 +70,13 @@ describe('POST /api/search', () => {
 
         expect(response.status).toBe(200)
         await expect(response.json()).resolves.toEqual({ results: RESULTS })
-        expect(searchBrave).toHaveBeenCalledWith('rerun', 20)
+        expect(searchTheWeb).toHaveBeenCalledWith('rerun', 20)
         expect(from).toHaveBeenCalledWith('web_search_events')
         expect(insert).toHaveBeenCalledWith(expect.objectContaining({ workspace_id: WORKSPACE_ID, engine_agent_id: 'surfer', query: 'rerun', outcome: 'ok', result_count: 1, provider_status: 200, cached: false }))
     })
 
     it('records a search that found nothing as empty', async () => {
-        vi.mocked(searchBrave).mockResolvedValue({ status: 200, ok: true, results: [] })
+        vi.mocked(searchTheWeb).mockResolvedValue({ status: 200, ok: true, results: [] })
 
         const response = await POST(searchRequest())
 
@@ -85,7 +85,7 @@ describe('POST /api/search', () => {
     })
 
     it('answers 502 and records the status when the provider fails', async () => {
-        vi.mocked(searchBrave).mockResolvedValue({ status: 429, ok: false, results: [] })
+        vi.mocked(searchTheWeb).mockResolvedValue({ status: 429, ok: false, results: [] })
 
         const response = await POST(searchRequest())
 
@@ -104,8 +104,8 @@ describe('POST /api/search', () => {
         await expect(response.json()).resolves.toEqual({ results: RESULTS })
     })
 
-    it('asks Brave for a full page, keeps it, and returns only what was asked', async () => {
-        vi.mocked(searchBrave).mockResolvedValue({ status: 200, ok: true, results: PAGE })
+    it('asks the provider for a full page, keeps it, and returns only what was asked', async () => {
+        vi.mocked(searchTheWeb).mockResolvedValue({ status: 200, ok: true, results: PAGE })
 
         const response = await POST(searchRequest({ body: { query: '  Rerun  AI ', maxResults: 3 } }))
 
@@ -115,21 +115,21 @@ describe('POST /api/search', () => {
         expect(insert).toHaveBeenCalledWith(expect.objectContaining({ result_count: 3, cached: false }))
     })
 
-    it('answers a query already searched from the cache, without paying Brave', async () => {
+    it('answers a query already searched from the cache, without paying the provider', async () => {
         vi.mocked(readCachedSearch).mockResolvedValue(PAGE)
 
         const response = await POST(searchRequest({ body: { query: 'rerun', maxResults: 5 } }))
 
         expect(response.status).toBe(200)
         await expect(response.json()).resolves.toEqual({ results: PAGE.slice(0, 5) })
-        expect(searchBrave).not.toHaveBeenCalled()
+        expect(searchTheWeb).not.toHaveBeenCalled()
         expect(storeSearch).not.toHaveBeenCalled()
         expect(insert).toHaveBeenCalledWith(expect.objectContaining({ workspace_id: WORKSPACE_ID, outcome: 'ok', result_count: 5, provider_status: null, cached: true }))
     })
 
     it('answers from the cache even when no search key is configured', async () => {
         vi.mocked(readCachedSearch).mockResolvedValue(RESULTS)
-        vi.mocked(searchBrave).mockResolvedValue(null)
+        vi.mocked(searchTheWeb).mockResolvedValue(null)
 
         const response = await POST(searchRequest())
 
@@ -138,10 +138,10 @@ describe('POST /api/search', () => {
     })
 
     it('keeps neither a failed nor an empty search', async () => {
-        vi.mocked(searchBrave).mockResolvedValue({ status: 429, ok: false, results: [] })
+        vi.mocked(searchTheWeb).mockResolvedValue({ status: 429, ok: false, results: [] })
         await POST(searchRequest())
 
-        vi.mocked(searchBrave).mockResolvedValue({ status: 200, ok: true, results: [] })
+        vi.mocked(searchTheWeb).mockResolvedValue({ status: 200, ok: true, results: [] })
         await POST(searchRequest())
 
         expect(storeSearch).not.toHaveBeenCalled()

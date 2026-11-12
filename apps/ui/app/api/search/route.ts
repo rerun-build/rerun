@@ -1,8 +1,8 @@
 import { z } from 'zod'
 import type { Database } from '@/app/api/database.types'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
-import { BRAVE_MAX_COUNT, searchBrave } from '@/lib/search/brave'
 import { readCachedSearch, searchCacheKey, storeSearch } from '@/lib/search/cache'
+import { searchTheWeb, WEB_SEARCH_PAGE_SIZE } from '@/lib/search/web-search'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
 // The one door a coworker's web_search goes through. The engine calls it with its RERUN_API_KEY,
@@ -61,7 +61,7 @@ export async function POST(req: Request): Promise<Response> {
     }
 
     // Always the full page, so a later search asking for more results is served from the cache too.
-    const search = await searchBrave(query, BRAVE_MAX_COUNT)
+    const search = await searchTheWeb(query, WEB_SEARCH_PAGE_SIZE)
     if (!search) return Response.json({ error: 'Web search is not configured' }, { status: 503 })
 
     if (search.ok && search.results.length > 0) await storeSearch(key, search.results)

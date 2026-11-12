@@ -1,5 +1,5 @@
 import type { Database } from '@/app/api/database.types'
-import type { WebSearchResult } from '@/lib/search/brave'
+import type { WebSearchResult } from '@/lib/search/web-search'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
