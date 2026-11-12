@@ -6,7 +6,10 @@
     "version": "0.1.0",
     "private": true,
     "type": "module",
-    "author": "Rerun",
+    "author": {
+        "name": "Rerun",
+        "email": "help@rerun.build"
+    },
     "homepage": "https://rerun.build",
     "main": "./out/main/index.js",
     "scripts": {

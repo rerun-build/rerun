@@ -1,3 +1,4 @@
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { safeFilename, uniqueDownloadPath } from '../src/main/download-path'
 
@@ -13,8 +14,8 @@ describe('safeFilename', () => {
 
 describe('uniqueDownloadPath', () => {
     it('never overwrites a file already there', () => {
-        const taken = new Set(['/d/report.csv', '/d/report (1).csv'])
-        expect(uniqueDownloadPath('/d', 'report.csv', (path) => taken.has(path))).toBe('/d/report (2).csv')
-        expect(uniqueDownloadPath('/d', 'new.csv', (path) => taken.has(path))).toBe('/d/new.csv')
+        const taken = new Set([join('/d', 'report.csv'), join('/d', 'report (1).csv')])
+        expect(uniqueDownloadPath('/d', 'report.csv', (path) => taken.has(path))).toBe(join('/d', 'report (2).csv'))
+        expect(uniqueDownloadPath('/d', 'new.csv', (path) => taken.has(path))).toBe(join('/d', 'new.csv'))
     })
 })
