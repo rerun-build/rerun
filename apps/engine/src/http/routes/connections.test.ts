@@ -408,7 +408,10 @@ describe('plan limits on the list', () => {
             const listed = planLimitsOf(claude.id).finally(() => {
                 answered = true
             })
-            for (let tick = 0; tick < 20 && !answered; tick += 1) {
+            // Bounded by the real clock, not a tick count: on a slow runner the data-dir read takes
+            // more turns of the loop before the cap is even armed.
+            const deadline = Date.now() + 4_000
+            while (!answered && Date.now() < deadline) {
                 await new Promise<void>(resolve => setImmediate(resolve))
                 await vi.advanceTimersByTimeAsync(1_000)
             }
