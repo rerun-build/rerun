@@ -2,6 +2,7 @@ import { DEFAULT_LOCALE, mergeMessages, type Locale } from '@rerun/i18n'
 
 import enChatErrors from '@rerun/i18n/messages/en/chatErrors.json'
 import enMobileAuth from '@rerun/i18n/messages/en/mobileAuth.json'
+import enMobileBilling from '@rerun/i18n/messages/en/mobileBilling.json'
 import enMobileCards from '@rerun/i18n/messages/en/mobileCards.json'
 import enMobileChat from '@rerun/i18n/messages/en/mobileChat.json'
 import enMobileCommon from '@rerun/i18n/messages/en/mobileCommon.json'
@@ -16,6 +17,7 @@ import enSubRuns from '@rerun/i18n/messages/en/subRuns.json'
 import enTools from '@rerun/i18n/messages/en/tools.json'
 import frChatErrors from '@rerun/i18n/messages/fr/chatErrors.json'
 import frMobileAuth from '@rerun/i18n/messages/fr/mobileAuth.json'
+import frMobileBilling from '@rerun/i18n/messages/fr/mobileBilling.json'
 import frMobileCards from '@rerun/i18n/messages/fr/mobileCards.json'
 import frMobileChat from '@rerun/i18n/messages/fr/mobileChat.json'
 import frMobileCommon from '@rerun/i18n/messages/fr/mobileCommon.json'
@@ -30,6 +32,7 @@ import frSubRuns from '@rerun/i18n/messages/fr/subRuns.json'
 import frTools from '@rerun/i18n/messages/fr/tools.json'
 import esChatErrors from '@rerun/i18n/messages/es/chatErrors.json'
 import esMobileAuth from '@rerun/i18n/messages/es/mobileAuth.json'
+import esMobileBilling from '@rerun/i18n/messages/es/mobileBilling.json'
 import esMobileCards from '@rerun/i18n/messages/es/mobileCards.json'
 import esMobileChat from '@rerun/i18n/messages/es/mobileChat.json'
 import esMobileCommon from '@rerun/i18n/messages/es/mobileCommon.json'
@@ -44,6 +47,7 @@ import esSubRuns from '@rerun/i18n/messages/es/subRuns.json'
 import esTools from '@rerun/i18n/messages/es/tools.json'
 import ptChatErrors from '@rerun/i18n/messages/pt/chatErrors.json'
 import ptMobileAuth from '@rerun/i18n/messages/pt/mobileAuth.json'
+import ptMobileBilling from '@rerun/i18n/messages/pt/mobileBilling.json'
 import ptMobileCards from '@rerun/i18n/messages/pt/mobileCards.json'
 import ptMobileChat from '@rerun/i18n/messages/pt/mobileChat.json'
 import ptMobileCommon from '@rerun/i18n/messages/pt/mobileCommon.json'
@@ -58,6 +62,7 @@ import ptSubRuns from '@rerun/i18n/messages/pt/subRuns.json'
 import ptTools from '@rerun/i18n/messages/pt/tools.json'
 import deChatErrors from '@rerun/i18n/messages/de/chatErrors.json'
 import deMobileAuth from '@rerun/i18n/messages/de/mobileAuth.json'
+import deMobileBilling from '@rerun/i18n/messages/de/mobileBilling.json'
 import deMobileCards from '@rerun/i18n/messages/de/mobileCards.json'
 import deMobileChat from '@rerun/i18n/messages/de/mobileChat.json'
 import deMobileCommon from '@rerun/i18n/messages/de/mobileCommon.json'
@@ -72,11 +77,11 @@ import deSubRuns from '@rerun/i18n/messages/de/subRuns.json'
 import deTools from '@rerun/i18n/messages/de/tools.json'
 
 // Only the app's own namespaces ship in the bundle: the web's strings would weigh on every launch.
-const english = { chatErrors: enChatErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
-const french = { chatErrors: frChatErrors, mobileAuth: frMobileAuth, mobileCards: frMobileCards, mobileChat: frMobileChat, mobileCommon: frMobileCommon, mobileCoworker: frMobileCoworker, mobileHitl: frMobileHitl, mobileHome: frMobileHome, mobileOnboarding: frMobileOnboarding, mobileProviders: frMobileProviders, mobileSettings: frMobileSettings, mobileSteps: frMobileSteps, subRuns: frSubRuns, tools: frTools }
-const spanish = { chatErrors: esChatErrors, mobileAuth: esMobileAuth, mobileCards: esMobileCards, mobileChat: esMobileChat, mobileCommon: esMobileCommon, mobileCoworker: esMobileCoworker, mobileHitl: esMobileHitl, mobileHome: esMobileHome, mobileOnboarding: esMobileOnboarding, mobileProviders: esMobileProviders, mobileSettings: esMobileSettings, mobileSteps: esMobileSteps, subRuns: esSubRuns, tools: esTools }
-const portuguese = { chatErrors: ptChatErrors, mobileAuth: ptMobileAuth, mobileCards: ptMobileCards, mobileChat: ptMobileChat, mobileCommon: ptMobileCommon, mobileCoworker: ptMobileCoworker, mobileHitl: ptMobileHitl, mobileHome: ptMobileHome, mobileOnboarding: ptMobileOnboarding, mobileProviders: ptMobileProviders, mobileSettings: ptMobileSettings, mobileSteps: ptMobileSteps, subRuns: ptSubRuns, tools: ptTools }
-const german = { chatErrors: deChatErrors, mobileAuth: deMobileAuth, mobileCards: deMobileCards, mobileChat: deMobileChat, mobileCommon: deMobileCommon, mobileCoworker: deMobileCoworker, mobileHitl: deMobileHitl, mobileHome: deMobileHome, mobileOnboarding: deMobileOnboarding, mobileProviders: deMobileProviders, mobileSettings: deMobileSettings, mobileSteps: deMobileSteps, subRuns: deSubRuns, tools: deTools }
+const english = { chatErrors: enChatErrors, mobileAuth: enMobileAuth, mobileBilling: enMobileBilling, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
+const french = { chatErrors: frChatErrors, mobileAuth: frMobileAuth, mobileBilling: frMobileBilling, mobileCards: frMobileCards, mobileChat: frMobileChat, mobileCommon: frMobileCommon, mobileCoworker: frMobileCoworker, mobileHitl: frMobileHitl, mobileHome: frMobileHome, mobileOnboarding: frMobileOnboarding, mobileProviders: frMobileProviders, mobileSettings: frMobileSettings, mobileSteps: frMobileSteps, subRuns: frSubRuns, tools: frTools }
+const spanish = { chatErrors: esChatErrors, mobileAuth: esMobileAuth, mobileBilling: esMobileBilling, mobileCards: esMobileCards, mobileChat: esMobileChat, mobileCommon: esMobileCommon, mobileCoworker: esMobileCoworker, mobileHitl: esMobileHitl, mobileHome: esMobileHome, mobileOnboarding: esMobileOnboarding, mobileProviders: esMobileProviders, mobileSettings: esMobileSettings, mobileSteps: esMobileSteps, subRuns: esSubRuns, tools: esTools }
+const portuguese = { chatErrors: ptChatErrors, mobileAuth: ptMobileAuth, mobileBilling: ptMobileBilling, mobileCards: ptMobileCards, mobileChat: ptMobileChat, mobileCommon: ptMobileCommon, mobileCoworker: ptMobileCoworker, mobileHitl: ptMobileHitl, mobileHome: ptMobileHome, mobileOnboarding: ptMobileOnboarding, mobileProviders: ptMobileProviders, mobileSettings: ptMobileSettings, mobileSteps: ptMobileSteps, subRuns: ptSubRuns, tools: ptTools }
+const german = { chatErrors: deChatErrors, mobileAuth: deMobileAuth, mobileBilling: deMobileBilling, mobileCards: deMobileCards, mobileChat: deMobileChat, mobileCommon: deMobileCommon, mobileCoworker: deMobileCoworker, mobileHitl: deMobileHitl, mobileHome: deMobileHome, mobileOnboarding: deMobileOnboarding, mobileProviders: deMobileProviders, mobileSettings: deMobileSettings, mobileSteps: deMobileSteps, subRuns: deSubRuns, tools: deTools }
 
 export type MobileMessages = typeof english
 

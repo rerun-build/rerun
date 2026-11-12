@@ -1,0 +1,37 @@
+{
+    "paywall": {
+        "trialTitle": "{days, plural, one {Teste Rerun # Tag kostenlos} other {Teste Rerun # Tage kostenlos}}",
+        "paidTitle": "Starte deinen Rerun-Tarif",
+        "includes": "Unbegrenzte Coworker, mit KI-Guthaben jeden Monat.",
+        "then": "Danach {price} pro Monat. Jederzeit kündbar.",
+        "monthly": "{price} pro Monat. Jederzeit kündbar.",
+        "startTrial": "Kostenlos testen",
+        "subscribe": "Abonnieren",
+        "confirming": "Dein Tarif wird bestätigt…",
+        "restore": "Käufe wiederherstellen",
+        "terms": "AGB",
+        "privacy": "Datenschutz",
+        "renews": "{store, select, apple {Verlängert sich automatisch jeden Monat für {price}, bis du mindestens 24 Stunden vor Ende des Zeitraums in den Abos deines Apple Accounts kündigst. Die Zahlung wird deinem Apple Account belastet.} other {Verlängert sich automatisch jeden Monat für {price}, bis du in deinen Google Play-Abos kündigst. Die Zahlung wird deinem Google-Konto belastet.}}",
+        "notice": {
+            "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
+            "pending": "Deine Zahlung steht noch aus. Dein Tarif startet, sobald sie durch ist.",
+            "nothing_to_restore": "Kein Kauf zum Wiederherstellen in diesem Konto.",
+            "linked_elsewhere": "Dieses Abo läuft bereits in einem anderen Workspace.",
+            "expired": "Dieses Abo ist beendet.",
+            "billed_on_web": "Dieser Workspace hat bereits einen Tarif.",
+            "other_store": "Dieser Workspace wird über einen anderen Store abgerechnet.",
+            "not_sold": "Der Tarif kann hier gerade nicht gekauft werden.",
+            "tryAgain": "Erneut versuchen"
+        },
+        "unavailable": {
+            "member": "Bitte einen Admin dieses Workspace, den Tarif zu starten.",
+            "no_product": "Der Tarif kann auf diesem Gerät gerade nicht gekauft werden.",
+            "retry": "Erneut versuchen"
+        }
+    },
+    "creditsOnTrial": "Das monatliche Guthaben deines Tarifs startet, wenn der kostenlose Test endet.",
+    "menu": {
+        "subscription": "Abo"
+    },
+    "deleteBlocked": "{store, select, apple {Das Abo von {workspaces} verlängert sich noch über den App Store. Kündige es zuerst in den Abos deines Apple Accounts.} other {Das Abo von {workspaces} verlängert sich noch über Google Play. Kündige es zuerst in deinen Google Play-Abos.}}"
+}

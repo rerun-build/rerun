@@ -149,6 +149,7 @@ function App() {
                                         <Stack.Screen name="lab-home" />
                                         <Stack.Screen name="lab-markdown" />
                                         <Stack.Screen name="lab-onboarding" />
+                                        <Stack.Screen name="lab-paywall" />
                                         <Stack.Screen name="lab-consent" />
                                         <Stack.Screen name="lab-splash" options={{ animation: 'none', gestureEnabled: true }} />
                                         <Stack.Screen name="lab-coworker" />

@@ -14,15 +14,19 @@ export type ErrorCardActions = {
     onReconnect?: () => void
     onSwitchModel?: () => void
     onConnect?: (provider: 'claude' | 'codex') => void
+    // On a free week sold by the app's store: the stores cannot end a trial early, so the plan's
+    // credit only comes with the first paid month, which the card says instead of selling more.
+    storeTrial?: boolean
 }
 
 // The web's ProviderErrorNotice and BudgetExhaustedNotice, without what the app cannot sell: a
 // refusal that repeats on every send is offered its fix instead of a retry. A fix the screen does not
 // offer falls back to Try again.
-export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConnect }: { message: string } & ErrorCardActions) {
+export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConnect, storeTrial }: { message: string } & ErrorCardActions) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.error')
     const tErrors = useTranslations('chatErrors')
+    const tBilling = useTranslations('mobileBilling')
     const kind = classifyChatError(message)
     const budget = kind === 'budget' && onConnect
     const reconnect = kind === 'unauthorized' && onReconnect
@@ -36,6 +40,11 @@ export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConn
             <AppText variant="callout" tone="muted">
                 {budget ? t('creditsBody') : friendlyError(message, tErrors)}
             </AppText>
+            {budget && storeTrial && (
+                <AppText variant="footnote" tone="muted">
+                    {tBilling('creditsOnTrial')}
+                </AppText>
+            )}
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
                 {budget && (
                     <>

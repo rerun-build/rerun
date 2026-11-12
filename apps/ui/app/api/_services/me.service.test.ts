@@ -34,4 +34,9 @@ describe('readMe', () => {
         expect(readMe(contextWith({ subscription_status: null, is_sandbox: false })).workspace.billingProvider).toBeNull()
         expect(readMe(contextWith({ subscription_status: null, is_sandbox: false, billing_provider: 'amazon' })).workspace.billingProvider).toBeNull()
     })
+
+    it('says whether the workspace is on its trial', () => {
+        expect(readMe(contextWith({ subscription_status: 'trialing', is_sandbox: false })).workspace.trialing).toBe(true)
+        expect(readMe(contextWith({ subscription_status: 'active', is_sandbox: false })).workspace.trialing).toBe(false)
+    })
 })

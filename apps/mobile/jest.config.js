@@ -9,6 +9,10 @@ const shared = {
     "transformIgnorePatterns": [
         "node_modules/(?!(.pnpm|(jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|native-base|react-native-svg|marked|remend|use-intl|intl-messageformat|@formatjs/.*|icu-minify|@schummar/.*))"
     ],
+    // The native build keeps its Swift packages under .expo/ (expo-iap's OpenIAP checkout comes with
+    // tests of its own): only the app's tests are the app's to run.
+    "testPathIgnorePatterns": ["/node_modules/", "<rootDir>/.expo/", "<rootDir>/ios/", "<rootDir>/android/"],
+    "modulePathIgnorePatterns": ["<rootDir>/.expo/"],
     "moduleNameMapper": {
         "^remend$": "<rootDir>/node_modules/remend/dist/index.js"
     }

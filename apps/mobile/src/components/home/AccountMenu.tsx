@@ -10,6 +10,7 @@ import { AppText } from '@/components/ui/AppText'
 import { Icon } from '@/components/ui/Icon'
 import { CircleTrigger, MenuItem, NativeMenu } from '@/components/ui/NativeMenu'
 import { onCustomServer } from '@/config/environment'
+import { storefront } from '@/store'
 import { useTheme } from '@/theme/theme'
 
 export function AccountMenu() {
@@ -19,6 +20,9 @@ export function AccountMenu() {
     const avatarUrl = me?.user?.avatarUrl
     const [brokenAvatar, setBrokenAvatar] = useState<string | null>(null)
     const t = useTranslations('mobileHome')
+    const tBilling = useTranslations('mobileBilling')
+    // A subscription this phone's store bills is managed in that store, and only there.
+    const managedHere = Boolean(me?.workspace.subscribed && me.workspace.billingProvider === storefront.provider)
     return (
         <NativeMenu
             glass="circle"
@@ -39,6 +43,7 @@ export function AccountMenu() {
         >
             <WorkspaceSubmenu />
             <MenuItem label={t('account.preferences')} icon="settings" onPress={() => router.push('/settings')} />
+            {managedHere && <MenuItem label={tBilling('menu.subscription')} icon="credit-card" onPress={() => void storefront.manage().catch(error => console.warn('[store] opening the subscriptions failed', error))} />}
             {!onCustomServer && <MenuItem label={t('account.contactSupport')} icon="message-circle" onPress={() => contactSupport(me?.user)} />}
             <MenuItem label={t('account.signOut')} icon="log-out" destructive onPress={signOut} />
         </NativeMenu>

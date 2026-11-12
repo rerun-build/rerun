@@ -1,0 +1,37 @@
+{
+    "paywall": {
+        "trialTitle": "{days, plural, one {Teste o Rerun grátis por # dia} other {Teste o Rerun grátis por # dias}}",
+        "paidTitle": "Comece seu plano do Rerun",
+        "includes": "Coworkers ilimitados, com crédito de IA todo mês.",
+        "then": "Depois, {price} por mês. Cancele quando quiser.",
+        "monthly": "{price} por mês. Cancele quando quiser.",
+        "startTrial": "Começar teste grátis",
+        "subscribe": "Assinar",
+        "confirming": "Confirmando seu plano…",
+        "restore": "Restaurar compras",
+        "terms": "Termos",
+        "privacy": "Privacidade",
+        "renews": "{store, select, apple {Renova automaticamente todo mês por {price} até você cancelar, pelo menos 24 horas antes do fim do período, nas assinaturas da sua Conta Apple. O pagamento é cobrado na sua Conta Apple.} other {Renova automaticamente todo mês por {price} até você cancelar nas suas assinaturas do Google Play. O pagamento é cobrado na sua conta do Google.}}",
+        "notice": {
+            "failed": "Não deu certo. Tente de novo.",
+            "pending": "Seu pagamento está pendente. Seu plano começa assim que ele for concluído.",
+            "nothing_to_restore": "Nenhuma compra para restaurar nesta conta.",
+            "linked_elsewhere": "Esta assinatura já roda outro workspace.",
+            "expired": "Esta assinatura terminou.",
+            "billed_on_web": "Este workspace já tem um plano.",
+            "other_store": "Este workspace é cobrado por outra loja.",
+            "not_sold": "O plano não pode ser comprado aqui no momento.",
+            "tryAgain": "Tentar de novo"
+        },
+        "unavailable": {
+            "member": "Peça a um admin deste workspace para começar o plano.",
+            "no_product": "O plano não pode ser comprado neste dispositivo no momento.",
+            "retry": "Tentar de novo"
+        }
+    },
+    "creditsOnTrial": "O crédito mensal do seu plano começa quando o teste grátis termina.",
+    "menu": {
+        "subscription": "Assinatura"
+    },
+    "deleteBlocked": "{store, select, apple {A assinatura de {workspaces} ainda renova pela App Store. Cancele-a primeiro nas assinaturas da sua Conta Apple.} other {A assinatura de {workspaces} ainda renova pelo Google Play. Cancele-a primeiro nas suas assinaturas do Google Play.}}"
+}

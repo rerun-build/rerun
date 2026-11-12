@@ -1,0 +1,43 @@
+{
+    "_context": {
+        "paywall.trialTitle": "{days} is the length of the free trial in days, 7 today.",
+        "paywall.then": "{price} is the monthly price the store shows, in the account's currency, like \"$29.99\" or \"29,99 €\".",
+        "paywall.renews": "Required by the App Store and Google Play under the buy button. {price} as above. {store} picks the store: keep \"App Store\", \"Apple Account\" and \"Google Play\" as they are.",
+        "paywall.notice.other_store": "The workspace is already billed through the other store."
+    },
+    "paywall": {
+        "trialTitle": "{days, plural, one {Try Rerun free for # day} other {Try Rerun free for # days}}",
+        "paidTitle": "Start your Rerun plan",
+        "includes": "Unlimited coworkers, with AI credit every month.",
+        "then": "Then {price} a month. Cancel anytime.",
+        "monthly": "{price} a month. Cancel anytime.",
+        "startTrial": "Start free trial",
+        "subscribe": "Subscribe",
+        "confirming": "Confirming your plan…",
+        "restore": "Restore purchases",
+        "terms": "Terms",
+        "privacy": "Privacy",
+        "renews": "{store, select, apple {Renews automatically every month at {price} until you cancel, at least 24 hours before the period ends, in your Apple Account subscriptions. Payment is charged to your Apple Account.} other {Renews automatically every month at {price} until you cancel in your Google Play subscriptions. Payment is charged to your Google account.}}",
+        "notice": {
+            "failed": "That did not go through. Try again.",
+            "pending": "Your payment is pending. Your plan starts once it goes through.",
+            "nothing_to_restore": "No purchase to restore on this account.",
+            "linked_elsewhere": "This subscription already runs another workspace.",
+            "expired": "This subscription has ended.",
+            "billed_on_web": "This workspace already has a plan.",
+            "other_store": "This workspace is billed through another store.",
+            "not_sold": "The plan cannot be bought here right now.",
+            "tryAgain": "Try again"
+        },
+        "unavailable": {
+            "member": "Ask an admin of this workspace to start the plan.",
+            "no_product": "The plan cannot be bought on this device right now.",
+            "retry": "Try again"
+        }
+    },
+    "creditsOnTrial": "Your plan's monthly credit starts when the free trial ends.",
+    "menu": {
+        "subscription": "Subscription"
+    },
+    "deleteBlocked": "{store, select, apple {The subscription of {workspaces} still renews through the App Store. Cancel it in your Apple Account subscriptions first.} other {The subscription of {workspaces} still renews through Google Play. Cancel it in your Google Play subscriptions first.}}"
+}

@@ -9,7 +9,9 @@ import { useAuth } from '@/auth/AuthProvider'
 import { ConversationSkeleton } from '@/components/chat/ConversationSkeleton'
 import { AppText } from '@/components/ui/AppText'
 import { PillButton } from '@/components/ui/PillButton'
+import { PaywallCard } from '@/components/billing/PaywallCard'
 import { track } from '@/lib/analytics'
+import { usePaywall } from '@/store/usePaywall'
 import { spacing } from '@/theme/tokens'
 
 import { IntakeView } from './IntakeView'
@@ -22,8 +24,8 @@ import type { TeamStartState } from './widgets/TeamCards'
 export type LeadStarted = { agentId: string; conversationId: string }
 
 // The onboarding of a new workspace, the web's walked in the app: the welcome card, then the hub's
-// conversation from the starter team to the built team. Nothing is sold here: the confirmed plan starts
-// the workspace without a card, and the build follows on its own.
+// conversation from the starter team to the built team. The confirmed plan puts the store's offer up,
+// and the build follows on its own once the subscription is on.
 export function Onboarding({ state, onLeadStarted }: { state: ForemanStateResponse; onLeadStarted: (lead: LeadStarted) => void }) {
     const { session, me } = useAuth()
     const caller = useMemo(() => (session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null), [session, me])
@@ -62,11 +64,31 @@ export function Onboarding({ state, onLeadStarted }: { state: ForemanStateRespon
         if (messages.length === 0 || ((state.phase === 'trial' || state.phase === 'build') && !asked)) void kickoff()
     }, [welcomed, history, busy, messages, state.phase, kickoff])
 
-    // The trial card answers itself: the workspace starts without a card the moment the plan is confirmed.
+    // The trial card is the store's offer: it answers itself the moment the hub confirms the purchase,
+    // and stays up through a closed sheet or a failed payment. A hub that sells nothing through the
+    // store (self-hosted, or before the store is set up) starts the workspace without a card instead.
     const trialCall = pendingWidget(messages)?.widget === 'open_checkout' ? pendingWidget(messages)?.toolCallId : null
     const { answer } = chat
+    const paywall = usePaywall({
+        surface: 'onboarding',
+        enabled: Boolean(trialCall),
+        onEntitled: () => {
+            if (!trialCall) return
+            track('onboarding_checkout_answered', { ok: true })
+            answer(trialCall, { ok: true, status: 'entitled' })
+        },
+    })
+    const unavailable = paywall.state.step === 'unavailable' ? paywall.state.reason : null
+    const cardless = unavailable === 'not_sold'
+    // Already on (a plan from the web, the other store, a sandbox): there is nothing to buy.
+    const alreadyOn = unavailable === 'subscribed' || unavailable === 'billed_on_web' || unavailable === 'other_store' || unavailable === 'sandbox' || unavailable === 'lifetime_plan'
     useEffect(() => {
-        if (!trialCall || !caller || teamStart !== 'starting') return
+        if (!trialCall || !alreadyOn) return
+        track('onboarding_checkout_answered', { ok: true })
+        answer(trialCall, { ok: true, status: 'entitled' })
+    }, [trialCall, alreadyOn, answer])
+    useEffect(() => {
+        if (!trialCall || !caller || !cardless || teamStart !== 'starting') return
         let cancelled = false
         startTeam(caller)
             .then(entitled => {
@@ -82,7 +104,7 @@ export function Onboarding({ state, onLeadStarted }: { state: ForemanStateRespon
         return () => {
             cancelled = true
         }
-    }, [trialCall, caller, teamStart, answer])
+    }, [trialCall, caller, cardless, teamStart, answer])
 
     const built = messages.flatMap(message => message.parts.flatMap(part => (widgetOf(part)?.widget === 'build_team' ? [readBuildResult(widgetOf(part)?.output)] : []))).find(Boolean) ?? null
     const lead = built?.lead ?? null
@@ -123,5 +145,5 @@ export function Onboarding({ state, onLeadStarted }: { state: ForemanStateRespon
             </View>
         )
 
-    return <OnboardingConversation messages={messages} busy={busy} failed={Boolean(chat.error)} onRetry={() => void chat.regenerate()} teamStart={teamStart} leadStarting={leadStarting} onAnswer={chat.answer} onSend={text => void chat.send(text)} onStop={chat.stop} onRetryStart={() => setTeamStart('starting')} onRetryBuild={() => void chat.kickoff()} onStartLead={() => void startTheLead()} />
+    return <OnboardingConversation messages={messages} busy={busy} failed={Boolean(chat.error)} onRetry={() => void chat.regenerate()} teamStart={teamStart} paywall={cardless || alreadyOn ? undefined : <PaywallCard state={paywall.state} provider={paywall.provider} onBuy={paywall.buy} onRestore={paywall.restore} onRetry={paywall.retry} />} leadStarting={leadStarting} onAnswer={chat.answer} onSend={text => void chat.send(text)} onStop={chat.stop} onRetryStart={() => setTeamStart('starting')} onRetryBuild={() => void chat.kickoff()} onStartLead={() => void startTheLead()} />
 }

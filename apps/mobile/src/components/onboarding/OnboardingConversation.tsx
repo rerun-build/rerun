@@ -1,6 +1,6 @@
 import { FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -32,6 +32,9 @@ export type OnboardingConversationProps = {
     failed: boolean
     onRetry: () => void
     teamStart: TeamStartState
+    // The plan's offer through the app's store, in place of the trial card while it waits on a
+    // purchase. Absent while the hub sells nothing through the store: the trial starts without one.
+    paywall?: ReactNode
     leadStarting: boolean
     onAnswer: (toolCallId: string, output: unknown) => void
     onSend: (text: string) => void
@@ -81,7 +84,7 @@ function Answered({ widget }: { widget: WidgetPart }) {
 
 // The hub's onboarding conversation: what it says in bubbles, each card where it was asked, and the
 // composer only while no card waits on an answer.
-export function OnboardingConversation({ messages, busy, failed, onRetry, teamStart, leadStarting, onAnswer, onSend, onStop, onRetryStart, onRetryBuild, onStartLead }: OnboardingConversationProps) {
+export function OnboardingConversation({ messages, busy, failed, onRetry, teamStart, paywall, leadStarting, onAnswer, onSend, onStop, onRetryStart, onRetryBuild, onStartLead }: OnboardingConversationProps) {
     const insets = useSafeAreaInsets()
     const scroll = useRef<ScrollViewInstance>(null)
     const [draft, setDraft] = useState('')
@@ -101,7 +104,10 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
     const lastBuild = messages.flatMap(message => message.parts.flatMap(part => (widgetOf(part)?.widget === 'build_team' ? [widgetOf(part)?.toolCallId] : []))).at(-1)
 
     const render = (widget: WidgetPart, message: UIMessage) => {
-        if (widget.widget === 'open_checkout') return <TeamStartCard state={widget.answered ? (readTrialOutput(widget.output)?.ok ? 'started' : 'blocked') : teamStart} onRetry={onRetryStart} />
+        if (widget.widget === 'open_checkout') {
+            if (!widget.answered && paywall) return paywall
+            return <TeamStartCard state={widget.answered ? (readTrialOutput(widget.output)?.ok ? 'started' : 'blocked') : teamStart} onRetry={onRetryStart} />
+        }
         if (widget.widget === 'build_team') return <BuildCard tasks={buildTasks(message, widget.toolCallId)} result={readBuildResult(widget.output)} starting={leadStarting} onStartLead={onStartLead} onRetry={widget.toolCallId === lastBuild ? onRetryBuild : null} />
         if (widget.widget === 'show_plan') return <PlanCard input={widget.input} answered={widget.answered ? readPlanOutput(widget.output) : null} onAnswer={output => onAnswer(widget.toolCallId, output)} />
         if (widget.answered) return <Answered widget={widget} />

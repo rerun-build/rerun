@@ -1,0 +1,37 @@
+{
+    "paywall": {
+        "trialTitle": "{days, plural, one {Essayez Rerun gratuitement pendant # jour} other {Essayez Rerun gratuitement pendant # jours}}",
+        "paidTitle": "Démarrez votre abonnement Rerun",
+        "includes": "Coworkers illimités, avec du crédit IA chaque mois.",
+        "then": "Puis {price} par mois. Résiliable à tout moment.",
+        "monthly": "{price} par mois. Résiliable à tout moment.",
+        "startTrial": "Démarrer l'essai gratuit",
+        "subscribe": "S'abonner",
+        "confirming": "Confirmation de votre abonnement…",
+        "restore": "Restaurer les achats",
+        "terms": "Conditions",
+        "privacy": "Confidentialité",
+        "renews": "{store, select, apple {Se renouvelle automatiquement chaque mois à {price} jusqu'à résiliation, au moins 24 heures avant la fin de la période, dans les abonnements de votre compte Apple. Le paiement est débité sur votre compte Apple.} other {Se renouvelle automatiquement chaque mois à {price} jusqu'à résiliation dans vos abonnements Google Play. Le paiement est débité sur votre compte Google.}}",
+        "notice": {
+            "failed": "Cela n'a pas abouti. Réessayez.",
+            "pending": "Votre paiement est en attente. Votre abonnement démarre dès qu'il est validé.",
+            "nothing_to_restore": "Aucun achat à restaurer sur ce compte.",
+            "linked_elsewhere": "Cet abonnement fait déjà tourner un autre workspace.",
+            "expired": "Cet abonnement est terminé.",
+            "billed_on_web": "Ce workspace a déjà un abonnement.",
+            "other_store": "Ce workspace est facturé via un autre store.",
+            "not_sold": "L'abonnement ne peut pas être acheté ici pour le moment.",
+            "tryAgain": "Réessayer"
+        },
+        "unavailable": {
+            "member": "Demandez à un admin de ce workspace de démarrer l'abonnement.",
+            "no_product": "L'abonnement ne peut pas être acheté sur cet appareil pour le moment.",
+            "retry": "Réessayer"
+        }
+    },
+    "creditsOnTrial": "Le crédit mensuel de votre abonnement démarre à la fin de l'essai gratuit.",
+    "menu": {
+        "subscription": "Abonnement"
+    },
+    "deleteBlocked": "{store, select, apple {L'abonnement de {workspaces} se renouvelle encore via l'App Store. Résiliez-le d'abord dans les abonnements de votre compte Apple.} other {L'abonnement de {workspaces} se renouvelle encore via Google Play. Résiliez-le d'abord dans vos abonnements Google Play.}}"
+}

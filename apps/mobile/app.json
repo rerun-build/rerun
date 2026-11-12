@@ -75,7 +75,16 @@
           "microphonePermission": "Rerun uses the microphone to record voice messages."
         }
       ],
+      [
+        "expo-iap",
+        {
+          "android": {
+            "store": "play"
+          }
+        }
+      ],
       "./plugins/without-background-playback",
+      "./plugins/with-storekit-config",
       "./plugins/with-home-launch-screen",
       [
         "expo-splash-screen",

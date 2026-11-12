@@ -29,6 +29,7 @@ export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me 
             role: ctx.role,
             boxScope: ctx.boxScope,
             billingProvider: billingProviderSchema.nullable().catch(null).parse(ctx.workspace.billing_provider ?? null),
+            trialing: ctx.workspace.subscription_status === 'trialing',
         },
     }
 }

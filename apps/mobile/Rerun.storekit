@@ -1,0 +1,65 @@
+{
+  "identifier" : "8F2A3C61",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6825274993",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21582301",
+      "localizations" : [
+
+      ],
+      "name" : "Rerun",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6755512301",
+          "introductoryOffer" : {
+            "internalID" : "4A71B3C2",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "Unlimited coworkers, with AI credit every month.",
+              "displayName" : "Rerun plan",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "rerun.base.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Rerun base monthly",
+          "subscriptionGroupID" : "21582301",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

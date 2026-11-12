@@ -1,0 +1,37 @@
+{
+    "paywall": {
+        "trialTitle": "{days, plural, one {Prueba Rerun gratis durante # día} other {Prueba Rerun gratis durante # días}}",
+        "paidTitle": "Empieza tu plan de Rerun",
+        "includes": "Coworkers ilimitados, con crédito de IA cada mes.",
+        "then": "Después, {price} al mes. Cancela cuando quieras.",
+        "monthly": "{price} al mes. Cancela cuando quieras.",
+        "startTrial": "Empezar prueba gratis",
+        "subscribe": "Suscribirse",
+        "confirming": "Confirmando tu plan…",
+        "restore": "Restaurar compras",
+        "terms": "Términos",
+        "privacy": "Privacidad",
+        "renews": "{store, select, apple {Se renueva automáticamente cada mes a {price} hasta que lo canceles, al menos 24 horas antes de que termine el período, en las suscripciones de tu cuenta de Apple. El pago se carga a tu cuenta de Apple.} other {Se renueva automáticamente cada mes a {price} hasta que lo canceles en tus suscripciones de Google Play. El pago se carga a tu cuenta de Google.}}",
+        "notice": {
+            "failed": "No se completó. Inténtalo de nuevo.",
+            "pending": "Tu pago está pendiente. Tu plan empieza en cuanto se complete.",
+            "nothing_to_restore": "No hay ninguna compra que restaurar en esta cuenta.",
+            "linked_elsewhere": "Esta suscripción ya está activa en otro workspace.",
+            "expired": "Esta suscripción ha terminado.",
+            "billed_on_web": "Este workspace ya tiene un plan.",
+            "other_store": "Este workspace se factura a través de otra tienda.",
+            "not_sold": "El plan no se puede comprar aquí por ahora.",
+            "tryAgain": "Reintentar"
+        },
+        "unavailable": {
+            "member": "Pide a un admin de este workspace que empiece el plan.",
+            "no_product": "El plan no se puede comprar en este dispositivo por ahora.",
+            "retry": "Reintentar"
+        }
+    },
+    "creditsOnTrial": "El crédito mensual de tu plan empieza cuando termina la prueba gratis.",
+    "menu": {
+        "subscription": "Suscripción"
+    },
+    "deleteBlocked": "{store, select, apple {La suscripción de {workspaces} sigue renovándose a través de la App Store. Cancélala primero en las suscripciones de tu cuenta de Apple.} other {La suscripción de {workspaces} sigue renovándose a través de Google Play. Cancélala primero en tus suscripciones de Google Play.}}"
+}

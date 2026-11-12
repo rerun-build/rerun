@@ -23,6 +23,8 @@ export const workspaceSummarySchema = z.object({
     // Who bills the workspace, null before anyone does: the app manages a store subscription in the
     // store it came from. Absent from a server older than store billing.
     billingProvider: billingProviderSchema.nullable().optional(),
+    // On its free trial: what it runs on is the trial's credit until the plan's first month.
+    trialing: z.boolean().optional(),
 })
 export type WorkspaceSummary = z.infer<typeof workspaceSummarySchema>
 

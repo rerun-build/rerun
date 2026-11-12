@@ -117,6 +117,13 @@ export interface AnalyticsEventMap {
     // and is not counted here.
     checkout_started: { plan: string; source: 'template_cta' | 'billing_dialog' | 'agent_share' | 'foreman' | 'pay_now' | 'ai_providers' }
     paywall_viewed: { trigger: string; addon_shown?: string; variant?: string }
+    // The mobile app's store purchase: `store` is the one it goes through, `surface` where the offer
+    // was shown (the onboarding's card, the paused workspace, the account menu), `trial` whether the
+    // offer was the free week. The subscription itself is reported by the hub, as `trial_started`.
+    purchase_started: { store: 'apple' | 'google'; surface: string; trial: boolean }
+    purchase_cancelled: { store: 'apple' | 'google'; surface: string }
+    purchase_failed: { store: 'apple' | 'google'; surface: string; reason: string }
+    purchases_restored: { store: 'apple' | 'google'; surface: string; outcome: string }
     // `origin` is where the trial was started: the app's are all cardless, whatever the test's arm.
     trial_started: SubscriptionLifecycleProps & { trial_type: TrialType; origin?: 'web' | 'ios' | 'android' }
     trial_converted: SubscriptionLifecycleProps

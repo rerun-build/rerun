@@ -22,6 +22,7 @@ const SYSTEM_SYMBOLS = {
     'square-pen': 'square.and.pencil',
     'messages-square': 'bubble.left.and.bubble.right',
     settings: 'gearshape',
+    'credit-card': 'creditcard',
     'message-circle': 'bubble.left',
     'log-out': 'rectangle.portrait.and.arrow.right',
     layers: 'square.stack',

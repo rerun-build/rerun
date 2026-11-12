@@ -75,6 +75,8 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Onboarding, plan', href: '/lab-onboarding?step=plan' },
     { label: 'Onboarding, starting', href: '/lab-onboarding?step=trial' },
     { label: 'Onboarding, start failed', href: '/lab-onboarding?step=failed' },
+    { label: 'Store offer, every state', href: '/lab-paywall' },
+    { label: 'Store offer, Google Play, dark', href: '/lab-paywall?provider=google&scheme=dark' },
     { label: 'Onboarding, building', href: '/lab-onboarding?step=building' },
     { label: 'Onboarding, built', href: '/lab-onboarding?step=built' },
     { label: 'Onboarding, waitlist', href: '/lab-onboarding?step=waitlist' },

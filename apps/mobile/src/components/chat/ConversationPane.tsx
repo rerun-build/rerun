@@ -1,3 +1,4 @@
+import { isStoreProvider } from '@rerun/contracts'
 import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -355,6 +356,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
             track('connection_cta_clicked', { source: `ios_budget_notice_${provider}` })
             router.push(connectHref(provider))
         },
+        storeTrial: Boolean(me?.workspace.trialing && isStoreProvider(me.workspace.billingProvider)),
     }
     const stopTask = (taskId: string) => {
         const runId = chat.activeRunId()

@@ -45,7 +45,10 @@ export async function askToDeleteAccount(accessToken: string, signOut: () => Pro
     try {
         const blockers = await fetchDeletionBlockers({ accessToken })
         if (blockers.length) {
-            Alert.alert(t('account.subscriptionTitle'), t('account.subscriptionMessage', { workspaces: blockers.map(blocker => blocker.name).join(', ') }))
+            // A store's subscription is cancelled in that store: the web's Billing cannot stop it.
+            const store = blockers.find(blocker => blocker.billedBy === 'apple' || blocker.billedBy === 'google')?.billedBy
+            const message = store ? translatorFor('mobileBilling')('deleteBlocked', { store, workspaces: blockers.map(blocker => blocker.name).join(', ') }) : t('account.subscriptionMessage', { workspaces: blockers.map(blocker => blocker.name).join(', ') })
+            Alert.alert(t('account.subscriptionTitle'), message)
             return
         }
         const confirmed = await confirm(t('account.deleteTitle'), t('account.deleteMessage'), t('account.delete'), t('account.cancel'))

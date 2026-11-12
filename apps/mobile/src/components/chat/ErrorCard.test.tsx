@@ -35,6 +35,12 @@ describe('ErrorCard', () => {
         expect(screen.queryByText(/Top up|Subscribe/)).toBeNull()
     })
 
+    it('says the plan credit comes after a store trial, and still sells nothing', async () => {
+        await render(<ErrorCard message={CREDITS} {...actions()} storeTrial />)
+        expect(screen.getByText("Your plan's monthly credit starts when the free trial ends.")).toBeTruthy()
+        expect(screen.queryByText(/Top up|Subscribe/)).toBeNull()
+    })
+
     it('retries a rejected thinking replay rather than sending it to another model', async () => {
         const handlers = actions()
         await render(<ErrorCard message={THINKING_REPLAY} {...handlers} />)
