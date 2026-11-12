@@ -1,5 +1,7 @@
-# Konductor flow for a Linear issue labeled Harness Use Case: replay the case, plan (approved by the flow), review, fix the review
-# (plan approved by you), PR, summary on the issue, then wait for your merge.
+# Konductor flow for a Linear issue labeled Harness Use Case: read the real transcript and replay the case on the real
+# product, plan and build the fix (plan approved by the flow, only once the case is reproduced), measure after on the
+# same spec, review, fix the review (plan approved by you), PR, summary on the issue, then after your merge the card goes to Done
+# with a last update posted on it.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Harness"
 match = { labels = ["Harness Use Case"] }
@@ -12,6 +14,25 @@ prompt = """
 /harness-use-case {{issue.url}}
 
 Le ticket Linear complet (description, images) est dans {{issue.file}}.
+
+Le fix est demandé : enchaîne les phases 1 et 2 sans attendre de feu vert, sauf pour le plafond de dépense que la
+skill demande. Ce qui compte avant tout ici, c'est de **reproduire le cas pour de vrai** :
+
+1. Lis ce qui s'est réellement passé, en lecture seule : le coworker et son workspace dans Supabase, la box du
+   client (`fetch-transcripts.sh`, `box.sh`, `engine-tunnel.sh` pour une box derrière un tunnel, SSH pour les logs),
+   le modèle et le provider de chaque run, ce que le coworker avait reçu (soul, install, skills, prompt de l'engine
+   du jour).
+2. Rejoue le cas sur le vrai produit avec le modèle du client et ses messages mot pour mot : la spec dans
+   `specs/`, puis les runs `--label=baseline` sur le workspace interne, ou sur l'engine de cette branche
+   (`local-engine.sh`) quand le cas touche l'engine. Ajoute des runs, change de base (box, engine local, staging)
+   tant que le mauvais comportement n'est pas apparu au moins une fois.
+3. Garde la preuve : les runs baseline, les tours où ça déraille (`turns.mjs`, `timeline.mjs`, `score.mjs`), et
+   `analysis/<nn>-<slug>.md` avec la cause classée (a à e) et ce qui est prouvé ou seulement supposé.
+
+Le workspace et la box du client restent en lecture : on n'y écrit, ne relance ni ne supprime jamais rien.
+
+Si le cas ne se reproduit pas : dis-le en tête de ta réponse, liste chaque tentative (base, modèle, nombre de runs,
+ce qu'elles ont montré), vérifie si `{{workspace.target}}` l'a déjà corrigé, et dis ce qui manque.
 """
 
 [[steps]]
@@ -19,12 +40,44 @@ id = "plan"
 title = "Plan the fix"
 plan = true
 approve = "auto"
-prompt = "Planifie le fix à partir du cas rejoué : la cause, la couche où le corriger (hub, prompt du moteur, template), et la mesure avant / après qui le prouve."
+prompt = """
+Planifie le fix à partir du cas rejoué.
+
+Si le cas n'a pas été reproduit en baseline, ne propose pas de plan de fix et n'appelle pas ExitPlanMode : explique
+ce qui a été tenté et ce qu'il te faudrait. Le flow attend alors une réponse humaine.
+
+Sinon, le plan contient : la spec et les runs baseline qui montrent le mauvais comportement, la cause prouvée, la
+couche où la corriger (hub, prompt du moteur, template) selon `where-the-fix-goes.md`, le plus petit changement qui
+la corrige, et la mesure avant / après qui le prouvera (mêmes spec, modèle et base que la baseline, nombre de runs).
+"""
+
+[[steps]]
+id = "prove"
+title = "Prove the fix"
+prompt = """
+Prouve que le cas est réellement corrigé, sur la même reproduction que la baseline :
+
+1. Rejoue la même spec, avec le même modèle et sur la même base, en `--label=after` (puis `after2`… à chaque
+   nouvelle tentative, sans jamais écraser un label) : au moins 3 runs. Lis chaque réponse avec `turns.mjs`.
+2. Le tableau avant → après sur N runs : ce qui a été compté, les appels payants (`score.mjs`), le coût, et les
+   biais (engine local sans navigateur, workspace sans crédit, site qui a changé depuis le ticket).
+3. Pour un changement de code (engine, hub, contracts) : les tests de l'engine et des paquets touchés, typecheck
+   et lint.
+
+Écris `.context/harness-cases/proof.md` avec ce tableau. Un fix qui ne fait pas bouger le résultat ne part pas :
+retourne à la cause avec ce que les runs ont montré, corrige et mesure à nouveau avant de terminer.
+"""
 
 [[steps]]
 id = "review"
 title = "Review"
 kind = "review"
+prompt = """
+Vérifie aussi la preuve, dans `.context/harness-cases/` (`analysis/`, `specs/`, `cases/`, `proof.md`) :
+- pas de baseline qui montre le mauvais comportement, ou pas de mesure après sur la même spec : `blocking` ;
+- une mesure sur un autre modèle ou une autre base que la baseline, ou trop peu de runs pour conclure : `major` ;
+- une règle qui contredit ou duplique une règle déjà en place dans `where-the-fix-goes.md` : `major`.
+"""
 
 [[steps]]
 id = "fixes"
@@ -37,6 +90,7 @@ prompt = """
 Voici les {{comments.count}} remarques de la review, chacune avec sa sévérité.
 Planifie la correction de toutes les remarques blocking et major, et des minor / nit qui sont des quick wins.
 Pour chaque remarque que tu écartes, dis pourquoi.
+Si les corrections touchent au fix, mesure à nouveau sur la même spec (nouveau label) et mets `proof.md` à jour.
 """
 
 [[steps]]
@@ -50,12 +104,29 @@ title = "Summary"
 chat = "summary"
 linear_comment = true
 prompt = """
-Lis {{issue.file}}, le diff de ce workspace (GetWorkspaceDiff) et la PR ouverte.
-Écris un résumé pour la personne qui va relire et merger : le cas client, la cause, la couche corrigée et comment,
-la mesure avant / après, et ce qu'il reste à vérifier avant de merger. Court, en français.
+Lis {{issue.file}}, `.context/harness-cases/` (`analysis/`, `proof.md`), le diff de ce workspace (GetWorkspaceDiff) et
+la PR ouverte.
+Écris un résumé pour la personne qui va relire et merger : le cas client, comment il a été reproduit, la cause, la
+couche corrigée et comment, la mesure avant / après, et ce qu'il reste à vérifier avant de merger. Court, en français.
 """
 
 [[steps]]
 id = "merge"
 title = "Merge"
 kind = "wait_merge"
+
+[[steps]]
+id = "close"
+title = "Close the card"
+chat = "summary"
+linear_comment = true
+prompt = """
+La PR de {{issue.identifier}} est mergée. Passe la carte Linear en Done avec le MCP Linear si elle n'y est pas
+déjà (l'intégration GitHub de Linear a pu le faire), puis écris sa mise à jour finale, postée telle quelle sur la carte :
+- la PR et son commit sur `{{workspace.target}}` (`gh pr view --json number,url,mergeCommit,mergedAt`) ;
+- la cause et la couche corrigée, en deux phrases ;
+- la mesure avant → après sur N runs ;
+- ce qui est déjà en production (template publié) et ce qui part avec la prochaine release (engine, hub) ;
+- ce qui reste à surveiller chez le client.
+Court, en français, sans clé, token ni contenu privé du client.
+"""

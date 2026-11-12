@@ -1,6 +1,6 @@
 ---
 name: investigate-bug
-description: Start of every bug, before any fix. Read the report (often a Notion card), gather the evidence, reproduce the bug when possible, find the root cause and report it with the smallest fix proposed. Use whenever a bug, an incident or a customer complaint comes in, or when someone says "investigate this bug", "why does X happen", "reproduce the bug", « analyse ce bug », « regarde cette carte », « reproduis le bug », « trouve la cause ».
+description: Start of every bug, before any fix. Read the report (a Linear issue, or an older Notion card), gather the evidence, reproduce the bug by every means available, find the root cause and report it with the smallest fix proposed. Use whenever a bug, an incident or a customer complaint comes in, or when someone says "investigate this bug", "why does X happen", "reproduce the bug", « analyse ce bug », « regarde cette carte », « reproduis le bug », « trouve la cause ».
 ---
 
 # investigate-bug: understand before fixing
@@ -9,7 +9,8 @@ Reply in the user's language. Notes and captures go in `.context/bugs/<slug>/`.
 
 ## 1. Read the report
 
-- A Notion card: fetch the page, its comments and its attachments (screenshots, videos).
+- A Linear issue (or an older Notion card): read it with its comments and attachments (screenshots,
+  videos).
 - Write down in one line each: what was expected, what happened, who (workspace id, user), where
   (web, mobile, engine, email…), when (date and time), how often (once, always, since a release).
 - What is missing from the report, ask for it now rather than guessing.
@@ -23,7 +24,7 @@ Before digging, make sure the bug is not already known or fixed:
   (`gh pr list --state all --search "<keyword>"`). History before 2026-10-29 lives in the private
   `rerun-build/rerun-monorepo-archive`; what Rerun Cloud runs differently lives in `cloud/`
   (`git -C cloud log`, repo `rerun-build/rerun-cloud`).
-- Search Notion for a card with the same symptom (done or in progress).
+- Search Linear (and Notion for older cards) for an issue with the same symptom (done or in progress).
 - A fix found: check it reached where the bug was seen. Is the commit on `master`? Is the app's
   `/api/version` (staging or prod) at or after it? Does the customer's engine box run a version
   that includes it? On mobile, does the build in the customer's hands include it?
@@ -54,15 +55,29 @@ Investigating on the real account is allowed, still read-only:
 - Read the model and provider the customer actually used before any reproduction, it changes the
   behaviour.
 - Never paste the engine API key, tokens or the customer's private content in a message, a commit
-  or a Notion card. Quote only what proves the cause.
+  or a Linear issue. Quote only what proves the cause.
 
 ## 4. Reproduce
 
-- On the local stack only (`pnpm db:start`, `pnpm cloud env:local`): a `pnpm verify:ui` scenario in
-  `.context/verify/` that clicks the reported path, or a failing test.
-- Keep the exact steps that trigger it. A bug reproduced is a bug whose fix can be proved.
-- Not reproducible: say so, list what was tried, and keep going from the evidence. Never present a
-  guessed cause as a found one.
+A bug reproduced is a bug whose fix can be proved: try everything before giving up, and see it happen.
+
+- Replay the exact path of the report under the customer's conditions: same model and provider, same
+  data shape, same settings, same app and engine version. Climb this ladder until it shows:
+  1. the local stack (`pnpm db:start`, `pnpm cloud env:local`): a `pnpm verify:ui` scenario in
+     `.context/verify/` that clicks the reported path (`--engine` for the engine of the branch), or a
+     failing test;
+  2. the engine of this checkout against the prod hub (`local-engine.sh` of the `harness-use-case`
+     skill), when the bug needs real data or real providers;
+  3. staging, or Rerun's internal test workspace on prod, for what cannot be replayed locally.
+- The customer's workspace and engine box stay read-only (section 3): they show what happened, the
+  replay runs elsewhere.
+- Turn the reproduction into an automated test that fails on the base branch, as close to the
+  customer's real path as possible.
+- Write `.context/bugs/<slug>/repro.md` (the exact command or scenario, the environment, the model) and
+  keep the proof next to it: the failing output, captures, log lines with their timestamps.
+- Not reproducible after the whole ladder: say so first, list each attempt and what it showed, say what
+  is missing (an answer from the customer, an access, data), and keep going from the evidence. Never
+  present a guessed cause as a found one.
 
 ## 5. Find the root cause
 
@@ -78,7 +93,8 @@ Unless the user already asked for the fix, stop here and give:
 
 - **Symptom**: one sentence.
 - **Already fixed?**: the earlier fix or card found (and whether it shipped), or "nothing found".
-- **Reproduction**: the steps, or "not reproduced" with what was tried.
+- **Reproduction**: the steps, where they ran and the failing test, or "not reproduced" with what was
+  tried.
 - **Root cause**: `file:line` and why, with the evidence (log line, row, capture).
 - **Proposed fix**: the smallest diff that removes the cause. A wider refactor is mentioned in one
   line, never folded into the fix.
