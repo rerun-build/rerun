@@ -1,0 +1,26 @@
+{
+    "title": "Descarga la app de escritorio de Rerun",
+    "eyebrow": "App de escritorio",
+    "headline": "Rerun en tu escritorio",
+    "description": "Tus coworkers en una ventana propia, con notificaciones, un icono en la barra de menús y la pregunta rápida.",
+    "mac": "Descargar para macOS",
+    "requirements": "macOS 13 o posterior, Apple Silicon e Intel.",
+    "otherPlatforms": "Windows y Linux están en camino. Mientras tanto, Rerun funciona en tu navegador.",
+    "openWebApp": "Abrir la app web",
+    "features": {
+        "label": "Lo que añade la app",
+        "title": "Todo Rerun, a un atajo",
+        "notifications": {
+            "title": "Notificaciones que te traen de vuelta",
+            "body": "Tus coworkers te avisan en cuanto estás en otra app, y un clic abre la conversación."
+        },
+        "quickAsk": {
+            "title": "Pregunta rápida",
+            "body": "⌘⇧Espacio desde cualquier app, una pregunta para tu Chief of Staff, y la respuesta te espera en Rerun."
+        },
+        "always": {
+            "title": "Siempre en marcha",
+            "body": "Al cerrar la ventana, Rerun queda en la barra de menús, con lo que te espera contado en su icono."
+        }
+    }
+}

@@ -160,6 +160,8 @@
         "main": "Main",
         "starOnGithub": "Star on GitHub",
         "login": "Log in",
+        "download": "Download",
+        "openWebApp": "Open web app",
         "browseAll": {
             "label": "Browse all templates",
             "description": "The whole library, every category in one page."

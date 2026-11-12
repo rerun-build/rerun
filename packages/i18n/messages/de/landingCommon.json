@@ -160,6 +160,8 @@
         "main": "Hauptmenü",
         "starOnGithub": "Stern auf GitHub",
         "login": "Anmelden",
+        "download": "Herunterladen",
+        "openWebApp": "Web-App öffnen",
         "browseAll": {
             "label": "Alle Vorlagen ansehen",
             "description": "Die ganze Bibliothek, alle Kategorien auf einer Seite."

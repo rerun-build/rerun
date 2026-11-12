@@ -1,0 +1,30 @@
+{
+    "_context": {
+        "features.quickAsk.body": "⌘⇧Space is the keyboard shortcut of the desktop app; keep the symbols.",
+        "otherPlatforms": "The desktop app exists for macOS only for now."
+    },
+    "title": "Download the Rerun desktop app",
+    "eyebrow": "Desktop app",
+    "headline": "Rerun on your desktop",
+    "description": "Your coworkers in a window of their own, with notifications, a menu bar icon and Quick ask.",
+    "mac": "Download for macOS",
+    "requirements": "macOS 13 or later, Apple Silicon and Intel.",
+    "otherPlatforms": "Windows and Linux are on the way. Until then, Rerun runs in your browser.",
+    "openWebApp": "Open the web app",
+    "features": {
+        "label": "What the app adds",
+        "title": "Everything in Rerun, a shortcut away",
+        "notifications": {
+            "title": "Notifications that bring you back",
+            "body": "Your coworkers reach you as soon as you are in another app, and a click opens the conversation."
+        },
+        "quickAsk": {
+            "title": "Quick ask",
+            "body": "⌘⇧Space from any app, a question for your Chief of Staff, and the answer waits in Rerun."
+        },
+        "always": {
+            "title": "Always running",
+            "body": "Closing the window keeps Rerun in the menu bar, with the count of what waits for you on its icon."
+        }
+    }
+}

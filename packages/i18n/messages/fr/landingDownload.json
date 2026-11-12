@@ -1,0 +1,26 @@
+{
+    "title": "Télécharger l’app de bureau Rerun",
+    "eyebrow": "App de bureau",
+    "headline": "Rerun sur votre bureau",
+    "description": "Vos coworkers dans une fenêtre à eux, avec les notifications, une icône dans la barre des menus et la question rapide.",
+    "mac": "Télécharger pour macOS",
+    "requirements": "macOS 13 ou plus récent, Apple Silicon et Intel.",
+    "otherPlatforms": "Windows et Linux arrivent. En attendant, Rerun fonctionne dans votre navigateur.",
+    "openWebApp": "Ouvrir l’app web",
+    "features": {
+        "label": "Ce que l’app ajoute",
+        "title": "Tout Rerun, à un raccourci",
+        "notifications": {
+            "title": "Des notifications qui vous ramènent",
+            "body": "Vos coworkers vous joignent dès que vous êtes dans une autre app, et un clic ouvre la conversation."
+        },
+        "quickAsk": {
+            "title": "Question rapide",
+            "body": "⌘⇧Espace depuis n’importe quelle app, une question pour votre Chief of Staff, et la réponse vous attend dans Rerun."
+        },
+        "always": {
+            "title": "Toujours là",
+            "body": "Fermer la fenêtre garde Rerun dans la barre des menus, avec sur son icône le nombre de ce qui vous attend."
+        }
+    }
+}

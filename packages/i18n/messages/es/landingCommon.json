@@ -160,6 +160,8 @@
         "main": "Principal",
         "starOnGithub": "Estrella en GitHub",
         "login": "Iniciar sesión",
+        "download": "Descargar",
+        "openWebApp": "Abrir la app web",
         "browseAll": {
             "label": "Ver todas las plantillas",
             "description": "Toda la biblioteca, cada categoría en una sola página."
