@@ -99,7 +99,8 @@
         "open": "Abrir {name}",
         "waiting": "{count, plural, one {# te espera} other {# te esperan}}",
         "openAtLogin": "Abrir al iniciar sesión",
-        "stillRunning": "{name} sigue funcionando aquí. Ciérralo desde este icono."
+        "stillRunning": "{name} sigue funcionando aquí. Ciérralo desde este icono.",
+        "quickAsk": "Pregunta rápida"
     },
     "context": {
         "addToDictionary": "Añadir al diccionario",

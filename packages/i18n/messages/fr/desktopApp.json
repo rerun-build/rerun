@@ -99,7 +99,8 @@
         "open": "Ouvrir {name}",
         "waiting": "{count, plural, one {# en attente de vous} other {# en attente de vous}}",
         "openAtLogin": "Ouvrir à la connexion",
-        "stillRunning": "{name} continue de tourner ici. Quittez-le depuis cette icône."
+        "stillRunning": "{name} continue de tourner ici. Quittez-le depuis cette icône.",
+        "quickAsk": "Question rapide"
     },
     "context": {
         "addToDictionary": "Ajouter au dictionnaire",

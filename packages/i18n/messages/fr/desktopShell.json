@@ -50,10 +50,17 @@
         "downloading": "Téléchargement de la mise à jour… {percent} %",
         "updateFailed": "Impossible de rechercher les mises à jour.",
         "check": "Rechercher des mises à jour",
-        "restart": "Redémarrer pour passer à {version}"
+        "restart": "Redémarrer pour passer à {version}",
+        "quickAsk": "Question rapide",
+        "quickAskHint": "{shortcut} ouvre un champ pour votre Chief of Staff depuis n’importe quelle app."
     },
     "openInApp": {
         "title": "Ouvrir cette page dans {app} ?",
         "open": "Ouvrir"
+    },
+    "quickAsk": {
+        "placeholder": "Demandez à votre Chief of Staff…",
+        "hint": "Entrée pour envoyer, Échap pour fermer",
+        "send": "Envoyer"
     }
 }

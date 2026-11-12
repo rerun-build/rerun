@@ -10,7 +10,9 @@
         "signIn.waitingTitle": "Shown in the desktop app after it opened the web browser to sign in.",
         "signIn.codeLabel": "Label of the field where the person pastes the code shown by the browser.",
         "settings.version": "Under the Updates row of the desktop app settings. {version} is like 0.4.0.",
-        "openInApp.title": "Toast in the web browser, offering to open the current page in the Rerun desktop app. {app} is the app name."
+        "openInApp.title": "Toast in the web browser, offering to open the current page in the Rerun desktop app. {app} is the app name.",
+        "quickAsk.placeholder": "Placeholder of the small floating window of the desktop app where the person types a question for the Chief of Staff (the workspace assistant).",
+        "settings.quickAskHint": "{shortcut} is the keyboard shortcut, like ⌘⇧Space."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -63,10 +65,17 @@
         "downloading": "Downloading the update… {percent}%",
         "updateFailed": "Couldn’t check for updates.",
         "check": "Check for updates",
-        "restart": "Restart to update to {version}"
+        "restart": "Restart to update to {version}",
+        "quickAsk": "Quick ask",
+        "quickAskHint": "{shortcut} opens a field for your Chief of Staff from any app."
     },
     "openInApp": {
         "title": "Open this page in {app}?",
         "open": "Open"
+    },
+    "quickAsk": {
+        "placeholder": "Ask your Chief of Staff…",
+        "hint": "Enter to send, Esc to close",
+        "send": "Send"
     }
 }

@@ -11,7 +11,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -104,7 +104,15 @@ export type DesktopSettings = {
     openAtLogin: boolean
     // Windows and Linux: closing the window leaves the app in the tray. macOS always does.
     closeToTray: boolean
+    // The global shortcut that opens Quick ask, from any app.
+    quickAsk: boolean
 }
+
+// The page the Quick ask window shows: one field, sent to the Chief of Staff.
+export const QUICK_ASK_PATH = '/quick-ask'
+
+// Electron's accelerator syntax: ⌘⇧Space on macOS, Ctrl+Shift+Space elsewhere.
+export const QUICK_ASK_SHORTCUT = 'CommandOrControl+Shift+Space'
 
 export type DesktopSignInProvider = 'google' | 'apple'
 
@@ -167,6 +175,13 @@ export type DesktopShellApi = {
     locale: {
         // The language of the app's menus, as the person picked it in Rerun.
         set(locale: string): void
+    }
+    quickAsk: {
+        // The keys of the shortcut, as Electron writes them (`CommandOrControl+Shift+Space`).
+        shortcut: string
+        close(): void
+        // The message left: the main window opens on `path`.
+        sent(path: string): void
     }
 }
 

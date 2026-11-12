@@ -50,10 +50,17 @@
         "downloading": "Update wird geladen… {percent} %",
         "updateFailed": "Suche nach Updates fehlgeschlagen.",
         "check": "Nach Updates suchen",
-        "restart": "Neu starten für Version {version}"
+        "restart": "Neu starten für Version {version}",
+        "quickAsk": "Schnellfrage",
+        "quickAskHint": "{shortcut} öffnet aus jeder App ein Feld für deinen Chief of Staff."
     },
     "openInApp": {
         "title": "Diese Seite in {app} öffnen?",
         "open": "Öffnen"
+    },
+    "quickAsk": {
+        "placeholder": "Frag deinen Chief of Staff…",
+        "hint": "Enter zum Senden, Esc zum Schließen",
+        "send": "Senden"
     }
 }

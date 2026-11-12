@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
+import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
 import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
@@ -60,10 +61,15 @@ if (bootstrap?.audience === 'app') {
         },
         settings: {
             get: () => ipcRenderer.invoke(IPC.settingsGet) as Promise<DesktopSettings>,
-            set: (patch) => ipcRenderer.invoke(IPC.settingsSet, { openAtLogin: patch.openAtLogin, closeToTray: patch.closeToTray }) as Promise<DesktopSettings>,
+            set: (patch) => ipcRenderer.invoke(IPC.settingsSet, { openAtLogin: patch.openAtLogin, closeToTray: patch.closeToTray, quickAsk: patch.quickAsk }) as Promise<DesktopSettings>,
         },
         locale: {
             set: (locale) => void ipcRenderer.invoke(IPC.localeSet, String(locale)),
+        },
+        quickAsk: {
+            shortcut: QUICK_ASK_SHORTCUT,
+            close: () => void ipcRenderer.invoke(IPC.quickAskClose),
+            sent: (path) => void ipcRenderer.invoke(IPC.quickAskSent, String(path)),
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)

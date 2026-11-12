@@ -32,6 +32,7 @@ export function DesktopAppPanel() {
         setSettings(await shell.settings.set(patch))
     }
 
+    const shortcutLabel = shell.platform === 'mac' ? '⌘⇧Space' : 'Ctrl+Shift+Space'
     const updates = desktopShell('update')
     const updateLine =
         update.status === 'downloading' ? t('downloading', { percent: update.percent }) : update.status === 'checking' ? t('checking') : update.status === 'error' ? t('updateFailed') : t('version', { version: shell.version })
@@ -42,6 +43,9 @@ export function DesktopAppPanel() {
                 <>
                     <Field orientation="row" label={t('openAtLogin')} helperText={shell.platform === 'mac' ? t('openAtLoginMac') : t('openAtLoginOther')} htmlFor="desktop-open-at-login">
                         <Switch id="desktop-open-at-login" checked={settings.openAtLogin} onCheckedChange={(openAtLogin) => void change({ openAtLogin })} />
+                    </Field>
+                    <Field orientation="row" label={t('quickAsk')} helperText={t('quickAskHint', { shortcut: shortcutLabel })} htmlFor="desktop-quick-ask">
+                        <Switch id="desktop-quick-ask" checked={settings.quickAsk} onCheckedChange={(quickAsk) => void change({ quickAsk })} />
                     </Field>
                     {shell.platform !== 'mac' && (
                         <Field orientation="row" label={t('closeToTray')} helperText={t('closeToTrayHint')} htmlFor="desktop-close-to-tray">

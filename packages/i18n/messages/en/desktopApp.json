@@ -22,7 +22,8 @@
         "tray.open": "Tray menu item that shows the app window. {name} is the app name.",
         "tray.waiting": "In the tray menu and tooltip: how many conversations wait for the person.",
         "tray.stillRunning": "Windows balloon the first time the window is closed into the notification area. {name} is the app name.",
-        "context.openLink": "Right-click menu on a link: opens it in the web browser."
+        "context.openLink": "Right-click menu on a link: opens it in the web browser.",
+        "tray.quickAsk": "Tray menu item opening the small window where the person types a question for the Chief of Staff (the workspace assistant), from any app."
     },
     "menu": {
         "app": {
@@ -124,7 +125,8 @@
         "open": "Open {name}",
         "waiting": "{count, plural, one {# waiting for you} other {# waiting for you}}",
         "openAtLogin": "Open at Login",
-        "stillRunning": "{name} keeps running here. Quit it from this icon."
+        "stillRunning": "{name} keeps running here. Quit it from this icon.",
+        "quickAsk": "Quick Ask"
     },
     "context": {
         "addToDictionary": "Add to Dictionary",

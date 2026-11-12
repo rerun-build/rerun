@@ -1,4 +1,4 @@
-import { app, session as electronSession } from 'electron'
+import { app, globalShortcut, session as electronSession } from 'electron'
 import { join, resolve } from 'node:path'
 import { completeFromLink } from './browser-sign-in'
 import { deepLinkInArgv, parseDeepLink } from './deep-links'
@@ -13,7 +13,8 @@ import { onLocaleChange } from './messages'
 import { partitionFor, serverOrigin } from './server'
 import { checkServer } from './server-check'
 import { checkForUpdates, startUpdater } from './updater'
-import { createTray, refreshTray, startedAtLogin } from './native'
+import { createTray, desktopSettings, refreshTray, startedAtLogin } from './native'
+import { setQuickAskShortcut, toggleQuickAsk } from './quick-ask'
 
 // Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
@@ -80,6 +81,8 @@ app.on('activate', () => {
     else createMainWindow(serverOrigin())
 })
 
+app.on('will-quit', () => globalShortcut.unregisterAll())
+
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 })
@@ -98,6 +101,7 @@ function menu(): void {
             showServerPicker()
         },
         reload: () => reloadApp(),
+        quickAsk: () => toggleQuickAsk(),
     })
 }
 
@@ -119,6 +123,7 @@ function start(): void {
     const origin = serverOrigin()
     createMainWindow(origin, { hidden: startedAtLogin() })
     createTray({ checkForUpdates: () => void checkForUpdates(true), quit: () => app.quit() })
+    setQuickAskShortcut(desktopSettings().quickAsk)
     if (origin) void verifyServer(origin)
     startUpdater()
     registerScheme()

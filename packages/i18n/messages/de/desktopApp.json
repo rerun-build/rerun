@@ -99,7 +99,8 @@
         "open": "{name} öffnen",
         "waiting": "{count, plural, one {# wartet auf dich} other {# warten auf dich}}",
         "openAtLogin": "Bei der Anmeldung öffnen",
-        "stillRunning": "{name} läuft hier weiter. Beende es über dieses Symbol."
+        "stillRunning": "{name} läuft hier weiter. Beende es über dieses Symbol.",
+        "quickAsk": "Schnellfrage"
     },
     "context": {
         "addToDictionary": "Zum Wörterbuch hinzufügen",

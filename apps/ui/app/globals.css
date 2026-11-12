@@ -582,6 +582,16 @@ html[data-desktop-shell] [data-slot='sheet-content'][data-side='top'] {
   top: var(--shell-titlebar-h);
 }
 
+/* The Quick ask window is frameless and rounded: no strip, and nothing painted around its card. */
+html[data-desktop-shell]:has([data-quick-ask]) {
+  --shell-titlebar-h: 0px;
+}
+
+html:has([data-quick-ask]),
+html:has([data-quick-ask]) body {
+  background: transparent;
+}
+
 [data-shell-titlebar] {
   position: fixed;
   inset: 0 0 auto 0;

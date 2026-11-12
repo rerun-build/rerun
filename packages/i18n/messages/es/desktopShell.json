@@ -50,10 +50,17 @@
         "downloading": "Descargando la actualización… {percent} %",
         "updateFailed": "No se pudieron buscar actualizaciones.",
         "check": "Buscar actualizaciones",
-        "restart": "Reiniciar para actualizar a {version}"
+        "restart": "Reiniciar para actualizar a {version}",
+        "quickAsk": "Pregunta rápida",
+        "quickAskHint": "{shortcut} abre un campo para tu Chief of Staff desde cualquier app."
     },
     "openInApp": {
         "title": "¿Abrir esta página en {app}?",
         "open": "Abrir"
+    },
+    "quickAsk": {
+        "placeholder": "Pregúntale a tu Chief of Staff…",
+        "hint": "Intro para enviar, Esc para cerrar",
+        "send": "Enviar"
     }
 }

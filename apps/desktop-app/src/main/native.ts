@@ -12,6 +12,7 @@ import { PRODUCT_NAME, shellPlatform } from './identity'
 import { getMainWindow, showMainWindow } from './main-window'
 import { t } from './messages'
 import { readSettings, updateSettings } from './settings'
+import { QUICK_ASK_ACCELERATOR, setQuickAskShortcut, toggleQuickAsk } from './quick-ask'
 import { isExternalUrl } from './url-policy'
 
 // What makes the app feel installed rather than a tab: system notifications that bring back the
@@ -84,7 +85,7 @@ function applyOpenAtLogin(openAtLogin: boolean): void {
 
 export function desktopSettings(): DesktopSettings {
     const settings = readSettings()
-    return { openAtLogin: settings.openAtLogin ?? false, closeToTray: settings.closeToTray ?? true }
+    return { openAtLogin: settings.openAtLogin ?? false, closeToTray: settings.closeToTray ?? true, quickAsk: settings.quickAsk ?? true }
 }
 
 export function changeDesktopSettings(patch: Partial<DesktopSettings>): DesktopSettings {
@@ -94,7 +95,11 @@ export function changeDesktopSettings(patch: Partial<DesktopSettings>): DesktopS
         applyOpenAtLogin(next.openAtLogin)
     }
     if (typeof patch.closeToTray === 'boolean') next.closeToTray = patch.closeToTray
-    updateSettings({ openAtLogin: next.openAtLogin, closeToTray: next.closeToTray })
+    if (typeof patch.quickAsk === 'boolean') {
+        next.quickAsk = patch.quickAsk
+        setQuickAskShortcut(next.quickAsk)
+    }
+    updateSettings({ openAtLogin: next.openAtLogin, closeToTray: next.closeToTray, quickAsk: next.quickAsk })
     refreshTray()
     return next
 }
@@ -116,6 +121,7 @@ function trayImage(): Electron.NativeImage {
 function trayMenu(): Menu {
     const items: MenuItemConstructorOptions[] = [
         { label: t('tray.open', { name: PRODUCT_NAME }), click: () => showMainWindow() },
+        { label: t('tray.quickAsk'), accelerator: QUICK_ASK_ACCELERATOR, enabled: desktopSettings().quickAsk, click: () => toggleQuickAsk() },
         ...(waiting > 0 ? [{ label: t('tray.waiting', { count: waiting }), enabled: false }] : []),
         { type: 'separator' },
         {

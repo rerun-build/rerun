@@ -1,4 +1,5 @@
 import { app, Menu, type MenuItemConstructorOptions } from 'electron'
+import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
 import { devToolsAllowed, PRODUCT_NAME } from './identity'
 import { t } from './messages'
 
@@ -8,6 +9,7 @@ export type MenuActions = {
     checkForUpdates: () => void
     changeServer: () => void
     reload: () => void
+    quickAsk: () => void
 }
 
 const DOCS_URL = 'https://docs.rerun.build'
@@ -36,6 +38,9 @@ export function buildMenu(actions: MenuActions): Menu {
     const fileMenu: MenuItemConstructorOptions = {
         label: t('menu.file.title'),
         submenu: [
+            // The shortcut is global (registered by quick-ask.ts): the menu only shows it.
+            { id: 'quick-ask', label: t('tray.quickAsk'), accelerator: QUICK_ASK_SHORTCUT, registerAccelerator: false, click: actions.quickAsk },
+            { type: 'separator' },
             ...(mac ? [] : [{ label: t('menu.app.checkForUpdates'), click: actions.checkForUpdates }, { label: t('menu.app.changeServer'), click: actions.changeServer }, { type: 'separator' as const }]),
             mac ? { role: 'close' as const, label: t('menu.file.closeWindow') } : { role: 'quit' as const, label: t('menu.app.quit', { name }) },
         ],

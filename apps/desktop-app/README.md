@@ -75,6 +75,9 @@ chain: a ticket, the browser, a claim back through the scheme.
 - A browser that signed the app in (cookie `rr_desktop_app`) offers once per tab to open the page in
   the app (`rerun-desktop://open?path=/…`, a path of the server and nothing else): the link of an
   email lands in the browser, the work happens in the app.
+- Quick ask: ⌘⇧Space (Ctrl+Shift+Space) from any app opens a small floating field for the Chief of
+  Staff (`/quick-ask`). The text goes to the main window through the origin's localStorage, never a
+  URL a link could forge, and the main window asks it in a new conversation.
 - Menus and tray in the language the person reads Rerun in (`locale.set`), a right-click menu
   (editing, spelling, links, images).
 
@@ -100,6 +103,7 @@ pnpm verify:desktop --signed-out --scenario apps/desktop-app/e2e/sign-in.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/links.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/native.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/open-links.mjs
+pnpm verify:desktop --onboarded --engine --scenario apps/desktop-app/e2e/quick-ask.mjs
 pnpm verify:desktop --packaged --scenario apps/desktop-app/e2e/shell.mjs # the packaged app, fuses on
 CSC_NAME="<a signing identity>" node apps/desktop-app/e2e/update-loop.mjs # 0.0.1 updates itself to 0.0.2
 ```

@@ -4,6 +4,7 @@ import { CrispChat } from '@rerun/cloud/support'
 import { BoardChatSplit } from '@/components/layout/BoardChatSplit'
 import { FeatureFlagsProvider } from '@/components/layout/FeatureFlagsProvider'
 import { WorkspaceSwitchLoader } from '@/components/layout/WorkspaceSwitchLoader'
+import { QuickAskReceiver } from '@/components/desktop-shell/QuickAskReceiver'
 import { paidAppFlags } from '@rerun/cloud/apps.server'
 import { startBackgroundSchedules } from '@rerun/cloud/tasks'
 import { computerFlag, i18nFlag, publishedAccessFlag, rewindFlag } from '@/flags'
@@ -32,6 +33,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
                 <CrispChat hideLauncher position="left" />
                 <WorkspaceSwitchLoader />
+                <QuickAskReceiver />
             </FeatureFlagsProvider>
         </SessionProvider>
     )

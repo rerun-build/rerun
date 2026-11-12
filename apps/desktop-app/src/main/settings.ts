@@ -13,6 +13,7 @@ export type ShellSettings = {
     openAtLogin?: boolean
     // Windows and Linux: closing the window keeps the app in the tray.
     closeToTray?: boolean
+    quickAsk?: boolean
     // The balloon that says so was shown once.
     explainedTray?: boolean
 }

@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, session as electronSession } from 'electron'
-import type { DesktopNotification, DesktopSettings, DesktopUpdateState } from '@rerun/contracts'
+import { isDesktopOpenPath, type DesktopNotification, type DesktopSettings, type DesktopUpdateState } from '@rerun/contracts'
 import { IPC, type FindRequest, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 import { completeFromPastedCode, startBrowserSignIn } from './browser-sign-in'
 import { showDownload } from './downloads'
@@ -9,6 +9,7 @@ import { audienceOf, handle } from './ipc'
 import { currentServer, getMainWindow, openExternal, reloadApp, replaceMainWindow, setTitleBarColors, windowState } from './main-window'
 import { setShellLocale, shellLocale } from './messages'
 import { changeDesktopSettings, desktopSettings, setBadge, showNotification } from './native'
+import { hideQuickAsk, quickAskSent, resetQuickAsk } from './quick-ask'
 import { partitionFor, serverOrigin, setServerOrigin } from './server'
 import { checkServer } from './server-check'
 import { checkForUpdates, installUpdate, updatesEnabled, updateState } from './updater'
@@ -49,7 +50,12 @@ export function registerIpcHandlers(): void {
     )
     handle(IPC.badgeSet, ['app'], (_event, count: number) => setBadge(Number(count)))
     handle(IPC.settingsGet, ['app'], () => desktopSettings())
-    handle(IPC.settingsSet, ['app'], (_event, patch: Partial<DesktopSettings>) => changeDesktopSettings({ openAtLogin: patch?.openAtLogin, closeToTray: patch?.closeToTray }))
+    handle(IPC.settingsSet, ['app'], (_event, patch: Partial<DesktopSettings>) => changeDesktopSettings({ openAtLogin: patch?.openAtLogin, closeToTray: patch?.closeToTray, quickAsk: patch?.quickAsk }))
+    handle(IPC.quickAskClose, ['app'], () => hideQuickAsk())
+    handle(IPC.quickAskSent, ['app'], (_event, path: string) => {
+        const target = String(path ?? '/')
+        quickAskSent(isDesktopOpenPath(target) ? target : '/')
+    })
     handle(IPC.localeSet, ['app'], (_event, locale: string) => setShellLocale(String(locale).slice(0, 16)))
 
     handle(IPC.localFind, ['local'], (_event, request: FindRequest) => find({ text: String(request?.text ?? '').slice(0, 500), forward: request?.forward !== false, findNext: !!request?.findNext }))
@@ -79,7 +85,10 @@ export function registerIpcHandlers(): void {
         if (check.status === 'shell-too-old') return { ok: false, reason: 'tooOld', version: check.minShellVersion }
         setServerOrigin(origin)
         // Answered before the window that asked is replaced.
-        setTimeout(() => replaceMainWindow(origin), 50)
+        setTimeout(() => {
+            resetQuickAsk()
+            replaceMainWindow(origin)
+        }, 50)
         return { ok: true }
     })
     handle(IPC.localServerCancel, ['local'], () => {

@@ -7,6 +7,7 @@
 //   pnpm verify:desktop --signed-out                          a first launch, before any sign-in
 //   pnpm verify:desktop --sizes 1440x900,820x640 --themes dark --native
 //   pnpm verify:desktop --no-build                            reuses the last build of apps/desktop-app/out
+//   pnpm verify:desktop --engine --scenario …                with a local engine behind the workspace
 //   pnpm verify:desktop --packaged                            the packaged app (asar, fuses), as installed
 //
 // Local stack only, with the same checks as verify:ui (scripts/verify/shared.mjs). The app is the
@@ -45,6 +46,7 @@ import {
     settle,
     signInPage,
     slug,
+    startEngine,
     testAccount,
     watch,
 } from './verify/shared.mjs'
@@ -54,7 +56,7 @@ const fromDesktop = createRequire(join(DESKTOP_DIR, 'package.json'))
 const { _electron: electron } = fromDesktop('playwright')
 
 function parseArgs(argv) {
-    const options = { sizes: ['1440x900', '1024x700', '820x640'], themes: ['light', 'dark'], scenario: null, signedOut: false, native: false, build: true, packaged: false, keep: false, fresh: false, onboarded: false, paths: [] }
+    const options = { sizes: ['1440x900', '1024x700', '820x640'], themes: ['light', 'dark'], scenario: null, signedOut: false, native: false, build: true, packaged: false, engine: false, keep: false, fresh: false, onboarded: false, paths: [] }
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
         if (arg === '--sizes') options.sizes = argv[++i].split(',')
@@ -64,6 +66,7 @@ function parseArgs(argv) {
         else if (arg === '--native') options.native = true
         else if (arg === '--no-build') options.build = false
         else if (arg === '--packaged') options.packaged = true
+        else if (arg === '--engine') options.engine = true
         else if (arg === '--keep') options.keep = true
         else if (arg === '--fresh') options.fresh = true
         else if (arg === '--onboarded') options.onboarded = true
@@ -201,6 +204,7 @@ const { app, page } = await launchShell(base, join(outDir, 'user-data'), options
 app.process().stdout?.on('data', (chunk) => process.env.VERIFY_DESKTOP_VERBOSE && process.stdout.write(chunk))
 const shell = shellHelpers(app, page)
 let failed = false
+let engine = null
 try {
     const seed = { app, page, shell, base, admin: null, workspaceId: null, account: null }
     if (!options.signedOut) {
@@ -208,6 +212,7 @@ try {
         await signInPage(page, base, account)
         const engineLink = await linkTestEngine(account.admin, account.userId)
         if (options.onboarded) await markOnboarded(account.admin, engineLink.workspaceId)
+        if (options.engine) engine = await startEngine(base, engineLink.apiKey, outDir)
         Object.assign(seed, { admin: account.admin, workspaceId: engineLink.workspaceId, account })
         log(`Signed in as ${account.email}, workspace ${engineLink.workspaceId}.`)
     } else {
@@ -220,6 +225,6 @@ try {
     log(`Report: ${join(outDir, 'report.json')}`)
 } finally {
     await app.close().catch(() => {})
-    if (!options.keep && server) process.kill(-server.pid)
+    if (!options.keep) for (const child of [server, engine]) if (child) process.kill(-child.pid)
 }
 process.exit(failed ? 1 : 0)
