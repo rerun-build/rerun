@@ -22,6 +22,10 @@
         "buildType": "apk"
       }
     },
+    "simulator-lab": {
+      "extends": "development",
+      "environment": "preview"
+    },
     "staging": {
       "extends": "base",
       "distribution": "store",

@@ -2,8 +2,9 @@ import { appendVoiceMarker, buildVoiceMarker, FOREMAN_DISPLAY_NAME, teamEmptySta
 import type { UIMessage } from 'ai'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
-import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
+import { Keyboard, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native'
+import Animated, { useAnimatedKeyboard, useAnimatedReaction, useAnimatedStyle, type AnimatedKeyboardInfo } from 'react-native-reanimated'
+import { scheduleOnRN } from 'react-native-worklets'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Composer } from '@/components/chat/Composer'
@@ -94,8 +95,35 @@ function useStreamedReply(active: boolean) {
     return { text: STREAMED.slice(0, length), done: length >= STREAMED.length }
 }
 
+// RER-72: the keyboard height the pane is lifted by (Reanimated) beside the one React Native last
+// heard of, to catch the lift that stays up once the keyboard is gone.
+function KeyboardProbe({ keyboard }: { keyboard: AnimatedKeyboardInfo }) {
+    const [lifted, setLifted] = useState({ height: 0, state: 0 })
+    const [heard, setHeard] = useState({ height: 0, visible: false })
+    useAnimatedReaction(
+        () => ({ height: Math.round(keyboard.height.value), state: keyboard.state.value }),
+        (current, previous) => {
+            if (current.height !== previous?.height || current.state !== previous?.state) scheduleOnRN(setLifted, current)
+        }
+    )
+    useEffect(() => {
+        const shown = Keyboard.addListener('keyboardDidShow', event => setHeard({ height: Math.round(event.endCoordinates.height), visible: true }))
+        const hidden = Keyboard.addListener('keyboardDidHide', () => setHeard({ height: 0, visible: false }))
+        return () => {
+            shown.remove()
+            hidden.remove()
+        }
+    }, [])
+    return (
+        <View pointerEvents="none" testID="keyboard-probe" style={{ position: 'absolute', top: 120, right: 8, padding: 6, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.75)' }}>
+            <Text style={{ color: '#fff', fontSize: 12, fontVariant: ['tabular-nums'] }}>{`rea ${lifted.height} s${lifted.state}`}</Text>
+            <Text style={{ color: '#fff', fontSize: 12, fontVariant: ['tabular-nums'] }}>{`rn ${heard.height} ${heard.visible ? 'up' : 'down'}`}</Text>
+        </View>
+    )
+}
+
 // The same layout as ConversationPane, fed by mock messages, lifted above the keyboard the same way.
-export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = FOREMAN_DISPLAY_NAME }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string }) {
+export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = FOREMAN_DISPLAY_NAME, probe = false }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string; probe?: boolean }) {
     const insets = useSafeAreaInsets()
     const [draft, setDraft] = useState('')
     const [footerHeight, setFooterHeight] = useState(0)
@@ -135,6 +163,7 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
                     )}
                 </View>
             </View>
+            {probe && <KeyboardProbe keyboard={keyboard} />}
         </Animated.View>
     )
 }
