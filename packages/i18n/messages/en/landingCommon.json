@@ -259,11 +259,6 @@
         },
         "cookieSettings": "Cookie settings"
     },
-    "languageBanner": {
-        "offer": "This page is available in English.",
-        "open": "Read in English",
-        "dismiss": "Dismiss"
-    },
     "discord": "Join our Discord",
     "tabNudge": {
         "firstCoworker": "3 min to your first coworker",
@@ -315,7 +310,6 @@
         "nav.trialCta": "The price stays in US dollars in every language.",
         "finalCta.titleLead": "<switch></switch> is a rotating pill naming the AI provider (ChatGPT, Claude...). The title is split in two lines: titleLead then titleTail.",
         "openSource.announce": "<wide> wraps the part hidden on small screens.",
-        "languageBanner.offer": "Shown to a visitor whose browser prefers this language, on the English version of a page. Each language says it in its own words.",
         "og.default.line1": "The social card of the site (1200x630 image): three short lines, the last one highlighted. Keep each line short."
     }
 }
