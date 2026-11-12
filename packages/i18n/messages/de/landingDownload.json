@@ -2,11 +2,38 @@
     "title": "Die Rerun-Desktop-App herunterladen",
     "eyebrow": "Desktop-App",
     "headline": "Rerun auf deinem Desktop",
-    "description": "Deine Coworker in einem eigenen Fenster, mit Benachrichtigungen, einem Symbol in der Menüleiste und der Schnellfrage.",
+    "description": "Deine Coworker in einem eigenen Fenster, mit Benachrichtigungen, einem Symbol in der Menüleiste oder im Infobereich und der Schnellfrage.",
     "mac": "Für macOS herunterladen",
+    "windows": "Für Windows herunterladen",
+    "linux": "Für Linux herunterladen",
     "requirements": "macOS 13 oder neuer, Apple Silicon und Intel.",
     "otherPlatforms": "Windows und Linux kommen bald. Bis dahin läuft Rerun in deinem Browser.",
     "openWebApp": "Web-App öffnen",
+    "allPlatforms": "Alle Plattformen",
+    "beta": "Beta",
+    "webApp": "Rerun läuft auch in deinem Browser: <link>Web-App öffnen</link>.",
+    "platforms": {
+        "label": "Herunterladen",
+        "title": "macOS, Windows und Linux",
+        "mac": {
+            "name": "macOS",
+            "requirements": "macOS 13 oder neuer, Apple Silicon und Intel.",
+            "download": "Die .dmg herunterladen"
+        },
+        "windows": {
+            "name": "Windows",
+            "requirements": "Windows 10 oder neuer, x64 und Arm.",
+            "warning": "Die Windows-App ist noch nicht signiert. Zeigt Windows „Der Computer wurde durch Windows geschützt“, klicke auf Weitere Informationen und dann auf Trotzdem ausführen.",
+            "download": "Installer herunterladen"
+        },
+        "linux": {
+            "name": "Linux",
+            "requirements": "x64. Das AppImage läuft auf den meisten Distributionen und aktualisiert sich selbst.",
+            "appImage": "AppImage",
+            "deb": ".deb (Debian, Ubuntu)",
+            "rpm": ".rpm (Fedora, openSUSE)"
+        }
+    },
     "features": {
         "label": "Was die App hinzufügt",
         "title": "Ganz Rerun, nur ein Kürzel entfernt",
@@ -16,11 +43,11 @@
         },
         "quickAsk": {
             "title": "Schnellfrage",
-            "body": "⌘⇧Leertaste aus jeder App, eine Frage an deinen Chief of Staff, und die Antwort wartet in Rerun."
+            "body": "⌘⇧Leertaste auf dem Mac, Strg+Umschalt+Leertaste unter Windows und Linux: eine Frage an deinen Chief of Staff aus jeder App, und die Antwort wartet in Rerun."
         },
         "always": {
             "title": "Immer da",
-            "body": "Beim Schließen des Fensters bleibt Rerun in der Menüleiste, mit der Zahl dessen, was auf dich wartet, auf dem Symbol."
+            "body": "Beim Schließen des Fensters bleibt Rerun in der Menüleiste oder im Infobereich, mit der Zahl dessen, was auf dich wartet, auf dem Symbol."
         }
     }
 }

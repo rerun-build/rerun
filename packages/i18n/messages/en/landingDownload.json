@@ -1,16 +1,53 @@
 {
     "_context": {
-        "features.quickAsk.body": "⌘⇧Space is the keyboard shortcut of the desktop app; keep the symbols.",
-        "otherPlatforms": "The desktop app exists for macOS only for now."
+        "features.quickAsk.body": "⌘⇧Space and Ctrl+Shift+Space are the keyboard shortcut of the desktop app; keep the symbols and the key names.",
+        "allPlatforms": "Link under the download button, scrolls to the list of every system.",
+        "beta": "Badge next to the name of an operating system whose app is still in beta.",
+        "webApp": "<link> wraps the words that open the web app.",
+        "platforms.windows.warning": "\"Windows protected your PC\", \"More info\" and \"Run anyway\" are the labels Windows shows: use the ones Windows shows in this language.",
+        "platforms.linux.appImage": "AppImage is a Linux file format, keep the name.",
+        "platforms.linux.deb": ".deb is a Linux package format, keep the extension.",
+        "platforms.linux.rpm": ".rpm is a Linux package format, keep the extension.",
+        "otherPlatforms": "The desktop app exists for macOS only for now.",
+        "platforms.mac.name": "Name of the operating system, keep it as is.",
+        "platforms.windows.name": "Name of the operating system, keep it as is.",
+        "platforms.linux.name": "Name of the operating system, keep it as is."
     },
     "title": "Download the Rerun desktop app",
     "eyebrow": "Desktop app",
     "headline": "Rerun on your desktop",
-    "description": "Your coworkers in a window of their own, with notifications, a menu bar icon and Quick ask.",
+    "description": "Your coworkers in a window of their own, with notifications, an icon in the menu bar or the system tray, and Quick ask.",
     "mac": "Download for macOS",
+    "windows": "Download for Windows",
+    "linux": "Download for Linux",
     "requirements": "macOS 13 or later, Apple Silicon and Intel.",
     "otherPlatforms": "Windows and Linux are on the way. Until then, Rerun runs in your browser.",
     "openWebApp": "Open the web app",
+    "allPlatforms": "All platforms",
+    "beta": "Beta",
+    "webApp": "Rerun also runs in your browser: <link>open the web app</link>.",
+    "platforms": {
+        "label": "Download",
+        "title": "macOS, Windows and Linux",
+        "mac": {
+            "name": "macOS",
+            "requirements": "macOS 13 or later, Apple Silicon and Intel.",
+            "download": "Download the .dmg"
+        },
+        "windows": {
+            "name": "Windows",
+            "requirements": "Windows 10 or later, x64 and Arm.",
+            "warning": "The Windows app is not signed yet. If Windows shows \"Windows protected your PC\", click More info, then Run anyway.",
+            "download": "Download the installer"
+        },
+        "linux": {
+            "name": "Linux",
+            "requirements": "x64. The AppImage runs on most distributions and updates itself.",
+            "appImage": "AppImage",
+            "deb": ".deb (Debian, Ubuntu)",
+            "rpm": ".rpm (Fedora, openSUSE)"
+        }
+    },
     "features": {
         "label": "What the app adds",
         "title": "Everything in Rerun, a shortcut away",
@@ -20,11 +57,11 @@
         },
         "quickAsk": {
             "title": "Quick ask",
-            "body": "⌘⇧Space from any app, a question for your Chief of Staff, and the answer waits in Rerun."
+            "body": "⌘⇧Space on a Mac, Ctrl+Shift+Space on Windows and Linux: a question for your Chief of Staff from any app, and the answer waits in Rerun."
         },
         "always": {
             "title": "Always running",
-            "body": "Closing the window keeps Rerun in the menu bar, with the count of what waits for you on its icon."
+            "body": "Closing the window keeps Rerun in the menu bar or the system tray, with the count of what waits for you on its icon."
         }
     }
 }
