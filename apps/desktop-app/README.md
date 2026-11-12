@@ -96,6 +96,10 @@ follows the server the window shows, not only the configured one.
 RERUN_DESKTOP_CHANNEL=staging RERUN_DESKTOP_DEFAULT_URL=https://staging.rerun.build pnpm --filter rerun-desktop package
 ```
 
+It makes one installer per architecture (a DMG for Apple Silicon and one for Intel, an NSIS installer for
+x64 and one for Arm): a universal build carries Chromium twice. The updater takes the file of its own
+architecture from the feed.
+
 Unsigned (ad hoc on macOS) unless signing credentials are in the environment: see
 `electron-builder.config.ts`. The signed, notarized release and its upload to the update feed
 (`downloads.rerun.build/desktop/<channel>/`) run in Rerun Cloud's private repository. A bad release is

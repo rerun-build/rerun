@@ -10,6 +10,12 @@
     "otherPlatforms": "Windows e Linux estão a caminho. Enquanto isso, o Rerun funciona no seu navegador.",
     "openWebApp": "Abrir o app web",
     "allPlatforms": "Todas as plataformas",
+    "alternatives": {
+        "macIntel": "Baixar para um Mac com Intel",
+        "macAppleSilicon": "Baixar para um Mac com Apple Silicon",
+        "windowsArm64": "Baixar para Windows no Arm",
+        "windowsX64": "Baixar para Windows x64"
+    },
     "beta": "Beta",
     "webApp": "O Rerun também funciona no seu navegador: <link>abra o app web</link>.",
     "platforms": {
@@ -18,13 +24,17 @@
         "mac": {
             "name": "macOS",
             "requirements": "macOS 13 ou mais recente, Apple Silicon e Intel.",
-            "download": "Baixar o .dmg"
+            "download": "Baixar o .dmg",
+            "appleSilicon": "Apple Silicon",
+            "intel": "Intel"
         },
         "windows": {
             "name": "Windows",
             "requirements": "Windows 10 ou mais recente, x64 e Arm.",
             "warning": "O app para Windows ainda não é assinado. Se o Windows mostrar \"O Windows protegeu o computador\", clique em Mais informações e depois em Executar assim mesmo.",
-            "download": "Baixar o instalador"
+            "download": "Baixar o instalador",
+            "x64": "x64",
+            "arm64": "Arm"
         },
         "linux": {
             "name": "Linux",

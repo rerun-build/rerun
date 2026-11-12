@@ -61,9 +61,11 @@ const config: Configuration = {
     },
     mac: {
         target: [
-            { target: 'dmg', arch: ['universal'] },
+            // One build per chip rather than a universal one, which carries Chromium twice (~490 MB
+            // installed). The updater picks the zip whose name says arm64 on Apple Silicon.
+            { target: 'dmg', arch: ['arm64', 'x64'] },
             // The zip is what the updater downloads; without it no latest-mac.yml is written.
-            { target: 'zip', arch: ['universal'] },
+            { target: 'zip', arch: ['arm64', 'x64'] },
         ],
         icon,
         category: 'public.app-category.productivity',
@@ -82,7 +84,10 @@ const config: Configuration = {
         },
     },
     dmg: {
-        artifactName: `${identity.executableName}-\${version}-mac.\${ext}`,
+        title: '${productName}',
+        // null keeps macOS's own disk icon on the mounted volume; left unset, it takes the app icon.
+        icon: null,
+        artifactName: `${identity.executableName}-\${version}-mac-\${arch}.\${ext}`,
         writeUpdateInfo: false,
     },
     win: {
@@ -93,6 +98,8 @@ const config: Configuration = {
     nsis: {
         oneClick: true,
         perMachine: false,
+        // One installer per architecture: the combined one carries the app twice.
+        buildUniversalInstaller: false,
         artifactName: `${identity.executableName}-\${version}-win-\${arch}.\${ext}`,
     },
     linux: {

@@ -11,7 +11,15 @@
         "otherPlatforms": "The desktop app exists for macOS only for now.",
         "platforms.mac.name": "Name of the operating system, keep it as is.",
         "platforms.windows.name": "Name of the operating system, keep it as is.",
-        "platforms.linux.name": "Name of the operating system, keep it as is."
+        "platforms.linux.name": "Name of the operating system, keep it as is.",
+        "platforms.mac.appleSilicon": "Apple's name for its own Mac chips, keep it as is.",
+        "platforms.mac.intel": "The Intel chip of older Macs, keep it as is.",
+        "platforms.windows.x64": "The usual PC architecture, keep it as is.",
+        "platforms.windows.arm64": "PCs with an Arm chip (Windows on Arm), keep the word Arm.",
+        "alternatives.macIntel": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
+        "alternatives.macAppleSilicon": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
+        "alternatives.windowsArm64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
+        "alternatives.windowsX64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads."
     },
     "title": "Download the Rerun desktop app",
     "eyebrow": "Desktop app",
@@ -24,6 +32,12 @@
     "otherPlatforms": "Windows and Linux are on the way. Until then, Rerun runs in your browser.",
     "openWebApp": "Open the web app",
     "allPlatforms": "All platforms",
+    "alternatives": {
+        "macIntel": "Download for a Mac with Intel",
+        "macAppleSilicon": "Download for a Mac with Apple Silicon",
+        "windowsArm64": "Download for Windows on Arm",
+        "windowsX64": "Download for Windows x64"
+    },
     "beta": "Beta",
     "webApp": "Rerun also runs in your browser: <link>open the web app</link>.",
     "platforms": {
@@ -32,13 +46,17 @@
         "mac": {
             "name": "macOS",
             "requirements": "macOS 13 or later, Apple Silicon and Intel.",
-            "download": "Download the .dmg"
+            "download": "Download the .dmg",
+            "appleSilicon": "Apple Silicon",
+            "intel": "Intel"
         },
         "windows": {
             "name": "Windows",
             "requirements": "Windows 10 or later, x64 and Arm.",
             "warning": "The Windows app is not signed yet. If Windows shows \"Windows protected your PC\", click More info, then Run anyway.",
-            "download": "Download the installer"
+            "download": "Download the installer",
+            "x64": "x64",
+            "arm64": "Arm"
         },
         "linux": {
             "name": "Linux",
