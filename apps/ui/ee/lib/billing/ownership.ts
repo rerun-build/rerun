@@ -1,3 +1,6 @@
+import { isSubscriptionEntitled } from './entitlement'
+import { isStoreProvider } from '@rerun/contracts'
+
 // A workspace has exactly one plan subscription: the one its `stripe_subscription_id` points at.
 // Nothing stops a Stripe customer from carrying several, though — a renewal that failed leaves its
 // subscription alive and retrying for days while the user re-subscribes through Checkout — and every
@@ -23,4 +26,11 @@ export function shouldAdoptSubscription(
 ): boolean {
     if (isSameSubscription(stored.id, incomingSubscriptionId)) return true
     return REPLACEABLE_STATUSES.has(stored.status ?? '')
+}
+
+// A workspace the mobile app's store bills while that subscription runs. Stripe's events for a plan
+// it held before (a renewal still retrying, a cancellation landing late) must leave it alone: the
+// store's notifications are the ones that move its status now.
+export function isStoreBilled(workspace: { billing_provider: string | null; subscription_status: string | null } | null | undefined): boolean {
+    return isStoreProvider(workspace?.billing_provider) && isSubscriptionEntitled(workspace?.subscription_status)
 }

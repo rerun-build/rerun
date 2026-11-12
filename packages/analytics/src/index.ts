@@ -20,7 +20,9 @@ export type BillingPeriod = 'monthly' | 'annual'
 // the trials of before and stay so those events keep a name: 'no_card_7d' between 2026-08-19 and
 // 2026-09-05, then 'card_required_7d', then three days with a card ('card_required_3d') or without
 // one ('no_card_3d').
-export type TrialType = 'card_required_5d' | 'no_card_5d' | 'no_card_3d' | 'card_required_3d' | 'card_required_7d' | 'no_card_7d'
+// 'store_7d' is the week the mobile app sells through its store (App Store or Google Play) since
+// 2026-11-12, behind the store's own payment sheet.
+export type TrialType = 'card_required_5d' | 'no_card_5d' | 'no_card_3d' | 'card_required_3d' | 'card_required_7d' | 'no_card_7d' | 'store_7d'
 
 export type ExpertProps = {
     expert_id: string
@@ -60,12 +62,16 @@ export type Attribution = {
 // The shared payload of every server-side Stripe lifecycle event, so any of them can be joined
 // back to the workspace and the Stripe objects. `mrr` is in the currency it was billed in, not
 // normalized: a rate hardcoded here would drift, so the split lives in the PostHog dashboard.
+// A store subscription (the mobile app's App Store or Google Play purchase) carries no Stripe ids:
+// `billing_provider` says which one billed it, `store_subscription_id` is the store's own id.
 export type SubscriptionLifecycleProps = {
     plan: string
     workspace_id: number
     user_id?: string
-    stripe_customer_id: string
-    stripe_subscription_id: string
+    billing_provider?: 'stripe' | 'apple' | 'google'
+    stripe_customer_id?: string
+    stripe_subscription_id?: string
+    store_subscription_id?: string
     addons: Record<string, number>
     mrr: number
     currency: string

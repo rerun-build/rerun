@@ -142,6 +142,20 @@ beforeEach(() => {
 })
 
 describe('applySubscriptionToWorkspace', () => {
+    it('marks the workspace as billed by Stripe', async () => {
+        const db = useDb({ row: { stripe_subscription_id: null, subscription_status: null, current_period_end: null } })
+        await applySubscriptionToWorkspace(sub())
+        expect(db.updates()[0]).toMatchObject({ billing_provider: 'stripe', subscription_status: 'active' })
+    })
+
+    it('never rewrites a workspace a store subscription runs, whatever Stripe says of an older plan', async () => {
+        const db = useDb({ row: { stripe_subscription_id: 'sub_1', billing_provider: 'google', subscription_status: 'trialing', current_period_end: null } })
+        await applySubscriptionToWorkspace(sub({ status: 'past_due' }), { adopt: false })
+        await applySubscriptionToWorkspace(sub({ status: 'active' }))
+        expect(db.updates()).toEqual([])
+        expect(m.requestBoxRestore).not.toHaveBeenCalled()
+    })
+
     it('writes nothing for a template subscription', async () => {
         const db = useDb({ row: { current_period_end: null } })
         await applySubscriptionToWorkspace(sub({ metadata: { kind: 'template_purchase', workspace_id: '7' } }))
@@ -347,6 +361,13 @@ describe('applySubscriptionToWorkspace', () => {
 })
 
 describe('markSubscriptionCanceled', () => {
+    it('leaves alone a workspace the mobile app store bills now', async () => {
+        const db = useDb({ row: { stripe_subscription_id: 'sub_1', billing_provider: 'apple', subscription_status: 'active' } })
+        await markSubscriptionCanceled(sub({ status: 'canceled' }))
+        expect(db.updates()).toEqual([])
+        expect(m.reportSubscriptionCancelled).not.toHaveBeenCalled()
+    })
+
     it('ignores a template subscription', async () => {
         const db = useDb({ row: { stripe_subscription_id: 'sub_1' } })
         await markSubscriptionCanceled(sub({ metadata: { kind: 'template_purchase' } }))

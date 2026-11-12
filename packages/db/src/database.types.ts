@@ -2470,6 +2470,33 @@ export type Database = {
           },
         ]
       }
+      store_notifications: {
+        Row: {
+          claimed_at: string
+          notification_id: string
+          payload: Json | null
+          processed_at: string | null
+          provider: string
+          type: string
+        }
+        Insert: {
+          claimed_at?: string
+          notification_id: string
+          payload?: Json | null
+          processed_at?: string | null
+          provider: string
+          type: string
+        }
+        Update: {
+          claimed_at?: string
+          notification_id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          provider?: string
+          type?: string
+        }
+        Relationships: []
+      }
       stripe_events: {
         Row: {
           claimed_at: string
@@ -3583,6 +3610,7 @@ export type Database = {
       }
       workspaces: {
         Row: {
+          billing_provider: string | null
           boxes_archived_at: string | null
           boxes_deleted_at: string | null
           boxes_disabled_at: string | null
@@ -3611,6 +3639,9 @@ export type Database = {
           rerun_period_anchor: string | null
           rerun_topup_micros: number
           rerun_used_micros: number
+          store_account_token: string | null
+          store_environment: string | null
+          store_subscription_id: string | null
           stripe_customer_id: string | null
           stripe_price_id: string | null
           stripe_subscription_id: string | null
@@ -3621,6 +3652,7 @@ export type Database = {
           waitlisted_at: string | null
         }
         Insert: {
+          billing_provider?: string | null
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -3649,6 +3681,9 @@ export type Database = {
           rerun_period_anchor?: string | null
           rerun_topup_micros?: number
           rerun_used_micros?: number
+          store_account_token?: string | null
+          store_environment?: string | null
+          store_subscription_id?: string | null
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
@@ -3659,6 +3694,7 @@ export type Database = {
           waitlisted_at?: string | null
         }
         Update: {
+          billing_provider?: string | null
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -3687,6 +3723,9 @@ export type Database = {
           rerun_period_anchor?: string | null
           rerun_topup_micros?: number
           rerun_used_micros?: number
+          store_account_token?: string | null
+          store_environment?: string | null
+          store_subscription_id?: string | null
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null

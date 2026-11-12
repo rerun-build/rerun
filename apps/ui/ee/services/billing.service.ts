@@ -44,7 +44,8 @@ import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
 import { canEndTrialNow, isMachineEntitled, isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { BOX_DELETION_GRACE_MS } from '@/ee/lib/billing/grace'
 import { isTemplateSubscription, stripeTimestampIso, subscriptionPeriodEndIso } from '@/ee/lib/billing/marketplace'
-import { isSameSubscription, shouldAdoptSubscription } from '@/ee/lib/billing/ownership'
+import { isSameSubscription, isStoreBilled, shouldAdoptSubscription } from '@/ee/lib/billing/ownership'
+import { maxLimit, mergeHeldLimits } from '@/ee/lib/billing/held-limits'
 import { hasPeriodAdvanced, rerunPeriodUpdate } from '@/ee/lib/billing/period'
 import { trialArm } from '@/ee/lib/billing/trial-experiment'
 import { normalizeTaxIdValue, taxIdTypesFor, type TaxIdStatus, type TaxIdType } from '@/ee/lib/billing/tax-id'
@@ -1378,7 +1379,11 @@ export async function findWorkspaceId(subscription: Stripe.Subscription): Promis
 // agents off.
 async function ownsWorkspacePlan(workspaceId: number, subscription: Stripe.Subscription): Promise<boolean> {
     const supabase = createServiceRoleClient()
-    const { data } = await selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id'] as const, { id: workspaceId })
+    const { data } = await selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id', 'billing_provider', 'subscription_status'] as const, { id: workspaceId })
+    if (isStoreBilled(data)) {
+        console.warn(`[billing] ignoring ${subscription.id} for workspace ${workspaceId}, billed by ${data?.billing_provider}`)
+        return false
+    }
     const owns = isSameSubscription(data?.stripe_subscription_id, subscription.id)
     if (!owns) console.warn(`[billing] ignoring ${subscription.id} for workspace ${workspaceId}, which is billed on ${data?.stripe_subscription_id}`)
     return owns
@@ -1415,20 +1420,6 @@ export async function checkoutPaymentMethodId(session: Stripe.Checkout.Session |
     return typeof setupIntent.payment_method === 'string' ? setupIntent.payment_method : setupIntent.payment_method.id
 }
 
-// null = unlimited, so it wins any max.
-function maxLimit(a: number | null, b: number | null): number | null {
-    if (a === null || b === null) return null
-    return Math.max(a, b)
-}
-
-type ExistingWorkspaceRow = {
-    current_period_end: string | null
-    subscription_status: string | null
-    max_agents: number | null
-    max_seats: number | null
-    rerun_budget_micros: number
-}
-
 // Sync a Stripe subscription onto its workspace: derived limits + subscription state.
 // Called by the webhook on create/update/checkout-completed.
 //
@@ -1463,9 +1454,14 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
     const { data: existing } = await selectMaybeSingle(
         supabase,
         'workspaces',
-        ['current_period_end', 'subscription_status', 'stripe_subscription_id', 'max_agents', 'max_seats', 'rerun_budget_micros'] as const,
+        ['current_period_end', 'subscription_status', 'stripe_subscription_id', 'max_agents', 'max_seats', 'rerun_budget_micros', 'billing_provider'] as const,
         { id: workspaceId },
     )
+
+    if (isStoreBilled(existing)) {
+        console.warn(`[billing] ignoring ${subscription.id} for workspace ${workspaceId}, billed by ${existing?.billing_provider}`)
+        return
+    }
 
     if (!adopt && !shouldAdoptSubscription({ id: existing?.stripe_subscription_id, status: existing?.subscription_status }, subscription.id)) {
         console.warn(`[billing] ignoring ${subscription.id} for workspace ${workspaceId}, which is billed on ${existing?.stripe_subscription_id}`)
@@ -1479,6 +1475,7 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
     const trialEndsAt = stripeTimestampIso(subscription.trial_end)
     const trialStartedAt = stripeTimestampIso(subscription.trial_start)
     const update: WorkspaceUpdate = {
+        billing_provider: 'stripe',
         stripe_subscription_id: subscription.id,
         stripe_price_id: subscription.items.data.find(item => isBasePriceId(item.price?.id))?.price.id ?? basePriceId(),
         subscription_status: subscription.status,
@@ -1570,15 +1567,6 @@ export async function stampFirstPlanPayment(invoice: Stripe.Invoice): Promise<vo
     if (error) throw error
 
     await reportTrialConverted(subscription, workspaceId)
-}
-
-function mergeHeldLimits(existing: ExistingWorkspaceRow, derived: WorkspaceLimitColumns): WorkspaceLimitColumns {
-    return {
-        ...derived,
-        max_agents: maxLimit(existing.max_agents, derived.max_agents),
-        max_seats: maxLimit(existing.max_seats, derived.max_seats),
-        rerun_budget_micros: Math.max(existing.rerun_budget_micros ?? 0, derived.rerun_budget_micros),
-    }
 }
 
 // Mark a workspace's subscription as canceled. Plan/limits are kept and nothing is deleted; what

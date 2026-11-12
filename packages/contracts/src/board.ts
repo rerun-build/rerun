@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { agentDetailSchema } from './agent.js'
+import { billingProviderSchema } from './store-billing.js'
 
 // A member of the workspace. Admins run it (billing, members, keys, AI providers).
 export const workspaceRoleSchema = z.enum(['admin', 'member'])
@@ -19,6 +20,9 @@ export const workspaceSummarySchema = z.object({
     // Whether a member uses every Box open to the workspace or only the ones named to them. Absent
     // from a server older than access by Box.
     boxScope: z.enum(['all', 'assigned']).optional(),
+    // Who bills the workspace, null before anyone does: the app manages a store subscription in the
+    // store it came from. Absent from a server older than store billing.
+    billingProvider: billingProviderSchema.nullable().optional(),
 })
 export type WorkspaceSummary = z.infer<typeof workspaceSummarySchema>
 

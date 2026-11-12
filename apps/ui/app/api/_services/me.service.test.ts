@@ -5,7 +5,7 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { readMe } from './me.service'
 vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
-const contextWith = (workspace: { subscription_status: string | null; is_sandbox: boolean }) =>
+const contextWith = (workspace: { subscription_status: string | null; is_sandbox: boolean; billing_provider?: string | null }) =>
     ({
         userId: 'user-1',
         userEmail: 'ada@example.com',
@@ -26,5 +26,12 @@ describe('readMe', () => {
 
     it('counts the expert sandbox as subscribed, as every other gate does', () => {
         expect(readMe(contextWith({ subscription_status: null, is_sandbox: true })).workspace.subscribed).toBe(true)
+    })
+
+    it('says who bills the workspace, so the app manages a store subscription in its store', () => {
+        expect(readMe(contextWith({ subscription_status: 'trialing', is_sandbox: false, billing_provider: 'apple' })).workspace.billingProvider).toBe('apple')
+        expect(readMe(contextWith({ subscription_status: 'active', is_sandbox: false, billing_provider: 'stripe' })).workspace.billingProvider).toBe('stripe')
+        expect(readMe(contextWith({ subscription_status: null, is_sandbox: false })).workspace.billingProvider).toBeNull()
+        expect(readMe(contextWith({ subscription_status: null, is_sandbox: false, billing_provider: 'amazon' })).workspace.billingProvider).toBeNull()
     })
 })

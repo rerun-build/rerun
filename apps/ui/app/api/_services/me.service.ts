@@ -1,7 +1,7 @@
 import { displayNameOf, PROFILE_NAME_MAX, readProfile } from '@/lib/auth/user-profile'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import type { Me, MessageAuthor } from '@rerun/contracts'
+import { billingProviderSchema, type Me, type MessageAuthor } from '@rerun/contracts'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { User } from '@supabase/supabase-js'
 
@@ -28,6 +28,7 @@ export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me 
             subscribed: ctx.workspace.is_sandbox || isSubscriptionEntitled(ctx.workspace.subscription_status),
             role: ctx.role,
             boxScope: ctx.boxScope,
+            billingProvider: billingProviderSchema.nullable().catch(null).parse(ctx.workspace.billing_provider ?? null),
         },
     }
 }

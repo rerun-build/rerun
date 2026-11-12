@@ -88,7 +88,8 @@ export const foremanIndustryRequestSchema = z.object({ input: z.string().trim().
 export const foremanIndustryResultSchema = z.object({ industry: templateCategorySchema.nullable() })
 
 // POST /api/v1/foreman/trial: false when the workspace cannot start one from the app (a trial already spent).
-export const foremanTrialResultSchema = z.object({ entitled: z.boolean() })
+// `purchase_required`: the app sells the trial through its store now, a build that predates it is told so.
+export const foremanTrialResultSchema = z.object({ entitled: z.boolean(), reason: z.enum(['purchase_required']).optional() })
 export type ForemanTrialResult = z.infer<typeof foremanTrialResultSchema>
 
 // GET /api/v1/foreman/files: whether the engine's foreman takes files in its own workspace. A box

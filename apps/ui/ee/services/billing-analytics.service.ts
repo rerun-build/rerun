@@ -1,4 +1,5 @@
-import { BASE_PLAN_SLUG, perMonthCents } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_SLUG, ZERO_QUANTITIES, perMonthCents } from '@/ee/lib/billing/plans'
+import type { StoreSubscriptionState } from '@/ee/lib/billing/store/subscription-state'
 import { CANCEL_COMEBACK_METADATA_KEY, CANCEL_REASON_CHECK_METADATA_KEY } from '@/ee/lib/billing/cancel-flow'
 import { isTemplateSubscription, stripeTimestampIso } from '@/ee/lib/billing/marketplace'
 import { intervalOfItems, legacyBaseDiscountCents, priceArmOfItems, quantitiesFromItems, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
@@ -195,5 +196,57 @@ export async function reportPlanInvoicePaid(invoice: Stripe.Invoice): Promise<vo
         )
     } catch (err) {
         console.error('[billing analytics] invoice capture failed', err)
+    }
+}
+
+// --- The store subscriptions the mobile app sells (App Store, Google Play) ---
+
+// What one month of the store plan is listed at, for MRR. The store converts it into the buyer's
+// currency and keeps its commission: this is the list price, the same on both stores.
+export const STORE_PLAN_PRICE_CENTS = 2999
+
+function storeLifecycleProps(state: StoreSubscriptionState, workspaceId: number, owner: WorkspaceOwner): SubscriptionLifecycleProps {
+    return {
+        plan: BASE_PLAN_SLUG,
+        workspace_id: workspaceId,
+        user_id: owner.userId,
+        billing_provider: state.provider,
+        store_subscription_id: state.subscriptionId,
+        addons: ZERO_QUANTITIES,
+        mrr: STORE_PLAN_PRICE_CENTS / 100,
+        currency: 'usd',
+        billing_period: 'monthly',
+        trial_start: state.trialStartedAt ?? undefined,
+        trial_end: state.trialEndsAt ?? undefined,
+    }
+}
+
+// The store's own transitions, read against the workspace as it stood before the reading was applied,
+// with the same deterministic uuids as the Stripe reporters so a replayed notification counts once.
+export async function reportStoreSubscriptionTransition(state: StoreSubscriptionState, workspaceId: number, previousStatus: string | null, wasPaid: boolean): Promise<void> {
+    try {
+        const wasLive = LIVE_STATUSES.has(previousStatus ?? '')
+        const owner = await resolveWorkspaceOwner(workspaceId)
+        if (!owner) return
+        const props = storeLifecycleProps(state, workspaceId, owner)
+
+        if (!wasLive && state.status === 'trialing') {
+            const origin = state.provider === 'apple' ? 'ios' : 'android'
+            await captureServer(owner.email, 'trial_started', { ...props, trial_type: 'store_7d', origin }, { uuid: deterministicUuid(`trial_started:${state.subscriptionId}`) })
+        } else if (!wasLive && state.status === 'active') {
+            await captureServer(owner.email, 'subscription_started', props, { uuid: deterministicUuid(`subscription_started:${state.subscriptionId}:${state.periodEnd}`) })
+        }
+
+        // The first paid period after the free week. A subscription bought without one reported
+        // `subscription_started` above instead.
+        if (state.paid && !wasPaid && previousStatus === 'trialing') {
+            await captureServer(owner.email, 'trial_converted', props, { uuid: deterministicUuid(`trial_converted:${state.subscriptionId}`) })
+        }
+
+        if (wasLive && state.status === 'canceled') {
+            await captureServer(owner.email, 'subscription_cancelled', { ...props, cancellation_reason: state.revoked ? 'refunded' : 'expired' }, { uuid: deterministicUuid(`subscription_cancelled:${state.subscriptionId}:${state.periodEnd}`) })
+        }
+    } catch (err) {
+        console.error('[billing analytics] store transition capture failed', err)
     }
 }
