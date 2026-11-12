@@ -6,6 +6,10 @@
 //   pnpm dev:mobile                                   first, so the app runs in "Rerun · <workspace>"
 //   node apps/mobile/scripts/capture-store-shots.mjs [only-this-capture ...]
 //
+//   node apps/mobile/scripts/capture-store-shots.mjs --ipad [only-this-capture ...]
+//                                                     same, on a booted iPad simulator named "Rerun · <workspace> · iPad"
+//                                                     (an iPad Pro 13", for the App Store's iPad set), into ipad/
+//
 //   pnpm dev:mobile --android                         first, so the app runs in this workspace's AVD
 //   node apps/mobile/scripts/capture-store-shots.mjs --android [only-this-capture ...]
 //
@@ -28,9 +32,13 @@ import { fileURLToPath } from 'node:url'
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const OUT_DIR = join(REPO_ROOT, 'cloud/apps/admin/public/render-lab/app-store')
 const WORKSPACE_NAME = process.env.CONDUCTOR_WORKSPACE_NAME || basename(REPO_ROOT)
-const SIMULATOR_NAME = `Rerun · ${WORKSPACE_NAME}`
+const onIpad = process.argv.includes('--ipad')
+const SIMULATOR_NAME = onIpad ? `Rerun · ${WORKSPACE_NAME} · iPad` : `Rerun · ${WORKSPACE_NAME}`
+const IOS_OUT_DIR = onIpad ? join(OUT_DIR, 'ipad') : OUT_DIR
 const APPEARANCES = ['light', 'dark']
 const DEV_BUNDLE_ID = 'build.rerun.app.dev'
+// An EAS development build keeps the store bundle ID: RERUN_IOS_BUNDLE_ID=build.rerun.app.
+const IOS_BUNDLE_ID = process.env.RERUN_IOS_BUNDLE_ID ?? DEV_BUNDLE_ID
 const METRO_URL = `http://localhost:${Number(process.env.CONDUCTOR_PORT ?? 3050) + 2}`
 // A fresh launch per shot: a deep link pushes on top of the previous screen, sheets included.
 const LAUNCH_MS = 9000
@@ -77,9 +85,9 @@ async function captureIos(captures) {
 
     for (const appearance of APPEARANCES) {
         simctl('ui', udid, 'appearance', appearance)
-        mkdirSync(join(OUT_DIR, appearance), { recursive: true })
+        mkdirSync(join(IOS_OUT_DIR, appearance), { recursive: true })
         for (const capture of captures) {
-            simctl('launch', '--terminate-running-process', udid, DEV_BUNDLE_ID, '--initialUrl', METRO_URL)
+            simctl('launch', '--terminate-running-process', udid, IOS_BUNDLE_ID, '--initialUrl', METRO_URL)
             await wait(LAUNCH_MS)
             if (capture.over) {
                 await openUrl(udid, capture.over)
@@ -87,9 +95,9 @@ async function captureIos(captures) {
             }
             await openUrl(udid, capture.url)
             await wait(SETTLE_MS)
-            const file = join(OUT_DIR, appearance, `${capture.id}.png`)
+            const file = join(IOS_OUT_DIR, appearance, `${capture.id}.png`)
             simctl('io', udid, 'screenshot', '--type=png', file)
-            console.log(`${appearance}/${capture.id}.png`)
+            console.log(file)
         }
     }
 }
@@ -172,7 +180,7 @@ async function captureAndroid(captures) {
 }
 
 const onAndroid = process.argv.includes('--android')
-const only = process.argv.slice(2).filter(arg => arg !== '--android')
+const only = process.argv.slice(2).filter(arg => !arg.startsWith('--'))
 const captures = only.length ? CAPTURES.filter(capture => only.includes(capture.id)) : CAPTURES
 
 if (onAndroid) await captureAndroid(captures)
