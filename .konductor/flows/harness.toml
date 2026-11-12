@@ -1,5 +1,5 @@
 # Konductor flow for a Linear issue labeled Harness Use Case: replay the case, plan (approved by the flow), review, fix the review
-# (plan approved by you), PR, summary on the issue, then wait for your merge.
+# (plan approved by you), PR, summary on the issue, wait for your merge, then close the card.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Harness"
 match = { labels = ["Harness Use Case"] }
@@ -62,3 +62,14 @@ la mesure avant / après, et ce qu'il reste à vérifier avant de merger. Court,
 id = "merge"
 title = "Merge"
 kind = "wait_merge"
+
+[[steps]]
+id = "close"
+title = "Close the card"
+chat = "summary"
+linear_comment = true
+prompt = """
+La PR de {{issue.identifier}} est mergée. Passe la carte Linear en Done avec le MCP Linear si elle n'y est pas déjà,
+puis écris sa mise à jour finale, postée telle quelle sur la carte : la PR mergée, la cause du comportement, ce qui a
+été corrigé et la mesure avant / après. Court, en français, sans clé, token ni contenu privé du client.
+"""
