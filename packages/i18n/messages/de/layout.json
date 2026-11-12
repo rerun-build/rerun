@@ -105,6 +105,7 @@
         "servers": "Server",
         "billing": "Abrechnung",
         "newWorkspace": "Neuer Workspace",
+        "railLabel": "Workspaces",
         "templates": "Vorlagen",
         "myTemplates": "Meine Vorlagen",
         "newTemplate": "Neue Vorlage",

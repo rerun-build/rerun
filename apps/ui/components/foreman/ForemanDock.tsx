@@ -26,7 +26,7 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // `fixed` et pas `absolute` : l'orbe n'appartient à aucun cadre, elle est posée sur le viewport.
 // C'est ce qui l'affranchit des `overflow-hidden` qui coupaient son halo. Le prix du `fixed`, c'est
 // de rajouter soi-même ce dont la carte est rentrée du bord de l'écran (--board-inset, publié par
-// BoardChatSplit) : sans lui l'orbe serait 9px plus près du coin que la barre du bas et le bouton
+// BoardChatSplit, --board-inset-left à gauche, où le rail des workspaces l'élargit) : sans lui l'orbe serait 9px plus près du coin que la barre du bas et le bouton
 // Help, qui eux vivent dans la carte. Sous `md` cet inset vaut 0 et le calc retombe sur la ligne du
 // reste du mobilier. Trois coins sont déjà tenus : en bas à gauche l'orbe s'assoit à droite de la
 // rangée de BoardCornerActions (sa largeur publiée + un écart), en haut à gauche sous le sélecteur
@@ -34,10 +34,10 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // elle partage leur axe : posée dans une rangée, elle déborde d'autant au-dessus qu'en dessous
 // (--orb-overhang), au lieu de s'aligner par le bord.
 const CORNER_CLASSES: Record<ForemanCorner, string> = {
-    'top-left': 'top-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap)+var(--board-inset,0px))] left-[calc(var(--chrome-edge)+var(--board-inset,0px))]',
+    'top-left': 'top-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap)+var(--board-inset,0px))] left-[calc(var(--chrome-edge)+var(--board-inset-left,0px))]',
     'top-right': 'top-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px))] right-[calc(var(--chrome-edge)+var(--chrome-size)+var(--chrome-gap)+var(--board-inset,0px))]',
     'bottom-left':
-        'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] left-[calc(var(--chrome-edge)+var(--board-corner-width,var(--chrome-size))+var(--chrome-gap)+var(--board-inset,0px))]',
+        'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] left-[calc(var(--chrome-edge)+var(--board-corner-width,var(--chrome-size))+var(--chrome-gap)+var(--board-inset-left,0px))]',
     'bottom-right': 'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] right-[calc(var(--chrome-edge)+var(--board-inset,0px))]',
 }
 

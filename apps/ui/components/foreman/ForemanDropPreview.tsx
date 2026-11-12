@@ -9,7 +9,7 @@ import { useForemanStore } from '@/stores/foreman.store'
 
 /** Les bandes de dock reprennent la piste moins la gouttière `md:p-2` qui la borde côté board. */
 function targetClasses(target: ForemanPlacement): string {
-    if (target.mode === 'dock') return cn('md:inset-y-2 md:w-[calc(var(--foreman-dock-track)-8px)]', target.side === 'left' ? 'md:left-2' : 'md:right-2')
+    if (target.mode === 'dock') return cn('md:inset-y-2 md:w-[calc(var(--foreman-dock-track)-8px)]', target.side === 'left' ? 'md:left-[calc(var(--board-inset-left)-1px)]' : 'md:right-2')
     return cn(FLOAT_SIZE_CLASSES, FLOAT_CORNER_CLASSES[target.corner])
 }
 

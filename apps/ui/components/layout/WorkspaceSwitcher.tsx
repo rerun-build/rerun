@@ -2,7 +2,7 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { accountLabel } from '@/lib/auth/placeholder-email'
-import { enterSandboxAction, switchWorkspaceAction } from '@/app/api/_actions/workspace.actions'
+import { enterSandboxAction } from '@/app/api/_actions/workspace.actions'
 import { AccountDialog } from '@/components/dialogs/AccountDialog'
 import { AiProvidersDialog } from '@/components/dialogs/AiProvidersDialog'
 import { ApiKeysDialog } from '@/components/dialogs/ApiKeysDialog'
@@ -27,11 +27,12 @@ import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from 
 import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
 import { Badge } from '@rerun/ui/primitives'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { useBrainProposalCount } from '@/hooks/useBrainProposalCount'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
+import { useWorkspaceSwitch } from '@/hooks/useWorkspaceSwitch'
 import { useRerunCredit } from '@/hooks/useRerunCredit'
 import { useAccountStore } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
@@ -43,14 +44,13 @@ import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
 import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { fallbackWorkspaceIcon, listSwitchableWorkspaces } from '@/lib/workspace/switchable-workspaces'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import Link from 'next/link'
 import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
-
-const PRICING_ICONS = ['/pricing/solo.png', '/pricing/team.png', '/pricing/scale.png']
 
 type SessionWorkspace = NonNullable<ReturnType<typeof useSession>['workspace']>
 
@@ -100,7 +100,7 @@ export function WorkspaceSwitcher() {
     const openWorkspacePanel = useWorkspaceSettingsStore(s => s.openWorkspacePanel)
     const setPanel = useWorkspaceSettingsStore(s => s.setPanel)
     const [serversOpen, setServersOpen] = useState(false)
-    const [busy, setBusy] = useState(false)
+    const { switchTo, busy } = useWorkspaceSwitch(workspace?.id)
     const [entering, setEntering] = useState(false)
     const [createOpen, setCreateOpen] = useState(false)
     // The team invite email links straight to this dialog. Read rather than mirrored into state, and
@@ -142,23 +142,10 @@ export function WorkspaceSwitcher() {
 
     const isExpert = user?.account_role === 'expert'
     const apiEntitled = isWorkspaceApiEntitled(workspace)
-    const regular = workspaces.filter(w => !w.is_sandbox)
     const email = accountLabel(session?.user?.email)
 
-    const sorted = [...regular].sort((a, b) => a.id - b.id)
-    const activeIndex = Math.max(0, sorted.findIndex(w => w.id === workspace.id))
-    const activeIcon = PRICING_ICONS[activeIndex % PRICING_ICONS.length]
-
-    async function handleSwitch(workspaceId: number) {
-        if (busy || workspaceId === workspace?.id) return
-        setBusy(true)
-        beginWorkspaceSwitch()
-        const result = await switchWorkspaceAction(workspaceId)
-        if (result.ok) return enterActiveWorkspace()
-        abortWorkspaceSwitch()
-        toast.error(errorText(result))
-        setBusy(false)
-    }
+    const sorted = listSwitchableWorkspaces(workspaces)
+    const activeIcon = fallbackWorkspaceIcon(Math.max(0, sorted.findIndex(w => w.id === workspace.id)))
 
     // Toujours par enterSandboxAction, jamais un simple switch même quand le sandbox existe déjà :
     // l'action est un get-or-create qui réattribue aussi un engine au sandbox qui n'en a pas. Si le
@@ -271,9 +258,9 @@ export function WorkspaceSwitcher() {
             {email && <DropdownMenuLabel className="truncate pl-7.5 text-xs font-normal text-muted-foreground">{email}</DropdownMenuLabel>}
             {sorted.map((w, index) => {
                 const active = w.id === workspace.id
-                const fallbackIcon = PRICING_ICONS[index % PRICING_ICONS.length]
+                const fallbackIcon = fallbackWorkspaceIcon(index)
                 return (
-                    <DropdownMenuItem key={w.id} disabled={busy} onSelect={() => handleSwitch(w.id)} className={cn('gap-2', !active && 'text-muted-foreground')}>
+                    <DropdownMenuItem key={w.id} disabled={busy} onSelect={() => switchTo(w.id)} className={cn('gap-2', !active && 'text-muted-foreground')}>
                         <WorkspaceLogoImage src={w.icon_url || fallbackIcon} fallbackSrc={fallbackIcon} className="size-5 shrink-0 rounded-full object-cover" />
                         <span className="flex-1 truncate">{w.name || t('defaultName')}</span>
                         {active && <CheckIcon className="size-4" />}
@@ -379,7 +366,8 @@ export function WorkspaceSwitcher() {
     )
 
     // From the workspace and what runs on it, to switching away from it, to the person using it.
-    const sections = [headerSection, workspaceItemsSection, workspacesSection, rolesSection, footerSection].filter(Boolean)
+    // From `lg` the rail beside the board switches workspaces: the list stays for narrower screens.
+    const sections = [{ content: headerSection }, { content: workspaceItemsSection }, { content: workspacesSection, className: 'lg:hidden' }, { content: rolesSection }, { content: footerSection }].filter(section => Boolean(section.content))
 
     return (
         // Leaves room for the view controls in the top-right corner: on a phone the workspace name
@@ -405,8 +393,8 @@ export function WorkspaceSwitcher() {
                 >
                     {sections.map((section, index) => (
                         <Fragment key={index}>
-                            {index > 0 && <DropdownMenuSeparator />}
-                            {section}
+                            {index > 0 && <DropdownMenuSeparator className={section.className} />}
+                            {section.className ? <DropdownMenuGroup className={section.className}>{section.content}</DropdownMenuGroup> : section.content}
                         </Fragment>
                     ))}
                 </DropdownMenuContent>

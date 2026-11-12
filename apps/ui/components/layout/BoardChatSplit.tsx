@@ -6,11 +6,13 @@ import { type CSSProperties, useEffect, type ReactNode } from 'react'
 import { ForemanColumn } from '@/components/foreman/ForemanColumn'
 import { ForemanDropPreview } from '@/components/foreman/ForemanDropPreview'
 import { ProviderStatusBanner } from '@/components/layout/ProviderStatusBanner'
+import { WorkspaceRail } from '@/components/layout/WorkspaceRail'
 import { DEFAULT_FOREMAN_PLACEMENT, type ForemanPlacement, dockedForemanSide, loadForemanPlacement } from '@/lib/foreman-layout'
 import { loadForemanOpen } from '@/lib/foreman-open'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
+import { useSession } from '@/supabase/session/SessionProvider'
 
 /**
  * Le cadre du dashboard : la carte du board et, docké à sa droite ou à sa gauche, le chat de l'orbe.
@@ -26,7 +28,9 @@ import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
  * Un workspace sorti de l'onboarding sans machine n'a pas de Foreman : la colonne reste montée, c'est
  * elle qui relit la phase, mais elle ne prend ni piste ni place à l'écran.
  */
-export function BoardChatSplit({ initialOpen, initialPlacement, children }: { initialOpen: boolean | null; initialPlacement: ForemanPlacement | null; children: ReactNode }) {
+export function BoardChatSplit({ initialOpen, initialPlacement, initialSignedIn, children }: { initialOpen: boolean | null; initialPlacement: ForemanPlacement | null; initialSignedIn: boolean; children: ReactNode }) {
+    const session = useSession()
+    const withRail = session.loading ? initialSignedIn : !session.isAnonymous && session.workspace !== null
     const visible = useForemanStore(selectForemanVisible)
     const requested = useForemanStore(state => state.open)
     const resolved = requested ?? initialOpen
@@ -71,36 +75,45 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
         // défilement au document.
         // --foreman-dock-track : la largeur tirée de la piste docké, bornée pour laisser sa part au
         // board quand l'écran rétrécit. La poignée du dock réécrit --foreman-dock-w ici pendant le geste.
+        // --board-inset-left : le même retrait, côté gauche seulement. Le rail des workspaces (w-14)
+        // prend la place du padding de ce côté-là, à partir de `lg` : plus étroit, avec la colonne
+        // dockée, le board n'aurait plus la largeur de sa pastille de workspace.
         <div
             data-foreman-split
             style={{ '--foreman-dock-w': `${placement.dockWidth}px` } as CSSProperties}
-            className="relative h-dvh w-full overflow-hidden p-0 md:p-2 bg-frame flex flex-col [--board-inset:0px] md:[--board-inset:9px] [--foreman-dock-track:min(var(--foreman-dock-w),60vw)]"
+            className={cn(
+                'relative h-dvh w-full overflow-hidden p-0 md:p-2 bg-frame flex flex-col md:flex-row [--board-inset:0px] md:[--board-inset:9px] [--board-inset-left:0px] md:[--board-inset-left:9px] [--foreman-dock-track:min(var(--foreman-dock-w),60vw)]',
+                withRail && 'lg:pl-0 lg:[--board-inset-left:calc(3.5rem+1px)]'
+            )}
         >
-            {onboarded && <ProviderStatusBanner />}
-            <div
-                data-foreman-grid
-                className={cn(
-                    'grid flex-1 min-h-0 w-full grid-cols-1 grid-rows-[minmax(0,1fr)] duration-300 ease-in-out',
-                    // Lu depuis le hook plutôt qu'écrit `motion-reduce:md:transition-none`, dont les deux
-                    // variants ne se départagent que par l'ordre source.
-                    visible && (reduceMotion ? 'md:transition-none' : 'md:transition-[grid-template-columns]'),
-                    // Des pistes, jamais une custom property : sans `@property` une variable CSS n'est
-                    // pas interpolée et la colonne sauterait au lieu de s'ouvrir. Toujours trois, une de
-                    // chaque côté du board, pour que passer d'un dock à l'autre reste une interpolation.
-                    // Foreman éteint, il n'y en a qu'une : le `grid-cols-1` de base tient le board seul.
-                    visible &&
-                        (docked === 'left'
-                            ? 'md:grid-cols-[var(--foreman-dock-track)_minmax(0,1fr)_0px]'
-                            : docked === 'right'
-                              ? 'md:grid-cols-[0px_minmax(0,1fr)_var(--foreman-dock-track)]'
-                              : 'md:grid-cols-[0px_minmax(0,1fr)_0px]')
-                )}
-            >
-                <div className={cn('min-w-0 bg-background md:rounded-3xl md:border md:border-border md:shadow overflow-hidden md:overflow-auto h-full', visible && 'md:col-start-2 md:row-start-1')}>{children}</div>
-                {/* Se connecter à un autre compte sans recharger repart d'une colonne neuve, qui relit
-                    la phase et la conversation de ce compte-là. */}
-                <div className={visible ? 'contents' : 'hidden'}>
-                    <ForemanColumn key={accountSwitches} open={open} placement={placement} />
+            {withRail && <WorkspaceRail className="max-lg:hidden" />}
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                {onboarded && <ProviderStatusBanner />}
+                <div
+                    data-foreman-grid
+                    className={cn(
+                        'grid flex-1 min-h-0 w-full grid-cols-1 grid-rows-[minmax(0,1fr)] duration-300 ease-in-out',
+                        // Lu depuis le hook plutôt qu'écrit `motion-reduce:md:transition-none`, dont les deux
+                        // variants ne se départagent que par l'ordre source.
+                        visible && (reduceMotion ? 'md:transition-none' : 'md:transition-[grid-template-columns]'),
+                        // Des pistes, jamais une custom property : sans `@property` une variable CSS n'est
+                        // pas interpolée et la colonne sauterait au lieu de s'ouvrir. Toujours trois, une de
+                        // chaque côté du board, pour que passer d'un dock à l'autre reste une interpolation.
+                        // Foreman éteint, il n'y en a qu'une : le `grid-cols-1` de base tient le board seul.
+                        visible &&
+                            (docked === 'left'
+                                ? 'md:grid-cols-[var(--foreman-dock-track)_minmax(0,1fr)_0px]'
+                                : docked === 'right'
+                                  ? 'md:grid-cols-[0px_minmax(0,1fr)_var(--foreman-dock-track)]'
+                                  : 'md:grid-cols-[0px_minmax(0,1fr)_0px]')
+                    )}
+                >
+                    <div className={cn('min-w-0 bg-background md:rounded-3xl md:border md:border-border md:shadow overflow-hidden md:overflow-auto h-full', visible && 'md:col-start-2 md:row-start-1')}>{children}</div>
+                    {/* Se connecter à un autre compte sans recharger repart d'une colonne neuve, qui relit
+                        la phase et la conversation de ce compte-là. */}
+                    <div className={visible ? 'contents' : 'hidden'}>
+                        <ForemanColumn key={accountSwitches} open={open} placement={placement} />
+                    </div>
                 </div>
             </div>
             {visible && <ForemanDropPreview />}

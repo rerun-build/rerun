@@ -134,6 +134,7 @@
         "servers": "Servers",
         "billing": "Billing",
         "newWorkspace": "New workspace",
+        "railLabel": "Workspaces",
         "templates": "Templates",
         "myTemplates": "My templates",
         "newTemplate": "New template",

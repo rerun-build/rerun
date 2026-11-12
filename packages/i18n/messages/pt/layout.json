@@ -105,6 +105,7 @@
         "servers": "Servidores",
         "billing": "Cobrança",
         "newWorkspace": "Novo workspace",
+        "railLabel": "Workspaces",
         "templates": "Templates",
         "myTemplates": "Meus templates",
         "newTemplate": "Novo template",
