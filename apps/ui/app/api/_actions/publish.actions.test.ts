@@ -38,6 +38,7 @@ describe('publishFileAction', () => {
         vi.mocked(publishWithThumbnail).mockResolvedValue({
             status: 'published',
             url: 'https://file.rerun.test',
+            fileUrl: 'https://file.rerun.test/__rerun/raw',
             slug: 'file',
             path: 'report.pdf',
             kind: 'file',

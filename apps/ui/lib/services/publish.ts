@@ -16,7 +16,7 @@ import {
     type EffectivePolicy,
     type PublishedAccess,
 } from '@/lib/published/access'
-import { PUBLISHED_SLUG_TOKEN_LENGTH, publishedSiteOrigin, slugPrefix, suffixedSlug } from '@/lib/published/host'
+import { PUBLISHED_SLUG_TOKEN_LENGTH, publishedRawFileUrl, publishedSiteOrigin, rendersAsPage, slugPrefix, suffixedSlug } from '@/lib/published/host'
 import { hashPassword } from '@/lib/published/password'
 import { siteObjectKey } from '@/lib/published/site-path'
 import { htmlTitle } from '@/lib/published/title'
@@ -94,6 +94,12 @@ export function thumbnailKeyFor(workspaceId: number, slug: string, version: numb
 
 export function shareUrlFor(slug: string): string {
     return publishedSiteOrigin(slug) ?? `${hubBaseUrl()}/p/${slug}`
+}
+
+// What a service that downloads the file itself fetches (Instagram taking an image by URL). Without a
+// publish host, /p/<slug> already leads to the bytes.
+function fileUrlFor(slug: string, kind: string, contentType: string): string | null {
+    return rendersAsPage(kind, contentType) ? null : (publishedRawFileUrl(slug) ?? shareUrlFor(slug))
 }
 
 function storageKeysOf(row: PublishedObjects): string[] {
@@ -314,6 +320,7 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
     return {
         status: 'published',
         url,
+        fileUrl: fileUrlFor(slug, uploaded.kind, uploaded.contentType),
         slug,
         path: cleanPath,
         kind: uploaded.kind,
@@ -443,6 +450,7 @@ async function toPublishedFiles(supabase: ServiceClient, rows: readonly ListedRo
         agentId: r.agent_id,
         path: r.source_path,
         url: shareUrlFor(r.slug),
+        fileUrl: fileUrlFor(r.slug, r.kind, r.content_type),
         kind: r.kind === 'site' ? 'site' : 'file',
         contentType: r.content_type,
         size: r.size,

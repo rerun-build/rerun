@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { extractPublishedSlug, isValidSlugLabel, publishedSiteOrigin, rendersAsPage, suffixedSlug } from './host'
+import { extractPublishedSlug, isValidSlugLabel, publishedRawFileUrl, publishedSiteOrigin, rendersAsPage, suffixedSlug } from './host'
 
 describe('publish host', () => {
     beforeEach(() => vi.stubEnv('PUBLISH_HOST', 'rerun.site'))
@@ -34,6 +34,12 @@ describe('publish host', () => {
 
     it('builds the https origin of a slug', () => {
         expect(publishedSiteOrigin('demo')).toBe('https://demo.rerun.site')
+    })
+
+    it('serves the bytes of a file at a reserved path of its host', () => {
+        expect(publishedRawFileUrl('photo')).toBe('https://photo.rerun.site/__rerun/raw')
+        vi.stubEnv('PUBLISH_HOST', '')
+        expect(publishedRawFileUrl('photo')).toBeNull()
     })
 })
 
