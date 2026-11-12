@@ -1,7 +1,5 @@
-# Konductor flow for a Linear issue labeled Bug: investigate and reproduce, plan and build the fix (plan approved by
-# the flow, only once the bug is reproduced), prove the fix on the same reproduction, review, fix the review (plan
-# approved by you), PR, summary on the issue, then after your merge the card goes to Done with a last update
-# posted on it.
+# Konductor flow for a Linear issue labeled Bug: investigate, plan (approved by the flow), review, fix the review
+# (plan approved by you), PR, summary on the issue, then wait for your merge.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Bug"
 match = { labels = ["Bug"] }
@@ -14,32 +12,6 @@ prompt = """
 /investigate-bug {{issue.url}}
 
 Le ticket Linear complet (description, images) est dans {{issue.file}}.
-
-Le fix est demandé : va au bout de l'enquête sans attendre de feu vert. Ce qui compte avant tout ici, c'est de
-**reproduire le bug pour de vrai**. Un bug reproduit est un bug dont on pourra prouver le fix ; une cause devinée
-ne suffit pas. Fais tout ce qui est possible, dans cet ordre, jusqu'à le voir arriver :
-
-1. Regarde ce que le client a réellement vécu, en lecture seule : son workspace et ses lignes dans Supabase, sa
-   box engine (API `/agents`, `/sessions/:sid/messages`, `/runs`, `/runs/:rid/tools`, et SSH sur la box pour les
-   logs, `journalctl`, le data-dir), PostHog (erreurs, session replay), les logs Dokploy et Trigger.dev. Les
-   scripts de la skill `harness-use-case` (`box.sh`, `fetch-transcripts.sh`, `engine-tunnel.sh`) font ces
-   lectures sans jamais afficher une clé. Note le modèle, le provider, la version de l'app et de l'engine.
-2. Rejoue le parcours exact du rapport avec ces mêmes conditions (même modèle, mêmes données, mêmes réglages) :
-   - sur la stack locale (`pnpm db:start`, `pnpm cloud env:local`) : un scénario `pnpm verify:ui` dans
-     `.context/verify/` qui clique le chemin signalé, `--engine` pour l'engine de la branche ;
-   - l'engine de ce checkout contre le hub de prod (`local-engine.sh` de `harness-use-case`), pour un bug qui
-     dépend des vraies données ou des vrais providers ;
-   - staging, ou le workspace interne de test sur la prod, pour ce qui ne se rejoue pas en local.
-   Le workspace et la box du client restent en lecture : on n'y écrit, ne relance ni ne supprime jamais rien.
-3. Transforme la reproduction en test automatisé qui échoue sur `{{workspace.target}}` (unitaire, intégration ou
-   scénario `verify:ui`), au plus près du chemin réel du client.
-
-Range tout dans `.context/bugs/<slug>/` : `report.md`, `repro.md` (la commande ou le scénario exact, l'environnement,
-le modèle), et la preuve du bug (sortie du test qui échoue, captures, lignes de log, horodatages).
-
-Si malgré tout le bug ne se reproduit pas : dis-le en tête de ta réponse, liste chaque tentative et ce qu'elle a
-montré, et dis ce qui manque (une info du client, un accès, des données). Ne présente jamais une cause supposée
-comme trouvée.
 """
 
 [[steps]]
@@ -47,55 +19,12 @@ id = "plan"
 title = "Plan the fix"
 plan = true
 approve = "auto"
-prompt = """
-Planifie le fix à partir de ton enquête.
-
-Si le bug n'a pas été reproduit, ne propose pas de plan de fix et n'appelle pas ExitPlanMode : explique ce qui a été
-tenté et ce qu'il te faudrait. Le flow attend alors une réponse humaine.
-
-Sinon, le plan contient :
-- la reproduction : la commande ou le scénario de `.context/bugs/<slug>/repro.md` et ce qu'il montre aujourd'hui ;
-- la cause racine (`file:line`), qui explique chaque symptôme du ticket ;
-- le correctif, au bon endroit, le plus petit qui supprime la cause ;
-- le test qui reproduit le bug : écrit et lancé **avant** le correctif, il doit échouer pour la bonne raison
-  (garde sa sortie dans `.context/bugs/<slug>/before.txt`), puis passer après ;
-- les cas limites à couvrir autour (vide, très long, unicode, erreur réseau, process qui meurt, double clic,
-  actions concurrentes, redémarrage) quand ils touchent le chemin corrigé ;
-- comment tu rejoueras exactement la même reproduction une fois le fix fait.
-
-Puis construis-le dans cet ordre : test qui échoue, correctif, test qui passe.
-"""
-
-[[steps]]
-id = "prove"
-title = "Prove the fix"
-prompt = """
-Prouve que le bug est réellement corrigé, avec la même reproduction que pendant l'enquête :
-
-1. Rejoue exactement `.context/bugs/<slug>/repro.md` : même environnement, même parcours, mêmes données, même
-   modèle. Le symptôme du ticket ne doit plus apparaître. Garde la sortie et les captures (`after.txt`, `after-*.png`).
-2. Mets le correctif de côté (commit WIP ou `git diff > .context/bugs/<slug>/fix.patch`, puis remets-le) et vérifie
-   que le nouveau test échoue sans lui et passe avec lui. Un test qui passe sans le fix ne prouve rien : réécris-le.
-3. Lance toute la batterie, pas seulement le fichier touché : typecheck, lint, tests du paquet et des paquets qui
-   en dépendent, `pnpm verify:ui` (avec un scénario du parcours corrigé) pour tout ce qui se voit.
-4. Cherche à casser le fix : relis le diff contre `{{workspace.target}}`, les autres appelants du code modifié,
-   les cas limites du plan.
-
-Écris `.context/bugs/<slug>/proof.md` : avant / après côte à côte (sorties, captures), ce qui a été lancé et le
-résultat, ce qui n'a pas pu être testé et pourquoi. Si la reproduction montre encore le bug ou qu'un test échoue,
-corrige et recommence jusqu'à ce que tout soit vert avant de terminer.
-"""
+prompt = "Planifie le fix à partir de ton investigation : la cause racine, le correctif au bon endroit, et le test qui reproduit le bug puis prouve le fix."
 
 [[steps]]
 id = "review"
 title = "Review"
 kind = "review"
-prompt = """
-Vérifie aussi la preuve du fix, dans `.context/bugs/*/` (`repro.md`, `before.txt`, `proof.md`) :
-- pas de reproduction du bug, ou pas de test qui échoue sans le fix et passe avec : `blocking` ;
-- un test qui ne passe pas par le chemin réel du ticket (mock trop large, mauvaise entrée) : `major` ;
-- un symptôme du ticket que la cause n'explique pas, ou un cas limite évident non couvert : `major`.
-"""
 
 [[steps]]
 id = "fixes"
@@ -108,8 +37,6 @@ prompt = """
 Voici les {{comments.count}} remarques de la review, chacune avec sa sévérité.
 Planifie la correction de toutes les remarques blocking et major, et des minor / nit qui sont des quick wins.
 Pour chaque remarque que tu écartes, dis pourquoi.
-Une fois les corrections faites, rejoue la reproduction de `.context/bugs/<slug>/repro.md` et toute la batterie, et
-mets `proof.md` à jour.
 """
 
 [[steps]]
@@ -123,31 +50,12 @@ title = "Summary"
 chat = "summary"
 linear_comment = true
 prompt = """
-Lis {{issue.file}}, `.context/bugs/*/` (`report.md`, `repro.md`, `proof.md`), le diff de ce workspace
-(GetWorkspaceDiff) et la PR ouverte.
-Écris un résumé pour la personne qui va relire et merger : le bug, comment il a été reproduit, sa cause, ce qui a été
-corrigé et comment, la preuve avant / après, comment c'est testé, et ce qu'il reste à vérifier avant de merger.
-Court, en français.
+Lis {{issue.file}}, le diff de ce workspace (GetWorkspaceDiff) et la PR ouverte.
+Écris un résumé pour la personne qui va relire et merger : le bug, sa cause, ce qui a été corrigé et comment,
+comment c'est testé, et ce qu'il reste à vérifier avant de merger. Court, en français.
 """
 
 [[steps]]
 id = "merge"
 title = "Merge"
 kind = "wait_merge"
-
-[[steps]]
-id = "close"
-title = "Close the card"
-chat = "summary"
-linear_comment = true
-prompt = """
-La PR de {{issue.identifier}} est mergée. Passe la carte Linear en Done avec le MCP Linear si elle n'y est pas
-déjà (l'intégration GitHub de Linear a pu le faire), puis écris sa mise à jour finale, postée telle quelle sur la carte :
-- la PR et son commit sur `{{workspace.target}}` (`gh pr view --json number,url,mergeCommit,mergedAt`) ;
-- la cause et le correctif, en deux phrases ;
-- la preuve que le bug est parti (reproduction avant / après, tests ajoutés) ;
-- où en est le déploiement : mergé, ou déjà en production (compare avec `/api/version` et, pour l'engine, la
-  version des box) ; sinon, il part avec la prochaine release ;
-- ce que le client ou le support doit savoir, et ce qui reste à surveiller.
-Court, en français, sans clé, token ni contenu privé du client.
-"""
