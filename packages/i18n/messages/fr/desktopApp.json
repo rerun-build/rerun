@@ -94,5 +94,18 @@
         "readyDetail": "L’app redémarre pour terminer la mise à jour.",
         "restartNow": "Redémarrer maintenant",
         "later": "Plus tard"
+    },
+    "tray": {
+        "open": "Ouvrir {name}",
+        "waiting": "{count, plural, one {# en attente de vous} other {# en attente de vous}}",
+        "openAtLogin": "Ouvrir à la connexion",
+        "stillRunning": "{name} continue de tourner ici. Quittez-le depuis cette icône."
+    },
+    "context": {
+        "addToDictionary": "Ajouter au dictionnaire",
+        "openLink": "Ouvrir le lien dans le navigateur",
+        "copyLink": "Copier le lien",
+        "copyImage": "Copier l’image",
+        "saveImage": "Enregistrer l’image"
     }
 }

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
+import { pageAttention } from '@/lib/desktop-shell/attention'
 import { dismissUpdateAvailableToast, showUpdateAvailableToast } from './showUpdateAvailableToast'
 import { UpdateRequiredDialog } from './UpdateRequiredDialog'
 
@@ -17,7 +18,7 @@ const UNATTENDED_RELOAD_COOLDOWN_MS = 10 * 60_000
 // comes back to a working app instead of a failed action. The cooldown keeps a build that never
 // matches its own /api/version from reloading in a loop.
 function reloadIfUnattended() {
-    if (document.visibilityState !== 'hidden') return
+    if (pageAttention() !== 'hidden') return
     const reloadedAt = Number(sessionStorage.getItem(UNATTENDED_RELOAD_KEY))
     if (Date.now() - reloadedAt < UNATTENDED_RELOAD_COOLDOWN_MS) return
     sessionStorage.setItem(UNATTENDED_RELOAD_KEY, String(Date.now()))
@@ -73,7 +74,7 @@ export function DeployUpdateWatcher() {
                 if (!response.ok) return
                 const { buildSha } = (await response.json()) as { buildSha?: string }
                 if (!buildSha || buildSha === BUILD_SHA) return
-                if (document.visibilityState === 'hidden') reloadIfUnattended()
+                if (pageAttention() === 'hidden') reloadIfUnattended()
                 else showUpdateAvailableToast({ title: t('available.title'), description: t('available.description'), reload: t('reload') })
             } catch {}
         }

@@ -62,6 +62,19 @@ with its verifier at `/api/desktop/auth/exchange` for a session of its own. Emai
 in the window as they do on the web. A service's sign-in (Gmail, an MCP server) takes the iOS app's
 chain: a ticket, the browser, a claim back through the scheme.
 
+## Native
+
+- Notifications: the web's notifications go through the system's (`notifications.show`) as soon as the
+  person is in another app; a click brings the window back and the page opens what it was about.
+  Whether someone is looking comes from the window's state (`lib/desktop-shell/attention.ts`), since
+  the window keeps its timers when hidden and `document.visibilityState` stays visible.
+- The count of what waits: on the Dock (macOS), a dot over the taskbar button (Windows), the tray.
+- A tray icon (menu bar on macOS): open, what waits, open at login, updates, quit. On Windows and
+  Linux, closing the window leaves the app there (a setting); macOS keeps the app in the Dock.
+- Open at login, started hidden; settings in the Desktop tab of the account (`settings.get/set`).
+- Menus and tray in the language the person reads Rerun in (`locale.set`), a right-click menu
+  (editing, spelling, links, images).
+
 ## Release
 
 ```bash
@@ -82,6 +95,7 @@ pnpm verify:desktop --scenario apps/desktop-app/e2e/shell.mjs            # the w
 pnpm verify:desktop --native --scenario apps/desktop-app/e2e/title-bar.mjs
 pnpm verify:desktop --signed-out --scenario apps/desktop-app/e2e/sign-in.mjs
 pnpm verify:desktop --scenario apps/desktop-app/e2e/links.mjs
+pnpm verify:desktop --scenario apps/desktop-app/e2e/native.mjs
 pnpm verify:desktop --packaged --scenario apps/desktop-app/e2e/shell.mjs # the packaged app, fuses on
 CSC_NAME="<a signing identity>" node apps/desktop-app/e2e/update-loop.mjs # 0.0.1 updates itself to 0.0.2
 ```

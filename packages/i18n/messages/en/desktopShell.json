@@ -8,7 +8,8 @@
         "handoff.body": "{account} is the email address (or phone number) of the signed-in account.",
         "handoff.codeHint": "Shown after confirming, in case the desktop app did not open by itself.",
         "signIn.waitingTitle": "Shown in the desktop app after it opened the web browser to sign in.",
-        "signIn.codeLabel": "Label of the field where the person pastes the code shown by the browser."
+        "signIn.codeLabel": "Label of the field where the person pastes the code shown by the browser.",
+        "settings.version": "Under the Updates row of the desktop app settings. {version} is like 0.4.0."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -48,5 +49,19 @@
             "network": "Couldn’t reach Rerun. Check your connection.",
             "cancelled": "The sign-in was cancelled."
         }
+    },
+    "settings": {
+        "openAtLogin": "Open at login",
+        "openAtLoginMac": "Rerun starts with your Mac, in the menu bar.",
+        "openAtLoginOther": "Rerun starts with your computer, in the notification area.",
+        "closeToTray": "Keep running when closed",
+        "closeToTrayHint": "Closing the window leaves Rerun in the notification area, so notifications still arrive.",
+        "updates": "Updates",
+        "version": "Rerun {version}",
+        "checking": "Checking for updates…",
+        "downloading": "Downloading the update… {percent}%",
+        "updateFailed": "Couldn’t check for updates.",
+        "check": "Check for updates",
+        "restart": "Restart to update to {version}"
     }
 }

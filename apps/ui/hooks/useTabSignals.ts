@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { desktopShell } from '@/lib/desktop-shell/client'
 
 const COUNT_PREFIX = /^\(\d+\+?\)\s/
 const FAVICON_SIZE = 64
@@ -57,6 +58,8 @@ export function useTabSignals(count: number) {
         const badging = navigator as BadgingNavigator
         if (count > 0) badging.setAppBadge?.(count).catch(() => {})
         else badging.clearAppBadge?.().catch(() => {})
+        // The desktop app puts it on the Dock, the taskbar and its tray icon.
+        desktopShell('badge')?.badge.set(count)
 
         return () => {
             cancelled = true
@@ -68,6 +71,7 @@ export function useTabSignals(count: number) {
             document.title = document.title.replace(COUNT_PREFIX, '')
             setFavicon(null)
             ;(navigator as BadgingNavigator).clearAppBadge?.().catch(() => {})
+            desktopShell('badge')?.badge.set(0)
         },
         []
     )

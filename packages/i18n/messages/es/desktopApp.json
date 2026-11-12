@@ -94,5 +94,18 @@
         "readyDetail": "La app se reinicia para terminar la actualización.",
         "restartNow": "Reiniciar ahora",
         "later": "Más tarde"
+    },
+    "tray": {
+        "open": "Abrir {name}",
+        "waiting": "{count, plural, one {# te espera} other {# te esperan}}",
+        "openAtLogin": "Abrir al iniciar sesión",
+        "stillRunning": "{name} sigue funcionando aquí. Ciérralo desde este icono."
+    },
+    "context": {
+        "addToDictionary": "Añadir al diccionario",
+        "openLink": "Abrir enlace en el navegador",
+        "copyLink": "Copiar enlace",
+        "copyImage": "Copiar imagen",
+        "saveImage": "Guardar imagen"
     }
 }

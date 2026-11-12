@@ -37,5 +37,19 @@
             "network": "No se puede conectar con Rerun. Revisa tu conexión.",
             "cancelled": "Se canceló el inicio de sesión."
         }
+    },
+    "settings": {
+        "openAtLogin": "Abrir al iniciar sesión",
+        "openAtLoginMac": "Rerun se inicia con tu Mac, en la barra de menús.",
+        "openAtLoginOther": "Rerun se inicia con tu computadora, en el área de notificación.",
+        "closeToTray": "Seguir funcionando al cerrar",
+        "closeToTrayHint": "Al cerrar la ventana, Rerun queda en el área de notificación y las notificaciones siguen llegando.",
+        "updates": "Actualizaciones",
+        "version": "Rerun {version}",
+        "checking": "Buscando actualizaciones…",
+        "downloading": "Descargando la actualización… {percent} %",
+        "updateFailed": "No se pudieron buscar actualizaciones.",
+        "check": "Buscar actualizaciones",
+        "restart": "Reiniciar para actualizar a {version}"
     }
 }

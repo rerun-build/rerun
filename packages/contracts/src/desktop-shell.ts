@@ -11,7 +11,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -83,6 +83,17 @@ export type DesktopOAuthReturn = { status: 'success'; claim?: string } | { statu
 
 export const DESKTOP_OAUTH_RETURN_HOST = 'oauth'
 
+// A notification the app shows through the system. `id` comes back on the click, the page knows
+// what it opens.
+export type DesktopNotification = { id: string; title: string; body?: string; silent?: boolean }
+
+// What the person sets for the app itself, in the Desktop tab of their account.
+export type DesktopSettings = {
+    openAtLogin: boolean
+    // Windows and Linux: closing the window leaves the app in the tray. macOS always does.
+    closeToTray: boolean
+}
+
 export type DesktopSignInProvider = 'google' | 'apple'
 
 export type DesktopSignInResult = { status: 'signed-in' } | { status: 'error'; reason: DesktopSignInError }
@@ -128,6 +139,22 @@ export type DesktopShellApi = {
     }
     oauth: {
         onReturn(callback: (result: DesktopOAuthReturn) => void): Unsubscribe
+    }
+    notifications: {
+        // False when the system refused it (notifications off for the app, an unsigned build).
+        show(notification: DesktopNotification): Promise<boolean>
+        onClick(callback: (id: string) => void): Unsubscribe
+    }
+    badge: {
+        set(count: number): void
+    }
+    settings: {
+        get(): Promise<DesktopSettings>
+        set(patch: Partial<DesktopSettings>): Promise<DesktopSettings>
+    }
+    locale: {
+        // The language of the app's menus, as the person picked it in Rerun.
+        set(locale: string): void
     }
 }
 

@@ -18,7 +18,11 @@
         "server.insecure": "Warning under the address field when the address uses http:// on another machine.",
         "incompatible.title": "Shown when the desktop app is older than the oldest version the server accepts.",
         "updates.upToDateDetail": "Native dialog after Check for Updates. {version} is like 0.4.0.",
-        "updates.readyToInstall": "Native dialog title when an update was downloaded. {version} is like 0.4.0."
+        "updates.readyToInstall": "Native dialog title when an update was downloaded. {version} is like 0.4.0.",
+        "tray.open": "Tray menu item that shows the app window. {name} is the app name.",
+        "tray.waiting": "In the tray menu and tooltip: how many conversations wait for the person.",
+        "tray.stillRunning": "Windows balloon the first time the window is closed into the notification area. {name} is the app name.",
+        "context.openLink": "Right-click menu on a link: opens it in the web browser."
     },
     "menu": {
         "app": {
@@ -115,5 +119,18 @@
         "readyDetail": "The app restarts to finish the update.",
         "restartNow": "Restart Now",
         "later": "Later"
+    },
+    "tray": {
+        "open": "Open {name}",
+        "waiting": "{count, plural, one {# waiting for you} other {# waiting for you}}",
+        "openAtLogin": "Open at Login",
+        "stillRunning": "{name} keeps running here. Quit it from this icon."
+    },
+    "context": {
+        "addToDictionary": "Add to Dictionary",
+        "openLink": "Open Link in Browser",
+        "copyLink": "Copy Link",
+        "copyImage": "Copy Image",
+        "saveImage": "Save Image"
     }
 }

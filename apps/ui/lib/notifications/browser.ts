@@ -1,5 +1,9 @@
 'use client'
 
+import type { DesktopShellApi } from '@rerun/contracts'
+import { pageAttention } from '@/lib/desktop-shell/attention'
+import { desktopShell } from '@/lib/desktop-shell/client'
+
 const SOUND_URL = '/sounds/notification.mp3'
 
 export type BrowserPermission = 'default' | 'granted' | 'denied' | 'unsupported'
@@ -20,9 +24,37 @@ export async function requestBrowserPermission(): Promise<BrowserPermission> {
 
 type ShowNotificationArgs = { title: string; body?: string; tag?: string; icon?: string; onClick?: () => void }
 
+// The desktop app shows its own system notifications: one as soon as the person is in another app
+// (a window can be on screen without being looked at), and its click brings the window back before
+// the page opens what the notification is about.
+const desktopClicks = new Map<string, () => void>()
+const MAX_PENDING_CLICKS = 50
+let listeningToDesktopClicks = false
+
+function showDesktopNotification(shell: DesktopShellApi, { title, body, tag, onClick }: ShowNotificationArgs): void {
+    if (pageAttention() === 'focused') return
+    const id = tag ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    if (onClick) {
+        desktopClicks.delete(id)
+        desktopClicks.set(id, onClick)
+        if (desktopClicks.size > MAX_PENDING_CLICKS) desktopClicks.delete(desktopClicks.keys().next().value!)
+    }
+    if (!listeningToDesktopClicks) {
+        listeningToDesktopClicks = true
+        shell.notifications.onClick(clicked => {
+            const handler = desktopClicks.get(clicked)
+            desktopClicks.delete(clicked)
+            handler?.()
+        })
+    }
+    void shell.notifications.show({ id, title, body, silent: true })
+}
+
 // Fires an OS-level notification only when permission is granted and the tab is hidden: while the tab
 // is visible the in-app toast is the surface, so an OS notification would be a redundant duplicate.
 export function showBrowserNotification({ title, body, tag, icon = '/icon-192.png', onClick }: ShowNotificationArgs): void {
+    const shell = desktopShell('notifications')
+    if (shell) return showDesktopNotification(shell, { title, body, tag, onClick })
     if (browserPermission() !== 'granted') return
     if (typeof document !== 'undefined' && document.visibilityState === 'visible') return
     try {

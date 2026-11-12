@@ -5,8 +5,12 @@
 // electron-builder turns each 1024 PNG into the .icns, .ico and Linux sizes.
 //
 //   node scripts/make-icons.mjs
+//
+// It also draws the tray icons: the R of the logo (`R_PATH` of packages/ui's Logo) as a macOS template
+// image (black, the system tints it) and in color for Windows and Linux, and the dot laid over the
+// taskbar button on Windows when something waits.
 
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
@@ -54,3 +58,17 @@ for (const [channel, channelBand] of Object.entries(BANDS)) {
         .toFile(out)
     console.log(`wrote ${out}`)
 }
+
+const R_PATH = readFileSync(join(ROOT, '../../packages/ui/src/logo/Logo.tsx'), 'utf8').match(/R_PATH =\s*'([^']+)'/)[1]
+
+function glyph(size, color) {
+    return Buffer.from(`<svg width="${size}" height="${size}" viewBox="0 0 512 512"><path d="${R_PATH}" fill="${color}"/></svg>`)
+}
+
+const TRAY = join(ROOT, 'resources/tray')
+mkdirSync(TRAY, { recursive: true })
+await sharp(glyph(16, '#000')).png().toFile(join(TRAY, 'trayTemplate.png'))
+await sharp(glyph(32, '#000')).resize(32, 32).png().toFile(join(TRAY, 'trayTemplate@2x.png'))
+await sharp(glyph(32, '#4d34f7')).resize(32, 32).png().toFile(join(TRAY, 'tray.png'))
+await sharp(Buffer.from('<svg width="16" height="16"><circle cx="8" cy="8" r="7" fill="#ef4444" stroke="#fff" stroke-width="1.5"/></svg>')).png().toFile(join(TRAY, 'badge.png'))
+console.log(`wrote ${TRAY}`)

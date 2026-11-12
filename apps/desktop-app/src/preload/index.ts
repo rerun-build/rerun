@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
-import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
+import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
 // Runs before any script of the page, in an isolated world, in the main frame only. It asks the
@@ -50,6 +50,20 @@ if (bootstrap?.audience === 'app') {
         },
         oauth: {
             onReturn: (callback) => subscribe<DesktopOAuthReturn>(IPC_EVENTS.oauthReturn, callback),
+        },
+        notifications: {
+            show: (notification) => ipcRenderer.invoke(IPC.notificationsShow, { id: String(notification.id), title: String(notification.title), body: notification.body === undefined ? undefined : String(notification.body), silent: notification.silent !== false }) as Promise<boolean>,
+            onClick: (callback) => subscribe<string>(IPC_EVENTS.notificationClick, callback),
+        },
+        badge: {
+            set: (count) => void ipcRenderer.invoke(IPC.badgeSet, Number(count) || 0),
+        },
+        settings: {
+            get: () => ipcRenderer.invoke(IPC.settingsGet) as Promise<DesktopSettings>,
+            set: (patch) => ipcRenderer.invoke(IPC.settingsSet, { openAtLogin: patch.openAtLogin, closeToTray: patch.closeToTray }) as Promise<DesktopSettings>,
+        },
+        locale: {
+            set: (locale) => void ipcRenderer.invoke(IPC.localeSet, String(locale)),
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)

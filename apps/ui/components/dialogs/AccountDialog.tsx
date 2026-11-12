@@ -40,8 +40,12 @@ import { useBillingStore } from '@/stores/billing.store'
 import { createClient } from '@/supabase/client'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { DesktopAppPanel } from '@/components/account/DesktopAppPanel'
+import { desktopShell } from '@/lib/desktop-shell/client'
 import { toast } from 'sonner'
+
+const noSubscription = () => () => {}
 
 function unwrap(result: ActionResult, errorText: ReturnType<typeof useErrorText>) {
     if (!result.ok) throw new Error(errorText(result))
@@ -258,6 +262,7 @@ const TAB_CONTENT: Record<AccountTab, () => ReactNode> = {
     profile: ProfileTab,
     'sign-in': SignInTab,
     language: LanguageTab,
+    desktop: DesktopAppPanel,
     delete: DeleteAccountTab,
 }
 
@@ -265,7 +270,8 @@ export function AccountDialog() {
     const { open, tab: requestedTab, setOpen, setTab } = useAccountStore()
     const t = useTranslations('account')
     const showLanguage = useLanguagePacksEnabled()
-    const tab = requestedTab === 'language' && !showLanguage ? 'profile' : requestedTab
+    const showDesktop = useSyncExternalStore(noSubscription, () => desktopShell('settings') !== null, () => false)
+    const tab = (requestedTab === 'language' && !showLanguage) || (requestedTab === 'desktop' && !showDesktop) ? 'profile' : requestedTab
     const { description } = useAccountTabText(tab)
     const TabContent = TAB_CONTENT[tab]
 
@@ -276,6 +282,7 @@ export function AccountDialog() {
                     tab={tab}
                     onTabChange={setTab}
                     showLanguage={showLanguage}
+                    showDesktop={showDesktop}
                     header={
                         <DialogHeader className={DIALOG_TABS_HEADER}>
                             <DialogTitle>{t('title')}</DialogTitle>

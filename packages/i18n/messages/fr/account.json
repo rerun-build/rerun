@@ -13,6 +13,10 @@
             "label": "Langue",
             "description": "La langue que Rerun utilise avec vous."
         },
+        "desktop": {
+            "label": "App de bureau",
+            "description": "Le comportement de l’app Rerun sur cet ordinateur."
+        },
         "delete": {
             "label": "Supprimer le compte",
             "description": "Fermer définitivement votre compte Rerun."

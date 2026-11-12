@@ -15,6 +15,11 @@ export const IPC = {
     authStart: 'rerun-shell:auth:start',
     authSubmitCode: 'rerun-shell:auth:submit-code',
     localRetry: 'rerun-shell:local:retry',
+    notificationsShow: 'rerun-shell:notifications:show',
+    badgeSet: 'rerun-shell:badge:set',
+    settingsGet: 'rerun-shell:settings:get',
+    settingsSet: 'rerun-shell:settings:set',
+    localeSet: 'rerun-shell:locale:set',
     localServerInfo: 'rerun-shell:local:server-info',
     localServerConnect: 'rerun-shell:local:server-connect',
     localServerCancel: 'rerun-shell:local:server-cancel',
@@ -30,6 +35,7 @@ export const IPC_EVENTS = {
     findResult: 'rerun-shell:event:find-result',
     findFocus: 'rerun-shell:event:find-focus',
     oauthReturn: 'rerun-shell:event:oauth-return',
+    notificationClick: 'rerun-shell:event:notification-click',
 } as const
 
 export type AppBootstrap = {

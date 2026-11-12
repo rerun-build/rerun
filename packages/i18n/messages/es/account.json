@@ -13,6 +13,10 @@
             "label": "Idioma",
             "description": "El idioma que Rerun usa contigo."
         },
+        "desktop": {
+            "label": "App de escritorio",
+            "description": "Cómo funciona la app de Rerun en esta computadora."
+        },
         "delete": {
             "label": "Eliminar cuenta",
             "description": "Cierra tu cuenta de Rerun para siempre."

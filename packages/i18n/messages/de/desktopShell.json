@@ -37,5 +37,19 @@
             "network": "Rerun ist nicht erreichbar. Prüfe deine Verbindung.",
             "cancelled": "Die Anmeldung wurde abgebrochen."
         }
+    },
+    "settings": {
+        "openAtLogin": "Bei der Anmeldung öffnen",
+        "openAtLoginMac": "Rerun startet mit deinem Mac, in der Menüleiste.",
+        "openAtLoginOther": "Rerun startet mit deinem Computer, im Infobereich.",
+        "closeToTray": "Nach dem Schließen weiterlaufen",
+        "closeToTrayHint": "Beim Schließen des Fensters bleibt Rerun im Infobereich, Benachrichtigungen kommen weiter an.",
+        "updates": "Updates",
+        "version": "Rerun {version}",
+        "checking": "Suche nach Updates…",
+        "downloading": "Update wird geladen… {percent} %",
+        "updateFailed": "Suche nach Updates fehlgeschlagen.",
+        "check": "Nach Updates suchen",
+        "restart": "Neu starten für Version {version}"
     }
 }

@@ -10,6 +10,11 @@ export type ShellSettings = {
     windowBounds?: WindowBounds
     // The language the web app last told the shell, for the menus.
     locale?: string
+    openAtLogin?: boolean
+    // Windows and Linux: closing the window keeps the app in the tray.
+    closeToTray?: boolean
+    // The balloon that says so was shown once.
+    explainedTray?: boolean
 }
 
 const FILE_NAME = 'settings.json'

@@ -9,6 +9,7 @@ import { partitionFor } from './server'
 import { prepareSession } from './session'
 import { decideNavigation, decideWindowOpen, isExternalUrl, isPaymentPage, isSameOrigin, parseUrl } from './url-policy'
 import { restoredBounds, trackBounds } from './window-state'
+import { attachContextMenu, desktopSettings, explainBackgroundOnce, hasTray } from './native'
 
 export const PRELOAD_PATH = join(import.meta.dirname, '../preload/index.cjs')
 
@@ -220,7 +221,7 @@ export function loadAppPath(path: string): void {
 // on the server picker, in a session of its own.
 const NO_SERVER_PARTITION = 'persist:no-server'
 
-export function createMainWindow(origin: string | null): BrowserWindow {
+export function createMainWindow(origin: string | null, options: { hidden?: boolean } = {}): BrowserWindow {
     currentOrigin = origin
     lastAppUrl = null
     const partition = origin ? partitionFor(origin) : NO_SERVER_PARTITION
@@ -263,12 +264,13 @@ export function createMainWindow(origin: string | null): BrowserWindow {
     }
     confirmUnload(window)
     broadcastWindowState(window)
+    attachContextMenu(window.webContents)
 
     let shown = false
     const show = () => {
         if (shown || window.isDestroyed()) return
         shown = true
-        if (process.env.RERUN_DESKTOP_START_HIDDEN !== '1') window.show()
+        if (!options.hidden && process.env.RERUN_DESKTOP_START_HIDDEN !== '1') window.show()
     }
     window.once('ready-to-show', show)
     // A slow first paint still shows the window, on the page's own loading state.
@@ -277,6 +279,13 @@ export function createMainWindow(origin: string | null): BrowserWindow {
     // macOS keeps an app alive with its window closed: the window hides and comes back from the Dock
     // with everything (the realtime channel, the open conversation) as it was.
     window.on('close', (event) => {
+        // Windows and Linux: the window goes to the tray, when there is one and the person wants it.
+        if (process.platform !== 'darwin' && !quitting && hasTray() && desktopSettings().closeToTray) {
+            event.preventDefault()
+            window.hide()
+            explainBackgroundOnce()
+            return
+        }
         if (process.platform === 'darwin' && !quitting) {
             event.preventDefault()
             if (window.isFullScreen()) {

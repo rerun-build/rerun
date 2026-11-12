@@ -1,7 +1,7 @@
 'use client'
 
 import type { DesktopDownloadEvent, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { desktopShell } from '@/lib/desktop-shell/client'
@@ -13,6 +13,7 @@ const DESKTOP_FULLSCREEN_ATTRIBUTE = 'data-desktop-fullscreen'
 // install, a file it downloaded. Renders nothing, and does nothing in a browser.
 export function DesktopShellBridge() {
     const t = useTranslations('desktopShell')
+    const locale = useLocale()
 
     useEffect(() => {
         const shell = desktopShell('update')
@@ -78,6 +79,11 @@ export function DesktopShellBridge() {
         window.addEventListener('keydown', onKey)
         return () => window.removeEventListener('keydown', onKey)
     }, [])
+
+    // The app's menus and tray speak the language the person reads Rerun in.
+    useEffect(() => {
+        desktopShell('locale')?.locale.set(locale)
+    }, [locale])
 
     return null
 }

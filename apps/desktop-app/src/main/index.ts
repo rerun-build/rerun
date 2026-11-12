@@ -13,6 +13,7 @@ import { onLocaleChange } from './messages'
 import { partitionFor, serverOrigin } from './server'
 import { checkServer } from './server-check'
 import { checkForUpdates, startUpdater } from './updater'
+import { createTray, refreshTray, startedAtLogin } from './native'
 
 // Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
@@ -110,8 +111,10 @@ function start(): void {
     registerIpcHandlers()
     menu()
     onLocaleChange(menu)
+    onLocaleChange(refreshTray)
     const origin = serverOrigin()
-    createMainWindow(origin)
+    createMainWindow(origin, { hidden: startedAtLogin() })
+    createTray({ checkForUpdates: () => void checkForUpdates(true), quit: () => app.quit() })
     if (origin) void verifyServer(origin)
     startUpdater()
     registerScheme()

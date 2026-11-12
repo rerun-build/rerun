@@ -23,6 +23,10 @@
             "label": "Language",
             "description": "The language Rerun uses with you."
         },
+        "desktop": {
+            "label": "Desktop app",
+            "description": "How the Rerun app behaves on this computer."
+        },
         "delete": {
             "label": "Delete account",
             "description": "Close your Rerun account for good."

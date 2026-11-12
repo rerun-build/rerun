@@ -94,5 +94,18 @@
         "readyDetail": "Die App startet neu, um das Update abzuschließen.",
         "restartNow": "Jetzt neu starten",
         "later": "Später"
+    },
+    "tray": {
+        "open": "{name} öffnen",
+        "waiting": "{count, plural, one {# wartet auf dich} other {# warten auf dich}}",
+        "openAtLogin": "Bei der Anmeldung öffnen",
+        "stillRunning": "{name} läuft hier weiter. Beende es über dieses Symbol."
+    },
+    "context": {
+        "addToDictionary": "Zum Wörterbuch hinzufügen",
+        "openLink": "Link im Browser öffnen",
+        "copyLink": "Link kopieren",
+        "copyImage": "Bild kopieren",
+        "saveImage": "Bild sichern"
     }
 }

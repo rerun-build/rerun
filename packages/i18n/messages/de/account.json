@@ -13,6 +13,10 @@
             "label": "Sprache",
             "description": "Die Sprache, in der Rerun mit dir spricht."
         },
+        "desktop": {
+            "label": "Desktop-App",
+            "description": "Wie sich die Rerun-App auf diesem Computer verhält."
+        },
         "delete": {
             "label": "Konto löschen",
             "description": "Schließe dein Rerun-Konto endgültig."
