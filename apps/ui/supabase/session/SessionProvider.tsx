@@ -47,6 +47,8 @@ type Workspace = Pick<
     | 'boxes_archived_at'
     | 'price_arm'
     | 'locale'
+    | 'billing_provider'
+    | 'subscription_cancel_at'
 >
 type User = Pick<Database['public']['Tables']['users']['Row'], 'id' | 'created_at' | 'workspace_id' | 'email_notification_prefs' | 'account_role' | 'expert_profile_id' | 'signed_up_at' | 'locale'>
 type WorkspaceAnswers = Database['public']['Tables']['workspace_onboarding']['Row']['answers']
@@ -61,7 +63,7 @@ const FRESH_SIGNUP_MS = 60 * 60 * 1000
 
 installWorkspaceHeader()
 
-const WORKSPACE_COLUMNS = ['id', 'name', 'icon_url', 'created_at', 'plan', 'stripe_customer_id', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'rerun_used_micros', 'rerun_budget_micros', 'rerun_topup_micros', 'rerun_period_anchor', 'rerun_credit_paused_at', 'is_sandbox', 'boxes_disabled_at', 'boxes_archived_at', 'onboarded_at', 'price_arm', 'locale'] as const
+const WORKSPACE_COLUMNS = ['id', 'name', 'icon_url', 'created_at', 'plan', 'stripe_customer_id', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'rerun_used_micros', 'rerun_budget_micros', 'rerun_topup_micros', 'rerun_period_anchor', 'rerun_credit_paused_at', 'is_sandbox', 'boxes_disabled_at', 'boxes_archived_at', 'onboarded_at', 'price_arm', 'locale', 'billing_provider', 'subscription_cancel_at'] as const
 
 // Whether a verified phone number stands between this account and the app. `unknown` is the gap
 // between an account being born and its signup reaching this tab: nothing may start on its own

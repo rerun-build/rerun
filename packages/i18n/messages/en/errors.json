@@ -1,7 +1,8 @@
 {
     "_context": {
         "generic": "Fallback when an action failed for a reason the screen cannot explain.",
-        "whatsappNumberRefused": "{message} is the provider's own explanation, in English."
+        "whatsappNumberRefused": "{message} is the provider's own explanation, in English.",
+        "storeManaged": "The workspace pays for its plan through the mobile app's store. Keep \"App Store\", \"Apple Account\" and \"Google Play\" as they are: they are the stores' own names."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -398,6 +399,7 @@
     "checkoutNotPlan": "This checkout does not sell a plan.",
     "trialPlanLocked": "The trial plan cannot be changed.",
     "alreadySubscribed": "Your workspace already has a subscription. Manage it from Billing.",
+    "storeManaged": "{store, select, apple {This plan is billed through the App Store. Manage it from your Apple Account subscriptions.} other {This plan is billed through Google Play. Manage it from your Google Play subscriptions.}}",
     "noBillingAccount": "Your workspace has no billing account yet.",
     "billingAccountClosed": "Your billing account was closed.",
     "addCardBeforeTaxId": "Add a card first: the number is checked against its billing address.",

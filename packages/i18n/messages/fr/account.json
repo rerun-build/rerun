@@ -81,7 +81,8 @@
         "blocker": {
             "current": "Son abonnement se renouvelle encore. Résiliez-le depuis la Facturation avant de supprimer votre compte.",
             "other": "Son abonnement se renouvelle encore. Passez sur ce workspace et résiliez-le depuis la Facturation avant de supprimer votre compte.",
-            "openBilling": "Ouvrir la facturation"
+            "openBilling": "Ouvrir la facturation",
+            "store": "{store, select, apple {Son abonnement se renouvelle encore via l'App Store. Résiliez-le depuis les abonnements de votre compte Apple avant de supprimer votre compte.} other {Son abonnement se renouvelle encore via Google Play. Résiliez-le depuis vos abonnements Google Play avant de supprimer votre compte.}}"
         },
         "submit": "Supprimer le compte",
         "failed": "Impossible de supprimer votre compte."

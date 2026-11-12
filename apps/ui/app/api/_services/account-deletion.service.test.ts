@@ -17,7 +17,7 @@ const { accountDeletionBlockers, anonymizeAccount, ACCOUNT_DELETED_REASON } = aw
 const USER = 'user-leaving'
 const TEAMMATE = 'user-staying'
 
-type WorkspaceRow = { id: number; name: string; is_sandbox: boolean; stripe_customer_id: string | null; stripe_subscription_id: string | null; subscription_status: string | null }
+type WorkspaceRow = { id: number; name: string; is_sandbox: boolean; stripe_customer_id: string | null; stripe_subscription_id: string | null; subscription_status: string | null; billing_provider?: string | null; subscription_cancel_at?: string | null }
 
 const SHARED: WorkspaceRow = { id: 1, name: 'Acme', is_sandbox: false, stripe_customer_id: 'cus_acme', stripe_subscription_id: 'sub_acme', subscription_status: 'active' }
 const OWN: WorkspaceRow = { id: 2, name: 'Side project', is_sandbox: false, stripe_customer_id: 'cus_side', stripe_subscription_id: 'sub_side', subscription_status: 'trialing' }
@@ -67,6 +67,29 @@ describe('accountDeletionBlockers', () => {
         const db = world([OWN], [{ workspace_id: OWN.id, user_id: USER }])
 
         await expect(accountDeletionBlockers(db.client, USER)).resolves.toEqual([{ workspaceId: OWN.id, name: OWN.name }])
+    })
+
+    it('names a workspace a store subscription still renews, and the store it is cancelled in', async () => {
+        const store = { ...OWN, stripe_customer_id: null, stripe_subscription_id: null, billing_provider: 'apple', subscription_status: 'trialing' }
+        const db = world([store], [{ workspace_id: OWN.id, user_id: USER }])
+
+        await expect(accountDeletionBlockers(db.client, USER)).resolves.toEqual([{ workspaceId: OWN.id, name: OWN.name, billedBy: 'apple' }])
+        expect(mocks.subscriptionStillCharges).not.toHaveBeenCalled()
+    })
+
+    it('lets a store subscription go once it no longer renews, or is over', async () => {
+        const cancelled = { ...OWN, stripe_subscription_id: null, billing_provider: 'google', subscription_status: 'active', subscription_cancel_at: '2026-12-01T00:00:00Z' }
+        const over = { ...OWN, id: 3, stripe_subscription_id: null, billing_provider: 'google', subscription_status: 'canceled' }
+        const db = world([cancelled, over], [{ workspace_id: OWN.id, user_id: USER }, { workspace_id: 3, user_id: USER }])
+
+        await expect(accountDeletionBlockers(db.client, USER)).resolves.toEqual([])
+    })
+
+    it('still blocks while the store retries a failed renewal', async () => {
+        const retrying = { ...OWN, stripe_subscription_id: null, billing_provider: 'google', subscription_status: 'past_due' }
+        const db = world([retrying], [{ workspace_id: OWN.id, user_id: USER }])
+
+        await expect(accountDeletionBlockers(db.client, USER)).resolves.toEqual([{ workspaceId: OWN.id, name: OWN.name, billedBy: 'google' }])
     })
 
     it('lets a workspace whose plan no longer charges go', async () => {

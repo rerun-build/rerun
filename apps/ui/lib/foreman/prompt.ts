@@ -4,6 +4,8 @@ import { MEMBER_REACH_NOTE, renderBoardMap } from './board-map'
 import { describeNeed } from './needs'
 import { foremanUseCases, isMobileApp } from './phase'
 import type { ForemanState } from './phase'
+import { STORE_NAMES, storeTerms } from '@/ee/lib/foreman/phases/checkout-terms'
+import type { StoreProvider } from '@rerun/contracts'
 import { phaseSpec } from './phases'
 
 // One definition of a Box, a SOUL and a skill for both foremen. A second description written beside
@@ -130,13 +132,25 @@ function languageBlock(state: ForemanState, { browserGuess }: { browserGuess: bo
 // and the trial it starts asks for none of them.
 export const MOBILE_APP_BLOCK = `They are in the Rerun mobile app. Never mention a price, a cost, a card, a payment, a subscription, a plan they would buy or a trial, and never give a link to a pricing or billing page, even one search_docs returned. If they ask what it costs or how to pay, say in one line that billing lives in their account settings, and go back to their coworker. There is no way to reach the team from this chat in the app: where you would call contact_team, tell them in one line they can write to the team from rerun.build.`
 
+// Once the app sells the plan through its store, the store is the only way to pay: its rules forbid
+// pointing to any other, and its sheet shows the price in their currency. The foreman sends them to
+// the offer in the chat or to Subscription in the account menu, and never to the website for money.
+export function mobileStoreBlock(provider: StoreProvider): string {
+    return `They are in the Rerun mobile app, which sells the plan through ${STORE_NAMES[provider]}. ${storeTerms(provider)} If they ask what it costs or how to pay, say it in one or two lines and point them to the offer in this chat, or to Subscription in the account menu once onboarding is done: never quote a price of your own, never mention a card, a discount or a coupon, and never give a link to a pricing, billing or checkout page, even one search_docs returned. There is no way to reach the team from this chat in the app: where you would call contact_team, tell them in one line they can write to the team from rerun.build.`
+}
+
+function mobileBlock(state: ForemanState): string | null {
+    if (!isMobileApp(state)) return null
+    return state.storeBilling ? mobileStoreBlock(state.storeBilling) : MOBILE_APP_BLOCK
+}
+
 // The phase block sits last, right before the board, and says so: this conversation is never
 // restarted, so a user who comes back days later still carries the instructions of the phase they
 // were in, higher up in the transcript.
 export function foremanSystemPrompt(state: ForemanState): string {
     const phase = phaseSpec(state.phase).instructions(state)
 
-    const blocks = [ONBOARDING_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, languageBlock(state, { browserGuess: true }), isMobileApp(state) ? MOBILE_APP_BLOCK : null, foremanProfileBlock(state), intentBlock(state), phase ? `${phase}\n\nThis block describes where things stand now. Anything earlier in this conversation that says otherwise is out of date.` : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: false, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+    const blocks = [ONBOARDING_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, languageBlock(state, { browserGuess: true }), mobileBlock(state), foremanProfileBlock(state), intentBlock(state), phase ? `${phase}\n\nThis block describes where things stand now. Anything earlier in this conversation that says otherwise is out of date.` : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: false, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

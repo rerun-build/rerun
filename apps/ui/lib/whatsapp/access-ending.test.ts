@@ -42,6 +42,11 @@ describe('sweepAccessEnding', () => {
         expect(filters).toContainEqual(['eq', 'is_sandbox', false])
     })
 
+    it('leaves a store subscription to the store, where it is resumed', async () => {
+        const report = await sweepAccessEnding(database({ workspaces: { data: [{ id: 7, subscription_cancel_at: ENDS_AT, billing_provider: 'google' }] } }).client, NOW)
+        expect(report).toEqual({ considered: 0, sent: [], skipped: [] })
+    })
+
     it('sends the owner what the team got done, once per end date', async () => {
         const report = await sweepAccessEnding(database().client, NOW)
 

@@ -394,6 +394,7 @@
     "checkoutNotPlan": "Este checkout não vende um plano.",
     "trialPlanLocked": "O plano de teste não pode ser alterado.",
     "alreadySubscribed": "Seu workspace já tem uma assinatura. Gerencie-a em Cobrança.",
+    "storeManaged": "{store, select, apple {Este plano é cobrado pela App Store. Gerencie-o nas assinaturas da sua Conta Apple.} other {Este plano é cobrado pelo Google Play. Gerencie-o nas suas assinaturas do Google Play.}}",
     "noBillingAccount": "Seu workspace ainda não tem uma conta de cobrança.",
     "billingAccountClosed": "Sua conta de cobrança foi encerrada.",
     "addCardBeforeTaxId": "Adicione um cartão primeiro: o número é conferido com o endereço de cobrança dele.",

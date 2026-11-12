@@ -204,6 +204,14 @@
             "title": "Plano vitalício",
             "description": "Pago uma vez, seu para sempre. Coworkers e assentos ilimitados, rodando na sua própria IA.",
             "connectAi": "Conectar sua IA"
+        },
+        "store": {
+            "title": "{store, select, apple {Cobrado pela App Store} other {Cobrado pelo Google Play}}",
+            "trialing": "Grátis até {date}, depois renova todo mês.",
+            "active": "Renova em {date}.",
+            "ending": "Termina em {date}.",
+            "pastDue": "O último pagamento não foi concluído. Atualize-o na loja para seus coworkers continuarem rodando.",
+            "manage": "{store, select, apple {Gerenciar na App Store} other {Gerenciar no Google Play}}"
         }
     },
     "postPayment": {

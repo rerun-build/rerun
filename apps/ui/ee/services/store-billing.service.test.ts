@@ -14,6 +14,7 @@ const m = vi.hoisted(() => ({
     reportStoreSubscriptionTransition: vi.fn(),
     requestBoxRestore: vi.fn(),
     fetchGoogleSubscription: vi.fn(),
+    markPaymentMethodAdded: vi.fn(),
     acknowledgeGoogleSubscription: vi.fn(),
 }))
 
@@ -24,6 +25,7 @@ vi.mock('@/app/api/_services/workspace-engine.service', () => ({ syncEnginePlan:
 vi.mock('@/lib/apps/slots-sync', () => ({ syncWorkspaceAppSlots: m.syncWorkspaceAppSlots }))
 vi.mock('./billing-analytics.service', () => ({ reportStoreSubscriptionTransition: m.reportStoreSubscriptionTransition }))
 vi.mock('@rerun/cloud/engines', () => ({ requestBoxRestore: m.requestBoxRestore }))
+vi.mock('@/app/api/_services/getting-started.service', () => ({ markPaymentMethodAdded: m.markPaymentMethodAdded }))
 vi.mock('@/ee/lib/billing/google/client', () => ({ fetchGoogleSubscription: m.fetchGoogleSubscription, acknowledgeGoogleSubscription: m.acknowledgeGoogleSubscription }))
 // Rerun Cloud's answer, so the suite runs the same with and without cloud/.
 vi.mock('@rerun/cloud/billing', () => ({ BILLING_ENABLED: true }))
@@ -158,6 +160,7 @@ describe('recordStorePurchase', () => {
         expect(m.syncEnginePlan).toHaveBeenCalledWith(1)
         expect(m.requestBoxRestore).toHaveBeenCalledWith(1)
         expect(m.reportStoreSubscriptionTransition).toHaveBeenCalledWith(expect.objectContaining({ status: 'trialing' }), 1, null, false)
+        expect(m.markPaymentMethodAdded).toHaveBeenCalledWith(1)
     })
 
     it('links a purchase carrying no token to the workspace that sent it', async () => {

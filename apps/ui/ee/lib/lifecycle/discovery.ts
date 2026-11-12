@@ -4,6 +4,7 @@
 // Two shapes recur. Anti-joins ("agents that never ran", "workspaces with no agent") are done by
 // fetching the positive side over the same bounded id list and subtracting with a Set: PostgREST has
 // no NOT EXISTS.
+import { isStoreProvider } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
@@ -49,6 +50,7 @@ export type WorkspaceRow = {
     payment_failed_at: string | null
     renewal_reminder_at: string | null
     renewal_reminder_user_id: string | null
+    billing_provider: string | null
     // What the workspace's onboarding learned, read from workspace_onboarding and kept beside the
     // row because the recommendation email is the only thing that needs it.
     onboarding_answers: unknown
@@ -70,6 +72,7 @@ const WORKSPACE_COLUMNS = [
     'renewal_reminder_user_id',
     'boxes_archived_at',
     'payment_failed_at',
+    'billing_provider',
 ] as const
 export type UserRow = { id: string; workspace_id: number; signed_up_at: string | null; email_notification_prefs: unknown }
 type MemberRow = { workspace_id: number; user_id: string; created_at: string }
@@ -380,6 +383,7 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
             workspaceId: user.workspace_id,
             isFounder: founders.get(user.workspace_id) === user.id,
             isSandbox: workspace?.is_sandbox ?? true,
+            storeBilled: isStoreProvider(workspace?.billing_provider),
             signedUpAt: user.signed_up_at ? new Date(user.signed_up_at) : null,
             onboardingCompletedAt: workspace?.onboarded_at ? new Date(workspace.onboarded_at) : null,
             trialEndsAt: workspace?.trial_ends_at ? new Date(workspace.trial_ends_at) : null,

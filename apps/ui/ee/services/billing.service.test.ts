@@ -880,6 +880,12 @@ describe('extendTrial', () => {
 })
 
 describe('getSubscriptionState', () => {
+    it('reads no Stripe plan for a workspace a store bills, whatever it once had', async () => {
+        useDb({ row: { stripe_subscription_id: 'sub_1', subscription_status: 'trialing', billing_provider: 'apple', current_period_end: null, rerun_budget_micros: 0 } })
+        expect(await getSubscriptionState()).toBeNull()
+        expect(stripe.subscriptions.retrieve).not.toHaveBeenCalled()
+    })
+
     const row = { stripe_subscription_id: 'sub_1', subscription_status: 'active', current_period_end: '2030-01-01T00:00:00+00:00', max_agents: 5, max_seats: 3, rerun_budget_micros: 5 * MICROS_PER_USD }
 
     it('is null for a workspace without a subscription or without the base plan', async () => {
@@ -1141,6 +1147,18 @@ describe('createPlanCheckoutSession', () => {
         expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
     })
 
+    it('turns away a workspace the mobile app store bills, before anything reaches Stripe', async () => {
+        useDb({ row: { ...FRESH_WORKSPACE, billing_provider: 'apple', subscription_status: 'trialing', stripe_customer_id: null } })
+        await expect(createPlanCheckoutSession(BASE_SELECTION)).rejects.toThrow('This plan is billed through the App Store.')
+        expect(stripe.customers.create).not.toHaveBeenCalled()
+        expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
+    })
+
+    it('sells a Stripe plan again once the store subscription is over', async () => {
+        useDb({ row: { ...FRESH_WORKSPACE, billing_provider: 'google', subscription_status: 'canceled', trial_ends_at: '2026-10-01T00:00:00Z' } })
+        await expect(createPlanCheckoutSession(BASE_SELECTION)).resolves.toMatchObject({ trial: false })
+    })
+
     it('turns away a workspace on the lifetime plan, before anything reaches Stripe', async () => {
         useDb({ row: { ...FRESH_WORKSPACE, plan: 'lifetime', subscription_status: 'active', stripe_customer_id: null } })
         await expect(createPlanCheckoutSession(BASE_SELECTION)).rejects.toThrow('This workspace is on the lifetime plan.')
@@ -1292,6 +1310,12 @@ describe('planChangeKind', () => {
 })
 
 describe('changePlan', () => {
+    it('refuses to change the old Stripe plan of a workspace a store now bills', async () => {
+        useDb({ row: { stripe_subscription_id: 'sub_1', subscription_status: 'active', billing_provider: 'google' } })
+        await expect(changePlan({ quantities: { credit_pack: 1, linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' })).rejects.toThrow('This plan is billed through Google Play.')
+        expect(stripe.subscriptions.update).not.toHaveBeenCalled()
+    })
+
     const monthly = sub({
         default_payment_method: 'pm_1',
         items: [

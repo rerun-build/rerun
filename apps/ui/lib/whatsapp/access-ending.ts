@@ -1,5 +1,6 @@
 // The message that goes out a day before a cancelled subscription, paid or still in trial, reaches
 // its end. No 'server-only', like the rest of this folder: a Trigger.dev task runs it.
+import { isStoreProvider } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { selectCount, selectMany } from '@/supabase/supabase-helpers'
@@ -46,11 +47,12 @@ export async function sweepAccessEnding(supabase: SupabaseClient<Database>, now:
     const { data } = await selectMany(
         supabase,
         'workspaces',
-        ['id', 'subscription_cancel_at'] as const,
+        ['id', 'subscription_cancel_at', 'billing_provider'] as const,
         { subscription_cancel_at: { gte: now.toISOString(), lte: new Date(now.getTime() + ACCESS_ENDING_LEAD_MS).toISOString() }, is_sandbox: false, ...(only ? { id: only } : {}) },
         { column: 'subscription_cancel_at', ascending: true },
     )
-    const workspaces: EndingWorkspace[] = data ?? []
+    // A store subscription is resumed in the store, not from the web's billing the message links to.
+    const workspaces: EndingWorkspace[] = (data ?? []).filter(workspace => !isStoreProvider(workspace.billing_provider))
     const report: AccessEndingReport = { considered: workspaces.length, sent: [], skipped: [] }
 
     for (const workspace of workspaces) {

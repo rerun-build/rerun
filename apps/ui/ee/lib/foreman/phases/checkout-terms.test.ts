@@ -1,7 +1,7 @@
 import { TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS } from '@rerun/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { checkoutTerms } from './checkout-terms'
+import { checkoutTerms, storeTerms } from './checkout-terms'
 
 const NOW = new Date('2026-10-12T12:00:00Z')
 
@@ -36,5 +36,17 @@ describe('checkoutTerms', () => {
     it('quotes the price of the arm the workspace was drawn into', () => {
         expect(checkoutTerms({ trialSpent: false, trialNeedsCard: true, priceArm: '29' }, NOW)).toContain('$29 a month')
         expect(checkoutTerms({ trialSpent: true, trialNeedsCard: true, priceArm: '49' }, NOW)).toContain('$49 a month')
+    })
+
+    it.each([
+        ['apple', 'the App Store', 'Apple Account'],
+        ['google', 'Google Play', 'Google account'],
+    ] as const)('leaves the price to %s, whose sheet shows it in their currency', (store, name, account) => {
+        const terms = checkoutTerms({ trialSpent: false, trialNeedsCard: true, priceArm: '49', storeBilling: store }, NOW)
+        expect(terms).toContain(storeTerms(store))
+        expect(terms).toContain(`7 days free for a first subscription, then the monthly price ${name} shows them`)
+        expect(terms).toContain(account)
+        expect(terms).not.toMatch(/\$\d|card/)
+        expect(terms).toContain(`${TRIAL_ACTIVE_AGENTS} coworkers at once`)
     })
 })

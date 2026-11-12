@@ -81,7 +81,8 @@
         "blocker": {
             "current": "Sein Abo verlängert sich noch. Kündige es unter Abrechnung, bevor du dein Konto löschst.",
             "other": "Sein Abo verlängert sich noch. Wechsle zu diesem Workspace und kündige es unter Abrechnung, bevor du dein Konto löschst.",
-            "openBilling": "Abrechnung öffnen"
+            "openBilling": "Abrechnung öffnen",
+            "store": "{store, select, apple {Sein Abo verlängert sich noch über den App Store. Kündige es in den Abos deines Apple Accounts, bevor du dein Konto löschst.} other {Sein Abo verlängert sich noch über Google Play. Kündige es in deinen Google Play-Abos, bevor du dein Konto löschst.}}"
         },
         "submit": "Konto löschen",
         "failed": "Dein Konto konnte nicht gelöscht werden."

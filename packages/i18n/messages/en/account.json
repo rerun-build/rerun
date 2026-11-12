@@ -91,7 +91,8 @@
         "blocker": {
             "current": "Its subscription still renews. Cancel it from Billing before deleting your account.",
             "other": "Its subscription still renews. Switch to this workspace and cancel it from Billing before deleting your account.",
-            "openBilling": "Open billing"
+            "openBilling": "Open billing",
+            "store": "{store, select, apple {Its subscription still renews through the App Store. Cancel it from your Apple Account subscriptions before deleting your account.} other {Its subscription still renews through Google Play. Cancel it from your Google Play subscriptions before deleting your account.}}"
         },
         "submit": "Delete account",
         "failed": "Could not delete your account."

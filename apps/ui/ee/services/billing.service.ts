@@ -164,8 +164,9 @@ async function basePlanCheckoutParams(): Promise<{ params: Omit<Stripe.Checkout.
     if (session && (await isPhoneStepPending(createServiceRoleClient(), session.id))) throw new AppError('phoneRequired')
     // The webhook writes the base plan over the workspace, so cancelling Pro later would take the
     // lifetime access away with it.
-    const { data: current } = await selectSingle(createServiceRoleClient(), 'workspaces', ['plan'] as const, { id: await requireWorkspaceId() })
+    const { data: current } = await selectSingle(createServiceRoleClient(), 'workspaces', ['plan', 'billing_provider', 'subscription_status'] as const, { id: await requireWorkspaceId() })
     if (isLifetimePlan(current)) throw new AppError('lifetimePlan')
+    assertNotStoreBilled(current)
 
     const { workspaceId, customerId } = await ensureStripeCustomer()
     if (await resolveEngineWaitlist(workspaceId)) throw new AppError('engineWaitlist')
@@ -372,6 +373,12 @@ export async function readCheckoutOutcome(sessionId: string): Promise<CheckoutOu
     return { state: 'pending' }
 }
 
+// A workspace the mobile app's store bills is managed in that store: every Stripe action refuses it,
+// and the billing dialog says where to go instead.
+function assertNotStoreBilled(workspace: { billing_provider: string | null; subscription_status: string | null } | null | undefined): void {
+    if (isStoreBilled(workspace)) throw new AppError('storeManaged', { store: workspace!.billing_provider! })
+}
+
 // A subscription in any of these is still being billed, so a second one is a second bill.
 const LIVE_SUBSCRIPTION_STATUSES = new Set<Stripe.Subscription.Status>(['active', 'trialing', 'past_due', 'unpaid'])
 
@@ -556,10 +563,10 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
     const { data: workspace } = await selectSingle(
         supabase,
         'workspaces',
-        ['stripe_subscription_id', 'subscription_status', 'current_period_end', 'rerun_budget_micros'] as const,
+        ['stripe_subscription_id', 'subscription_status', 'current_period_end', 'rerun_budget_micros', 'billing_provider'] as const,
         { id: workspaceId },
     )
-    if (!workspace?.stripe_subscription_id) return null
+    if (!workspace?.stripe_subscription_id || isStoreBilled(workspace)) return null
 
     const subscription = await stripe.subscriptions.retrieve(workspace.stripe_subscription_id, {
         expand: ['discounts.source.coupon', 'customer.invoice_settings.default_payment_method', 'customer.tax_ids', 'default_payment_method'],
@@ -778,8 +785,11 @@ function planItemChanges(subscription: Stripe.Subscription, target: AddonQuantit
 async function requireEditablePlanSubscription({ allowPastDue = false }: { allowPastDue?: boolean } = {}): Promise<{ workspaceId: number; subscription: Stripe.Subscription }> {
     const workspaceId = await requireWorkspaceId()
     const supabase = createServiceRoleClient()
-    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['stripe_subscription_id', 'subscription_status'] as const, { id: workspaceId })
+    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['stripe_subscription_id', 'subscription_status', 'billing_provider'] as const, { id: workspaceId })
 
+    // The Stripe subscription a store-billed workspace may still point at is over: changing it would
+    // bill a second plan beside the store's.
+    assertNotStoreBilled(workspace)
     if (!workspace?.stripe_subscription_id) throw new AppError('noActiveSubscription')
     const editable = workspace.subscription_status === 'active' || workspace.subscription_status === 'trialing' || (allowPastDue && workspace.subscription_status === 'past_due')
     if (!editable) throw new AppError('subscriptionNotActive')

@@ -81,7 +81,8 @@
         "blocker": {
             "current": "A assinatura dele ainda renova. Cancele-a em Cobrança antes de excluir sua conta.",
             "other": "A assinatura dele ainda renova. Mude para este workspace e cancele-a em Cobrança antes de excluir sua conta.",
-            "openBilling": "Abrir cobrança"
+            "openBilling": "Abrir cobrança",
+            "store": "{store, select, apple {A assinatura dele ainda renova pela App Store. Cancele-a nas assinaturas da sua Conta Apple antes de excluir sua conta.} other {A assinatura dele ainda renova pelo Google Play. Cancele-a nas suas assinaturas do Google Play antes de excluir sua conta.}}"
         },
         "submit": "Excluir conta",
         "failed": "Não foi possível excluir sua conta."

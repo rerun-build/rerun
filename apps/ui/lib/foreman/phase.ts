@@ -1,4 +1,4 @@
-import { FOREMAN_PHASES, isMobileClient, type ForemanClient, type ForemanPhase, type TemplatePricing } from '@rerun/contracts'
+import { FOREMAN_PHASES, isMobileClient, type ForemanClient, type ForemanPhase, type StoreProvider, type TemplatePricing } from '@rerun/contracts'
 
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
 import type { PriceArm } from '@rerun/cloud/billing'
@@ -203,6 +203,10 @@ export type ForemanState = {
     // The price the workspace is sold the base plan at, which the trial phase quotes.
     priceArm: PriceArm
     client: ForemanClient
+    // The store the app sells the plan through, behind its own payment sheet: the App Store on iOS,
+    // Google Play on Android. Null on the web, and in the app for as long as this deployment does not
+    // sell through that store, where the app still starts its trial without one.
+    storeBilling?: StoreProvider | null
     workspaceName: string
     workspacePlan: string
     userEmail: string | null

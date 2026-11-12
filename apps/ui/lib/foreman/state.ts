@@ -1,8 +1,9 @@
 import 'server-only'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
-import { isPaid, type ForemanClient } from '@rerun/contracts'
+import { isMobileClient, isPaid, storeProviderOf, type ForemanClient, type StoreProvider } from '@rerun/contracts'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
+import { storeProductId } from '@/ee/lib/billing/store/products'
 import { readAgentShare } from '@/lib/agents/share-read'
 import { isSubscriptionEntitled, parsePriceArm, trialArm } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
@@ -102,10 +103,12 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         entitled,
         trialing,
         trialSpent: !!ctx.workspace.trial_ends_at,
-        // The app sells nothing, so every trial it starts goes without a card, whatever the test's arm.
+        // The app never shows the card form: its trial is the store's, or, before the store sells it,
+        // one started without a card, whatever the test's arm.
         trialNeedsCard: client === 'web' && trialArm(ctx.workspace.id) === 'card',
         priceArm: parsePriceArm(ctx.workspace.price_arm),
         client,
+        storeBilling: storeBillingOf(client),
         workspaceName: ctx.workspace.name ?? 'this workspace',
         workspacePlan: ctx.workspace.plan ?? 'none',
         userEmail: ctx.userEmail,
@@ -114,4 +117,10 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         hiddenBoxes: (spaces?.length ?? 0) - visibleSpaces.length,
         isMember: !!reach,
     }
+}
+
+function storeBillingOf(client: ForemanClient): StoreProvider | null {
+    if (!isMobileClient(client)) return null
+    const provider = storeProviderOf(client)
+    return storeProductId(provider) ? provider : null
 }

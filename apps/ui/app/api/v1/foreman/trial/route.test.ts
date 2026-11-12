@@ -8,6 +8,8 @@ vi.mock('@/ee/services/billing.service', () => ({
     ENGINE_WAITLIST_MESSAGE: 'Every machine is taken right now.',
     startCardlessTrial: (...args: unknown[]) => startCardlessTrial(...args),
 }))
+const storeProductId = vi.fn()
+vi.mock('@/ee/lib/billing/store/products', () => ({ storeProductId: (...args: unknown[]) => storeProductId(...args) }))
 vi.mock('@/lib/foreman/profile', () => ({ mergeForeman: (...args: unknown[]) => mergeForeman(...args) }))
 vi.mock('@/app/api/_auth/ownership', async importOriginal => ({
     ...(await importOriginal<typeof import('@/app/api/_auth/ownership')>()),
@@ -25,6 +27,22 @@ describe('POST /api/v1/foreman/trial', () => {
         workspace.subscription_status = null
         startCardlessTrial.mockReset().mockResolvedValue(true)
         mergeForeman.mockReset().mockResolvedValue({})
+        storeProductId.mockReset().mockReturnValue(null)
+    })
+
+    it('starts nothing once the app store sells the plan, and says a purchase is required', async () => {
+        storeProductId.mockImplementation(provider => (provider === 'apple' ? 'rerun.base.monthly' : null))
+        expect(await (await POST(request('ios/1.2.0 (50)'), segment)).json()).toEqual({ entitled: false, reason: 'purchase_required' })
+        expect(startCardlessTrial).not.toHaveBeenCalled()
+        expect(mergeForeman).not.toHaveBeenCalled()
+        workspace.subscription_status = 'trialing'
+        expect(await (await POST(request('ios/1.2.0 (50)'), segment)).json()).toEqual({ entitled: true })
+    })
+
+    it('keeps the cardless trial on the platform whose store does not sell yet', async () => {
+        storeProductId.mockImplementation(provider => (provider === 'apple' ? 'rerun.base.monthly' : null))
+        expect(await (await POST(request('android/1.0.1 (4)'), segment)).json()).toEqual({ entitled: true })
+        expect(startCardlessTrial).toHaveBeenCalledWith('android')
     })
 
     it('starts the trial as the app, and marks it so the trial test leaves it out', async () => {

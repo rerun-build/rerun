@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { PLAN_PRICES_CENTS, TRIAL_DAYS } from '@rerun/contracts'
 import { assertAgentInWorkspace } from '@/app/api/_auth/access'
 import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
+import { isStoreBilled } from '@/ee/lib/billing/ownership'
 import type { Database } from '@/app/api/database.types'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { reportWorkspaceEvent } from '@/lib/apps/analytics'
@@ -64,6 +65,8 @@ export class AppActionError extends AppError {
 type SlotState = {
     workspaceId: number
     subscription: Stripe.Subscription | null
+    // The store that bills the workspace, whose plan has no slot to sell.
+    storeProvider: string | null
     stripeSlots: number
     workspaceTrialing: boolean
     app: { slots: number; status: string; trial_ends_at: string | null; trial_settled_at: string | null } | null
@@ -75,15 +78,18 @@ type SlotState = {
 
 async function readSlotState(supabase: Client, workspaceId: number, slug: AppSlug): Promise<SlotState> {
     const [{ data: workspace }, { data: app }, { data: holding }, { data: claim }] = await Promise.all([
-        selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id', 'subscription_status', 'boxes_archived_at'] as const, { id: workspaceId }),
+        selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id', 'subscription_status', 'boxes_archived_at', 'billing_provider'] as const, { id: workspaceId }),
         selectMaybeSingle(supabase, 'workspace_apps', ['slots', 'status', 'trial_ends_at', 'trial_settled_at'] as const, { workspace_id: workspaceId, app_slug: slug }),
         selectMany(supabase, 'app_connections', ['id', 'status', 'pause_reason'] as const, { workspace_id: workspaceId, app_slug: slug, status: [...SLOT_HOLDING_STATUSES] }),
         selectMaybeSingle(supabase, 'app_trial_claims', ['id'] as const, { workspace_id: workspaceId, app_slug: slug }),
     ])
-    const subscription = workspace?.stripe_subscription_id ? await stripe.subscriptions.retrieve(workspace.stripe_subscription_id) : null
+    // A slot is an item on the Stripe plan: a workspace a store bills has none to add it to.
+    const storeBilled = isStoreBilled(workspace)
+    const subscription = workspace?.stripe_subscription_id && !storeBilled ? await stripe.subscriptions.retrieve(workspace.stripe_subscription_id) : null
     return {
         workspaceId,
         subscription,
+        storeProvider: storeBilled ? workspace!.billing_provider : null,
         stripeSlots: subscription ? slotQuantity(subscription, appDefinition(slug).addonKey) : 0,
         workspaceTrialing: subscription?.status === 'trialing',
         app: app ?? null,
@@ -178,6 +184,7 @@ export async function addAppSlot(slug: AppSlug, requestId: string): Promise<{ tr
     const { workspace, supabase } = await requireWorkspaceContext()
     const state = await readSlotState(supabase, workspace.id, slug)
     const app = appDefinition(slug)
+    if (state.storeProvider) throw new AppActionError('not_entitled', 'storeManaged', { store: state.storeProvider })
     if (!state.subscription || !isMachineEntitled(state.subscriptionStatus)) throw new AppActionError('not_entitled', 'appSubscribeToAddSlot', { provider: app.providerLabel })
     if (state.boxesArchived) throw new AppActionError('paused', 'workspacePaused')
 

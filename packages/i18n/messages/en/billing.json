@@ -1,5 +1,7 @@
 {
     "_context": {
+        "dialog.store.title": "The workspace pays through the mobile app's store. Keep \"App Store\" and \"Google Play\" as they are.",
+        "dialog.store.manage": "Opens the store's subscription page. Keep \"App Store\" and \"Google Play\" as they are.",
         "trialOffer.limitsDuringTrial": "{agents} is how many coworkers can run during the trial, {credits} the credit it comes with.",
         "trialOffer.chargeLine": "{price} is the monthly plan price like \"$49\", {date} a short date.",
         "trialOffer.cardlessLine": "{price} is the monthly plan price like \"$49\", {date} a short date.",
@@ -298,6 +300,14 @@
             "title": "Lifetime plan",
             "description": "Paid once, yours for good. Unlimited coworkers and seats, running on your own AI.",
             "connectAi": "Connect your AI"
+        },
+        "store": {
+            "title": "{store, select, apple {Billed through the App Store} other {Billed through Google Play}}",
+            "trialing": "Free until {date}, then renews every month.",
+            "active": "Renews on {date}.",
+            "ending": "Ends on {date}.",
+            "pastDue": "The last payment did not go through. Update it in the store to keep your coworkers running.",
+            "manage": "{store, select, apple {Manage in the App Store} other {Manage in Google Play}}"
         }
     },
     "postPayment": {

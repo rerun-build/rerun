@@ -1,3 +1,4 @@
+import { isStoreProvider } from '@rerun/contracts'
 import 'server-only'
 
 import { captureServer, deterministicUuid } from '@rerun/analytics/server'
@@ -137,9 +138,10 @@ export async function catchUpEngineSteps(supabase: ServiceRoleClient, workspaceI
 export async function catchUpPaymentMethod(supabase: ServiceRoleClient, workspaceId: number, items: ReadonlySet<GettingStartedItem>): Promise<GettingStartedItem[]> {
     if (items.has('payment_method')) return []
 
-    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['subscription_status', 'stripe_subscription_id'] as const, { id: workspaceId })
+    const { data: workspace } = await selectSingle(supabase, 'workspaces', ['subscription_status', 'stripe_subscription_id', 'billing_provider'] as const, { id: workspaceId })
     if (!workspace || !isSubscriptionEntitled(workspace.subscription_status)) return []
-    if (workspace.subscription_status !== 'trialing') return ['payment_method']
+    // A store subscription is paid with the account on the phone, trial included.
+    if (workspace.subscription_status !== 'trialing' || isStoreProvider(workspace.billing_provider)) return ['payment_method']
     if (!workspace.stripe_subscription_id) return []
 
     try {

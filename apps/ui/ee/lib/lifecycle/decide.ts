@@ -18,6 +18,9 @@ export type LifecycleSnapshot = {
     // its trial and its team, is told to one person only; the others hear about their agents.
     isFounder: boolean
     isSandbox: boolean
+    // Billed by the mobile app's store, which sends its own trial and renewal reminders and is
+    // where the subscription is managed: the Stripe countdowns have nothing true to say to it.
+    storeBilled?: boolean
     signedUpAt: Date | null
     onboardingCompletedAt: Date | null
     trialEndsAt: Date | null
@@ -104,10 +107,18 @@ function alreadyReminded(snapshot: LifecycleSnapshot): boolean {
     return snapshot.sent.some(sent => sent.recipientId === snapshot.userId && ACTIVATION_SEQUENCES.has(sent.sequenceKey))
 }
 
+// The reminders that only make sense for a Stripe plan: the charge a trial is about to turn into,
+// the countdown of a cancellation and the renewal reminder of the web's cancel flow, each with a
+// button to the web's billing. A store subscription gets the store's own. The trial's end and the
+// archive's expiry still go out: they say the workspace is being paused, and the teardown counts
+// its grace from the first.
+const STRIPE_COUNTDOWN_SEQUENCES = new Set<LifecycleSequenceKey>(['trial_ending_3d', 'trial_ending_2h', 'subscription_ending_7d', 'subscription_ending_3d', 'subscription_ending_24h', 'renewal_reminder_7d'])
+
 // What makes each rung true, and what timestamp it is reacting to. Returning the timestamp rather
 // than testing the window here keeps the delay and the expiry in one place for all of them.
 function evaluate(key: LifecycleSequenceKey, snapshot: LifecycleSnapshot, now: Date): Rung | null {
     if (ACTIVATION_SEQUENCES.has(key) && alreadyReminded(snapshot)) return null
+    if (snapshot.storeBilled && STRIPE_COUNTDOWN_SEQUENCES.has(key)) return null
 
     switch (key) {
         case 'subscription_ending_7d':

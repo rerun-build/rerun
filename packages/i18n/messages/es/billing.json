@@ -204,6 +204,14 @@
             "title": "Plan de por vida",
             "description": "Pagado una vez, tuyo para siempre. Coworkers y asientos ilimitados, con tu propia IA.",
             "connectAi": "Conectar tu IA"
+        },
+        "store": {
+            "title": "{store, select, apple {Facturado a través de la App Store} other {Facturado a través de Google Play}}",
+            "trialing": "Gratis hasta el {date}, luego se renueva cada mes.",
+            "active": "Se renueva el {date}.",
+            "ending": "Termina el {date}.",
+            "pastDue": "El último pago no se completó. Actualízalo en la tienda para que tus coworkers sigan funcionando.",
+            "manage": "{store, select, apple {Gestionar en la App Store} other {Gestionar en Google Play}}"
         }
     },
     "postPayment": {

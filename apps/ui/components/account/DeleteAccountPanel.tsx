@@ -64,9 +64,10 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
                         key={blocker.workspaceId}
                         leading={<Icon icon={CreditCard} size="sm" />}
                         title={blocker.name}
-                        description={blocker.workspaceId === currentWorkspaceId ? t('blocker.current') : t('blocker.other')}
+                        description={blocker.billedBy && blocker.billedBy !== 'stripe' ? t('blocker.store', { store: blocker.billedBy }) : blocker.workspaceId === currentWorkspaceId ? t('blocker.current') : t('blocker.other')}
                         actions={
-                            blocker.workspaceId === currentWorkspaceId && (
+                            blocker.workspaceId === currentWorkspaceId &&
+                            (!blocker.billedBy || blocker.billedBy === 'stripe') && (
                                 <Button type="button" variant="outline" size="sm" onClick={onOpenBilling}>
                                     {t('blocker.openBilling')}
                                 </Button>

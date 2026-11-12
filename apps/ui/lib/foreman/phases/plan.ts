@@ -115,7 +115,9 @@ ${naming.map(line => `- ${line}\n`).join('')}- A coworker is a name and a job he
 - ${
             state.entitled
                 ? 'Do not create anything yet, and do not claim anything is running: nothing is built before the plan comes back confirmed. The moment it does, the app builds it, on the plan their account is already on, with no payment asked for.'
-                : isMobileApp(state)
+                : isMobileApp(state) && state.storeBilling
+                  ? 'Do not create anything yet, and do not claim anything is running: nothing is built before the card comes back confirmed. The moment it does, the app puts the free week of the plan in front of them, through their store, then builds the coworker.'
+                  : isMobileApp(state)
                   ? 'Do not create anything yet, and do not claim anything is running: nothing is built before the card comes back confirmed. The moment it does, the app asks them to start the build, then builds the coworker.'
                   : 'Do not create anything yet, and do not claim anything is running: their workspace has no plan, so no Box and no coworker can exist. The moment the card comes back confirmed, the app puts the free trial in front of them, then builds the coworker.'
         }`

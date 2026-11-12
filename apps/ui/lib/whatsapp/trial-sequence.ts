@@ -1,6 +1,7 @@
 // The WhatsApp sequence between the start and the end of a trial: one message a day at most, in
 // the voice of a coworker, to bring its owner back to what their coworkers are doing. No
 // 'server-only', like the rest of this folder: a Trigger.dev task runs it.
+import { isStoreProvider } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
@@ -234,7 +235,7 @@ export async function sweepTrialSequence(supabase: Client, now: Date, only?: num
     const { data } = await selectMany(
         supabase,
         'workspaces',
-        ['id', 'trial_started_at', 'trial_ends_at', 'subscription_cancel_at'] as const,
+        ['id', 'trial_started_at', 'trial_ends_at', 'subscription_cancel_at', 'billing_provider'] as const,
         {
             subscription_status: 'trialing',
             is_sandbox: false,
@@ -244,7 +245,8 @@ export async function sweepTrialSequence(supabase: Client, now: Date, only?: num
         },
         { column: 'trial_ends_at', ascending: false },
     )
-    const workspaces: TrialWorkspace[] = data ?? []
+    // A store's trial is the store's to remind of: its sequence sells the web's card form.
+    const workspaces: TrialWorkspace[] = (data ?? []).filter(workspace => !isStoreProvider(workspace.billing_provider))
     const report: TrialSequenceReport = { considered: workspaces.length, sent: [], skipped: [] }
 
     for (const workspace of workspaces) {

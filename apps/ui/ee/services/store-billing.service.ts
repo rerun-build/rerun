@@ -4,6 +4,7 @@ import type { ResponseBodyV2DecodedPayload } from '@apple/app-store-server-libra
 import type { Database } from '@/app/api/database.types'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { reconcileAgentActivation, wakePlanLimitedAgents } from '@/app/api/_services/agent-activation.service'
+import { markPaymentMethodAdded } from '@/app/api/_services/getting-started.service'
 import { syncEnginePlan } from '@/app/api/_services/workspace-engine.service'
 import { appleIapConfig, appleServerApiKey, type AppleIapConfig } from '@/ee/lib/billing/apple/config'
 import { fetchAppleSubscription } from '@/ee/lib/billing/apple/server-api'
@@ -16,6 +17,7 @@ import { verifyAppleRenewalInfo, verifyAppleTransaction, type AppleEnvironment, 
 import { isMachineEntitled, isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { hasPeriodAdvanced } from '@/ee/lib/billing/period'
 import { ZERO_QUANTITIES, isLifetimePlan } from '@/ee/lib/billing/plans'
+import { storeProductId } from '@/ee/lib/billing/store/products'
 import { STORE_WORKSPACE_COLUMNS, isStaleReading, storeWorkspaceUpdate, type StoreSubscriptionState } from '@/ee/lib/billing/store/subscription-state'
 import { syncWorkspaceAppSlots } from '@/lib/apps/slots-sync'
 import { randomUuid } from '@/lib/random-uuid'
@@ -48,14 +50,6 @@ type StoreWorkspace = {
 
 // A transaction the hub cannot read: forged, for another app, or for a product it does not sell.
 export class InvalidStorePurchaseError extends Error {}
-
-// The store each provider sells through, and the one product it sells there. Null when this
-// deployment does not sell through that store (self-hosted, or the store's settings are missing).
-function storeProductId(provider: StoreProvider): string | null {
-    if (!BILLING_ENABLED) return null
-    if (provider === 'apple') return appleIapConfig()?.productId ?? null
-    return googlePlayConfig()?.productId ?? null
-}
 
 async function loadStoreWorkspace(filter: { id: number } | { store_subscription_id: string } | { store_account_token: string }): Promise<StoreWorkspace | null> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', STORE_WORKSPACE_COLUMNS, filter)
@@ -219,6 +213,8 @@ async function applyStoreState(workspace: StoreWorkspace, state: StoreSubscripti
 
     if (isSubscriptionEntitled(state.status) && state.status !== 'past_due') {
         await syncWorkspaceAppSlots(supabase, workspace.id, ZERO_QUANTITIES, { periodAdvanced: hasPeriodAdvanced(workspace.current_period_end, state.periodEnd) })
+        // The store holds the payment method: the checklist's step is done the moment it bills.
+        if (!isSubscriptionEntitled(workspace.subscription_status)) await markPaymentMethodAdded(workspace.id)
     }
     await requestAgentActivationSync(await reconcileAgentActivation(workspace.id))
     if (workspace.subscription_status === 'trialing' && state.status === 'active') {

@@ -394,6 +394,7 @@
     "checkoutNotPlan": "Este pago no vende un plan.",
     "trialPlanLocked": "El plan de prueba no se puede cambiar.",
     "alreadySubscribed": "Tu workspace ya tiene una suscripción. Gestiónala desde Facturación.",
+    "storeManaged": "{store, select, apple {Este plan se factura a través de la App Store. Gestiónalo desde las suscripciones de tu cuenta de Apple.} other {Este plan se factura a través de Google Play. Gestiónalo desde tus suscripciones de Google Play.}}",
     "noBillingAccount": "Tu workspace todavía no tiene una cuenta de facturación.",
     "billingAccountClosed": "Tu cuenta de facturación se cerró.",
     "addCardBeforeTaxId": "Añade primero una tarjeta: el número se comprueba con su dirección de facturación.",

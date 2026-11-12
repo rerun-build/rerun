@@ -81,7 +81,8 @@
         "blocker": {
             "current": "Su suscripción sigue renovándose. Cancélala desde Facturación antes de eliminar tu cuenta.",
             "other": "Su suscripción sigue renovándose. Cambia a este workspace y cancélala desde Facturación antes de eliminar tu cuenta.",
-            "openBilling": "Abrir facturación"
+            "openBilling": "Abrir facturación",
+            "store": "{store, select, apple {Su suscripción sigue renovándose a través de la App Store. Cancélala desde las suscripciones de tu cuenta de Apple antes de eliminar tu cuenta.} other {Su suscripción sigue renovándose a través de Google Play. Cancélala desde tus suscripciones de Google Play antes de eliminar tu cuenta.}}"
         },
         "submit": "Eliminar cuenta",
         "failed": "No se pudo eliminar tu cuenta."

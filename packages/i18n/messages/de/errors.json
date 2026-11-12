@@ -394,6 +394,7 @@
     "checkoutNotPlan": "Dieser Bezahlvorgang verkauft keinen Tarif.",
     "trialPlanLocked": "Der Testtarif kann nicht geändert werden.",
     "alreadySubscribed": "Dein Workspace hat bereits ein Abo. Verwalte es unter Abrechnung.",
+    "storeManaged": "{store, select, apple {Dieser Tarif wird über den App Store abgerechnet. Verwalte ihn in den Abos deines Apple Accounts.} other {Dieser Tarif wird über Google Play abgerechnet. Verwalte ihn in deinen Google Play-Abos.}}",
     "noBillingAccount": "Dein Workspace hat noch kein Abrechnungskonto.",
     "billingAccountClosed": "Dein Abrechnungskonto wurde geschlossen.",
     "addCardBeforeTaxId": "Füge zuerst eine Karte hinzu: Die Nummer wird mit ihrer Rechnungsadresse abgeglichen.",

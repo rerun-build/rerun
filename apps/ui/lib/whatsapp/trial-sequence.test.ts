@@ -76,6 +76,12 @@ describe('sweepTrialSequence', () => {
         expect(filters).toContainEqual(['not', 'trial_started_at', 'is', null])
     })
 
+    it('leaves a trial the mobile app sold through its store to the store', async () => {
+        const db = database({ workspaces: { data: [{ id: 7, trial_started_at: TRIAL_STARTED_AT, trial_ends_at: TRIAL_ENDS_AT, subscription_cancel_at: null, billing_provider: 'apple' }] } })
+        expect(await sweepTrialSequence(db.client, DAY_ZERO_EVENING)).toEqual({ considered: 0, sent: [], skipped: [] })
+        expect(deliverWhatsApp).not.toHaveBeenCalled()
+    })
+
     it('celebrates the first job on day 0, pointing at the schedules of the coworker who did it', async () => {
         const report = await sweepTrialSequence(database().client, DAY_ZERO_EVENING)
 

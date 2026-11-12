@@ -59,6 +59,28 @@ function sent(sequenceKey: LifecycleSnapshot['sent'][number]['sequenceKey'], ove
     return { sequenceKey, agentId: null, sentAt: ago(30 * DAY), recipientId: 'user-1', ...overrides }
 }
 
+describe('pickLifecycleEmail for a store subscription', () => {
+    const NOW = new Date('2026-11-12T10:00:00Z')
+    const DAY = 86_400_000
+
+    it('leaves the trial countdown to the store, which reminds before its own charge', () => {
+        const trialing = snapshot({ trialEndsAt: new Date(NOW.getTime() + DAY), subscriptionEntitled: true, subscriptionPaid: false, wantsBilling: true })
+        expect(pickLifecycleEmail(trialing, NOW)?.sequenceKey).toBe('trial_ending_3d')
+        expect(pickLifecycleEmail({ ...trialing, storeBilled: true }, NOW)).toBeNull()
+    })
+
+    it('leaves the cancellation countdown to the store, where it is resumed', () => {
+        const ending = snapshot({ subscriptionEntitled: true, subscriptionPaid: true, subscriptionCancelAt: new Date(NOW.getTime() + 12 * 3_600_000) })
+        expect(pickLifecycleEmail(ending, NOW)?.sequenceKey).toBe('subscription_ending_24h')
+        expect(pickLifecycleEmail({ ...ending, storeBilled: true }, NOW)).toBeNull()
+    })
+
+    it('still says the trial ended, which the teardown counts its grace from', () => {
+        const lapsed = snapshot({ trialEndsAt: new Date(NOW.getTime() - 3_600_000), subscriptionEntitled: false, trialLapsed: true, storeBilled: true })
+        expect(pickLifecycleEmail(lapsed, NOW)?.sequenceKey).toBe('trial_ended')
+    })
+})
+
 describe('pickLifecycleEmail', () => {
     it('picks the activation email highest on the ladder', () => {
         const activation = snapshot({

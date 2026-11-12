@@ -4,7 +4,7 @@ import { BILLING_ENABLED } from '@rerun/cloud/billing'
 
 vi.mock('server-only', () => ({}))
 
-const { MOBILE_APP_BLOCK, foremanEngineInstructions, foremanSystemPrompt } = await import('./prompt')
+const { MOBILE_APP_BLOCK, foremanEngineInstructions, foremanSystemPrompt, mobileStoreBlock } = await import('./prompt')
 import type { ForemanPlan, ForemanState } from './phase'
 
 const ASKED = 'Je cherche un worker capable de trouver des décisionnaires capables de me recruter en alternance'
@@ -99,6 +99,29 @@ describe('foremanSystemPrompt in the app', () => {
     it.skipIf(!BILLING_ENABLED).each(['ios', 'android'] as const)('sends a spent trial to the web on %s, and anything else back to the button', client => {
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, trialSpent: true, client }))).toContain('finish setting it up at rerun.build')
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, trialSpent: false, client }))).toContain('"Build my team" button right under your reply tries again')
+    })
+
+    it.each([
+        ['ios', 'apple', 'the App Store'],
+        ['android', 'google', 'Google Play'],
+    ] as const)('sells through the store once it is configured, on %s, without a figure of its own', (client, store, name) => {
+        for (const phase of ['plan', 'trial'] as const) {
+            const prompt = foremanSystemPrompt(stateWith({ phase, entitled: false, client, storeBilling: store, foreman: { ...stateWith({}).foreman, plan: PLAN } }))
+            expect(prompt).toContain(mobileStoreBlock(store))
+            expect(prompt).not.toContain(MOBILE_APP_BLOCK)
+            expect(prompt).toContain(`through ${name}`)
+            expect(prompt).not.toMatch(/\$\d|card required|Start free trial|Talk to the team/i)
+        }
+    })
+
+    it.skipIf(!BILLING_ENABLED)('tells an older build to update from its store, never to pay on the web', () => {
+        const prompt = foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'ios', storeBilling: 'apple', trialSpent: true }))
+        expect(prompt).toContain('updating Rerun from the App Store brings the offer back')
+        expect(prompt).not.toContain('finish setting it up at rerun.build')
+    })
+
+    it('puts the free week of the store in front of them after the plan', () => {
+        expect(foremanSystemPrompt(stateWith({ phase: 'plan', entitled: false, client: 'android', storeBilling: 'google', onboardingCompletedAt: null }))).toContain('the free week of the plan in front of them, through their store')
     })
 
     it('says nothing of the mobile app on the web', () => {

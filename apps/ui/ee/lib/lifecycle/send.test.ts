@@ -94,6 +94,7 @@ const workspace: WorkspaceRow = {
     renewal_reminder_at: null,
     renewal_reminder_user_id: null,
     boxes_archived_at: null,
+    billing_provider: 'stripe',
     onboarding_answers: null,
 }
 

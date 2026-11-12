@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { billingProviderSchema } from './store-billing.js'
+
 // Sign-in from the iOS app. The hub answers a refusal with `error` to show and `reason` to count.
 
 export const phoneChannelSchema = z.enum(['sms', 'whatsapp'])
@@ -38,7 +40,8 @@ export const signInRefusalSchema = z.object({
 export type SignInRefusal = z.infer<typeof signInRefusalSchema>
 
 export const accountDeletionStatusSchema = z.object({
-    blockers: z.array(z.object({ workspaceId: z.number(), name: z.string() })),
+    // `billedBy` names the store a subscription is cancelled in. Absent from an older hub, and for Stripe.
+    blockers: z.array(z.object({ workspaceId: z.number(), name: z.string(), billedBy: billingProviderSchema.optional() })),
 })
 
 export const deleteAccountRequestSchema = z.object({ confirmation: z.literal('DELETE') })

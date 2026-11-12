@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { stopWorkspaceCharges, subscriptionStillCharges, uninstallWorkspaceApps } from '@rerun/cloud/account'
 import type { AccountDeletionBlocker } from '@/lib/auth/account-deletion'
+import { isStoreProvider, type BillingProvider } from '@rerun/contracts'
 import { deletedAccountEmailFor } from '@/lib/auth/placeholder-email'
 import { DEFAULT_WORKSPACE_NAME } from '@/lib/naming/workspace-name'
 import { isLastAdmin, setMemberRole } from '@/app/api/_services/members.service'
@@ -18,10 +19,21 @@ type NewsletterRecipientUpdate = Database['public']['Tables']['newsletter_recipi
 export const ACCOUNT_DELETED_REASON = 'account_deleted'
 
 const USER_AVATARS_BUCKET = 'user-avatars'
-const WORKSPACE_COLUMNS = ['id', 'name', 'is_sandbox', 'stripe_customer_id', 'stripe_subscription_id', 'subscription_status'] as const
+const WORKSPACE_COLUMNS = ['id', 'name', 'is_sandbox', 'stripe_customer_id', 'stripe_subscription_id', 'subscription_status', 'billing_provider', 'subscription_cancel_at'] as const
 const LIVE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing'])
+const STORE_RENEWING_STATUSES = new Set(['active', 'trialing', 'past_due'])
 
-type OwnWorkspace = { id: number; name: string; isSandbox: boolean; stripeCustomerId: string | null; stripeSubscriptionId: string | null; subscriptionStatus: string | null; shared: boolean }
+type OwnWorkspace = {
+    id: number
+    name: string
+    isSandbox: boolean
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
+    subscriptionStatus: string | null
+    billingProvider: string | null
+    subscriptionCancelAt: string | null
+    shared: boolean
+}
 
 async function workspacesOf(admin: Client, userId: string): Promise<OwnWorkspace[]> {
     const { data: memberships, error } = await selectAll(admin, 'workspace_members', ['workspace_id'] as const, { user_id: userId })
@@ -40,16 +52,27 @@ async function workspacesOf(admin: Client, userId: string): Promise<OwnWorkspace
         stripeCustomerId: workspace.stripe_customer_id,
         stripeSubscriptionId: workspace.stripe_subscription_id,
         subscriptionStatus: workspace.subscription_status,
+        billingProvider: workspace.billing_provider,
+        subscriptionCancelAt: workspace.subscription_cancel_at,
         shared: members.some(member => member.workspace_id === workspace.id && member.user_id !== userId),
     }))
 }
 
 // The workspaces only this user is left in, whose subscription has to be cancelled through the
 // billing flow before the account can go. Shared workspaces carry on with their other members.
+//
+// A store's subscription renews until it is cancelled in that store, which only its owner can do: Rerun
+// has no way to stop it, so it blocks as long as it renews, and is told apart for the copy.
 async function blockersAmong(workspaces: OwnWorkspace[]): Promise<AccountDeletionBlocker[]> {
-    const candidates = workspaces.filter(workspace => !workspace.shared && workspace.stripeSubscriptionId && LIVE_SUBSCRIPTION_STATUSES.has(workspace.subscriptionStatus ?? ''))
+    const own = workspaces.filter(workspace => !workspace.shared)
+    // A store retrying a failed renewal still renews.
+    const store = own.filter(workspace => isStoreProvider(workspace.billingProvider) && STORE_RENEWING_STATUSES.has(workspace.subscriptionStatus ?? ''))
+    const candidates = own.filter(workspace => !isStoreProvider(workspace.billingProvider) && workspace.stripeSubscriptionId && LIVE_SUBSCRIPTION_STATUSES.has(workspace.subscriptionStatus ?? ''))
     const charging = await Promise.all(candidates.map(workspace => subscriptionStillCharges(workspace.stripeSubscriptionId!)))
-    return candidates.filter((_, index) => charging[index]).map(workspace => ({ workspaceId: workspace.id, name: workspace.name }))
+    return [
+        ...candidates.filter((_, index) => charging[index]).map(workspace => ({ workspaceId: workspace.id, name: workspace.name })),
+        ...store.filter(workspace => !workspace.subscriptionCancelAt).map(workspace => ({ workspaceId: workspace.id, name: workspace.name, billedBy: workspace.billingProvider as BillingProvider })),
+    ]
 }
 
 export async function accountDeletionBlockers(admin: Client, userId: string): Promise<AccountDeletionBlocker[]> {

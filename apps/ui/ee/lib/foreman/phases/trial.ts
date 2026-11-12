@@ -1,4 +1,4 @@
-import { checkoutTerms } from './checkout-terms'
+import { STORE_NAMES, checkoutTerms } from './checkout-terms'
 import { isMobileApp, type ForemanState } from '@/lib/foreman/phase'
 import type { PhaseSpec } from '@/lib/foreman/phases/spec'
 
@@ -32,10 +32,25 @@ How to run this:
     tools: ['search_docs', 'contact_team'],
 }
 
+// In the app that sells the plan through its store, the card is the store's offer: the app answers it
+// only once the subscription is on, and keeps it in the chat through a cancelled sheet or a failed
+// payment, so a refusal can only come from an older build, which still calls the cardless trial the
+// hub no longer starts. Pointing to the web would break the store's rules: the way forward is an
+// update of the app.
+function storeAppInstructions(state: ForemanState, agreed: string): string {
+    const store = STORE_NAMES[state.storeBilling!]
+    return `Right now: their first coworker is agreed and nothing has been created. ${agreed}
+
+When they agreed, the app put the plan's offer in the chat, and it came back without the plan being on: this version of the app cannot start it. Say in one line that updating Rerun from ${store} brings the offer back. Nothing else, and never mention a price, a card or the website.
+
+They cannot write back here, so ask nothing. Never answer anything beside this, and do not try to create a Box or a coworker: it will fail, and they will read the failure.`
+}
+
 // In the app the card is a "Build my team" button that starts the trial without a card, and nothing
 // about paying is ever said there: what can stop it is a trial already spent, which only the web can
 // take further, or a hiccup the button simply retries.
 function mobileAppInstructions(state: ForemanState, agreed: string): string {
+    if (state.storeBilling) return storeAppInstructions(state, agreed)
     const blocked = state.trialSpent
         ? 'This workspace cannot be started from the app. Say so in one line, and that they can finish setting it up at rerun.build. Nothing else.'
         : 'The build did not start. Say in one line that it did not go through and that the "Build my team" button right under your reply tries again.'

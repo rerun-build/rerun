@@ -1,7 +1,9 @@
 'use client'
 
 import { track } from '@rerun/analytics/client'
-import { useTranslations } from 'next-intl'
+import { formatDate } from '@rerun/i18n/format'
+import { isStoreProvider, type StoreProvider } from '@rerun/contracts'
+import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { getSubscriptionStateAction } from '@/ee/actions/billing.actions'
@@ -12,7 +14,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { checkoutRouteFor, trialOffer, type CheckoutRoute } from '@/ee/lib/billing/checkout-variant'
-import { CreditCardIcon, RefreshCwIcon, TicketIcon } from '@/lib/icons'
+import { CreditCardIcon, ExternalLinkIcon, RefreshCwIcon, Smartphone, TicketIcon } from '@/lib/icons'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { isLifetimePlan } from '@/ee/lib/billing/plans'
 import { useBillingStore } from '@/stores/billing.store'
@@ -28,7 +30,7 @@ import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscripti
 // What the dialog shows, decided when it opens and held until it closes: a payment rewrites the
 // workspace through the webhook, and re-deciding then would swap the success panel for the next
 // dialog under the user's eyes.
-type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'error' }
+type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'store'; provider: StoreProvider } | { kind: 'error' }
 
 // Every openBilling() lands here. Two dialogs: the checkout, which sells a plan (or ends a trial),
 // and the plan dialog, which manages one that is paid.
@@ -79,6 +81,13 @@ export function BillingDialog() {
             track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: 'lifetime' })
             return
         }
+        // Bought in the mobile app, through its store: only the store can change or cancel it, and
+        // a Stripe plan sold on top would bill the workspace twice.
+        if (entitled && isStoreProvider(workspace?.billing_provider)) {
+            setResolved({ kind: 'store', provider: workspace.billing_provider })
+            track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: 'store' })
+            return
+        }
         setResolved({ kind: 'loading' })
         const read = entitled ? await loadState() : null
         if (read && !read.ok) {
@@ -119,6 +128,8 @@ export function BillingDialog() {
                         useWorkspaceSettingsStore.getState().openAiProviders()
                     }}
                 />
+            ) : resolved.kind === 'store' && workspace ? (
+                <StoreShell provider={resolved.provider} workspace={workspace} />
             ) : resolved.kind === 'error' ? (
                 <ErrorShell onRetry={() => void decide()} />
             ) : resolved.kind === 'checkout' ? (
@@ -174,6 +185,47 @@ function LifetimeShell({ onConnectAi }: { onConnectAi: () => void }) {
                 action={
                     <Button size="sm" variant="outline" onClick={onConnectAi}>
                         {t('lifetime.connectAi')}
+                    </Button>
+                }
+            />
+        </DialogContent>
+    )
+}
+
+// Where each store lets its subscriber change or cancel a subscription, from any browser.
+const STORE_SUBSCRIPTIONS_URL: Record<StoreProvider, string> = {
+    apple: 'https://apps.apple.com/account/subscriptions',
+    google: 'https://play.google.com/store/account/subscriptions',
+}
+
+type StoreWorkspace = { subscription_status: string | null; trial_ends_at: string | null; current_period_end: string | null; subscription_cancel_at: string | null }
+
+function StoreShell({ provider, workspace }: { provider: StoreProvider; workspace: StoreWorkspace }) {
+    const t = useTranslations('billing.dialog')
+    const locale = useLocale()
+    const day = (iso: string) => formatDate(iso, locale, { month: 'long', day: 'numeric' })
+    const status =
+        workspace.subscription_status === 'past_due'
+            ? t('store.pastDue')
+            : workspace.subscription_cancel_at
+              ? t('store.ending', { date: day(workspace.subscription_cancel_at) })
+              : workspace.subscription_status === 'trialing' && workspace.trial_ends_at
+                ? t('store.trialing', { date: day(workspace.trial_ends_at) })
+                : workspace.current_period_end
+                  ? t('store.active', { date: day(workspace.current_period_end) })
+                  : null
+    return (
+        <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
+            <DialogTitle className="sr-only">{t('title')}</DialogTitle>
+            <EmptyState
+                icon={Smartphone}
+                title={t('store.title', { store: provider })}
+                description={status ?? undefined}
+                action={
+                    <Button size="sm" variant="outline" asChild>
+                        <a href={STORE_SUBSCRIPTIONS_URL[provider]} target="_blank" rel="noreferrer">
+                            {t('store.manage', { store: provider })} <ExternalLinkIcon className="size-3.5" />
+                        </a>
                     </Button>
                 }
             />

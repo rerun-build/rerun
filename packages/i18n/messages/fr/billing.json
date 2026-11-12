@@ -204,6 +204,14 @@
             "title": "Offre à vie",
             "description": "Payée une fois, à vous pour de bon. Coworkers et sièges illimités, sur votre propre IA.",
             "connectAi": "Connecter votre IA"
+        },
+        "store": {
+            "title": "{store, select, apple {Facturé via l'App Store} other {Facturé via Google Play}}",
+            "trialing": "Gratuit jusqu'au {date}, puis renouvelé chaque mois.",
+            "active": "Se renouvelle le {date}.",
+            "ending": "Prend fin le {date}.",
+            "pastDue": "Le dernier paiement n'est pas passé. Mettez-le à jour dans le store pour que vos coworkers continuent de tourner.",
+            "manage": "{store, select, apple {Gérer dans l'App Store} other {Gérer dans Google Play}}"
         }
     },
     "postPayment": {

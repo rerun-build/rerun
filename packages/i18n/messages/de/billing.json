@@ -204,6 +204,14 @@
             "title": "Lifetime-Tarif",
             "description": "Einmal bezahlt, für immer deins. Unbegrenzte Coworker und Plätze, mit deiner eigenen KI.",
             "connectAi": "Deine KI verbinden"
+        },
+        "store": {
+            "title": "{store, select, apple {Abgerechnet über den App Store} other {Abgerechnet über Google Play}}",
+            "trialing": "Kostenlos bis {date}, danach monatliche Verlängerung.",
+            "active": "Verlängert sich am {date}.",
+            "ending": "Endet am {date}.",
+            "pastDue": "Die letzte Zahlung ist fehlgeschlagen. Aktualisiere sie im Store, damit deine Coworker weiterlaufen.",
+            "manage": "{store, select, apple {Im App Store verwalten} other {In Google Play verwalten}}"
         }
     },
     "postPayment": {
