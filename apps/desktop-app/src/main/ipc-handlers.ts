@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, session as electronSession } from 'electron'
 import type { DesktopUpdateState } from '@rerun/contracts'
 import { IPC, type FindRequest, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
+import { completeFromPastedCode, startBrowserSignIn } from './browser-sign-in'
 import { showDownload } from './downloads'
 import { closeFindBar, find, openFindBar } from './find-bar'
 import { bootstrapPayload, shellPlatform } from './identity'
@@ -35,6 +36,12 @@ export function registerIpcHandlers(): void {
     handle(IPC.updateGetState, ['app', 'local'], (): DesktopUpdateState => updateState())
     handle(IPC.updateCheck, ['app', 'local'], () => checkForUpdates(false))
     handle(IPC.updateInstall, ['app', 'local'], () => installUpdate())
+
+    handle(IPC.authStart, ['app'], (_event, options: { provider?: string } | undefined) => {
+        const provider = options?.provider === 'google' || options?.provider === 'apple' ? options.provider : undefined
+        return startBrowserSignIn(provider)
+    })
+    handle(IPC.authSubmitCode, ['app'], (_event, code: string) => completeFromPastedCode(String(code ?? '').slice(0, 200)))
 
     handle(IPC.localFind, ['local'], (_event, request: FindRequest) => find({ text: String(request?.text ?? '').slice(0, 500), forward: request?.forward !== false, findNext: !!request?.findNext }))
     handle(IPC.localFindClose, ['local'], () => closeFindBar())

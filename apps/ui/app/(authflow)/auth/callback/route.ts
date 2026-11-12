@@ -4,6 +4,7 @@ import { ACCOUNT_LINK_ERROR_PARAM, ACCOUNT_LINK_PROVIDER_PARAM, ACCOUNT_PARAM, L
 import { OAUTH_PROVIDER_COOKIE, isOAuthProvider, type OAuthProvider } from '@/lib/auth/oauth-providers'
 import { internalPath } from '@/lib/auth/internal-path'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
+import { AUTH_RETURN_COOKIE, readAuthReturnCookie } from '@/lib/auth/auth-return'
 import { routes } from '@/lib/routes'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { SIGNUP_INTENT_COOKIE, sharedCookieDomain } from '@rerun/analytics'
@@ -90,11 +91,13 @@ export async function GET(request: Request) {
 
         if (!error && data.session) {
             const pendingInvite = linking ? undefined : cookieStore.get(PENDING_INVITE_COOKIE)?.value
-            const response = withSessionCookies(linking ? backToAccount(request) : NextResponse.redirect(publicUrl(request, internalPath(pendingInvite, routes.home))))
+            const authReturn = linking ? undefined : readAuthReturnCookie(cookieStore.get(AUTH_RETURN_COOKIE)?.value)
+            const response = withSessionCookies(linking ? backToAccount(request) : NextResponse.redirect(publicUrl(request, internalPath(pendingInvite ?? authReturn, routes.home))))
 
             if (pendingInvite) {
                 response.cookies.delete(PENDING_INVITE_COOKIE)
             }
+            if (authReturn) response.cookies.delete(AUTH_RETURN_COOKIE)
 
             // Only a provider the click left behind is worth remembering: the guess that restarts a
             // sign-in would badge the wrong button for a year.

@@ -4,7 +4,7 @@ import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { drawPriceArm } from '@rerun/cloud/billing'
 import { routes } from '@/lib/routes'
 import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
-import { CONSENT_COOKIE, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseSessionHintCookie } from '@rerun/contracts'
+import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseDesktopShellUserAgent, parseSessionHintCookie } from '@rerun/contracts'
 import { createServerClient } from '@supabase/ssr'
 import type { User } from '@supabase/supabase-js'
 import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
@@ -13,10 +13,13 @@ import { NextResponse, type NextRequest } from 'next/server'
 // A visitor with no session gets an anonymous Supabase user so they can explore the app without
 // signing up. We only mint one for real top-level navigations (a document GET outside /auth), never
 // for prefetches, RSC fetches, assets or API calls, to avoid spawning throwaway users on every hit.
+// The desktop app never gets one: it opens on the sign-in page, and an anonymous workspace minted
+// for its window would be one nobody can reach again from the browser.
 function shouldStartAnonymousSession(request: NextRequest): boolean {
     if (request.method !== 'GET') return false
     if (request.headers.get('sec-fetch-dest') !== 'document') return false
     if (request.nextUrl.pathname.startsWith(routes.auth)) return false
+    if (parseDesktopShellUserAgent(request.headers.get('user-agent'))) return false
     return true
 }
 
@@ -174,7 +177,8 @@ export async function updateSession(request: NextRequest) {
         // to /auth so they can sign in or upgrade their account.
         // The callback is let through: connecting Google from the account settings comes back to it
         // signed in, and the code it carries is only exchanged there.
-        if (!identity.isAnonymous && request.nextUrl.pathname.startsWith(routes.auth) && request.nextUrl.pathname !== routes.authCallback) {
+        // So is the desktop app's hand-off, which a signed-in browser opens to sign the app in.
+        if (!identity.isAnonymous && request.nextUrl.pathname.startsWith(routes.auth) && request.nextUrl.pathname !== routes.authCallback && request.nextUrl.pathname !== DESKTOP_AUTH_PATH) {
             return redirectKeepingSession(request, routes.home, supabaseResponse)
         }
     } else if (request.nextUrl.pathname === routes.home) {

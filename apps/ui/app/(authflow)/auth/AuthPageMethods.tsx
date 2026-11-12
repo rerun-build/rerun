@@ -12,6 +12,8 @@ import { internalPath } from '@/lib/auth/internal-path'
 import { routes } from '@/lib/routes'
 import { useRouter, useSearchParams } from 'next/navigation'
 import EmailAuth from './EmailAuth'
+import { DesktopSignInWaiting } from '@/components/desktop-shell/DesktopSignInWaiting'
+import { useDesktopSignInWaiting } from '@/components/desktop-shell/desktop-sign-in'
 
 export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlone: boolean; showGoogle: boolean }) {
     const searchParams = useSearchParams()
@@ -21,6 +23,7 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlo
     const initialMethod = searchParams.get('email') || !PHONE_ENABLED ? 'email' : 'phone'
     const passwordOnly = searchParams.get('method') === 'password'
     const funnel = useSignupFunnel({ surface: 'auth_page', active: !passwordOnly, initialStep: initialMethod })
+    const waitingForBrowser = useDesktopSignInWaiting()
 
     const enter = () => {
         funnel.markConverted()
@@ -29,6 +32,7 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlo
     }
 
     if (passwordOnly) return <PasswordSignInForm onSignedIn={enter} />
+    if (waitingForBrowser) return <DesktopSignInWaiting provider={waitingForBrowser} />
 
     return (
         <AuthMethods

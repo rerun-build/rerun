@@ -1,6 +1,8 @@
 import { app, session as electronSession } from 'electron'
-import { join } from 'node:path'
-import { CHANNEL, PRODUCT_NAME, shellUserAgent } from './identity'
+import { join, resolve } from 'node:path'
+import { completeFromLink } from './browser-sign-in'
+import { deepLinkInArgv, parseDeepLink } from './deep-links'
+import { CHANNEL, PRODUCT_NAME, SCHEME, shellUserAgent } from './identity'
 import { registerIpcHandlers } from './ipc-handlers'
 import { registerLocalScheme } from './local-pages'
 import { closeFindBar, openFindBar } from './find-bar'
@@ -18,11 +20,44 @@ app.setPath('userData', userDataOverride ?? join(app.getPath('appData'), PRODUCT
 
 registerLocalScheme()
 
+// Links to the app's scheme: macOS sends them as `open-url`, before `ready` for the one that launched
+// the app; Windows and Linux start a second instance with the link in its arguments.
+let ready = false
+const waitingLinks: string[] = []
+
+function receiveLink(raw: string): void {
+    if (!ready) {
+        waitingLinks.push(raw)
+        return
+    }
+    const link = parseDeepLink(raw, SCHEME)
+    if (link?.kind === 'auth-callback') void completeFromLink(link.code, link.state)
+}
+
+app.on('open-url', (event, url) => {
+    event.preventDefault()
+    receiveLink(url)
+})
+
 if (!app.requestSingleInstanceLock()) {
     app.quit()
 } else {
-    app.on('second-instance', () => showMainWindow())
+    app.on('second-instance', (_event, argv) => {
+        showMainWindow()
+        const link = deepLinkInArgv(argv, SCHEME)
+        if (link) receiveLink(link)
+    })
+    const launchLink = deepLinkInArgv(process.argv, SCHEME)
+    if (launchLink) waitingLinks.push(launchLink)
     void app.whenReady().then(start)
+}
+
+// A packaged app declares its scheme in its bundle; registering it again makes it the handler. Run
+// from the sources, only Windows can point the scheme at Electron with the app's path; macOS and
+// Linux need the packaged app.
+function registerScheme(): void {
+    if (app.isPackaged) app.setAsDefaultProtocolClient(SCHEME)
+    else if (process.platform === 'win32' && process.argv[1]) app.setAsDefaultProtocolClient(SCHEME, process.execPath, [resolve(process.argv[1])])
 }
 
 // No page of any origin may embed a <webview>: it would run outside every rule set here.
@@ -74,4 +109,7 @@ function start(): void {
     createMainWindow(origin)
     if (origin) void verifyServer(origin)
     startUpdater()
+    registerScheme()
+    ready = true
+    for (const link of waitingLinks.splice(0)) receiveLink(link)
 }

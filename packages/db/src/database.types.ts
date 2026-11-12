@@ -640,6 +640,33 @@ export type Database = {
           },
         ]
       }
+      desktop_auth_codes: {
+        Row: {
+          code_challenge: string
+          code_hash: string
+          created_at: string
+          expires_at: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          code_challenge: string
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          code_challenge?: string
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       device_tokens: {
         Row: {
           app_version: string | null
