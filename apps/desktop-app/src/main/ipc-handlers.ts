@@ -5,7 +5,7 @@ import { showDownload } from './downloads'
 import { closeFindBar, find, openFindBar } from './find-bar'
 import { bootstrapPayload, shellPlatform } from './identity'
 import { audienceOf, handle } from './ipc'
-import { currentServer, getMainWindow, openExternal, reloadApp, replaceMainWindow, windowState } from './main-window'
+import { currentServer, getMainWindow, openExternal, reloadApp, replaceMainWindow, setTitleBarColors, windowState } from './main-window'
 import { shellLocale } from './messages'
 import { partitionFor, serverOrigin, setServerOrigin } from './server'
 import { checkServer } from './server-check'
@@ -25,6 +25,7 @@ export function registerIpcHandlers(): void {
         const window = BrowserWindow.fromWebContents(event.sender)
         return window ? windowState(window) : null
     })
+    handle(IPC.windowSetChrome, ['app'], (_event, chrome: { frameColor: string; symbolColor: string }) => setTitleBarColors(chrome))
     handle(IPC.findOpen, ['app'], (event) => {
         const window = BrowserWindow.fromWebContents(event.sender)
         if (window) openFindBar(window)

@@ -14,15 +14,17 @@ import {
 import { extractPublishedSlug, PUBLISHED_SITE_ROUTE } from '@/lib/published/host'
 import { STAGING_GATE_CHALLENGE, stagingGateVerdict } from '@/lib/staging-gate'
 import { updateSession } from '@/supabase/middleware'
+import { DESKTOP_SHELL_PREVIEW_HEADER, DESKTOP_SHELL_PREVIEW_PARAM } from '@/lib/desktop-shell/preview'
 import {
     APP_GATED_PATHS,
+    DESKTOP_SHELL_PLATFORMS,
     BRAND_GATE_COOKIE,
     BRAND_GATE_MAX_AGE,
     BRAND_GATE_PARAM,
     brandGateVerdict,
     isGatedPath,
 } from '@rerun/contracts'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // The labs are work in progress, so they answer 404 unless the request carries the shared design
 // system token, as `?key=` or in the cookie that grants it. Same token and same cookie as the
@@ -104,7 +106,18 @@ export async function proxy(request: NextRequest) {
         })
     }
 
-    return updateSession(request)
+    return updateSession(withDesktopShellPreview(request))
+}
+
+// The lab of the desktop chrome (/render/lab/desktop-shell) frames the app in iframes: the app there
+// renders as it does inside the desktop app, for the platform the lab asks for. Only an iframe asks:
+// a page opened with the parameter renders as a browser.
+function withDesktopShellPreview(request: NextRequest): NextRequest {
+    const platform = request.nextUrl.searchParams.get(DESKTOP_SHELL_PREVIEW_PARAM)
+    if (!platform || request.headers.get('sec-fetch-dest') !== 'iframe' || !(DESKTOP_SHELL_PLATFORMS as readonly string[]).includes(platform)) return request
+    const headers = new Headers(request.headers)
+    headers.set(DESKTOP_SHELL_PREVIEW_HEADER, platform)
+    return new NextRequest(request, { headers })
 }
 
 export const config = {

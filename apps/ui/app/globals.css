@@ -525,3 +525,76 @@ html [data-sonner-toaster] [data-sonner-toast][data-styled='true']:has([data-clo
     opacity: 1;
   }
 }
+
+/* The desktop app (apps/desktop-app). The server marks <html data-desktop-shell="mac|win|linux"> from
+   the app's User-Agent, so none of this reaches a browser. The window has no title bar of its own:
+   a strip at the top (`ShellTitleBar`) drags it, with the native buttons over it (the traffic
+   lights on macOS, the caption buttons on the right elsewhere). Everything the app lays out against
+   the viewport starts under the strip; in native full screen the strip folds away. */
+:root {
+  --shell-titlebar-h: 0px;
+  --shell-titlebar-bg: var(--background);
+}
+
+html[data-desktop-shell] {
+  --shell-titlebar-h: 32px;
+}
+
+html[data-desktop-shell='mac'] {
+  --shell-titlebar-h: 28px;
+}
+
+html[data-desktop-shell][data-desktop-fullscreen] {
+  --shell-titlebar-h: 0px;
+}
+
+/* The board sits in its frame: the strip takes the frame's color and reads as its top gutter. */
+html[data-desktop-shell]:has([data-foreman-split]) {
+  --shell-titlebar-bg: var(--frame);
+}
+
+html[data-desktop-shell] body {
+  padding-top: var(--shell-titlebar-h);
+}
+
+html[data-desktop-shell] .h-dvh,
+html[data-desktop-shell] .h-screen {
+  height: calc(100dvh - var(--shell-titlebar-h));
+}
+
+html[data-desktop-shell] .min-h-dvh,
+html[data-desktop-shell] .min-h-screen {
+  min-height: calc(100dvh - var(--shell-titlebar-h));
+}
+
+/* Centered dialogs center in the space under the strip. */
+html[data-desktop-shell] [data-slot='dialog-content'],
+html[data-desktop-shell] [data-slot='alert-dialog-content'] {
+  margin-top: calc(var(--shell-titlebar-h) / 2);
+}
+
+html[data-desktop-shell] [data-slot='sheet-content']:is([data-side='left'], [data-side='right']) {
+  top: var(--shell-titlebar-h);
+  height: calc(100% - var(--shell-titlebar-h));
+}
+
+html[data-desktop-shell] [data-slot='sheet-content'][data-side='top'] {
+  top: var(--shell-titlebar-h);
+}
+
+[data-shell-titlebar] {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--shell-titlebar-h);
+  background: var(--shell-titlebar-bg);
+  -webkit-app-region: drag;
+  app-region: drag;
+  user-select: none;
+}
+
+/* A drag region swallows the clicks of anything drawn over it: a menu or a popover that opens high
+   enough to cross the strip stays clickable. */
+html[data-desktop-shell] :is([data-radix-popper-content-wrapper], [role='dialog'], [role='menu'], [role='listbox'], [data-sonner-toaster]) {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}

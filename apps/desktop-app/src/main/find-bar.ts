@@ -1,8 +1,9 @@
-import { nativeTheme, WebContentsView, type BrowserWindow } from 'electron'
+import { WebContentsView, type BrowserWindow } from 'electron'
 import type { FindRequest } from '../shared/ipc-channels'
 import { IPC_EVENTS } from '../shared/ipc-channels'
 import { localPageUrl } from './local-pages'
-import { PRELOAD_PATH } from './main-window'
+import { currentTheme, PRELOAD_PATH, TITLE_BAR_HEIGHT } from './main-window'
+import { shellPlatform } from './identity'
 
 // Electron has no find bar of its own: a small page of the shell, laid over the top right corner of
 // the window, drives `findInPage` on the app below it. The web app opens it on a second ⌘F.
@@ -17,7 +18,8 @@ let bar: FindBar | null = null
 
 function layout(current: FindBar): void {
     const [width] = current.window.getContentSize()
-    current.view.setBounds({ x: Math.max(0, width - WIDTH - MARGIN), y: MARGIN, width: Math.min(WIDTH, width), height: HEIGHT })
+    const top = current.window.isFullScreen() ? 0 : TITLE_BAR_HEIGHT[shellPlatform()]
+    current.view.setBounds({ x: Math.max(0, width - WIDTH - MARGIN), y: top + MARGIN, width: Math.min(WIDTH, width), height: HEIGHT })
 }
 
 export function openFindBar(window: BrowserWindow): void {
@@ -57,7 +59,7 @@ export function openFindBar(window: BrowserWindow): void {
             window.webContents.off('did-start-navigation', onNavigation)
         }
     }
-    void view.webContents.loadURL(localPageUrl('find', { theme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light' }))
+    void view.webContents.loadURL(localPageUrl('find', { theme: currentTheme() }))
     view.webContents.once('did-finish-load', () => view.webContents.focus())
 }
 

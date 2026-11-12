@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { isDesktopShell } from '@/lib/desktop-shell/client'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -17,7 +18,7 @@ export function useInstallPrompt() {
   const [canInstall, setCanInstall] = useState(false)
 
   useEffect(() => {
-    if (window.matchMedia('(display-mode: standalone)').matches) return
+    if (window.matchMedia('(display-mode: standalone)').matches || isDesktopShell()) return
 
     setCanInstall(!!window.__pwaPrompt)
 

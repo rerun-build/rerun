@@ -10,6 +10,9 @@ import { AppChrome } from "@/components/layout/AppChrome";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { DeployUpdateWatcher } from "@/components/deploy-update/DeployUpdateWatcher";
 import { DesktopShellBridge } from "@/components/desktop-shell/DesktopShellBridge";
+import { ShellTitleBar } from "@/components/desktop-shell/ShellTitleBar";
+import { requestDesktopShell } from "@/lib/desktop-shell/server";
+import { DESKTOP_SHELL_ATTRIBUTE } from "@rerun/contracts";
 import { DomMutationGuard } from "@rerun/ui/dom-guard";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
 import { ThemeCookieBootstrap, ThemeProvider } from "@rerun/ui/theme";
@@ -83,14 +86,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
+  const [locale, messages, desktopShell] = await Promise.all([getLocale(), getMessages(), requestDesktopShell()]);
   return (
     <html
       lang={locale}
       suppressHydrationWarning
+      {...(desktopShell ? { [DESKTOP_SHELL_ATTRIBUTE]: desktopShell.platform } : {})}
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
     >
       <body className="min-h-full flex flex-col">
+        {desktopShell && <ShellTitleBar />}
         <DomMutationGuard />
         <ThemeCookieBootstrap />
         <script

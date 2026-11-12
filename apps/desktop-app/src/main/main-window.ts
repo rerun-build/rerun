@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, nativeTheme, shell, type WebContents } from
 import { join } from 'node:path'
 import type { DesktopWindowState } from '@rerun/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
-import { PRODUCT_NAME } from './identity'
+import { PRODUCT_NAME, shellPlatform } from './identity'
 import { localPageUrl } from './local-pages'
 import { t } from './messages'
 import { partitionFor } from './server'
@@ -12,11 +12,22 @@ import { restoredBounds, trackBounds } from './window-state'
 
 export const PRELOAD_PATH = join(import.meta.dirname, '../preload/index.cjs')
 
-const LIGHT = { background: '#fafafa' }
-const DARK = { background: '#0a0a0a' }
+// The strip the web app draws at the top of the window to drag it by (`ShellTitleBar`): 28 px on
+// macOS, 32 px on Windows and Linux where the native caption buttons are drawn over it.
+export const TITLE_BAR_HEIGHT = { mac: 28, win: 32, linux: 32 } as const
+
+const LIGHT = { background: '#fafafa', symbol: '#0a0a0a' }
+const DARK = { background: '#0a0a0a', symbol: '#fafafa' }
 
 function themeColors() {
     return nativeTheme.shouldUseDarkColors ? DARK : LIGHT
+}
+
+function titleBarOptions(): Electron.BrowserWindowConstructorOptions {
+    const platform = shellPlatform()
+    if (platform === 'mac') return { titleBarStyle: 'hidden', trafficLightPosition: { x: 12, y: 8 } }
+    const colors = themeColors()
+    return { titleBarStyle: 'hidden', titleBarOverlay: { color: colors.background, symbolColor: colors.symbol, height: TITLE_BAR_HEIGHT[platform] } }
 }
 
 let mainWindow: BrowserWindow | null = null
@@ -125,7 +136,7 @@ function hostOf(origin: string): string {
 export function showOfflinePage(reason: 'offline' | 'unavailable'): void {
     const window = getMainWindow()
     if (!window || !currentOrigin) return
-    void window.loadURL(localPageUrl('offline', { host: hostOf(currentOrigin), reason }))
+    void window.loadURL(localPageUrl('offline', { host: hostOf(currentOrigin), reason, theme: currentTheme() }))
 }
 
 function watchLoadFailures(window: BrowserWindow, origin: string): void {
@@ -192,6 +203,7 @@ export function createMainWindow(origin: string | null): BrowserWindow {
         show: false,
         title: PRODUCT_NAME,
         backgroundColor: themeColors().background,
+        ...titleBarOptions(),
         webPreferences: {
             preload: PRELOAD_PATH,
             partition,
@@ -265,7 +277,7 @@ export function showServerPicker(options: { error?: string; version?: string } =
 export function showIncompatiblePage(minShellVersion: string): void {
     const window = getMainWindow()
     if (!window || !currentOrigin) return
-    void window.loadURL(localPageUrl('offline', { host: hostOf(currentOrigin), reason: 'incompatible', version: minShellVersion }))
+    void window.loadURL(localPageUrl('offline', { host: hostOf(currentOrigin), reason: 'incompatible', version: minShellVersion, theme: currentTheme() }))
 }
 
 // The app moves to another server: a new window in that server's session, where the old one stood.
@@ -277,4 +289,20 @@ export function replaceMainWindow(origin: string): void {
         previous.removeAllListeners('close')
         previous.destroy()
     }
+}
+
+// The page's theme, as it last told it: the shell's own pages follow the app, not the system.
+let appTheme: 'light' | 'dark' | null = null
+
+export function currentTheme(): 'light' | 'dark' {
+    return appTheme ?? (nativeTheme.shouldUseDarkColors ? 'dark' : 'light')
+}
+
+export function setTitleBarColors(chrome: { frameColor: string; symbolColor: string }): void {
+    if (/^#[0-9a-f]{6}$/i.test(chrome.symbolColor)) appTheme = parseInt(chrome.symbolColor.slice(1, 3), 16) > 0x80 ? 'dark' : 'light'
+    const window = getMainWindow()
+    const platform = shellPlatform()
+    if (!window || platform === 'mac') return
+    if (!/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(chrome.frameColor) || !/^#[0-9a-f]{6}$/i.test(chrome.symbolColor)) return
+    window.setTitleBarOverlay({ color: chrome.frameColor, symbolColor: chrome.symbolColor, height: TITLE_BAR_HEIGHT[platform] })
 }
