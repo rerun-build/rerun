@@ -12,6 +12,9 @@ prompt = """
 /harness-use-case {{issue.url}}
 
 Le ticket Linear complet (description, images) est dans {{issue.file}}.
+
+Tu peux te connecter en SSH à l'engine pour diagnostiquer la cause, et lire tous les logs dont tu as besoin
+dans PostHog ou dans Supabase. Fais une analyse complète et essaye de reproduire le cas au maximum.
 """
 
 [[steps]]
