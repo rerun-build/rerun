@@ -34,12 +34,17 @@ import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvi
 //
 // Both chats are always mounted and the store says which one the column reads: a conversation never
 // moves from one to the other. Once the build hands the workspace to the engine, the onboarding's
-// stays on screen, and the next message opens a new conversation there.
+// stays on screen, and the next message goes to the engine's General.
+//
+// On the engine, the conversation on screen is General or one of its threads, and the chat is keyed
+// on it: switching reads the one that takes the screen from the server, as a reload would.
 
 type RestoredConversation = { sessionId: string; backend: ForemanBackend; messages: UIMessage[]; usage?: SessionUsageSeed | null; lastError?: string | null; activeRunId?: string | null }
 
+const ENGINE_ROUTE = '/api/chat/foreman/engine'
+
 async function fetchEngineTranscript(sessionId: string): Promise<UIMessage[]> {
-    const res = await fetch(`/api/chat/foreman/engine?sessionId=${encodeURIComponent(sessionId)}`)
+    const res = await fetch(`${ENGINE_ROUTE}?sessionId=${encodeURIComponent(sessionId)}`)
     if (!res.ok) return []
     return ((await res.json()) as { messages?: UIMessage[] }).messages ?? []
 }
@@ -106,14 +111,22 @@ export function useForemanChat() {
                 api: '/api/chat/foreman/engine',
                 // Read at send time: the transport lives as long as the conversation, and a model picked in
                 // the composer has to reach the very next message.
-                body: () => ({ sessionId, ...readAgentModel(FOREMAN_AGENT_ID) }),
+                body: () => ({ sessionId, kind: sessionId === useForemanStore.getState().generalId ? 'general' : 'thread', ...readAgentModel(FOREMAN_AGENT_ID) }),
                 prepareSendMessagesRequest: ({ body, messages }) => ({ body: { ...body, text: lastUserText(messages) } }),
                 prepareReconnectToStreamRequest: () => ({ api: `/api/chat/resume?agentId=${FOREMAN_AGENT_ID}&runId=${encodeURIComponent(useForemanStore.getState().engineRunId ?? '')}` }),
                 fetch: (async (url: string | URL | Request, init?: RequestInit) => {
                     const res = await fetch(url, init)
                     // Only a send names a run. A send the route refused names none, and letting go
                     // of the previous one keeps its failure from being chased as a dropped stream.
-                    if (init?.method === 'POST') holdRun(res.headers.get('X-Run-Id'))
+                    // A conversation left before its send answered keeps its run to itself: the one
+                    // on screen now would stop or chase a run that is not its own.
+                    const store = useForemanStore.getState()
+                    if (init?.method !== 'POST' || store.sessionId !== sessionId) return res
+                    holdRun(res.headers.get('X-Run-Id'))
+                    // Another tab opened General first: the message went to that one, and the column
+                    // follows it there, picking up the run it started.
+                    const landed = res.headers.get('X-Session-Id')
+                    if (landed && landed !== sessionId && sessionId === store.generalId) setTimeout(() => store.setGeneral(landed, 'engine'), 0)
                     return res
                 }) as typeof globalThis.fetch,
             }),
@@ -209,7 +222,7 @@ export function useForemanChat() {
             // The onboarding is over under this conversation: it stays where it is, and what they
             // say next starts with the foreman on the engine, sent once the new chat is in place.
             if (store.backend === 'hub' && store.surface === 'engine') {
-                store.newChat()
+                store.startEngineGeneral()
                 store.askForeman(message.text)
                 return true
             }
@@ -303,34 +316,50 @@ export function useForemanChat() {
         if (owesPhone) void refreshPhoneStep()
     }, [owesPhone, refreshPhoneStep])
 
-    // The server holds the conversation, so the column asks for the last one at mount, of the foreman
-    // the workspace talks to now: the onboarding's never comes back once the engine took over.
-    // Adopting its id comes first: useChat is keyed on it, and messages set before the swap would
-    // belong to the chat instance the swap throws away. The second effect lands them once the ids
+    // The server holds the conversations, so the column reads the one on screen when it first opens
+    // and every time another takes its place: General, from the foreman the workspace talks to now
+    // (the onboarding's never comes back once the engine took over), or a thread by its id. A thread
+    // "New task" just opened has nothing to read.
+    // Adopting the id comes first: useChat is keyed on it, and messages set before the swap would
+    // belong to the chat instance the swap throws away. The landing effect sets them once the ids
     // agree.
     const restored = useRef<RestoredConversation | null>(null)
-    const asked = useRef(false)
-    // Whether the transcript on the server has been asked for yet. Anything that wants to write the
-    // first message has to wait for this, or it writes into a conversation it has not seen.
-    const [restoreDone, setRestoreDone] = useState(false)
+    const [restoredTick, setRestoredTick] = useState(0)
+    const readFor = useRef<string | null>(null)
+    // Whether the transcript on the server has been read for the conversation on screen. Anything that
+    // wants to write the first message has to wait for this, or it writes into a conversation it has
+    // not seen. A thread « New task » just opened has nothing to wait for.
+    const [readDoneFor, setReadDoneFor] = useState<string | null>(null)
+    const draftId = useForemanStore(state => state.draftId)
+    const restoreDone = readDoneFor === sessionId || draftId === sessionId
     useEffect(() => {
         // Not before the Foreman is opened or called on from its pill: the column is mounted on every
         // board load, and a transcript carries its tool outputs with it. The 300ms the panel takes to
         // slide in covers the fetch.
-        if ((!open && !engaged) || asked.current || surface === 'unknown' || surface === 'none') return
-        asked.current = true
-        void fetch(surface === 'engine' ? '/api/chat/foreman/engine' : '/api/chat/foreman')
-            .then(res => (res.ok ? (res.json() as Promise<RestoredConversation | null>) : null))
+        if ((!open && !engaged) || readFor.current === sessionId || surface === 'unknown' || surface === 'none') return
+        readFor.current = sessionId
+        const store = useForemanStore.getState()
+        if (store.draftId === sessionId) return
+        const general = sessionId === store.generalId
+        const url = !general ? `${ENGINE_ROUTE}?sessionId=${encodeURIComponent(sessionId)}` : surface === 'engine' ? ENGINE_ROUTE : '/api/chat/foreman'
+        void fetch(url)
+            .then(res => (res.ok ? (res.json() as Promise<Partial<RestoredConversation> | null>) : null))
             .then(conversation => {
-                if (!conversation?.messages.length) {
-                    setRestoreDone(true)
-                    return
+                // Another conversation took the screen while this one was read.
+                if (useForemanStore.getState().sessionId !== sessionId) return
+                const id = conversation?.sessionId ?? sessionId
+                const backend = conversation?.backend ?? 'engine'
+                // General has an id of its own on the server: the draft the column opened on gives way.
+                if (general && conversation?.sessionId && conversation.sessionId !== sessionId) {
+                    readFor.current = conversation.sessionId
+                    useForemanStore.getState().setGeneral(conversation.sessionId, backend)
                 }
-                restored.current = conversation
-                useForemanStore.getState().setSessionId(conversation.sessionId, conversation.backend)
+                if (!conversation?.messages?.length) return setReadDoneFor(id)
+                restored.current = { ...conversation, sessionId: id, backend, messages: conversation.messages }
+                setRestoredTick(tick => tick + 1)
             })
-            .catch(() => setRestoreDone(true))
-    }, [open, engaged, surface])
+            .catch(() => setReadDoneFor(sessionId))
+    }, [open, engaged, surface, sessionId])
 
     const engineLive = useRef({ messages: engineChat.messages, status: engineChat.status })
     useEffect(() => {
@@ -385,8 +414,8 @@ export function useForemanChat() {
         } else setHubMessages(conversation.messages)
         // Marked here rather than when the fetch resolves: between the two the transcript is in
         // hand but not in the chat, and anything watching for an empty conversation would fire.
-        setRestoreDone(true)
-    }, [sessionId, setHubMessages, setEngineMessages, holdRun, attachToRun, setRunError])
+        setReadDoneFor(sessionId)
+    }, [sessionId, restoredTick, setHubMessages, setEngineMessages, holdRun, attachToRun, setRunError])
 
     // Where the next message goes, which is not always where the conversation on screen runs: the
     // onboarding's stays displayed once the engine took over, and the composer reads as the engine's.

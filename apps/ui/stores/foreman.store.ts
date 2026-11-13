@@ -42,8 +42,15 @@ type ForemanState = {
     activity: OrbActivity
     /** The run the engine foreman is streaming or was reattached to, so it can be stopped or picked up again. */
     engineRunId: string | null
-    /** La conversation en cours. En changer vide le chat : c'est tout ce que fait « New task ». */
+    /** The conversation on screen: General, or one of its threads. Changing it swaps the chat. */
     sessionId: string
+    /**
+     * This person's General, the conversation that never closes. A draft id until they first speak in
+     * it, then the server's. On the hub, the onboarding's one conversation.
+     */
+    generalId: string
+    /** A thread "New task" just opened: the server has nothing of it yet, there is nothing to read. */
+    draftId: string | null
     /**
      * Qui sert la conversation en cours. `null` tant qu'aucun message n'est parti : elle suit alors
      * `surface`, puis se fige au premier envoi et ne change plus.
@@ -118,10 +125,18 @@ type ForemanState = {
     /** Entrer dans le tunnel : le mode, la carte d'accueil et l'ouverture, d'un seul coup. */
     startFunnel: (intake: boolean) => void
     setArrival: (arrival: ForemanArrival | null) => void
+    /** « New task »: a thread of its own beside General, on the engine. */
     newChat: () => void
+    /** Brings General back on screen, read again from the server. */
+    showGeneral: () => void
+    /** Slides a thread of General in. */
+    openThread: (sessionId: string) => void
+    /** General's id, once the server named it: the one it reopened, or the one a send landed in. */
+    setGeneral: (sessionId: string, backend?: ForemanBackend) => void
+    /** The onboarding is over under General: the engine's General takes its place. */
+    startEngineGeneral: () => void
     setActivity: (activity: OrbActivity) => void
     setEngineRunId: (engineRunId: string | null) => void
-    setSessionId: (sessionId: string, backend?: ForemanBackend) => void
     setSurface: (surface: ForemanSurface) => void
     /** Fige le backend d'une conversation qui n'a encore rien envoyé. */
     pinBackend: () => void
@@ -148,6 +163,12 @@ type ForemanState = {
     reset: () => void
 }
 
+// What a conversation leaves behind when another one takes the screen: its run, its orb, its plan.
+const CONVERSATION_SWITCH = { tab: 'assistant', backend: null, activity: 'idle', engineRunId: null, planPreview: null, dock: IDLE_DOCK_FEED } as const satisfies Partial<ForemanState>
+
+// Threads only exist beside the engine's foreman: the onboarding's is one conversation from start to end.
+const onEngine = (state: ForemanState) => state.surface === 'engine'
+
 // La conversation, elle, n'est pas persistée : elle vit côté serveur, et la colonne va la rechercher
 // au montage. Seule l'ouverture l'est, et seulement quand elle vient d'un geste (lib/foreman-open).
 export const useForemanStore = create<ForemanState>()((set, get) => ({
@@ -160,7 +181,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     waitlisted: false,
     activity: 'idle',
     engineRunId: null,
-    sessionId: randomUuid(),
+    ...freshGeneral(),
     backend: null,
     surface: 'unknown',
     planPreview: null,
@@ -227,10 +248,23 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         set({ funnel: 'guided', intake, open: true, yieldedToSheet: false, tab: 'assistant' })
     },
     setArrival: arrival => set({ arrival }),
-    newChat: () => set({ tab: 'assistant', sessionId: randomUuid(), backend: null, activity: 'idle', engineRunId: null, planPreview: null, intake: false, intakePreview: null, dock: IDLE_DOCK_FEED }),
+    newChat: () => {
+        const sessionId = randomUuid()
+        set({ ...CONVERSATION_SWITCH, sessionId, draftId: sessionId, intake: false, intakePreview: null })
+    },
+    showGeneral: () => {
+        if (get().sessionId !== get().generalId) set({ ...CONVERSATION_SWITCH, sessionId: get().generalId })
+    },
+    openThread: sessionId => {
+        if (get().sessionId !== sessionId) set({ ...CONVERSATION_SWITCH, sessionId, backend: 'engine' })
+    },
+    setGeneral: (sessionId, backend) => set({ generalId: sessionId, sessionId, backend: backend ?? null }),
+    startEngineGeneral: () => {
+        const sessionId = randomUuid()
+        set({ ...CONVERSATION_SWITCH, sessionId, generalId: sessionId })
+    },
     setActivity: activity => set({ activity }),
     setEngineRunId: engineRunId => set({ engineRunId }),
-    setSessionId: (sessionId, backend) => set({ sessionId, backend: backend ?? null }),
     setSurface: surface => set({ surface }),
     pinBackend: () => {
         if (get().backend === null) set({ backend: selectForemanBackend(get()) })
@@ -241,12 +275,17 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     closeIntake: () => set({ intake: false }),
     setIntakePreview: intakePreview => set({ intakePreview }),
     // Un geste, comme `toggle` : l'ouverture devient la préférence.
+    // What is asked from outside the column goes to General, whatever thread is on screen.
     askForeman: text => {
         applyOpen(set, true)
         rememberForemanOpen(true)
+        if (onEngine(get())) get().showGeneral()
         set({ pendingPrompt: text, tab: 'assistant' })
     },
-    sendToForeman: text => set({ pendingPrompt: text, engaged: true }),
+    sendToForeman: text => {
+        if (onEngine(get())) get().showGeneral()
+        set({ pendingPrompt: text, engaged: true })
+    },
     engage: () => set({ engaged: true }),
     setDock: dock => set({ dock }),
     setPillAvailable: pillAvailable => set({ pillAvailable }),
@@ -263,7 +302,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             waitlisted: false,
             activity: 'idle',
             engineRunId: null,
-            sessionId: randomUuid(),
+            ...freshGeneral(),
             backend: null,
             surface: 'unknown',
             planPreview: null,
@@ -278,6 +317,11 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         })),
 }))
 
+function freshGeneral() {
+    const sessionId = randomUuid()
+    return { sessionId, generalId: sessionId, draftId: null }
+}
+
 function applyOpen(set: (partial: Partial<ForemanState>) => void, open: boolean) {
     if (open) {
         useBoardStore.getState().selectAgent(null)
@@ -291,6 +335,9 @@ export const selectForemanBackend = (state: ForemanState): ForemanBackend => sta
 
 /** Pas de machine hors onboarding : ni colonne ni orbe. */
 export const selectForemanVisible = (state: ForemanState): boolean => state.surface !== 'none'
+
+/** A thread of General is on screen, rather than General itself. */
+export const selectForemanInThread = (state: ForemanState): boolean => onEngine(state) && state.sessionId !== state.generalId
 
 /** Pour tous ceux qui n'ont rien à faire du `null` : non tranché, la colonne n'est pas ouverte. */
 export const selectForemanOpen = (state: ForemanState) => state.open === true

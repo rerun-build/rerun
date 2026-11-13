@@ -17,6 +17,11 @@
         "signIn": "Se connecter",
         "newTask": "Nouvelle tâche"
     },
+    "threads": {
+        "general": "Général",
+        "back": "Retour à Général",
+        "untitled": "Nouvelle tâche"
+    },
     "resize": "Redimensionner le chat",
     "modelPill": {
         "hubReason": "Ce chat tourne toujours sur Rerun Balanced"

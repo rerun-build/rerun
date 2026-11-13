@@ -5,15 +5,13 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { useEffect } from 'react'
 
 // The main window of the desktop app takes what the Quick ask window handed over and asks the Chief
-// of Staff in a new conversation.
+// of Staff in General, like anything asked from outside the column.
 export function QuickAskReceiver() {
     useEffect(() => {
         const ask = () => {
             const text = takeQuickAsk()
             if (!text) return
-            const foreman = useForemanStore.getState()
-            foreman.newChat()
-            foreman.askForeman(text)
+            useForemanStore.getState().askForeman(text)
         }
         ask()
         const onStorage = (event: StorageEvent) => {

@@ -39,7 +39,10 @@
         "purchase.billedTo": "{name} is the name of the workspace.",
         "teamEmptyState.buildPrompt": "Prefilled in the composer: the start of the user's own sentence to the assistant, completed by them. Keep the trailing space.",
         "plan.lifeDelivered": "Caption under a coworker block in an animated preview of its day: it finished and handed the result to the user.",
-        "gettingStarted.prompts": "Messages sent to the assistant in the user's name when they click a step of the getting started checklist. First person, the user speaking."
+        "gettingStarted.prompts": "Messages sent to the assistant in the user's name when they click a step of the getting started checklist. First person, the user speaking.",
+        "threads.general": "Back button above a thread: the name of the Chief of Staff's main conversation, which every thread hangs from. Keep it short.",
+        "threads.back": "Accessible label of the back button above a thread.",
+        "threads.untitled": "Title of a thread the person just opened with New task, before they wrote anything in it."
     },
     "welcome": {
         "title": "Hey, ready to hand off your first task?",
@@ -58,6 +61,11 @@
         },
         "signIn": "Sign in",
         "newTask": "New task"
+    },
+    "threads": {
+        "general": "General",
+        "back": "Back to General",
+        "untitled": "New task"
     },
     "resize": "Resize chat",
     "modelPill": {

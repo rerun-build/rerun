@@ -17,6 +17,11 @@
         "signIn": "Iniciar sesión",
         "newTask": "Nueva tarea"
     },
+    "threads": {
+        "general": "General",
+        "back": "Volver a General",
+        "untitled": "Nueva tarea"
+    },
     "resize": "Cambiar tamaño del chat",
     "modelPill": {
         "hubReason": "Este chat siempre funciona con Rerun Balanced"

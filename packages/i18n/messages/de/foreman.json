@@ -17,6 +17,11 @@
         "signIn": "Anmelden",
         "newTask": "Neue Aufgabe"
     },
+    "threads": {
+        "general": "Allgemein",
+        "back": "Zurück zu Allgemein",
+        "untitled": "Neue Aufgabe"
+    },
     "resize": "Chatgröße ändern",
     "modelPill": {
         "hubReason": "Dieser Chat läuft immer mit Rerun Balanced"

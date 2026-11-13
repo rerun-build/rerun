@@ -5,9 +5,11 @@ import { type PointerEvent, useState } from 'react'
 
 import { AuthDialog } from '@/components/dialogs/AuthDialog'
 import { ForemanTabs } from '@/components/foreman/ForemanTabs'
+import { ForemanThreadCrumb } from '@/components/foreman/ForemanThreadCrumb'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipLabeled } from '@/components/ui/tooltip'
+import type { SessionStatus } from '@/lib/board/types'
 import type { ForemanPlacement } from '@/lib/foreman-layout'
 import { LogInIcon, PanelLeftIcon, PanelRightIcon, PictureInPicture2Icon, PlusIcon } from '@/lib/icons'
 import { foremanOrbState, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
@@ -49,6 +51,8 @@ export function ForemanHeader({
     onDragPointerDown,
     onToggleSheetDetent,
     onNewChat,
+    thread,
+    onBackToGeneral,
 }: {
     placement: ForemanPlacement
     // False where its place is fixed (the Simple view's middle): no menu to move it.
@@ -56,6 +60,9 @@ export function ForemanHeader({
     onDragPointerDown: (event: PointerEvent<HTMLElement>) => void
     onToggleSheetDetent: () => void
     onNewChat: () => void
+    /** The thread on screen, null on General. */
+    thread: { title: string; status: SessionStatus | null } | null
+    onBackToGeneral: () => void
 }) {
     const t = useTranslations('foreman.header')
     const close = useForemanStore(state => state.close)
@@ -64,6 +71,7 @@ export function ForemanHeader({
     // Repartir de zéro en plein tunnel jette la conversation guidée et ce que le Foreman y a appris.
     const guided = useForemanStore(state => state.funnel === 'guided')
     const intakeOpen = useForemanStore(state => state.intake)
+    const onAssistant = useForemanStore(state => state.tab === 'assistant')
     const { isAnonymous } = useSession()
     const [signInOpen, setSignInOpen] = useState(false)
     const choice = positionChoiceOf(placement)
@@ -122,7 +130,14 @@ export function ForemanHeader({
                 </>
             }
             // Le tunnel guidé n'a qu'une conversation, pas de tabs.
-            tabs={guided ? undefined : <ForemanTabs />}
+            tabs={
+                guided ? undefined : (
+                    <>
+                        <ForemanTabs />
+                        {thread && onAssistant && <ForemanThreadCrumb title={thread.title} status={thread.status} onBack={onBackToGeneral} />}
+                    </>
+                )
+            }
         />
     )
 }

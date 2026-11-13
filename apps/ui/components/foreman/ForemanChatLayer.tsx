@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useScrollFade } from '@rerun/ui/primitives'
 
+import type { ThreadRow } from '@/app/api/_services/conversation.service'
+import { ThreadBranch } from '@/components/agent/sheet/ThreadBranch'
 import { Conversation, ConversationContent, ConversationScrollButton, type ConversationHandle } from '@/components/ai-elements/conversation'
 import { Message, MessageContent } from '@/components/ai-elements/message'
 import { ActionApprovalBlock } from '@/components/chat/ActionApprovalBlock'
@@ -17,10 +19,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
 import type { FileAccess } from '@/components/chat/FileCard'
 import { useArriveByTop } from '@/hooks/useArriveByTop'
+import { useMessageTimes } from '@/hooks/useMessageTimes'
 import type { ChatErrorKind } from '@/lib/chat-error'
 import { hitlKindOf, pendingApprovals, serializeApprovalDecisions } from '@/lib/chat-hitl'
 import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { hitlCallBefore } from '@/lib/chat/hitl-receipts'
+import { threadsByMessage } from '@/lib/chat/thread-rows'
 import type { MessageFeedbackRating } from '@rerun/contracts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
 import type { UploadTarget } from '@/lib/files/upload-url'
@@ -90,6 +94,11 @@ type ForemanChatLayerProps = {
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     sharedFiles?: FileAccess
+    /** General's threads, each under the message it was opened after. Only General has them. */
+    threads?: ThreadRow[]
+    onOpenThread?: (sessionId: string) => void
+    /** A thread is on screen: the header carries the way back to General under its tabs. */
+    underCrumb?: boolean
     /** Ce qui porte la hauteur naturelle de la pile, que la sheet mobile mesure. */
     onStackElement?: (element: HTMLElement | null) => void
     className?: string
@@ -102,7 +111,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onStackElement, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, onStackElement, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -151,6 +160,9 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
     })
     // Toutes les lignes de raccourci d'un message tiennent dans une seule carte, posée au premier appel.
     const shortcuts = planAgentShortcuts(visible)
+    const messageTimes = useMessageTimes(visible)
+    const threadRows = useMemo(() => threadsByMessage(messageTimes, threads ?? []), [messageTimes, threads])
+    const threadBranches = (rows: ThreadRow[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} onOpen={() => onOpenThread?.(thread.id)} />)
 
     // Une pile vide veut dire deux choses opposées, et elles ne se rendent pas pareil. En tunnel,
     // elle veut dire que le premier tour n'est pas encore revenu : proposer « What is running in my
@@ -158,7 +170,8 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
     // l'onboarding en cours, est un faux départ, donc c'est l'orbe qui tient l'écran. Ailleurs elle
     // veut dire que la conversation du serveur est encore en vol, et ça se dit avec la forme de ce
     // qui va arriver.
-    const empty = visible.length === 0 && !error
+    // A General nobody spoke in yet, whose threads were all opened from « New task », shows them.
+    const empty = visible.length === 0 && !error && threadRows.leading.length === 0
     // Pas pendant la carte : « Getting your workspace ready... » annonce un tour en vol, et là rien
     // n'est parti. C'est l'en-tête de la carte qui tient l'écran.
     const greeting = empty && guided && !intake
@@ -207,13 +220,14 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                         qui la mesure rétrécirait d'un pixel à chaque tour : `shrink-0` l'en garde. */}
                     <ConversationContent
                         scrollClassName="max-md:flex max-md:flex-col md:[container-type:size]"
-                        className={cn('justify-end gap-4 px-3 pb-5 max-md:mt-auto max-md:shrink-0 md:min-h-full', guided ? 'pt-12' : 'pt-24', intake || greeting ? 'max-md:min-h-72' : 'max-md:min-h-36')}
+                        className={cn('justify-end gap-4 px-3 pb-5 max-md:mt-auto max-md:shrink-0 md:min-h-full', guided ? 'pt-12' : underCrumb ? 'pt-[8.5rem]' : 'pt-24', intake || greeting ? 'max-md:min-h-72' : 'max-md:min-h-36')}
                     >
                         {restoring && <ForemanChatSkeleton />}
+                        {threadBranches(threadRows.leading)}
                         {empty && !greeting && !restoring && !intake ? (
                             <ForemanTeamEmptyStateSlot onSend={onSuggestion} onPrefill={onPrefill} />
                         ) : (
-                            visible.map((message, index) => (
+                            visible.flatMap((message, index) => [
                                 <FloatingMessage
                                     key={message.id}
                                     message={message}
@@ -229,8 +243,9 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                                     onRateMessage={actions?.onRate}
                                     feedbackRating={actions ? actions.ratingOf(message.id) : undefined}
                                     hitlCall={hitlCallBefore(visible, index)}
-                                />
-                            ))
+                                />,
+                                ...(threadBranches(threadRows.after.get(index)) ?? []),
+                            ])
                         )}
                         {engineHitl && onWidgetAnswer && (
                             <motion.div key={engineHitl.toolCallId} ref={pendingRef} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
