@@ -1,0 +1,138 @@
+# Konductor flow for a Linear issue labeled Feature: move the card to In Progress, check it is not already built, design it
+# in a render lab and iterate with you until you validate it, write the design brief, plan it in a new Fable 5.2 chat from
+# that brief (approved by the flow), build it, review, fix the review (plan approved by you), summary on the issue, PR,
+# wait for your merge, then close the card.
+# Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
+name = "Feature"
+match = { labels = ["Feature"] }
+
+[[steps]]
+id = "design"
+title = "Design"
+chat = "design"
+attach_issue = true
+prompt = """
+Avant toute chose, passe la carte Linear {{issue.identifier}} en In Progress avec le MCP Linear si elle n'y est pas déjà.
+
+Le ticket Linear complet (description, images) est dans {{issue.file}}.
+
+1. Vérifie que la feature n'existe pas déjà, en tout ou en partie : cherche dans le code (`rg`), dans `git log origin/dev`,
+   dans les PRs ouvertes (`gh pr list`) et dans les cartes Linear proches. Si elle existe déjà, ou si une PR la couvre,
+   dis-le avec les preuves (fichiers, commits, PRs) et demande-moi avec AskUserQuestion si on continue.
+2. Fais un render lab de preview : `app/render/lab/<sujet>` dans apps/ui, construit avec les vrais composants du kit,
+   qui montre 2 ou 3 variantes, chaque état utile (vide, chargement, erreur, rempli) en clair et en sombre, aux largeurs
+   mobile, tablette et desktop. Lance le serveur, donne-moi l'URL cliquable vérifiée, et mets les captures dans `.context/`
+   en les intégrant en Markdown. Si la feature n'a rien de visible, remplace le render lab par une maquette concrète du
+   comportement (appel d'API, sortie de commande, message de l'agent).
+3. Itère avec moi : après chaque version, pose la question avec AskUserQuestion (« Validé, on planifie » ou « Encore une
+   itération », mes remarques arrivent dans « Other »), applique mes retours, montre la nouvelle version et repose la
+   question. Ne termine jamais ton tour sans cette question : la fin de ton tour lance l'étape suivante du flow.
+   Termine le tour seulement quand je choisis « Validé, on planifie ».
+"""
+
+[[steps]]
+id = "brief"
+title = "Design brief"
+chat = "design"
+prompt = """
+Le design est validé. Écris {{run.dir}}/design.md, la seule source qu'aura la conversation qui va planifier et construire la
+feature : elle ne voit pas cette conversation. Il doit se suffire à lui-même :
+- le besoin du ticket {{issue.identifier}} et ce qui existe déjà dans le code (fichiers, composants, routes, tables à réutiliser) ;
+- le design retenu, variante par variante écartée avec la raison, et chaque retour que je t'ai donné pendant les itérations ;
+- le chemin du render lab, l'URL, et les captures de la version validée (chemins dans `.context/`) ;
+- les états (vide, chargement, erreur, rempli), le responsive, le clair et le sombre, les textes affichés ;
+- les décisions prises et les questions encore ouvertes.
+Réponds avec le chemin du fichier.
+"""
+
+[[steps]]
+id = "plan"
+title = "Plan the feature"
+chat = "build"
+model = "fable-5-2"
+attach_issue = true
+plan = true
+approve = "auto"
+prompt = """
+Tu reprends la feature {{issue.identifier}}. Le design a été validé dans une conversation précédente : sa source est
+{{run.dir}}/design.md, avec le render lab qu'il cite et ses captures. Lis-les en entier, puis le ticket {{issue.file}}.
+Le render lab fait foi : la feature construite doit lui ressembler à l'identique.
+
+Planifie la feature de façon très complète :
+- ce qui existe déjà et ce qu'on réutilise (composants du kit, helpers de `@rerun/contracts`, routes, tables) ;
+- les données : tables, colonnes, migrations Supabase (avec le grant service_role), helpers de lecture typés, écritures typées ;
+- le moteur s'il est touché, et les migrations de data-dir s'il change ce qu'il garde sur disque ;
+- les routes d'API et les server actions, avec leurs contrats ;
+- l'UI fichier par fichier : composants, états vide / chargement (skeleton calqué) / erreur, responsive, clair et sombre ;
+- les textes via i18n (`t()`, une clé ICU par phrase) ;
+- ce qui relève de `@rerun/cloud/<domain>` et son jumeau dans `apps/ui/cloud-oss/` ;
+- les tests (unitaires, e2e) et le scénario `verify-in-app` qui clique le chemin de la feature ;
+- l'ordre de construction, les risques et les cas limites.
+Le render lab reste livré avec la feature et importe les vrais composants.
+"""
+
+[[steps]]
+id = "build"
+title = "Build"
+chat = "build"
+prompt = """
+Construis tout le plan approuvé, jusqu'au bout. Puis :
+- lance typecheck, lint et tests à distance (`remote run`), et corrige ce qui casse ;
+- `pnpm i18n:translate` puis `pnpm i18n:check` ;
+- vérifie la feature dans l'app avec le skill verify-in-app (stack locale) : clique le chemin de la feature, captures
+  mobile / tablette / desktop en clair et en sombre, compare avec les captures validées du render lab, corrige les écarts.
+Ne crée ni commit, ni push, ni pull request. Termine avec les captures, ce qui a été cliqué, les erreurs trouvées,
+et ce qui n'a pas pu être testé.
+"""
+
+[[steps]]
+id = "review"
+title = "Review"
+kind = "review"
+
+[[steps]]
+id = "fixes"
+title = "Review fixes"
+chat = "review"
+plan = true
+approve = "human"
+comments = ["blocking", "major", "minor", "nit"]
+skip_if_no_comments = true
+prompt = """
+Voici les {{comments.count}} remarques de la review, chacune avec sa sévérité.
+Planifie la correction de toutes les remarques blocking et major, et des minor / nit qui sont des quick wins.
+Pour chaque remarque que tu écartes, dis pourquoi.
+"""
+
+[[steps]]
+id = "summary"
+title = "Summary"
+chat = "summary"
+linear_comment = true
+prompt = """
+Lis {{issue.file}}, {{run.dir}}/design.md et le diff de ce workspace (GetWorkspaceDiff). Ne crée ni commit, ni push,
+ni pull request : l'étape suivante ouvre la PR.
+Écris un résumé pour la personne qui va relire et merger : la feature, le design retenu, ce qui a été construit et où,
+comment c'est testé et vérifié dans l'app, et ce qu'il reste à vérifier avant de merger. Court, en français.
+"""
+
+[[steps]]
+id = "pr"
+title = "Create PR"
+kind = "create_pr"
+
+[[steps]]
+id = "merge"
+title = "Merge"
+kind = "wait_merge"
+
+[[steps]]
+id = "close"
+title = "Close the card"
+chat = "summary"
+linear_comment = true
+prompt = """
+La PR de {{issue.identifier}} est mergée. Passe la carte Linear en Done avec le MCP Linear si elle n'y est pas déjà,
+puis écris sa mise à jour finale, postée telle quelle sur la carte : la PR mergée, la feature livrée, ce qui a été
+construit et comment c'est vérifié. Court, en français, sans clé, token ni contenu privé du client.
+"""
