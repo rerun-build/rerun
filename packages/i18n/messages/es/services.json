@@ -34,6 +34,7 @@
     },
     "connect": {
         "authorizationFailed": "Falló la autorización",
+        "scopeNotGranted": "Google no dio acceso a {name}. Vuelve a conectarte y marca cada permiso de {name} en la pantalla de Google. En una cuenta de trabajo, puede que el administrador de Google Workspace lo bloquee.",
         "startFailed": "No se pudo iniciar la conexión",
         "startOAuthFailed": "No se pudo iniciar OAuth",
         "connectedAs": "Conectado como {account}",

@@ -34,6 +34,7 @@
     },
     "connect": {
         "authorizationFailed": "Autorisierung fehlgeschlagen",
+        "scopeNotGranted": "Google hat {name} keinen Zugriff gegeben. Verbinde dich erneut und setze auf dem Google-Bildschirm jedes Häkchen für {name}. Bei einem Arbeitskonto blockiert dein Google-Workspace-Admin das eventuell.",
         "startFailed": "Verbindung konnte nicht gestartet werden",
         "startOAuthFailed": "OAuth-Start fehlgeschlagen",
         "connectedAs": "Verbunden als {account}",

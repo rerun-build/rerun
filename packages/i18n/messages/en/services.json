@@ -49,6 +49,7 @@
     },
     "connect": {
         "authorizationFailed": "Authorization failed",
+        "scopeNotGranted": "Google didn't give {name} access. Connect again and tick every {name} permission on the Google screen. On a work account, your Google Workspace admin may be blocking it.",
         "startFailed": "Failed to start the connection",
         "startOAuthFailed": "Failed to start OAuth",
         "connectedAs": "Connected as {account}",

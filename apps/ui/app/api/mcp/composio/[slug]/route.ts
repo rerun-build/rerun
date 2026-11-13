@@ -1,7 +1,7 @@
 import { SERVICE_INSTANCE_ID_RE, serviceRegistryKey } from '@rerun/contracts'
 import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { ComposioApiError, composioUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
+import { ComposioApiError, composioUserId, deleteConnectedAccount, executeTool, listToolkitTools } from '@/lib/composio/client'
 import { readRegistry, upsertRegistryEntry } from '@/lib/services/registry'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -37,21 +37,28 @@ function isNotConnectedError(message: string): boolean {
     return /connected account|no connection|not connected|inactive|expired/i.test(message)
 }
 
+// Google's answer when the token lacks the permission the tool needs: the account is connected, but
+// the user left that box unticked on the consent screen, or an admin blocks it.
+function isMissingScopeError(message: string): boolean {
+    return /insufficient authentication scopes|ACCESS_TOKEN_SCOPE_INSUFFICIENT/i.test(message)
+}
+
 // A coworker gets the app's tools as soon as it is installed, before the user connects the account
 // behind it, so "not connected" is more often a first connection than a lost one: only an active
 // entry was ever connected. That one goes back to needs_auth, so the Services tab shows Reconnect
 // instead of a silently broken connector. Failures are logged, never surfaced to the agent.
-async function settleNotConnected(workspaceId: number, engineAgentId: string, key: string): Promise<'never' | 'lost'> {
+// A lost entry also hands back the account it was bound to, which the registry no longer remembers.
+async function settleNotConnected(workspaceId: number, engineAgentId: string, key: string): Promise<{ connection: 'never' | 'lost'; connectedAccountId?: string }> {
     try {
         const conn = await getWorkspaceConnection(workspaceId)
         const entry = (await readRegistry(conn, engineAgentId)).services[key]
-        if (!entry?.composio || entry.status !== 'active') return 'never'
+        if (!entry?.composio || entry.status !== 'active') return { connection: 'never' }
         const composio = { toolkit: entry.composio.toolkit, serverName: entry.composio.serverName }
         await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'needs_auth', composio })
-        return 'lost'
+        return { connection: 'lost', connectedAccountId: entry.composio.connectedAccountId }
     } catch (err) {
         console.warn(`[composio:${key}] could not read or flag the registry entry:`, err instanceof Error ? err.message : err)
-        return 'never'
+        return { connection: 'never' }
     }
 }
 
@@ -60,12 +67,27 @@ function notConnectedMessage(name: string, slug: string, connection: 'never' | '
     return `${situation} Call suggest_service with slug "${slug}" so the user gets a Connect card, then end your turn.`
 }
 
+type ToolCallContext = { workspaceId: number; engineAgentId: string; slug: string; instanceId?: string; name: string; tool: string; rawMessage: string }
+
 // suggest_service only knows catalog slugs, so the agent is pointed at the app, not the account.
-async function notConnectedResponse(id: unknown, ctx: { workspaceId: number; engineAgentId: string; slug: string; instanceId?: string; name: string; tool: string; rawMessage: string }): Promise<Response> {
+async function notConnectedResponse(id: unknown, ctx: ToolCallContext): Promise<Response> {
     const key = serviceRegistryKey(ctx.slug, ctx.instanceId)
-    const connection = await settleNotConnected(ctx.workspaceId, ctx.engineAgentId, key)
+    const { connection } = await settleNotConnected(ctx.workspaceId, ctx.engineAgentId, key)
     console.warn(`[composio:${key}] tools/call ${ctx.tool}: not connected (${connection}):`, ctx.rawMessage)
     return toolError(id, notConnectedMessage(ctx.name, ctx.slug, connection))
+}
+
+// Composio picks the account by user_id alone: left ACTIVE, this one could answer again after the reconnect.
+async function missingScopeResponse(id: unknown, ctx: ToolCallContext): Promise<Response> {
+    const key = serviceRegistryKey(ctx.slug, ctx.instanceId)
+    const { connectedAccountId } = await settleNotConnected(ctx.workspaceId, ctx.engineAgentId, key)
+    if (connectedAccountId) {
+        await deleteConnectedAccount(connectedAccountId).catch(err => {
+            console.warn(`[composio:${key}] could not delete connected account ${connectedAccountId}:`, err instanceof Error ? err.message : err)
+        })
+    }
+    console.warn(`[composio:${key}] tools/call ${ctx.tool}: scope not granted:`, ctx.rawMessage)
+    return toolError(id, `${ctx.name} is connected without the permission this needs. Call suggest_service with slug "${ctx.slug}" so the user connects it again and grants it, then end your turn.`)
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }): Promise<Response> {
@@ -134,23 +156,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
         const { data: agent } = engineAgentId ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: engineAgentId, workspace_id: engine.workspaceId }) : { data: null }
         if (!agent) return rpcError(id, -32603, 'Coworker does not belong to the authenticated workspace')
 
+        const callContext = (rawMessage: string): ToolCallContext => ({ workspaceId: engine.workspaceId, engineAgentId, slug, instanceId, name: manifest.name, tool: name, rawMessage })
         try {
             const out = await executeTool(name, composioUserId(agent.id, instanceId), args)
             if (!out.successful) {
                 const message = out.error ?? 'Tool failed'
-                if (isNotConnectedError(message)) {
-                    return notConnectedResponse(id, { workspaceId: engine.workspaceId, engineAgentId, slug, instanceId, name: manifest.name, tool: name, rawMessage: message })
-                }
+                if (isMissingScopeError(message)) return missingScopeResponse(id, callContext(message))
+                if (isNotConnectedError(message)) return notConnectedResponse(id, callContext(message))
                 return toolError(id, message)
             }
             return rpcResult(id, { content: [{ type: 'text', text: JSON.stringify(out.data) }], structuredContent: out.data })
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Tool failed'
+            if (isMissingScopeError(message)) return missingScopeResponse(id, callContext(message))
             // Order matters: Composio reports a missing connected account as a 404 too, so the
             // not-connected check must run before the 404 → unknown-tool mapping.
-            if (isNotConnectedError(message)) {
-                return notConnectedResponse(id, { workspaceId: engine.workspaceId, engineAgentId, slug, instanceId, name: manifest.name, tool: name, rawMessage: message })
-            }
+            if (isNotConnectedError(message)) return notConnectedResponse(id, callContext(message))
             if (err instanceof ComposioApiError && err.status === 404) return rpcError(id, -32601, `Unknown tool: ${name}`)
             console.error(`[composio:${slug}] tools/call ${name} failed:`, message)
             return toolError(id, `${manifest.name} is temporarily unavailable. Try again later.`)

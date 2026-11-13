@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { ComposioApiError, composioUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
+import { ComposioApiError, composioUserId, deleteConnectedAccount, executeTool, listToolkitTools } from '@/lib/composio/client'
 import { readRegistry, type RegistryEntry, upsertRegistryEntry } from '@/lib/services/registry'
 import type { EngineConnection } from '@/lib/engine/types'
 import { serviceManifestSchema } from '@/lib/services/manifest'
@@ -14,7 +14,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_services/services.service', () => ({ loadManifest: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn(), getWorkspaceConnection: vi.fn() }))
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(), upsertRegistryEntry: vi.fn() }))
-vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), executeTool: vi.fn(), listToolkitTools: vi.fn() }))
+vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), executeTool: vi.fn(), listToolkitTools: vi.fn(), deleteConnectedAccount: vi.fn() }))
 
 const BOX_KEY = 'box-key-of-workspace-7'
 const WORKSPACE_ID = 7
@@ -178,6 +178,7 @@ describe('POST /api/mcp/composio/[slug]', () => {
         beforeEach(() => {
             vi.mocked(getWorkspaceConnection).mockResolvedValue(conn)
             vi.mocked(executeTool).mockResolvedValue({ successful: false, data: null, error: NO_ACCOUNT })
+            vi.mocked(deleteConnectedAccount).mockResolvedValue()
         })
 
         it('tells the agent the app was never connected and to suggest it, leaving the registry alone', async () => {
@@ -197,6 +198,7 @@ describe('POST /api/mcp/composio/[slug]', () => {
 
             expect(text).toBe('Gmail\'s connection expired or was revoked. Call suggest_service with slug "gmail" so the user gets a Connect card, then end your turn.')
             expect(upsertRegistryEntry).toHaveBeenCalledWith(conn, 'engine-own', 'gmail', { ...entry, status: 'needs_auth', composio: { toolkit: 'gmail', serverName: 'gmail' } })
+            expect(deleteConnectedAccount).not.toHaveBeenCalled()
         })
 
         it('sends the instance entry back to needs_auth, and still points suggest_service at the app', async () => {
@@ -218,6 +220,39 @@ describe('POST /api/mcp/composio/[slug]', () => {
             const text = await errorText(await POST(request(toolCall('GMAIL_LIST_THREADS')), context()))
 
             expect(text).toMatch(/^Gmail is not connected yet\. Call suggest_service with slug "gmail"/)
+        })
+
+        it('sends an active entry back to needs_auth when Google refused the scope the tool needs', async () => {
+            const entry = registryWith({ status: 'active', composio: { toolkit: 'gmail', serverName: 'gmail', connectedAccountId: 'ca_1' } })
+            vi.mocked(executeTool).mockResolvedValue({ successful: false, data: null, error: 'Request had insufficient authentication scopes.' })
+
+            const text = await errorText(await POST(request(toolCall('GMAIL_LIST_THREADS')), context()))
+
+            expect(text).toBe('Gmail is connected without the permission this needs. Call suggest_service with slug "gmail" so the user connects it again and grants it, then end your turn.')
+            expect(upsertRegistryEntry).toHaveBeenCalledWith(conn, 'engine-own', 'gmail', { ...entry, status: 'needs_auth', composio: { toolkit: 'gmail', serverName: 'gmail' } })
+            expect(deleteConnectedAccount).toHaveBeenCalledWith('ca_1')
+        })
+
+        it('sorts a thrown scope refusal the same way', async () => {
+            registryWith({ status: 'active', composio: { toolkit: 'gmail', serverName: 'gmail', connectedAccountId: 'ca_1' } })
+            vi.mocked(executeTool).mockRejectedValue(new ComposioApiError(403, 'Composio POST /tools/execute/GMAIL_LIST_THREADS failed (403): {"reason":"ACCESS_TOKEN_SCOPE_INSUFFICIENT"}'))
+
+            const text = await errorText(await POST(request(toolCall('GMAIL_LIST_THREADS')), context()))
+
+            expect(text).toMatch(/^Gmail is connected without the permission this needs\./)
+            expect(upsertRegistryEntry).toHaveBeenCalledOnce()
+            expect(deleteConnectedAccount).toHaveBeenCalledWith('ca_1')
+        })
+
+        it('still answers the agent when Composio cannot drop the account', async () => {
+            registryWith({ status: 'active', composio: { toolkit: 'gmail', serverName: 'gmail', connectedAccountId: 'ca_1' } })
+            vi.mocked(executeTool).mockResolvedValue({ successful: false, data: null, error: 'Request had insufficient authentication scopes.' })
+            vi.mocked(deleteConnectedAccount).mockRejectedValue(new Error('Composio down'))
+
+            const text = await errorText(await POST(request(toolCall('GMAIL_LIST_THREADS')), context()))
+
+            expect(text).toMatch(/^Gmail is connected without the permission this needs\./)
+            expect(upsertRegistryEntry).toHaveBeenCalledOnce()
         })
 
         it('falls back to a first connection when the registry cannot be read', async () => {

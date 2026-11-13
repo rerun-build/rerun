@@ -1,5 +1,5 @@
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
-import { type ComposioConnectedAccount, getConnectedAccount } from '@/lib/composio/client'
+import { type ComposioConnectedAccount, deleteConnectedAccount, getConnectedAccount } from '@/lib/composio/client'
 import { type ComposioOAuthContext, encodeComposioContext } from '@/lib/composio/oauth'
 import { mintCallbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
@@ -12,7 +12,7 @@ vi.mock('next/headers', () => ({ cookies: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({ requireAgentWorkspaceId: vi.fn(async () => 7), workspaceActor: (workspaceId: number) => ({ kind: 'workspace', workspaceId }) }))
 vi.mock('@/app/api/_services/services.service', () => ({ markComposioAuthorized: vi.fn(), loadManifest: vi.fn() }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ parkSignIn: vi.fn() }))
-vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), getConnectedAccount: vi.fn() }))
+vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), getConnectedAccount: vi.fn(), deleteConnectedAccount: vi.fn() }))
 
 const STATE = 'state-1'
 const COOKIE = `composio_oauth_${STATE}`
@@ -32,6 +32,9 @@ const MANIFEST = serviceManifestSchema.parse({
 })
 
 const ACTIVE: ComposioConnectedAccount = { id: 'ca_1', userId: 'local_agent_agent-1', authConfigId: 'ac_gmail', status: 'ACTIVE', toolkit: 'gmail' }
+
+// What Google handed back on a production sign-in where the Gmail box was left unticked (RER-5).
+const SIGN_IN_SCOPES_ONLY = ['https://www.googleapis.com/auth/contacts.other.readonly', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile', 'openid']
 
 let jar: Record<string, string> = {}
 
@@ -204,6 +207,57 @@ describe('GET /api/oauth/composio/callback', () => {
         expect(await res.text()).toContain('Connection is not active yet (FAILED)')
         expect(getConnectedAccount).toHaveBeenCalledOnce()
         expect(markComposioAuthorized).not.toHaveBeenCalled()
+    })
+
+    it('refuses an active account Google granted sign-in scopes only, and drops it at Composio', async () => {
+        vi.mocked(getConnectedAccount).mockResolvedValue({ ...ACTIVE, grantedScopes: SIGN_IN_SCOPES_ONLY })
+        vi.mocked(deleteConnectedAccount).mockResolvedValue()
+        withContext(CONTEXT)
+
+        const res = await callback({ state: STATE, status: 'success' })
+
+        const html = await res.text()
+        expect(html).toContain('composio-oauth-error')
+        expect(html).toContain('"reason":"scope_not_granted"')
+        expect(markComposioAuthorized).not.toHaveBeenCalled()
+        expect(deleteConnectedAccount).toHaveBeenCalledWith('ca_1')
+        expect(deletesStateCookie(res)).toBe(true)
+    })
+
+    it('still refuses the account when Composio cannot drop it', async () => {
+        vi.mocked(getConnectedAccount).mockResolvedValue({ ...ACTIVE, grantedScopes: SIGN_IN_SCOPES_ONLY })
+        vi.mocked(deleteConnectedAccount).mockRejectedValue(new Error('Composio down'))
+        withContext(CONTEXT)
+
+        const res = await callback({ state: STATE, status: 'success' })
+
+        expect(await res.text()).toContain('"reason":"scope_not_granted"')
+        expect(markComposioAuthorized).not.toHaveBeenCalled()
+    })
+
+    it('sends the scope refusal of a mobile sign-in back to the app and parks nothing', async () => {
+        vi.mocked(getConnectedAccount).mockResolvedValue({ ...ACTIVE, grantedScopes: SIGN_IN_SCOPES_ONLY })
+        vi.mocked(deleteConnectedAccount).mockResolvedValue()
+        withContext({ ...CONTEXT, mobileGrant: mintCallbackGrant({ agentId: CONTEXT.agentId, workspaceId: 7, userId: 'user-1', jti: 'row-1' }) })
+
+        const res = await callback({ state: STATE, status: 'success' })
+
+        const location = new URL(res.headers.get('location') ?? '')
+        expect(location.searchParams.get('status')).toBe('error')
+        expect(location.searchParams.get('message')).toContain('Google did not grant Gmail access')
+        expect(parkSignIn).not.toHaveBeenCalled()
+        expect(markComposioAuthorized).not.toHaveBeenCalled()
+    })
+
+    it('connects an account that got the scope of the app', async () => {
+        vi.mocked(getConnectedAccount).mockResolvedValue({ ...ACTIVE, grantedScopes: [...SIGN_IN_SCOPES_ONLY, 'https://mail.google.com/'] })
+        withContext(CONTEXT)
+
+        const res = await callback({ state: STATE, status: 'success' })
+
+        expect(await res.text()).toContain('composio-oauth-success')
+        expect(markComposioAuthorized).toHaveBeenCalledOnce()
+        expect(deleteConnectedAccount).not.toHaveBeenCalled()
     })
 
     it('sends a forged mobile grant back to the app as an error without marking anything', async () => {

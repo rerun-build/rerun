@@ -64,11 +64,34 @@ export type ComposioConnectedAccount = {
     authConfigId: string
     status: string
     toolkit: string
+    // What the provider actually granted, which can be less than the auth config asked for.
+    grantedScopes?: string[]
 }
 
 export async function getConnectedAccount(id: string): Promise<ComposioConnectedAccount> {
-    const data = await composioFetch<{ id: string; user_id: string; status: string; auth_config?: { id?: string }; toolkit?: { slug?: string } }>(`/connected_accounts/${encodeURIComponent(id)}`)
-    return { id: data.id, userId: data.user_id, authConfigId: data.auth_config?.id ?? '', status: data.status, toolkit: data.toolkit?.slug ?? '' }
+    const data = await composioFetch<{ id: string; user_id: string; status: string; auth_config?: { id?: string }; toolkit?: { slug?: string }; state?: { val?: { scope?: unknown } } }>(`/connected_accounts/${encodeURIComponent(id)}`)
+    const scope = data.state?.val?.scope
+    return {
+        id: data.id,
+        userId: data.user_id,
+        authConfigId: data.auth_config?.id ?? '',
+        status: data.status,
+        toolkit: data.toolkit?.slug ?? '',
+        ...(typeof scope === 'string' ? { grantedScopes: scope.split(/\s+/).filter(Boolean) } : {}),
+    }
+}
+
+const GOOGLE_SIGN_IN_SCOPES = new Set([
+    'openid',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/contacts.other.readonly',
+])
+
+// Google's consent screen lets the user untick each permission, and a Workspace admin can block one,
+// yet the account still comes back ACTIVE with a token that only proves who signed in.
+export function grantedNothingButSignIn(scopes: string[] | undefined): boolean {
+    return scopes !== undefined && scopes.length > 0 && scopes.every(scope => GOOGLE_SIGN_IN_SCOPES.has(scope))
 }
 
 export async function deleteConnectedAccount(id: string): Promise<void> {

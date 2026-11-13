@@ -36,13 +36,13 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
     const [error, setError] = useState<string | null>(null)
     const popupRef = useRef<Window | null>(null)
 
-    const armResult = useOAuthPopupResult<{ type: string; key?: string; accountLabel?: string; error?: string }>('composio-oauth', RESULT_TYPES, data => {
+    const armResult = useOAuthPopupResult<{ type: string; key?: string; accountLabel?: string; error?: string; reason?: string }>('composio-oauth', RESULT_TYPES, data => {
         if (data.type === 'composio-oauth-success') {
             setAccountLabel(data.accountLabel ?? null)
             setState('authorized')
             onAuthorized(data.accountLabel)
         } else {
-            setError(data.error || t('authorizationFailed'))
+            setError(data.reason === 'scope_not_granted' ? t('scopeNotGranted', { name }) : data.error || t('authorizationFailed'))
             setState('error')
         }
         popupRef.current?.close()
@@ -107,9 +107,9 @@ export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, auto
     if (state === 'error') {
         return (
             <div className="space-y-2 py-1">
-                <div className="flex items-center gap-2 text-sm text-destructive">
-                    <XCircleIcon className="size-3.5 shrink-0" />
-                    <span className="truncate">{error}</span>
+                <div className="flex items-start gap-2 text-sm text-destructive">
+                    <XCircleIcon className="size-3.5 shrink-0 mt-0.5" />
+                    <span className="min-w-0 break-words">{error}</span>
                 </div>
                 <Button variant="outline" size="sm" onClick={startAuth}>
                     {t('retry')}
