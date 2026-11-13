@@ -77,11 +77,28 @@ describe('POST /api/mcp/oauth/start', () => {
         expect(authorize.origin + authorize.pathname).toBe('https://auth.acme.test/authorize')
         expect(authorize.searchParams.get('code_challenge_method')).toBe('S256')
         expect(authorize.searchParams.get('redirect_uri')).toBe('https://rerun.test/api/mcp/oauth/callback')
+        expect(authorize.searchParams.get('scope')).toBe('read write')
 
         const [cookie] = res.cookies.getAll()
         expect(cookie.name).toBe(`mcp_oauth_${authorize.searchParams.get('state')}`)
         expect(cookie).toMatchObject({ httpOnly: true, maxAge: 600, sameSite: 'lax', path: '/api/mcp/oauth' })
-        expect(decodeContext(cookie.value)).toMatchObject({ agentId: 'agent-1', serverName: 'acme', tokenEndpoint: 'https://auth.acme.test/token', clientId: CLIENT_METADATA_DOCUMENT, scope: 'read write' })
+        expect(decodeContext(cookie.value)).toMatchObject({ agentId: 'agent-1', serverName: 'acme', tokenEndpoint: 'https://auth.acme.test/token', clientId: CLIENT_METADATA_DOCUMENT })
+        expect(decodeContext(cookie.value)).not.toHaveProperty('scope')
+    })
+
+    // PostHog advertises 160 scopes (~2.9 KB): carried in the cookie, they pushed it past the
+    // 4096 bytes a browser stores, and the callback found no context.
+    it('keeps a long scope list in the authorize URL and out of the cookie', async () => {
+        const scopes = Array.from({ length: 160 }, (_, i) => `resource_${String(i).padStart(3, '0')}:write`)
+        documents[RESOURCE_METADATA_URL] = { authorization_servers: ['https://auth.acme.test'], scopes_supported: scopes }
+
+        const res = await start({})
+
+        expect(res.status).toBe(200)
+        const { authorizationUrl } = (await res.json()) as { authorizationUrl: string }
+        expect(new URL(authorizationUrl).searchParams.get('scope')).toBe(scopes.join(' '))
+        const [cookie] = res.cookies.getAll()
+        expect(cookie.name.length + cookie.value.length).toBeLessThan(4096)
     })
 
     it('refuses an agent of another workspace without setting a cookie', async () => {

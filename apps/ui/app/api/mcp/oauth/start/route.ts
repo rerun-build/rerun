@@ -27,7 +27,6 @@ export async function POST(req: Request) {
             clientId: clientInfo.clientId,
             clientSecret: clientInfo.clientSecret,
             redirectUri: callbackUrl(req),
-            scope: metadata.scopesSupported?.join(' '),
         }
 
         const res = NextResponse.json({ authorizationUrl: buildAuthorizeUrl(metadata, ctx, challenge, state) })

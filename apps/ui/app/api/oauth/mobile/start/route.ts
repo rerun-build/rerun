@@ -37,7 +37,6 @@ async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverN
         clientId: clientInfo.clientId,
         clientSecret: clientInfo.clientSecret,
         redirectUri: callbackUrl(req),
-        scope: metadata.scopesSupported?.join(' '),
         mobileGrant: target.mobileGrant,
     }
     return redirect(buildAuthorizeUrl(metadata, ctx, challenge, state), { name: OAUTH_COOKIE_PREFIX + state, value: encodeContext(ctx), path: OAUTH_COOKIE_PATH })

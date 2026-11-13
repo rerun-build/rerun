@@ -30,7 +30,6 @@ export type OAuthContext = {
     clientId: string
     clientSecret?: string
     redirectUri: string
-    scope?: string
     // Started from the iOS app: the callback redirects back into it instead of answering with the
     // popup page, and reads the workspace from this signed grant since that browser has no session.
     mobileGrant?: string
@@ -288,7 +287,8 @@ export function buildAuthorizeUrl(metadata: DiscoveredMetadata, ctx: OAuthContex
         code_challenge_method: 'S256',
         resource: ctx.mcpUrl,
     })
-    if (ctx.scope) params.set('scope', ctx.scope)
+    const scope = metadata.scopesSupported?.join(' ')
+    if (scope) params.set('scope', scope)
     return `${metadata.authorizationEndpoint}?${params.toString()}`
 }
 
