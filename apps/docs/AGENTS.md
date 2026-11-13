@@ -2,7 +2,7 @@
 
 ## About this project
 
-- Public documentation for Rerun, built on [Mintlify](https://mintlify.com) and living in `apps/docs` of the `rerun-cloud` monorepo
+- Public documentation for Rerun, built on [Mintlify](https://mintlify.com) and living in `apps/docs` of the public `rerun-build/rerun` repository
 - Pages are MDX files with YAML frontmatter, configuration lives in `docs.json`
 - A page only appears on the site once it is listed in `docs.json` navigation
 - Preview locally with `pnpm dev:docs` from the repo root
