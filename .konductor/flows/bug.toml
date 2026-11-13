@@ -7,6 +7,7 @@ match = { labels = ["Bug"] }
 [[steps]]
 id = "investigate"
 title = "Investigate"
+model = "opus-5-5-1m"
 attach_issue = true
 prompt = """
 Avant toute chose, passe la carte Linear {{issue.identifier}} en In Progress avec le MCP Linear si elle n'y est pas déjà.
@@ -22,6 +23,7 @@ dans PostHog ou dans Supabase. Fais une analyse complète et essaye de reproduir
 [[steps]]
 id = "plan"
 title = "Plan the fix"
+model = "opus-5-5-1m"
 plan = true
 approve = "auto"
 prompt = "Planifie le fix à partir de ton investigation : la cause racine, le correctif au bon endroit, et le test qui reproduit le bug puis prouve le fix."
@@ -35,6 +37,7 @@ kind = "review"
 id = "fixes"
 title = "Review fixes"
 chat = "review"
+model = "opus-5-5-1m"
 plan = true
 approve = "human"
 comments = ["blocking", "major", "minor", "nit"]
@@ -49,6 +52,7 @@ Pour chaque remarque que tu écartes, dis pourquoi.
 id = "summary"
 title = "Summary"
 chat = "summary"
+model = "opus-5-5-1m"
 linear_comment = true
 prompt = """
 Lis {{issue.file}} et le diff de ce workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request :

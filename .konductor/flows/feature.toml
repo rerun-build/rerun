@@ -1,5 +1,6 @@
-# Konductor flow for a Linear issue labeled Feature: design in a render lab until you validate it, design brief, plan in a
-# new Fable 5.2 chat, build, review, review fixes, summary, PR, merge, then close the card.
+# Konductor flow for a Linear issue labeled Feature: design in a render lab until you validate it, design brief, plan and
+# build in a new Opus 5.5 chat, review, review fixes, summary, PR, merge, then close the card.
+# Plan and build are one step: an approved plan is built in the same turn, so a separate Build step would start after it.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Feature"
 match = { labels = ["Feature"] }
@@ -8,6 +9,7 @@ match = { labels = ["Feature"] }
 id = "design"
 title = "Design"
 chat = "design"
+model = "opus-5-5-1m"
 attach_issue = true
 prompt = """
 Passe la carte Linear {{issue.identifier}} en In Progress avec le MCP Linear si elle n'y est pas déjà.
@@ -29,24 +31,17 @@ et les décisions. La conversation suivante ne verra que ce fichier. Réponds av
 
 [[steps]]
 id = "plan"
-title = "Plan the feature"
+title = "Plan and build"
 chat = "build"
-model = "fable-5-2"
+model = "opus-5-5-1m"
 attach_issue = true
 plan = true
 approve = "auto"
 prompt = """
 Lis {{run.dir}}/design.md, le render lab qu'il cite et le ticket {{issue.file}}, puis planifie la feature {{issue.identifier}}.
 Le render lab fait foi : la feature doit lui ressembler.
-"""
-
-[[steps]]
-id = "build"
-title = "Build"
-chat = "build"
-prompt = """
-Construis le plan approuvé, lance les tests à distance et vérifie dans l'app avec verify-in-app en comparant au render lab.
-Ne crée ni commit, ni push, ni pull request.
+Une fois le plan approuvé, construis-le, lance les tests à distance et vérifie dans l'app avec verify-in-app en comparant
+au render lab. Ne crée ni commit, ni push, ni pull request.
 """
 
 [[steps]]
@@ -58,6 +53,7 @@ kind = "review"
 id = "fixes"
 title = "Review fixes"
 chat = "review"
+model = "opus-5-5-1m"
 plan = true
 approve = "human"
 comments = ["blocking", "major", "minor", "nit"]
@@ -71,6 +67,7 @@ Planifie la correction des blocking et major, et des minor / nit faciles. Dis po
 id = "summary"
 title = "Summary"
 chat = "summary"
+model = "opus-5-5-1m"
 linear_comment = true
 prompt = """
 Lis {{issue.file}}, {{run.dir}}/design.md et le diff du workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request.
