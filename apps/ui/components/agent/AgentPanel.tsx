@@ -19,6 +19,7 @@ import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { isAgentViewTab, type AgentViewTab } from '@/lib/board/agent-sheet-views'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import { ChevronDownIcon, MessageCircle, XIcon } from '@/lib/icons'
+import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import { useDesktopStore } from '@/stores/desktop.store'
 import { BorderBeam } from '@rerun/ui'
@@ -73,6 +74,7 @@ export function AgentPanel() {
     const servicesNeedConfig = useConnectorServices(selectedAgentId ?? undefined).needsConfig
     const [surface, setSurface] = useState<Surface | null>(null)
     const [viewTab, setViewTab] = useState<AgentViewTab | null>(null)
+    const [grownFrom, setGrownFrom] = useState<CardOrigin | null>(null)
     const [openedAgentIds, setOpenedAgentIds] = useState<string[]>([])
     const [pendingOpenSession, setPendingOpenSession] = useState<{ sessionId: string; title: string; runId: string | null } | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
@@ -166,6 +168,12 @@ export function AgentPanel() {
     // A screen grown out of the card covers the thread, its pills and the card, all kept underneath
     // so they are already in place when it folds back.
     const threadShown = !displayedTab || !!enteredFrom
+    // Once grown, nothing it covers is painted any more: blurred and faded layers under an opaque
+    // screen ran a phone's GPU out of tiles, and Android Chrome left holes in the screen (RER-93).
+    // The blurred ones (veil, pills, scrim) go, since a hidden backdrop-filter still paints in
+    // Chromium; the thread and the card stay mounted, only hidden. The way back clears
+    // `enteredFrom`, so they are all there again before the screen folds.
+    const covered = !!enteredFrom && grownFrom === enteredFrom
 
     const screen = agent && displayedTab && (
         <AgentView
@@ -191,7 +199,7 @@ export function AgentPanel() {
             {/* Les chats restent montés même quand la sheet est fermée (selectedAgentId null)
                 ou qu'on regarde un écran — ne pas démonter pour préserver le stream. */}
             {openedAgentIds.map(id => (
-                <div key={id} className={threadShown && selectedAgentId === id ? 'absolute inset-0 flex flex-col' : 'hidden'}>
+                <div key={id} className={threadShown && selectedAgentId === id ? cn('absolute inset-0 flex flex-col', covered && 'invisible') : 'hidden'}>
                     <AgentPanelChat
                         agentId={id}
                         agentName={agents.find(a => a.id === id)?.name ?? t('panelsShared.yourCoworker')}
@@ -211,7 +219,7 @@ export function AgentPanel() {
                 </div>
             )}
 
-            {agent && threadShown && (
+            {agent && threadShown && !covered && (
                 <>
                     <TopVeil tall={!locked} />
                     {!locked && (
@@ -243,9 +251,9 @@ export function AgentPanel() {
             )}
 
             <AnimatePresence>
-                {agent && threadShown && shownSurface && <Scrim key="scrim" onClose={() => setSurface(null)} />}
+                {agent && threadShown && !covered && shownSurface && <Scrim key="scrim" onClose={() => setSurface(null)} />}
                 {agent && threadShown && shownSurface?.kind === 'card' && (
-                    <FloatingSurface key="card" receded={!!enteredFrom} className="inset-x-3 top-16 max-h-[calc(100%-5rem)] md:inset-x-5">
+                    <FloatingSurface key="card" receded={!!enteredFrom} className={cn('inset-x-3 top-16 max-h-[calc(100%-5rem)] md:inset-x-5', covered && 'invisible')}>
                         <AgentCard
                             agent={agent}
                             onOpen={openView}
@@ -261,7 +269,7 @@ export function AgentPanel() {
                     </FloatingSurface>
                 )}
                 {screen && enteredFrom && (
-                    <AgentViewExpander key="screen" origin={enteredFrom} ghost={<CardDestinationGhost tab={enteredFrom.tab} shape={enteredFrom.shape} />}>
+                    <AgentViewExpander key="screen" origin={enteredFrom} onGrown={() => setGrownFrom(enteredFrom)} ghost={<CardDestinationGhost tab={enteredFrom.tab} shape={enteredFrom.shape} />}>
                         {screen}
                     </AgentViewExpander>
                 )}

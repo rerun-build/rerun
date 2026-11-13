@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { motion, useIsPresent } from 'motion/react'
 import { type ReactNode, useLayoutEffect, useRef, useState } from 'react'
 
 import type { CardDestination, CardDestinationShape } from '@/components/agent/sheet/AgentCard'
@@ -25,8 +25,9 @@ const transition = (duration: number, delay = 0) => ({ duration, delay, ease: SU
  * it on the way out. Its edges move, nothing is scaled: the screen inside already has its final
  * size, the surface uncovers it as it grows instead of laying it out again on every frame.
  */
-export function AgentViewExpander({ origin, ghost, children }: { origin: CardOrigin; ghost: ReactNode; children: ReactNode }) {
+export function AgentViewExpander({ origin, ghost, onGrown, children }: { origin: CardOrigin; ghost: ReactNode; onGrown: () => void; children: ReactNode }) {
     const ref = useRef<HTMLDivElement>(null)
+    const isPresent = useIsPresent()
     const [size, setSize] = useState<Size>(origin.panel)
     const from = { top: origin.top, left: origin.left, width: origin.width, height: origin.height, borderRadius: 10 }
 
@@ -46,6 +47,7 @@ export function AgentViewExpander({ origin, ghost, children }: { origin: CardOri
             animate={{ top: 0, left: 0, width: size.width, height: size.height, borderRadius: 0 }}
             exit={from}
             transition={transition(0.5)}
+            onAnimationComplete={() => isPresent && onGrown()}
             className="absolute z-[60] overflow-hidden bg-background shadow-2xl ring-1 ring-border"
         >
             <motion.div
