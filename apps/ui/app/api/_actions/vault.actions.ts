@@ -12,9 +12,7 @@ import {
     detachVaultEntry,
     listVault,
     markVaultEntryAuthorized,
-    renameVaultEntry,
     shareVaultEntry,
-    signOutVaultEntry,
     vaultEntryUsage,
     vaultSignedOutCount,
     coworkerVault,
@@ -58,20 +56,12 @@ export async function shareVaultEntryAction(itemId: string, sharedWithAll: boole
     return attempt(() => shareVaultEntry(itemId, sharedWithAll))
 }
 
-export async function renameVaultEntryAction(itemId: string, patch: { name?: string; label?: string | null }): Promise<Result<VaultItemSummary>> {
-    return attempt(() => renameVaultEntry(itemId, patch))
-}
-
 export async function vaultEntryUsageAction(itemId: string): Promise<Result<{ coworkers: VaultCoworker[]; hidden: number }>> {
     return attempt(() => vaultEntryUsage(itemId))
 }
 
 export async function deleteVaultEntryAction(itemId: string): Promise<Result<{ detached: VaultCoworker[] }>> {
     return attempt(() => deleteVaultEntry(itemId))
-}
-
-export async function signOutVaultEntryAction(itemId: string): Promise<Result<VaultItemSummary>> {
-    return attempt(() => signOutVaultEntry(itemId))
 }
 
 export async function markVaultEntryAuthorizedAction(itemId: string): Promise<Result<VaultItemSummary>> {

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Actor } from '@/app/api/_auth/access'
 import { EngineRequestError, supportsVault } from '@/lib/engine/client'
-import { attachVaultItem, deleteVaultItem, deleteVaultToken, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
+import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { vaultFlag } from '@/flags'
@@ -18,9 +18,7 @@ import {
     detachVaultEntry,
     listVault,
     markVaultEntryAuthorized,
-    renameVaultEntry,
     shareVaultEntry,
-    signOutVaultEntry,
     vaultEntryUsage,
     vaultWritesEnabled,
     coworkerVault,
@@ -40,7 +38,6 @@ vi.mock('@/lib/engine/vault-client', () => ({
     detachVaultItem: vi.fn(async () => ({ id: 'item-1' })),
     patchVaultItem: vi.fn(async () => ({ id: 'item-1' })),
     deleteVaultItem: vi.fn(),
-    deleteVaultToken: vi.fn(),
     getVaultItemUsage: vi.fn(),
 }))
 
@@ -226,12 +223,6 @@ describe('admin-only changes', () => {
         await expect(shareVaultEntry('item-1', true, admin)).rejects.toMatchObject({ code: 'vaultPaidAppEveryone' })
     })
 
-    it('lets someone who manages every coworker an entry reaches rename it, and nobody else', async () => {
-        await renameVaultEntry('item-1', { label: 'ops@acme.test' }, managerOfA)
-        expect(patchVaultItem).toHaveBeenCalledWith(conn, 'item-1', { label: 'ops@acme.test' })
-        vi.mocked(getVaultItem).mockResolvedValue(item({ agentIds: ['e-alice', 'e-bob'] }) as never)
-        await expect(renameVaultEntry('item-1', { name: 'x' }, managerOfA)).rejects.toMatchObject({ code: 'vaultAdminOnly' })
-    })
 })
 
 describe('who may change an item', () => {
@@ -282,13 +273,10 @@ describe('sign-in', () => {
         await expect(vaultEntryUsage('gone', admin)).rejects.toMatchObject({ code: 'vaultItemNotFound' })
     })
 
-    it('lets a manager of a Box sign an entry out and back in, never a member who manages nothing', async () => {
-        await signOutVaultEntry('item-1', managerOfA)
-        expect(deleteVaultToken).toHaveBeenCalledWith(conn, 'item-1', 'gmail')
-        expect(patchVaultItem).toHaveBeenCalledWith(conn, 'item-1', { status: 'needs_auth' })
+    it('lets a manager of a Box record a sign-in, never a member who manages nothing', async () => {
         await markVaultEntryAuthorized('item-1', managerOfA, { label: 'ops@acme.test' })
         expect(patchVaultItem).toHaveBeenLastCalledWith(conn, 'item-1', { status: 'active', label: 'ops@acme.test' })
-        await expect(signOutVaultEntry('item-1', user)).rejects.toMatchObject({ code: 'vaultManageOnly' })
+        await expect(markVaultEntryAuthorized('item-1', user)).rejects.toMatchObject({ code: 'vaultManageOnly' })
     })
 
     it('names who would lose an entry, counting those the caller cannot see', async () => {

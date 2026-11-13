@@ -1,13 +1,13 @@
 import 'server-only'
 
-import type { UpdateVaultItemInput, VaultConflict, VaultItemSummary } from '@rerun/contracts'
+import type { VaultConflict, VaultItemSummary } from '@rerun/contracts'
 
 import { AccessDeniedError, assertAgentAccess, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { vaultFlag } from '@/flags'
 import { EngineRequestError, supportsVault } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
-import { attachVaultItem, deleteVaultItem, deleteVaultToken, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
+import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { VAULT_RELEASED } from '@/lib/features'
 import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
@@ -217,13 +217,6 @@ export async function shareVaultEntry(itemId: string, sharedWithAll: boolean, ac
     return rethrowConflict(ctx, () => patchVaultItem(ctx.conn, itemId, { sharedWithAll }))
 }
 
-export async function renameVaultEntry(itemId: string, patch: Pick<UpdateVaultItemInput, 'name' | 'label'>, actor?: Actor): Promise<VaultItemSummary> {
-    const ctx = await vaultContext(actor)
-    const item = await readItem(ctx, itemId)
-    await assertCanChangeItem(ctx.actor, item, ctx)
-    return patchVaultItem(ctx.conn, itemId, { ...(patch.name !== undefined ? { name: patch.name } : {}), ...(patch.label !== undefined ? { label: patch.label } : {}) })
-}
-
 // The coworkers that lose the entry if it goes, those the caller sees by name and the others counted.
 export async function vaultEntryUsage(itemId: string, actor?: Actor): Promise<{ coworkers: VaultCoworker[]; hidden: number }> {
     const ctx = await vaultContext(actor)
@@ -242,15 +235,6 @@ export async function deleteVaultEntry(itemId: string, actor?: Actor): Promise<{
     await revokeVaultComposioAccount(ctx.actor.workspaceId, item).catch(err => console.warn(`[vault] Composio account of entry ${itemId} left connected:`, err instanceof Error ? err.message : err))
     if (isRegistryItem(item)) for (const engineAgentId of detached) await dropMigrationCopy(ctx.conn, engineAgentId, vaultRegistryKey(item), item).catch(err => console.warn(`[vault] copy of ${engineAgentId} left in place:`, err instanceof Error ? err.message : err))
     return { detached: detached.flatMap(id => ctx.byEngineId.get(id) ?? []) }
-}
-
-// Sends an entry back to its sign-in: its tokens go, every coworker using it sees it to reconnect.
-export async function signOutVaultEntry(itemId: string, actor?: Actor): Promise<VaultItemSummary> {
-    const ctx = await vaultContext(actor)
-    await assertCanAdd(ctx.actor)
-    const item = await readItem(ctx, itemId)
-    for (const server of item.tokens) await deleteVaultToken(ctx.conn, itemId, server)
-    return patchVaultItem(ctx.conn, itemId, { status: 'needs_auth' })
 }
 
 // After a sign-in made from the Vault itself, which writes the token straight to the entry.

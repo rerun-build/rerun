@@ -111,8 +111,8 @@ export async function vaultCatalog(query?: string): Promise<VaultCatalogApp[]> {
 
 export type AddVaultSecretInput = { name: string; key: string; value: string; agentIds?: string[] }
 
-// A free secret: one variable, read by the attached coworkers in their shell and in any `${VAR}`
-// of their own servers. Its value is never shown again.
+// A free secret: one variable, read by the attached coworkers in their shell. Its value is never
+// shown again.
 export async function addVaultSecret(input: AddVaultSecretInput, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
     await assertCanAdd(ctx.actor)

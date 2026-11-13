@@ -21,9 +21,9 @@ export function attachedVaultItems(agent: VaultHolder): LoadedVaultItem[] {
     return id ? vaultItemsForAgent(id) : []
 }
 
-// The variables of every attached item, for the coworker's shell and its own servers. They win over
-// the coworker's own `.env`: the Vault is where the workspace keeps the value it means today. Two
-// attached items never set the same one, the attachment refuses it.
+// The variables of every attached item, for the coworker's shell. They win over the coworker's own
+// `.env`: the Vault is where the workspace keeps the value it means today. Two attached items never
+// set the same one, the attachment refuses it. A server of the coworker's own never reads them.
 export function vaultEnvFor(agent: VaultHolder): Record<string, string> {
     return Object.assign({}, ...attachedVaultItems(agent).map(item => item.env)) as Record<string, string>
 }
