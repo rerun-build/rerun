@@ -33,7 +33,8 @@ const state = vi.hoisted(() => ({
     desktop: true,
     downloadFails: false,
     verifyFails: false,
-    freeSpaceFails: false,
+    freeSpaceFailures: 0,
+    pruneFailures: 0,
     previousTarget: null as string | null,
     pruned: [] as string[],
     swept: [] as string[],
@@ -98,7 +99,10 @@ vi.mock('./release.js', async importOriginal => ({
     ...(await importOriginal<typeof import('./release.js')>()),
     requireFreeSpace: (dir: string, bytes?: number) => {
         state.calls.push(`<requireFreeSpace ${dir} ${bytes ?? 'default'}>`)
-        if (state.freeSpaceFails) throw new Error('not enough free space')
+        if (state.freeSpaceFailures > 0) {
+            state.freeSpaceFailures -= 1
+            throw new Error('not enough free space')
+        }
     },
     downloadArtifact: async (url: string, dest: string, sha256: string) => {
         state.calls.push(`<download ${url} ${dest} ${sha256}>`)
@@ -122,6 +126,10 @@ vi.mock('./release.js', async importOriginal => ({
     },
     pruneReleases: (root: string) => {
         state.calls.push(`<prune ${root}>`)
+        if (state.pruneFailures > 0) {
+            state.pruneFailures -= 1
+            throw new Error('EACCES: permission denied')
+        }
         return state.pruned
     },
     sweepLegacyCheckout: (root: string) => {
@@ -176,7 +184,8 @@ beforeEach(() => {
     state.desktop = true
     state.downloadFails = false
     state.verifyFails = false
-    state.freeSpaceFails = false
+    state.freeSpaceFailures = 0
+    state.pruneFailures = 0
     state.previousTarget = null
     state.pruned = []
     state.swept = []
@@ -412,13 +421,73 @@ describe('updateCommand from an artifact', () => {
         expect(readLastUpdate()).toMatchObject({ status: 'error', commit: COMMIT, error: expect.stringContaining('sudo') })
     })
 
-    it('stops before downloading when the disk is short', async () => {
+    // RER-91: boxes full of their coworkers' data failed every wave without ever freeing what is ours.
+    it('frees its stale releases and caches on a short disk, checks again, then updates', async () => {
         state.layout = RELEASE_LAYOUT
-        state.freeSpaceFails = true
+        state.freeSpaceFailures = 1
+        state.pruned = ['stale0']
+        await updateCommand(ARTIFACT_ARGS)
+
+        expect(state.calls.slice(0, 9)).toEqual([
+            'sudo -n true',
+            `<sweep ${RELEASE_ROOT}>`,
+            `<requireFreeSpace ${RELEASES} default>`,
+            `<prune ${RELEASE_ROOT}>`,
+            'sudo -n rm -rf /root/.local/share/pnpm /root/.npm /root/.cache/node',
+            'command -v apt-get',
+            'sudo -n apt-get clean',
+            `<requireFreeSpace ${RELEASES} default>`,
+            `<download ${URL} ${resolve(TMP, 'engine.tar.gz')} ${SHA}>`,
+        ])
+        expect(out).toContain('not enough free space, freeing regenerable space')
+        expect(out).toContain('removed release stale0')
+        expect(out).toContain('cleaned apt cache')
+        expect(readLastUpdate()).toMatchObject({ status: 'restarting', commit: COMMIT })
+    })
+
+    it('stops before downloading when the disk is still short once freed', async () => {
+        state.layout = RELEASE_LAYOUT
+        state.freeSpaceFailures = Infinity
         await expect(updateCommand(ARTIFACT_ARGS)).rejects.toThrow('not enough free space')
         expect(state.calls).toContain(`<sweep ${RELEASE_ROOT}>`)
+        expect(state.calls.filter(call => call.startsWith('<requireFreeSpace'))).toHaveLength(2)
+        expect(state.calls).toContain('sudo -n apt-get clean')
         expect(state.calls.some(call => call.startsWith('<download'))).toBe(false)
         expect(readLastUpdate()).toMatchObject({ status: 'error', error: 'not enough free space' })
+    })
+
+    it('still checks again when freeing the caches fails', async () => {
+        state.layout = RELEASE_LAYOUT
+        state.freeSpaceFailures = 1
+        state.failing = ['sudo -n rm -rf /root/', 'sudo -n apt-get']
+        await updateCommand([...ARTIFACT_ARGS, '--no-restart'])
+        expect(out).toContain('root cache sweep failed (continuing): sudo exited with 1')
+        expect(out).toContain('apt cache clean failed (continuing): sudo exited with 1')
+        expect(state.calls.filter(call => call.startsWith('<requireFreeSpace'))).toHaveLength(2)
+        expect(readLastUpdate()).toMatchObject({ status: 'restarting', commit: COMMIT })
+    })
+
+    it('still checks again when pruning the releases fails', async () => {
+        state.layout = RELEASE_LAYOUT
+        state.freeSpaceFailures = 1
+        state.pruneFailures = 1
+        await updateCommand([...ARTIFACT_ARGS, '--no-restart'])
+        expect(out).toContain('release prune failed (continuing): EACCES: permission denied')
+        expect(state.calls).toContain('sudo -n apt-get clean')
+        expect(state.calls.filter(call => call.startsWith('<requireFreeSpace'))).toHaveLength(2)
+        expect(readLastUpdate()).toMatchObject({ status: 'restarting', commit: COMMIT })
+    })
+
+    it('skips the apt cache where apt-get is missing', async () => {
+        state.layout = RELEASE_LAYOUT
+        state.freeSpaceFailures = 1
+        state.failing = ['command -v apt-get']
+        await updateCommand([...ARTIFACT_ARGS, '--no-restart'])
+        expect(state.calls).toContain('command -v apt-get')
+        expect(state.calls).not.toContain('sudo -n apt-get clean')
+        expect(out).not.toContain('apt cache clean failed')
+        expect(state.calls.filter(call => call.startsWith('<requireFreeSpace'))).toHaveLength(2)
+        expect(readLastUpdate()).toMatchObject({ status: 'restarting', commit: COMMIT })
     })
 
     it('swaps nothing and removes its download on a checksum mismatch', async () => {

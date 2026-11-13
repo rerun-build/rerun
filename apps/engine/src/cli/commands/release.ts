@@ -179,6 +179,12 @@ export function sweepRootCaches(dirs: readonly string[] = ROOT_CACHE_DIRS): stri
     return [...dirs]
 }
 
+// Only the downloaded .deb files go: an `rm` of the apt folders would leave apt without the
+// directories it expects.
+export function cleanAptCache(): void {
+    asRoot(['apt-get', 'clean'])
+}
+
 // A box only hands freed blocks back to the host's thin volume on a discard: without it, the
 // release just pruned stays allocated on the host until the guest's weekly fstrim. A filesystem
 // without discard (a VPS, LVM without issue_discards) is not an error worth a line at every update.
