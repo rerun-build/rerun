@@ -15,12 +15,18 @@
             "float": "Flutuar"
         },
         "signIn": "Entrar",
-        "newTask": "Nova tarefa"
+        "newTask": "Nova tarefa",
+        "conversations": "Conversas"
     },
     "threads": {
         "general": "Geral",
         "back": "Voltar para Geral",
         "untitled": "Nova tarefa"
+    },
+    "history": {
+        "title": "Conversas",
+        "close": "Fechar",
+        "empty": "Nenhum tópico ainda."
     },
     "resize": "Redimensionar o chat",
     "modelPill": {

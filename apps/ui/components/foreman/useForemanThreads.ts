@@ -4,16 +4,20 @@ import type { Conversation } from '@rerun/contracts'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { listForemanConversationsAction } from '@/app/api/_actions/foreman-conversation.actions'
-import type { ThreadRow } from '@/app/api/_services/conversation.service'
+import type { SessionHistoryEntry, ThreadRow } from '@/app/api/_services/conversation.service'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 
 // A run that ends writes its status, then its title: one read covers both.
 const REFRESH_DEBOUNCE_MS = 500
 
+type Thread = Conversation & { id: string }
+
+const isThread = (conversation: Conversation): conversation is Thread => conversation.kind === 'thread' && !!conversation.id
+
 // A thread drawn with the parts of a coworker's: nobody else opens a conversation of the foreman, and
 // none of them is a routine's run.
-function threadRowOf(conversation: Conversation & { id: string }): ThreadRow {
+function threadRowOf(conversation: Thread): ThreadRow {
     return {
         id: conversation.id,
         title: conversation.title,
@@ -28,12 +32,18 @@ function threadRowOf(conversation: Conversation & { id: string }): ThreadRow {
     }
 }
 
+// The same row as a coworker's list of conversations draws.
+function historyEntryOf(conversation: Thread): SessionHistoryEntry {
+    return { ...threadRowOf(conversation), agentId: conversation.agentId, engineSessionId: conversation.engineSessionId, originAgentName: null, kind: 'thread' }
+}
+
 /**
- * General's threads, the newest first. Read when the column needs them, then again, debounced, on
+ * General's threads, the newest first: as branches of General (`threads`) and as rows of the list of
+ * every conversation (`entries`). Read when the column needs them, then again, debounced, on
  * every change of this person's conversations: a thread that opens, starts working, waits on an
  * answer or gets its title. Only the engine's foreman has threads.
  */
-export function useForemanThreads(enabled: boolean): ThreadRow[] {
+export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; entries: SessionHistoryEntry[] } {
     const { user } = useSession()
     const [conversations, setConversations] = useState<Conversation[]>([])
     const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -71,5 +81,8 @@ export function useForemanThreads(enabled: boolean): ThreadRow[] {
         onResync: refresh,
     })
 
-    return useMemo(() => conversations.filter((conversation): conversation is Conversation & { id: string } => conversation.kind === 'thread' && !!conversation.id).map(threadRowOf), [conversations])
+    return useMemo(() => {
+        const threads = conversations.filter(isThread)
+        return { threads: threads.map(threadRowOf), entries: threads.map(historyEntryOf) }
+    }, [conversations])
 }

@@ -16,11 +16,13 @@ import { ArrivalWall } from '@/components/foreman/arrival/ArrivalWall'
 import { arrivalStepOf } from '@/components/foreman/arrival/flow'
 import { ForemanChatLayer } from '@/components/foreman/ForemanChatLayer'
 import { ForemanHeader } from '@/components/foreman/ForemanHeader'
+import { ForemanHistory } from '@/components/foreman/ForemanHistory'
 import { ForemanComposerSlot } from '@/components/foreman/ForemanComposerSlot'
 import { ForemanDockResizeHandle } from '@/components/foreman/ForemanDockResizeHandle'
 import { ForemanResizeHandle } from '@/components/foreman/ForemanResizeHandle'
 import { ForemanRoutines } from '@/components/foreman/ForemanRoutines'
 import { useForemanThreads } from '@/components/foreman/useForemanThreads'
+import { threadStateOf } from '@/components/agent/sheet/ThreadBranch'
 import { FLOAT_CORNER_CLASSES, FLOAT_SIZE_CLASSES, floatSizeStyle } from '@/components/foreman/placement-classes'
 import { useForemanDrag } from '@/components/foreman/useForemanDrag'
 import { useForemanChat } from '@/components/foreman/useForemanChat'
@@ -99,7 +101,12 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const tThreads = useTranslations('foreman.threads')
     const surface = useForemanStore(state => state.surface)
     const inThread = useForemanStore(selectForemanInThread) && !guided
-    const threads = useForemanThreads(open === true && surface === 'engine' && !guided)
+    const hasThreads = surface === 'engine' && !guided
+    const { threads, entries: threadEntries } = useForemanThreads(open === true && hasThreads)
+    const threadWaiting = useMemo(() => threads.some(thread => threadStateOf(thread.status) === 'needs'), [threads])
+    const [historyOpen, setHistoryOpen] = useState(false)
+    const openHistory = useCallback(() => setHistoryOpen(true), [])
+    const closeHistory = useCallback(() => setHistoryOpen(false), [])
     const openThread = useCallback((id: string) => useForemanStore.getState().openThread(id), [])
     const backToGeneral = useCallback(() => useForemanStore.getState().showGeneral(), [])
     const threadOnScreen = useMemo(() => {
@@ -452,7 +459,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                           )
                 )}
             >
-                <ForemanHeader placement={placement} movable={!pinned} onDragPointerDown={handleHeaderPointerDown} onToggleSheetDetent={toggleDetent} onNewChat={startNewChat} thread={threadOnScreen} onBackToGeneral={backToGeneral} />
+                <ForemanHeader placement={placement} movable={!pinned} onDragPointerDown={handleHeaderPointerDown} onToggleSheetDetent={toggleDetent} onNewChat={startNewChat} thread={threadOnScreen} onBackToGeneral={backToGeneral} onOpenHistory={hasThreads ? openHistory : undefined} waiting={threadWaiting} />
                 {/* Masqués et pas démontés hors de l'onglet Assistant : un aller-retour sur Routines
                     ne doit perdre ni le brouillon du composer ni la position dans la conversation. */}
                 {arrivalStep && arrivalPick && (
@@ -486,7 +493,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             rawUrlFor={rawUrlFor}
                             readFile={readFile}
                             sharedFiles={sharedFiles}
-                            threads={inThread || surface !== 'engine' || guided ? undefined : threads}
+                            threads={inThread || !hasThreads ? undefined : threads}
                             onOpenThread={openThread}
                             underCrumb={inThread}
                             onStackElement={setStackEl}
@@ -515,6 +522,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                 </div>
                 <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />
                 {onRoutines && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
+                {hasThreads && <ForemanHistory open={historyOpen} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} onClose={closeHistory} />}
             </div>
             {placement.mode === 'float' && !dragging && open && !pinned && <ForemanResizeHandle panelRef={panelRef} placement={placement} />}
             {placement.mode === 'dock' && !dragging && open && !pinned && <ForemanDockResizeHandle panelRef={panelRef} placement={placement} />}

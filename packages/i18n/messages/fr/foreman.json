@@ -15,12 +15,18 @@
             "float": "Flottant"
         },
         "signIn": "Se connecter",
-        "newTask": "Nouvelle tâche"
+        "newTask": "Nouvelle tâche",
+        "conversations": "Conversations"
     },
     "threads": {
         "general": "Général",
         "back": "Retour à Général",
         "untitled": "Nouvelle tâche"
+    },
+    "history": {
+        "title": "Conversations",
+        "close": "Fermer",
+        "empty": "Aucun fil pour l’instant."
     },
     "resize": "Redimensionner le chat",
     "modelPill": {

@@ -15,12 +15,18 @@
             "float": "Flotante"
         },
         "signIn": "Iniciar sesión",
-        "newTask": "Nueva tarea"
+        "newTask": "Nueva tarea",
+        "conversations": "Conversaciones"
     },
     "threads": {
         "general": "General",
         "back": "Volver a General",
         "untitled": "Nueva tarea"
+    },
+    "history": {
+        "title": "Conversaciones",
+        "close": "Cerrar",
+        "empty": "Aún no hay hilos."
     },
     "resize": "Cambiar tamaño del chat",
     "modelPill": {

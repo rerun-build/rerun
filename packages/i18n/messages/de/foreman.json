@@ -15,12 +15,18 @@
             "float": "Schwebend"
         },
         "signIn": "Anmelden",
-        "newTask": "Neue Aufgabe"
+        "newTask": "Neue Aufgabe",
+        "conversations": "Unterhaltungen"
     },
     "threads": {
         "general": "Allgemein",
         "back": "Zurück zu Allgemein",
         "untitled": "Neue Aufgabe"
+    },
+    "history": {
+        "title": "Unterhaltungen",
+        "close": "Schließen",
+        "empty": "Noch kein Thread."
     },
     "resize": "Chatgröße ändern",
     "modelPill": {
