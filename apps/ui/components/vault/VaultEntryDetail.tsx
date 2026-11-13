@@ -133,8 +133,18 @@ function SignInSection({ entry, signingIn, onSigningIn, onChanged }: { entry: Va
         )
     }
 
-    if (!entry.oauth) return null
     const signedOut = entry.status === 'needs_auth'
+    // A managed or Composio sign-in starts from a coworker for now: say where to go.
+    if (!entry.oauth && signedOut && (entry.managed || entry.composio)) {
+        return (
+            <Alert variant="warning">
+                <AlertDescription>
+                    {t('detail.signedOut', { name: entry.name })} {t('detail.reconnectFromCoworker')}
+                </AlertDescription>
+            </Alert>
+        )
+    }
+    if (!entry.oauth) return null
     if (!signedOut && !signingIn) {
         return (
             <div className="flex justify-end">

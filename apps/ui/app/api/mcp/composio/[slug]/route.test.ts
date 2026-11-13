@@ -9,11 +9,13 @@ import { serviceManifestSchema } from '@/lib/services/manifest'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 import { POST } from './route'
+import { getVaultItem, patchVaultItem } from '@/lib/engine/vault-client'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_services/services.service', () => ({ loadManifest: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn(), getWorkspaceConnection: vi.fn() }))
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(), upsertRegistryEntry: vi.fn() }))
+vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(), patchVaultItem: vi.fn(async () => ({})) }))
 vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), executeTool: vi.fn(), listToolkitTools: vi.fn() }))
 
 const BOX_KEY = 'box-key-of-workspace-7'
@@ -226,6 +228,54 @@ describe('POST /api/mcp/composio/[slug]', () => {
             const text = await errorText(await POST(request(toolCall('GMAIL_LIST_THREADS')), context()))
 
             expect(text).toMatch(/^Gmail is not connected yet\./)
+            expect(upsertRegistryEntry).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('a server of a Vault entry', () => {
+        const entry = (over: Record<string, unknown> = {}) => ({ id: 'item-1', kind: 'service', slug: 'gmail', name: 'Gmail', status: 'active', agentIds: ['engine-own'], sharedWithAll: false, composio: { toolkit: 'gmail', serverName: 'gmail' }, config: {}, mcpServers: [], skills: [], envKeys: [], tokens: [], createdBy: null, createdAt: '', updatedAt: '', ...over })
+
+        beforeEach(() => {
+            vi.mocked(getWorkspaceConnection).mockResolvedValue({ baseUrl: 'https://engine.test', apiKey: null } as EngineConnection)
+        })
+
+        it("acts as the entry's own Composio account", async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry() as never)
+            await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', 'local_vault_item-1', { to: 'a@b.c' })
+        })
+
+        it('keeps the account a migrated entry was connected with', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry({ composio: { toolkit: 'gmail', serverName: 'gmail', userId: composioUserId('agent-own') } }) as never)
+            await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioUserId('agent-own'), { to: 'a@b.c' })
+        })
+
+        it('serves a coworker holding the entry through everyone, and refuses one that does not hold it', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry({ agentIds: [], sharedWithAll: true }) as never)
+            await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())
+            expect(executeTool).toHaveBeenCalledTimes(1)
+
+            vi.mocked(getVaultItem).mockResolvedValue(entry({ agentIds: ['someone-else'] }) as never)
+            const refused = await (await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())).json()
+            expect(refused.error.message).toMatch(/does not hold/)
+            expect(executeTool).toHaveBeenCalledTimes(1)
+        })
+
+        it('refuses an entry of another app, or one the box no longer has', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry({ composio: { toolkit: 'slack', serverName: 'slack' } }) as never)
+            expect((await (await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())).json()).error).toBeDefined()
+            vi.mocked(getVaultItem).mockRejectedValue(new Error('404'))
+            expect((await (await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'gone' }), context())).json()).error).toBeDefined()
+            expect(executeTool).not.toHaveBeenCalled()
+        })
+
+        it('sends an entry that lost its account back to its sign-in, for every coworker', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry() as never)
+            vi.mocked(executeTool).mockResolvedValue({ successful: false, data: null, error: 'No connected account found' })
+            const body = await (await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())).json()
+            expect(body.result.content[0].text).toMatch(/expired or was revoked/)
+            expect(patchVaultItem).toHaveBeenCalledWith(expect.anything(), 'item-1', { status: 'needs_auth' })
             expect(upsertRegistryEntry).not.toHaveBeenCalled()
         })
     })

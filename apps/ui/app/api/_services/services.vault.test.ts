@@ -19,7 +19,7 @@ vi.mock('@/lib/services/compiler', () => ({
     decompileService: vi.fn(),
 }))
 vi.mock('@/lib/vault/install', () => ({
-    VAULT_METHOD_KINDS: new Set(['oauth', 'key', 'stdio', 'none']),
+    VAULT_METHOD_KINDS: new Set(['oauth', 'key', 'stdio', 'none', 'managed', 'composio']),
     compileIntoVault: vi.fn(async () => ({ toolNames: ['linear'], oauth: { serverName: 'linear', url: 'https://mcp.linear.test' }, managed: null, composio: null, app: null, item: { id: 'item-1' } })),
 }))
 vi.mock('@/lib/vault/tokens', () => ({ deleteConnectorToken: vi.fn(async () => {}) }))
@@ -45,7 +45,8 @@ vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: () => false }))
 const oauthMethod = { id: 'oauth', label: 'Sign in', kind: 'oauth', recommended: true, mcpServers: [{ name: 'linear', transport: 'http', url: 'https://mcp.linear.test' }] }
 const keyMethod = { id: 'key', label: 'API key', kind: 'key', recommended: false, inputs: [{ key: 'TOKEN', label: 'Token', secret: true }], envKeys: [{ key: 'LINEAR_TOKEN', fromInput: 'TOKEN' }] }
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: false, composio: { toolkit: 'linear', authConfigId: 'ac', allowedTools: [] } }
-const MANIFEST = { slug: 'linear', name: 'Linear', authMethods: [oauthMethod, keyMethod, composioMethod] }
+const appMethod = { id: 'app', label: 'Pick an account', kind: 'app', recommended: false, app: { appSlug: 'linkedin' }, mcpServers: [{ name: 'linear_pro', transport: 'http', url: 'https://hub.test/api/mcp/apps/linkedin' }] }
+const MANIFEST = { slug: 'linear', name: 'Linear', authMethods: [oauthMethod, keyMethod, composioMethod, appMethod] }
 
 const entry = (over: Partial<RegistryEntry> = {}): RegistryEntry => ({ status: 'active', config: {}, mcpServers: ['linear'], envKeys: [], skills: [], installedAt: '2026-10-01', ...over })
 
@@ -102,7 +103,7 @@ describe('installService on a box that keeps a Vault', () => {
 
     it('never compiles a Vault entry into a sign-in the Vault does not hold', async () => {
         vi.mocked(readRegistry).mockResolvedValue({ services: { linear: entry({ vaultItemId: 'item-1' }) } })
-        await expect(installService('agent-1', 'linear', {}, 'composio')).rejects.toMatchObject({ code: 'vaultMethodUnsupported' })
+        await expect(installService('agent-1', 'linear', {}, 'app')).rejects.toMatchObject({ code: 'vaultMethodUnsupported' })
         expect(compileIntoVault).not.toHaveBeenCalled()
         expect(compileService).not.toHaveBeenCalled()
     })
@@ -113,8 +114,14 @@ describe('installService on a box that keeps a Vault', () => {
         await expect(installService('agent-1', 'linear', {}, 'oauth')).rejects.toMatchObject({ code: 'vaultConflictSomeone', params: { name: 'linear' } })
     })
 
-    it('keeps a sign-in the Vault does not hold yet in the coworker folder', async () => {
+    it('puts a Composio account in the Vault too', async () => {
         await installService('agent-1', 'linear', {}, 'composio')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ authMethodId: 'composio' }))
+        expect(compileService).not.toHaveBeenCalled()
+    })
+
+    it('keeps a sign-in the Vault does not hold yet in the coworker folder', async () => {
+        await installService('agent-1', 'linear', {}, 'app')
         expect(compileService).toHaveBeenCalled()
         expect(compileIntoVault).not.toHaveBeenCalled()
     })

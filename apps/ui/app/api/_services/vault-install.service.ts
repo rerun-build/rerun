@@ -11,7 +11,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { newServiceInstanceId } from '@/lib/services/instances'
 import type { AuthMethodSummary } from '@/lib/services/types'
-import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
+import { VAULT_DIALOG_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { assertCanAdd, assertCanChangeItem, assertManagesCoworker, rethrowConflict, vaultContext } from './vault.service'
 import { loadManifest, toAuthMethodSummaries } from './services.service'
 
@@ -44,7 +44,7 @@ export async function addVaultService(input: AddVaultServiceInput, actor?: Actor
     const manifest = await loadManifest(input.slug)
     if (!manifest) throw new Error(`Service not found: ${input.slug}`)
     const method = getMethod(manifest, input.authMethodId)
-    if (!VAULT_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
+    if (!VAULT_DIALOG_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
 
     const sameApp = (await listVaultItems(ctx.conn)).filter(item => item.slug === manifest.slug)
     const instanceId = manifest.multiInstance && sameApp.length > 0 ? newServiceInstanceId(sameApp.flatMap(item => item.instanceId ?? [])) : undefined
@@ -81,7 +81,7 @@ export async function reconfigureVaultService(itemId: string, values: Record<str
     const manifest = await loadManifest(current.slug)
     if (!manifest) throw new Error(`Service not found: ${current.slug}`)
     const method = getMethod(manifest, authMethodId ?? current.authMethodId)
-    if (!VAULT_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
+    if (!VAULT_DIALOG_METHOD_KINDS.has(method.kind)) throw new AccessDeniedError('vaultMethodUnsupported')
     if (missingRequiredInputs(method, values).length > 0) return { status: 'needs_config', item: current, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id }
     const instance = current.instanceId ? { key: `${current.slug}@${current.instanceId}`, instanceId: current.instanceId, label: current.label } : undefined
     const { item } = await rethrowConflict(ctx, () => compileIntoVault({ conn: ctx.conn, manifest, values, authMethodId: method.id, instance, itemId }))
@@ -103,7 +103,7 @@ export async function vaultCatalog(query?: string): Promise<VaultCatalogApp[]> {
     return (data ?? []).flatMap(row => {
         const parsed = serviceManifestSchema.safeParse(row.manifest)
         if (!parsed.success) return []
-        const authMethods = toAuthMethodSummaries(parsed.data).filter(method => VAULT_METHOD_KINDS.has(method.kind))
+        const authMethods = toAuthMethodSummaries(parsed.data).filter(method => VAULT_DIALOG_METHOD_KINDS.has(method.kind))
         if (authMethods.length === 0) return []
         return [{ slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: parsed.data.multiInstance, authMethods }]
     })

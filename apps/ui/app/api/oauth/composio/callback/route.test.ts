@@ -12,6 +12,9 @@ vi.mock('next/headers', () => ({ cookies: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({ requireAgentWorkspaceId: vi.fn(async () => 7), workspaceActor: (workspaceId: number) => ({ kind: 'workspace', workspaceId }) }))
 vi.mock('@/app/api/_services/services.service', () => ({ markComposioAuthorized: vi.fn(), loadManifest: vi.fn() }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ parkSignIn: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(async () => ({ services: {} })) }))
+vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn() }))
 vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), getConnectedAccount: vi.fn() }))
 
 const STATE = 'state-1'

@@ -563,7 +563,7 @@ export async function markComposioAuthorized(agentId: string, key: string, conne
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (!entry) return
-    const composio = { toolkit: entry.composio?.toolkit ?? '', serverName: entry.composio?.serverName ?? '', connectedAccountId, ...(accountLabel ? { accountLabel } : {}) }
+    const composio = { toolkit: entry.composio?.toolkit ?? '', serverName: entry.composio?.serverName ?? '', connectedAccountId, ...(accountLabel ? { accountLabel } : {}), ...(entry.composio?.userId ? { userId: entry.composio.userId } : {}) }
     await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active', composio, ...(accountLabel ? { label: accountLabel } : {}) })
 }
 
@@ -596,7 +596,7 @@ export async function resetServiceConnection(agentId: string, key: string, actor
                 console.warn(`[composio] could not delete connected account ${entry.composio?.connectedAccountId}:`, err instanceof Error ? err.message : err)
             })
         }
-        const composio = { toolkit: entry.composio.toolkit, serverName: entry.composio.serverName }
+        const composio = { toolkit: entry.composio.toolkit, serverName: entry.composio.serverName, ...(entry.composio.userId ? { userId: entry.composio.userId } : {}) }
         await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'needs_auth', composio })
         return { mode: 'auth', composio }
     }

@@ -40,7 +40,7 @@ export type RegistryEntry = {
     // A Composio connection to complete (needs_auth): Composio holds the third-party token, so
     // there is no engine token-store entry. `connectedAccountId` (set once connected) is what
     // uninstall/reconnect delete at Composio to actually revoke access.
-    composio?: { toolkit: string; serverName: string; connectedAccountId?: string; accountLabel?: string }
+    composio?: { toolkit: string; serverName: string; connectedAccountId?: string; accountLabel?: string; userId?: string }
     // A paid app to plug in (needs_auth until the coworker picks an account). Which account it
     // picked lives in Supabase (app_connection_agents), the label here is only for display.
     app?: { appSlug: string; serverName: string; accountLabel?: string }

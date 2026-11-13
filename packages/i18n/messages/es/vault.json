@@ -31,7 +31,8 @@
         "coworkers": "Coworkers",
         "noCoworkers": "Todavía no hay coworkers en este workspace.",
         "hiddenCoworkers": "{count, plural, one {# coworker} other {# coworkers}} en Boxes que no ves",
-        "variables": "Variables"
+        "variables": "Variables",
+        "reconnectFromCoworker": "Vuelve a conectarla desde la pestaña Apps de un coworker que la use."
     },
     "delete": {
         "button": "Eliminar",

@@ -10,6 +10,9 @@ const openPendingGrant = vi.fn()
 vi.mock('@/lib/oauth/pending-grant', () => ({ openPendingGrant: (...args: unknown[]) => openPendingGrant(...args) }))
 vi.mock('@/app/api/_services/custom-mcp.service', () => ({ getCustomMcpServer: (...args: unknown[]) => getCustomMcpServer(...args) }))
 vi.mock('@/app/api/_services/services.service', () => ({ getServiceDetails: vi.fn(), loadManifest: vi.fn() }))
+vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(async () => ({ services: {} })) }))
+vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn() }))
 vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), composioConfigured: () => true, initiateConnectedAccount: vi.fn() }))
 vi.mock('@/lib/mcp-oauth', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/mcp-oauth')>()),
