@@ -7,6 +7,7 @@ import { toBoxScope } from '@/app/api/_auth/box-scope'
 import type { Database } from '@/app/api/database.types'
 import { BANNER_WARM_INLINE_MS, buildUnsubscribeUrl, emailBoardBanner, pushNotification, sendIncidentResolvedEmail, sendNotificationEmail } from '@rerun/cloud/email'
 import { notificationUrl } from '@/lib/app-url'
+import { seedSessionTitle } from '@/lib/chat/session-title'
 import type { NotificationPayload } from '@/lib/engine/types'
 import { RERUN_BUDGET_ERROR_CODE, suppressesErrorEmail } from '@/lib/notifications/budget-notice'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
@@ -182,7 +183,8 @@ async function applySessionStatus(supabase: ServiceRoleClient, agentId: string |
 
 // A schedule or a trigger opens its session under the routine's name, and every run of it would
 // read the same in the list. Once over, the session is titled after what the run did, the routine's
-// name kept in `automation_name`. Best-effort: on any failure the session keeps the routine's name.
+// name kept in `automation_name`. A session someone renamed keeps the name they gave it.
+// Best-effort: on any failure the session keeps the routine's name.
 async function retitleAutomatedRun(supabase: ServiceRoleClient, agentId: string | null, notification: StoredNotification): Promise<void> {
     const run = automatedRunReport(notification)
     if (!run || !agentId || !notification.sessionId) return
@@ -191,9 +193,10 @@ async function retitleAutomatedRun(supabase: ServiceRoleClient, agentId: string 
         if (!session) return
         const routineName = session.automation_name ?? session.title
         const generated = run.report ? await generateRunTitle(routineName, run.report, run.failed) : null
+        const renamed = session.title !== seedSessionTitle(routineName)
         const { error } = await supabase
             .from('sessions')
-            .update<SessionUpdate>({ automation_name: routineName, outcome: automatedRunOutcome(run.failed, generated?.nothingToReport ?? false), ...(generated && { title: generated.title }) })
+            .update<SessionUpdate>({ automation_name: routineName, outcome: automatedRunOutcome(run.failed, generated?.nothingToReport ?? false), ...(generated && !renamed && { title: generated.title }) })
             .eq('id', session.id)
         if (error) console.error('[notification] failed to retitle the run', error)
     } catch (err) {

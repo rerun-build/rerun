@@ -36,7 +36,8 @@
         "emptyThreads": "Aucun fil pour l’instant.",
         "emptyAutomations": "Aucune exécution automatique pour l’instant.",
         "running": "En cours",
-        "startedBy": "Lancé par {name}"
+        "startedBy": "Lancé par {name}",
+        "moreFor": "Plus d’actions pour {title}"
     },
     "agentComputerThumbnail": {
         "working": "Travaille sur son ordinateur",
@@ -75,8 +76,14 @@
     },
     "openChatsTabs": {
         "closeTab": "Fermer {title}",
+        "closeTabMenu": "Fermer l’onglet",
         "newThread": "Nouveau fil",
         "general": "Général"
+    },
+    "sessionRename": {
+        "rename": "Renommer",
+        "label": "Nom de la conversation",
+        "failed": "Impossible de renommer. Réessayez."
     },
     "threadBranch": {
         "needs": "Pour vous",

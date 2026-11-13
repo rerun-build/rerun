@@ -4,6 +4,7 @@ import { recordSessionParticipant } from '@/app/api/_services/notification-audie
 import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { reformulateKickoff } from '@/lib/ai/reformulate-kickoff'
+import { seedSessionTitle } from '@/lib/chat/session-title'
 import { chat } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import type { MessageAuthor } from '@rerun/contracts'
@@ -48,7 +49,7 @@ export async function startKickoff(agentId: string, input: { kickoff?: string; d
         generateSessionTitle(message)
             .then(async title => {
                 const supabase = createServiceRoleClient()
-                await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title }).eq('id', sessionId)
+                await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title }).eq('id', sessionId).eq('title', seedSessionTitle(message))
             })
             .catch(() => {})
 

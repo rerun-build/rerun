@@ -1,5 +1,5 @@
-import { assertAgentAccess, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
-import { type WorkspaceContext } from '@/app/api/_auth/ownership'
+import { assertAgentAccess, assertSessionInWorkspace, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
+import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
@@ -9,7 +9,7 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentConversations, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
+import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentConversations, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, renameSession, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
 
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybeSingle: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -182,6 +182,59 @@ describe('markSessionsHandled', () => {
         await markSessionsHandled(ctx, ['foreign-session'])
 
         expect(db.writes('sessions')).toHaveLength(0)
+    })
+})
+
+describe('renameSession', () => {
+    beforeEach(() => vi.clearAllMocks())
+
+    function sessions(renamed: { id: string }[] = [{ id: 'session-1' }]) {
+        const db = fakeSupabase(() => ({ data: renamed }))
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+        vi.mocked(assertSessionInWorkspace).mockResolvedValue({ id: 'session-1', agent_id: 'a', engine_session_id: 'engine-1', engine_agent_id: 'engine-agent' })
+        return db
+    }
+
+    it('writes the name without the spaces around it, on a thread only', async () => {
+        const db = sessions()
+
+        expect(await renameSession('session-1', '  Pipeline, week 46  ')).toBe(true)
+
+        const [write] = db.writes('sessions')
+        expect(write.payload).toEqual({ title: 'Pipeline, week 46' })
+        expect(write.filters.map(call => call.args)).toEqual([['id', 'session-1'], ['kind', 'thread'], ['id']])
+    })
+
+    it('cuts a name longer than a title can be', async () => {
+        const db = sessions()
+
+        await renameSession('session-1', 'x'.repeat(200))
+
+        expect(db.writes('sessions')[0].payload).toEqual({ title: 'x'.repeat(80) })
+    })
+
+    it('refuses a blank name before reading anything', async () => {
+        const db = sessions()
+
+        expect(await renameSession('session-1', '   ')).toBe(false)
+
+        expect(assertSessionInWorkspace).not.toHaveBeenCalled()
+        expect(db.writes('sessions')).toEqual([])
+    })
+
+    it('says no when the row is General, which the write leaves untouched', async () => {
+        sessions([])
+
+        expect(await renameSession('session-1', 'Mine')).toBe(false)
+    })
+
+    it('writes nothing on a conversation the caller does not reach', async () => {
+        const db = sessions()
+        vi.mocked(assertSessionInWorkspace).mockRejectedValue(new AuthorizationError('sessionNotFound'))
+
+        await expect(renameSession('foreign-session', 'Mine')).rejects.toBeInstanceOf(AuthorizationError)
+
+        expect(db.writes('sessions')).toEqual([])
     })
 })
 

@@ -1,10 +1,10 @@
 'use client'
 
 import { AnimatePresence, motion } from 'motion/react'
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 
 import { cn } from '../cn'
-import { Input } from '../forms'
+import { Input, useRenameField } from '../forms'
 import { ChevronDownIcon } from '../icons'
 import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
 import { ScrollFade, Switch } from '../primitives'
@@ -225,52 +225,8 @@ function LiveDot({ tone }: { tone: RoutineStatus['tone'] }) {
     )
 }
 
-// Mounted only while renaming, so the current name is the initial state.
 function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (name: string) => void; onCancel: () => void }) {
     const t = useKitTranslations()
-    const [value, setValue] = useState(name)
-    const inputRef = useRef<HTMLInputElement>(null)
-
-    // A menu item starts the rename: its focus restore would steal the focus from an immediate call.
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            inputRef.current?.focus()
-            inputRef.current?.select()
-        })
-        return () => clearTimeout(timer)
-    }, [])
-
-    // Unmounting the field fires its blur in Chrome, so an Escape (or an Enter) would be followed by
-    // a second submit carrying the edited value.
-    const settled = useRef(false)
-    const settle = (fn: () => void) => {
-        if (settled.current) return
-        settled.current = true
-        fn()
-    }
-
-    const submit = () =>
-        settle(() => {
-            const next = value.trim()
-            if (next && next !== name) onSubmit(next)
-            else onCancel()
-        })
-
-    return (
-        <Input
-            ref={inputRef}
-            value={value}
-            maxLength={120}
-            aria-label={t('foreman.routines.nameLabel')}
-            onChange={event => setValue(event.target.value)}
-            onBlur={submit}
-            onClick={event => event.stopPropagation()}
-            onKeyDown={event => {
-                event.stopPropagation()
-                if (event.key === 'Enter') submit()
-                if (event.key === 'Escape') settle(onCancel)
-            }}
-            className="-ml-1.5 h-6 px-1.5 text-sm font-medium"
-        />
-    )
+    const { inputProps } = useRenameField({ name, onSubmit, onCancel })
+    return <Input {...inputProps} maxLength={120} aria-label={t('foreman.routines.nameLabel')} className="-ml-1.5 h-6 px-1.5 text-sm font-medium" />
 }
