@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from 'react-native'
-import Animated, { FadeInLeft, FadeInRight, FadeOut, useAnimatedKeyboard, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated'
+import Animated, { FadeInLeft, FadeInRight, FadeOut, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
@@ -16,6 +16,7 @@ import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { useFocusedSystemBack } from '@/lib/focused-system-back'
 import * as Haptics from '@/lib/haptics'
+import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { EASE_OUT, MOTION } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
@@ -51,7 +52,7 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
     const insets = useSafeAreaInsets()
     const { height: windowHeight } = useWindowDimensions()
     const { step, direction, back, canGoBack, thinking } = useSignInFlow()
-    const keyboard = useAnimatedKeyboard()
+    const keyboard = useKeyboardHeight()
     const t = useTranslations('mobileAuth')
     // Android's back gesture walks the steps back as the sheet's own back button does, rather than leave
     // the app; the country sheet pushed over this screen takes the gesture back while it is open.

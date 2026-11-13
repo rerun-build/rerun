@@ -3,7 +3,7 @@ import type { UIMessage } from 'ai'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Keyboard, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native'
-import Animated, { useAnimatedKeyboard, useAnimatedReaction, useAnimatedStyle, type AnimatedKeyboardInfo } from 'react-native-reanimated'
+import Animated, { useAnimatedKeyboard, useAnimatedReaction, useAnimatedStyle, type AnimatedKeyboardInfo, type DerivedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -22,6 +22,7 @@ import { SectionHeader } from '@/components/home/SectionHeader'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { ProgressiveBlur } from '@/components/ui/ProgressiveBlur'
 import { statusLine } from '@/components/ui/status'
+import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { coworkers, MOCK_VOICE_PEAKS, sessions } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -95,15 +96,15 @@ function useStreamedReply(active: boolean) {
     return { text: STREAMED.slice(0, length), done: length >= STREAMED.length }
 }
 
-// RER-72: the keyboard height the pane is lifted by (Reanimated) beside the one React Native last
-// heard of, to catch the lift that stays up once the keyboard is gone.
-function KeyboardProbe({ keyboard }: { keyboard: AnimatedKeyboardInfo }) {
-    const [lifted, setLifted] = useState({ height: 0, state: 0 })
+// RER-72, RER-68: the keyboard height Reanimated reads, the one the pane is lifted by, and the one React
+// Native last heard of, to catch a lift that disagrees with the keyboard on screen.
+function KeyboardProbe({ keyboard, lift }: { keyboard: AnimatedKeyboardInfo; lift: DerivedValue<number> }) {
+    const [lifted, setLifted] = useState({ height: 0, state: 0, lift: 0 })
     const [heard, setHeard] = useState({ height: 0, visible: false })
     useAnimatedReaction(
-        () => ({ height: Math.round(keyboard.height.value), state: keyboard.state.value }),
+        () => ({ height: Math.round(keyboard.height.value), state: keyboard.state.value, lift: Math.round(lift.value) }),
         (current, previous) => {
-            if (current.height !== previous?.height || current.state !== previous?.state) scheduleOnRN(setLifted, current)
+            if (current.height !== previous?.height || current.state !== previous?.state || current.lift !== previous?.lift) scheduleOnRN(setLifted, current)
         }
     )
     useEffect(() => {
@@ -117,6 +118,7 @@ function KeyboardProbe({ keyboard }: { keyboard: AnimatedKeyboardInfo }) {
     return (
         <View pointerEvents="none" testID="keyboard-probe" style={{ position: 'absolute', top: 120, right: 8, padding: 6, borderRadius: 6, backgroundColor: 'rgba(0,0,0,0.75)' }}>
             <Text style={{ color: '#fff', fontSize: 12, fontVariant: ['tabular-nums'] }}>{`rea ${lifted.height} s${lifted.state}`}</Text>
+            <Text style={{ color: '#fff', fontSize: 12, fontVariant: ['tabular-nums'] }}>{`lift ${lifted.lift}`}</Text>
             <Text style={{ color: '#fff', fontSize: 12, fontVariant: ['tabular-nums'] }}>{`rn ${heard.height} ${heard.visible ? 'up' : 'down'}`}</Text>
         </View>
     )
@@ -134,7 +136,8 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
     const running = state === 'running' || (state === 'streaming' && !streamed.done)
     const blockShown = state === 'question' || state === 'approval'
     const keyboard = useAnimatedKeyboard()
-    const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
+    const keyboardHeight = useKeyboardHeight()
+    const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboardHeight.height.value + spacing.sm, insets.bottom) }))
     useKeyboardShown(() => scroll.current?.scrollToEnd({ animated: true }))
     return (
         <Animated.View style={[{ flex: 1 }, lift]}>
@@ -163,7 +166,7 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
                     )}
                 </View>
             </View>
-            {probe && <KeyboardProbe keyboard={keyboard} />}
+            {probe && <KeyboardProbe keyboard={keyboard} lift={keyboardHeight.height} />}
         </Animated.View>
     )
 }

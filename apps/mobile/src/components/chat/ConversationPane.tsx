@@ -2,7 +2,7 @@ import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf
 import { router, useFocusEffect } from 'expo-router'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
-import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
@@ -13,6 +13,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { setPendingDesktopOpen } from '@/desktop/pending-open'
 import { track } from '@/lib/analytics'
 import * as Haptics from '@/lib/haptics'
+import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { askForPushOnce, setConversationOnScreen } from '@/notifications/push'
 import type { ChatEndpoints } from '@/chat/endpoints'
 import { useCoworkerChat } from '@/chat/useCoworkerChat'
@@ -153,7 +154,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     )
     const [footerHeight, setFooterHeight] = useState(0)
 
-    const keyboard = useAnimatedKeyboard()
+    const keyboard = useKeyboardHeight()
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
 
     const lastAssistant = chat.messages.findLastIndex(message => message.role === 'assistant')

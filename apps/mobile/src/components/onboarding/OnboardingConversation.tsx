@@ -2,7 +2,7 @@ import { FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { useRef, useState } from 'react'
 import { ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
-import Animated, { FadeInDown, FadeOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { FadeInDown, FadeOutDown, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
@@ -15,6 +15,7 @@ import { AppText } from '@/components/ui/AppText'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { PillButton } from '@/components/ui/PillButton'
 import { ProgressiveBlur } from '@/components/ui/ProgressiveBlur'
+import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { spacing } from '@/theme/tokens'
 
 import { buildTasks, isKickoff, pendingWidget, readBuildResult, readPlanOutput, readQuestionOutput, readStarterPack, readStarterPackOutput, readTrialOutput, textOf, widgetOf, type WidgetPart } from './parts'
@@ -86,7 +87,7 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
     const scroll = useRef<ScrollViewInstance>(null)
     const [draft, setDraft] = useState('')
     const [footerHeight, setFooterHeight] = useState(0)
-    const keyboard = useAnimatedKeyboard()
+    const keyboard = useKeyboardHeight()
     const t = useTranslations('mobileOnboarding')
     const foreman = { id: 'foreman', kind: 'foreman' as const, name: FOREMAN_DISPLAY_NAME, role: t('conversation.foremanRole'), status: 'working' as const }
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))

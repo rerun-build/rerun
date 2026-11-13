@@ -2,7 +2,7 @@ import { ROUTE_ID_PATTERN } from '@rerun/contracts'
 import { Redirect, router, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { BackHandler, Pressable, TextInput, View } from 'react-native'
-import Animated, { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { WebView, type WebViewMessageEvent } from 'react-native-webview'
 import { useTranslations } from 'use-intl'
@@ -18,6 +18,7 @@ import { handBack } from '@/desktop/hand-back'
 import { takePendingDesktopOpen } from '@/desktop/pending-open'
 import { DESKTOP_KEYS, keyScript, typeScript, viewerUrl } from '@/desktop/viewer'
 import * as Haptics from '@/lib/haptics'
+import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { fonts, radius, spacing } from '@/theme/tokens'
 
 const SCREEN_BACKGROUND = '#000000'
@@ -136,7 +137,7 @@ export default function Desktop() {
         setText('')
     }
 
-    const keyboard = useAnimatedKeyboard()
+    const keyboard = useKeyboardHeight()
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value, insets.bottom) + spacing.sm }))
 
     if (!ROUTE_ID_PATTERN.test(agent)) return <Redirect href="/" />

@@ -1,7 +1,7 @@
 import { INTAKE_INDUSTRIES, rolesForIndustry } from '@rerun/contracts'
 import { useState } from 'react'
 import { ScrollView, TextInput, View } from 'react-native'
-import Animated, { FadeIn, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { FadeIn, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
@@ -11,6 +11,7 @@ import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { AppText } from '@/components/ui/AppText'
 import { Button } from '@/components/ui/Button'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { fieldOutline } from '@/theme/field'
 import { useTheme } from '@/theme/theme'
 import { controlSize, fonts, radius, spacing, withAlpha } from '@/theme/tokens'
@@ -68,7 +69,7 @@ function ChoicesSkeleton() {
 export function IntakeView({ intake }: { intake: IntakeController }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
-    const keyboard = useAnimatedKeyboard()
+    const keyboard = useKeyboardHeight()
     const t = useTranslations('mobileOnboarding')
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value, insets.bottom) + spacing.md }))
     const { step, steps, index, draft, industry, deciding, submitting, saveFailed, canAdvance, last, set, choose, next, back, skipWebsite } = intake
