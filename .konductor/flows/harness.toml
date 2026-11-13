@@ -48,6 +48,7 @@ Pour chaque remarque que tu écartes, dis pourquoi.
 id = "pr"
 title = "Pull request"
 kind = "create_pr"
+chat = "pr"
 
 [[steps]]
 id = "summary"
