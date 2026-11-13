@@ -10,6 +10,17 @@
 //                                                     same, on a booted iPad simulator named "Rerun · <workspace> · iPad"
 //                                                     (an iPad Pro 13", for the App Store's iPad set), into ipad/
 //
+//   node apps/mobile/scripts/capture-store-shots.mjs --duo [only-this-capture ...]
+//                                                     same, unfolded, on the EAS Simulator iPhone Duo session named in
+//                                                     apps/mobile/.env.eas-simulator, into duo/ (light only)
+//
+// The iPhone Duo needs Xcode 27.1, which the Namespace Mac lacks: the session runs on EAS Simulator.
+// Metro serves it through a public tunnel (`cloudflared tunnel --url http://127.0.0.1:8081`), started
+// with `EXPO_PACKAGER_PROXY_URL=<tunnel>` so its manifest points there. Then, from apps/mobile:
+// `eas simulator:start --platform ios --device "iPhone Duo" --application-archive-url <development build>
+// --open-url "exp+rerun://expo-development-client/?url=<tunnel, URL-encoded>"`, and turn the dev menu's
+// "Tools button" off by hand before the run.
+//
 //   pnpm dev:mobile --android                         first, so the app runs in this workspace's AVD
 //   node apps/mobile/scripts/capture-store-shots.mjs --android [only-this-capture ...]
 //
@@ -30,6 +41,7 @@ import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
+const MOBILE_DIR = join(REPO_ROOT, 'apps/mobile')
 const OUT_DIR = join(REPO_ROOT, 'cloud/apps/admin/public/render-lab/app-store')
 const WORKSPACE_NAME = process.env.CONDUCTOR_WORKSPACE_NAME || basename(REPO_ROOT)
 const onIpad = process.argv.includes('--ipad')
@@ -179,9 +191,51 @@ async function captureAndroid(captures) {
     }
 }
 
+// agent-device on the EAS Simulator session of apps/mobile/.env.eas-simulator.
+function agentDevice(...args) {
+    const result = spawnSync('npx', ['--yes', 'eas-cli@latest', 'simulator:exec', 'npx', 'agent-device@latest', ...args], { cwd: MOBILE_DIR, encoding: 'utf8' })
+    if (result.status !== 0) throw new Error(`agent-device ${args.join(' ')} failed: ${(result.stderr || result.stdout).trim()}`)
+    return result.stdout
+}
+
+async function openDuoUrl(url) {
+    agentDevice('open', url, '--platform', 'ios')
+    await wait(2000)
+    spawnSync('npx', ['--yes', 'eas-cli@latest', 'simulator:exec', 'npx', 'agent-device@latest', 'press', 'label="Open"', '--timeout', '15000'], { cwd: MOBILE_DIR, encoding: 'utf8' })
+}
+
+const DUO_OUT_DIR = join(OUT_DIR, 'duo')
+// Long enough for a chat opened through the tunnel to scroll to its end.
+const DUO_SETTLE_MS = 12_000
+
+// Deep links stack on the session (a relaunch would lose the tunnel), and the dark run caught the
+// previous sheet behind the home: the lab frames the light captures only.
+async function captureDuo(captures) {
+    // The hinge read often times out once the inner display is lit: the screenshot size says whether it unfolded.
+    spawnSync('npx', ['--yes', 'eas-cli@latest', 'simulator:exec', 'npx', 'agent-device@latest', 'fold', 'open'], { cwd: MOBILE_DIR, encoding: 'utf8' })
+    // On the unfolded inner display, the simulator's landscape-right is the app's portrait window.
+    agentDevice('orientation', 'landscape-right')
+    agentDevice('settings', 'appearance', 'light')
+    await wait(10_000)
+    mkdirSync(join(DUO_OUT_DIR, 'light'), { recursive: true })
+    for (const capture of captures) {
+        if (capture.over) {
+            await openDuoUrl(capture.over)
+            await wait(SETTLE_MS)
+        }
+        await openDuoUrl(capture.url)
+        await wait(DUO_SETTLE_MS)
+        const file = join(DUO_OUT_DIR, 'light', `${capture.id}.png`)
+        agentDevice('screenshot', file, '--pixel-density', '3', '--normalize-status-bar')
+        console.log(file)
+    }
+}
+
 const onAndroid = process.argv.includes('--android')
+const onDuo = process.argv.includes('--duo')
 const only = process.argv.slice(2).filter(arg => !arg.startsWith('--'))
 const captures = only.length ? CAPTURES.filter(capture => only.includes(capture.id)) : CAPTURES
 
 if (onAndroid) await captureAndroid(captures)
+else if (onDuo) await captureDuo(captures)
 else await captureIos(captures)
