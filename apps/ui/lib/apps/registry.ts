@@ -38,6 +38,8 @@ export type AppDefinition = AppInfo & {
     signInRefusal(message: string): { code: ErrorCode; params?: ErrorParams }
     // A provider failure that means the account is gone, which the provider does not say as such.
     sessionClosed?(err: LinkupError): boolean
+    // What a coworker without an account can still read elsewhere, told when it is refused one.
+    readWithoutAccount?: string
     deleteProviderAccount: (accountId: string) => Promise<void>
 }
 
@@ -57,6 +59,7 @@ const APPS: Record<AppSlug, AppDefinition> = {
         profile: linkedinProfile,
         signInRefusal: linkedinSignInRefusal,
         deleteProviderAccount: deleteAccount,
+        readWithoutAccount: 'Public LinkedIn profiles, posts and company pages need no account: read them with paid_data.',
     },
     whatsapp: {
         ...APP_INFO.whatsapp,

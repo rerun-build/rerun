@@ -7,7 +7,7 @@ import { AppToolRefusal, missingRequired, toolParams } from '@/lib/apps/tools'
 import { isAppSlug } from '@/lib/apps/types'
 import { negotiatedProtocolVersion, rpcError, rpcResult, toolError, toolResult, type RpcRequest } from '@/lib/mcp/hub-rpc'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 // A paid app's MCP server, hosted by the hub. Same trust model as /api/mcp/composio/<slug>: the
 // engine proves its workspace with `x-rerun-key`, names its coworker with `x-rerun-agent`, and the
@@ -54,7 +54,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     if (!agent) return rpcError(id, -32603, 'Coworker does not belong to the authenticated workspace')
 
     const resolved = await agentConnection(supabase, agent.id, slug)
-    if (!resolved.ok) return toolError(id, `No ${app.providerLabel} account is attached to you. Ask the user to pick one in your Services, under ${app.name}.`)
+    if (!resolved.ok) {
+        const { data: workspaceAccounts } = await selectCount(supabase, 'app_connections', { workspace_id: engine.workspaceId, app_slug: slug, status: 'connected' })
+        const attach = workspaceAccounts
+            ? `No ${app.providerLabel} account is attached to you, but the workspace already has one: call suggest_service with ${app.serviceSlug} and the user picks it for you on the card.`
+            : `No ${app.providerLabel} account is attached to you: call suggest_service with ${app.serviceSlug} so the user connects one.`
+        return toolError(id, app.readWithoutAccount ? `${attach} ${app.readWithoutAccount}` : attach)
+    }
     const { connection, appStatus } = resolved
     if (connection.workspace_id !== engine.workspaceId) return rpcError(id, -32603, 'Account does not belong to the authenticated workspace')
     if (appStatus !== 'active') return toolError(id, `${app.name} is paused while the workspace is paused. Nothing was sent.`)
