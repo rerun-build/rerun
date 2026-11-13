@@ -17,7 +17,7 @@ type SectionHeaderProps = {
     action?: { label: string; onPress: () => void }
 }
 
-// As Grok draws a group: the label alone, its chevron right after it. The count is only read aloud.
+// A group drawn as its label alone, its chevron right after it. The count is only read aloud.
 export function SectionHeader({ label, count, collapsed, onToggle, action }: SectionHeaderProps) {
     const theme = useTheme()
     const t = useTranslations('mobileHome')

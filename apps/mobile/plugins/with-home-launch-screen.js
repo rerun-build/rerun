@@ -24,7 +24,7 @@ const LAUNCH_LAYOUT = {
     rowHeight: 80,
     avatar: { left: 20, top: 16, size: 48, radius: 12 },
     column: { left: 84, right: 20 },
-    name: { top: 20, height: 14 },
+    name: { top: 22, height: 14 },
     status: { top: 47, height: 12 },
     barRadius: 8,
     barWidths: index => ({ name: 40 + ((index * 17) % 30), status: 60 + ((index * 23) % 30) }),

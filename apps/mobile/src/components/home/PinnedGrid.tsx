@@ -42,7 +42,7 @@ export function PinnedAvatar({ coworker, cell, animated = true }: { coworker: Ho
                 {coworker.id === FOREMAN_AGENT_ID ? <CoworkerAvatar coworker={{ id: coworker.id, kind: 'foreman', status: coworker.status === 'working' ? 'working' : 'idle' }} size={Math.round(cell.disc * 0.7)} animated={animated} /> : <AgentBuddy agentId={coworker.id} size={Math.round(cell.disc * 0.7)} mood={moodOf(moodStatus(coworker))} animated={animated} />}
                 {unread && <UnreadDot style={{ position: 'absolute', top: dotInset, left: dotInset, width: UNREAD_DOT, height: UNREAD_DOT, borderRadius: UNREAD_DOT / 2, borderWidth: 2, borderColor: theme.background }} />}
             </View>
-            <AppText variant="callout" medium={unread} numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ maxWidth: cell.width - spacing.sm, textAlign: 'center' }}>
+            <AppText variant="footnote" tone={unread ? 'default' : 'muted'} medium={unread} numberOfLines={1} maxFontSizeMultiplier={1.3} style={{ maxWidth: cell.width - spacing.sm, textAlign: 'center' }}>
                 {coworker.name}
             </AppText>
         </View>

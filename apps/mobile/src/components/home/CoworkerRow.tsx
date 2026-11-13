@@ -15,11 +15,11 @@ import { useTheme } from '@/theme/theme'
 import { brand, spacing, withAlpha } from '@/theme/tokens'
 
 export const AVATAR = 48
-// The Home's side margin, its row title and the line under it, as Grok's sidebar draws them.
+// The Home's side margin, its row title and the line under it, at Apple's default Headline and Subheadline sizes.
 export const HOME_GUTTER = 20
-export const ROW_TITLE = { fontSize: 19, lineHeight: 24 } as const
-export const ROW_LINE = { fontSize: 17, lineHeight: 22 } as const
-export const ROW_PADDING = 15
+export const ROW_TITLE = { fontSize: 17, lineHeight: 22 } as const
+export const ROW_LINE = { fontSize: 15, lineHeight: 20 } as const
+export const ROW_PADDING = 17
 export const ROW_LINE_GAP = 4
 // At the default text size: the padding around a name line, the gap and the status line under it.
 export const COWORKER_ROW_HEIGHT = 2 * ROW_PADDING + ROW_TITLE.lineHeight + ROW_LINE_GAP + ROW_LINE.lineHeight
