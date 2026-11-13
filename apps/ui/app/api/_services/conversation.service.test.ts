@@ -1,6 +1,6 @@
 import { assertAgentAccess, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { type WorkspaceContext } from '@/app/api/_auth/ownership'
-import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
 import { createClient } from '@/supabase/server'
@@ -9,7 +9,7 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, listAgentConversations, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
+import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentConversations, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
 
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybeSingle: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -99,6 +99,37 @@ describe('listWorkspaceConversationOverview', () => {
 
         expect(await listWorkspaceConversationOverview(ctx)).toEqual([])
         expect(selectMany).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('finalizeSession', () => {
+    beforeEach(() => vi.clearAllMocks())
+
+    // RER-78: a stream reconnection that settles after the run ended on a question card used to write
+    // `idle` over the `awaiting_question` the hub had just written, and the card vanished.
+    it.each(['idle', 'error'] as const)('a settled reconnection only moves a session still working, to %s', async status => {
+        const db = fakeSupabase()
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+
+        await finalizeSession('s1', status, { onlyWhileWorking: true })
+
+        expect(updateSessionStatus).not.toHaveBeenCalled()
+        const [write] = db.writes('sessions')
+        expect(write.payload).toEqual({ status })
+        expect(write.filters.map(call => call.args)).toEqual([
+            ['id', 's1'],
+            ['status', 'working'],
+        ])
+    })
+
+    it('a stop or a closed card still ends the conversation whatever its status', async () => {
+        const db = fakeSupabase()
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+
+        await finalizeSession('s1', 'idle')
+
+        expect(updateSessionStatus).toHaveBeenCalledWith('s1', 'idle')
+        expect(db.writes('sessions')).toEqual([])
     })
 })
 

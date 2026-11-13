@@ -385,7 +385,11 @@ export async function cancelSessionRuns(sessionId: string): Promise<void> {
     await Promise.all(running.map(r => cancelRun(ctx.conn, ctx.engineAgentId, r.id).catch(() => {})))
 }
 
-export async function finalizeSession(sessionId: string, status: 'idle' | 'error'): Promise<void> {
+// `onlyWhileWorking` is the reconnection's safety net: the engine's notification already settles a run's
+// end (`done` to idle, a card to `awaiting_*`), so that write may only catch a session left `working`
+// and never move one that waits on an answer. A stop or a closed card passes no option.
+export async function finalizeSession(sessionId: string, status: 'idle' | 'error', options?: { onlyWhileWorking?: boolean }): Promise<void> {
     await assertSessionInWorkspace(sessionId)
-    await updateSessionStatus(sessionId, status)
+    if (!options?.onlyWhileWorking) return updateSessionStatus(sessionId, status)
+    await createServiceRoleClient().from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ status }).eq('id', sessionId).eq('status', 'working')
 }

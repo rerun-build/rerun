@@ -528,7 +528,9 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                 getRun: () => getRunAction(agentId, runId),
                 fetchMessages: () => fetchSessionMessages(sid),
                 onSettled: async ({ errored, errorText }) => {
-                    await finalizeSessionAction(sid, errored ? 'error' : 'idle').catch(() => {})
+                    // The run's end belongs to the engine's notification: a run that stopped on a card has
+                    // already put the session in `awaiting_*`, and settling here must not close that card.
+                    await finalizeSessionAction(sid, errored ? 'error' : 'idle', { onlyWhileWorking: true }).catch(() => {})
                     activeRunIdRef.current = null
                     if (errorText) setRunError(errorText)
                 },

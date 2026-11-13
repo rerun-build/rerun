@@ -5,8 +5,8 @@ import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { clearSessionAlert, findGeneralSession, findIdleSessions, findSessionActiveRun, type GeneralSession } from '@/app/api/_services/chat.service'
 import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentSessions, listAgentThreads, readSessionMessages, readSessionSnapshot, searchWorkspaceConversations, type ConversationHit, type SessionHistoryEntry, type SessionSnapshot, type ThreadRow } from '@/app/api/_services/conversation.service'
 
-export async function finalizeSessionAction(sessionId: string, status: 'idle' | 'error'): Promise<void> {
-    await finalizeSession(sessionId, status).catch(() => {})
+export async function finalizeSessionAction(sessionId: string, status: 'idle' | 'error', options?: { onlyWhileWorking?: boolean }): Promise<void> {
+    await finalizeSession(sessionId, status, options).catch(() => {})
 }
 
 export async function acknowledgeSessionAlertAction(sessionId: string): Promise<void> {
