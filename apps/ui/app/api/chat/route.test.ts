@@ -2,6 +2,8 @@ import { callableEngineAgentIds } from '@/app/api/_auth/access'
 import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, getAgentChatTarget, getExistingSession } from '@/app/api/_services/chat.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import * as engine from '@/lib/engine/client'
+import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { fakeSupabase } from '@/test/supabase-fake'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { POST } from './route'
 
@@ -178,6 +180,20 @@ describe('POST /api/chat', () => {
             expect(response.status).toBe(200)
             expect(createSessionRow).toHaveBeenCalledWith('agent', 'engine-session', 'ship it', null, undefined, 'thread', 'ship it')
             expect(generateSessionTitle).toHaveBeenCalledWith('ship it')
+        })
+
+        it('writes the generated title only on a thread still named after its first message', async () => {
+            const db = fakeSupabase()
+            vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+
+            await settle(POST(request({ sessionId: undefined })))
+
+            const [write] = db.writes('sessions')
+            expect(write.payload).toEqual({ title: 'Title' })
+            expect(write.filters.map(call => call.args)).toEqual([
+                ['id', 'general-row'],
+                ['title', 'ship it'],
+            ])
         })
     })
 })

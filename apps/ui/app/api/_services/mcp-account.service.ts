@@ -42,7 +42,6 @@ import { MAX_MEMORIES_PER_CALL, MAX_MEMORY_CHARS, MAX_UPLOAD_MB } from '@/lib/mc
 import { asBooleanRecord, asNumber, asString, asStringArray, clamp, requireConfirmation, requireString } from '@/lib/mcp/args'
 import { connectionModels, readModelPin, type ModelPin } from '@/lib/mcp/model-pin'
 import { projectRun } from '@/lib/mcp/run-projection'
-import { assertModelEntitled } from '@/app/api/_services/engine-plan.service'
 import { truncateField } from '@/lib/mcp/truncate'
 import { describeSkillFiles, normalizeSkillFilePath, planSkillFileRemovals, readSkillReferenceFile, removeSkillFiles } from '@/lib/skills/reference-files'
 import { connectorSkillOwners, readRegistry } from '@/lib/services/registry'
@@ -310,9 +309,6 @@ function readMemoryEntries(value: unknown): MemoryEntry[] {
 // API key's creator, the foreman's member).
 export async function dispatchAccountTool(actor: Actor, name: string, args: Record<string, unknown>, { actorUserId = null }: { actorUserId?: string | null } = {}): Promise<unknown> {
     const workspaceId = actor.workspaceId
-    // Every tool that takes a `model` pins it, on a coworker, a scheduled task, a trigger or the
-    // workspace default, so the plan is checked once for all of them.
-    if (typeof args.model === 'string') await assertModelEntitled(args.model, workspaceId)
     switch (name) {
         case 'list_spaces': {
             const supabase = createServiceRoleClient()
@@ -499,7 +495,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const { connections } = await engineListConnections(conn)
             const pin = readModelPin({ connectionId: requireString(args.connectionId, 'connectionId'), model: requireString(args.model, 'model') }, connections)
             if (!pin?.connectionId || !pin.model) throw new Error('set_default_model needs a connectionId and a model.')
-            await assertModelEntitled(pin.model, workspaceId)
             await engineSetBoxDefault(conn, { connectionId: pin.connectionId, model: pin.model })
             return { default: { connectionId: pin.connectionId, connectionName: connections.find(connection => connection.id === pin.connectionId)?.name ?? null, provider: pin.provider, model: pin.model } }
         }

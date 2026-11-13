@@ -91,7 +91,8 @@
         "usage.pane.pace": "Toggle of the chart: the cumulative view, spent so far against the credit.",
         "usage.pane.periodLeft": "{start} and {end} are short dates of the billing period, {left} the credits left.",
         "usage.paidData": "Names of the paid data sources a coworker can buy, as rows of the credit usage breakdown (plural nouns: what was bought).",
-        "perks.headlines.credits": "Short perk of the paid plan, in a row of checkmarks: the monthly credit allowance."
+        "perks.headlines.credits": "Short perk of the paid plan, in a row of checkmarks: the monthly credit allowance.",
+        "perks.headlines.team": "Short perk of the paid plan, in a row of checkmarks: teammates can be invited."
     },
     "credits": "{count, plural, one {# credit} other {# credits}}",
     "plan": {
@@ -470,8 +471,6 @@
                 "bodyNoCoworker": "Your coworker is ready to pick the task back up. Your receipt is on its way by email.",
                 "credits": "Credits",
                 "creditsValue": "{credits, plural, one {# credit} other {# credits}} a month",
-                "models": "Models",
-                "modelsValue": "Every premium model",
                 "coworkers": "Coworkers",
                 "coworkersValue": "Unlimited",
                 "resume": "Resume the task"
@@ -592,11 +591,6 @@
                 "trial": "{credits, plural, one {# credit} other {# credits}}, once",
                 "pro": "{credits, plural, one {# credit} other {# credits}} every month"
             },
-            "models": {
-                "title": "Models",
-                "trial": "Lighter models",
-                "pro": "Every premium model unlocked"
-            },
             "coworkers": {
                 "title": "Coworkers",
                 "trial": "{count} active",
@@ -615,8 +609,8 @@
         },
         "headlines": {
             "credits": "{credits, plural, one {# credit/mo} other {# credits/mo}}",
-            "models": "Premium models",
-            "coworkers": "Unlimited coworkers"
+            "coworkers": "Unlimited coworkers",
+            "team": "Invite your team"
         }
     },
     "cancel": {

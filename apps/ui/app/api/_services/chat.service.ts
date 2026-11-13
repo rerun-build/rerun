@@ -2,6 +2,7 @@ import { COWORKER_NOT_FOUND, assertSessionInWorkspace, enforce, requireLightSess
 import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
+import { seedSessionTitle } from '@/lib/chat/session-title'
 import { getRunSteps, listRuns } from '@/lib/engine/client'
 import type { EngineConnection, EngineRun, SessionSource } from '@/lib/engine/types'
 import { FOREMAN_AGENT_ID, type SessionKind, type Usage } from '@rerun/contracts'
@@ -136,7 +137,7 @@ export async function createSessionRow(agentId: string, engineSessionId: string,
         .insert<Database['public']['Tables']['sessions']['Insert']>({
             agent_id: agentId,
             engine_session_id: engineSessionId,
-            title: kind === 'general' ? GENERAL_SESSION_TITLE : title?.slice(0, 50) || 'New conversation',
+            title: kind === 'general' ? GENERAL_SESSION_TITLE : seedSessionTitle(title),
             origin_agent_id: originAgentId ?? null,
             source: source ?? 'dashboard',
             kind,
@@ -178,7 +179,7 @@ export async function ensureSessionRow(agentId: string, engineSessionId: string,
         {
             agent_id: agentId,
             engine_session_id: engineSessionId,
-            title: title?.slice(0, 50) || 'New conversation',
+            title: seedSessionTitle(title),
             origin_agent_id: options?.originAgentId ?? null,
             source: options?.source ?? 'dashboard',
             status: options?.status ?? 'idle',

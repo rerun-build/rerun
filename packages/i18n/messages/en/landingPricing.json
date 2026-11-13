@@ -58,7 +58,6 @@
                 "seats": "<b>Unlimited seats</b>, no per-user fees",
                 "team": "Manage your Coworkers with <b>your whole team</b>",
                 "credits": "<b>{credits, plural, one {# credit} other {# credits}} on us</b>, every month",
-                "models": "<b>Smart models</b> for your hardest tasks",
                 "autopilot": "Put your business on <b>Autopilot</b>"
             },
             "creditsNote": "Top up anytime"

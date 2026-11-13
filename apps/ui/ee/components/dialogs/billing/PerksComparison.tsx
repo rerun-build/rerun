@@ -11,8 +11,6 @@ function perkCopy(t: ReturnType<typeof useTranslations<'billing.perks'>>, perk: 
     switch (perk.id) {
         case 'credits':
             return { title: t('rows.credits.title'), trial: t('rows.credits.trial', { credits: TRIAL_CREDITS }), pro: t('rows.credits.pro', { credits: BASE_PLAN_CREDITS }) }
-        case 'models':
-            return { title: t('rows.models.title'), trial: t('rows.models.trial'), pro: t('rows.models.pro') }
         case 'coworkers':
             return { title: t('rows.coworkers.title'), trial: t('rows.coworkers.trial', { count: TRIAL_ACTIVE_AGENTS }), pro: t('rows.coworkers.pro') }
         case 'team':
@@ -48,14 +46,8 @@ export function PerksComparison() {
                                     {text.title}
                                 </span>
                             </th>
-                            <td className="py-2.5 pl-4 text-muted-foreground">
-                                {text.trial}
-                                {perk.trialDetail && <span className="block text-xs">{perk.trialDetail}</span>}
-                            </td>
-                            <td className="py-2.5 pl-4 font-medium">
-                                {text.pro}
-                                {perk.proDetail && <span className="block text-xs font-normal text-muted-foreground">{perk.proDetail}</span>}
-                            </td>
+                            <td className="py-2.5 pl-4 text-muted-foreground">{text.trial}</td>
+                            <td className="py-2.5 pl-4 font-medium">{text.pro}</td>
                         </tr>
                     ))}
                 </tbody>

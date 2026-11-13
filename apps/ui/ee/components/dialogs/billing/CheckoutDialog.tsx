@@ -263,7 +263,6 @@ function creditUnlockedCopy(t: BillingTranslator, interval: BillingInterval, pri
         body: upgrade?.coworker ? t('checkout.success.creditUnlocked.body', { coworker: upgrade.coworker }) : t('checkout.success.creditUnlocked.bodyNoCoworker'),
         rows: [
             { label: t('checkout.success.creditUnlocked.credits'), value: t('checkout.success.creditUnlocked.creditsValue', { credits: BASE_PLAN_CREDITS }) },
-            { label: t('checkout.success.creditUnlocked.models'), value: t('checkout.success.creditUnlocked.modelsValue') },
             { label: t('checkout.success.creditUnlocked.coworkers'), value: t('checkout.success.creditUnlocked.coworkersValue') },
             {
                 label: t('checkout.success.nextInvoice'),

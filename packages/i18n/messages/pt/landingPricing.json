@@ -46,7 +46,6 @@
                 "seats": "<b>Usuários ilimitados</b>, sem cobrança por usuário",
                 "team": "Gerencie seus Coworkers com <b>toda a sua equipe</b>",
                 "credits": "<b>{credits, plural, one {# crédito por nossa conta} other {# créditos por nossa conta}}</b>, todo mês",
-                "models": "<b>Modelos inteligentes</b> para suas tarefas mais difíceis",
                 "autopilot": "Coloque seu negócio no <b>piloto automático</b>"
             },
             "creditsNote": "Recarregue quando quiser"

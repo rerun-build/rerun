@@ -70,7 +70,7 @@ import { browserPermission } from '@/lib/notifications/browser'
 import { modelContextWindow } from '@/lib/engine/models'
 import { rerunCreditOf } from '@/lib/engine/ai-sources'
 import { toGroup } from '@/lib/engine/model-groups'
-import { isLifetimePlan, isPremiumModelEntitled } from '@rerun/cloud/billing'
+import { isLifetimePlan } from '@rerun/cloud/billing'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { useChat } from '@ai-sdk/react'
@@ -726,7 +726,6 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
         const own = connections.filter(connection => connection.connected && connection.id !== RERUN_CONNECTION_ID)
         return own.find(connection => connection.id === boxDefault?.connectionId) ?? own[0] ?? null
     }, [connections, boxDefault])
-    const premiumAllowed = !workspace || isPremiumModelEntitled(workspace)
     const tConnections = useTranslations('connections')
     const runOnOwnConnection = useMemo(() => {
         if (!ownConnection) return undefined
@@ -734,12 +733,12 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
             track('connection_cta_clicked', { source: 'budget_notice_use_connection' })
             // The Box default is resolved by the engine on every run, so following it beats freezing it.
             if (boxDefault?.connectionId === ownConnection.id) selectModel({})
-            else selectModel({ connectionId: ownConnection.id, model: toGroup(ownConnection, premiumAllowed, tConnections).defaultModel })
+            else selectModel({ connectionId: ownConnection.id, model: toGroup(ownConnection, tConnections).defaultModel })
             setRunError(null)
             clearError()
         }
         return { label: ownConnection.name, provider: ownConnection.provider, onUse }
-    }, [ownConnection, boxDefault, premiumAllowed, tConnections, selectModel, clearError])
+    }, [ownConnection, boxDefault, tConnections, selectModel, clearError])
     const connectProvider = useCallback(
         (provider: 'claude' | 'codex') => {
             track('connection_cta_clicked', { source: `budget_notice_${provider}` })

@@ -2,9 +2,7 @@ import 'server-only'
 import { actorFromContext, type AccessLevel } from '@/app/api/_auth/access'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { resolveAgentTarget, resolveRunTarget } from '@/app/api/_services/chat.service'
-import { assertModelEntitled } from '@/app/api/_services/engine-plan.service'
 import { ApiError } from '@/lib/api-error'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
 import { getAgent as engineGetAgent, listConnections, patchAgent as enginePatchAgent } from '@/lib/engine/client'
 import { connectionGroups } from '@/lib/engine/model-groups'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
@@ -26,14 +24,14 @@ export async function readAgentModels(ctx: WorkspaceContext, agentId: string): P
         listConnections(conn),
         recipientLocale(ctx.supabase, ctx.userId, ctx.workspace.id).then(locale => translatorFor(locale, 'connections')),
     ])
-    const groups = connectionGroups(list.connections, isPremiumModelEntitled(ctx.workspace), t)
+    const groups = connectionGroups(list.connections, t)
     return {
         groups: groups.map(group => ({
             connectionId: group.connectionId,
             label: group.label,
             provider: group.provider,
             defaultModel: group.defaultModel,
-            models: group.models.map(model => ({ id: model.id, label: model.label, description: model.description, locked: model.locked })),
+            models: group.models.map(model => ({ id: model.id, label: model.label, description: model.description })),
         })),
         pinned: choiceOf(detail.config.connectionId, detail.config.model),
         resolved: choiceOf(detail.resolvedConnectionId, detail.resolvedModel),
@@ -49,7 +47,6 @@ export async function setAgentModel(ctx: WorkspaceContext, agentId: string, choi
         await enginePatchAgent(conn, engineAgentId, { connectionId: null, provider: null, model: null })
         return
     }
-    await assertModelEntitled(choice.model, ctx.workspace.id)
     const connection = (await listConnections(conn)).connections.find(entry => entry.id === choice.connectionId && entry.connected)
     if (!connection) throw new ApiError(400, 'This connection is not available on the machine')
     await enginePatchAgent(conn, engineAgentId, { connectionId: connection.id, provider: connection.provider, model: choice.model })

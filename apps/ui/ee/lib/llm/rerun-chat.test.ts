@@ -29,7 +29,7 @@ function request(model: string = RERUN_MODEL, extra: Record<string, unknown> = {
 describe('POST /api/llm/chat/completions', () => {
     beforeEach(() => {
         vi.restoreAllMocks()
-        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1, smartAllowed: true } as Awaited<ReturnType<typeof getWorkspaceBudgetByEngineKey>>)
+        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1 } as Awaited<ReturnType<typeof getWorkspaceBudgetByEngineKey>>)
         process.env.OPENROUTER_API_KEY = 'internal-key'
         process.env.RERUN_MAX_API_KEY = 'max-key'
     })
@@ -42,7 +42,7 @@ describe('POST /api/llm/chat/completions', () => {
     })
 
     it('refuses with 402 and calls no model while the workspace credit is paused', async () => {
-        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1, smartAllowed: true, paused: true } as Awaited<ReturnType<typeof getWorkspaceBudgetByEngineKey>>)
+        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1, paused: true } as Awaited<ReturnType<typeof getWorkspaceBudgetByEngineKey>>)
         const fetchMock = vi.spyOn(globalThis, 'fetch')
 
         const response = await POST(request())
@@ -130,15 +130,6 @@ describe('POST /api/llm/chat/completions', () => {
     it('rewrites anything that is not a tier into Balanced', async () => {
         expect(await upstreamModelFor('qwen/qwen3.7-max')).toBe(RERUN_UPSTREAM_MODELS.balanced)
         expect(await upstreamModelFor('anthropic/claude-fable-5.1')).toBe(RERUN_UPSTREAM_MODELS.balanced)
-    })
-
-    // The pickers lock Smart on a trial; an agent pinned to it through the API still has to run.
-    it('serves and bills Balanced when a workspace that has not paid asks for Smart', async () => {
-        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1, smartAllowed: false } as Awaited<ReturnType<typeof getWorkspaceBudgetByEngineKey>>)
-        vi.mocked(recordRerunUsage).mockResolvedValue()
-
-        expect(await upstreamModelFor(RERUN_MODELS.smart)).toBe(RERUN_UPSTREAM_MODELS.balanced)
-        expect(recordRerunUsage).toHaveBeenLastCalledWith(expect.objectContaining({ tier: 'balanced', model: RERUN_UPSTREAM_MODELS.balanced }))
     })
 
     it('bills the call to the coworker the box names', async () => {

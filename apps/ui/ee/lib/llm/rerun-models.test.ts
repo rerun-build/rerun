@@ -12,7 +12,7 @@ const request = (authorization = 'Bearer engine-key') => new Request('https://hu
 
 describe('GET /api/llm/models', () => {
     beforeEach(() => {
-        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1, smartAllowed: true } as Budget)
+        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1 } as Budget)
     })
 
     it('names the model behind each alias', async () => {
@@ -24,12 +24,6 @@ describe('GET /api/llm/models', () => {
                 [RERUN_MODELS.smart]: RERUN_UPSTREAM_MODELS.smart,
             },
         })
-    })
-
-    it('says Balanced serves Smart on a workspace that has not paid, as the proxy does', async () => {
-        vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1, smartAllowed: false } as Budget)
-        const { models } = (await (await GET(request())).json()) as { models: Record<string, string> }
-        expect(models[RERUN_MODELS.smart]).toBe(RERUN_UPSTREAM_MODELS.balanced)
     })
 
     it('refuses a caller that is not a box', async () => {

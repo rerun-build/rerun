@@ -246,7 +246,6 @@
     "coworkerNotReachable": "Coworker injoignable",
     "upgradeToEditContent": "Passez à un abonnement supérieur pour modifier ce contenu.",
     "updateProposalFailed": "Impossible de mettre à jour la proposition",
-    "modelNeedsPaidPlan": "{model} est disponible avec un abonnement payant.",
     "noMachineYet": "Ce workspace n'a pas encore de machine",
     "workspaceRestoring": "Votre workspace est en cours de restauration. Il sera de retour dans une minute ou deux.",
     "addSharedCoworkerFailed": "Impossible d'ajouter ce coworker à votre board",

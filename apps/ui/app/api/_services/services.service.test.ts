@@ -23,7 +23,7 @@ vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toV
 vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
 // The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
-// The open source build has no lifetime plan; the lifetime cases read Rerun Cloud's answer, pinned from ee/.
+// The lifetime plan only exists on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
 vi.mock('@rerun/cloud/billing', async importOriginal => ({
     ...(await importOriginal<object>()),
     isLifetimePlan: (await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')).isLifetimePlan,

@@ -5,12 +5,15 @@ import { useScrollFade } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { isGeneralTab, type SessionTab } from '@/hooks/useSessionTabs'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { SessionStatus } from '@/lib/board/types'
-import { MessagesSquare, PlusIcon, XIcon } from '@/lib/icons'
+import { MessagesSquare, PencilIcon, PlusIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
+
+import { TabRenameField, type SessionRename } from './SessionRename'
 
 export type TabState = 'live' | 'needs' | 'quiet'
 
@@ -26,15 +29,19 @@ type OpenChatsTabsProps = {
     onSelect: (index: number) => void
     onClose: (index: number) => void
     onCreate: () => void
+    // Without it the tabs are read-only: no rename by double-click, no menu on right-click.
+    rename?: SessionRename
 }
 
 /**
  * The coworker's open conversations, left-aligned under the pills: General pinned first, out of the
  * row that scrolls, then the open threads, the active one on a muted fill, the others as plain text.
- * Too many to fit, the row scrolls and only the edge still hiding a tab fades.
+ * Too many to fit, the row scrolls and only the edge still hiding a tab fades. A thread is renamed
+ * where its title stands: the tab turns into a field, and a save that failed says so under the row.
  */
-export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }: OpenChatsTabsProps) {
+export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate, rename }: OpenChatsTabsProps) {
     const t = useTranslations('agent.openChatsTabs')
+    const tRename = useTranslations('agent.sessionRename')
     const [scroller, setScroller] = useState<HTMLDivElement | null>(null)
     const fadeMask = useScrollFade(scroller, { axis: 'x' })
     const sessions = useBoardStore(s => s.sessions)
@@ -50,58 +57,111 @@ export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }
 
     const stateOf = (tab: SessionTab): TabState => tabStateOf(tab.id ? statusById.get(tab.id) : undefined)
 
+    const renaming = rename?.rename
+    const renameFailed = renaming?.status === 'error' && threads.some(tab => tab.id === renaming.id)
+
     return (
-        <div className="flex w-full items-center gap-1 px-3">
-            {general && (
-                <>
-                    <MainChatTab active={activeIndex === 0} onSelect={() => onSelect(0)} />
-                    <span aria-hidden className="mx-0.5 h-4 w-px shrink-0 bg-border" />
-                </>
-            )}
-            <div ref={setScroller} className="min-w-0 overflow-x-auto [scrollbar-width:none]" style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}>
-                <div className="flex w-max items-center gap-1">
-                    {threads.map((tab, i) => {
-                        const index = i + offset
-                        const active = index === activeIndex
-                        return (
-                            <div
-                                key={tab.uid}
-                                data-active={active}
-                                className={cn(
-                                    'group relative flex h-7 shrink-0 items-center gap-1 rounded-md pl-2.5 pr-1 text-xs transition-colors',
-                                    active ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                                )}
-                            >
-                                <button
-                                    type="button"
-                                    onClick={() => onSelect(index)}
-                                    className="flex min-w-0 items-center gap-1.5 after:absolute after:inset-0 after:rounded-md after:content-['']"
-                                >
-                                    <StateDot state={stateOf(tab)} />
-                                    <span className="max-w-[160px] truncate">{tab.title}</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    aria-label={t('closeTab', { title: tab.title })}
-                                    onClick={() => onClose(index)}
-                                    className={cn('relative z-10 flex size-5 shrink-0 items-center justify-center rounded hover:bg-background/60', !active && 'opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100')}
-                                >
-                                    <XIcon className="size-3" />
-                                </button>
-                            </div>
-                        )
-                    })}
+        <div className="flex flex-col gap-1">
+            <div className="flex w-full items-center gap-1 px-3">
+                {general && (
+                    <>
+                        <MainChatTab active={activeIndex === 0} onSelect={() => onSelect(0)} />
+                        <span aria-hidden className="mx-0.5 h-4 w-px shrink-0 bg-border" />
+                    </>
+                )}
+                <div ref={setScroller} className="min-w-0 overflow-x-auto [scrollbar-width:none]" style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}>
+                    <div className="flex w-max items-center gap-1">
+                        {threads.map((tab, i) => {
+                            const index = i + offset
+                            const sessionId = tab.id
+                            if (rename && renaming && sessionId && renaming.id === sessionId) {
+                                return <TabRenameField key={tab.uid} title={tab.title} status={renaming.status} focus={renaming.focus} onSubmit={title => void rename.submit(sessionId, title)} onCancel={rename.cancel} />
+                            }
+                            return (
+                                <ThreadTab
+                                    key={tab.uid}
+                                    tab={tab}
+                                    active={index === activeIndex}
+                                    state={stateOf(tab)}
+                                    onSelect={() => onSelect(index)}
+                                    onClose={() => onClose(index)}
+                                    onRename={rename && sessionId ? () => rename.start(sessionId) : undefined}
+                                    renamable={!!rename}
+                                />
+                            )
+                        })}
+                    </div>
                 </div>
+                <button
+                    type="button"
+                    aria-label={t('newThread')}
+                    onClick={onCreate}
+                    className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+                >
+                    <PlusIcon className="size-3.5" />
+                </button>
             </div>
+            {renameFailed && (
+                <p role="alert" className="px-4 text-[11px] text-destructive">
+                    {tRename('failed')}
+                </p>
+            )}
+        </div>
+    )
+}
+
+type ThreadTabProps = {
+    tab: SessionTab
+    active: boolean
+    state: TabState
+    onSelect: () => void
+    onClose: () => void
+    // Undefined on a tab nobody has spoken in yet: there is no conversation to rename.
+    onRename?: () => void
+    renamable: boolean
+}
+
+function ThreadTab({ tab, active, state, onSelect, onClose, onRename, renamable }: ThreadTabProps) {
+    const t = useTranslations('agent.openChatsTabs')
+    const tRename = useTranslations('agent.sessionRename')
+    const chip = (
+        <div
+            data-active={active}
+            className={cn(
+                'group relative flex h-7 shrink-0 items-center gap-1 rounded-md pl-2.5 pr-1 text-xs transition-colors',
+                active ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+            )}
+        >
+            <button type="button" onClick={onSelect} onDoubleClick={onRename} className="flex min-w-0 items-center gap-1.5 after:absolute after:inset-0 after:rounded-md after:content-['']">
+                <StateDot state={state} />
+                <span className="max-w-[160px] truncate">{tab.title}</span>
+            </button>
             <button
                 type="button"
-                aria-label={t('newThread')}
-                onClick={onCreate}
-                className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+                aria-label={t('closeTab', { title: tab.title })}
+                onClick={onClose}
+                className={cn('relative z-10 flex size-5 shrink-0 items-center justify-center rounded hover:bg-background/60', !active && 'opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100')}
             >
-                <PlusIcon className="size-3.5" />
+                <XIcon className="size-3" />
             </button>
         </div>
+    )
+    if (!renamable) return chip
+    return (
+        <ContextMenu>
+            <ContextMenuTrigger asChild>{chip}</ContextMenuTrigger>
+            <ContextMenuContent>
+                <ContextMenuItem disabled={!onRename} onSelect={onRename}>
+                    <PencilIcon className="size-4" />
+                    {tRename('rename')}
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem onSelect={onClose}>
+                    <XIcon className="size-4" />
+                    {t('closeTabMenu')}
+                </ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
     )
 }
 

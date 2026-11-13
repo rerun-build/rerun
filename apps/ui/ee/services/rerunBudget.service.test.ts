@@ -9,7 +9,7 @@ const eq = vi.fn()
 const update = vi.fn((_payload: Record<string, unknown>) => ({ eq }))
 
 function budgetWith(periodAnchor: string | null): WorkspaceBudget {
-    return { workspaceId: 42, budgetMicros: 5_000_000, usedMicros: 4_800_000, topupMicros: 0, periodAnchor, currentPeriodEnd: null, smartAllowed: true, paused: false }
+    return { workspaceId: 42, budgetMicros: 5_000_000, usedMicros: 4_800_000, topupMicros: 0, periodAnchor, currentPeriodEnd: null, paused: false }
 }
 
 beforeEach(() => {

@@ -16,7 +16,6 @@ export const CLOUD_ENTITLEMENTS = {
     isMachineEntitled: (status: string | null | undefined) => status === 'active' || status === 'trialing',
     isPaidSubscription,
     isWorkspaceApiEntitled: (workspace: WorkspacePlan) => workspace.is_sandbox || isSubscriptionEntitled(workspace.subscription_status),
-    isPremiumModelEntitled: (workspace: WorkspacePlan) => workspace.is_sandbox || isPaidSubscription(workspace.subscription_status),
     activeAgentLimitFor: (maxAgents: number | null, status: string | null | undefined) => (isSubscriptionEntitled(status) ? maxAgents : 0),
 }
 

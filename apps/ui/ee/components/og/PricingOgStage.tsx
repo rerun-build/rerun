@@ -6,7 +6,7 @@ import { Icon } from '@rerun/ui/primitives'
 import type { ReactNode, RefObject } from 'react'
 
 import { RerunWordmark } from '@/components/brand/RerunWordmark'
-import { BrainNodesIcon, KeyIcon, RobotIcon, ShipWheelIcon, UserCogIcon, Users, type LucideIcon } from '@/lib/icons'
+import { KeyIcon, RobotIcon, ShipWheelIcon, UserCogIcon, Users, type LucideIcon } from '@/lib/icons'
 import { OG_HEIGHT, OG_WIDTH } from '@/lib/og/size'
 
 import { OgCta } from '@/components/og/OgCta'
@@ -30,7 +30,6 @@ const BENEFITS: { icon: LucideIcon; title: string; detail: string; extra?: React
     { icon: RobotIcon, title: 'A team of coworkers', detail: 'Working for you, side by side' },
     { icon: Users, title: 'Unlimited seats', detail: 'No per-user fees' },
     { icon: UserCogIcon, title: 'Your whole team', detail: 'Manage your coworkers together' },
-    { icon: BrainNodesIcon, title: 'Smart models', detail: 'For your hardest tasks' },
     { icon: ShipWheelIcon, title: 'Autopilot', detail: 'Put your business on it' },
     { icon: KeyIcon, title: 'Your own AI subscription', detail: 'Or your API key', extra: <ModelMarks /> },
 ]

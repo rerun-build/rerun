@@ -376,8 +376,6 @@
                 "bodyNoCoworker": "Seu coworker está pronto para retomar a tarefa. Seu recibo está a caminho por e-mail.",
                 "credits": "Créditos",
                 "creditsValue": "{credits, plural, one {# crédito} other {# créditos}} por mês",
-                "models": "Modelos",
-                "modelsValue": "Todos os modelos premium",
                 "coworkers": "Coworkers",
                 "coworkersValue": "Ilimitados",
                 "resume": "Retomar a tarefa"
@@ -498,11 +496,6 @@
                 "trial": "{credits, plural, one {# crédito} other {# créditos}}, uma vez",
                 "pro": "{credits, plural, one {# crédito} other {# créditos}} todo mês"
             },
-            "models": {
-                "title": "Modelos",
-                "trial": "Modelos mais leves",
-                "pro": "Todos os modelos premium liberados"
-            },
             "coworkers": {
                 "title": "Coworkers",
                 "trial": "{count} ativos",
@@ -521,8 +514,8 @@
         },
         "headlines": {
             "credits": "{credits, plural, one {# crédito/mês} other {# créditos/mês}}",
-            "models": "Modelos premium",
-            "coworkers": "Coworkers ilimitados"
+            "coworkers": "Coworkers ilimitados",
+            "team": "Convide sua equipe"
         }
     },
     "cancel": {

@@ -1,5 +1,5 @@
 # Konductor flow for a Linear issue labeled Improvement: context, plan and build (Opus 5.5), review, review fixes, summary,
-# PR, merge, then close the card.
+# wait for the PR you open and merge, then close the card.
 # Plan and build are one step: an approved plan is built in the same turn, so a separate Build step would start after it.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Improvement"
@@ -56,11 +56,6 @@ prompt = """
 Lis {{issue.file}} et le diff du workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request.
 Résume pour la personne qui merge : l'amélioration, ce qui a changé, comment c'est testé. Court, en français.
 """
-
-[[steps]]
-id = "pr"
-title = "Create PR"
-kind = "create_pr"
 
 [[steps]]
 id = "merge"

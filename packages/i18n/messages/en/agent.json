@@ -9,6 +9,10 @@
         "agentCard.share": "Button: share this coworker through a link.",
         "agentChatsList.filters.chats": "Filter chip: threads a person started, as opposed to automated runs.",
         "agentChatsList.filters.needs": "Filter chip: threads waiting on the user's answer.",
+        "agentChatsList.moreFor": "Accessible name of the three-dot button opening the actions of one conversation; {title} is its title.",
+        "openChatsTabs.closeTabMenu": "Right-click menu item on the tab of an open conversation.",
+        "sessionRename.rename": "Menu item: give this conversation another title.",
+        "sessionRename.label": "Accessible name of the field where the title of a conversation is typed.",
         "agentComputerThumbnail.computer": "Label above the preview of the coworker's virtual computer screen.",
         "agentLockedOverlay.saved": "Shown on a paused or archived coworker. Followed by a second sentence saying how to get it back.",
         "agentLockedOverlay.slot.activeCount": "Under the upgrade button: how many coworkers run out of the plan's maximum.",
@@ -54,7 +58,6 @@
         "modelSelector.loading": "Model picker pill while the models load.",
         "modelSelector.refused": "Shown in the chat composer when the AI subscription refuses the picked model. {model} is a model name, {reason} an English reason from the provider.",
         "modelsShared.boxManageReason": "Tooltip on a disabled control: the person lacks the rights on the Box (group of coworkers) holding this coworker.",
-        "modelTierRow.pro": "Badge on a model only available on the paid Pro plan.",
         "openChatsTabs.general": "Tab of the coworker's main conversation, always open.",
         "planLimitHint.credit.usedUpOn": "Monthly Rerun credits are exhausted. {date} is a short date like \"Nov 12\".",
         "planLimitHint.paused": "Badge: the Rerun credits are paused.",
@@ -115,7 +118,8 @@
         "emptyThreads": "No thread yet.",
         "emptyAutomations": "No automated run yet.",
         "running": "Running",
-        "startedBy": "Started by {name}"
+        "startedBy": "Started by {name}",
+        "moreFor": "More for {title}"
     },
     "agentComputerThumbnail": {
         "working": "Working on its computer",
@@ -154,8 +158,14 @@
     },
     "openChatsTabs": {
         "closeTab": "Close {title}",
+        "closeTabMenu": "Close tab",
         "newThread": "New thread",
         "general": "General"
+    },
+    "sessionRename": {
+        "rename": "Rename",
+        "label": "Conversation name",
+        "failed": "Couldn't rename. Try again."
     },
     "threadBranch": {
         "needs": "Needs you",
@@ -546,9 +556,6 @@
         },
         "connected": "Connected",
         "manage": "Manage connections"
-    },
-    "modelTierRow": {
-        "pro": "Pro"
     },
     "runModelField": {
         "label": "Model",

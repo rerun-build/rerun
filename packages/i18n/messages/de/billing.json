@@ -376,8 +376,6 @@
                 "bodyNoCoworker": "Dein Coworker ist bereit, die Aufgabe wieder aufzunehmen. Deine Quittung kommt per E-Mail.",
                 "credits": "Guthaben",
                 "creditsValue": "{credits, plural, one {# Credit} other {# Credits}} pro Monat",
-                "models": "Modelle",
-                "modelsValue": "Alle Premium-Modelle",
                 "coworkers": "Coworker",
                 "coworkersValue": "Unbegrenzt",
                 "resume": "Aufgabe fortsetzen"
@@ -498,11 +496,6 @@
                 "trial": "{credits, plural, one {# Credit} other {# Credits}}, einmalig",
                 "pro": "{credits, plural, one {# Credit} other {# Credits}} jeden Monat"
             },
-            "models": {
-                "title": "Modelle",
-                "trial": "Leichtere Modelle",
-                "pro": "Alle Premium-Modelle freigeschaltet"
-            },
             "coworkers": {
                 "title": "Coworker",
                 "trial": "{count} aktiv",
@@ -521,8 +514,8 @@
         },
         "headlines": {
             "credits": "{credits, plural, one {# Credit/Monat} other {# Credits/Monat}}",
-            "models": "Premium-Modelle",
-            "coworkers": "Unbegrenzte Coworker"
+            "coworkers": "Unbegrenzte Coworker",
+            "team": "Lade dein Team ein"
         }
     },
     "cancel": {

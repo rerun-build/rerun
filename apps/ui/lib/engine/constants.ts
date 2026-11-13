@@ -30,12 +30,6 @@ export const RERUN_UPSTREAM_MODELS: Record<RerunTier, string> = {
     smart: 'openai/gpt-6-sol',
 }
 
-// Smart asked for by a workspace that has not paid yet is served by Balanced: the pickers are where
-// that is said, and a run already under way is not the place to fail on it.
-export function servedRerunTier(asked: RerunTier, smartAllowed: boolean): RerunTier {
-    return asked === 'smart' && !smartAllowed ? 'balanced' : asked
-}
-
 // What the hub asks of a tier's reasoning, over whatever the box sent. Fast has to answer sooner
 // than Balanced, and left to its own effort its model takes more steps and finishes later.
 export const RERUN_TIER_REASONING: Partial<Record<RerunTier, { effort: 'low' }>> = {

@@ -5,12 +5,11 @@ import { ModelTierRow } from '@/components/agent/ModelTierRow'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useAvailableModels, type ConnectionGroup } from '@/hooks/useAvailableModels'
-import { PREMIUM_MODEL_BILLING_TRIGGER, modelName } from '@/lib/engine/ai-sources'
+import { modelName } from '@/lib/engine/ai-sources'
 import { modelLabel } from '@/lib/engine/models'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { EngineProvider } from '@/lib/engine/types'
 import { cn } from '@/lib/utils'
-import { useBillingStore } from '@/stores/billing.store'
 import { useTranslations } from 'next-intl'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -76,12 +75,7 @@ export function RunModelField({ id, value, onChange, availableGroups, helperText
     // Spelled out rather than mirrored from the picked item: a tier's item is a two-line row.
     const triggerLabel = value.model ? modelName(value.connectionId ?? '', value.model) : agentDefaultLabel
 
-    const pick = (encoded: string) => {
-        const next = decode(encoded)
-        const locked = availableGroups.find(g => g.connectionId === next.connectionId)?.models.find(m => m.id === next.model)?.locked
-        if (locked) useBillingStore.getState().openBilling(undefined, PREMIUM_MODEL_BILLING_TRIGGER)
-        else onChange(next)
-    }
+    const pick = (encoded: string) => onChange(decode(encoded))
 
     return (
         <Field label={t('label')} htmlFor={id} helperText={helperText}>
@@ -104,9 +98,9 @@ export function RunModelField({ id, value, onChange, availableGroups, helperText
                                     <SelectItem
                                         value={encode({ connectionId: group.connectionId, model: m.id })}
                                         disabled={!!m.unavailable}
-                                        className={cn('flex-1', (m.description || m.locked) && '*:[span]:last:flex-1')}
+                                        className={cn('flex-1', m.description && '*:[span]:last:flex-1')}
                                     >
-                                        {m.description || m.locked ? <ModelTierRow label={m.label} description={m.description} power={m.power} locked={m.locked} /> : m.label}
+                                        {m.description ? <ModelTierRow label={m.label} description={m.description} power={m.power} /> : m.label}
                                     </SelectItem>
                                 </TooltipDisabledReason>
                             ))}

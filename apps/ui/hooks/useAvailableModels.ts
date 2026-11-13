@@ -3,10 +3,8 @@
 import { updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
 import { patchAgentModel, useAgentContext } from '@/hooks/useAgentContext'
 import { useWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
 import type { BoxDefault } from '@/lib/engine/types'
 import type { EngineProvider } from '@/lib/engine/types'
-import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 import { useCallback, useMemo } from 'react'
 import { connectionGroups, type ConnectionGroup } from '@/lib/engine/model-groups'
@@ -16,11 +14,7 @@ export type { ConnectionGroup } from '@/lib/engine/model-groups'
 export function useAvailableModels(agentId: string) {
     const { context, loaded } = useAgentContext(agentId)
     const { connections, boxDefault, loading: connectionsLoading, refresh: refreshConnections } = useWorkspaceConnections()
-    const { workspace } = useSession()
     const tConnections = useTranslations('connections')
-    // Unknown until the workspace is there, and unlocked meanwhile: a lock that flashes on a paying
-    // account for the time of a hydration reads as a plan that was lost.
-    const premiumAllowed = !workspace || isPremiumModelEntitled(workspace)
 
     const agentModel = context?.model
     const pin = { connectionId: agentModel?.connectionId ?? null, model: agentModel?.model ?? null }
@@ -33,7 +27,7 @@ export function useAvailableModels(agentId: string) {
     // following the Box: the picker would repair a state it does not know. It waits for a read.
     const loading = !loaded || connectionsLoading || !agentModel?.loaded
 
-    const availableGroups = useMemo(() => connectionGroups(connections, premiumAllowed, tConnections), [connections, premiumAllowed, tConnections])
+    const availableGroups = useMemo(() => connectionGroups(connections, tConnections), [connections, tConnections])
     // The connection owning a model id. Ambiguous by construction — two Claude subscriptions both
     // serve `opus` — so the agent's own connection wins when it is one of the candidates.
     const connectionOf = useCallback(

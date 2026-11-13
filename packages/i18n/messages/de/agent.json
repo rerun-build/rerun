@@ -36,7 +36,8 @@
         "emptyThreads": "Noch kein Thread.",
         "emptyAutomations": "Noch keine Automation.",
         "running": "Läuft",
-        "startedBy": "Gestartet von {name}"
+        "startedBy": "Gestartet von {name}",
+        "moreFor": "Mehr zu {title}"
     },
     "agentComputerThumbnail": {
         "working": "Arbeitet an seinem Computer",
@@ -75,8 +76,14 @@
     },
     "openChatsTabs": {
         "closeTab": "{title} schließen",
+        "closeTabMenu": "Tab schließen",
         "newThread": "Neuer Thread",
         "general": "Allgemein"
+    },
+    "sessionRename": {
+        "rename": "Umbenennen",
+        "label": "Name der Unterhaltung",
+        "failed": "Umbenennen fehlgeschlagen. Versuch es noch einmal."
     },
     "threadBranch": {
         "needs": "Braucht dich",
@@ -467,9 +474,6 @@
         },
         "connected": "Verbunden",
         "manage": "Verbindungen verwalten"
-    },
-    "modelTierRow": {
-        "pro": "Pro"
     },
     "runModelField": {
         "label": "Modell",

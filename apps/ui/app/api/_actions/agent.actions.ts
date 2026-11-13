@@ -6,7 +6,6 @@ import { AccessDeniedError, assertAgentInWorkspace, assertSessionInWorkspace, ke
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { activateAgent } from '@/app/api/_services/agent-activation.service'
 import { getAgentChatTarget, resolveRunTarget, sessionRowOf } from '@/app/api/_services/chat.service'
-import { assertModelEntitled } from '@/app/api/_services/engine-plan.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { followCoworker } from '@/app/api/_services/notification-audience.service'
 import { getServerSession } from '@/supabase/session/getServerSession'
@@ -179,7 +178,6 @@ export async function activateAgentAutomationsAction(agentId: string): Promise<v
 export async function updateAgentConfigAction(agentId: string, patch: EngineAgentConfigPatch & { soul?: string; install?: string }): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId, contentLocked } = await resolveRunTarget(agentId, 'manage')
-        await assertModelEntitled(patch.model)
         // Same reason as the skill body: a sealed soul is dropped from the patch, not written back.
         await enginePatchAgent(conn, engineAgentId, contentLocked ? { ...patch, soul: undefined } : patch)
         return { success: true }
@@ -644,7 +642,6 @@ export async function getScheduleAction(agentId: string, slug: string): Promise<
 export async function createScheduleAction(agentId: string, params: ScheduleCreateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
-        await assertModelEntitled(params.model)
         const schedule = await engineCreateSchedule(conn, engineAgentId, params)
         await followCoworker((await getServerSession()).user?.id, agentId)
         return { success: true, schedule }
@@ -656,7 +653,6 @@ export async function createScheduleAction(agentId: string, params: ScheduleCrea
 export async function updateScheduleAction(agentId: string, slug: string, patch: ScheduleUpdateParams): Promise<SuccessResult & { schedule?: EngineSchedule }> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
-        await assertModelEntitled(patch.model)
         // Pausing or rescheduling a sealed task is ordinary use; only its prompt is held back.
         const schedule = await engineUpdateSchedule(conn, engineAgentId, slug, contentLocked ? { ...patch, body: undefined } : patch)
         // A box that predates renaming drops the unknown field and still answers 200.
@@ -733,7 +729,6 @@ export async function getTriggerAction(agentId: string, slug: string): Promise<E
 export async function createTriggerAction(agentId: string, params: TriggerCreateParams): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
-        await assertModelEntitled(params.model)
         const trigger = await engineCreateTrigger(conn, engineAgentId, params)
         await followCoworker((await getServerSession()).user?.id, agentId)
         return { success: true, trigger }
@@ -745,7 +740,6 @@ export async function createTriggerAction(agentId: string, params: TriggerCreate
 export async function updateTriggerAction(agentId: string, slug: string, patch: TriggerUpdateParams): Promise<SuccessResult & { trigger?: EngineTrigger }> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
-        await assertModelEntitled(patch.model)
         const trigger = await engineUpdateTrigger(conn, engineAgentId, slug, contentLocked ? { ...patch, body: undefined } : patch)
         return { success: true, trigger }
     } catch (err) {

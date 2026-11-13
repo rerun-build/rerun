@@ -2,7 +2,6 @@ import { DEFAULT_PROVIDER_MODEL, RERUN_CONNECTION_ID, RERUN_MODEL, cliServesMode
 import { liveOpencodeProviderModels } from '../connections/opencode-catalog.js'
 import { readCliModels } from '../connections/cli-models.js'
 import { readBoxDefault, writeBoxDefault } from '../connections/default.js'
-import { allowedModel } from '../connections/plan.js'
 import { findConnection, listConnections } from '../connections/registry.js'
 import { isConnected } from '../connections/loader.js'
 import { resolveConnection, servesModel } from '../connections/resolve.js'
@@ -32,19 +31,17 @@ export function isUsable(connection: LoadedConnection | null, model: string | nu
 }
 
 // What the connection would run if no model were named. Its own first entry rather than the
-// provider default, because the box owner curated that list on purpose. On a trial, the first one
-// the plan runs as is, and the first one the subscription's CLI serves, so the default a box adopts
-// on connect is never a model it cannot run. OpenCode's live catalog says the same of a model it
-// stopped publishing.
+// provider default, because the box owner curated that list on purpose. The first one the
+// subscription's CLI serves, so the default a box adopts on connect is never a model it cannot run.
+// OpenCode's live catalog says the same of a model it stopped publishing.
 export function defaultModelOf(connection: LoadedConnection): string {
     const { provider, models, extraModels } = connection.config
     const offered = [...models, ...extraModels]
-    const runsAsIs = (model: string): boolean => allowedModel(provider, model) === model
-    return offered.find(model => runsAsIs(model) && servedByProvider(connection, model)) ?? offered.find(runsAsIs) ?? offered[0] ?? DEFAULT_PROVIDER_MODEL[provider]
+    return offered.find(model => servedByProvider(connection, model)) ?? offered[0] ?? DEFAULT_PROVIDER_MODEL[provider]
 }
 
-// A default starred before the subscription said which models it serves (or before the plan
-// changed) names a model every agent following it fails on. It moves to the first model the same
+// A default starred before the subscription said which models it serves names a model every agent
+// following it fails on. It moves to the first model the same
 // connection serves: the bill stays where the owner put it, only the model changes. Nothing is
 // written while no served model is known, a wrong guess would be worse than the stored pick.
 export async function repairBoxDefault(connection: LoadedConnection): Promise<void> {
@@ -58,7 +55,7 @@ export async function repairBoxDefault(connection: LoadedConnection): Promise<vo
 }
 
 function pick(connection: LoadedConnection, model: string): RunModel {
-    return { connection, provider: connection.config.provider, model: allowedModel(connection.config.provider, model) }
+    return { connection, provider: connection.config.provider, model }
 }
 
 // What the box runs for every agent that named no model of its own, and the only place the fallback
@@ -95,7 +92,7 @@ export async function resolveConfiguredModel(config: Pick<AgentConfig, 'connecti
     if (!config.model) return boxDefaultModel()
     const connection = await resolveConnection(config.connectionId, config.provider)
     const provider = connection?.config.provider ?? config.provider ?? 'rerun'
-    return { connection, provider, model: allowedModel(provider, config.model) }
+    return { connection, provider, model: config.model }
 }
 
 // The same answer with a run's override laid on top. The override names a connection and a model;
@@ -104,7 +101,7 @@ export async function resolveRunModel(agent: LoadedAgent, override?: ModelOverri
     if (!override?.connectionId && !override?.provider && !override?.model) return agent.resolved
     const connection = await resolveConnection(override.connectionId ?? agent.config.connectionId, override.provider ?? agent.config.provider)
     const provider = connection?.config.provider ?? override.provider ?? agent.resolved.provider
-    return { connection, provider, model: allowedModel(provider, override.model ?? agent.resolved.model) }
+    return { connection, provider, model: override.model ?? agent.resolved.model }
 }
 
 // An automation carries a pair frozen when it was written, and nothing repairs it when the

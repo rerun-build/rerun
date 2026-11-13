@@ -65,6 +65,9 @@ export const conversationHitSchema = z.object({
 })
 export type ConversationHit = z.infer<typeof conversationHitSchema>
 
+// The longest title a person can give a conversation.
+export const CONVERSATION_TITLE_MAX = 80
+
 export const adoptConversationSchema = z.object({ engineSessionId: z.string().min(1), title: z.string() })
 
 export const conversationAttachmentSchema = z.object({

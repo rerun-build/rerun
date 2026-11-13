@@ -28,7 +28,6 @@ import {
     agentDuplicateResultSchema,
     agentImportResultSchema,
     type AgentArchivePlan,
-    type BoxPlan,
     type AgentDuplicateResult,
     type AgentImportResult,
     type ForemanBrief,
@@ -208,12 +207,6 @@ export async function setBoxDefault(conn: EngineConnection, pick: BoxDefault | n
         return
     }
     await request(conn, '/connections/default', { method: 'PUT', body: JSON.stringify(pick) }, () => undefined)
-}
-
-// Whether the box runs premium models as asked or steps them down. An engine older than plans
-// answers 404, which leaves it running everything as it always has.
-export async function setBoxPlan(conn: EngineConnection, plan: BoxPlan): Promise<void> {
-    await request(conn, '/plan', { method: 'PUT', body: JSON.stringify(plan) }, () => undefined)
 }
 
 export async function createConnection(conn: EngineConnection, params: CreateBoxConnectionInput): Promise<BoxConnection> {

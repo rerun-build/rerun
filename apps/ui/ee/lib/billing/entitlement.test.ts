@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canEndTrialNow, isApiEntitled, isMachineEntitled, isPaidSubscription, isPremiumModelEntitled, isSubscriptionEntitled, isTrialLapsed, isWorkspaceApiEntitled } from './entitlement'
+import { canEndTrialNow, isApiEntitled, isMachineEntitled, isPaidSubscription, isSubscriptionEntitled, isTrialLapsed, isWorkspaceApiEntitled } from './entitlement'
 
 describe('isSubscriptionEntitled', () => {
     it('keeps a trial and a late payment entitled', () => {
@@ -97,17 +97,5 @@ describe('isTrialLapsed', () => {
 
     it('never covers an account that has paid once', () => {
         for (const status of ['canceled', 'past_due', 'unpaid', 'active']) expect(isTrialLapsed(status, '2026-09-01T00:00:00Z')).toBe(false)
-    })
-})
-
-describe('isPremiumModelEntitled', () => {
-    it('keeps premium models for after the first charge', () => {
-        expect(isPremiumModelEntitled({ subscription_status: 'trialing', is_sandbox: false })).toBe(false)
-        expect(isPremiumModelEntitled({ subscription_status: null, is_sandbox: false })).toBe(false)
-        expect(isPremiumModelEntitled({ subscription_status: 'active', is_sandbox: false })).toBe(true)
-    })
-
-    it('opens them to a sandbox, which has no subscription of its own', () => {
-        expect(isPremiumModelEntitled({ subscription_status: 'trialing', is_sandbox: true })).toBe(true)
     })
 })
