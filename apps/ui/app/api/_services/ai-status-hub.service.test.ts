@@ -18,7 +18,7 @@ vi.mock('@/ee/services/rerunBudget.service', async importOriginal => ({
 
 const { isAiStatusHubTool, readRerunCredit } = await import('./ai-status-hub.service')
 
-const BUDGET = { workspaceId: 7, budgetMicros: 20_000_000, usedMicros: 5_000_000, topupMicros: 1_000_000, periodAnchor: '2026-11-01T00:00:00Z', currentPeriodEnd: '2026-12-01T00:00:00Z', smartAllowed: true, paused: false }
+const BUDGET = { workspaceId: 7, budgetMicros: 20_000_000, usedMicros: 5_000_000, topupMicros: 1_000_000, periodAnchor: '2026-11-01T00:00:00Z', currentPeriodEnd: '2026-12-01T00:00:00Z', paused: false }
 
 describe('readRerunCredit', () => {
     beforeEach(() => {

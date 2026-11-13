@@ -13,7 +13,6 @@ export const isSubscriptionEntitled = (_status: string | null | undefined): bool
 export const isMachineEntitled = (_status: string | null | undefined): boolean => true
 export const isPaidSubscription = (_status: string | null | undefined): boolean => true
 export const isWorkspaceApiEntitled = (_workspace: WorkspacePlan): boolean => true
-export const isPremiumModelEntitled = (_workspace: WorkspacePlan): boolean => true
 
 // A lifetime plan is sold through an AppSumo code, which only Rerun Cloud redeems.
 export const isLifetimePlan = (_workspace: { plan: string | null } | null | undefined): boolean => false

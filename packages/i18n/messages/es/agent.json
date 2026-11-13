@@ -468,9 +468,6 @@
         "connected": "Conectado",
         "manage": "Gestionar conexiones"
     },
-    "modelTierRow": {
-        "pro": "Pro"
-    },
     "runModelField": {
         "label": "Modelo",
         "placeholder": "Elige un modelo",

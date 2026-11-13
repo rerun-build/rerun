@@ -19,7 +19,7 @@ const { getConnection } = await import('../connections/registry.js')
 const { clearAgentCache } = await import('./registry.js')
 const { clearBoxDefault, readBoxDefault, writeBoxDefault } = await import('../connections/default.js')
 const { forgetCliModels, recordCliModels, recordRefusedModel } = await import('../connections/cli-models.js')
-const { boxDefaultModel, defaultModelOf, isUsable, repairBoxDefault, resolveAutomationModel, resolveConfiguredModel } = await import('./availability.js')
+const { boxDefaultModel, defaultModelOf, isUsable, repairBoxDefault, resolveAutomationModel, resolveConfiguredModel, resolveRunModel } = await import('./availability.js')
 
 let seq = 0
 
@@ -193,6 +193,16 @@ describe('resolveConfiguredModel', () => {
     })
 })
 
+describe('resolveRunModel', () => {
+    // The hub names a connection and a model in a chat, never a provider.
+    it('runs an override on the provider of the connection it names, not on the agent\'s', async () => {
+        const codex = await connect('codex', { CODEX_OAUTH_TOKEN: 't' })
+        const claude = await connect('claude', { CLAUDE_CODE_OAUTH_TOKEN: 't' })
+        const agent = await makeAgent(codex.id, 'codex', 'gpt-6-sol')
+        expect(await resolveRunModel(agent, { connectionId: claude.id, model: 'claude-opus-5-5' })).toMatchObject({ connection: { id: claude.id }, provider: 'claude', model: 'claude-opus-5-5' })
+    })
+})
+
 describe('resolveAutomationModel over a box-default agent', () => {
     it('runs the box default when the automation names no model of its own', async () => {
         await ensureRerunConnection()
@@ -215,6 +225,10 @@ async function chatgpt(served: string[] | null = CHATGPT_PLAN_MODELS) {
 describe('a ChatGPT plan that leaves models out', () => {
     it('defaults to the first model the account serves', async () => {
         expect(defaultModelOf(await chatgpt())).toBe('gpt-6-luna')
+    })
+
+    it('defaults to the first model of the list while the account has not been read', async () => {
+        expect(defaultModelOf(await chatgpt(null))).toBe(DEFAULT_CONNECTION_MODELS.codex[0])
     })
 
     it('does not count a model the account refuses as usable', async () => {
@@ -264,5 +278,14 @@ describe('a ChatGPT plan that leaves models out', () => {
         const pinned = await makeAgent(codex.id, 'codex', 'gpt-6-sol')
         expect(pinned.resolved).toMatchObject({ provider: 'codex', model: 'gpt-6-sol' })
         expect(await resolveAutomationModel(pinned, { connectionId: codex.id, model: 'gpt-6-sol' })).toEqual({ connectionId: codex.id, provider: 'codex', model: 'gpt-6-luna' })
+    })
+})
+
+describe('a Claude subscription', () => {
+    it('keeps the first model as its default whatever Claude Code lists', async () => {
+        const claude = await connect('claude', { CLAUDE_CODE_OAUTH_TOKEN: 't' })
+        recordCliModels(claude.id, ['claude-sonnet-5-5', 'claude-haiku-5-5'], '2.1.317', false)
+        expect(defaultModelOf(claude)).toBe('claude-opus-5-5')
+        forgetCliModels(claude.id)
     })
 })

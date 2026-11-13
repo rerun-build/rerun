@@ -55,7 +55,6 @@ const m = vi.hoisted(() => ({
     reportTrialPaymentFailed: vi.fn(),
     requestBoxRestore: vi.fn(),
     resolveEngineWaitlist: vi.fn(),
-    syncEnginePlan: vi.fn(),
     isPhoneStepPending: vi.fn(),
 }))
 
@@ -81,7 +80,6 @@ vi.mock('./billing-analytics.service', () => ({
 }))
 vi.mock('@rerun/cloud/engines', () => ({ requestBoxRestore: m.requestBoxRestore }))
 vi.mock('@/app/api/_services/waitlist.service', () => ({ resolveEngineWaitlist: m.resolveEngineWaitlist }))
-vi.mock('@/app/api/_services/workspace-engine.service', () => ({ syncEnginePlan: m.syncEnginePlan }))
 vi.mock('@/app/api/_services/phone-gate.service', () => ({ isPhoneStepPending: m.isPhoneStepPending }))
 vi.mock('@/ee/lib/billing/trial-experiment', async importOriginal => {
     const actual = await importOriginal<typeof import('@/ee/lib/billing/trial-experiment')>()

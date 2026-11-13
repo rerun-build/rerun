@@ -54,7 +54,6 @@
         "modelSelector.loading": "Model picker pill while the models load.",
         "modelSelector.refused": "Shown in the chat composer when the AI subscription refuses the picked model. {model} is a model name, {reason} an English reason from the provider.",
         "modelsShared.boxManageReason": "Tooltip on a disabled control: the person lacks the rights on the Box (group of coworkers) holding this coworker.",
-        "modelTierRow.pro": "Badge on a model only available on the paid Pro plan.",
         "openChatsTabs.general": "Tab of the coworker's main conversation, always open.",
         "planLimitHint.credit.usedUpOn": "Monthly Rerun credits are exhausted. {date} is a short date like \"Nov 12\".",
         "planLimitHint.paused": "Badge: the Rerun credits are paused.",
@@ -546,9 +545,6 @@
         },
         "connected": "Connected",
         "manage": "Manage connections"
-    },
-    "modelTierRow": {
-        "pro": "Pro"
     },
     "runModelField": {
         "label": "Model",

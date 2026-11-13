@@ -87,7 +87,7 @@ describe('OpenCode in the model pickers', () => {
     // One group for the connection, whatever its two catalogs: the iOS app keys the running model on it.
     // A free Go model says so, as the connection dialog does, rather than "Included in Go".
     it('lists one group, Go before Console, with what each costs as its description', () => {
-        const groups = connectionGroups([connection], true, englishTranslator('connections'))
+        const groups = connectionGroups([connection], englishTranslator('connections'))
         expect(groups).toHaveLength(1)
         expect(groups[0].models.map(model => [model.id, model.description])).toEqual([
             ['go/deepseek-v4-pro', 'Included in Go'],
@@ -100,13 +100,8 @@ describe('OpenCode in the model pickers', () => {
 
     it('greys out a model OpenCode no longer offers, and does not default to it', () => {
         const live = OPENCODE_SNAPSHOT.map(toProviderModel).filter(model => model.id !== 'go/deepseek-v4-pro')
-        const [group] = connectionGroups([opencode({ models: ['go/deepseek-v4-pro', 'go/glm-5.3'], providerModels: live })], true, englishTranslator('connections'))
+        const [group] = connectionGroups([opencode({ models: ['go/deepseek-v4-pro', 'go/glm-5.3'], providerModels: live })], englishTranslator('connections'))
         expect(group.models.find(model => model.id === 'go/deepseek-v4-pro')?.unavailable).toBe('No longer offered by OpenCode')
         expect(group.defaultModel).toBe('go/glm-5.3')
-    })
-
-    it('locks the premium Console models on a trial, never the Go ones', () => {
-        const [group] = connectionGroups([opencode({ models: ['go/deepseek-v4-pro', 'console/claude-opus-5-5', 'console/gpt-6-astra'] })], false, englishTranslator('connections'))
-        expect(group.models.filter(model => model.locked).map(model => model.id)).toEqual(['console/claude-opus-5-5', 'console/gpt-6-astra'])
     })
 })

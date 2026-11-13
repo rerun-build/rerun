@@ -250,7 +250,6 @@
     "coworkerNotReachable": "Coworker not reachable",
     "upgradeToEditContent": "Upgrade your plan to edit this content.",
     "updateProposalFailed": "Failed to update the proposal",
-    "modelNeedsPaidPlan": "{model} is available with a paid plan.",
     "noMachineYet": "This workspace has no machine yet",
     "workspaceRestoring": "Your workspace is being restored. It will be back in a minute or two.",
     "addSharedCoworkerFailed": "Could not add this coworker to your board",

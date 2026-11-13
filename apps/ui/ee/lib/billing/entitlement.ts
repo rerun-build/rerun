@@ -45,13 +45,6 @@ export function isWorkspaceApiEntitled(workspace: { subscription_status: string 
     return workspace.is_sandbox || isApiEntitled(workspace.subscription_status)
 }
 
-// Premium models are one such capability: Rerun Smart costs an order of magnitude more than Fast and Balanced
-// and spends a signup allowance that never comes back, and Opus, Fable and GPT-6 Astra empty the
-// user's own subscription in an afternoon. Shared by the hub proxy, the box plan and the pickers.
-export function isPremiumModelEntitled(workspace: { subscription_status: string | null; is_sandbox: boolean }): boolean {
-    return workspace.is_sandbox || isPaidSubscription(workspace.subscription_status)
-}
-
 // Converting a trial into a paid subscription on the spot, at unchanged quantities. Shared by the
 // server guard and the button that offers it, so the two can never disagree on who is eligible.
 // A trial without a card has nothing to charge (those started before 2026-09-05), and one already

@@ -46,7 +46,6 @@
                 "seats": "<b>Puestos ilimitados</b>, sin cargos por usuario",
                 "team": "Gestiona tus Coworkers con <b>todo tu equipo</b>",
                 "credits": "<b>{credits, plural, one {# crédito de regalo} other {# créditos de regalo}}</b> cada mes",
-                "models": "<b>Modelos inteligentes</b> para tus tareas más difíciles",
                 "autopilot": "Pon tu negocio en <b>piloto automático</b>"
             },
             "creditsNote": "Recarga cuando quieras"

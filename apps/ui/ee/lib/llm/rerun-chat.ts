@@ -1,6 +1,6 @@
 import { after } from 'next/server'
 import { rerunTierOf, withAnthropicCacheBreakpoints } from '@rerun/contracts'
-import { RERUN_TIER_REASONING, RERUN_UPSTREAM_MODELS, servedRerunTier } from '@/lib/engine/constants'
+import { RERUN_TIER_REASONING, RERUN_UPSTREAM_MODELS } from '@/lib/engine/constants'
 import { MICROS_PER_USD } from '@/ee/lib/billing/plans'
 import { meteredFetch, type OpenRouterUsage } from '@/ee/lib/billing/openrouter-usage'
 import { notifyBudgetExhausted } from '@/ee/services/budgetNotification.service'
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     // The box names an alias, the hub says what it resolves to. Rewriting rather than refusing an
     // unknown id is what lets a box that has not self-updated keep running the current model, and
     // it is the guard on the shared key too: nothing else can be asked for on it.
-    const tier = servedRerunTier(rerunTierOf(body.model), resolved.smartAllowed)
+    const tier = rerunTierOf(body.model)
     const model = RERUN_UPSTREAM_MODELS[tier]
     const reasoning = RERUN_TIER_REASONING[tier]
 

@@ -78,7 +78,6 @@ import { sendTrialStartedReceipt } from '@/ee/lib/lifecycle/trial-receipt'
 import { reportSubscriptionCancelled, reportSubscriptionTransition, reportTrialConverted, reportTrialPaymentFailed } from './billing-analytics.service'
 import { requestBoxRestore } from '@rerun/cloud/engines'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
-import { syncEnginePlan } from '@/app/api/_services/workspace-engine.service'
 import type Stripe from 'stripe'
 
 type WorkspaceUpdate = Database['public']['Tables']['workspaces']['Update']
@@ -1531,10 +1530,6 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
         const { woken } = await wakePlanLimitedAgents(workspaceId)
         await requestAgentActivationSync(woken, { switchOn: true })
     }
-
-    // Starting a trial locks the premium models on the box, converting it unlocks them. Not awaited:
-    // the box may be asleep, and a webhook that waits for it times out.
-    void syncEnginePlan(workspaceId)
 
     await reportSubscriptionTransition(subscription, workspaceId, existing?.subscription_status ?? null)
 

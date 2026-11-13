@@ -1,6 +1,5 @@
 import type { RerunTier } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
-import { isPremiumModelEntitled } from '@/ee/lib/billing/entitlement'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -14,9 +13,6 @@ export type WorkspaceBudget = {
     topupMicros: number
     periodAnchor: string | null
     currentPeriodEnd: string | null
-    // A trial runs on Fast and Balanced: Smart costs an order of magnitude more, on a signup
-    // allowance that does not come back.
-    smartAllowed: boolean
     // A member paused the credit: nothing may spend it until someone resumes it.
     paused: boolean
 }
@@ -28,7 +24,7 @@ export const RERUN_CREDIT_PAUSED_ERROR = 'rerun_credit_paused'
 // where a box asks for it through its engine key.
 export async function getWorkspaceBudget(workspaceId: number): Promise<WorkspaceBudget | null> {
     const supabase = createServiceRoleClient()
-    const { data: ws } = await selectMaybeSingle(supabase, 'workspaces', ['id', 'rerun_budget_micros', 'rerun_used_micros', 'rerun_topup_micros', 'rerun_period_anchor', 'current_period_end', 'subscription_status', 'is_sandbox', 'rerun_credit_paused_at'] as const, { id: workspaceId })
+    const { data: ws } = await selectMaybeSingle(supabase, 'workspaces', ['id', 'rerun_budget_micros', 'rerun_used_micros', 'rerun_topup_micros', 'rerun_period_anchor', 'current_period_end', 'rerun_credit_paused_at'] as const, { id: workspaceId })
     if (!ws) return null
 
     return {
@@ -38,7 +34,6 @@ export async function getWorkspaceBudget(workspaceId: number): Promise<Workspace
         topupMicros: ws.rerun_topup_micros ?? 0,
         periodAnchor: ws.rerun_period_anchor,
         currentPeriodEnd: ws.current_period_end,
-        smartAllowed: isPremiumModelEntitled(ws),
         paused: ws.rerun_credit_paused_at !== null,
     }
 }

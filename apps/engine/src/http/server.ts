@@ -6,7 +6,6 @@ import { foremanGuard } from './foreman-guard.js'
 import { healthRoutes } from './routes/health.js'
 import { agentRoutes } from './routes/agents.js'
 import { connectionRoutes } from './routes/connections.js'
-import { planRoutes } from './routes/plan.js'
 import { chatRoutes } from './routes/chat.js'
 import { sessionRoutes } from './routes/sessions.js'
 import { memoryRoutes } from './routes/memories.js'
@@ -44,7 +43,6 @@ export function createServer(): Hono {
     api.route('/doctor', doctorRoutes)
     api.route('/tools', toolRoutes)
     api.route('/connections', connectionRoutes)
-    api.route('/plan', planRoutes)
     api.route('/agents', agentRoutes)
     api.route('/agents/:id/sessions', sessionRoutes)
     api.route('/agents/:id/memories', memoryRoutes)

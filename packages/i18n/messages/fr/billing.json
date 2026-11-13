@@ -376,8 +376,6 @@
                 "bodyNoCoworker": "Votre coworker est prêt à reprendre la tâche. Votre reçu arrive par email.",
                 "credits": "Crédits",
                 "creditsValue": "{credits, plural, one {# crédit} other {# crédits}} par mois",
-                "models": "Modèles",
-                "modelsValue": "Tous les modèles premium",
                 "coworkers": "Coworkers",
                 "coworkersValue": "Illimités",
                 "resume": "Reprendre la tâche"
@@ -498,11 +496,6 @@
                 "trial": "{credits, plural, one {# crédit} other {# crédits}}, une fois",
                 "pro": "{credits, plural, one {# crédit} other {# crédits}} chaque mois"
             },
-            "models": {
-                "title": "Modèles",
-                "trial": "Modèles plus légers",
-                "pro": "Tous les modèles premium débloqués"
-            },
             "coworkers": {
                 "title": "Coworkers",
                 "trial": "{count} actifs",
@@ -521,8 +514,8 @@
         },
         "headlines": {
             "credits": "{credits, plural, one {# crédit/mois} other {# crédits/mois}}",
-            "models": "Modèles premium",
-            "coworkers": "Coworkers illimités"
+            "coworkers": "Coworkers illimités",
+            "team": "Invitez votre équipe"
         }
     },
     "cancel": {

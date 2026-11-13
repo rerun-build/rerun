@@ -1,5 +1,4 @@
 import { assertEngineEntitlement } from '@/app/api/_services/capacity.service'
-import { pushBoxPlan } from '@/app/api/_services/engine-plan.service'
 import type { Database } from '@/app/api/database.types'
 import { claimPoolEngine } from '@rerun/cloud/engines'
 import { requestCompanyBrainSeed } from '@/lib/brain/request-seed'
@@ -77,19 +76,7 @@ export async function ensureWorkspaceEngine(workspaceId: number, { forRestore = 
 
     // A restored data-dir carries its own Company Brain.
     if (!forRestore) await requestCompanyBrainSeed(workspaceId, `brain-seed-${workspaceId}`)
-    await pushBoxPlan(workspaceId, { baseUrl: buildBaseUrl(instance.engineHost), apiKey: instance.engineApiKey })
     return { ok: true, instanceId: instance.id }
-}
-
-// Tells the workspace's box what its plan runs, once the plan has changed. Never rejects: the
-// billing webhook fires it without awaiting, and a rejection there has no handler.
-export async function syncEnginePlan(workspaceId: number): Promise<void> {
-    try {
-        const engine = await findWorkspaceEngine(workspaceId)
-        if (engine) await pushBoxPlan(workspaceId, engine.conn)
-    } catch (err) {
-        console.error(`[plan] failed to sync the plan of workspace ${workspaceId}`, err)
-    }
 }
 
 // The door that replaces the self-hosted Box: an engine somebody else runs, pinned to a workspace

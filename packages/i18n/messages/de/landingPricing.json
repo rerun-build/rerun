@@ -46,7 +46,6 @@
                 "seats": "<b>Unbegrenzt viele Plätze</b>, keine Gebühr pro Nutzer",
                 "team": "Verwalte deine Coworker mit <b>deinem ganzen Team</b>",
                 "credits": "<b>{credits, plural, one {# Credit} other {# Credits}} von uns</b>, jeden Monat",
-                "models": "<b>Smarte Modelle</b> für deine schwierigsten Aufgaben",
                 "autopilot": "Stell dein Geschäft auf <b>Autopilot</b>"
             },
             "creditsNote": "Jederzeit aufladen"

@@ -259,7 +259,7 @@ function TrialUpgradeNotice({ coworker, priceArm = DEFAULT_PRICE_ARM, onPaid, re
                 {NOTICE_PERKS.map(perk => (
                     <li key={perk.id} className="flex items-center gap-1.5 text-xs">
                         <CheckIcon className="size-3.5 shrink-0 text-green-500" />
-                        {tPerks(perk.id as 'credits' | 'models' | 'coworkers', { credits: BASE_PLAN_CREDITS })}
+                        {tPerks(perk.id as 'credits' | 'coworkers' | 'team', { credits: BASE_PLAN_CREDITS })}
                     </li>
                 ))}
             </ul>

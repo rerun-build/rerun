@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { DEFAULT_ADMIN_EMAILS } from './admin'
-import { activeAgentLimitFor, BILLING_ENABLED, isMachineEntitled, isPaidSubscription, isPremiumModelEntitled, isSubscriptionEntitled, isWorkspaceApiEntitled } from './billing'
+import { activeAgentLimitFor, BILLING_ENABLED, isMachineEntitled, isPaidSubscription, isSubscriptionEntitled, isWorkspaceApiEntitled } from './billing'
 import { RERUN_CLOUD } from './edition'
 import { DESKTOP_DIRECT } from './engines'
 import { ILLUSTRATION_ENTRIES } from './illustrations'
@@ -27,7 +27,6 @@ describe('the self-hosted side of @rerun/cloud', () => {
             expect(isPaidSubscription(status)).toBe(true)
         }
         expect(isWorkspaceApiEntitled({ subscription_status: null, is_sandbox: true })).toBe(true)
-        expect(isPremiumModelEntitled({ subscription_status: null, is_sandbox: false })).toBe(true)
         expect(activeAgentLimitFor(null, 'canceled')).toBeNull()
         expect(activeAgentLimitFor(4, null)).toBe(4)
     })

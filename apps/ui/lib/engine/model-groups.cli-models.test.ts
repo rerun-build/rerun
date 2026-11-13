@@ -43,25 +43,25 @@ describe('cliUnavailableReason', () => {
 
 describe('toGroup', () => {
     it('marks what the CLI does not serve and defaults to the first model it does', () => {
-        const group = toGroup(codex(reading(['gpt-6-sol', 'gpt-6-luna'], true)), true, t)
+        const group = toGroup(codex(reading(['gpt-6-sol', 'gpt-6-luna'], true)), t)
         expect(group.models.find(m => m.id === 'gpt-6.1-sol')?.unavailable).toBe('Codex CLI outdated on this box')
         expect(group.models.find(m => m.id === 'gpt-6-sol')?.unavailable).toBeUndefined()
         expect(group.defaultModel).toBe('gpt-6-sol')
     })
 
     it('marks an extra model the CLI does not list, like any other', () => {
-        const extra = (connection: BoxConnection) => toGroup(connection, true, t).models.find(m => m.id === 'gpt-6.2-nova')
+        const extra = (connection: BoxConnection) => toGroup(connection, t).models.find(m => m.id === 'gpt-6.2-nova')
         expect(extra(codex(reading(['gpt-6-sol'], false), ['gpt-6.2-nova']))?.unavailable).toBe('Not in your ChatGPT plan')
         expect(extra(codex(null, ['gpt-6.2-nova']))?.unavailable).toBeUndefined()
     })
 
     it('keeps the first model as default without a reading', () => {
-        expect(toGroup(codex(null), true, t).defaultModel).toBe('gpt-6.1-sol')
+        expect(toGroup(codex(null), t).defaultModel).toBe('gpt-6.1-sol')
     })
 })
 
 describe('refusedModelReason', () => {
-    const plan = toGroup(codex(reading(['gpt-6-luna'], false)), true, t)
+    const plan = toGroup(codex(reading(['gpt-6-luna'], false)), t)
 
     it('names why the plan refuses the model the next turn would run', () => {
         expect(refusedModelReason(plan, 'gpt-6-sol')).toBe('Not in your ChatGPT plan')
@@ -69,7 +69,7 @@ describe('refusedModelReason', () => {
 
     it('holds nothing back on a served model, an unread CLI or no pick at all', () => {
         expect(refusedModelReason(plan, 'gpt-6-luna')).toBeUndefined()
-        expect(refusedModelReason(toGroup(codex(null), true, t), 'gpt-6-sol')).toBeUndefined()
+        expect(refusedModelReason(toGroup(codex(null), t), 'gpt-6-sol')).toBeUndefined()
         expect(refusedModelReason(undefined, 'gpt-6-sol')).toBeUndefined()
         expect(refusedModelReason(plan, null)).toBeUndefined()
     })

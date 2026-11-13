@@ -18,7 +18,6 @@ import type { ContextOccupancy, McpServer, Provider } from '@rerun/contracts'
 import { env } from '../config/env.js'
 import { codexPath } from '../runtime/codex-cli.js'
 import { codexHomeDir } from '../config/paths.js'
-import { allowedModel } from '../connections/plan.js'
 import { CONNECTION_TOKEN_KEY, RERUN_CONNECTION_ID } from '@rerun/contracts'
 import { childProcessEnv, envOverlay } from '../lib/child-env.js'
 import { newId } from '../lib/ids.js'
@@ -441,7 +440,7 @@ export type ModelOverride = { connectionId?: string; provider?: Provider; model?
 // what a caller with no override of its own (compaction, curator, vision, memory reconcile) means.
 function pairFor(agent: LoadedAgent, override?: ModelOverride): { provider: Provider; model: string } {
     const provider = agent.resolved.provider
-    return { provider, model: allowedModel(provider, override?.model ?? agent.resolved.model) }
+    return { provider, model: override?.model ?? agent.resolved.model }
 }
 
 // For one-shot calls with no tools. Codex resolves to the exec transport here, which spawns per call

@@ -246,7 +246,6 @@
     "coworkerNotReachable": "Coworker inacessível",
     "upgradeToEditContent": "Faça upgrade do seu plano para editar este conteúdo.",
     "updateProposalFailed": "Falha ao atualizar a proposta",
-    "modelNeedsPaidPlan": "{model} está disponível com um plano pago.",
     "noMachineYet": "Este workspace ainda não tem máquina",
     "workspaceRestoring": "Seu workspace está sendo restaurado. Ele volta em um ou dois minutos.",
     "addSharedCoworkerFailed": "Não foi possível adicionar este coworker ao seu quadro",

@@ -15,11 +15,10 @@ import { useAvailableModels, type ConnectionGroup } from '@/hooks/useAvailableMo
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { refusedModelReason } from '@/lib/engine/model-groups'
 import { useRerunCredit } from '@/hooks/useRerunCredit'
-import { PREMIUM_MODEL_BILLING_TRIGGER, pillUsage } from '@/lib/engine/ai-sources'
+import { pillUsage } from '@/lib/engine/ai-sources'
 import { modelLabel } from '@/lib/engine/models'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { ChevronDownIcon, Settings2Icon, StarIcon } from '@/lib/icons'
-import { useBillingStore } from '@/stores/billing.store'
 import { useBoardStore } from '@/stores/board.store'
 import { useModelPickerStore } from '@/stores/model-picker.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
@@ -156,11 +155,6 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         openAiProviders()
     }, [openAiProviders])
 
-    const upgradeForModel = useCallback(() => {
-        setOpen(false)
-        useBillingStore.getState().openBilling(undefined, PREMIUM_MODEL_BILLING_TRIGGER)
-    }, [])
-
     const addProvider = useCallback(
         (provider: AddableProvider) => {
             setOpen(false)
@@ -260,13 +254,6 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                                     <ModelTierRow label={m.label} description={m.description} power={m.power} />
                                                 </CommandItem>
                                             </TooltipDisabledReason>
-                                        )
-                                    }
-                                    if (m.locked) {
-                                        return (
-                                            <CommandItem key={m.id} className="[&>svg:last-child]:hidden" value={`${group.label} ${m.label} ${m.id}`} onSelect={upgradeForModel}>
-                                                <ModelTierRow label={m.label} description={m.description} power={m.power} locked />
-                                            </CommandItem>
                                         )
                                     }
                                     const defaultStar = isDefault ? (

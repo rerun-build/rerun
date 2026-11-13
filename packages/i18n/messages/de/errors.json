@@ -246,7 +246,6 @@
     "coworkerNotReachable": "Coworker nicht erreichbar",
     "upgradeToEditContent": "Wechsle zu einem höheren Tarif, um diesen Inhalt zu bearbeiten.",
     "updateProposalFailed": "Der Vorschlag konnte nicht aktualisiert werden",
-    "modelNeedsPaidPlan": "{model} ist mit einem bezahlten Tarif verfügbar.",
     "noMachineYet": "Dieser Workspace hat noch keine Maschine",
     "workspaceRestoring": "Dein Workspace wird wiederhergestellt. In ein, zwei Minuten ist er zurück.",
     "addSharedCoworkerFailed": "Dieser Coworker konnte nicht zu deinem Board hinzugefügt werden",
