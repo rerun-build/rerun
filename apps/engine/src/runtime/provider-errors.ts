@@ -1,5 +1,5 @@
 import { APICallError, LoadAPIKeyError, RetryError } from 'ai'
-import { CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, PROVIDER_OVERLOADED, SUBSCRIPTION_LIMIT, type Provider } from '@rerun/contracts'
+import { CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, OPENAI_API_CREDITS_USED_UP, PROVIDER_OVERLOADED, stripErrorPrefix, SUBSCRIPTION_LIMIT, type Provider } from '@rerun/contracts'
 import { isRerunBudgetError, RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 
 export const RUN_ERROR_CODES = {
@@ -161,6 +161,35 @@ export function refusalReason(error: unknown): string | null {
     return /^provider returned error$/i.test(error.message.trim()) ? null : error.message
 }
 
+// The provider's own error code: on an error event of the OpenAI Responses stream, or in the body of
+// a refused call, which the SDK keeps out of the error's message.
+function providerErrorCodeOf(error: unknown): string | null {
+    const cause = RetryError.isInstance(error) ? error.lastError : error
+    if (APICallError.isInstance(cause)) {
+        const body = (cause.data ?? (cause.responseBody ? parseJson(cause.responseBody) : null)) as { error?: { code?: unknown } } | null
+        return typeof body?.error?.code === 'string' ? body.error.code : null
+    }
+    if (cause instanceof Error || typeof cause !== 'object' || cause === null) return null
+    const code = (cause as { error?: { code?: unknown } }).error?.code
+    return typeof code === 'string' ? code : null
+}
+
+// An OpenAI API key whose account has no prepaid credits left. Stored under the sentence the chat
+// names OpenAI by, since OpenAI's older wording reads like any provider's rate limit.
+class OpenAiCreditsError extends Error {
+    constructor(reason: string) {
+        super(`${OPENAI_API_CREDITS_USED_UP}: ${reason}`)
+        this.name = 'OpenAiCreditsError'
+    }
+}
+
+export function openAiCreditsError(provider: Provider, error: unknown): OpenAiCreditsError | null {
+    if (provider !== 'openai') return null
+    if (providerErrorCodeOf(error) !== 'insufficient_quota' && !/no credits remaining/i.test(errorText(error))) return null
+    const cause = RetryError.isInstance(error) ? error.lastError : error
+    return new OpenAiCreditsError(stripErrorPrefix(errorMessageOf(cause)))
+}
+
 function apiCallErrorCode(error: unknown): RunErrorCode | null {
     if (!APICallError.isInstance(error)) return null
     const data = error.data as { exitCode?: unknown; code?: unknown } | undefined
@@ -173,7 +202,7 @@ function apiCallErrorCode(error: unknown): RunErrorCode | null {
 
 export function classifyProviderError(provider: Provider, error: unknown): RunErrorCode | null {
     if (provider === 'rerun' && isRerunBudgetError(error)) return RERUN_BUDGET_ERROR_CODE
-    const text = `${errorText(error)} ${upstreamReason(error) ?? ''}`
+    const text = `${errorText(error)} ${upstreamReason(error) ?? ''} ${providerErrorCodeOf(error) ?? ''}`
     // Both CLIs surface a spent subscription as free text on a generic error, with no status code
     // and no error kind of their own. Claude Code names the window that ran out rather than saying
     // "usage limit" at all: "You've hit your session limit · resets 3pm".
