@@ -5,7 +5,7 @@ import { NotificationPermissionDialog } from '@/components/dialogs/NotificationP
 import { NotificationsDialog } from '@/components/dialogs/NotificationsDialog'
 import { ShortcutsDialog } from '@/components/dialogs/ShortcutsDialog'
 import { SubscriptionOfferDialog } from '@/components/dialogs/SubscriptionOfferDialog'
-import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
 import { useInstallPrompt } from '@/components/pwa/useInstallPrompt'
 import { useRewindEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { selectHasEntries, selectUnreadCount, useChangelogStore } from '@/stores/changelog.store'
@@ -13,7 +13,7 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { selectHasUnseenLatest, useRewindStore } from '@rerun/cloud/rewind.client'
 import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { Badge } from '@rerun/ui/primitives'
-import { BookOpenIcon, DownloadIcon, HandshakeIcon, KeyboardIcon, ListTodoIcon, MegaphoneIcon, MonitorIcon, RewindIcon, UsersIcon } from '@/lib/icons'
+import { BookOpenIcon, DownloadIcon, KeyboardIcon, ListTodoIcon, MegaphoneIcon, MonitorIcon, RewindIcon, UsersIcon } from '@/lib/icons'
 import { isDesktopShell } from '@/lib/desktop-shell/client'
 import { detectMobileOs } from '@/lib/in-app-browser'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
@@ -114,13 +114,6 @@ export function HelpMenuItems({ onOpenGettingStarted }: { onOpenGettingStarted: 
                     </a>
                 </DropdownMenuItem>
             )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="gap-2 text-muted-foreground">
-                <a href={landingUrl('/community/experts')} target="_blank" rel="noopener noreferrer">
-                    <HandshakeIcon className="size-4" />
-                    {t('hireExpert')}
-                </a>
-            </DropdownMenuItem>
         </>
     )
 }
