@@ -5,7 +5,7 @@ import { env } from '../config/env.js'
 // authenticates with its own bearer and ignores both headers, so it costs two useless headers and
 // nothing else — not worth an exception.
 const HUB_MCP_PREFIX = '/api/mcp/'
-const INJECTED_HEADERS = ['x-rerun-key', 'x-rerun-agent']
+const INJECTED_HEADERS = ['x-rerun-key', 'x-rerun-agent', 'x-rerun-vault-item']
 
 // Matched on parsed URLs, not strings: parsing normalises host casing, default ports and `..`
 // segments, so `/api/mcp/../../evil` cannot pass as one of ours. The hub base is a parameter
@@ -27,9 +27,14 @@ export function isHubMcpUrl(url: string | undefined, hubBaseUrl: string | undefi
 // env().RERUN_HUB_BASE_URL and never the agent's, which the agent can override to point elsewhere —
 // and they overwrite whatever the config carries, header casing included. `Authorization` is left
 // alone: on /api/mcp/managed it carries the third party's token, put there by withAuth.
-export function withHubHeaders(server: McpServer, agentId: string): McpServer {
+//
+// `x-rerun-vault-item` names the Vault item a server came from, for the hub to find the account
+// behind it (the Composio user an item was connected under). Set here only, from the run's own
+// list, so a server a coworker wrote into its config can never borrow another item's account.
+export function withHubHeaders(server: McpServer, agentId: string, vaultItemId?: string): McpServer {
     const { RERUN_HUB_BASE_URL, RERUN_API_KEY } = env()
     if (!isHubMcpUrl(server.url, RERUN_HUB_BASE_URL)) return server
     const carried = Object.entries(server.headers).filter(([key]) => !INJECTED_HEADERS.includes(key.toLowerCase()))
-    return { ...server, headers: { ...Object.fromEntries(carried), 'x-rerun-key': RERUN_API_KEY ?? '', 'x-rerun-agent': agentId } }
+    const vault: Record<string, string> = vaultItemId ? { 'x-rerun-vault-item': vaultItemId } : {}
+    return { ...server, headers: { ...Object.fromEntries(carried), 'x-rerun-key': RERUN_API_KEY ?? '', 'x-rerun-agent': agentId, ...vault } }
 }

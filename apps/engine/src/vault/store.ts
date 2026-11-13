@@ -1,5 +1,5 @@
-import { mkdir, readFile, readdir, rm } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+import { mkdir, rm } from 'node:fs/promises'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import {
     MCP_SERVER_NAME_RE,
     VAULT_REDACTED,
@@ -15,7 +15,7 @@ import {
     updateVaultItemSchema,
 } from '@rerun/contracts'
 import { vaultDir, vaultItemDir, vaultItemEnvPath, vaultItemPath, isPathSegment } from '../config/paths.js'
-import { readEnvFile, serializeEnv, writeEnvFile } from '../lib/env-file.js'
+import { parseEnvFile, serializeEnv, writeEnvFile } from '../lib/env-file.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
 import { badRequest, notFound } from '../lib/errors.js'
 import { newId, nowIso } from '../lib/ids.js'
@@ -49,14 +49,16 @@ export function vaultItemExists(id: string): boolean {
     return isPathSegment(id) && existsSync(vaultItemPath(id))
 }
 
-async function loadFromDisk(id: string): Promise<LoadedVaultItem> {
-    const config = vaultItemConfigSchema.parse(JSON.parse(await readFile(vaultItemPath(id), 'utf8')))
-    const env = await readEnvFile(vaultItemEnvPath(id))
+// Read synchronously on purpose: a run reads the Vault where it builds a shell's environment, which
+// cannot wait, and the folder holds a handful of small files read once and then kept in memory.
+function loadFromDisk(id: string): LoadedVaultItem {
+    const config = vaultItemConfigSchema.parse(JSON.parse(readFileSync(vaultItemPath(id), 'utf8')))
+    const env = existsSync(vaultItemEnvPath(id)) ? parseEnvFile(readFileSync(vaultItemEnvPath(id), 'utf8')) : {}
     return { id, config, env }
 }
 
-async function reload(id: string): Promise<LoadedVaultItem> {
-    const item = await loadFromDisk(id)
+function reload(id: string): LoadedVaultItem {
+    const item = loadFromDisk(id)
     cache.set(id, item)
     return item
 }
@@ -70,15 +72,15 @@ export async function getVaultItem(id: string): Promise<LoadedVaultItem> {
 
 // An item the engine cannot read is left out rather than failing the whole list: one hand-edited
 // file must not take every other account of the workspace with it.
-export async function listVaultItems(): Promise<LoadedVaultItem[]> {
+export function listVaultItemsSync(): LoadedVaultItem[] {
     if (!fullyListed) {
         const root = vaultDir()
-        const names = existsSync(root) ? (await readdir(root, { withFileTypes: true })).filter(e => e.isDirectory()).map(e => e.name) : []
+        const names = existsSync(root) ? readdirSync(root, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name) : []
         cache.clear()
         for (const name of names) {
             if (!vaultItemExists(name)) continue
             try {
-                await reload(name)
+                reload(name)
             } catch (err) {
                 logger.warn({ item: name, err: String(err) }, 'vault item left unread')
             }
@@ -88,13 +90,24 @@ export async function listVaultItems(): Promise<LoadedVaultItem[]> {
     return [...cache.values()].sort((a, b) => a.config.createdAt.localeCompare(b.config.createdAt) || a.id.localeCompare(b.id))
 }
 
+export async function listVaultItems(): Promise<LoadedVaultItem[]> {
+    return listVaultItemsSync()
+}
+
 export function isAttachedTo(item: Pick<LoadedVaultItem, 'config'>, agentId: string): boolean {
     return item.config.sharedWithAll || item.config.agentIds.includes(agentId)
 }
 
 // What a coworker draws on from the Vault: the items attached to it and those shared with everyone.
-export async function vaultItemsForAgent(agentId: string): Promise<LoadedVaultItem[]> {
-    return (await listVaultItems()).filter(item => isAttachedTo(item, agentId))
+export function vaultItemsForAgent(agentId: string): LoadedVaultItem[] {
+    return listVaultItemsSync().filter(item => isAttachedTo(item, agentId))
+}
+
+// The item as last written, or null once it is gone: a run holding a server of a deleted item
+// resolves it against nothing rather than failing.
+export function findVaultItem(id: string): LoadedVaultItem | null {
+    listVaultItemsSync()
+    return cache.get(id) ?? null
 }
 
 const redactRecord = (record: Record<string, string>) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, redactVaultValue(value)]))

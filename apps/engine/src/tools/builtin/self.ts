@@ -10,8 +10,8 @@ import { withAgentLock } from '../../agents/lock.js'
 import { writeAgentConfig, mergeMcpServers, ReservedMcpServerNameError, InvalidMcpServerNameError } from '../../agents/config-write.js'
 import { mcpToolNameFor, probeMcp } from '../mcp.js'
 import { agentMcpSpawn } from '../mcp-pool.js'
-import { describeConnectorState } from '../mcp-index.js'
-import { connectorServerStates } from '../../services/registry.js'
+import { agentConnectorStates, describeConnectorState } from '../mcp-index.js'
+import { agentMcpServers } from '../../vault/runtime.js'
 import {
     clearPending,
     discoverDeviceAuth,
@@ -33,6 +33,13 @@ const run = promisify(execFile)
 function serverCarriesCredential(server: McpServer): boolean {
     const holdsPlaceholder = (value: string | undefined) => value?.includes('${') === true
     return Object.keys(server.headers).length > 0 || holdsPlaceholder(server.url) || holdsPlaceholder(server.command) || server.args.some(holdsPlaceholder)
+}
+
+// A server of the workspace's Vault is signed in from the Vault, once for every coworker using it:
+// a device sign-in here would land in this coworker's folder, where nothing reads it.
+function vaultServerNote(name: string, agent: RunContext['agent']): string | null {
+    const server = agentMcpServers(agent).find(candidate => candidate.name === name && candidate.vaultItemId)
+    return server ? `"${name}" comes from the workspace's Vault and is shared with other coworkers. Ask the user to reconnect it from the Vault (workspace menu, Vault); you cannot sign it in yourself.` : null
 }
 
 export function selfTools(ctx: RunContext): ToolSet {
@@ -103,6 +110,10 @@ export function selfTools(ctx: RunContext): ToolSet {
                 const server = mcpServerSchema.parse({ ...input, env: {} })
                 if (server.name === BRIDGE_SERVER_NAME) return `${new ReservedMcpServerNameError().message}\nNothing was saved.`
                 if (!MCP_SERVER_NAME_RE.test(server.name)) return `${new InvalidMcpServerNameError(server.name).message}\nNothing was saved.`
+                // A server the Vault lends under this name would hide the one registered here.
+                if (agentMcpServers(ctx.agent).some(candidate => candidate.name === server.name && candidate.vaultItemId)) {
+                    return `"${server.name}" is already the name of a server this coworker gets from the workspace's Vault. Register it under another name.\nNothing was saved.`
+                }
                 const probe = await probeMcp(id, server, ctx.agent.env, { spawn: agentMcpSpawn(ctx.agent) })
                 const needsLogin = !probe.ok && isAuthError(probe.error)
                 if (needsLogin && serverCarriesCredential(server)) {
@@ -127,6 +138,8 @@ export function selfTools(ctx: RunContext): ToolSet {
             description: 'Start OAuth device-code sign-in for a registered MCP server. Returns a URL for the user to open in their browser. After they confirm they signed in, call mcp_login_complete.',
             inputSchema: z.object({ name: z.string() }),
             execute: async ({ name }) => {
+                const fromVault = vaultServerNote(name, ctx.agent)
+                if (fromVault) return fromVault
                 const config = agentConfigSchema.parse(JSON.parse(await readFile(configPath(id), 'utf8')))
                 const server = config.mcpServers.find(s => s.name === name)
                 if (!server) return `No MCP server named "${name}" is registered. Register it first with mcp_register.`
@@ -146,6 +159,8 @@ export function selfTools(ctx: RunContext): ToolSet {
             description: 'Finish a pending MCP device-code sign-in started with mcp_login. Call this only after the user confirms they have signed in via the URL.',
             inputSchema: z.object({ name: z.string() }),
             execute: async ({ name }) => {
+                const fromVault = vaultServerNote(name, ctx.agent)
+                if (fromVault) return fromVault
                 const pending = await loadPending(id, name)
                 if (!pending) return `No pending sign-in for "${name}". Call mcp_login first.`
                 try {
@@ -170,10 +185,11 @@ export function selfTools(ctx: RunContext): ToolSet {
             inputSchema: z.object({}),
             execute: async () => {
                 const config = agentConfigSchema.parse(JSON.parse(await readFile(configPath(id), 'utf8')))
-                if (config.mcpServers.length === 0) return 'No MCP servers registered.'
-                const states = await connectorServerStates(id)
+                const servers = agentMcpServers({ ...ctx.agent, config })
+                if (servers.length === 0) return 'No MCP servers registered.'
+                const states = await agentConnectorStates(ctx.agent)
                 const lines = await Promise.all(
-                    config.mcpServers.map(async server => {
+                    servers.map(async server => {
                         const state = states.get(server.name)
                         if (state && state.status !== 'active') {
                             return `not connected yet ${server.name}: ${describeConnectorState(state, states)} is waiting for the user to connect it (suggest_service), every call to its tools fails until then`

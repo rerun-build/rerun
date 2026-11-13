@@ -16,8 +16,23 @@ import {
     isAttachedTo,
 } from '../../vault/store.js'
 import { clearVaultToken, saveVaultToken } from '../../vault/tokens.js'
+import { applyVaultChange } from '../../vault/apply.js'
+import type { LoadedVaultItem } from '../../vault/types.js'
 
 export const vaultRoutes = new Hono()
+
+async function usersOf(id: string): Promise<string[]> {
+    return vaultItemExists(id) ? vaultItemUsage(await getVaultItem(id)) : []
+}
+
+// Every write is followed by the coworkers it touched, those that held the item before and those
+// that hold it now, being brought in line with it.
+async function changing(id: string, write: () => Promise<LoadedVaultItem>): Promise<LoadedVaultItem> {
+    const before = await usersOf(id)
+    const item = await write()
+    await applyVaultChange([...before, ...(await vaultItemUsage(item))])
+    return item
+}
 
 // `?agent=<id>` narrows the list to what one coworker draws on: its own items and the shared ones.
 vaultRoutes.get('/', async c => {
@@ -28,6 +43,7 @@ vaultRoutes.get('/', async c => {
 
 vaultRoutes.post('/', async c => {
     const item = await createVaultItem(await c.req.json())
+    await applyVaultChange(await vaultItemUsage(item))
     return c.json(await toVaultSummary(item), 201)
 })
 
@@ -40,27 +56,31 @@ vaultRoutes.get('/:id', async c => {
 vaultRoutes.patch('/:id', async c => {
     const id = c.req.param('id')
     if (!vaultItemExists(id)) return c.json({ error: 'vault item not found' }, 404)
-    return c.json(await toVaultSummary(await updateVaultItem(id, await c.req.json())))
+    const patch = await c.req.json()
+    return c.json(await toVaultSummary(await changing(id, () => updateVaultItem(id, patch))))
 })
 
 // Answers the names of the variables the item now holds, never a value.
 vaultRoutes.patch('/:id/env', async c => {
     const id = c.req.param('id')
     if (!vaultItemExists(id)) return c.json({ error: 'vault item not found' }, 404)
-    const item = await updateVaultItemEnv(id, await c.req.json())
+    const input = await c.req.json()
+    const item = await changing(id, () => updateVaultItemEnv(id, input))
     return c.json({ keys: Object.keys(item.env).sort() })
 })
 
 vaultRoutes.put('/:id/agents/:agentId', async c => {
     const id = c.req.param('id')
     if (!vaultItemExists(id)) return c.json({ error: 'vault item not found' }, 404)
-    return c.json(await toVaultSummary(await attachVaultItem(id, c.req.param('agentId'))))
+    const agentId = c.req.param('agentId')
+    return c.json(await toVaultSummary(await changing(id, () => attachVaultItem(id, agentId))))
 })
 
 vaultRoutes.delete('/:id/agents/:agentId', async c => {
     const id = c.req.param('id')
     if (!vaultItemExists(id)) return c.json({ error: 'vault item not found' }, 404)
-    return c.json(await toVaultSummary(await detachVaultItem(id, c.req.param('agentId'))))
+    const agentId = c.req.param('agentId')
+    return c.json(await toVaultSummary(await changing(id, () => detachVaultItem(id, agentId))))
 })
 
 function serverParam(name: string): string {
@@ -94,5 +114,6 @@ vaultRoutes.delete('/:id', async c => {
     const id = c.req.param('id')
     if (!vaultItemExists(id)) return c.json({ error: 'vault item not found' }, 404)
     const { detached } = await deleteVaultItem(id)
+    await applyVaultChange(detached)
     return c.json({ deleted: id, detached })
 })

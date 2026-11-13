@@ -47,8 +47,8 @@ its own version and every change to its layout is a numbered step in a ladder:
   is written to `RERUN_DATA_DIR/data-version.json` after each step; a folder without it is v0.
 - `SYSTEM_DB_MIGRATIONS` (`src/db/systemDb.ts`) and `SHARED_DB_MIGRATIONS` (`src/db/sharedDb.ts`): one
   ladder per SQLite file, versioned with `PRAGMA user_version`, applied when the file is opened.
-- Every-boot reconcilers (`ensureAgentsIndex`, `reconcileConnections`, `ensureForeman`) are not
-  steps: they bring the folder in line with today's code, whatever its history.
+- Every-boot reconcilers (`ensureAgentsIndex`, `reconcileConnections`, `ensureForeman`,
+  `reconcileVault`) are not steps: they bring the folder in line with today's code, whatever its history.
 
 Rules:
 

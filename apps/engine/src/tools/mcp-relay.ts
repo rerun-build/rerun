@@ -30,7 +30,7 @@ export function relayMcpServer(relay: PooledMcp, toolTimeoutMs: number): McpSdkS
 
 // Each server the pool can hold carries its relay; one it cannot reach stays as declared, and the CLI
 // dials it itself as it always did.
-export async function withPooledRelays(agent: Pick<LoadedAgent, 'id' | 'env' | 'config'>, servers: McpServer[]): Promise<RunMcpServer[]> {
+export async function withPooledRelays(agent: Pick<LoadedAgent, 'id' | 'env' | 'config' | 'hubAgentId'>, servers: McpServer[]): Promise<RunMcpServer[]> {
     const spawn = agentMcpSpawn(agent)
     return Promise.all(
         servers.map(async server => {

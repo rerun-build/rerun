@@ -1,8 +1,9 @@
 import { mcpToolNameFor, resolveTransport } from './mcp.js'
-import { loadToken } from './mcp-auth.js'
+import { tokenSlotFor } from './mcp-auth.js'
 import { connectorServerStates, type ConnectorServerState } from '../services/registry.js'
 import type { Provider } from '@rerun/contracts'
 import type { LoadedAgent } from '../agents/types.js'
+import { agentMcpServers, vaultServerStates } from '../vault/runtime.js'
 
 // Names the app behind a server, and which of its accounts when the agent holds several or the
 // account has a label, so the model can pick the right server for "the support inbox".
@@ -27,21 +28,28 @@ function connectorAuth(state: ConnectorServerState, states: Map<string, Connecto
     return `connected (${app})`
 }
 
+// The Vault's servers and states are layered over the coworker's own: an item wins over the copy of
+// a connector a migration left in the coworker's folder.
+export async function agentConnectorStates(agent: Pick<LoadedAgent, 'id' | 'config' | 'hubAgentId'>): Promise<Map<string, ConnectorServerState>> {
+    return new Map([...(await connectorServerStates(agent.id)), ...vaultServerStates(agent)])
+}
+
 export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider): Promise<string> {
-    if (agent.config.mcpServers.length === 0) return ''
-    const states = await connectorServerStates(agent.id)
+    const servers = agentMcpServers(agent)
+    if (servers.length === 0) return ''
+    const states = await agentConnectorStates(agent)
     const lines = await Promise.all(
-        agent.config.mcpServers.map(async server => {
+        servers.map(async server => {
             const transport = resolveTransport(server)
             const state = states.get(server.name)
             let auth = 'not authenticated — call mcp_login if its tools fail'
             if (state) auth = connectorAuth(state, states)
             else if (Object.keys(server.headers).length > 0) auth = 'authenticated via request headers'
-            else if (await loadToken(agent.id, server.name).catch(() => null)) auth = 'authenticated (OAuth)'
+            else if (await tokenSlotFor(agent.id, server).load().catch(() => null)) auth = 'authenticated (OAuth)'
             return `- ${server.name} (${transport}): ${auth}`
         }),
     )
-    const pending = agent.config.mcpServers.some(server => {
+    const pending = servers.some(server => {
         const status = states.get(server.name)?.status
         return status !== undefined && status !== 'active'
     })

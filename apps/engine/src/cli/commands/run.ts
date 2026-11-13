@@ -3,6 +3,7 @@ import { serve } from '@hono/node-server'
 import { createServer } from '../../http/server.js'
 import { attachDesktopBridge } from '../../desktop/bridge.js'
 import { prepareDataDir } from '../../datadir/ladder.js'
+import { reconcileVault } from '../../vault/apply.js'
 import { ensureForeman } from '../../agents/foreman.js'
 import { startScheduler } from '../../runtime/scheduler.js'
 import { reconcileInterruptedRuns } from '../../runtime/reconcile.js'
@@ -25,6 +26,9 @@ export async function runCommand(): Promise<void> {
     const lastUpdate = settleLastUpdateOnBoot()
     if (lastUpdate?.status === 'error') logger.warn({ error: lastUpdate.error, commit: lastUpdate.commit }, 'last update did not land')
     await ensureForeman()
+    // Here and not in prepareDataDir: the CLI commands that also prepare the folder run beside a live
+    // engine, and the skills it writes take locks that only hold inside one process.
+    await reconcileVault()
     await reconcileInterruptedRuns()
     if (await installBrowserInBackground()) logger.info('chromium missing: installing it in the background')
     if (installDesktopInBackground()) logger.info('desktop missing: installing it in the background')

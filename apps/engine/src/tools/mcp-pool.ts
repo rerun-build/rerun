@@ -4,6 +4,7 @@ import type { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import type { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
 import type { LoadedAgent, McpServer } from '../agents/types.js'
 import { agentProcessEnv } from '../agents/process-env.js'
+import { agentMcpServers } from '../vault/runtime.js'
 import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
 import { mcpToolSet, openMcpClient, prepareMcpServer, resolveTransport, type McpCallResult, type McpSpawn, type McpTool } from './mcp.js'
@@ -122,15 +123,15 @@ export async function acquireMcp(agentId: string, server: McpServer, spawn: McpS
 // The environment a stdio server got when the CLI started it: what the engine inherits to any
 // agent process (PATH, HOME, locale…), the agent's keys, and its workspace as the working
 // directory. Never the engine's secrets, which a package fetched from npm has no business reading.
-export function agentMcpSpawn(agent: Pick<LoadedAgent, 'id' | 'env' | 'config'>): McpSpawn {
-    const { cwd, env } = agentProcessEnv(agent)
+export function agentMcpSpawn(agent: Pick<LoadedAgent, 'id' | 'env' | 'config' | 'hubAgentId'>): McpSpawn {
+    const { cwd, env } = agentProcessEnv(agent, { vault: false })
     return { cwd, env: childProcessEnv(env) }
 }
 
 // For the providers the engine drives itself: the agent's MCP tools, served by the pooled connections.
 export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
     const spawn = agentMcpSpawn(agent)
-    const prepared = await Promise.all(agent.config.mcpServers.map(server => prepareMcpServer(agent.id, server, agent.env, agent.hubAgentId)))
+    const prepared = await Promise.all(agentMcpServers(agent).map(server => prepareMcpServer(agent.id, server, agent.env, agent.hubAgentId)))
     const pooled = await Promise.all(prepared.map(server => acquireMcp(agent.id, server, spawn)))
     const tools: ToolSet = {}
     for (const server of pooled)

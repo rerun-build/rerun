@@ -5,6 +5,7 @@ import { isPathSegment, mcpDir, mcpPendingPath, mcpTokenPath } from '../config/p
 import type { McpServer } from '../agents/types.js'
 import { writeFileAtomic } from '../lib/atomic-write.js'
 import { logger } from '../lib/logger.js'
+import { vaultTokenSlot } from '../vault/token-slot.js'
 
 const DEVICE_CLIENT_ID = 'hermes'
 const DEVICE_SCOPE = 'openid email offline_access'
@@ -107,10 +108,17 @@ function logRefreshRefused(res: Response, data: Record<string, unknown>): void {
     logger.warn({ status: res.status, error: data.error, description: data.error_description }, 'mcp token refresh refused')
 }
 
+// A refresh either hands back a token, is refused by the provider for good (the grant was revoked,
+// the refresh token expired: only a new sign-in helps), or did not go through (network, a 5xx), and
+// the next call simply tries again.
+export type RefreshOutcome = { token: StoredToken } | { refused: true } | null
+
+const refusedForGood = (res: Response): boolean => res.status === 400 || res.status === 401
+
 // Refresh an authorization-code token straight against its stored token endpoint
 // (RFC 6749 form-encoded grant). Used for UI-driven OAuth, where the client id and
 // endpoint are known up front and no device-code discovery is needed.
-async function refreshWithEndpoint(token: StoredToken): Promise<StoredToken | null> {
+async function refreshWithEndpoint(token: StoredToken): Promise<RefreshOutcome> {
     if (!token.refreshToken || !token.tokenEndpoint) return null
     try {
         const body = new URLSearchParams({ grant_type: 'refresh_token', refresh_token: token.refreshToken })
@@ -128,16 +136,17 @@ async function refreshWithEndpoint(token: StoredToken): Promise<StoredToken | nu
             next.tokenEndpoint = token.tokenEndpoint
             next.clientId = token.clientId
             next.clientSecret = token.clientSecret
-            return next
+            return { token: next }
         }
         logRefreshRefused(res, data)
+        if (refusedForGood(res)) return { refused: true }
     } catch (e) {
         logger.warn({ err: (e as Error).message }, 'mcp token refresh failed')
     }
     return null
 }
 
-async function refreshToken(auth: DeviceAuth, token: StoredToken): Promise<StoredToken | null> {
+async function refreshToken(auth: DeviceAuth, token: StoredToken): Promise<RefreshOutcome> {
     if (!token.refreshToken) return null
     try {
         const res = await fetch(auth.tokenEndpoint, {
@@ -149,9 +158,10 @@ async function refreshToken(auth: DeviceAuth, token: StoredToken): Promise<Store
         if (data.access_token) {
             const next = tokenFromResponse(data)
             if (!next.refreshToken) next.refreshToken = token.refreshToken
-            return next
+            return { token: next }
         }
         logRefreshRefused(res, data)
+        if (refusedForGood(res)) return { refused: true }
     } catch (e) {
         logger.warn({ err: (e as Error).message }, 'mcp token refresh failed')
     }
@@ -205,44 +215,68 @@ export async function clearPending(agentId: string, name: string): Promise<void>
     if (existsSync(path)) await rm(path)
 }
 
-// Keyed per agent and server, and held across the read of the token file too: two runs starting
-// together would otherwise both refresh with the same refresh token, and a provider that rotates
-// them (Affonso) answers the reuse by revoking the whole grant.
+// Where a server's token lives: the coworker's own `mcp/` folder, or the Vault item it came from.
+// `key` names the refresh lineage, so every coworker drawing on one item shares a single one.
+export type TokenSlot = {
+    key: string
+    load: () => Promise<StoredToken | null>
+    save: (token: StoredToken) => Promise<void>
+    // Told when the provider refused the refresh for good: the account needs a new sign-in.
+    refused?: () => Promise<void>
+}
+
+export function agentTokenSlot(agentId: string, name: string): TokenSlot {
+    return { key: `agent:${agentId}/${name}`, load: () => loadToken(agentId, name), save: token => saveToken(agentId, name, token) }
+}
+
+export function tokenSlotFor(agentId: string, server: McpServer & { vaultItemId?: string }): TokenSlot {
+    if (server.vaultItemId) return vaultTokenSlot(server.vaultItemId, server.name)
+    return agentTokenSlot(agentId, server.name)
+}
+
+// Keyed per lineage (a coworker's server, or a Vault item's), and held across the read of the token
+// file too: two runs starting together would otherwise both refresh with the same refresh token, and
+// a provider that rotates them (Affonso) answers the reuse by revoking the whole grant.
 const inFlight = new Map<string, Promise<string | null>>()
 
-function ensureAccessToken(agentId: string, server: McpServer): Promise<string | null> {
-    const key = `${agentId}/${server.name}`
-    const pending = inFlight.get(key)
+function ensureAccessToken(slot: TokenSlot, server: McpServer): Promise<string | null> {
+    const pending = inFlight.get(slot.key)
     if (pending) return pending
-    const task = loadFreshAccessToken(agentId, server).finally(() => inFlight.delete(key))
-    inFlight.set(key, task)
+    const task = loadFreshAccessToken(slot, server).finally(() => inFlight.delete(slot.key))
+    inFlight.set(slot.key, task)
     return task
 }
 
-async function loadFreshAccessToken(agentId: string, server: McpServer): Promise<string | null> {
-    const stored = await loadToken(agentId, server.name)
+async function loadFreshAccessToken(slot: TokenSlot, server: McpServer): Promise<string | null> {
+    const stored = await slot.load()
     if (!stored) return null
     const expired = stored.expiresAt !== undefined && stored.expiresAt - Date.now() < REFRESH_SKEW_MS
     if (!expired) return stored.accessToken
     try {
-        const refreshed = stored.tokenEndpoint
+        const outcome = stored.tokenEndpoint
             ? await refreshWithEndpoint(stored)
             : server.url
               ? await refreshToken(await discoverDeviceAuth(server.url), stored)
               : null
-        if (refreshed) {
-            await saveToken(agentId, server.name, refreshed)
-            return refreshed.accessToken
+        // A sign-in made while the refresh was out (a reconnect) wrote a new lineage: the outcome of
+        // the old one is stale, and saving it or calling the account dead would undo the reconnect.
+        const latest = await slot.load()
+        if (latest && (latest.accessToken !== stored.accessToken || latest.refreshToken !== stored.refreshToken)) return latest.accessToken
+        if (outcome && 'token' in outcome) {
+            await slot.save(outcome.token)
+            return outcome.token.accessToken
         }
+        // An expired token with nothing to refresh it with is as dead as a refused one.
+        if ((outcome && 'refused' in outcome) || !stored.refreshToken) await slot.refused?.()
     } catch (e) {
         logger.warn({ server: server.name, err: (e as Error).message }, 'mcp token refresh skipped')
     }
     return stored.accessToken
 }
 
-export async function withAuth(agentId: string, server: McpServer): Promise<McpServer> {
+export async function withAuth(agentId: string, server: McpServer & { vaultItemId?: string }): Promise<McpServer> {
     if (!server.url) return server
-    const token = await ensureAccessToken(agentId, server)
+    const token = await ensureAccessToken(tokenSlotFor(agentId, server), server)
     if (!token) return server
     return { ...server, headers: { Authorization: `Bearer ${token}`, ...server.headers } }
 }
