@@ -126,6 +126,7 @@
             "servers": "Only an admin can manage servers",
             "billing": "Only an admin can manage billing"
         },
+        "needsPlan": "Available once your free trial starts",
         "apiKeys": "API keys & MCP",
         "settings": "Settings",
         "members": "Members",

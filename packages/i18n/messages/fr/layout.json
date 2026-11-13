@@ -97,6 +97,7 @@
             "servers": "Seul un admin peut gérer les serveurs",
             "billing": "Seul un admin peut gérer la facturation"
         },
+        "needsPlan": "Disponible dès le début de votre essai gratuit",
         "apiKeys": "Clés API et MCP",
         "settings": "Paramètres",
         "members": "Membres",

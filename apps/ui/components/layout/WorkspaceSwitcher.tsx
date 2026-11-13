@@ -30,6 +30,7 @@ import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from 
 import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
 import { Badge, Stripes, useIsMobile } from '@rerun/ui/primitives'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
+import { useNeedsPlanToConnect } from '@/components/connections/NoPlanNotice'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
 import { useBrainProposalCount } from '@/hooks/useBrainProposalCount'
@@ -57,8 +58,8 @@ const PRICING_ICONS = ['/pricing/solo.png', '/pricing/team.png', '/pricing/scale
 
 type SessionWorkspace = NonNullable<ReturnType<typeof useSession>['workspace']>
 
-// A menu entry an admin uses and a member sees, disabled, with the reason on hover.
-function AdminOnly({ allowed, reason, className = 'flex w-full', children }: { allowed: boolean; reason: string; className?: string; children: ReactNode }) {
+// A menu entry the caller cannot use yet (a member, or a workspace with no plan): shown disabled, with the reason on hover.
+function DisabledWithReason({ allowed, reason, className = 'flex w-full', children }: { allowed: boolean; reason: string; className?: string; children: ReactNode }) {
     if (allowed) return <>{children}</>
     return (
         <TooltipDisabledReason reason={reason} side="right" className={className}>
@@ -120,6 +121,9 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
     const brainProposals = useBrainProposalCount(Boolean(workspace) && !isAnonymous)
     const vaultEnabled = useVaultEnabled()
+    // Brain, AI providers and the Vault all live on the workspace's machine, and a workspace gets one
+    // only once it is on a plan.
+    const needsPlan = useNeedsPlanToConnect()
     // Entries of the Vault waiting on a sign-in: read on mount and each time the menu opens.
     const [vaultSignedOut, setVaultSignedOut] = useState(0)
     const refreshVaultSignedOut = useCallback(() => {
@@ -193,7 +197,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const showCredit = !workspace.is_sandbox && credit.budgetMicros > 0 && workspace.subscription_status !== 'past_due'
 
     const apiKeysItem = (
-        <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.apiKeys')}>
+        <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.apiKeys')}>
             <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => (apiEntitled ? openWorkspacePanel('api_keys') : openBilling(undefined, 'api_keys'))} className="gap-2 text-muted-foreground">
                 <KeyIcon className="size-4" />
                 {t('apiKeys')}
@@ -203,7 +207,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     </Badge>
                 )}
             </DropdownMenuItem>
-        </AdminOnly>
+        </DisabledWithReason>
     )
 
     const workspacesSection = (
@@ -274,12 +278,12 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     )}
                     {!workspace.is_sandbox && (
                         <div className="flex gap-1.5">
-                            <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.settings')} className="flex flex-1">
+                            <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.settings')} className="flex flex-1">
                                 <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openWorkspacePanel('workspace')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
                                     <SettingsIcon className="size-3.5" />
                                     {t('settings')}
                                 </DropdownMenuItem>
-                            </AdminOnly>
+                            </DisabledWithReason>
                             <DropdownMenuItem onSelect={() => openWorkspacePanel('members')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
                                 <UsersIcon className="size-3.5" />
                                 {t('members')}
@@ -293,42 +297,48 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
 
     const workspaceItemsSection = (
         <>
-            <DropdownMenuItem onSelect={() => openWorkspacePanel('knowledge_base')} className="gap-2 text-muted-foreground">
-                <BrainIcon className="size-4" />
-                {t('brain')}
-                {brainProposals > 0 && (
-                    <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white tabular-nums" aria-label={t('brainProposals', { count: brainProposals })}>
-                        {brainProposals}
-                    </span>
-                )}
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => openWorkspacePanel('ai_providers')} className="gap-2 text-muted-foreground">
-                <LockKeyholeIcon className="size-4" />
-                {t('aiProviders')}
-            </DropdownMenuItem>
-            {vaultEnabled && (
-                <DropdownMenuItem onSelect={() => openWorkspacePanel('vault')} className="gap-2 text-muted-foreground">
-                    <LockIcon className="size-4" />
-                    {t('vault')}
-                    {vaultSignedOut > 0 && <span className="ml-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
+            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('knowledge_base')} className="gap-2 text-muted-foreground">
+                    <BrainIcon className="size-4" />
+                    {t('brain')}
+                    {brainProposals > 0 && (
+                        <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] text-white tabular-nums" aria-label={t('brainProposals', { count: brainProposals })}>
+                            {brainProposals}
+                        </span>
+                    )}
                 </DropdownMenuItem>
+            </DisabledWithReason>
+            <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('ai_providers')} className="gap-2 text-muted-foreground">
+                    <LockKeyholeIcon className="size-4" />
+                    {t('aiProviders')}
+                </DropdownMenuItem>
+            </DisabledWithReason>
+            {vaultEnabled && (
+                <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                    <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('vault')} className="gap-2 text-muted-foreground">
+                        <LockIcon className="size-4" />
+                        {t('vault')}
+                        {vaultSignedOut > 0 && <span className="ml-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
+                    </DropdownMenuItem>
+                </DisabledWithReason>
             )}
             {apiKeysItem}
             {SERVERS_ENABLED && (
-                <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.servers')}>
+                <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.servers')}>
                     <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => setServersOpen(true)} className="gap-2 text-muted-foreground">
                         <ServerIcon className="size-4" />
                         {t('servers')}
                     </DropdownMenuItem>
-                </AdminOnly>
+                </DisabledWithReason>
             )}
             {BILLING_ENABLED && !workspace.is_sandbox && (
-                <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.billing')}>
+                <DisabledWithReason allowed={workspaceAdmin} reason={t('adminOnly.billing')}>
                     <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openBilling()} className="gap-2 text-muted-foreground">
                         <CreditCardIcon className="size-4" />
                         {t('billing')}
                     </DropdownMenuItem>
-                </AdminOnly>
+                </DisabledWithReason>
             )}
             <WhatsNewMenuItem />
             <WeeklyRewindMenuItem />

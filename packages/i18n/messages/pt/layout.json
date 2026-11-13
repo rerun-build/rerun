@@ -97,6 +97,7 @@
             "servers": "Só um admin pode gerenciar os servidores",
             "billing": "Só um admin pode gerenciar a cobrança"
         },
+        "needsPlan": "Disponível assim que seu teste grátis começar",
         "apiKeys": "Chaves de API e MCP",
         "settings": "Configurações",
         "members": "Membros",

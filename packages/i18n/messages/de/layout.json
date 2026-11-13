@@ -97,6 +97,7 @@
             "servers": "Nur Admins können Server verwalten",
             "billing": "Nur Admins können die Abrechnung verwalten"
         },
+        "needsPlan": "Verfügbar, sobald deine kostenlose Testphase beginnt",
         "apiKeys": "API-Schlüssel & MCP",
         "settings": "Einstellungen",
         "members": "Mitglieder",
