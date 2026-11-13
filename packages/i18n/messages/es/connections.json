@@ -251,6 +251,8 @@
         "pitch": {
             "plansWithOpencode": "¿Ya usas Claude Code, Codex u OpenCode? Tus coworkers pueden funcionar con tu plan.",
             "plans": "¿Ya usas Claude Code o Codex? Tus coworkers pueden funcionar con tu plan.",
+            "plansWithoutClaudeWithOpencode": "¿Ya usas Codex u OpenCode? Tus coworkers pueden funcionar con tu plan.",
+            "plansWithoutClaude": "¿Ya usas Codex? Tus coworkers pueden funcionar con tu plan de ChatGPT.",
             "keysWithCustom": "Paga directamente a tu proveedor, por token, o usa tu propio modelo.",
             "keys": "Paga directamente a tu proveedor, por token."
         },

@@ -159,6 +159,7 @@
     "baseUrlNotPublic": "Die Basis-URL muss eine öffentliche Webadresse sein.",
     "customNeedsUpdate": "Eigene Endpunkte kommen mit dem nächsten Update dieser Maschine. Versuch es bald erneut.",
     "opencodeNotAvailable": "OpenCode ist noch nicht verfügbar.",
+    "claudePlanNotOffered": "Der Lifetime-Tarif läuft mit einem API-Schlüssel oder einem ChatGPT-Tarif, nicht mit einem Claude-Abo.",
     "opencodeNeedsUpdate": "OpenCode kommt mit dem nächsten Update dieser Maschine. Versuch es bald erneut.",
     "claudePlanTokenAsApiKey": "Das ist ein Token eines Claude-Tarifs. Füge es stattdessen unter Claude Pro oder Max hinzu.",
     "providerKeyRejected": "{provider} hat diesen Schlüssel abgelehnt. Prüfe, ob er vollständig kopiert wurde und noch aktiv ist.",

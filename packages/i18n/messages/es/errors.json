@@ -159,6 +159,7 @@
     "baseUrlNotPublic": "La URL base debe ser una dirección web pública.",
     "customNeedsUpdate": "Los endpoints personalizados llegan con la próxima actualización de esta máquina. Inténtalo de nuevo en un rato.",
     "opencodeNotAvailable": "OpenCode aún no está disponible.",
+    "claudePlanNotOffered": "El plan de por vida funciona con una clave de API o un plan de ChatGPT, no con una suscripción de Claude.",
     "opencodeNeedsUpdate": "OpenCode llega con la próxima actualización de esta máquina. Inténtalo de nuevo en un rato.",
     "claudePlanTokenAsApiKey": "Este es un token del plan de Claude. Añádelo en Claude Pro o Max.",
     "providerKeyRejected": "{provider} rechazó esta clave. Comprueba que se copió completa y que sigue activa.",

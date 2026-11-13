@@ -620,6 +620,7 @@
     },
     "subscriptionOffer": {
         "title": "Faites tourner vos coworkers sur votre abonnement Claude ou ChatGPT",
+        "titleWithoutClaude": "Faites tourner vos coworkers sur votre abonnement ChatGPT ou une clé API",
         "back": "Retour",
         "connect": "Connecter",
         "or": "ou",
@@ -634,7 +635,9 @@
         },
         "offer": {
             "title": "Rerun fonctionne mieux avec votre abonnement Claude ou ChatGPT",
-            "description": "Connectez-le et vos coworkers tournent sur l'abonnement que vous payez déjà."
+            "description": "Connectez-le et vos coworkers tournent sur l'abonnement que vous payez déjà.",
+            "titleWithoutClaude": "Vos coworkers tournent sur votre propre IA",
+            "descriptionWithoutClaude": "Connectez votre abonnement ChatGPT ou une clé API, et vos coworkers tournent dessus."
         },
         "arguments": {
             "ownPlan": {

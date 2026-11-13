@@ -25,9 +25,11 @@ vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
 
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: true, composio: { toolkit: 'gmail', authConfigId: 'ac', allowedTools: [] } }
+const appMethod = { id: 'app', label: 'Connect', kind: 'app', recommended: true, app: { appSlug: 'whatsapp' } }
 const MANIFESTS: Record<string, unknown> = {
     gmail: { slug: 'gmail', name: 'Gmail', multiInstance: true, authMethods: [composioMethod] },
     'linkedin-pro': { slug: 'linkedin-pro', name: 'LinkedIn Pro', authMethods: [composioMethod] },
+    'whatsapp-pro': { slug: 'whatsapp-pro', name: 'WhatsApp Pro', authMethods: [appMethod] },
 }
 
 function eqSlug(calls: readonly { method: string; args: unknown[] }[]): unknown {
@@ -36,14 +38,20 @@ function eqSlug(calls: readonly { method: string; args: unknown[] }[]): unknown 
 
 const entry = (over: Partial<RegistryEntry> = {}): RegistryEntry => ({ status: 'active', config: {}, mcpServers: [], envKeys: [], skills: [], installedAt: '2026-10-01', ...over })
 
+// The agent's workspace, read by the paid-apps rule: absent from the fake unless a test sets it.
+let workspacePlan: string | null = null
+
 function useRegistry(reg: ServiceRegistry) {
     vi.mocked(readRegistry).mockResolvedValue(reg)
 }
 
 beforeEach(() => {
     vi.clearAllMocks()
+    workspacePlan = null
     vi.mocked(createServiceRoleClient).mockReturnValue(
         fakeSupabase((table, calls) => {
+            if (table === 'agents') return workspacePlan ? { data: { workspace_id: 1 } } : undefined
+            if (table === 'workspaces') return { data: { plan: workspacePlan } }
             if (table !== 'services') return undefined
             const slug = eqSlug(calls)
             if (typeof slug === 'string') return { data: MANIFESTS[slug] ? { manifest: MANIFESTS[slug], enabled: true } : null }
@@ -51,6 +59,7 @@ beforeEach(() => {
                 data: [
                     { slug: 'gmail', name: 'Gmail', icon: null, category: 'productivity', summary: '', manifest: MANIFESTS.gmail, verified: true },
                     { slug: 'notion', name: 'Notion', icon: null, category: 'productivity', summary: '', manifest: { slug: 'notion', name: 'Notion' }, verified: true },
+                    { slug: 'whatsapp-pro', name: 'WhatsApp Pro', icon: null, category: 'communication', summary: '', manifest: MANIFESTS['whatsapp-pro'], verified: true },
                 ],
             }
         }).client,
@@ -124,6 +133,39 @@ describe('searchServices', () => {
         const { results } = await searchServices('agent')
 
         expect(results.find(r => r.slug === 'gmail')).toMatchObject({ installStatus: 'active', installed: true, multiInstance: true })
+    })
+
+    it('lists the paid apps for a workspace on a plan', async () => {
+        useRegistry({ services: {} })
+        workspacePlan = 'base'
+        const { results } = await searchServices('agent')
+
+        expect(results.map(r => r.slug)).toContain('whatsapp-pro')
+    })
+
+    it('leaves the paid apps out for a lifetime workspace, which cannot buy a slot', async () => {
+        useRegistry({ services: {} })
+        workspacePlan = 'lifetime'
+        const { results } = await searchServices('agent')
+
+        expect(results.map(r => r.slug)).toEqual(['gmail', 'notion'])
+    })
+})
+
+describe('installService on a lifetime workspace', () => {
+    it('refuses a paid app', async () => {
+        useRegistry({ services: {} })
+        workspacePlan = 'lifetime'
+
+        await expect(installService('agent', 'whatsapp-pro')).rejects.toThrow('WhatsApp Pro is not included in the lifetime plan.')
+        expect(compileService).not.toHaveBeenCalled()
+    })
+
+    it('still installs any other service', async () => {
+        useRegistry({ services: {} })
+        workspacePlan = 'lifetime'
+
+        await expect(installService('agent', 'gmail')).resolves.toMatchObject({ slug: 'gmail' })
     })
 })
 

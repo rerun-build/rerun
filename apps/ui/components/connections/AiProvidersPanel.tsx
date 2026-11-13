@@ -5,7 +5,7 @@ import { AddProviderPage } from '@/components/connections/AddProviderPage'
 import { AddCustomProviderPage } from '@/components/connections/custom/AddCustomProviderPage'
 import { ConnectionDetail } from '@/components/connections/ConnectionDetail'
 import { DefaultModelPicker } from '@/components/connections/DefaultModelPicker'
-import { NoPlanNotice, useNeedsPlanToConnect } from '@/components/connections/NoPlanNotice'
+import { NoPlanNotice, useClaudePlanOffered, useNeedsPlanToConnect } from '@/components/connections/NoPlanNotice'
 import { ProviderPicker } from '@/components/connections/ProviderPicker'
 import { CreditMeter, PlanLimitMeter, SourceAvatar, SourceStatus } from '@/components/connections/SourceBits'
 import { Button } from '@/components/ui/button'
@@ -78,6 +78,7 @@ export function AiProvidersPanel({
     const { connections, boxDefault, opencodeOffered, customOffered, loading, create, update, updateKeys, remove, setDefault } = useWorkspaceConnections({ revalidate: true })
     const credit = useRerunCredit()
     const needsPlan = useNeedsPlanToConnect()
+    const claudePlanOffered = useClaudePlanOffered()
     const workspaceAdmin = useIsWorkspaceAdmin()
     const readOnlyReason = workspaceAdmin ? undefined : t('panel.adminOnly')
     const [page, setPage] = useState<ConnectionsPage>({ kind: 'list' })
@@ -92,9 +93,9 @@ export function AiProvidersPanel({
     useEffect(() => {
         if (!initialAddProvider) return
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setPage({ kind: 'add', provider: initialAddProvider })
+        if (initialAddProvider !== 'claude' || claudePlanOffered) setPage({ kind: 'add', provider: initialAddProvider })
         onInitialAddProviderConsumed?.()
-    }, [initialAddProvider, onInitialAddProviderConsumed])
+    }, [initialAddProvider, onInitialAddProviderConsumed, claudePlanOffered])
 
     // Derived rather than synced: a connection that disappeared (deleted here, or gone on a
     // refresh) simply drops the panel back to the list.
@@ -116,6 +117,9 @@ export function AiProvidersPanel({
             if (!result.success) toast.error(errorText(result, t('errors.defaultFailed')))
         })
 
+    const planPitch = claudePlanOffered
+        ? t(opencodeOffered ? 'panel.pitch.plansWithOpencode' : 'panel.pitch.plans')
+        : t(opencodeOffered ? 'panel.pitch.plansWithoutClaudeWithOpencode' : 'panel.pitch.plansWithoutClaude')
     const byKind = (kind: SourceKind) => connections.filter(c => sourceKind(c.provider) === kind)
     const taken = new Set(connections.map(c => c.provider))
 
@@ -163,8 +167,8 @@ export function AiProvidersPanel({
                         onOpen={open}
                         onAdd={needsPlan ? undefined : add}
                         addDisabledReason={readOnlyReason}
-                        pitch={opencodeOffered ? t('panel.pitch.plansWithOpencode') : t('panel.pitch.plans')}
-                        providers={planProviders(opencodeOffered)}
+                        pitch={planPitch}
+                        providers={planProviders(opencodeOffered, { claude: claudePlanOffered })}
                     />
 
                     <SourceGroup

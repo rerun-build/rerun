@@ -251,6 +251,8 @@
         "pitch": {
             "plansWithOpencode": "Du nutzt schon Claude Code, Codex oder OpenCode? Deine Coworker können mit deinem Tarif arbeiten.",
             "plans": "Du nutzt schon Claude Code oder Codex? Deine Coworker können mit deinem Tarif arbeiten.",
+            "plansWithoutClaudeWithOpencode": "Du nutzt schon Codex oder OpenCode? Deine Coworker können mit deinem Tarif arbeiten.",
+            "plansWithoutClaude": "Du nutzt schon Codex? Deine Coworker können mit deinem ChatGPT-Tarif arbeiten.",
             "keysWithCustom": "Bezahl deinen Anbieter direkt, pro Token, oder betreibe dein eigenes Modell.",
             "keys": "Bezahl deinen Anbieter direkt, pro Token."
         },

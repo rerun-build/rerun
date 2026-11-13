@@ -620,6 +620,7 @@
     },
     "subscriptionOffer": {
         "title": "Lass deine Coworker mit deinem Claude- oder ChatGPT-Abo laufen",
+        "titleWithoutClaude": "Lass deine Coworker mit deinem ChatGPT-Abo oder einem API-Schlüssel laufen",
         "back": "Zurück",
         "connect": "Verbinden",
         "or": "oder",
@@ -634,7 +635,9 @@
         },
         "offer": {
             "title": "Rerun funktioniert besser mit deinem Claude- oder ChatGPT-Abo",
-            "description": "Verbinde es, und deine Coworker laufen mit dem Tarif, den du ohnehin bezahlst."
+            "description": "Verbinde es, und deine Coworker laufen mit dem Tarif, den du ohnehin bezahlst.",
+            "titleWithoutClaude": "Deine Coworker laufen mit deiner eigenen KI",
+            "descriptionWithoutClaude": "Verbinde dein ChatGPT-Abo oder einen API-Schlüssel, und deine Coworker laufen damit."
         },
         "arguments": {
             "ownPlan": {

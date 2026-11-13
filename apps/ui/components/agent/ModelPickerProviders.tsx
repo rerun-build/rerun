@@ -69,13 +69,14 @@ export function SubscriptionNudge({ providers, onConnect }: SubscriptionCallProp
 
 type AddProviderItemProps = {
     connectedProviders: Set<Provider>
+    claudePlanOffered: boolean
     onConnect: (provider: AddableProvider) => void
     onManage: () => void
 }
 
 // A submenu opened by hovering, like a native menu's: the row and the submenu count as one surface,
 // so closing waits a beat after the pointer leaves either. Enter on the row opens it for keyboards.
-export function AddProviderItem({ connectedProviders, onConnect, onManage }: AddProviderItemProps) {
+export function AddProviderItem({ connectedProviders, claudePlanOffered, onConnect, onManage }: AddProviderItemProps) {
     const t = useTranslations('agent.modelPickerProviders')
     const [open, setOpen] = useState(false)
     const closeTimer = useRef<number | undefined>(undefined)
@@ -119,7 +120,7 @@ export function AddProviderItem({ connectedProviders, onConnect, onManage }: Add
                     <CommandList className="max-h-[min(32rem,70vh)]">
                         {(['subscription', 'api'] as const).map(section => (
                             <CommandGroup key={section} heading={t(`sections.${section}`)}>
-                                {ADDABLE.filter(p => p.section === section).map(p => (
+                                {ADDABLE.filter(p => p.section === section && (claudePlanOffered || p.provider !== 'claude')).map(p => (
                                     <CommandItem key={p.provider} value={`${p.label} ${t(`hints.${p.provider}`)}`} onSelect={() => onConnect(p.provider)} className="gap-2.5 [&>svg:last-child]:hidden">
                                         <ProviderIcon provider={p.provider} className="size-4" />
                                         <span className="flex min-w-0 flex-1 flex-col">

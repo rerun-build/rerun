@@ -620,6 +620,7 @@
     },
     "subscriptionOffer": {
         "title": "Haz que tus coworkers funcionen con tu plan de Claude o ChatGPT",
+        "titleWithoutClaude": "Haz que tus coworkers funcionen con tu plan de ChatGPT o una clave de API",
         "back": "Atrás",
         "connect": "Conectar",
         "or": "o",
@@ -634,7 +635,9 @@
         },
         "offer": {
             "title": "Rerun funciona mejor con tu suscripción de Claude o ChatGPT",
-            "description": "Conéctala y tus coworkers funcionan con el plan que ya pagas."
+            "description": "Conéctala y tus coworkers funcionan con el plan que ya pagas.",
+            "titleWithoutClaude": "Tus coworkers funcionan con tu propia IA",
+            "descriptionWithoutClaude": "Conecta tu plan de ChatGPT o una clave de API, y tus coworkers funcionan con ella."
         },
         "arguments": {
             "ownPlan": {

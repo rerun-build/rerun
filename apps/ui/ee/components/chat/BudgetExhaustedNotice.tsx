@@ -41,7 +41,8 @@ type SubscriptionProvider = 'claude' | 'codex'
 // plan: nothing was used up, so the notice does not say it was.
 //
 // `lifetime` is a workspace on the lifetime plan (an AppSumo code): it has no Rerun credit by design
-// and nothing is sold to it, so its only way out is its own AI.
+// and nothing is sold to it, so its only way out is its own AI, an API key first. It is not offered
+// the Claude plan, which AppSumo refuses to list.
 //
 // On a trial, `coworker` names who stopped, `onPaid` hands the checkout a way to pick the task back
 // up, and `resuming` is the moment between paying and the plan landing, when the notice turns into
@@ -195,22 +196,16 @@ function LifetimeNotice({ onConnectProvider, ownConnection }: { onConnectProvide
             ) : onConnectProvider ? (
                 <>
                     <p className="text-sm">{t('lifetime.connectProvider')}</p>
-                    <div className="grid grid-cols-2 gap-2">
-                        <Button size="sm" onClick={() => onConnectProvider('claude')}>
-                            <ProviderIcon provider="claude" className="size-3.5" />
-                            {t('connectProvider.claude')}
-                        </Button>
-                        <Button size="sm" onClick={() => onConnectProvider('codex')}>
-                            <ProviderIcon provider="openai" className="size-3.5" />
-                            {t('connectProvider.chatgpt')}
-                        </Button>
-                    </div>
+                    <NoticeActions actions={[{ key: 'api-key', leading: <Icon icon={KeyIcon} size="sm" />, title: t('lifetime.apiKeyTitle'), description: t('lifetime.apiKeyDescription'), cta: t('lifetime.apiKeyCta'), onClick: () => openAiProviders() }]} />
                     <div className="flex items-center gap-2 text-xs uppercase">
                         <span className="flex-1 border-t" />
                         <span className="text-muted-foreground">{t('or')}</span>
                         <span className="flex-1 border-t" />
                     </div>
-                    <NoticeActions actions={[{ key: 'api-key', leading: <Icon icon={KeyIcon} size="sm" />, title: t('lifetime.apiKeyTitle'), description: t('lifetime.apiKeyDescription'), cta: t('lifetime.apiKeyCta'), variant: 'outline', onClick: () => openAiProviders() }]} />
+                    <Button size="sm" variant="outline" className="w-full" onClick={() => onConnectProvider('codex')}>
+                        <ProviderIcon provider="openai" className="size-3.5" />
+                        {t('connectProvider.chatgpt')}
+                    </Button>
                 </>
             ) : (
                 <>

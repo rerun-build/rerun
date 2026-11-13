@@ -23,11 +23,12 @@ type SubscriptionOfferProps = {
     onDone: () => void
     // Whether OpenCode can be offered as a third plan: its flag and the machine's engine both allow it.
     opencodeOffered?: boolean
+    claudePlanOffered?: boolean
 }
 
 // The left column of the offer. The board beside it is the dialog's aside, and stays put whatever
 // step this column is on.
-export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'claude', onPick, onKeys, onSkip, onDone, opencodeOffered = false }: SubscriptionOfferProps) {
+export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'claude', onPick, onKeys, onSkip, onDone, opencodeOffered = false, claudePlanOffered = true }: SubscriptionOfferProps) {
     const [step, setStep] = useState<SubscriptionOfferStep>(initialStep)
     const [provider, setProvider] = useState<AddableProvider>(initialStep === 'claude' || initialStep === 'codex' ? initialStep : initialProvider)
 
@@ -53,6 +54,7 @@ export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'cl
         <div className="flex h-full min-h-0 flex-col p-6 sm:p-8">
             {step === 'offer' && (
                 <OfferStep
+                    claudePlanOffered={claudePlanOffered}
                     onPick={pickPlan}
                     onKey={() => setStep('key')}
                     onOpencode={

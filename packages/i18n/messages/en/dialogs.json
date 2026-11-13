@@ -696,6 +696,7 @@
     },
     "subscriptionOffer": {
         "title": "Run your coworkers on your Claude or ChatGPT plan",
+        "titleWithoutClaude": "Run your coworkers on your ChatGPT plan or an API key",
         "back": "Back",
         "connect": "Connect",
         "or": "or",
@@ -710,7 +711,9 @@
         },
         "offer": {
             "title": "Rerun works better with your Claude or ChatGPT subscription",
-            "description": "Connect it and your coworkers run on the plan you already pay for."
+            "description": "Connect it and your coworkers run on the plan you already pay for.",
+            "titleWithoutClaude": "Your coworkers run on your own AI",
+            "descriptionWithoutClaude": "Connect your ChatGPT plan or an API key, and your coworkers run on it."
         },
         "arguments": {
             "ownPlan": {

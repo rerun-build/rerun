@@ -1,6 +1,6 @@
 'use client'
 
-import { SUBSCRIPTION_PROVIDERS, type SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
+import type { SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import { Button } from '@/components/ui/button'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { KeyIcon } from '@/lib/icons'
@@ -14,15 +14,16 @@ import { KeyLogos } from './offer-plans'
 //
 // OpenCode joins as a third plan only where it can run (`onOpencode`). Two columns stay two on a
 // phone: the third tile then takes a row of its own rather than squeezing the other two.
-export function OfferConnect({ onPick, onKey, onOpencode }: { onPick: (provider: SubscriptionProvider) => void; onKey: () => void; onOpencode?: () => void }) {
+export function OfferConnect({ providers, onPick, onKey, onOpencode }: { providers: SubscriptionProvider[]; onPick: (provider: SubscriptionProvider) => void; onKey: () => void; onOpencode?: () => void }) {
     const t = useTranslations('dialogs.subscriptionOffer')
+    const tiles = providers.length + (onOpencode ? 1 : 0)
     return (
         <div className="flex flex-col gap-3">
-            <div className={cn('grid grid-cols-2 gap-3', onOpencode && 'sm:grid-cols-3')}>
-                {SUBSCRIPTION_PROVIDERS.map(provider => (
+            <div className={cn('grid gap-3', tiles === 1 ? 'grid-cols-1' : 'grid-cols-2', tiles === 3 && 'sm:grid-cols-3')}>
+                {providers.map(provider => (
                     <PlanTile key={provider} provider={provider} plan={t(`plans.${provider}`)} onConnect={() => onPick(provider)} />
                 ))}
-                {onOpencode && <PlanTile provider="opencode" plan={OPENCODE_PLAN} onConnect={onOpencode} className="col-span-2 sm:col-span-1" />}
+                {onOpencode && <PlanTile provider="opencode" plan={OPENCODE_PLAN} onConnect={onOpencode} className={cn(tiles === 3 && 'col-span-2 sm:col-span-1')} />}
             </div>
             <OrDivider />
             <Button variant="outline" className="w-full" onClick={onKey}>

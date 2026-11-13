@@ -212,6 +212,8 @@
         "sendFailed": "Diese Aufnahme konnte nicht gesendet werden.",
         "sendFailedHint": "Wiederholen oder verwerfen.",
         "waitingForMicrophone": "Warte auf das Mikrofon...",
+        "microphone": "Mikrofon...",
+        "transcribing": "Wird transkribiert...",
         "hideTranscript": "Transkript ausblenden",
         "transcript": "Transkript",
         "copyTranscript": "Transkript kopieren",
@@ -231,9 +233,7 @@
         "startFailed": "Aufnahme konnte nicht gestartet werden.",
         "nothingHeard": "In dieser Aufnahme war nichts zu hören.",
         "voiceMessageFailed": "Deine Sprachnachricht konnte nicht gesendet werden.",
-        "nothingRecorded": "Es wurde nichts aufgenommen.",
-        "microphone": "Mikrofon...",
-        "transcribing": "Wird transkribiert..."
+        "nothingRecorded": "Es wurde nichts aufgenommen."
     },
     "agentInstall": {
         "started": "Installation gestartet",
@@ -411,13 +411,13 @@
         "resetsNextMonth": "Es wird nächsten Monat zurückgesetzt.",
         "lifetime": {
             "ownConnection": "Dein Lifetime-Tarif läuft mit deiner eigenen KI, und dein {plan}-Abo ist verbunden.",
-            "connectProvider": "Dein Lifetime-Tarif läuft mit deiner eigenen KI. Verbinde Claude oder ChatGPT oder füge einen API-Schlüssel hinzu, damit deine Coworker weiterarbeiten.",
+            "connectProvider": "Dein Lifetime-Tarif läuft mit deiner eigenen KI. Füge einen API-Schlüssel hinzu oder verbinde ChatGPT, damit deine Coworker weiterarbeiten.",
             "apiKeyTitle": "API-Schlüssel verwenden",
             "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter oder ein eigener Endpoint.",
             "apiKeyCta": "Schlüssel hinzufügen",
             "body": "Dein Lifetime-Tarif läuft mit deiner eigenen KI.",
             "connectTitle": "Deine KI verbinden",
-            "connectDescription": "Claude, ChatGPT oder ein API-Schlüssel.",
+            "connectDescription": "Ein API-Schlüssel oder ChatGPT.",
             "connectCta": "Verbinden"
         },
         "trial": {

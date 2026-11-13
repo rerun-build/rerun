@@ -2,7 +2,9 @@
 
 import { assertAgentAccess, assertSpaceAccess } from '@/app/api/_auth/access'
 import { createAgentWithSetup } from '@/app/api/_services/agent-setup.service'
-import { getCatalogServicesBySlugs, getServiceAlternatives, getServiceDetails, installService, listCatalogServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService } from '@/app/api/_services/services.service'
+import { getCatalogServicesBySlugs, getServiceAlternatives, getServiceDetails, installService, listCatalogServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService, withoutPaidApps } from '@/app/api/_services/services.service'
+import { getServerSession } from '@/supabase/session/getServerSession'
+import { isLifetimePlan } from '@rerun/cloud/billing'
 import type { InstallResult, ResetConnectionResult, ServiceAlternative, ServiceChecklistItem, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
 import { failureOf, refusalOf, type ActionFailure, type SuccessResult } from '@/lib/i18n/action-error'
 
@@ -42,7 +44,8 @@ export async function searchServicesAction(agentId: string, query?: string, cate
 // via createAgentWithSetupAction. Free-text lookup uses searchCatalogServicesAction instead.
 export async function listCatalogServicesAction(opts?: { category?: string; limit?: number; offset?: number }): Promise<ServiceSearchResult[]> {
     try {
-        return await listCatalogServices(opts)
+        const [services, { workspace }] = await Promise.all([listCatalogServices(opts), getServerSession()])
+        return isLifetimePlan(workspace) ? withoutPaidApps(services) : services
     } catch {
         return []
     }

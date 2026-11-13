@@ -212,6 +212,8 @@
         "sendFailed": "Impossible d'envoyer cet enregistrement.",
         "sendFailedHint": "Réessayez, ou supprimez-le.",
         "waitingForMicrophone": "En attente du micro...",
+        "microphone": "Micro...",
+        "transcribing": "Transcription...",
         "hideTranscript": "Masquer la transcription",
         "transcript": "Transcription",
         "copyTranscript": "Copier la transcription",
@@ -231,9 +233,7 @@
         "startFailed": "Impossible de démarrer l'enregistrement.",
         "nothingHeard": "Rien n'a été entendu dans cet enregistrement.",
         "voiceMessageFailed": "Impossible d'envoyer votre message vocal.",
-        "nothingRecorded": "Rien n'a été enregistré.",
-        "microphone": "Micro...",
-        "transcribing": "Transcription..."
+        "nothingRecorded": "Rien n'a été enregistré."
     },
     "agentInstall": {
         "started": "Installation lancée",
@@ -411,13 +411,13 @@
         "resetsNextMonth": "Ils se renouvellent le mois prochain.",
         "lifetime": {
             "ownConnection": "Votre offre à vie fonctionne avec votre propre IA, et votre abonnement {plan} est connecté.",
-            "connectProvider": "Votre offre à vie fonctionne avec votre propre IA. Connectez Claude ou ChatGPT, ou ajoutez une clé API, pour que vos coworkers continuent de travailler.",
+            "connectProvider": "Votre offre à vie fonctionne avec votre propre IA. Ajoutez une clé API, ou connectez ChatGPT, pour que vos coworkers continuent de travailler.",
             "apiKeyTitle": "Utiliser une clé API",
             "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter ou un endpoint personnalisé.",
             "apiKeyCta": "Ajouter une clé",
             "body": "Votre offre à vie fonctionne avec votre propre IA.",
             "connectTitle": "Connecter votre IA",
-            "connectDescription": "Claude, ChatGPT ou une clé API.",
+            "connectDescription": "Une clé API ou ChatGPT.",
             "connectCta": "Connecter"
         },
         "trial": {

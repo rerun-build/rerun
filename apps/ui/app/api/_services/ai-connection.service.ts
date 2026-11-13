@@ -2,7 +2,7 @@ import 'server-only'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { assertModelEntitled } from '@/app/api/_services/engine-plan.service'
 import { ensureWorkspaceEngine, findWorkspaceEngine, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { isPremiumModelEntitled } from '@rerun/cloud/billing'
+import { isLifetimePlan, isPremiumModelEntitled } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import {
     KEY_PROVIDERS,
@@ -46,6 +46,8 @@ import {
 } from '@/lib/engine/client'
 import { type CodexDeviceAuthStart, codexKeysFrom, pollCodexDeviceAuth, startCodexDeviceAuth } from '@/lib/engine/codex-oauth'
 import { pinFirst } from '@/lib/engine/model-groups'
+import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, EngineConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { assertPublicUrl } from '@/lib/net/public-fetch'
@@ -151,6 +153,13 @@ export async function isCustomOfferedTo(workspaceId: number): Promise<boolean> {
 }
 
 
+// The mobile app and the routes reach this without the web's list, so the rule is held here too.
+async function assertClaudePlanOffered(workspaceId: number, provider: CreateBoxConnectionInput['provider']): Promise<void> {
+    if (provider !== 'claude') return
+    const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['plan'] as const, { id: workspaceId })
+    if (isLifetimePlan(workspace)) throw new ConnectionInputError('claudePlanNotOffered')
+}
+
 async function assertProviderOffered(provider: CreateBoxConnectionInput['provider'], conn: EngineConnection): Promise<void> {
     if (provider === 'custom' && !(await supportsCustomProvider(conn))) throw new ConnectionInputError('customNeedsUpdate')
     if (provider !== 'opencode') return
@@ -163,6 +172,7 @@ async function assertProviderOffered(provider: CreateBoxConnectionInput['provide
 export async function createAiConnection(workspaceId: number, params: CreateBoxConnectionInput): Promise<BoxConnection> {
     assertValidClaudeToken(params.keys)
     await assertPublicBaseUrl(params.baseUrl)
+    await assertClaudePlanOffered(workspaceId, params.provider)
     const conn = await connectionForCreate(workspaceId)
     await assertProviderOffered(params.provider, conn)
     const keyProblem = await providerKeyProblem(params.provider, params.keys, params.baseUrl)
@@ -302,7 +312,7 @@ export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiCo
         connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, premiumAllowed, t, locale)),
         default: { ...pick, label: modelName(pick.connectionId, pick.model) },
         credit: { percent: credit.percent, usedUp: isCreditUsedUp(credit), backOn: creditResetPhrase(credit, t, locale) },
-        addable: [...planProviders(await isOpencodeOffered(engine?.conn)), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
+        addable: [...planProviders(await isOpencodeOffered(engine?.conn), { claude: !isLifetimePlan(ctx.workspace) }), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
             provider,
             kind: sourceKind(provider),
             ...providerPitch(provider, t),

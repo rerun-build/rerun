@@ -620,6 +620,7 @@
     },
     "subscriptionOffer": {
         "title": "Rode seus coworkers no seu plano do Claude ou do ChatGPT",
+        "titleWithoutClaude": "Rode seus coworkers no seu plano do ChatGPT ou com uma chave de API",
         "back": "Voltar",
         "connect": "Conectar",
         "or": "ou",
@@ -634,7 +635,9 @@
         },
         "offer": {
             "title": "O Rerun funciona melhor com sua assinatura do Claude ou do ChatGPT",
-            "description": "Conecte-a e seus coworkers rodam no plano que você já paga."
+            "description": "Conecte-a e seus coworkers rodam no plano que você já paga.",
+            "titleWithoutClaude": "Seus coworkers rodam na sua própria IA",
+            "descriptionWithoutClaude": "Conecte seu plano do ChatGPT ou uma chave de API, e seus coworkers rodam nele."
         },
         "arguments": {
             "ownPlan": {

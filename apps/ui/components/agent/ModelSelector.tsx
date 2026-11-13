@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ModelPillTrigger } from '@/components/agent/ModelPillTrigger'
 import { PlanLimitDetail, PlanLimitHint, RerunCreditHint, usePlanWindowsSummary, useRerunCreditDetail } from '@/components/agent/PlanLimitHint'
 import { ModelTierRow } from '@/components/agent/ModelTierRow'
+import { useClaudePlanOffered } from '@/components/connections/NoPlanNotice'
 import { PowerBars } from '@/components/ui/power-bars'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useAgentModel } from '@/hooks/useAgentModel'
@@ -75,7 +76,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const connectionId = selection.connectionId ?? pinnedConnectionId ?? resolvedConnectionId
     const hasAvailable = availableGroups.length > 0
     const connectedProviders = useMemo(() => new Set(availableGroups.map(group => group.provider)), [availableGroups])
-    const missingSubscriptions = SUBSCRIPTION_PROVIDERS.filter(provider => !connectedProviders.has(provider))
+    const claudePlanOffered = useClaudePlanOffered()
+    const missingSubscriptions = SUBSCRIPTION_PROVIDERS.filter(provider => !connectedProviders.has(provider) && (claudePlanOffered || provider !== 'claude'))
     const hasOwnConnection = availableGroups.some(group => group.connectionId !== RERUN_CONNECTION_ID)
     // Only when nothing at all was chosen: an override on this conversation is still a choice, and
     // the trigger has to say which model that turn will bill.
@@ -341,7 +343,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                             ))}
                         <CommandSeparator />
                         <CommandGroup>
-                            <AddProviderItem connectedProviders={connectedProviders} onConnect={addProvider} onManage={manage} />
+                            <AddProviderItem connectedProviders={connectedProviders} claudePlanOffered={claudePlanOffered} onConnect={addProvider} onManage={manage} />
                         </CommandGroup>
                     </CommandList>
                 </Command>

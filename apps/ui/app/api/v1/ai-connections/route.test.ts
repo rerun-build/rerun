@@ -27,6 +27,11 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => {
     }
 })
 vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
+// The plan read before a Claude sign-in is stored: a workspace on Rerun Cloud's plans, not a lifetime one.
+vi.mock('@/supabase/serviceRole', async () => {
+    const { fakeSupabase } = await import('@/test/supabase-fake')
+    return { createServiceRoleClient: () => fakeSupabase(table => (table === 'workspaces' ? { data: { plan: 'base' } } : undefined)).client }
+})
 vi.mock('@/app/api/_services/capacity.service', () => ({
     NoPlanError: class NoPlanError extends Error {
         constructor() {

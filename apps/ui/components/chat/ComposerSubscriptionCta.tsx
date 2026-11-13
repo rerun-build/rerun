@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl'
 
 type ComposerSubscriptionCtaProps = {
     open: boolean
+    claudePlanOffered: boolean
     onClick: () => void
 }
 
@@ -17,7 +18,7 @@ type ComposerSubscriptionCtaProps = {
 // instead. It says nothing about credits, on purpose.
 //
 // Opening and closing goes through grid rows rather than height, so no measurement is needed.
-export function ComposerSubscriptionCta({ open, onClick }: ComposerSubscriptionCtaProps) {
+export function ComposerSubscriptionCta({ open, claudePlanOffered, onClick }: ComposerSubscriptionCtaProps) {
     const t = useTranslations('chat')
     return (
         <div className={cn('-mt-px grid transition-[grid-template-rows] duration-300 ease-out', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>
@@ -26,7 +27,7 @@ export function ComposerSubscriptionCta({ open, onClick }: ComposerSubscriptionC
                     {/* Mirror of the notification nudge above the composer: stripes densest on the outer edge. */}
                     <Stripes className="rounded-b-lg" fade="top" />
                     <ProviderIcon provider="openai" className="relative size-3.5 shrink-0" />
-                    <ProviderIcon provider="claude" className="relative size-3.5 shrink-0" />
+                    {claudePlanOffered && <ProviderIcon provider="claude" className="relative size-3.5 shrink-0" />}
                     <span className="relative min-w-0 flex-1 truncate text-xs leading-normal text-muted-foreground">{t('composer.subscriptionCta')}</span>
                     <Button size="xs" variant="outline" onClick={onClick} className="relative">
                         {t('actions.connect')}
