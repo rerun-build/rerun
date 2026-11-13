@@ -18,6 +18,11 @@ Le ticket Linear complet (description, images) est dans {{issue.file}}.
 
 Tu peux te connecter en SSH à l'engine pour diagnostiquer la cause, et lire tous les logs dont tu as besoin
 dans PostHog ou dans Supabase. Fais une analyse complète et essaye de reproduire le cas au maximum.
+
+Si le cas est isolé (cause hors de Rerun : le provider du client, son réseau, sa config) ou un peu wtf
+(incohérent, inexplicable, ou un correctif disproportionné pour l'impact), ouvre ton message par une alerte :
+explique ce qui le rend isolé ou bizarre, avec les preuves, et recommande de corriger, de clore ou de creuser.
+C'est moi qui décide si on continue.
 """
 
 [[steps]]
@@ -26,7 +31,12 @@ title = "Plan the fix"
 model = "opus-5-5-1m"
 plan = true
 approve = "auto"
-prompt = "Planifie le fix à partir du cas rejoué : la cause, la couche où le corriger (hub, prompt du moteur, template), et la mesure avant / après qui le prouve."
+prompt = """
+Si ton investigation a levé une alerte « cas isolé ou wtf » et que je n'ai pas dit de continuer, ne planifie rien :
+rappelle l'alerte en deux lignes et arrête-toi sans plan, le flow attend ma décision.
+Sinon, planifie le fix à partir du cas rejoué : la cause, la couche où le corriger (hub, prompt du moteur, template),
+et la mesure avant / après qui le prouve.
+"""
 
 [[steps]]
 id = "review"

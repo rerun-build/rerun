@@ -74,6 +74,11 @@ Investigating on the real account is allowed, still read-only:
 
 ## 6. Report, then wait
 
+An isolated bug (one customer, a cause outside Rerun: their provider, their network, their config) or
+an odd one (inconsistent, unexplained, or a fix out of proportion with the impact) opens the report
+with an alert: what makes it isolated or odd, the evidence, and a recommendation (fix, close, or dig
+further). Never plan nor write the fix until the user says to go on, even when asked to fix it upfront.
+
 Unless the user already asked for the fix, stop here and give:
 
 - **Symptom**: one sentence.
