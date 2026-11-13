@@ -5,6 +5,7 @@ import { fakeSupabase } from '@/test/supabase-fake'
 import type { NextResponse } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { POST } from './route'
+import { getVaultItem } from '@/lib/engine/vault-client'
 
 const mocks = vi.hoisted(() => ({ lookup: vi.fn() }))
 vi.mock('node:dns/promises', () => ({ lookup: mocks.lookup }))
@@ -13,6 +14,10 @@ vi.mock('@/supabase/session/getServerSession', () => {
     const session = vi.fn()
     return { getServerSession: session, getSessionWorkspace: session }
 })
+
+vi.mock('@/app/api/_services/workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(async () => ({ instanceId: 'i', conn: { baseUrl: 'https://engine.test', apiKey: null }, managed: true })), NoEngineError: class NoEngineError extends Error {} }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/engine/client')>()), supportsVault: vi.fn(async () => true) }))
+vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn() }))
 
 const SESSION_WORKSPACE = 1
 
@@ -167,5 +172,46 @@ describe('POST /api/mcp/oauth/start', () => {
         expect(((await res.json()) as { error: string }).error).toContain('is not a public host')
         expect(res.cookies.getAll()).toEqual([])
         expect(fetchMock).not.toHaveBeenCalled()
+    })
+})
+
+describe('POST /api/mcp/oauth/start for a Vault entry', () => {
+    const entry = { id: 'item-1', kind: 'service', slug: 'acme', name: 'Acme', status: 'needs_auth', oauth: { serverName: 'acme', url: 'https://mcp.acme.test/mcp' }, agentIds: [], sharedWithAll: false, mcpServers: [], skills: [], config: {}, envKeys: [], tokens: [], createdBy: null, createdAt: '', updatedAt: '' }
+
+    beforeEach(() => {
+        vi.mocked(getVaultItem).mockResolvedValue(entry as never)
+        vi.mocked(createServiceRoleClient).mockReturnValue(
+            fakeSupabase(table => {
+                if (table === 'agents') return { data: [] }
+                if (table === 'spaces') return { data: [{ id: 'space-1', workspace_id: SESSION_WORKSPACE, visibility: 'workspace' }] }
+                if (table === 'space_members') return { data: [] }
+                return undefined
+            }).client,
+        )
+    })
+
+    it("signs in the entry's own server at its own address, whatever the caller sends", async () => {
+        const res = await start({ agentId: undefined, vaultItemId: 'item-1', mcpUrl: 'https://evil.test/mcp' })
+
+        expect(res.status).toBe(200)
+        const [cookie] = res.cookies.getAll()
+        expect(decodeContext(cookie.value)).toMatchObject({ agentId: '', serverName: 'acme', mcpUrl: 'https://mcp.acme.test/mcp', vault: { itemId: 'item-1', workspaceId: SESSION_WORKSPACE } })
+    })
+
+    it('refuses a server the entry does not sign in through', async () => {
+        const res = await start({ agentId: undefined, vaultItemId: 'item-1', serverName: 'other' })
+
+        expect(res.status).toBe(400)
+        expect(res.cookies.getAll()).toEqual([])
+    })
+
+    it('refuses a member who manages no Box', async () => {
+        role = 'member'
+
+        const res = await start({ agentId: undefined, vaultItemId: 'item-1' })
+
+        expect(res.status).toBe(400)
+        expect(res.cookies.getAll()).toEqual([])
+        expect(getVaultItem).not.toHaveBeenCalled()
     })
 })

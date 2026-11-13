@@ -1,5 +1,6 @@
 import { findWorkspaceEngine, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { putMcpToken } from '@/lib/engine/client'
+import { putMcpToken, supportsVault } from '@/lib/engine/client'
+import { listVaultItems, putVaultToken } from '@/lib/engine/vault-client'
 import { type OAuthContext, encodeContext, exchangeCode } from '@/lib/mcp-oauth'
 import { mintCallbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
@@ -17,7 +18,8 @@ vi.mock('@/supabase/session/getServerSession', () => {
     return { getServerSession: session, getSessionWorkspace: session }
 })
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(), findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
-vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn(), listRuns: vi.fn() }))
+vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn(), deleteMcpToken: vi.fn(), supportsVault: vi.fn(async () => false), listRuns: vi.fn() }))
+vi.mock('@/lib/engine/vault-client', () => ({ putVaultToken: vi.fn(), listVaultItems: vi.fn(async () => []) }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ parkSignIn: vi.fn() }))
 vi.mock('@/lib/mcp-oauth', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/mcp-oauth')>()), exchangeCode: vi.fn() }))
 
@@ -310,5 +312,86 @@ describe('GET /api/mcp/oauth/callback', () => {
         expect(exchangeCode).not.toHaveBeenCalled()
         expect(putMcpToken).not.toHaveBeenCalled()
         expect(deletesStateCookie(res)).toBe(true)
+    })
+})
+
+describe('GET /api/mcp/oauth/callback with a Vault', () => {
+    const vaultItem = { id: 'item-1', kind: 'service', slug: 'acme', name: 'Acme', status: 'needs_auth', config: {}, skills: [], agentIds: ['engine-agent'], sharedWithAll: false, createdBy: null, createdAt: '', updatedAt: '', envKeys: [], tokens: [], mcpServers: [{ name: 'acme', args: [], env: {}, headers: {} }], oauth: { serverName: 'acme', url: CONTEXT.mcpUrl } }
+
+    it("puts the token on the Vault entry the coworker draws the server from, not in the coworker's folder", async () => {
+        vi.mocked(supportsVault).mockResolvedValue(true)
+        vi.mocked(listVaultItems).mockResolvedValue([vaultItem] as never)
+        withContext(CONTEXT)
+
+        const res = await callback({ code: 'code-1', state: STATE })
+
+        expect(await res.text()).toContain('mcp-oauth-success')
+        expect(putVaultToken).toHaveBeenCalledWith(expect.anything(), 'item-1', 'acme', expect.objectContaining({ accessToken: 'access', refreshToken: 'refresh' }))
+        expect(putMcpToken).not.toHaveBeenCalled()
+        expect(listVaultItems).toHaveBeenCalledWith(expect.anything(), 'engine-agent')
+    })
+
+    it("keeps the coworker's own server in its folder on a box that keeps a Vault", async () => {
+        vi.mocked(supportsVault).mockResolvedValue(true)
+        vi.mocked(listVaultItems).mockResolvedValue([])
+        withContext(CONTEXT)
+
+        await callback({ code: 'code-1', state: STATE })
+
+        expect(putMcpToken).toHaveBeenCalledWith(expect.anything(), 'engine-agent', 'acme', expect.objectContaining({ accessToken: 'access' }))
+        expect(putVaultToken).not.toHaveBeenCalled()
+    })
+
+    describe('started from the Vault itself', () => {
+        const VAULT_CONTEXT: OAuthContext = { ...CONTEXT, agentId: '', vault: { itemId: 'item-1', workspaceId: SESSION_WORKSPACE } }
+
+        function signedIn(memberRole: 'admin' | 'member', workspaceId = SESSION_WORKSPACE) {
+            vi.mocked(getServerSession).mockResolvedValue({ user: { id: 'user-1', workspace_id: workspaceId }, workspaceRefused: false, membership: { role: memberRole, box_scope: 'all' } } as never)
+        }
+
+        beforeEach(() => {
+            vi.mocked(supportsVault).mockResolvedValue(true)
+            vi.mocked(createServiceRoleClient).mockReturnValue(
+                fakeSupabase(table => {
+                    if (table === 'agents') return { data: [] }
+                    if (table === 'spaces') return { data: [{ id: 'space-1', workspace_id: SESSION_WORKSPACE, visibility: 'workspace' }] }
+                    if (table === 'space_members') return { data: [] }
+                    return undefined
+                }).client,
+            )
+        })
+
+        it('writes the token to the entry for a member allowed to add to the Vault', async () => {
+            signedIn('admin')
+            withContext(VAULT_CONTEXT)
+
+            const res = await callback({ code: 'code-1', state: STATE })
+
+            expect(await res.text()).toContain('mcp-oauth-success')
+            expect(putVaultToken).toHaveBeenCalledWith(expect.anything(), 'item-1', 'acme', expect.objectContaining({ accessToken: 'access', tokenEndpoint: CONTEXT.tokenEndpoint }))
+            expect(putMcpToken).not.toHaveBeenCalled()
+            expect(deletesStateCookie(res)).toBe(true)
+        })
+
+        it('refuses a member who manages no Box, before the code reaches the token endpoint', async () => {
+            signedIn('member')
+            withContext(VAULT_CONTEXT)
+
+            const res = await callback({ code: 'code-1', state: STATE })
+
+            expect(await res.text()).toContain('mcp-oauth-error')
+            expect(exchangeCode).not.toHaveBeenCalled()
+            expect(putVaultToken).not.toHaveBeenCalled()
+        })
+
+        it('refuses a sign-in started in another workspace', async () => {
+            signedIn('admin', OTHER_WORKSPACE)
+            withContext(VAULT_CONTEXT)
+
+            const res = await callback({ code: 'code-1', state: STATE })
+
+            expect(await res.text()).toContain('another workspace')
+            expect(exchangeCode).not.toHaveBeenCalled()
+        })
     })
 })

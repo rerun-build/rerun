@@ -1,7 +1,9 @@
 import { parseServiceRegistryKey } from '@rerun/contracts'
 
-import { makeDir, readFileText, writeFileText } from '@/lib/engine/client'
+import { makeDir, readFileText, supportsVault, writeFileText } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
+import { detachVaultItem, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
+import { isRegistryItem, vaultPatchOf, vaultRegistryEntry, vaultRegistryKey } from '@/lib/vault/registry-view'
 
 // The per-agent "installed services" registry lives WITH the agent, on the engine, not
 // in the UI database — an agent must be autonomous and carry its own capabilities. It is
@@ -47,6 +49,9 @@ export type RegistryEntry = {
     // Which account this entry is, for the user and the agent alike: the email, else "Gmail 2".
     label?: string
     installedAt: string
+    // Set on an entry read from the workspace's Vault rather than the coworker's own registry: the
+    // item behind it, which every write to the entry goes to. Never written to services.json.
+    vaultItemId?: string
 }
 
 export type ServiceRegistry = { services: Record<string, RegistryEntry> }
@@ -129,7 +134,8 @@ export function connectorMcpServerNames(reg: ServiceRegistry): Set<string> {
     )
 }
 
-export async function readRegistry(conn: EngineConnection, engineAgentId: string): Promise<ServiceRegistry> {
+// The coworker's own registry file, without what the Vault lends it.
+export async function readOwnRegistry(conn: EngineConnection, engineAgentId: string): Promise<ServiceRegistry> {
     try {
         const { content } = await readFileText(conn, filesBase(engineAgentId), REGISTRY_PATH)
         const parsed = JSON.parse(content) as unknown
@@ -143,19 +149,57 @@ export async function readRegistry(conn: EngineConnection, engineAgentId: string
     }
 }
 
+// The catalog apps the coworker draws from the Vault, keyed like its own entries. An unreachable
+// Vault reads as empty, exactly like an unreachable registry file.
+async function vaultEntries(conn: EngineConnection, engineAgentId: string): Promise<Array<[string, RegistryEntry]>> {
+    try {
+        if (!(await supportsVault(conn))) return []
+        const items = await listVaultItems(conn, engineAgentId)
+        return items.filter(isRegistryItem).map(item => [vaultRegistryKey(item), vaultRegistryEntry(item)])
+    } catch {
+        return []
+    }
+}
+
+// The coworker's connectors: those in its own registry, and the Vault items attached to it. An item
+// wins over an entry of the same key, the copy a migration leaves in the coworker's folder.
+export async function readRegistry(conn: EngineConnection, engineAgentId: string): Promise<ServiceRegistry> {
+    const [own, vault] = await Promise.all([readOwnRegistry(conn, engineAgentId), vaultEntries(conn, engineAgentId)])
+    for (const [key, entry] of vault) own.services[key] = entry
+    return own
+}
+
 async function writeRegistry(conn: EngineConnection, engineAgentId: string, reg: ServiceRegistry): Promise<void> {
     await makeDir(conn, filesBase(engineAgentId), REGISTRY_DIR).catch(() => {})
     await writeFileText(conn, filesBase(engineAgentId), REGISTRY_PATH, `${JSON.stringify(reg, null, 2)}\n`)
 }
 
+// Strict, unlike the read: an unreachable Vault must fail a write, or it would land in the coworker's
+// own file, where the Vault hides it.
+async function vaultItemIdOf(conn: EngineConnection, engineAgentId: string, key: string): Promise<string | null> {
+    if (!(await supportsVault(conn))) return null
+    const item = (await listVaultItems(conn, engineAgentId)).filter(isRegistryItem).find(candidate => vaultRegistryKey(candidate) === key)
+    return item?.id ?? null
+}
+
 export async function upsertRegistryEntry(conn: EngineConnection, engineAgentId: string, key: string, entry: RegistryEntry): Promise<void> {
-    const reg = await readRegistry(conn, engineAgentId)
-    reg.services[key] = entry
+    const itemId = entry.vaultItemId ?? (await vaultItemIdOf(conn, engineAgentId, key))
+    if (itemId) {
+        await patchVaultItem(conn, itemId, vaultPatchOf(entry))
+        return
+    }
+    const reg = await readOwnRegistry(conn, engineAgentId)
+    const { vaultItemId: _, ...own } = entry
+    reg.services[key] = own
     await writeRegistry(conn, engineAgentId, reg)
 }
 
+// For an entry the Vault lends, removing it from the coworker detaches the coworker: the account
+// stays in the Vault for every other coworker, and for later.
 export async function removeRegistryEntry(conn: EngineConnection, engineAgentId: string, key: string): Promise<void> {
-    const reg = await readRegistry(conn, engineAgentId)
+    const itemId = await vaultItemIdOf(conn, engineAgentId, key)
+    if (itemId) await detachVaultItem(conn, itemId, engineAgentId)
+    const reg = await readOwnRegistry(conn, engineAgentId)
     if (reg.services[key]) {
         delete reg.services[key]
         await writeRegistry(conn, engineAgentId, reg)

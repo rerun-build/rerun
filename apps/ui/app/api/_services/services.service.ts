@@ -7,7 +7,13 @@ import { unbindAgent } from '@rerun/cloud/apps.server'
 import { isAppSlug, type AppSlug } from '@rerun/cloud/apps'
 import { isLifetimePlan } from '@rerun/cloud/billing'
 import { deleteConnectedAccount } from '@/lib/composio/client'
-import { deleteMcpToken } from '@/lib/engine/client'
+import { getVaultItem, patchVaultItem, createVaultItem } from '@/lib/engine/vault-client'
+import { deleteConnectorToken } from '@/lib/vault/tokens'
+import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
+import { assertCanChangeItem, rethrowConflict, vaultContext, vaultWritesEnabled, type VaultContext } from '@/app/api/_services/vault.service'
+import { AccessDeniedError } from '@/app/api/_auth/access'
+import { supportsVault } from '@/lib/engine/client'
+import type { EngineConnection } from '@/lib/engine/types'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { type ServiceInstanceTarget, compileService, decompileService } from '@/lib/services/compiler'
 import { embedText, toVectorLiteral } from '@/lib/services/embed'
@@ -19,6 +25,7 @@ import {
     type ServiceRegistry,
     entriesOfSlug,
     primaryStatusOfSlug,
+    readOwnRegistry,
     readRegistry,
     registryFootprint,
     removeRegistryEntry,
@@ -432,12 +439,16 @@ export async function installService(
     const key = instance?.key ?? manifest.slug
     const method = getMethod(manifest, authMethodId)
     const missing = missingRequiredInputs(method, values)
+    const vault = await vaultInstallTarget(agentId, key, method.kind, actor)
     if (missing.length > 0) {
-        await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
+        if (vault) await rethrowConflict(vault.ctx, () => markVaultNeedsConfig(vault, manifest, method.id, instance))
+        else await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
         return { status: 'needs_config', key, slug: manifest.slug, name: manifest.name, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id, message: `${manifest.name} needs configuration. A form has been shown to the user — ask them to fill it in.` }
     }
 
-    const { toolNames, oauth, managed, composio, app } = await compileService(agentId, manifest, values, method.id, actor, instance ?? undefined)
+    const { toolNames, oauth, managed, composio, app } = vault
+        ? await rethrowConflict(vault.ctx, () => compileIntoVault({ conn: vault.conn, manifest, values, authMethodId: method.id, instance: instance ?? undefined, itemId: vault.itemId, engineAgentId: vault.engineAgentId, createdBy: vault.createdBy }))
+        : await compileService(agentId, manifest, values, method.id, actor, instance ?? undefined)
     if (oauth) {
         return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, oauth, message: `${manifest.name} needs the user to sign in. A Connect button has been shown to them.` }
     }
@@ -456,6 +467,45 @@ export async function installService(
         await markAppAuthorized(agentId, key, bound || undefined, actor)
     }
     return { status: 'installed', key, slug: manifest.slug, name: manifest.name, toolNames, message: `${manifest.name} installed. Its tools become available on your next turn.` }
+}
+
+type VaultInstallTarget = { conn: EngineConnection; engineAgentId: string; itemId: string | null; createdBy: string | null; ctx: VaultContext }
+
+// Where an install goes. The Vault item the coworker already draws this account from, which only
+// someone allowed to change it for every coworker using it may compile again. A new account goes to
+// the Vault when the box keeps one and the feature is on, unless the coworker already holds the app
+// in its own folder (it is reconfigured where it is) or its sign-in is one the Vault does not hold yet.
+async function vaultInstallTarget(agentId: string, key: string, methodKind: string, actor?: Actor): Promise<VaultInstallTarget | null> {
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+    // A box without a Vault takes the path it always took, with no read more than the capability.
+    if (!(await supportsVault(conn))) return null
+    const entry = (await readRegistry(conn, engineAgentId)).services[key]
+    if (entry && !entry.vaultItemId) return null
+    if (!entry && (!VAULT_METHOD_KINDS.has(methodKind) || !(await vaultWritesEnabled(conn, actor)))) return null
+    // An entry of the Vault is never compiled into a sign-in the Vault does not hold yet.
+    if (entry?.vaultItemId && !VAULT_METHOD_KINDS.has(methodKind)) throw new AccessDeniedError('vaultMethodUnsupported')
+    const ctx = await vaultContext(actor)
+    const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
+    if (!entry?.vaultItemId) return { conn, engineAgentId, itemId: null, createdBy, ctx }
+    await assertCanChangeItem(ctx.actor, await getVaultItem(conn, entry.vaultItemId), ctx, engineAgentId)
+    return { conn, engineAgentId, itemId: entry.vaultItemId, createdBy, ctx }
+}
+
+async function markVaultNeedsConfig(target: VaultInstallTarget, manifest: ServiceManifest, authMethodId: string, instance: ServiceInstanceSeed | null): Promise<void> {
+    if (target.itemId) {
+        await patchVaultItem(target.conn, target.itemId, { status: 'needs_config', authMethodId })
+        return
+    }
+    await createVaultItem(target.conn, {
+        kind: 'service',
+        slug: manifest.slug,
+        name: manifest.name,
+        status: 'needs_config',
+        authMethodId,
+        ...(instance ? { instanceId: instance.instanceId, label: instance.label } : {}),
+        agentIds: [target.engineAgentId],
+        createdBy: target.createdBy,
+    })
 }
 
 // Which registry entry an install writes: null for the base account, a fresh key for a new
@@ -557,7 +607,7 @@ export async function resetServiceConnection(agentId: string, key: string, actor
     const serverName = entry.oauth?.serverName ?? entryManaged?.serverName
     if (!serverName || !(entry.oauth?.url || entryManaged?.provider)) return { mode: 'config', authMethodId: entry.authMethodId }
 
-    await deleteMcpToken(conn, engineAgentId, serverName).catch(() => {})
+    await deleteConnectorToken(conn, engineAgentId, serverName).catch(() => {})
     // provider/serverName are what markManagedAuthorized reads back after the new sign-in; only
     // the account label is stale.
     const managed = entryManaged ? { provider: entryManaged.provider, serverName: entryManaged.serverName } : undefined
@@ -612,7 +662,18 @@ export async function uninstallService(agentId: string, key: string, actor?: Act
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const reg = await readRegistry(conn, engineAgentId)
     const entry = reg.services[key]
+    // An entry shared with every coworker cannot be taken from one of them: it is changed in the Vault,
+    // and saying it was uninstalled while the coworker keeps it would be a lie.
+    if (entry?.vaultItemId && !(await getVaultItem(conn, entry.vaultItemId)).agentIds.includes(engineAgentId)) throw new AccessDeniedError('vaultSharedItem')
     if (entry) await decompileService(conn, engineAgentId, entry, { keepSkills: sharedSkillSlugs(reg, key) })
+    // The copy of the same account a migration left in the coworker's folder goes too: the Vault hid
+    // it, and detaching the item would otherwise bring it back.
+    const ownCopy = entry?.vaultItemId ? (await readOwnRegistry(conn, engineAgentId)).services[key] : undefined
+    if (ownCopy) {
+        // The item kept the Composio account the coworker connected: it is not the copy's to revoke.
+        const composio = ownCopy.composio && ownCopy.composio.connectedAccountId === entry?.composio?.connectedAccountId ? { ...ownCopy.composio, connectedAccountId: undefined } : ownCopy.composio
+        await decompileService(conn, engineAgentId, { ...ownCopy, ...(composio ? { composio } : {}) }, { keepSkills: sharedSkillSlugs(reg, key) })
+    }
     await removeRegistryEntry(conn, engineAgentId, key)
     if (entry?.app && isAppSlug(entry.app.appSlug)) {
         const supabase = createServiceRoleClient()

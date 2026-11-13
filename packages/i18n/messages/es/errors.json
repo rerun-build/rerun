@@ -439,5 +439,15 @@
     "fileChangedOnBox": "Este archivo cambió en la Box desde que lo abriste.",
     "saveThisFileFailed": "No se pudo guardar este archivo",
     "templateSubscriptionEnded": "Este coworker venía de una suscripción a una plantilla que terminó. Vuelve a comprar la plantilla para recuperarlo.",
-    "noFreeCoworkerSlot": "No queda ningún espacio libre para coworkers en tu plan. Activa Pro para tener coworkers ilimitados o elimina un coworker para hacer sitio."
+    "noFreeCoworkerSlot": "No queda ningún espacio libre para coworkers en tu plan. Activa Pro para tener coworkers ilimitados o elimina un coworker para hacer sitio.",
+    "vaultUnavailable": "La máquina de tu workspace todavía no tiene Vault. Lo tendrá con su próxima actualización.",
+    "vaultItemNotFound": "Esta entrada del Vault ya no existe",
+    "vaultAdminOnly": "Solo un admin puede hacer esto",
+    "vaultManageOnly": "Necesitas gestionar al menos una Box para añadir al Vault",
+    "vaultConflict": "{coworker} ya recibe {name} de otra entrada del Vault",
+    "vaultSharedItem": "Esta app viene del Vault y otros coworkers la usan. Cámbiala desde el Vault.",
+    "vaultPaidAppEveryone": "Una app de pago se conecta coworker por coworker",
+    "vaultMethodUnsupported": "Esta app todavía no se puede añadir al Vault. Conéctala desde la pestaña Apps de un coworker.",
+    "vaultConflictEveryone": "Cada coworker ya recibe {name} de otra entrada del Vault compartida con todos",
+    "vaultConflictSomeone": "Un coworker ya recibe {name} de otra entrada del Vault"
 }

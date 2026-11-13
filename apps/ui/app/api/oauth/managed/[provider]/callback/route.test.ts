@@ -21,7 +21,7 @@ vi.mock('@/supabase/session/getServerSession', () => {
 })
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(), findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
 vi.mock('@/app/api/_services/services.service', () => ({ markManagedAuthorized: vi.fn() }))
-vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn(), listRuns: vi.fn() }))
+vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn(), deleteMcpToken: vi.fn(), supportsVault: vi.fn(async () => false), listRuns: vi.fn() }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ parkSignIn: vi.fn() }))
 vi.mock('@/lib/managed/registry', () => ({ getManagedProvider: vi.fn() }))
 vi.mock('@/lib/managed/oauth', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/managed/oauth')>()), exchangeManagedCode: vi.fn() }))

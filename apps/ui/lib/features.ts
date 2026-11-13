@@ -20,3 +20,8 @@ export const OPENCODE_ENABLED = process.env.NEXT_PUBLIC_OPENCODE_ENABLED === '1'
 // Gates the language packs: until it flips, everyone outside the early access reads English and the
 // language pickers stay hidden, whatever their browser or their saved choice asks for.
 export const I18N_RELEASED = true
+// Gates the workspace's Vault: its entry in the workspace menu, and new connectors going into it
+// rather than into each coworker's folder. Until it flips, only the early access sees it, and a box
+// without the engine's `vault` capability keeps every connector per coworker whatever it says.
+// `NEXT_PUBLIC_VAULT_ENABLED=1` turns it on for a local stack or a staging deploy.
+export const VAULT_RELEASED = process.env.NEXT_PUBLIC_VAULT_ENABLED === '1'

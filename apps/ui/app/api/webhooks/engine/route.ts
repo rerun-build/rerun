@@ -2,7 +2,7 @@ import { recordGettingStartedEvent } from '@/app/api/_services/getting-started.s
 import { followAuthorOfCreatedTask } from '@/app/api/_services/notification-audience.service'
 import { recordNotification } from '@/app/api/_services/notification.service'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
-import { engineCreatedEventSchema, notificationPayloadSchema } from '@/lib/engine/types'
+import { engineCreatedEventSchema, engineVaultSignedOutSchema, notificationPayloadSchema } from '@/lib/engine/types'
 
 export async function POST(req: Request) {
     const header = req.headers.get('authorization') ?? ''
@@ -23,6 +23,8 @@ export async function POST(req: Request) {
         await Promise.all([recordGettingStartedEvent(engine.workspaceId, created.data.event), followAuthorOfCreatedTask(engine.workspaceId, created.data)])
         return Response.json({ ok: true }, { status: 202 })
     }
+
+    if (engineVaultSignedOutSchema.safeParse(body).success) return Response.json({ ok: true }, { status: 202 })
 
     const parsed = notificationPayloadSchema.safeParse(body)
     if (!parsed.success) return Response.json({ error: 'Invalid payload' }, { status: 400 })

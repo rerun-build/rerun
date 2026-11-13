@@ -1,6 +1,6 @@
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { markManagedAuthorized } from '@/app/api/_services/services.service'
-import { putMcpToken } from '@/lib/engine/client'
+import { putConnectorToken } from '@/lib/vault/tokens'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, decodeManagedContext, exchangeManagedCode } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { oauthPopupResponse } from '@/lib/oauth/popup-result'
@@ -85,7 +85,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
             return finish({ ok: true, email, claim: grant.jti })
         }
 
-        await putMcpToken(conn, engineAgentId, ctx.serverName, {
+        await putConnectorToken(conn, engineAgentId, ctx.serverName, {
             accessToken: token.accessToken,
             refreshToken: token.refreshToken,
             expiresAt: token.expiresAt,

@@ -1,11 +1,13 @@
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
-import { putMcpToken } from '@/lib/engine/client'
+import { putConnectorToken } from '@/lib/vault/tokens'
 import { oauthPopupResponse } from '@/lib/oauth/popup-result'
 import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, decodeContext, engineClientSecret, exchangeCode } from '@/lib/mcp-oauth'
 import { appReturnUrl } from '@/lib/oauth/app-return'
 import { callbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
-import { requireAgentWorkspaceId, workspaceActor } from '@/app/api/_auth/access'
+import { requireAgentWorkspaceId, requireLightSessionActor, workspaceActor } from '@/app/api/_auth/access'
+import { assertCanAdd, vaultContext } from '@/app/api/_services/vault.service'
+import { putVaultToken } from '@/lib/engine/vault-client'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { DesktopShellChannel } from '@rerun/contracts'
@@ -57,6 +59,25 @@ export async function GET(req: Request) {
         const ctx = decodeContext(raw)
         mobile = ctx.mobileGrant !== undefined
         serverName = ctx.serverName
+        if (ctx.vault) {
+            // The member who started it, still allowed to add to this workspace's Vault.
+            const actor = await requireLightSessionActor()
+            if (actor.workspaceId !== ctx.vault.workspaceId) throw new Error('This sign-in belongs to another workspace')
+            const vaultCtx = await vaultContext(actor)
+            await assertCanAdd(actor)
+            const token = await exchangeCode(ctx, code)
+            await putVaultToken(vaultCtx.conn, ctx.vault.itemId, ctx.serverName, {
+                accessToken: token.accessToken,
+                refreshToken: token.refreshToken,
+                expiresAt: token.expiresAt,
+                scope: token.scope,
+                tokenEndpoint: ctx.tokenEndpoint,
+                clientId: ctx.clientId,
+                clientSecret: engineClientSecret(ctx),
+                obtainedAt: Date.now(),
+            })
+            return finish({ ok: true })
+        }
         const grant = callbackGrant(ctx)
         desktop = grant?.desktop
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
@@ -78,7 +99,7 @@ export async function GET(req: Request) {
             await parkSignIn(grant, { kind: 'mcp', serverName: ctx.serverName, mcpUrl: ctx.mcpUrl, token: bundle })
             return finish({ ok: true, claim: grant.jti })
         }
-        await putMcpToken(conn, engineAgentId, ctx.serverName, { ...bundle, clientSecret: engineClientSecret(ctx) })
+        await putConnectorToken(conn, engineAgentId, ctx.serverName, { ...bundle, clientSecret: engineClientSecret(ctx) })
         return finish({ ok: true })
     } catch (err) {
         return finish({ ok: false, error: err instanceof Error ? err.message : 'Authorization failed' })

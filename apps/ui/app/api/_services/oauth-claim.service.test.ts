@@ -6,7 +6,7 @@ import { finishParkedSignIn } from './oauth-claim.service'
 
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn() }))
 vi.mock('@/app/api/_services/services.service', () => ({ markComposioAuthorized: vi.fn(), markManagedAuthorized: vi.fn(), markServiceAuthorized: vi.fn() }))
-vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn() }))
+vi.mock('@/lib/engine/client', () => ({ putMcpToken: vi.fn(), deleteMcpToken: vi.fn(), supportsVault: vi.fn(async () => false) }))
 vi.mock('@/lib/managed/registry', () => ({ getManagedProvider: vi.fn() }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ claimSignIn: vi.fn(), SignInClaimError: class SignInClaimError extends Error {} }))
 
