@@ -45,9 +45,9 @@ export function intakeSteps(knownFirstName: string | null | undefined, websiteSk
     })
 }
 
-/** Whether a step has something in it, which is what the stepper's dots read. */
+/** Whether a step has something in it, which is what the stepper's dots read. A platform's address answers nothing. */
 export function stepAnswered(step: IntakeStep, draft: IntakeDraft): boolean {
-    if (step === 'company') return !!draft.companyUrl.trim() || draft.websiteSkipped
+    if (step === 'company') return (!!draft.companyUrl.trim() && !platformHost(draft.companyUrl)) || draft.websiteSkipped
     if (step === 'industry') return !!draft.industry || !!draft.industryLabel.trim()
     if (step === 'role') return !!draft.position.trim()
     return !!draft.firstName.trim()
@@ -118,6 +118,25 @@ const SITE = /^(https?:\/\/)?[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}(\/.*)?$/i
 
 export function looksLikeSite(input: string): boolean {
     return SITE.test(input.trim())
+}
+
+// Platforms people type instead of their own site: reading one describes the platform, not them.
+// Every subdomain of these belongs to the platform itself (fr.linkedin.com, m.facebook.com).
+const PLATFORM_DOMAINS = ['linkedin.com', 'lnkd.in', 'facebook.com', 'fb.com', 'fb.me', 'instagram.com', 'x.com', 'twitter.com', 'tiktok.com', 'youtube.com', 'youtu.be', 'pinterest.com', 'threads.net', 'reddit.com', 'snapchat.com', 'whatsapp.com', 'wa.me', 'messenger.com', 't.me', 'telegram.org', 'discord.com', 'discord.gg', 'google.com', 'g.page', 'goo.gl']
+// Page hosts: only the bare domain is the platform, a subdomain (acme.wixsite.com) is someone's own site.
+const PAGE_HOSTS = new Set(['linktr.ee', 'wix.com', 'wixsite.com', 'squarespace.com', 'wordpress.com', 'blogspot.com', 'medium.com', 'substack.com', 'notion.site', 'carrd.co', 'github.io', 'shopify.com', 'myshopify.com'])
+
+/** The platform an address points at (`linkedin.com` for `https://www.linkedin.com/company/acme`), or `null` for a site of its own. */
+export function platformHost(input: string): string | null {
+    const host = input
+        .trim()
+        .toLowerCase()
+        .replace(/^https?:\/\//, '')
+        .split(/[/?#:]/)[0]
+        .replace(/^www\./, '')
+    if (!host) return null
+    if (PAGE_HOSTS.has(host)) return host
+    return PLATFORM_DOMAINS.find(domain => host === domain || host.endsWith(`.${domain}`)) ?? null
 }
 
 // How many coworkers the starter pack lets them pick: the ones a trial runs at once.

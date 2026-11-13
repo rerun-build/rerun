@@ -118,7 +118,8 @@
         },
         "settingUp": "Configuration de <highlight>{title}</highlight>",
         "website": {
-            "label": "Site de l'entreprise"
+            "label": "Site de l'entreprise",
+            "platform": "{domain} n'est pas le site de votre entreprise. Saisissez le vôtre, ou passez."
         },
         "industry": {
             "label": "Secteur",

@@ -1,4 +1,4 @@
-import { INTAKE_INDUSTRIES, rolesForIndustry } from '@rerun/contracts'
+import { INTAKE_INDUSTRIES, platformHost, rolesForIndustry } from '@rerun/contracts'
 import { useState } from 'react'
 import { ScrollView, TextInput, View } from 'react-native'
 import Animated, { FadeIn, useAnimatedStyle } from 'react-native-reanimated'
@@ -74,7 +74,8 @@ export function IntakeView({ intake }: { intake: IntakeController }) {
     const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value, insets.bottom) + spacing.md }))
     const { step, steps, index, draft, industry, deciding, submitting, saveFailed, canAdvance, last, set, choose, next, back, skipWebsite } = intake
     const industries = INTAKE_INDUSTRIES.map(option => ({ value: option.value, label: t(`intake.industries.${option.value}`) }))
-    const skippable = step === 'company' && !draft.companyUrl.trim()
+    // A platform (linkedin.com) does not answer the question either: the way on is the industry one.
+    const skippable = step === 'company' && (!draft.companyUrl.trim() || !!platformHost(draft.companyUrl))
     const roles = rolesForIndustry(industry)
 
     return (
