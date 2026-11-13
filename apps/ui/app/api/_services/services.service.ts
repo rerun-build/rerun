@@ -7,7 +7,7 @@ import { unbindAgent } from '@rerun/cloud/apps.server'
 import { isAppSlug, type AppSlug } from '@rerun/cloud/apps'
 import { isLifetimePlan } from '@rerun/cloud/billing'
 import { deleteConnectedAccount } from '@/lib/composio/client'
-import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
+import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { decompileMigrationCopy } from '@/lib/vault/copies'
@@ -704,10 +704,12 @@ export async function uninstallService(agentId: string, key: string, actor?: Act
     const entry = reg.services[key]
     // An entry shared with every coworker cannot be taken from one of them: it is changed in the Vault,
     // and saying it was uninstalled while the coworker keeps it would be a lie.
-    if (entry?.vaultItemId && !(await getVaultItem(conn, entry.vaultItemId)).agentIds.includes(engineAgentId)) throw new AccessDeniedError('vaultSharedItem')
+    if (entry?.vaultSharedWithAll) throw new AccessDeniedError('vaultSharedItem')
     if (entry) await decompileService(conn, engineAgentId, entry, { keepSkills: sharedSkillSlugs(reg, key) })
-    if (entry?.vaultItemId) await decompileMigrationCopy(conn, engineAgentId, key, entry, reg)
-    await removeRegistryEntry(conn, engineAgentId, key)
+    // An account the coworker connected itself under the entry's key is no copy: it keeps its place in
+    // the coworker's registry, and only the entry leaves.
+    if (entry?.vaultItemId && !(await decompileMigrationCopy(conn, engineAgentId, key, entry, reg))) await detachVaultItem(conn, entry.vaultItemId, engineAgentId)
+    else await removeRegistryEntry(conn, engineAgentId, key)
     if (entry?.app && isAppSlug(entry.app.appSlug)) {
         const supabase = createServiceRoleClient()
         const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })

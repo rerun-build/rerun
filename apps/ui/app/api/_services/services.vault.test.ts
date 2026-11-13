@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { compileService, decompileService } from '@/lib/services/compiler'
 import { type RegistryEntry, readOwnRegistry, readRegistry, removeRegistryEntry } from '@/lib/services/registry'
 import { compileIntoVault } from '@/lib/vault/install'
-import { createVaultItem, getVaultItem, patchVaultItem } from '@/lib/engine/vault-client'
+import { createVaultItem, detachVaultItem, getVaultItem, patchVaultItem } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
@@ -24,7 +24,7 @@ vi.mock('@/lib/vault/install', () => ({
 }))
 vi.mock('@/lib/vault/tokens', () => ({ deleteConnectorToken: vi.fn(async () => {}) }))
 vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(async () => true) }))
-vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(async () => ({ id: 'item-1', agentIds: ['engine-agent'] })), patchVaultItem: vi.fn(), createVaultItem: vi.fn() }))
+vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(async () => ({ id: 'item-1', agentIds: ['engine-agent'] })), patchVaultItem: vi.fn(), createVaultItem: vi.fn(), detachVaultItem: vi.fn() }))
 vi.mock('./vault.service', async () => ({
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
     vaultWritesEnabled: vi.fn(async () => true),
@@ -158,10 +158,29 @@ describe('uninstalling and resetting an entry the Vault lends', () => {
     })
 
     it('refuses to take an entry shared with everyone from one coworker, and changes nothing', async () => {
-        vi.mocked(readRegistry).mockResolvedValue({ services: { linear: entry({ vaultItemId: 'item-1' }) } })
-        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', agentIds: [], sharedWithAll: true } as never)
+        vi.mocked(readRegistry).mockResolvedValue({ services: { linear: entry({ vaultItemId: 'item-1', vaultSharedWithAll: true }) } })
         await expect(uninstallService('agent-1', 'linear')).rejects.toMatchObject({ code: 'vaultSharedItem' })
         expect(decompileService).not.toHaveBeenCalled()
+        expect(removeRegistryEntry).not.toHaveBeenCalled()
+    })
+
+    it("leaves a Composio account the coworker connected itself where it is, under an entry of another account", async () => {
+        const vaultEntry = entry({ vaultItemId: 'item-1', composio: { toolkit: 'linear', serverName: 'linear', connectedAccountId: 'ca-1' } })
+        const own = entry({ composio: { toolkit: 'linear', serverName: 'linear', connectedAccountId: 'ca-own' } })
+        vi.mocked(readRegistry).mockResolvedValue({ services: { linear: vaultEntry } })
+        vi.mocked(readOwnRegistry).mockResolvedValue({ services: { linear: own } })
+        await uninstallService('agent-1', 'linear')
+        expect(decompileService).toHaveBeenCalledTimes(1)
+        expect(vi.mocked(decompileService).mock.calls[0][2].vaultItemId).toBe('item-1')
+        expect(detachVaultItem).toHaveBeenCalledWith(expect.anything(), 'item-1', 'engine-agent')
+        expect(removeRegistryEntry).not.toHaveBeenCalled()
+    })
+
+    it('only detaches a coworker that holds no copy of the entry', async () => {
+        vi.mocked(readRegistry).mockResolvedValue({ services: { linear: entry({ vaultItemId: 'item-1' }) } })
+        vi.mocked(readOwnRegistry).mockResolvedValue({ services: {} })
+        await uninstallService('agent-1', 'linear')
+        expect(detachVaultItem).toHaveBeenCalledWith(expect.anything(), 'item-1', 'engine-agent')
         expect(removeRegistryEntry).not.toHaveBeenCalled()
     })
 

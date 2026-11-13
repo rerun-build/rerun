@@ -1,15 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { deleteConnectedAccount, getConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { readRegistry } from '@/lib/services/registry'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
-import { composioUserForKey, composioVaultUserId } from './composio'
+import { composioUserForKey, composioVaultUserId, revokeVaultComposioAccount } from './composio'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn() }))
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn() }))
+vi.mock('@/lib/composio/client', async importOriginal => ({
+    ...(await importOriginal<typeof import('@/lib/composio/client')>()),
+    getConnectedAccount: vi.fn(),
+    deleteConnectedAccount: vi.fn(async () => {}),
+}))
 
 const WORKSPACE_ID = 7
 const OWN_COWORKER = '11111111-1111-4111-8111-111111111111'
@@ -23,6 +29,7 @@ const AGENTS = [
 const conn = { baseUrl: 'https://engine.test', apiKey: null }
 const entry = { status: 'active' as const, config: {}, mcpServers: [], envKeys: [], skills: [], installedAt: '' }
 const gmail = (userId?: string) => ({ toolkit: 'gmail', serverName: 'gmail', ...(userId ? { userId } : {}) })
+const account = (userId: string) => ({ id: 'ca-1', userId, authConfigId: 'ac', status: 'ACTIVE', toolkit: 'gmail' })
 
 function eqValue(calls: readonly SupabaseCall[], column: string): unknown {
     return calls.find(call => call.method === 'eq' && call.args[0] === column)?.args[1]
@@ -96,5 +103,36 @@ describe('the Composio user of a connector', () => {
         expect(await composioUserForKey(conn, WORKSPACE_ID, 'e-1', 'agent-1', 'gmail')).toBe('local_agent_agent-1')
         expect(await composioUserForKey(conn, WORKSPACE_ID, 'e-1', 'agent-1', 'gmail@k3x9ab')).toBe('local_agent_agent-1_k3x9ab')
         expect(getVaultItem).not.toHaveBeenCalled()
+    })
+})
+
+describe('the Composio account of an entry that goes', () => {
+    it('is revoked, under the user the entry was connected with', async () => {
+        vi.mocked(getConnectedAccount).mockResolvedValue(account('local_vault_7_item-1'))
+        await revokeVaultComposioAccount(WORKSPACE_ID, { id: 'item-1', composio: { ...gmail(), connectedAccountId: 'ca-1' } })
+        expect(deleteConnectedAccount).toHaveBeenCalledWith('ca-1')
+
+        vi.mocked(deleteConnectedAccount).mockClear()
+        vi.mocked(getConnectedAccount).mockResolvedValue(account(`local_agent_${OWN_COWORKER}`))
+        await revokeVaultComposioAccount(WORKSPACE_ID, { id: 'item-1', composio: { ...gmail(`local_agent_${OWN_COWORKER}`), connectedAccountId: 'ca-1' } })
+        expect(deleteConnectedAccount).toHaveBeenCalledWith('ca-1')
+    })
+
+    it('asks Composio nothing for an entry that never connected one', async () => {
+        await revokeVaultComposioAccount(WORKSPACE_ID, { id: 'item-1' })
+        await revokeVaultComposioAccount(WORKSPACE_ID, { id: 'item-1', composio: gmail() })
+        expect(getConnectedAccount).not.toHaveBeenCalled()
+        expect(deleteConnectedAccount).not.toHaveBeenCalled()
+    })
+
+    it.each([
+        ['another entry', 'local_vault_7_item-2'],
+        ['another workspace', 'local_vault_99_item-1'],
+        ['a coworker', `local_agent_${OWN_COWORKER}`],
+    ])('is left alone when the box names the account of %s', async (_what, userId) => {
+        vi.mocked(getConnectedAccount).mockResolvedValue(account(userId))
+        await revokeVaultComposioAccount(WORKSPACE_ID, { id: 'item-1', composio: { ...gmail(), connectedAccountId: 'ca-1' } })
+        expect(deleteConnectedAccount).not.toHaveBeenCalled()
+        expect(console.warn).toHaveBeenCalled()
     })
 })

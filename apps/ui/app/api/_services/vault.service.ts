@@ -9,6 +9,7 @@ import { EngineRequestError, supportsVault } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, deleteVaultItem, deleteVaultToken, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { VAULT_RELEASED } from '@/lib/features'
+import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
 import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
 import { AppError } from '@/lib/i18n/action-error'
@@ -238,6 +239,7 @@ export async function deleteVaultEntry(itemId: string, actor?: Actor): Promise<{
     requireAdmin(ctx.actor)
     const item = await readItem(ctx, itemId)
     const { detached } = await deleteVaultItem(ctx.conn, itemId)
+    await revokeVaultComposioAccount(ctx.actor.workspaceId, item).catch(err => console.warn(`[vault] Composio account of entry ${itemId} left connected:`, err instanceof Error ? err.message : err))
     if (isRegistryItem(item)) for (const engineAgentId of detached) await dropMigrationCopy(ctx.conn, engineAgentId, vaultRegistryKey(item), item).catch(err => console.warn(`[vault] copy of ${engineAgentId} left in place:`, err instanceof Error ? err.message : err))
     return { detached: detached.flatMap(id => ctx.byEngineId.get(id) ?? []) }
 }

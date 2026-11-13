@@ -7,6 +7,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { vaultFlag } from '@/flags'
 import { findWorkspaceEngine } from './workspace-engine.service'
+import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
 import {
     VaultConflictError,
@@ -27,6 +28,7 @@ import {
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/vault/copies', () => ({ dropMigrationCopy: vi.fn(async () => {}) }))
+vi.mock('@/lib/vault/composio', () => ({ revokeVaultComposioAccount: vi.fn(async () => {}) }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/flags', () => ({ vaultFlag: vi.fn(async () => false) }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
@@ -204,6 +206,19 @@ describe('admin-only changes', () => {
         expect(await deleteVaultEntry('item-1', admin)).toEqual({ detached: [{ id: 'alice', engineAgentId: 'e-alice', name: 'Alice', spaceId: 'box-a' }] })
         await shareVaultEntry('item-1', true, admin)
         expect(patchVaultItem).toHaveBeenCalledWith(conn, 'item-1', { sharedWithAll: true })
+    })
+
+    it('revokes the Composio account of an entry it deletes, and deletes it even when Composio does not answer', async () => {
+        const connected = item({ composio: { toolkit: 'gmail', serverName: 'gmail', connectedAccountId: 'ca-1' } })
+        vi.mocked(getVaultItem).mockResolvedValue(connected as never)
+        vi.mocked(deleteVaultItem).mockResolvedValue({ deleted: 'item-1', detached: [] })
+        await deleteVaultEntry('item-1', admin)
+        expect(revokeVaultComposioAccount).toHaveBeenCalledWith(WORKSPACE, connected)
+
+        vi.spyOn(console, 'warn').mockImplementation(() => {})
+        vi.mocked(revokeVaultComposioAccount).mockRejectedValueOnce(new Error('Composio is down'))
+        expect(await deleteVaultEntry('item-1', admin)).toEqual({ detached: [] })
+        expect(deleteVaultItem).toHaveBeenCalledTimes(2)
     })
 
     it('never sends a paid app to everyone', async () => {

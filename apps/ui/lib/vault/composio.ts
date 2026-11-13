@@ -2,7 +2,7 @@ import 'server-only'
 
 import { isVaultItemId, parseServiceRegistryKey, type VaultItemSummary } from '@rerun/contracts'
 
-import { composioUserId, composioVaultOwnUserId, parseCoworkerComposioUserId } from '@/lib/composio/client'
+import { composioUserId, composioVaultOwnUserId, deleteConnectedAccount, getConnectedAccount, parseCoworkerComposioUserId } from '@/lib/composio/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { readRegistry } from '@/lib/services/registry'
@@ -25,6 +25,19 @@ export async function composioVaultUserId(workspaceId: number, item: Pick<VaultI
         console.warn(`[vault] entry ${item.id} of workspace ${workspaceId} names a Composio user outside it, using its own`)
     }
     return composioVaultOwnUserId(workspaceId, item.id)
+}
+
+// Once an entry is gone nothing names its account any more, so the grant is revoked with it. The
+// account id is the box's word too: only one living under the entry's own Composio user is deleted.
+export async function revokeVaultComposioAccount(workspaceId: number, item: Pick<VaultItemSummary, 'id' | 'composio'>): Promise<void> {
+    const connectedAccountId = item.composio?.connectedAccountId
+    if (!connectedAccountId) return
+    const [account, userId] = await Promise.all([getConnectedAccount(connectedAccountId), composioVaultUserId(workspaceId, item)])
+    if (account.userId !== userId) {
+        console.warn(`[vault] entry ${item.id} of workspace ${workspaceId} names a Composio account that is not its own, left as it is`)
+        return
+    }
+    await deleteConnectedAccount(connectedAccountId)
 }
 
 // The Composio user behind a coworker's connector key: the entry's when the Vault lends it, the
