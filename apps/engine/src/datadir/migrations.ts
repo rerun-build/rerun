@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { migrate } from '../db/migrate.js'
 import { latestVersion } from '../db/ladder.js'
 import { foldAgentKeysIntoConnections } from '../connections/migrate.js'
-import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir } from '../config/paths.js'
+import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir, vaultDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
 
 const isMissing = (err: unknown): boolean => (err as NodeJS.ErrnoException).code === 'ENOENT'
@@ -96,6 +96,17 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
                 }
                 await chmodRegular(mcp, 0o700, 'dir')
             }
+        },
+    },
+    {
+        // The workspace's Vault: accounts and secrets held once on the box and attached to the
+        // coworkers that use them. Created empty; an engine from before this step never reads it, so
+        // a rollback leaves every coworker on the connectors in its own folder.
+        version: 5,
+        id: 'vault',
+        up: async () => {
+            await mkdir(vaultDir(), { recursive: true, mode: 0o700 })
+            await chmodRegular(vaultDir(), 0o700, 'dir')
         },
     },
 ]

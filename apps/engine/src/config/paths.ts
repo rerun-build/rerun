@@ -55,6 +55,21 @@ export const connectionEnvPath = (id: string) => resolve(connectionDir(id), '.en
 // Written once the boot migration has folded every agent's provider keys into box connections.
 export const connectionsMigratedPath = () => resolve(connectionsDir(), '.migrated')
 
+// The workspace's Vault: one folder per item, holding what it is (`item.json`), its secrets (`.env`)
+// and its OAuth tokens (`tokens/<server>.json`). A sibling of `agents/`, so no archive of an agent
+// ever carries a piece of it.
+export const vaultDir = () => resolve(dataDir(), 'vault')
+
+export const vaultItemDir = (id: string) => resolve(vaultDir(), pathSegment(id, 'vault item id'))
+
+export const vaultItemPath = (id: string) => resolve(vaultItemDir(id), 'item.json')
+
+export const vaultItemEnvPath = (id: string) => resolve(vaultItemDir(id), '.env')
+
+export const vaultTokensDir = (id: string) => resolve(vaultItemDir(id), 'tokens')
+
+export const vaultTokenPath = (id: string, server: string) => resolve(vaultTokensDir(id), `${pathSegment(server, 'MCP server name')}.json`)
+
 // The connection and model an agent runs on when it has picked none. A sibling of the connection
 // folders rather than a flag inside each of them: `listConnectionIds` only walks directories, so
 // this file stays invisible to the listing.

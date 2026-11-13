@@ -6,10 +6,10 @@ const dataDir = mkdtempSync(resolve(tmpdir(), 'rerun-datadir-ladder-'))
 process.env.RERUN_DATA_DIR = dataDir
 
 const { beforeEach, describe, expect, it } = await import('vitest')
-const { chmod, mkdir, readFile, rm, stat, symlink, writeFile } = await import('node:fs/promises')
+const { chmod, mkdir, readFile, readdir, rm, stat, symlink, writeFile } = await import('node:fs/promises')
 const { existsSync } = await import('node:fs')
 const { RERUN_CONNECTION_ID } = await import('@rerun/contracts')
-const { agentEnvPath, agentDir, agentsDir, boxPlanPath, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpDir, mcpPackagesDir, mcpPendingPath, mcpTokenPath } = await import('../config/paths.js')
+const { agentEnvPath, agentDir, agentsDir, boxPlanPath, configPath, connectionsDir, connectionsMigratedPath, dataVersionPath, mcpDir, mcpPackagesDir, mcpPendingPath, mcpTokenPath, vaultDir } = await import('../config/paths.js')
 const { writeEnvFile, readEnvFile } = await import('../lib/env-file.js')
 const { raw } = await import('../db/client.js')
 const { buildCommit } = await import('../runtime/build-info.js')
@@ -185,7 +185,7 @@ describe('v3 to v4: secret-file-modes', () => {
         await legacyAgent('alpha')
         await writeDataVersion(3)
         await migrateDataDir()
-        expect(readDataVersion()).toBe(4)
+        expect(readDataVersion()).toBe(DATA_DIR_VERSION)
         expect(await mode(configPath('alpha'))).toBe(0o600)
         expect(await mode(mcpDir('alpha'))).toBe(0o700)
         expect(await mode(mcpTokenPath('alpha', 'srv'))).toBe(0o600)
@@ -229,6 +229,36 @@ describe('v3 to v4: secret-file-modes', () => {
     })
 })
 
+describe('v4 to v5: vault', () => {
+    const vaultStep = DATA_DIR_MIGRATIONS.find(s => s.id === 'vault')!
+    const mode = async (path: string) => (await stat(path)).mode & 0o777
+
+    beforeEach(async () => {
+        await rm(vaultDir(), { recursive: true, force: true })
+    })
+
+    it('creates an empty Vault closed to other users, from v4', async () => {
+        await mkdir(agentDir('alpha'), { recursive: true })
+        await writeFile(configPath('alpha'), '{}', 'utf8')
+        await writeDataVersion(4)
+        await migrateDataDir()
+        expect(readDataVersion()).toBe(5)
+        expect(await readdir(vaultDir())).toEqual([])
+        expect(await mode(vaultDir())).toBe(0o700)
+        expect(await readFile(configPath('alpha'), 'utf8')).toBe('{}')
+    })
+
+    it('keeps what a Vault already holds, closes a folder left open, and replays without harm', async () => {
+        await mkdir(resolve(vaultDir(), 'item1'), { recursive: true })
+        await chmod(vaultDir(), 0o755)
+        await writeFile(resolve(vaultDir(), 'item1', 'item.json'), '{"kind":"secret"}', 'utf8')
+        await vaultStep.up()
+        await vaultStep.up()
+        expect(await readFile(resolve(vaultDir(), 'item1', 'item.json'), 'utf8')).toBe('{"kind":"secret"}')
+        expect(await mode(vaultDir())).toBe(0o700)
+    })
+})
+
 // Append-only: a shipped step is never removed nor renamed, because a data-dir archived before it
 // still needs it. Updating this snapshot is the change to look at twice.
 describe('data-dir ladder', () => {
@@ -255,6 +285,10 @@ describe('data-dir ladder', () => {
             [
               4,
               "secret-file-modes",
+            ],
+            [
+              5,
+              "vault",
             ],
           ]
         `)

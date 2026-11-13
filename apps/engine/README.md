@@ -101,6 +101,9 @@ GET    /agents/:id/skills                    POST /agents/:id/skills
 GET    /agents/:id/skills/:slug              PATCH /agents/:id/skills/:slug
 GET    /agents/:id/files   /read   /raw       PUT /agents/:id/files   POST /raw /move /dir   DELETE   (private workspace)
 GET    /shared/files       /read   /raw       PUT /shared/files       POST /raw /move /dir   DELETE   (shared space)
+GET    /vault[?agent=:id]                    POST /vault        (the workspace's Vault: accounts and secrets)
+GET    /vault/:id   PATCH /vault/:id   DELETE /vault/:id   GET /vault/:id/usage
+PATCH  /vault/:id/env                        PUT|DELETE /vault/:id/agents/:agentId   PUT|DELETE /vault/:id/tokens/:server
 ```
 
 Create an agent:

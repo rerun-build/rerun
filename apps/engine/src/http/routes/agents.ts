@@ -27,6 +27,7 @@ import { finishTakeover } from '../../desktop/takeover.js'
 import { agentDir, configPath, installPath, soulPath } from '../../config/paths.js'
 import { agentToolCatalog } from '../../tools/catalog.js'
 import type { RunModel } from '../../agents/availability.js'
+import { forgetVaultAgent } from '../../vault/store.js'
 
 export const agentRoutes = new Hono()
 
@@ -226,6 +227,9 @@ agentRoutes.delete('/:id', async c => {
     unloadAgent(id)
     closeSystemDb(id)
     closeAgentDb(id)
+    // Before the folder goes: an agent id can come back (an import names its copy), and the coworker
+    // that gets it must never inherit the accounts of this one.
+    await forgetVaultAgent(id)
     await deleteAgentIndex(id)
     await rm(agentDir(id), { recursive: true, force: true })
     return c.json({ deleted: id })
