@@ -89,6 +89,13 @@ const config: Configuration = {
         icon: null,
         artifactName: `${identity.executableName}-\${version}-mac-\${arch}.\${ext}`,
         writeUpdateInfo: false,
+        // resources/background.png and its @2x are drawn around these two slots, in points (the window
+        // is 660x400, the size of the 1x image). Change them together with the dmg-background lab.
+        iconSize: 128,
+        contents: [
+            { x: 180, y: 200, type: 'file' },
+            { x: 480, y: 200, type: 'link', path: '/Applications' },
+        ],
     },
     win: {
         target: [{ target: 'nsis', arch: ['x64', 'arm64'] }],
