@@ -67,5 +67,11 @@ export function hubTools(ctx: RunContext): ToolSet {
             inputSchema: z.object({}),
             execute: () => call('list_published', {}),
         }),
+        rerun_hub_search_docs: tool({
+            description:
+                'Search the Rerun documentation (docs.rerun.build) for how Rerun works, its limits, pricing or API. Returns passages with their links: hand the user the one you used. Query in English keywords.',
+            inputSchema: z.object({ query: z.string().describe('e.g. "webhook trigger token"') }),
+            execute: ({ query }) => call('search_docs', { query }),
+        }),
     }
 }

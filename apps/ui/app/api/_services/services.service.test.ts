@@ -10,6 +10,7 @@ import { type RegistryEntry, type ServiceRegistry, readRegistry, removeRegistryE
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
+import { searchDocs } from '@/lib/foreman/search-docs'
 import { dispatchHubTool, getServiceDetails, installService, installedFromRegistry, listInstalledServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -43,6 +44,7 @@ vi.mock('@/app/api/_services/vault.service', async importOriginal => ({
 }))
 vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toVectorLiteral: vi.fn() }))
 vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
+vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 // The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
 // The lifetime plan only exists on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
@@ -395,5 +397,21 @@ describe('access level', () => {
         await dispatchHubTool('agent', 'service_list_installed', {}, 7)
 
         expect(resolveAgentTarget).toHaveBeenCalledWith('agent', { kind: 'workspace', workspaceId: 7 })
+    })
+})
+
+describe('search_docs', () => {
+    it('answers a coworker out of the Rerun documentation', async () => {
+        const answer = { documentation: 'https://docs.rerun.build', passages: [{ title: 'Triggers', url: 'https://docs.rerun.build/agents/triggers', text: 'A webhook trigger…' }] }
+        vi.mocked(searchDocs).mockResolvedValue(answer)
+
+        await expect(dispatchHubTool('agent', 'search_docs', { query: 'webhook trigger' }, 7)).resolves.toEqual(answer)
+        expect(searchDocs).toHaveBeenCalledWith('webhook trigger')
+        expect(resolveAgentTarget).not.toHaveBeenCalled()
+    })
+
+    it('refuses a search without a query', async () => {
+        await expect(dispatchHubTool('agent', 'search_docs', {}, 7)).rejects.toThrow('query')
+        expect(searchDocs).not.toHaveBeenCalled()
     })
 })

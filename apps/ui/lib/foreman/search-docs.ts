@@ -11,7 +11,7 @@ const PASSAGE_CHARS = 1600
 
 export type DocsSection = { page: string; heading: string | null; url: string; body: string }
 
-export type ForemanDocsResult = {
+export type DocsSearchResult = {
     documentation: string
     passages: { title: string; url: string; text: string }[]
     pages?: { title: string; url: string }[]
@@ -135,7 +135,7 @@ function sectionTitle(section: DocsSection): string {
  * Answers a question about Rerun itself out of the public documentation. Never throws: a
  * documentation the app cannot reach right now still has a home page worth handing to the user.
  */
-export async function searchForemanDocs(query: string): Promise<ForemanDocsResult> {
+export async function searchDocs(query: string): Promise<DocsSearchResult> {
     const documentation = docsUrl()
 
     let sections: DocsSection[]

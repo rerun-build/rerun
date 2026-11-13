@@ -62,6 +62,29 @@ describe('company brain section', () => {
     })
 })
 
+describe('Rerun documentation section', () => {
+    const docsOf = (prompt: string) => prompt.slice(prompt.indexOf('<rerun_docs>'), prompt.indexOf('</rerun_docs>'))
+
+    it('sends a question about Rerun to the documentation, with the link and never from memory', async () => {
+        const docs = docsOf(await buildSystemPrompt(agentWith({ hub: true, web: true }), { source: 'chat' }))
+        expect(docs).toContain('call rerun_hub_search_docs and give the user the link')
+        expect(docs).toContain('Never answer one of those from memory')
+        expect(docs).toContain('web_fetch on its docs.rerun.build link')
+    })
+
+    it('does not point at web_fetch when the web tools are off', async () => {
+        const docs = docsOf(await buildSystemPrompt(agentWith({ hub: true, web: false }), { source: 'chat' }))
+        expect(docs).toContain('rerun_hub_search_docs')
+        expect(docs).not.toContain('web_fetch')
+    })
+
+    it('leaves the section out when the hub tools are off', async () => {
+        const prompt = await buildSystemPrompt(agentWith({ hub: false }), { source: 'chat' })
+        expect(prompt).not.toContain('<rerun_docs>')
+        expect(prompt).not.toContain('rerun_hub_search_docs')
+    })
+})
+
 describe('operating notes', () => {
     it('checks what a site or a file holds at the source before stating it', async () => {
         const prompt = await buildSystemPrompt(agent, { source: 'chat' })

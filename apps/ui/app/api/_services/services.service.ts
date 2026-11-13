@@ -22,6 +22,7 @@ import { embedText, toVectorLiteral } from '@/lib/services/embed'
 import { type AuthMethod, type ServiceManifest, defaultMethod, getMethod, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema } from '@/lib/services/manifest'
 import { instanceServerName, newServiceInstanceId, ordinalInstanceLabel } from '@/lib/services/instances'
 import { isPublishedAccess } from '@/lib/published/access'
+import { searchDocs } from '@/lib/foreman/search-docs'
 import { listPublished, publishWithThumbnail, unpublishFile } from '@/lib/services/publish-thumbnail'
 import {
     type ServiceRegistry,
@@ -773,6 +774,8 @@ export async function dispatchHubTool(agentId: string, name: string, args: Recor
         // public URL. No DB read: the caller already proved it owns this agent's engine.
         case 'trigger_url':
             return { url: await triggerWebhookUrl(agentId, requireString(args.slug, 'slug'), requireString(args.token, 'token')) }
+        case 'search_docs':
+            return searchDocs(requireString(args.query, 'query'))
         default:
             throw new Error(`Unknown Hub tool: ${name}`)
     }

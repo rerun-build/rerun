@@ -201,6 +201,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     open_brain_page: BrainIcon,
     read_attachment: FileSearchIcon,
     search_docs: BookOpenIcon,
+    rerun_hub_search_docs: BookOpenIcon,
     analyze_website: GlobeIcon,
     save_profile: UsersIcon,
     save_needs: UsersIcon,

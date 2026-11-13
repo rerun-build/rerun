@@ -13,7 +13,7 @@ const LABELLED_TOOLS = [
     'skill_delete_file', 'skill_create', 'skill_import', 'skill_edit', 'skill_update', 'skill_delete', 'skill_propose', 'soul_update',
     'verbosity_set', 'tool_install', 'mcp_register', 'mcp_login', 'mcp_login_complete', 'mcp_status', 'card_table', 'card_file', 'image_generation', 'table_view_save',
     'table_view_delete', 'rerun_hub_service_search', 'rerun_hub_service_details', 'rerun_hub_service_install', 'rerun_hub_service_list_installed',
-    'rerun_hub_service_uninstall', 'rerun_hub_publish_file', 'rerun_hub_unpublish_file', 'rerun_hub_list_published', 'task_complete', 'list_spaces',
+    'rerun_hub_service_uninstall', 'rerun_hub_publish_file', 'rerun_hub_unpublish_file', 'rerun_hub_list_published', 'rerun_hub_search_docs', 'task_complete', 'list_spaces',
     'list_agents', 'get_agent', 'create_agent', 'update_agent', 'delete_agent', 'list_ai_connections', 'set_default_model', 'list_skills',
     'get_skill', 'upsert_skill', 'delete_skill', 'list_schedules', 'upsert_schedule', 'run_schedule_now', 'delete_schedule', 'list_runs', 'get_run',
     'search_connectors', 'list_agent_connectors', 'attach_connector', 'detach_connector', 'send_message', 'create_boxes', 'build_team', 'write_agent',
@@ -32,7 +32,7 @@ const ACTIVE_TOOLS = [
     'leads_email_find', 'leads_email_verify', 'leads_phone_find', 'google_serp', 'google_maps_search', 'download', 'memory_write', 'memory_recall',
     'brain_search', 'brain_read', 'brain_propose', 'brain_write', 'vision_analyze', 'image_generation', 'delegate_tasks', 'call_agent', 'team_status', 'team_list_runs',
     'team_get_run', 'ai_status', 'skill_read', 'skill_read_file', 'skill_create', 'skill_edit', 'skill_update', 'rerun_hub_service_search',
-    'rerun_hub_service_install', 'list_agents', 'create_agent', 'update_agent', 'send_message', 'build_team', 'search_docs', 'analyze_website',
+    'rerun_hub_service_install', 'list_agents', 'create_agent', 'update_agent', 'send_message', 'build_team', 'search_docs', 'rerun_hub_search_docs', 'analyze_website',
     'list_templates', 'propose_plan', 'install_template',
 ] as const
 

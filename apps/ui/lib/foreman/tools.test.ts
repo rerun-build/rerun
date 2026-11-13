@@ -4,7 +4,7 @@ import type { ForemanState } from './phase'
 
 vi.mock('server-only', () => ({}))
 vi.mock('./onboarding-tools', () => ({ dispatchOnboardingTool: vi.fn() }))
-vi.mock('./search-docs', () => ({ searchForemanDocs: vi.fn() }))
+vi.mock('./search-docs', () => ({ searchDocs: vi.fn() }))
 
 const { foremanActiveTools } = await import('./tools')
 

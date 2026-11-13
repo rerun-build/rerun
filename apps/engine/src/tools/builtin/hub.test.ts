@@ -44,6 +44,7 @@ describe('hubTools', () => {
         ],
         ['rerun_hub_unpublish_file', { slug: 'report' }, 'unpublish_file', { path: undefined, slug: 'report' }],
         ['rerun_hub_list_published', {}, 'list_published', {}],
+        ['rerun_hub_search_docs', { query: 'webhook trigger token' }, 'search_docs', { query: 'webhook trigger token' }],
     ])('%s calls the hub tool with its arguments', async (name, args, hubTool, hubArgs) => {
         expect(await run(name, args)).toEqual({ tool: hubTool })
         expect(calls).toEqual([{ agentId: 'hub-agent', tool: hubTool, args: hubArgs, timeoutMs: undefined }])
@@ -59,7 +60,7 @@ describe('hubTools', () => {
         expect(calls[0]).toMatchObject({ tool: 'service_uninstall', args: { slug: 'stripe' } })
     })
 
-    it('exposes exactly the catalog and publishing tools', () => {
+    it('exposes exactly the catalog, publishing and documentation tools', () => {
         expect(Object.keys(tools)).toEqual([
             'rerun_hub_service_search',
             'rerun_hub_service_details',
@@ -69,6 +70,7 @@ describe('hubTools', () => {
             'rerun_hub_publish_file',
             'rerun_hub_unpublish_file',
             'rerun_hub_list_published',
+            'rerun_hub_search_docs',
         ])
     })
 })

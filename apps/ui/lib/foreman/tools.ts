@@ -7,7 +7,7 @@ import { requireString } from '@/lib/mcp/args'
 import { dispatchOnboardingTool } from './onboarding-tools'
 import { phaseSpec, phaseTools, pinnedPlanBoxes, planKinds } from './phases'
 import { isMobileApp, type ForemanState } from './phase'
-import { searchForemanDocs } from './search-docs'
+import { searchDocs } from './search-docs'
 import type { ForemanTurn } from './turn'
 import { FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_DOCS_TOOL_DEFS, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_TOOL_NAMES, FOREMAN_WIDGET_TOOL_DEFS, showPlanDef, showTemplatesDef, type ForemanToolDef } from './tool-defs'
 
@@ -62,7 +62,7 @@ export function foremanTools({ ctx, turn }: ForemanContext): ToolSet {
         belt[def.name] = run ? tool({ ...base, execute: run }) : tool(base)
     }
 
-    for (const def of FOREMAN_DOCS_TOOL_DEFS) declare(def, args => searchForemanDocs(requireString(args.query, 'query')))
+    for (const def of FOREMAN_DOCS_TOOL_DEFS) declare(def, args => searchDocs(requireString(args.query, 'query')))
     for (const def of FOREMAN_ONBOARDING_TOOL_DEFS.filter(onBelt)) declare(def, args => dispatchOnboardingTool(ctx, def.name, args))
     // No execute: the browser resolves these and answers with addToolResult. The client tools
     // answer by themselves, the widgets wait for the user.

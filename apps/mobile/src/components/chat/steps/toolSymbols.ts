@@ -133,6 +133,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     open_brain_page: 'brain',
     read_attachment: 'file-search',
     search_docs: 'book',
+    rerun_hub_search_docs: 'book',
     analyze_website: 'globe',
     save_profile: 'users',
     save_needs: 'users',
