@@ -242,7 +242,7 @@ describe('v4 to v5: vault', () => {
         await writeFile(configPath('alpha'), '{}', 'utf8')
         await writeDataVersion(4)
         await migrateDataDir()
-        expect(readDataVersion()).toBe(5)
+        expect(readDataVersion()).toBe(DATA_DIR_VERSION)
         expect(await readdir(vaultDir())).toEqual([])
         expect(await mode(vaultDir())).toBe(0o700)
         expect(await readFile(configPath('alpha'), 'utf8')).toBe('{}')
@@ -289,6 +289,10 @@ describe('data-dir ladder', () => {
             [
               5,
               "vault",
+            ],
+            [
+              6,
+              "vault-adopt",
             ],
           ]
         `)

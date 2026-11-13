@@ -41,7 +41,7 @@ describe('runDataDirChecks', () => {
         const report = await runDataDirChecks()
 
         expect(failing(report)).toEqual([])
-        expect(report).toMatchObject({ ok: true, dataVersion: 5, dataVersionTarget: 5, agentIds: ['alpha'] })
+        expect(report).toMatchObject({ ok: true, dataVersion: 6, dataVersionTarget: 6, agentIds: ['alpha'] })
     })
 
     it('flags a data-dir the ladder has not reached', async () => {
@@ -106,6 +106,6 @@ describe('GET /doctor', () => {
     it('returns the report', async () => {
         const res = await app.request('/doctor', { headers: { Authorization: 'Bearer secret' } })
         expect(res.status).toBe(200)
-        expect(await res.json()).toMatchObject({ ok: true, dataVersion: 5 })
+        expect(await res.json()).toMatchObject({ ok: true, dataVersion: 6 })
     })
 })

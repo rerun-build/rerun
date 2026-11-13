@@ -10,6 +10,7 @@ import { deleteConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem, patchVaultItem, createVaultItem } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
+import { decompileMigrationCopy } from '@/lib/vault/copies'
 import { assertCanChangeItem, rethrowConflict, vaultContext, vaultWritesEnabled, type VaultContext } from '@/app/api/_services/vault.service'
 import { AccessDeniedError } from '@/app/api/_auth/access'
 import { supportsVault } from '@/lib/engine/client'
@@ -25,7 +26,6 @@ import {
     type ServiceRegistry,
     entriesOfSlug,
     primaryStatusOfSlug,
-    readOwnRegistry,
     readRegistry,
     registryFootprint,
     removeRegistryEntry,
@@ -667,14 +667,7 @@ export async function uninstallService(agentId: string, key: string, actor?: Act
     // and saying it was uninstalled while the coworker keeps it would be a lie.
     if (entry?.vaultItemId && !(await getVaultItem(conn, entry.vaultItemId)).agentIds.includes(engineAgentId)) throw new AccessDeniedError('vaultSharedItem')
     if (entry) await decompileService(conn, engineAgentId, entry, { keepSkills: sharedSkillSlugs(reg, key) })
-    // The copy of the same account a migration left in the coworker's folder goes too: the Vault hid
-    // it, and detaching the item would otherwise bring it back.
-    const ownCopy = entry?.vaultItemId ? (await readOwnRegistry(conn, engineAgentId)).services[key] : undefined
-    if (ownCopy) {
-        // The item kept the Composio account the coworker connected: it is not the copy's to revoke.
-        const composio = ownCopy.composio && ownCopy.composio.connectedAccountId === entry?.composio?.connectedAccountId ? { ...ownCopy.composio, connectedAccountId: undefined } : ownCopy.composio
-        await decompileService(conn, engineAgentId, { ...ownCopy, ...(composio ? { composio } : {}) }, { keepSkills: sharedSkillSlugs(reg, key) })
-    }
+    if (entry?.vaultItemId) await decompileMigrationCopy(conn, engineAgentId, key, entry, reg)
     await removeRegistryEntry(conn, engineAgentId, key)
     if (entry?.app && isAppSlug(entry.app.appSlug)) {
         const supabase = createServiceRoleClient()

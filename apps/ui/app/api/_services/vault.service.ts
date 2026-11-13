@@ -9,6 +9,8 @@ import { EngineRequestError, supportsVault } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, deleteVaultItem, deleteVaultToken, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { VAULT_RELEASED } from '@/lib/features'
+import { dropMigrationCopy } from '@/lib/vault/copies'
+import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
 import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll } from '@/supabase/supabase-helpers'
@@ -160,9 +162,19 @@ export type VaultListing = {
     isAdmin: boolean
 }
 
+// The box names an app it moved into the Vault on its own by its slug: it has no catalog to read.
+async function withCatalogNames(items: VaultItemSummary[]): Promise<VaultItemSummary[]> {
+    const bare = (item: VaultItemSummary) => item.kind === 'service' && !!item.slug && item.name === item.slug
+    const slugs = [...new Set(items.filter(bare).map(item => item.slug as string))]
+    if (slugs.length === 0) return items
+    const { data } = await selectAll(createServiceRoleClient(), 'services', ['slug', 'name'] as const, { slug: slugs })
+    const names = new Map((data ?? []).map(row => [row.slug, row.name]))
+    return items.map(item => (bare(item) && names.get(item.slug as string) ? { ...item, name: names.get(item.slug as string) as string } : item))
+}
+
 export async function listVault(actor?: Actor): Promise<VaultListing> {
     const ctx = await vaultContext(actor)
-    const [items, visible, manageable] = await Promise.all([listVaultItems(ctx.conn), visibleSpaceIds(ctx.actor), manageableSpaceIds(ctx.actor)])
+    const [items, visible, manageable] = await Promise.all([listVaultItems(ctx.conn).then(withCatalogNames), visibleSpaceIds(ctx.actor), manageableSpaceIds(ctx.actor)])
     const sees = (c: VaultCoworker) => visible === 'all' || visible.has(c.spaceId)
     const manages = (c: VaultCoworker) => manageable === 'all' || manageable.has(c.spaceId)
     const entries = await Promise.all(
@@ -190,8 +202,10 @@ export async function attachVaultEntry(itemId: string, agentId: string, actor?: 
 export async function detachVaultEntry(itemId: string, agentId: string, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
     const coworker = await assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === agentId))
-    await readItem(ctx, itemId)
-    return detachVaultItem(ctx.conn, itemId, coworker.engineAgentId)
+    const item = await readItem(ctx, itemId)
+    const detached = await detachVaultItem(ctx.conn, itemId, coworker.engineAgentId)
+    if (isRegistryItem(item) && !detached.sharedWithAll) await dropMigrationCopy(ctx.conn, coworker.engineAgentId, vaultRegistryKey(item), item)
+    return detached
 }
 
 export async function shareVaultEntry(itemId: string, sharedWithAll: boolean, actor?: Actor): Promise<VaultItemSummary> {
@@ -222,8 +236,9 @@ export async function vaultEntryUsage(itemId: string, actor?: Actor): Promise<{ 
 export async function deleteVaultEntry(itemId: string, actor?: Actor): Promise<{ detached: VaultCoworker[] }> {
     const ctx = await vaultContext(actor)
     requireAdmin(ctx.actor)
-    await readItem(ctx, itemId)
+    const item = await readItem(ctx, itemId)
     const { detached } = await deleteVaultItem(ctx.conn, itemId)
+    if (isRegistryItem(item)) for (const engineAgentId of detached) await dropMigrationCopy(ctx.conn, engineAgentId, vaultRegistryKey(item), item).catch(err => console.warn(`[vault] copy of ${engineAgentId} left in place:`, err instanceof Error ? err.message : err))
     return { detached: detached.flatMap(id => ctx.byEngineId.get(id) ?? []) }
 }
 
@@ -272,7 +287,7 @@ export async function coworkerVault(agentId: string, actor?: Actor): Promise<Cow
     const { agent, access } = await assertAgentAccess(agentId, 'use', resolved)
     const engine = await findWorkspaceEngine(resolved.workspaceId)
     if (!engine || !agent.engine_agent_id || !(await supportsVault(engine.conn))) return null
-    const items = await listVaultItems(engine.conn)
+    const items = await withCatalogNames(await listVaultItems(engine.conn))
     const holds = (item: VaultItemSummary) => item.sharedWithAll || item.agentIds.includes(agent.engine_agent_id as string)
     return {
         attached: items.filter(item => holds(item) && item.kind !== 'service'),

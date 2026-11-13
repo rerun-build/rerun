@@ -10,6 +10,9 @@ import { listAgentIdsOnDisk, readAgentConfig } from '../agents/loader.js'
 import { connectionExists, listConnectionIds, loadConnectionFromDisk } from '../connections/loader.js'
 import { DATA_DIR_VERSION } from './migrations.js'
 import { readDataVersion } from './version.js'
+import { listVaultItems } from '../vault/store.js'
+import { readAdopted } from '../vault/adopted.js'
+import { adoptionSkipReason, heldAlready, readOwnRegistryEntries } from '../vault/adopt.js'
 
 async function check(name: string, run: () => Promise<string | undefined>): Promise<EngineDoctorCheck> {
     try {
@@ -79,6 +82,23 @@ export async function runDataDirChecks(): Promise<EngineDoctor> {
             for (const id of ids) await loadConnectionFromDisk(id).catch(() => unreadable.push(id))
             failIf([...(connectionExists(RERUN_CONNECTION_ID) ? [] : ['the Rerun connection is missing']), ...(unreadable.length ? [`unreadable: ${unreadable.join(', ')}`] : [])])
             return `${ids.length} connection(s)`
+        }),
+        // Informative only: a restore is refused on any failed check, and neither a stale id nor a
+        // connector waiting for the next boot keeps a coworker from running.
+        await check('vault', async () => {
+            const items = await listVaultItems()
+            const onDisk = new Set(await listAgentIdsOnDisk())
+            const stale = [...new Set(items.flatMap(item => item.config.agentIds.filter(id => !onDisk.has(id))))]
+            const adopted = readAdopted()
+            const waiting: string[] = []
+            for (const id of onDisk) {
+                const entries = await readOwnRegistryEntries(id)
+                for (const [key, entry] of Object.entries(entries)) {
+                    if (adoptionSkipReason(entry) || adopted.agents[id]?.[key]) continue
+                    if (!heldAlready(items, id, key)) waiting.push(`${id}:${key}`)
+                }
+            }
+            return [`${items.length} item(s)`, ...(stale.length ? [`attached to coworkers gone: ${stale.join(', ')}`] : []), ...(waiting.length ? [`not in the Vault yet: ${waiting.join(', ')}`] : [])].join('; ')
         }),
         await check('shared-db', async () => {
             if (!sharedDbExists()) return 'not created yet'

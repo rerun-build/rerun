@@ -6,6 +6,7 @@ import { latestVersion } from '../db/ladder.js'
 import { foldAgentKeysIntoConnections } from '../connections/migrate.js'
 import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir, vaultDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
+import { adoptConnectors } from '../vault/adopt.js'
 
 const isMissing = (err: unknown): boolean => (err as NodeJS.ErrnoException).code === 'ENOENT'
 
@@ -107,6 +108,18 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
         up: async () => {
             await mkdir(vaultDir(), { recursive: true, mode: 0o700 })
             await chmodRegular(vaultDir(), 0o700, 'dir')
+        },
+    },
+    {
+        // Every catalog app a coworker installed in its own folder becomes an item of the Vault
+        // attached to it, its keys and tokens copied. Nothing is removed from the coworker's folder:
+        // an engine from before the Vault, put back in place, finds every account where it left it.
+        // The boot of the engine runs the same adoption again for what was written there since.
+        version: 6,
+        id: 'vault-adopt',
+        up: async () => {
+            await mkdir(vaultDir(), { recursive: true, mode: 0o700 })
+            await adoptConnectors()
         },
     },
 ]

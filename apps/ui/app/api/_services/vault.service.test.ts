@@ -7,6 +7,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { vaultFlag } from '@/flags'
 import { findWorkspaceEngine } from './workspace-engine.service'
+import { dropMigrationCopy } from '@/lib/vault/copies'
 import {
     VaultConflictError,
     VaultUnavailableError,
@@ -25,6 +26,7 @@ import {
 } from './vault.service'
 
 vi.mock('server-only', () => ({}))
+vi.mock('@/lib/vault/copies', () => ({ dropMigrationCopy: vi.fn(async () => {}) }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/flags', () => ({ vaultFlag: vi.fn(async () => false) }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
@@ -106,6 +108,7 @@ beforeEach(() => {
             }
             if (table === 'spaces' && filterValue(calls, 'id')) return { data: SPACES.find(space => space.id === filterValue(calls, 'id')) ?? null }
             if (table === 'spaces') return { data: SPACES }
+            if (table === 'services') return { data: [{ slug: 'linear', name: 'Linear' }] }
             if (table === 'space_members') {
                 const userId = filterValue(calls, 'user_id') as string
                 const spaceId = filterValue(calls, 'space_id') as string | undefined
@@ -298,5 +301,28 @@ describe("a coworker's side of the Vault", () => {
         vi.mocked(supportsVault).mockResolvedValue(false)
         expect(await coworkerVault('alice', admin)).toBeNull()
         await expect(coworkerVault('carol', user)).rejects.toMatchObject({ code: 'coworkerNotFound' })
+    })
+})
+
+describe('an app the box moved into the Vault on its own', () => {
+    it('shows under its catalog name, never its slug', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([item({ slug: 'linear', name: 'linear' }), item({ id: 'item-2', slug: 'linear', name: 'Team Linear' })] as never)
+        expect((await listVault(admin)).entries.map(entry => entry.name)).toEqual(['Linear', 'Team Linear'])
+    })
+
+    it('takes the copy left in a coworker folder with it, on a detach and on a delete', async () => {
+        await detachVaultEntry('item-1', 'alice', admin)
+        expect(dropMigrationCopy).toHaveBeenCalledWith(conn, 'e-alice', 'gmail', expect.objectContaining({ id: 'item-1' }))
+
+        vi.mocked(dropMigrationCopy).mockClear()
+        vi.mocked(deleteVaultItem).mockResolvedValue({ deleted: 'item-1', detached: ['e-alice', 'e-carol'] } as never)
+        await deleteVaultEntry('item-1', admin)
+        expect(vi.mocked(dropMigrationCopy).mock.calls.map(call => call[1])).toEqual(['e-alice', 'e-carol'])
+    })
+
+    it('leaves the copy of a coworker that still gets the entry through everyone', async () => {
+        vi.mocked(detachVaultItem).mockResolvedValue({ id: 'item-1', sharedWithAll: true } as never)
+        await detachVaultEntry('item-1', 'alice', admin)
+        expect(dropMigrationCopy).not.toHaveBeenCalled()
     })
 })
