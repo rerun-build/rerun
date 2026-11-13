@@ -17,6 +17,11 @@ const state = vi.hoisted(() => ({
     drivingAfterTyped: null as number | null,
     drivingForPolls: 0,
     parkLongSleeps: false,
+    vaultEnv: {} as Record<string, string>,
+}))
+
+vi.mock('../../vault/runtime.js', () => ({
+    vaultEnvFor: () => state.vaultEnv,
 }))
 
 vi.mock('node:timers/promises', () => ({
@@ -93,8 +98,8 @@ const { agentsOnScreen, computerTools, offersComputer } = await import('./comput
 type Built = ReturnType<typeof computerTools>
 const open: Built[] = []
 
-function ctxWith(id = 'a1', tools: Record<string, boolean> = {}, extra: Record<string, unknown> = {}) {
-    return { agent: { id, config: agentConfigSchema.parse({ name: 'x', tools: { computer: true, ...tools } }) }, sessionId: 's', ...extra } as any
+function ctxWith(id = 'a1', tools: Record<string, boolean> = {}, extra: Record<string, unknown> = {}, env: Record<string, string> = {}) {
+    return { agent: { id, env, config: agentConfigSchema.parse({ name: 'x', tools: { computer: true, ...tools } }) }, sessionId: 's', ...extra } as any
 }
 
 function build(ctx: any): Built {
@@ -119,6 +124,7 @@ beforeEach(() => {
     state.drivingForPolls = 0
     state.openBrowser = false
     state.parkLongSleeps = false
+    state.vaultEnv = {}
 })
 
 afterEach(() => {
@@ -311,6 +317,51 @@ describe('computer', () => {
         state.calls.length = 0
         state.drivingAfterTyped = 1
         expect(await settled(act(built, { action: 'type', text }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('driving your screen') })
+        expect(state.calls).toHaveLength(1)
+    })
+
+    it('types a coworker variable into the page without the value entering the tool call or its result', async () => {
+        const built = build(ctxWith('a1', {}, {}, { ATLANTIC_TOKEN: '839201' }))
+        const result = await settled(act(built, { action: 'type', secret: 'ATLANTIC_TOKEN' }))
+        expect(result.status).toBe('done')
+        expect(state.calls).toEqual([['type', '839201']])
+        expect(JSON.stringify(result)).not.toContain('839201')
+    })
+
+    it('types a variable the Vault gives the coworker the same way', async () => {
+        state.vaultEnv = { BANK_PASSWORD: 'vault-value' }
+        const built = build(ctxWith('a1', {}, {}, { BANK_PASSWORD: 'stale-value' }))
+        expect((await settled(act(built, { action: 'type', secret: 'BANK_PASSWORD' }))).status).toBe('done')
+        expect(state.calls).toEqual([['type', 'vault-value']])
+    })
+
+    it('reads a variable written as ${KEY} like its bare name', async () => {
+        const built = build(ctxWith('a1', {}, {}, { ATLANTIC_TOKEN: '839201' }))
+        expect((await settled(act(built, { action: 'type', secret: '${ATLANTIC_TOKEN}' }))).status).toBe('done')
+        expect(state.calls).toEqual([['type', '839201']])
+    })
+
+    it('refuses a variable that was never filled and points to request_secret', async () => {
+        const built = build(ctxWith('a1', {}, {}, { EMPTY_TOKEN: '' }))
+        for (const secret of ['MISSING_TOKEN', 'EMPTY_TOKEN']) {
+            expect(await settled(act(built, { action: 'type', secret }))).toEqual({ status: 'refused', reason: expect.stringMatching(new RegExp(`${secret}.*request_secret`)) })
+        }
+        expect(state.calls).toEqual([])
+    })
+
+    it('refuses text and secret together instead of guessing which one to type', async () => {
+        const built = build(ctxWith('a1', {}, {}, { ATLANTIC_TOKEN: '839201' }))
+        expect(await settled(act(built, { action: 'type', text: 'hello', secret: 'ATLANTIC_TOKEN' }))).toEqual({ status: 'refused', reason: 'type takes text or secret, not both.' })
+        expect(state.calls).toEqual([])
+    })
+
+    it('types a long secret in pieces and stops where a person takes the screen', async () => {
+        const built = build(ctxWith('a1', {}, {}, { LONG_SECRET: 'y'.repeat(100) }))
+        expect((await settled(act(built, { action: 'type', secret: 'LONG_SECRET' }))).status).toBe('done')
+        expect(state.calls.map(([, chunk]) => (chunk as string).length)).toEqual([40, 40, 20])
+        state.calls.length = 0
+        state.drivingAfterTyped = 1
+        expect(await settled(act(built, { action: 'type', secret: 'LONG_SECRET' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('driving your screen') })
         expect(state.calls).toHaveLength(1)
     })
 

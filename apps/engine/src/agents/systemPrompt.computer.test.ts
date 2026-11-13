@@ -57,6 +57,30 @@ describe('computer section', () => {
         expect(section).not.toContain('request_takeover')
     })
 
+    it('asks for a code a site wants through the masked form and types it as a secret, keeping the takeover for what only a person can do', async () => {
+        const prompt = await buildSystemPrompt(agentWith({ computer: true, requestSecret: true }), { source: 'chat' })
+        const section = prompt.slice(prompt.indexOf('<computer>'), prompt.indexOf('</computer>'))
+        expect(section).toContain('request_secret')
+        expect(section).toContain('secret set to its variable name')
+        expect(section).toContain('never repeat it')
+        expect(section).toContain('A one-time code works once')
+        expect(section).toContain('request_takeover')
+        expect(prompt).toContain("or type them into a page with the computer tool's secret")
+    })
+
+    it('keeps handing a code to the user when the agent cannot ask for a secret', async () => {
+        const prompt = await buildSystemPrompt(agentWith({ computer: true, requestSecret: false }), { source: 'chat' })
+        const section = prompt.slice(prompt.indexOf('<computer>'), prompt.indexOf('</computer>'))
+        expect(section).not.toContain('request_secret')
+        expect(section).toContain('a sign-in, a captcha or a code, hand the browser to the user with request_takeover')
+    })
+
+    it('says nothing of typing a secret into a page to an agent with no computer', async () => {
+        const prompt = await buildSystemPrompt(agentWith({ computer: false, requestSecret: true }), { source: 'chat' })
+        expect(prompt).toContain('request_secret')
+        expect(prompt).not.toContain("computer tool's secret")
+    })
+
     it('offers to finish on the site a job that ends there, an application rather than an email, and waits for the go-ahead to submit', async () => {
         const prompt = await buildSystemPrompt(agentWith({ computer: true }), { source: 'chat' })
         const section = prompt.slice(prompt.indexOf('<computer>'), prompt.indexOf('</computer>'))

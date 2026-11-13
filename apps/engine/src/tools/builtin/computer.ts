@@ -18,6 +18,7 @@ import type { RunContext } from '../../runtime/context.js'
 import { newId } from '../../lib/ids.js'
 import { createScreenshotStore } from '../../runtime/screenshots.js'
 import { publicHttpUrl } from '../url.js'
+import { agentVariables } from '../../agents/process-env.js'
 
 const ACTIONS = ['screenshot', 'left_click', 'right_click', 'double_click', 'mouse_move', 'left_click_drag', 'scroll', 'type', 'key', 'wait'] as const
 type Action = (typeof ACTIONS)[number]
@@ -40,6 +41,7 @@ const computerInput = z.object({
     coordinate: coordinate.optional().describe('[x, y] in pixels of the latest screenshot, from its top-left corner.'),
     start_coordinate: coordinate.optional().describe('[x, y] where a left_click_drag starts.'),
     text: z.string().optional().describe('The text to type, or for key the keys to press: "Return", "Escape", "ctrl+a", "shift+Tab". Several presses are separated by a space.'),
+    secret: z.string().min(1).optional().describe('For type, instead of text: a variable whose value is typed unseen.'),
     scroll_direction: z.enum(['up', 'down', 'left', 'right']).optional(),
     scroll_amount: z.number().int().min(1).max(30).optional(),
     duration: z.number().min(0).max(10).optional().describe('Seconds to wait, for the wait action.'),
@@ -124,7 +126,21 @@ function need<T>(value: T | undefined, field: string, action: Action): T {
     return value
 }
 
-async function perform(agentId: string, control: ScreenControl, input: ComputerInput, signal: AbortSignal | undefined): Promise<void> {
+// A model taught to write `${KEY}` elsewhere may pass the variable that way here too.
+function secretValue(agent: RunContext['agent'], name: string): string {
+    const key = name.replace(/^\$\{(.+)\}$/, '$1')
+    const value = agentVariables(agent)[key]
+    if (!value) throw new ControlRefusal(`${key} has no value. Ask the user for it with request_secret, then type it.`)
+    return value
+}
+
+function textToType(agent: RunContext['agent'], input: ComputerInput): string {
+    if (input.secret === undefined) return need(input.text, 'text', input.action)
+    if (input.text !== undefined) throw new ControlRefusal('type takes text or secret, not both.')
+    return secretValue(agent, input.secret)
+}
+
+async function perform(agent: RunContext['agent'], control: ScreenControl, input: ComputerInput, signal: AbortSignal | undefined): Promise<void> {
     const at = () => need(input.coordinate, 'coordinate', input.action) as [number, number]
     switch (input.action) {
         case 'screenshot':
@@ -142,7 +158,7 @@ async function perform(agentId: string, control: ScreenControl, input: ComputerI
         case 'scroll':
             return scroll(control, at(), need(input.scroll_direction, 'scroll_direction', input.action), input.scroll_amount ?? DEFAULT_SCROLL_AMOUNT)
         case 'type':
-            return typeUnlessDriven(agentId, control, need(input.text, 'text', input.action), signal)
+            return typeUnlessDriven(agent.id, control, textToType(agent, input), signal)
         case 'key':
             return pressKeys(control, need(input.text, 'text', input.action))
         case 'wait':
@@ -238,7 +254,7 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
             computer: tool({
                 description: COMPUTER_DESCRIPTION,
                 inputSchema: computerInput,
-                execute: (input, { abortSignal }) => onScreen(abortSignal, input.action === 'screenshot' || input.action === 'wait' ? 0 : SETTLE_MS, (control, signal) => perform(id, control, input, signal)),
+                execute: (input, { abortSignal }) => onScreen(abortSignal, input.action === 'screenshot' || input.action === 'wait' ? 0 : SETTLE_MS, (control, signal) => perform(ctx.agent, control, input, signal)),
             }),
             computer_open_app: tool({
                 description: OPEN_APP_DESCRIPTION,
