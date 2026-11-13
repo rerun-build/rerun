@@ -4,7 +4,9 @@
         "row.usedBy": "{names} is a comma-separated list of coworker names.",
         "row.usedByMore": "{names} is a comma-separated list of coworker names, {count} how many more there are.",
         "detail.hiddenCoworkers": "Coworkers that sit in Boxes the reader cannot see.",
-        "delete.loses": "{names} is a comma-separated list of coworker names."
+        "delete.loses": "{names} is a comma-separated list of coworker names.",
+        "addSecret.variable": "The environment variable name a coworker reads the secret under, like STRIPE_API_KEY.",
+        "addMcp.header": "An HTTP header name, like Authorization."
     },
     "title": "Vault",
     "description": "Sign in to an app once, then pick the coworkers that use it.",
@@ -55,10 +57,31 @@
         "paidAppEveryone": "A paid app is attached coworker by coworker"
     },
     "addPage": {
-        "title": "Add an app",
-        "search": "Search apps"
+        "title": "Add to the Vault",
+        "search": "Search apps",
+        "mcp": "MCP server",
+        "secret": "Secret"
     },
     "errors": {
         "changeFailed": "Couldn't save the change"
+    },
+    "addSecret": {
+        "name": "Name",
+        "namePlaceholder": "Stripe live key",
+        "variable": "Variable",
+        "variableHint": "Coworkers read it under this name.",
+        "variableInvalid": "Letters, digits and underscores, not starting with a digit",
+        "value": "Value",
+        "valueHint": "It is never shown again.",
+        "add": "Add secret"
+    },
+    "addMcp": {
+        "name": "Name",
+        "namePlaceholder": "Company docs",
+        "target": "Address or command",
+        "targetHint": "An https address, or the command the machine starts.",
+        "header": "Header",
+        "headerValue": "Value",
+        "add": "Add server"
     }
 }

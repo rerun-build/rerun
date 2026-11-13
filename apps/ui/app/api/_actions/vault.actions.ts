@@ -2,7 +2,7 @@
 
 import type { VaultItemSummary } from '@rerun/contracts'
 
-import { addVaultService, reconfigureVaultService, vaultCatalog, type AddVaultServiceInput, type VaultAddResult, type VaultCatalogApp } from '@/app/api/_services/vault-install.service'
+import { addVaultMcp, addVaultSecret, addVaultService, reconfigureVaultService, vaultCatalog, type AddVaultMcpInput, type AddVaultSecretInput, type AddVaultServiceInput, type VaultAddResult, type VaultCatalogApp } from '@/app/api/_services/vault-install.service'
 import { requireLightSessionActor } from '@/app/api/_auth/access'
 import {
     attachVaultEntry,
@@ -93,4 +93,12 @@ export async function coworkerVaultAction(agentId: string): Promise<CoworkerVaul
     } catch {
         return null
     }
+}
+
+export async function addVaultSecretAction(input: AddVaultSecretInput): Promise<Result<VaultItemSummary>> {
+    return attempt(() => addVaultSecret(input))
+}
+
+export async function addVaultMcpAction(input: AddVaultMcpInput): Promise<Result<VaultItemSummary>> {
+    return attempt(() => addVaultMcp(input))
 }

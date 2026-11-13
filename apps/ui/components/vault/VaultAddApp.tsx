@@ -18,23 +18,52 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useErrorText } from '@/hooks/useErrorText'
 import { ChevronRightIcon, SearchIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
+import { Segmented } from '@/components/ui/segmented'
 import { vaultSetupDriver } from './vault-setup-driver'
+import { VaultAddMcp, VaultAddSecret } from './VaultAddOther'
+
+type AddKind = 'app' | 'mcp' | 'secret'
 
 const SEARCH_DELAY_MS = 250
 
 // Adding an app to the Vault: pick it in the catalog, then sign in or type its key once. Who uses it is
 // picked next, on the entry itself.
 export function VaultAddApp({ listing, onBack, onAdded }: { listing: VaultListing; onBack: () => void; onAdded: (itemId: string) => Promise<void> }) {
+    const t = useTranslations('vault')
     const [picked, setPicked] = useState<VaultCatalogApp | null>(null)
+    const [kind, setKind] = useState<AddKind>('app')
 
     return (
         <PanelSteps stepKey={picked?.slug ?? 'catalog'} depth={picked ? 1 : 0}>
-            {picked ? <VaultAppSetup app={picked} listing={listing} onBack={() => setPicked(null)} onAdded={onAdded} /> : <VaultCatalog onBack={onBack} onPick={setPicked} />}
+            {picked ? (
+                <VaultAppSetup app={picked} listing={listing} onBack={() => setPicked(null)} onAdded={onAdded} />
+            ) : (
+                <div className="flex h-full flex-col">
+                    <PanelEditorHeader title={t('addPage.title')} onBack={onBack} />
+                    <div className="border-b px-3 pt-3">
+                        <Segmented
+                            className="mb-3 w-full"
+                            value={kind}
+                            onChange={setKind}
+                            options={[
+                                { value: 'app', label: t('groups.apps') },
+                                { value: 'mcp', label: t('addPage.mcp') },
+                                { value: 'secret', label: t('addPage.secret') },
+                            ]}
+                        />
+                    </div>
+                    {kind === 'app' ? (
+                        <VaultCatalog onPick={setPicked} />
+                    ) : (
+                        <PanelScroller className="p-4">{kind === 'mcp' ? <VaultAddMcp onAdded={onAdded} /> : <VaultAddSecret onAdded={onAdded} />}</PanelScroller>
+                    )}
+                </div>
+            )}
         </PanelSteps>
     )
 }
 
-function VaultCatalog({ onBack, onPick }: { onBack: () => void; onPick: (app: VaultCatalogApp) => void }) {
+function VaultCatalog({ onPick }: { onPick: (app: VaultCatalogApp) => void }) {
     const t = useTranslations('vault')
     const errorText = useErrorText()
     const [query, setQuery] = useState('')
@@ -61,8 +90,7 @@ function VaultCatalog({ onBack, onPick }: { onBack: () => void; onPick: (app: Va
     }, [query, errorText])
 
     return (
-        <div className="flex h-full flex-col">
-            <PanelEditorHeader title={t('addPage.title')} onBack={onBack} />
+        <div className="flex min-h-0 flex-1 flex-col">
             <div className="border-b p-3">
                 <div className="relative">
                     <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />

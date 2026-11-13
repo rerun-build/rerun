@@ -48,10 +48,31 @@
         "paidAppEveryone": "Une app payante s'attache coworker par coworker"
     },
     "addPage": {
-        "title": "Ajouter une app",
-        "search": "Rechercher une app"
+        "title": "Ajouter au Vault",
+        "search": "Rechercher une app",
+        "mcp": "Serveur MCP",
+        "secret": "Secret"
     },
     "errors": {
         "changeFailed": "La modification n'a pas pu être enregistrée"
+    },
+    "addSecret": {
+        "name": "Nom",
+        "namePlaceholder": "Clé Stripe live",
+        "variable": "Variable",
+        "variableHint": "Les coworkers la lisent sous ce nom.",
+        "variableInvalid": "Lettres, chiffres et underscores, sans commencer par un chiffre",
+        "value": "Valeur",
+        "valueHint": "Elle n'est plus jamais affichée.",
+        "add": "Ajouter le secret"
+    },
+    "addMcp": {
+        "name": "Nom",
+        "namePlaceholder": "Docs de l'entreprise",
+        "target": "Adresse ou commande",
+        "targetHint": "Une adresse https, ou la commande que la machine lance.",
+        "header": "En-tête",
+        "headerValue": "Valeur",
+        "add": "Ajouter le serveur"
     }
 }

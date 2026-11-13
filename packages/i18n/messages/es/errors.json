@@ -449,5 +449,6 @@
     "vaultPaidAppEveryone": "Una app de pago se conecta coworker por coworker",
     "vaultMethodUnsupported": "Esta app todavía no se puede añadir al Vault. Conéctala desde la pestaña Apps de un coworker.",
     "vaultConflictEveryone": "Cada coworker ya recibe {name} de otra entrada del Vault compartida con todos",
-    "vaultConflictSomeone": "Un coworker ya recibe {name} de otra entrada del Vault"
+    "vaultConflictSomeone": "Un coworker ya recibe {name} de otra entrada del Vault",
+    "vaultMcpTarget": "Dale al servidor una dirección o un comando"
 }

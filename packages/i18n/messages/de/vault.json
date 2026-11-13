@@ -48,10 +48,31 @@
         "paidAppEveryone": "Eine kostenpflichtige App wird Coworker für Coworker verbunden"
     },
     "addPage": {
-        "title": "App hinzufügen",
-        "search": "Apps suchen"
+        "title": "Zum Vault hinzufügen",
+        "search": "Apps suchen",
+        "mcp": "MCP-Server",
+        "secret": "Secret"
     },
     "errors": {
         "changeFailed": "Die Änderung konnte nicht gespeichert werden"
+    },
+    "addSecret": {
+        "name": "Name",
+        "namePlaceholder": "Stripe-Live-Schlüssel",
+        "variable": "Variable",
+        "variableHint": "Coworker lesen es unter diesem Namen.",
+        "variableInvalid": "Buchstaben, Ziffern und Unterstriche, nicht mit einer Ziffer beginnend",
+        "value": "Wert",
+        "valueHint": "Er wird nie wieder angezeigt.",
+        "add": "Secret hinzufügen"
+    },
+    "addMcp": {
+        "name": "Name",
+        "namePlaceholder": "Firmendokumentation",
+        "target": "Adresse oder Befehl",
+        "targetHint": "Eine https-Adresse oder der Befehl, den die Maschine startet.",
+        "header": "Header",
+        "headerValue": "Wert",
+        "add": "Server hinzufügen"
     }
 }

@@ -6,6 +6,7 @@ import { AccessDeniedError, type Actor } from '@/app/api/_auth/access'
 import { attachVaultItem, createVaultItem, getVaultItem, listVaultItems } from '@/lib/engine/vault-client'
 import { getMethod, missingRequiredInputs, serviceManifestSchema } from '@/lib/services/manifest'
 import { sanitizeIlike } from '@/lib/search/ilike'
+import { slugify } from '@/lib/slugify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { newServiceInstanceId } from '@/lib/services/instances'
@@ -106,4 +107,79 @@ export async function vaultCatalog(query?: string): Promise<VaultCatalogApp[]> {
         if (authMethods.length === 0) return []
         return [{ slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: parsed.data.multiInstance, authMethods }]
     })
+}
+
+export type AddVaultSecretInput = { name: string; key: string; value: string; agentIds?: string[] }
+
+// A free secret: one variable, read by the attached coworkers in their shell and in any `${VAR}`
+// of their own servers. Its value is never shown again.
+export async function addVaultSecret(input: AddVaultSecretInput, actor?: Actor): Promise<VaultItemSummary> {
+    const ctx = await vaultContext(actor)
+    await assertCanAdd(ctx.actor)
+    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
+    const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
+    return rethrowConflict(ctx, () =>
+        createVaultItem(ctx.conn, {
+            kind: 'secret',
+            name: input.name,
+            env: { [input.key.trim()]: input.value },
+            agentIds: coworkers.map(c => c.engineAgentId),
+            createdBy,
+        }),
+    )
+}
+
+export type AddVaultMcpInput = {
+    name: string
+    // A remote server, or a command the box starts.
+    url?: string
+    command?: string
+    args?: string[]
+    // Headers whose values are secrets: kept in the entry's `.env`, the server only names them.
+    headers?: Array<{ name: string; value: string }>
+    agentIds?: string[]
+}
+
+const SERVER_NAME_MAX = 64
+
+// The server name the model sees its tools under: `<name>_<tool>`.
+export function vaultServerName(name: string): string {
+    return slugify(name, { maxLength: SERVER_NAME_MAX }) || 'mcp'
+}
+
+function headerVariable(server: string, header: string): string {
+    return `VAULT_${server}_${header}`.toUpperCase().replace(/[^A-Z0-9_]/g, '_').slice(0, 120)
+}
+
+// A custom MCP server: its secret headers go to the entry's `.env`, and a remote one with no key of
+// its own is offered a browser sign-in, which the server may or may not ask for.
+export async function addVaultMcp(input: AddVaultMcpInput, actor?: Actor): Promise<VaultItemSummary> {
+    const ctx = await vaultContext(actor)
+    await assertCanAdd(ctx.actor)
+    const coworkers = await Promise.all((input.agentIds ?? []).map(id => assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === id))))
+    const url = input.url?.trim()
+    const command = input.command?.trim()
+    if (!url === !command) throw new AccessDeniedError('vaultMcpTarget')
+    const serverName = vaultServerName(input.name)
+    const env: Record<string, string> = {}
+    const headers: Record<string, string> = {}
+    for (const { name, value } of input.headers ?? []) {
+        if (!name.trim() || !value) continue
+        const variable = headerVariable(serverName, name)
+        env[variable] = value
+        headers[name.trim()] = `\${${variable}}`
+    }
+    const server = { name: serverName, ...(url ? { url } : { command, args: input.args ?? [] }), headers }
+    const createdBy = ctx.actor.kind === 'user' ? ctx.actor.userId : null
+    return rethrowConflict(ctx, () =>
+        createVaultItem(ctx.conn, {
+            kind: 'mcp',
+            name: input.name,
+            mcpServers: [server],
+            ...(url && Object.keys(headers).length === 0 ? { oauth: { serverName, url } } : {}),
+            env,
+            agentIds: coworkers.map(c => c.engineAgentId),
+            createdBy,
+        }),
+    )
 }
