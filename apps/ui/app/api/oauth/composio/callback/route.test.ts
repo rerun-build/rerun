@@ -1,14 +1,19 @@
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
 import { type ComposioConnectedAccount, getConnectedAccount } from '@/lib/composio/client'
+import { getVaultItem } from '@/lib/engine/vault-client'
+import { readRegistry } from '@/lib/services/registry'
 import { type ComposioOAuthContext, encodeComposioContext } from '@/lib/composio/oauth'
 import { mintCallbackGrant } from '@/lib/oauth/mobile-ticket'
 import { parkSignIn } from '@/lib/oauth/pending-grant'
 import { serviceManifestSchema } from '@/lib/services/manifest'
+import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { fakeSupabase } from '@/test/supabase-fake'
 import { cookies } from 'next/headers'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { GET } from './route'
 
 vi.mock('next/headers', () => ({ cookies: vi.fn() }))
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_auth/access', () => ({ requireAgentWorkspaceId: vi.fn(async () => 7), workspaceActor: (workspaceId: number) => ({ kind: 'workspace', workspaceId }) }))
 vi.mock('@/app/api/_services/services.service', () => ({ markComposioAuthorized: vi.fn(), loadManifest: vi.fn() }))
 vi.mock('@/lib/oauth/pending-grant', () => ({ parkSignIn: vi.fn() }))
@@ -63,6 +68,8 @@ beforeEach(() => {
     vi.mocked(cookies).mockResolvedValue({ get: (name: string) => (jar[name] === undefined ? undefined : { name, value: jar[name] }) } as never)
     vi.mocked(getConnectedAccount).mockResolvedValue(ACTIVE)
     vi.mocked(loadManifest).mockResolvedValue(MANIFEST)
+    vi.mocked(readRegistry).mockResolvedValue({ services: {} })
+    vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase().client)
 })
 
 afterEach(() => {
@@ -245,6 +252,35 @@ describe('GET /api/oauth/composio/callback', () => {
         expect(await res.text()).toContain('Connection mismatch, please retry')
         expect(markComposioAuthorized).not.toHaveBeenCalled()
         expect(deletesStateCookie(res)).toBe(true)
+    })
+
+    describe('for an account the Vault lends', () => {
+        const FOREIGN_USER = 'local_agent_99999999-9999-4999-8999-999999999999'
+        const lent = { status: 'active' as const, config: {}, mcpServers: [], envKeys: [], skills: [], installedAt: '', vaultItemId: 'item-1' }
+
+        beforeEach(() => {
+            vi.mocked(readRegistry).mockResolvedValue({ services: { gmail: lent } })
+            vi.mocked(getVaultItem).mockResolvedValue({ id: 'item-1', composio: { toolkit: 'gmail', serverName: 'gmail', userId: FOREIGN_USER } } as never)
+            withContext(CONTEXT)
+        })
+
+        it("accepts the account connected under the entry's own user of the workspace", async () => {
+            vi.mocked(getConnectedAccount).mockResolvedValue({ ...ACTIVE, userId: 'local_vault_7_item-1' })
+
+            const res = await callback({ state: STATE, status: 'success' })
+
+            expect(await res.text()).toContain('composio-oauth-success')
+            expect(markComposioAuthorized).toHaveBeenCalledOnce()
+        })
+
+        it('refuses an account connected under the user the box names, when it is not of the workspace', async () => {
+            vi.mocked(getConnectedAccount).mockResolvedValue({ ...ACTIVE, userId: FOREIGN_USER })
+
+            const res = await callback({ state: STATE, status: 'success' })
+
+            expect(await res.text()).toContain('Connection mismatch, please retry')
+            expect(markComposioAuthorized).not.toHaveBeenCalled()
+        })
     })
 
     it('refuses a slug whose manifest has no Composio connection', async () => {

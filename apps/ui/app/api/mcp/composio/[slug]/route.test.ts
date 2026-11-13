@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { ComposioApiError, composioUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
+import { ComposioApiError, composioUserId, composioVaultOwnUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
 import { readRegistry, type RegistryEntry, upsertRegistryEntry } from '@/lib/services/registry'
 import type { EngineConnection } from '@/lib/engine/types'
 import { serviceManifestSchema } from '@/lib/services/manifest'
@@ -21,9 +21,14 @@ vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOrig
 const BOX_KEY = 'box-key-of-workspace-7'
 const WORKSPACE_ID = 7
 
+const MIGRATED_COWORKER = '11111111-1111-4111-8111-111111111111'
+const FOREIGN_COWORKER = '99999999-9999-4999-8999-999999999999'
+
 const AGENTS = [
     { id: 'agent-own', workspace_id: WORKSPACE_ID, engine_agent_id: 'engine-own' },
     { id: 'agent-foreign', workspace_id: 99, engine_agent_id: 'engine-foreign' },
+    { id: MIGRATED_COWORKER, workspace_id: WORKSPACE_ID, engine_agent_id: 'engine-migrated' },
+    { id: FOREIGN_COWORKER, workspace_id: 99, engine_agent_id: 'engine-foreign-migrated' },
 ]
 
 const manifest = serviceManifestSchema.parse({
@@ -38,7 +43,8 @@ function eqValue(calls: readonly SupabaseCall[], column: string): unknown {
 
 function resolve(table: string, calls: readonly SupabaseCall[]) {
     if (table !== 'agents') return undefined
-    const match = AGENTS.find(agent => agent.workspace_id === eqValue(calls, 'workspace_id') && agent.engine_agent_id === eqValue(calls, 'engine_agent_id'))
+    const id = eqValue(calls, 'id')
+    const match = AGENTS.find(agent => agent.workspace_id === eqValue(calls, 'workspace_id') && (id === undefined ? agent.engine_agent_id === eqValue(calls, 'engine_agent_id') : agent.id === id))
     return { data: match ? { id: match.id } : null }
 }
 
@@ -242,13 +248,25 @@ describe('POST /api/mcp/composio/[slug]', () => {
         it("acts as the entry's own Composio account", async () => {
             vi.mocked(getVaultItem).mockResolvedValue(entry() as never)
             await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())
-            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', 'local_vault_item-1', { to: 'a@b.c' })
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioVaultOwnUserId(WORKSPACE_ID, 'item-1'), { to: 'a@b.c' })
+            expect(composioVaultOwnUserId(WORKSPACE_ID, 'item-1')).toContain(`_vault_${WORKSPACE_ID}_`)
         })
 
-        it('keeps the account a migrated entry was connected with', async () => {
-            vi.mocked(getVaultItem).mockResolvedValue(entry({ composio: { toolkit: 'gmail', serverName: 'gmail', userId: composioUserId('agent-own') } }) as never)
+        it('keeps the account a migrated entry was connected with, when its coworker is of the workspace', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry({ composio: { toolkit: 'gmail', serverName: 'gmail', userId: composioUserId(MIGRATED_COWORKER) } }) as never)
             await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())
-            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioUserId('agent-own'), { to: 'a@b.c' })
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioUserId(MIGRATED_COWORKER), { to: 'a@b.c' })
+        })
+
+        it.each([
+            ['a coworker of another workspace', composioUserId(FOREIGN_COWORKER)],
+            ['an entry of another workspace', composioVaultOwnUserId(99, 'item-9')],
+            ['a coworker in another namespace', `prod_agent_${MIGRATED_COWORKER}`],
+        ])("acts as the entry's own account when the box names %s", async (_what, userId) => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry({ composio: { toolkit: 'gmail', serverName: 'gmail', userId } }) as never)
+            await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())
+            expect(executeTool).toHaveBeenCalledTimes(1)
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioVaultOwnUserId(WORKSPACE_ID, 'item-1'), { to: 'a@b.c' })
         })
 
         it('serves a coworker holding the entry through everyone, and refuses one that does not hold it', async () => {

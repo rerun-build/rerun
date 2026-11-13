@@ -10,6 +10,10 @@
 // 'prod' so forgetting it can only isolate, never collide.
 // An extra account of an app (registry key `<slug>@<instanceId>`) gets its own user_id, suffixed
 // with the instance id, so Composio holds one connected account per instance.
+// A Vault entry connected in the Vault gets `<namespace>_vault_<workspaces.id>_<itemId>`: the box
+// names its entries, so the workspace the hub authenticated is what keeps two of them apart.
+
+import { SERVICE_INSTANCE_ID_RE } from '@rerun/contracts'
 
 const COMPOSIO_API_BASE = 'https://backend.composio.dev/api/v3.1'
 
@@ -24,9 +28,30 @@ export class ComposioApiError extends Error {
     }
 }
 
+function composioUserNamespace(): string {
+    return process.env.COMPOSIO_USER_NAMESPACE || 'local'
+}
+
 export function composioUserId(agentId: string, instanceId?: string): string {
-    const base = `${process.env.COMPOSIO_USER_NAMESPACE || 'local'}_agent_${agentId}`
+    const base = `${composioUserNamespace()}_agent_${agentId}`
     return instanceId ? `${base}_${instanceId}` : base
+}
+
+export function composioVaultOwnUserId(workspaceId: number, itemId: string): string {
+    return `${composioUserNamespace()}_vault_${workspaceId}_${itemId}`
+}
+
+const COWORKER_USER_ID_RE = /^(.+)_agent_([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:_(.+))?$/
+
+// The coworker a user_id names, read back from `composioUserId`'s own form only, and only in this
+// server's namespace: a staging box must never name a `prod_` user.
+export function parseCoworkerComposioUserId(userId: string): { agentId: string; instanceId?: string } | null {
+    const match = COWORKER_USER_ID_RE.exec(userId)
+    if (!match) return null
+    const [, namespace, agentId, instanceId] = match
+    if (namespace !== composioUserNamespace()) return null
+    if (instanceId !== undefined && !SERVICE_INSTANCE_ID_RE.test(instanceId)) return null
+    return instanceId ? { agentId, instanceId } : { agentId }
 }
 
 export function composioConfigured(): boolean {

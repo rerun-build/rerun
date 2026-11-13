@@ -1,5 +1,9 @@
 import { getServiceDetails, loadManifest } from '@/app/api/_services/services.service'
-import { composioUserId, initiateConnectedAccount } from '@/lib/composio/client'
+import { composioUserId, composioVaultOwnUserId, initiateConnectedAccount } from '@/lib/composio/client'
+import { getVaultItem } from '@/lib/engine/vault-client'
+import { readRegistry } from '@/lib/services/registry'
+import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { fakeSupabase } from '@/test/supabase-fake'
 import { decodeComposioContext } from '@/lib/composio/oauth'
 import { decodeContext } from '@/lib/mcp-oauth'
 import { mintConnectTicket } from '@/lib/oauth/mobile-ticket'
@@ -13,6 +17,7 @@ vi.mock('@/app/api/_services/services.service', () => ({ getServiceDetails: vi.f
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' })) }))
 vi.mock('@/lib/services/registry', () => ({ readRegistry: vi.fn(async () => ({ services: {} })) }))
 vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn() }))
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/composio/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/composio/client')>()), composioConfigured: () => true, initiateConnectedAccount: vi.fn() }))
 vi.mock('@/lib/mcp-oauth', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/mcp-oauth')>()),
@@ -85,5 +90,15 @@ describe('GET /api/oauth/mobile/start, for an extra account of a Composio app', 
         const ctx = decodeComposioContext(cookie.value)
         expect(ctx).toMatchObject({ agentId: 'agent-1', key: KEY, serverName: 'gmail-k3x9ab' })
         expect(ctx).not.toHaveProperty('userId')
+    })
+
+    it("connects an account the Vault lends as the entry's own user of the workspace, whatever user the box names", async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase().client)
+        vi.mocked(readRegistry).mockResolvedValueOnce({ services: { [KEY]: { status: 'needs_auth', config: {}, mcpServers: [], envKeys: [], skills: [], installedAt: '', vaultItemId: 'item-1' } } })
+        vi.mocked(getVaultItem).mockResolvedValueOnce({ id: 'item-1', composio: { toolkit: 'gmail', serverName: 'gmail-k3x9ab', userId: composioUserId('99999999-9999-4999-8999-999999999999') } } as never)
+
+        await open(mintConnectTicket({ agentId: 'agent-1', key: KEY, workspaceId: 7, userId: 'user-1' }))
+
+        expect(initiateConnectedAccount).toHaveBeenLastCalledWith(composioVaultOwnUserId(7, 'item-1'), 'ac_1', expect.any(String))
     })
 })

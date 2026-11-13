@@ -96,7 +96,7 @@ export async function GET(req: Request) {
 
             const state = createComposioState()
             const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
-            const userId = await composioUserForKey(conn, engineAgentId, agentId, key)
+            const userId = await composioUserForKey(conn, workspaceId, engineAgentId, agentId, key)
             const { connectedAccountId, redirectUrl } = await initiateConnectedAccount(userId, method.composio.authConfigId, composioCallbackUrl(req, state))
             const ctx: ComposioOAuthContext = { agentId, key, toolkit: method.composio.toolkit, serverName: details.composio.serverName, connectedAccountId, mobileGrant }
             return redirect(redirectUrl, { name: COMPOSIO_COOKIE_PREFIX + state, value: encodeComposioContext(ctx), path: COMPOSIO_COOKIE_PATH })

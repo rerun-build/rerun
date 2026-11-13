@@ -79,7 +79,7 @@ export async function GET(req: Request) {
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
         const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, actor, 'manage')
-        const userId = await composioUserForKey(conn, engineAgentId, ctx.agentId, ctx.key)
+        const userId = await composioUserForKey(conn, workspaceId, engineAgentId, ctx.agentId, ctx.key)
         const method = (await loadManifest(ctx.key))?.authMethods.find(m => m.kind === 'composio' && m.composio)
         if (!method?.composio) return finish({ ok: false, error: `${ctx.key} has no Composio connection to set up.` })
         const authConfigId = method.composio.authConfigId

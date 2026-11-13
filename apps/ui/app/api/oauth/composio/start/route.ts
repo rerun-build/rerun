@@ -38,7 +38,7 @@ export async function POST(req: Request) {
         }
 
         const state = createComposioState()
-        const userId = await composioUserForKey(conn, engineAgentId, agentId, key)
+        const userId = await composioUserForKey(conn, actor.workspaceId, engineAgentId, agentId, key)
         const { connectedAccountId, redirectUrl } = await initiateConnectedAccount(userId, method.composio.authConfigId, composioCallbackUrl(req, state))
 
         const ctx: ComposioOAuthContext = {

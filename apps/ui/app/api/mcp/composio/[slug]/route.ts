@@ -165,7 +165,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
             vaultItem = await vaultEntryFor(engine.workspaceId, vaultItemId, engineAgentId, toolkit)
             if (!vaultItem) return rpcError(id, -32603, 'This coworker does not hold that Vault entry')
         }
-        const userId = vaultItem ? composioVaultUserId(vaultItem) : composioUserId(agent.id, instanceId)
+        const userId = vaultItem ? await composioVaultUserId(engine.workspaceId, vaultItem) : composioUserId(agent.id, instanceId)
 
         try {
             const out = await executeTool(name, userId, args)
