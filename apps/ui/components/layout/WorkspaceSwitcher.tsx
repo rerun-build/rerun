@@ -28,7 +28,7 @@ import { HelpButton } from '@/components/layout/HelpButton'
 import { WeeklyRewindMenuItem, WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
 import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from '@/components/layout/WorkspacePowerControl'
 import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
-import { Badge, Stripes } from '@rerun/ui/primitives'
+import { Badge, Stripes, useIsMobile } from '@rerun/ui/primitives'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
@@ -44,7 +44,7 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, ChevronDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, ChevronDownIcon, ChevronsUpDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import Link from 'next/link'
@@ -128,6 +128,9 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     useEffect(refreshVaultSignedOut, [refreshVaultSignedOut])
     const guided = useForemanStore(state => state.funnel === 'guided')
     const credit = useRerunCredit()
+    // A list beside the menu has no room on a phone: there the header unfolds it in place instead.
+    const isMobile = useIsMobile()
+    const [switching, setSwitching] = useState(false)
 
     // An app joins the Apps section of the menu with its first account: counted on mount and again
     // each time a dialog connects or removes one.
@@ -185,6 +188,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
         setEntering(false)
     }
 
+    const listInPlace = isMobile && switching
     const trialing = workspace.subscription_status === 'trialing'
     const showCredit = !workspace.is_sandbox && credit.budgetMicros > 0 && workspace.subscription_status !== 'past_due'
 
@@ -202,38 +206,86 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
         </AdminOnly>
     )
 
+    const workspacesSection = (
+        <>
+            {email && <DropdownMenuLabel className="truncate pl-7.5 text-xs font-normal text-muted-foreground">{email}</DropdownMenuLabel>}
+            {sorted.map((w, index) => {
+                const active = w.id === workspace.id
+                const fallbackIcon = PRICING_ICONS[index % PRICING_ICONS.length]
+                return (
+                    <DropdownMenuItem key={w.id} disabled={busy} onSelect={() => handleSwitch(w.id)} className={cn('gap-2', !active && 'text-muted-foreground')}>
+                        <WorkspaceLogoImage src={w.icon_url || fallbackIcon} fallbackSrc={fallbackIcon} className="size-5 shrink-0 rounded-full object-cover" />
+                        <span className="flex-1 truncate">{w.name || t('defaultName')}</span>
+                        {active && <CheckIcon className="size-4" />}
+                    </DropdownMenuItem>
+                )
+            })}
+            <DropdownMenuItem onSelect={() => setCreateOpen(true)} className="gap-2 text-muted-foreground">
+                <PlusIcon className="size-4" />
+                {t('newWorkspace')}
+            </DropdownMenuItem>
+        </>
+    )
+
+    const identity = (
+        <div className="flex min-w-0 flex-1 items-center gap-2.5 text-left">
+            <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-8 shrink-0 rounded-full object-cover" />
+            <div className="min-w-0">
+                <div className="truncate text-sm font-medium text-foreground">{workspace.name || t('defaultName')}</div>
+                <div className="truncate text-xs text-muted-foreground">{workspaceSummary(workspace, t)}</div>
+            </div>
+        </div>
+    )
+
+    const identityTrigger = isMobile ? (
+        <DropdownMenuItem
+            aria-expanded={switching}
+            onSelect={event => {
+                event.preventDefault()
+                setSwitching(value => !value)
+            }}
+            className={cn('p-1', switching && 'bg-accent')}
+        >
+            {identity}
+            <ChevronsUpDownIcon className="size-4 text-muted-foreground" />
+        </DropdownMenuItem>
+    ) : (
+        <DropdownMenuSub>
+            <DropdownMenuSubTrigger className="p-1 [&>svg:last-child]:text-muted-foreground">{identity}</DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="w-60 max-h-[calc(100dvh-5rem)] overflow-y-auto">{workspacesSection}</DropdownMenuSubContent>
+        </DropdownMenuSub>
+    )
+
     // A sandbox has no settings, members nor billing of its own, but it runs on a machine of its own,
     // so it keeps its providers, its knowledge base and the API key the template tools require.
     const headerSection = (
-        <div className="flex flex-col gap-2.5 p-1.5">
-            <div className="flex items-center gap-2.5">
-                <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-8 shrink-0 rounded-full object-cover" />
-                <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-foreground">{workspace.name || t('defaultName')}</div>
-                    <div className="truncate text-xs text-muted-foreground">{workspaceSummary(workspace, t)}</div>
-                </div>
-            </div>
-            {showCredit && (
-                <CreditMeter
-                    usedMicros={credit.usedMicros}
-                    wholeMicros={credit.budgetMicros}
-                    trial={trialing}
-                    onOpen={() => (workspaceAdmin ? openBilling(undefined, 'workspace_menu') : undefined)}
-                    onAdd={workspaceAdmin ? () => openBilling(trialing ? undefined : 'credit_pack', 'workspace_menu') : undefined}
-                />
-            )}
-            {!workspace.is_sandbox && (
-                <div className="flex gap-1.5">
-                    <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.settings')} className="flex flex-1">
-                        <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openWorkspacePanel('workspace')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
-                            <SettingsIcon className="size-3.5" />
-                            {t('settings')}
-                        </DropdownMenuItem>
-                    </AdminOnly>
-                    <DropdownMenuItem onSelect={() => openWorkspacePanel('members')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
-                        <UsersIcon className="size-3.5" />
-                        {t('members')}
-                    </DropdownMenuItem>
+        <div className="flex flex-col gap-2.5 p-0.5">
+            {identityTrigger}
+            {!listInPlace && (showCredit || !workspace.is_sandbox) && (
+                <div className="flex flex-col gap-2.5 px-1 pb-1">
+                    {showCredit && (
+                        <CreditMeter
+                            usedMicros={credit.usedMicros}
+                            wholeMicros={credit.budgetMicros}
+                            trial={trialing}
+                            onOpen={() => (workspaceAdmin ? openBilling(undefined, 'workspace_menu') : undefined)}
+                            onAdd={workspaceAdmin ? () => openBilling(trialing ? undefined : 'credit_pack', 'workspace_menu') : undefined}
+                        />
+                    )}
+                    {!workspace.is_sandbox && (
+                        <div className="flex gap-1.5">
+                            <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.settings')} className="flex flex-1">
+                                <DropdownMenuItem disabled={!workspaceAdmin} onSelect={() => openWorkspacePanel('workspace')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
+                                    <SettingsIcon className="size-3.5" />
+                                    {t('settings')}
+                                </DropdownMenuItem>
+                            </AdminOnly>
+                            <DropdownMenuItem onSelect={() => openWorkspacePanel('members')} className="h-7 flex-1 justify-center gap-1.5 rounded-md border border-border text-xs text-foreground">
+                                <UsersIcon className="size-3.5" />
+                                {t('members')}
+                            </DropdownMenuItem>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
@@ -281,27 +333,6 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
             <WhatsNewMenuItem />
             <WeeklyRewindMenuItem />
             {!workspace.is_sandbox && appsInMenu.length > 0 && <AppsMenuSection apps={appsInMenu} onOpen={slug => openApp(slug)} />}
-        </>
-    )
-
-    const workspacesSection = (
-        <>
-            {email && <DropdownMenuLabel className="truncate pl-7.5 text-xs font-normal text-muted-foreground">{email}</DropdownMenuLabel>}
-            {sorted.map((w, index) => {
-                const active = w.id === workspace.id
-                const fallbackIcon = PRICING_ICONS[index % PRICING_ICONS.length]
-                return (
-                    <DropdownMenuItem key={w.id} disabled={busy} onSelect={() => handleSwitch(w.id)} className={cn('gap-2', !active && 'text-muted-foreground')}>
-                        <WorkspaceLogoImage src={w.icon_url || fallbackIcon} fallbackSrc={fallbackIcon} className="size-5 shrink-0 rounded-full object-cover" />
-                        <span className="flex-1 truncate">{w.name || t('defaultName')}</span>
-                        {active && <CheckIcon className="size-4" />}
-                    </DropdownMenuItem>
-                )
-            })}
-            <DropdownMenuItem onSelect={() => setCreateOpen(true)} className="gap-2 text-muted-foreground">
-                <PlusIcon className="size-4" />
-                {t('newWorkspace')}
-            </DropdownMenuItem>
         </>
     )
 
@@ -397,8 +428,8 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
         </>
     )
 
-    // From the workspace and what runs on it, to switching away from it, to the person using it.
-    const sections = [headerSection, workspaceItemsSection, workspacesSection, rolesSection, footerSection].filter(Boolean)
+    // From the workspace and what runs on it to the person using it. The other workspaces hang off the header.
+    const sections = (listInPlace ? [headerSection, workspacesSection] : [headerSection, workspaceItemsSection, rolesSection, footerSection]).filter(Boolean)
 
     return (
         // Leaves room for the view controls in the top-right corner: on a phone the workspace name
@@ -406,7 +437,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
         <div className={cn('flex items-center gap-2', placement === 'column' ? 'min-w-0' : 'absolute top-4 left-4 z-40 max-w-[calc(100%-2*var(--chrome-edge)-var(--chrome-size)-var(--chrome-gap))]')}>
             <DropdownMenu
                 onOpenChange={open => {
-                    if (!open) return
+                    if (!open) return setSwitching(false)
                     void refreshBrainProposals()
                     refreshVaultSignedOut()
                     if (!workspace.is_sandbox) for (const slug of paidApps) refreshAppAccounts(slug).catch(() => {})
