@@ -14,6 +14,10 @@ const UNREACHABLE: Partial<Record<string, readonly PhoneChannel[]>> = { CN: ['wh
 // list as of October 1, 2026). Rerun's own number does deliver there.
 const VERIFY_WHATSAPP_REFUSED: ReadonlySet<string> = new Set(['AE', 'BD', 'EG', 'ID', 'IN', 'IQ', 'KW', 'KZ', 'LK', 'MA', 'MY', 'NG', 'NP', 'OM', 'PK', 'SA', 'UA', 'ZA'])
 
+// Bird takes the send, then reports every SMS code undelivered: Saudi Arabia, 0 of 42 delivered
+// (PostHog, October to November 2026). Rerun's own WhatsApp number does deliver there.
+const VERIFY_SMS_REFUSED: ReadonlySet<string> = new Set(['SA'])
+
 // Meta keeps Rerun's own number out of these countries for every template, utility included
 // (error 130497, 34 failures out of 34 to Brazil by November 2026).
 const RERUN_WHATSAPP_REFUSED: ReadonlySet<string> = new Set(['BR'])
@@ -25,6 +29,7 @@ const MARKETING_WHATSAPP_REFUSED: ReadonlySet<string> = new Set(['US'])
 function refusedChannels(country: string, sender: PhoneSender): PhoneChannel[] {
     const refused = [...(UNREACHABLE[country] ?? [])]
     if (sender === 'verify' && VERIFY_WHATSAPP_REFUSED.has(country)) refused.push('whatsapp')
+    if (sender === 'verify' && VERIFY_SMS_REFUSED.has(country)) refused.push('sms')
     if (sender !== 'verify' && RERUN_WHATSAPP_REFUSED.has(country)) refused.push('whatsapp')
     if (sender === 'rerun_marketing' && MARKETING_WHATSAPP_REFUSED.has(country)) refused.push('whatsapp')
     return refused

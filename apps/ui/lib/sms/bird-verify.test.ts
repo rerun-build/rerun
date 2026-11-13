@@ -96,6 +96,12 @@ describe('sendVerification', () => {
         expect(urls()).toEqual(['https://eu1.platform.bird.com/v1/verify/verifications'])
     })
 
+    it('sends no SMS code to Saudi Arabia, where none is ever delivered', async () => {
+        expect(await sendVerification('+966501234567', 'sms')).toEqual({ ok: false, error: 'unsupported_country' })
+
+        expect(fetchMock).not.toHaveBeenCalled()
+    })
+
     it('sends nothing to a country no channel reaches', async () => {
         expect(await sendVerification('+8613812345678', 'sms')).toEqual({ ok: false, error: 'unsupported_country' })
 

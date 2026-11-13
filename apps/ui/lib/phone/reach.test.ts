@@ -30,6 +30,11 @@ describe('reachableChannels', () => {
         expect(reachableChannels('CN', 'rerun')).toEqual([])
     })
 
+    it('leaves Saudi Arabia no channel for codes, keeps Rerun’s own WhatsApp', () => {
+        expect(reachableChannels('SA', 'verify')).toEqual([])
+        expect(reachableChannels('SA', 'rerun')).toEqual(['whatsapp', 'sms'])
+    })
+
     it('keeps both channels when the country is unknown', () => {
         expect(reachableChannels(undefined, 'verify')).toEqual(['whatsapp', 'sms'])
     })
