@@ -8,7 +8,6 @@
         "platforms.linux.appImage": "AppImage is a Linux file format, keep the name.",
         "platforms.linux.deb": ".deb is a Linux package format, keep the extension.",
         "platforms.linux.rpm": ".rpm is a Linux package format, keep the extension.",
-        "otherPlatforms": "The desktop app exists for macOS only for now.",
         "platforms.mac.name": "Name of the operating system, keep it as is.",
         "platforms.windows.name": "Name of the operating system, keep it as is.",
         "platforms.linux.name": "Name of the operating system, keep it as is.",
@@ -28,9 +27,6 @@
     "mac": "Download for macOS",
     "windows": "Download for Windows",
     "linux": "Download for Linux",
-    "requirements": "macOS 13 or later, Apple Silicon and Intel.",
-    "otherPlatforms": "Windows and Linux are on the way. Until then, Rerun runs in your browser.",
-    "openWebApp": "Open the web app",
     "allPlatforms": "All platforms",
     "alternatives": {
         "macIntel": "Download for a Mac with Intel",
@@ -46,7 +42,6 @@
         "mac": {
             "name": "macOS",
             "requirements": "macOS 13 or later, Apple Silicon and Intel.",
-            "download": "Download the .dmg",
             "appleSilicon": "Apple Silicon",
             "intel": "Intel"
         },
@@ -54,7 +49,6 @@
             "name": "Windows",
             "requirements": "Windows 10 or later, x64 and Arm.",
             "warning": "The Windows app is not signed yet. If Windows shows \"Windows protected your PC\", click More info, then Run anyway.",
-            "download": "Download the installer",
             "x64": "x64",
             "arm64": "Arm"
         },

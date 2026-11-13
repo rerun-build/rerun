@@ -6,9 +6,6 @@
     "mac": "Descargar para macOS",
     "windows": "Descargar para Windows",
     "linux": "Descargar para Linux",
-    "requirements": "macOS 13 o posterior, Apple Silicon e Intel.",
-    "otherPlatforms": "Windows y Linux están en camino. Mientras tanto, Rerun funciona en tu navegador.",
-    "openWebApp": "Abrir la app web",
     "allPlatforms": "Todas las plataformas",
     "alternatives": {
         "macIntel": "Descargar para un Mac con Intel",
@@ -24,7 +21,6 @@
         "mac": {
             "name": "macOS",
             "requirements": "macOS 13 o posterior, Apple Silicon e Intel.",
-            "download": "Descargar el .dmg",
             "appleSilicon": "Apple Silicon",
             "intel": "Intel"
         },
@@ -32,7 +28,6 @@
             "name": "Windows",
             "requirements": "Windows 10 o posterior, x64 y Arm.",
             "warning": "La app de Windows aún no está firmada. Si Windows muestra «Windows protegió su PC», haz clic en Más información y luego en Ejecutar de todas formas.",
-            "download": "Descargar el instalador",
             "x64": "x64",
             "arm64": "Arm"
         },

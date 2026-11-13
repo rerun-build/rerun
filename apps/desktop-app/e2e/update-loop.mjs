@@ -67,7 +67,8 @@ build('0.0.2')
 
 const applications = mkdtempSync(join(tmpdir(), 'rerun-update-loop-'))
 const installed = join(applications, 'Rerun Dev.app')
-cpSync(join(feedRoot, 'v1', `mac-${ARCH}`, 'Rerun Dev.app'), installed, { recursive: true, verbatimSymlinks: true })
+// electron-builder unpacks x64 in mac/ and every other architecture in mac-<arch>/.
+cpSync(join(feedRoot, 'v1', ARCH === 'x64' ? 'mac' : `mac-${ARCH}`, 'Rerun Dev.app'), installed, { recursive: true, verbatimSymlinks: true })
 const plistVersion = () => execFileSync('/usr/libexec/PlistBuddy', ['-c', 'Print :CFBundleShortVersionString', join(installed, 'Contents/Info.plist')], { encoding: 'utf8' }).trim()
 log(`installed ${plistVersion()} in ${applications}`)
 

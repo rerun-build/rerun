@@ -6,9 +6,6 @@
     "mac": "Für macOS herunterladen",
     "windows": "Für Windows herunterladen",
     "linux": "Für Linux herunterladen",
-    "requirements": "macOS 13 oder neuer, Apple Silicon und Intel.",
-    "otherPlatforms": "Windows und Linux kommen bald. Bis dahin läuft Rerun in deinem Browser.",
-    "openWebApp": "Web-App öffnen",
     "allPlatforms": "Alle Plattformen",
     "alternatives": {
         "macIntel": "Für einen Mac mit Intel herunterladen",
@@ -24,7 +21,6 @@
         "mac": {
             "name": "macOS",
             "requirements": "macOS 13 oder neuer, Apple Silicon und Intel.",
-            "download": "Die .dmg herunterladen",
             "appleSilicon": "Apple Silicon",
             "intel": "Intel"
         },
@@ -32,7 +28,6 @@
             "name": "Windows",
             "requirements": "Windows 10 oder neuer, x64 und Arm.",
             "warning": "Die Windows-App ist noch nicht signiert. Zeigt Windows „Der Computer wurde durch Windows geschützt“, klicke auf Weitere Informationen und dann auf Trotzdem ausführen.",
-            "download": "Installer herunterladen",
             "x64": "x64",
             "arm64": "Arm"
         },
