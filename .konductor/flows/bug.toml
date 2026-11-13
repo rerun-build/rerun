@@ -1,5 +1,5 @@
 # Konductor flow for a Linear issue labeled Bug: move the card to In Progress, investigate, plan (approved by the flow), review, fix the review
-# (plan approved by you), summary on the issue, wait for the pull request you open and merge yourself, then close the card.
+# (plan approved by you), summary on the issue, PR, wait for your merge, then close the card.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Bug"
 match = { labels = ["Bug"] }
@@ -34,6 +34,7 @@ kind = "review"
 [[steps]]
 id = "fixes"
 title = "Review fixes"
+chat = "review"
 plan = true
 approve = "human"
 comments = ["blocking", "major", "minor", "nit"]
@@ -51,10 +52,15 @@ chat = "summary"
 linear_comment = true
 prompt = """
 Lis {{issue.file}} et le diff de ce workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request :
-la personne qui relit ouvre la PR et la merge elle-même.
-Écris un résumé pour elle : le bug, sa cause, ce qui a été corrigé et comment,
+l'étape suivante ouvre la PR.
+Écris un résumé pour la personne qui va relire et merger : le bug, sa cause, ce qui a été corrigé et comment,
 comment c'est testé, et ce qu'il reste à vérifier avant de merger. Court, en français.
 """
+
+[[steps]]
+id = "pr"
+title = "Create PR"
+kind = "create_pr"
 
 [[steps]]
 id = "merge"
