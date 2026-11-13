@@ -408,7 +408,14 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         return (
             <PanelSteps stepKey={`setup:${setupKey}`} depth={1}>
                 <PanelEditorShell>
-                    <PanelEditorHeader title={setupTarget.name} onBack={() => setSetupTarget(null)} />
+                    <PanelEditorHeader
+                        title={setupTarget.name}
+                        onBack={() => {
+                            // A key the app refused leaves the app to configure: the list has changed.
+                            setSetupTarget(null)
+                            void load()
+                        }}
+                    />
                     <PanelEditorBody>
                         <ServiceConfigForm
                             key={setupKey}
