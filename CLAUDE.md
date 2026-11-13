@@ -138,10 +138,11 @@ of `apps/ui/vitest.config.ts` for the tests. A checkout without `cloud/` builds 
 The repository is public: commit messages, pull request titles and descriptions are written in
 English, whatever the language of the conversation.
 
-## A plan delivered in several pull requests ships as a stack
+## Work ships as a stack of pull requests
 
-A plan that needs more than one pull request never opens them side by side on the base branch: they
-form a GitHub stack, so each diff shows one step and the chain stays reviewable and trackable.
+Work is delivered as a GitHub stack by default: pull requests 0, 1, 2… piled on one another, never
+opened side by side nor alone on the base branch, so each diff shows one step and the chain stays
+reviewable and trackable.
 
 - The plan announces the stack before any code is written: one pull request per step, in merge order,
   each one reviewable on its own.
@@ -150,8 +151,13 @@ form a GitHub stack, so each diff shows one step and the chain stays reviewable 
   so a diff only ever shows its own step.
 - Every description opens with the stack, the current pull request in bold
   (`1/3 #101 ← 2/3 #102 ← **3/3 #103**`), and every description is updated as soon as one is added.
-- A fix on a lower step lands on that step's branch, then the branches above it are rebased on it and
-  pushed with `--force-with-lease`.
+- The stack stays open until it has been gone through as a whole. The fixes and corrections found
+  then land in one more pull request on top of the stack (`gh pr create --base <top branch>`), never
+  in a lone pull request on the base nor by rewriting a lower step. Only then is the whole stack
+  merged. With its bottom already merged, there is nothing left to pile a correction on (#192,
+  13/11/2026).
+- Only a slip caught while its step is still being written is fixed on that step's branch, then the
+  branches above it are rebased on it and pushed with `--force-with-lease`.
 - Merge from the bottom up. After a squash merge, rebase the next one with
   `git rebase --onto origin/<base> <old tip of the merged branch> <next branch>`, then retarget it on
   the base (`gh pr edit --base <base>`).
