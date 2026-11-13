@@ -116,7 +116,12 @@ export const CODEX_HARNESS_OVERRIDES: CodexConfigOverrides = {
     'features.goals': false,
     'features.tool_suggest': false,
     'features.hooks': false,
-    'features.code_mode': false,
+    // `features.code_mode` is a table as well as a switch. The model catalog OpenAI serves sets
+    // tool_mode code_mode_only on every Codex model, and that beats the switch: the bridged tools
+    // then only exist inside exec, and the model answers that it cannot create coworkers. The
+    // namespace list keeps the rerun tools direct model tools (read back against 0.166).
+    'features.code_mode.enabled': false,
+    'features.code_mode.direct_only_tool_namespaces': [`mcp__${BRIDGE_SERVER_NAME}`],
     // Running a command is shell_exec, the Rerun tool. These two close Codex's own shell whole:
     // with them the model answers that it has no way to run a command.
     'features.shell_tool': false,

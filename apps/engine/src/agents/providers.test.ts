@@ -135,6 +135,12 @@ describe('CODEX_HARNESS_OVERRIDES', () => {
         expect(CODEX_HARNESS_OVERRIDES['features.image_generation']).toBeUndefined()
     })
 
+    it('keeps the rerun tools direct model tools when the catalog forces code mode only', () => {
+        expect(CODEX_HARNESS_OVERRIDES['features.code_mode.enabled']).toBe(false)
+        expect(CODEX_HARNESS_OVERRIDES).not.toHaveProperty('features.code_mode')
+        expect(CODEX_HARNESS_OVERRIDES['features.code_mode.direct_only_tool_namespaces']).toEqual(['mcp__rerun'])
+    })
+
     it('holds dotted config paths, so each key stays a valid config override', () => {
         for (const key of Object.keys(CODEX_HARNESS_OVERRIDES)) expect(key).toMatch(/^[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*$/)
     })
