@@ -63,8 +63,8 @@ export function isMobileClient(client: ForemanClient | null | undefined): client
 export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string() })
 export type ForemanStateResponse = z.infer<typeof foremanStateSchema>
 
-// GET /api/chat/foreman/engine: the caller's last conversation with the engine's foreman, null before
-// the first one. With `?sessionId=`, the transcript of that conversation alone.
+// GET /api/chat/foreman/engine: the caller's General with the engine's foreman, null before they
+// first spoke in it. With `?sessionId=`, that conversation, General or a thread.
 export const foremanEngineConversationSchema = z
     .looseObject({ sessionId: z.string(), title: z.string().nullable().optional(), messages: z.array(conversationMessageSchema), activeRunId: z.string().nullable().optional() })
     .nullable()

@@ -1197,8 +1197,11 @@ export type Database = {
           backend: string
           created_at: string
           engine_session_id: string | null
+          first_message: string | null
           id: string
+          kind: Database["public"]["Enums"]["session_kind"]
           messages: Json
+          status: Database["public"]["Enums"]["session_status"]
           title: string | null
           updated_at: string
           user_id: string
@@ -1208,8 +1211,11 @@ export type Database = {
           backend?: string
           created_at?: string
           engine_session_id?: string | null
+          first_message?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["session_kind"]
           messages?: Json
+          status?: Database["public"]["Enums"]["session_status"]
           title?: string | null
           updated_at?: string
           user_id: string
@@ -1219,8 +1225,11 @@ export type Database = {
           backend?: string
           created_at?: string
           engine_session_id?: string | null
+          first_message?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["session_kind"]
           messages?: Json
+          status?: Database["public"]["Enums"]["session_status"]
           title?: string | null
           updated_at?: string
           user_id?: string

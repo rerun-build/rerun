@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn() }))
+const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), authenticateEngineToken: vi.fn(), setForemanConversationStatus: vi.fn() }))
 
 vi.mock('next/server', () => ({ after: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({}))
@@ -11,10 +11,11 @@ vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: mocks.selectM
 vi.mock('./chat.service', () => ({ ensureSessionRow: vi.fn() }))
 vi.mock('./notification-audience.service', () => ({ writeNotificationPrefs: vi.fn() }))
 vi.mock('./presence.service', () => ({ loadPresence: vi.fn() }))
-vi.mock('./workspace-engine.service', () => ({ authenticateEngineToken: vi.fn() }))
+vi.mock('./workspace-engine.service', () => ({ authenticateEngineToken: mocks.authenticateEngineToken }))
+vi.mock('@/lib/foreman/conversation', () => ({ setForemanConversationStatus: mocks.setForemanConversationStatus }))
 vi.mock('./workspace-owner.service', () => ({ resolveWorkspaceMemberEmail: vi.fn(), resolveWorkspaceOwner: vi.fn() }))
 
-const { membersReachingBox } = await import('./notification.service')
+const { membersReachingBox, recordNotification } = await import('./notification.service')
 
 const members = [
     { user_id: 'admin', role: 'admin' as const, box_scope: 'assigned' },
@@ -57,5 +58,31 @@ describe('membersReachingBox', () => {
     it('keeps only the admins when the Box is gone', async () => {
         boxIs(null)
         expect(ids(await membersReachingBox({} as never, 1, 'box', members))).toEqual(['admin'])
+    })
+})
+
+describe('recordNotification for the foreman', () => {
+    const foremanEvent = (event: string, kind: string) => ({ event, kind, agentId: 'foreman', sessionId: 'engine-1', message: 'Done', timestamp: '2026-11-13T16:00:00.000Z' }) as never
+
+    beforeEach(() => {
+        mocks.selectMaybeSingle.mockReset()
+        mocks.setForemanConversationStatus.mockReset()
+        mocks.authenticateEngineToken.mockResolvedValue({ workspaceId: 7, isSandbox: false })
+    })
+
+    it('puts the thread back to idle when its run is over, without storing any news', async () => {
+        expect(await recordNotification('token', foremanEvent('agent.message.completed', 'done'))).toEqual({ ok: true })
+        expect(mocks.setForemanConversationStatus).toHaveBeenCalledWith(7, 'engine-1', 'idle')
+        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+    })
+
+    it('marks the thread as waiting on a question the foreman asked', async () => {
+        await recordNotification('token', foremanEvent('agent.notification', 'question'))
+        expect(mocks.setForemanConversationStatus).toHaveBeenCalledWith(7, 'engine-1', 'awaiting_question')
+    })
+
+    it('marks the thread as failed when its run errored', async () => {
+        await recordNotification('token', foremanEvent('agent.message.completed', 'error'))
+        expect(mocks.setForemanConversationStatus).toHaveBeenCalledWith(7, 'engine-1', 'error')
     })
 })

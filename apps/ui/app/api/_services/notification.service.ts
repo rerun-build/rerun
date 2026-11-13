@@ -18,6 +18,7 @@ import { isPresent } from '@/lib/notifications/presence'
 import { emailReasonSentence } from '@/lib/notifications/reason-copy'
 import { computeRecipients, needsOwnerFollow, wantsIncidentEmail, wantsRecoveryEmail, type NotificationRecipients, type RoutedEvent, type RoutedMember } from '@/lib/notifications/routing'
 import { boardStatusOfKind } from '@/lib/og/team-board'
+import { setForemanConversationStatus } from '@/lib/foreman/conversation'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -47,8 +48,12 @@ export async function recordNotification(token: string, payload: NotificationPay
     if (!engine) return { ok: false, status: 401, error: 'Unauthorized' }
 
     // The foreman answers in the column the user is looking at: none of its runs is inbox news, an
-    // email, or the first agent run that counts as activation.
-    if (payload.agentId === FOREMAN_AGENT_ID) return { ok: true }
+    // email, or the first agent run that counts as activation. Where a run stopped still shows, on
+    // its thread in General.
+    if (payload.agentId === FOREMAN_AGENT_ID) {
+        await applyForemanStatus(engine.workspaceId, payload)
+        return { ok: true }
+    }
 
     const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: engine.workspaceId, engine_agent_id: payload.agentId })
 
@@ -161,6 +166,12 @@ async function mirrorSession(supabase: ServiceRoleClient, workspaceId: number, a
     } catch (err) {
         console.error('[notification] failed to create session', err)
     }
+}
+
+async function applyForemanStatus(workspaceId: number, payload: NotificationPayload): Promise<void> {
+    const kind = storedKind(payload)
+    const status = kind ? completionStatus({ ...payload, kind }) : null
+    if (status && payload.sessionId) await setForemanConversationStatus(workspaceId, payload.sessionId, status)
 }
 
 function isCancelled(notification: StoredNotification): boolean {
