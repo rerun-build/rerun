@@ -30,6 +30,7 @@ export function vaultRegistryEntry(item: VaultItemSummary): RegistryEntry {
         ...(item.label ? { label: item.label } : {}),
         installedAt: item.createdAt,
         vaultItemId: item.id,
+        vaultSharedWithAll: item.sharedWithAll,
     }
 }
 

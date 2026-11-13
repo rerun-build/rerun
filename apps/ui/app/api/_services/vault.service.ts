@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { UpdateVaultItemInput, VaultConflict, VaultItemSummary } from '@rerun/contracts'
 
-import { AccessDeniedError, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
+import { AccessDeniedError, assertAgentAccess, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { vaultFlag } from '@/flags'
 import { EngineRequestError, supportsVault } from '@/lib/engine/client'
@@ -256,5 +256,27 @@ export async function vaultSignedOutCount(actor?: Actor): Promise<number> {
         return (await listVaultItems(engine.conn)).filter(item => item.status === 'needs_auth').length
     } catch {
         return 0
+    }
+}
+
+// The Vault as one coworker's Apps tab shows it: the custom servers and secrets attached to it (its
+// catalog apps already come through its registry), and the entries it could be attached to.
+export type CoworkerVault = {
+    attached: VaultItemSummary[]
+    available: VaultItemSummary[]
+    canAttach: boolean
+}
+
+export async function coworkerVault(agentId: string, actor?: Actor): Promise<CoworkerVault | null> {
+    const resolved = actor ?? (await requireLightSessionActor())
+    const { agent, access } = await assertAgentAccess(agentId, 'use', resolved)
+    const engine = await findWorkspaceEngine(resolved.workspaceId)
+    if (!engine || !agent.engine_agent_id || !(await supportsVault(engine.conn))) return null
+    const items = await listVaultItems(engine.conn)
+    const holds = (item: VaultItemSummary) => item.sharedWithAll || item.agentIds.includes(agent.engine_agent_id as string)
+    return {
+        attached: items.filter(item => holds(item) && item.kind !== 'service'),
+        available: items.filter(item => !holds(item)),
+        canAttach: access === 'manage',
     }
 }

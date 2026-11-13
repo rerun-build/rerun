@@ -58,6 +58,7 @@ describe('the registry of a coworker on a box that keeps a Vault', () => {
             label: 'ops@acme.test',
             installedAt: '2026-11-13T00:00:00.000Z',
             vaultItemId: 'item-gmail',
+            vaultSharedWithAll: false,
         })
         expect(listVaultItems).toHaveBeenCalledWith(conn, 'engine-agent')
     })

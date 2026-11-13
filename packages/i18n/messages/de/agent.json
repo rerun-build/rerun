@@ -122,7 +122,16 @@
         "uninstallDescription": "Der Coworker verliert diesen Dienst und seine Tools. Die Verbindung wird widerrufen, bei einer Neuinstallation musst du dich also erneut verbinden.",
         "uninstallAction": "Deinstallieren",
         "requestHint": "Nicht gefunden? Wir können die App hinzufügen, die du brauchst.",
-        "requestApp": "App anfragen"
+        "requestApp": "App anfragen",
+        "vaultBadge": "Vault",
+        "fromVault": "Aus dem Vault",
+        "vaultAdd": "Hinzufügen",
+        "vaultShared": "Alle Coworker bekommen sie aus dem Vault. Ändere sie dort.",
+        "vaultRemove": "{name} von diesem Coworker entfernen",
+        "vaultRemoveConfirm": "{name} von diesem Coworker entfernen?",
+        "vaultRemoveDescription": "Sie bleibt im Vault, für die anderen Coworker und für später.",
+        "vaultRemoveAction": "Entfernen",
+        "vaultAttachFailed": "{name} konnte nicht hinzugefügt werden"
     },
     "agentPanelMcp": {
         "unreachableTitle": "Engine nicht erreichbar",

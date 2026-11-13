@@ -50,8 +50,10 @@ export type RegistryEntry = {
     label?: string
     installedAt: string
     // Set on an entry read from the workspace's Vault rather than the coworker's own registry: the
-    // item behind it, which every write to the entry goes to. Never written to services.json.
+    // item behind it, which every write to the entry goes to, and whether every coworker holds it.
+    // Never written to services.json.
     vaultItemId?: string
+    vaultSharedWithAll?: boolean
 }
 
 export type ServiceRegistry = { services: Record<string, RegistryEntry> }
@@ -189,7 +191,7 @@ export async function upsertRegistryEntry(conn: EngineConnection, engineAgentId:
         return
     }
     const reg = await readOwnRegistry(conn, engineAgentId)
-    const { vaultItemId: _, ...own } = entry
+    const { vaultItemId: _item, vaultSharedWithAll: _shared, ...own } = entry
     reg.services[key] = own
     await writeRegistry(conn, engineAgentId, reg)
 }

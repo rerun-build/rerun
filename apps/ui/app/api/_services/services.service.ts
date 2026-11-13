@@ -650,6 +650,7 @@ export async function installedFromRegistry(reg: ServiceRegistry): Promise<Insta
                 app: entry.app,
                 authMethodId: entry.authMethodId,
                 installedAt: entry.installedAt,
+                ...(entry.vaultItemId ? { vault: { itemId: entry.vaultItemId, sharedWithAll: entry.vaultSharedWithAll ?? false } } : {}),
             }
         }),
     )

@@ -15,6 +15,8 @@ import {
     signOutVaultEntry,
     vaultEntryUsage,
     vaultSignedOutCount,
+    coworkerVault,
+    type CoworkerVault,
     type VaultCoworker,
     type VaultListing,
 } from '@/app/api/_services/vault.service'
@@ -83,4 +85,12 @@ export async function vaultCatalogAction(query?: string): Promise<Result<VaultCa
 
 export async function vaultSignedOutCountAction(): Promise<number> {
     return vaultSignedOutCount()
+}
+
+export async function coworkerVaultAction(agentId: string): Promise<CoworkerVault | null> {
+    try {
+        return await coworkerVault(agentId)
+    } catch {
+        return null
+    }
 }

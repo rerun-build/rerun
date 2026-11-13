@@ -21,6 +21,7 @@ import {
     signOutVaultEntry,
     vaultEntryUsage,
     vaultWritesEnabled,
+    coworkerVault,
 } from './vault.service'
 
 vi.mock('server-only', () => ({}))
@@ -95,7 +96,15 @@ beforeEach(() => {
     vi.mocked(listVaultItems).mockResolvedValue([item(), item({ id: 'item-2', agentIds: ['e-alice', 'e-carol'] }), item({ id: 'item-3', sharedWithAll: true, agentIds: [] })] as never)
     vi.mocked(createServiceRoleClient).mockReturnValue(
         fakeSupabase((table, calls) => {
-            if (table === 'agents') return { data: AGENTS }
+            if (table === 'agents') {
+                const id = filterValue(calls, 'id')
+                if (id) {
+                    const row = AGENTS.find(agent => agent.id === id)
+                    return { data: row ? { workspace_id: WORKSPACE, space_id: row.space_id, engine_agent_id: row.engine_agent_id } : null }
+                }
+                return { data: AGENTS }
+            }
+            if (table === 'spaces' && filterValue(calls, 'id')) return { data: SPACES.find(space => space.id === filterValue(calls, 'id')) ?? null }
             if (table === 'spaces') return { data: SPACES }
             if (table === 'space_members') {
                 const userId = filterValue(calls, 'user_id') as string
@@ -267,5 +276,27 @@ describe('sign-in', () => {
     it('names who would lose an entry, counting those the caller cannot see', async () => {
         vi.mocked(getVaultItemUsage).mockResolvedValue(['e-alice', 'e-carol'])
         expect(await vaultEntryUsage('item-1', managerOfA)).toEqual({ coworkers: [{ id: 'alice', engineAgentId: 'e-alice', name: 'Alice', spaceId: 'box-a' }], hidden: 1 })
+    })
+})
+
+describe("a coworker's side of the Vault", () => {
+    it('lists its custom servers and secrets, and what it could be given, saying whether the caller may', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([
+            item({ id: 'app', kind: 'service', agentIds: ['e-alice'] }),
+            item({ id: 'secret', kind: 'secret', slug: null, agentIds: ['e-alice'] }),
+            item({ id: 'everyone', kind: 'mcp', slug: null, sharedWithAll: true, agentIds: [] }),
+            item({ id: 'other', kind: 'secret', slug: null, agentIds: ['e-bob'] }),
+        ] as never)
+        const forManager = await coworkerVault('alice', managerOfA)
+        expect(forManager?.attached.map(i => i.id)).toEqual(['secret', 'everyone'])
+        expect(forManager?.available.map(i => i.id)).toEqual(['other'])
+        expect(forManager?.canAttach).toBe(true)
+        expect((await coworkerVault('bob', managerOfA))?.canAttach).toBe(false)
+    })
+
+    it('says nothing on a box without a Vault, and hides a coworker the caller cannot see', async () => {
+        vi.mocked(supportsVault).mockResolvedValue(false)
+        expect(await coworkerVault('alice', admin)).toBeNull()
+        await expect(coworkerVault('carol', user)).rejects.toMatchObject({ code: 'coworkerNotFound' })
     })
 })

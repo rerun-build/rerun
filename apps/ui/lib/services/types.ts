@@ -106,6 +106,9 @@ export type InstalledService = {
     app?: AppTarget
     authMethodId?: string
     installedAt: string
+    // Lent by the workspace's Vault rather than installed in the coworker's own folder: removing it
+    // only detaches the coworker, and one shared with every coworker is changed from the Vault.
+    vault?: { itemId: string; sharedWithAll: boolean }
 }
 
 // Outcome of resetting a connected service: 'auth' when only the sign-in was cleared (the
