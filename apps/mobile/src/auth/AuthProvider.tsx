@@ -1,7 +1,7 @@
 import type { Me } from '@rerun/contracts'
 import type { Session } from '@supabase/supabase-js'
 import * as SecureStore from 'expo-secure-store'
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { fetchMe } from '@/api/account'
 import { isAdminRole } from '@/auth/access'
@@ -54,6 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [ready, setReady] = useState(false)
     const [session, setSession] = useState<Session | null>(null)
     const [me, setMe] = useState<Me | null>(null)
+    // The workspace last picked in this session: a read of the account sent before the pick (a refresh
+    // as the app comes back to the foreground on a tapped push) must not take the person back.
+    const picked = useRef<number | null>(null)
+    const accepts = useCallback((next: Me) => picked.current === null || next.workspace.id === picked.current, [])
+    const applyMe = useCallback(
+        (next: Me) => {
+            if (accepts(next)) setMe(next)
+        },
+        [accepts]
+    )
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data }) => {
@@ -66,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setSession(next)
             if (!next) {
                 setMe(null)
+                picked.current = null
                 clearLocalCache()
             }
         })
@@ -92,16 +103,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .getSession()
             .then(({ data }) => {
                 const signedIn = data.session
-                return signedIn ? cachedMe(signedIn.user.id).load(() => loadMe(signedIn.access_token)) : null
+                return signedIn ? cachedMe(signedIn.user.id).load(() => loadMe(signedIn.access_token), accepts) : null
             })
             .then(result => {
-                if (!cancelled && result) setMe(result)
+                if (!cancelled && result) applyMe(result)
             })
             .catch(error => console.warn('[auth] loading the account failed', error))
         return () => {
             cancelled = true
         }
-    }, [userId])
+    }, [userId, accepts, applyMe])
 
     useEffect(() => {
         if (!accessToken || !workspaceId) return
@@ -113,16 +124,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const switchWorkspace = useCallback(
         async (workspaceId: number) => {
             if (!session) return
-            setMe(await cachedMe(session.user.id).load(() => fetchMe({ accessToken: session.access_token, workspaceId })))
+            const previous = picked.current
+            picked.current = workspaceId
+            try {
+                applyMe(await cachedMe(session.user.id).load(() => fetchMe({ accessToken: session.access_token, workspaceId }), accepts))
+            } catch (error) {
+                if (picked.current === workspaceId) picked.current = previous
+                throw error
+            }
+            // A later switch has taken over: the store follows it, not this answer.
+            if (picked.current !== workspaceId) return
             await SecureStore.setItemAsync(WORKSPACE_KEY, String(workspaceId))
         },
-        [session]
+        [session, accepts, applyMe]
     )
 
     const refreshMe = useCallback(async () => {
         if (!session || !me) return
-        setMe(await cachedMe(session.user.id).load(() => fetchMe({ accessToken: session.access_token, workspaceId: me.workspace.id })))
-    }, [session, me])
+        applyMe(await cachedMe(session.user.id).load(() => fetchMe({ accessToken: session.access_token, workspaceId: me.workspace.id }), accepts))
+    }, [session, me, accepts, applyMe])
 
     // The screen leaves first: the hub call, supabase-js's lock or the auth event must never hold the
     // person on a home they asked to leave. A local sign-out still tells Supabase to revoke this
@@ -132,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
         setSession(null)
         setMe(null)
+        picked.current = null
         clearLocalCache()
         if (caller) unregisterDevice(caller).catch(() => {})
         await SecureStore.deleteItemAsync(WORKSPACE_KEY).catch(() => {})

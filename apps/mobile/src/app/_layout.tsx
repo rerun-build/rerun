@@ -24,7 +24,7 @@ import { I18nProvider } from '@/i18n/I18nProvider'
 import { useAiConsent } from '@/lib/ai-consent'
 import { posthog } from '@/lib/analytics'
 import { MockStore } from '@/mocks/store'
-import { PushRouting } from '@/notifications/PushRouting'
+import { OpenPushTarget, usePushTarget } from '@/notifications/PushRouting'
 import { useAppearanceLoaded } from '@/theme/appearance'
 import { ReducedMotionOverride } from '@/theme/ReducedMotionOverride'
 import { useColorSchemeName } from '@/theme/theme'
@@ -53,6 +53,7 @@ function App() {
     const consentKnown = !signedIn || aiConsent.state !== 'loading'
     // The first coworker the onboarding started, opened once the app has taken over from it.
     const [lead, setLead] = useState<LeadStarted | null>(null)
+    const pushTarget = usePushTarget()
 
     useEffect(() => {
         if (!lead || route.kind !== 'app') return
@@ -109,7 +110,7 @@ function App() {
                 ) : (
                     <MockStore>
                         <InboxProvider>
-                            {signedIn && <PushRouting />}
+                            {signedIn && <OpenPushTarget href={pushTarget.href} onOpened={pushTarget.opened} />}
                             <SplitShell enabled={signedIn}>
                                 <Stack screenOptions={{ headerShown: false }}>
                                     <Stack.Protected guard={signedIn} redirectTo="/sign-in">

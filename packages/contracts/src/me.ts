@@ -44,8 +44,10 @@ export type DeviceTokenInput = z.infer<typeof deviceTokenSchema>
 export const ROUTE_ID_PATTERN = /^[\w-]+$/
 
 // What a push carries for the app to open the right conversation. `conversationId` is the hub's
-// conversation, null for a run with no conversation of its own.
+// conversation, null for a run with no conversation of its own. `workspaceId` is the workspace it
+// lives in, which the phone switches to first; a push sent before it existed carries none.
 export const pushDataSchema = z.object({
+    workspaceId: z.number().int().positive().optional(),
     agentId: z.string().regex(ROUTE_ID_PATTERN).nullable(),
     conversationId: z.string().regex(ROUTE_ID_PATTERN).nullable(),
     kind: z.string(),

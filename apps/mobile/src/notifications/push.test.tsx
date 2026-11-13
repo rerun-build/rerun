@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native'
+import { act, render } from '@testing-library/react-native'
 import { ANDROID_PUSH_CHANNELS, FOREMAN_AGENT_ID } from '@rerun/contracts'
 import * as Notifications from 'expo-notifications'
 import { AndroidImportance } from 'expo-notifications'
@@ -8,7 +8,7 @@ import appJson from '../../app.json'
 import { brand } from '@/theme/tokens'
 
 import { askForPushOnce, pushAvailable, registerDevice, setConversationOnScreen, turnOnPush, unregisterDevice } from './push'
-import { PushRouting } from './PushRouting'
+import { OpenPushTarget, usePushTarget } from './PushRouting'
 
 const mockApi = jest.fn().mockResolvedValue(undefined)
 jest.mock('@/api/client', () => ({ api: (...args: unknown[]) => mockApi(...args), appBuild: 7 }))
@@ -48,9 +48,43 @@ jest.mock('expo-notifications', () => ({
     setBadgeCountAsync: jest.fn(),
     useLastNotificationResponse: () => mockLastResponse,
 }))
-const mockPush = jest.fn()
+const mockPush = jest.fn((..._args: unknown[]) => void mockCalls.push('navigate'))
 jest.mock('expo-router', () => ({ router: { push: (...args: unknown[]) => mockPush(...args) } }))
+// The active workspace as the AuthProvider holds it. A test moves it itself, as the provider does once
+// a switch has answered (its own tests cover that part), then renders again.
+const mockAuth = { workspaceId: 18259 }
+const mockSwitchWorkspace = jest.fn(async (workspaceId: number) => void mockCalls.push(`switch:${workspaceId}`))
+jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ me: { workspace: { id: mockAuth.workspaceId } }, switchWorkspace: mockSwitchWorkspace }) }))
 
+function Routing({ shellShown = true }: { shellShown?: boolean }) {
+    const { href, opened } = usePushTarget()
+    return shellShown ? <OpenPushTarget href={href} onOpened={opened} /> : null
+}
+
+const settle = () => act(async () => await new Promise(resolve => setTimeout(resolve, 0)))
+
+let view: Awaited<ReturnType<typeof render>> | null = null
+async function renderRouting({ shellShown = true }: { shellShown?: boolean } = {}) {
+    view = await render(<Routing shellShown={shellShown} />)
+    await settle()
+}
+
+async function moveTo(workspaceId: number, { shellShown = true }: { shellShown?: boolean } = {}) {
+    mockAuth.workspaceId = workspaceId
+    await view!.rerender(<Routing shellShown={shellShown} />)
+    await settle()
+}
+
+beforeEach(() => {
+    mockCalls.length = 0
+    mockPush.mockClear()
+    mockSwitchWorkspace.mockClear()
+    mockAuth.workspaceId = 18259
+})
+afterEach(() => {
+    view?.unmount()
+    view = null
+})
 
 const caller = { accessToken: 'jwt', workspaceId: 7 }
 const notification = (data: object, identifier = 'n1') => ({ request: { identifier, content: { data } } }) as unknown as Notifications.Notification
@@ -138,17 +172,80 @@ describe('push display and taps', () => {
 
     it('opens the conversation a tapped push is about, once', async () => {
         mockLastResponse = { notification: notification({ agentId: 'a1', conversationId: 'conv-2', kind: 'question' }, 'n9') }
-        const view = await render(<PushRouting />)
-        await view.rerender(<PushRouting />)
+        await renderRouting()
+        await view!.rerender(<Routing />)
+        await settle()
         expect(mockPush).toHaveBeenCalledTimes(1)
         expect(mockPush).toHaveBeenCalledWith({ pathname: '/chat/[id]', params: { id: 'conv-2', to: 'a1' } })
     })
 
     it('opens a push from the Foreman on its own chat page', async () => {
-        mockPush.mockClear()
         mockLastResponse = { notification: notification({ agentId: FOREMAN_AGENT_ID, conversationId: 'conv-3', kind: 'question' }, 'n10') }
-        await render(<PushRouting />)
+        await renderRouting()
         expect(mockPush).toHaveBeenCalledWith({ pathname: '/chat/[id]', params: { id: 'conv-3' } })
+    })
+})
+
+// RER-56: a push about a conversation of another workspace opened it under the phone's workspace, where
+// the hub answers 404.
+describe('a tapped push from another workspace', () => {
+    it('switches to the workspace of the push, and opens its conversation only once that workspace is active', async () => {
+        mockLastResponse = { notification: notification({ workspaceId: 1, agentId: 'a1', conversationId: 'conv-4', kind: 'question' }, 'n11') }
+        await renderRouting()
+        expect(mockCalls).toEqual(['switch:1'])
+        await moveTo(1)
+        expect(mockCalls).toEqual(['switch:1', 'navigate'])
+        expect(mockPush).toHaveBeenCalledWith({ pathname: '/chat/[id]', params: { id: 'conv-4', to: 'a1' } })
+    })
+
+    it('asks for the switch once, however often the screen renders while it is on its way', async () => {
+        mockLastResponse = { notification: notification({ workspaceId: 1, agentId: 'a1', conversationId: 'conv-10', kind: 'question' }, 'n17') }
+        await renderRouting()
+        await view!.rerender(<Routing />)
+        await view!.rerender(<Routing />)
+        await settle()
+        expect(mockSwitchWorkspace).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not switch for a push of the workspace the phone is on', async () => {
+        mockLastResponse = { notification: notification({ workspaceId: 18259, agentId: 'a1', conversationId: 'conv-5', kind: 'question' }, 'n12') }
+        await renderRouting()
+        expect(mockCalls).toEqual(['navigate'])
+    })
+
+    it('opens a push that names no workspace where the phone is, as before', async () => {
+        mockLastResponse = { notification: notification({ agentId: 'a1', conversationId: 'conv-6', kind: 'question' }, 'n13') }
+        await renderRouting()
+        expect(mockCalls).toEqual(['navigate'])
+    })
+
+    it('stays where it is when the switch is refused, and gives the push up for good', async () => {
+        mockSwitchWorkspace.mockRejectedValueOnce(new Error('HTTP 403'))
+        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        mockLastResponse = { notification: notification({ workspaceId: 1, agentId: 'a1', conversationId: 'conv-7', kind: 'question' }, 'n14') }
+        await renderRouting()
+        expect(mockPush).not.toHaveBeenCalled()
+        await moveTo(1)
+        expect(mockPush).not.toHaveBeenCalled()
+        expect(mockSwitchWorkspace).toHaveBeenCalledTimes(1)
+        warn.mockRestore()
+    })
+
+    it('waits for the conversation screens behind a workspace with no plan, then opens it', async () => {
+        mockLastResponse = { notification: notification({ workspaceId: 1, agentId: 'a1', conversationId: 'conv-8', kind: 'question' }, 'n15') }
+        await renderRouting({ shellShown: false })
+        expect(mockCalls).toEqual(['switch:1'])
+        await moveTo(1, { shellShown: false })
+        expect(mockCalls).toEqual(['switch:1'])
+        await moveTo(1)
+        expect(mockCalls).toEqual(['switch:1', 'navigate'])
+    })
+
+    it('does not open the conversation under a workspace the phone has moved to before it could open', async () => {
+        mockLastResponse = { notification: notification({ workspaceId: 1, agentId: 'a1', conversationId: 'conv-9', kind: 'question' }, 'n16') }
+        await renderRouting({ shellShown: false })
+        await moveTo(7)
+        expect(mockPush).not.toHaveBeenCalled()
     })
 })
 

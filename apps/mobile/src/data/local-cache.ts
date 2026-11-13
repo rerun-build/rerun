@@ -83,19 +83,19 @@ function write(key: string, value: unknown) {
 export type CacheEntry<T> = {
     read: () => T | null
     save: (value: T) => void
-    // The hub's answer, kept unless the person signed out while it was on its way.
-    load: (fetch: () => Promise<T>) => Promise<T>
+    // The hub's answer, kept unless the person signed out while it was on its way, or `keep` declines it.
+    load: (fetch: () => Promise<T>, keep?: (value: T) => boolean) => Promise<T>
 }
 
 function entry<T>(key: string, parse: (value: unknown) => T): CacheEntry<T> {
     return {
         read: () => read(key, parse),
         save: value => write(key, value),
-        load: fetch => {
+        load: (fetch, keep) => {
             const askedFor = generation
             return fetch().then(value => {
                 // The home reads again at every move of a run: an answer that changed nothing is not written again.
-                if (askedFor === generation && JSON.stringify(read(key, parse)) !== JSON.stringify(value)) write(key, value)
+                if (askedFor === generation && (keep?.(value) ?? true) && JSON.stringify(read(key, parse)) !== JSON.stringify(value)) write(key, value)
                 return value
             })
         },

@@ -146,6 +146,17 @@ describe('chat cache', () => {
         expect(mockDisk.size).toBe(0)
     })
 
+    it('hands back an answer the caller declines without keeping it', async () => {
+        await cachedMe('u1').load(async () => me)
+        const other = { ...me, workspace: { ...me.workspace, id: me.workspace.id + 1 } }
+
+        const answer = await cachedMe('u1').load(async () => other, () => false)
+        flushWrites()
+
+        expect(answer).toEqual(other)
+        expect(cachedMe('u1').read()).toEqual(me)
+    })
+
     it('does not write again an answer that changed nothing', async () => {
         await cachedMe('u1').load(async () => me)
         flushWrites()

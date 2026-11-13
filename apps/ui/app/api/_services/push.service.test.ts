@@ -57,7 +57,7 @@ describe('pushNotification', () => {
     it('rings every device of a recipient, with what the app needs to open the conversation, and counts it', async () => {
         await pushNotification(supabase, context())
         const [, init] = expo.mock.calls[0]
-        expect(JSON.parse(init.body)).toEqual([{ to: 'ExponentPushToken[a]', title: 'Scout', subtitle: 'Question', body: 'Which list first?', sound: 'default', data: { agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } }])
+        expect(JSON.parse(init.body)).toEqual([{ to: 'ExponentPushToken[a]', title: 'Scout', subtitle: 'Question', body: 'Which list first?', sound: 'default', data: { workspaceId: 1, agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } }])
         expect(inserted).toEqual([{ table: 'notification_push_dispatches', row: { user_id: 'user-1', source_key: 'question:agent-1' } }])
     })
 
@@ -99,8 +99,8 @@ describe('pushNotification', () => {
         expo.mockResolvedValue(new Response(JSON.stringify({ data: [{ status: 'ok' }, { status: 'ok' }] })))
         await pushNotification(supabase, context())
         const [ios, android] = JSON.parse(expo.mock.calls[0][1].body)
-        expect(ios).toEqual({ to: 'ExponentPushToken[ios]', title: 'Scout', subtitle: 'Question', body: 'Which list first?', sound: 'default', data: { agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } })
-        expect(android).toEqual({ to: 'ExponentPushToken[android]', title: 'Scout · Question', body: 'Which list first?', channelId: 'messages', priority: 'high', data: { agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } })
+        expect(ios).toEqual({ to: 'ExponentPushToken[ios]', title: 'Scout', subtitle: 'Question', body: 'Which list first?', sound: 'default', data: { workspaceId: 1, agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } })
+        expect(android).toEqual({ to: 'ExponentPushToken[android]', title: 'Scout · Question', body: 'Which list first?', channelId: 'messages', priority: 'high', data: { workspaceId: 1, agentId: 'agent-1', conversationId: 'conv-1', kind: 'question' } })
     })
 
     it('lands a finished run on the silent Android channel, at the normal priority', async () => {
