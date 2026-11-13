@@ -1,6 +1,7 @@
 {
     "actions": {
         "notNow": "Nicht jetzt",
+        "explain": "Erklären",
         "skip": "Überspringen",
         "connect": "Verbinden",
         "connecting": "Wird verbunden…",

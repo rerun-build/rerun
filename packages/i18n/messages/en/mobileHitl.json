@@ -1,6 +1,7 @@
 {
     "actions": {
         "notNow": "Not now",
+        "explain": "Explain",
         "skip": "Skip",
         "connect": "Connect",
         "connecting": "Connecting…",
@@ -130,6 +131,7 @@
     },
     "_context": {
         "actions.notNow": "Declines an ask of a coworker for now (an approval, a sign-in, an app to connect).",
+        "actions.explain": "Small button next to 'Not now' on an approval: opens a field to tell the coworker why the action is refused.",
         "steps.position": "Which step of a multi-step card is shown, e.g. 3 / 8.",
         "receipts.approvalCount": "Summary of approval decisions: how many were approved and how many were declined ('not now').",
         "receipts.cancelled.takeover": "The person gave the remote browser back to the coworker without doing anything.",

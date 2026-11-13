@@ -51,8 +51,8 @@ export function HitlCard({ symbol, label, beam = 'brand', onClose, closeLabel, c
     )
 }
 
-// A small action under a widget, the web's: the main one filled, the others outlined.
-export function HitlAction({ label, onPress, primary, tone, disabled }: { label: string; onPress: () => void; primary?: boolean; tone?: 'destructive'; disabled?: boolean }) {
-    return <Button label={label} onPress={onPress} size="sm" disabled={disabled} variant={primary ? 'default' : tone === 'destructive' ? 'destructive' : 'outline'} />
+// A small action under a widget, the web's: the main one filled, the others outlined, a quiet one bare.
+export function HitlAction({ label, onPress, primary, tone, disabled }: { label: string; onPress: () => void; primary?: boolean; tone?: 'destructive' | 'quiet'; disabled?: boolean }) {
+    return <Button label={label} onPress={onPress} size="sm" disabled={disabled} variant={primary ? 'default' : tone === 'destructive' ? 'destructive' : tone === 'quiet' ? 'ghost' : 'outline'} />
 }
 

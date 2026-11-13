@@ -73,7 +73,7 @@ export function ActionApprovalBlock({ approvals, onSubmit, disabled, inline, cla
         setCurrent(nextMissing === -1 ? firstMissing : nextMissing)
     }
 
-    const startDeclining = () => {
+    const startExplaining = () => {
         if (locked) return
         setNote(currentDecision?.decision === 'declined' ? (currentDecision.note ?? '') : '')
         setDeclining(true)
@@ -125,8 +125,11 @@ export function ActionApprovalBlock({ approvals, onSubmit, disabled, inline, cla
                 ) : (
                     <motion.div key="actions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex flex-wrap items-center justify-between gap-2">
                         {progress}
-                        <div className="ml-auto flex items-center gap-2">
-                            <Button size="sm" variant="destructive" disabled={locked} onClick={startDeclining} data-hitl="decline" aria-pressed={currentDecision?.decision === 'declined'}>
+                        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+                            <Button size="sm" variant="ghost" disabled={locked} onClick={startExplaining} data-hitl="explain" className="text-muted-foreground">
+                                {t('chat.actionApproval.explain')}
+                            </Button>
+                            <Button size="sm" variant="destructive" disabled={locked} onClick={() => decide('declined', currentDecision?.decision === 'declined' ? currentDecision.note : undefined)} data-hitl="decline" aria-pressed={currentDecision?.decision === 'declined'}>
                                 {currentDecision?.decision === 'declined' && <CheckIcon className="size-3.5" />}
                                 {t('chat.actionApproval.decline')}
                             </Button>

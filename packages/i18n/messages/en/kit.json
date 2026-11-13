@@ -2,6 +2,7 @@
     "_context": {
         "close": "Accessible label of the button that closes a dialog, a sheet or a panel.",
         "chat.actionApproval.decline": "Button that refuses the action the coworker asks to run.",
+        "chat.actionApproval.explain": "Small button next to the refusal: opens a field to tell the coworker why the action is refused.",
         "chat.approval.title": "{label} is the name of the tool that asks for approval.",
         "chat.approval.responded": "{choice} is the raw choice code (once, session, always, deny), kept untranslated.",
         "chat.approval.choices.session": "Approve for the rest of this chat session.",
@@ -83,6 +84,7 @@
             "previous": "Previous approval",
             "next": "Next approval",
             "decline": "Not now",
+            "explain": "Explain",
             "approve": "Approve",
             "approved": "Approved"
         },

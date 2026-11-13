@@ -1,6 +1,7 @@
 {
     "actions": {
         "notNow": "Pas maintenant",
+        "explain": "Expliquer",
         "skip": "Passer",
         "connect": "Connecter",
         "connecting": "Connexion…",

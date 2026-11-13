@@ -41,7 +41,7 @@ export function ApprovalWidget({ pending, onAnswer }: HitlWidgetProps) {
         onAnswer(serializeApprovalDecisions(next.filter((entry): entry is ApprovalDecision => entry !== null)))
     }
 
-    const startDeclining = () => {
+    const startExplaining = () => {
         const current = decisions[index]
         setNote(current?.decision === 'declined' ? (current.note ?? '') : '')
         setDeclining(true)
@@ -79,7 +79,8 @@ export function ApprovalWidget({ pending, onAnswer }: HitlWidgetProps) {
                 actions={
                     declining ? undefined : (
                         <>
-                            <HitlAction label={t('actions.notNow')} tone="destructive" onPress={startDeclining} />
+                            <HitlAction label={t('actions.explain')} tone="quiet" onPress={startExplaining} />
+                            <HitlAction label={t('actions.notNow')} tone="destructive" onPress={() => decide('declined', decisions[index]?.decision === 'declined' ? decisions[index]?.note : undefined)} />
                             <HitlAction label={decisions[index]?.decision === 'approved' ? t('approval.approved') : t('approval.approve')} primary onPress={() => decide('approved')} />
                         </>
                     )
