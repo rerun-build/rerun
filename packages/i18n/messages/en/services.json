@@ -137,7 +137,10 @@
         "skipped": "Skipped.",
         "skip": "Skip",
         "finish": "Finish",
-        "nextApp": "Next app"
+        "nextApp": "Next app",
+        "fromVault": "Already in the Vault",
+        "useAccount": "Use {label}",
+        "connectNew": "New account"
     },
     "signInPopup": {
         "connecting": "Connecting to {name}…"

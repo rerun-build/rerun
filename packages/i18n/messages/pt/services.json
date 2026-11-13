@@ -122,7 +122,10 @@
         "skipped": "Pulado.",
         "skip": "Pular",
         "finish": "Concluir",
-        "nextApp": "Próximo app"
+        "nextApp": "Próximo app",
+        "fromVault": "Já no Vault",
+        "useAccount": "Usar {label}",
+        "connectNew": "Nova conta"
     },
     "signInPopup": {
         "connecting": "Conectando a {name}…"
