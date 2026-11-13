@@ -12,7 +12,7 @@ import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { useBillingStore } from '@/stores/billing.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { BorderBeam } from '@rerun/ui'
-import { ArrowRightIcon, CheckIcon, CoinsIcon, CreditCardIcon, LinkIcon, PauseIcon, Play, ZapOffIcon } from '@/lib/icons'
+import { ArrowRightIcon, CheckIcon, CoinsIcon, CreditCardIcon, KeyIcon, LinkIcon, PauseIcon, Play, ZapOffIcon } from '@/lib/icons'
 import { usd } from '@/ee/components/dialogs/billing/parts'
 import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, TRIAL_CREDITS, ZERO_QUANTITIES, creditsLabel, planPriceCents, type PriceArm } from '@/ee/lib/billing/plans'
 import { NOTICE_PERKS } from '@/ee/lib/billing/pro-perks'
@@ -205,6 +205,12 @@ function LifetimeNotice({ onConnectProvider, ownConnection }: { onConnectProvide
                             {t('connectProvider.chatgpt')}
                         </Button>
                     </div>
+                    <div className="flex items-center gap-2 text-xs uppercase">
+                        <span className="flex-1 border-t" />
+                        <span className="text-muted-foreground">{t('or')}</span>
+                        <span className="flex-1 border-t" />
+                    </div>
+                    <NoticeActions actions={[{ key: 'api-key', leading: <Icon icon={KeyIcon} size="sm" />, title: t('lifetime.apiKeyTitle'), description: t('lifetime.apiKeyDescription'), cta: t('lifetime.apiKeyCta'), variant: 'outline', onClick: () => openAiProviders() }]} />
                 </>
             ) : (
                 <>

@@ -411,7 +411,10 @@
         "resetsNextMonth": "Eles renovam no mês que vem.",
         "lifetime": {
             "ownConnection": "Seu plano vitalício roda na sua própria IA, e seu plano {plan} está conectado.",
-            "connectProvider": "Seu plano vitalício roda na sua própria IA. Conecte Claude ou ChatGPT para seus coworkers continuarem trabalhando.",
+            "connectProvider": "Seu plano vitalício roda na sua própria IA. Conecte Claude ou ChatGPT, ou adicione uma chave de API, para seus coworkers continuarem trabalhando.",
+            "apiKeyTitle": "Usar uma chave de API",
+            "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter ou um endpoint personalizado.",
+            "apiKeyCta": "Adicionar uma chave",
             "body": "Seu plano vitalício roda na sua própria IA.",
             "connectTitle": "Conectar sua IA",
             "connectDescription": "Claude, ChatGPT ou uma chave de API.",

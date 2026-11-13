@@ -411,7 +411,10 @@
         "resetsNextMonth": "Ils se renouvellent le mois prochain.",
         "lifetime": {
             "ownConnection": "Votre offre à vie fonctionne avec votre propre IA, et votre abonnement {plan} est connecté.",
-            "connectProvider": "Votre offre à vie fonctionne avec votre propre IA. Connectez Claude ou ChatGPT pour que vos coworkers continuent de travailler.",
+            "connectProvider": "Votre offre à vie fonctionne avec votre propre IA. Connectez Claude ou ChatGPT, ou ajoutez une clé API, pour que vos coworkers continuent de travailler.",
+            "apiKeyTitle": "Utiliser une clé API",
+            "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter ou un endpoint personnalisé.",
+            "apiKeyCta": "Ajouter une clé",
             "body": "Votre offre à vie fonctionne avec votre propre IA.",
             "connectTitle": "Connecter votre IA",
             "connectDescription": "Claude, ChatGPT ou une clé API.",

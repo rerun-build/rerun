@@ -411,7 +411,10 @@
         "resetsNextMonth": "Es wird nächsten Monat zurückgesetzt.",
         "lifetime": {
             "ownConnection": "Dein Lifetime-Tarif läuft mit deiner eigenen KI, und dein {plan}-Abo ist verbunden.",
-            "connectProvider": "Dein Lifetime-Tarif läuft mit deiner eigenen KI. Verbinde Claude oder ChatGPT, damit deine Coworker weiterarbeiten.",
+            "connectProvider": "Dein Lifetime-Tarif läuft mit deiner eigenen KI. Verbinde Claude oder ChatGPT oder füge einen API-Schlüssel hinzu, damit deine Coworker weiterarbeiten.",
+            "apiKeyTitle": "API-Schlüssel verwenden",
+            "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter oder ein eigener Endpoint.",
+            "apiKeyCta": "Schlüssel hinzufügen",
             "body": "Dein Lifetime-Tarif läuft mit deiner eigenen KI.",
             "connectTitle": "Deine KI verbinden",
             "connectDescription": "Claude, ChatGPT oder ein API-Schlüssel.",

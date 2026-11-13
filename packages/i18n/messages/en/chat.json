@@ -516,7 +516,10 @@
         "resetsNextMonth": "It resets next month.",
         "lifetime": {
             "ownConnection": "Your lifetime plan runs on your own AI, and your {plan} plan is connected.",
-            "connectProvider": "Your lifetime plan runs on your own AI. Connect Claude or ChatGPT to keep your coworkers working.",
+            "connectProvider": "Your lifetime plan runs on your own AI. Connect Claude or ChatGPT, or add an API key, to keep your coworkers working.",
+            "apiKeyTitle": "Use an API key",
+            "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter or a custom endpoint.",
+            "apiKeyCta": "Add a key",
             "body": "Your lifetime plan runs on your own AI.",
             "connectTitle": "Connect your AI",
             "connectDescription": "Claude, ChatGPT or an API key.",
