@@ -1,0 +1,57 @@
+{
+    "title": "Vault",
+    "description": "Entre uma vez em um app e escolha os coworkers que o usam.",
+    "search": "Buscar no Vault",
+    "noMatch": "Nenhum resultado",
+    "groups": {
+        "apps": "Apps",
+        "mcp": "Servidores MCP",
+        "secrets": "Segredos"
+    },
+    "add": "Adicionar",
+    "addApp": "Adicionar um app",
+    "empty": "O Vault está vazio. Entre uma vez em um app e cada coworker que você escolher poderá usá-lo.",
+    "row": {
+        "everyone": "Todos os coworkers",
+        "unused": "Nenhum coworker ainda",
+        "usedBy": "{names}",
+        "usedByMore": "{names} e mais {count, plural, one {#} other {#}}"
+    },
+    "status": {
+        "needsAuth": "Desconectado",
+        "needsConfig": "Não configurado"
+    },
+    "detail": {
+        "back": "Voltar ao Vault",
+        "signedOut": "Desconectado: os coworkers dele não podem usar {name} até alguém entrar de novo.",
+        "notSetUp": "{name} ainda não está configurado.",
+        "reconnect": "Reconectar",
+        "everyone": "Todos os coworkers",
+        "everyoneHint": "Coworkers adicionados depois também vão recebê-lo.",
+        "coworkers": "Coworkers",
+        "noCoworkers": "Ainda não há coworkers neste workspace.",
+        "hiddenCoworkers": "{count, plural, one {# coworker} other {# coworkers}} em Boxes que você não vê",
+        "variables": "Variáveis"
+    },
+    "delete": {
+        "button": "Excluir",
+        "title": "Excluir {name}?",
+        "loses": "Estes coworkers vão perdê-lo: {names}.",
+        "nobody": "Nenhum coworker o usa.",
+        "confirm": "Excluir",
+        "deleted": "{name} excluído"
+    },
+    "reasons": {
+        "adminOnly": "Só um admin pode fazer isso",
+        "manageBox": "Você não gerencia a Box deste coworker",
+        "manageAny": "Gerencie uma Box para adicionar ao Vault",
+        "paidAppEveryone": "Um app pago é conectado coworker por coworker"
+    },
+    "addPage": {
+        "title": "Adicionar um app",
+        "search": "Buscar apps"
+    },
+    "errors": {
+        "changeFailed": "Não foi possível salvar a alteração"
+    }
+}

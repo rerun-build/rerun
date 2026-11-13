@@ -19,7 +19,9 @@ export const SETTINGS_PANEL_LABELS: Record<SettingsPanel, string> = {
 }
 
 // The ones the workspace settings store owns. The others already have a store of their own.
-export type WorkspaceDialogPanel = Extract<SettingsPanel, 'workspace' | 'members' | 'api_keys' | 'ai_providers' | 'knowledge_base'>
+// The Vault is one of them, but stays out of SETTINGS_PANELS until it ships: the foreman offers every
+// panel listed there, and must not open one the workspace cannot see yet.
+export type WorkspaceDialogPanel = Extract<SettingsPanel, 'workspace' | 'members' | 'api_keys' | 'ai_providers' | 'knowledge_base'> | 'vault'
 
 // The tabs of the Brain dialog: the company pages every agent reads, the changes agents propose to
 // them, the links they published, the shared folder and the shared database. The panel id keeps its

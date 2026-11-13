@@ -245,3 +245,16 @@ export async function markVaultEntryAuthorized(itemId: string, actor?: Actor, ac
     if (item.oauth && !item.tokens.includes(item.oauth.serverName)) return item
     return patchVaultItem(ctx.conn, itemId, { status: 'active', ...(account?.label ? { label: account.label } : {}) })
 }
+
+// How many entries wait on a sign-in, for the dot on the workspace menu. Nothing to say, rather
+// than an error, for a box without a Vault or one that cannot be reached.
+export async function vaultSignedOutCount(actor?: Actor): Promise<number> {
+    try {
+        const resolved = actor ?? (await requireLightSessionActor())
+        const engine = await findWorkspaceEngine(resolved.workspaceId)
+        if (!engine || !(await supportsVault(engine.conn))) return 0
+        return (await listVaultItems(engine.conn)).filter(item => item.status === 'needs_auth').length
+    } catch {
+        return 0
+    }
+}

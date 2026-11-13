@@ -1,0 +1,64 @@
+{
+    "_context": {
+        "title": "The Vault is the product name of the place where a workspace keeps the accounts and keys its coworkers share. Keep \"Vault\" as is.",
+        "row.usedBy": "{names} is a comma-separated list of coworker names.",
+        "row.usedByMore": "{names} is a comma-separated list of coworker names, {count} how many more there are.",
+        "detail.hiddenCoworkers": "Coworkers that sit in Boxes the reader cannot see.",
+        "delete.loses": "{names} is a comma-separated list of coworker names."
+    },
+    "title": "Vault",
+    "description": "Sign in to an app once, then pick the coworkers that use it.",
+    "search": "Search the Vault",
+    "noMatch": "Nothing matches",
+    "groups": {
+        "apps": "Apps",
+        "mcp": "MCP servers",
+        "secrets": "Secrets"
+    },
+    "add": "Add",
+    "addApp": "Add an app",
+    "empty": "Nothing in the Vault yet. Sign in to an app once, every coworker you pick can use it.",
+    "row": {
+        "everyone": "Every coworker",
+        "unused": "No coworker yet",
+        "usedBy": "{names}",
+        "usedByMore": "{names} and {count, plural, one {# other} other {# others}}"
+    },
+    "status": {
+        "needsAuth": "Signed out",
+        "needsConfig": "Not set up"
+    },
+    "detail": {
+        "back": "Back to the Vault",
+        "signedOut": "Signed out: its coworkers can't use {name} until someone signs in again.",
+        "notSetUp": "{name} is not set up yet.",
+        "reconnect": "Reconnect",
+        "everyone": "Every coworker",
+        "everyoneHint": "Coworkers added later get it too.",
+        "coworkers": "Coworkers",
+        "noCoworkers": "No coworker in this workspace yet.",
+        "hiddenCoworkers": "{count, plural, one {# coworker} other {# coworkers}} in Boxes you can't see",
+        "variables": "Variables"
+    },
+    "delete": {
+        "button": "Delete",
+        "title": "Delete {name}?",
+        "loses": "These coworkers lose it: {names}.",
+        "nobody": "No coworker uses it.",
+        "confirm": "Delete",
+        "deleted": "{name} deleted"
+    },
+    "reasons": {
+        "adminOnly": "Only an admin can do this",
+        "manageBox": "You don't manage this coworker's Box",
+        "manageAny": "Manage a Box to add to the Vault",
+        "paidAppEveryone": "A paid app is attached coworker by coworker"
+    },
+    "addPage": {
+        "title": "Add an app",
+        "search": "Search apps"
+    },
+    "errors": {
+        "changeFailed": "Couldn't save the change"
+    }
+}
