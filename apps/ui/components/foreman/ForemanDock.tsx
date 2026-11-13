@@ -29,7 +29,8 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // BoardChatSplit) : sans lui l'orbe serait 9px plus près du coin que la barre du bas et le bouton
 // Help, qui eux vivent dans la carte. Sous `md` cet inset vaut 0 et le calc retombe sur la ligne du
 // reste du mobilier. Trois coins sont déjà tenus : en bas à gauche l'orbe s'assoit à droite de la
-// rangée de BoardCornerActions (sa largeur publiée + un écart), en haut à gauche sous le sélecteur
+// rangée de BoardCornerActions (sa largeur publiée + un écart) et publie à son tour sa place
+// (--board-corner-orb) pour que la barre du bas la contourne, en haut à gauche sous le sélecteur
 // de workspace, en haut à droite à gauche de la pill de zoom du board. Plus haute que les pills,
 // elle partage leur axe : posée dans une rangée, elle déborde d'autant au-dessus qu'en dessous
 // (--orb-overhang), au lieu de s'aligner par le bord.
@@ -41,9 +42,9 @@ const CORNER_CLASSES: Record<ForemanCorner, string> = {
     'bottom-right': 'bottom-[calc(var(--chrome-edge)-var(--orb-overhang)+var(--board-inset,0px)+var(--consent-inset))] right-[calc(var(--chrome-edge)+var(--board-inset,0px))]',
 }
 
-// Under it the pill, grown to write in, would run into the bar at the bottom of the board: the
-// Foreman stays the ball it was.
-const PILL_TOO_NARROW_QUERY = '(max-width: 1023.98px)'
+// Under it the pill would run into the bar at the bottom of the board, which moves right of the
+// bottom-left corner when the board cannot centre it: the Foreman stays the ball it was.
+const PILL_TOO_NARROW_QUERY = '(max-width: 1279.98px)'
 
 export function ForemanDock() {
     const open = useForemanStore(selectForemanOpen)
@@ -154,9 +155,32 @@ export function ForemanDock() {
         gaze.current = bubbleShown ? { x: corner.endsWith('left') ? 0.5 : -0.5, y: corner.startsWith('bottom') ? -1 : 1 } : null
     }, [bubbleShown, corner])
 
+    const size = isMobile ? PARKED_ORB_SIZE_MOBILE : PARKED_ORB_SIZE
+
+    // Parked in the bottom-left corner, the ball (or the pill it grows into) sits where the bar at
+    // the bottom of the board lands once the board cannot centre it: it publishes its place, the way
+    // the corner row publishes its width. Column open, the ball is faded out and takes no room.
+    const pillRef = useRef<HTMLDivElement>(null)
+    const parkedBottomLeft = isMobile !== null && !open && corner === 'bottom-left'
+    useEffect(() => {
+        if (!parkedBottomLeft) return
+        const root = document.documentElement
+        const pill = pillRef.current
+        const publish = () => {
+            const taken = Math.max(size, pillVisible && pill ? pill.offsetWidth : 0)
+            root.style.setProperty('--board-corner-orb', `calc(${taken}px + var(--chrome-gap))`)
+        }
+        publish()
+        const observer = new ResizeObserver(publish)
+        if (pill && pillVisible) observer.observe(pill)
+        return () => {
+            observer.disconnect()
+            root.style.removeProperty('--board-corner-orb')
+        }
+    }, [parkedBottomLeft, size, pillVisible])
+
     if (isMobile === null) return null
 
-    const size = isMobile ? PARKED_ORB_SIZE_MOBILE : PARKED_ORB_SIZE
     const orbState = voice.status === 'listening' || bubbleShown ? 'listening' : foremanOrbState({ open, activity })
 
     // What the control center itself asks for before it anchors to the orb, minus the phone, which
@@ -189,6 +213,7 @@ export function ForemanDock() {
                 d'un svg coûtent moins cher que le suivi d'une cible qui bouge avec le composer.
                 Fermée, on peut la traîner : lâchée, elle s'aimante au coin le plus proche. */}
             <ForemanDockPill
+                ref={pillRef}
                 side={corner.endsWith('left') ? 'left' : 'right'}
                 mode={pillMode}
                 tone={nudge ? 'orange' : dock.failed ? 'red' : undefined}

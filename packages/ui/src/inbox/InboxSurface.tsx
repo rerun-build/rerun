@@ -315,7 +315,7 @@ export function InboxSurface<T extends InboxEntry>({
                 aria-controls={cardId}
                 aria-label={items.length > 0 ? t('inbox.pillLabel', { summary: pillSummary(items, t) }) : t('inbox.pillLabelEmpty')}
                 onClick={togglePill}
-                className={cn('sm:pr-[15px]', (cardOpen || cardMounted) && 'invisible')}
+                className={cn((cardOpen || cardMounted) && 'invisible')}
             >
                 {pulse > 0 && !reducedMotion && (
                     <motion.span
@@ -509,7 +509,8 @@ function pillSummary(items: InboxEntry[], t: KitTranslator): string {
     return [needs > 0 && t('inbox.needsYouCount', { count: needs }), done > 0 && t('inbox.doneCount', { count: done })].filter(Boolean).join(' · ')
 }
 
-// `compact` keeps only the bell below `sm`: the full summary crowds the bottom bar on a phone.
+// `compact` keeps only the bell on a phone, or on a board narrower than 56rem (the `board` container,
+// shrunk by the chat column on a wide window): the full summary would crowd the bottom bar.
 function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; compact?: boolean }) {
     const t = useKitTranslations()
     const stack = [...new Set(items.map(item => item.agentId).filter(Boolean))].slice(0, PILL_STACK_SIZE)
@@ -519,7 +520,7 @@ function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; com
                 <BellIcon className="size-4" />
                 {items.length > 0 && <span aria-hidden className="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
             </span>
-            <span className={cn('flex items-center gap-2', compact && 'hidden sm:flex')}>
+            <span className={cn('flex items-center gap-2', compact && 'pr-1 max-sm:hidden @max-4xl/board:hidden')}>
                 {stack.length > 0 && (
                     <span aria-hidden className="flex -space-x-1.5">
                         {stack.map(agentId => (

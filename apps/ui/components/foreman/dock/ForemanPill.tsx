@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import { BorderBeam, type BorderBeamProps } from '@rerun/ui'
 import { ChromeBar } from '@rerun/ui/chrome'
 
@@ -16,6 +16,7 @@ type ForemanPillProps = {
     /** Lights the rim in a state's colour: orange when it waits for you, red when it failed. */
     tone?: BorderBeamProps['tone']
     hidden?: boolean
+    ref?: RefObject<HTMLDivElement | null>
     children: ReactNode
 }
 
@@ -23,9 +24,10 @@ type ForemanPillProps = {
  * The parked Foreman grown into a field: a chrome-high pill whose outer cap is the ball itself.
  * Laid in the ball's own slot, on its axis, it leaves under the ball the room the ball takes.
  */
-export function ForemanPill({ side, width, tone, hidden = false, children }: ForemanPillProps) {
+export function ForemanPill({ side, width, tone, hidden = false, ref, children }: ForemanPillProps) {
     return (
         <ChromeBar
+            ref={ref}
             start={side === 'left' ? 'control' : 'text'}
             end={side === 'left' ? 'text' : 'control'}
             beamTone={tone ? 'white' : 'brand'}

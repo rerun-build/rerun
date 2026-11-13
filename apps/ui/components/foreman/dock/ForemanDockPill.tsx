@@ -19,6 +19,8 @@ type ForemanDockPillProps = {
     mode: ForemanDockPillMode
     tone?: BorderBeamProps['tone']
     hidden?: boolean
+    /** The pill's own box, for whoever has to keep clear of it. */
+    ref?: RefObject<HTMLDivElement | null>
     mod: string
     inputRef: RefObject<HTMLInputElement | null>
     onSubmit: (text: string) => void
@@ -27,14 +29,14 @@ type ForemanDockPillProps = {
 }
 
 /** The pill in whichever of its three lives the Foreman is in: a field, its run, or a voice. */
-export function ForemanDockPill({ side, mode, tone, hidden, mod, inputRef, onSubmit, onEngage }: ForemanDockPillProps) {
+export function ForemanDockPill({ side, mode, tone, hidden, ref, mod, inputRef, onSubmit, onEngage }: ForemanDockPillProps) {
     const [draft, setDraft] = useState('')
     const [focused, setFocused] = useState(false)
     const writing = mode.kind === 'field' && (focused || draft.length > 0)
     const width = mode.kind === 'voice' || writing ? WRITING_WIDTH : mode.kind === 'ticker' ? TICKER_WIDTH : REST_WIDTH
 
     return (
-        <ForemanPill side={side} width={width} tone={tone} hidden={hidden}>
+        <ForemanPill ref={ref} side={side} width={width} tone={tone} hidden={hidden}>
             {mode.kind === 'voice' ? (
                 <ForemanPillVoice phase={mode.phase} stream={mode.stream} />
             ) : mode.kind === 'ticker' ? (

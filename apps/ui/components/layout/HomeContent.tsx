@@ -425,7 +425,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
 
     return (
         <div className="flex flex-col h-full bg-background overflow-hidden">
-            <main className="flex-1 relative overflow-hidden">
+            <main className="@container/board flex-1 relative overflow-hidden">
                 <BuilderView initialSpaces={serverBoardMatchesTab ? initialSpaces : []} />
                 <WorkspaceSwitcher />
                 <WorkspacePausedBanner />
