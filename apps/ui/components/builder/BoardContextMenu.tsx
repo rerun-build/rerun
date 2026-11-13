@@ -39,7 +39,7 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
     const spaces = useBoardStore(state => state.spaces)
     const openAgentChat = useBoardStore(state => state.openAgentChat)
     const openAgentSettings = useBoardStore(state => state.openAgentSettings)
-    const beginAgentDuplicatePlacement = useBoardStore(state => state.beginAgentDuplicatePlacement)
+    const requestCreation = useBoardStore(state => state.requestCreation)
     const moveAgentToBox = useBoardStore(state => state.moveAgentToBox)
     const deleteSpace = useBoardStore(state => state.deleteSpace)
     const [deleteAgentId, setDeleteAgentId] = useState<string | null>(null)
@@ -102,7 +102,7 @@ export function BoardContextMenu({ children, target, onTargetClear }: BoardConte
                             </ContextMenuItem>
                         </Forbidden>
                         <Forbidden reason={agentReason}>
-                            <ContextMenuItem disabled={!canManageAgent} className="w-full" onSelect={() => beginAgentDuplicatePlacement({ agentId: targetAgent.id, agentName: targetAgent.name })}>
+                            <ContextMenuItem disabled={!canManageAgent} className="w-full" onSelect={() => requestCreation({ kind: 'duplicate', agentId: targetAgent.id, agentName: targetAgent.name }, viewer)}>
                                 <CopyPlusIcon className="size-4" />
                                 {t('duplicate')}
                             </ContextMenuItem>

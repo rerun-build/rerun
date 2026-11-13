@@ -18,6 +18,7 @@ type AgentSheetChatProps = {
     active: boolean
     agentId: string
     sessionId: string | null
+    sessionPending?: boolean
     onSessionCreated: (id: string) => void
     initialRunId?: string | null
     arrival?: number
@@ -33,7 +34,7 @@ type AgentSheetChatProps = {
     onOpenThread?: (sessionId: string, title: string) => void
 }
 
-export function AgentSheetChat({ uid, active, agentId, sessionId, onSessionCreated, initialRunId, arrival, setup, onSetupSkipped, onOpenInstall, onRunFinished, onNewConversation, kind, title, threads, onOpenThread }: AgentSheetChatProps) {
+export function AgentSheetChat({ uid, active, agentId, sessionId, sessionPending, onSessionCreated, initialRunId, arrival, setup, onSetupSkipped, onOpenInstall, onRunFinished, onNewConversation, kind, title, threads, onOpenThread }: AgentSheetChatProps) {
     const t = useTranslations('agent')
     const boardAgents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
@@ -90,6 +91,7 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, onSessionCreat
             agentId={agentId}
             agentName={agentName}
             sessionId={sessionId}
+            sessionPending={sessionPending}
             onSessionCreated={onSessionCreated}
             initialRunId={initialRunId}
             arrival={arrival}

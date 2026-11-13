@@ -1,0 +1,66 @@
+{
+    "_context": {
+        "switch.label": "Name of the setting that picks how the workspace is drawn: as the 3D board, or as the Simple view (a list of coworkers beside the chat).",
+        "switch.board": "The isometric 3D board of the workspace. Keep it short, it labels an icon.",
+        "switch.simple": "The Simple view of the workspace: a list of coworkers on the left, the chat in the middle. Keep it short, it labels an icon.",
+        "list.label": "Accessible name of the list of the workspace's coworkers.",
+        "tile.more": "Accessible name of the '…' button on a coworker's row. {name} is the coworker's name.",
+        "chat.pick": "Shown in the middle of the Simple view when no coworker is open.",
+        "line.workingOn": "Status line under a coworker's name: it is running, {detail} is the title of its conversation or its description.",
+        "line.asleepAbout": "Status line under a coworker's name: its machine is off, {about} is its description.",
+        "line.waiting": "Line under a coworker's name in the list, when it waits on the person and its conversation has no title.",
+        "foreman.line": "Line under the Chief of Staff's name at the top of the list of coworkers: it invites the person to ask it anything.",
+        "line.you": "Line under a coworker's name: the last message of its latest conversation, written by the person reading. {message} is that message, cut to one line.",
+        "details.close": "Accessible name of the veil behind the coworker's card when it lies over the chat on a narrow window: clicking it closes the card.",
+        "details.label": "Accessible name of the column showing a coworker's card. {name} is the coworker's name.",
+        "phone.section": "Accessible name of a collapsible Box header in the phone's list: the Box's name and how many coworkers it holds.",
+        "phone.byBox": "Option of the phone's list: the coworkers grouped by Box (a group of coworkers) rather than by recency."
+    },
+    "switch": {
+        "label": "View",
+        "board": "3D",
+        "simple": "Simple"
+    },
+    "list": {
+        "label": "Coworkers",
+        "search": "Search",
+        "empty": "No coworkers yet"
+    },
+    "tile": {
+        "more": "More for {name}",
+        "newConversation": "New conversation",
+        "allConversations": "All conversations",
+        "card": "Coworker card",
+        "pin": "Pin to top",
+        "unpin": "Unpin"
+    },
+    "chat": {
+        "allConversations": "All conversations",
+        "pick": "Pick a coworker on the left.",
+        "card": "Coworker card"
+    },
+    "line": {
+        "paused": "Paused",
+        "waiting": "Waiting for you",
+        "error": "Something went wrong",
+        "working": "Working",
+        "workingOn": "Working · {detail}",
+        "asleep": "Asleep",
+        "asleepAbout": "Asleep · {about}",
+        "you": "You: {message}"
+    },
+    "foreman": {
+        "name": "Chief of Staff",
+        "line": "Ask anything"
+    },
+    "details": {
+        "close": "Close the card",
+        "label": "Card of {name}"
+    },
+    "phone": {
+        "pinned": "Pinned",
+        "recent": "Recent",
+        "byBox": "By Box",
+        "section": "{label}, {count}"
+    }
+}

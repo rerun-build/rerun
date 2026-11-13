@@ -3,16 +3,9 @@
 import type { KeyboardEvent, PointerEvent, RefObject } from 'react'
 import { useCallback, useEffect, useRef } from 'react'
 
-import {
-    SIDE_PANEL_DEFAULT_WIDTH,
-    SIDE_PANEL_MIN_WIDTH,
-    SIDE_PANEL_WIDTH_STORAGE_KEY,
-    clampSidePanelWidth,
-    getSidePanelMaxWidth,
-    loadSidePanelWidth,
-    saveSidePanelWidth,
-} from '@/lib/side-panel-width'
+import { SIDE_PANEL_WIDTH, clampSidePanelWidth, getSidePanelMaxWidth, loadSidePanelWidth, saveSidePanelWidth, type PanelWidthConfig } from '@/lib/side-panel-width'
 import { GripVerticalIcon } from '@/lib/icons'
+import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
 const KEYBOARD_RESIZE_STEP = 32
@@ -29,7 +22,9 @@ type DocumentStyles = {
     userSelect: string
 }
 
-export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDivElement | null> }) {
+// The grip on a panel's left edge. `config` and `widthVar` say which panel: the board's side panel by
+// default, whose width the agent panel and every other side panel share.
+export function SidePanelResizeHandle({ panelRef, config = SIDE_PANEL_WIDTH, widthVar = '--side-panel-width', className }: { panelRef: RefObject<HTMLElement | null>; config?: PanelWidthConfig; widthVar?: string; className?: string }) {
     const t = useTranslations('layout.sidePanel')
     const handleRef = useRef<HTMLDivElement>(null)
     const dragRef = useRef<DragState | null>(null)
@@ -38,17 +33,17 @@ export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDi
     const syncAria = useCallback((width: number) => {
         const handle = handleRef.current
         if (!handle) return
-        handle.setAttribute('aria-valuemin', String(SIDE_PANEL_MIN_WIDTH))
-        handle.setAttribute('aria-valuemax', String(getSidePanelMaxWidth(window.innerWidth)))
+        handle.setAttribute('aria-valuemin', String(config.min))
+        handle.setAttribute('aria-valuemax', String(getSidePanelMaxWidth(window.innerWidth, config)))
         handle.setAttribute('aria-valuenow', String(Math.round(width)))
-    }, [])
+    }, [config])
 
     const applyWidth = useCallback((width: number) => {
-        const clamped = clampSidePanelWidth(width, window.innerWidth)
-        panelRef.current?.style.setProperty('--side-panel-width', `${clamped}px`)
+        const clamped = clampSidePanelWidth(width, window.innerWidth, config)
+        panelRef.current?.style.setProperty(widthVar, `${clamped}px`)
         syncAria(clamped)
         return clamped
-    }, [panelRef, syncAria])
+    }, [panelRef, syncAria, config, widthVar])
 
     const restoreDocumentStyles = useCallback(() => {
         if (!documentStylesRef.current) return
@@ -67,11 +62,11 @@ export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDi
         if (handle?.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId)
         restoreDocumentStyles()
 
-        if (persist) saveSidePanelWidth(drag.currentWidth, window.innerWidth)
-    }, [restoreDocumentStyles])
+        if (persist) saveSidePanelWidth(drag.currentWidth, window.innerWidth, config)
+    }, [restoreDocumentStyles, config])
 
     useEffect(() => {
-        applyWidth(loadSidePanelWidth(window.innerWidth))
+        applyWidth(loadSidePanelWidth(window.innerWidth, config))
         const mountedHandle = handleRef.current
 
         let frame: number | null = null
@@ -84,8 +79,8 @@ export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDi
             })
         }
         const syncStoredWidth = (event: StorageEvent) => {
-            if (event.key === SIDE_PANEL_WIDTH_STORAGE_KEY) {
-                applyWidth(loadSidePanelWidth(window.innerWidth))
+            if (event.key === config.storageKey) {
+                applyWidth(loadSidePanelWidth(window.innerWidth, config))
             }
         }
 
@@ -98,13 +93,13 @@ export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDi
 
             const drag = dragRef.current
             if (drag) {
-                saveSidePanelWidth(drag.currentWidth, window.innerWidth)
+                saveSidePanelWidth(drag.currentWidth, window.innerWidth, config)
                 if (mountedHandle?.hasPointerCapture(drag.pointerId)) mountedHandle.releasePointerCapture(drag.pointerId)
                 dragRef.current = null
             }
             restoreDocumentStyles()
         }
-    }, [applyWidth, panelRef, restoreDocumentStyles, syncAria])
+    }, [applyWidth, panelRef, restoreDocumentStyles, syncAria, config])
 
     const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
         if (event.button !== 0 || dragRef.current) return
@@ -146,16 +141,16 @@ export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDi
         let nextWidth: number | null = null
         if (event.key === 'ArrowLeft') nextWidth = currentWidth + KEYBOARD_RESIZE_STEP
         if (event.key === 'ArrowRight') nextWidth = currentWidth - KEYBOARD_RESIZE_STEP
-        if (event.key === 'Home') nextWidth = SIDE_PANEL_MIN_WIDTH
-        if (event.key === 'End') nextWidth = getSidePanelMaxWidth(window.innerWidth)
+        if (event.key === 'Home') nextWidth = config.min
+        if (event.key === 'End') nextWidth = getSidePanelMaxWidth(window.innerWidth, config)
         if (nextWidth === null) return
 
         event.preventDefault()
-        saveSidePanelWidth(applyWidth(nextWidth), window.innerWidth)
+        saveSidePanelWidth(applyWidth(nextWidth), window.innerWidth, config)
     }
 
     const resetWidth = () => {
-        saveSidePanelWidth(applyWidth(SIDE_PANEL_DEFAULT_WIDTH), window.innerWidth)
+        saveSidePanelWidth(applyWidth(config.defaultWidth), window.innerWidth, config)
     }
 
     return (
@@ -164,10 +159,10 @@ export function SidePanelResizeHandle({ panelRef }: { panelRef: RefObject<HTMLDi
             role="separator"
             aria-label={t('resize')}
             aria-orientation="vertical"
-            aria-valuemin={SIDE_PANEL_MIN_WIDTH}
+            aria-valuemin={config.min}
             data-dragging="false"
             tabIndex={0}
-            className="group absolute inset-y-0 -left-[9px] z-10 hidden w-4 cursor-col-resize touch-none focus-visible:outline-none md:block"
+            className={cn('group absolute inset-y-0 -left-[9px] z-10 hidden w-4 cursor-col-resize touch-none focus-visible:outline-none md:block', className)}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={event => finishResize(event.pointerId)}

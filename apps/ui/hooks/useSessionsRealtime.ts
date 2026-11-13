@@ -2,6 +2,7 @@
 
 import type { SessionStatus } from '@/lib/board/types'
 import { useBoardStore } from '@/stores/board.store'
+import { useCoworkerPreviewsStore } from '@/stores/coworker-previews.store'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 
 export function useSessionsRealtime(enabled: boolean) {
@@ -14,8 +15,10 @@ export function useSessionsRealtime(enabled: boolean) {
         enabled,
         onResync: () => {
             void useBoardStore.getState().reconcileSessions()
+            void useCoworkerPreviewsStore.getState().reload()
         },
         onInsert: row => {
+            useCoworkerPreviewsStore.getState().applySession(row)
             _onSessionInsert({
                 id: row.id,
                 agentId: row.agent_id,
@@ -24,6 +27,7 @@ export function useSessionsRealtime(enabled: boolean) {
             })
         },
         onUpdate: row => {
+            useCoworkerPreviewsStore.getState().applySession(row)
             _onSessionUpdate({
                 id: row.id,
                 agentId: row.agent_id,

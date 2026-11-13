@@ -20,3 +20,6 @@ export const OPENCODE_ENABLED = process.env.NEXT_PUBLIC_OPENCODE_ENABLED === '1'
 // Gates the language packs: until it flips, everyone outside the early access reads English and the
 // language pickers stay hidden, whatever their browser or their saved choice asks for.
 export const I18N_RELEASED = true
+// Gates the Simple view, the list of coworkers beside the chat offered next to the 3D board. Until it
+// flips, only the early access sees the switch; the board stays everyone's default either way.
+export const SIMPLE_VIEW_RELEASED = false

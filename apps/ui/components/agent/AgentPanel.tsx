@@ -15,8 +15,9 @@ import { SidePanel } from '@/components/layout/SidePanel'
 import { Button } from '@/components/ui/button'
 import { useAgentBuddyMood } from '@/hooks/useAgentBuddyMood'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
+import { useOpenedAgents } from '@/hooks/useOpenedAgents'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { isAgentViewTab, type AgentViewTab } from '@/lib/board/agent-sheet-views'
+import { useAgentSheetView } from '@/hooks/useAgentSheetView'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import { ChevronDownIcon, MessageCircle, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
@@ -27,22 +28,6 @@ import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { AnimatePresence } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-
-// Combien de conversations d'agents restent montées derrière celle qu'on regarde. Chaque panneau
-// gardé vivant retient tout son transcript dans le DOM et se re-rend avec le board : sans plafond,
-// une session de travail d'une heure finit par en empiler une dizaine et tout ralentit.
-const KEEP_ALIVE_PANELS = 3
-
-// Le panneau d'un agent qui répond encore possède le stream en cours : on le garde même s'il est
-// vieux, et on évacue le plus ancien des autres.
-function trimOpenedAgents(ids: string[], busy: Set<string>): string[] {
-    const kept = [...ids]
-    for (let i = 0; kept.length > KEEP_ALIVE_PANELS && i < kept.length - 1; ) {
-        if (busy.has(kept[i])) i++
-        else kept.splice(i, 1)
-    }
-    return kept
-}
 
 // What floats over the chat, one at a time: the coworker's card, or its list of threads.
 // `entered` is the card's button a screen grew out of, while that screen is open over the card.
@@ -61,10 +46,6 @@ export function AgentPanel() {
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
     const selectAgent = useBoardStore(s => s.selectAgent)
     const sessions = useBoardStore(s => s.sessions)
-    const agentFocusRequest = useBoardStore(s => s.agentFocusRequest)
-    const clearAgentFocus = useBoardStore(s => s.clearAgentFocus)
-    const agentFileFocus = useBoardStore(s => s.agentFileFocus)
-    const agentDataFocus = useBoardStore(s => s.agentDataFocus)
     const desktopEnabled = useComputerEnabled()
     const openDesktop = useDesktopStore(s => s.openDesktop)
     const { access, needsMachineReason } = useWorkspaceAccess()
@@ -73,64 +54,20 @@ export function AgentPanel() {
     const buddyMood = useAgentBuddyMood(selectedAgentId)
     const servicesNeedConfig = useConnectorServices(selectedAgentId ?? undefined).needsConfig
     const [surface, setSurface] = useState<Surface | null>(null)
-    const [viewTab, setViewTab] = useState<AgentViewTab | null>(null)
+    // Declared before the screen's own effects: a link landing with a new coworker opens its list on
+    // top of this reset, not under it.
+    useEffect(() => {
+        setSurface(null)
+    }, [selectedAgentId])
+    const { setViewTab, displayedTab } = useAgentSheetView(request => setSurface(request.kind === 'chats' ? { kind: 'chats', filter: request.filter } : null))
     const [grownFrom, setGrownFrom] = useState<CardOrigin | null>(null)
-    const [openedAgentIds, setOpenedAgentIds] = useState<string[]>([])
+    const openedAgentIds = useOpenedAgents()
     const [pendingOpenSession, setPendingOpenSession] = useState<{ sessionId: string; title: string; runId: string | null } | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const [shareOpen, setShareOpen] = useState(false)
-    // A file or table link opens its screen on the very render that carries it, before the screen
-    // reads and clears it. The two signals are mutually exclusive in the store.
-    const displayedTab: AgentViewTab | null = agentFileFocus?.agentId === selectedAgentId ? 'files' : agentDataFocus?.agentId === selectedAgentId ? 'data' : viewTab
 
     const attentionCount = useMemo(() => sessions.filter(s => s.agentId === selectedAgentId && ATTENTION_STATUSES.has(s.status)).length, [sessions, selectedAgentId])
     const working = useMemo(() => sessions.some(s => s.agentId === selectedAgentId && s.status === 'working'), [sessions, selectedAgentId])
-
-    // Rangés du plus ancien au plus récemment ouvert : c'est cet ordre que le plafond consomme.
-    useEffect(() => {
-        if (!selectedAgentId) return
-        setOpenedAgentIds(prev => {
-            if (prev[prev.length - 1] === selectedAgentId) return prev
-            const busy = new Set(useBoardStore.getState().sessions.filter(s => s.status === 'working').map(s => s.agentId))
-            return trimOpenedAgents([...prev.filter(id => id !== selectedAgentId), selectedAgentId], busy)
-        })
-    }, [selectedAgentId])
-
-    useEffect(() => {
-        const agentIds = new Set(agents.map(a => a.id))
-        setOpenedAgentIds(prev => {
-            const filtered = prev.filter(id => agentIds.has(id))
-            return filtered.length === prev.length ? prev : filtered
-        })
-    }, [agents])
-
-    // Another coworker opens on its thread, never on the screen the previous one was showing.
-    useEffect(() => {
-        setSurface(null)
-        setViewTab(null)
-    }, [selectedAgentId])
-
-    // A file or table link keeps its screen once the screen has consumed the link.
-    useEffect(() => {
-        if (agentFileFocus?.agentId === selectedAgentId) setViewTab('files')
-        else if (agentDataFocus?.agentId === selectedAgentId) setViewTab('data')
-        else return
-        setSurface(null)
-    }, [agentFileFocus, agentDataFocus, selectedAgentId])
-
-    // External surfaces can open an agent on a precise tab without owning this panel's local state.
-    useEffect(() => {
-        if (!agentFocusRequest) return
-        const tab = agentFocusRequest.tab
-        if (isAgentViewTab(tab)) {
-            setViewTab(tab)
-            setSurface(null)
-        } else {
-            setViewTab(null)
-            setSurface(tab === 'actions' ? { kind: 'chats', filter: 'needs' } : null)
-        }
-        clearAgentFocus()
-    }, [agentFocusRequest, clearAgentFocus])
 
     const isOpen = !!selectedAgentId
     const closePanel = useCallback(() => selectAgent(null), [selectAgent])

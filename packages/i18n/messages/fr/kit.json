@@ -345,6 +345,7 @@
         "noUpdates": "Aucune nouveauté",
         "pillLabel": "Notifications : {summary}",
         "pillLabelEmpty": "Notifications : aucune nouveauté",
+        "needsYouRow": "Vous attend",
         "needsYouCount": "{count, plural, one {# vous attend} other {# vous attendent}}",
         "doneCount": "{count, plural, one {# terminée} other {# terminées}}",
         "needsYouRich": "{count, plural, one {<b>#</b> vous attend} other {<b>#</b> vous attendent}}",

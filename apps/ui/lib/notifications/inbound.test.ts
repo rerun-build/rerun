@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { automatedRunOutcome, automatedRunReport, completionStatus, storedKind, type StoredNotification } from './inbound'
+import { agentReplyOf, automatedRunOutcome, automatedRunReport, completionStatus, storedKind, type StoredNotification } from './inbound'
 import type { NotificationPayload } from '@/lib/engine/types'
 
 const BASE = {
@@ -83,5 +83,29 @@ describe('automatedRunOutcome', () => {
         expect(automatedRunOutcome(false, false)).toBe('done')
         expect(automatedRunOutcome(false, true)).toBe('nothing')
         expect(automatedRunOutcome(true, true)).toBe('failed')
+    })
+})
+
+describe('agentReplyOf', () => {
+    it('reads the start of a chat answer', () => {
+        expect(agentReplyOf(stored({ event: 'agent.message.completed', kind: 'done' }))).toBe('The draft is ready to review.')
+    })
+
+    it('never takes the placeholder of an empty answer for a reply', () => {
+        expect(agentReplyOf(stored({ event: 'agent.message.completed', kind: 'done', message: 'Message completed' }))).toBeNull()
+        expect(agentReplyOf(stored({ event: 'agent.message.completed', kind: 'done', message: '  ' }))).toBeNull()
+    })
+
+    it('reads what a routine reported, not its English status sentence', () => {
+        const run = stored({ event: 'agent.schedule.completed', kind: 'done', message: 'Schedule "Digest" completed', metadata: { finalText: 'Three new leads in Lyon.' } })
+        expect(agentReplyOf(run)).toBe('Three new leads in Lyon.')
+        expect(agentReplyOf({ ...run, metadata: {} })).toBeNull()
+        expect(agentReplyOf(stored({ event: 'agent.trigger.completed', kind: 'done', metadata: { finalText: 'Replied to the ticket.' } }))).toBe('Replied to the ticket.')
+    })
+
+    it('says nothing for a run that failed or was stopped, nor for a heads-up', () => {
+        expect(agentReplyOf(stored({ event: 'agent.message.completed', kind: 'error', message: 'Message failed: boom' }))).toBeNull()
+        expect(agentReplyOf(stored({ event: 'agent.message.completed', kind: 'done', message: 'Message stopped', metadata: { status: 'cancelled' } }))).toBeNull()
+        expect(agentReplyOf(stored({ event: 'agent.notification', kind: 'question' }))).toBeNull()
     })
 })

@@ -45,11 +45,14 @@ function placementFor(choice: PositionChoice, current: ForemanPlacement): Forema
  */
 export function ForemanHeader({
     placement,
+    movable = true,
     onDragPointerDown,
     onToggleSheetDetent,
     onNewChat,
 }: {
     placement: ForemanPlacement
+    // False where its place is fixed (the Simple view's middle): no menu to move it.
+    movable?: boolean
     onDragPointerDown: (event: PointerEvent<HTMLElement>) => void
     onToggleSheetDetent: () => void
     onNewChat: () => void
@@ -79,25 +82,27 @@ export function ForemanHeader({
             onToggleSheetDetent={onToggleSheetDetent}
             actions={
                 <>
-                    <DropdownMenu>
-                        <TooltipLabeled label={t('move')} side="bottom">
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon-sm" aria-label={t('moveChat')} className="max-md:hidden">
-                                    <ChoiceIcon className="size-3.5" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                        </TooltipLabeled>
-                        <DropdownMenuContent align="end" className="w-auto">
-                            <DropdownMenuRadioGroup value={choice} onValueChange={value => useForemanStore.getState().setPlacement(placementFor(value as PositionChoice, placement))}>
-                                {POSITION_CHOICES.map(({ value, labelKey, icon: Icon }) => (
-                                    <DropdownMenuRadioItem key={value} value={value}>
-                                        <Icon />
-                                        {t(`position.${labelKey}`)}
-                                    </DropdownMenuRadioItem>
-                                ))}
-                            </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {movable && (
+                        <DropdownMenu>
+                            <TooltipLabeled label={t('move')} side="bottom">
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon-sm" aria-label={t('moveChat')} className="max-md:hidden">
+                                        <ChoiceIcon className="size-3.5" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            </TooltipLabeled>
+                            <DropdownMenuContent align="end" className="w-auto">
+                                <DropdownMenuRadioGroup value={choice} onValueChange={value => useForemanStore.getState().setPlacement(placementFor(value as PositionChoice, placement))}>
+                                    {POSITION_CHOICES.map(({ value, labelKey, icon: Icon }) => (
+                                        <DropdownMenuRadioItem key={value} value={value}>
+                                            <Icon />
+                                            {t(`position.${labelKey}`)}
+                                        </DropdownMenuRadioItem>
+                                    ))}
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                     {/* Sous `md`, le tunnel masque la pastille Sign in du board : la sheet la recouvre. */}
                     {guided && isAnonymous && (
                         <>

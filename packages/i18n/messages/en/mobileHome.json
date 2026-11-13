@@ -29,7 +29,8 @@
         "working": "Working",
         "workingOn": "Working · {detail}",
         "asleep": "Asleep",
-        "asleepAbout": "Asleep · {about}"
+        "asleepAbout": "Asleep · {about}",
+        "you": "You: {message}"
     },
     "foreman": {
         "askAnything": "Ask anything"
@@ -132,6 +133,7 @@
         "inbox.row.read": "Very short label of the swipe action that marks a row as read.",
         "section.label": "VoiceOver label of a collapsible section header: its name and how many rows it holds.",
         "account.leaveServerTitle": "{host} is the web address of the Rerun server the app is connected to.",
-        "account.leaveServer": "Destructive button of the dialog that leaves a self-hosted server."
+        "account.leaveServer": "Destructive button of the dialog that leaves a self-hosted server.",
+        "line.you": "Status line under a coworker's name: the last message of its conversation, written by the person reading. {message} is that message, cut to one line."
     }
 }

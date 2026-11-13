@@ -10,7 +10,7 @@ import { useBoardStore } from '@/stores/board.store'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 import { AnimatePresence } from 'motion/react'
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { AgentSheetChat } from '@/components/agent/AgentSheetChat'
 import { AgentChatsList, type ChatsFilter } from '@/components/agent/sheet/AgentChatsList'
 import { FloatingSurface } from '@/components/agent/sheet/floating'
@@ -47,9 +47,16 @@ type AgentPanelChatProps = {
     // The list of this coworker's conversations, floating over the thread while it is open.
     chats: ChatsFilter | null
     onCloseChats: () => void
+    // `floating`: the panel over the board, its tabs under the pills that float above the thread.
+    // `docked`: a column of its own, its tabs a header in the flow, with `headerEnd` at their right.
+    presentation?: 'floating' | 'docked'
+    headerEnd?: ReactNode
+    // Asked from outside the chat (a menu of the Simple view's list): a new conversation, once.
+    newThreadRequest?: boolean
+    onNewThreadConsumed?: () => void
 }
 
-export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats }: AgentPanelChatProps) {
+export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats, presentation = 'floating', headerEnd, newThreadRequest = false, onNewThreadConsumed }: AgentPanelChatProps) {
     const t = useTranslations('agent.agentPanelChat')
     const { tabs, activeIndex, createNew, selectTab, closeTab, openTab, updateTabByUid, updateTabTitle, setGeneralSessionId } = useSessionTabs(agentId)
     const { threads, refresh: refreshThreads } = useAgentThreads(agentId)
@@ -57,9 +64,13 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     // General's row exists once someone has spoken in it; until then its tab opens on nothing, and
     // the first message sent there creates it. A General opened after this read, by another tab or
     // a teammate, arrives through the sessions channel below.
+    const [generalLookedUp, setGeneralLookedUp] = useState(false)
     useEffect(() => {
         let alive = true
-        getGeneralSessionAction(agentId).then(general => alive && general && setGeneralSessionId(general.id)).catch(() => {})
+        getGeneralSessionAction(agentId)
+            .then(general => alive && general && setGeneralSessionId(general.id))
+            .catch(() => {})
+            .finally(() => alive && setGeneralLookedUp(true))
         return () => {
             alive = false
         }
@@ -174,6 +185,12 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         onOpenSessionConsumed?.()
     }, [openSessionRequest, openTab, onOpenSessionConsumed, arriveAt])
 
+    useEffect(() => {
+        if (!newThreadRequest) return
+        createNew()
+        onNewThreadConsumed?.()
+    }, [newThreadRequest, createNew, onNewThreadConsumed])
+
     // Cmd/Ctrl+K : nouvelle conversation. Cmd/Ctrl+Backspace : fermer l'onglet actif, hors d'un champ
     // où le raccourci efface le mot précédent.
     useEffect(() => {
@@ -213,14 +230,22 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         onResync: refreshThreads,
     })
 
+    const docked = presentation === 'docked'
+    const openChatsTabs = <OpenChatsTabs tabs={tabs} activeIndex={activeIndex} onSelect={selectTab} onClose={requestCloseTab} onCreate={createNew} rename={tabRename} />
+
     return (
-        <div className="flex flex-col h-full">
-            {/* Room for the pills that float over the top of the panel, and the open conversations under them. */}
-            <div className={cn('shrink-0', tabRenameFailed ? 'h-[7.25rem]' : 'h-24')} />
-            {selected && (
-                <div className="absolute inset-x-0 top-[3.75rem] z-20">
-                    <OpenChatsTabs tabs={tabs} activeIndex={activeIndex} onSelect={selectTab} onClose={requestCloseTab} onCreate={createNew} rename={tabRename} />
+        <div className={cn('flex flex-col h-full', docked && '[--chat-column:48rem]')}>
+            {docked ? (
+                <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border pr-2">
+                    <div className="min-w-0 flex-1">{openChatsTabs}</div>
+                    {headerEnd}
                 </div>
+            ) : (
+                <>
+                    {/* Room for the pills that float over the top of the panel, and the open conversations under them. */}
+                    <div className={cn('shrink-0', tabRenameFailed ? 'h-[7.25rem]' : 'h-24')} />
+                    {selected && <div className="absolute inset-x-0 top-[3.75rem] z-20">{openChatsTabs}</div>}
+                </>
             )}
             {/* Skipping hides the gate, not the fact that the agent still has nothing connected. */}
             {setup.pending && setup.skipped && (
@@ -252,6 +277,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                             active={active}
                             agentId={agentId}
                             sessionId={tab.id}
+                            sessionPending={isGeneralTab(tab) && !tab.id && !generalLookedUp}
                             onSessionCreated={(id) => handleSessionCreated(tab.uid, id)}
                             initialRunId={tab.id && tab.id === kickoffRun?.sessionId ? kickoffRun.runId : null}
                             arrival={tab.id ? arrivals[tab.id] : undefined}
@@ -270,7 +296,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
             })}
             <AnimatePresence>
                 {chats && (
-                    <FloatingSurface key="chats" className="left-3 top-16 w-[min(340px,calc(100%-1.5rem))]">
+                    <FloatingSurface key="chats" className={cn('left-3 w-[min(340px,calc(100%-1.5rem))]', docked ? 'top-14 max-h-[calc(100%-4.5rem)]' : 'top-16')}>
                         <AgentChatsList
                             key={chats}
                             agentId={agentId}

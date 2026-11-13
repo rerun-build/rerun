@@ -73,7 +73,8 @@
         "subscriptionOffer.arguments.unplug.label": "Selling point: the subscription can be disconnected at any time.",
         "subscriptionOffer.key.add": "Button: save the pasted API key.",
         "viewSettings.groupByRequired": "Form error of a board view: the user must pick the column whose distinct values become the board's columns.",
-        "newBox.suggestedNames": "Box names offered as chips under the Box name field: a Box groups coworkers by company division. Short, one or two words, title case where the language uses it."
+        "newBox.suggestedNames": "Box names offered as chips under the Box name field: a Box groups coworkers by company division. Short, one or two words, title case where the language uses it.",
+        "boxPicker.description": "Dialog shown in the Simple view when the workspace has several Boxes: the person picks the Box a coworker they are creating joins."
     },
     "account": {
         "emailChangeNeedsCurrentAddress": "This change still has to be confirmed from your current address.",
@@ -763,5 +764,10 @@
             "keyDetail": "Your coworkers now run on this key.",
             "done": "Done"
         }
+    },
+    "boxPicker": {
+        "title": "Choose a Box",
+        "description": "The new coworker joins it, on a free spot.",
+        "coworkers": "{count, plural, =0 {No coworker yet} one {# coworker} other {# coworkers}}"
     }
 }

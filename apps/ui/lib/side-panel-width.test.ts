@@ -7,6 +7,7 @@ import {
     getSidePanelMaxWidth,
     parseSidePanelWidth,
 } from './side-panel-width'
+import { DETAILS_COLUMN_WIDTH } from './workspace-view'
 
 describe('side panel width', () => {
     it('caps its desktop maximum at 800px or 60 percent of the viewport', () => {
@@ -31,5 +32,13 @@ describe('side panel width', () => {
         expect(parseSidePanelWidth('720', 1440)).toBe(720)
         expect(parseSidePanelWidth('200', 1440)).toBe(SIDE_PANEL_MIN_WIDTH)
         expect(parseSidePanelWidth('2000', 1000)).toBe(600)
+    })
+
+    it('bounds another panel by its own configuration, the board panel keeping its own', () => {
+        expect(clampSidePanelWidth(200, 1440, DETAILS_COLUMN_WIDTH)).toBe(320)
+        expect(clampSidePanelWidth(900, 1440, DETAILS_COLUMN_WIDTH)).toBe(648)
+        expect(getSidePanelMaxWidth(1280, DETAILS_COLUMN_WIDTH)).toBe(576)
+        expect(parseSidePanelWidth(null, 1440, DETAILS_COLUMN_WIDTH)).toBe(400)
+        expect(parseSidePanelWidth(null, 1440)).toBe(SIDE_PANEL_DEFAULT_WIDTH)
     })
 })

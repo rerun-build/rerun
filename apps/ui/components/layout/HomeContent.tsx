@@ -5,6 +5,12 @@ import { AppLoader } from '@/components/layout/AppLoader'
 import { AuthDialog } from '@/components/dialogs/AuthDialog'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { BuilderView } from '@/components/builder/BuilderView'
+import { AgentPanel } from '@/components/agent/AgentPanel'
+import { SimplePhoneHome } from '@/components/workspace-view/SimplePhoneHome'
+import { SimpleWorkspace } from '@/components/workspace-view/SimpleWorkspace'
+import { useWorkspaceView } from '@/components/workspace-view/WorkspaceViewProvider'
+import { FOREMAN_COLUMN_QUERY } from '@/lib/foreman-open'
+import { useResolvedIsMobile } from '@rerun/ui/primitives'
 import { ForemanDock } from '@/components/foreman/ForemanDock'
 import { useRewindEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PhoneVerificationDialog } from '@rerun/cloud/phone.client'
@@ -12,6 +18,7 @@ import { PostPaymentDialog, TemplatePurchaseSuccessDialog } from '@rerun/cloud/b
 import { AgentShareDeepLinkDialog } from '@/components/dialogs/AgentShareDeepLinkDialog'
 import { TemplateDeepLinkDialog } from '@/components/dialogs/TemplateDeepLinkDialog'
 import { WorkspacePausedBanner } from '@/components/layout/WorkspacePausedBanner'
+import { WorkspaceDialogs } from '@/components/layout/WorkspaceDialogs'
 import { WorkspaceSwitcher } from '@/components/layout/WorkspaceSwitcher'
 import { ChangelogDialog } from '@/components/changelog/ChangelogDialog'
 import { ControlCenter } from '@/components/control-center/ControlCenter'
@@ -20,6 +27,7 @@ import { useChangelogLauncher } from '@/components/changelog/useChangelogLaunche
 import { useEnsureSandboxSpace } from '@/lib/sandbox/useEnsureSandboxSpace'
 import { useAgentHealthSync } from '@/hooks/useAgentHealthSync'
 import { useAgentSchedulesSync } from '@/hooks/useAgentSchedulesSync'
+import { useCoworkerPreviewsSync } from '@/hooks/useCoworkerPreviewsSync'
 import { useNotificationsRealtime } from '@/hooks/useNotificationsRealtime'
 import { useSessionsRealtime } from '@/hooks/useSessionsRealtime'
 import { useSpaceAccessSync } from '@/hooks/useSpaceAccessSync'
@@ -110,6 +118,16 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     const purchase = useTemplateFlowStore(s => s.purchase)
     const hydrated = useBoardStore(s => s.hydrated)
     const hydrate = useBoardStore(s => s.hydrate)
+    const { view, enabled: simpleViewEnabled } = useWorkspaceView()
+    // Under `md` the Simple view is the phone's Home, the coworker's panel opening over it as on the
+    // board. Unknown until the window is measured, so neither frame mounts for a frame on the wrong side.
+    const phone = useResolvedIsMobile(FOREMAN_COLUMN_QUERY)
+    const simple = view === 'simple' && phone === false
+    const phoneHome = view === 'simple' && phone === true
+    // What is created goes where the frame on screen can show it: on the grid, or into a Box of the list.
+    useEffect(() => {
+        useBoardStore.getState().setCreationFrame(simple || phoneHome ? 'list' : 'board')
+    }, [simple, phoneHome])
     const selectedAgentWorking = useBoardStore(s =>
         s.selectedAgentId !== null &&
         s.agents.some(a => a.id === s.selectedAgentId && a.status === 'working')
@@ -413,6 +431,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     useSessionsRealtime(hydrated)
     useNotificationsRealtime(hydrated ? workspace?.id : undefined)
     useUnseenRunsSync(hydrated ? workspace?.id : undefined, user?.id)
+    useCoworkerPreviewsSync(hydrated && simpleViewEnabled ? workspace?.id : undefined)
 
     // The page load names no workspace, so the server prefetched the stored one. A tab pinned
     // elsewhere shows neither those spaces nor an empty board in their place (the recruit
@@ -426,14 +445,26 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     return (
         <div className="flex flex-col h-full bg-background overflow-hidden">
             <main className="@container/board flex-1 relative overflow-hidden">
-                <BuilderView initialSpaces={serverBoardMatchesTab ? initialSpaces : []} />
-                <WorkspaceSwitcher />
-                <WorkspacePausedBanner />
+                {simple ? (
+                    <SimpleWorkspace />
+                ) : phoneHome ? (
+                    <>
+                        <SimplePhoneHome />
+                        <AgentPanel />
+                        <WorkspacePausedBanner />
+                    </>
+                ) : (
+                    <>
+                        <BuilderView initialSpaces={serverBoardMatchesTab ? initialSpaces : []} />
+                        <WorkspaceSwitcher />
+                        <WorkspacePausedBanner />
+                    </>
+                )}
             </main>
             {/* Hors du `<main>` comme il est hors du cadre : l'orbe est `fixed`, sa place ne dépend
                 pas de l'endroit où il est monté. Ici il reste derrière l'écran de chargement. Pas
                 de machine hors onboarding, pas de Foreman. */}
-            {foremanVisible && <ForemanDock />}
+            {foremanVisible && view !== 'simple' && <ForemanDock />}
             {/* Le mur d'entrée : le board reste visible derrière, mais rien n'est actionnable tant
                 qu'il n'y a pas de compte. Le signup upgrade la session anonyme en place, donc le
                 workspace déjà provisionné et tout ce qu'un deep link a parké lui restent attachés. */}
@@ -452,6 +483,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
             {rewindEnabled && <RewindViewer />}
             <ChangelogDialog />
             <ControlCenter />
+            <WorkspaceDialogs />
         </div>
     )
 }

@@ -59,20 +59,34 @@ type AgentCardProps = {
     servicesNeedConfig: boolean
     // Why what needs the machine is out of reach: the workspace is paused or has none yet.
     needsMachineReason: string | null
+    // `docked`: a column of its own, its actions a ruled header in line with the chat's tabs beside it.
+    presentation?: 'floating' | 'docked'
 }
 
 /**
  * Who the coworker is, what it has at hand and the screen it is looking at. A glance, never a full
  * screen: a destination picked here grows out of its button to fill the panel, the card waiting behind.
  */
-export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, computerEnabled, working, servicesNeedConfig, needsMachineReason }: AgentCardProps) {
+export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, computerEnabled, working, servicesNeedConfig, needsMachineReason, presentation = 'floating' }: AgentCardProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
     const canManage = useCanManageAgent(agent.id)
     const manageDisabledReason = needsMachineReason ?? (canManage ? null : boxManageReason)
-    return (
-        <div className="flex min-h-0 flex-col overflow-y-auto">
-            <CardIdentity agent={agent} canRename={canManage} onClose={onClose} onShare={onShare} shareDisabledReason={manageDisabledReason} />
+    const actions = <CardActions agent={agent} onShare={onShare} shareDisabledReason={manageDisabledReason} />
+    const close = (
+        <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
+            <XIcon className="size-4" />
+        </Button>
+    )
+    const body = (
+        <>
+            {presentation === 'floating' && (
+                <>
+                    <div className="absolute left-3 top-3 z-10">{actions}</div>
+                    <div className="absolute right-3 top-3 z-10">{close}</div>
+                </>
+            )}
+            <CardIdentity agent={agent} canRename={canManage} />
             <div className="grid shrink-0 grid-cols-4 gap-1.5 px-3 pb-3">
                 {TILES.map(tab => {
                     const Glyph = DESTINATION_ICONS[tab]
@@ -117,12 +131,38 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
                     </button>
                 </TooltipDisabledReason>
             </div>
+        </>
+    )
+
+    if (presentation === 'floating') return <div className="relative flex min-h-0 flex-col overflow-y-auto">{body}</div>
+    return (
+        <div className="flex min-h-0 flex-1 flex-col">
+            <div className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-border px-3">
+                {actions}
+                {close}
+            </div>
+            <div className="flex min-h-0 flex-col overflow-y-auto">{body}</div>
+        </div>
+    )
+}
+
+function CardActions({ agent, onShare, shareDisabledReason }: { agent: IsoAgent; onShare: () => void; shareDisabledReason: string | null }) {
+    const t = useTranslations('agent.agentCard')
+    return (
+        <div className="flex items-center gap-0.5">
+            <CoworkerNotificationBell agentId={agent.id} name={agent.name} />
+            <TooltipDisabledReason reason={shareDisabledReason ?? undefined}>
+                <Button variant="ghost" size="sm" disabled={!!shareDisabledReason} onClick={onShare} className="text-muted-foreground">
+                    <Link2 className="size-4" />
+                    {t('share')}
+                </Button>
+            </TooltipDisabledReason>
         </div>
     )
 }
 
 /** The name is the field that renames it: one click, Enter or a click away keeps it, Escape drops it. */
-function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason }: { agent: IsoAgent; canRename: boolean; onClose: () => void; onShare: () => void; shareDisabledReason: string | null }) {
+function CardIdentity({ agent, canRename }: { agent: IsoAgent; canRename: boolean }) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
     const tAgent = useTranslations('agent')
@@ -145,21 +185,7 @@ function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason 
     }
 
     return (
-        <div className="relative flex shrink-0 flex-col items-center px-4 pb-3 pt-4">
-            <div className="absolute left-3 top-3 flex items-center gap-0.5">
-                <CoworkerNotificationBell agentId={agent.id} name={agent.name} />
-                <TooltipDisabledReason reason={shareDisabledReason ?? undefined}>
-                    <Button variant="ghost" size="sm" disabled={!!shareDisabledReason} onClick={onShare} className="text-muted-foreground">
-                        <Link2 className="size-4" />
-                        {t('share')}
-                    </Button>
-                </TooltipDisabledReason>
-            </div>
-            <div className="absolute right-3 top-3">
-                <Button aria-label={t('close')} variant="ghost" size="icon-sm" onClick={onClose}>
-                    <XIcon className="size-4" />
-                </Button>
-            </div>
+        <div className="flex shrink-0 flex-col items-center px-4 pb-3 pt-4">
             <AgentBuddy agentId={agent.id} mood={mood} size={116} facing="left" />
             {editing ? (
                 <Input

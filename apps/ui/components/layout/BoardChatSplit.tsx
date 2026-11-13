@@ -6,8 +6,11 @@ import { type CSSProperties, useEffect, type ReactNode } from 'react'
 import { ForemanColumn } from '@/components/foreman/ForemanColumn'
 import { ForemanDropPreview } from '@/components/foreman/ForemanDropPreview'
 import { ProviderStatusBanner } from '@/components/layout/ProviderStatusBanner'
+import { useForemanInCenter } from '@/components/workspace-view/useForemanInCenter'
+import { useWorkspaceView } from '@/components/workspace-view/WorkspaceViewProvider'
 import { DEFAULT_FOREMAN_PLACEMENT, type ForemanPlacement, dockedForemanSide, loadForemanPlacement } from '@/lib/foreman-layout'
-import { loadForemanOpen } from '@/lib/foreman-open'
+import { FOREMAN_COLUMN_QUERY, loadForemanOpen } from '@/lib/foreman-open'
+import { useResolvedIsMobile } from '@rerun/ui/primitives'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
@@ -30,8 +33,15 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
     const visible = useForemanStore(selectForemanVisible)
     const requested = useForemanStore(state => state.open)
     const resolved = requested ?? initialOpen
-    const open = visible ? resolved : false
-    const placement = useForemanStore(state => state.placement) ?? initialPlacement ?? DEFAULT_FOREMAN_PLACEMENT
+    // The Simple view, from `md`: the column takes the middle beside the list, and only while no coworker
+    // is open there. Its place on the board is neither read nor written.
+    const { view } = useWorkspaceView()
+    const phone = useResolvedIsMobile(FOREMAN_COLUMN_QUERY)
+    const simple = view === 'simple' && phone === false
+    const inCenter = useForemanInCenter()
+    const open = visible ? (simple ? inCenter : resolved) : false
+    const chosenPlacement = useForemanStore(state => state.placement) ?? initialPlacement ?? DEFAULT_FOREMAN_PLACEMENT
+    const placement: ForemanPlacement = simple ? { ...chosenPlacement, mode: 'dock', side: 'right' } : chosenPlacement
     const dragging = useForemanStore(state => state.dropTarget !== null)
     const docked = dockedForemanSide({ open, placement, dragging })
     const reduceMotion = useReducedMotion()
@@ -74,7 +84,12 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
         <div
             data-foreman-split
             style={{ '--foreman-dock-w': `${placement.dockWidth}px` } as CSSProperties}
-            className="relative h-dvh w-full overflow-hidden p-0 md:p-2 bg-frame flex flex-col [--board-inset:0px] md:[--board-inset:9px] [--foreman-dock-track:min(var(--foreman-dock-w),60vw)]"
+            className={cn(
+                'relative h-dvh w-full overflow-hidden p-0 md:p-2 bg-frame flex flex-col [--board-inset:0px] md:[--board-inset:9px]',
+                // In the Simple view the list keeps its width (its sidebar's 288px, see SimpleWorkspace, and the
+                // card's border) and the column takes the rest of the frame, its padding taken off.
+                simple ? '[--simple-list-track:290px] [--foreman-dock-track:calc(100vw-1rem-var(--simple-list-track))]' : '[--foreman-dock-track:min(var(--foreman-dock-w),60vw)]'
+            )}
         >
             {onboarded && <ProviderStatusBanner />}
             <div
@@ -92,7 +107,9 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
                         (docked === 'left'
                             ? 'md:grid-cols-[var(--foreman-dock-track)_minmax(0,1fr)_0px]'
                             : docked === 'right'
-                              ? 'md:grid-cols-[0px_minmax(0,1fr)_var(--foreman-dock-track)]'
+                              ? simple
+                                  ? 'md:grid-cols-[0px_var(--simple-list-track)_var(--foreman-dock-track)]'
+                                  : 'md:grid-cols-[0px_minmax(0,1fr)_var(--foreman-dock-track)]'
                               : 'md:grid-cols-[0px_minmax(0,1fr)_0px]')
                 )}
             >
@@ -100,7 +117,7 @@ export function BoardChatSplit({ initialOpen, initialPlacement, children }: { in
                 {/* Se connecter à un autre compte sans recharger repart d'une colonne neuve, qui relit
                     la phase et la conversation de ce compte-là. */}
                 <div className={visible ? 'contents' : 'hidden'}>
-                    <ForemanColumn key={accountSwitches} open={open} placement={placement} />
+                    <ForemanColumn key={accountSwitches} open={open} placement={placement} pinned={simple} />
                 </div>
             </div>
             {visible && <ForemanDropPreview />}

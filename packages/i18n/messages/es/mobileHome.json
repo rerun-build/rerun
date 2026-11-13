@@ -29,7 +29,8 @@
         "working": "Trabajando",
         "workingOn": "Trabajando · {detail}",
         "asleep": "Dormido",
-        "asleepAbout": "Dormido · {about}"
+        "asleepAbout": "Dormido · {about}",
+        "you": "Tú: {message}"
     },
     "foreman": {
         "askAnything": "Pregunta lo que quieras"

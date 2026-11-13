@@ -107,6 +107,7 @@ type ForemanState = {
     yieldToSheet: () => void
     reclaimFromSheet: () => void
     openForFunnel: () => void
+    openInCenter: () => void
     restoreOpen: (open: boolean) => void
     setPlacement: (placement: ForemanPlacement) => void
     restorePlacement: (placement: ForemanPlacement) => void
@@ -198,6 +199,8 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         applyOpen(set, true)
         set({ tab: 'assistant' })
     },
+    // The Simple view puts it in the middle: no gesture on the board's column, so no preference written.
+    openInCenter: () => applyOpen(set, true),
     // Ce que le client a lu au montage. Un kickoff qui a déjà tranché garde la main.
     restoreOpen: open => {
         if (get().open !== null) return

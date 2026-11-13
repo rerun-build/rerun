@@ -20,12 +20,13 @@ import { WorkspaceMembersDialog } from '@/components/dialogs/WorkspaceMembersDia
 import { WorkspaceSettingsDialog } from '@/components/dialogs/WorkspaceSettingsDialog'
 import { SignInPillButton } from '@/components/layout/SignInPill'
 import { ThemeMenuRow } from '@/components/layout/ThemeMenuRow'
+import { ViewMenuRow } from '@/components/workspace-view/ViewMenuRow'
 import { LanguageMenuRow } from '@/components/layout/LanguageMenuRow'
 import { HelpButton } from '@/components/layout/HelpButton'
 import { WeeklyRewindMenuItem, WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
 import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from '@/components/layout/WorkspacePowerControl'
 import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge, Stripes } from '@rerun/ui/primitives'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { activeAgentLimitFor, BILLING_ENABLED, isLifetimePlan, isWorkspaceApiEntitled } from '@rerun/cloud/billing'
@@ -41,7 +42,7 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, ChevronDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import Link from 'next/link'
@@ -76,7 +77,8 @@ function workspaceSummary(workspace: SessionWorkspace, t: WorkspaceMenuTranslato
     return isLifetimePlan(workspace) ? t('summary.lifetime', { limits }) : limits
 }
 
-export function WorkspaceSwitcher() {
+// `column`: at the top of the Simple view's list, in the flow, alone: help and the offer sit at its foot.
+export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corner' | 'column' }) {
     const t = useTranslations('layout.workspaceMenu')
     const errorText = useErrorText()
     const { user, workspace, workspaces, session, isAnonymous, signOut } = useSession()
@@ -362,6 +364,7 @@ export function WorkspaceSwitcher() {
     const footerSection = (
         <>
             <ThemeMenuRow />
+            <ViewMenuRow />
             <LanguageMenuRow />
             <DropdownMenuItem onSelect={() => useNotificationsStore.getState().openNotifications()} className="gap-2 text-muted-foreground">
                 <BellIcon className="size-4" />
@@ -384,7 +387,7 @@ export function WorkspaceSwitcher() {
     return (
         // Leaves room for the view controls in the top-right corner: on a phone the workspace name
         // truncates rather than pushing the row under them.
-        <div className="absolute top-4 left-4 z-40 flex max-w-[calc(100%-2*var(--chrome-edge)-var(--chrome-size)-var(--chrome-gap))] items-center gap-2">
+        <div className={cn('flex items-center gap-2', placement === 'column' ? 'min-w-0' : 'absolute top-4 left-4 z-40 max-w-[calc(100%-2*var(--chrome-edge)-var(--chrome-size)-var(--chrome-gap))]')}>
             <DropdownMenu
                 onOpenChange={open => {
                     if (!open) return
@@ -392,12 +395,26 @@ export function WorkspaceSwitcher() {
                     if (!workspace.is_sandbox) for (const slug of paidApps) refreshAppAccounts(slug).catch(() => {})
                 }}
             >
-                <div className="relative min-w-0">
+                {placement === 'column' ? (
                     <DropdownMenuTrigger asChild>
-                        <WorkspacePill className="max-w-full shrink" name={workspace.name || t('defaultName')} iconUrl={workspace.icon_url || activeIcon} fallbackIconUrl={activeIcon} stripes={workspace.is_sandbox} />
+                        <button type="button" className="relative flex h-8 max-w-full min-w-0 items-center gap-2 rounded-md px-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent data-[state=open]:bg-accent">
+                            {workspace.is_sandbox && <Stripes className="rounded-md" color="color-mix(in oklab, var(--foreground) 6%, transparent)" />}
+                            <span className="relative shrink-0">
+                                <WorkspaceLogoImage src={workspace.icon_url || activeIcon} fallbackSrc={activeIcon} className="size-6 rounded-md object-cover" />
+                                {brainProposals > 0 && <span className="pointer-events-none absolute -top-0.5 -right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-sidebar" />}
+                            </span>
+                            <span className="relative truncate">{workspace.name || t('defaultName')}</span>
+                            <ChevronDownIcon className="relative size-3.5 shrink-0 text-muted-foreground" />
+                        </button>
                     </DropdownMenuTrigger>
-                    {brainProposals > 0 && <span className="pointer-events-none absolute top-0.5 right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
-                </div>
+                ) : (
+                    <div className="relative min-w-0">
+                        <DropdownMenuTrigger asChild>
+                            <WorkspacePill className="max-w-full shrink" name={workspace.name || t('defaultName')} iconUrl={workspace.icon_url || activeIcon} fallbackIconUrl={activeIcon} stripes={workspace.is_sandbox} />
+                        </DropdownMenuTrigger>
+                        {brainProposals > 0 && <span className="pointer-events-none absolute top-0.5 right-0.5 size-2 rounded-full bg-red-500 ring-2 ring-card" />}
+                    </div>
+                )}
                 <DropdownMenuContent
                     align="start"
                     side="bottom"
@@ -411,8 +428,13 @@ export function WorkspaceSwitcher() {
                     ))}
                 </DropdownMenuContent>
             </DropdownMenu>
-            <HelpButton />
-            <UpgradePill />
+            {/* The Simple view's list keeps them at its foot, out of the way of the workspace's name. */}
+            {placement === 'corner' && (
+                <>
+                    <HelpButton />
+                    <UpgradePill />
+                </>
+            )}
 
             <AccountDialog />
             <CreateWorkspaceDialog open={createOpen} onOpenChange={setCreateOpen} />

@@ -3,6 +3,7 @@
 import { SUPPORT_CHAT_ENABLED } from '@rerun/cloud/support'
 import { ChromePill } from '@rerun/ui/chrome'
 import { HelpMenuItems } from '@/components/layout/ToolbarActions'
+import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import { HeadsetIcon, HelpCircleIcon } from '@/lib/icons'
@@ -11,7 +12,8 @@ import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 import { useRef } from 'react'
 
-export function HelpButton() {
+// `icon`: a plain icon button, for a row of icon buttons such as the foot of the Simple view's list.
+export function HelpButton({ trigger = 'chrome' }: { trigger?: 'chrome' | 'icon' }) {
     const t = useTranslations('layout.help')
     const { session } = useSession()
     // The menu hands focus back to its trigger as it closes, which the checklist popover would read
@@ -22,9 +24,15 @@ export function HelpButton() {
         <DropdownMenu>
             <TooltipLabeled label={t('label')} side="bottom">
                 <DropdownMenuTrigger asChild>
-                    <ChromePill start="icon" end="icon" aria-label={t('label')}>
-                        <HelpCircleIcon className="size-4 text-muted-foreground" />
-                    </ChromePill>
+                    {trigger === 'icon' ? (
+                        <Button variant="ghost" size="icon-sm" aria-label={t('label')}>
+                            <HelpCircleIcon className="size-4" />
+                        </Button>
+                    ) : (
+                        <ChromePill start="icon" end="icon" aria-label={t('label')}>
+                            <HelpCircleIcon className="size-4 text-muted-foreground" />
+                        </ChromePill>
+                    )}
                 </DropdownMenuTrigger>
             </TooltipLabeled>
             <DropdownMenuContent

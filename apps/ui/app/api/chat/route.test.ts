@@ -1,6 +1,8 @@
 import { callableEngineAgentIds } from '@/app/api/_auth/access'
 import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, getAgentChatTarget, getExistingSession } from '@/app/api/_services/chat.service'
+import { recordSentMessage } from '@/app/api/_services/session-preview.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
+import { buildInstallMessage } from '@/lib/chat/install-marker'
 import * as engine from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
@@ -18,6 +20,7 @@ vi.mock('@/app/api/_services/chat.service', async importOriginal => ({
     findGeneralSession: vi.fn(),
     updateSessionStatus: vi.fn(),
 }))
+vi.mock('@/app/api/_services/session-preview.service', () => ({ recordSentMessage: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('@/lib/ai/generate-title', () => ({ generateSessionTitle: vi.fn().mockResolvedValue('Title') }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ chat: vi.fn(), reconnectRun: vi.fn(), cancelRun: vi.fn().mockResolvedValue(undefined) }))
@@ -194,6 +197,35 @@ describe('POST /api/chat', () => {
                 ['id', 'general-row'],
                 ['title', 'ship it'],
             ])
+        })
+    })
+
+    describe('preview of the last message', () => {
+        it('keeps what the person sent on their conversation, for the list of coworkers', async () => {
+            vi.mocked(engine.chat).mockResolvedValue(streaming('run-3'))
+
+            const response = await settle(POST(request({})))
+
+            expect(response.status).toBe(200)
+            expect(recordSentMessage).toHaveBeenCalledWith('session', 'ship it', 'me')
+        })
+
+        it('keeps nothing of an install, which opens with its guide', async () => {
+            vi.mocked(engine.chat).mockResolvedValue(streaming('run-4'))
+            vi.mocked(createSessionRow).mockResolvedValue('new-session')
+
+            await settle(POST(request({ sessionId: undefined, text: buildInstallMessage('Set up the coworker', 'Scout') })))
+
+            expect(recordSentMessage).not.toHaveBeenCalled()
+        })
+
+        it('keeps nothing when the engine refuses the message', async () => {
+            vi.mocked(engine.chat).mockResolvedValue(new Response('boom', { status: 500 }))
+
+            const response = await settle(POST(request({})))
+
+            expect(response.status).toBe(502)
+            expect(recordSentMessage).not.toHaveBeenCalled()
         })
     })
 })

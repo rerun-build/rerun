@@ -345,6 +345,7 @@
         "noUpdates": "Keine Neuigkeiten",
         "pillLabel": "Benachrichtigungen: {summary}",
         "pillLabelEmpty": "Benachrichtigungen: keine Neuigkeiten",
+        "needsYouRow": "Braucht dich",
         "needsYouCount": "{count, plural, one {# braucht dich} other {# brauchen dich}}",
         "doneCount": "{count, plural, one {# fertig} other {# fertig}}",
         "needsYouRich": "{count, plural, one {<b>#</b> braucht dich} other {<b>#</b> brauchen dich}}",

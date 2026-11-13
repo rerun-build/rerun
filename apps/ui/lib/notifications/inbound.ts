@@ -58,3 +58,21 @@ export function automatedRunOutcome(failed: boolean, nothingToReport: boolean): 
     if (failed) return 'failed'
     return nothingToReport ? 'nothing' : 'done'
 }
+
+// What an engine with nothing to say writes as the message of a finished chat run: never a reply.
+const EMPTY_REPLY = 'Message completed'
+
+// The start of what the coworker answered, for the list of coworkers: a chat run's message, a
+// routine's final text. A run that failed or was stopped says nothing new, and leaves the last line.
+export function agentReplyOf(notification: StoredNotification): string | null {
+    if (notification.kind !== 'done' || notification.metadata?.status === 'cancelled') return null
+    if (notification.event === 'agent.message.completed') {
+        const message = notification.message?.trim()
+        return message && message !== EMPTY_REPLY ? message : null
+    }
+    if (notification.event === 'agent.schedule.completed' || notification.event === 'agent.trigger.completed') {
+        const finalText = notification.metadata?.finalText
+        return typeof finalText === 'string' && finalText.trim() ? finalText.trim() : null
+    }
+    return null
+}

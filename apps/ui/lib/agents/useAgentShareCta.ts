@@ -7,6 +7,7 @@ import { isSubscriptionEntitled, PLAN_CURRENCY, basePriceCents, trialOffer, tria
 import { usePriceArm, startPlan } from '@rerun/cloud/billing.client'
 import { CreditCard, LayoutGridIcon, type LucideIcon } from '@/lib/icons'
 import { TRIAL_DAYS, formatAmount, trialLimitsCaption } from '@rerun/contracts'
+import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -30,7 +31,8 @@ export type AgentShareCta = {
 export function useAgentShareCta(token: string, preview: AgentSharePreview, onDone: () => void): AgentShareCta {
     const { workspace } = useSession()
     const [pending, startTransition] = useTransition()
-    const beginAgentSharePlacement = useBoardStore(s => s.beginAgentSharePlacement)
+    const requestCreation = useBoardStore(s => s.requestCreation)
+    const viewer = useBoxViewer()
 
     const t = useTranslations('agent.shareCta')
     const tTrial = useTranslations('billing.trialOffer')
@@ -47,7 +49,7 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
     const placeStep: ShareStep = { label: t('placeLabel'), caption: t('placeCaption'), icon: LayoutGridIcon }
 
     const place = () => {
-        beginAgentSharePlacement({ token, agentName: preview.agent.name })
+        requestCreation({ kind: 'share', token, agentName: preview.agent.name }, viewer)
         onDone()
     }
 

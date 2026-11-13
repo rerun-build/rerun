@@ -1,0 +1,49 @@
+{
+    "switch": {
+        "label": "Vista",
+        "board": "3D",
+        "simple": "Simple"
+    },
+    "list": {
+        "label": "Coworkers",
+        "search": "Buscar",
+        "empty": "Aún no hay coworkers"
+    },
+    "tile": {
+        "more": "Más para {name}",
+        "newConversation": "Nueva conversación",
+        "allConversations": "Todas las conversaciones",
+        "card": "Ficha del coworker",
+        "pin": "Fijar arriba",
+        "unpin": "Desfijar"
+    },
+    "chat": {
+        "allConversations": "Todas las conversaciones",
+        "pick": "Elige un coworker a la izquierda.",
+        "card": "Ficha del coworker"
+    },
+    "line": {
+        "paused": "En pausa",
+        "waiting": "Te está esperando",
+        "error": "Algo salió mal",
+        "working": "Trabajando",
+        "workingOn": "Trabajando · {detail}",
+        "asleep": "Dormido",
+        "asleepAbout": "Dormido · {about}",
+        "you": "Tú: {message}"
+    },
+    "foreman": {
+        "name": "Chief of Staff",
+        "line": "Pregunta lo que quieras"
+    },
+    "details": {
+        "close": "Cerrar la ficha",
+        "label": "Ficha de {name}"
+    },
+    "phone": {
+        "pinned": "Fijados",
+        "recent": "Recientes",
+        "byBox": "Por Box",
+        "section": "{label}, {count}"
+    }
+}

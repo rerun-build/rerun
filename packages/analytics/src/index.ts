@@ -225,6 +225,8 @@ export interface AnalyticsEventMap {
     // `clicked` is the step handed to the Foreman. Kept apart from `onboarding_step_*`, the funnel's.
     getting_started_step_completed: { step: string }
     getting_started_step_clicked: { step: string }
+    // The 3D board or the Simple view, picked by hand in the workspace menu.
+    workspace_view_switched: { view: 'board' | 'simple' }
     // Days added to a running trial, and what earned them.
     trial_extended: { days: number; source: 'getting_started' }
     // The welcome card's submit. `industry` is where the card ended: picked by hand, or decided from

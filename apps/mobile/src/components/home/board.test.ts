@@ -1,6 +1,6 @@
-import { FOREMAN_AGENT_ID, type AgentConversationsOverview, type BoardAgent } from '@rerun/contracts'
+import { byRecency, FOREMAN_AGENT_ID, sectionsByBox, withPinned, type AgentConversationsOverview, type BoardAgent } from '@rerun/contracts'
 
-import { byRecency, foremanOnBoard, lineOf, minutesSince, moodStatus, moveIn, sectionOf, recentCoworkers, sectionsByBox, toHomeCoworkers, withPinned } from '@/components/home/board'
+import { foremanOnBoard, lineOf, minutesSince, moodStatus, moveIn, sectionOf, recentCoworkers, toHomeCoworkers } from '@/components/home/board'
 
 const agent = (patch: Partial<BoardAgent>): BoardAgent => ({ id: 'a1', name: 'Scout', handle: 'scout', description: 'Finds leads', templateId: null, status: 'idle', workspaceId: 7, spaceId: 's1', disabledAt: null, disabledReason: null, ...patch })
 const latest = (patch: Partial<NonNullable<AgentConversationsOverview[number]['latest']>> = {}) => ({ id: 'c1', agentId: 'a1', engineSessionId: 'e1', title: 'Q4 prospects', status: 'idle' as const, source: 'dashboard' as const, updatedAt: '2026-10-21T10:00:00Z', originAgentName: null, ...patch })

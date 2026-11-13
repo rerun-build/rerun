@@ -1,17 +1,10 @@
 'use client'
 
-import { ClaimSpaceDialog } from '@/components/dialogs/ClaimSpaceDialog'
-import { NewAgentDialog } from '@/components/dialogs/NewAgentDialog'
-import { TemplateLibraryDialog } from '@/components/templates/TemplateLibraryDialog'
-import { MyTemplatesDialog } from '@/components/templates/expert/MyTemplatesDialog'
 import { Shimmer } from '@/components/ai-elements/shimmer'
 import { ChromeBar, ChromeButton, ChromeDivider } from '@rerun/ui/chrome'
 import { Gauge } from '@/components/ui/gauge'
-import { ToolbarDialogs } from '@/components/layout/ToolbarActions'
-import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { isPlaced } from '@/lib/board/iso'
-import { useLibraryViewerSignals } from '@/lib/templates/useLibraryViewerSignals'
 import { placementLabel, useBoardStore } from '@/stores/board.store'
 import { useBuilderDialogsStore } from '@/stores/builder-dialogs.store'
 import { useControlCenterStore } from '@/stores/control-center.store'
@@ -30,11 +23,10 @@ export function BuilderToolbar() {
     const placingAgentId = useBoardStore(s => s.placingAgentId)
     const placement = useBoardStore(s => s.placement)
     const cancelPlacement = useBoardStore(s => s.cancelPlacement)
-    const { libraryOpen, newAgentOpen, librarySlug, newBoxOpen, openLibrary, openNewAgent, setLibraryOpen, setNewAgentOpen, setNewBoxOpen } = useBuilderDialogsStore()
+    const openLibrary = useBuilderDialogsStore(s => s.openLibrary)
+    const openNewAgent = useBuilderDialogsStore(s => s.openNewAgent)
     const openControlCenter = useControlCenterStore(s => s.openControlCenter)
-    const isTemplateAuthor = useIsTemplateAuthor()
     const { isAnonymous } = useSession()
-    const viewerSignals = useLibraryViewerSignals()
     const { needsMachineReason } = useWorkspaceAccess()
 
     const unplacedAgents = agents.filter(a => !isPlaced(a.position))
@@ -52,12 +44,12 @@ export function BuilderToolbar() {
     const recruitingFirstAgent = hydrated && spaces.length === 0
 
     // Nothing in the bar is for an anonymous visitor: the sign-in pill in the top corner is their
-    // only way in. The store-driven dialogs stay mounted.
-    if (isAnonymous) return <ToolbarDialogs />
+    // only way in.
+    if (isAnonymous) return null
 
-    const showBar = placing || !recruitingFirstAgent || unplacedAgents.length > 0
+    if (!placing && recruitingFirstAgent && unplacedAgents.length === 0) return null
 
-    const bar = (
+    return (
         // Le bas n'est pas toujours le bas : la bannière cookies est `fixed bottom-0 z-60` en
         // mobile, donc la barre s'assoit sur l'inset qu'elle publie — sinon le prompt de placement
         // et son Cancel passent dessous pendant la toute première session.
@@ -133,18 +125,5 @@ export function BuilderToolbar() {
                 </div>
             </ChromeBar>
         </div>
-    )
-
-    return (
-        <>
-            {showBar && bar}
-            {/* Dialogs montés en permanence (Radix les portale). Une Box, elle, se crée depuis une
-                face d'une Box existante sur le board (cf. IsoBoard). */}
-            <NewAgentDialog open={newAgentOpen} onOpenChange={setNewAgentOpen} onBrowseTemplates={openLibrary} />
-            <TemplateLibraryDialog open={libraryOpen} onOpenChange={setLibraryOpen} priorityCategory={viewerSignals.category} preferredConnectorSlugs={viewerSignals.connectorSlugs} initialSlug={librarySlug} onCreateFromScratch={openNewAgent} />
-            <ClaimSpaceDialog target={null} open={newBoxOpen} onClose={() => setNewBoxOpen(false)} />
-            {isTemplateAuthor && <MyTemplatesDialog />}
-            <ToolbarDialogs />
-        </>
     )
 }

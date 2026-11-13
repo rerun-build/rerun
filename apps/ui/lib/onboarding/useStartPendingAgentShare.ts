@@ -4,6 +4,7 @@ import { getSharedAgentAction } from '@/app/api/_actions/agent-share.actions'
 import { claimSpaceAction } from '@/app/api/_actions/space.actions'
 import { resolveTargetSpace } from '@/lib/onboarding/target-space'
 import { useAgentShareStore } from '@/stores/agent-share.store'
+import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -19,7 +20,8 @@ import { useTranslations } from 'next-intl'
 // the onboarding placeholder again, and be sent back to the paywall they just paid.
 export function useStartPendingAgentShare() {
     const { workspace } = useSession()
-    const beginAgentSharePlacement = useBoardStore(s => s.beginAgentSharePlacement)
+    const requestCreation = useBoardStore(s => s.requestCreation)
+    const viewer = useBoxViewer()
     const t = useTranslations('builder.boardToasts')
     const errorText = useErrorText()
 
@@ -49,7 +51,7 @@ export function useStartPendingAgentShare() {
         // Cleared only now: up to here the entry is what brings the card back on a reload.
         useOnboardingStore.getState().clearPendingShareLink()
         useAgentShareStore.getState().closeLink()
-        beginAgentSharePlacement({ token, agentName: preview.agent.name })
+        requestCreation({ kind: 'share', token, agentName: preview.agent.name }, viewer)
         return true
     }
 }

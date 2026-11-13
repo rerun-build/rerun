@@ -687,5 +687,10 @@
             "keyDetail": "Vos coworkers tournent désormais sur cette clé.",
             "done": "Terminé"
         }
+    },
+    "boxPicker": {
+        "title": "Choisissez une Box",
+        "description": "Le nouveau coworker la rejoint, sur une place libre.",
+        "coworkers": "{count, plural, =0 {Aucun coworker pour l'instant} one {# coworker} other {# coworkers}}"
     }
 }

@@ -12,7 +12,7 @@ import type { NotificationPayload } from '@/lib/engine/types'
 import { RERUN_BUDGET_ERROR_CODE, suppressesErrorEmail } from '@/lib/notifications/budget-notice'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { announcesRecovery, emailSourceLabel, incidentKeyFor, resolvedIncidentKeysFor } from '@/lib/notifications/incidents'
-import { automatedRunOutcome, automatedRunReport, completionStatus, isRunCompletion, storedKind, type StoredNotification } from '@/lib/notifications/inbound'
+import { agentReplyOf, automatedRunOutcome, automatedRunReport, completionStatus, isRunCompletion, storedKind, type StoredNotification } from '@/lib/notifications/inbound'
 import { NOTIFICATION_EMAILS_PAUSED, coworkerRuleOf, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { isPresent } from '@/lib/notifications/presence'
 import { emailReasonSentence } from '@/lib/notifications/reason-copy'
@@ -22,6 +22,7 @@ import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { ensureSessionRow } from './chat.service'
+import { recordAgentReply } from './session-preview.service'
 import { writeNotificationPrefs } from './notification-audience.service'
 import { loadPresence } from './presence.service'
 import { authenticateEngineToken } from './workspace-engine.service'
@@ -94,6 +95,10 @@ export async function recordNotification(token: string, payload: NotificationPay
     await applySessionStatus(supabase, agent?.id ?? null, notification)
     // After the response: a model call must not hold the engine's webhook open.
     after(() => retitleAutomatedRun(supabase, agent?.id ?? null, notification))
+    const reply = agentReplyOf(notification)
+    const agentId = agent?.id
+    const engineSessionId = notification.sessionId
+    if (reply && agentId && engineSessionId) after(() => recordAgentReply(agentId, engineSessionId, reply))
 
     if (!engine.isSandbox) await reportChatRun(engine.workspaceId, agent?.id ?? notification.agentId, notification)
 

@@ -12,37 +12,42 @@ export const SIDE_PANEL_GAP = 8
 // ne pas réinitialiser celle que les utilisateurs ont déjà réglée sur le panneau agent.
 export const SIDE_PANEL_WIDTH_STORAGE_KEY = 'rerun-agent-panel-width'
 
-export function getSidePanelMaxWidth(viewportWidth: number): number {
-    if (!Number.isFinite(viewportWidth) || viewportWidth <= 0) return SIDE_PANEL_DEFAULT_WIDTH
-    return Math.max(SIDE_PANEL_MIN_WIDTH, Math.min(SIDE_PANEL_MAX_WIDTH, Math.floor(viewportWidth * SIDE_PANEL_MAX_VIEWPORT_RATIO)))
+// A resizable panel: where its width is remembered, its bounds, and the share of the window it may take.
+export type PanelWidthConfig = { storageKey: string; defaultWidth: number; min: number; max: number; maxViewportRatio: number }
+
+export const SIDE_PANEL_WIDTH: PanelWidthConfig = { storageKey: SIDE_PANEL_WIDTH_STORAGE_KEY, defaultWidth: SIDE_PANEL_DEFAULT_WIDTH, min: SIDE_PANEL_MIN_WIDTH, max: SIDE_PANEL_MAX_WIDTH, maxViewportRatio: SIDE_PANEL_MAX_VIEWPORT_RATIO }
+
+export function getSidePanelMaxWidth(viewportWidth: number, config: PanelWidthConfig = SIDE_PANEL_WIDTH): number {
+    if (!Number.isFinite(viewportWidth) || viewportWidth <= 0) return config.defaultWidth
+    return Math.max(config.min, Math.min(config.max, Math.floor(viewportWidth * config.maxViewportRatio)))
 }
 
-export function clampSidePanelWidth(width: number, viewportWidth: number): number {
-    const safeWidth = Number.isFinite(width) ? Math.round(width) : SIDE_PANEL_DEFAULT_WIDTH
-    return Math.min(Math.max(safeWidth, SIDE_PANEL_MIN_WIDTH), getSidePanelMaxWidth(viewportWidth))
+export function clampSidePanelWidth(width: number, viewportWidth: number, config: PanelWidthConfig = SIDE_PANEL_WIDTH): number {
+    const safeWidth = Number.isFinite(width) ? Math.round(width) : config.defaultWidth
+    return Math.min(Math.max(safeWidth, config.min), getSidePanelMaxWidth(viewportWidth, config))
 }
 
-export function parseSidePanelWidth(value: string | null, viewportWidth: number): number {
-    if (value === null || value.trim() === '') return clampSidePanelWidth(SIDE_PANEL_DEFAULT_WIDTH, viewportWidth)
+export function parseSidePanelWidth(value: string | null, viewportWidth: number, config: PanelWidthConfig = SIDE_PANEL_WIDTH): number {
+    if (value === null || value.trim() === '') return clampSidePanelWidth(config.defaultWidth, viewportWidth, config)
 
     const parsed = Number(value)
-    if (!Number.isFinite(parsed)) return clampSidePanelWidth(SIDE_PANEL_DEFAULT_WIDTH, viewportWidth)
+    if (!Number.isFinite(parsed)) return clampSidePanelWidth(config.defaultWidth, viewportWidth, config)
 
-    return clampSidePanelWidth(parsed, viewportWidth)
+    return clampSidePanelWidth(parsed, viewportWidth, config)
 }
 
-export function loadSidePanelWidth(viewportWidth: number): number {
+export function loadSidePanelWidth(viewportWidth: number, config: PanelWidthConfig = SIDE_PANEL_WIDTH): number {
     try {
-        return parseSidePanelWidth(localStorage.getItem(SIDE_PANEL_WIDTH_STORAGE_KEY), viewportWidth)
+        return parseSidePanelWidth(localStorage.getItem(config.storageKey), viewportWidth, config)
     } catch {
-        return clampSidePanelWidth(SIDE_PANEL_DEFAULT_WIDTH, viewportWidth)
+        return clampSidePanelWidth(config.defaultWidth, viewportWidth, config)
     }
 }
 
-export function saveSidePanelWidth(width: number, viewportWidth: number): number {
-    const clamped = clampSidePanelWidth(width, viewportWidth)
+export function saveSidePanelWidth(width: number, viewportWidth: number, config: PanelWidthConfig = SIDE_PANEL_WIDTH): number {
+    const clamped = clampSidePanelWidth(width, viewportWidth, config)
     try {
-        localStorage.setItem(SIDE_PANEL_WIDTH_STORAGE_KEY, String(clamped))
+        localStorage.setItem(config.storageKey, String(clamped))
     } catch {}
     return clamped
 }

@@ -2314,6 +2314,10 @@ export type Database = {
           first_message: string | null
           id: string
           kind: Database["public"]["Enums"]["session_kind"]
+          last_message: string | null
+          last_message_at: string | null
+          last_message_author_id: string | null
+          last_message_from: string | null
           origin_agent_id: string | null
           outcome: Database["public"]["Enums"]["session_outcome"] | null
           source: Database["public"]["Enums"]["session_source"]
@@ -2329,6 +2333,10 @@ export type Database = {
           first_message?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["session_kind"]
+          last_message?: string | null
+          last_message_at?: string | null
+          last_message_author_id?: string | null
+          last_message_from?: string | null
           origin_agent_id?: string | null
           outcome?: Database["public"]["Enums"]["session_outcome"] | null
           source?: Database["public"]["Enums"]["session_source"]
@@ -2344,6 +2352,10 @@ export type Database = {
           first_message?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["session_kind"]
+          last_message?: string | null
+          last_message_at?: string | null
+          last_message_author_id?: string | null
+          last_message_from?: string | null
           origin_agent_id?: string | null
           outcome?: Database["public"]["Enums"]["session_outcome"] | null
           source?: Database["public"]["Enums"]["session_source"]
@@ -2357,6 +2369,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_last_message_author_id_fkey"
+            columns: ["last_message_author_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -3796,6 +3815,20 @@ export type Database = {
       consume_rerun_credit: {
         Args: { p_micros: number; p_workspace_id: number }
         Returns: undefined
+      }
+      coworker_previews: {
+        Args: { p_workspace_id: number }
+        Returns: {
+          agent_id: string
+          last_message: string | null
+          last_message_at: string | null
+          last_message_author_id: string | null
+          last_message_from: string | null
+          session_id: string | null
+          status: Database["public"]["Enums"]["session_status"] | null
+          title: string | null
+          updated_at: string | null
+        }[]
       }
       current_admin_workspace_ids: { Args: never; Returns: number[] }
       current_workspace_ids: { Args: never; Returns: number[] }

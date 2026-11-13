@@ -46,7 +46,7 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
 
     return (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            <div className="flex shrink-0 items-center gap-1 border-b border-border px-2 py-2">
+            <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border px-2">
                 <Button variant="ghost" size="sm" onClick={onBack} className="min-w-0 shrink pl-1.5">
                     <ChevronLeftIcon className="size-4" />
                     <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-muted">

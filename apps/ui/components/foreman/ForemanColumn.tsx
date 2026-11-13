@@ -60,7 +60,8 @@ const TRANSITION_MS = 300
 // `open` vaut `null` tant que la préférence n'est pas tranchée, le temps de l'hydratation : la piste
 // de grille s'ouvre quand même (le défaut desktop), mais le panneau reste hors de la tabulation, au
 // cas où l'écran serait un téléphone — là le calque est translaté hors champ.
-export function ForemanColumn({ open, placement }: { open: boolean | null; placement: ForemanPlacement }) {
+// `pinned`: in the Simple view's middle, where it is neither dragged, nor floated, nor resized.
+export function ForemanColumn({ open, placement, pinned = false }: { open: boolean | null; placement: ForemanPlacement; pinned?: boolean }) {
     const sessionId = useForemanStore(state => state.sessionId)
     const guided = useForemanStore(state => state.funnel === 'guided')
     // Le tunnel guidé n'affiche pas de tabs : un onglet resté ouvert avant ne doit pas y cacher le chat.
@@ -345,9 +346,9 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     const handleHeaderPointerDown = useCallback(
         (event: PointerEvent<HTMLElement>) => {
             onSheetPointerDown(event)
-            onHeaderPointerDown(event)
+            if (!pinned) onHeaderPointerDown(event)
         },
-        [onSheetPointerDown, onHeaderPointerDown]
+        [onSheetPointerDown, onHeaderPointerDown, pinned]
     )
 
     // Redimensionner la piste de grille redimensionne le layer GPU du board à chaque frame : on le
@@ -437,7 +438,7 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
                           )
                 )}
             >
-                <ForemanHeader placement={placement} onDragPointerDown={handleHeaderPointerDown} onToggleSheetDetent={toggleDetent} onNewChat={startNewChat} />
+                <ForemanHeader placement={placement} movable={!pinned} onDragPointerDown={handleHeaderPointerDown} onToggleSheetDetent={toggleDetent} onNewChat={startNewChat} />
                 {/* Masqués et pas démontés hors de l'onglet Assistant : un aller-retour sur Routines
                     ne doit perdre ni le brouillon du composer ni la position dans la conversation. */}
                 {arrivalStep && arrivalPick && (
@@ -495,8 +496,8 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
                 <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />
                 {onRoutines && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
             </div>
-            {placement.mode === 'float' && !dragging && open && <ForemanResizeHandle panelRef={panelRef} placement={placement} />}
-            {placement.mode === 'dock' && !dragging && open && <ForemanDockResizeHandle panelRef={panelRef} placement={placement} />}
+            {placement.mode === 'float' && !dragging && open && !pinned && <ForemanResizeHandle panelRef={panelRef} placement={placement} />}
+            {placement.mode === 'dock' && !dragging && open && !pinned && <ForemanDockResizeHandle panelRef={panelRef} placement={placement} />}
         </div>
     )
 }

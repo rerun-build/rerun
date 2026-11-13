@@ -101,6 +101,8 @@ type AgentChatProps = {
     agentId: string
     agentName: string
     sessionId: string | null
+    // The conversation to show is still being looked up (General's): its history is on its way, not empty.
+    sessionPending?: boolean
     onSessionCreated: (id: string) => void
     initialRunId?: string | null
     // Bumped each time the conversation is opened from somewhere else (a notification, the inbox):
@@ -130,7 +132,7 @@ type AgentChatProps = {
     composerPlaceholder?: string
 }
 
-export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder }: AgentChatProps) {
+export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder }: AgentChatProps) {
     const t = useTranslations('chat.agentChat')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace, user } = useSession()
@@ -460,6 +462,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
 
     const [historyLoading, setHistoryLoading] = useState(false)
     const historyLoadedRef = useRef<string | null>(null)
+    const [historyReadFor, setHistoryReadFor] = useState<string | null>(null)
     // The session whose snapshot is on its way: it answers the active-run question too, so the
     // separate lookup below waits for it instead of racing it.
     const [snapshotPendingFor, setSnapshotPendingFor] = useState<string | null>(null)
@@ -512,9 +515,13 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
             .catch(() => {})
             .finally(() => {
                 setHistoryLoading(false)
+                setHistoryReadFor(sessionId)
                 setSnapshotPendingFor(null)
             })
     }, [active, sessionId, messages.length, setMessages, initialRunId, showReplayedRunError])
+    // From the first frame a conversation is on screen, not once the effect above has asked for its
+    // history: the empty state would flash in between, as if the conversation had nothing in it.
+    const historyAwaited = historyLoading || (messages.length === 0 && (sessionPending || (active && !!sessionId && !initialRunId && historyReadFor !== sessionId)))
 
     const reconnecting = useRunReconnect({
         error,
@@ -965,10 +972,10 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
                 conversation in front of the user. Only a reply being written is followed smoothly. */}
             <Conversation className="flex-1" contextRef={conversationRef} initial="instant" resize={status === 'streaming' || status === 'submitted' ? 'smooth' : 'instant'}>
                 <div className="h-full" style={{ maskImage: scrollMask, WebkitMaskImage: scrollMask }}>
-                    <ConversationContent>
-                        {historyLoading && <SkeletonChat className="py-2" />}
-                        {threadRows.leading.length > 0 && !historyLoading && <div className="flex flex-col gap-3">{threadBranches(threadRows.leading)}</div>}
-                        {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyLoading && !showInstallGate && (
+                    <ConversationContent className="mx-auto w-full max-w-[var(--chat-column,none)]">
+                        {historyAwaited && <SkeletonChat className="py-2" />}
+                        {threadRows.leading.length > 0 && !historyAwaited && <div className="flex flex-col gap-3">{threadBranches(threadRows.leading)}</div>}
+                        {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyAwaited && !showInstallGate && (
                             <ConversationEmptyState>
                                 <AgentBuddy agentId={agentId} mood={buddyMood} size={96} />
                                 <div className="space-y-1">
@@ -1081,7 +1088,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
 
             {mentionMenu && <div className="absolute inset-x-3" style={{ top: mentionMenuTop }}>{mentionMenu}</div>}
             {footerVisible && (
-                <div className="border-t border-border p-3">
+                <div className="border-t border-border p-3 *:mx-auto *:max-w-[var(--chat-column,none)]">
                     <AnimatePresence initial={false}>
                         {pendingAlert && (
                             <motion.div key="alert" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden">

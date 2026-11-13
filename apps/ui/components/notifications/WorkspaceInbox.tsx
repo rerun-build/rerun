@@ -32,8 +32,8 @@ function InboxItemMenu({ item, onOpenChange }: RowMenuProps<InboxItem>) {
 
 type View = null | 'hub' | { notification: AnnouncedNotification }
 
-/** Every agent's « To handle » list in one place, parked in the board's bottom-left corner. */
-export function WorkspaceInbox() {
+/** Every agent's « To handle » list in one place: a pill in the board's bottom-left corner, or a row at the top of the Simple view's list. */
+export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' }) {
     const t = useTranslations('notifications.inbox')
     const tReasons = useTranslations('notifications.inbox.reasons')
     const { isAnonymous } = useSession()
@@ -212,6 +212,9 @@ export function WorkspaceInbox() {
             onRowMenuOpenChange={setRowMenuOpen}
             keepOpen={rowMenuOpen}
             detail={detail}
+            trigger={trigger}
+            // Dropped from the top of the list, the card may reach over the chat, never past the window.
+            {...(trigger === 'row' && { resizable: false, listMaxHeight: 'min(28rem, calc(100dvh - 14rem))', cardClassName: 'w-[min(24rem,calc(100vw-1.5rem))]', detailClassName: 'w-[min(22rem,calc(100vw-1.5rem))]' })}
         />
     )
 }
