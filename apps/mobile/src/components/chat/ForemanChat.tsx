@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentModels, type ForemanSurface } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentModels, type Conversation, type ForemanSurface } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
@@ -6,7 +6,7 @@ import { useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
-import { fetchForemanConversation, fetchForemanEngineFiles, fetchForemanSurface, type ForemanConversation } from '@/api/foreman'
+import { fetchForemanEngineFiles, fetchForemanSurface } from '@/api/foreman'
 import { fetchAgentModels } from '@/api/models'
 import { useAuth } from '@/auth/AuthProvider'
 import { takePendingAsk } from '@/chat/pending-ask'
@@ -23,23 +23,23 @@ import { spacing } from '@/theme/tokens'
 
 import { CHAT_HEADER_HEIGHT, ChatHeader, type ChatTab } from './ChatHeader'
 import { CONTROL } from './ComposerControls'
-import { activePageIndex, conversationPages, type ConversationPage } from './conversation-pages'
+import { activePageIndex, conversationPages, GENERAL_DRAFT_KEY, GENERAL_PAGE_ID, type ConversationPage } from './conversation-pages'
 import { ConversationPager } from './ConversationPager'
 import { BLUR_ABOVE_FOOTER, ConversationPane, type ChatCoworker } from './ConversationPane'
 import { ConversationSkeleton } from './ConversationSkeleton'
+import { generalThreadsOf } from './threads/general-threads'
+import { useForemanConversations } from './useCoworkerConversations'
 import { useOpenChats } from './useOpenChats'
 
-// Opens the last conversation with the Foreman, as the web column does.
+// Opens the Foreman's General, the conversation the web column opens on. Older links and pushes say `last`.
 export const LAST_CONVERSATION = 'last'
 
 const FOREMAN: Omit<ChatCoworker, 'role'> = { id: FOREMAN_AGENT_ID, kind: 'foreman', name: FOREMAN_DISPLAY_NAME, status: 'idle' }
 
-const TITLE_DELAY_MS = 4000
+const tabOf = (conversation: Conversation): ChatTab | null => (conversation.id ? { id: conversation.id, title: conversation.title, running: conversation.status === 'working', empty: false, status: conversation.status, updatedAt: conversation.updatedAt, kind: conversation.kind } : null)
 
 type SurfaceState = ForemanSurface | 'loading' | 'error'
 
-
-const noop = () => {}
 
 // Where the pane's transcript rests above its composer, so the conversation that replaces this
 // skeleton lands where it already stood.
@@ -73,33 +73,33 @@ function Notice({ title, body, onRetry }: { title: string; body: string; onRetry
     )
 }
 
-// The Foreman of the workspace, the one running on its machine, on a page of its own like a coworker.
-// The onboarding's lives on the web: a workspace still in it is sent there. `sessionId` is null for a
-// new conversation, or `last` for the one the web column would show. A new one may open on the text
-// the search left for it.
+// The Foreman of the workspace, the one running on its machine, on a page of its own like a coworker:
+// General pinned first, the threads it opened, a new thread at the end of the row. The onboarding's
+// lives on the web: a workspace still in it is sent there. `sessionId` is null for a new thread, or
+// `last` / `general` for General. What the search asks lands in General.
 export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.foreman')
     const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, role: t('role') }), [t])
     const back = useChatBack()
     const { session, me } = useAuth()
-    const [ask] = useState(() => (sessionId === null ? takePendingAsk() : undefined))
-    const [wantsLast] = useState(sessionId === LAST_CONVERSATION)
-    // Where the last visit found the Foreman, and its last conversation: the page opens on them.
+    const opensGeneral = sessionId === LAST_CONVERSATION || sessionId === GENERAL_PAGE_ID
+    const [ask] = useState(() => (opensGeneral ? takePendingAsk() : undefined))
+    // Where the last visit found the Foreman: the page opens on it.
     const [kept] = useState(() => (me ? cachedForeman(me.workspace.id).read() : null))
-    const keptLast = kept?.surface === 'engine' ? kept.last : null
-    const initialId = wantsLast ? (keptLast?.sessionId ?? null) : sessionId
     const [surface, setSurface] = useState<SurfaceState>(kept?.surface ?? 'loading')
     const [attempt, setAttempt] = useState(0)
-    const [titles, setTitles] = useState<Record<string, string>>(() => (kept?.last?.title ? { [kept.last.sessionId]: kept.last.title } : {}))
+    const { conversations, loaded: conversationsLoaded, reload: loadConversations } = useForemanConversations()
     const [draftKey, setDraftKey] = useState(() => `new-${Date.now()}`)
     const [bornKeys, setBornKeys] = useState<Record<string, string>>({})
-    const [activeId, setActiveId] = useState(initialId)
+    const [activeId, setActiveId] = useState(opensGeneral ? GENERAL_PAGE_ID : sessionId)
     const [models, setModels] = useState<AgentModels | null>(null)
     const [filesOnEngine, setFilesOnEngine] = useState(false)
     // Read by the pages' endpoints at upload time, long after the render that built them.
     const filesOnEngineRef = useRef(false)
-    const [openIds, openChat] = useOpenChats(FOREMAN_AGENT_ID, initialId)
+    const [openIds, openChat] = useOpenChats(FOREMAN_AGENT_ID, opensGeneral ? null : sessionId)
+    const generalId = conversations.find(conversation => conversation.kind === 'general')?.id ?? null
+    const generalThreads = useMemo(() => generalThreadsOf(conversations), [conversations])
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
     const signedIn = Boolean(accessToken)
@@ -111,53 +111,25 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         latestToken.current = accessToken
     }, [accessToken])
 
-    const open = useCallback(
-        (id: string) => {
-            openChat(id)
-            setActiveId(id)
-            router.setParams({ id })
-        },
-        [openChat]
-    )
+    const open = (id: string) => {
+        if (id !== GENERAL_PAGE_ID && id !== generalId) openChat(id)
+        setActiveId(id)
+        router.setParams({ id })
+    }
 
-    const showDraft = useCallback(() => {
+    const showDraft = () => {
         setActiveId(null)
         router.setParams({ id: 'new' })
-    }, [])
-
-    // The hub only tells the last conversation, with its title: null when there is none yet,
-    // undefined when it could not be read.
-    const readLastTitle = useCallback(
-        (caller: { accessToken: string; workspaceId: number }): Promise<ForemanConversation | null | undefined> =>
-            fetchForemanConversation(caller)
-                .then(last => {
-                    if (last?.sessionId && last.title) setTitles(current => ({ ...current, [last.sessionId]: last.title as string }))
-                    return last
-                })
-                .catch(() => undefined),
-        []
-    )
+    }
 
     useEffect(() => {
         const token = latestToken.current
         if (!signedIn || !token || !workspaceId) return
-        const caller = { accessToken: token, workspaceId }
         let cancelled = false
-        const lastConversation = readLastTitle(caller)
-        fetchForemanSurface(caller)
-            .then(async next => {
-                const last = next === 'engine' ? await lastConversation : null
+        fetchForemanSurface({ accessToken: token, workspaceId })
+            .then(next => {
                 if (cancelled) return
-                if (next === 'engine' && wantsLast) {
-                    if (last?.sessionId) {
-                        if (last.sessionId !== keptLast?.sessionId) open(last.sessionId)
-                    } else if (last === null && keptLast) showDraft()
-                    else if (!keptLast) router.setParams({ id: 'new' })
-                }
-                // A last conversation that could not be read keeps the one the phone knew; the hub
-                // answering that there is none forgets it.
-                const remembered = last === undefined ? (kept?.last ?? null) : last?.sessionId ? { sessionId: last.sessionId, title: last.title ?? null } : null
-                cachedForeman(workspaceId).save({ surface: next, last: remembered })
+                cachedForeman(workspaceId).save({ surface: next, last: kept?.last ?? null })
                 setSurface(next)
             })
             // Offline, the page stays on what the phone knew.
@@ -167,7 +139,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         return () => {
             cancelled = true
         }
-    }, [signedIn, workspaceId, wantsLast, attempt, readLastTitle, open, showDraft, kept, keptLast])
+    }, [signedIn, workspaceId, attempt, kept])
 
     // Read again when the model sheet closes on a new pick, as a coworker's page does.
     useFocusEffect(
@@ -196,8 +168,9 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         }
     }, [surface, workspaceId])
 
-    const makeEndpoints = useCallback(() => foremanEndpoints(() => filesOnEngineRef.current), [])
+    const makeEndpoints = useCallback((general: boolean) => foremanEndpoints(() => filesOnEngineRef.current, { general }), [])
 
+    // A pick in the header ticks on the tap; a swipe has already ticked as it crossed into the page.
     const select = (id: string) => {
         Haptics.selectionAsync()
         open(id)
@@ -208,35 +181,81 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         showDraft()
     }
 
-    // Born from its first send: the page stays and becomes a tab, and a fresh draft ends the row. The
-    // hub titles it from its first message, a moment after it answers the send.
+    // Born from its first send: the page stays and becomes a tab, and a fresh draft ends the row.
     const onSessionCreated = useCallback(
         (id: string) => {
             setBornKeys(known => ({ ...known, [id]: draftKey }))
             setDraftKey(`new-${Date.now()}`)
-            open(id)
-            if (accessToken && workspaceId) setTimeout(() => readLastTitle({ accessToken, workspaceId }), TITLE_DELAY_MS)
+            openChat(id)
+            setActiveId(id)
+            router.setParams({ id })
+            loadConversations()
         },
-        [draftKey, open, accessToken, workspaceId, readLastTitle]
+        [draftKey, openChat, loadConversations]
     )
 
-    const pages = conversationPages(openIds, bornKeys, draftKey)
+    // General born on its own page: it keeps that page, and stays the active one under its own id
+    // once the list names it.
+    const onGeneralCreated = useCallback(
+        (id: string) => {
+            setBornKeys(known => ({ ...known, [id]: GENERAL_DRAFT_KEY }))
+            router.setParams({ id })
+            loadConversations()
+        },
+        [loadConversations]
+    )
+
+    const pages = conversationPages(openIds, bornKeys, draftKey, { sessionId: generalId })
     const activeIndex = activePageIndex(pages, activeId)
+    const shownId = activeId === GENERAL_PAGE_ID && generalId ? generalId : activeId
     const progress = useSharedValue(activeIndex)
 
     const settleOn = (index: number) => {
         const sessionAt = pages[index]?.sessionId
         if (sessionAt === undefined) return
-        if (sessionAt) open(sessionAt)
+        if (pages[index]?.general) open(sessionAt ?? GENERAL_PAGE_ID)
+        else if (sessionAt) open(sessionAt)
         else showDraft()
     }
 
-    const tabs = openIds.map((id): ChatTab => ({ id, title: titles[id] ?? null, running: false, empty: false }))
+    const byId = new Map(conversations.map(conversation => [conversation.id, conversation]))
+    // One chip per page, even before the hub names the conversation, so the strip lines up with the pager.
+    const tabs = pages.slice(0, -1).map((page): ChatTab => {
+        const conversation = page.sessionId ? byId.get(page.sessionId) : undefined
+        const tab = conversation && tabOf(conversation)
+        if (page.general) return tab ? { ...tab, kind: 'general' } : { id: GENERAL_PAGE_ID, title: null, running: false, empty: true, kind: 'general' }
+        return tab || { id: page.sessionId ?? page.key, title: null, running: false, empty: false, loading: !conversationsLoaded }
+    })
+    const allTabs = conversations.map(tabOf).filter((tab): tab is ChatTab => tab !== null)
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
             {surface === 'loading' && <LoadingConversation />}
-            {surface === 'engine' && <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={settleOn} renderPage={(page: ConversationPage, onScreen) => <ConversationPane coworker={foreman} makeEndpoints={makeEndpoints} initialSessionId={page.sessionId} onSessionCreated={onSessionCreated} models={models} status={null} onStatusChange={noop} webUrl={`${environment.apiUrl}/`} onScreen={onScreen} initialMessage={page.sessionId ? undefined : ask} canAttach={filesOnEngine} />} />}
+            {surface === 'engine' && (
+                <ConversationPager
+                    pages={pages}
+                    activeIndex={activeIndex}
+                    progress={progress}
+                    onSettle={settleOn}
+                    renderPage={(page: ConversationPage, onScreen) => (
+                        <ConversationPane
+                            coworker={foreman}
+                            makeEndpoints={() => makeEndpoints(!!page.general)}
+                            initialSessionId={page.sessionId}
+                            onSessionCreated={page.general ? onGeneralCreated : onSessionCreated}
+                            models={models}
+                            status={(page.sessionId && byId.get(page.sessionId)?.status) || null}
+                            onStatusChange={loadConversations}
+                            webUrl={`${environment.apiUrl}/`}
+                            onScreen={onScreen}
+                            initialMessage={page.general ? ask : undefined}
+                            canAttach={filesOnEngine}
+                            threads={page.general ? generalThreads : undefined}
+                            onOpenThread={select}
+                        />
+                    )}
+                />
+            )}
             {(surface === 'onboarding' || surface === 'none') && <Notice title={t(`away.${surface}.title`)} body={t(`away.${surface}.body`, { host: webHost })} />}
             {surface === 'error' && (
                 <Notice
@@ -248,7 +267,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
                     }}
                 />
             )}
-            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={activeId ?? undefined} progress={progress} allSessions={surface === 'engine' ? tabs : []} onBack={back} onSelect={select} onNewSession={startNew} />
+            <ChatHeader coworker={foreman} tabs={surface === 'engine' ? tabs : []} activeId={shownId ?? undefined} progress={progress} allSessions={surface === 'engine' ? allTabs : []} onBack={back} onSelect={select} onNewSession={startNew} />
         </View>
     )
 }

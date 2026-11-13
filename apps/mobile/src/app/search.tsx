@@ -10,6 +10,7 @@ import { searchConversations } from '@/api/search'
 import { useAuth } from '@/auth/AuthProvider'
 import { setPendingAsk } from '@/chat/pending-ask'
 import { AgentBuddy } from '@/components/buddy/AgentBuddy'
+import { LAST_CONVERSATION } from '@/components/chat/ForemanChat'
 import { ForemanOrb } from '@/components/orb/ForemanOrb'
 import { lineOf, minutesSince, moodStatus, toHomeCoworkers, type HomeCoworker } from '@/components/home/board'
 import { CoworkerRow } from '@/components/home/CoworkerRow'
@@ -119,9 +120,10 @@ export default function Search() {
     const asked = query.trim()
 
     const openCoworker = (coworker: HomeCoworker) => router.push({ pathname: '/chat/[id]', params: { id: coworker.latest?.id ?? 'new', to: coworker.id } })
+    // Asked from outside its page, the Foreman hears it in General, as on the web.
     const askRerun = (text: string) => {
         setPendingAsk(text)
-        router.push({ pathname: '/chat/[id]', params: { id: 'new' } })
+        router.push({ pathname: '/chat/[id]', params: { id: LAST_CONVERSATION } })
     }
 
     return (

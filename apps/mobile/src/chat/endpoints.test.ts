@@ -29,11 +29,17 @@ describe('Foreman endpoints', () => {
     let filesOnEngine = false
     const endpoints = foremanEndpoints(() => filesOnEngine)
 
-    it('names a new conversation itself and keeps that name on every send', () => {
+    it('names a new thread itself and keeps that name on every send', () => {
         expect(endpoints.agentId).toBe('foreman')
         expect(endpoints.sendPath).toBe('/api/chat/foreman/engine')
-        expect(endpoints.sendBody(null, 'Hi')).toEqual({ sessionId: '7d3f2c1a-0000-4000-8000-000000000001', text: 'Hi' })
-        expect(endpoints.sendBody('s1', 'Hi')).toEqual({ sessionId: 's1', text: 'Hi' })
+        expect(endpoints.sendBody(null, 'Hi')).toEqual({ sessionId: '7d3f2c1a-0000-4000-8000-000000000001', kind: 'thread', text: 'Hi' })
+        expect(endpoints.sendBody('s1', 'Hi')).toEqual({ sessionId: 's1', kind: 'thread', text: 'Hi' })
+    })
+
+    it('opens General on its page, and follows the General the hub names when another device opened it first', () => {
+        const general = foremanEndpoints(() => false, { general: true })
+        expect(general.sendBody(null, 'Hi')).toEqual({ sessionId: '7d3f2c1a-0000-4000-8000-000000000001', kind: 'general', text: 'Hi' })
+        expect(general.bornSessionOf(response(200, { 'X-Session-Id': 'general-1' }))).toBe('general-1')
     })
 
     it('counts the conversation as born only once the hub accepted the send', () => {

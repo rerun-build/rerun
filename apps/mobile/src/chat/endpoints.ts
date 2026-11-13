@@ -38,14 +38,15 @@ export function coworkerEndpoints(agentId: string, { general = false }: { genera
 }
 
 // Its files live in its own workspace on the machine once the machine takes them, in the hub's
-// bucket before: the web column switches the same way.
-export function foremanEndpoints(filesOnEngine: () => boolean): ChatEndpoints {
+// bucket before: the web column switches the same way. `general`: the page is the Foreman's General,
+// which the hub continues if another device opened it first, and then names in a header.
+export function foremanEndpoints(filesOnEngine: () => boolean, { general = false }: { general?: boolean } = {}): ChatEndpoints {
     const draftId = randomUUID()
     return {
         agentId: FOREMAN_AGENT_ID,
         sendPath: '/api/chat/foreman/engine',
-        sendBody: (sessionId, text) => ({ sessionId: sessionId ?? draftId, text }),
-        bornSessionOf: response => (response.ok ? draftId : null),
+        sendBody: (sessionId, text) => ({ sessionId: sessionId ?? draftId, kind: general ? 'general' : 'thread', text }),
+        bornSessionOf: response => (response.ok ? (response.headers.get('X-Session-Id') ?? draftId) : null),
         messages: async (caller, sessionId) => (await fetchForemanMessages(caller, sessionId)) as UIMessage[],
         activeRun: fetchForemanActiveRun,
         stop: stopForeman,

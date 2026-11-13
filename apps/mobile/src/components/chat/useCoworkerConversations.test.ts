@@ -5,12 +5,13 @@ import { AppState, type AppStateStatus } from 'react-native'
 import { clearLocalCache } from '@/data/local-cache'
 import { realtime } from '@/test/realtime'
 
-import { useCoworkerConversations } from './useCoworkerConversations'
+import { useCoworkerConversations, useForemanConversations } from './useCoworkerConversations'
 
 const mockFetchConversations = jest.fn<Promise<Conversation[]>, []>()
 
 jest.mock('expo-file-system', () => ({ Directory: class {}, File: class {}, Paths: {} }))
 jest.mock('@/api/chat', () => ({ fetchAgentConversations: () => mockFetchConversations() }))
+jest.mock('@/api/foreman', () => ({ fetchForemanConversations: () => mockFetchConversations() }))
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: { access_token: 't' }, me: { user: { id: 'u1' }, workspace: { id: 7 } } }) }))
 jest.mock('@/auth/supabase', () => ({ supabase: require('@/test/realtime').fakeSupabase }))
 
@@ -56,5 +57,16 @@ describe('useCoworkerConversations', () => {
         await act(async () => appStateListeners.forEach(listener => listener('active')))
 
         expect(result.current.conversations).toContainEqual(expect.objectContaining({ id: 'from-the-web', status: 'working' }))
+    })
+
+    it('follows the Foreman\'s own conversations, those of the person signed in', async () => {
+        mockFetchConversations.mockResolvedValueOnce([general]).mockResolvedValue([general, startedOnTheWeb])
+        const { result } = await renderHook(() => useForemanConversations())
+        await act(async () => {})
+        expect(realtime.live().flatMap(channel => channel.bindings)).toContainEqual(expect.objectContaining({ table: 'foreman_conversations', filter: 'user_id=eq.u1' }))
+
+        await act(async () => realtime.change('foreman_conversations'))
+
+        expect(result.current.conversations.map(c => c.id)).toEqual(['from-the-web', 'general'])
     })
 })

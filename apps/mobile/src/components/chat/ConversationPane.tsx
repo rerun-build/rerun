@@ -91,7 +91,7 @@ type ConversationPaneProps = {
     onScreen?: boolean
     // The coworker that opened this conversation on this one, when it was not a person.
     startedBy?: StartedBy | null
-    // Sent as soon as a new conversation is ready, the text someone asked from the search.
+    // Sent once the conversation's history is in, the text someone asked from the search.
     initialMessage?: string
     // False where the machine would refuse the upload: the Foreman of a box that predates its files.
     canAttach?: boolean
@@ -258,7 +258,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
 
     const askedRef = useRef(false)
     useEffect(() => {
-        if (!initialMessage || askedRef.current || initialSessionId || chat.history !== 'ready') return
+        if (!initialMessage || askedRef.current || chat.history !== 'ready') return
         askedRef.current = true
         send(initialMessage)
     })
