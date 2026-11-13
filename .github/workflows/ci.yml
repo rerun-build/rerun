@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [dev, master, staging]
+    branches: [master, staging]
   pull_request:
 
 concurrency:
@@ -205,7 +205,7 @@ jobs:
     needs: docker-inputs
     if: >-
       always() && github.repository == 'rerun-build/rerun' &&
-      ((github.event_name == 'push' && github.ref != 'refs/heads/dev') || needs.docker-inputs.outputs.changed == 'true')
+      (github.event_name == 'push' || needs.docker-inputs.outputs.changed == 'true')
     name: Docker image build (${{ matrix.image }})
     runs-on: ubuntu-latest
     permissions:
