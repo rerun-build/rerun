@@ -19,18 +19,22 @@ export function useAgentThreads(agentId: string): { threads: ThreadRow[]; refres
     const [rows, setRows] = useState<ThreadRow[]>([])
     const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+    // A read the network drops (a laptop waking up before its connection) is taken again at the
+    // next realtime event or resync; the rows in hand stay until then.
     const refresh = useCallback(() => {
         if (timer.current) clearTimeout(timer.current)
         timer.current = setTimeout(() => {
             timer.current = null
-            void listAgentThreadsAction(agentId).then(setRows)
+            void listAgentThreadsAction(agentId).then(setRows).catch(() => {})
         }, REFRESH_DEBOUNCE_MS)
     }, [agentId])
 
     useEffect(() => {
         let alive = true
         setRows([])
-        listAgentThreadsAction(agentId).then(threads => alive && setRows(threads))
+        listAgentThreadsAction(agentId)
+            .then(threads => alive && setRows(threads))
+            .catch(() => {})
         return () => {
             alive = false
             if (timer.current) clearTimeout(timer.current)
