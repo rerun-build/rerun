@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
-import { listVaultAction } from '@/app/api/_actions/vault.actions'
+import { listVaultAction, vaultPaidAccountsAction } from '@/app/api/_actions/vault.actions'
+import type { VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
 import type { VaultListing } from '@/app/api/_services/vault.service'
 import { useErrorText } from '@/hooks/useErrorText'
 
@@ -11,16 +12,18 @@ import { useErrorText } from '@/hooks/useErrorText'
 export function useVault(open: boolean) {
     const errorText = useErrorText()
     const [listing, setListing] = useState<VaultListing | null>(null)
+    const [paid, setPaid] = useState<VaultPaidAccount[]>([])
     const [error, setError] = useState<string | null>(null)
 
     const reload = useCallback(async () => {
-        const res = await listVaultAction()
+        const [res, accounts] = await Promise.all([listVaultAction(), vaultPaidAccountsAction()])
         if (res.ok) {
             setListing(res.result)
             setError(null)
         } else {
             setError(errorText(res))
         }
+        if (accounts.ok) setPaid(accounts.result)
     }, [errorText])
 
     useEffect(() => {
@@ -28,5 +31,5 @@ export function useVault(open: boolean) {
         if (open) void reload()
     }, [open, reload])
 
-    return { listing, error, reload }
+    return { listing, paid, error, reload }
 }

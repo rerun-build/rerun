@@ -19,22 +19,26 @@ import { serviceIconProps } from '@/lib/services/icons'
 import { Badge } from '@rerun/ui/primitives'
 import { VaultAddApp } from './VaultAddApp'
 import { VaultEntryDetail } from './VaultEntryDetail'
+import { AppIcon } from '@/components/apps/PaidAppViews'
+import { PaidAccountStatusBadge, VaultPaidAccountDetail } from './VaultPaidAccountDetail'
+import type { VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
 import { matchesVaultQuery, usedBySummary, vaultGroupOf, type UsedByText, type VaultGroup } from './vault-text'
 
-type VaultPage = { kind: 'list' } | { kind: 'detail'; id: string } | { kind: 'add' }
+type VaultPage = { kind: 'list' } | { kind: 'detail'; id: string } | { kind: 'paid'; connectionId: string } | { kind: 'add' }
 
 // Past this many entries the list gets a search field: a handful is read at a glance.
 const SEARCH_FROM = 8
 const GROUPS: VaultGroup[] = ['apps', 'mcp', 'secrets']
 
-export function VaultPanel({ listing, error, onChanged }: { listing: VaultListing | null; error: string | null; onChanged: () => Promise<void> }) {
+export function VaultPanel({ listing, paid = [], error, onChanged }: { listing: VaultListing | null; paid?: VaultPaidAccount[]; error: string | null; onChanged: () => Promise<void> }) {
     const t = useTranslations('vault')
     const [page, setPage] = useState<VaultPage>({ kind: 'list' })
     const [query, setQuery] = useState('')
 
     // Derived rather than synced: an entry deleted here, or gone on a reload, drops the panel back to the list.
     const selected = page.kind === 'detail' ? listing?.entries.find(entry => entry.id === page.id) : undefined
-    const stepKey = page.kind === 'add' ? 'add' : (selected?.id ?? 'list')
+    const selectedPaid = page.kind === 'paid' ? paid.find(account => account.connectionId === page.connectionId) : undefined
+    const stepKey = page.kind === 'add' ? 'add' : (selected?.id ?? selectedPaid?.connectionId ?? 'list')
     const back = () => setPage({ kind: 'list' })
 
     const slugs = useMemo(() => [...new Set((listing?.entries ?? []).flatMap(entry => (entry.slug ? [entry.slug] : [])))], [listing])
@@ -58,6 +62,8 @@ export function VaultPanel({ listing, error, onChanged }: { listing: VaultListin
                         setPage({ kind: 'detail', id })
                     }}
                 />
+            ) : selectedPaid && listing ? (
+                <VaultPaidAccountDetail account={selectedPaid} listing={listing} onBack={back} onChanged={onChanged} />
             ) : selected && listing ? (
                 <VaultEntryDetail entry={selected} listing={listing} icon={iconOf(selected)} onBack={back} onChanged={onChanged} />
             ) : !listing ? (
@@ -70,7 +76,7 @@ export function VaultPanel({ listing, error, onChanged }: { listing: VaultListin
                             <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} className="pl-8" aria-label={t('search')} />
                         </div>
                     )}
-                    {listing.entries.length === 0 ? (
+                    {listing.entries.length === 0 && paid.length === 0 ? (
                         <EmptyPitch
                             text={t('empty')}
                             actions={
@@ -82,7 +88,7 @@ export function VaultPanel({ listing, error, onChanged }: { listing: VaultListin
                             }
                         />
                     ) : (
-                        <VaultGroups listing={listing} query={query} iconOf={iconOf} onOpen={id => setPage({ kind: 'detail', id })} onAdd={() => setPage({ kind: 'add' })} addReason={addReason} />
+                        <VaultGroups listing={listing} paid={paid} query={query} iconOf={iconOf} onOpen={id => setPage({ kind: 'detail', id })} onOpenPaid={connectionId => setPage({ kind: 'paid', connectionId })} onAdd={() => setPage({ kind: 'add' })} addReason={addReason} />
                     )}
                 </PanelScroller>
             )}
@@ -92,6 +98,8 @@ export function VaultPanel({ listing, error, onChanged }: { listing: VaultListin
 
 type VaultGroupsProps = {
     listing: VaultListing
+    paid: VaultPaidAccount[]
+    onOpenPaid: (connectionId: string) => void
     query: string
     iconOf: (entry: VaultEntryView) => React.ReactNode
     onOpen: (id: string) => void
@@ -99,7 +107,7 @@ type VaultGroupsProps = {
     addReason?: string
 }
 
-function VaultGroups({ listing, query, iconOf, onOpen, onAdd, addReason }: VaultGroupsProps) {
+function VaultGroups({ listing, paid, query, iconOf, onOpen, onOpenPaid, onAdd, addReason }: VaultGroupsProps) {
     const t = useTranslations('vault')
     const usedByText: UsedByText = {
         everyone: t('row.everyone'),
@@ -110,7 +118,9 @@ function VaultGroups({ listing, query, iconOf, onOpen, onAdd, addReason }: Vault
     }
     const groupTitle: Record<VaultGroup, string> = { apps: t('groups.apps'), mcp: t('groups.mcp'), secrets: t('groups.secrets') }
     const shown = listing.entries.filter(entry => matchesVaultQuery(entry, query))
-    if (shown.length === 0) return <p className="py-6 text-center text-sm text-muted-foreground">{t('noMatch')}</p>
+    const shownPaid = paid.filter(account => [account.name, account.label ?? ''].some(text => text.toLowerCase().includes(query.trim().toLowerCase())))
+    const coworkerName = new Map(listing.coworkers.map(coworker => [coworker.id, coworker.name]))
+    if (shown.length === 0 && shownPaid.length === 0) return <p className="py-6 text-center text-sm text-muted-foreground">{t('noMatch')}</p>
 
     const addMenu = (
         <TooltipDisabledReason reason={addReason}>
@@ -140,6 +150,29 @@ function VaultGroups({ listing, query, iconOf, onOpen, onAdd, addReason }: Vault
                                 }
                             />
                         ))}
+                        {group === 'apps' &&
+                            shownPaid.map(account => (
+                                <PanelRow
+                                    key={account.connectionId}
+                                    onClick={() => onOpenPaid(account.connectionId)}
+                                    leading={<AppIcon slug={account.slug} />}
+                                    title={
+                                        <span className="flex min-w-0 items-center gap-1.5">
+                                            <span className="truncate">{account.label ? `${account.name} · ${account.label}` : account.name}</span>
+                                            <Badge size="xs" tone="brand" glow={false}>
+                                                {t('paid.badge')}
+                                            </Badge>
+                                        </span>
+                                    }
+                                    description={usedBySummary({ sharedWithAll: false, coworkers: account.agentIds.map(id => ({ id, engineAgentId: id, name: coworkerName.get(id) ?? '', spaceId: '' })).filter(c => c.name), hiddenCoworkers: account.hiddenAgents + account.agentIds.filter(id => !coworkerName.has(id)).length }, usedByText)}
+                                    actions={
+                                        <>
+                                            <PaidAccountStatusBadge account={account} />
+                                            <ChevronRightIcon className="ml-1 size-4 text-muted-foreground" />
+                                        </>
+                                    }
+                                />
+                            ))}
                     </Group>
                 )
             })}

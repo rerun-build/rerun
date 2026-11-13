@@ -11,7 +11,7 @@ import { VaultPanel } from './VaultPanel'
 // workspace and its one machine, never to a Box.
 export function VaultDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('vault')
-    const { listing, error, reload } = useVault(open)
+    const { listing, paid, error, reload } = useVault(open)
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -21,7 +21,7 @@ export function VaultDialog({ open, onOpenChange }: { open: boolean; onOpenChang
                     <DialogDescription>{t('description')}</DialogDescription>
                 </DialogHeader>
                 <div className="flex min-h-0 flex-1 flex-col">
-                    <VaultPanel listing={listing} error={error} onChanged={reload} />
+                    <VaultPanel listing={listing} paid={paid} error={error} onChanged={reload} />
                 </div>
             </PanelDialogContent>
         </Dialog>

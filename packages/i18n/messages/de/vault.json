@@ -75,5 +75,11 @@
         "header": "Header",
         "headerValue": "Wert",
         "add": "Server hinzufügen"
+    },
+    "paid": {
+        "badge": "Kostenpflichtig",
+        "managedInApp": "Anmeldung, Slot und Abrechnung verwaltest du im Fenster {provider} des Apps-Menüs.",
+        "paused": "Pausiert",
+        "connecting": "Verbindet"
     }
 }

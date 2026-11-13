@@ -75,5 +75,11 @@
         "header": "Cabecera",
         "headerValue": "Valor",
         "add": "Añadir servidor"
+    },
+    "paid": {
+        "badge": "De pago",
+        "managedInApp": "Su inicio de sesión, su slot y su factura se gestionan en la ventana {provider} del menú Apps.",
+        "paused": "En pausa",
+        "connecting": "Conectando"
     }
 }

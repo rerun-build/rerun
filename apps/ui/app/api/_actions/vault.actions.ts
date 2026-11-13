@@ -4,6 +4,8 @@ import type { VaultItemSummary } from '@rerun/contracts'
 
 import { addVaultMcp, addVaultSecret, addVaultService, reconfigureVaultService, vaultCatalog, type AddVaultMcpInput, type AddVaultSecretInput, type AddVaultServiceInput, type VaultAddResult, type VaultCatalogApp } from '@/app/api/_services/vault-install.service'
 import { requireLightSessionActor } from '@/app/api/_auth/access'
+import { attachVaultPaidAccount, detachVaultPaidAccount, vaultPaidAccounts, type VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
+import { isAppSlug } from '@/lib/apps/types'
 import {
     attachVaultEntry,
     deleteVaultEntry,
@@ -101,4 +103,24 @@ export async function addVaultSecretAction(input: AddVaultSecretInput): Promise<
 
 export async function addVaultMcpAction(input: AddVaultMcpInput): Promise<Result<VaultItemSummary>> {
     return attempt(() => addVaultMcp(input))
+}
+
+export async function vaultPaidAccountsAction(): Promise<Result<VaultPaidAccount[]>> {
+    return attempt(() => vaultPaidAccounts())
+}
+
+export async function attachVaultPaidAccountAction(slug: string, connectionId: string, agentId: string): Promise<Result<null>> {
+    return attempt(async () => {
+        if (!isAppSlug(slug)) throw new Error('Unknown paid app')
+        await attachVaultPaidAccount(slug, connectionId, agentId)
+        return null
+    })
+}
+
+export async function detachVaultPaidAccountAction(slug: string, connectionId: string, agentId: string): Promise<Result<null>> {
+    return attempt(async () => {
+        if (!isAppSlug(slug)) throw new Error('Unknown paid app')
+        await detachVaultPaidAccount(slug, connectionId, agentId)
+        return null
+    })
 }

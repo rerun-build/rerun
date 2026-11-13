@@ -61,7 +61,7 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
                 <SignInSection entry={entry} signingIn={signingIn} onSigningIn={setSigningIn} onChanged={onChanged} />
 
                 <Group title={t('detail.coworkers')}>
-                    <TooltipDisabledReason reason={everyoneReason}>
+                    <TooltipDisabledReason reason={everyoneReason} className="flex w-full">
                         <PanelRow
                             title={t('detail.everyone')}
                             description={t('detail.everyoneHint')}
@@ -80,7 +80,7 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
                         const reason = !coworker.canManage ? t('reasons.manageBox') : undefined
                         const on = attached(coworker.engineAgentId)
                         return (
-                            <TooltipDisabledReason key={coworker.id} reason={reason}>
+                            <TooltipDisabledReason key={coworker.id} reason={reason} className="flex w-full">
                                 <PanelRow
                                     title={coworker.name}
                                     actions={

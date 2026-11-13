@@ -75,5 +75,11 @@
         "header": "En-tête",
         "headerValue": "Valeur",
         "add": "Ajouter le serveur"
+    },
+    "paid": {
+        "badge": "Payant",
+        "managedInApp": "Sa connexion, son slot et sa facture se gèrent dans la fenêtre {provider} du menu Apps.",
+        "paused": "En pause",
+        "connecting": "Connexion"
     }
 }

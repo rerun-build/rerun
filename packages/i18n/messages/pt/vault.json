@@ -75,5 +75,11 @@
         "header": "Cabeçalho",
         "headerValue": "Valor",
         "add": "Adicionar servidor"
+    },
+    "paid": {
+        "badge": "Pago",
+        "managedInApp": "O login, o slot e a cobrança ficam na janela {provider} do menu Apps.",
+        "paused": "Pausado",
+        "connecting": "Conectando"
     }
 }

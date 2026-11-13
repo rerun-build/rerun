@@ -84,5 +84,11 @@
         "header": "Header",
         "headerValue": "Value",
         "add": "Add server"
+    },
+    "paid": {
+        "badge": "Paid",
+        "managedInApp": "Its sign-in, slot and billing live in the {provider} window of the Apps menu.",
+        "paused": "Paused",
+        "connecting": "Connecting"
     }
 }
