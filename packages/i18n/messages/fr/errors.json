@@ -264,6 +264,7 @@
     "importTemplateFailed": "Impossible d'importer ce template",
     "inspectCoworkersFailed": "Impossible d'inspecter les coworkers.",
     "installServiceFailed": "Impossible d'installer le service",
+    "serviceKeyRejected": "{name} a refusé cette clé. Vérifiez que vous avez copié la bonne depuis {name}, puis réessayez.",
     "keepYearlyPlanFailed": "Impossible de garder votre abonnement annuel",
     "listBoxesFailed": "Impossible de lister vos Boxes.",
     "loadSubscriptionFailedShort": "Impossible de charger l'abonnement",

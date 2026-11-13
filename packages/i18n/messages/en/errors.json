@@ -4,7 +4,8 @@
         "whatsappNumberRefused": "{message} is the provider's own explanation, in English.",
         "vaultConflict": "{name} is an environment variable name or an MCP server name, shown as is. {coworker} is a coworker name.",
         "vaultConflictEveryone": "{name} is an environment variable name or an MCP server name, shown as is.",
-        "vaultConflictSomeone": "{name} is an environment variable name or an MCP server name, shown as is."
+        "vaultConflictSomeone": "{name} is an environment variable name or an MCP server name, shown as is.",
+        "serviceKeyRejected": "{name} is the name of a third-party app (Buffer, Linear…), kept as is."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -271,6 +272,7 @@
     "importTemplateFailed": "Failed to import this template",
     "inspectCoworkersFailed": "Failed to inspect the coworkers.",
     "installServiceFailed": "Failed to install service",
+    "serviceKeyRejected": "{name} refused this key. Check you copied the right one from {name}, then try again.",
     "keepYearlyPlanFailed": "Failed to keep your yearly plan",
     "listBoxesFailed": "Failed to list your Boxes.",
     "loadSubscriptionFailedShort": "Failed to load subscription",

@@ -1,4 +1,4 @@
-import { parseServiceRegistryKey, serviceRegistryKey } from '@rerun/contracts'
+import { parseServiceRegistryKey, serviceRegistryKey, type VaultItemSummary } from '@rerun/contracts'
 
 import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
@@ -7,19 +7,20 @@ import { unbindAgent } from '@rerun/cloud/apps.server'
 import { isAppSlug, type AppSlug } from '@rerun/cloud/apps'
 import { isLifetimePlan } from '@rerun/cloud/billing'
 import { deleteConnectedAccount } from '@/lib/composio/client'
-import { getVaultItem, patchVaultItem, createVaultItem } from '@/lib/engine/vault-client'
+import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
 import { VAULT_METHOD_KINDS, compileIntoVault } from '@/lib/vault/install'
 import { decompileMigrationCopy } from '@/lib/vault/copies'
 import { assertCanChangeItem, rethrowConflict, vaultContext, vaultWritesEnabled, type VaultContext } from '@/app/api/_services/vault.service'
 import { AccessDeniedError } from '@/app/api/_auth/access'
-import { supportsVault } from '@/lib/engine/client'
+import { getMcpServerStatuses, supportsVault } from '@/lib/engine/client'
+import { AppError } from '@/lib/i18n/action-error'
 import type { EngineConnection } from '@/lib/engine/types'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { type ServiceInstanceTarget, compileService, decompileService } from '@/lib/services/compiler'
 import { embedText, toVectorLiteral } from '@/lib/services/embed'
-import { type ServiceManifest, defaultMethod, getMethod, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema } from '@/lib/services/manifest'
-import { newServiceInstanceId, ordinalInstanceLabel } from '@/lib/services/instances'
+import { type AuthMethod, type ServiceManifest, defaultMethod, getMethod, missingRequiredInputs, predictInstall, requiredSecretInputs, serviceManifestSchema } from '@/lib/services/manifest'
+import { instanceServerName, newServiceInstanceId, ordinalInstanceLabel } from '@/lib/services/instances'
 import { isPublishedAccess } from '@/lib/published/access'
 import { listPublished, publishWithThumbnail, unpublishFile } from '@/lib/services/publish-thumbnail'
 import {
@@ -446,9 +447,12 @@ export async function installService(
         return { status: 'needs_config', key, slug: manifest.slug, name: manifest.name, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id, message: `${manifest.name} needs configuration. A form has been shown to the user — ask them to fill it in.` }
     }
 
-    const { toolNames, oauth, managed, composio, app } = vault
+    const intoVault = vault
         ? await rethrowConflict(vault.ctx, () => compileIntoVault({ conn: vault.conn, manifest, values, authMethodId: method.id, instance: instance ?? undefined, itemId: vault.itemId, engineAgentId: vault.engineAgentId, createdBy: vault.createdBy }))
-        : await compileService(agentId, manifest, values, method.id, actor, instance ?? undefined)
+        : null
+    const { toolNames, oauth, managed, composio, app } = intoVault ?? (await compileService(agentId, manifest, values, method.id, actor, instance ?? undefined))
+    const keyTyped = method.kind === 'key' && method.inputs.some(input => input.secret && values[input.key]?.trim())
+    if (keyTyped) await refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount: Boolean(opts?.newInstance && manifest.multiInstance), actor, vaultItem: intoVault?.item ?? null })
     if (oauth) {
         return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, oauth, message: `${manifest.name} needs the user to sign in. A Connect button has been shown to them.` }
     }
@@ -467,6 +471,41 @@ export async function installService(
         await markAppAuthorized(agentId, key, bound || undefined, actor)
     }
     return { status: 'installed', key, slug: manifest.slug, name: manifest.name, toolNames, message: `${manifest.name} installed. Its tools become available on your next turn.` }
+}
+
+type KeyInstall = {
+    agentId: string
+    key: string
+    manifest: ServiceManifest
+    method: AuthMethod
+    instance: ServiceInstanceSeed | null
+    // An account this very call added: a retry allocates another one, so it is not left to configure.
+    freshAccount: boolean
+    actor?: Actor
+    vaultItem: VaultItemSummary | null
+}
+
+// An app refuses a wrong key only when it is called: dialed once here, so the person who typed it
+// hears it at once instead of the coworker at its first run. Only a refusal undoes the install: a
+// server down or slow says nothing about the key. A server the engine would have to start is left
+// alone, starting it proves nothing about the key and can take the whole probe deadline.
+async function refuseRejectedKey({ agentId, key, manifest, method, instance, freshAccount, actor, vaultItem }: KeyInstall): Promise<void> {
+    const remoteServers = method.mcpServers.filter(server => server.url).map(server => (instance ? instanceServerName(server.name, instance.instanceId) : server.name))
+    if (remoteServers.length === 0) return
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+    const statuses = await getMcpServerStatuses(conn, engineAgentId, remoteServers).catch(() => null)
+    if (!statuses?.some(server => server.status === 'needs_auth')) return
+
+    if (vaultItem && freshAccount) {
+        await deleteVaultItem(conn, vaultItem.id)
+    } else if (vaultItem) {
+        await updateVaultItemEnv(conn, vaultItem.id, { remove: vaultItem.envKeys })
+        await patchVaultItem(conn, vaultItem.id, { status: 'needs_config', mcpServers: [], skills: [] })
+    } else {
+        await uninstallService(agentId, key, actor)
+        if (!freshAccount) await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
+    }
+    throw new AppError('serviceKeyRejected', { name: manifest.name })
 }
 
 type VaultInstallTarget = { conn: EngineConnection; engineAgentId: string; itemId: string | null; createdBy: string | null; ctx: VaultContext }

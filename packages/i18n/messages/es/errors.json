@@ -264,6 +264,7 @@
     "importTemplateFailed": "No se pudo importar esta plantilla",
     "inspectCoworkersFailed": "No se pudieron inspeccionar los coworkers.",
     "installServiceFailed": "No se pudo instalar el servicio",
+    "serviceKeyRejected": "{name} rechazó esta clave. Comprueba que copiaste la correcta desde {name} y vuelve a intentarlo.",
     "keepYearlyPlanFailed": "No se pudo mantener tu plan anual",
     "listBoxesFailed": "No se pudieron listar tus Boxes.",
     "loadSubscriptionFailedShort": "No se pudo cargar la suscripción",

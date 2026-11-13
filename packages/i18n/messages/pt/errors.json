@@ -264,6 +264,7 @@
     "importTemplateFailed": "Falha ao importar este template",
     "inspectCoworkersFailed": "Falha ao inspecionar os coworkers.",
     "installServiceFailed": "Falha ao instalar o serviço",
+    "serviceKeyRejected": "{name} recusou esta chave. Confira se você copiou a chave certa no {name} e tente de novo.",
     "keepYearlyPlanFailed": "Falha ao manter seu plano anual",
     "listBoxesFailed": "Falha ao listar suas Boxes.",
     "loadSubscriptionFailedShort": "Falha ao carregar a assinatura",

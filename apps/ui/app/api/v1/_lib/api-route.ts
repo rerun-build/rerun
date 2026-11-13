@@ -6,6 +6,7 @@ import { CLIENT_HEADER } from '@rerun/contracts'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { ApiError } from '@/lib/api-error'
+import { AppError } from '@/lib/i18n/action-error'
 
 // `public` is for what an app needs before anyone signs in (sign-in itself, the version gate). `user` only
 // proves who is calling, for the routes a caller reaches before it has a workspace. `admin` is a member
@@ -99,6 +100,8 @@ export function apiRoute<A extends AuthLevel, B extends z.ZodType | undefined = 
         } catch (err) {
             if (err instanceof z.ZodError) return errorResponse(400, 'Invalid request', { issues: err.issues })
             if (err instanceof ApiError) return errorResponse(err.status, err.message)
+            // A refusal meant for the person, in English for the clients that predate the codes.
+            if (err instanceof AppError) return errorResponse(422, err.message, { code: err.code, ...(err.params ? { params: err.params } : {}) })
             // Reached, but the caller only uses this Box and the route changes it.
             if (err instanceof AccessDeniedError) return errorResponse(403, err.message)
             // Past authentication, a resource outside the caller's workspace or Boxes reads as missing.

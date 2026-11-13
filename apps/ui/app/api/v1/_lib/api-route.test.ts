@@ -21,6 +21,7 @@ vi.mock('@/app/api/_auth/ownership', async () => {
 
 const { apiRoute, ApiError } = await import('./api-route')
 const { AuthorizationError, UnauthenticatedError } = await import('@/app/api/_auth/ownership')
+const { AppError } = await import('@/lib/i18n/action-error')
 
 const segment = { params: Promise.resolve({}) }
 
@@ -87,6 +88,15 @@ describe('apiRoute', () => {
         const res = await route(post(''), segment)
         expect(res.status).toBe(409)
         expect(await res.json()).toEqual({ error: 'Busy' })
+    })
+
+    it('answers 422 with the English text and the code of a refusal meant for the person', async () => {
+        const route = apiRoute({ auth: 'member' }, async () => {
+            throw new AppError('serviceKeyRejected', { name: 'Buffer' })
+        })
+        const res = await route(post(''), segment)
+        expect(res.status).toBe(422)
+        expect(await res.json()).toEqual({ error: 'Buffer refused this key. Check you copied the right one from Buffer, then try again.', code: 'serviceKeyRejected', params: { name: 'Buffer' } })
     })
 
     it('answers 500 without leaking the message of an unexpected failure', async () => {

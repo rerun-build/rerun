@@ -264,6 +264,7 @@
     "importTemplateFailed": "Diese Vorlage konnte nicht importiert werden",
     "inspectCoworkersFailed": "Die Coworker konnten nicht untersucht werden.",
     "installServiceFailed": "Dienst konnte nicht installiert werden",
+    "serviceKeyRejected": "{name} hat diesen Schlüssel abgelehnt. Prüfe, ob du den richtigen aus {name} kopiert hast, und versuche es erneut.",
     "keepYearlyPlanFailed": "Dein Jahrestarif konnte nicht beibehalten werden",
     "listBoxesFailed": "Deine Boxes konnten nicht aufgelistet werden.",
     "loadSubscriptionFailedShort": "Abo konnte nicht geladen werden",
