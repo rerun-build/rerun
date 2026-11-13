@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { intakePreviewPlan, looksLikeSite, type ForemanIntake } from '@/lib/onboarding/intake'
 import { useForemanStore } from '@/stores/foreman.store'
-import { EMPTY_DRAFT, furthestReachable, industryHint, intakeSteps, stepAnswered, toIntake, type IntakeDraft, type IntakeStep } from './steps'
+import { EMPTY_DRAFT, furthestReachable, industryHint, intakeSteps, platformHost, stepAnswered, toIntake, type IntakeDraft, type IntakeStep } from './steps'
 
 // The card, wired: which question is on screen, what the board is drawing behind it, and the one
 // write at the end.
@@ -43,6 +43,8 @@ export type ForemanIntakeController = {
     deciding: boolean
     /** Where the read of the typed site stands. `null` when there is no site to read, or an industry was picked over it. */
     siteRead: 'reading' | 'ready' | null
+    /** The platform typed instead of their own site (`linkedin.com`): it is not read and does not answer the question. */
+    platform: string | null
     submitting: boolean
     error: string | null
     set: (patch: Partial<IntakeDraft>) => void
@@ -88,6 +90,7 @@ export function useForemanIntake({ firstName, handlers }: { firstName: string | 
     }, [handlers])
 
     const industry = draft.industry ?? decided
+    const platform = platformHost(draft.companyUrl)
     const reachable = furthestReachable(steps, draft)
     const canAdvance = reachable > index || steps.every(step => stepAnswered(step, draft))
 
@@ -130,7 +133,7 @@ export function useForemanIntake({ firstName, handlers }: { firstName: string | 
     // arriver avant la question suivante. On part dès que la frappe s'arrête et que ce qui est écrit
     // ressemble à un site, puis Next ne renvoie que ce qui n'est pas déjà parti.
     const site = draft.companyUrl.trim()
-    const readable = looksLikeSite(site) ? site : null
+    const readable = looksLikeSite(site) && !platform ? site : null
     const picked = !!draft.industry
     useEffect(() => {
         if (!readable || picked) return
@@ -225,15 +228,17 @@ export function useForemanIntake({ firstName, handlers }: { firstName: string | 
         (ownAsk: string) => {
             const asked = ownAsk.trim()
             if (submitting || !asked) return false
-            const hint = draft.industry ? null : industryHint(draft)
+            // The steps are skipped here, so nothing else kept a platform's address out of the profile.
+            const answerable = platform ? { ...draft, companyUrl: '' } : draft
+            const hint = answerable.industry ? null : industryHint(answerable)
             if (hint && looksLikeSite(hint) && sent.current !== hint) {
                 handlersRef.current.onAnalyzeSite(hint)
                 decide(hint)
             }
-            submit(draft, decided, asked)
+            submit(answerable, decided, asked)
             return true
         },
-        [decide, decided, draft, submit, submitting]
+        [decide, decided, draft, platform, submit, submitting]
     )
 
     return {
@@ -248,6 +253,7 @@ export function useForemanIntake({ firstName, handlers }: { firstName: string | 
         industry,
         deciding,
         siteRead: !readable || picked ? null : readFor === readable ? 'ready' : 'reading',
+        platform,
         submitting,
         error,
         set,

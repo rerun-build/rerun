@@ -1,7 +1,10 @@
 {
     "_context": {
         "generic": "Fallback when an action failed for a reason the screen cannot explain.",
-        "whatsappNumberRefused": "{message} is the provider's own explanation, in English."
+        "whatsappNumberRefused": "{message} is the provider's own explanation, in English.",
+        "vaultConflict": "{name} is an environment variable name or an MCP server name, shown as is. {coworker} is a coworker name.",
+        "vaultConflictEveryone": "{name} is an environment variable name or an MCP server name, shown as is.",
+        "vaultConflictSomeone": "{name} is an environment variable name or an MCP server name, shown as is."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -443,5 +446,16 @@
     "fileChangedOnBox": "This file changed on the Box since you opened it.",
     "saveThisFileFailed": "Failed to save this file",
     "templateSubscriptionEnded": "This coworker came from a template subscription that has ended. Buy the template again to bring it back.",
-    "noFreeCoworkerSlot": "No free coworker slot on your plan. Start Pro for unlimited coworkers, or delete a coworker to make room."
+    "noFreeCoworkerSlot": "No free coworker slot on your plan. Start Pro for unlimited coworkers, or delete a coworker to make room.",
+    "vaultUnavailable": "Your workspace's machine does not keep a Vault yet. It gets one with its next update.",
+    "vaultItemNotFound": "This Vault entry no longer exists",
+    "vaultAdminOnly": "Only an admin can do this",
+    "vaultManageOnly": "You need to manage at least one Box to add to the Vault",
+    "vaultConflict": "{coworker} already gets {name} from another Vault entry",
+    "vaultSharedItem": "This app comes from the Vault and other coworkers use it. Change it from the Vault.",
+    "vaultPaidAppEveryone": "A paid app is attached coworker by coworker",
+    "vaultMethodUnsupported": "This app can't be added to the Vault yet. Connect it from a coworker's Apps tab.",
+    "vaultConflictEveryone": "Every coworker already gets {name} from another Vault entry shared with everyone",
+    "vaultConflictSomeone": "A coworker already gets {name} from another Vault entry",
+    "vaultMcpTarget": "Give the server either an address or a command"
 }

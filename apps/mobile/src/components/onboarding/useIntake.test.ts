@@ -21,6 +21,24 @@ describe('useIntake', () => {
         expect(submit).toHaveBeenCalledWith(expect.objectContaining({ companyUrl: 'rerun.build', position: 'Founder / CEO', firstName: 'Clement', decidedIndustry: 'saas' }))
     })
 
+    it('keeps a platform from answering the site question, and asks the industry once it is skipped', async () => {
+        const decideIndustry = jest.fn(async () => 'saas' as const)
+        const submit = jest.fn(async () => {})
+        const { result } = await renderHook(() => useIntake({ knownFirstName: 'Clement', decideIndustry, submit }))
+
+        await act(async () => result.current.set({ companyUrl: 'linkedin.com/company/acme' }))
+        expect(result.current.canAdvance).toBe(false)
+        await act(async () => result.current.next())
+        expect(result.current.step).toBe('company')
+        expect(decideIndustry).not.toHaveBeenCalled()
+
+        await act(async () => result.current.skipWebsite())
+        expect(result.current.step).toBe('industry')
+        await act(async () => result.current.choose({ industry: 'agencies' }))
+        await act(async () => result.current.choose({ position: 'Founder / Agency owner' }))
+        expect(submit).toHaveBeenCalledWith(expect.objectContaining({ companyUrl: null, industry: 'agencies' }))
+    })
+
     it("steps back on Android's back gesture instead of leaving the app, and lets it through on the first step", async () => {
         type BackListener = Parameters<typeof BackHandler.addEventListener>[1]
         let listeners: BackListener[] = []

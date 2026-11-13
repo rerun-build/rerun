@@ -5,6 +5,8 @@ import { getSystemDb } from '../db/systemDb.js'
 import { runs, sessions, toolCalls } from '../db/schema.js'
 import { collectAssistantText } from '../db/repos/messages.js'
 import { readRegistry } from '../services/registry.js'
+import { agentMcpServers, attachedVaultItems } from '../vault/runtime.js'
+import type { LoadedAgent } from '../agents/types.js'
 import { buildAgentReport, longestDoneRun, OUTPUT_MAX_CHARS, pickOutputRuns, type RewindRunRow } from './report.js'
 
 const MAX_RUNS = 20000
@@ -14,9 +16,10 @@ function clip(text: string): string {
     return flat.length > OUTPUT_MAX_CHARS ? `${flat.slice(0, OUTPUT_MAX_CHARS)}…` : flat
 }
 
-// Every account of an app counts toward that app, whatever its registry key or server name.
-async function connectorSlugsByServer(agentId: string): Promise<Map<string, string>> {
-    const registry = await readRegistry(agentId)
+// Every account of an app counts toward that app, whatever its registry key or server name, and
+// whether the coworker installed it or a Vault item lends it.
+async function connectorSlugsByServer(agent: LoadedAgent): Promise<Map<string, string>> {
+    const registry = await readRegistry(agent.id)
     const slugs = new Map<string, string>()
     for (const [key, entry] of Object.entries(registry?.services ?? {})) {
         const { slug } = parseServiceRegistryKey(key)
@@ -27,6 +30,10 @@ async function connectorSlugsByServer(agentId: string): Promise<Map<string, stri
         for (const name of [...footprint, ...authTargets]) {
             if (typeof name === 'string' && name) slugs.set(name, slug)
         }
+    }
+    for (const item of attachedVaultItems(agent)) {
+        if (!item.config.slug) continue
+        for (const server of item.config.mcpServers) slugs.set(server.name, item.config.slug)
     }
     return slugs
 }
@@ -105,8 +112,8 @@ export async function readAgentRewind(agentId: string, from: string, to: string)
         to,
         runs: runRows,
         tools: tools.map(row => ({ toolName: row.toolName, calls: Number(row.calls), errors: Number(row.errors) })),
-        mcpServerNames: agent.config.mcpServers.map(server => server.name),
-        connectorSlugs: await connectorSlugsByServer(agentId),
+        mcpServerNames: agentMcpServers(agent).map(server => server.name),
+        connectorSlugs: await connectorSlugsByServer(agent),
         sessionTitles,
         sessions: sessionCount?.value ?? 0,
         calledBy: calledBy.map(row => ({ agentId: row.agentId, count: Number(row.count) })),

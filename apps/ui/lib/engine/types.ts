@@ -297,3 +297,7 @@ export const engineCreatedEventSchema = z.object({
     metadata: z.record(z.string(), z.unknown()).nullable().optional(),
 })
 export type EngineCreatedEvent = z.infer<typeof engineCreatedEventSchema>
+
+// A Vault entry whose token can no longer be refreshed. The entry itself now says `needs_auth`, which
+// is what the Vault and the coworkers using it show: the event only has to be taken, not stored.
+export const engineVaultSignedOutSchema = z.object({ event: z.literal('box.vault.signed_out') })

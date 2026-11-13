@@ -37,6 +37,7 @@ import { PanelRow } from '@/components/ui/panel-row'
 import { SkeletonPanelRows } from '@/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { CoworkerVaultAttachedRows, CoworkerVaultAvailable, VaultBadge, useCoworkerVault } from '@/components/vault/CoworkerVaultSection'
 
 type AgentPanelServicesProps = {
     agentId: string
@@ -116,6 +117,8 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const [swapError, setSwapError] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [reconnecting, setReconnecting] = useState<string | null>(null)
+    // Bumped after every change of the list, so the Vault section below reads its own state again.
+    const [revision, setRevision] = useState(0)
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
 
@@ -175,12 +178,16 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         setCustom(customServers)
         resetBrowse()
         setLoading(false)
+        setRevision(r => r + 1)
         setConnectorServices(agentId, services, customServers)
     }, [agentId, resetBrowse])
 
     useEffect(() => {
         load()
     }, [load])
+
+    const coworkerVault = useCoworkerVault(agentId, revision, load, setError)
+    const vaultAttached = coworkerVault.vault?.attached.length ?? 0
 
     // Seed the first browse page once the initial load has cleared it.
     useEffect(() => {
@@ -447,7 +454,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                         <SkeletonPanelRows rows={6} leading className="p-0" />
                     ) : (
                         <>
-                            {installed.length + custom.length > 0 && (
+                            {installed.length + custom.length + vaultAttached > 0 && (
                                 <PanelSection label={t('installed')}>
                                     <PanelList>
                                         {installed.map(s => (
@@ -458,6 +465,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 title={
                                                     <span className="flex min-w-0 items-center gap-1.5">
                                                         <span className="truncate">{s.name}</span>
+                                                        {s.vault && <VaultBadge />}
                                                         {(s.status === 'needs_config' || s.status === 'needs_auth') && (
                                                             <TooltipLabeled label={s.status === 'needs_auth' ? t('needsAuthHint') : t('needsConfigHint')}>
                                                                 <AlertTriangleIcon className="size-3.5 shrink-0 text-amber-400" />
@@ -489,16 +497,30 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                                 </Button>
                                                             </TooltipDisabledReason>
                                                         )}
-                                                        <TooltipDisabledReason reason={manageReason}>
-                                                            <PanelDeleteButton
-                                                                label={s.label ? t('uninstallLabeled', { name: s.name, label: s.label }) : t('uninstall', { name: s.name })}
-                                                                disabled={!canManage}
-                                                                onClick={() => onUninstall(s.key)}
-                                                                confirmTitle={s.label ? t('uninstallLabeledConfirm', { name: s.name, label: s.label }) : t('uninstallConfirm', { name: s.name })}
-                                                                confirmDescription={t('uninstallDescription')}
-                                                                confirmLabel={t('uninstallAction')}
-                                                            />
-                                                        </TooltipDisabledReason>
+                                                        {s.vault ? (
+                                                            // Lent by the Vault: removing it only detaches this coworker.
+                                                            <TooltipDisabledReason reason={s.vault.sharedWithAll ? t('vaultShared') : manageReason}>
+                                                                <PanelDeleteButton
+                                                                    label={t('vaultRemove', { name: s.name })}
+                                                                    disabled={!canManage || s.vault.sharedWithAll}
+                                                                    onClick={() => onUninstall(s.key)}
+                                                                    confirmTitle={t('vaultRemoveConfirm', { name: s.label ? `${s.name} · ${s.label}` : s.name })}
+                                                                    confirmDescription={t('vaultRemoveDescription')}
+                                                                    confirmLabel={t('vaultRemoveAction')}
+                                                                />
+                                                            </TooltipDisabledReason>
+                                                        ) : (
+                                                            <TooltipDisabledReason reason={manageReason}>
+                                                                <PanelDeleteButton
+                                                                    label={s.label ? t('uninstallLabeled', { name: s.name, label: s.label }) : t('uninstall', { name: s.name })}
+                                                                    disabled={!canManage}
+                                                                    onClick={() => onUninstall(s.key)}
+                                                                    confirmTitle={s.label ? t('uninstallLabeledConfirm', { name: s.name, label: s.label }) : t('uninstallConfirm', { name: s.name })}
+                                                                    confirmDescription={t('uninstallDescription')}
+                                                                    confirmLabel={t('uninstallAction')}
+                                                                />
+                                                            </TooltipDisabledReason>
+                                                        )}
                                                     </>
                                                 }
                                             />
@@ -515,9 +537,11 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 disabledReason={manageReason}
                                             />
                                         ))}
+                                        <CoworkerVaultAttachedRows {...coworkerVault} disabledReason={manageReason} />
                                     </PanelList>
                                 </PanelSection>
                             )}
+                            <CoworkerVaultAvailable {...coworkerVault} disabledReason={manageReason} />
                             <PanelSection label={t('library')}>
                                 {searchLoading ? <SkeletonPanelRows rows={6} leading className="p-0" /> : <ServiceList services={isSearchActive ? searchResults : browseWithInstalled} onInstall={onInstall} onUninstall={onUninstall} onAddAccount={onAddAccount} disabledReason={manageReason} />}
                                 {!isSearchActive && (

@@ -778,6 +778,7 @@ Events:
 - `agent.schedule.completed` — a scheduled run finished.
 - `agent.trigger.completed` — a webhook-triggered run finished.
 - `agent.notification` — the agent called `notify_user`.
+- `box.vault.signed_out` — a Vault item lost its sign-in: its token was refused or expired with nothing to refresh it.
 
 Payload (`content-type: application/json`):
 
@@ -823,6 +824,124 @@ If either is unset the tool is a no-op (it tells the agent the notification wasn
 ```
 
 `kind` is one of `info` | `question` | `approval` | `progress` | `done` | `error`. `info` is the one kind that outlives the run: the hub flags the conversation as needing an acknowledgement, and it stays flagged after the run completes until the user marks it as read or sends the next message. `progress` is its silent counterpart, for updates that flag nothing. `sessionId`/`runId`/`metadata` may be `null`. Delivery is best-effort with a ~5s timeout: non-2xx responses and network errors are logged and never fail the run.
+
+---
+
+## Vault
+
+The box's shared accounts and keys. An item is signed in to (or filled in) once and attached to the
+coworkers that use it, one by one or all at once with `sharedWithAll`. It lives in
+`data/vault/<id>/`: `item.json` (what it is and who holds it), `.env` (its secrets, chmod 600) and
+`tokens/<server>.json` (its OAuth tokens). Nothing of the Vault is copied into a coworker's folder
+but the skills of the items it holds, which the engine writes into `skills/` and keeps in step.
+
+At run time a coworker gets the MCP servers of its items before its own (an item wins over one of
+its own servers of the same name), and their variables in its shell. A `${VAR}` in an item's server
+resolves against that item's `.env` only, never another item's nor the coworker's. The foreman holds
+no item; a delegate draws on the coworker it works for.
+
+`GET /health` lists `vault` in `capabilities` when the box has one. Every read answers names, never a
+value: `envKeys` are the variables an item holds, `tokens` the servers holding an OAuth token.
+
+Kinds: `service` (a catalog app, `slug` set), `mcp` (a custom MCP server), `secret` (variables only).
+Statuses: `active`, `needs_auth`, `needs_config`.
+
+### `GET /vault`
+
+`?agent=<id>` narrows the list to the items that coworker draws on, its own and the shared ones.
+
+```json
+{
+  "items": [
+    {
+      "id": "v1x...",
+      "kind": "service",
+      "slug": "linear",
+      "name": "Linear",
+      "label": "ops@acme.test",
+      "status": "active",
+      "config": {},
+      "mcpServers": [{ "name": "linear", "transport": "http", "url": "https://mcp.linear.app/mcp", "args": [], "env": {}, "headers": {} }],
+      "skills": [{ "slug": "linear-usage", "name": "Linear", "description": "", "body": "..." }],
+      "oauth": { "serverName": "linear", "url": "https://mcp.linear.app/mcp" },
+      "agentIds": ["abc..."],
+      "sharedWithAll": false,
+      "createdBy": "user-uuid",
+      "createdAt": "...",
+      "updatedAt": "...",
+      "envKeys": [],
+      "tokens": ["linear"]
+    }
+  ]
+}
+```
+
+### `POST /vault`
+
+Create an item. `env` holds its secrets and is never returned. `agentIds` must name coworkers of the
+box. A paid app (`app` set) is never `sharedWithAll` (400).
+
+```json
+{ "kind": "secret", "name": "Stripe live key", "env": { "STRIPE_API_KEY": "sk_live_..." }, "agentIds": ["abc..."] }
+```
+
+Response `201`: the item, as in the list.
+
+### `GET /vault/:id`
+
+One item, as in the list. `404` when it does not exist.
+
+### `PATCH /vault/:id`
+
+Change anything but the kind, the attachments and the secrets: `slug`, `name`, `label`, `status`,
+`authMethodId`, `config`, `mcpServers`, `skills`, `oauth`, `managed`, `composio`, `app`,
+`sharedWithAll`. `null` removes an optional field. Answers the item.
+
+### `PATCH /vault/:id/env`
+
+`{ "set": { "KEY": "value" }, "remove": ["OTHER"] }`. Answers the names the item now holds:
+`{ "keys": ["KEY"] }`.
+
+### `PUT /vault/:id/agents/:agentId` · `DELETE /vault/:id/agents/:agentId`
+
+Attach the item to a coworker, or detach it. Both answer the item and are idempotent.
+
+### `PUT /vault/:id/tokens/:server` · `DELETE /vault/:id/tokens/:server`
+
+Store the OAuth token of one of the item's servers (same body as `PUT /agents/:id/mcp/:name/token`),
+or forget it. A token the server refuses to refresh puts the item back to `needs_auth` and sends
+`box.vault.signed_out` to the hub.
+
+### `GET /vault/:id/usage`
+
+The coworkers that lose the item if it goes, for the UI to name them before a delete:
+`{ "agentIds": ["abc..."] }`. For an item shared with everyone, every coworker of the box.
+
+### `DELETE /vault/:id`
+
+Delete the item, its secrets and its tokens: `{ "deleted": "v1x...", "detached": ["abc..."] }`.
+
+### Conflicts
+
+A coworker never holds two items that set the same variable, carry a server under the same name or
+a skill under the same slug: it would get one of them at random. A create, a change, an attachment
+or a share that would do it answers `409`, naming each clash (`"*"` for two items shared with
+everyone, which clash on every coworker, present and future):
+
+```json
+{
+  "error": "This coworker already gets the variable LINEAR_API_KEY from another item of the Vault",
+  "conflicts": [{ "agentId": "abc...", "itemId": "v2y...", "kind": "env", "name": "LINEAR_API_KEY" }]
+}
+```
+
+### Archives and duplicates
+
+`GET /agents/:id/archive` carries what a coworker holds from the Vault as its own: the items'
+servers in `config.json`, their variables as empty keys in `.env`, their apps in the connector
+registry back to `needs_auth` or `needs_config`. No value and no item id leaves the box.
+`POST /agents/:id/duplicate` attaches the copy to every item the source was attached to.
+`DELETE /agents/:id` detaches the coworker from every item.
 
 ---
 

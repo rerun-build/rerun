@@ -1,5 +1,6 @@
 # Konductor flow for a Linear issue labeled Feature: design in a render lab until you validate it, design brief, plan and
-# build in a new Opus 5.5 chat, review, review fixes, summary, PR, merge, then close the card.
+# build in a new Opus 5.5 chat, review, review fixes, summary, wait for the PR you open
+# and merge, then close the card.
 # Plan and build are one step: an approved plan is built in the same turn, so a separate Build step would start after it.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Feature"
@@ -73,11 +74,6 @@ prompt = """
 Lis {{issue.file}}, {{run.dir}}/design.md et le diff du workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request.
 Résume pour la personne qui merge : la feature, ce qui a été construit, comment c'est testé. Court, en français.
 """
-
-[[steps]]
-id = "pr"
-title = "Create PR"
-kind = "create_pr"
 
 [[steps]]
 id = "merge"

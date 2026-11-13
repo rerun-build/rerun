@@ -27,6 +27,9 @@ import { finishTakeover } from '../../desktop/takeover.js'
 import { agentDir, configPath, installPath, soulPath } from '../../config/paths.js'
 import { agentToolCatalog } from '../../tools/catalog.js'
 import type { RunModel } from '../../agents/availability.js'
+import { copyVaultAttachments, forgetVaultAgent } from '../../vault/store.js'
+import { agentMcpServers } from '../../vault/runtime.js'
+import { applyVaultChange } from '../../vault/apply.js'
 
 export const agentRoutes = new Hono()
 
@@ -42,6 +45,8 @@ agentRoutes.get('/', async c => {
 agentRoutes.post('/', async c => {
     const body = createAgentSchema.parse(await c.req.json())
     const agent = await createAgent({ config: body.config, soul: body.soul, install: body.install, keys: body.keys })
+    // A new coworker gets what the Vault shares with everyone from its very first run.
+    await applyVaultChange([agent.id])
     return c.json(publicView(agent.id, agent.config, agent.soul, agent.install, agent.resolved), 201)
 })
 
@@ -52,7 +57,9 @@ agentRoutes.post('/import', async c => {
     if (!name) throw badRequest('An import needs a `name` for the copy')
     const body = c.req.raw.body
     if (!body) throw badRequest('Expected a gzipped agent archive as the request body')
-    return c.json(await importAgent({ body, name, displayName: c.req.query('displayName') }), 201)
+    const imported = await importAgent({ body, name, displayName: c.req.query('displayName') })
+    await applyVaultChange([imported.id])
+    return c.json(imported, 201)
 })
 
 agentRoutes.get('/:id', async c => {
@@ -82,7 +89,10 @@ agentRoutes.post('/:id/duplicate', async c => {
     const id = c.req.param('id')
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
     const body = duplicateAgentSchema.parse(await c.req.json())
-    return c.json(await duplicateAgent(id, body), 201)
+    const copy = await duplicateAgent(id, body)
+    await copyVaultAttachments(id, copy.id)
+    await applyVaultChange([copy.id])
+    return c.json(copy, 201)
 })
 
 agentRoutes.get('/:id/archive/plan', async c => {
@@ -174,7 +184,7 @@ agentRoutes.get('/:id/mcp-servers/status', async c => {
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
     const names = c.req.queries('name')
     const [config, env] = await Promise.all([readAgentConfig(id), readAgentEnv(id)])
-    const servers = config.mcpServers.filter(server => server.name !== BRIDGE_SERVER_NAME && (!names || names.includes(server.name)))
+    const servers = agentMcpServers({ id, config }).filter(server => server.name !== BRIDGE_SERVER_NAME && (!names || names.includes(server.name)))
     return c.json({ servers: await probeMcpStatuses(id, servers, env, agentMcpSpawn({ id, env, config })) })
 })
 
@@ -226,6 +236,9 @@ agentRoutes.delete('/:id', async c => {
     unloadAgent(id)
     closeSystemDb(id)
     closeAgentDb(id)
+    // Before the folder goes: an agent id can come back (an import names its copy), and the coworker
+    // that gets it must never inherit the accounts of this one.
+    await forgetVaultAgent(id)
     await deleteAgentIndex(id)
     await rm(agentDir(id), { recursive: true, force: true })
     return c.json({ deleted: id })

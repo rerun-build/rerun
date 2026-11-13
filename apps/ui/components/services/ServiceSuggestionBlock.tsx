@@ -2,6 +2,10 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { getCatalogServicesBySlugsAction, getServiceAlternativesAction, getServiceDetailsAction } from '@/app/api/_actions/services.actions'
+import { attachVaultEntryAction, coworkerVaultAction } from '@/app/api/_actions/vault.actions'
+import { vaultAccountsFor, type VaultAccount } from '@/components/vault/vault-text'
+import { useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
+import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { ServiceAlternatives } from '@/components/services/ServiceAlternatives'
 import { connectsInOneClick, ServiceConfigForm } from '@/components/services/ServiceConfigForm'
 import { useServiceSetupDriver } from '@/components/services/service-setup-driver'
@@ -42,7 +46,12 @@ export type ResolvedService = {
     alternatives: ServiceAlternative[]
     // The app the agent asked for, once the user picked one of its alternatives instead.
     replaces?: { slug: string; name: string }
+    // Accounts of this app the workspace Vault already holds, signed in, that the coworker lacks.
+    vaultAccounts?: VaultAccount[]
+    // Whether the user may attach them: `manage` on the coworker's Box.
+    canAttachVault?: boolean
 }
+
 
 type ServiceSuggestionBlockProps = {
     agentId: string
@@ -85,6 +94,7 @@ function buildSummary(resolved: ResolvedService[], statuses: Record<string, Card
 }
 
 export function ServiceSuggestionBlock({ agentId, services, onDone, inline }: ServiceSuggestionBlockProps) {
+    const vaultEnabled = useVaultEnabled()
     // The caller rebuilds this array on every one of its renders, so keying the load below on its
     // identity would re-fetch and reset the cards each time. Key on the content instead.
     const servicesKey = services.map(s => `${s.slug}\0${s.reason ?? ''}`).join('\x01')
@@ -98,16 +108,21 @@ export function ServiceSuggestionBlock({ agentId, services, onDone, inline }: Se
         const suggested = suggestedRef.current
         const slugs = suggested.map(s => s.slug)
         const load = async () => {
-            const [details, catalog, alternatives] = await Promise.all([Promise.all(slugs.map(slug => getServiceDetailsAction(agentId, slug))), getCatalogServicesBySlugsAction(slugs), getServiceAlternativesAction(slugs)])
+            const [details, catalog, alternatives, vault] = await Promise.all([
+                Promise.all(slugs.map(slug => getServiceDetailsAction(agentId, slug))),
+                getCatalogServicesBySlugsAction(slugs),
+                getServiceAlternativesAction(slugs),
+                vaultEnabled ? coworkerVaultAction(agentId) : null,
+            ])
             if (cancelled) return
             const iconBySlug = new Map(catalog.map(c => [c.slug, c.icon]))
-            setResolved(suggested.map((s, i) => toResolved(s, details[i], iconBySlug.get(s.slug) ?? null, alternatives[s.slug] ?? [])))
+            setResolved(suggested.map((s, i) => ({ ...toResolved(s, details[i], iconBySlug.get(s.slug) ?? null, alternatives[s.slug] ?? []), vaultAccounts: vaultAccountsFor(vault, s.slug), canAttachVault: vault?.canAttach ?? false })))
         }
         load()
         return () => {
             cancelled = true
         }
-    }, [agentId, servicesKey])
+    }, [agentId, servicesKey, vaultEnabled])
 
     useEffect(() => {
         if (!resolved || resolved.length > 0 || answeredEmptyRef.current) return
@@ -153,6 +168,7 @@ type ServiceSuggestionCardProps = {
 
 export function ServiceSuggestionCard({ agentId, services, onDone, inline, defaultOpen }: ServiceSuggestionCardProps) {
     const t = useTranslations('services')
+    const tVault = useTranslations('vault')
     const errorText = useErrorText()
     const driver = useServiceSetupDriver()
     const [resolved, setResolved] = useState(services)
@@ -282,6 +298,22 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
         })
     }
 
+    const [attaching, setAttaching] = useState<string | null>(null)
+    const [attachError, setAttachError] = useState<string | null>(null)
+    const attachFromVault = async (account: VaultAccount) => {
+        if (locked || attaching) return
+        setAttaching(account.id)
+        setAttachError(null)
+        const res = await attachVaultEntryAction(account.id, agentId)
+        setAttaching(null)
+        if (!res.ok) return setAttachError(errorText(res))
+        const next = { ...statuses, [s.slug]: 'connected' as CardStatus }
+        setStatuses(next)
+        advance(next)
+    }
+    const vaultAccounts = s.vaultAccounts ?? []
+    const attachReason = s.canAttachVault ? undefined : tVault('reasons.manageBox')
+
     const skip = () => {
         if (locked) return
         const next = { ...statuses, [s.slug]: 'skipped' as CardStatus }
@@ -308,8 +340,8 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
                                         {t('suggestion.notNow')}
                                     </Button>
                                 )}
-                                <Button size="sm" disabled={locked || swapping !== null} onClick={connect}>
-                                    {t('suggestion.connect')}
+                                <Button size="sm" variant={vaultAccounts.length > 0 ? 'outline' : 'default'} disabled={locked || swapping !== null || attaching !== null} onClick={connect}>
+                                    {vaultAccounts.length > 0 ? t('suggestion.connectNew') : t('suggestion.connect')}
                                 </Button>
                             </div>
                         )}
@@ -319,6 +351,23 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
                             </Button>
                         )}
                     </div>
+
+                    {folded && vaultAccounts.length > 0 && (
+                        <div className="space-y-1.5">
+                            <p className="text-xs text-muted-foreground">{t('suggestion.fromVault')}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                                {vaultAccounts.map(account => (
+                                    <TooltipDisabledReason key={account.id} reason={attachReason} className="max-w-full">
+                                        <Button size="sm" className="max-w-full" disabled={locked || attaching !== null || !!attachReason} onClick={() => void attachFromVault(account)}>
+                                            {attaching === account.id && <Loader2Icon className="animate-spin" />}
+                                            <span className="truncate">{t('suggestion.useAccount', { label: account.label })}</span>
+                                        </Button>
+                                    </TooltipDisabledReason>
+                                ))}
+                            </div>
+                            {attachError && <p className="text-xs text-destructive">{attachError}</p>}
+                        </div>
+                    )}
 
                     {folded && <ServiceAlternatives alternatives={alternatives} swapping={swapping} disabled={locked} error={swapError} onPick={swapTo} />}
 

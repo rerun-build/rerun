@@ -46,6 +46,10 @@ export const ENGINE_CAPABILITY_OPENCODE = 'connections.opencode'
 // The engine runs custom OpenAI-compatible connections and answers `POST /connections/probe`.
 export const ENGINE_CAPABILITY_CUSTOM = 'connections.custom'
 
+// The box keeps the workspace's Vault and answers `/vault`: an account is signed in once and
+// attached to the coworkers that use it. A box without it keeps every connector per coworker.
+export const ENGINE_CAPABILITY_VAULT = 'vault'
+
 // What the last `rerun update` on a box did, as `/health` reports it.
 export const engineLastUpdateSchema = z.object({
     status: z.enum(['running', 'error', 'restarting', 'success']),

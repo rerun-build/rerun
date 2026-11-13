@@ -1,5 +1,5 @@
 import { isAdminEmail } from '@/lib/auth/admin-emails'
-import { COMPUTER_RELEASED, I18N_RELEASED, PUBLISHED_ACCESS_RELEASED, REWIND_RELEASED, SIMPLE_VIEW_RELEASED } from '@/lib/features'
+import { COMPUTER_RELEASED, I18N_RELEASED, PUBLISHED_ACCESS_RELEASED, REWIND_RELEASED, SIMPLE_VIEW_RELEASED, VAULT_RELEASED } from '@/lib/features'
 import { createClient } from '@/supabase/server'
 import { dedupe, flag } from 'flags/next'
 
@@ -52,6 +52,14 @@ export const i18nFlag = flag<boolean, Entities>({
     defaultValue: false,
     identify,
     decide: releasedOrEarlyAccess(I18N_RELEASED, ['rerun.local']),
+})
+
+// The verify accounts of the local stack see it too, so the Vault can be walked through before it ships.
+export const vaultFlag = flag<boolean, Entities>({
+    key: 'vault',
+    defaultValue: false,
+    identify,
+    decide: releasedOrEarlyAccess(VAULT_RELEASED, ['rerun.local']),
 })
 
 export const simpleViewFlag = flag<boolean, Entities>({

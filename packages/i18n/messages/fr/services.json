@@ -122,7 +122,10 @@
         "skipped": "Ignorée.",
         "skip": "Passer",
         "finish": "Terminer",
-        "nextApp": "App suivante"
+        "nextApp": "App suivante",
+        "fromVault": "Déjà dans le Vault",
+        "useAccount": "Utiliser {label}",
+        "connectNew": "Nouveau compte"
     },
     "signInPopup": {
         "connecting": "Connexion à {name}…"

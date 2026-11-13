@@ -38,6 +38,9 @@ type ServiceConfigFormProps = {
     // Connects at mount, for a caller whose own Connect button already was the user's click.
     // The popup is the one it opened inside that click handler.
     autoConnect?: { popup: Window | null }
+    // Set up in the Vault: the driver answers with the entry's id as the key, and a sign-in lands on
+    // that entry rather than on a coworker.
+    vault?: boolean
 }
 
 type AuthTarget = NonNullable<ServiceConfigFormProps['initialAuthTarget']>
@@ -71,7 +74,7 @@ export function connectsInOneClick(authMethods: AuthMethodSummary[], initialMeth
 // When a service offers several auth methods, a picker swaps the fields; submitting compiles
 // the selected method into engine primitives. OAuth methods surface an inline sign-in step,
 // so the form handles both credential and browser-sign-in flows end-to-end.
-export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, name, authMethods, initialMethodId, initialAuthTarget, onInstalled, autoConnect }: ServiceConfigFormProps) {
+export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, name, authMethods, initialMethodId, initialAuthTarget, onInstalled, autoConnect, vault }: ServiceConfigFormProps) {
     const t = useTranslations('services')
     const errorText = useErrorText()
     const driver = useServiceSetupDriver()
@@ -195,6 +198,7 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
                     agentId={agentId}
                     serverName={authStep.serverName}
                     serviceKey={connectKey}
+                    vaultItemId={vault ? connectKey : undefined}
                     autoStart={signInStart !== null}
                     pendingPopup={signInStart?.popup}
                     onAuthorized={async () => {

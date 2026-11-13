@@ -15,7 +15,9 @@ import { CreditMeter, UpgradePill } from '@rerun/cloud/billing.client'
 import { ExpertProfileDialog } from '@/components/dialogs/ExpertProfileDialog'
 import { KnowledgeBaseDialog } from '@/components/dialogs/KnowledgeBaseDialog'
 import { PaidAppDialogs, usePaidAppsStore, AppsMenuSection } from '@rerun/cloud/apps.client'
-import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
+import { useEnabledPaidApps, useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
+import { VaultDialog } from '@/components/vault/VaultDialog'
+import { vaultSignedOutCountAction } from '@/app/api/_actions/vault.actions'
 import { WorkspaceMembersDialog } from '@/components/dialogs/WorkspaceMembersDialog'
 import { WorkspaceSettingsDialog } from '@/components/dialogs/WorkspaceSettingsDialog'
 import { SignInPillButton } from '@/components/layout/SignInPill'
@@ -42,11 +44,11 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, ChevronDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, ChevronDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import Link from 'next/link'
-import { Fragment, useEffect, useState, type ReactNode } from 'react'
+import { Fragment, useCallback, useEffect, useState, type ReactNode } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
@@ -117,6 +119,13 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const [powerAction, setPowerAction] = useState<PowerAction | null>(null)
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
     const brainProposals = useBrainProposalCount(Boolean(workspace) && !isAnonymous)
+    const vaultEnabled = useVaultEnabled()
+    // Entries of the Vault waiting on a sign-in: read on mount and each time the menu opens.
+    const [vaultSignedOut, setVaultSignedOut] = useState(0)
+    const refreshVaultSignedOut = useCallback(() => {
+        if (vaultEnabled && !isAnonymous) void vaultSignedOutCountAction().then(setVaultSignedOut)
+    }, [vaultEnabled, isAnonymous])
+    useEffect(refreshVaultSignedOut, [refreshVaultSignedOut])
     const guided = useForemanStore(state => state.funnel === 'guided')
     const credit = useRerunCredit()
 
@@ -245,6 +254,13 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                 <LockKeyholeIcon className="size-4" />
                 {t('aiProviders')}
             </DropdownMenuItem>
+            {vaultEnabled && (
+                <DropdownMenuItem onSelect={() => openWorkspacePanel('vault')} className="gap-2 text-muted-foreground">
+                    <LockIcon className="size-4" />
+                    {t('vault')}
+                    {vaultSignedOut > 0 && <span className="ml-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
+                </DropdownMenuItem>
+            )}
             {apiKeysItem}
             {SERVERS_ENABLED && (
                 <AdminOnly allowed={workspaceAdmin} reason={t('adminOnly.servers')}>
@@ -392,6 +408,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                 onOpenChange={open => {
                     if (!open) return
                     void refreshBrainProposals()
+                    refreshVaultSignedOut()
                     if (!workspace.is_sandbox) for (const slug of paidApps) refreshAppAccounts(slug).catch(() => {})
                 }}
             >
@@ -449,6 +466,15 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
             <ApiKeysDialog open={panel === 'api_keys'} onOpenChange={open => setPanel(open ? 'api_keys' : null)} />
             {SERVERS_ENABLED && <ServersDialog open={serversOpen} onOpenChange={setServersOpen} />}
             <AiProvidersDialog open={panel === 'ai_providers'} onOpenChange={open => setPanel(open ? 'ai_providers' : null)} />
+            {vaultEnabled && (
+                <VaultDialog
+                    open={panel === 'vault'}
+                    onOpenChange={open => {
+                        setPanel(open ? 'vault' : null)
+                        if (!open) refreshVaultSignedOut()
+                    }}
+                />
+            )}
             <KnowledgeBaseDialog open={panel === 'knowledge_base'} onOpenChange={open => setPanel(open ? 'knowledge_base' : null)} />
             <PaidAppDialogs apps={paidApps} />
             <WorkspacePowerDialog action={powerAction} onOpenChange={open => setPowerAction(open ? powerAction : null)} />

@@ -1,4 +1,6 @@
 import { assertAgentInWorkspace } from '@/app/api/_auth/access'
+import { assertCanAdd, vaultContext } from '@/app/api/_services/vault.service'
+import { getVaultItem } from '@/lib/engine/vault-client'
 import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthorizeUrl, callbackUrl, createPkce, discoverAuthServer, encodeContext, resolveClient } from '@/lib/mcp-oauth'
 import { describeSignInError } from '@/lib/net/network-error'
 import { NextResponse } from 'next/server'
@@ -9,8 +11,22 @@ import { NextResponse } from 'next/server'
 // callback POSTs the code to that token endpoint and the engine later sends the refresh token there.
 export async function POST(req: Request) {
     try {
-        const { agentId, serverName, mcpUrl } = (await req.json()) as { agentId: string; serverName: string; mcpUrl: string }
-        await assertAgentInWorkspace(agentId, 'manage')
+        const body = (await req.json()) as { agentId?: string; vaultItemId?: string; serverName: string; mcpUrl: string }
+        const { serverName } = body
+        let { mcpUrl } = body
+        const agentId = body.agentId ?? ''
+        let vault: OAuthContext['vault']
+        if (body.vaultItemId) {
+            // An entry signs in where it was compiled to: its own server and address, never the caller's.
+            const ctx = await vaultContext()
+            await assertCanAdd(ctx.actor)
+            const item = await getVaultItem(ctx.conn, body.vaultItemId)
+            if (!item.oauth || item.oauth.serverName !== serverName) return NextResponse.json({ error: 'This entry does not sign in through this server' }, { status: 400 })
+            mcpUrl = item.oauth.url
+            vault = { itemId: item.id, workspaceId: ctx.actor.workspaceId }
+        } else {
+            await assertAgentInWorkspace(agentId, 'manage')
+        }
 
         const metadata = await discoverAuthServer(mcpUrl)
         const clientInfo = await resolveClient(metadata, mcpUrl, req)
@@ -27,6 +43,7 @@ export async function POST(req: Request) {
             clientId: clientInfo.clientId,
             clientSecret: clientInfo.clientSecret,
             redirectUri: callbackUrl(req),
+            ...(vault ? { vault } : {}),
         }
 
         const res = NextResponse.json({ authorizationUrl: buildAuthorizeUrl(metadata, ctx, challenge, state) })

@@ -33,6 +33,9 @@ export type OAuthContext = {
     // Started from the iOS app: the callback redirects back into it instead of answering with the
     // popup page, and reads the workspace from this signed grant since that browser has no session.
     mobileGrant?: string
+    // Started from the workspace's Vault, for an entry no coworker may hold yet: the token goes to the
+    // entry, in the workspace named here, and `agentId` is empty.
+    vault?: { itemId: string; workspaceId: number }
 }
 
 export type DiscoveredMetadata = {

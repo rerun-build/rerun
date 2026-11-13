@@ -28,6 +28,12 @@ describe('companySiteUrl', () => {
     it('refuses a raw public IP, which has no letters in its top-level label', () => {
         expect(companySiteUrl('8.8.8.8')).toBeNull()
     })
+
+    it('never takes a platform for the company site', () => {
+        expect(companySiteUrl('linkedin.com')).toBeNull()
+        expect(companySiteUrl('https://m.facebook.com/acme')).toBeNull()
+        expect(companySiteUrl('acme.substack.com')).toBe('https://acme.substack.com')
+    })
 })
 
 describe('scrapeCompanySite', () => {

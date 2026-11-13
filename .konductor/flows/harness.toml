@@ -1,5 +1,5 @@
 # Konductor flow for a Linear issue labeled Harness Use Case: move the card to In Progress, replay the case, plan (approved by the flow), review, fix the review
-# (plan approved by you), summary on the issue, PR, wait for your merge, then close the card.
+# (plan approved by you), summary on the issue, wait for the PR you open and merge, then close the card.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Harness"
 match = { labels = ["Harness Use Case"] }
@@ -56,15 +56,10 @@ model = "opus-5-5-1m"
 linear_comment = true
 prompt = """
 Lis {{issue.file}} et le diff de ce workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request :
-l'étape suivante ouvre la PR.
+c'est moi qui ouvre la PR.
 Écris un résumé pour la personne qui va relire et merger : le cas client, la cause, la couche corrigée et comment,
 la mesure avant / après, et ce qu'il reste à vérifier avant de merger. Court, en français.
 """
-
-[[steps]]
-id = "pr"
-title = "Create PR"
-kind = "create_pr"
 
 [[steps]]
 id = "merge"

@@ -132,6 +132,8 @@
         "brain": "Brain",
         "brainProposals": "{count, plural, one {# proposal to review} other {# proposals to review}}",
         "aiProviders": "AI providers",
+        "vault": "Vault",
+        "vaultSignedOut": "An app of the Vault is signed out",
         "servers": "Servers",
         "billing": "Billing",
         "newWorkspace": "New workspace",

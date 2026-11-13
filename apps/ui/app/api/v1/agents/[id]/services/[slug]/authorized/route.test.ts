@@ -6,7 +6,7 @@ const markServiceAuthorized = vi.fn()
 const markManagedAuthorized = vi.fn()
 const markComposioAuthorized = vi.fn()
 vi.mock('@/lib/oauth/pending-grant', () => ({ claimSignIn: (...args: unknown[]) => claimSignIn(...args), SignInClaimError: class SignInClaimError extends Error {} }))
-vi.mock('@/lib/engine/client', () => ({ putMcpToken: (...args: unknown[]) => putMcpToken(...args) }))
+vi.mock('@/lib/engine/client', () => ({ putMcpToken: (...args: unknown[]) => putMcpToken(...args), supportsVault: async () => false }))
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: async () => ({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-agent' }) }))
 vi.mock('@/app/api/_services/services.service', () => ({
     markServiceAuthorized: (...args: unknown[]) => markServiceAuthorized(...args),

@@ -103,6 +103,8 @@
         "brain": "Brain",
         "brainProposals": "{count, plural, one {# Vorschlag zu prüfen} other {# Vorschläge zu prüfen}}",
         "aiProviders": "KI-Anbieter",
+        "vault": "Vault",
+        "vaultSignedOut": "Eine App im Vault ist abgemeldet",
         "servers": "Server",
         "billing": "Abrechnung",
         "newWorkspace": "Neuer Workspace",

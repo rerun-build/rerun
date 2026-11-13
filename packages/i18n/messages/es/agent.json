@@ -122,7 +122,16 @@
         "uninstallDescription": "El coworker pierde este servicio y sus herramientas. Su conexión se revoca, así que reinstalarlo implica volver a conectarse.",
         "uninstallAction": "Desinstalar",
         "requestHint": "¿Sigues buscando? Podemos añadir la app que necesitas.",
-        "requestApp": "Pedir una app"
+        "requestApp": "Pedir una app",
+        "vaultBadge": "Vault",
+        "fromVault": "Desde el Vault",
+        "vaultAdd": "Añadir",
+        "vaultShared": "Todos los coworkers la reciben del Vault. Cámbiala allí.",
+        "vaultRemove": "Quitar {name} de este coworker",
+        "vaultRemoveConfirm": "¿Quitar {name} de este coworker?",
+        "vaultRemoveDescription": "Sigue en el Vault, para los otros coworkers y para más adelante.",
+        "vaultRemoveAction": "Quitar",
+        "vaultAttachFailed": "No se pudo añadir {name}"
     },
     "agentPanelMcp": {
         "unreachableTitle": "Engine inaccesible",

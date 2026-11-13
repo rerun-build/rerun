@@ -20,6 +20,7 @@ import { agentConfigSchema, type AgentConfig } from './types.js'
 import { activateAutomations } from './automations.js'
 import { hasPendingSetup } from './setup.js'
 import { ARCHIVE_LIMITS, ARCHIVE_ROOTS, MANIFEST_PATH, mcpAuthServers, registryConnectorSlugs, requiredEnvKeys } from './archive.js'
+import { VAULT_SKILLS_MARKER } from '../vault/skills.js'
 import { readRegistry } from '../services/registry.js'
 import { parseEnvFile, writeAgentEnv } from './env.js'
 import { writeAgentConfig } from './config-write.js'
@@ -50,6 +51,8 @@ const MAX_SKIPPED_REPORTED = 100
 const importsDir = () => resolve(dataDir(), '.imports')
 
 function isAllowed(path: string, isDirectory: boolean): boolean {
+    // Names the source box's Vault items: the skills it listed arrive as the copy's own.
+    if (path === `skills/${VAULT_SKILLS_MARKER}`) return false
     if (FILE_ROOTS.has(path)) return !isDirectory
     if (DIR_ROOTS.some(root => path === root || path.startsWith(`${root}/`))) return true
     // A directory only because it is on the way to a file root, e.g. `data` above `data/agent.db`.

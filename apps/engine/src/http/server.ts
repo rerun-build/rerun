@@ -23,6 +23,8 @@ import { doctorRoutes } from './routes/doctor.js'
 import { createFilesRouter } from './routes/files.js'
 import { brainRoutes } from './routes/brain.js'
 import { agentDesktopRoutes, desktopRoutes } from './routes/desktop.js'
+import { vaultRoutes } from './routes/vault.js'
+import { VaultConflictError } from '../vault/conflicts.js'
 import { HttpError, notFound } from '../lib/errors.js'
 import { agentExists, listAgentIdsOnDisk } from '../agents/loader.js'
 import { workspaceDir, sharedDir } from '../config/paths.js'
@@ -43,6 +45,7 @@ export function createServer(): Hono {
     api.route('/doctor', doctorRoutes)
     api.route('/tools', toolRoutes)
     api.route('/connections', connectionRoutes)
+    api.route('/vault', vaultRoutes)
     api.route('/agents', agentRoutes)
     api.route('/agents/:id/sessions', sessionRoutes)
     api.route('/agents/:id/memories', memoryRoutes)
@@ -88,6 +91,8 @@ export function createServer(): Hono {
     app.route('/', api)
 
     app.onError((err, c) => {
+        // A refused attachment names the coworker and the item it clashes with, for the UI to show.
+        if (err instanceof VaultConflictError) return c.json({ error: err.message, conflicts: err.conflicts }, 409)
         if (err instanceof HttpError) return c.json({ error: err.message }, err.status as 400)
         if (err instanceof Error && err.message.startsWith('Path escapes the root')) return c.json({ error: err.message }, 400)
         if (err instanceof ZodError) {

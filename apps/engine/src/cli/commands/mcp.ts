@@ -2,6 +2,7 @@ import { getAgent } from '../../agents/registry.js'
 import { probeMcp } from '../../tools/mcp.js'
 import { agentMcpSpawn } from '../../tools/mcp-pool.js'
 import { clearToken, deviceLogin } from '../../tools/mcp-auth.js'
+import { agentMcpServers } from '../../vault/runtime.js'
 
 export async function mcpCommand(args: string[]): Promise<void> {
     const sub = args[0]
@@ -28,11 +29,12 @@ export async function mcpCommand(args: string[]): Promise<void> {
         const [, agentId] = args
         if (!agentId) throw new Error('Usage: rerun mcp status <agentId>')
         const agent = await getAgent(agentId)
-        if (agent.config.mcpServers.length === 0) {
+        const servers = agentMcpServers(agent)
+        if (servers.length === 0) {
             process.stdout.write('No MCP servers registered.\n')
             return
         }
-        for (const server of agent.config.mcpServers) {
+        for (const server of servers) {
             const probe = await probeMcp(agentId, server, agent.env, { spawn: agentMcpSpawn(agent) })
             const line = probe.ok
                 ? `ok\t${server.name}\t${probe.transport}\t${probe.toolNames.length} tools`

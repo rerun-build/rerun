@@ -80,7 +80,8 @@
         "schedule.once": "Description of a task that runs a single time. {date} is a formatted date and time.",
         "schedule.everyMinutes": "{count} is a number of minutes, such as 15.",
         "schedule.everyWeekday": "{day} is a weekday name such as Monday; {time} a clock time such as 9:00 AM.",
-        "schedule.monthly": "{day} is a day of the month, a number such as 1 or 15; {time} a clock time."
+        "schedule.monthly": "{day} is a day of the month, a number such as 1 or 15; {time} a clock time.",
+        "agentPanelServices.vaultBadge": "Marks an app this coworker gets from the workspace Vault. Keep \"Vault\" as is."
     },
     "agentCard": {
         "destinations": {
@@ -204,7 +205,16 @@
         "uninstallDescription": "The coworker loses this service and its tools. Its connection is revoked, so reinstalling means connecting again.",
         "uninstallAction": "Uninstall",
         "requestHint": "Still looking? We can add the app you need.",
-        "requestApp": "Request an app"
+        "requestApp": "Request an app",
+        "vaultBadge": "Vault",
+        "fromVault": "From the Vault",
+        "vaultAdd": "Add",
+        "vaultShared": "Every coworker gets it from the Vault. Change it there.",
+        "vaultRemove": "Remove {name} from this coworker",
+        "vaultRemoveConfirm": "Remove {name} from this coworker?",
+        "vaultRemoveDescription": "It stays in the Vault, for the other coworkers and for later.",
+        "vaultRemoveAction": "Remove",
+        "vaultAttachFailed": "Couldn't add {name}"
     },
     "agentPanelMcp": {
         "unreachableTitle": "Engine unreachable",

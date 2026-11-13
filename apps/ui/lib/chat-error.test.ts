@@ -205,6 +205,30 @@ describe('describeSubscriptionLimit', () => {
         expect(friendlyError("AI_APICallError: You've hit your session limit · resets 6:50pm (UTC)")).toContain('It refills at 6:50pm (UTC)')
     })
 
+    // What an OpenAI API key with no credits left stores as the run's error (RER-106).
+    it('names an OpenAI API account out of credits', () => {
+        const noCredits = 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.'
+        expect(classifyChatError(noCredits)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(noCredits)).toEqual({ plan: 'openai', scope: 'credits' })
+        expect(chatErrorTitle('usage_limit', noCredits)).toBe('OpenAI API credits used up')
+        expect(friendlyError(noCredits)).toBe('Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.')
+    })
+
+    // What the engine stores once it read `insufficient_quota` off OpenAI's older wording.
+    it('names OpenAI on the sentence the engine stores', () => {
+        const stored = 'OpenAiCreditsError: OpenAI API credits used up: You exceeded your current quota, please check your plan and billing details.'
+        expect(classifyChatError(stored)).toBe('usage_limit')
+        expect(describeSubscriptionLimit(stored)).toEqual({ plan: 'openai', scope: 'credits' })
+        expect(chatErrorTitle('usage_limit', stored)).toBe('OpenAI API credits used up')
+    })
+
+    it('does not send an OpenAI-compatible gateway out of credits to OpenAI', () => {
+        for (const message of ['AI_APICallError: You have no credits remaining on this gateway.', 'Provider returned error: {"error":{"code":"insufficient_quota","message":"Quota used"}}']) {
+            expect(classifyChatError(message)).toBe('usage_limit')
+            expect(describeSubscriptionLimit(message).plan).toBeNull()
+        }
+    })
+
     it('falls back to a plan-less description when nothing names a vendor', () => {
         expect(describeSubscriptionLimit('Error: quota exceeded')).toEqual({ plan: null, scope: 'session' })
     })
@@ -331,6 +355,7 @@ describe('the English copy of a spent subscription', () => {
         [{ plan: 'claude', scope: 'model', modelName: 'Opus' }, 'Claude Opus limit reached', 'Your Claude plan has reached its Opus limit. The other Claude models still run: switch to one of them.'],
         [{ plan: 'claude', scope: 'session', resetsAt: '3pm' }, 'Claude session limit reached', 'Your Claude plan has used up its current usage window. It refills at 3pm; switch this coworker to another model in the meantime.'],
         [{ plan: 'chatgpt', scope: 'session' }, 'ChatGPT usage limit reached', 'Your ChatGPT plan has used up its current usage window. It refills on its own; switch this coworker to another model in the meantime.'],
+        [{ plan: 'openai', scope: 'credits' }, 'OpenAI API credits used up', 'Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.'],
     ]
 
     it.each(cases)('%o', (limit, title, message) => {

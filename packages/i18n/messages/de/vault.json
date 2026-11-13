@@ -1,0 +1,85 @@
+{
+    "title": "Vault",
+    "description": "Melde dich einmal bei einer App an und wähle die Coworker, die sie nutzen.",
+    "search": "Im Vault suchen",
+    "noMatch": "Keine Treffer",
+    "groups": {
+        "apps": "Apps",
+        "mcp": "MCP-Server",
+        "secrets": "Secrets"
+    },
+    "add": "Hinzufügen",
+    "addApp": "App hinzufügen",
+    "empty": "Der Vault ist leer. Melde dich einmal bei einer App an, jeder Coworker, den du wählst, kann sie nutzen.",
+    "row": {
+        "everyone": "Alle Coworker",
+        "unused": "Noch kein Coworker",
+        "usedBy": "{names}",
+        "usedByMore": "{names} und {count, plural, one {# weiterer} other {# weitere}}"
+    },
+    "status": {
+        "needsAuth": "Abgemeldet",
+        "needsConfig": "Nicht eingerichtet"
+    },
+    "detail": {
+        "back": "Zurück zum Vault",
+        "signedOut": "Abgemeldet: Ihre Coworker können {name} nicht nutzen, bis sich jemand wieder anmeldet.",
+        "notSetUp": "{name} ist noch nicht eingerichtet.",
+        "reconnect": "Neu verbinden",
+        "everyone": "Alle Coworker",
+        "everyoneHint": "Später hinzugefügte Coworker bekommen sie auch.",
+        "coworkers": "Coworker",
+        "noCoworkers": "Noch keine Coworker in diesem Workspace.",
+        "hiddenCoworkers": "{count, plural, one {# Coworker} other {# Coworker}} in Boxes, die du nicht siehst",
+        "variables": "Variablen",
+        "reconnectFromCoworker": "Verbinde sie neu im Tab Apps eines Coworkers, der sie nutzt."
+    },
+    "delete": {
+        "button": "Löschen",
+        "title": "{name} löschen?",
+        "loses": "Diese Coworker verlieren sie: {names}.",
+        "nobody": "Kein Coworker nutzt sie.",
+        "confirm": "Löschen",
+        "deleted": "{name} gelöscht"
+    },
+    "reasons": {
+        "adminOnly": "Nur ein Admin kann das tun",
+        "manageBox": "Du verwaltest die Box dieses Coworkers nicht",
+        "manageAny": "Verwalte eine Box, um etwas zum Vault hinzuzufügen",
+        "paidAppEveryone": "Eine kostenpflichtige App wird Coworker für Coworker verbunden"
+    },
+    "addPage": {
+        "title": "Zum Vault hinzufügen",
+        "search": "Apps suchen",
+        "mcp": "MCP-Server",
+        "secret": "Secret"
+    },
+    "errors": {
+        "changeFailed": "Die Änderung konnte nicht gespeichert werden"
+    },
+    "addSecret": {
+        "name": "Name",
+        "namePlaceholder": "Stripe-Live-Schlüssel",
+        "variable": "Variable",
+        "variableHint": "Coworker lesen es unter diesem Namen.",
+        "variableInvalid": "Buchstaben, Ziffern und Unterstriche, nicht mit einer Ziffer beginnend",
+        "value": "Wert",
+        "valueHint": "Er wird nie wieder angezeigt.",
+        "add": "Secret hinzufügen"
+    },
+    "addMcp": {
+        "name": "Name",
+        "namePlaceholder": "Firmendokumentation",
+        "target": "Adresse oder Befehl",
+        "targetHint": "Eine https-Adresse oder der Befehl, den die Maschine startet.",
+        "header": "Header",
+        "headerValue": "Wert",
+        "add": "Server hinzufügen"
+    },
+    "paid": {
+        "badge": "Kostenpflichtig",
+        "managedInApp": "Anmeldung, Slot und Abrechnung verwaltest du im Fenster {provider} des Apps-Menüs.",
+        "paused": "Pausiert",
+        "connecting": "Verbindet"
+    }
+}

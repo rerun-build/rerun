@@ -439,5 +439,16 @@
     "fileChangedOnBox": "Diese Datei wurde auf der Box geändert, seit du sie geöffnet hast.",
     "saveThisFileFailed": "Diese Datei konnte nicht gespeichert werden",
     "templateSubscriptionEnded": "Dieser Coworker stammt aus einem beendeten Vorlagenabo. Kauf die Vorlage erneut, um ihn zurückzuholen.",
-    "noFreeCoworkerSlot": "Kein freier Coworker-Slot in deinem Tarif. Starte Pro für unbegrenzt viele Coworker oder lösche einen Coworker, um Platz zu schaffen."
+    "noFreeCoworkerSlot": "Kein freier Coworker-Slot in deinem Tarif. Starte Pro für unbegrenzt viele Coworker oder lösche einen Coworker, um Platz zu schaffen.",
+    "vaultUnavailable": "Die Maschine deines Workspace hat noch keinen Vault. Sie bekommt ihn mit dem nächsten Update.",
+    "vaultItemNotFound": "Dieser Vault-Eintrag existiert nicht mehr",
+    "vaultAdminOnly": "Nur ein Admin kann das tun",
+    "vaultManageOnly": "Du musst mindestens eine Box verwalten, um etwas zum Vault hinzuzufügen",
+    "vaultConflict": "{coworker} bekommt {name} schon aus einem anderen Vault-Eintrag",
+    "vaultSharedItem": "Diese App kommt aus dem Vault und andere Coworker nutzen sie. Ändere sie im Vault.",
+    "vaultPaidAppEveryone": "Eine kostenpflichtige App wird Coworker für Coworker verbunden",
+    "vaultMethodUnsupported": "Diese App kann noch nicht zum Vault hinzugefügt werden. Verbinde sie über den Tab Apps eines Coworkers.",
+    "vaultConflictEveryone": "Jeder Coworker bekommt {name} schon aus einem anderen Vault-Eintrag, der mit allen geteilt ist",
+    "vaultConflictSomeone": "Ein Coworker bekommt {name} schon aus einem anderen Vault-Eintrag",
+    "vaultMcpTarget": "Gib dem Server eine Adresse oder einen Befehl"
 }

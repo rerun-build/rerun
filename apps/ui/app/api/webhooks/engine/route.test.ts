@@ -175,6 +175,15 @@ describe('POST /api/webhooks/engine', () => {
         })
     })
 
+    describe('a Vault entry signed out', () => {
+        it('takes it without storing a notification: the entry itself says it', async () => {
+            const response = await POST(request({ event: 'box.vault.signed_out', kind: 'connector', agentId: null, message: 'Linear', metadata: { itemId: 'item-1' } }))
+
+            expect(response.status).toBe(202)
+            expect(db.writes('notifications')).toEqual([])
+        })
+    })
+
     describe('notifications', () => {
         it('answers 401 for a token that names no machine and stores nothing', async () => {
             const response = await POST(request(notification(), 'Bearer forged-key'))

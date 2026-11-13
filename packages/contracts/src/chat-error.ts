@@ -38,6 +38,11 @@ export function stripErrorPrefix(message: string): string {
 export const OPENCODE_CREDITS_USED_UP = 'OpenCode Console credits used up'
 export const OPENCODE_GO_LIMIT = 'OpenCode Go limit reached'
 
+// What the engine stores when an OpenAI API key's account has no prepaid credits left, ahead of
+// OpenAI's own sentence: OpenAI answers either "You have no credits remaining" or the older "You
+// exceeded your current quota", and the second one is also Gemini's plain per-minute rate limit.
+export const OPENAI_API_CREDITS_USED_UP = 'OpenAI API credits used up'
+
 // Claude Code builds its own sentence: "You've hit your ${limit}" with the limit named after the
 // window that ran out (`session limit`, `weekly limit`, `Opus limit`, `Sonnet limit`), optionally
 // followed by " · resets <time>". The older wording ("Claude AI usage limit reached|<epoch>") is
@@ -48,7 +53,12 @@ export const OPENCODE_GO_LIMIT = 'OpenCode Go limit reached'
 // once they are spent), Codex "The 'gpt-6-astra' model is not supported when using Codex with a
 // ChatGPT account". Shared with the engine's `classifyProviderError`, so both ends agree.
 export const SUBSCRIPTION_LIMIT =
-    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached/i
+    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|openai api credits used up|no credits remaining|insufficient_quota/i
+
+// The subset of `SUBSCRIPTION_LIMIT` that names OpenAI: the engine's sentence, or OpenAI's own one,
+// which points at platform.openai.com. An OpenAI-compatible gateway answering `insufficient_quota`
+// or "no credits remaining" is out of credits too, but OpenAI is not where the user tops it up.
+export const OPENAI_API_CREDITS = /openai api credits used up|no credits remaining.*platform\.openai\.com/i
 
 // The subset of `SUBSCRIPTION_LIMIT` that names a model the plan does not include, rather than a
 // window that ran out. The chat words both the same way, but the engine reports it under its own

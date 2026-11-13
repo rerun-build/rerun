@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { parseServiceRegistryKey } from '@rerun/contracts'
 import { workspaceDir } from '../config/paths.js'
+import { vaultItemsForAgent } from '../vault/store.js'
 
 // The per-agent "installed connectors" registry is written by the UI into the agent's own
 // workspace, so it travels with the agent. The engine only reads it: it is the sole record of
@@ -36,8 +37,9 @@ export async function readRegistry(id: string): Promise<ServiceRegistry | null> 
     }
 }
 
-// Skill slug → slug of the connector that installed it. An agent with no connector has no
-// registry at all, so absent, unreadable and footprint-less all answer the same empty map.
+// Skill slug → slug of the connector that installed it, whether the coworker installed it itself
+// or a Vault item attached to it wrote it. An agent with no connector has no registry at all, so
+// absent, unreadable and footprint-less all answer the same empty map.
 export async function connectorSkillOwners(id: string): Promise<Map<string, string>> {
     const registry = await readRegistry(id)
     const owners = new Map<string, string>()
@@ -45,6 +47,7 @@ export async function connectorSkillOwners(id: string): Promise<Map<string, stri
         const service = parseServiceRegistryKey(key).slug
         for (const slug of entry?.skills ?? []) if (typeof slug === 'string' && slug) owners.set(slug, service)
     }
+    for (const item of vaultItemsForAgent(id)) for (const skill of item.config.skills) owners.set(skill.slug, item.config.slug ?? item.config.name)
     return owners
 }
 

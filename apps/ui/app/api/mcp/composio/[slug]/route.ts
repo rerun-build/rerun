@@ -3,6 +3,9 @@ import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { ComposioApiError, composioUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
 import { readRegistry, upsertRegistryEntry } from '@/lib/services/registry'
+import { getVaultItem, patchVaultItem } from '@/lib/engine/vault-client'
+import { composioVaultUserId } from '@/lib/vault/composio'
+import type { VaultItemSummary } from '@rerun/contracts'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
@@ -66,6 +69,26 @@ async function notConnectedResponse(id: unknown, ctx: { workspaceId: number; eng
     const connection = await settleNotConnected(ctx.workspaceId, ctx.engineAgentId, key)
     console.warn(`[composio:${key}] tools/call ${ctx.tool}: not connected (${connection}):`, ctx.rawMessage)
     return toolError(id, notConnectedMessage(ctx.name, ctx.slug, connection))
+}
+
+// The entry behind a server of the Vault, read off the box of the authenticated workspace: the right
+// app, and held by the coworker calling.
+async function vaultEntryFor(workspaceId: number, itemId: string, engineAgentId: string, toolkit: string): Promise<VaultItemSummary | null> {
+    try {
+        const item = await getVaultItem(await getWorkspaceConnection(workspaceId), itemId)
+        const holds = item.sharedWithAll || item.agentIds.includes(engineAgentId)
+        return holds && item.composio?.toolkit === toolkit ? item : null
+    } catch {
+        return null
+    }
+}
+
+// An entry that was connected and no longer answers goes back to needs_auth, for every coworker
+// using it: the Vault shows it to reconnect.
+async function vaultNotConnected(id: unknown, workspaceId: number, item: VaultItemSummary, slug: string, name: string): Promise<Response> {
+    const lost = item.status === 'active'
+    if (lost) await patchVaultItem(await getWorkspaceConnection(workspaceId), item.id, { status: 'needs_auth' }).catch(() => {})
+    return toolError(id, notConnectedMessage(name, slug, lost ? 'lost' : 'never'))
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }): Promise<Response> {
@@ -134,11 +157,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
         const { data: agent } = engineAgentId ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: engineAgentId, workspace_id: engine.workspaceId }) : { data: null }
         if (!agent) return rpcError(id, -32603, 'Coworker does not belong to the authenticated workspace')
 
+        // A server of a Vault entry acts as the entry's account, once the calling coworker is proven to
+        // hold it. The header is the engine's own: a server a coworker wrote itself never carries one.
+        const vaultItemId = req.headers.get('x-rerun-vault-item')
+        let vaultItem: VaultItemSummary | null = null
+        if (vaultItemId) {
+            vaultItem = await vaultEntryFor(engine.workspaceId, vaultItemId, engineAgentId, toolkit)
+            if (!vaultItem) return rpcError(id, -32603, 'This coworker does not hold that Vault entry')
+        }
+        const userId = vaultItem ? composioVaultUserId(vaultItem) : composioUserId(agent.id, instanceId)
+
         try {
-            const out = await executeTool(name, composioUserId(agent.id, instanceId), args)
+            const out = await executeTool(name, userId, args)
             if (!out.successful) {
                 const message = out.error ?? 'Tool failed'
                 if (isNotConnectedError(message)) {
+                    if (vaultItem) return vaultNotConnected(id, engine.workspaceId, vaultItem, slug, manifest.name)
                     return notConnectedResponse(id, { workspaceId: engine.workspaceId, engineAgentId, slug, instanceId, name: manifest.name, tool: name, rawMessage: message })
                 }
                 return toolError(id, message)
@@ -149,6 +183,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
             // Order matters: Composio reports a missing connected account as a 404 too, so the
             // not-connected check must run before the 404 → unknown-tool mapping.
             if (isNotConnectedError(message)) {
+                if (vaultItem) return vaultNotConnected(id, engine.workspaceId, vaultItem, slug, manifest.name)
                 return notConnectedResponse(id, { workspaceId: engine.workspaceId, engineAgentId, slug, instanceId, name: manifest.name, tool: name, rawMessage: message })
             }
             if (err instanceof ComposioApiError && err.status === 404) return rpcError(id, -32601, `Unknown tool: ${name}`)

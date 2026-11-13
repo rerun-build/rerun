@@ -1,6 +1,6 @@
 {
     "_doc": "Terms the translation keeps fixed. `keep` stays as written in every language; `translations` imposes a word per language; `tone` is the register of each language.",
-    "keep": ["Rerun", "Rerun Cloud", "Rerun Max", "Chief of Staff", "Box", "Boxes", "Pro", "Max", "Google", "WhatsApp", "LinkedIn", "Slack", "Stripe"],
+    "keep": ["Rerun", "Rerun Cloud", "Rerun Max", "Chief of Staff", "Box", "Boxes", "Pro", "Max", "Google", "WhatsApp", "LinkedIn", "Slack", "Stripe", "Vault"],
     "translations": {
         "coworker": { "fr": "coworker", "es": "coworker", "pt": "coworker", "de": "Coworker" },
         "coworkers": { "fr": "coworkers", "es": "coworkers", "pt": "coworkers", "de": "Coworker" },

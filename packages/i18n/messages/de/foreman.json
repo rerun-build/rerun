@@ -118,7 +118,8 @@
         },
         "settingUp": "<highlight>{title}</highlight> wird eingerichtet",
         "website": {
-            "label": "Website der Firma"
+            "label": "Website der Firma",
+            "platform": "{domain} ist nicht die Website deiner Firma. Gib deine ein oder überspringe."
         },
         "industry": {
             "label": "Branche",

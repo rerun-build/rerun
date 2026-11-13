@@ -1,6 +1,8 @@
-import { parseServiceRegistryKey, sleep } from '@rerun/contracts'
+import { sleep } from '@rerun/contracts'
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
-import { composioUserId, getConnectedAccount } from '@/lib/composio/client'
+import { getConnectedAccount } from '@/lib/composio/client'
+import { composioUserForKey } from '@/lib/vault/composio'
+import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, decodeComposioContext } from '@/lib/composio/oauth'
 import { oauthPopupResponse } from '@/lib/oauth/popup-result'
 import { appReturnUrl } from '@/lib/oauth/app-return'
@@ -76,7 +78,8 @@ export async function GET(req: Request) {
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
-        const userId = composioUserId(ctx.agentId, parseServiceRegistryKey(ctx.key).instanceId)
+        const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, actor, 'manage')
+        const userId = await composioUserForKey(conn, engineAgentId, ctx.agentId, ctx.key)
         const method = (await loadManifest(ctx.key))?.authMethods.find(m => m.kind === 'composio' && m.composio)
         if (!method?.composio) return finish({ ok: false, error: `${ctx.key} has no Composio connection to set up.` })
         const authConfigId = method.composio.authConfigId

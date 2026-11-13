@@ -11,6 +11,8 @@ import { withAuth } from './mcp-auth.js'
 import { withHubHeaders } from './mcp-hub-headers.js'
 import { withInstalledPackage } from './mcp-packages.js'
 import { resolveServerSecrets } from './mcp-resolve.js'
+import { findVaultItem } from '../vault/store.js'
+import type { AgentMcpServer } from '../vault/runtime.js'
 import { toToolInputSchema } from './mcp-schema.js'
 import { logger } from '../lib/logger.js'
 
@@ -94,9 +96,23 @@ export function mcpToolSet(serverName: string, tools: McpTool[], call: McpCall):
 // swapped for the package installed once, when it is. `${RERUN_WORKSPACE}` names the agent's own
 // workspace, for a server that needs an absolute folder (the mail server's attachment root).
 // `hubAgentId` is who the hub sees calling: the agent itself, or the coworker a delegate works for.
-export async function prepareMcpServer(agentId: string, server: McpServer, env: Record<string, string>, hubAgentId = agentId): Promise<McpServer> {
+//
+// A server of a Vault item resolves its ${VAR}s against that item's secrets only, never the
+// coworker's nor another item's, and takes its bearer from the item's own token. `${RERUN_AGENT_ID}`
+// names the coworker calling, which an item shared by several cannot carry as a literal.
+export async function prepareMcpServer(agentId: string, server: AgentMcpServer, env: Record<string, string>, hubAgentId = agentId): Promise<McpServer> {
+    const { vaultItemId, ...plain } = server
+    if (vaultItemId) {
+        const item = findVaultItem(vaultItemId)
+        const resolvable = { ...(item?.env ?? {}), RERUN_WORKSPACE: workspaceDir(agentId), RERUN_AGENT_ID: hubAgentId }
+        const { vaultItemId: _tag, ...authed } = (await withAuth(agentId, server)) as AgentMcpServer
+        // A command the item starts reads its secrets from its environment, as a package installed
+        // with an API key expects to: the item's own, which the spawn of the coworker no longer carries.
+        const withItemEnv = authed.command ? { ...authed, env: { ...(item?.env ?? {}), ...authed.env } } : authed
+        return withInstalledPackage(withHubHeaders(resolveServerSecrets(withItemEnv, resolvable), hubAgentId, vaultItemId))
+    }
     const resolvable = { ...env, RERUN_WORKSPACE: workspaceDir(agentId) }
-    return withInstalledPackage(withHubHeaders(resolveServerSecrets(await withAuth(agentId, server), resolvable), hubAgentId))
+    return withInstalledPackage(withHubHeaders(resolveServerSecrets(await withAuth(agentId, plain), resolvable), hubAgentId))
 }
 
 export class McpProbeTimeoutError extends Error {
@@ -132,7 +148,7 @@ function probeErrorMessage(e: unknown): string {
     return typeof code === 'number' && code >= 400 && !message.includes(String(code)) ? `${message.trimEnd()} (HTTP ${code})` : message
 }
 
-export async function probeMcp(agentId: string, server: McpServer, env: Record<string, string>, opts: { spawn: McpSpawn; timeoutMs?: number }): Promise<McpProbe> {
+export async function probeMcp(agentId: string, server: AgentMcpServer, env: Record<string, string>, opts: { spawn: McpSpawn; timeoutMs?: number }): Promise<McpProbe> {
     const transport = resolveTransport(server)
     try {
         const opening = prepareMcpServer(agentId, server, env).then(prepared => openMcpClient(prepared, opts.spawn))

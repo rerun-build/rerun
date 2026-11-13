@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { APICallError, LoadAPIKeyError, RetryError } from 'ai'
-import { classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, ProviderRefusedError, refusalReason, RUN_ERROR_CODES, STREAM_CUT_RAW_REASON, unreachableEndpointError, upstreamReason } from './provider-errors.js'
+import { classifyChatError, describeSubscriptionLimit } from '@rerun/contracts'
+import { classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, refusalReason, RUN_ERROR_CODES, STREAM_CUT_RAW_REASON, unreachableEndpointError, upstreamReason } from './provider-errors.js'
 import { RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 
 const apiError = (init: { statusCode?: number; message?: string; data?: unknown; isRetryable?: boolean; responseBody?: string }) =>
@@ -18,6 +19,13 @@ const apiError = (init: { statusCode?: number; message?: string; data?: unknown;
 const openAiStreamError = (code: string, message: string) => ({ type: 'error', sequence_number: 2, error: { type: 'invalid_request_error', code, message, param: null } })
 
 const MODEL_NOT_FOUND = 'The model `gpt-6-sol` does not exist or you do not have access to it.'
+
+// An OpenAI API key whose account has no prepaid credits left (RER-106).
+const OPENAI_NO_CREDITS = 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.'
+
+const OPENAI_OLD_QUOTA = 'You exceeded your current quota, please check your plan and billing details.'
+const openAiQuotaBody = (message: string) => ({ error: { message, type: 'insufficient_quota', param: null, code: 'insufficient_quota' } })
+const afterRetries = (lastError: unknown) => new RetryError({ message: `Failed after 3 attempts. Last error: ${errorMessageOf(lastError)}`, reason: 'maxRetriesExceeded', errors: [lastError] })
 
 const SCHEMA_REFUSAL = 'tools.0.custom.input_schema: input_schema does not support oneOf, allOf, or anyOf at the top level'
 
@@ -135,6 +143,48 @@ describe('classifyProviderError', () => {
 
     it('reads an error event of the OpenAI Responses stream', () => {
         expect(classifyProviderError('openai', openAiStreamError('model_not_found', MODEL_NOT_FOUND))).toBe(RUN_ERROR_CODES.modelNotInPlan)
+    })
+
+    // Read off the four failed runs of a box whose OpenAI key had no credits: stored without a code,
+    // they reached the hub as a bare run_error and the chat as the raw sentence.
+    it('reads an OpenAI API account out of credits as a spent quota', () => {
+        const streamed = openAiStreamError('insufficient_quota', OPENAI_NO_CREDITS)
+        expect(errorMessageOf(streamed)).toBe(OPENAI_NO_CREDITS)
+        expect(classifyProviderError('openai', streamed)).toBe(RUN_ERROR_CODES.usageLimit)
+        const refused = apiError({ statusCode: 429, message: OPENAI_NO_CREDITS, isRetryable: true, responseBody: JSON.stringify({ error: { type: 'insufficient_quota', code: 'insufficient_quota', message: OPENAI_NO_CREDITS } }) })
+        expect(classifyProviderError('openai', refused)).toBe(RUN_ERROR_CODES.usageLimit)
+    })
+
+    // OpenAI's older wording for the same code reads like any rate limit: only the body's code tells.
+    it('reads insufficient_quota from the body of a refused call', () => {
+        const refused = apiError({ statusCode: 429, message: OPENAI_OLD_QUOTA, isRetryable: true, data: openAiQuotaBody(OPENAI_OLD_QUOTA), responseBody: JSON.stringify(openAiQuotaBody(OPENAI_OLD_QUOTA)) })
+        expect(classifyProviderError('openai', refused)).toBe(RUN_ERROR_CODES.usageLimit)
+        const bodyOnly = apiError({ statusCode: 429, message: OPENAI_OLD_QUOTA, isRetryable: true, responseBody: JSON.stringify(openAiQuotaBody(OPENAI_OLD_QUOTA)) })
+        expect(classifyProviderError('openai', bodyOnly)).toBe(RUN_ERROR_CODES.usageLimit)
+        expect(classifyProviderError('openai', afterRetries(refused))).toBe(RUN_ERROR_CODES.usageLimit)
+    })
+
+    it('keeps a Gemini quota 429 as a rate limit', () => {
+        const rateLimited = apiError({ statusCode: 429, message: 'You exceeded your current quota, please check your plan and billing details.', isRetryable: true })
+        expect(classifyProviderError('google', rateLimited)).toBe(RUN_ERROR_CODES.overloaded)
+    })
+})
+
+describe('openAiCreditsError', () => {
+    const refused = (message: string) => apiError({ statusCode: 429, message, isRetryable: true, data: openAiQuotaBody(message), responseBody: JSON.stringify(openAiQuotaBody(message)) })
+
+    it('stores an OpenAI account out of credits under the sentence the chat names OpenAI by', () => {
+        for (const error of [openAiStreamError('insufficient_quota', OPENAI_OLD_QUOTA), refused(OPENAI_OLD_QUOTA), afterRetries(refused(OPENAI_OLD_QUOTA)), refused(OPENAI_NO_CREDITS)]) {
+            const stored = errorMessageOf(openAiCreditsError('openai', error))
+            expect(stored).toMatch(/^OpenAiCreditsError: OpenAI API credits used up: You (exceeded|have no credits)/)
+            expect(classifyChatError(stored)).toBe('usage_limit')
+            expect(describeSubscriptionLimit(stored)).toEqual({ plan: 'openai', scope: 'credits' })
+        }
+    })
+
+    it('leaves another provider and another error as they are', () => {
+        expect(openAiCreditsError('custom', refused(OPENAI_OLD_QUOTA))).toBeNull()
+        expect(openAiCreditsError('openai', apiError({ statusCode: 429, message: 'Rate limit reached for requests', isRetryable: true }))).toBeNull()
     })
 })
 

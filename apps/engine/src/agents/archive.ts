@@ -1,7 +1,7 @@
-import { cp, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises'
 import { createReadStream, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { relative, resolve, sep } from 'node:path'
+import { dirname, relative, resolve, sep } from 'node:path'
 import type { Readable } from 'node:stream'
 import { create } from 'tar'
 import {
@@ -26,6 +26,8 @@ import { checkpointAgentDb } from '../db/agentDb.js'
 import { buildCommit } from '../runtime/build-info.js'
 import { badRequest } from '../lib/errors.js'
 import { readRegistry, type RegistryEntry, type ServiceRegistry } from '../services/registry.js'
+import { registryWithVault, withVaultFolded } from '../vault/archive-view.js'
+import { VAULT_SKILLS_MARKER } from '../vault/skills.js'
 
 // An allowlist, not a denylist: anything an agent folder gains later stays out of the archive
 // until someone adds it here on purpose. The goal is a copy as complete as the original, so what
@@ -42,6 +44,9 @@ const SKIP_DIRS = new Set(['node_modules', '.git', '__pycache__', '.venv', 'venv
 // from the agent too. Paid answers are data the workspace bought (emails, phones), and saved pages
 // what it read, not behaviour.
 const SKIP_PATHS = new Set(['memory/archive', 'workspace/.rerun/paid-data', 'workspace/.rerun/pages'])
+// Which skills a Vault item wrote names the box's items: an archive carries those skills as the
+// coworker's own. A duplicate keeps it, or the copy would take them for its own and keep them forever.
+const ARCHIVE_SKIP_FILES = new Set([`skills/${VAULT_SKILLS_MARKER}`])
 
 const ENV_PATH = '.env'
 const CONFIG_PATH = 'config.json'
@@ -109,7 +114,7 @@ export async function listPathsUnder(id: string, roots: readonly string[]): Prom
 }
 
 export async function listArchivablePaths(id: string): Promise<string[]> {
-    return listPathsUnder(id, ARCHIVE_ROOTS)
+    return (await listPathsUnder(id, ARCHIVE_ROOTS)).filter(path => !ARCHIVE_SKIP_FILES.has(path))
 }
 
 function sanitizeVar(value: string): string {
@@ -248,7 +253,7 @@ async function redactionFor(id: string, path: string, agent: LoadedAgent): Promi
     }
 
     if (path === REGISTRY_PATH) {
-        const registry = await readRegistry(id)
+        const registry = registryWithVault(agent, await readRegistry(id))
         return registry ? redactRegistry(registry) : null
     }
 
@@ -262,12 +267,20 @@ async function resolveEntries(id: string, agent: LoadedAgent, exclude: string[])
     const excluded = new Set(exclude)
     const entries: ResolvedEntry[] = []
 
-    for (const path of await listArchivablePaths(id)) {
+    const paths = await listArchivablePaths(id)
+    for (const path of paths) {
         if (excluded.has(path)) continue
         const redaction = await redactionFor(id, path, agent)
         const bytes = redaction ? Buffer.byteLength(redaction.content, 'utf8') : (await stat(resolve(root, path))).size
         entries.push({ path, bytes, redaction })
     }
+    // A coworker holding keys or accounts only through the Vault has no file of its own for them.
+    for (const path of [ENV_PATH, REGISTRY_PATH]) {
+        if (paths.includes(path) || excluded.has(path)) continue
+        const redaction = await redactionFor(id, path, agent)
+        if (redaction?.content) entries.push({ path, bytes: Buffer.byteLength(redaction.content, 'utf8'), redaction })
+    }
+    entries.sort((a, b) => a.path.localeCompare(b.path))
 
     return entries
 }
@@ -290,9 +303,9 @@ function noteFor(path: string, redaction: Redaction | null): string {
 }
 
 export async function planArchive(id: string, exclude: string[] = []): Promise<AgentArchivePlan> {
-    const agent = await getAgent(id)
+    const agent = withVaultFolded(await getAgent(id))
     const root = agentDir(id)
-    const registry = await readRegistry(id)
+    const registry = registryWithVault(agent, await readRegistry(id))
 
     const files: AgentArchiveEntry[] = []
     const redactions: AgentArchiveRedaction[] = []
@@ -385,7 +398,9 @@ async function stageArchive(id: string, agent: LoadedAgent, exclude: string[]): 
     })
 
     for (const { path, redaction } of entries) {
-        if (redaction) await writeFile(resolve(staging, path), redaction.content, 'utf8')
+        if (!redaction) continue
+        await mkdir(dirname(resolve(staging, path)), { recursive: true })
+        await writeFile(resolve(staging, path), redaction.content, 'utf8')
     }
 
     return { staging, entries }
@@ -394,7 +409,7 @@ async function stageArchive(id: string, agent: LoadedAgent, exclude: string[]): 
 // Written to a file rather than piped straight out: tar returns a Minipass stream, not a
 // node stream.Readable, and the response needs a real one. It also gives an exact byte size.
 export async function buildArchive(id: string, exclude: string[] = []): Promise<{ stream: Readable; bytes: number }> {
-    const agent = await getAgent(id)
+    const agent = withVaultFolded(await getAgent(id))
     const { staging, entries } = await stageArchive(id, agent, exclude)
     const tarball = resolve(staging, '..', `${id}-${Date.now()}.tar.gz`)
 
@@ -407,7 +422,7 @@ export async function buildArchive(id: string, exclude: string[] = []): Promise<
             engineCommit: buildCommit(),
             capturedAt: new Date().toISOString(),
             envKeys: requiredEnvKeys(agent),
-            mcpAuth: await mcpAuthServers(id, await readRegistry(id)),
+            mcpAuth: await mcpAuthServers(id, registryWithVault(agent, await readRegistry(id))),
             redactions: entries.filter(entry => entry.redaction?.reason).map(entry => ({ path: entry.path, reason: entry.redaction?.reason ?? '' })),
             excludedPaths: [...exclude].sort(),
         }
