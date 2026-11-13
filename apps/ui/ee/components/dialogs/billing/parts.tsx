@@ -243,7 +243,7 @@ function TestimonialRotation() {
                         <span className="font-medium">{testimonial.author}</span>
                         <span className="truncate text-muted-foreground">· {copy.role}</span>
                         {testimonial.companyLogo ? (
-                            // eslint-disable-next-line @next/next/no-img-element -- a company mark from public/, sized by CSS
+                            // eslint-disable-next-line @next/next/no-img-element -- a company mark bundled with the testimonial, sized by CSS
                             <img src={testimonial.companyLogo} alt={testimonial.company} className="ml-auto size-5 object-contain" />
                         ) : (
                             <span className="ml-auto shrink-0 text-xs font-medium text-muted-foreground">{testimonial.company}</span>
