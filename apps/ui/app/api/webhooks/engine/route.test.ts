@@ -349,6 +349,17 @@ describe('POST /api/webhooks/engine', () => {
             ])
         })
 
+        it('keeps the name someone gave the run, and still records how it ended', async () => {
+            session = { id: 'session-1', source: 'schedule', title: 'Monday applications', automation_name: 'Daily missions apply' }
+            vi.mocked(generateRunTitle).mockResolvedValue({ title: '4 applications sent: Doctolib, Qonto', nothingToReport: false })
+
+            await POST(request(notification({ event: 'agent.schedule.completed', kind: 'done', source: 'schedule', metadata: { scheduleSlug: 'daily', finalText: 'I sent 4 applications…' } })))
+            await afterResponse()
+
+            const update = db.writes('sessions').find(write => write.payload && 'outcome' in (write.payload as object))
+            expect(update?.payload).toEqual({ automation_name: 'Daily missions apply', outcome: 'done' })
+        })
+
         it('leaves the title of a run from an engine that sent no answer', async () => {
             session = { id: 'session-1', source: 'schedule', title: 'Daily missions apply', automation_name: null }
 

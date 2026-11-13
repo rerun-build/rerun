@@ -8,7 +8,7 @@ import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificati
 import { sanitizeIlike } from '@/lib/search/ilike'
 import { cancelRun, getSession, getSessionMessages, listRuns, listSessions, listSkillProposals } from '@/lib/engine/client'
 import type { EngineSkillProposal, SessionSource } from '@/lib/engine/types'
-import { ATTENTION_STATUSES, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
+import { ATTENTION_STATUSES, CONVERSATION_TITLE_MAX, needsHuman, sessionStatusSchema, type AgentConversationsOverview, type Conversation, type ConversationHit, type SessionKind, type SessionOutcome, type SessionStatus, type ToHandleList } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
 import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -310,6 +310,16 @@ export async function markSessionsHandled(ctx: WorkspaceContext, sessionIds: str
         .in('status', [...ATTENTION_STATUSES])
     if (sessionIds !== 'all') update = update.in('id', sessionIds)
     await update
+}
+
+// The name a person gives a conversation, shared by everyone who reaches it. General keeps its
+// fixed name: the `kind` filter leaves its row untouched, and no row written means nothing renamed.
+export async function renameSession(sessionId: string, title: string): Promise<boolean> {
+    const name = title.trim().slice(0, CONVERSATION_TITLE_MAX)
+    if (!name) return false
+    const session = await assertSessionInWorkspace(sessionId)
+    const { data } = await createServiceRoleClient().from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title: name }).eq('id', session.id).eq('kind', 'thread').select('id')
+    return !!data?.length
 }
 
 // Creates the Supabase mirror row for an engine-only session so it can be

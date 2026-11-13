@@ -37,14 +37,14 @@ const STEP_MOTION = {
 // disputeraient le focus, et la seconde ferait défiler la page jusqu'à elle au chargement.
 export function ForemanIntakeCard({ intake, autoFocus = true, className }: { intake: ForemanIntakeController; autoFocus?: boolean; className?: string }) {
     const t = useTranslations('foreman.intake')
-    const { step, draft, index, steps, answered, reachable, canAdvance, submitting, error, industry, siteRead, set, chooseIndustry, chooseRole, skipWebsite, goTo, next } = intake
+    const { step, draft, index, steps, answered, reachable, canAdvance, submitting, error, industry, siteRead, platform, set, chooseIndustry, chooseRole, skipWebsite, goTo, next } = intake
     // Seule la sauvegarde verrouille la carte. La classification de l'industrie, elle, tourne
     // pendant qu'on répond à la question suivante : la seule chose qu'elle décide est ce que le
     // board dessine, et rien ici ne l'attend.
     const busy = submitting
     // Un champ vide n'a rien à valider : le bouton du pied propose de passer sur le site, et la
-    // question du métier prend sa place.
-    const skippable = step === 'company' && !draft.companyUrl.trim()
+    // question du métier prend sa place. Une plateforme non plus, elle ne répond pas à la question.
+    const skippable = step === 'company' && (!draft.companyUrl.trim() || !!platform)
 
     return (
         <div className={cn('relative mb-2 flex flex-col gap-3 overflow-hidden rounded-lg border border-border bg-muted/30 p-3', className)}>
@@ -54,7 +54,7 @@ export function ForemanIntakeCard({ intake, autoFocus = true, className }: { int
             <AnimatedHeight>
                 <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div key={step} {...STEP_MOTION}>
-                        {step === 'company' && <IntakeCompanyStep draft={draft} siteRead={siteRead} disabled={busy} autoFocus={autoFocus} onChange={set} onEnter={next} />}
+                        {step === 'company' && <IntakeCompanyStep draft={draft} siteRead={siteRead} platform={platform} disabled={busy} autoFocus={autoFocus} onChange={set} onEnter={next} />}
                         {step === 'industry' && <IntakeIndustryStep draft={draft} disabled={busy} onChange={set} onChoose={chooseIndustry} onEnter={next} />}
                         {step === 'role' && <IntakeChoiceStep label={t('role.label')} options={rolesForIndustry(industry)} value={draft.position} placeholder={t('role.placeholder')} disabled={busy} onChange={position => set({ position })} onChoose={chooseRole} onEnter={next} />}
                         {step === 'name' && <IntakeTextStep label={t('name.label')} value={draft.firstName} placeholder={t('name.placeholder')} disabled={busy} onChange={firstName => set({ firstName })} onEnter={next} />}

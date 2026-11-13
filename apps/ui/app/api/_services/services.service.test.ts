@@ -5,7 +5,6 @@ import { type RegistryEntry, type ServiceRegistry, readRegistry, removeRegistryE
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
-import { CLOUD_ENTITLEMENTS } from '@/test/cloud-fakes'
 import { dispatchHubTool, getServiceDetails, installService, installedFromRegistry, listInstalledServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService } from './services.service'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -24,7 +23,11 @@ vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toV
 vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
 // The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...CLOUD_ENTITLEMENTS }))
+// The lifetime plan only exists on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
+vi.mock('@rerun/cloud/billing', async importOriginal => ({
+    ...(await importOriginal<object>()),
+    isLifetimePlan: (await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')).isLifetimePlan,
+}))
 
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: true, composio: { toolkit: 'gmail', authConfigId: 'ac', allowedTools: [] } }
 const appMethod = { id: 'app', label: 'Connect', kind: 'app', recommended: true, app: { appSlug: 'whatsapp' } }

@@ -9,6 +9,7 @@ import { cancelRun, reconnectRun } from '@/lib/engine/client'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { installSessionTitle, parseInstallMessage } from '@/lib/chat/install-marker'
+import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -189,12 +190,13 @@ export async function POST(request: Request) {
                 }
                 return Response.json({ error: 'Failed to persist session' }, { status: 500 })
             }
-            // General keeps its name; a thread is named after what it opens with.
+            // General keeps its name; a thread is named after what it opens with, unless someone
+            // renamed it while the title was being written.
             if (!install && !general) {
                 generateSessionTitle(sessionTitleSeed)
                     .then(async title => {
                         const supabase = createServiceRoleClient()
-                        await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title }).eq('id', supabaseSessionId)
+                        await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ title }).eq('id', supabaseSessionId).eq('title', seedSessionTitle(sessionTitleSeed))
                     })
                     .catch(() => {})
             }

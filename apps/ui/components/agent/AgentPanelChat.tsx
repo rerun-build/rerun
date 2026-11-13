@@ -1,6 +1,6 @@
 'use client'
 
-import { getGeneralSessionAction } from '@/app/api/_actions/session.actions'
+import { getGeneralSessionAction, renameSessionAction } from '@/app/api/_actions/session.actions'
 import { useAgentSetup } from '@/hooks/useAgentSetup'
 import { useAgentThreads } from '@/hooks/useAgentThreads'
 import { invalidateAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
@@ -15,9 +15,11 @@ import { AgentSheetChat } from '@/components/agent/AgentSheetChat'
 import { AgentChatsList, type ChatsFilter } from '@/components/agent/sheet/AgentChatsList'
 import { FloatingSurface } from '@/components/agent/sheet/floating'
 import { OpenChatsTabs } from '@/components/agent/sheet/OpenChatsTabs'
+import { useSessionRename } from '@/components/agent/sheet/SessionRename'
 import { CloseRunningTabDialog } from '@/components/dialogs/CloseRunningTabDialog'
 import { Button } from '@/components/ui/button'
 import { ArrowRightIcon, WrenchIcon } from '@/lib/icons'
+import { cn } from '@/lib/utils'
 
 // Combien de conversations restent montées derrière celle qu'on lit. Un onglet gardé vivant garde
 // tout son transcript dans le DOM, donc le coût d'un re-render du panneau grandit avec le nombre de
@@ -152,6 +154,18 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         [tabs, closeTab]
     )
 
+    // The tab takes the new title at once: the sessions channel brings it too, to every other client.
+    const renameSession = useCallback(
+        async (sessionId: string, title: string) => {
+            const renamed = await renameSessionAction(sessionId, title)
+            if (renamed) updateTabTitle(sessionId, title)
+            return renamed
+        },
+        [updateTabTitle]
+    )
+    const tabRename = useSessionRename(renameSession)
+    const tabRenameFailed = tabRename.rename?.status === 'error' && tabs.some(tab => tab.id === tabRename.rename?.id)
+
     useEffect(() => {
         if (!openSessionRequest) return
         if (openSessionRequest.runId) setKickoffRun({ sessionId: openSessionRequest.sessionId, runId: openSessionRequest.runId })
@@ -202,10 +216,10 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     return (
         <div className="flex flex-col h-full">
             {/* Room for the pills that float over the top of the panel, and the open conversations under them. */}
-            <div className="h-24 shrink-0" />
+            <div className={cn('shrink-0', tabRenameFailed ? 'h-[7.25rem]' : 'h-24')} />
             {selected && (
                 <div className="absolute inset-x-0 top-[3.75rem] z-20">
-                    <OpenChatsTabs tabs={tabs} activeIndex={activeIndex} onSelect={selectTab} onClose={requestCloseTab} onCreate={createNew} />
+                    <OpenChatsTabs tabs={tabs} activeIndex={activeIndex} onSelect={selectTab} onClose={requestCloseTab} onCreate={createNew} rename={tabRename} />
                 </div>
             )}
             {/* Skipping hides the gate, not the fact that the agent still has nothing connected. */}
@@ -267,6 +281,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                                 openTab(sessionId, title)
                                 onCloseChats()
                             }}
+                            onRename={renameSession}
                             onCreateNew={() => {
                                 createNew()
                                 onCloseChats()

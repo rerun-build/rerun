@@ -36,7 +36,8 @@
         "emptyThreads": "Aún no hay hilos.",
         "emptyAutomations": "Aún no hay ejecuciones automáticas.",
         "running": "En curso",
-        "startedBy": "Iniciado por {name}"
+        "startedBy": "Iniciado por {name}",
+        "moreFor": "Más opciones de {title}"
     },
     "agentComputerThumbnail": {
         "working": "Trabajando en su computadora",
@@ -75,8 +76,14 @@
     },
     "openChatsTabs": {
         "closeTab": "Cerrar {title}",
+        "closeTabMenu": "Cerrar pestaña",
         "newThread": "Nuevo hilo",
         "general": "General"
+    },
+    "sessionRename": {
+        "rename": "Renombrar",
+        "label": "Nombre de la conversación",
+        "failed": "No se pudo renombrar. Inténtalo de nuevo."
     },
     "threadBranch": {
         "needs": "Te necesita",

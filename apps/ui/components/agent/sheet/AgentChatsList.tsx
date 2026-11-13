@@ -10,12 +10,15 @@ import type { SessionHistoryEntry } from '@/app/api/_services/conversation.servi
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAttentionSessions } from '@/hooks/useAttentionSessions'
-import { CalendarClock, CheckCheckIcon, LoaderIcon, MessageCircle, PlusIcon, WebhookIcon, XIcon } from '@/lib/icons'
+import { CalendarClock, CheckCheckIcon, EllipsisIcon, LoaderIcon, MessageCircle, PencilIcon, PlusIcon, WebhookIcon, XIcon } from '@/lib/icons'
 import { messageDayLabel, messageTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
+
+import { ChatRowRenameField, useSessionRename, type SessionRename } from './SessionRename'
 
 export type ChatsFilter = 'all' | 'chats' | 'automations' | 'needs'
 
@@ -27,6 +30,7 @@ type AgentChatsListProps = {
     activeSessionId: string | null
     initialFilter: ChatsFilter
     onSelect: (sessionId: string, title: string) => void
+    onRename: (sessionId: string, title: string) => Promise<boolean>
     onCreateNew: () => void
     onClose: () => void
 }
@@ -36,7 +40,7 @@ type AgentChatsListProps = {
  * any other, only marked, and opening it leads back into it. General is not listed: it has its own
  * tab, always there. The filter replaces the inbox the panel used to carry beside the chat.
  */
-export function AgentChatsList({ agentId, agentName, activeSessionId, initialFilter, onSelect, onCreateNew, onClose }: AgentChatsListProps) {
+export function AgentChatsList({ agentId, agentName, activeSessionId, initialFilter, onSelect, onRename, onCreateNew, onClose }: AgentChatsListProps) {
     const t = useTranslations('agent.agentChatsList')
     const [filter, setFilter] = useState<ChatsFilter>(initialFilter)
     const [history, setHistory] = useState<SessionHistoryEntry[] | null>(null)
@@ -80,6 +84,17 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
             setAdopting(null)
         }
     }
+
+    // The history is not read again while the list is open: the new title is written into it.
+    const rename = useSessionRename(async (engineSessionId, title) => {
+        const entry = history?.find(candidate => candidate.engineSessionId === engineSessionId)
+        if (!entry) return false
+        // Like opening it: a conversation that lives on the engine only gets its row first.
+        const sessionId = entry.id ?? (await adoptEngineSessionAction(agentId, engineSessionId, entry.title))
+        if (!(await onRename(sessionId, title))) return false
+        setHistory(entries => entries?.map(candidate => (candidate.engineSessionId === engineSessionId ? { ...candidate, id: sessionId, title } : candidate)) ?? entries)
+        return true
+    })
 
     return (
         <div className="flex min-h-0 flex-col">
@@ -136,13 +151,14 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                         <div key={day} className="pb-1">
                             <p className="px-2.5 pb-1 pt-2 text-[11px] font-medium text-muted-foreground">{day}</p>
                             {entries.map(entry => (
-                                <ChatRow
+                                <ChatListRow
                                     key={entry.engineSessionId}
                                     entry={entry}
                                     active={!!entry.id && entry.id === activeSessionId}
                                     running={!!entry.id && runningIds.has(entry.id)}
                                     adopting={adopting === entry.engineSessionId}
                                     onOpen={() => void open(entry)}
+                                    rename={rename}
                                 />
                             ))}
                         </div>
@@ -169,7 +185,46 @@ export function groupByDay(entries: SessionHistoryEntry[], locale?: string) {
     return days
 }
 
-export function ChatRow({ entry, active, running, adopting, onOpen }: { entry: SessionHistoryEntry; active: boolean; running: boolean; adopting: boolean; onOpen: () => void }) {
+type ChatRowProps = { entry: SessionHistoryEntry; active: boolean; running: boolean; adopting: boolean; onOpen: () => void }
+
+/**
+ * A row of the list with what can be done to it. The row is one button from edge to edge, so its
+ * menu sits beside it, over the time, rather than inside it. Renaming turns the row into a field.
+ */
+export function ChatListRow({ rename, ...row }: ChatRowProps & { rename: SessionRename }) {
+    const t = useTranslations('agent.agentChatsList')
+    const tRename = useTranslations('agent.sessionRename')
+    const { entry } = row
+    const renaming = rename.rename?.id === entry.engineSessionId ? rename.rename : null
+    if (renaming) {
+        return <ChatRowRenameField title={entry.title} status={renaming.status} focus={renaming.focus} onSubmit={title => void rename.submit(entry.engineSessionId, title)} onCancel={rename.cancel} />
+    }
+    return (
+        <div className="group/row relative [@media(hover:none)]:pr-8">
+            <ChatRow {...row} />
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        aria-label={t('moreFor', { title: entry.title })}
+                        variant="ghost"
+                        size="icon-sm"
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-background opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100 [@media(hover:none)]:right-0 [@media(hover:none)]:bg-transparent [@media(hover:none)]:opacity-100"
+                    >
+                        <EllipsisIcon className="size-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-auto">
+                    <DropdownMenuItem onSelect={() => rename.start(entry.engineSessionId)}>
+                        <PencilIcon />
+                        {tRename('rename')}
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    )
+}
+
+export function ChatRow({ entry, active, running, adopting, onOpen }: ChatRowProps) {
     const t = useTranslations('agent.agentChatsList')
     const locale = useLocale()
     const SourceIcon = entry.source === 'trigger' ? WebhookIcon : CalendarClock
@@ -208,7 +263,7 @@ export function ChatRow({ entry, active, running, adopting, onOpen }: { entry: S
 
 const SKELETON_WIDTHS = ['w-3/4', 'w-1/2', 'w-2/3', 'w-3/5']
 
-function ChatsSkeleton() {
+export function ChatsSkeleton() {
     return (
         <>
             {SKELETON_WIDTHS.map((width, i) => (

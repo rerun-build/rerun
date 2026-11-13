@@ -17,7 +17,6 @@ export const CLOUD_ENTITLEMENTS = {
     isPaidSubscription,
     isWorkspaceApiEntitled: (workspace: WorkspacePlan) => workspace.is_sandbox || isSubscriptionEntitled(workspace.subscription_status),
     activeAgentLimitFor: (maxAgents: number | null, status: string | null | undefined) => (isSubscriptionEntitled(status) ? maxAgents : 0),
-    isLifetimePlan: (workspace: { plan: string | null } | null | undefined) => workspace?.plan === 'lifetime',
 }
 
 type PhoneRow = { verified_at: string | null; skipped_at: string | null; unverifiable_at: string | null } | null

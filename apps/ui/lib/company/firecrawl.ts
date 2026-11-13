@@ -1,3 +1,5 @@
+import { platformHost } from '@rerun/contracts'
+
 import { normalizeDomain } from '@/lib/services/brand-icon'
 
 const FIRECRAWL_BASE_URL = process.env.RERUN_FIRECRAWL_BASE_URL ?? 'https://api.firecrawl.dev'
@@ -13,10 +15,11 @@ const PRIVATE_HOST = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\
 
 // The onboarding field takes whatever people type: "acme.com", "www.acme.com/fr", a full URL.
 // Returns null when there is nothing that could be a public site, which is the signal to skip the
-// analysis entirely rather than spend a scrape on it.
+// analysis entirely rather than spend a scrape on it. A platform (linkedin.com, facebook.com) is
+// never a company's site: reading it would describe the platform.
 export function companySiteUrl(input: string): string | null {
     const domain = normalizeDomain(input)
-    if (!domain.includes('.') || PRIVATE_HOST.test(domain)) return null
+    if (!domain.includes('.') || PRIVATE_HOST.test(domain) || platformHost(domain)) return null
     if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) return null
     return `https://${domain}`
 }

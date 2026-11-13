@@ -1,6 +1,6 @@
 'use server'
 
-import { isTemplateCategory, type TemplateCategory } from '@rerun/contracts'
+import { isTemplateCategory, platformHost, type TemplateCategory } from '@rerun/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { decideIndustry } from '@/lib/company/decide-industry'
@@ -25,6 +25,7 @@ import type { ForemanIntake } from '@/lib/onboarding/intake'
  */
 export async function decideIndustryAction(input: string): Promise<TemplateCategory | null> {
     const ctx = await requireWorkspaceContext()
+    if (platformHost(input)) return null
     if (!takeIntakeCall(ctx.workspace.id, 'decide')) return null
     const decision = await decideIndustry(input)
     return decision?.industry ?? null

@@ -9,6 +9,7 @@ export { Popover, PopoverAnchor, PopoverContent, PopoverDescription, PopoverHead
 export { Calendar, calendarLocaleFr } from './calendar'
 export type { DateRange } from './calendar'
 export { useDialogPortalContainer } from './use-dialog-portal-container'
+export { useRenameField } from './use-rename-field'
 export { FileDropzone } from './file-dropzone'
 export { Select } from './select'
 export { MultiSelect } from './multi-select'

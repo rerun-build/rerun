@@ -6,11 +6,14 @@ import * as engine from '@/lib/engine/client'
 import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
-import { CLOUD_ENTITLEMENTS } from '@/test/cloud-fakes'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAiConnectionAction, updateAiConnectionKeysAction } from './workspace-connection.actions'
 
-vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...CLOUD_ENTITLEMENTS }))
+// The lifetime plan only exists on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
+vi.mock('@rerun/cloud/billing', async importOriginal => ({
+    ...(await importOriginal<object>()),
+    isLifetimePlan: (await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')).isLifetimePlan,
+}))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireAdminContext: vi.fn(), requireWorkspaceId: vi.fn() }))
 vi.mock('@/app/api/_services/capacity.service', () => ({
     NoPlanError: class NoPlanError extends Error {

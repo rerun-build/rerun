@@ -36,7 +36,8 @@
         "emptyThreads": "Nenhum tópico ainda.",
         "emptyAutomations": "Nenhuma automação ainda.",
         "running": "Em execução",
-        "startedBy": "Iniciado por {name}"
+        "startedBy": "Iniciado por {name}",
+        "moreFor": "Mais opções de {title}"
     },
     "agentComputerThumbnail": {
         "working": "Trabalhando no computador",
@@ -75,8 +76,14 @@
     },
     "openChatsTabs": {
         "closeTab": "Fechar {title}",
+        "closeTabMenu": "Fechar aba",
         "newThread": "Novo tópico",
         "general": "Geral"
+    },
+    "sessionRename": {
+        "rename": "Renomear",
+        "label": "Nome da conversa",
+        "failed": "Não foi possível renomear. Tente de novo."
     },
     "threadBranch": {
         "needs": "Precisa de você",

@@ -18,6 +18,7 @@
         "intake.role.placeholder": "Example job title in an empty field.",
         "intake.name.placeholder": "Example first name in an empty field.",
         "intake.skip": "Button: skip the company website question.",
+        "intake.website.platform": "Shown under the company website field when the person typed a social network or page host instead of their own site. {domain} is that platform's address (e.g. linkedin.com).",
         "ownEntry": "The way out of the onboarding cards: the person already knows which coworker they want and writes it themselves.",
         "gettingStarted.pillLabel": "Accessible label of the checklist pill.",
         "gettingStarted.reward.lockedDescription": "{total} is the number of steps of the checklist, {remaining} how many are left.",
@@ -159,7 +160,8 @@
         },
         "settingUp": "Setting up <highlight>{title}</highlight>",
         "website": {
-            "label": "Company website"
+            "label": "Company website",
+            "platform": "{domain} is not your company's site. Enter yours, or skip."
         },
         "industry": {
             "label": "Industry",

@@ -1,5 +1,6 @@
-# Konductor flow for a Linear issue labeled Improvement: context, plan, build, review, review fixes, summary, PR, merge,
-# then close the card.
+# Konductor flow for a Linear issue labeled Improvement: context, plan and build (Opus 5.5), review, review fixes, summary,
+# wait for the PR you open and merge, then close the card.
+# Plan and build are one step: an approved plan is built in the same turn, so a separate Build step would start after it.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Improvement"
 match = { labels = ["Improvement"] }
@@ -7,6 +8,7 @@ match = { labels = ["Improvement"] }
 [[steps]]
 id = "context"
 title = "Context"
+model = "opus-5-5-1m"
 attach_issue = true
 prompt = """
 Passe la carte Linear {{issue.identifier}} en In Progress avec le MCP Linear si elle n'y est pas déjà.
@@ -16,17 +18,13 @@ Vérifie que l'amélioration n'est pas déjà faite, puis rassemble le contexte 
 
 [[steps]]
 id = "plan"
-title = "Plan the improvement"
+title = "Plan and build"
+model = "opus-5-5-1m"
 plan = true
 approve = "auto"
-prompt = "Planifie l'amélioration à partir de ce contexte."
-
-[[steps]]
-id = "build"
-title = "Build"
 prompt = """
-Construis le plan approuvé, lance les tests à distance et vérifie dans l'app avec verify-in-app si ça se voit.
-Ne crée ni commit, ni push, ni pull request.
+Planifie l'amélioration à partir de ce contexte. Une fois le plan approuvé, construis-le, lance les tests à distance et
+vérifie dans l'app avec verify-in-app si ça se voit. Ne crée ni commit, ni push, ni pull request.
 """
 
 [[steps]]
@@ -38,6 +36,7 @@ kind = "review"
 id = "fixes"
 title = "Review fixes"
 chat = "review"
+model = "opus-5-5-1m"
 plan = true
 approve = "human"
 comments = ["blocking", "major", "minor", "nit"]
@@ -51,16 +50,12 @@ Planifie la correction des blocking et major, et des minor / nit faciles. Dis po
 id = "summary"
 title = "Summary"
 chat = "summary"
+model = "opus-5-5-1m"
 linear_comment = true
 prompt = """
 Lis {{issue.file}} et le diff du workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request.
 Résume pour la personne qui merge : l'amélioration, ce qui a changé, comment c'est testé. Court, en français.
 """
-
-[[steps]]
-id = "pr"
-title = "Create PR"
-kind = "create_pr"
 
 [[steps]]
 id = "merge"

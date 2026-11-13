@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { EMPTY_DRAFT, furthestReachable, industryHint, intakeSteps, stepAnswered, toIntake } from './steps'
+import { EMPTY_DRAFT, furthestReachable, industryHint, intakeSteps, platformHost, stepAnswered, toIntake } from './steps'
 
 describe('intakeSteps', () => {
     it('asks for a name only when nothing holds one', () => {
@@ -21,6 +21,9 @@ describe('stepAnswered', () => {
         expect(stepAnswered('company', { ...EMPTY_DRAFT, companyUrl: 'rerun.build' })).toBe(true)
         expect(stepAnswered('company', { ...EMPTY_DRAFT, websiteSkipped: true })).toBe(true)
         expect(stepAnswered('company', { ...EMPTY_DRAFT, industry: 'saas' })).toBe(false)
+        expect(stepAnswered('company', { ...EMPTY_DRAFT, companyUrl: 'linkedin.com/company/acme' })).toBe(false)
+        expect(stepAnswered('company', { ...EMPTY_DRAFT, companyUrl: 'acme.wixsite.com' })).toBe(true)
+        expect(furthestReachable(['company', 'role'], { ...EMPTY_DRAFT, companyUrl: 'facebook.com', position: 'Founder' })).toBe(0)
     })
 
     it('counts a picked industry or their own words as an answer to the second', () => {
@@ -75,5 +78,23 @@ describe('industryHint', () => {
         expect(industryHint({ ...EMPTY_DRAFT, companyUrl: 'rerun.build', industryLabel: 'bakery' })).toBe('rerun.build')
         expect(industryHint({ ...EMPTY_DRAFT, industryLabel: 'bakery' })).toBe('bakery')
         expect(industryHint(EMPTY_DRAFT)).toBeNull()
+    })
+})
+
+describe('platformHost', () => {
+    it('names the platform typed instead of a site of their own', () => {
+        expect(platformHost('linkedin.com')).toBe('linkedin.com')
+        expect(platformHost('  https://www.LinkedIn.com/company/acme ')).toBe('linkedin.com')
+        expect(platformHost('fr.linkedin.com/in/jane')).toBe('linkedin.com')
+        expect(platformHost('facebook.com/acme')).toBe('facebook.com')
+        expect(platformHost('m.facebook.com')).toBe('facebook.com')
+        expect(platformHost('linktr.ee/acme')).toBe('linktr.ee')
+        expect(platformHost('http://wa.me/33600000000')).toBe('wa.me')
+    })
+
+    it('leaves a site of their own alone, on a page host included', () => {
+        for (const input of ['acme.com', 'rerun.build', 'acme.wixsite.com/shop', 'acme.substack.com', 'linkedin-tools.io', 'notlinkedin.com', 'facebook.company', '', 'bakery']) {
+            expect(platformHost(input)).toBeNull()
+        }
     })
 })

@@ -3,7 +3,7 @@
 import { assertAgentAccess, assertSessionInWorkspace } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { clearSessionAlert, findGeneralSession, findIdleSessions, findSessionActiveRun, type GeneralSession } from '@/app/api/_services/chat.service'
-import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentSessions, listAgentThreads, readSessionMessages, readSessionSnapshot, searchWorkspaceConversations, type ConversationHit, type SessionHistoryEntry, type SessionSnapshot, type ThreadRow } from '@/app/api/_services/conversation.service'
+import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentSessions, listAgentThreads, readSessionMessages, readSessionSnapshot, renameSession, searchWorkspaceConversations, type ConversationHit, type SessionHistoryEntry, type SessionSnapshot, type ThreadRow } from '@/app/api/_services/conversation.service'
 
 export async function finalizeSessionAction(sessionId: string, status: 'idle' | 'error', options?: { onlyWhileWorking?: boolean }): Promise<void> {
     await finalizeSession(sessionId, status, options).catch(() => {})
@@ -39,6 +39,10 @@ export async function searchConversationsAction(query: string, agentId?: string)
 
 export async function adoptEngineSessionAction(agentId: string, engineSessionId: string, title: string): Promise<string> {
     return adoptEngineSession(agentId, engineSessionId, title)
+}
+
+export async function renameSessionAction(sessionId: string, title: string): Promise<boolean> {
+    return renameSession(sessionId, title).catch(() => false)
 }
 
 export async function fetchSessionMessages(sessionId: string) {

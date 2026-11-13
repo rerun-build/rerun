@@ -21,6 +21,7 @@ import type { IntakeDraft } from './steps'
 type IntakeCompanyStepProps = {
     draft: IntakeDraft
     siteRead: ForemanIntakeController['siteRead']
+    platform: ForemanIntakeController['platform']
     disabled?: boolean
     autoFocus?: boolean
     onChange: (patch: Partial<IntakeDraft>) => void
@@ -34,12 +35,12 @@ const ADORNMENT_MOTION = {
     transition: { duration: 0.15 },
 }
 
-export function IntakeCompanyStep({ draft, siteRead, disabled, autoFocus, onChange, onEnter }: IntakeCompanyStepProps) {
+export function IntakeCompanyStep({ draft, siteRead, platform, disabled, autoFocus, onChange, onEnter }: IntakeCompanyStepProps) {
     const t = useTranslations('foreman.intake')
     const siteId = useId()
 
     return (
-        <Field label={t('website.label')} htmlFor={siteId}>
+        <Field label={t('website.label')} htmlFor={siteId} error={platform ? t('website.platform', { domain: platform }) : undefined}>
             <div className="relative">
                 <Input
                     id={siteId}
