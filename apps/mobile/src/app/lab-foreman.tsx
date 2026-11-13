@@ -8,6 +8,7 @@ import { scheduleOnRN } from 'react-native-worklets'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Composer } from '@/components/chat/Composer'
+import { BLUR_ABOVE_FOOTER, FooterFade } from '@/components/chat/ConversationPane'
 import { ConversationSkeleton } from '@/components/chat/ConversationSkeleton'
 import { HitlBlock } from '@/components/chat/hitl/HitlBlock'
 import { MessageView } from '@/components/chat/MessageView'
@@ -139,7 +140,7 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
     return (
         <Animated.View style={[{ flex: 1 }, lift]}>
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-                <ScrollView ref={scroll} style={StyleSheet.absoluteFill} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ flexGrow: 1, justifyContent: messages.length || loading ? 'flex-end' : 'center', paddingTop: topInset, paddingBottom: footerHeight + 32, paddingHorizontal: spacing.xl - 4 }}>
+                <ScrollView ref={scroll} style={StyleSheet.absoluteFill} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ flexGrow: 1, justifyContent: messages.length || loading ? 'flex-end' : 'center', paddingTop: topInset, paddingBottom: footerHeight + BLUR_ABOVE_FOOTER, paddingHorizontal: spacing.xl - 4 }}>
                     {loading && <ConversationSkeleton />}
                     {messages.length === 0 && !loading && <ForemanEmptyStateView model={teamEmptyStateOf({ agents: coworkers.map(coworker => ({ id: coworker.id, name: coworker.name, handle: null, status: coworker.status, disabledAt: null })), nextRoutine: null, firstName: 'Clément' })} onSend={noop} onPrefill={noop} />}
                     {messages.length > 0 && (
@@ -153,7 +154,7 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
                         </View>
                     )}
                 </ScrollView>
-                <ProgressiveBlur height={footerHeight + 32} veiled={!seeThrough} />
+                {seeThrough ? <ProgressiveBlur height={footerHeight + BLUR_ABOVE_FOOTER} veiled={false} /> : <FooterFade footerHeight={footerHeight} />}
                 <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, paddingTop: spacing.sm }}>
                     {(state === 'conversation' || state === 'long') && !draft && <Suggestions items={SUGGESTIONS} onPick={noop} />}
                     {!blockShown && (

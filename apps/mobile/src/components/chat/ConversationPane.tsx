@@ -28,6 +28,7 @@ import { CHAT_COLUMN_MAX_WIDTH } from '@/components/layout/split'
 import { connectHref } from '@/components/providers/routes'
 import { AppText } from '@/components/ui/AppText'
 import { moodOf } from '@/components/ui/CoworkerAvatar'
+import { EdgeFade } from '@/components/ui/EdgeFade'
 import { PillButton } from '@/components/ui/PillButton'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -63,8 +64,8 @@ import { ThreadBranch } from './threads/ThreadBranch'
 import { TimedTurns } from './TimedTurns'
 import { useKeyboardShown } from './useKeyboardShown'
 
-// The transcript scrolls under the suggestions and the composer, going out of focus this far above
-// them; scrolled to the end, the last message rests just above that band, sharp.
+// The transcript scrolls under the suggestions and the composer, dissolving into the background over
+// this band above them; scrolled to the end, the last message rests just above that band, sharp.
 export const BLUR_ABOVE_FOOTER = 32
 // How far above the end the thread still counts as at the bottom, and keeps following what comes.
 const AT_BOTTOM = 24
@@ -72,6 +73,13 @@ const AT_BOTTOM = 24
 const SEEN_BAND = 24
 
 export type ChatCoworker = { id: string; kind: 'coworker' | 'foreman'; name: string; role: string; status: AgentView['agent']['status'] }
+
+// The background veiling the transcript under the footer: opaque behind the chips and the composer,
+// whose glass lets high-contrast text through, then fading out over the band above. The composer stays
+// sharp over it, where a blur had muddied it.
+export function FooterFade({ footerHeight }: { footerHeight: number }) {
+    return <EdgeFade edge="bottom" height={footerHeight + BLUR_ABOVE_FOOTER} solid={footerHeight} />
+}
 
 type ConversationPaneProps = {
     coworker: ChatCoworker
@@ -465,6 +473,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                         </LayoutAnimationConfig>
                     )}
                 </ScrollView>
+                <FooterFade footerHeight={footerHeight} />
                 {floatingShown && (
                     <FloatingScreen top={insets.top + CHAT_HEADER_HEIGHT + spacing.xs} label={takeover ? t('openBrowser') : t('takeControl')} onTakeControl={takeControl}>
                         <ScreenMirror frames={screen.frames} />
@@ -481,7 +490,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                     </Animated.View>
                 )}
 
-                <View onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: replacesComposer && !alert ? 0 : spacing.sm }}>
+                <View testID="conversation-footer" onLayout={event => setFooterHeight(event.nativeEvent.layout.height)} style={{ gap: spacing.md, width: '100%', maxWidth: CHAT_COLUMN_MAX_WIDTH, alignSelf: 'center', paddingTop: replacesComposer && !alert ? 0 : spacing.sm }}>
                     {alert && (
                         <Animated.View entering={FadeInDown.duration(280)} exiting={FadeOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
                             <AlertWidget

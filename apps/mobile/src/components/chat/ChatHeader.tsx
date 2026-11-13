@@ -1,5 +1,5 @@
 import type { SessionKind, SessionStatus } from '@rerun/contracts'
-import { Platform, Pressable, View } from 'react-native'
+import { Pressable, View } from 'react-native'
 import Animated, { Extrapolation, FadeIn, interpolate, LayoutAnimationConfig, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
@@ -187,8 +187,9 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
 
     return (
         <View pointerEvents="box-none" style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-            {/* Android's pill is opaque, not glass: what scrolls under it is hidden down to its bottom, then fades. */}
-            <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + 16} solid={Platform.OS === 'android' ? insets.top + spacing.xs + PILL_HEIGHT : undefined} />
+            {/* What scrolls under the pill is hidden down to its bottom (its glass lets text through), then
+                fades out until where the thread starts, so the first message is never dimmed. */}
+            <EdgeFade edge="top" height={insets.top + CHAT_HEADER_HEIGHT + spacing.lg} solid={insets.top + spacing.xs + PILL_HEIGHT} />
             <View pointerEvents="box-none" style={{ paddingTop: insets.top + spacing.xs, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
                 {onBack ? <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} /> : <View style={{ width: GLASS_BUTTON_SIZE }} />}
                 <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center' }}>

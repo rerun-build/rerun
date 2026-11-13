@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react-native'
+import { StyleSheet } from 'react-native'
 
 import { EdgeFade } from '@/components/ui/EdgeFade'
 
@@ -21,10 +22,13 @@ describe('EdgeFade', () => {
     it('eases out from the edge by default', async () => {
         await render(<EdgeFade edge="top" height={100} />)
         expect(stops()).toEqual(['stop:0:1', 'stop:0.55:0.85', 'stop:1:0'])
+        expect(screen.queryByTestId('edge-fade-solid')).toBeNull()
     })
 
-    it('stays opaque over its solid part, then fades out', async () => {
-        await render(<EdgeFade edge="top" height={100} solid={75} />)
-        expect(stops()).toEqual(['stop:0:1', 'stop:0.75:1', 'stop:1:0'])
+    it('stays opaque over its solid part, as a plain view the glass above sees, then fades out', async () => {
+        await render(<EdgeFade edge="bottom" height={100} solid={75} />)
+        const solid = StyleSheet.flatten(screen.getByTestId('edge-fade-solid').props.style)
+        expect(solid).toMatchObject({ bottom: 0, height: 75 })
+        expect(stops()).toEqual(['stop:0:1', 'stop:1:0'])
     })
 })
