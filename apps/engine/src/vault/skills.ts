@@ -14,10 +14,10 @@ import { vaultItemsForAgent } from './store.js'
 
 // Which skills of a coworker's folder a Vault item wrote, by slug: the only ones a sync may rewrite
 // or remove. A dotfile, so the skill listing (folders holding a SKILL.md) never shows it.
-const MARKER = '.vault-skills.json'
+export const VAULT_SKILLS_MARKER = '.vault-skills.json'
 const markerSchema = z.record(z.string(), z.string())
 
-const markerPath = (agentId: string) => resolve(skillsDir(agentId), MARKER)
+const markerPath = (agentId: string) => resolve(skillsDir(agentId), VAULT_SKILLS_MARKER)
 
 async function readMarker(agentId: string): Promise<Record<string, string>> {
     const path = markerPath(agentId)

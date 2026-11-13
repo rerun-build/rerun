@@ -245,6 +245,29 @@ export async function deleteVaultItem(id: string): Promise<{ detached: string[] 
     })
 }
 
+// A copy of a coworker on the same box holds what the coworker held, as it keeps the rest of its
+// folder. An item that would clash on the copy, which the source passed, is left out with a log.
+export async function copyVaultAttachments(fromAgentId: string, toAgentId: string): Promise<string[]> {
+    return withVaultLock(async () => {
+        await assertAgentsExist([toAgentId])
+        const attached: string[] = []
+        for (const item of await listVaultItems()) {
+            if (!item.config.agentIds.includes(fromAgentId) || item.config.agentIds.includes(toAgentId)) continue
+            const config = { ...item.config, agentIds: [...item.config.agentIds, toAgentId], updatedAt: nowIso() }
+            try {
+                await assertNoConflicts({ id: item.id, config, env: item.env })
+            } catch (err) {
+                logger.warn({ item: item.id, agent: toAgentId, err: String(err) }, 'vault item left off a duplicated agent')
+                continue
+            }
+            await writeItemConfig(item.id, config)
+            reload(item.id)
+            attached.push(item.id)
+        }
+        return attached
+    })
+}
+
 // A coworker deleted from the box leaves every item it was attached to, so a coworker created later
 // under the same id never inherits its accounts.
 export async function forgetVaultAgent(agentId: string): Promise<string[]> {

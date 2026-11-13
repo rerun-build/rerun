@@ -27,7 +27,7 @@ import { finishTakeover } from '../../desktop/takeover.js'
 import { agentDir, configPath, installPath, soulPath } from '../../config/paths.js'
 import { agentToolCatalog } from '../../tools/catalog.js'
 import type { RunModel } from '../../agents/availability.js'
-import { forgetVaultAgent } from '../../vault/store.js'
+import { copyVaultAttachments, forgetVaultAgent } from '../../vault/store.js'
 import { agentMcpServers } from '../../vault/runtime.js'
 import { applyVaultChange } from '../../vault/apply.js'
 
@@ -90,6 +90,7 @@ agentRoutes.post('/:id/duplicate', async c => {
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
     const body = duplicateAgentSchema.parse(await c.req.json())
     const copy = await duplicateAgent(id, body)
+    await copyVaultAttachments(id, copy.id)
     await applyVaultChange([copy.id])
     return c.json(copy, 201)
 })
