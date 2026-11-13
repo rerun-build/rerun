@@ -1,4 +1,4 @@
-# Konductor flow for a Linear issue labeled Harness Use Case: replay the case, plan (approved by the flow), review, fix the review
+# Konductor flow for a Linear issue labeled Harness Use Case: move the card to In Progress, replay the case, plan (approved by the flow), review, fix the review
 # (plan approved by you), PR, summary on the issue, wait for your merge, then close the card.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Harness"
@@ -9,6 +9,8 @@ id = "investigate"
 title = "Investigate"
 attach_issue = true
 prompt = """
+Avant toute chose, passe la carte Linear {{issue.identifier}} en In Progress avec le MCP Linear si elle n'y est pas déjà.
+
 /harness-use-case {{issue.url}}
 
 Le ticket Linear complet (description, images) est dans {{issue.file}}.
