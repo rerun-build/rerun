@@ -125,6 +125,18 @@ export function isPlanPriceId(priceId?: string | null): boolean {
     return isBasePriceId(priceId) || !!addonForPriceId(priceId) || isLegacyPlanItemPriceId(priceId)
 }
 
+// The one-time price of a credit pack, bought on its own and never renewed.
+export function creditPackOncePriceId(): string {
+    const id = process.env.STRIPE_PRICE_CREDIT_ONCE
+    if (!id) throw new Error('No Stripe price configured for a one-time credit pack (set STRIPE_PRICE_CREDIT_ONCE)')
+    return id
+}
+
+export function idOf(value: string | { id: string } | null | undefined): string | null {
+    if (!value) return null
+    return typeof value === 'string' ? value : value.id
+}
+
 // The invoice's subscription moved under `parent.subscription_details` in recent API versions;
 // older events still carry the legacy top-level field.
 export async function subscriptionOfInvoice(invoice: Stripe.Invoice): Promise<Stripe.Subscription | null> {

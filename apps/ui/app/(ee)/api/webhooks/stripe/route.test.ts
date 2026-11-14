@@ -12,6 +12,7 @@ import { reportPlanInvoicePaid, reportSubscriptionCancelRequested } from '@/ee/s
 import { markPaymentMethodAdded } from '@/app/api/_services/getting-started.service'
 import { enforceTrialCardClaim } from '@/ee/services/trial-card.service'
 import { applyTemplateSubscription, recordTemplatePurchase, recordTemplateRenewal, refundTemplatePurchase, revokeTemplateSubscription } from '@/ee/services/template-purchase.service'
+import { recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { signedStripeRequest, TEST_WEBHOOK_SECRET } from '@/ee/test/stripe-fake'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent } from './idempotency'
@@ -41,6 +42,12 @@ vi.mock('@/ee/services/template-purchase.service', () => ({
     recordTemplateRenewal: vi.fn(),
     refundTemplatePurchase: vi.fn(),
     revokeTemplateSubscription: vi.fn(),
+}))
+vi.mock('@/ee/services/credit-purchase.service', async importOriginal => ({
+    isCreditCheckoutSession: (await importOriginal<typeof import('@/ee/services/credit-purchase.service')>()).isCreditCheckoutSession,
+    recordCreditCheckoutSession: vi.fn(),
+    recordCreditInvoice: vi.fn(),
+    refundCreditPurchase: vi.fn(),
 }))
 vi.mock('./idempotency', async importOriginal => ({ ...(await importOriginal<typeof import('./idempotency')>()), claimStripeEvent: vi.fn(), markStripeEventProcessed: vi.fn(), releaseStripeEvent: vi.fn() }))
 
@@ -129,6 +136,14 @@ describe('checkout.session.completed', () => {
         expect(recordTemplatePurchase).not.toHaveBeenCalled()
         expect(stripe.subscriptions.retrieve).not.toHaveBeenCalled()
         expect(applySubscriptionToWorkspace).not.toHaveBeenCalled()
+    })
+
+    it('grants the Rerun credit bought on a Checkout page, without touching the plan', async () => {
+        const session = { id: 'cs_1', mode: 'payment', payment_status: 'paid', metadata: { kind: 'credit_purchase', workspace_id: '7', packs: '2' } }
+        await deliver('checkout.session.completed', session)
+        expect(recordCreditCheckoutSession).toHaveBeenCalledWith(expect.objectContaining({ id: 'cs_1' }))
+        expect(recordTemplatePurchase).not.toHaveBeenCalled()
+        expect(stripe.subscriptions.retrieve).not.toHaveBeenCalled()
     })
 
     it('applies a plan card setup and marks the payment method added', async () => {
@@ -247,9 +262,9 @@ describe('customer.subscription.*', () => {
 })
 
 describe('invoice.*', () => {
-    it('records the renewal, reports the payment and stamps the first payment, in that order', async () => {
+    it('records a credit purchase, the renewal, reports the payment and stamps the first payment, in that order', async () => {
         await deliver('invoice.paid', { id: 'in_1' })
-        const fns = [recordTemplateRenewal, reportPlanInvoicePaid, stampFirstPlanPayment]
+        const fns = [recordCreditInvoice, recordTemplateRenewal, reportPlanInvoicePaid, stampFirstPlanPayment]
         for (const fn of fns) expect(fn).toHaveBeenCalledWith(expect.objectContaining({ id: 'in_1' }))
         const order = fns.map(fn => vi.mocked(fn).mock.invocationCallOrder[0])
         expect(order).toEqual([...order].sort((a, b) => a - b))
@@ -294,5 +309,10 @@ describe('charge.refunded', () => {
         await deliver('charge.refunded', { id: 'ch_1' })
         expect(refundTemplatePurchase).toHaveBeenCalledWith(expect.objectContaining({ id: 'ch_1' }))
         expect(markStripeEventProcessed).toHaveBeenCalledWith('evt_1')
+    })
+
+    it('takes back the Rerun credit of a refunded purchase', async () => {
+        await deliver('charge.refunded', { id: 'ch_1' })
+        expect(refundCreditPurchase).toHaveBeenCalledWith(expect.objectContaining({ id: 'ch_1' }))
     })
 })

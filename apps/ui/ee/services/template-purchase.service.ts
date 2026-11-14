@@ -3,7 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type Stripe from 'stripe'
 import type { Database } from '@/app/api/database.types'
 import { stripeTimestampIso, subscriptionPeriodEndIso, TEMPLATE_PURCHASE_KIND } from '@/ee/lib/billing/marketplace'
-import { stripe } from '@/ee/lib/billing/stripe'
+import { idOf, stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { requestTemplateRevocation } from '@/ee/trigger/revoke-template-access'
@@ -53,11 +53,6 @@ function transferMetadata(meta: PurchaseMetadata): Stripe.MetadataParam {
         template_slug: meta.templateSlug,
         creator_id: meta.creatorId ?? '',
     }
-}
-
-function idOf(value: string | { id: string } | null | undefined): string | null {
-    if (!value) return null
-    return typeof value === 'string' ? value : value.id
 }
 
 // The buyer lands back in the app before Stripe has finished delivering the webhook, so the

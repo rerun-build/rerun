@@ -19,6 +19,7 @@ import {
     revokeTemplateSubscription,
 } from '@/ee/services/template-purchase.service'
 import { isTemplateCheckoutSession, isTemplateSubscription } from '@/ee/lib/billing/marketplace'
+import { isCreditCheckoutSession, recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import type Stripe from 'stripe'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent, unclaimedResponse } from './idempotency'
@@ -55,6 +56,10 @@ export async function POST(req: Request) {
                 const session = event.data.object
                 if (isTemplateCheckoutSession(session)) {
                     if (session.payment_status === 'paid') await recordTemplatePurchase(session)
+                    break
+                }
+                if (isCreditCheckoutSession(session)) {
+                    await recordCreditCheckoutSession(session)
                     break
                 }
                 // Setup mode carries no `session.subscription`: it is the card collected on a trial
@@ -124,10 +129,11 @@ export async function POST(req: Request) {
             // The ledger line of every template subscription cycle, first invoice included: a
             // checkout only ever fires once, renewals only show up here.
             // Each step runs whatever the others do: a template ledger that keeps failing must not
-            // hold back the plan's own stamp through every retry. All three are safe to replay.
+            // hold back the plan's own stamp through every retry. All of them are safe to replay.
             case 'invoice.paid': {
                 const invoice = event.data.object
                 await runEach([
+                    () => recordCreditInvoice(invoice),
                     () => recordTemplateRenewal(invoice),
                     () => reportPlanInvoicePaid(invoice),
                     // The only place a real charge is observed, and therefore the only place the
@@ -144,7 +150,7 @@ export async function POST(req: Request) {
                 break
             }
             case 'charge.refunded':
-                await refundTemplatePurchase(event.data.object)
+                await runEach([() => refundTemplatePurchase(event.data.object), () => refundCreditPurchase(event.data.object)])
                 break
         }
         await markStripeEventProcessed(event.id)

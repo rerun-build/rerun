@@ -600,7 +600,7 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
     }
 }
 
-function savedCard(paymentMethod: string | Stripe.PaymentMethod | null): SavedCard | null {
+export function savedCard(paymentMethod: string | Stripe.PaymentMethod | null): SavedCard | null {
     if (!paymentMethod || typeof paymentMethod === 'string' || !paymentMethod.card) return null
     const { brand, last4, exp_month, exp_year } = paymentMethod.card
     return { brand, last4, expMonth: exp_month, expYear: exp_year }
@@ -1138,7 +1138,7 @@ async function updateWithPayment(subscriptionId: string, params: Stripe.Subscrip
 
 // A pending update also holds a plain decline, which leaves the browser nothing to confirm: only a
 // payment waiting on the bank goes back to it, a refusal comes back in the card's own words.
-async function assertPaymentAwaitsConfirmation(clientSecret: string): Promise<void> {
+export async function assertPaymentAwaitsConfirmation(clientSecret: string): Promise<void> {
     const intent = await stripe.paymentIntents.retrieve(clientSecret.split('_secret_')[0]!)
     if (intent.status === 'requires_action') return
     const refusal = intent.last_payment_error

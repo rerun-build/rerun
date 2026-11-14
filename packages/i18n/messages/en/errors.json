@@ -430,6 +430,8 @@
     "templateNotPurchasableYet": "This template is not available for purchase yet.",
     "purchaseOtherWorkspace": "This purchase belongs to another workspace.",
     "changePlanFailed": "Failed to change your plan",
+    "buyCreditFailed": "Failed to buy the credit",
+    "quoteCreditFailed": "Failed to price the credit",
     "updateBrainProposalFailed": "Could not update the proposal",
     "prepareSandboxFailed": "Could not prepare your sandbox",
     "templateTitleFirst": "Give the template a title first.",

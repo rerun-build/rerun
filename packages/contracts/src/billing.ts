@@ -110,6 +110,11 @@ export const CREDIT_USD_PER_PACK = 10
 
 export const CREDITS_PER_PACK = creditsFromUsd(CREDIT_USD_PER_PACK)
 
+// A pack is bought once, and its credit never expires: no renewal resets it.
+export const CREDIT_PACK_PRICE_CENTS = 1000
+
+export const MAX_CREDIT_PACKS_PER_PURCHASE = 100
+
 // Monthly prices only, for the surfaces that quote a plain "per month" figure.
 export const ADDONS: Record<AddonKey, { priceCents: number }> = {
     credit_pack: { priceCents: PLAN_PRICES_CENTS.monthly.credit_pack },
