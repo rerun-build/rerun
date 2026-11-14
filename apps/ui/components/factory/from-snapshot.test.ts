@@ -4,9 +4,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { factoryJobStateSchema, factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
-import { TileBuddy } from '@rerun/ui/iso-grid'
+import { type BuddyLook, buddyColor, buddyEyes, buddyMouth, TileBuddy } from '@rerun/ui/iso-grid'
 import { sceneFromSnapshot } from './from-snapshot'
-import { factoryScene } from './factory-scene'
+import { factoryScene, LOOP_MS } from './factory-scene'
 
 const sampleTime = vi.hoisted(() => ({ t: 0 }))
 vi.mock('./factory-scene', async importOriginal => {
@@ -154,7 +154,7 @@ describe('sceneFromSnapshot: live tiles', () => {
         s.pools = s.pools.map(p => ({ ...p, coworkers: p.coworkers.map(c => (c.name === 'LINUS' ? { ...c, out: 1 } : c)) }))
         const f = sceneFromSnapshot(s, NOW)
         const st = (id: string) => f.tiles.find(x => x.id === id)!.style
-        expect(st('LINUS').glow).toBe('rgba(245, 158, 11, 0.6)')
+        expect(st('LINUS').glow).toBe('color-mix(in srgb, #00b862 60%, transparent)')
         expect(st('code').glow).toBe('var(--iso-tile-idle-glow)')
         expect(st('Delegator').glow).toBe('var(--iso-tile-idle-glow)')
         s.jobs[0].state = 'queued'
@@ -221,6 +221,85 @@ describe('belts ask for chevrons', () => {
             expect(belts.length).toBeGreaterThan(0)
             expect(belts.every(l => l.chevrons === true)).toBe(true)
             expect(links.filter(l => l.variant === 'trace').some(l => l.chevrons)).toBe(false)
+        }
+    })
+    const withLinus = () => {
+        const s = nothingRunning()
+        s.pools = s.pools.map(p => ({ ...p, coworkers: p.coworkers.map(c => (c.name === 'LINUS' ? { ...c, out: 1 } : c)) }))
+        return s
+    }
+    const html = (style: object, extra: object = {}) => renderToStaticMarkup(createElement(TileBuddy, { id: 'x', style, width: 120, height: 120, floorOffset: 0, ...extra } as never))
+
+    it("draws each coworker's look from its pool id, as Rerun's panel does", () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        for (const [name, id] of [['code', 'code-1'], ['LARRY', 'larry-1'], ['LINUS', 'linus-1'], ['BRUCE', 'bruce-1'], ['search', 'search-1'], ['DIETER', 'dieter-1']]) {
+            const b = f.tiles.find(t => t.id === name)!.style.buddy as BuddyLook
+            expect(b.color).toBe(buddyColor(id, {}))
+            expect(b.eyes).toBe(buddyEyes(id, {}))
+            expect(b.mouth).toBe(buddyMouth(id, {}))
+        }
+    })
+
+    it('falls back to the tile name when the pool sends no id', () => {
+        const s = sample()
+        for (const p of s.pools) for (const c of p.coworkers) delete c.id
+        expect((sceneFromSnapshot(s, NOW).tiles.find(t => t.id === 'code')!.style.buddy as BuddyLook).color).toBe(buddyColor('code', {}))
+    })
+
+    it('works in its own colour: mood working, own glow, no amber', () => {
+        const f = sceneFromSnapshot(withLinus(), NOW)
+        const st = (id: string) => f.tiles.find(t => t.id === id)!.style
+        expect(st('LINUS').buddy).toMatchObject({ mood: 'working', ownColor: true, color: '#00b862' })
+        expect(st('LINUS').glow).toBe('color-mix(in srgb, #00b862 60%, transparent)')
+        expect(st('code').glow).toBe('var(--iso-tile-idle-glow)')
+        expect((st('code').buddy as BuddyLook).mood).toBeUndefined()
+    })
+
+    it('bobs and stands taller at work, is still and flat at rest, and does not bob under reduced motion', () => {
+        const f = sceneFromSnapshot(withLinus(), NOW)
+        const st = (id: string) => f.tiles.find(t => t.id === id)!.style
+        expect(html(st('LINUS'))).toContain('data-buddy-motion="bob"')
+        expect(html(st('LINUS'))).toContain('data-buddy-stretched')
+        const rest = html(st('code'))
+        expect(rest).not.toContain('data-buddy-motion')
+        expect(rest).not.toContain('data-buddy-stretched')
+        expect(rest).toContain('iso-buddy-body')
+        expect(html(st('LINUS'), { reducedMotion: true })).not.toContain('data-buddy-motion')
+        expect(html(st('Delegator'))).not.toContain('data-buddy-stretched')
+        expect(html(st('code'), { stretched: true })).toContain('data-buddy-stretched')
+    })
+
+    it('a copy wears its coworker look, stands taller and is see-through', () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        const copy = f.tiles.find(t => t.id === 'code-copy-330')!
+        expect(copy.style.buddy).toEqual({ ...(f.tiles.find(t => t.id === 'code')!.style.buddy as BuddyLook), mood: 'working', ownColor: true })
+        expect(copy.style.opacity).toBeLessThan(1)
+        expect(html(copy.style)).toContain('data-buddy-stretched')
+        expect(f.tiles.find(t => t.id === 'code')!.style.opacity ?? 1).toBe(1)
+    })
+})
+
+describe('pod card facts', () => {
+    it('carries since, holder and pr from the job on its pod', () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        expect(pod(f, 330)).toMatchObject({ since: Date.parse('2026-11-14T03:21:05Z'), holder: 'code · 2' })
+        expect(pod(f, 330)!.pr).toBeUndefined()
+        expect(pod(f, 331)).toMatchObject({ since: Date.parse('2026-11-14T03:23:40Z'), holder: 'LINUS · 1', pr: 341 })
+        expect(pod(f, 332)).toMatchObject({ since: Date.parse('2026-11-14T03:21:05Z') })
+        expect(pod(f, 332)!.holder).toBeUndefined()
+        expect(pod(f, 332)!.pr).toBeUndefined()
+        expect(pod(f, 333)).toMatchObject({ holder: 'code · 1', pr: 343 })
+    })
+
+    it('gives every pod of the sample loop a since in the last loop', () => {
+        for (const t of [0, 6_000, 50_000]) {
+            const f = factoryScene(t, 1_000_000)
+            expect(f.pods.length).toBeGreaterThan(0)
+            for (const p of f.pods) {
+                expect(typeof p.since, `${p.id} at ${t}`).toBe('number')
+                expect(p.since!).toBeLessThanOrEqual(1_000_000)
+                expect(p.since!).toBeGreaterThanOrEqual(1_000_000 - LOOP_MS)
+            }
         }
     })
 })

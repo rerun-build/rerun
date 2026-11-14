@@ -122,6 +122,9 @@ export type PodView = {
     state: 'queued' | 'held' | 'working' | 'fixing' | 'checks' | 'complete' | 'rejected'
     verdict?: 'pass' | 'fail' // set while the scanner shows it, at the end of a review
     scan: number // 0..1 through a review, for the scanner's sweep
+    since?: number // epoch ms the task entered its stage
+    holder?: string // the coworker and its copy, `code · 3`
+    pr?: number
 }
 export const STATUS_COLOR = { queued: '#8ea2ff', held: '#ef4444', build: '#f5a524', review: '#2dd4a3', fixing: '#fb923c', checks: '#6ea8ff', complete: '#ffe08a', rejected: '#f87171' } as const
 export type SlotView = { issue: number; state: 'empty' | 'merged' | 'rejected'; arriving: number } // arriving: 0..1 while sliding in
@@ -146,7 +149,12 @@ const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 
 function coworker(id: string, who: string, position: Cell, room: string, state: 'working' | 'idle' | 'waiting_human', opts: { copy?: boolean; behind?: boolean } = {}): Tile {
     return {
         id, position, span: 2, containerId: room, selectable: false, draggable: false, justPlaced: !!opts.copy,
-        style: { ...agentTileStyle(state, who), buddy: { ...LOOKS[who] }, ...(opts.copy ? { opacity: 0.55 } : opts.behind ? { opacity: 0.5 } : {}) },
+        style: {
+            ...(state === 'working' && who !== 'Delegator'
+                ? { ...agentTileStyle('idle', who), glow: `color-mix(in srgb, ${LOOKS[who].color} 60%, transparent)`, buddy: { ...LOOKS[who], mood: 'working' as const, ownColor: true } }
+                : { ...agentTileStyle(state, who), buddy: { ...LOOKS[who] } }),
+            ...(opts.copy ? { opacity: 0.55 } : opts.behind ? { opacity: 0.5 } : {}),
+        },
         ariaLabel: opts.copy ? `${who}, a copy` : who,
     }
 }
@@ -185,7 +193,7 @@ export function factoryScene(t: number, now: number): FactoryFrame {
         const prev = job.legs[legIndex - 1]
         const ride = (t - leg.from) / (TRANSIT_MS * 1.6)
         const pod = (path: string[], travel: number, band: Band, state: PodView['state'], extra: Partial<PodView> = {}) =>
-            pods.push({ id: `pod-${job.issue}`, issue: job.issue, title: job.title, path, travel: ease(clamp(travel)), queue: 0, level, band, state, scan: 0, ...extra })
+            pods.push({ id: `pod-${job.issue}`, issue: job.issue, title: job.title, path, travel: ease(clamp(travel)), queue: 0, level, band, state, scan: 0, since: Math.round(now - (t - leg.from)), ...extra })
         counts.runs += leg.kind === 'queued' ? 0 : 1
 
         if (leg.kind === 'queued') {

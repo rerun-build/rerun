@@ -36,6 +36,45 @@ Five owner instructions given in one evening, ordered so that no step is cut aga
 5. **Timers.** A read-only classification first: each timer kept with its reason, or marked for removal. "No real reason" is written down as a test before anything is removed; waits that carry a deadline (FACTORY-CORE section 0a) stay.
 6. **Runtime verification.** One document per feature: what it does, how a user reaches it, and what proves it works (a check that runs against the running app). Those documents also hold the reasons for kept timers and the comments worth keeping.
 
+## Upstream syncs after the purge
+
+Rehearsed on 2026-11-15 with the 65 upstream commits not yet in dev (upstream/dev 742a9cdd, base 2bf98517):
+
+| Merge | Conflicted files |
+|---|---|
+| dev as it is + upstream | 51 |
+| stripped dev + upstream as it is | 187 |
+| stripped dev + upstream stripped first | 51, the same files as the first row |
+
+So every sync strips the upstream side before merging. Branch `upstream-stripped` holds the stripped upstream commits: its first commit is the stripped base (2bf98517 stripped), which dev records as merged with `git merge -s ours`. A sync checks out the last `upstream-stripped` commit, replaces its tree with the new upstream tip, runs `scripts/strip-comments/strip.py --write`, commits on top, and merges that commit into dev. The merge base is then the previous stripped commit, and only real changes conflict.
+
+## Guards: keeping antipatterns out
+
+Owner, 2026-11-15: "We need a way or mechanism which prevents any new occurrences of antipatterns or gates them and or/minimizes them or alerts us about them automatically somehow."
+
+One guard per rule, each with the owner's words, a detector, a mode and the message that names the fix. Rules are encoded at the highest level that holds: structure first (one source of truth, a single sanctioned helper), then types, then lint, then a CI diff check, then the proof step's judgement; text in briefs is the weakest level and never the only one.
+
+| Rule | Level | Mode at start |
+|---|---|---|
+| No comments in code | lint rule in each package's eslint config (TypeScript); `guards.py --diff` for Python, shell, YAML, SQL | block |
+| Done-test red before green | CI job on factory pull requests | block, after a back-test on merged pull requests |
+| Every state handled | one state model with a test that fails on a state without a handler, deadline or screen entry; TypeScript `Record<State, …>` and the `switch-exhaustiveness-check` lint | block |
+| Timers only with a reason | every timer goes through a few named helpers (debounce, deadline, retry with backoff, poll, animation frame); a lint forbids raw `setTimeout`, `setInterval` and `sleep` elsewhere, so the helper's name is the reason | warn until the timer pass has moved the existing ones, then block |
+| Every ask of the issue delivered | proof step (a coworker who neither built nor reviewed) | block |
+| Heuristic rules (idle animation, made-up lookup tables, magic numbers) | warning comment on the pull request and a count on dev | warn |
+
+Where each runs:
+1. In the builder's own loop: the brief already makes builders run lint and the type check before opening a pull request, so a lint guard is seen and fixed before CI.
+2. CI on every pull request, diff-scoped: only lines the pull request adds are judged, so old code does not block new work.
+3. CI on every push to dev, tree-scoped: one count per guard, kept as a scorecard. A count that rises (an upstream sync bringing comments back, a hand merge) raises an alert: a line on the factory page and a push to the owner.
+4. Upstream syncs: the stripper runs on the upstream side, and the guards run on the sync pull request like any other.
+
+Rollout per guard: back-test on the last merged pull requests first; a guard that would have blocked an accepted change is fixed before it blocks. Each block costs the job's one fix round, so a guard is promoted from warn to block only once its false-alarm count on real pull requests is zero. An exception is an entry in the guard's allow list with a reason, read by the proof step.
+
+Learning loop: each review rejection and each fault the owner points out is checked for a rule a guard could hold; if there is one, the fix job adds the guard in the same pull request.
+
+Benefit, measured: occurrences per guard per week on dev (blocked guards stay at zero), fix rounds spent on guards, and allow-list entries added. A guard that costs more fix rounds than the faults it stops is reconsidered.
+
 ## Status
 
 | Step | State |
