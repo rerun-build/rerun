@@ -1,9 +1,11 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { TableIcon } from '@/lib/icons'
 import { deleteAgentTableRowsAction, dropAgentTableAction, listAgentTablesAction, purgeAgentTableAction, readAgentTableRowsAction } from '@/app/api/_actions/agent.actions'
 import { DataBrowser } from '@/components/data/DataBrowser'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
-import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { tablesOrThrow, viewActions, type DataFocus, type DataSource } from '@/lib/data/source'
@@ -57,10 +59,7 @@ export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPan
                 at full size, as a second browser that reads the same database. */}
             <Dialog open={expanded !== null} onOpenChange={open => !open && setExpanded(null)}>
                 <PanelDialogContent className="sm:h-[92dvh] sm:max-w-[min(100rem,95vw)]">
-                    <DialogHeader className="border-b px-4 py-3">
-                        <DialogTitle>{t('dialogTitle')}</DialogTitle>
-                        <DialogDescription className="sr-only">{t('dialogDescription')}</DialogDescription>
-                    </DialogHeader>
+                    <DialogHeaderBar icon={TableIcon} title={t('dialogTitle')} description={t('dialogDescription')} />
                     {expanded && <DataBrowser source={source} initial={expanded} />}
                 </PanelDialogContent>
             </Dialog>

@@ -16,7 +16,6 @@ type OpenDialog = 'prompt' | 'payload' | null
 export function WebhookRunBlock({ agentId, payload }: { agentId: string | undefined; payload: TriggerPayload }) {
     const t = useTranslations('chat.webhookRun')
     const [openDialog, setOpenDialog] = useState<OpenDialog>(null)
-    const icon = <WebhookIcon className="size-3.5 text-muted-foreground" />
     const closeOn = (dialog: Exclude<OpenDialog, null>) => (open: boolean) => setOpenDialog(open ? dialog : null)
 
     return (
@@ -34,13 +33,13 @@ export function WebhookRunBlock({ agentId, payload }: { agentId: string | undefi
                 <ThreadDividerDot />
                 <ThreadDividerLink onClick={() => setOpenDialog('payload')}>{t('viewPayload')}</ThreadDividerLink>
             </ThreadDividerLine>
-            <ThreadDividerDialog open={openDialog === 'prompt'} onOpenChange={closeOn('prompt')} icon={icon} title={t('promptTitle', { name: payload.slug })}>
+            <ThreadDividerDialog open={openDialog === 'prompt'} onOpenChange={closeOn('prompt')} icon={WebhookIcon} title={t('promptTitle', { name: payload.slug })}>
                 <AgentWorkspaceMessage agentId={agentId}>{payload.prompt}</AgentWorkspaceMessage>
             </ThreadDividerDialog>
             <ThreadDividerDialog
                 open={openDialog === 'payload'}
                 onOpenChange={closeOn('payload')}
-                icon={icon}
+                icon={WebhookIcon}
                 title={t('payloadTitle', { name: payload.slug })}
                 aside={
                     <span className="flex shrink-0 items-center gap-2">

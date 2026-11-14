@@ -1,8 +1,10 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { Settings2Icon } from '@/lib/icons'
 import { AiProvidersPanel, type InitialConnection } from '@/components/connections/AiProvidersPanel'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
-import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import type { Provider } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
@@ -31,10 +33,7 @@ export function AiProvidersDialog({ open, onOpenChange }: { open: boolean; onOpe
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <PanelDialogContent className="sm:h-[min(48rem,90dvh)] sm:max-w-2xl">
-                <DialogHeader className="border-b px-4 py-4">
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>{t('description')}</DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={Settings2Icon} title={t('title')} description={t('description')} />
 
                 <div className="flex min-h-0 flex-1 flex-col">
                     <AiProvidersPanel

@@ -23,7 +23,7 @@ export function AgentInstallBlock({ agentId, agentName, guide, installing = fals
                 <ThreadDividerDot />
                 <ThreadDividerLink onClick={() => setGuideOpen(true)}>{t('viewGuide')}</ThreadDividerLink>
             </ThreadDividerLine>
-            <ThreadDividerDialog open={guideOpen} onOpenChange={setGuideOpen} icon={<Box3Icon className="size-3.5 text-muted-foreground" />} title={t('guideTitle', { name: liveName ?? agentName })}>
+            <ThreadDividerDialog open={guideOpen} onOpenChange={setGuideOpen} icon={Box3Icon} title={t('guideTitle', { name: liveName ?? agentName })}>
                 <AgentWorkspaceMessage agentId={agentId}>{guide}</AgentWorkspaceMessage>
             </ThreadDividerDialog>
         </>

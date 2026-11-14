@@ -1,11 +1,12 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import type { SaveFileResult } from '@/app/api/_services/file.service'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { XIcon } from '@/lib/icons'
+import { FileTextIcon } from '@/lib/icons'
 import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
@@ -41,22 +42,21 @@ export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, on
         <Dialog open dismissible={!dirty} onOpenChange={open => !open && requestClose()}>
             <DialogContent
                 aria-describedby={undefined}
-                showCloseButton={false}
                 className="flex h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl"
                 // Radix focuses the content wrapper on open, which would undo the editor's autofocus.
                 onOpenAutoFocus={event => event.preventDefault()}
             >
-                <div className="flex shrink-0 items-center gap-2 border-b border-border py-2 pr-2 pl-4">
-                    <DialogTitle className="min-w-0 flex-1 truncate text-left font-mono text-xs font-normal text-muted-foreground">{fileName}</DialogTitle>
-                    {dirty && (
-                        <Badge size="xs" tone="orange" glow={false}>
-                            {t('unsaved')}
-                        </Badge>
-                    )}
-                    <Button size="icon-sm" variant="ghost" onClick={requestClose} disabled={saving} title={t('close')} aria-label={t('close')}>
-                        <XIcon className="size-4" />
-                    </Button>
-                </div>
+                <DialogHeaderBar
+                    icon={FileTextIcon}
+                    title={fileName}
+                    actions={
+                        dirty && (
+                            <Badge size="xs" tone="orange" glow={false}>
+                                {t('unsaved')}
+                            </Badge>
+                        )
+                    }
+                />
                 <div className="min-h-0 flex-1 overflow-hidden">
                     <FileTextEditor value={draft} onChange={setDraft} fileName={fileName} readOnly={saving} autoFocus onSave={save} />
                 </div>

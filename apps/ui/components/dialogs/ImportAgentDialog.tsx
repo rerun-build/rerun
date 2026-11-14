@@ -1,11 +1,13 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { DownloadIcon } from '@/lib/icons'
 import { useErrorText } from '@/hooks/useErrorText'
 import { createImportKeyAction } from '@/app/api/_actions/api-keys.actions'
 import { CopyBlock } from '@/components/dialogs/CopyBlock'
 import { CopyLine } from '@/components/dialogs/CopyLine'
 import { ImportSourcePicker } from '@/components/dialogs/ImportSourcePicker'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Skeleton } from '@/components/ui/skeleton'
 import { importSource, type ImportSourceId } from '@/lib/agent-import/sources'
@@ -72,10 +74,7 @@ export function ImportAgentDialog({ open, onOpenChange, spaceId = null }: { open
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="flex flex-col sm:max-h-[85dvh] sm:max-w-lg sm:overflow-hidden">
-                <DialogHeader>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>{t('description')}</DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={DownloadIcon} title={t('title')} description={t('description')} />
 
                 <ScrollFade className="-mx-1 min-h-0 flex-1 px-1 py-1">
                     <div className="space-y-4">

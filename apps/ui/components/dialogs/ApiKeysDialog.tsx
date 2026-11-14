@@ -1,5 +1,6 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useErrorText } from '@/hooks/useErrorText'
 import { createApiKeyAction, listApiKeysAction, revokeApiKeyAction, type ApiKeyView } from '@/app/api/_actions/api-keys.actions'
 import { ApiKeyList } from '@/components/dialogs/ApiKeyList'
@@ -7,12 +8,12 @@ import { CreatedApiKey } from '@/components/dialogs/CreatedApiKey'
 import { McpSnippets } from '@/components/dialogs/McpSnippets'
 import { RevokeApiKeyDialog } from '@/components/dialogs/RevokeApiKeyDialog'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { DocsLink } from '@/components/ui/docs-link'
 import { Input } from '@/components/ui/input'
 import { SkeletonList } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { Loader2Icon } from '@/lib/icons'
+import { Loader2Icon, KeyIcon } from '@/lib/icons'
 import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 import { track } from '@rerun/analytics/client'
 import { ScrollFade } from '@rerun/ui/primitives'
@@ -102,10 +103,7 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
                 past a short viewport. The bounds are sm: only: the mobile sheet already caps itself
                 against the cookie bar inset, and overriding that would push it off screen. */}
             <DialogContent className="flex flex-col sm:max-h-[85dvh] sm:max-w-lg sm:overflow-hidden">
-                <DialogHeader>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">{t('description')}</p>
-                </DialogHeader>
+                <DialogHeaderBar icon={KeyIcon} title={t('title')} description={t('description')} />
 
                 <ScrollFade className="-mx-1 min-h-0 flex-1 px-1 py-1">
                     <div className="space-y-4">

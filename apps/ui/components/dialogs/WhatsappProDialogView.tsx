@@ -1,5 +1,6 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import type { CountryCode } from 'libphonenumber-js/min'
 import type { AppConnectionView, AppsOverview } from '@/app/api/_services/apps.service'
 import { AccountsScreen, AccountsSkeleton, AppIcon, AppPageHeader, IntroScreen, SuccessScreen, connectHint } from '@/components/apps/PaidAppViews'
@@ -52,13 +53,7 @@ export function WhatsappProDialogView(props: WhatsappProDialogViewProps) {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <PanelDialogContent className="sm:h-[min(42rem,88dvh)] sm:max-w-xl">
                 {screen.kind === 'accounts' && !intro ? (
-                    <DialogHeader className="flex-row items-center gap-3 border-b px-4 py-4 text-left">
-                        <AppIcon slug="whatsapp" size="md" />
-                        <div className="min-w-0 space-y-0.5">
-                            <DialogTitle>WhatsApp Pro</DialogTitle>
-                            <DialogDescription>{t('description')}</DialogDescription>
-                        </div>
-                    </DialogHeader>
+                    <DialogHeaderBar icon={<AppIcon slug="whatsapp" size="md" />} title="WhatsApp Pro" description={t('description')} />
                 ) : (
                     <DialogHeader className="sr-only">
                         <DialogTitle>WhatsApp Pro</DialogTitle>

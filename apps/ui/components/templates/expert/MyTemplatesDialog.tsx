@@ -1,10 +1,11 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { CreateTemplateDialog } from '@/components/dialogs/CreateTemplateDialog'
 import { CaptureAgentsDialog } from '@/components/templates/capture/CaptureAgentsDialog'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { LayersIcon } from '@/lib/icons'
 import { useCreatorStore } from '@/stores/creator.store'
@@ -54,10 +55,7 @@ export function MyTemplatesDialog() {
                         dialog, which leaves the panes clipped instead of scrolling. */}
                     <div className="grid min-h-0 flex-1 grid-cols-1 sm:h-[min(46rem,88dvh)] sm:grid-cols-[19rem_1fr] sm:grid-rows-[minmax(0,1fr)]">
                         <div className="flex min-h-0 flex-col border-r border-border">
-                            <DialogHeader className="p-5 pb-4">
-                                <DialogTitle>{t('title')}</DialogTitle>
-                                <DialogDescription className="text-xs">{t('description')}</DialogDescription>
-                            </DialogHeader>
+                            <DialogHeaderBar icon={LayersIcon} title={t('title')} description={t('description')} />
                             <ExpertTemplateList
                                 templates={templates}
                                 selectedId={editingId}

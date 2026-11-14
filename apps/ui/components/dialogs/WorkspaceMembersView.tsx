@@ -1,5 +1,6 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import type { WorkspaceInviteRow, WorkspaceMember } from '@/app/api/_actions/members.actions'
 import type { MemberAccessView, MemberBoxAccess } from '@/app/api/_actions/space-access.actions'
 import type { BoxAccess } from '@/app/api/_auth/access'
@@ -9,7 +10,6 @@ import { CopyLine } from '@/components/dialogs/CopyLine'
 import { MemberBoxesView } from '@/components/dialogs/MemberBoxesView'
 import { WorkspaceInviteRowView, WorkspaceMemberRow } from '@/components/dialogs/WorkspaceMemberRow'
 import { Button } from '@/components/ui/button'
-import { DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SkeletonList } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import type { AuthorProfile } from '@/lib/chat/message-author'
-import { Loader2Icon } from '@/lib/icons'
+import { Loader2Icon, UsersIcon } from '@/lib/icons'
 import type { WorkspaceRole } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -58,10 +58,7 @@ export function WorkspaceMembersView(props: WorkspaceMembersViewProps) {
 
     return (
         <>
-            <DialogHeader className="border-b px-4 py-4">
-                <DialogTitle>{t('title')}</DialogTitle>
-                <DialogDescription>{t('description')}</DialogDescription>
-            </DialogHeader>
+            <DialogHeaderBar icon={UsersIcon} title={t('title')} description={t('description')} />
 
             <PanelSteps stepKey={opened ? opened.member.userId : 'list'} depth={opened ? 1 : 0}>
                 {opened ? (

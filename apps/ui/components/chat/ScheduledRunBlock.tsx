@@ -22,7 +22,7 @@ export function ScheduledRunBlock({ agentId, run }: { agentId: string | undefine
                 <ThreadDividerDot />
                 <ThreadDividerLink onClick={() => setPromptOpen(true)}>{t('viewPrompt')}</ThreadDividerLink>
             </ThreadDividerLine>
-            <ThreadDividerDialog open={promptOpen} onOpenChange={setPromptOpen} icon={<CalendarClockIcon className="size-3.5 text-muted-foreground" />} title={t('promptTitle', { name: run.name })}>
+            <ThreadDividerDialog open={promptOpen} onOpenChange={setPromptOpen} icon={CalendarClockIcon} title={t('promptTitle', { name: run.name })}>
                 <AgentWorkspaceMessage agentId={agentId}>{run.prompt}</AgentWorkspaceMessage>
             </ThreadDividerDialog>
         </>

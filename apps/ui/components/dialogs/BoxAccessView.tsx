@@ -1,12 +1,13 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { BoxIcon } from '@/lib/icons'
 import type { AccessLevel, SpaceVisibility } from '@/app/api/_auth/access'
 import type { SpaceAccessCoworker, SpaceAccessView } from '@/app/api/_actions/space-access.actions'
 import { BoxAccessAddPeople } from '@/components/dialogs/BoxAccessAddPeople'
 import { BoxAccessPersonRow } from '@/components/dialogs/BoxAccessPersonRow'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { AddButton, EmptyPitch, Group } from '@/components/connections/AiProvidersPanel'
-import { DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { PanelScroller } from '@/components/ui/panel-list'
 import { PanelSteps } from '@/components/ui/panel-steps'
@@ -48,13 +49,7 @@ export function BoxAccessView({ boxName, loading, access, busy, profileOf, onVis
 
     return (
         <>
-            <DialogHeader className="border-b px-4 py-4">
-                <DialogTitle className="truncate pr-6">{t('title', { box: boxName })}</DialogTitle>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                    <DialogDescription>{t('description')}</DialogDescription>
-                    {access && <CoworkerAvatars coworkers={access.coworkers} />}
-                </div>
-            </DialogHeader>
+            <DialogHeaderBar icon={BoxIcon} title={t('title', { box: boxName })} description={t('description')} actions={access && <CoworkerAvatars coworkers={access.coworkers} />} />
 
             <PanelSteps stepKey={page} depth={page === 'list' ? 0 : 1}>
                 {loading || !access ? (

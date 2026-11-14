@@ -1,5 +1,6 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useErrorText } from '@/hooks/useErrorText'
 import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
@@ -9,7 +10,7 @@ import { toast } from 'sonner'
 import { getPublishedAction, getPublishSettingsAction, unpublishLinkAction, updatePublishedAccessAction, type PublishSettings } from '@/app/api/_actions/publish.actions'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -36,7 +37,7 @@ type ShareDialogProps = {
 export function ShareDialog({ open, onOpenChange, slug, initial, onChanged, onUnpublished }: ShareDialogProps) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent showCloseButton={false} className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-[440px]" onOpenAutoFocus={event => event.preventDefault()}>
+            <DialogContent className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-[440px]" onOpenAutoFocus={event => event.preventDefault()}>
                 {open && slug && <ShareDialogBody slug={slug} initial={initial ?? null} onChanged={onChanged} onUnpublished={onUnpublished} onClose={() => onOpenChange(false)} />}
             </DialogContent>
         </Dialog>
@@ -104,16 +105,7 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
 
     return (
         <>
-            <div className="flex h-11 shrink-0 items-center gap-2 border-b pr-2 pl-4">
-                <Share2Icon className="size-4 text-muted-foreground" />
-                <DialogTitle className="min-w-0 flex-1 truncate text-sm leading-normal">{t('share.title')}</DialogTitle>
-                <DialogDescription className="sr-only">{t('share.description')}</DialogDescription>
-                <DialogClose asChild>
-                    <Button variant="ghost" size="icon-sm" aria-label={t('share.close')} className="max-sm:hidden">
-                        <XIcon />
-                    </Button>
-                </DialogClose>
-            </div>
+            <DialogHeaderBar icon={Share2Icon} title={t('share.title')} description={t('share.description')} />
 
             <div className="@container relative h-44 shrink-0 overflow-hidden border-b bg-muted/30">
                 <Stripes fade="bottom" />

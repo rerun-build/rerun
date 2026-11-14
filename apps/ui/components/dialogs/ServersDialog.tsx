@@ -1,12 +1,13 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useErrorText } from '@/hooks/useErrorText'
 import { attachServerManuallyAction, createPairingTokenAction, detachServerAction, getWorkspaceServerAction } from '@/app/api/_actions/servers.actions'
 import type { WorkspaceServer } from '@/app/api/_services/servers.service'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { CopyBlock } from '@/components/dialogs/CopyBlock'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { PanelRow } from '@/components/ui/panel-row'
 import { SkeletonList } from '@/components/ui/skeleton'
@@ -193,10 +194,7 @@ export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="flex flex-col sm:max-h-[85dvh] sm:max-w-lg sm:overflow-hidden">
-                <DialogHeader>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">{t('description')}</p>
-                </DialogHeader>
+                <DialogHeaderBar icon={ServerIcon} title={t('title')} description={t('description')} />
                 <ScrollFade className="-mx-1 min-h-0 flex-1 px-1 py-1">
                     <div className="space-y-4">{body}</div>
                 </ScrollFade>
