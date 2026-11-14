@@ -141,7 +141,7 @@ nothing that rides `offset-path` may carry its own scale or translate.
 
 An at-a-glance tree, top of the pyramid first:
 
-1. **Parent task**: what the work is for, whatever its kind (owner: "A feature or PARENT TASK... sometimes
+1. **Epic** (the parent task): what the work is for, whatever its kind (owner: "A feature or PARENT TASK... sometimes
    main task will be a code review and fixing"): the parent issue's title, a kind tag (feature, review +
    fix, fix, upgrade, refactor, research; from the parent issue), and progress rolled up from all its tasks.
 2. **Department**, in the order work flows through the stack: Design, Database, Engine, Backend services,
@@ -156,7 +156,10 @@ An at-a-glance tree, top of the pyramid first:
    status, steps, time and tokens; opening one goes to that run's steps.
 
 Selecting a task lights the chain it waits on and everything waiting on it; a blocked task shows its stuck
-chain in red. Tasks with no parent sit under "No parent task" at the bottom. Data: the snapshot carries each job's
+chain in red. Tasks with no epic sit under "No epic" at the bottom. Industry names: the tree is a work breakdown
+structure; Epic, Department (Jira calls it a component), Task (story), Subtask; the "needs" chain is the
+dependency graph and its longest chain the critical path. Sprints are not a level: the factory runs waves
+(a batch of jobs the delegator takes on together), shown as a "This wave" chip that filters the tree. Data: the snapshot carries each job's
 department (computed by the delegator from the issue's allowed paths) and each parent's title and kind.
 
 ## 5c. A coworker's run log
