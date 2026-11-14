@@ -17,6 +17,10 @@ import { z } from 'zod'
 // - round: the review round as the ledger holds it (1, 2 after a fix push), or null.
 // - tokensIn, tokensOut: null until the delegator records a run's tokens (the ledger holds 0 today).
 // - parent: null until the cut format carries a `**Part of**: #n` line.
+// - history (optional): the ledger `transitions` rows that changed state (store.py:37), oldest first, at most 30.
+// - runs (optional): the ledger `fires` rows (store.py:8), `intent_at` is the start, at most 12.
+// - the pool coworker `id` (optional) is the coworker's id in the delegator's config.
+// All three are optional so the app accepts both the old and the new producer.
 // - every string cut to its limit (some reasons are not cut in dispatch.py).
 // Holds: only those still running, `until` from epoch seconds to ISO.
 
@@ -30,6 +34,24 @@ export const factoryWorkerTypeSchema = z.enum(['coder', 'reviewer', 'researcher'
 
 const isoTime = z.string().max(40).datetime({ offset: true })
 const count = z.number().int().min(0)
+
+const factoryHistoryEntrySchema = z.object({
+    state: factoryJobStateSchema,
+    at: isoTime,
+    reason: z.string().max(300).nullable(),
+    runId: z.string().max(64).nullable(),
+}).strict()
+
+const factoryRunSchema = z.object({
+    stage: z.string().max(20),
+    coworkerId: z.string().max(64),
+    status: z.string().max(20),
+    startedAt: isoTime,
+    endedAt: isoTime.nullable(),
+    tokensIn: count,
+    tokensOut: count,
+    runId: z.string().max(64).nullable(),
+}).strict()
 
 export const factoryJobSchema = z.object({
     issue: z.number().int().positive(),
@@ -46,13 +68,15 @@ export const factoryJobSchema = z.object({
     parent: z.number().int().positive().nullable(), // the feature it was cut from, when the cut names one
     dependsOn: z.array(z.number().int().positive()).max(20),
     reason: z.string().max(300).nullable(), // why it waits, or why it ended blocked, failed or returned
+    history: z.array(factoryHistoryEntrySchema).max(30).optional(), // oldest first
+    runs: z.array(factoryRunSchema).max(12).optional(),
 }).strict()
 
 export const factoryHoldSchema = z.object({ kind: z.string().max(40), until: isoTime }).strict()
 
 export const factoryPoolSchema = z.object({
     type: factoryWorkerTypeSchema,
-    coworkers: z.array(z.object({ name: z.string().max(64), runs: z.number().int().min(1).max(32), out: z.number().int().min(0).max(32) }).strict()).max(20),
+    coworkers: z.array(z.object({ name: z.string().max(64), id: z.string().max(64).optional(), runs: z.number().int().min(1).max(32), out: z.number().int().min(0).max(32) }).strict()).max(20),
 }).strict()
 
 export const factorySnapshotSchema = z.object({
