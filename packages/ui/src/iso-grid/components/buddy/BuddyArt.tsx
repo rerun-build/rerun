@@ -27,9 +27,10 @@ type BuddyArtProps = {
 // Today's tile grown into a soft block with a face. At rest its top wears the agent's colour, the
 // only colour on it; at work, broken or waiting, the whole block takes the state's colour instead.
 export function BuddyArt({ uid, id, mood, look, plain, geometry = BUDDY_GEOMETRY, lit = !plain, faceScale = 1 }: BuddyArtProps) {
-    const body = plain ?? BUDDY_STATE_COLOR[mood]
-    const resting = mood === 'idle' || mood === 'asleep'
     const identity = buddyColor(id, look)
+    const own = !plain && mood === 'working' && look.ownColor === true
+    const body = plain ?? (own ? identity : BUDDY_STATE_COLOR[mood])
+    const resting = mood === 'idle' || mood === 'asleep'
     const top = !plain && resting ? shade(identity, mood === 'asleep' ? -0.6 : -0.12) : body
     const t = boxTop(geometry)
 
