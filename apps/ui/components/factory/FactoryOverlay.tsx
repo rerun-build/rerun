@@ -8,22 +8,25 @@
 
 import { type AxisPoint, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 
-import { along, atDistance, centreOf, inScanner, podPath, restDistances, settles, toWorld, type P } from './factory-rest'
+import { along, atDistance, centreOf, inScanner, lineUp, podPath, settles, workSpot, toWorld, type P } from './factory-rest'
 import { Gate, GATE_CSS } from './FactoryGate'
 import { HOLD_CSS, HoldBarrier } from './FactoryHold'
 import { FeatureTank, RejectTank, TANK_CSS } from './FactoryTank'
 import { Sphere, SPHERE_CSS } from './FactorySphere'
 import { type CabinetView, type PodView } from './factory-scene'
 
-const QUEUE_GAP = 40 // px between waiting spheres on the loader's line
-
 // `routes` are the board's own, from routeTileLinks on the same tiles and links, so a sphere rides
 // the belt drawn under it.
 export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, holdLeftMs = 0, links = [], selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean; holdLeftMs?: number; links?: TileLink[]; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
-    // A sphere being worked rests short of whoever works it, clear of every block and every other
-    // resting sphere (factory-rest.ts).
-    const rests = restDistances(pods, tiles, routes)
+    // Waiting tasks line up per belt from its start, the one waiting longest first (factory-rest.ts).
+    const lineIndex = new Map<string, number>()
+    const belts = new Map<string, PodView[]>()
+    for (const p of pods) if (p.state === 'queued' || p.state === 'held') {
+        const key = `${p.path[0]}>${p.path[1]}`
+        belts.set(key, [...(belts.get(key) ?? []), p])
+    }
+    for (const group of belts.values()) group.sort((a, b) => (a.since ?? 0) - (b.since ?? 0) || a.issue - b.issue).forEach((p, i) => lineIndex.set(p.id, i))
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
             <style>{FAB_CSS + SPHERE_CSS + GATE_CSS + TANK_CSS + HOLD_CSS}</style>
@@ -42,7 +45,8 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, h
             {pods.map(p => {
                 const pts = podPath(p.path, byId, routes)
                 if (pts.length < 2) return null
-                const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : settles(p) ? atDistance(pts, (rests.get(p.id) ?? 0) * p.travel) : along(pts, p.travel)
+                const holder = settles(p) ? byId.get(p.path[p.path.length - 1]) : undefined
+                const at = lineIndex.has(p.id) ? lineUp(pts, lineIndex.get(p.id)!) : holder ? along([...pts, workSpot(holder, inScanner(p))], p.travel) : along(pts, p.travel)
                 return inScanner(p)
                     ? <Gate key={p.id} pod={p} at={at}><Sphere pod={p} at={{ x: 0, y: 0 }} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} /></Gate>
                     : <Sphere key={p.id} pod={p} at={at} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} />

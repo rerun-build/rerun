@@ -8,7 +8,10 @@ import { useState } from 'react'
 
 import { STATUS_COLOR, type PodView } from './factory-scene'
 import type { P } from './factory-rest'
+import { formatInState } from './FactoryTasks'
 
+// The overlay re-renders every 250 ms, so the time in stage ticks without a timer of its own.
+const clock = () => Date.now()
 const R = 15
 const DISC = '#1b2140'
 
@@ -49,7 +52,11 @@ export function Sphere({ pod, at, selected = false, onSelectJob }: { pod: PodVie
                     <ellipse cx={-5} cy={-7.5} rx={3.6} ry={2} fill="#e8edff" />
                 </svg>
                 <span className="fab-orb-tag">#{pod.issue}<b>{stageWord(pod)}</b></span>
-                {hover && <span className="fab-orb-card" data-card={pod.issue}>#{pod.issue} {pod.title}<br />stage: {stageWord(pod)}</span>}
+                {hover && <span className="fab-orb-card" data-card={pod.issue}>#{pod.issue} {pod.title}<br />stage: {stageWord(pod)}
+                    {pod.holder && <><br /><span data-card-line="holder">holder: {pod.holder}</span></>}
+                    {pod.since !== undefined && <><br /><span data-card-line="since">in stage: {formatInState(clock() - pod.since)}</span></>}
+                    {pod.pr !== undefined && <><br /><span data-card-line="pr">PR #{pod.pr}</span></>}
+                </span>}
             </div>
         </div>
     )
