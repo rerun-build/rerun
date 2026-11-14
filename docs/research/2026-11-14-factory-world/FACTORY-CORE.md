@@ -44,6 +44,13 @@ Healing and improving are not schedules or a person's review: they are reactions
   kept as data** in the ledger, versioned, never hard-coded; a policy change that the following signals
   show to be worse is rolled back by the same loop, and every change and its measured effect is written
   down. No setting changes without a signal behind it.
+- **On the heartbeat** (owner: "so feedback loop needs to also be on the heartbeat"): the loop runs every
+  delegator beat (about 30 s), not at the end of an epic. Each beat reads the signals since the last beat,
+  runs the detectors and takes the healing actions within that beat; the improving loop judges each policy
+  over a rolling window of recent signals on every beat. Against thrashing: a policy changes only with
+  enough evidence behind it (a minimum count of tasks in the window), waits a cooldown after a change
+  before it is judged again, and a new setting must beat the old one by a clear margin, not by noise. The
+  epic scorecard remains as the summary of what the beats did.
 
 ## 1. The chunker: any epic into a graph that runs in parallel
 - **A planner proposes, the chunker decides.** Boss (or any planner) writes a cut; the chunker validates it
