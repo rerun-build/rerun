@@ -875,7 +875,14 @@
         "step": "Passo {number}",
         "noSteps": "Nenhum passo registrado nesta execução.",
         "input": "Entrada",
-        "output": "Saída"
+        "output": "Saída",
+        "filters": { "running": "Em curso", "failed": "Falhadas", "done": "Concluídas" },
+        "search": "Pesquisar execuções",
+        "hiddenRunning": "{count, plural, one {# execução em curso} other {# execuções em curso}}",
+        "hiddenFailed": "{count, plural, one {# execução falhada} other {# execuções falhadas}}",
+        "hiddenDone": "{count, plural, one {# execução concluída} other {# execuções concluídas}}",
+        "hidden": "{parts} ocultas",
+        "noMatch": "Nenhuma execução corresponde a \"{query}\""
     },
     "agentRunHistory": {
         "tokens": "{total} tokens",
