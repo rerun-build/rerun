@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { routeTileLinks } from '@rerun/ui/iso-grid'
+import { TILE_H, routeTileLinks } from '@rerun/ui/iso-grid'
 
-import { atDistance, inScanner, podPath, restDistances, settles, sphereShapes, tileShapes } from './factory-rest'
+import { atDistance, centreOf, inScanner, lineUp, podPath, restDistances, settles, sphereShapes, tileShapes, toWorld, workSpot } from './factory-rest'
 import { LOOP_MS, factoryScene } from './factory-scene'
 
 // Bounding boxes are enough to report a collision by name; the module itself tests the exact shapes.
@@ -43,6 +43,44 @@ describe('where a sphere being worked rests', () => {
             const pts = podPath(p.path, byId, routes)
             expect(rests.get(p.id)!).toBeLessThan(pts.slice(1).reduce((a, q, i) => a + Math.hypot(q.x - pts[i].x, q.y - pts[i].y), 0))
         }
+    })
+})
+
+describe('the fixed work spot and the line-up', () => {
+    it('puts the spot straight in front of the holder, the same every time', () => {
+        const tile = factoryScene(9_000, 0).tiles.find(x => x.id === 'code')!
+        const c = toWorld(centreOf(tile))
+        expect(c).toEqual({ x: 392, y: 294 })
+        expect(workSpot(tile, false)).toEqual({ x: 392, y: 362 })
+        expect(workSpot(tile, false).y).toBe(c.y + TILE_H + 40)
+        expect(workSpot(tile, true).y - workSpot(tile, false).y).toBe(26)
+        for (const t of [0, 20_000, 60_000]) {
+            const again = factoryScene(t, 0).tiles.find(x => x.id === 'code')!
+            expect(workSpot(again, false)).toEqual(workSpot(tile, false))
+        }
+    })
+
+    it('never sits on its own holder', () => {
+        let n = 0
+        for (let t = 0; t <= LOOP_MS; t += 250) {
+            const frame = factoryScene(t, 0)
+            const byId = new Map(frame.tiles.map(x => [x.id, x]))
+            for (const p of frame.pods) {
+                if (!settles(p) || p.travel < 1) continue
+                const holder = byId.get(p.path[p.path.length - 1])
+                if (!holder) continue
+                n++
+                const spot = sphereShapes(workSpot(holder, inScanner(p)), inScanner(p))
+                const clash = spot.some(a => tileShapes(holder).some(b => overlapsExactly(a, b)))
+                expect({ t, id: p.id, clash }).toEqual({ t, id: p.id, clash: false })
+            }
+        }
+        expect(n).toBe(648)
+    })
+
+    it('lines up evenly from the start of the belt', () => {
+        const path = [{ x: 0, y: 0 }, { x: 400, y: 0 }]
+        expect([0, 1, 2].map(i => lineUp(path, i))).toEqual([{ x: 22, y: 0 }, { x: 62, y: 0 }, { x: 102, y: 0 }])
     })
 })
 
