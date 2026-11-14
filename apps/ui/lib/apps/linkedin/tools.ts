@@ -14,6 +14,7 @@ const offset = { type: 'integer', minimum: 0 }
 const cursor = { type: 'string', description: 'next_cursor from the previous answer, to read the next page' }
 const postUrl = { type: 'string', description: 'LinkedIn post URL, e.g. https://www.linkedin.com/feed/update/urn:li:activity:…' }
 const companyUrl = { type: 'string', description: 'LinkedIn company page URL, e.g. https://www.linkedin.com/company/stripe/' }
+const asPage = { type: 'string', description: 'Act as this company page instead of the user, when they are one of its admins' }
 const groupUrl = { type: 'string', description: 'LinkedIn group URL or numeric id' }
 const dateField = { type: 'string', description: 'YYYY-MM or YYYY' }
 const eventUrl = { type: 'string', description: 'LinkedIn event URL, urn:li:fsd_professionalEvent:… or numeric id' }
@@ -54,6 +55,32 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         action: 'search_people',
         quota: { action: 'search_result', amount: args => Number(args.count) || 10 },
         clamp: { count: { default: 10, max: 50 } },
+    },
+    {
+        name: 'search_companies',
+        description: 'Search LinkedIn company pages by keyword, location, sector or size.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                keyword: { type: 'string' },
+                location: { type: 'string', description: 'e.g. New York, Germany' },
+                sector: { type: 'string' },
+                company_size: { type: 'string', description: 'e.g. 11-50, 201-500' },
+                count: count(50),
+                offset,
+            },
+        },
+        category: 'profiles',
+        action: 'search_companies',
+        quota: { action: 'search_result', amount: args => Number(args.count) || 10 },
+        clamp: { count: { default: 10, max: 50 } },
+    },
+    {
+        name: 'get_company',
+        description: 'A LinkedIn company page: description, industry, size, headquarters, website, followers.',
+        inputSchema: { type: 'object', properties: { company_url: companyUrl }, required: ['company_url'] },
+        category: 'profiles',
+        action: 'get_company',
     },
     {
         name: 'get_contact_info',
@@ -493,16 +520,16 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'react_to_post',
-        description: 'React to a LinkedIn post as the user.',
-        inputSchema: { type: 'object', properties: { post_url: { type: 'string' }, reaction_type: { type: 'string', enum: ['LIKE', 'CELEBRATE', 'SUPPORT', 'FUNNY', 'LOVE', 'INSIGHTFUL'] } }, required: ['post_url'] },
+        description: 'React to a LinkedIn post as the user, or as a company page they admin.',
+        inputSchema: { type: 'object', properties: { post_url: { type: 'string' }, reaction_type: { type: 'string', enum: ['LIKE', 'CELEBRATE', 'SUPPORT', 'FUNNY', 'LOVE', 'INSIGHTFUL'] }, company_url: asPage }, required: ['post_url'] },
         category: 'content',
         action: 'react',
         quota: { action: 'engagement' },
     },
     {
         name: 'comment_on_post',
-        description: 'Comment on a LinkedIn post as the user.',
-        inputSchema: { type: 'object', properties: { post_url: { type: 'string' }, comment_text: { type: 'string' } }, required: ['post_url', 'comment_text'] },
+        description: 'Comment on a LinkedIn post as the user, or as a company page they admin.',
+        inputSchema: { type: 'object', properties: { post_url: { type: 'string' }, comment_text: { type: 'string' }, company_url: asPage }, required: ['post_url', 'comment_text'] },
         category: 'content',
         action: 'comment',
         quota: { action: 'engagement' },
@@ -528,8 +555,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'repost',
-        description: "Repost a LinkedIn post on the user's feed.",
-        inputSchema: { type: 'object', properties: { post_url: postUrl }, required: ['post_url'] },
+        description: "Repost a LinkedIn post on the user's feed, or on a company page they admin.",
+        inputSchema: { type: 'object', properties: { post_url: postUrl, company_url: asPage }, required: ['post_url'] },
         category: 'content',
         action: 'repost',
         quota: { action: 'engagement' },
@@ -551,6 +578,24 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         },
         category: 'content',
         action: 'create',
+        quota: { action: 'post' },
+    },
+    {
+        name: 'create_company_post',
+        description: 'Publish a post on a company page the user admins: text, with an image, a video or a carousel by public URL. Only when the user asked for it or approved the text.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                company_url: companyUrl,
+                message: { type: 'string' },
+                file: { type: 'string', description: 'Public URL of one image or video' },
+                files: { type: 'array', items: { type: 'string' }, description: 'Public URLs of the images of a carousel' },
+                thumbnail: { type: 'string', description: 'Cover image URL, for a video file only' },
+            },
+            required: ['company_url'],
+        },
+        category: 'content',
+        action: 'create_company',
         quota: { action: 'post' },
     },
     attachmentTool('attachment_download'),
