@@ -1,7 +1,9 @@
-import { parseQueued, type QueuedMessage } from '@rerun/contracts'
+import { parseQueued, queuedPreview, type QueuedMessage } from '@rerun/contracts'
 import { randomUUID } from 'expo-crypto'
 import { Directory, File, Paths } from 'expo-file-system'
 import { useCallback, useState } from 'react'
+
+import { restoreDraft } from './composer-drafts'
 
 // A file per conversation, not SecureStore: a value there is capped at 2 KB and a message is not.
 const folder = () => new Directory(Paths.document, 'queued-messages')
@@ -59,5 +61,15 @@ export function useQueuedMessage(key: string) {
         setState(prev => ({ ...prev, queued: null }))
     }, [key])
 
-    return { queued, restoredId, enqueue, clear }
+    // A message that stopped waiting goes back to the composer. Text already typed there stays, and the
+    // message leaves the queue either way: left queued, it would go out on its own.
+    const returnToComposer = useCallback(
+        (draftKey: string) => {
+            if (queued) restoreDraft(draftKey, queuedPreview(queued.text).text)
+            clear()
+        },
+        [queued, clear]
+    )
+
+    return { queued, restoredId, enqueue, clear, returnToComposer }
 }
