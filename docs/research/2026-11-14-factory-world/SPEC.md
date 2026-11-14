@@ -31,6 +31,17 @@ first.
 | Flow line with arrows | direction of flow | a belt, with chevrons pointing the way work moves; still when nothing is on it |
 | D-shape (delay) | waiting | a hold: a red D-shaped barrier across the belts, with the time left |
 
+**Moods** (owner: "yes moods are important"; Rerun's own moods, `BuddyMood` in `packages/ui/src/iso-grid/types.ts`,
+faces in `components/buddy/BuddyFace.tsx`, motions `MOTION` in `components/buddy/AgentBuddy.tsx`):
+
+| Mood | Face and body (as Rerun draws them) | On the floor, when |
+|---|---|---|
+| idle | eyes blink and look around; body still; grey body, coloured top | it has no run out |
+| working | animated face; the jello bob; about twice as tall; top and body in its colour; stronger glow | it has a run out |
+| error | crossed eyes (glasses, visor and shades keep their frame), a frown, the shudder; its top keeps its colour, the glow turns red | a task it holds is blocked or failed, or its last run ended in error or stalled, until that is resolved |
+| waiting | Rerun's waiting face | its run waits on a person (a question to the owner) |
+| asleep | Rerun's asleep face, dimmed | switched off, or in no pool |
+
 Only copies are see-through. Spheres, tanks, gates and coworkers are solid.
 
 Idle means still bodies: an idle coworker, the Loader, a gate, a tank or a belt does not move its shape (no
