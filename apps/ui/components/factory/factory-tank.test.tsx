@@ -81,3 +81,45 @@ describe('a feature is a tank', () => {
         expect(html).toMatch(/0\/5/)
     })
 })
+
+const rejectTank = (html: string) => html.match(/<div class="fab-reject[^>]*data-tank="rejects"[\s\S]*?rejected<\/span><\/div>/g) ?? []
+
+describe('the reject store is a tank', () => {
+    it('draws the reject store as a red cylinder', () => {
+        const { html } = render(0)
+        const ts = rejectTank(html)
+        expect(ts.length).toBe(1)
+        expect(ts[0].match(/<ellipse/g)?.length).toBeGreaterThanOrEqual(2)
+        expect(tag(ts[0], 'body')).toContain('#7f1d1d')
+        for (const gone of ['fab-bin-left', 'fab-bin-right', 'fab-bin-part']) expect(html).not.toContain(gone)
+    })
+
+    it('prints how many are in it, once', () => {
+        const start = rejectTank(render(0).html)[0]
+        expect(num(start, 'data-count')).toBe(0)
+        expect(start).not.toContain('data-filled')
+        expect(start).toMatch(/>0<\/span><span>rejected/)
+        let t = 0
+        while (t <= LOOP_MS && factoryScene(t, 0).rejects < 1) t += 250
+        expect(t).toBeLessThanOrEqual(LOOP_MS)
+        const { frame, html } = render(t)
+        expect(frame.rejects).toBe(1)
+        const one = rejectTank(html)[0]
+        expect(num(one, 'data-count')).toBe(1)
+        expect(one).toContain('data-filled')
+        expect(one.match(/>1</g)?.length).toBe(1)
+    })
+
+    it('is solid', () => {
+        const t = rejectTank(render(21_750).html)[0]
+        expect(t).not.toContain('rgba(')
+        expect(t).not.toContain('fill-opacity')
+        expect(t).not.toMatch(/opacity/)
+    })
+
+    it('stands beside two feature tanks in the sample loop', () => {
+        const { html } = render(6_000)
+        expect(html.match(/data-tank="rejects"/g)?.length).toBe(1)
+        expect(html.match(/data-tank="feature"/g)?.length).toBe(2)
+    })
+})
