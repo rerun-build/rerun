@@ -9,6 +9,7 @@ import { JOB_STATE_VIEW, groupOf, type JobGroup } from './factory-state'
 const GROUP_ORDER: JobGroup[] = ['active', 'waiting', 'ended']
 const GROUP_LABEL: Record<JobGroup, string> = { active: 'Active', waiting: 'Waiting', ended: 'Ended today' }
 const IDLE_TEXT = (merged: number) => `The line is idle. ${merged} merged today.`
+export const SAMPLE_TEXT = 'This is the sample floor: no live data from the line yet. The tasks moving on it are a demonstration.'
 const REASON_STATES = new Set(['blocked', 'failed', 'returned'])
 
 export function formatInState(ms: number): string {
@@ -19,7 +20,9 @@ export function formatInState(ms: number): string {
     return `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`
 }
 
-export function FactoryTasks({ jobs, repo, endedToday, selected, onSelect }: { jobs: FactoryJob[]; repo: string; endedToday: FactorySnapshot['endedToday']; selected: number | null; onSelect: (issue: number) => void }) {
+// `sample`: there is no snapshot yet and the floor plays the sample loop, so the column says that
+// instead of reporting an idle line next to a floor full of moving tasks.
+export function FactoryTasks({ jobs, repo, endedToday, selected, onSelect, sample = false }: { jobs: FactoryJob[]; repo: string; endedToday: FactorySnapshot['endedToday']; selected: number | null; onSelect: (issue: number) => void; sample?: boolean }) {
     const [now, setNow] = useState(() => Date.now())
     const [filter, setFilter] = useState<JobGroup | null>(null)
     useEffect(() => {
@@ -42,7 +45,7 @@ export function FactoryTasks({ jobs, repo, endedToday, selected, onSelect }: { j
                     </button>
                 ))}
             </div>
-            {idle && <p className="text-muted-foreground">{IDLE_TEXT(endedToday.merged)}</p>}
+            {sample ? <p data-sample className="text-muted-foreground">{SAMPLE_TEXT}</p> : idle && <p className="text-muted-foreground">{IDLE_TEXT(endedToday.merged)}</p>}
             {shown.map((g) => (
                 <section key={g} className="flex flex-col gap-1">
                     <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{GROUP_LABEL[g]}</h3>

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { factoryJobStateSchema, type FactoryJob } from '@rerun/contracts'
 import { JOB_STATE_VIEW, groupOf } from './factory-state'
 import { STATUS_COLOR } from './factory-scene'
-import { FactoryTasks, formatInState } from './FactoryTasks'
+import { FactoryTasks, SAMPLE_TEXT, formatInState } from './FactoryTasks'
 
 const NOW = Date.parse('2026-11-14T12:00:00Z')
 const ended = { merged: 23, rejected: 0, blocked: 0, failed: 0, returned: 0 }
@@ -98,6 +98,12 @@ describe('FactoryTasks', () => {
     it('says the line is idle with the merged count', () => {
         render([job({ state: 'merged' })])
         expect(host.textContent).toContain('The line is idle. 23 merged today.')
+    })
+
+    it('says it is the sample floor, not an idle line, when there is no live data', () => {
+        act(() => { root.render(createElement(FactoryTasks, { jobs: [], repo: '', endedToday: ended, selected: null, onSelect: () => {}, sample: true })) })
+        expect(host.textContent).toContain(SAMPLE_TEXT)
+        expect(host.textContent).not.toContain('The line is idle')
     })
 
     it('calls onSelect with the issue on a row click, and not on the PR link click', () => {
