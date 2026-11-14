@@ -62,6 +62,20 @@ function findConflicts(tiles: Tile[], links: TileLink[]) {
     return { routes, shared, crossings, hits }
 }
 
+// Sideways steps: a stretch no longer than a pitch between two stretches heading the same way, the S a
+// line makes when it changes lane mid-run instead of at a corner.
+function sidewaysSteps(routes: Map<string, AxisPoint[]>) {
+    const steps: string[] = []
+    for (const [key, points] of routes) {
+        const dir = (a: AxisPoint, b: AxisPoint) => `${Math.sign(b.u - a.u)},${Math.sign(b.v - a.v)}`
+        for (let i = 1; i < points.length - 2; i++) {
+            const length = Math.abs(points[i + 1].u - points[i].u) + Math.abs(points[i + 1].v - points[i].v)
+            if (length < LINK_PITCH + EPS && dir(points[i - 1], points[i]) === dir(points[i + 1], points[i + 2])) steps.push(key)
+        }
+    }
+    return steps
+}
+
 // The along-face coordinates of the ends leaving `id` through its +u face (u = col + span).
 const portsOnPlusU = (routes: Map<string, AxisPoint[]>, id: string, targets: string[], plane: number) =>
     targets.map(t => {
@@ -112,6 +126,17 @@ describe('routeTileLinks', () => {
         expect((ports[0] + ports[4]) / 2).toBeCloseTo(5)
     })
 
+    it('keeps a straight line in one lane from face to face, with no sideways step', () => {
+        // The hub's +u face carries two ends, so its straight one sits off centre: the far end follows it.
+        const tiles = [tile('hub', 1, 4), tile('ahead', 12, 4), tile('below', 12, 12)]
+        const routes = routeTileLinks(tiles, [link('hub', 'ahead'), link('hub', 'below')])
+        const straight = routes.get('hub->ahead')!
+        expect(straight).toHaveLength(2)
+        expect(straight[0].v).toBeCloseTo(straight[1].v)
+        expect(straight[0].v).not.toBeCloseTo(5)
+        expect(sidewaysSteps(routes)).toEqual([])
+    })
+
     it('routes around a tile standing between the two ends', () => {
         const tiles = [tile('a', 1, 1), tile('b', 13, 1), tile('wall', 7, 1)]
         const { hits, routes } = findConflicts(tiles, [link('a', 'b')])
@@ -139,7 +164,7 @@ describe('routeTileLinks', () => {
         for (let t = 0; t < LOOP_MS; t += 1_500) {
             const frame = factoryScene(t, 0)
             const { shared, hits, crossings, routes } = findConflicts(frame.tiles, frame.links)
-            expect({ t, shared, hits, crossings }).toEqual({ t, shared: [], hits: [], crossings: [] })
+            expect({ t, shared, hits, crossings, steps: sidewaysSteps(routes) }).toEqual({ t, shared: [], hits: [], crossings: [], steps: [] })
             for (const l of frame.links) {
                 const points = routes.get(`${l.source}->${l.target}`)!
                 expect(points.length).toBeGreaterThanOrEqual(2)
@@ -151,8 +176,8 @@ describe('routeTileLinks', () => {
         const s = factorySnapshotSchema.parse(JSON.parse(readFileSync(path.resolve(import.meta.dirname, '../../../../packages/contracts/fixtures/factory-snapshot.sample.json'), 'utf8')))
         s.jobs[0].parent = 320
         const frame = sceneFromSnapshot(s, Date.parse('2026-11-14T03:24:40Z'))
-        const { shared, hits, crossings } = findConflicts(frame.tiles, frame.links)
-        expect({ shared, hits, crossings }).toEqual({ shared: [], hits: [], crossings: [] })
+        const { shared, hits, crossings, routes } = findConflicts(frame.tiles, frame.links)
+        expect({ shared, hits, crossings, steps: sidewaysSteps(routes) }).toEqual({ shared: [], hits: [], crossings: [], steps: [] })
     })
 
     it('keeps the reject bin a free cell away from every coworker and from every belt but its own', () => {
