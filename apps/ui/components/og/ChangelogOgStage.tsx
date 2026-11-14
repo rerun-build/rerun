@@ -12,6 +12,7 @@ function TimelineEntry({ entry, latest }: { entry: ChangelogOgEntry; latest: boo
             </span>
             {entry.imageUrl ? (
                 <div className="flex aspect-video h-full shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={entry.imageUrl} alt="" className="size-full object-contain" />
                 </div>
             ) : null}

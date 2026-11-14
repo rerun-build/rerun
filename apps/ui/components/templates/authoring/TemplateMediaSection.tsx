@@ -103,6 +103,7 @@ function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: 
                                 className="flex items-center gap-3 rounded-lg border border-foreground/10 bg-background p-2"
                             >
                                 <GripVerticalIcon className="size-4 shrink-0 cursor-grab text-muted-foreground" />
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={image.url} alt="" className="h-10 w-16 shrink-0 rounded object-cover" />
                                 <div className="flex-1">
                                     <Input

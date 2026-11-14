@@ -263,6 +263,7 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
                                         transition={{ duration: 1.4, repeat: 2, ease: 'easeOut' }}
                                     />
                                 )}
+                                {/* eslint-disable-next-line @next/next/no-img-element -- LinkedIn photo URLs are third-party */}
                                 <img src={finding.photoUrl} alt="" className="relative size-10 rounded-full object-cover" />
                             </div>
                         ) : (

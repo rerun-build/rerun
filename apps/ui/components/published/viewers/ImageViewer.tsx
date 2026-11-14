@@ -9,6 +9,7 @@ export function ImageViewer({ slug, name }: { slug: string; name: string }) {
     return (
         <ViewerPage slug={slug} bar={<ViewerTopBar icon={ImageIcon} name={name} meta={size} />} className="flex items-center justify-center bg-muted/60 p-6 max-md:p-3">
             <a href={RAW_URL} target="_blank" rel="noopener" className="flex max-h-full max-w-[720px] cursor-zoom-in">
+                {/* eslint-disable-next-line @next/next/no-img-element -- a published file, served through its own signed URL */}
                 <img
                     src={RAW_URL}
                     alt={name}

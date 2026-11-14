@@ -22,6 +22,7 @@ export function FilePreview({ fileName, content, rawUrl, loading }: FilePreviewP
     if (kind === 'image') {
         return (
             <div className="flex h-full items-center justify-center overflow-auto bg-muted p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary proxied file bytes, no fixed dimensions or configured loader */}
                 <img src={rawUrl} alt={fileName} className="max-h-full max-w-full object-contain" />
             </div>
         )

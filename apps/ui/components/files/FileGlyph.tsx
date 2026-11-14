@@ -75,6 +75,7 @@ export function ImageGlyph({ src, alt }: { src: string; alt: string }) {
             className="relative size-16 overflow-hidden rounded-[5px]"
             style={{ backgroundColor: 'var(--iso-tile-idle)', boxShadow: `inset 0 0 0 1px ${INK}` }}
         >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={src} alt={alt} loading="lazy" decoding="async" className="size-full object-cover" />
         </div>
     )

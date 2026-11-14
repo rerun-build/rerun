@@ -221,6 +221,7 @@ export const TileBlock = memo(function TileBlock({ tile, selected, hovered, isDr
 
                 {s.image != null && (
                     <div className="absolute left-0 top-0 flex items-center justify-center pointer-events-none select-none" style={{ width: AW, height: AH }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={s.image}
                             alt=""

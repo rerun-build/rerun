@@ -149,8 +149,10 @@ export function stripText(ts, file, text) {
     const spans = drop.map((r) => ({ pos: r.pos, end: r.end }))
     for (const n of jsxEmpty) {
         const start = n.getStart(sf)
-        const inside = ranges.filter((r) => r.pos >= start && r.end <= n.end)
-        if (inside.every((r) => !r.keep)) spans.push({ pos: start, end: n.end })
+        const inner = text.slice(start + 1, n.end - 1)
+        const found = ts.getLeadingCommentRanges(inner, 0) || []
+        if (found.some((r) => KEEP.test(inner.slice(r.pos, r.end)))) continue
+        spans.push({ pos: start, end: n.end })
     }
     if (!spans.length) return { text, removed: 0, kept: ranges.length - drop.length, same: true }
     const out = apply(text, cuts(text, spans))

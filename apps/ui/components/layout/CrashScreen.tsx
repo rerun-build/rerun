@@ -14,6 +14,7 @@ export function CrashScreen() {
             <div className="flex items-center gap-2">
                 <Button onClick={() => window.location.reload()}>{t('crash.reload')}</Button>
                 <Button variant="outline" asChild>
+                    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                     <a href="/">{t('backToDashboard')}</a>
                 </Button>
             </div>

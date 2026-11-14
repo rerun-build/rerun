@@ -25,6 +25,7 @@ function MediaTile({ item, shape, onOpen }: { item: MediaAlbumItem; shape: Media
             aria-label={t('open', { name: item.name })}
             className={cn('overflow-hidden rounded-2xl bg-muted transition-opacity hover:opacity-90', natural ? 'max-h-72 max-w-full' : cn('w-full', MEDIA_CELL_ASPECT[shape]))}
         >
+            {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary proxied file bytes, no fixed dimensions or configured loader */}
             <img src={item.src} alt={item.name} loading="lazy" decoding="async" className={natural ? 'max-h-72 max-w-full object-contain' : 'size-full object-cover'} />
         </button>
     )
