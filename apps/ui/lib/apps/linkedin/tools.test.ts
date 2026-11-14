@@ -111,6 +111,44 @@ describe('company pages', () => {
     })
 })
 
+describe('Sales Navigator', () => {
+    const salesNavTools = LINKEDIN_TOOLS.filter(tool => tool.name.startsWith('sales_nav_'))
+
+    it('tells the coworker every Sales Navigator tool needs a seat', () => {
+        expect(salesNavTools.length).toBeGreaterThan(10)
+        for (const tool of salesNavTools) expect(tool.description).toMatch(/^Needs a Sales Navigator seat\./)
+    })
+
+    it('meters a lead search per result and passes its filters through', () => {
+        const search = linkedinTool('sales_nav_search_people')!
+        expect(search.quota?.action).toBe('search_result')
+        const filters = { seniority_level: ['Director', 'CXO'], geography: ['DACH'], exclude: { industry: ['Banking'] }, ignored: true }
+        expect(toolParams(search, filters)).toEqual({ seniority_level: ['Director', 'CXO'], geography: ['DACH'], exclude: { industry: ['Banking'] }, count: 10 })
+    })
+
+    it('saves a search with the filters of either search', () => {
+        const save = linkedinTool('sales_nav_save_search')!
+        expect(toolParams(save, { name: 'CTOs', type: 'people', current_title: ['CTO'], company_headcount: ['51-200'] })).toEqual({
+            name: 'CTOs',
+            type: 'people',
+            current_title: ['CTO'],
+            company_headcount: ['51-200'],
+        })
+    })
+
+    it('reads the InMail balance from its own endpoint', async () => {
+        vi.mocked(runFlatEndpoint).mockResolvedValueOnce({ inmail_credits: 12 })
+        await linkedinTool('sales_nav_inmail_balance')!.run!({ slug: 'linkedin', accountId: 'acc-1', connectionId: 'c', engineAgentId: 'a', engine: vi.fn() }, {})
+        expect(runFlatEndpoint).toHaveBeenCalledWith('acc-1', 'balance', { action: 'get' })
+    })
+
+    it('reads and answers the Sales Navigator inbox through the classic tools', () => {
+        for (const name of ['get_profile', 'list_conversations', 'get_conversation', 'send_message']) {
+            expect(Object.keys(linkedinTool(name)!.inputSchema.properties)).toContain('sales_nav')
+        }
+    })
+})
+
 describe('toolParams', () => {
     it('drops what the tool does not declare and caps the page size', () => {
         const search = linkedinTool('search_people')!

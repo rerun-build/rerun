@@ -160,7 +160,7 @@ export async function runAction<T = unknown>(accountId: string, category: Linkup
 }
 
 // Endpoints that take their parameters flat in the body, without an `action` + `params` pair.
-export type LinkupFlatEndpoint = 'typeahead'
+export type LinkupFlatEndpoint = 'typeahead' | 'balance'
 
 export async function runFlatEndpoint<T = unknown>(accountId: string, endpoint: LinkupFlatEndpoint, body: Record<string, unknown>): Promise<T> {
     return call<T>('POST', `/v2/${endpoint}`, { ...body, account_id: accountId })

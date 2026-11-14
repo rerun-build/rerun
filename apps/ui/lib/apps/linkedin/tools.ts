@@ -19,6 +19,87 @@ const groupUrl = { type: 'string', description: 'LinkedIn group URL or numeric i
 const dateField = { type: 'string', description: 'YYYY-MM or YYYY' }
 const eventUrl = { type: 'string', description: 'LinkedIn event URL, urn:li:fsd_professionalEvent:… or numeric id' }
 
+const SALES_NAV = 'Needs a Sales Navigator seat.'
+const stringList = (description?: string) => ({ type: 'array', items: { type: 'string' }, ...(description ? { description } : {}) })
+const yearsRange = { type: 'array', items: { type: 'string', enum: ['Less than 1 year', '1 to 2 years', '3 to 5 years', '6 to 10 years', 'More than 10 years'] } }
+const minMax = { type: 'object', properties: { min: { type: 'number' }, max: { type: 'number' } } }
+
+const SALES_NAV_PEOPLE_FILTERS = {
+    sales_nav_url: { type: 'string', description: 'A Sales Navigator search, saved search or lead list URL. Wins over the filters' },
+    saved_search_id: { type: 'string' },
+    keyword: { type: 'string' },
+    first_name: { type: 'string' },
+    last_name: { type: 'string' },
+    current_title: stringList('Titles, free text or ids from linkedin_pro_typeahead'),
+    past_title: stringList(),
+    seniority_level: {
+        type: 'array',
+        items: { type: 'string', enum: ['In Training', 'Entry Level', 'Senior', 'Strategic', 'Entry Level Manager', 'Experienced Manager', 'Director', 'Vice President', 'CXO', 'Owner / Partner'] },
+    },
+    function: stringList('e.g. Sales, Marketing, Engineering'),
+    years_in_current_position: yearsRange,
+    years_at_current_company: yearsRange,
+    years_of_experience: yearsRange,
+    current_company: stringList('Names, page URLs or typeahead ids'),
+    past_company: stringList(),
+    company_size: stringList('e.g. 1-10, 51-200'),
+    company_type: {
+        type: 'array',
+        items: { type: 'string', enum: ['Public Company', 'Privately Held', 'Non Profit', 'Educational Institution', 'Partnership', 'Self Employed', 'Self Owned', 'Government Agency'] },
+    },
+    company_headquarters: stringList('Places, or EMEA, APAC, DACH, Benelux, Oceania, North America'),
+    industry: stringList(),
+    geography: stringList('Places, or EMEA, APAC, DACH, Benelux, Oceania, North America'),
+    region: stringList(),
+    postal_code: stringList(),
+    postal_radius: { type: 'number', enum: [5, 10, 25, 35, 50, 75, 100] },
+    profile_language: stringList('ISO code or name, e.g. en'),
+    school: stringList(),
+    relationship: stringList('1st, 2nd, 3rd+ or group'),
+    connection_of: stringList(),
+    category_interest: stringList(),
+    persona: stringList(),
+    group: stringList(),
+    shared_experiences: { type: 'boolean' },
+    changed_jobs: { type: 'boolean' },
+    posted_on_linkedin: { type: 'boolean' },
+    following_your_company: { type: 'boolean' },
+    viewed_your_profile: { type: 'boolean' },
+    past_colleague: { type: 'boolean' },
+    past_customer: { type: 'boolean' },
+    lead_interactions: stringList('Viewed profile, Messaged'),
+    account_list: stringList('ALL or list names'),
+    lead_list: stringList('ALL or list names'),
+    saved: stringList('saved leads, saved accounts'),
+    exclude: {
+        type: 'object',
+        description:
+            'Values to leave out, by filter: current_company, past_company, current_title, past_title, geography, region, company_headquarters, industry, school, function, account_list, lead_list, lead_interactions, saved',
+    },
+}
+
+const SALES_NAV_COMPANY_FILTERS = {
+    sales_nav_url: { type: 'string', description: 'A Sales Navigator account search URL. Wins over the filters' },
+    keyword: { type: 'string' },
+    industry: stringList(),
+    location: stringList('Places, super-regions or typeahead ids'),
+    company_headcount: { type: 'array', items: { type: 'string', enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5001-10000', '10001+'] } },
+    headcount_growth: { ...minMax, description: 'Percent' },
+    department_headcount: { type: 'object', properties: { department: { type: 'string' }, min: { type: 'number' }, max: { type: 'number' } } },
+    department_headcount_growth: { type: 'object', properties: { department: { type: 'string' }, min: { type: 'number' }, max: { type: 'number' } } },
+    annual_revenue: { type: 'object', properties: { min: { type: 'number' }, max: { type: 'number' }, currency: { type: 'string' } }, description: 'In millions, USD unless currency says otherwise' },
+    fortune: { type: 'array', items: { type: 'string', enum: ['50', '51-100', '101-250', '251-500'] } },
+    followers: { type: 'array', items: { type: 'string', enum: ['1-50', '51-100', '101-1000', '1001-5000', '5000+'] } },
+    hiring_on_linkedin: { type: 'boolean' },
+    recent_funding: { type: 'boolean' },
+    leadership_changes: { type: 'boolean' },
+    first_degree_connections: { type: 'boolean' },
+    saved_accounts: { type: 'boolean' },
+    postal_code: stringList(),
+    account_list: stringList(),
+    exclude: { type: 'object', description: 'Values to leave out: { industry: [...], location: [...] }' },
+}
+
 export const LINKEDIN_TOOLS: LinkedinTool[] = [
     {
         name: 'get_my_profile',
@@ -30,7 +111,14 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     {
         name: 'get_profile',
         description: 'Read one LinkedIn profile you need to act on (before an invitation or a message). For enriching many profiles at once, use the paid_data tools instead: they do not spend this account’s daily profile views.',
-        inputSchema: { type: 'object', properties: { profile_url: profileUrl, identifier: { type: 'string', description: 'Public id from the profile URL, e.g. jane-doe' } } },
+        inputSchema: {
+            type: 'object',
+            properties: {
+                profile_url: profileUrl,
+                identifier: { type: 'string', description: 'Public id from the profile URL, e.g. jane-doe' },
+                sales_nav: { type: 'boolean', description: 'With a Sales Navigator seat: also tell whether the profile is open to free InMail' },
+            },
+        },
         category: 'profiles',
         action: 'get',
         quota: { action: 'profile_view' },
@@ -386,6 +474,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
             properties: {
                 profile_url: profileUrl,
                 conversation_id: { type: 'string', description: 'Reply in this conversation instead of naming a profile' },
+                recipient_urn: { type: 'string', description: 'urn:li:fs_salesProfile:… from linkedin_pro_sales_nav_search_people: sends a Sales Navigator InMail' },
+                sales_nav: { type: 'boolean', description: 'Reply in a Sales Navigator InMail thread' },
                 message_text: { type: 'string' },
                 subject: { type: 'string', description: 'InMail only' },
                 inmail: { type: 'boolean' },
@@ -402,10 +492,14 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'list_conversations',
-        description: "The user's LinkedIn inbox, most recent first. Pass next_cursor from the last answer to go further back.",
-        inputSchema: { type: 'object', properties: {
-                category: { type: 'string', enum: ['INBOX', 'UNREAD', 'MY_CONNECTIONS', 'INMAIL', 'STARRED'] },
+        description:
+            "The user's LinkedIn inbox, most recent first. With sales_nav: true, the Sales Navigator InMail inbox instead (category INBOX, UNREAD, ARCHIVED or SENT). Pass next_cursor from the last answer to go further back.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                category: { type: 'string', enum: ['INBOX', 'UNREAD', 'MY_CONNECTIONS', 'INMAIL', 'STARRED', 'ARCHIVED', 'SENT'] },
                 since: { type: 'integer', description: 'Only conversations active after this time, in Unix milliseconds' },
+                sales_nav: { type: 'boolean' },
                 count: count(50),
                 cursor: { type: 'string' },
             },
@@ -425,6 +519,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
                 count: count(50),
                 cursor: { type: 'string' },
                 mark_as_read: { type: 'boolean', description: 'Also mark the conversation as read on LinkedIn' },
+                sales_nav: { type: 'boolean', description: 'A Sales Navigator InMail thread, by its conversation_id' },
             },
         },
         category: 'messages',
@@ -597,6 +692,142 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         category: 'content',
         action: 'create_company',
         quota: { action: 'post' },
+    },
+    {
+        name: 'sales_nav_search_people',
+        description: `${SALES_NAV} Lead search with every Sales Navigator filter. Values within one filter are OR, filters together are AND. Ids for the filters come from linkedin_pro_typeahead with category sales_nav. Page with offset, up to 2500.`,
+        inputSchema: { type: 'object', properties: { ...SALES_NAV_PEOPLE_FILTERS, count: count(100), offset } },
+        category: 'profiles',
+        action: 'search_people_nav',
+        quota: { action: 'search_result', amount: args => Number(args.count) || 10 },
+        clamp: { count: { default: 10, max: 100 } },
+    },
+    {
+        name: 'sales_nav_search_companies',
+        description: `${SALES_NAV} Account search with every Sales Navigator filter: headcount and its growth, revenue, Fortune rank, hiring, funding. Page with offset, up to 2500.`,
+        inputSchema: { type: 'object', properties: { ...SALES_NAV_COMPANY_FILTERS, count: count(100), offset } },
+        category: 'profiles',
+        action: 'search_companies_nav',
+        quota: { action: 'search_result', amount: args => Number(args.count) || 10 },
+        clamp: { count: { default: 10, max: 100 } },
+    },
+    {
+        name: 'sales_nav_get_profile',
+        description: `${SALES_NAV} A lead as Sales Navigator shows it.`,
+        inputSchema: { type: 'object', properties: { profile: { type: 'string', description: 'Profile URL, Sales Navigator lead URL or urn' } }, required: ['profile'] },
+        category: 'profiles',
+        action: 'get_profile_nav',
+        quota: { action: 'profile_view' },
+    },
+    {
+        name: 'sales_nav_get_company',
+        description: `${SALES_NAV} A company as Sales Navigator shows it, with its headcount over time, and on request its decision makers, warm paths in and news.`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                company: { type: 'string', description: 'Company id, page URL or Sales Navigator company URL' },
+                include: { type: 'array', items: { type: 'string', enum: ['headcount', 'decision_makers', 'warm_paths', 'news'] } },
+                headcount_timespan: { type: 'string', enum: ['6_months', '1_year', '2_years'] },
+            },
+            required: ['company'],
+        },
+        category: 'profiles',
+        action: 'get_company_nav',
+    },
+    {
+        name: 'sales_nav_check_inmail',
+        description: `${SALES_NAV} Which of up to 100 profiles accept a free InMail (Open Profile). Nothing is sent.`,
+        inputSchema: { type: 'object', properties: { profiles: { type: 'array', items: { type: 'string' }, maxItems: 100 } }, required: ['profiles'] },
+        category: 'profiles',
+        action: 'check_inmail',
+    },
+    {
+        name: 'sales_nav_check_inmail_seat',
+        description: `${SALES_NAV} Whether the seat can send an InMail right now, to anyone or to one profile. Nothing is sent.`,
+        inputSchema: { type: 'object', properties: { profile: { type: 'string' } } },
+        category: 'profiles',
+        action: 'check_inmail_seat',
+    },
+    {
+        name: 'sales_nav_inmail_balance',
+        description: `${SALES_NAV} How many InMail credits the seat has left.`,
+        inputSchema: { type: 'object', properties: {} },
+        category: 'profiles',
+        action: 'balance',
+        run: context => runFlatEndpoint(context.accountId, 'balance', { action: 'get' }),
+    },
+    {
+        name: 'sales_nav_unlock_profile',
+        description: `${SALES_NAV} Reveal an out-of-network lead, spending one of the seat's 25 monthly unlocks. Only when the user asked for it.`,
+        inputSchema: { type: 'object', properties: { profile: { type: 'string', description: 'Profile URL, slug, member id or Sales Navigator lead reference' } }, required: ['profile'] },
+        category: 'profiles',
+        action: 'unlock',
+    },
+    {
+        name: 'sales_nav_list_lists',
+        description: `${SALES_NAV} The seat's lead and account lists.`,
+        inputSchema: { type: 'object', properties: { type: { type: 'string', enum: ['lead', 'account'] }, ownership: { type: 'string', enum: ['all', 'owned', 'editable'] }, count: count(100), offset } },
+        category: 'profiles',
+        action: 'list_lists_nav',
+        clamp: { count: { default: 25, max: 100 } },
+    },
+    {
+        name: 'sales_nav_create_list',
+        description: `${SALES_NAV} Create an empty lead or account list.`,
+        inputSchema: { type: 'object', properties: { name: { type: 'string' }, type: { type: 'string', enum: ['lead', 'account'] }, description: { type: 'string' } }, required: ['name', 'type'] },
+        category: 'profiles',
+        action: 'create_list_nav',
+    },
+    {
+        name: 'sales_nav_add_to_list',
+        description: `${SALES_NAV} Add up to 25 profiles to a lead list, or up to 100 companies to an account list.`,
+        inputSchema: {
+            type: 'object',
+            properties: { list_id: { type: 'string' }, profiles: stringList('Profile URLs or ids, for a lead list'), companies: stringList('Company URLs or ids, for an account list') },
+            required: ['list_id'],
+        },
+        category: 'profiles',
+        action: 'add_to_list_nav',
+    },
+    {
+        name: 'sales_nav_remove_from_lists',
+        description: `${SALES_NAV} Unsave leads or companies. LinkedIn takes them out of every list at once.`,
+        inputSchema: { type: 'object', properties: { profiles: stringList(), companies: stringList() } },
+        category: 'profiles',
+        action: 'remove_from_lists_nav',
+    },
+    {
+        name: 'sales_nav_delete_list',
+        description: `${SALES_NAV} Delete a lead or account list.`,
+        inputSchema: { type: 'object', properties: { list_id: { type: 'string' }, unsave_entities: { type: 'boolean', description: 'Also unsave what the list held' } }, required: ['list_id'] },
+        category: 'profiles',
+        action: 'delete_list_nav',
+    },
+    {
+        name: 'sales_nav_list_saved_searches',
+        description: `${SALES_NAV} The seat's saved searches, each with its saved_search_id.`,
+        inputSchema: { type: 'object', properties: { type: { type: 'string', enum: ['people', 'company'] }, count: count(100), offset } },
+        category: 'profiles',
+        action: 'list_saved_searches_nav',
+        clamp: { count: { default: 25, max: 100 } },
+    },
+    {
+        name: 'sales_nav_save_search',
+        description: `${SALES_NAV} Save a lead search (type people) or an account search (type company) under a new name, with the filters of linkedin_pro_sales_nav_search_people or linkedin_pro_sales_nav_search_companies.`,
+        inputSchema: {
+            type: 'object',
+            properties: { name: { type: 'string' }, type: { type: 'string', enum: ['people', 'company'] }, ...SALES_NAV_COMPANY_FILTERS, ...SALES_NAV_PEOPLE_FILTERS },
+            required: ['name'],
+        },
+        category: 'profiles',
+        action: 'save_search_nav',
+    },
+    {
+        name: 'sales_nav_delete_saved_search',
+        description: `${SALES_NAV} Delete a saved search.`,
+        inputSchema: { type: 'object', properties: { saved_search_id: { type: 'string' } }, required: ['saved_search_id'] },
+        category: 'profiles',
+        action: 'delete_saved_search_nav',
     },
     attachmentTool('attachment_download'),
 ]
