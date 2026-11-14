@@ -22,7 +22,7 @@ export function useToolDisplay(agentId?: string): (toolName: string, input?: unk
 
     return useCallback(
         (toolName: string, input?: unknown) => {
-            const connector = resolveConnectorTool(toolName, map, isKnownTool)
+            const connector = resolveConnectorTool(toolName, map, isKnownTool, input)
             if (connector) return { label: connector.label, iconProps: serviceIconProps(connector.service.icon, connector.service.category) }
             const meta = getToolMeta(toolName, input, t)
             return { label: meta.label, iconProps: { icon: meta.icon } }

@@ -138,3 +138,22 @@ describe('custom servers in the connector map', () => {
         expect(resolveConnectorTool('memory_recall_all', map, name => name === 'memory_write')?.label).toBe('Memory · Recall All')
     })
 })
+
+describe('a tool a paid app runs from its directory', () => {
+    const map = buildConnectorMap([service({ key: 'linkedin-pro', slug: 'linkedin-pro', name: 'LinkedIn Pro', toolNames: ['linkedin_pro'] })])
+
+    it('is named after the tool that ran, with or without the server prefix', () => {
+        expect(resolveConnectorTool('linkedin_pro_run_tool', map, undefined, { tool: 'sales_nav_search_people', arguments: { keyword: 'cto' } })?.label).toBe('Sales Nav Search People')
+        expect(resolveConnectorTool('mcp__linkedin_pro__run_tool', map, undefined, { tool: 'linkedin_pro_recruiter_list_jobs' })?.label).toBe('Recruiter List Jobs')
+    })
+
+    it('keeps the name of the call while its input has not streamed in', () => {
+        expect(resolveConnectorTool('linkedin_pro_run_tool', map)?.label).toBe('Run Tool')
+        expect(resolveConnectorTool('linkedin_pro_run_tool', map, undefined, { tool: '' })?.label).toBe('Run Tool')
+    })
+
+    it('leaves every other tool named after itself, whatever its input holds', () => {
+        expect(resolveConnectorTool('linkedin_pro_get_profile', map, undefined, { tool: 'send_message' })?.label).toBe('Get Profile')
+    })
+})
+
