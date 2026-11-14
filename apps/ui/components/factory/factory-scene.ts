@@ -2,7 +2,7 @@
 // Coworkers are the board's 2x2 buddies; a copy is the same buddy, see-through. A task is a glass sphere
 // riding the belts between them and filling with its progress; a review is a scanner gate that passes
 // it on, sends it back for a fix, or turns a defect into the reject bin; a finished task pours into its
-// feature's sphere. Boxes keep the board's measures (8 high, a cell apart; places five cells apart).
+// feature's sphere. The layout is below, at BOXES.
 // `factoryScene(t)` is a pure function of the time in the loop.
 // shortcut: the jobs are a fixed sample loop; the real page feeds the delegator's snapshot instead.
 
@@ -16,24 +16,38 @@ const TRANSIT_MS = 1_400
 const SHAKE_MS = 700
 const SLIDE_MS = 900
 
-const PITCH = 5
-const box = (id: string, label: string, col: number, row: number, perRow: number, rows = 1): Container =>
-    ({ id, label, color: '#ffffff', col_start: col, row_start: row, col_end: col + PITCH * perRow, row_end: row + 8 * rows - 1 })
+// The floor reads left to right: the Loader sends to `code` in Build, `code` hands down to LINUS in
+// Review, LINUS sends back to the Loader through the open lane between the boxes, and the Loader fills
+// the feature spheres in Stock below it. Every object has at least two free cells around it, and the
+// copies sit straight out from or on a diagonal of their coworker, three at most to a face, so every
+// line is straight or a single bend and none crosses another (link-routes.test.ts holds this).
+const box = (id: string, label: string, col_start: number, row_start: number, col_end: number, row_end: number): Container =>
+    ({ id, label, color: '#ffffff', col_start, row_start, col_end, row_end })
 const BOXES: Container[] = [
-    box('dispatch', 'Loader', 0, 0, 1),
-    box('build', 'Build', 7, 0, 4),
-    box('stock', 'Stock', 0, 9, 2),
-    box('review', 'Review', 12, 9, 2),
-    box('studio', 'Research & design', 0, 18, 2),
+    box('dispatch', 'Loader', 4, 6, 10, 11),
+    box('build', 'Build', 17, 0, 37, 19),
+    box('stock', 'Stock', 0, 14, 10, 20),
+    box('review', 'Review', 17, 21, 29, 30),
+    box('studio', 'Research & design', 0, 22, 10, 31),
 ]
-const B = (id: string) => BOXES.find(b => b.id === id)!
-const places = (b: Container, perRow: number, n: number): Cell[] =>
-    Array.from({ length: n }, (_, i) => ({ col: b.col_start + 1 + PITCH * (i % perRow), row: b.row_start + 1 + PITCH * Math.floor(i / perRow) }))
 
-const BUILD = places(B('build'), 4, 8)
-const REVIEW = places(B('review'), 2, 4)
-const STUDIO = places(B('studio'), 2, 4)
-export const LOADER: Cell = { col: B('dispatch').col_start + 2, row: B('dispatch').row_start + 3 }
+export const LOADER: Cell = { col: 7, row: 9 }
+export const CODE: Cell = { col: 22, row: 9 }
+// The cells a copy of a coworker takes, in the order copies are made.
+export const COPY_CELLS = {
+    code: [{ col: 18, row: 5 }, { col: 22, row: 1 }, { col: 25, row: 4 }, { col: 30, row: 5 }, { col: 34, row: 9 }, { col: 26, row: 13 }],
+    LINUS: [{ col: 26, row: 23 }, { col: 22, row: 27 }],
+    search: [{ col: 7, row: 24 }],
+} satisfies Record<string, Cell[]>
+const LARRY: Cell = { col: 26, row: 17 }
+export const LINUS: Cell = { col: 22, row: 23 }
+const BRUCE: Cell = { col: 26, row: 27 }
+// The reject bin: beside the scanners, with free floor between it and every coworker and belt.
+const REJECT_BIN: Cell = { col: 18, row: 27 }
+const SEARCH: Cell = { col: 2, row: 24 }
+const DIETER: Cell = { col: 2, row: 29 }
+// Where the feature spheres stand in Stock: one under the Loader, one beside it.
+export const FEATURE_CELLS: Cell[] = [{ col: 7, row: 15 }, { col: 2, row: 15 }]
 
 const LOOKS: Record<string, BuddyLook> = {
     Delegator: { eyes: 'pixel', mouth: 'flat', color: '#334155' },
@@ -45,18 +59,15 @@ const LOOKS: Record<string, BuddyLook> = {
     DIETER: { eyes: 'sparkle', mouth: 'cat', color: '#f59e0b' },
 }
 
-export const CODE = BUILD[0]
-const CODE_COPIES = BUILD.slice(1, 7), LARRY = BUILD[7]
-export const LINUS = REVIEW[0]
-const LINUS_COPIES = REVIEW.slice(1, 3), BRUCE = REVIEW[3]
-const REJECT_BIN: Cell = { col: B('review').col_start + 4, row: B('review').row_start + 3 }
-const SEARCH = STUDIO[0], SEARCH_COPY = STUDIO[1], DIETER = STUDIO[2]
+const CODE_COPIES = COPY_CELLS.code
+const LINUS_COPIES = COPY_CELLS.LINUS
+const SEARCH_COPY = COPY_CELLS.search[0]
 
 // Features and their spheres: one share per task of the feature, the count known from the cut.
 export type Feature = { issue: number; title: string; tasks: number[]; at: Cell }
 export const FEATURES: Feature[] = [
-    { issue: 320, title: 'Factory world', tasks: [330, 331, 332, 333, 334, 335, 336], at: { col: B('stock').col_start + 1, row: B('stock').row_start + 3 } },
-    { issue: 321, title: 'Polish', tasks: [337, 338, 339, 340, 341], at: { col: B('stock').col_start + 6, row: B('stock').row_start + 3 } },
+    { issue: 320, title: 'Factory world', tasks: [330, 331, 332, 333, 334, 335, 336], at: FEATURE_CELLS[0] },
+    { issue: 321, title: 'Polish', tasks: [337, 338, 339, 340, 341], at: FEATURE_CELLS[1] },
 ]
 
 type JobSpec = { issue: number; title: string; start: number; build: number; review: number; checks: number; fix?: number; defect?: boolean }

@@ -1,6 +1,6 @@
 'use client'
 
-import { IsoGrid, frameTemplateBoard, useRenderedFrame, type Tile } from '@rerun/ui/iso-grid'
+import { IsoGrid, frameTemplateBoard, routeTileLinks, useRenderedFrame, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { fireRerunConfetti } from '@/lib/confetti'
@@ -27,14 +27,14 @@ function useStable<T>(value: T): T {
 // The moving parts keep a clock of their own, so the spheres glide while the board stays still.
 type SceneFn = (t: number, now: number) => FactoryFrame
 
-function LiveOverlay({ start, tiles, scene }: { start: number; tiles: Tile[]; scene: SceneFn }) {
+function LiveOverlay({ start, tiles, routes, scene }: { start: number; tiles: Tile[]; routes: Map<string, AxisPoint[]>; scene: SceneFn }) {
     const [now, setNow] = useState(() => Date.now())
     useEffect(() => {
         const id = setInterval(() => setNow(Date.now()), TICK_MS)
         return () => clearInterval(id)
     }, [])
     const frame = scene((now - start) % LOOP_MS, now)
-    return <FactoryOverlay tiles={tiles} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} />
+    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} />
 }
 
 // The factory, drawn by the board's own world. The world takes the whole stage; a thin glass bar
@@ -55,8 +55,10 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene }: { theme?:
     const toasts = useStable(frame.toasts.map(toast => ({ ...toast, id: `${toast.id}#${loop}` })).filter(toast => !expired.has(toast.id)).slice(-2))
     const tiles = useStable(frame.tiles)
     const links = useStable(frame.links)
+    // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
+    const routes = useMemo(() => routeTileLinks(tiles, links), [tiles, links])
     const onToastExpire = useCallback((id: string) => setExpired(prev => new Set(prev).add(id)), [])
-    const worldOverlay = useCallback(() => <LiveOverlay start={clock.start} tiles={tiles} scene={scene} />, [clock.start, tiles, scene])
+    const worldOverlay = useCallback(() => <LiveOverlay start={clock.start} tiles={tiles} routes={routes} scene={scene} />, [clock.start, tiles, routes, scene])
 
     // A feature whose sphere fills throws the app's own confetti; a single merge has its own shake.
     const fullCabinets = frame.cabinets.filter(c => c.slots.every(s => s.state !== 'empty')).length
