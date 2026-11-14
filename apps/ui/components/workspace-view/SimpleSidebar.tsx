@@ -3,9 +3,9 @@
 import { byRecency } from '@rerun/contracts'
 import { UpgradePill } from '@rerun/cloud/billing.client'
 import { CardAvatar } from '@rerun/ui/chat'
-import { EmptyState } from '@rerun/ui/primitives'
+import { EmptyState, useScrollFade } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { memo, useMemo } from 'react'
+import { memo, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -56,6 +56,8 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
 
     const ordered = useMemo(() => [...agents].map(agent => ({ agent, latest: previews[agent.id] ?? null })).sort(byRecency), [agents, previews])
     const unseenAgents = useMemo(() => new Set(unseenRuns.map(run => run.agent_id)), [unseenRuns])
+    const [listElement, setListElement] = useState<HTMLElement | null>(null)
+    const listFade = useScrollFade(listElement)
 
     return (
         <aside className="flex h-full min-h-0 w-full flex-col">
@@ -83,40 +85,42 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                 </TooltipDisabledReason>
             </div>
 
-            <nav aria-label={t('label')} className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-2 pb-2">
-                <ForemanTile />
-                {!previewsLoaded ? (
-                    <TileSkeletons />
-                ) : ordered.length === 0 ? (
-                    <EmptyState
-                        icon={UsersIcon}
-                        title={t('empty')}
-                        action={
-                            <div className="flex flex-wrap justify-center gap-2">
-                                <TooltipDisabledReason reason={needsMachineReason ?? undefined}>
-                                    <Button size="sm" disabled={!!needsMachineReason} onClick={openNewAgent}>
-                                        <CirclePlusIcon className="size-4" />
-                                        {tBuilder('newCoworker')}
-                                    </Button>
-                                </TooltipDisabledReason>
-                                <TooltipDisabledReason reason={needsMachineReason ?? undefined}>
-                                    <Button size="sm" variant="outline" disabled={!!needsMachineReason} onClick={() => openLibrary()}>
-                                        <GridIcon className="size-4" />
-                                        {tBuilder('template')}
-                                    </Button>
-                                </TooltipDisabledReason>
-                            </div>
-                        }
-                    />
-                ) : (
-                    <ul className="space-y-0.5">
-                        {ordered.map(({ agent, latest }) => (
-                            <li key={agent.id}>
-                                <CoworkerTile agent={agent} preview={latest ?? undefined} viewerId={user?.id ?? null} selected={agent.id === selectedAgentId} unseen={unseenAgents.has(agent.id)} onOpen={() => onOpenCoworker(agent.id)} actions={actionsFor(agent.id)} />
-                            </li>
-                        ))}
-                    </ul>
-                )}
+            <nav ref={setListElement} aria-label={t('label')} className="min-h-0 flex-1 overflow-y-auto px-2" style={{ maskImage: listFade, WebkitMaskImage: listFade }}>
+                <div className="space-y-0.5 pb-2">
+                    <ForemanTile />
+                    {!previewsLoaded ? (
+                        <TileSkeletons />
+                    ) : ordered.length === 0 ? (
+                        <EmptyState
+                            icon={UsersIcon}
+                            title={t('empty')}
+                            action={
+                                <div className="flex flex-wrap justify-center gap-2">
+                                    <TooltipDisabledReason reason={needsMachineReason ?? undefined}>
+                                        <Button size="sm" disabled={!!needsMachineReason} onClick={openNewAgent}>
+                                            <CirclePlusIcon className="size-4" />
+                                            {tBuilder('newCoworker')}
+                                        </Button>
+                                    </TooltipDisabledReason>
+                                    <TooltipDisabledReason reason={needsMachineReason ?? undefined}>
+                                        <Button size="sm" variant="outline" disabled={!!needsMachineReason} onClick={() => openLibrary()}>
+                                            <GridIcon className="size-4" />
+                                            {tBuilder('template')}
+                                        </Button>
+                                    </TooltipDisabledReason>
+                                </div>
+                            }
+                        />
+                    ) : (
+                        <ul className="space-y-0.5">
+                            {ordered.map(({ agent, latest }) => (
+                                <li key={agent.id}>
+                                    <CoworkerTile agent={agent} preview={latest ?? undefined} viewerId={user?.id ?? null} selected={agent.id === selectedAgentId} unseen={unseenAgents.has(agent.id)} onOpen={() => onOpenCoworker(agent.id)} actions={actionsFor(agent.id)} />
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </nav>
 
             <SidebarFoot />
