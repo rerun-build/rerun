@@ -10,7 +10,7 @@ export function ThreadDividerDialog({ open, onOpenChange, icon, title, aside, ch
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent aria-describedby={undefined} className="flex max-h-[80vh] flex-col gap-0 p-0 sm:max-w-2xl">
                 <DialogHeaderBar icon={icon} title={title} actions={aside} />
-                <div className="overflow-y-auto px-5 py-4 text-sm">{children}</div>
+                <div className="overflow-y-auto p-4 text-sm">{children}</div>
             </DialogContent>
         </Dialog>
     )

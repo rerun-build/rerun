@@ -38,7 +38,7 @@ export function DesktopAppPanel() {
         update.status === 'downloading' ? t('downloading', { percent: update.percent }) : update.status === 'checking' ? t('checking') : update.status === 'error' ? t('updateFailed') : t('version', { version: shell.version })
 
     return (
-        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 sm:px-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5">
             {settings ? (
                 <>
                     <Field orientation="row" label={t('openAtLogin')} helperText={shell.platform === 'mac' ? t('openAtLoginMac') : t('openAtLoginOther')} htmlFor="desktop-open-at-login">

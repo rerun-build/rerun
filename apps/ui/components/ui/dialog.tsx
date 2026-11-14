@@ -14,7 +14,7 @@ import { XIcon } from '@/lib/icons'
 // Under sm every dialog renders as a vaul bottom sheet instead of a centered Radix modal, so the
 // callers keep one import and one markup for both. The context is what lets each part pick its
 // primitive without the caller passing anything down.
-const SheetModeContext = React.createContext({ isSheet: false, dismissible: true })
+const SheetModeContext = React.createContext({ isSheet: false, dismissible: true, close: () => {} })
 
 function useSheetMode() {
   return React.useContext(SheetModeContext)
@@ -50,7 +50,8 @@ function Dialog({
     [onOpenChange]
   )
 
-  const mode = React.useMemo(() => ({ isSheet, dismissible }), [isSheet, dismissible])
+  const close = React.useCallback(() => handleOpenChange(false), [handleOpenChange])
+  const mode = React.useMemo(() => ({ isSheet, dismissible, close }), [isSheet, dismissible, close])
 
   return (
     <SheetModeContext.Provider value={mode}>
@@ -139,7 +140,7 @@ function DialogContent({
   showCloseButton?: boolean
 }) {
   const t = useTranslations("ui")
-  const { isSheet, dismissible } = useSheetMode()
+  const { isSheet, dismissible, close } = useSheetMode()
 
   if (isSheet) {
     return (
@@ -169,13 +170,13 @@ function DialogContent({
           {/* A sheet you can swipe away needs no close button; one you cannot still does. */}
           {dismissible ? <SheetGrabber /> : null}
           {children}
+          {/* A plain button and not DrawerPrimitive.Close: vaul drops every close request of a
+              drawer that is not dismissible, so its Close would do nothing here. */}
           {showCloseButton && !dismissible && (
-            <DrawerPrimitive.Close data-slot="dialog-close" asChild>
-              <Button variant="ghost" className="absolute top-2 right-2" size="icon-sm">
-                <XIcon />
-                <span className="sr-only">{t("close")}</span>
-              </Button>
-            </DrawerPrimitive.Close>
+            <Button data-slot="dialog-close" variant="ghost" className="absolute top-2 right-2" size="icon-sm" onClick={close}>
+              <XIcon />
+              <span className="sr-only">{t("close")}</span>
+            </Button>
           )}
         </DrawerPrimitive.Content>
       </DialogPortal>

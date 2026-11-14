@@ -37,7 +37,7 @@ export function LanguagePanel({ value, onChange }: LanguagePanelProps) {
     }
 
     return (
-        <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-5 sm:px-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-5">
             <Field label={t('field')} htmlFor="account-language" helperText={shown === null ? t('automaticHint', { language: localeNativeName(browserLocale()) }) : undefined}>
                 <Select value={shown ?? AUTOMATIC} onValueChange={pick} disabled={pending !== undefined}>
                     <SelectTrigger id="account-language" className="w-full sm:w-72">

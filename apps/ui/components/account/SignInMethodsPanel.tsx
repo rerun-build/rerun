@@ -85,7 +85,7 @@ export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider =
     const t = useTranslations('account.signIn')
     if (!methods) {
         return (
-            <div className="px-1 py-2 sm:px-3">
+            <div className="px-1 py-2">
                 <SkeletonPanelRows rows={4} lines={2} leading />
             </div>
         )
@@ -94,7 +94,7 @@ export function SignInMethodsPanel({ methods, unavailableReasons, busyProvider =
     const { email, oauth, phone } = methods
 
     return (
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
             <PanelRow
                 leading={<Icon icon={Mail} size="sm" />}
                 title={t('email.title')}

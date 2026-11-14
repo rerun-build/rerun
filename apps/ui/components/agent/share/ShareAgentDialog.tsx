@@ -22,9 +22,9 @@ import { useShareAgentFlow, type ShareActions, type ShareFlow } from './useShare
 export function ShareAgentDialog({ agentId, agentName, open, onOpenChange }: { agentId: string; agentName: string; open: boolean; onOpenChange: (open: boolean) => void }) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            {/* Same frame as the plan confirmation: the padding moves onto the rows so the striped
-                header can run edge to edge. `p-0` also drops the sheet's safe-area padding, which
-                the footer below puts back on its own.
+            {/* The frame carries no padding: the header and the footer bring their own, and the body
+                scrolls between them. `p-0` also drops the sheet's safe-area padding, which the
+                footer below puts back on its own.
                 The body is mounted only while the dialog is open: its inspection streams an archive
                 plan off the source box, and closing has to throw the answers away rather than leave
                 them staged for the next agent. */}

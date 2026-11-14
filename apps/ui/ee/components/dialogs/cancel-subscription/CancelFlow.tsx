@@ -286,7 +286,7 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
                 </StepTransition>
             </div>
 
-            <DialogFooter className={cn('m-0 px-6 py-4', step !== 'done' && 'sm:justify-between')}>
+            <DialogFooter className={cn('m-0', step !== 'done' && 'sm:justify-between')}>
                 {step === 'done' ? (
                     <>
                         {outcome === 'cancelled' && (

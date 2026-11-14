@@ -78,7 +78,7 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
 
     return (
         <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
-            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-5 sm:px-6">
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-5">
                 <Field label={t('photo')} helperText={t('photoHelp')}>
                     <FileDropzone accept="image/*" onFiles={handleFiles} disabled={photoBusy} overlayLabel={t('dropPhoto')} className="w-fit rounded-full">
                         {({ inputId, dragOver }) => (
@@ -129,7 +129,7 @@ export function ProfilePanel({ name, avatarUrl, fallbackLabel, uploadAvatar, rem
                 <Input label={t('name')} placeholder={t('namePlaceholder')} autoComplete="name" maxLength={PROFILE_NAME_MAX} value={draft} onChange={event => setDraft(event.target.value)} />
             </div>
 
-            <div className="flex justify-end border-t px-4 py-3 max-sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-6">
+            <div className="flex justify-end border-t px-4 py-3 max-sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
                 <Button type="submit" disabled={!dirty || !trimmed} loading={saving}>
                     {t('save')}
                 </Button>

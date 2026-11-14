@@ -19,7 +19,7 @@ const TAB_VALUES = ['coworkers', 'account'] as const satisfies readonly Notifica
 
 // The sheet's own safe-area padding is dropped by the p-0 of DIALOG_TABS_CONTENT, so the scrolling
 // body carries it itself.
-const TAB_BODY = 'flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6'
+const TAB_BODY = 'flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))]'
 
 export function NotificationsDialog() {
     const open = useNotificationsStore(s => s.open)

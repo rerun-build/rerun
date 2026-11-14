@@ -35,7 +35,7 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
 
     if (!blockers) {
         return (
-            <div className="px-1 py-2 sm:px-3">
+            <div className="px-1 py-2">
                 <SkeletonPanelRows rows={3} lines={2} leading />
             </div>
         )
@@ -54,7 +54,7 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-5 sm:px-6">
+            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-5">
                 {CONSEQUENCES.map(consequence => (
                     <PanelRow key={consequence.key} leading={<Icon icon={consequence.icon} size="sm" />} title={t(`consequences.${consequence.key}.title`)} description={t(`consequences.${consequence.key}.description`)} />
                 ))}
@@ -76,7 +76,7 @@ export function DeleteAccountPanel({ blockers, currentWorkspaceId, onOpenBilling
                 ))}
             </div>
 
-            <div className="flex justify-end border-t px-4 py-3 max-sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:px-6">
+            <div className="flex justify-end border-t px-4 py-3 max-sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
                 <Button type="button" variant="destructive" disabled={blockers.length > 0} onClick={() => setConfirmOpen(true)}>
                     {t('submit')}
                 </Button>
