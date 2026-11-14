@@ -21,7 +21,7 @@ import { ServiceConfigForm } from '@/components/services/ServiceConfigForm'
 import { ServiceList } from '@/components/services/ServiceList'
 import { Button } from '@/components/ui/button'
 import { Chip } from '@/components/ui/chip'
-import { HScrollFade } from '@rerun/ui/primitives'
+import { Badge, HScrollFade } from '@rerun/ui/primitives'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
@@ -469,6 +469,11 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 key={s.key}
                                                 leading={<Icon {...serviceIconProps(s.icon, s.category)} size="sm" />}
                                                 description={s.label}
+                                                footer={s.status === 'active' ? (
+                                                    <Badge size="xs" tone="green" glow={false}>
+                                                        {tServices('connect.connected')}
+                                                    </Badge>
+                                                ) : undefined}
                                                 title={
                                                     <span className="flex min-w-0 items-center gap-1.5">
                                                         <span className="truncate">{s.name}</span>
