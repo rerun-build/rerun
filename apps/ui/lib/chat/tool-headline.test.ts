@@ -29,6 +29,11 @@ describe('toolHeadline', () => {
         expect(toolHeadline({ capability: 'tiktok.user.profile', params: { username: 'khaby.lame' } })).toBe('khaby.lame')
     })
 
+    it('shows what a tool run by name was given, not the name its label already carries', () => {
+        expect(toolHeadline({ tool: 'sales_nav_search_people', arguments: { keyword: 'CTO', geography: ['Paris'] } })).toBe('CTO')
+        expect(toolHeadline({ tool: 'sales_nav_inmail_balance', arguments: {} })).toBeUndefined()
+    })
+
     it('ignores an input that is not an object', () => {
         expect(toolHeadline(undefined)).toBeUndefined()
         expect(toolHeadline('plain text')).toBeUndefined()

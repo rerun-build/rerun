@@ -1,3 +1,5 @@
+import { argsOf } from '@rerun/contracts'
+import { APP_RUN_TOOL } from '@/lib/apps/catalog'
 import { stripBridgePrefix } from '@/lib/chat/bridge-name'
 import type { CustomMcpServer, InstalledService } from '@/lib/services/types'
 
@@ -65,13 +67,21 @@ export function humanizeToolSegment(segment: string): string {
         .replace(/\b\w/g, c => c.toUpperCase())
 }
 
+// A paid app runs the tools of its directory through one call: the step is named after the tool
+// that ran, not after the call.
+function ranTool(tool: string, input: unknown): string {
+    const ran = tool === APP_RUN_TOOL ? argsOf(input)?.tool : undefined
+    return typeof ran === 'string' && ran ? ran : tool
+}
+
 // Null means "not a connector tool": the caller falls back to getToolMeta, so anything unmapped
 // keeps today's rendering untouched.
-export function resolveConnectorTool(raw: string, map: ConnectorMap, isBuiltin?: (name: string) => boolean): { label: string; service: ConnectorService } | null {
+export function resolveConnectorTool(raw: string, map: ConnectorMap, isBuiltin?: (name: string) => boolean, input?: unknown): { label: string; service: ConnectorService } | null {
     const parsed = parseMcpToolName(raw, map.keys(), isBuiltin)
     if (!parsed) return null
     const service = map.get(parsed.server)
     if (!service) return null
-    const tool = humanizeToolSegment(parsed.tool)
+    const ran = ranTool(parsed.tool, input)
+    const tool = humanizeToolSegment(ran.startsWith(`${parsed.server}_`) ? ran.slice(parsed.server.length + 1) : ran)
     return { label: service.custom ? `${service.name} · ${tool}` : tool, service }
 }
