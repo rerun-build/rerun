@@ -7,7 +7,8 @@ export function run(command: string, args: string[], options: { cwd?: string; in
 
 export function hasCommand(command: string): boolean {
     try {
-        execFileSync('command', ['-v', command], { stdio: 'ignore', shell: '/bin/sh' })
+        // The name reaches the shell as $1, never inside the script: nothing in it is run.
+        execFileSync('/bin/sh', ['-c', 'command -v "$1"', 'sh', command], { stdio: 'ignore' })
         return true
     } catch {
         return false
