@@ -32,6 +32,11 @@ Idle means still bodies: an idle coworker, the Loader, a gate, a tank or a belt 
 bob, squash, sway, running slats or travelling light). Only faces stay alive when idle: a coworker's eyes
 may blink and look around. Motion of a body says work is happening.
 
+Traces (the thin neon lines between coworkers, and between a coworker and its copies) are still and dim by
+default. Light travels along a trace only while something actually passes between its two ends: a copy
+reporting back, a handoff, one coworker calling another. A belt moves only while a task rides it. Nothing
+on the floor moves to look busy.
+
 Where section 1 below says otherwise (glass spheres, an open bin, a buddy for the loader, a scanner box),
 this section wins; section 1 is kept for what each object is and how it moves while working.
 
