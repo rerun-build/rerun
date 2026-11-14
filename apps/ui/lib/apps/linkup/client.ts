@@ -153,7 +153,7 @@ export async function createWebhook(accountId: string, url: string, events: read
 
 // --- Actions ---
 
-export type LinkupCategory = 'profiles' | 'network' | 'messages' | 'content'
+export type LinkupCategory = 'profiles' | 'network' | 'messages' | 'content' | 'recruiter'
 
 export async function runAction<T = unknown>(accountId: string, category: LinkupCategory, action: string, params: Record<string, unknown>): Promise<T> {
     return call<T>('POST', `/v2/${category}`, { account_id: accountId, action, params })
