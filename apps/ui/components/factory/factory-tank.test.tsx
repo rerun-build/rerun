@@ -17,10 +17,10 @@ const num = (s: string, a: string) => Number(s.match(new RegExp(`${a}="([^"]+)"`
 const tag = (s: string, part: string) => s.match(new RegExp(`<[a-z]+[^>]*data-part="${part}"[^>]*>`))?.[0] ?? ''
 const sum = (c: CabinetView, state: string) => c.slots.filter(x => x.state === state).reduce((a, x) => a + x.arriving, 0)
 const scan = (pick: (c: CabinetView) => boolean) => {
+    // Search on the cheap scene only, render markup once for the frame found.
     for (let t = 0; t <= LOOP_MS; t += 250) {
-        const r = render(t)
-        const i = r.frame.cabinets.findIndex(pick)
-        if (i >= 0) return { ...r, i, t }
+        const i = factoryScene(t, 0).cabinets.findIndex(pick)
+        if (i >= 0) return { ...render(t), i, t }
     }
     throw new Error('no frame')
 }
