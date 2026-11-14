@@ -49,7 +49,7 @@ export function FactoryTasks({ jobs, repo, endedToday, selected, onSelect, sampl
 
     const byGroup: Record<Shown, FactoryJob[]> = { problems: [], active: [], waiting: [], ended: [], earlier: [] }
     for (const j of jobs) {
-        if (PROBLEM_STATES.has(j.state)) { byGroup.problems.push(j); continue }
+        if (PROBLEM_STATES.has(j.state) && !j.closedOutside) { byGroup.problems.push(j); continue }
         const g = groupOf(j.state)
         byGroup[g === 'ended' && !isLocalToday(j.enteredAt, now) ? 'earlier' : g].push(j)
     }
@@ -105,6 +105,7 @@ export function FactoryTasks({ jobs, repo, endedToday, selected, onSelect, sampl
                                         </a>
                                     )}
                                 </div>
+                                {j.closedOutside && <div data-closed-by-hand className="pl-6 text-xs text-muted-foreground">closed by hand</div>}
                                 {REASON_STATES.has(j.state) && j.reason !== null && <div className="pl-6 text-xs text-muted-foreground">{j.reason}</div>}
                             </div>
                         )
