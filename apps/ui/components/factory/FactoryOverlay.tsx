@@ -10,7 +10,7 @@ import { type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
 
 import { along, atDistance, centreOf, inScanner, podPath, restDistances, settles, toWorld, type P } from './factory-rest'
 import { Gate, GATE_CSS } from './FactoryGate'
-import { FeatureTank, TANK_CSS } from './FactoryTank'
+import { FeatureTank, RejectTank, TANK_CSS } from './FactoryTank'
 import { STATUS_COLOR, type CabinetView, type PodView } from './factory-scene'
 
 const QUEUE_GAP = 40 // px between waiting spheres on the loader's line
@@ -27,7 +27,7 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, s
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
             <style>{FAB_CSS + GATE_CSS + TANK_CSS}</style>
-            {byId.get('rejects') && <RejectBin tile={byId.get('rejects')!} count={rejects} />}
+            {byId.get('rejects') && <RejectTank tile={byId.get('rejects')!} count={rejects} />}
             {cabinets.map(c => {
                 const t = byId.get(`cab-${c.issue}`)
                 return t ? <FeatureTank key={c.issue} cab={c} tile={t} /> : null
@@ -94,29 +94,6 @@ function Orb({ pod, at, selected = false, onSelectJob }: { pod: PodView; at: P; 
     )
 }
 
-// The reject bin: an open bin of dark red glass. Each defect that lands in it adds a dull red sphere
-// to the heap, and the count sits on its rim.
-function RejectBin({ tile, count }: { tile: Tile; count: number }) {
-    const c = toWorld(centreOf(tile))
-    const W = 38, H = 26
-    return (
-        <div className="fab-bin absolute" data-filled={count > 0 || undefined} style={{ left: 0, top: 0, transform: `translate(${c.x}px, ${c.y}px)` }}>
-            <svg className="absolute overflow-visible" width="1" height="1">
-                <path d={`M${-W},${-H} L0,${-H + 19} L0,19 L${-W},0 Z`} className="fab-bin-left" />
-                <path d={`M0,${-H + 19} L${W},${-H} L${W},0 L0,19 Z`} className="fab-bin-right" />
-                {Array.from({ length: Math.min(count, 6) }, (_, i) => (
-                    <circle key={i} cx={-12 + (i % 3) * 12} cy={-H + 6 - Math.floor(i / 3) * 7} r={6} className="fab-bin-part" />
-                ))}
-                <path d={`M${-W},${-H} L0,${-H - 19} L${W},${-H} L0,${-H + 19} Z`} className="fab-bin-rim" />
-            </svg>
-            <div className="fab-bin-label" style={{ top: 26 }}>
-                <span className="fab-bin-count">{count}</span>
-                <span>rejected</span>
-            </div>
-        </div>
-    )
-}
-
 const FAB_CSS = `
 .fab-orb-pos { transition: transform 260ms linear; will-change: transform; }
 .fab-orb { position: relative; }
@@ -134,13 +111,6 @@ const FAB_CSS = `
 .fab-orb[data-state='held'] .fab-orb-rim { stroke: #ef4444; }
 .fab-orb[data-state='complete'] .fab-orb-rim { stroke: #ffe08a; stroke-width: 1.2; }
 .fab-orb[data-state='complete'] .fab-orb-glow { opacity: .9; }
-.fab-bin-left { fill: rgba(80,18,22,.55); stroke: rgba(248,113,113,.45); stroke-width: .8; }
-.fab-bin-right { fill: rgba(110,24,28,.55); stroke: rgba(248,113,113,.5); stroke-width: .8; }
-.fab-bin-rim { fill: rgba(30,8,10,.75); stroke: #f87171; stroke-width: 1; }
-.fab-bin-part { fill: #7f1d1d; stroke: #f87171; stroke-width: .6; }
-.fab-bin[data-filled] .fab-bin-rim { filter: drop-shadow(0 0 4px rgba(248,113,113,.7)); }
-.fab-bin-label { position: absolute; left: 0; transform: translateX(-50%); display: flex; gap: 4px; align-items: baseline; white-space: nowrap; font: 500 8px/1 ui-sans-serif, system-ui; color: #fca5a5; }
-.fab-bin-count { font: 700 12px/1 ui-monospace, monospace; color: #f87171; }
 
 @media (prefers-reduced-motion: no-preference) {
   .fab-surface { animation: fab-slosh 2.6s ease-in-out var(--wobble-delay, 0s) infinite; }
