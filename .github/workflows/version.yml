@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 26
       - id: next
         run: node scripts/release/next-version.mjs --to "$GITHUB_SHA" --github-output
 

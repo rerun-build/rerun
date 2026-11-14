@@ -1,8 +1,8 @@
 # The web app of Rerun. Built from the repository root: docker build -f apps/ui/Dockerfile .
 # The NEXT_PUBLIC_* values are read by the browser bundle, so they are baked in at build time.
-FROM node:22-bookworm-slim AS base
+FROM node:26-bookworm-slim AS base
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable
+RUN npm install -g corepack && corepack enable
 WORKDIR /app
 
 FROM base AS build

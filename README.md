@@ -181,7 +181,7 @@ Or paste this into Claude Code, Codex or Cursor, which run the commands for you:
 Install Rerun, the open source AI coworkers app, for me. Follow the guide written for AI assistants: https://raw.githubusercontent.com/rerun-build/rerun/main/INSTALL.md
 ```
 
-By hand, you need Docker, Node.js 22, and a Supabase project (a free one on [supabase.com](https://supabase.com) works).
+By hand, you need Docker, Node.js 26, and a Supabase project (a free one on [supabase.com](https://supabase.com) works).
 
 ```bash
 git clone https://github.com/rerun-build/rerun.git && cd rerun

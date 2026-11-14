@@ -6,7 +6,7 @@
     "type": "module",
     "packageManager": "pnpm@8.15.4",
     "engines": {
-        "node": ">=20"
+        "node": ">=26.13"
     },
     "scripts": {
         "postinstall": "([ ! -f scripts/install-cloud.mjs ] || node scripts/install-cloud.mjs) && ([ ! -f scripts/install-git-hooks.mjs ] || node scripts/install-git-hooks.mjs)",

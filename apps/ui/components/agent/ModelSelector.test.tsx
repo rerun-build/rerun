@@ -79,6 +79,12 @@ const storedOverride = (agentId: string) => {
 // loaded machine that alone can pass vitest's default 5 s.
 const REIMPORT_TIMEOUT = { timeout: 20_000 }
 
+// Node 26 has its own localStorage global, undefined without --localstorage-file, and it hides happy-dom's.
+beforeEach(() => {
+    const store = new Map<string, string>()
+    vi.stubGlobal('localStorage', { getItem: (key: string) => store.get(key) ?? null, setItem: (key: string, value: string) => void store.set(key, value), removeItem: (key: string) => void store.delete(key), clear: () => store.clear() })
+})
+
 describe('ModelSelector override', REIMPORT_TIMEOUT, () => {
     beforeEach(() => {
         vi.resetModules()

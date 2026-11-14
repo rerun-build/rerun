@@ -43,7 +43,7 @@ services:
       - traefik.http.services.rerun-engine.loadbalancer.server.port=3000
 
   webgate:
-    image: node:22-alpine
+    image: node:26-alpine
     command: node /srv/webgate/server.mjs
     volumes:
       - ./deploy/vps/webgate:/srv/webgate:ro

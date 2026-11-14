@@ -37,7 +37,7 @@ PW=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$SUPABASE_DIR/.env" | tail -n 1 | sed "s
 NET=$(docker inspect "$SUPABASE_DB_CONTAINER" -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}')
 # Only supabase/ is mounted: the CLI would otherwise try to read Rerun's root-only .env. --include-all
 # applies upstream migrations dated before ones already applied here; they are written to be rerun.
-docker run --rm --network "$NET" -v "$REPO/supabase:/work/supabase" -w /work --user "$OWNER" -e HOME=/tmp node:22 \
+docker run --rm --network "$NET" -v "$REPO/supabase:/work/supabase" -w /work --user "$OWNER" -e HOME=/tmp node:26 \
     npx -y "$SUPABASE_CLI" db push --include-all --yes --db-url "postgresql://postgres:$PW@db:5432/postgres?sslmode=disable"
 unset PW
 
