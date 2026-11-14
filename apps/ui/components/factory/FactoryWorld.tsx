@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { applyMoves, canMove, dropReason, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
 import { METRICS, barModel, type MetricDef, type MetricKey, type MetricValues } from './factory-metrics'
+import { FactoryBarFrame } from './FactoryBarFrame'
 import { FactoryOverlay } from './FactoryOverlay'
 import { LOOP_MS, factoryScene, type Cell, type FactoryFrame } from './factory-scene'
 
@@ -138,27 +139,25 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
 
             {/* The bar lives in the visible part of the stage and wraps its groups onto more rows when
                 that part is narrow, so no number is ever cut. */}
-            <div className="pointer-events-none absolute bottom-0 left-0 flex justify-center p-5" style={{ right: rightInset }}>
-                <div ref={barRef} className="pointer-events-auto flex max-w-full flex-wrap items-stretch justify-center gap-x-4 gap-y-3 rounded-2xl border border-border/60 bg-background/75 px-5 py-3 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl">
-                    <div className="flex items-center gap-2 pr-1">
-                        <span className={`size-2 rounded-full ${frame.held ? 'bg-red-500' : 'animate-pulse bg-emerald-500 motion-reduce:animate-none'}`} />
-                        <span className="text-sm font-semibold tracking-tight">Factory</span>
-                        {sample && <span className="text-[10px] text-muted-foreground">sample</span>}
-                    </div>
-                    {(['jobs', 'runs', 'plan'] as const).map(group => (
-                        <div key={group} className="flex flex-wrap items-center justify-center gap-4 border-l border-border/70 pl-4">
-                            {METRICS.filter(m => m.group === group).map(m => <Metric key={m.key} def={m} value={values[m.key]} />)}
-                        </div>
-                    ))}
-                    {moved && (
-                        <div className="flex items-center border-l border-border/70 pl-4">
-                            <Button type="button" variant="outline" size="sm" onClick={() => saveLayout(storageKey, null)}>
-                                Reset layout
-                            </Button>
-                        </div>
-                    )}
+            <FactoryBarFrame edge="bottom" rightInset={rightInset} frameRef={barRef}>
+                <div className="flex items-center gap-2 pr-1">
+                    <span className={`size-2 rounded-full ${frame.held ? 'bg-red-500' : 'animate-pulse bg-emerald-500 motion-reduce:animate-none'}`} />
+                    <span className="text-sm font-semibold tracking-tight">Factory</span>
+                    {sample && <span className="text-[10px] text-muted-foreground">sample</span>}
                 </div>
-            </div>
+                {(['jobs', 'runs', 'plan'] as const).map(group => (
+                    <div key={group} className="flex flex-wrap items-center justify-center gap-4 border-l border-border/70 pl-4">
+                        {METRICS.filter(m => m.group === group).map(m => <Metric key={m.key} def={m} value={values[m.key]} />)}
+                    </div>
+                ))}
+                {moved && (
+                    <div className="flex items-center border-l border-border/70 pl-4">
+                        <Button type="button" variant="outline" size="sm" onClick={() => saveLayout(storageKey, null)}>
+                            Reset layout
+                        </Button>
+                    </div>
+                )}
+            </FactoryBarFrame>
 
             <div
                 className="pointer-events-none absolute left-0 top-6 flex justify-center transition-all duration-500 motion-reduce:transition-none"
