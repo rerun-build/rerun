@@ -35,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           HEAD_REF: ${{ github.head_ref }}
           PR_BODY: ${{ github.event.pull_request.body }}
-        run: python3 -I tools/factory/redgreen.py
+        run: python3 -I tools/factory/redgreen.py --prepare "pnpm --filter @rerun/contracts build"
 
   backtest:
     if: github.head_ref == 'ci/red-before-green'
@@ -88,4 +88,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python3 -I tool/tools/factory/redgreen.py --root repo --issue ${{ matrix.issue }} --base "$SHA^1"
+        run: python3 -I tool/tools/factory/redgreen.py --root repo --issue ${{ matrix.issue }} --base "$SHA^1" --prepare "pnpm --filter @rerun/contracts build"

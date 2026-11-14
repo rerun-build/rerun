@@ -21,12 +21,12 @@ def issue_number(ref, body):
 
 
 def run_lines(body):
-    m = re.search(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```", body or "")
+    m = re.search(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```", (body or "").replace("\r\n", "\n"))
     return [line.strip() for line in m.group(1).strip().split("\n") if line.strip()] if m else []
 
 
 def exempt(body):
-    m = re.search(r"(?mi)^\*\*Red before green\*\*:\s*not applicable\b(.*)$", body or "")
+    m = re.search(r"(?mi)^\*\*Red before green\*\*:\s*not applicable\b(.*)$", (body or "").replace("\r\n", "\n"))
     if not m:
         return None
     return m.group(1).strip(" :.-") or "no reason given"
@@ -58,7 +58,8 @@ def run(lines, root):
     return p.returncode, (p.stdout + p.stderr)[-3000:]
 
 
-def prove(root, base, lines, runner=run):
+def prove(root, base, lines, runner=run, prepare=()):
+    lines = list(prepare) + list(lines)
     code, tail = runner(lines, root)
     if code:
         return False, "the Run lines fail at the head (exit %d)" % code, tail
@@ -100,6 +101,7 @@ def main(argv=None):
     ap.add_argument("--base")
     ap.add_argument("--issue", type=int)
     ap.add_argument("--issue-body-file")
+    ap.add_argument("--prepare", action="append", default=[])
     a = ap.parse_args(argv)
     root = os.path.abspath(a.root)
     n = a.issue or issue_number(os.environ.get("HEAD_REF"), os.environ.get("PR_BODY"))
@@ -120,7 +122,7 @@ def main(argv=None):
         report("Red before green for #%d: the issue has no Run lines, nothing to prove." % n)
         return 0
     base = a.base or git(root, "rev-parse", "HEAD^1").strip()
-    ok, why, tail = prove(root, base, lines)
+    ok, why, tail = prove(root, base, lines, prepare=a.prepare)
     report("Red before green for #%d: %s." % (n, why))
     if tail and not ok:
         report("```\n%s\n```" % tail)

@@ -33,6 +33,9 @@ class Parsing(unittest.TestCase):
                                               "cd apps/ui && pnpm vitest run components/factory/factory-tasks.test.tsx"])
         self.assertEqual(RG.run_lines("no run block"), [])
 
+    def test_run_lines_of_a_body_with_windows_line_endings(self):
+        self.assertEqual(len(RG.run_lines(BODY.replace("\n", "\r\n"))), 2)
+
     def test_exempt_only_with_the_marker(self):
         self.assertEqual(RG.exempt("**Red before green**: not applicable: a pure rename"), "a pure rename")
         self.assertIsNone(RG.exempt(BODY))
@@ -87,6 +90,11 @@ class Prove(unittest.TestCase):
         ok, why, _ = RG.prove(root, base, ["true"])
         self.assertFalse(ok)
         self.assertIn("only test files", why)
+
+    def test_prepare_runs_before_each_phase(self):
+        root, base = self.repo({"lib.txt": "new\n", "test_lib.py": "pass\n"})
+        ok, why, _ = RG.prove(root, base, ["test -f built.txt", "grep -q new lib.txt"], prepare=["touch built.txt"])
+        self.assertTrue(ok, why)
 
     def test_lines_each_start_at_the_root(self):
         root, base = self.repo({"lib.txt": "new\n"})
