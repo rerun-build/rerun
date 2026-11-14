@@ -22,7 +22,7 @@ first.
 
 | Shape | Means | On the floor |
 |---|---|---|
-| Rectangle (process) with a face | a mind that does work | a Rerun coworker, drawn exactly as Rerun's board draws it: at rest in its own colour (the look Rerun derives from its id), still, a faint glow, face blinking; working: Rerun's working look, gold (owner: "they are all golden. that's how you know"), with a more pronounced glow than Rerun's board so its body walls take the same gold as its top (owner: "we will just have a more pronounced glow, so their body is of similar color than their top"), taller stance, bob, strong glow, its floor cell lit, the label taking turns between name and "Working" |
+| Rectangle (process) with a face | a mind that does work | a Rerun coworker, drawn as Rerun's board draws it. Idle (owner: "idle ones have all grey body and a colored head"): grey body, the top in its own colour (the look Rerun derives from its id), normal height, faint glow, still, face blinking. Working (owner: "once they start working they all get 2x taller and glow gold, not just their top but also body"): about twice as tall (Rerun's stretched stance), top AND body gold, a strong gold glow around the whole block, the bob, its floor cell lit, the label taking turns between name and "Working" |
 | Rectangle, see-through | the same process running again in parallel | a copy (ghost): drawn only while it runs a job, so always in the working look, see-through |
 | Diamond (decision) | a yes/no choice | review: a diamond gate on the belt; pass leaves by one corner, fail by the other |
 | Capsule (terminator) | where the flow starts and ends | the Loader (the delegator): faceless; intake, checks and merge happen there; clicking it opens the Loader tab |
