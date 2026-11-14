@@ -37,12 +37,16 @@ export function MediaViewerHost() {
     const pager = useRef<ScrollViewInstance>(null)
     const items = state?.items ?? []
 
-    useEffect(() => {
-        if (!state) return
-        setIndex(state.index)
-        setZoomed(false)
-        setDrag(0)
-    }, [state])
+    // A viewer opened again starts on the item it was opened on, at its own size.
+    const [openedState, setOpenedState] = useState<typeof state>(null)
+    if (openedState !== state) {
+        setOpenedState(state)
+        if (state) {
+            setIndex(state.index)
+            setZoomed(false)
+            setDrag(0)
+        }
+    }
 
     // A window that resizes (an iPad in Split View, an iPhone Duo folding) keeps the item on screen.
     useEffect(() => {

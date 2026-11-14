@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Animated, Easing, View, type LayoutChangeEvent } from 'react-native'
 import { useReducedMotion } from 'react-native-reanimated'
 import Svg, { Circle, Path } from 'react-native-svg'
@@ -76,7 +76,7 @@ const NEUTRAL_SHARES = { light: { beam: 0.4, rest: 0.08 }, dark: { beam: 0.55, r
 export function BorderBeam({ tone = 'brand', radius, surface, animated = true, angle = 220 }: { tone?: BeamTone; radius: number; surface: string; animated?: boolean; angle?: number }) {
     const theme = useTheme()
     const reduceMotion = useReducedMotion()
-    const turn = useRef(new Animated.Value(0)).current
+    const [turn] = useState(() => new Animated.Value(0))
     const [size, setSize] = useState<{ width: number; height: number } | null>(null)
     const neutral = NEUTRAL_SHARES[theme.scheme]
     const rest = tone === 'neutral' ? mix(surface, theme.foreground, neutral.rest) : theme.border.startsWith('#') ? theme.border : mix(surface, '#ffffff', 0.1)

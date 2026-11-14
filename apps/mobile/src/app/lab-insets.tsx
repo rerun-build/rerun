@@ -29,7 +29,7 @@ function Screen({ screen }: { screen: LabScreen }) {
         <OnboardingShell>
             <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: spacing.xl }}>
                 <AppText variant="callout" tone="muted" style={{ textAlign: 'center' }}>
-                    The onboarding body keeps the shell's side insets.
+                    The onboarding body keeps the shell&apos;s side insets.
                 </AppText>
             </View>
         </OnboardingShell>

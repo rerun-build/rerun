@@ -1,7 +1,7 @@
 import { parseQueued, type QueuedMessage } from '@rerun/contracts'
 import { randomUUID } from 'expo-crypto'
 import { Directory, File, Paths } from 'expo-file-system'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 // A file per conversation, not SecureStore: a value there is capped at 2 KB and a message is not.
 const folder = () => new Directory(Paths.document, 'queued-messages')
@@ -31,10 +31,13 @@ export function useQueuedMessage(key: string) {
         return { queued: found, restoredId: found?.id ?? null }
     })
 
-    useEffect(() => {
+    // Another conversation reads its own file, on the render that names it.
+    const [readKey, setReadKey] = useState(key)
+    if (readKey !== key) {
+        setReadKey(key)
         const found = read(key)
         setState({ queued: found, restoredId: found?.id ?? null })
-    }, [key])
+    }
 
     const enqueue = useCallback(
         (text: string, behindRunId: string | null) => {

@@ -57,15 +57,15 @@ export function ZoomableImage({ uri, headers, active, onZoomChange, onDismiss, o
 
     const pinch = Gesture.Pinch()
         .onUpdate(event => {
-            scale.value = Math.min(MAX_SCALE, Math.max(1, savedScale.value * event.scale))
+            scale.set(Math.min(MAX_SCALE, Math.max(1, savedScale.value * event.scale)))
         })
         .onEnd(() => {
-            savedScale.value = scale.value
+            savedScale.set(scale.value)
             if (scale.value <= 1.01) {
-                x.value = withTiming(0)
-                y.value = withTiming(0)
-                savedX.value = 0
-                savedY.value = 0
+                x.set(withTiming(0))
+                y.set(withTiming(0))
+                savedX.set(0)
+                savedY.set(0)
             }
             settle(scale.value)
         })
@@ -76,24 +76,24 @@ export function ZoomableImage({ uri, headers, active, onZoomChange, onDismiss, o
         .failOffsetX([-24, 24])
         .onUpdate(event => {
             if (savedScale.value > 1.01) {
-                x.value = clampTranslation(savedX.value + event.translationX, width, scale.value)
-                y.value = clampTranslation(savedY.value + event.translationY, height, scale.value)
+                x.set(clampTranslation(savedX.value + event.translationX, width, scale.value))
+                y.set(clampTranslation(savedY.value + event.translationY, height, scale.value))
                 return
             }
-            dismissY.value = Math.max(0, event.translationY)
+            dismissY.set(Math.max(0, event.translationY))
             runOnJS(onDrag)(Math.min(1, dismissY.value / (DISMISS_DISTANCE * 2)))
         })
         .onEnd(() => {
             if (savedScale.value > 1.01) {
-                savedX.value = x.value
-                savedY.value = y.value
+                savedX.set(x.value)
+                savedY.set(y.value)
                 return
             }
             if (dismissY.value > DISMISS_DISTANCE) {
                 runOnJS(onDismiss)()
                 return
             }
-            dismissY.value = withSpring(0)
+            dismissY.set(withSpring(0))
             runOnJS(onDrag)(0)
         })
 
@@ -105,12 +105,12 @@ export function ZoomableImage({ uri, headers, active, onZoomChange, onDismiss, o
             else manager.fail()
         })
         .onUpdate(event => {
-            x.value = clampTranslation(savedX.value + event.translationX, width, scale.value)
-            y.value = clampTranslation(savedY.value + event.translationY, height, scale.value)
+            x.set(clampTranslation(savedX.value + event.translationX, width, scale.value))
+            y.set(clampTranslation(savedY.value + event.translationY, height, scale.value))
         })
         .onEnd(() => {
-            savedX.value = x.value
-            savedY.value = y.value
+            savedX.set(x.value)
+            savedY.set(y.value)
         })
 
     const doubleTap = Gesture.Tap()
@@ -120,12 +120,12 @@ export function ZoomableImage({ uri, headers, active, onZoomChange, onDismiss, o
             const next = zoomIn ? DOUBLE_TAP_SCALE : 1
             const targetX = zoomIn ? clampTranslation((width / 2 - event.x) * (next - 1), width, next) : 0
             const targetY = zoomIn ? clampTranslation((height / 2 - event.y) * (next - 1), height, next) : 0
-            scale.value = withTiming(next)
-            x.value = withTiming(targetX)
-            y.value = withTiming(targetY)
-            savedScale.value = next
-            savedX.value = targetX
-            savedY.value = targetY
+            scale.set(withTiming(next))
+            x.set(withTiming(targetX))
+            y.set(withTiming(targetY))
+            savedScale.set(next)
+            savedX.set(targetX)
+            savedY.set(targetY)
             settle(next)
         })
 

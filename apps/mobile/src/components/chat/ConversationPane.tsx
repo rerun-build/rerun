@@ -1,6 +1,6 @@
 import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -118,7 +118,10 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     // A decision lifts the wait the proposal raised on the session, as on the web.
     const skillProposals = { ...proposals, decide: (proposalId: string, decision: 'accept' | 'dismiss') => proposals.decide(proposalId, decision).then(onStatusChange) }
     const feedback = useMessageFeedback(chat.sessionId, coworker.kind === 'foreman' ? 'foreman' : 'agent')
-    enqueueRef.current = queue.enqueue
+    // Before any effect runs: a refusal reported in the same commit queues under the current key.
+    useLayoutEffect(() => {
+        enqueueRef.current = queue.enqueue
+    }, [queue.enqueue])
     const [stopping, setStopping] = useState(false)
     const [draft, setDraft] = useState('')
     const composer = useRef<ComposerHandle>(null)
