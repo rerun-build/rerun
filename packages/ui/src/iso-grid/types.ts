@@ -104,6 +104,8 @@ export type BuddyLook = {
     // Share of its footprint's width the buddy fills, BUDDY_FOOTPRINT_SHARE when left out. The
     // floor shows around it for the rest.
     footprintShare?: number
+    // A buddy whose mood is working keeps the colour it rests in, instead of the state's amber. Left out: the board's behaviour.
+    ownColor?: boolean
 }
 
 export type TileCountdown = {
