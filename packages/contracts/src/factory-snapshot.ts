@@ -21,6 +21,9 @@ import { z } from 'zod'
 // - runs (optional): the ledger `fires` rows (store.py:8), `intent_at` is the start, at most 12.
 // - the pool coworker `id` (optional) is the coworker's id in the delegator's config.
 // All three are optional so the app accepts both the old and the new producer.
+// - department, departments (optional): the main department of the job and the other ones it touches, computed by the
+//   delegator from the issue's allowed paths (SPEC 5b).
+// - epics (optional): one per distinct `parent`, title from GitHub. Optional so the app accepts the old and the new producer.
 // - every string cut to its limit (some reasons are not cut in dispatch.py).
 // Holds: only those still running, `until` from epoch seconds to ISO.
 
@@ -31,6 +34,10 @@ export const factoryJobStateSchema = z.enum([
 ])
 
 export const factoryWorkerTypeSchema = z.enum(['coder', 'reviewer', 'researcher', 'designer'])
+
+export const factoryDepartmentSchema = z.enum(['design', 'database', 'engine', 'backend', 'frontend', 'tooling', 'docs'])
+
+export const factoryEpicKindSchema = z.enum(['feature', 'review_fix', 'fix', 'upgrade', 'refactor', 'research', 'other'])
 
 const isoTime = z.string().max(40).datetime({ offset: true })
 const count = z.number().int().min(0)
@@ -70,6 +77,14 @@ export const factoryJobSchema = z.object({
     reason: z.string().max(300).nullable(), // why it waits, or why it ended blocked, failed or returned
     history: z.array(factoryHistoryEntrySchema).max(30).optional(), // oldest first
     runs: z.array(factoryRunSchema).max(12).optional(),
+    department: factoryDepartmentSchema.optional(), // the main department
+    departments: z.array(factoryDepartmentSchema).max(6).optional(), // the other ones touched
+}).strict()
+
+export const factoryEpicSchema = z.object({
+    issue: z.number().int().positive(),
+    title: z.string().max(256), // as the job title
+    kind: factoryEpicKindSchema,
 }).strict()
 
 export const factoryHoldSchema = z.object({ kind: z.string().max(40), until: isoTime }).strict()
@@ -85,6 +100,7 @@ export const factorySnapshotSchema = z.object({
     beat: count,
     repo: z.string().max(200),
     jobs: z.array(factoryJobSchema).max(300),
+    epics: z.array(factoryEpicSchema).max(50).optional(),
     holds: z.array(factoryHoldSchema).max(10),
     pools: z.array(factoryPoolSchema).max(8),
     endedToday: z.object({ merged: count, rejected: count, blocked: count, failed: count, returned: count }).strict(),
@@ -95,6 +111,9 @@ export const FACTORY_SNAPSHOT_MAX_BYTES = 256 * 1024
 
 export type FactoryJobState = z.infer<typeof factoryJobStateSchema>
 export type FactoryWorkerType = z.infer<typeof factoryWorkerTypeSchema>
+export type FactoryDepartment = z.infer<typeof factoryDepartmentSchema>
+export type FactoryEpicKind = z.infer<typeof factoryEpicKindSchema>
+export type FactoryEpic = z.infer<typeof factoryEpicSchema>
 export type FactoryJob = z.infer<typeof factoryJobSchema>
 export type FactoryHold = z.infer<typeof factoryHoldSchema>
 export type FactoryPool = z.infer<typeof factoryPoolSchema>
