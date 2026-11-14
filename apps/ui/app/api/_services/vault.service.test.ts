@@ -125,11 +125,10 @@ describe('the Vault of a box', () => {
         await expect(listVault(admin)).rejects.toBeInstanceOf(VaultUnavailableError)
     })
 
-    it('takes new connectors only once released or for the early access, the engine itself following the release', async () => {
-        expect(await vaultWritesEnabled(conn, admin)).toBe(false)
-        vi.mocked(vaultFlag).mockResolvedValue(true as never)
+    it('takes new connectors for everyone and for the engine itself, on a box that keeps a Vault', async () => {
         expect(await vaultWritesEnabled(conn, admin)).toBe(true)
-        expect(await vaultWritesEnabled(conn, workspace)).toBe(false)
+        expect(await vaultWritesEnabled(conn, workspace)).toBe(true)
+        expect(vaultFlag).not.toHaveBeenCalled()
         vi.mocked(supportsVault).mockResolvedValue(false)
         expect(await vaultWritesEnabled(conn, admin)).toBe(false)
     })

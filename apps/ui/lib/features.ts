@@ -23,8 +23,7 @@ export const I18N_RELEASED = true
 // Gates the workspace's Vault: its entry in the workspace menu, and new connectors going into it
 // rather than into each coworker's folder. Until it flips, only the early access sees it, and a box
 // without the engine's `vault` capability keeps every connector per coworker whatever it says.
-// `NEXT_PUBLIC_VAULT_ENABLED=1` turns it on for a local stack or a staging deploy.
-export const VAULT_RELEASED = process.env.NEXT_PUBLIC_VAULT_ENABLED === '1'
+export const VAULT_RELEASED = true
 // Gates the Simple view, the list of coworkers beside the chat offered next to the 3D board. Until it
 // flips, only the early access sees the switch; the board stays everyone's default either way.
-export const SIMPLE_VIEW_RELEASED = false
+export const SIMPLE_VIEW_RELEASED = true
