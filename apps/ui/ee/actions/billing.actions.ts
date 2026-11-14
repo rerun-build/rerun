@@ -55,7 +55,7 @@ const requireBillingAdmin = () => requireAdminContext('adminOnlyBilling')
 const creditPacksSchema = z.number().int().min(1).max(MAX_CREDIT_PACKS_PER_PURCHASE)
 
 const planSelectionSchema = z.object({
-    quantities: z.object({ credit_pack: z.number().int().min(0).max(1000), linkedin_slot: z.number().int().min(0).max(1000), whatsapp_slot: z.number().int().min(0).max(1000) }),
+    quantities: z.object({ linkedin_slot: z.number().int().min(0).max(1000), whatsapp_slot: z.number().int().min(0).max(1000) }),
     interval: z.enum(BILLING_INTERVALS),
 })
 

@@ -21,9 +21,10 @@ import { Button } from '@/components/ui/button'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { formatCredits, planDiscountCents, planPriceCents, type AddonKey, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
+import { formatCredits, planDiscountCents, planPriceCents, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
 import { ChevronRightIcon, CoinsIcon, ExternalLinkIcon, Receipt } from '@/lib/icons'
 import { useSession } from '@/supabase/session/SessionProvider'
+import type { BillingHighlight } from '@/stores/billing.store'
 
 import { BillingDialogShell } from './BillingDialogShell'
 import { BusinessDetailsPane, BusinessDetailsRow } from './BusinessDetailsPane'
@@ -72,7 +73,7 @@ export function PlanDialog({
     appSlots,
 }: {
     state: SubscriptionState
-    highlightAddon: AddonKey | null
+    highlightAddon: BillingHighlight | null
     onClose: () => void
     onCancel: () => void
     onChanged: () => Promise<void>

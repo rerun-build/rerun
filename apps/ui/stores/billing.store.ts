@@ -9,14 +9,17 @@ export const AGENT_LIMIT_TRIGGER = 'entitlement_gate'
 // pick the stopped task back up once the plan is paid.
 export type BillingUpgrade = { coworker?: string; onPaid?: () => void }
 
+// `credit_pack` opens the purchase of Rerun credit, bought once outside the plan.
+export type BillingHighlight = AddonKey | 'credit_pack'
+
 type BillingState = {
     open: boolean
-    highlightAddon: AddonKey | null
+    highlightAddon: BillingHighlight | null
     // What surfaced the paywall (trial_pill, budget_exhausted, entitlement_gate, template_content, …), for `paywall_viewed`.
     trigger: string | null
     upgrade: BillingUpgrade | null
     // Ouvre le dialog billing, optionnellement en mettant un add-on en avant (ex. depuis un feature gate).
-    openBilling: (highlight?: AddonKey, trigger?: string, upgrade?: BillingUpgrade) => void
+    openBilling: (highlight?: BillingHighlight, trigger?: string, upgrade?: BillingUpgrade) => void
     setOpen: (open: boolean) => void
 }
 

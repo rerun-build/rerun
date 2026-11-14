@@ -11,7 +11,8 @@
     },
     "price": {
         "perMonth": "/mois",
-        "perMonthBilledYearly": "/mois, facturé {total}/an"
+        "perMonthBilledYearly": "/mois, facturé {total}/an",
+        "once": "une fois"
     },
     "billing": {
         "label": "Période de facturation",
@@ -128,12 +129,12 @@
     "addons": {
         "label": "Options",
         "title": "Grandissez pièce par pièce.",
-        "lede": "Les options sont des quantités sur l’offre que vous avez déjà, pas une formule de plus. Prenez-en une quand il le faut, retirez-la quand vous n’en avez plus besoin.",
+        "lede": "Pas une formule de plus. Prenez-en plus quand il le faut.",
         "items": {
             "credit_pack": {
                 "title": "Crédits Rerun",
-                "unit": "+{credits, plural, one {# crédit} other {# crédits}}/mois",
-                "caption": "Plus de crédits pour les modèles que nous hébergeons, en plus de l’offre."
+                "unit": "+{credits, plural, one {# crédit} other {# crédits}}, sans expiration",
+                "caption": "Plus de crédits pour les modèles que nous hébergeons, en plus de l’offre. Payés une fois."
             }
         }
     },
@@ -172,7 +173,7 @@
             },
             "addons": {
                 "question": "Comment fonctionnent les options ?",
-                "answer": "Ce sont des quantités sur votre abonnement actuel, pas une autre offre. Ajoutez des crédits quand il vous en faut, et retirez-les de la même façon."
+                "answer": "Ce n’est pas une autre offre. Les crédits Rerun se paient une fois et n’expirent jamais : achetez-en quand il vous en faut."
             },
             "removeAddon": {
                 "question": "Que se passe-t-il si je retire une option ?",

@@ -10,11 +10,11 @@ import {
     BILLING_INTERVALS,
     PLAN_CURRENCY,
     ZERO_QUANTITIES,
+    baseLimitsToColumns,
     basePriceCents,
     isLifetimePlan,
     parsePriceArm,
     planPriceCents,
-    quantitiesToColumns,
     type AddonQuantities,
     type BillingInterval,
     type PriceArm,
@@ -569,7 +569,7 @@ export async function getSubscriptionState(): Promise<SubscriptionState | null> 
     const paymentMethod = subscription.default_payment_method ?? customer?.invoice_settings?.default_payment_method ?? null
     const hasPaymentMethod = !!paymentMethod
 
-    const derived = quantitiesToColumns(quantities)
+    const derived = baseLimitsToColumns()
     const pendingDowngrade: SubscriptionState['pendingDowngrade'] = {}
     if (subscription.status !== 'trialing' && workspace.rerun_budget_micros > derived.rerun_budget_micros) pendingDowngrade.rerun_budget_micros = derived.rerun_budget_micros
 
@@ -1069,7 +1069,7 @@ export async function requestRenewalReminder(): Promise<string> {
 // --- Plan changes from the plan dialog: agents and interval together ---
 
 // Every plan item moved onto `selection`: the base and add-on items keep their ids and change price,
-// add-ons appear or go, and a legacy seat or agent pack item goes with the old interval, since a
+// add-ons appear or go, and a legacy seat, agent pack or credit pack item goes with the old interval, since a
 // subscription bills every item on the same one.
 function replacementItems(subscription: Stripe.Subscription, { quantities, interval }: PlanSelection): PlanItemChange[] {
     const priceArm = priceArmOfItems(subscription.items.data)
@@ -1471,7 +1471,7 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
         return
     }
 
-    const derived = quantitiesToColumns(quantities)
+    const derived = baseLimitsToColumns()
     const advanced = hasPeriodAdvanced(existing?.current_period_end, newPeriodEnd)
     const limits = advanced || !existing ? derived : mergeHeldLimits(existing, derived)
 
@@ -1502,12 +1502,8 @@ export async function applySubscriptionToWorkspace(subscription: Stripe.Subscrip
 
     // A trial adds no monthly credit: it runs on the signup top-up. The budget is held where it was,
     // after the merge, otherwise the max would hand out the full plan budget. The derived budget
-    // arrives on conversion, when this runs again with an entitled `active` status.
-    //
-    // This cannot swallow a credit pack the workspace paid for: checkout only ever sells the
-    // bare base plan, and buying an add-on ends the trial (changePlan), so a `trialing`
-    // subscription carries no credit pack. The one add-on it can carry is an app slot
-    // (addTrialSlot), which buys no credit.
+    // arrives on conversion, when this runs again with an entitled `active` status. Credit bought
+    // once is not in this column, so holding it swallows none.
     if (subscription.status === 'trialing') update.rerun_budget_micros = existing?.rerun_budget_micros ?? 0
 
     // A trial runs TRIAL_ACTIVE_AGENTS, not the plan's count, and the column is what the gate reads.

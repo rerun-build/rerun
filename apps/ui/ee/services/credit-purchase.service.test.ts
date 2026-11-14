@@ -72,7 +72,7 @@ describe('quoteCreditPurchase', () => {
 describe('buyCredit', () => {
     it('charges the card on file and grants the credit on the spot', async () => {
         await expect(buyCredit(2)).resolves.toEqual({ kind: 'paid' })
-        expect(vi.mocked(stripe.invoices.create).mock.calls[0][0]).toMatchObject({ customer: 'cus_1', automatic_tax: { enabled: true }, pending_invoice_items_behavior: 'exclude', default_payment_method: 'pm_1', metadata: METADATA })
+        expect(vi.mocked(stripe.invoices.create).mock.calls[0][0]).toMatchObject({ customer: 'cus_1', currency: 'usd', automatic_tax: { enabled: true }, pending_invoice_items_behavior: 'exclude', default_payment_method: 'pm_1', metadata: METADATA })
         expect(stripe.invoiceItems.create).toHaveBeenCalledWith({ customer: 'cus_1', invoice: 'in_1', pricing: { price: 'price_credit_once' }, quantity: 2 })
         expect(stripe.invoices.finalizeInvoice).toHaveBeenCalledWith('in_1')
         expect(grants()).toEqual([{ p_workspace_id: 42, p_stripe_ref: 'pi_1', p_packs: 2, p_micros: 20_000_000 }])
@@ -100,6 +100,14 @@ describe('buyCredit', () => {
         await expect(buyCredit(2)).rejects.toThrow('Your card was declined.')
         expect(stripe.invoices.voidInvoice).toHaveBeenCalledWith('in_1')
         expect(grants()).toEqual([])
+    })
+
+    it('deletes the draft invoice when Stripe refuses to build it', async () => {
+        vi.mocked(stripe.invoiceItems.create).mockRejectedValue(new Error('The price specified only supports `usd`.'))
+        vi.mocked(stripe.invoices.del).mockResolvedValue({} as never)
+        await expect(buyCredit(1)).rejects.toThrow('only supports')
+        expect(stripe.invoices.del).toHaveBeenCalledWith('in_1')
+        expect(stripe.invoices.pay).not.toHaveBeenCalled()
     })
 
     it.each([

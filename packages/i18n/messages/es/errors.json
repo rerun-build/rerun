@@ -422,6 +422,8 @@
     "templateNotPurchasableYet": "Esta plantilla todavía no está disponible para comprar.",
     "purchaseOtherWorkspace": "Esta compra pertenece a otro workspace.",
     "changePlanFailed": "No se pudo cambiar tu plan",
+    "buyCreditFailed": "No se pudieron comprar los créditos",
+    "quoteCreditFailed": "No se pudo calcular el precio de los créditos",
     "updateBrainProposalFailed": "No se pudo actualizar la propuesta",
     "prepareSandboxFailed": "No se pudo preparar tu sandbox",
     "templateTitleFirst": "Primero ponle un título a la plantilla.",

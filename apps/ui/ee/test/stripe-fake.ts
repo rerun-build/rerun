@@ -26,7 +26,7 @@ export function fakeStripe() {
         paymentIntents: { retrieve: vi.fn() },
         charges: { retrieve: vi.fn() },
         transfers: { create: vi.fn(), createReversal: vi.fn(), retrieve: vi.fn() },
-        invoices: { create: vi.fn(), createPreview: vi.fn(), finalizeInvoice: vi.fn(), list: vi.fn(), retrieve: vi.fn(), voidInvoice: vi.fn(), pay: vi.fn() },
+        invoices: { create: vi.fn(), createPreview: vi.fn(), del: vi.fn(), finalizeInvoice: vi.fn(), list: vi.fn(), retrieve: vi.fn(), voidInvoice: vi.fn(), pay: vi.fn() },
         invoiceItems: { create: vi.fn() },
         coupons: { create: vi.fn(), retrieve: vi.fn() },
         invoicePayments: { list: vi.fn() },

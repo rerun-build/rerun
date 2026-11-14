@@ -422,6 +422,8 @@
     "templateNotPurchasableYet": "Ce template n'est pas encore disponible à l'achat.",
     "purchaseOtherWorkspace": "Cet achat appartient à un autre workspace.",
     "changePlanFailed": "Impossible de changer votre abonnement",
+    "buyCreditFailed": "Impossible d'acheter les crédits",
+    "quoteCreditFailed": "Impossible de calculer le prix des crédits",
     "updateBrainProposalFailed": "Impossible de mettre à jour la proposition",
     "prepareSandboxFailed": "Impossible de préparer votre sandbox",
     "templateTitleFirst": "Donnez d'abord un titre au template.",

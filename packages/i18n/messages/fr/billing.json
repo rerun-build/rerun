@@ -114,19 +114,18 @@
         },
         "credit": {
             "addedTitle": "Crédits ajoutés",
-            "addedBody": "Vous recevez désormais {count, plural, one {# crédit} other {# crédits}} par mois. Vos coworkers reprennent là où ils s'étaient arrêtés.",
-            "unchangedBody": "Vos crédits restent inchangés jusqu'à votre renouvellement.",
-            "title": "Ajouter des crédits Rerun",
-            "eachPack": "Chaque pack ajoute {count, plural, one {# crédit} other {# crédits}} par mois, pour {price}.",
+            "addedBody": "{count, plural, one {# crédit est} other {# crédits sont}} dans votre workspace. Ils n'expirent jamais, et vos coworkers reprennent là où ils s'étaient arrêtés.",
+            "title": "Acheter des crédits Rerun",
+            "eachPack": "Chaque pack ajoute {count, plural, one {# crédit} other {# crédits}} pour {price}, payé une fois. Ils n'expirent jamais.",
             "packs": "{count, plural, one {# pack} other {# packs}}",
-            "perMonth": "+{count, plural, one {# crédit} other {# crédits}} par mois",
+            "packCredits": "{count, plural, one {# crédit} other {# crédits}}, sans expiration",
             "lessAria": "Un pack de moins",
             "moreAria": "Un pack de plus",
-            "then": "Ensuite",
-            "add": "Ajouter des crédits",
-            "pickPacks": "Choisissez un nombre de packs",
-            "removeAtRenewal": "Retirer au renouvellement",
-            "chargedNow": "Débité maintenant, au prorata jusqu'à votre renouvellement."
+            "dueBeforeTax": "À payer aujourd'hui, hors taxes",
+            "buy": "Acheter des crédits",
+            "payOnStripe": "Payer sur Stripe",
+            "chargedOnce": "Prélevé une seule fois sur cette carte.",
+            "checkoutFootnote": "Vous payez sur une page Stripe sécurisée, puis revenez ici."
         }
     },
     "apps": {
@@ -505,11 +504,6 @@
                 "title": "Coéquipiers",
                 "trial": "Vous seul",
                 "pro": "Invitez toute votre équipe"
-            },
-            "topup": {
-                "title": "Recharges",
-                "trial": "Non disponible",
-                "pro": "+{credits, plural, one {# crédit} other {# crédits}} quand vous en avez besoin"
             }
         },
         "headlines": {

@@ -16,9 +16,10 @@ import { CardOnFile, PayFooter, RightTitle, SummaryRows, TermsConsent, usd } fro
 
 const QUOTE_DEBOUNCE_MS = 250
 
-// What Stripe would charge today for a number of packs, 'loading' until the answer for that very
-// number is in. A failed quote reads as none: the pane falls back on the list price.
-function useCreditQuote(packs: number): CreditQuote | null | 'loading' {
+// What Stripe would charge today for a number of packs. `loading` until the answer for that very
+// number is in; `quote` keeps the last answer meanwhile, so the card on file does not blink at every
+// step. A failed quote reads as none: the pane falls back on the list price and on Checkout.
+function useCreditQuote(packs: number): { quote: CreditQuote | null; loading: boolean; settled: boolean } {
     const [answer, setAnswer] = useState<{ packs: number; quote: CreditQuote | null } | null>(null)
 
     useEffect(() => {
@@ -33,7 +34,7 @@ function useCreditQuote(packs: number): CreditQuote | null | 'loading' {
         }
     }, [packs])
 
-    return answer?.packs === packs ? answer.quote : 'loading'
+    return { quote: answer?.quote ?? null, loading: answer?.packs !== packs, settled: !!answer }
 }
 
 export type CreditPurchased = { title: string; body: string }
@@ -47,8 +48,10 @@ export function CreditPane({ onBack, onDone }: { onBack?: () => void; onDone: (s
     const [accepted, setAccepted] = useState(false)
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const quote = useCreditQuote(packs)
-    const onCheckout = quote !== 'loading' && !quote?.card
+    const { quote, loading, settled } = useCreditQuote(packs)
+    const onCheckout = settled && !quote?.card
+    // Stripe's Checkout page collects the consent itself.
+    const needsConsent = settled && !onCheckout && !accepted
     const listPrice = packs * CREDIT_PACK_PRICE_CENTS
 
     const buy = async () => {
@@ -64,7 +67,7 @@ export function CreditPane({ onBack, onDone }: { onBack?: () => void; onDone: (s
         onDone({ title: t('plan.credit.addedTitle'), body: t('plan.credit.addedBody', { count: packs * CREDITS_PER_PACK }) })
     }
 
-    const dueToday = quote === 'loading' ? <Skeleton className="inline-block h-4 w-14" /> : usd(quote?.dueTodayCents ?? listPrice)
+    const dueToday = loading ? <Skeleton className="inline-block h-4 w-14" /> : usd(quote?.dueTodayCents ?? listPrice)
 
     return (
         <>
@@ -85,19 +88,11 @@ export function CreditPane({ onBack, onDone }: { onBack?: () => void; onDone: (s
                         </Button>
                     </div>
                 </div>
-                <SummaryRows rows={[{ label: quote !== 'loading' && quote?.taxIncluded ? t('plan.change.dueTodayTaxIncluded') : t('plan.credit.dueBeforeTax'), value: dueToday, strong: true }]} />
-                {quote !== 'loading' && quote?.card && <CardOnFile card={quote.card} />}
+                <SummaryRows rows={[{ label: quote?.taxIncluded ? t('plan.change.dueTodayTaxIncluded') : t('plan.credit.dueBeforeTax'), value: dueToday, strong: true }]} />
+                {quote?.card && <CardOnFile card={quote.card} />}
             </div>
-            <PayFooter
-                cta={onCheckout ? t('plan.credit.payOnStripe') : t('plan.credit.buy')}
-                footnote={onCheckout ? t('plan.credit.checkoutFootnote') : t('plan.credit.chargedOnce')}
-                onClick={() => void buy()}
-                loading={submitting}
-                disabled={!accepted || quote === 'loading'}
-                disabledReason={!accepted ? t('plan.acceptTerms') : undefined}
-                error={error}
-            >
-                <TermsConsent checked={accepted} onChange={setAccepted} />
+            <PayFooter cta={onCheckout ? t('plan.credit.payOnStripe') : t('plan.credit.buy')} footnote={onCheckout ? t('plan.credit.checkoutFootnote') : t('plan.credit.chargedOnce')} onClick={() => void buy()} loading={submitting} disabled={needsConsent || loading} disabledReason={needsConsent ? t('plan.acceptTerms') : undefined} error={error}>
+                {settled && !onCheckout && <TermsConsent checked={accepted} onChange={setAccepted} />}
             </PayFooter>
         </>
     )

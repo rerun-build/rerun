@@ -273,7 +273,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                             wholeMicros={credit.budgetMicros}
                             trial={trialing}
                             onOpen={() => (workspaceAdmin ? openBilling(undefined, 'workspace_menu') : undefined)}
-                            onAdd={workspaceAdmin ? () => openBilling('credit_pack', 'workspace_menu') : undefined}
+                            onAdd={workspaceAdmin ? () => openBilling(trialing ? undefined : 'credit_pack', 'workspace_menu') : undefined}
                         />
                     )}
                     {!workspace.is_sandbox && (

@@ -11,7 +11,8 @@
     },
     "price": {
         "perMonth": "/Monat",
-        "perMonthBilledYearly": "/Monat, jährlich {total}"
+        "perMonthBilledYearly": "/Monat, jährlich {total}",
+        "once": "einmalig"
     },
     "billing": {
         "label": "Abrechnungszeitraum",
@@ -128,12 +129,12 @@
     "addons": {
         "label": "Add-ons",
         "title": "Wachse Stück für Stück.",
-        "lede": "Add-ons sind Mengen in deinem bestehenden Tarif, kein weiterer Tarif. Nimm eins, wenn du es brauchst, und gib es ab, wenn nicht.",
+        "lede": "Kein weiterer Tarif. Nimm mehr, wenn du es brauchst.",
         "items": {
             "credit_pack": {
                 "title": "Rerun-Guthaben",
-                "unit": "+{credits, plural, one {# Credit} other {# Credits}}/Monat",
-                "caption": "Mehr Guthaben für die Modelle, die wir hosten, zusätzlich zum Tarif."
+                "unit": "+{credits, plural, one {# Credit} other {# Credits}}, verfallen nie",
+                "caption": "Mehr Guthaben für die Modelle, die wir hosten, zusätzlich zum Tarif. Einmal bezahlt."
             }
         }
     },
@@ -172,7 +173,7 @@
             },
             "addons": {
                 "question": "Wie funktionieren Add-ons?",
-                "answer": "Sie sind Mengen in deinem bestehenden Abo, kein weiterer Tarif. Füge Guthaben hinzu, wann immer du es brauchst, und entferne es genauso."
+                "answer": "Sie sind kein weiterer Tarif. Rerun-Guthaben wird einmal bezahlt und verfällt nie: Kauf mehr, wann immer du es brauchst."
             },
             "removeAddon": {
                 "question": "Was passiert, wenn ich ein Add-on entferne?",

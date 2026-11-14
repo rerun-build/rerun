@@ -422,6 +422,8 @@
     "templateNotPurchasableYet": "Diese Vorlage kann noch nicht gekauft werden.",
     "purchaseOtherWorkspace": "Dieser Kauf gehört zu einem anderen Workspace.",
     "changePlanFailed": "Dein Tarif konnte nicht geändert werden",
+    "buyCreditFailed": "Guthaben konnte nicht gekauft werden",
+    "quoteCreditFailed": "Preis des Guthabens konnte nicht berechnet werden",
     "updateBrainProposalFailed": "Der Vorschlag konnte nicht aktualisiert werden",
     "prepareSandboxFailed": "Deine Sandbox konnte nicht vorbereitet werden",
     "templateTitleFirst": "Gib der Vorlage zuerst einen Titel.",

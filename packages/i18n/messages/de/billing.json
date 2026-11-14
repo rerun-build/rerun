@@ -114,19 +114,18 @@
         },
         "credit": {
             "addedTitle": "Guthaben hinzugefügt",
-            "addedBody": "Du bekommst jetzt jeden Monat {count, plural, one {# Credit} other {# Credits}}. Deine Coworker machen dort weiter, wo sie aufgehört haben.",
-            "unchangedBody": "Dein Guthaben bleibt bis zu deiner Verlängerung unverändert.",
-            "title": "Rerun-Guthaben hinzufügen",
-            "eachPack": "Jedes Paket fügt jeden Monat {count, plural, one {# Credit} other {# Credits}} hinzu, für {price}.",
+            "addedBody": "{count, plural, one {# Credit ist} other {# Credits sind}} in deinem Workspace. Sie verfallen nie, und deine Coworker machen dort weiter, wo sie aufgehört haben.",
+            "title": "Rerun-Guthaben kaufen",
+            "eachPack": "Jedes Paket fügt {count, plural, one {# Credit} other {# Credits}} für {price} hinzu, einmal bezahlt. Sie verfallen nie.",
             "packs": "{count, plural, one {# Paket} other {# Pakete}}",
-            "perMonth": "+{count, plural, one {# Credit} other {# Credits}} pro Monat",
+            "packCredits": "{count, plural, one {# Credit} other {# Credits}}, verfallen nie",
             "lessAria": "Ein Paket weniger",
             "moreAria": "Ein Paket mehr",
-            "then": "Danach",
-            "add": "Guthaben hinzufügen",
-            "pickPacks": "Wähle eine Anzahl Pakete",
-            "removeAtRenewal": "Bei Verlängerung entfernen",
-            "chargedNow": "Jetzt berechnet, anteilig bis zu deiner Verlängerung."
+            "dueBeforeTax": "Heute fällig, zzgl. Steuern",
+            "buy": "Guthaben kaufen",
+            "payOnStripe": "Bei Stripe bezahlen",
+            "chargedOnce": "Einmalig von dieser Karte abgebucht.",
+            "checkoutFootnote": "Du bezahlst auf einer sicheren Stripe-Seite und kommst dann hierher zurück."
         }
     },
     "apps": {
@@ -505,11 +504,6 @@
                 "title": "Teammitglieder",
                 "trial": "Nur du",
                 "pro": "Lade dein ganzes Team ein"
-            },
-            "topup": {
-                "title": "Aufladungen",
-                "trial": "Nicht verfügbar",
-                "pro": "+{credits, plural, one {# Credit} other {# Credits}}, wenn du sie brauchst"
             }
         },
         "headlines": {

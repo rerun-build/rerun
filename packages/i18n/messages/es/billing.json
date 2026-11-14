@@ -114,19 +114,18 @@
         },
         "credit": {
             "addedTitle": "Créditos añadidos",
-            "addedBody": "Ahora recibes {count, plural, one {# crédito} other {# créditos}} al mes. Tus coworkers retoman donde se quedaron.",
-            "unchangedBody": "Tus créditos siguen igual hasta tu renovación.",
-            "title": "Añadir créditos de Rerun",
-            "eachPack": "Cada pack añade {count, plural, one {# crédito} other {# créditos}} al mes, por {price}.",
+            "addedBody": "{count, plural, one {# crédito está} other {# créditos están}} en tu workspace. No caducan nunca, y tus coworkers retoman donde se quedaron.",
+            "title": "Comprar créditos de Rerun",
+            "eachPack": "Cada pack añade {count, plural, one {# crédito} other {# créditos}} por {price}, en un solo pago. No caducan nunca.",
             "packs": "{count, plural, one {# pack} other {# packs}}",
-            "perMonth": "+{count, plural, one {# crédito} other {# créditos}} al mes",
+            "packCredits": "{count, plural, one {# crédito} other {# créditos}}, sin caducidad",
             "lessAria": "Un pack menos",
             "moreAria": "Un pack más",
-            "then": "Después",
-            "add": "Añadir créditos",
-            "pickPacks": "Elige un número de packs",
-            "removeAtRenewal": "Quitar al renovar",
-            "chargedNow": "Se cobra ahora, prorrateado hasta tu renovación."
+            "dueBeforeTax": "A pagar hoy, sin impuestos",
+            "buy": "Comprar créditos",
+            "payOnStripe": "Pagar en Stripe",
+            "chargedOnce": "Se cobra una sola vez a esta tarjeta.",
+            "checkoutFootnote": "Pagas en una página segura de Stripe y luego vuelves aquí."
         }
     },
     "apps": {
@@ -505,11 +504,6 @@
                 "title": "Compañeros",
                 "trial": "Solo tú",
                 "pro": "Invita a todo tu equipo"
-            },
-            "topup": {
-                "title": "Recargas",
-                "trial": "No disponible",
-                "pro": "+{credits, plural, one {# crédito} other {# créditos}} cuando los necesites"
             }
         },
         "headlines": {

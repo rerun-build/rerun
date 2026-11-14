@@ -11,7 +11,8 @@
     },
     "price": {
         "perMonth": "/mes",
-        "perMonthBilledYearly": "/mes, facturado {total}/año"
+        "perMonthBilledYearly": "/mes, facturado {total}/año",
+        "once": "una vez"
     },
     "billing": {
         "label": "Periodo de facturación",
@@ -128,12 +129,12 @@
     "addons": {
         "label": "Complementos",
         "title": "Crece pieza a pieza.",
-        "lede": "Los complementos son cantidades sobre el plan que ya tienes, no otro nivel. Añade uno cuando lo necesites y quítalo cuando no.",
+        "lede": "No es otro nivel. Toma más cuando lo necesites.",
         "items": {
             "credit_pack": {
                 "title": "Créditos de Rerun",
-                "unit": "+{credits, plural, one {# crédito} other {# créditos}}/mes",
-                "caption": "Más créditos para los modelos que alojamos, además del plan."
+                "unit": "+{credits, plural, one {# crédito} other {# créditos}}, sin caducidad",
+                "caption": "Más créditos para los modelos que alojamos, además del plan. Un solo pago."
             }
         }
     },
@@ -172,7 +173,7 @@
             },
             "addons": {
                 "question": "¿Cómo funcionan los complementos?",
-                "answer": "Son cantidades sobre tu suscripción actual, no otro plan. Añade créditos cuando los necesites y quítalos de la misma forma."
+                "answer": "No son otro plan. Los créditos de Rerun se pagan una vez y no caducan nunca: compra más cuando los necesites."
             },
             "removeAddon": {
                 "question": "¿Qué pasa si quito un complemento?",

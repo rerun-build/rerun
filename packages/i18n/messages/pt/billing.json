@@ -114,19 +114,18 @@
         },
         "credit": {
             "addedTitle": "Créditos adicionados",
-            "addedBody": "Agora você recebe {count, plural, one {# crédito} other {# créditos}} todo mês. Seus coworkers continuam de onde pararam.",
-            "unchangedBody": "Seus créditos continuam iguais até a renovação.",
-            "title": "Adicionar créditos Rerun",
-            "eachPack": "Cada pacote adiciona {count, plural, one {# crédito} other {# créditos}} por mês, por {price}.",
+            "addedBody": "{count, plural, one {# crédito está} other {# créditos estão}} no seu workspace. Eles nunca expiram, e seus coworkers continuam de onde pararam.",
+            "title": "Comprar créditos Rerun",
+            "eachPack": "Cada pacote adiciona {count, plural, one {# crédito} other {# créditos}} por {price}, pago uma vez. Eles nunca expiram.",
             "packs": "{count, plural, one {# pacote} other {# pacotes}}",
-            "perMonth": "+{count, plural, one {# crédito} other {# créditos}} por mês",
+            "packCredits": "{count, plural, one {# crédito} other {# créditos}}, sem expiração",
             "lessAria": "Um pacote a menos",
             "moreAria": "Um pacote a mais",
-            "then": "Depois",
-            "add": "Adicionar créditos",
-            "pickPacks": "Escolha um número de pacotes",
-            "removeAtRenewal": "Remover na renovação",
-            "chargedNow": "Cobrado agora, proporcional até a renovação."
+            "dueBeforeTax": "A pagar hoje, sem impostos",
+            "buy": "Comprar créditos",
+            "payOnStripe": "Pagar no Stripe",
+            "chargedOnce": "Cobrado uma única vez neste cartão.",
+            "checkoutFootnote": "Você paga em uma página segura do Stripe e depois volta para cá."
         }
     },
     "apps": {
@@ -505,11 +504,6 @@
                 "title": "Colegas",
                 "trial": "Só você",
                 "pro": "Convide toda a sua equipe"
-            },
-            "topup": {
-                "title": "Recargas",
-                "trial": "Indisponível",
-                "pro": "+{credits, plural, one {# crédito} other {# créditos}} quando precisar"
             }
         },
         "headlines": {

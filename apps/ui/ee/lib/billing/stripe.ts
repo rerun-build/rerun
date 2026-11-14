@@ -14,10 +14,9 @@ type PlanPriceKey = 'base' | AddonKey
 // products/prices and prints these values). The prices carry metadata in Stripe; the
 // env mapping keeps the lookup cheap and avoids a round-trip on every checkout.
 const PRICE_ENV_NAMES: Record<BillingInterval, Record<PlanPriceKey, string>> = {
-    monthly: { base: 'STRIPE_PRICE_BASE', credit_pack: 'STRIPE_PRICE_CREDIT_PACK', linkedin_slot: 'STRIPE_PRICE_LINKEDIN_SLOT', whatsapp_slot: 'STRIPE_PRICE_WHATSAPP_SLOT' },
+    monthly: { base: 'STRIPE_PRICE_BASE', linkedin_slot: 'STRIPE_PRICE_LINKEDIN_SLOT', whatsapp_slot: 'STRIPE_PRICE_WHATSAPP_SLOT' },
     yearly: {
         base: 'STRIPE_PRICE_BASE_YEARLY',
-        credit_pack: 'STRIPE_PRICE_CREDIT_PACK_YEARLY',
         linkedin_slot: 'STRIPE_PRICE_LINKEDIN_SLOT_YEARLY',
         whatsapp_slot: 'STRIPE_PRICE_WHATSAPP_SLOT_YEARLY',
     },
@@ -75,9 +74,18 @@ export function isLegacyAgentPackPriceId(priceId?: string | null): boolean {
     return !!priceId && LEGACY_AGENT_PACK_ENV_NAMES.some(name => process.env[name] === priceId)
 }
 
+// The credit pack is bought once now, outside the plan. A subscription that still carries its monthly
+// item before scripts/convert-recurring-credit-packs.ts has run keeps reading as a plan, and the
+// item adds nothing to the monthly credit any more.
+const LEGACY_CREDIT_PACK_ENV_NAMES = ['STRIPE_PRICE_CREDIT_PACK', 'STRIPE_PRICE_CREDIT_PACK_YEARLY'] as const
+
+export function isLegacyCreditPackPriceId(priceId?: string | null): boolean {
+    return !!priceId && LEGACY_CREDIT_PACK_ENV_NAMES.some(name => process.env[name] === priceId)
+}
+
 // An item the plan no longer sells, deleted by any change made to the plan.
 export function isLegacyPlanItemPriceId(priceId?: string | null): boolean {
-    return isLegacySeatPriceId(priceId) || isLegacyAgentPackPriceId(priceId)
+    return isLegacySeatPriceId(priceId) || isLegacyAgentPackPriceId(priceId) || isLegacyCreditPackPriceId(priceId)
 }
 
 // The base plan's price. Read straight from the env rather than through basePriceId(): asking

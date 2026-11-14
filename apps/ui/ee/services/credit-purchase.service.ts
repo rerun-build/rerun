@@ -4,7 +4,7 @@ import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { getAppOrigin } from '@/lib/app-origin'
 import { AppError } from '@/lib/i18n/action-error'
 import { CREDIT_PURCHASE_CONSENT } from '@/ee/lib/billing/consent'
-import { MICROS_PER_USD } from '@/ee/lib/billing/plans'
+import { MICROS_PER_USD, PLAN_CURRENCY } from '@/ee/lib/billing/plans'
 import { creditPackOncePriceId, idOf, stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
@@ -67,6 +67,7 @@ export async function quoteCreditPurchase(packs: number): Promise<CreditQuote> {
 
     const preview = await stripe.invoices.createPreview({
         customer: context.customerId,
+        currency: PLAN_CURRENCY,
         invoice_items: [{ price: creditPackOncePriceId(), quantity: packs }],
         automatic_tax: { enabled: true },
     })
@@ -82,6 +83,8 @@ export async function buyCredit(packs: number): Promise<CreditPurchaseResult> {
     const metadata: Stripe.MetadataParam = { kind: CREDIT_PURCHASE_KIND, workspace_id: String(context.workspaceId), packs: String(packs) }
     const draft = await stripe.invoices.create({
         customer: context.customerId,
+        // Else the account's own currency, which the USD price refuses.
+        currency: PLAN_CURRENCY,
         collection_method: 'charge_automatically',
         auto_advance: false,
         automatic_tax: { enabled: true },
@@ -91,8 +94,13 @@ export async function buyCredit(packs: number): Promise<CreditPurchaseResult> {
         metadata,
     })
     const invoiceId = draft.id!
-    await stripe.invoiceItems.create({ customer: context.customerId, invoice: invoiceId, pricing: { price: creditPackOncePriceId() }, quantity: packs })
-    await stripe.invoices.finalizeInvoice(invoiceId)
+    try {
+        await stripe.invoiceItems.create({ customer: context.customerId, invoice: invoiceId, pricing: { price: creditPackOncePriceId() }, quantity: packs })
+        await stripe.invoices.finalizeInvoice(invoiceId)
+    } catch (err) {
+        await stripe.invoices.del(invoiceId).catch(delErr => console.error('[credit purchase] could not delete a draft invoice', invoiceId, delErr))
+        throw err
+    }
 
     try {
         const paid = await stripe.invoices.pay(invoiceId)

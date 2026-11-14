@@ -56,16 +56,15 @@ export const BILLING_INTERVALS = ['monthly', 'yearly'] as const
 
 export type BillingInterval = (typeof BILLING_INTERVALS)[number]
 
-export const ADDON_KEYS = ['credit_pack', 'linkedin_slot', 'whatsapp_slot'] as const
+export const ADDON_KEYS = ['linkedin_slot', 'whatsapp_slot'] as const
 
 export type AddonKey = (typeof ADDON_KEYS)[number]
 
-// Every price, per billing interval. The credit pack carries no yearly discount, because model credit
-// is resold at cost and a discount on it is a loss on every pack. Nor does an app slot: each one is
-// an account Rerun pays for by the month.
+// Every price, per billing interval. An app slot carries no yearly discount: each one is an account
+// Rerun pays for by the month.
 export const PLAN_PRICES_CENTS: Record<BillingInterval, Record<'base' | AddonKey, number>> = {
-    monthly: { base: 4900, credit_pack: 1000, linkedin_slot: 900, whatsapp_slot: 900 },
-    yearly: { base: 46800, credit_pack: 12000, linkedin_slot: 10800, whatsapp_slot: 10800 },
+    monthly: { base: 4900, linkedin_slot: 900, whatsapp_slot: 900 },
+    yearly: { base: 46800, linkedin_slot: 10800, whatsapp_slot: 10800 },
 }
 
 // The base plan is sold at two prices while the price test runs: a workspace is drawn into an arm
@@ -110,21 +109,21 @@ export const CREDIT_USD_PER_PACK = 10
 
 export const CREDITS_PER_PACK = creditsFromUsd(CREDIT_USD_PER_PACK)
 
-// A pack is bought once, and its credit never expires: no renewal resets it.
+// A pack is bought once, outside the plan, and its credit never expires: no renewal resets it. No
+// discount on it either: model credit is resold at cost.
 export const CREDIT_PACK_PRICE_CENTS = 1000
 
 export const MAX_CREDIT_PACKS_PER_PURCHASE = 100
 
 // Monthly prices only, for the surfaces that quote a plain "per month" figure.
 export const ADDONS: Record<AddonKey, { priceCents: number }> = {
-    credit_pack: { priceCents: PLAN_PRICES_CENTS.monthly.credit_pack },
     linkedin_slot: { priceCents: PLAN_PRICES_CENTS.monthly.linkedin_slot },
     whatsapp_slot: { priceCents: PLAN_PRICES_CENTS.monthly.whatsapp_slot },
 }
 
 export type AddonQuantities = Record<AddonKey, number>
 
-export const ZERO_QUANTITIES: AddonQuantities = { credit_pack: 0, linkedin_slot: 0, whatsapp_slot: 0 }
+export const ZERO_QUANTITIES: AddonQuantities = { linkedin_slot: 0, whatsapp_slot: 0 }
 
 // What one invoice of the interval bills, before tax and discounts.
 export function planPriceCents(quantities: AddonQuantities, interval: BillingInterval, arm: PriceArm = LIST_PRICE_ARM): number {

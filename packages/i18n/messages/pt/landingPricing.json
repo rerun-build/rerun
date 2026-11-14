@@ -11,7 +11,8 @@
     },
     "price": {
         "perMonth": "/mês",
-        "perMonthBilledYearly": "/mês, cobrado {total}/ano"
+        "perMonthBilledYearly": "/mês, cobrado {total}/ano",
+        "once": "uma vez"
     },
     "billing": {
         "label": "Período de cobrança",
@@ -128,12 +129,12 @@
     "addons": {
         "label": "Complementos",
         "title": "Cresça uma peça de cada vez.",
-        "lede": "Complementos são quantidades no plano que você já tem, não outro nível. Adicione um quando precisar e remova quando não precisar mais.",
+        "lede": "Não é outro nível. Pegue mais quando precisar.",
         "items": {
             "credit_pack": {
                 "title": "Créditos Rerun",
-                "unit": "+{credits, plural, one {# crédito} other {# créditos}}/mês",
-                "caption": "Mais créditos para os modelos que hospedamos, além do plano."
+                "unit": "+{credits, plural, one {# crédito} other {# créditos}}, sem expiração",
+                "caption": "Mais créditos para os modelos que hospedamos, além do plano. Pagos uma vez."
             }
         }
     },
@@ -172,7 +173,7 @@
             },
             "addons": {
                 "question": "Como funcionam os complementos?",
-                "answer": "São quantidades na sua assinatura atual, não outro plano. Adicione créditos quando precisar e remova do mesmo jeito."
+                "answer": "Não são outro plano. Os créditos Rerun são pagos uma vez e nunca expiram: compre mais quando precisar."
             },
             "removeAddon": {
                 "question": "O que acontece quando removo um complemento?",
