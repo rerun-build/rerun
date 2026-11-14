@@ -106,6 +106,7 @@ def strip_hash(path, text):
     block_indent = None
     run_block = False
     quote = None
+    dropped = False
     for i, line in enumerate(lines):
         stripped = line.strip()
         if heredoc:
@@ -127,7 +128,11 @@ def strip_hash(path, text):
         keep = (i == 0 and stripped.startswith("#!")) or HASH_KEEP.match(stripped)
         if comment and not keep:
             removed += 1
+            dropped = True
             continue
+        if dropped and not stripped and (not out or not out[-1].strip()):
+            continue
+        dropped = False
         out.append(line)
         if is_sh or is_docker:
             m = HEREDOC.search(line)
@@ -223,15 +228,22 @@ def strip_css(text):
             end = text.find("*/", i + 2)
             end = len(text) if end == -1 else end + 2
             removed += 1
+            out.append("\x00")
             i = end
             continue
         else:
             out.append(ch)
         i += 1
-    new = "".join(out)
-    new = re.sub(r"[ \t]+\n", "\n", new)
-    new = re.sub(r"\n{3,}", "\n\n", new)
-    return new, removed
+    lines, dropped = [], False
+    for line in "".join(out).splitlines(keepends=True):
+        if "\x00" in line and not line.replace("\x00", "").strip():
+            dropped = True
+            continue
+        if dropped and not line.strip() and (not lines or not lines[-1].strip() or lines[-1].rstrip().endswith("{")):
+            continue
+        dropped = False
+        lines.append(re.sub(r"[ \t]*\x00", "", line))
+    return "".join(lines), removed
 
 
 def main():
