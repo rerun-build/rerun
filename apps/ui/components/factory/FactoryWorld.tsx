@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import { fireRerunConfetti } from '@/lib/confetti'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { applyMoves, canMove, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
+import { applyMoves, canMove, dropReason, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
 import { METRICS, barModel, type MetricDef, type MetricKey, type MetricValues } from './factory-metrics'
 import { FactoryOverlay } from './FactoryOverlay'
 import { LOOP_MS, factoryScene, type Cell, type FactoryFrame } from './factory-scene'
@@ -71,10 +71,11 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     // the floor.
     const boxes = frame.containers
     const moves = useMemo(() => readMoves(saved, sceneTiles, boxes), [saved, sceneTiles, boxes])
-    const tiles = useMemo(() => applyMoves(sceneTiles, moves), [sceneTiles, moves])
+    const tiles = useMemo(() => applyMoves(sceneTiles, moves, boxes), [sceneTiles, moves, boxes])
     const onTileMove = useCallback((id: string, cell: Cell) => {
         if (canMove(sceneTiles, moves, id, cell, boxes)) saveLayout(storageKey, { ...moves, [id]: cell })
     }, [sceneTiles, moves, storageKey, boxes])
+    const canDropTile = useCallback((id: string, cell: Cell) => dropReason(sceneTiles, moves, id, cell, boxes), [sceneTiles, moves, boxes])
     const moved = Object.keys(moves).length > 0
     const links = useStable(frame.links)
     // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
@@ -128,6 +129,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
                 cameraTransitionMs={0}
                 showLinks
                 onTileMove={onTileMove}
+                canDropTile={canDropTile}
                 selectedTileId={null}
                 {...(onOpenCoworker ? { onTileSelect } : {})}
                 scrollGestures
