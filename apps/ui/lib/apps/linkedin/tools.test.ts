@@ -1,15 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
-import { runFlatEndpoint } from '@/lib/apps/linkup/client'
+import { runAction, runFlatEndpoint } from '@/lib/apps/linkup/client'
 import { missingRequired, toolParams } from '@/lib/apps/tools'
 import { LINKEDIN_TOOLS, linkedinTool } from './tools'
 
-vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/linkup/client')>()), runFlatEndpoint: vi.fn() }))
+vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/linkup/client')>()), runFlatEndpoint: vi.fn(), runAction: vi.fn() }))
 
 describe('the LinkedIn tool set', () => {
     it('never hands the coworker the account itself: no login, no checkpoint, no account deletion, no webhook', () => {
         for (const tool of LINKEDIN_TOOLS) {
             expect(tool.action).not.toMatch(/login|checkpoint|account|webhook/)
-            expect(['profiles', 'network', 'messages', 'content']).toContain(tool.category)
+            expect(['profiles', 'network', 'messages', 'content', 'recruiter']).toContain(tool.category)
         }
         expect(new Set(LINKEDIN_TOOLS.map(tool => tool.name)).size).toBe(LINKEDIN_TOOLS.length)
     })
@@ -146,6 +146,35 @@ describe('Sales Navigator', () => {
         for (const name of ['get_profile', 'list_conversations', 'get_conversation', 'send_message']) {
             expect(Object.keys(linkedinTool(name)!.inputSchema.properties)).toContain('sales_nav')
         }
+    })
+})
+
+describe('Recruiter', () => {
+    const context = { slug: 'linkedin' as const, accountId: 'acc-1', connectionId: 'c', engineAgentId: 'a', engine: vi.fn() }
+
+    it('tells the coworker every Recruiter tool needs a seat', () => {
+        const recruiterTools = LINKEDIN_TOOLS.filter(tool => tool.name.startsWith('recruiter_'))
+        expect(recruiterTools.length).toBeGreaterThan(15)
+        for (const tool of recruiterTools) expect(tool.description).toMatch(/^Needs a LinkedIn Recruiter seat\./)
+    })
+
+    it('sets the Recruiter flag itself on the classic actions it reuses', async () => {
+        vi.mocked(runAction).mockResolvedValue({})
+        await linkedinTool('recruiter_send_inmail')!.run!(context, { recipient_urn: 'urn:li:ts_profile:1', subject: 'Role', message_text: 'Hi' })
+        expect(runAction).toHaveBeenLastCalledWith('acc-1', 'messages', 'send', { recipient_urn: 'urn:li:ts_profile:1', subject: 'Role', message_text: 'Hi', recruiter: true })
+        await linkedinTool('recruiter_get_candidate')!.run!(context, { profile_urn: 'urn:li:ts_profile:1' })
+        expect(runAction).toHaveBeenLastCalledWith('acc-1', 'profiles', 'get', { profile_urn: 'urn:li:ts_profile:1', recruiter: true })
+    })
+
+    it('meters InMails, candidate views and searches', () => {
+        expect(linkedinTool('recruiter_send_inmail')?.quota?.action).toBe('message')
+        expect(linkedinTool('recruiter_get_candidate')?.quota?.action).toBe('profile_view')
+        expect(linkedinTool('recruiter_search_people')?.quota?.action).toBe('search_result')
+    })
+
+    it('runs jobs and projects on the recruiter endpoint', () => {
+        for (const name of ['recruiter_list_jobs', 'recruiter_create_job', 'recruiter_move_candidate']) expect(linkedinTool(name)?.category).toBe('recruiter')
+        expect(missingRequired(linkedinTool('recruiter_create_job')!, { title: 'CTO' })).toEqual(['company_url', 'place', 'html_description'])
     })
 })
 

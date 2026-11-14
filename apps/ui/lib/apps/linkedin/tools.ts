@@ -1,6 +1,6 @@
 import { attachmentTool } from '@/lib/apps/attachment-tool'
-import { runFlatEndpoint } from '@/lib/apps/linkup/client'
-import type { AppTool } from '@/lib/apps/tools'
+import { runAction, runFlatEndpoint, type LinkupCategory } from '@/lib/apps/linkup/client'
+import type { AppTool, AppToolContext } from '@/lib/apps/tools'
 import type { QuotaAction } from './quotas'
 
 // The LinkedIn tools a coworker gets. Linkup bills Rerun by the account, not by the call, so a quota
@@ -98,6 +98,17 @@ const SALES_NAV_COMPANY_FILTERS = {
     postal_code: stringList(),
     account_list: stringList(),
     exclude: { type: 'object', description: 'Values to leave out: { industry: [...], location: [...] }' },
+}
+
+const RECRUITER = 'Needs a LinkedIn Recruiter seat.'
+const projectUrn = { type: 'string', description: 'From linkedin_pro_recruiter_list_projects' }
+const candidateUrn = { type: 'string', description: 'The hire_identity_urn of the candidate, from linkedin_pro_recruiter_search_people' }
+const jobId = { type: 'string', description: 'From linkedin_pro_recruiter_list_jobs' }
+
+// The Recruiter variants of classic actions are the same Linkup action with `recruiter: true`, set
+// here rather than left to the coworker.
+function onRecruiterSeat(category: LinkupCategory, action: string) {
+    return (context: AppToolContext, params: Record<string, unknown>) => runAction(context.accountId, category, action, { ...params, recruiter: true })
 }
 
 export const LINKEDIN_TOOLS: LinkedinTool[] = [
@@ -828,6 +839,276 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { saved_search_id: { type: 'string' } }, required: ['saved_search_id'] },
         category: 'profiles',
         action: 'delete_saved_search_nav',
+    },
+    {
+        name: 'recruiter_search_people',
+        description: `${RECRUITER} Talent search with every Recruiter filter. Ids for locations, companies, schools, skills and occupations come from linkedin_pro_typeahead with category recruiter. Pass search_request_id from the first page with the next offset, up to 1000.`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                recruiter_url: { type: 'string', description: 'A Recruiter search URL. Wins over the filters' },
+                keywords: { type: 'string' },
+                job_title: stringList(),
+                title_scope: { type: 'string', enum: ['CURRENT', 'CURRENT_OR_PAST', 'PAST'] },
+                companies: stringList(),
+                company_scope: { type: 'string', enum: ['CURRENT', 'CURRENT_OR_PAST', 'PAST'] },
+                skills: stringList(),
+                occupations: stringList('Typeahead occupation ids'),
+                first_name: { type: 'string' },
+                last_name: { type: 'string' },
+                notes: { type: 'string' },
+                locations: stringList('Typeahead location ids'),
+                postal_codes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' } } }, description: 'Items from typeahead zip' },
+                distance: { type: 'number', description: 'Radius around postal_codes, 25 by default' },
+                current_company: stringList('Typeahead company ids'),
+                past_company: stringList('Typeahead company ids'),
+                schools: stringList('Typeahead school ids'),
+                industries: stringList('Typeahead industry ids'),
+                groups: stringList('Typeahead group ids'),
+                projects: stringList('Typeahead project ids'),
+                seniority_level: { type: 'array', items: { type: 'string', enum: ['Unpaid', 'Training', 'Entry level', 'Senior', 'Manager', 'Director', 'VP', 'CXO', 'Partner', 'Owner'] } },
+                function: stringList(),
+                company_size: { type: 'array', items: { type: 'string', enum: ['Self-employed', '1-10', '11-50', '51-200', '201-500', '501-1,000', '1,001-5,000', '5,001-10,000', '10,001+'] } },
+                connection_degree: { type: 'array', items: { type: 'string', enum: ['1st', '2nd', '3rd', 'group'] } },
+                workplace: { type: 'array', items: { type: 'string', enum: ['On-site', 'Remote', 'Hybrid'] } },
+                profile_language: stringList(),
+                joined_within: { type: 'array', items: { type: 'string', enum: ['1 day ago', '2 to 7 days ago', '8 to 14 days ago', '15 to 30 days ago', '1 to 3 months ago'] } },
+                activity_types: { type: 'array', items: { type: 'string', enum: ['Emailed', 'Has notes', 'Tagged', 'In a project', 'Reviewed', 'Has a resume'] } },
+                exclude_activities: { type: 'boolean', description: 'Leave out the activity_types instead' },
+                years_of_experience: { ...minMax, description: '{ min, max } in years' },
+                graduation_year: minMax,
+                veteran: { type: 'boolean' },
+                profile_views: { type: 'boolean' },
+                profile_views_days: { type: 'integer' },
+                search_request_id: { type: 'string' },
+                count: count(100),
+                offset,
+            },
+        },
+        category: 'profiles',
+        action: 'search_people_recruiter',
+        quota: { action: 'search_result', amount: args => Number(args.count) || 10 },
+        clamp: { count: { default: 10, max: 100 } },
+    },
+    {
+        name: 'recruiter_get_candidate',
+        description: `${RECRUITER} A candidate as Recruiter shows it, by the profile_urn (urn:li:ts_profile:…) from linkedin_pro_recruiter_search_people.`,
+        inputSchema: { type: 'object', properties: { profile_urn: { type: 'string' }, include_activity: { type: 'boolean', description: "Also the team's activity on them" } }, required: ['profile_urn'] },
+        category: 'profiles',
+        action: 'get',
+        quota: { action: 'profile_view' },
+        run: onRecruiterSeat('profiles', 'get'),
+    },
+    {
+        name: 'recruiter_check_inmail',
+        description: `${RECRUITER} What an InMail would cost for each of up to 100 candidates. Nothing is sent.`,
+        inputSchema: { type: 'object', properties: { profiles: { type: 'array', items: { type: 'string' }, maxItems: 100, description: 'Candidate profile_urns' } }, required: ['profiles'] },
+        category: 'profiles',
+        action: 'check_inmail',
+        run: onRecruiterSeat('profiles', 'check_inmail'),
+    },
+    {
+        name: 'recruiter_check_inmail_seat',
+        description: `${RECRUITER} Whether the Recruiter seat can send an InMail right now. Nothing is sent.`,
+        inputSchema: { type: 'object', properties: {} },
+        category: 'profiles',
+        action: 'check_inmail_seat',
+        run: onRecruiterSeat('profiles', 'check_inmail_seat'),
+    },
+    {
+        name: 'recruiter_list_inbox',
+        description: `${RECRUITER} The Recruiter inbox by folder.`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                folder: { type: 'string', enum: ['INBOX', 'UNREAD', 'AWAITING_REPLY', 'ACCEPTED', 'ACCEPTED_BUT_NOT_RESPONDED', 'DECLINED', 'ARCHIVED', 'CANCELED', 'SCHEDULED'] },
+                count: count(50),
+                offset,
+            },
+        },
+        category: 'messages',
+        action: 'list_inbox',
+        clamp: { count: { default: 20, max: 50 } },
+        run: onRecruiterSeat('messages', 'list_inbox'),
+    },
+    {
+        name: 'recruiter_get_conversation',
+        description: `${RECRUITER} The messages of one Recruiter thread.`,
+        inputSchema: { type: 'object', properties: { conversation_id: { type: 'string' }, count: count(50), offset, mark_as_read: { type: 'boolean' } }, required: ['conversation_id'] },
+        category: 'messages',
+        action: 'get_conversation',
+        clamp: { count: { default: 20, max: 50 } },
+        run: onRecruiterSeat('messages', 'get_conversation'),
+    },
+    {
+        name: 'recruiter_inbox_summary',
+        description: `${RECRUITER} The Recruiter inbox counters: unread, awaiting a reply, recent messages.`,
+        inputSchema: { type: 'object', properties: {} },
+        category: 'messages',
+        action: 'inbox_summary',
+        run: onRecruiterSeat('messages', 'inbox_summary'),
+    },
+    {
+        name: 'recruiter_send_inmail',
+        description: `${RECRUITER} Send a Recruiter InMail to a candidate (recipient_urn, subject, message_text), or reply in a Recruiter thread (conversation_id, message_text). A paid InMail spends one of the seat's credits. Read the thread first and never send the same message twice.`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                recipient_urn: { type: 'string', description: "The candidate's profile_urn" },
+                conversation_id: { type: 'string' },
+                subject: { type: 'string' },
+                message_text: { type: 'string' },
+                project_urn: { ...projectUrn, description: 'File the thread in this project' },
+                signature: { type: 'string', description: "Replaces the seat's own signature" },
+            },
+            required: ['message_text'],
+        },
+        category: 'messages',
+        action: 'send',
+        quota: { action: 'message' },
+        run: onRecruiterSeat('messages', 'send'),
+    },
+    {
+        name: 'recruiter_list_jobs',
+        description: `${RECRUITER} The job postings of the Recruiter contract, or one of them by job_id.`,
+        inputSchema: { type: 'object', properties: { job_id: { type: 'string' }, count: count(1000), offset, fetch_details: { type: 'boolean', description: 'Full details, true by default' } } },
+        category: 'recruiter',
+        action: 'get_posts',
+        clamp: { count: { default: 25, max: 1000 } },
+    },
+    {
+        name: 'recruiter_get_job_candidates',
+        description: `${RECRUITER} The applicants to a job, each with the application_id linkedin_pro_recruiter_get_cv takes.`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                job_id: jobId,
+                ratings: { type: 'string', description: 'Comma-separated: GOOD_FIT, MAYBE, UNRATED, NOT_A_FIT. All by default' },
+                sortType: { type: 'string', enum: ['RELEVANCE', 'APPLIED_DATE'] },
+                sortOrder: { type: 'string', enum: ['DESCENDING', 'ASCENDING'] },
+                count: count(1000),
+                offset,
+            },
+            required: ['job_id'],
+        },
+        category: 'recruiter',
+        action: 'get_candidates',
+        clamp: { count: { default: 25, max: 1000 } },
+    },
+    {
+        name: 'recruiter_get_cv',
+        description: `${RECRUITER} The CV an applicant attached, base64-encoded.`,
+        inputSchema: { type: 'object', properties: { application_id: { type: 'string' } }, required: ['application_id'] },
+        category: 'recruiter',
+        action: 'get_cv',
+    },
+    {
+        name: 'recruiter_create_job',
+        description: `${RECRUITER} Create a job posting as a draft. linkedin_pro_recruiter_publish_job makes it public.`,
+        inputSchema: {
+            type: 'object',
+            properties: {
+                company_url: companyUrl,
+                title: { type: 'string' },
+                place: { type: 'string', description: 'City or region of the job' },
+                html_description: { type: 'string', description: 'Basic HTML' },
+                employment_status: { type: 'string', enum: ['FULL_TIME', 'PART_TIME', 'CONTRACT', 'TEMPORARY', 'VOLUNTEER', 'INTERNSHIP'] },
+                workplace: { type: 'string', enum: ['1', '2', '3'], description: '1 on-site, 2 remote, 3 hybrid' },
+                contact_email: { type: 'string' },
+                skills: stringList(),
+                job_functions: stringList(),
+                industry_sectors: stringList(),
+                screening_questions: { type: 'array', items: { type: 'object' }, description: 'Predefined screening questions or CUSTOM_QUESTION entries' },
+                auto_rejection_template: { type: 'string' },
+            },
+            required: ['company_url', 'title', 'place', 'html_description'],
+        },
+        category: 'recruiter',
+        action: 'create_job',
+    },
+    {
+        name: 'recruiter_publish_job',
+        description: `${RECRUITER} Publish a draft job. Only when the user approved the posting.`,
+        inputSchema: { type: 'object', properties: { job_id: jobId }, required: ['job_id'] },
+        category: 'recruiter',
+        action: 'publish_job',
+    },
+    {
+        name: 'recruiter_close_job',
+        description: `${RECRUITER} Close an open job.`,
+        inputSchema: { type: 'object', properties: { job_id: jobId }, required: ['job_id'] },
+        category: 'recruiter',
+        action: 'close_job',
+    },
+    {
+        name: 'recruiter_list_projects',
+        description: `${RECRUITER} The Recruiter projects, with their candidates per stage.`,
+        inputSchema: { type: 'object', properties: { state: { type: 'string', enum: ['ACTIVE', 'CLOSED', 'DRAFT'] }, count: count(100), offset } },
+        category: 'recruiter',
+        action: 'list_projects',
+        clamp: { count: { default: 25, max: 100 } },
+    },
+    {
+        name: 'recruiter_create_project',
+        description: `${RECRUITER} Create a Recruiter project, private by default.`,
+        inputSchema: { type: 'object', properties: { name: { type: 'string' }, description: { type: 'string' }, private: { type: 'boolean' } }, required: ['name'] },
+        category: 'recruiter',
+        action: 'create_project',
+    },
+    {
+        name: 'recruiter_add_to_project',
+        description: `${RECRUITER} File a candidate into a project.`,
+        inputSchema: { type: 'object', properties: { project_urn: projectUrn, candidate_urn: candidateUrn }, required: ['project_urn', 'candidate_urn'] },
+        category: 'recruiter',
+        action: 'add_to_project',
+    },
+    {
+        name: 'recruiter_list_project_candidates',
+        description: `${RECRUITER} The pipeline of a project: its candidates and their stage.`,
+        inputSchema: { type: 'object', properties: { project_urn: projectUrn, states: { type: 'string', description: 'Stage names as the project shows them, e.g. contacted' }, count: count(100), offset }, required: ['project_urn'] },
+        category: 'recruiter',
+        action: 'list_project_candidates',
+        clamp: { count: { default: 25, max: 100 } },
+    },
+    {
+        name: 'recruiter_get_project_candidate',
+        description: `${RECRUITER} The stage and source of one candidate in a project.`,
+        inputSchema: { type: 'object', properties: { project_urn: projectUrn, candidate_urn: candidateUrn }, required: ['project_urn', 'candidate_urn'] },
+        category: 'recruiter',
+        action: 'get_project_candidate',
+    },
+    {
+        name: 'recruiter_move_candidate',
+        description: `${RECRUITER} Move a candidate to another stage of a project.`,
+        inputSchema: {
+            type: 'object',
+            properties: { project_urn: projectUrn, candidate_urn: candidateUrn, state: { type: 'string', description: 'The stage name, its status type (e.g. CONTACTED) or its urn' } },
+            required: ['project_urn', 'candidate_urn', 'state'],
+        },
+        category: 'recruiter',
+        action: 'move_candidate',
+    },
+    {
+        name: 'recruiter_add_note',
+        description: `${RECRUITER} Add a note on a candidate, seen by the Recruiter team.`,
+        inputSchema: { type: 'object', properties: { candidate_urn: candidateUrn, text: { type: 'string' } }, required: ['candidate_urn', 'text'] },
+        category: 'recruiter',
+        action: 'add_note',
+    },
+    {
+        name: 'recruiter_get_candidate_notes',
+        description: `${RECRUITER} The notes and tags on a candidate.`,
+        inputSchema: { type: 'object', properties: { profile_urn: { type: 'string' } }, required: ['profile_urn'] },
+        category: 'recruiter',
+        action: 'get_candidate_notes',
+    },
+    {
+        name: 'recruiter_recommended_candidates',
+        description: `${RECRUITER} The candidates LinkedIn recommends for a project.`,
+        inputSchema: { type: 'object', properties: { project_urn: projectUrn, count: count(100), offset }, required: ['project_urn'] },
+        category: 'recruiter',
+        action: 'recommended_candidates',
+        clamp: { count: { default: 25, max: 100 } },
     },
     attachmentTool('attachment_download'),
 ]
