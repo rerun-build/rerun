@@ -64,6 +64,8 @@ export type TileStyle = {
     // Draws the tile as a buddy: a thick rounded block with a face, its top in the agent's colour,
     // its name in a frosted label. `true` takes every trait from the tile id; an object pins some.
     buddy?: true | BuddyLook
+    // Drawn as a faceless capsule, the flowchart terminator, instead of a buddy's block and face.
+    shape?: 'capsule'
 }
 
 export type BuddyEyes =
