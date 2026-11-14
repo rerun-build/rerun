@@ -5,10 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DataSource } from '@/lib/data/source'
 import type { EngineDbTable } from '@/lib/engine/types'
 
-// A table card in chat opens its coworker's database on that table. A read of the table list that
-// failed used to come back as an empty list: the browser then showed "No tables yet" next to a
-// "Table not found" toast, for a table that was there all along.
-
 const mocks = vi.hoisted(() => ({ toastError: vi.fn() }))
 vi.mock('sonner', () => ({ toast: { error: mocks.toastError, success: vi.fn() } }))
 

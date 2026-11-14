@@ -1,14 +1,6 @@
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { catchUpEngineSteps, catchUpPaymentMethod, grantGettingStartedReward, markGettingStarted, readGettingStartedItems, reportGettingStartedSteps } from '@/app/api/_services/getting-started.service'
 
-// A route and not a server action: the catch-up can wait on a slow machine, and server actions run
-// one after the other, so every action fired on the board's first paint would queue behind it.
-//
-// Run on the board's first paint, and again once the pill is full. Realtime ticks every step
-// the moment it happens; this only catches up on what the machine did before it could say so and
-// on a card put on file outside the checklist, and is the one place the trial days are granted. It
-// is also where the steps a trigger ticked reach analytics, the trigger having no way to say so.
-// `dismissed` tells the profile menu the list is only hidden, and can be brought back.
 export async function POST(): Promise<Response> {
     let ctx: Awaited<ReturnType<typeof requireWorkspaceContext>>
     try {

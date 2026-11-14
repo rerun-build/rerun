@@ -24,12 +24,9 @@ type KeyConnectStepProps = {
     onBack: () => void
     onSkip: () => void
     onKeys: (provider: AddableProvider, keys: Record<string, string>) => Promise<KeysResult>
-    // A single provider whose key is pasted here, with no list to pick from: OpenCode, a plan sold as a key.
     only?: GuidedProvider
 }
 
-// The rows of the API key road. Nothing is picked up front: a preselected row would read as a
-// recommendation, and none of the four is one.
 export function KeyConnectStep({ onPick, onBack, onSkip, onKeys, only }: KeyConnectStepProps) {
     const t = useTranslations('dialogs.subscriptionOffer.key')
     const tConnections = useTranslations('connections')

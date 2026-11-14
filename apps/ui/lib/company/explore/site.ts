@@ -5,7 +5,6 @@ import type { Collector } from './types'
 export const PAGE_CATEGORIES = ['about', 'team', 'pricing', 'customers', 'product', 'legal', 'careers', 'contact', 'privacy', 'blog'] as const
 export type PageCategory = (typeof PAGE_CATEGORIES)[number]
 
-// In priority order: when a site has more than MAX_PAGES of them, the last ones are dropped.
 const CATEGORY_PATTERNS: Record<PageCategory, RegExp> = {
     about: /(^|\/)(about|about-us|a-propos|qui-sommes-nous|notre-histoire|our-story|company|entreprise|histoire)(\/|$)/i,
     team: /(^|\/)(team|equipe|l-equipe|our-team|people|founders|fondateurs)(\/|$)/i,
@@ -21,7 +20,6 @@ const CATEGORY_PATTERNS: Record<PageCategory, RegExp> = {
 
 const MAX_PAGES = 8
 const MAX_PRODUCT_URLS = 200
-// A product sheet, not the listing: /products/<handle>, /fr/produit/<slug>.
 const PRODUCT_URL = /(^|\/)(products?|produits?)\/[^/]+\/?$/i
 const SCRAPE_CONCURRENCY = 4
 const MAX_PAGE_MARKDOWN = 12_000
@@ -32,7 +30,6 @@ export type SitePage = { category: PageCategory | 'home'; url: string; title: st
 export type SiteFindings = {
     mappedUrls: number
     pages: SitePage[]
-    // The product sheets the home page links to, in their order: the ones the shop puts forward.
     homeProductUrls: string[]
     productUrls: string[]
     failedPages: { url: string; error: string }[]
@@ -54,8 +51,6 @@ function samesite(url: URL, home: URL): boolean {
     return url.hostname.replace(/^www\./, '') === home.hostname.replace(/^www\./, '')
 }
 
-// One page per category, the shallowest one: /about beats /about/press-kit, and /fr/about loses to
-// /about when both exist.
 export function pickPages(urls: string[], homeUrl: string): { category: PageCategory; url: string }[] {
     const home = new URL(homeUrl)
     const picked: { category: PageCategory; url: string }[] = []
@@ -116,7 +111,6 @@ type ScrapeResponse = {
     }
 }
 
-// A logo inlined as a data URI can weigh hundreds of kilobytes; the lab only needs a URL to show.
 function keepUrl(value: string | undefined): string | null {
     if (!value) return null
     return value.startsWith('http') || (value.startsWith('data:') && value.length < 40_000) ? value : null
@@ -141,10 +135,8 @@ export const siteCollector: Collector<'site'> = {
         let credits = 0
 
         const [map, home, branding] = await Promise.all([
-            // Without a map the home page's own links still point to most of the key pages.
             firecrawl<{ links?: { url: string }[]; creditsUsed?: number }>('/v2/map', { url: input.url, limit: 500 }, 30_000).catch(() => ({ links: [], creditsUsed: 0 })),
             firecrawl<ScrapeResponse>('/v2/scrape', { url: input.url, formats: ['markdown', 'links'], onlyMainContent: false }, PAGE_TIMEOUT_MS),
-            // Its own request: a cold branding render took over 30 s, and the pages do not need to wait for it.
             firecrawl<ScrapeResponse>('/v2/scrape', { url: input.url, formats: ['branding'] }, 90_000).catch(() => null),
         ])
         credits += (map.creditsUsed ?? 1) + (home.data?.metadata?.creditsUsed ?? 1) + (branding ? (branding.data?.metadata?.creditsUsed ?? 1) : 0)

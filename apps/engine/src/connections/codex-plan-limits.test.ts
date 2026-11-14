@@ -9,7 +9,6 @@ const MODEL_LIST = resolve(FAKE_DIR, 'model-list.json')
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-codex-session-'))
 process.env.RERUN_CODEX_PATH = FAKE_CODEX
 
-// The app-server's side of the session, answered from a file the test writes.
 writeFileSync(
     FAKE_CODEX,
     `import { readFileSync } from 'node:fs'

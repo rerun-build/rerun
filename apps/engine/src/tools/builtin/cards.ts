@@ -105,7 +105,6 @@ export function cardTools(ctx: RunContext): ToolSet {
     }
 }
 
-// The foreman shows the files it made, but has no table panel for card_table or a saved view to open.
 export function foremanCardTools(ctx: RunContext): ToolSet {
     const { card_file } = cardTools(ctx)
     return { card_file }
@@ -113,8 +112,6 @@ export function foremanCardTools(ctx: RunContext): ToolSet {
 
 const inside = (root: string, path: string) => isAbsolute(path) && !relative(root, path).startsWith('..')
 
-// A path the model copied from a shared_ or fs_ listing is absolute and names its own root, whatever
-// scope it was given.
 function scopeOf(agentId: string, path: string, scope: FileCardEntry['scope'] | undefined): FileCardEntry['scope'] {
     if (inside(sharedDir(), path)) return 'shared'
     if (inside(workspaceDir(agentId), path)) return 'agent'
@@ -127,7 +124,5 @@ async function fileCardEntry(agentId: string, path: string, requestedScope: File
     const absolute = await resolveWithinReal(root, path)
     const info = await stat(absolute)
     if (info.isDirectory()) throw new Error('it is a folder, not a file. Point to a file inside it.')
-    // The chat opens files through the app's own proxy, which addresses them relative to the root
-    // of their scope. An absolute engine path there is a 404.
     return { path: relative(root, absolute), name: basename(absolute), size: info.size, scope }
 }

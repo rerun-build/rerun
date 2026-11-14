@@ -53,7 +53,6 @@ function figure(chunks: ReactNode) {
 
 export type SunkStat = { icon: IconType; label: string; value: string | null }
 
-// A stat whose figure did not come back is left out, unless it is still on its way.
 export function SunkCard({ value, caption, stats, loading }: { value: string; caption: string; stats: readonly SunkStat[]; loading: boolean }) {
     const shown = stats.filter(stat => stat.value !== null || loading)
 
@@ -61,7 +60,6 @@ export function SunkCard({ value, caption, stats, loading }: { value: string; ca
         <div className={cn('overflow-hidden', PANEL_CARD)}>
             <div className="relative flex flex-col items-center gap-1 px-5 pt-6 pb-5 text-center">
                 <Stripes />
-                {/* The clipped gradient only paints the line box: at the default leading of text-5xl the descender of a "g" falls outside it. */}
                 <TextShimmer
                     duration={2.5}
                     spread={40}

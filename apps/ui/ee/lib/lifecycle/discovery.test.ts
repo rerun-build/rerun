@@ -17,8 +17,6 @@ function compare(value: unknown, bound: unknown, test: (a: string | number, b: s
     return value !== null && value !== undefined && test(value as string | number, bound as string | number)
 }
 
-// A tiny PostgREST: applies the filters the helpers emit to an in-memory table, so the bounds that
-// the module applies itself in TypeScript are exercised against rows the query really returned.
 function matches(row: Row, calls: readonly SupabaseCall[]): boolean {
     return calls.every(({ method, args: [column, value] }) => {
         const cell = row[column as string]
@@ -41,7 +39,6 @@ function matches(row: Row, calls: readonly SupabaseCall[]): boolean {
     })
 }
 
-// PostgREST's `max_rows`: whatever `limit` or `range` asks, one response holds at most this many rows.
 const MAX_ROWS = 1000
 
 function ordered(rows: Row[], calls: readonly SupabaseCall[]): Row[] {
@@ -163,7 +160,6 @@ describe('loadLifecycleContext', () => {
             workspaces: [lapsed(30), lapsed(31), lapsed(32)],
             workspace_archives: [
                 archive(30, at(-85 * DAY), at(5 * DAY)),
-                // Paused, restored, paused again: the older archive is expiring, the current one is not.
                 archive(31, at(-85 * DAY), at(5 * DAY)),
                 archive(31, at(-10 * DAY), at(80 * DAY)),
                 archive(32, at(-60 * DAY), at(30 * DAY)),

@@ -4,19 +4,12 @@ import { type CSSProperties, type ReactNode, useId } from 'react'
 
 import { cn } from '../cn'
 
-// The board's own floor: its 2:1 diamonds, at the board's size and in its ink (`--iso-glint`, white
-// on the dark theme, black on the light one), so the room around the field reads as the place the
-// agent is about to land.
 const TILE_W = 56
 const TILE_H = 28
 const DIAMOND = `M ${TILE_W / 2} 0 L ${TILE_W} ${TILE_H / 2} L ${TILE_W / 2} ${TILE_H} L 0 ${TILE_H / 2} Z`
 
-// Larger than any dialog and cut by it. Every layer shares this one box, centred on whatever the
-// caller anchors it to, so the lit diamonds land exactly on the faint ones.
 const SIZE = { width: 2000, height: 1600 }
 
-// Where a light catches the floor: nested masks, each one cutting the one around it, and the ink
-// of the lit lines per theme.
 export type FloorLight = { masks: string[]; light: string; dark: string }
 
 export function Floor({ fade, lights = [], className, style }: { fade: string; lights?: FloorLight[]; className?: string; style?: CSSProperties }) {

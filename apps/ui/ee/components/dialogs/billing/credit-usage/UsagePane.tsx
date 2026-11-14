@@ -126,8 +126,6 @@ function LatestCharges({ usage }: { usage: CreditUsage }) {
     )
 }
 
-// What to say when the credit will not last: nothing when it does, nor once it is gone, the card
-// says that one.
 function paceNote(t: ReturnType<typeof useTranslations<'billing'>>, balance: CreditBalance, usage: CreditUsage, trial: boolean, locale: string): string | null {
     if (balance.leftMicros <= 0) return null
     if (!trial && balance.monthLeftMicros === 0 && balance.topupLeftMicros > 0) return t('usage.pace.onTopup', { figure: formatCredits(balance.topupLeftMicros, locale) })
@@ -162,8 +160,6 @@ function UsageSkeleton() {
     )
 }
 
-// The drill-in on the right of a billing dialog, like Card and Invoices: where the credit went this
-// period, by day, by source or by coworker, and the latest charges.
 export function UsagePane({ credit, onBack, backLabel }: { credit: CreditUsageState; onBack: () => void; backLabel?: string }) {
     const locale = useLocale()
     const t = useTranslations('billing')

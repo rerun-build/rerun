@@ -2,8 +2,6 @@ import type { BorderBeamProps } from '@rerun/ui'
 import type { NotificationKind } from '@/lib/engine/types'
 import { AlertCircle, CheckCircle2, HelpCircle, Plug, ShieldCheck, TriangleAlertIcon, type LucideIcon } from '@/lib/icons'
 
-// Shared by the preferences matrix, the email preferences form and the realtime toast, so a kind
-// looks the same wherever it shows up and adding one is a single edit.
 export const KIND_ICONS: Record<NotificationKind, LucideIcon> = {
     done: CheckCircle2,
     error: AlertCircle,

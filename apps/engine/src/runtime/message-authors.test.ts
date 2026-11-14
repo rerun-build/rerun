@@ -32,7 +32,6 @@ describe('signHistoryMessage', () => {
         expect(signHistoryMessage({ role: 'user', content: 'hello' }, { role: 'user', authorId: 'u1', authorName: 'Marie' })).toEqual({ role: 'user', content: '<sender>Marie</sender>\nhello' })
     })
 
-    // The context the engine appended to the turn is not the person's words.
     it('signs the first text part of a turn stored as parts, and leaves its context alone', () => {
         const turn = {
             role: 'user' as const,

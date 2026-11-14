@@ -5,19 +5,6 @@ export const MAX_MEMORIES_PER_CALL = 100
 export const MAX_MEMORY_CHARS = 20_000
 export const MAX_UPLOAD_MB = 5
 
-// Static MCP tool definitions advertised by the Rerun account server for `tools/list`.
-// Pure data (no server deps) so the route can serve them without importing the service layer.
-//
-// Audience: an AI coding agent (Claude Code and friends) configuring a Rerun account from
-// outside the app. The surface covers shaping an agent — prompt, skills, scheduled tasks,
-// webhook triggers, connectors, private database — and checking what it did: send_message and
-// the run tools exist so an agent can be tested without first inventing a routine for it.
-//
-// Descriptions are the only documentation the calling model gets, so anything surprising
-// (what a field really promises, what a call leaves behind) belongs here rather than in a
-// comment it will never read.
-// Same shape as the `setup` field of capture_template_agents, on purpose: an agent written from
-// here and an agent captured into a template answer the same question in the same words.
 const SETUP_PROPERTY = {
     type: 'object',
     description:
@@ -29,9 +16,6 @@ const SETUP_PROPERTY = {
     required: ['required'],
 } as const
 
-// Which AI connection and model a coworker runs on, the same three fields at creation and on an
-// update. `connectionId` is the one that names a subscription: two Claude accounts are both
-// `claude`, and only the id tells them apart.
 const MODEL_PIN_PROPERTIES = {
     connectionId: {
         type: 'string',
@@ -50,7 +34,6 @@ const MODEL_PIN_PROPERTIES = {
     },
 } as const
 
-// The same pin on a scheduled task or a trigger, where picking nothing means following the coworker.
 const AUTOMATION_MODEL_PIN_PROPERTIES = {
     connectionId: { type: 'string', description: 'Run this one on a given AI connection, by its id from list_ai_connections, instead of the one its coworker runs on. Goes with `model`.' },
     model: { type: ['string', 'null'], description: 'Run this one on a model of its own. Omit it and it runs whatever its coworker runs, following it when that changes. Pass null to go back to that.' },
@@ -586,9 +569,6 @@ const AGENT_TOOL_DEFS = [
     },
 ] as const
 
-// The sharing and template halves are declared next door: same server, same key, and this file was
-// already long enough. Sharing sits between the two because it acts on the agents of any account,
-// where the template tools need an expert sandbox.
 export const ACCOUNT_TOOL_DEFS = [...AGENT_TOOL_DEFS, ...SHARE_TOOL_DEFS, ...TEMPLATE_TOOL_DEFS]
 
 export const ACCOUNT_TOOL_NAMES = ACCOUNT_TOOL_DEFS.map(t => t.name)

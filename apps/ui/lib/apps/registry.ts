@@ -16,9 +16,6 @@ import type { EnvelopeKind, LinkupEnvelope } from './linkup/envelope'
 import type { AppTool } from './tools'
 import { APP_ADDON_KEYS, type AppSlug } from './types'
 
-// What the socle needs to know about one paid app on the server. Adding an app is one entry here,
-// its row in catalog.ts, and its folder of tools, quotas and events. Methods rather than function
-// properties: each app narrows its own actions and events, which a method signature accepts.
 export type AppDefinition = AppInfo & {
     addonKey: AddonKey
     platform: LinkupPlatform
@@ -28,15 +25,10 @@ export type AppDefinition = AppInfo & {
     quotaRefusal(action: string): string
     envelopeKind(envelope: LinkupEnvelope): EnvelopeKind
     wakePayload(event: string, envelope: LinkupEnvelope, accountLabel: string | null, attachments: AttachmentSummary[]): Record<string, unknown>
-    // The ids a file of this envelope is downloaded with, besides its own.
     attachmentBase(envelope: LinkupEnvelope): AttachmentRef
     wakeTrigger: { name: string; description: string; prompt(events: string[]): string }
-    // What the account is called in the app, and the id that tells one person from another across
-    // reconnects: the free trial is claimed on it.
     profile(accountId: string): Promise<{ label: string; memberId: string }>
-    // What the person reads when the provider turns the sign-in down.
     signInRefusal(message: string): { code: ErrorCode; params?: ErrorParams }
-    // A provider failure that means the account is gone, which the provider does not say as such.
     sessionClosed?(err: LinkupError): boolean
     deleteProviderAccount: (accountId: string) => Promise<void>
 }

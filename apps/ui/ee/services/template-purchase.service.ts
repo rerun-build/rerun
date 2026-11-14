@@ -10,16 +10,11 @@ import { requestTemplateRevocation } from '@/ee/trigger/revoke-template-access'
 import { reverseCreatorTransfer, transferSaleToCreator } from './creator-payout.service'
 import { reenableAgentsForTemplate, revokeTemplateAccess } from './template-revocation.service'
 
-// Every writer here upserts on (workspace_id, template_id), because event order is not guaranteed:
-// `customer.subscription.created` regularly lands before `checkout.session.completed`, and both
-// carry the whole metadata. Whichever arrives first creates the row, the other refines it.
-
 type PurchaseInsert = Database['public']['Tables']['template_purchases']['Insert']
 type SaleInsert = Database['public']['Tables']['template_sales']['Insert']
 
 const PURCHASE_CONFLICT = 'workspace_id,template_id'
 
-// What our own checkout writes on the session, the payment intent and the subscription alike.
 type PurchaseMetadata = {
     workspaceId: number
     templateId: string
@@ -43,8 +38,6 @@ function readMetadata(metadata: Stripe.Metadata | null | undefined): PurchaseMet
     }
 }
 
-// What the creator sees against the transfer in their Express dashboard, where a bare amount would
-// tell them nothing about which template it paid for.
 function transferMetadata(meta: PurchaseMetadata): Stripe.MetadataParam {
     return {
         kind: TEMPLATE_PURCHASE_KIND,
@@ -60,8 +53,6 @@ function idOf(value: string | { id: string } | null | undefined): string | null 
     return typeof value === 'string' ? value : value.id
 }
 
-// The buyer lands back in the app before Stripe has finished delivering the webhook, so the
-// return path replays this writer against the retrieved session. It has to stay idempotent.
 export async function recordTemplatePurchase(session: Stripe.Checkout.Session): Promise<void> {
     if (session.payment_status !== 'paid') return
     const meta = readMetadata(session.metadata)
@@ -92,11 +83,8 @@ export async function recordTemplatePurchase(session: Stripe.Checkout.Session): 
     const { error } = await supabase.from('template_purchases').upsert<PurchaseInsert>(row, { onConflict: PURCHASE_CONFLICT })
     if (error) throw new Error(`Failed to record the purchase: ${error.message}`)
 
-    // Buying again after a lapse gives the agents back rather than a second copy of them.
     await reenableAgentsForTemplate(meta.workspaceId, meta.templateId)
 
-    // A subscription's first invoice is billed through `invoice.paid` like every renewal, so only
-    // the one-off writes its own ledger line here.
     if (!recurring) await recordOneTimeSale(session, meta)
 }
 
@@ -131,10 +119,6 @@ async function recordOneTimeSale(session: Stripe.Checkout.Session, meta: Purchas
     })
 }
 
-// `customer.subscription.*` for a template subscription. Status maps onto the purchase's own,
-// with `past_due` kept entitled: Stripe retries a failed invoice for weeks before giving up, and
-// cutting a paying customer off on the first declined card is hostile. Revocation happens on
-// `deleted`, not here.
 export async function applyTemplateSubscription(subscription: Stripe.Subscription): Promise<void> {
     const meta = readMetadata(subscription.metadata)
     if (!meta) return
@@ -181,8 +165,6 @@ export async function revokeTemplateSubscription(subscription: Stripe.Subscripti
     await requestTemplateRevocation({ workspaceId: meta.workspaceId, templateId: meta.templateId })
 }
 
-// Every paid invoice of a template subscription, including the first one. The ledger is keyed on
-// the invoice, so a replay writes nothing twice.
 export async function recordTemplateRenewal(invoice: Stripe.Invoice): Promise<void> {
     const subscriptionId = invoiceSubscriptionId(invoice)
     if (!subscriptionId) return
@@ -224,9 +206,6 @@ export async function recordTemplateRenewal(invoice: Stripe.Invoice): Promise<vo
     })
 }
 
-// The invoice stopped carrying its charge at the top level in recent API versions: it hangs off the
-// payment now, itself usually a PaymentIntent rather than a charge. `payments` is only present when
-// expanded, so the list endpoint is the reliable read.
 async function chargeOfInvoice(invoice: Stripe.Invoice): Promise<string | null> {
     const legacy = idOf((invoice as unknown as { charge?: string | { id: string } | null }).charge)
     if (legacy) return legacy
@@ -249,8 +228,6 @@ async function chargeOfInvoice(invoice: Stripe.Invoice): Promise<string | null> 
     return null
 }
 
-// The subscription moved from the invoice to its parent in recent API versions; read the new
-// shape, fall back to the legacy top-level field.
 function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
     const parent = (invoice as unknown as { parent?: { subscription_details?: { subscription?: string | { id: string } } } }).parent
     const fromParent = idOf(parent?.subscription_details?.subscription)
@@ -272,11 +249,6 @@ const REFUNDED_SALE_COLUMNS = [
     'stripe_transfer_id',
 ] as const
 
-// A refund reverses the entitlement as well as the money: a buyer who got their money back does
-// not keep the template. Stored as a negative line so the totals net out on their own.
-//
-// The refund itself comes out of the platform balance and leaves the creator's transfer alone, so
-// the reversal is what keeps a refund from costing Rerun the full price of the template.
 export async function refundTemplatePurchase(charge: Stripe.Charge): Promise<void> {
     const supabase = createServiceRoleClient()
     const refunded = charge.amount_refunded ?? 0
@@ -284,9 +256,6 @@ export async function refundTemplatePurchase(charge: Stripe.Charge): Promise<voi
 
     const { data: sale } = await selectMaybeSingle(supabase, 'template_sales', REFUNDED_SALE_COLUMNS, { stripe_charge_id: charge.id })
 
-    // A renewal charge carries no metadata of ours: Stripe does not copy a subscription's onto the
-    // invoice's payment. The ledger line written when the sale settled is the way back to the
-    // template, and without it there would be nothing to reverse a renewal refund against.
     const meta = readMetadata(charge.metadata) ?? metaOfSale(sale)
     if (!meta) return
 
@@ -294,15 +263,10 @@ export async function refundTemplatePurchase(charge: Stripe.Charge): Promise<voi
         try {
             await reverseCreatorTransfer(sale.stripe_transfer_id, refunded, charge.amount)
         } catch (err) {
-            // A creator whose balance has already been paid out goes negative instead, and that is a
-            // recovery problem, not a reason to make Stripe retry the refund event forever.
             console.error('[template refund] transfer reversal failed', sale.stripe_transfer_id, err)
         }
     }
 
-    // `amount_refunded` is the running total of every refund on the charge, so each event writes what
-    // the lines already recorded do not cover yet. A replay, or an earlier refund arriving after a
-    // later one, finds nothing left to write.
     const recorded = await recordedRefund(supabase, charge.id)
     const owed = refundedSplit(sale, refunded)
     if (refunded > recorded.grossCents) {
@@ -310,12 +274,8 @@ export async function refundTemplatePurchase(charge: Stripe.Charge): Promise<voi
             meta,
             kind: 'refund',
             grossCents: -(refunded - recorded.grossCents),
-            // Mirrored from the original line so a partial refund gives back its own share of the tax
-            // and of the fee, rather than a figure recomputed under whatever the barème says today.
             split: { taxCents: owed.taxCents - recorded.taxCents, feeCents: owed.feeCents - recorded.feeCents, netCents: owed.netCents - recorded.netCents },
             currency: charge.currency ?? 'usd',
-            // The first refund keeps the key every line written so far carries; a later one is keyed on
-            // the running total, which only grows, so a replay of it lands on the same key.
             chargeId: recorded.grossCents === 0 ? `${charge.id}_refund` : `${charge.id}_refund_${refunded}`,
             invoiceId: null,
             transferId: sale?.stripe_transfer_id ?? null,
@@ -323,16 +283,12 @@ export async function refundTemplatePurchase(charge: Stripe.Charge): Promise<voi
         })
     }
 
-    // A partial refund leaves the purchase alone: only giving the whole amount back takes the
-    // template with it.
     if (refunded < charge.amount) return
 
     await revokeTemplateAccess(meta.workspaceId, meta.templateId, 'refunded')
     await requestTemplateRevocation({ workspaceId: meta.workspaceId, templateId: meta.templateId })
 }
 
-// What the refund lines of a charge add up to, as positive amounts for the gross and negative ones
-// for the split, the way they are stored.
 async function recordedRefund(supabase: SupabaseClient<Database>, chargeId: string) {
     const { data, error } = await selectMany(supabase, 'template_sales', ['gross_cents', 'tax_cents', 'application_fee_cents', 'net_cents'] as const, { kind: 'refund', stripe_charge_id: { like: `${chargeId}_refund%` } })
     if (error) throw new Error(`Failed to read the refunds already recorded: ${error.message}`)
@@ -383,14 +339,10 @@ type SaleParams = {
     purchaseId?: string | null
 }
 
-// The ledger snapshots the title and slug so a deleted template does not erase its own revenue
-// history, which is exactly the history the creator is owed an account of.
 async function insertSale(params: SaleParams): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: template } = await selectMaybeSingle(supabase, 'templates', ['slug', 'title'] as const, { id: params.meta.templateId })
 
-    // `net_cents` is the amount actually transferred to the creator, so gross minus tax minus fee. It
-    // is read as-is by the revenue panel and must never be recomputed from gross alone.
     const row: SaleInsert = {
         template_id: params.meta.templateId,
         template_slug: template?.slug ?? params.meta.templateSlug,
@@ -411,8 +363,6 @@ async function insertSale(params: SaleParams): Promise<void> {
         occurred_at: params.occurredAt,
     }
 
-    // The unique indexes on the charge and the invoice are what make a replay a no-op; a conflict
-    // here is the expected outcome of a retry, not a failure.
     const { error } = await supabase.from('template_sales').insert<SaleInsert>(row)
     if (error && error.code !== '23505') throw new Error(`Failed to record the sale: ${error.message}`)
 }

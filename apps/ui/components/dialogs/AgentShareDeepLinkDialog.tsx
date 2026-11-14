@@ -18,9 +18,6 @@ import { useAgentShareCta } from '@/lib/agents/useAgentShareCta'
 import { useAgentShareStore } from '@/stores/agent-share.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// The landing page of a share link, in the app. Same shape as TemplateDeepLinkDialog: one card,
-// one decision. It is deliberately also what an anonymous visitor sees, ahead of the account wall,
-// because a share link has no public page of its own to preview from.
 export function AgentShareDeepLinkDialog({ token }: { token: string }) {
     const t = useTranslations('dialogs.agentShare')
     const preview = useAgentShareStore(s => s.preview)
@@ -47,8 +44,6 @@ export function AgentShareDeepLinkDialog({ token }: { token: string }) {
         <Dialog open onOpenChange={open => !open && closeLink()}>
             <DialogContent className="gap-0 overflow-hidden p-0 max-sm:h-[85dvh] sm:max-w-lg">
                 <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col sm:h-[min(52rem,92dvh)]">
-                    {/* The panel already shows the title: this only exists for Radix, which requires
-                        an accessible title and description on any dialog content. */}
                     <DialogHeader className="sr-only">
                         <DialogTitle>{preview ? t('titleNamed', { name: preview.agent.name }) : t('title')}</DialogTitle>
                         <DialogDescription>{t('description')}</DialogDescription>
@@ -72,9 +67,6 @@ function SharedAgentPanel({ token, preview, onDone }: { token: string; preview: 
 
     return (
         <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-            {/* The board is edge to edge and the text starts under it: it is the first thing on the
-                only page this coworker has, and a picture framed inside the padding would read as an
-                illustration of the card rather than as the agent itself. */}
             <ScrollFade className="min-h-0 flex-1">
                 <SharedAgentBoard agent={preview.agent} connectors={preview.connectors} />
                 <div className="flex flex-col gap-5 p-5">
@@ -104,9 +96,6 @@ function InstallFooter({ token, preview, onDone }: { token: string; preview: Age
     )
 }
 
-// An anonymous visitor sees the card first and the wall second: the link is the only place this
-// agent is described, so asking to sign up before showing it would be asking blind. Closing the
-// card hands the screen back to the account wall, which is already mounted underneath.
 function SignUpFooter() {
     const t = useTranslations('dialogs.agentShare')
     const closeLink = useAgentShareStore(s => s.closeLink)

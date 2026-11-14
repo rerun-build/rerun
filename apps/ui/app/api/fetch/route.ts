@@ -4,18 +4,13 @@ import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.se
 import { isPublicUrl, scrapePage } from '@/lib/company/firecrawl'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
-// Where a coworker's web_fetch falls back once the site refused the box itself. The engine calls it
-// with its RERUN_API_KEY, which names one workspace, so the scraping key never leaves the app.
 export const dynamic = 'force-dynamic'
 
 const MAX_MARKDOWN = 50_000
-// The engine only reads the head and the links out of it, but a page heavy with inline scripts can
-// weigh megabytes: past this the response would cost more than the facts are worth.
 const MAX_RAW_HTML = 1_000_000
 
 const bodySchema = z.object({ url: z.string().url(), directStatus: z.number().int().nullable().default(null) })
 
-// Kept for diagnosis only: a page that was read is never failed by its own bookkeeping.
 async function recordWebFetch(event: Database['public']['Tables']['web_fetch_events']['Insert']): Promise<void> {
     try {
         const { error } = await createServiceRoleClient().from('web_fetch_events').insert<Database['public']['Tables']['web_fetch_events']['Insert']>(event)

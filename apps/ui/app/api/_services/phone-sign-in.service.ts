@@ -14,14 +14,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 const SEND_COLUMNS = ['phone', 'send_count', 'send_window_started_at', 'last_sent_at', 'last_channel'] as const
 
-// Wide enough for an office behind one address, and for everybody on a busy day: a script meets
-// the first, and many scripts together meet the second, which is what bounds the bill.
 export const MAX_SENDS_PER_IP = 10
 export const MAX_SENDS_EVERYONE = 400
-// The app has no captcha in front of its sends, so a script on its routes runs out well before everybody's.
 export const MAX_SENDS_FROM_APP = 100
-// Tries at a code, before anything is compared: a six-digit code does not survive a loop. Bird counts
-// its own tries too; the App Review code has nothing else.
 export const MAX_VERIFY_PER_PHONE = 5
 export const MAX_VERIFY_PER_IP = 20
 export const VERIFY_WINDOW_MS = 15 * 60_000
@@ -42,11 +37,6 @@ const refused = <Failure extends string>(error: Failure, retryAfterSeconds?: num
     ...(retryAfterSeconds ? { retryAfterSeconds } : {}),
 })
 
-// `phone` is E.164 already. Nobody is signed in yet, so the sends are counted per number. A send
-// is counted before it leaves and given back when nothing went out.
-// The caller's and everybody's counts are not given back: an attempt is what they measure.
-// `account` is who asks, when someone signed in is moving to this number. `app` is set when the code is
-// asked from the mobile app rather than the web.
 export async function startPhoneSignIn(phone: string, channel: VerificationChannel, ip: string, language: string | null = null, account: { id: string; context: 'settings' } | null = null, app: SignInApp | null = null): Promise<PhoneSignInStart> {
     const supabase = createServiceRoleClient()
     const { data: row, error: readError } = await selectMaybeSingle(supabase, 'phone_sign_in_sends', SEND_COLUMNS, { phone })
@@ -83,7 +73,6 @@ export async function startPhoneSignIn(phone: string, channel: VerificationChann
     const metadata = account ? { context: account.context, user_id: account.id } : { context: 'sign_in' }
     const sent = await sendVerification(phone, channel, { language, previousChannel, lastSentAt, metadata })
     if (sent.ok) {
-        // The ledger keeps where the code went, which is what the next switch moves away from.
         if (sent.channel !== channel) await supabase.from('phone_sign_in_sends').update<SendUpdate>({ last_channel: sent.channel }).eq('phone', phone)
         return sent
     }
@@ -111,18 +100,12 @@ async function accountEmailFor(admin: SupabaseClient<Database>, phone: string): 
 
 type CreatedAccount = { email: string; adopted: boolean }
 
-// A number no account holds yet becomes one. The anonymous visitor who typed it keeps their id, so
-// the workspace and the draft they built stay theirs; with no visitor behind the request the
-// account is created outright. Either way it is filed under the number's placeholder address.
 async function createAccount(admin: SupabaseClient<Database>, session: SupabaseClient<Database>, phone: string): Promise<CreatedAccount | null> {
     const email = placeholderEmailFor(phone)
     const { data: current } = await session.auth.getUser()
     const visitor = current.user?.is_anonymous ? current.user : null
 
     const { data, error } = visitor ? await admin.auth.admin.updateUserById(visitor.id, { email, email_confirm: true }) : await admin.auth.admin.createUser({ email, email_confirm: true })
-    // The address is the number's own, so one that is taken is this number's account: left without
-    // its phone row by an earlier attempt that failed halfway, or planted through the public signup
-    // by someone who guessed the address. The number was just proved, so it is adopted either way.
     if (error?.code === 'email_exists') return { email, adopted: true }
     if (error || !data.user) {
         console.error('[phone-sign-in] account creation failed', error?.message)
@@ -131,17 +114,12 @@ async function createAccount(admin: SupabaseClient<Database>, session: SupabaseC
     return { email, adopted: false }
 }
 
-// An admin only ever sets a password on a real address, never on a phone placeholder, so one found
-// on an adopted account was planted by whoever filed the address first. Overwritten with a value
-// nobody knows before the owner of the number gets the account, so the planter is locked out.
 async function scramblePassword(admin: SupabaseClient<Database>, userId: string): Promise<boolean> {
     const { error } = await admin.auth.admin.updateUserById(userId, { password: randomBytes(32).toString('base64url') })
     if (error) console.error('[phone-sign-in] password scramble failed', error.message)
     return !error
 }
 
-// Supabase opens a session for a code it issued itself, and this one was issued by Bird: once Bird
-// has confirmed it, a one-time sign-in token is minted for the account. Nothing is mailed.
 async function mintSignInToken(admin: SupabaseClient<Database>, email: string): Promise<{ userId: string; tokenHash: string } | null> {
     const { data, error } = await admin.auth.admin.generateLink({ type: 'magiclink', email })
     const tokenHash = data.properties?.hashed_token
@@ -152,8 +130,6 @@ async function mintSignInToken(admin: SupabaseClient<Database>, email: string): 
     return { userId: data.user.id, tokenHash }
 }
 
-// Written before the session opens, so the phone step of a signup never asks for a number that
-// just signed the account in, whether the account was born now or by an attempt that failed halfway.
 async function writeVerifiedPhone(admin: SupabaseClient<Database>, userId: string, phone: string, channel: VerificationChannel): Promise<boolean> {
     const stamp = new Date().toISOString()
     const { error } = await admin
@@ -163,9 +139,6 @@ async function writeVerifiedPhone(admin: SupabaseClient<Database>, userId: strin
     return !error
 }
 
-// The token is spent by the request's own client, which sets the session cookies. Its tokens are
-// handed back as well: a browser that cannot read those cookies yet (an in-app browser) would
-// otherwise put its anonymous session back on top of them.
 async function openSession(session: SupabaseClient<Database>, tokenHash: string): Promise<SessionTokens | null> {
     const { data, error } = await session.auth.verifyOtp({ token_hash: tokenHash, type: 'magiclink' })
     if (error || !data.session) {
@@ -177,7 +150,6 @@ async function openSession(session: SupabaseClient<Database>, tokenHash: string)
 
 export type VerifyAttempt = 'ok' | 'too_many' | 'unavailable'
 
-// One try taken out of the number's window and the caller's, whatever the code turns out to be.
 export async function countVerifyAttempt(phone: string, ip: string): Promise<VerifyAttempt> {
     const { data, error } = await createServiceRoleClient().rpc('claim_phone_sign_in_verify', { p_phone: phone, p_ip: callerRateKey(ip), p_phone_max: MAX_VERIFY_PER_PHONE, p_ip_max: MAX_VERIFY_PER_IP, p_window_seconds: VERIFY_WINDOW_MS / 1000 })
     if (data === 'phone' || data === 'ip') return 'too_many'
@@ -185,14 +157,12 @@ export async function countVerifyAttempt(phone: string, ip: string): Promise<Ver
     return 'ok'
 }
 
-// `session` is the client of the request, the one that reads and writes its cookies.
 export async function completePhoneSignIn(session: SupabaseClient<Database>, phone: string, code: string, channel: VerificationChannel): Promise<PhoneSignInResult> {
     const checked = await checkVerification(phone, code)
     if (!checked.ok) return checked
     return signInWithNumber(session, phone, channel)
 }
 
-// The number given to App Review, whose fixed code the caller has already compared.
 export async function completeAppReviewSignIn(session: SupabaseClient<Database>, phone: string): Promise<PhoneSignInResult> {
     return signInWithNumber(session, phone, 'sms')
 }
@@ -218,9 +188,6 @@ export type PhoneChangeFailure = PhoneSignInFailure | 'taken' | 'same_number'
 export type PhoneChangeStart = { ok: true; channel: VerificationChannel } | PhoneRefusal<PhoneChangeFailure>
 export type PhoneChangeResult = { ok: true } | PhoneRefusal<PhoneChangeFailure>
 
-// Nothing is written on the account until the code proves the number: its verified row keeps the
-// old one, so the phone step of the signup never comes back up while a change is under way. The
-// sends are counted per number, on the ledger signing in already keeps.
 export async function startPhoneChange(account: PhoneAccount, phone: string, channel: VerificationChannel, ip: string, language: string | null = null): Promise<PhoneChangeStart> {
     const standing = await phoneStandingFor(createServiceRoleClient(), account, phone)
     if (standing !== 'free') return refused(standing)
@@ -235,8 +202,6 @@ export async function completePhoneChange(account: PhoneAccount, phone: string, 
     const checked = await checkVerification(phone, code)
     if (!checked.ok) return checked
 
-    // A phone-born account is filed under its number. Left under the old one, it would be opened by
-    // whoever proves that number next, and would go on showing it as its label.
     if (isPlaceholderEmail(account.email)) {
         const { error } = await admin.auth.admin.updateUserById(account.id, { email: placeholderEmailFor(phone), email_confirm: true })
         if (error) {

@@ -12,16 +12,10 @@ type DotLoaderProps = {
     duration?: number;
     repeatCount?: number;
     onComplete?: () => void;
-    /** Number of columns in the dot grid (default 7). */
     cols?: number;
-    /** Total number of dots rendered (default 49, i.e. a 7x7 grid). */
     count?: number;
 } & ComponentProps<"div">;
 
-// 3x3 diagonal fill-then-clear loop. Grid indices:
-//   0 1 2
-//   3 4 5
-//   6 7 8
 export const dotSpinnerFrames: number[][] = [
     [0],
     [0, 1, 3],

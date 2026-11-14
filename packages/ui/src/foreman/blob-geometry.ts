@@ -1,11 +1,7 @@
-/** Le contour de l'orbe : un cercle dont le rayon est modulé par quelques harmoniques. */
 export type Harmonic = { freq: number; amp: number; speed: number }
 
 const TAU = Math.PI * 2
 
-// Trois harmoniques : les 8 lobes qui donnent la silhouette en fleur, puis deux fréquences
-// premières entre elles qui la déséquilibrent — sans elles le contour est un rosace parfait qui
-// tourne, et l'oeil lit une rotation au lieu d'une matière molle.
 export const BLOB_HARMONICS: Harmonic[] = [
     { freq: 8, amp: 0.044, speed: 0.55 },
     { freq: 3, amp: 0.022, speed: -0.37 },
@@ -20,10 +16,6 @@ function radiusAt(angle: number, { harmonics, radius, amp, phase }: BlobSample) 
     return r * radius
 }
 
-/**
- * Le contour en une chaîne de béziers cubiques fermée (Catmull-Rom converti). Une polyligne de 64
- * points sur un disque de 56px se verrait : ce sont les tangentes qui gardent le galbe.
- */
 export function blobPath(config: BlobSample) {
     const { samples, center } = config
     const points: [number, number][] = []
@@ -49,7 +41,6 @@ export function blobPath(config: BlobSample) {
     return `${d} Z`
 }
 
-/** Rapproche `current` de `target` à vitesse constante quelle que soit la cadence d'écran. */
 export function approach(current: number, target: number, dt: number, rate = 3.2) {
     return current + (target - current) * (1 - Math.exp(-dt * rate))
 }

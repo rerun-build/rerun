@@ -3,10 +3,6 @@ import { pauseTemplateAgentSchedules } from '@/ee/services/template-revocation.s
 
 export type RevokeTemplateAccessPayload = { workspaceId: number; templateId: string }
 
-// The engine half of a revocation. The webhook has already written `agents.disabled_at`, which is
-// what actually gates access; pausing the schedules means reaching a box that may be asleep, and a
-// webhook that waits for it times out. Retried hard: a schedule left running is an agent still
-// spending on a template nobody is paying for any more.
 export const revokeTemplateAccessTask = task({
     id: 'revoke-template-access',
     maxDuration: 300,
@@ -19,8 +15,6 @@ export const revokeTemplateAccessTask = task({
     },
 })
 
-// Fire-and-forget from the webhook: a Trigger outage must not turn a cancellation into a 500 and
-// an endless Stripe retry, since the access flag is already written.
 export async function requestTemplateRevocation(payload: RevokeTemplateAccessPayload): Promise<void> {
     try {
         await revokeTemplateAccessTask.trigger(payload)

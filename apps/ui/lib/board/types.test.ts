@@ -4,7 +4,6 @@ import { computeAgentStatus, type SessionEntry } from './types'
 const session = (status: SessionEntry['status']): SessionEntry => ({ id: status, agentId: 'seo_chef', originAgentId: null, status })
 
 describe('computeAgentStatus', () => {
-    // The board loads live sessions only, which holds exactly as long as this stays true.
     it('scores an agent with no session like one whose sessions are all idle', () => {
         expect(computeAgentStatus([], true)).toBe('idle')
         expect(computeAgentStatus([session('idle'), session('idle')], true)).toBe('idle')

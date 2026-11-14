@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 describe('marketplace split', () => {
     it('takes the fee on what is left once the tax is carved out', () => {
-        // 20.00 charged, of which 3.33 is VAT: 16.67 net of tax, 5% + 0.30 to Rerun.
         expect(splitSale(2000, 333)).toEqual({ taxCents: 333, feeCents: 113, netCents: 1554 })
     })
 

@@ -14,8 +14,6 @@ export function CrashScreen() {
             <div className="flex items-center gap-2">
                 <Button onClick={() => window.location.reload()}>{t('crash.reload')}</Button>
                 <Button variant="outline" asChild>
-                    {/* A hard navigation on purpose: the router state is not trustworthy after a crash. */}
-                    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                     <a href="/">{t('backToDashboard')}</a>
                 </Button>
             </div>

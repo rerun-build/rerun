@@ -52,7 +52,6 @@ describe('isRetriableFailure', () => {
     })
 })
 
-// The limiter keeps its slot in module scope, so every test gets its own copy of the module.
 async function freshThrottle() {
     vi.resetModules()
     return import('./throttle')

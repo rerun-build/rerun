@@ -16,16 +16,6 @@ import { IntakeIndustryStep } from './IntakeIndustryStep'
 import { IntakeTextStep } from './IntakeTextStep'
 import type { ForemanIntakeController } from './useForemanIntake'
 
-/**
- * L'accueil du tunnel. Trois questions posées par l'app elle-même, avant que le modèle n'ait rien à
- * dire : ce sont des champs, et un aller-retour vers OpenRouter par champ, c'est une minute d'attente
- * pour quelque chose qu'un formulaire fait en vingt secondes.
- *
- * Elle prend la place du composer, comme le fait une question du Foreman, et se lit comme elles :
- * mêmes lignes d'options, même stepper. Ce qui est demandé et pourquoi se lit au-dessus, avec
- * l'orbe (ForemanIntakeHeader) : le cadre ne porte que les champs.
- */
-
 const STEP_MOTION = {
     initial: { opacity: 0, y: 6 },
     animate: { opacity: 1, y: 0 },
@@ -33,24 +23,14 @@ const STEP_MOTION = {
     transition: { duration: 0.18, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] },
 }
 
-// `autoFocus` n'est faux que dans le labo, où deux cartes cohabitent sur une page : elles se
-// disputeraient le focus, et la seconde ferait défiler la page jusqu'à elle au chargement.
 export function ForemanIntakeCard({ intake, autoFocus = true, className }: { intake: ForemanIntakeController; autoFocus?: boolean; className?: string }) {
     const t = useTranslations('foreman.intake')
     const { step, draft, index, steps, answered, reachable, canAdvance, submitting, error, industry, siteRead, set, chooseIndustry, chooseRole, skipWebsite, goTo, next } = intake
-    // Seule la sauvegarde verrouille la carte. La classification de l'industrie, elle, tourne
-    // pendant qu'on répond à la question suivante : la seule chose qu'elle décide est ce que le
-    // board dessine, et rien ici ne l'attend.
     const busy = submitting
-    // Un champ vide n'a rien à valider : le bouton du pied propose de passer sur le site, et la
-    // question du métier prend sa place.
     const skippable = step === 'company' && !draft.companyUrl.trim()
 
     return (
         <div className={cn('relative mb-2 flex flex-col gap-3 overflow-hidden rounded-lg border border-border bg-muted/30 p-3', className)}>
-            {/* `popLayout` et non `wait` : l'étape qui sort quitte le flux tout de suite, donc la
-                hauteur visée est celle de l'étape qui arrive, et AnimatedHeight a quelque chose à
-                viser dès la première image au lieu de passer par un cadre vide. */}
             <AnimatedHeight>
                 <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div key={step} {...STEP_MOTION}>

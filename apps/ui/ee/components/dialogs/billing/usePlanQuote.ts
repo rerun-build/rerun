@@ -7,9 +7,6 @@ import type { PlanQuote, PlanSelection } from '@/ee/services/billing.service'
 
 const QUOTE_DEBOUNCE_MS = 250
 
-// What Stripe would charge today for a selection, re-asked as the slider settles. 'loading' until
-// the answer for this very selection is in, so a quote never stands for the previous one. A failed
-// preview reads as no quote: the dialog falls back on the list price rather than blocking.
 export function usePlanQuote(selection: PlanSelection, enabled: boolean): PlanQuote | null | 'loading' {
     const key = JSON.stringify(selection)
     const [answer, setAnswer] = useState<{ key: string; quote: PlanQuote | null } | null>(null)

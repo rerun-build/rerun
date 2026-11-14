@@ -6,9 +6,6 @@ import { useCopy } from '@/lib/use-copy'
 import { cn } from '@/lib/utils'
 import { ScrollFade } from '@rerun/ui/primitives'
 
-// The CopyLine of multi-line values: a config someone pastes into a file keeps its indentation, so
-// it gets a block with the button in the corner rather than a row. `wrap` is for prose, a prompt,
-// which reads wrapped and scrolls down inside its own bounds, the faded edge telling there is more.
 export function CopyBlock({ value, label, className, wrap = false }: { value: string; label: string; className?: string; wrap?: boolean }) {
     const { copied, copy } = useCopy()
 

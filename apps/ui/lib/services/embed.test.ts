@@ -43,7 +43,6 @@ describe('embedText', () => {
         expect(createOpenAICompatible).not.toHaveBeenCalled()
     })
 
-    // The model refuses past 8192 tokens: a long memory used to come back as a 500 and no vector.
     it('embeds only the head of a text too long for the model', async () => {
         await embedText('a'.repeat(40_000))
 
@@ -51,7 +50,6 @@ describe('embedText', () => {
         expect(value.length).toBe(16_000)
     })
 
-    // JSON and code spend about one token for every two characters, CJK text about one per character.
     it('still gets a vector for text that spends more tokens than prose', async () => {
         vi.mocked(embed).mockImplementation(async ({ value }) => {
             const tokens = /[\u3040-\u9fff]/.test(value) ? value.length : value.length / 2

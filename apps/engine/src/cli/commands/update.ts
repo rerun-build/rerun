@@ -28,8 +28,6 @@ import {
     verifyRelease,
 } from './release.js'
 
-// Resolved through symlinks by Node, so this is the bin.js of the release that is running, even
-// when the process was started through `current/`.
 const CLI_ENTRY = fileURLToPath(new URL('../bin.js', import.meta.url))
 
 const continuing = (what: string, err: unknown): void => {
@@ -46,7 +44,6 @@ async function browserInstalled(): Promise<boolean> {
     }
 }
 
-// A checkout drives patchright through pnpm; a prebuilt package has it in its own node_modules.
 function patchrightCommand(layout: Layout, args: string[]): { command: string; args: string[]; cwd: string } {
     if (layout.kind === 'monorepo') return { command: 'pnpm', args: ['--filter', 'rerun-engine', 'exec', 'patchright', ...args], cwd: layout.root }
     return { command: process.execPath, args: [resolve(layout.packageDir, 'node_modules', 'patchright', 'cli.js'), ...args], cwd: layout.packageDir }
@@ -71,13 +68,10 @@ export async function installBrowser(layout: Layout): Promise<void> {
 
 const DESKTOP_PACKAGES = ['openbox', 'x11vnc', 'xdotool', 'thunar', 'xfce4-terminal', 'adwaita-icon-theme', 'tint2', 'hsetroot', 'curl', 'maim']
 
-// The dock, the wallpaper and the screen capture are checked too, so a box that got its desktop before they existed installs them.
 const desktopInstalled = (): boolean => ['openbox', 'x11vnc', 'xdotool', 'tint2', 'hsetroot', 'maim'].every(hasCommand)
 
 const desktopInstallable = (): boolean => process.platform === 'linux' && hasCommand('apt-get')
 
-// Kept in step with the list in the installer of the boxes (cloud/infra/engine/install.sh), which only
-// ever runs when a box is born.
 export function installDesktop(): void {
     if (!desktopInstallable()) return
     if (desktopInstalled()) {
@@ -89,7 +83,6 @@ export function installDesktop(): void {
         return
     }
     try {
-        // A box that has not installed anything since it was born holds package lists that point at versions the mirror dropped.
         asRoot(['apt-get', 'update', '-qq'])
         asRoot(['env', 'DEBIAN_FRONTEND=noninteractive', 'apt-get', 'install', '-y', '-qq', '--no-install-recommends', ...DESKTOP_PACKAGES])
     } catch (err) {
@@ -97,17 +90,12 @@ export function installDesktop(): void {
     }
 }
 
-// Same reason as the browser below: the update that brought this build in ran the previous
-// release's updater, which had never heard of these packages.
 export function installDesktopInBackground(): boolean {
     if (!desktopEnabled() || !desktopInstallable() || desktopInstalled()) return false
     spawn(process.execPath, [CLI_ENTRY, 'install-desktop'], { stdio: 'ignore', detached: true }).unref()
     return true
 }
 
-// An engine can come up without the browser its build expects: the updater that installed it ran
-// the previous release's code, which knew another package. A child process keeps the server
-// answering during the ~170 MB download.
 export async function installBrowserInBackground(): Promise<boolean> {
     if (await browserInstalled()) return false
     spawn(process.execPath, [CLI_ENTRY, 'install-browser'], { stdio: 'ignore', detached: true }).unref()
@@ -118,10 +106,6 @@ export async function installBrowserCommand(): Promise<void> {
     await installBrowser(detectLayout())
 }
 
-// The updater that brings a release in is the previous release's code, so the CLIs are installed by
-// the new release's `update-cli-tools`, and an engine that boots on a Codex other than its pin
-// installs it itself. Codex is best-effort: a box that cannot reach npm still gets its engine
-// update, it keeps the CLI it had and the models it cannot serve stay locked.
 export function updateCliTools(): void {
     const installed = installedCodexVersion()
     if (installed === CODEX_VERSION) {
@@ -143,8 +127,6 @@ export function updateCliTools(): void {
     }
 }
 
-// `no-root`: the global npm prefix is root's and the service user cannot sudo into it (install.sh's
-// sudoers only opens systemctl), so the spawn would fail silently at every boot.
 export function updateCliToolsInBackground(): 'spawned' | 'no-root' | false {
     if (detectLayout().kind !== 'release' || installedCodexVersion() === CODEX_VERSION) return false
     if (!isRoot() && !canSudo()) return 'no-root'
@@ -154,10 +136,6 @@ export function updateCliToolsInBackground(): 'spawned' | 'no-root' | false {
 
 const LEGACY_CLAUDE_LINK = '/usr/local/bin/claude'
 
-// Claude runs on the binary the Agent SDK ships inside each release. The one install.sh used to
-// fetch with claude.ai/install.sh was never on that path, and kept ~250 MB per version it saw.
-// Release layout and Linux only: on a checkout, or on a developer's Mac, the same folder is their
-// own Claude Code.
 export function removeLegacyClaudeCli(home = homedir(), platform = process.platform): string[] {
     const install = resolve(home, '.local', 'share', 'claude')
     const launcher = resolve(home, '.local', 'bin', 'claude')
@@ -187,10 +165,6 @@ function symlinkTarget(path: string): string | null {
 const DROP_CACHES = '/proc/sys/vm/drop_caches'
 const RETURN_MEMORY_SCRIPT = `sync; echo 3 > ${DROP_CACHES}; echo 1 > /proc/sys/vm/compact_memory`
 
-// A build leaves ~5 GiB of page cache in the VM, and the host only gets it back once the guest
-// frees it. The image's return-memory timer does that every 10 min and skips busy boxes, so a
-// fleet-wide update outran it and swapped a host until it stopped answering. Freeing it here,
-// before the restart, hands it back before the update queue moves on to the next box.
 function returnMemoryToHost(): void {
     if (!existsSync(DROP_CACHES)) return
     try {
@@ -240,8 +214,6 @@ async function updateFromGit(layout: Layout, noRestart: boolean): Promise<void> 
     run('pnpm', ['--filter', 'rerun-engine...', 'install', '--prod=false', '--frozen-lockfile'], { cwd: root })
     run('pnpm', ['--filter', 'rerun-engine...', 'build'], { cwd: root })
 
-    // Through the freshly built CLI: this process still runs the code it started with, and the new
-    // build may expect another browser than the one it knows how to install.
     try {
         run(process.execPath, [CLI_ENTRY, 'install-browser'], { cwd: root })
     } catch (err) {
@@ -265,9 +237,6 @@ async function updateFromGit(layout: Layout, noRestart: boolean): Promise<void> 
     finishUpdate(noRestart)
 }
 
-// Every step that runs code runs the NEW release's bin.js: this process is the old release, and its
-// own CLI_ENTRY resolves into the old folder. The updater dies with the restart it triggers, so the
-// `restarting` mark is its last word; the engine that comes up on the new build settles it.
 async function updateFromArtifact(layout: Layout, artifact: Artifact, noRestart: boolean): Promise<void> {
     if (layout.kind === 'image') throw new Error('an image does not take release artifacts: pull the new image instead')
     const root = layout.root
@@ -277,9 +246,6 @@ async function updateFromArtifact(layout: Layout, artifact: Artifact, noRestart:
     try {
         if (!isRoot() && !canSudo()) throw new Error('passwordless sudo is required to install a release')
         mkdirSync(releasesDir(root), { recursive: true })
-        // Before the free-space check, which the checkout alone can fail. A `release` updater runs from
-        // a release that already serves; only a swap not yet confirmed (`restarting`) or an updater cut
-        // short (`running`) leaves the checkout as the last build known to boot.
         if (layout.kind === 'release' && previousUpdate?.status !== 'restarting' && previousUpdate?.status !== 'running') {
             for (const path of sweepLegacyCheckout(root)) process.stdout.write(`removed legacy ${path}\n`)
         }
@@ -346,7 +312,6 @@ async function updateFromArtifact(layout: Layout, artifact: Artifact, noRestart:
     finishUpdate(noRestart)
 }
 
-// A dangling link counts: it was placed on purpose and `existsSync` would follow it to nothing.
 function linkExists(path: string): boolean {
     try {
         lstatSync(path)
@@ -365,8 +330,6 @@ export function rollbackCommand(): void {
     restartService()
 }
 
-// Run by the installer on a fresh machine, from the release it just unpacked: points `current` at it
-// when nothing does yet and writes the launcher and the units.
 export function installLayoutCommand(): void {
     const layout = detectLayout()
     if (layout.kind !== 'release') throw new Error('install-layout runs from a release under <root>/releases/<commit>/')

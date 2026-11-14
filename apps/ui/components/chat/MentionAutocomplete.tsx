@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode, type SyntheticEvent } from 'react'
 
-/** `hint` disambiguates two agents sharing a name, e.g. the Box each one lives in. `preferred` opens the list, e.g. the agents that share the Box of the conversation being typed in. */
 export type MentionAgent = { id: string; name: string; handle: string | null; hint?: string; preferred?: boolean }
 export type MentionSkill = { slug: string; name: string; description?: string }
 
@@ -111,8 +110,6 @@ function MentionMenu({ trigger, items, highlight, onHover, onPick }: MentionMenu
     const t = useTranslations('chat.mentions')
     const listRef = useRef<HTMLUListElement>(null)
 
-    // The list scrolls on its own; scrollIntoView would drag the surrounding sheet along, so
-    // keep the highlighted row visible by nudging the list's own scrollTop.
     useEffect(() => {
         const list = listRef.current
         const row = list?.children[highlight] as HTMLElement | undefined

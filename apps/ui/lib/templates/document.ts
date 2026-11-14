@@ -13,11 +13,6 @@ import {
 import { z } from 'zod'
 import type { Database } from '@/app/api/database.types'
 
-// SEO meta lives in real columns (filterable, indexable, granted column by column); the
-// editorial lists live in jsonb columns. The document is the shape the admin form and every
-// reader use; these two functions are the only place the two shapes meet. `connectors` is not
-// part of it: it is derived from the agents on the way in (see connectors.ts).
-
 export const TEMPLATE_DOC_COLUMNS = [
     'id',
     'slug',
@@ -77,8 +72,6 @@ export type TemplateRow = {
     updated_at?: string | null
 }
 
-// Every list is parsed with a fallback: a row written before a field existed, or by an older
-// shape, opens in the editor instead of throwing on the way in.
 const galleryFromRow = z.array(templateImageSchema).catch([])
 export const agentsFromRow = z.array(templateAgentSchema).catch([])
 const faqFromRow = z.array(templateFaqItemSchema).catch([])
@@ -115,9 +108,6 @@ export function rowToDocument(row: TemplateRow): TemplateDocument {
     })
 }
 
-// `connectors` arrives derived from the agents and already resolved against the services
-// catalog: name and icon are stored alongside the slug so a public page never has to resolve
-// them per card.
 export function documentToRow(doc: TemplateDocument, connectors: TemplateConnector[]): Database['public']['Tables']['templates']['Insert'] {
     return {
         slug: doc.slug,

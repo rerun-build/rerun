@@ -13,7 +13,6 @@ jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: { access_to
 const ada = (name: string): MemberProfile => ({ id: 'u1', name, avatarUrl: null, role: 'member' })
 
 describe('useMemberProfiles with a kept directory', () => {
-    // Each test is a fresh launch.
     beforeEach(() => {
         clearLocalCache()
         forgetMemberReads()

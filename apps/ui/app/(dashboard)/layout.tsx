@@ -19,10 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-    // Once per server process, on the first board anyone opens: the crons a self-hosted app runs itself.
     startBackgroundSchedules()
     const [rewind, computer, published, i18n, apps] = await Promise.all([rewindFlag(), computerFlag(), publishedAccessFlag(), i18nFlag(), paidAppFlags()])
-    // Les miroirs des préférences de la colonne, ouverture et placement, pour la rendre déjà à sa place.
     const cookieStore = await cookies()
     const foremanOpen = parseForemanOpen(cookieStore.get(FOREMAN_OPEN_COOKIE)?.value)
     const foremanPlacement = parseForemanPlacement(cookieStore.get(FOREMAN_PLACEMENT_COOKIE)?.value)

@@ -5,7 +5,6 @@ export type RewindSlideId = (typeof REWIND_SLIDE_IDS)[number]
 
 const MIN_RUNS_FOR_CLOCK = 5
 
-// A slide with nothing true to say is dropped rather than shown with a zero.
 const INCLUDED: Record<RewindSlideId, (payload: RewindPayload) => boolean> = {
     intro: () => true,
     hours: p => p.totals.workedMs > 0,

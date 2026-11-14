@@ -8,8 +8,6 @@ import { coworkerRuleOf, taskKey, taskNotifies } from '@/lib/notifications/prefs
 import type { TaskSource } from '@/lib/schedules/outcomes'
 import { useTranslations } from 'next-intl'
 
-// Whether this one task reaches you when it finishes. Saved on its own, like every notification
-// setting: it is yours, the task's Save is for the task.
 export function TaskNotifyField({ agentId, source, slug }: { agentId: string; source: TaskSource; slug: string }) {
     const t = useTranslations('agent.taskNotifyField')
     const { prefs, update } = useNotificationPrefs()

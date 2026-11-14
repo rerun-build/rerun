@@ -19,7 +19,6 @@ import type { CancelStep } from './cancel-flow-copy'
 type CancelSubscriptionDialogProps = {
     open: boolean
     onOpenChange: (open: boolean) => void
-    // Called after anything that changed the subscription, so the billing dialog behind reloads it.
     onChanged: () => void
 }
 
@@ -41,7 +40,6 @@ export function CancelSubscriptionDialog({ open, onOpenChange, onChanged }: Canc
     )
 }
 
-// Mounted with the dialog's content, so every opening starts from a fresh read of the subscription.
 function CancelFlowLoader({
     onChanged,
     onClose,

@@ -9,7 +9,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
 
-// The cancel dialog opens on these figures, so a machine slow to answer is dropped, not waited for.
 const ENGINE_TIMEOUT_MS = 4000
 
 const WEEK_MS = 7 * 24 * 60 * 60_000
@@ -17,7 +16,6 @@ const WEEK_MS = 7 * 24 * 60 * 60_000
 export type CancelFlowAgent = { key: string; name: string; runsWeek: number; connectorSlugs: string[] }
 
 export type CancelFlowActivity = {
-    // Most active first.
     agents: CancelFlowAgent[]
     connectors: TemplateConnector[]
     runsMonth: number
@@ -37,7 +35,6 @@ async function readAgentActivity(conn: EngineConnection, engineAgentId: string, 
         withTimeout(readRegistry(conn, engineAgentId), { services: {} }),
     ])
 
-    // Daily buckets: the week is the last seven of them, the month all thirty.
     return {
         runsMonth: points.reduce((sum, point) => sum + point.value, 0),
         runsWeek: points.filter(point => Date.parse(point.bucket) >= weekStart).reduce((sum, point) => sum + point.value, 0),
@@ -66,7 +63,6 @@ export async function loadCancelFlowActivity(workspaceId: number): Promise<Cance
                 key: agent.id,
                 name: agent.name,
                 runsWeek: activity[index].runsWeek,
-                // An installed service missing from the catalog has no icon to draw on the board.
                 connectorSlugs: activity[index].connectorSlugs.filter(slug => catalog.has(slug)),
             }))
             .sort((a, b) => b.runsWeek - a.runsWeek),

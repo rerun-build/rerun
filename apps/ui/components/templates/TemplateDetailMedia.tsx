@@ -12,8 +12,6 @@ import { useTranslations } from 'next-intl'
 export function TemplateDetailMedia({ template, showStatus }: { template: LibraryTemplate; showStatus: boolean }) {
     const tStatus = useTranslations('templates.status')
     return (
-        // shrink-0 : le bandeau ne tient que par son ratio. Sans lui, un ancêtre en flex l'étire sur
-        // toute la hauteur du panneau et pousse le titre, le prix et les agents sous la ligne de flottaison.
         <div className="relative flex aspect-video shrink-0 items-center justify-center overflow-hidden border-b bg-muted/40">
             {template.agents.length > 0 ? (
                 <TemplateBoardPreview agents={template.agents} connectors={template.connectors} className="size-full" />

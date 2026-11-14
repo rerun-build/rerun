@@ -19,8 +19,6 @@ type Day = CreditUsage['days'][number]
 
 const spentOn = (day: Day) => day.aiMicros + day.dataMicros
 
-// One bar per day of the period, AI under paid data, the days ahead left as faint slots so the
-// period's shape is readable at a glance.
 function Daily({ days, slots, hover, onHover }: { days: Day[]; slots: number; hover: number | null; onHover: (index: number | null) => void }) {
     const max = Math.max(...days.map(spentOn), 1)
     return (
@@ -44,7 +42,6 @@ function Daily({ days, slots, hover, onHover }: { days: Day[]; slots: number; ho
     )
 }
 
-// Spent so far against the credit, and where today's pace lands by the end of the period.
 function Cumulative({ days, slots, balance, trial, hover, onHover, locale }: { days: Day[]; slots: number; balance: CreditBalance; trial: boolean; hover: number | null; onHover: (index: number | null) => void; locale: string }) {
     const month = balance.wholeMicros - balance.topupLeftMicros
     const whole = balance.wholeMicros

@@ -18,8 +18,6 @@ import { setPendingDesktopOpen } from '@/desktop/pending-open'
 
 type Unavailable = Partial<Record<'files' | 'apps' | 'routines', boolean>>
 
-// The coworker's details, opened from its conversation. Every value is read again when the page comes
-// back on screen, so a routine switched off or an app connected one level down shows at once.
 export default function CoworkerDetailsScreen() {
     const { id: agentId, name: nameParam } = useLocalSearchParams<{ id: string; name?: string }>()
     const { session, me } = useAuth()
@@ -27,7 +25,6 @@ export default function CoworkerDetailsScreen() {
     const tCommon = useTranslations('mobileCommon')
     const errorText = (err: unknown) => (err instanceof Error ? err.message : tCommon('errors.tryAgainShortly'))
     const rule = useNotificationPrefs().ruleOf(agentId)
-    // Opens on what the last visit read, every value is replaced as the hub answers.
     const [kept] = useState(() => (me ? readCoworkerDetails(me.workspace.id, agentId) : {}))
     const [view, setView] = useState<AgentView | null>(kept.view ?? null)
     const [boxes, setBoxes] = useState<Box[]>(kept.boxes ?? [])
@@ -67,7 +64,6 @@ export default function CoworkerDetailsScreen() {
     const agent = view?.agent
     const switchedOff = !!agent?.disabledAt
     const boxName = boxes.find(box => box.id === agent?.spaceId)?.name ?? null
-    // The level comes with the coworker's copy: until one is read, the board the chat came from answers.
     const lock = manageLock(agent ? { access: agent.access, known: true } : knownCoworkerAccess(agentId, { agents: workspaceId ? cachedBoard(workspaceId).read()?.agents : null }))
 
     const openScreen = () => {

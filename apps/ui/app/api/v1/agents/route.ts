@@ -11,9 +11,6 @@ export const dynamic = 'force-dynamic'
 
 export const GET = apiRoute({ auth: 'member' }, async ({ ctx }) => listBoardAgents(ctx))
 
-// The web's own creation, then its first message: the description, reformulated. A coworker that
-// arrives switched off for want of a plan slot gets no message, it could not run it. Creating in a
-// Box takes `manage` on it, which createAgent checks.
 export const POST = apiRoute({ auth: 'member', body: createCoworkerSchema }, async ({ ctx, body }): Promise<CreatedCoworker> => {
     await assertSpaceOwnedBy(ctx.workspace.id, body.spaceId)
     const { agentId, active } = await createAgentWithSetup({ name: body.name, description: body.description, workspaceId: ctx.workspace.id, spaceId: body.spaceId, actor: actorFromContext(ctx) })

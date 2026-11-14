@@ -5,8 +5,6 @@ import { LOCAL_ORIGIN, LOCAL_SCHEME } from './url-policy'
 
 export type LocalPage = 'offline' | 'find' | 'server'
 
-// The shell's own pages (offline, find bar, server picker) are served from `rerun-shell://app/`,
-// never from `file://`: a standard, secure origin of their own, with a strict CSP.
 export function registerLocalScheme(): void {
     protocol.registerSchemesAsPrivileged([{ scheme: LOCAL_SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true } }])
 }
@@ -20,7 +18,6 @@ export function serveLocalPages(session: Session): void {
     session.protocol.handle(LOCAL_SCHEME, async (request) => {
         const url = new URL(request.url)
         if (url.host !== 'app') return new Response('Not found', { status: 404 })
-        // Under `electron-vite dev` the pages come from Vite's server, with hot reload.
         const devServer = process.env.ELECTRON_RENDERER_URL
         if (devServer) return net.fetch(`${devServer}${url.pathname}${url.search}`)
         const file = normalize(join(RENDERER_DIR, decodeURIComponent(url.pathname)))

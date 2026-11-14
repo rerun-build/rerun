@@ -5,8 +5,6 @@ import { WAKE_EVENT_LABELS, isWakeEvent, type WakeEvent } from './wake-events'
 
 export { WAKE_EVENTS, WAKE_EVENT_LABELS, isWakeEvent, type WakeEvent } from './wake-events'
 
-// What a LinkedIn delivery means to the coworkers woken by it.
-
 export function envelopeKind(envelope: LinkupEnvelope): EnvelopeKind<WakeEvent> {
     const type = envelope.event.type
     if (type === 'disconnection') return { kind: 'disconnection', reason: envelope.event.reason ?? 'LinkedIn ended the session' }
@@ -25,16 +23,12 @@ function person(entry: LinkupPerson | undefined): Record<string, string> | undef
     return out
 }
 
-// A file in classic messaging is named by its conversation, on a Recruiter seat by its message.
-// Linkup's own download_url, when the attachment carries one, already holds both.
 export function attachmentBase(envelope: LinkupEnvelope): AttachmentRef {
     const { inbox, metadata } = envelope.event
     if (inbox === 'recruiter') return metadata?.entity_urn ? { message_id: metadata.entity_urn } : {}
     return metadata?.conversation_urn ? { conversation_id: metadata.conversation_urn } : {}
 }
 
-// What the coworker reads in its trigger payload: the event in plain words, without Linkup's URNs
-// and cursors. A file comes as a link it can open and, for a voice note, its words.
 export function wakePayload(event: WakeEvent, envelope: LinkupEnvelope, accountLabel: string | null, attachments: AttachmentSummary[] = []): Record<string, unknown> {
     const base = { app: 'linkedin', event, account: accountLabel, at: envelope.event.timestamp ?? envelope.timestamp ?? null }
     if (event === 'message_received') {
@@ -53,8 +47,6 @@ export function wakePayload(event: WakeEvent, envelope: LinkupEnvelope, accountL
     return { ...base, people: (envelope.event.new_invitations ?? []).map(person) }
 }
 
-// The prompt the hub writes on the trigger it creates. The user can rewrite it in the trigger
-// editor like any other.
 export function wakeTriggerPrompt(events: WakeEvent[]): string {
     const what = events.map(event => WAKE_EVENT_LABELS[event].toLowerCase()).join(', or ')
     return [

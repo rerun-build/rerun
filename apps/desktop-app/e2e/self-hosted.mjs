@@ -1,9 +1,3 @@
-// A self-hosted server, end to end:
-//   pnpm verify:desktop --signed-out --scenario apps/desktop-app/e2e/self-hosted.mjs
-//
-// The second server is the same local hub reached as 127.0.0.1 instead of localhost: another origin,
-// so another session, which is what a person with two servers gets.
-
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
@@ -53,7 +47,6 @@ export default async function selfHostedScenario({ app, page, step, base }) {
     check(new Set(partitions).size === partitions.length, 'each server keeps its own data folder')
     await step('second server', { target: secondPage })
 
-    // Back to the default server from the menu.
     await app.evaluate(({ Menu }) => Menu.getApplicationMenu().items.flatMap((item) => item.submenu?.items ?? []).find((item) => /Change Server/.test(item.label))?.click())
     const pickerAgain = await waitUntil(() => currentPage(app, 'rerun-shell://app/server.html'), Boolean, 'Change Server… opens the picker')
     await pickerAgain.waitForSelector('#server-address')

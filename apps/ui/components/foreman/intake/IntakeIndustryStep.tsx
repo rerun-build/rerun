@@ -10,9 +10,6 @@ import { INTAKE_INDUSTRIES } from '@/lib/onboarding/intake'
 import { IntakeField } from './IntakeField'
 import type { IntakeDraft } from './steps'
 
-// Asked only of someone who gave no site. It buys the one thing the board needs from them, the
-// divisions to draw, and "Other" keeps their own words for a line of business we had no bucket for.
-
 type IntakeIndustryStepProps = {
     draft: IntakeDraft
     disabled?: boolean
@@ -22,16 +19,11 @@ type IntakeIndustryStepProps = {
 }
 
 export function IntakeIndustryStep({ draft, disabled, onChange, onChoose, onEnter }: IntakeIndustryStepProps) {
-    // Ouvrir la ligne libre est un geste, pas une conséquence de ce qui est tapé dedans : sans ce
-    // state elle se refermerait au premier effacement.
     const t = useTranslations('foreman.intake')
     const [custom, setCustom] = useState(!!draft.industryLabel)
 
     return (
         <Field label={t('industry.label')}>
-            {/* Deux colonnes et pas une : neuf lignes empilées ne tiennent pas dans un pied de
-                colonne. Pas de défilement à elle : la liste est close, et un deuxième conteneur qui
-                défile dans celui du pied cachait « Other », qui est la moitié de la question. */}
             <div className="-mx-1">
                 <div className="grid grid-cols-2 gap-x-1 gap-y-0.5">
                     {INTAKE_INDUSTRIES.map((option, index) => (

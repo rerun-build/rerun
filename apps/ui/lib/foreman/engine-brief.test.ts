@@ -43,8 +43,6 @@ describe('foremanEngineBrief', () => {
         expect(kinds.recenter_board).toBe('intent')
     })
 
-    // The engine can neither draw them nor read the browser's answer back. Delegation is the
-    // engine's own builtin, not the hub's.
     it('leaves out the widgets, attachments, delegation and moves', () => {
         const names = brief.tools.map(tool => tool.name)
         for (const name of ['show_plan', 'ask_choice', 'open_checkout', 'show_templates', 'read_attachment', 'delegate_tasks', 'move_agent']) expect(names).not.toContain(name)
@@ -56,20 +54,16 @@ describe('foremanEngineBrief', () => {
         expect(kinds.open_template_card).toBe('intent')
     })
 
-    // The brain is written by the engine's own builtins; the browser only shows the page.
     it('opens the brain in the browser', () => {
         const kinds = Object.fromEntries(brief.tools.map(tool => [tool.name, tool.kind]))
         expect(kinds.open_brain_page).toBe('intent')
         expect(brief.instructions).toContain('open_brain_page')
     })
 
-    // They write the onboarding answers of the person going through it, not the workspace.
     it('never hands it the onboarding writes', () => {
         for (const name of ['save_profile', 'save_needs', 'finish_onboarding']) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(name)).toBe(false)
     })
 
-    // The library list, not the template-authoring one the account MCP server carries under the
-    // same name.
     it('lists the library templates', () => {
         const listTemplates = brief.tools.find(tool => tool.name === 'list_templates')
         expect(listTemplates?.description).toContain('Rerun library')
@@ -81,7 +75,6 @@ describe('foremanEngineBrief', () => {
         expect(serial.sort()).toEqual(['create_agent', 'create_boxes', 'install_shared_agent', 'install_template'])
     })
 
-    // The engine drops a tool whose schema it cannot turn into zod, silently.
     it('declares only schemas the engine can convert', () => {
         for (const tool of brief.tools) expect(() => z.fromJSONSchema(tool.inputSchema as never), tool.name).not.toThrow()
     })
@@ -95,14 +88,11 @@ describe('foremanEngineBrief', () => {
         for (const tool of brief.tools.filter(t => t.kind === 'hub')) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(tool.name)).toBe(true)
     })
 
-    // A workspace keeps its machine, and its foreman, for a while after its plan lapses.
     it('tells it when the workspace has no plan, and only then', () => {
         expect(brief.instructions).not.toContain('no active plan')
         expect(foremanEngineBrief({ ...state, entitled: false }).instructions).toContain('no active plan')
     })
 
-    // Every turn on the engine starts from a message the user wrote, so the browser has nothing to
-    // add, and repeating it there talks the model out of the language they write in.
     it('never passes the browser language on, only the one they settled on', () => {
         const guessed = foremanEngineBrief({ ...state, language: 'German' }).instructions
         expect(guessed).not.toContain('browser is set')

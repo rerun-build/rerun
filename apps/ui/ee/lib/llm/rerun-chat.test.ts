@@ -62,8 +62,6 @@ describe('POST /api/llm/chat/completions', () => {
         expect((init.headers as Record<string, string>).Authorization).toBe('Bearer max-key')
     })
 
-    // A fresh Response per call: the metering wrapper reads the body, and one shared instance can
-    // only be read once.
     async function upstreamModelFor(model: string) {
         const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => Response.json({ choices: [], usage: { cost: 0.001 } }))
         await (await POST(request(model))).text()
@@ -72,7 +70,6 @@ describe('POST /api/llm/chat/completions', () => {
         return sent.model
     }
 
-    // The aliases are the whole contract with the boxes: they name a tier, the hub says what it runs.
     it('resolves each tier to its own model', async () => {
         expect(await upstreamModelFor(RERUN_MODELS.fast)).toBe(RERUN_UPSTREAM_MODELS.fast)
         expect(await upstreamModelFor(RERUN_MODELS.balanced)).toBe(RERUN_UPSTREAM_MODELS.balanced)
@@ -91,9 +88,6 @@ describe('POST /api/llm/chat/completions', () => {
         expect(await sentReasoning(RERUN_MODELS.smart)).toEqual({ enabled: true })
     })
 
-    // The box sends the system prompt in two blocks (stable, then what moves between turns) and does
-    // not know what model a tier runs: the hub marks each block and the prefix up to the last message
-    // for an hour, and only for an Anthropic model.
     it('asks an Anthropic model to cache each system block and the prefix, and leaves the others to cache on their own', async () => {
         const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => Response.json({ choices: [] }))
         const messages = [
@@ -125,14 +119,11 @@ describe('POST /api/llm/chat/completions', () => {
         }
     })
 
-    // A box still on the id Balanced used to be gets the current model rather than a 400, and the
-    // shared key cannot be pointed at a model of the caller's choosing.
     it('rewrites anything that is not a tier into Balanced', async () => {
         expect(await upstreamModelFor('qwen/qwen3.7-max')).toBe(RERUN_UPSTREAM_MODELS.balanced)
         expect(await upstreamModelFor('anthropic/claude-fable-5.1')).toBe(RERUN_UPSTREAM_MODELS.balanced)
     })
 
-    // The pickers lock Smart on a trial; an agent pinned to it through the API still has to run.
     it('serves and bills Balanced when a workspace that has not paid asks for Smart', async () => {
         vi.mocked(getWorkspaceBudgetByEngineKey).mockResolvedValue({ workspaceId: 1, smartAllowed: false } as Awaited<ReturnType<typeof getWorkspaceBudgetByEngineKey>>)
         vi.mocked(recordRerunUsage).mockResolvedValue()
@@ -152,8 +143,6 @@ describe('POST /api/llm/chat/completions', () => {
         expect(recordRerunUsage).toHaveBeenLastCalledWith(expect.objectContaining({ engineAgentId: 'prospector' }))
     })
 
-    // A box that gives up on a call (its run stopped, its tool timed out) must not leave OpenRouter
-    // generating, and billing, an answer nobody will read.
     it('cancels the upstream stream when the box hangs up', async () => {
         const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({ choices: [] }))
         const box = new AbortController()
@@ -166,8 +155,6 @@ describe('POST /api/llm/chat/completions', () => {
         expect(init.signal?.aborted).toBe(true)
     })
 
-    // OpenRouter bills a non-streaming answer in full even when the call is cancelled, so the only
-    // thing an abort would achieve is losing the usage frame the budget is decremented from.
     it('keeps a non-streaming call alive so its cost is still recorded', async () => {
         const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({ choices: [] }))
         const box = new AbortController()
@@ -180,7 +167,6 @@ describe('POST /api/llm/chat/completions', () => {
         expect(init.signal).toBeUndefined()
     })
 
-    // The box only keeps "Provider returned error"; the reason the model provider gave is in the body.
     it('logs the body of a refused call and still hands it to the box untouched', async () => {
         const refusal = JSON.stringify({ error: { message: 'Provider returned error', code: 400, metadata: { raw: 'messages.3: text content blocks must be non-empty', provider_name: 'Anthropic' } } })
         vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(refusal, { status: 400 }))

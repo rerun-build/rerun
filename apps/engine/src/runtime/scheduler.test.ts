@@ -77,8 +77,6 @@ vi.mock('./headless-run.js', async () => {
             let finish!: (o: Outcome) => void
             const settled = new Promise<Outcome>(r => (finish = r))
             const runId = `run-${state.runs.length + 1}`
-            // The real run registers itself before `startHeadlessRun` hands back, and unregisters
-            // itself as it settles.
             if (state.liveRuns) {
                 registerRunAbort(runId, agent.id)
                 state.liveRunIds.push(runId)
@@ -170,8 +168,6 @@ describe('fireSchedule', () => {
         expect(state.runs[0].override).toEqual({ provider: 'openai', model: 'm' })
     })
 
-    // A coworker called by another one at 15:28 had not touched its screen yet when its 15:30
-    // schedule fired, took the screen first, and left the called run with nothing to drive.
     it('leaves the schedule due while another run of a coworker with a screen is live', async () => {
         registerRunAbort('live-call', 'on')
 
@@ -274,7 +270,6 @@ describe('fireSchedule', () => {
     it('does not collapse two calls racing before the first run has started', async () => {
         const [a, b] = await Promise.all([fireSchedule('on', schedule('race')), fireSchedule('on', schedule('race'))])
 
-        // Looks wrong: the in-flight entry is only set after startHeadlessRun resolves, so concurrent callers both fire.
         expect(a.runId).not.toBe(b.runId)
         expect(state.runs).toHaveLength(2)
     })

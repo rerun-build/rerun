@@ -67,15 +67,11 @@ describe('stripErrorPrefix', () => {
 })
 
 describe('classifyChatError', () => {
-    // The engine flattens the provider error into `runs.error`, so these are the strings the two
-    // CLI providers actually produce when a subscription runs out or a login expires.
     it('recognises a spent subscription from either CLI', () => {
         expect(classifyChatError('Error: Claude AI usage limit reached|1750000000')).toBe('usage_limit')
         expect(classifyChatError('Error: usage_limit_exceeded')).toBe('usage_limit')
     })
 
-    // Claude Code stopped saying "usage limit" and now names the window that ran out. Without these
-    // the sentence fell through to `generic` and the chat printed the raw provider stack.
     it('recognises every window claude code names', () => {
         expect(classifyChatError("AI_APICallError: You've hit your session limit · resets 3pm")).toBe('usage_limit')
         expect(classifyChatError("AI_APICallError: You've hit your weekly limit · resets Nov 20, 3pm")).toBe('usage_limit')
@@ -91,15 +87,11 @@ describe('classifyChatError', () => {
         expect(classifyChatError('AI_LoadAPIKeyError: Failed to authenticate. API Error: 401 OAuth access token has been revoked.')).toBe('unauthorized')
     })
 
-    // OpenRouter's sentence when the model provider behind it refuses the request: the same request
-    // fails the same way on every retry, so the run stopped as `generic` with nothing to click.
     it('recognises a request the model provider refused', () => {
         expect(classifyChatError('AI_APICallError: Provider returned error')).toBe('provider_error')
         expect(classifyChatError('ProviderRefusedError: Provider returned error: tools.0.custom.input_schema: invalid')).toBe('provider_error')
     })
 
-    // Anthropic refusing a signed thinking block the engine replayed against another tool list. It
-    // reads "Provider returned error" too, but switching models does not help: a fresh run does.
     it('tells a rejected thinking replay apart from a refusal', () => {
         const fromApi = 'ProviderRefusedError: Provider returned error: messages.25.content.0: Invalid `signature` in `thinking` block. The block is bound to a different conversation. The `tools` list differs from the one this block was created with.'
         const pastedWithoutBackticks = 'ProviderRefusedError: Provider returned error: messages.402.content.0: Invalid signature in thinking block. The block is bound to a different conversation.'
@@ -109,23 +101,18 @@ describe('classifyChatError', () => {
         expect(friendlyError(fromApi)).toContain('switching models will not help')
     })
 
-    // The engine keeps the provider's reason in the run's error for the logs; the chat says what to do.
     it('tells the user a refusal will repeat, without the technical reason', () => {
         const message = friendlyError('ProviderRefusedError: Provider returned error: tools.0.custom.input_schema: invalid')
         expect(message).toContain('sending it again will get the same answer')
         expect(message).not.toContain('input_schema')
     })
 
-    // Codex's own sentence when the model has no room for the request: it used to fall through to
-    // `generic`, a notice with nothing to click.
     it('recognises a model at capacity as an overloaded provider', () => {
         expect(classifyChatError('Error: Selected model is at capacity. Please try a different model.')).toBe('overloaded')
         expect(classifyChatError('Error: exceeded retry limit, last status: 429 Too Many Requests')).toBe('overloaded')
         expect(classifyChatError('Message failed: AI_RetryError: Failed after 3 attempts. Last error: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.')).toBe('overloaded')
     })
 
-    // The engine codes it `provider_context_window`, but what reaches the chat is the provider's
-    // sentence. It used to fall through to `generic` and get offered a retry that hits the same wall.
     it('recognises a conversation that no longer fits the model', () => {
         expect(classifyChatError('AI_APICallError: prompt is too long: 213456 tokens > 200000 maximum')).toBe('context_window')
         expect(classifyChatError('Error: This request exceeds the context window of the model.')).toBe('context_window')
@@ -174,13 +161,10 @@ describe('describeSubscriptionLimit', () => {
         expect(describeSubscriptionLimit("You've hit your Opus limit")).toEqual({ plan: 'claude', scope: 'model', modelName: 'Opus' })
     })
 
-    // codex throws its server's message away and keeps only the raw finish reason, which is exactly
-    // what tells the two CLIs apart: claude-code never emits that marker.
     it('reads a bare codex finish reason as the ChatGPT plan', () => {
         expect(describeSubscriptionLimit('Error: usage_limit_exceeded')).toEqual({ plan: 'chatgpt', scope: 'session' })
     })
 
-    // The sentences real boxes failed on, none of which the chat used to name.
     it('names a model the plan does not include', () => {
         expect(describeSubscriptionLimit('AI_APICallError: Fable 5.1 requires usage credits. Switch to another model to continue.')).toEqual({ plan: 'claude', scope: 'not_in_plan', modelName: 'Fable 5.1' })
         expect(describeSubscriptionLimit('Error: {"type":"error","status":400,"error":{"type":"invalid_request_error","message":"The \'gpt-6-astra\' model is not supported when using Codex with a ChatGPT account."}}')).toEqual({
@@ -215,8 +199,6 @@ describe('describeSubscriptionLimit', () => {
     })
 })
 
-// The engine rewrites OpenCode's refusals into these sentences: OpenCode's own say neither which plan
-// nor which window ran out.
 describe('OpenCode limits', () => {
     const credits = 'AI_APICallError: OpenCode Console credits used up: Insufficient account funds'
     const goWeekly = 'AI_APICallError: OpenCode Go limit reached: weekly window · resets Nov 6, 3:00 PM UTC'
@@ -228,7 +210,6 @@ describe('OpenCode limits', () => {
         expect(friendlyError(credits)).toBe('No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.')
     })
 
-    // A Console model is often a Claude: the OpenCode rule runs before the "claude" one.
     it('names OpenCode on a Console Claude model', () => {
         const onClaude = `${credits} (console/claude-sonnet-5-5)`
         expect(describeSubscriptionLimit(onClaude)).toEqual({ plan: 'opencode', scope: 'credits' })
@@ -313,7 +294,6 @@ describe('a conversation the coworker cannot reach', () => {
     })
 })
 
-// Every sentence as it read before it moved to the catalog: the English must not change.
 describe('the English copy of a spent subscription', () => {
     const cases: [SubscriptionLimit, string, string][] = [
         [{ plan: 'opencode', scope: 'credits' }, 'OpenCode credits used up', 'No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.'],

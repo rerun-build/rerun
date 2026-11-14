@@ -46,8 +46,6 @@ function PackCard({ card, width, picked, onToggle }: { card: StarterCard; width:
     )
 }
 
-// The starter team of their industry, put up by the hub right after the welcome card: a rail of
-// coworkers to pick from, or a line saying what they need instead.
 export function StarterPackCard({ input, onAnswer }: { input: unknown; onAnswer: (output: StarterPackOutput) => void }) {
     const cards = readStarterPack(input)
     const { width } = usePaneSize()

@@ -1,12 +1,5 @@
 import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@rerun/contracts'
 
-// The library's own labels are written for someone browsing it ("SaaS", "Other") and read as too
-// narrow to a model: on them alone Stripe buckets to "other". These say what line of business each
-// one covers instead.
-//
-// One taxonomy for the two readers of a company: the fast decision that only needs the bucket, and
-// the full analysis that also writes the prose. A second wording beside this one would quietly send
-// the same company to two different industries depending on which one answered first.
 export const INDUSTRY_GLOSS: Record<TemplateCategory, string> = {
     agencies: 'agencies delivering work for clients, advertising, marketing, design and consulting firms included',
     ecommerce: 'brands, shops and marketplaces selling products online',

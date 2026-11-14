@@ -1,6 +1,3 @@
-// Labels follow MODEL_LABEL in @rerun/contracts, groups follow ENGINE_MODEL_CATALOG on the web: the
-// Rerun tiers, then one group per AI connection of the workspace.
-
 export type ModelProvider = 'rerun' | 'claude' | 'codex' | 'google' | 'opencode'
 
 export type Model = { id: string; label: string; provider: ModelProvider }

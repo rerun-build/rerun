@@ -29,8 +29,6 @@ export function CardFrame({ symbol, title, meta, children }: { symbol: IconName;
     )
 }
 
-// An image behind the hub's auth: the request carries the same headers as every other call. A broken
-// one falls back to a glyph rather than an empty box.
 export function AuthedImage({ url, fallback = 'image', style }: { url: string | null; fallback?: IconName; style: StyleProp<ViewStyle> }) {
     const theme = useTheme()
     const { session, me } = useAuth()

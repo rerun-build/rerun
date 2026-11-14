@@ -9,10 +9,6 @@ import type { TrialStep } from '@/lib/foreman/next-steps'
 import { LockIcon } from '@/lib/icons'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// Le pied de la colonne une fois la carte d'essai posée : tout ce qui serait tapé ici serait un tour
-// de modèle offert qui ne lance pas l'essai, donc le composer cède la place. Le bouton qui lance
-// l'essai est déjà dans la conversation (la carte, ou sous la réponse du Foreman) ; ici il ne reste
-// que la sortie vers une personne, pour qui bute sur le paiement.
 export function ForemanTrialGate({ step }: { step: TrialStep }) {
     const t = useTranslations('foreman.trialGate')
     const { session } = useSession()

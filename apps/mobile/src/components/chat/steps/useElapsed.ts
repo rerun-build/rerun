@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-// The web's `useElapsed` (packages/ui/src/primitives/use-elapsed.ts): a clock that starts when the
-// step runs, holds its final value once it stops, and stays undefined for a step that was already
-// done when it mounted, so a transcript read later shows no stray timer.
 export function useElapsed(active: boolean): number | undefined {
     const [seconds, setSeconds] = useState<number | undefined>(undefined)
     const startRef = useRef<number | null>(null)

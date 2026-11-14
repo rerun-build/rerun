@@ -10,8 +10,6 @@ import { mix, spacing } from '@/theme/tokens'
 import { ScreenLoader } from './ScreenLoader'
 import type { ScreenStatus } from './useAgentScreen'
 
-// What covers a 16:9 box until the screen paints, whatever its size: the block in the thread, the
-// floating thumbnail. The live screen under it is the caller's.
 export function ScreenFace({ status }: { status: ScreenStatus }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.screen')

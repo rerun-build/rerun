@@ -4,7 +4,6 @@ import { BUDDY_FACE_CENTER, BuddyFace } from './BuddyFace'
 import { BUDDY_STATE_COLOR, buddyColor, buddyEyes, buddyMouth, shade, type BuddyMood } from './buddy-look'
 import { GrowsFrom, RoundedBox, boxTop, leftWallPlane, type BoxGeometry } from './RoundedBox'
 
-// Drawn in a 100-unit box whose floor point is (50, 86), the centre of the block's bottom diamond.
 export const BUDDY_VIEW = { x: -16, y: -20, w: 132, h: 132 }
 const HALF_W = 40
 export const BUDDY_GEOMETRY: BoxGeometry = { base: { x: 50, y: 86 }, halfW: HALF_W, halfH: HALF_W / 2, depth: HALF_W * 2 * BUDDY_HEIGHT_RATIO, radius: 9 }
@@ -14,18 +13,12 @@ type BuddyArtProps = {
     id: string
     mood: BuddyMood
     look: BuddyLook
-    // Paints the whole block in one colour, top included: a placement ghost has no identity yet.
     plain?: string
     geometry?: BoxGeometry
-    // False paints the face flat, without the lit screen's gradients and filters: what a buddy
-    // drawn a few pixels wide needs to stay crisp.
     lit?: boolean
-    // Enlarges the face around its centre, on a wall tall enough to hold it.
     faceScale?: number
 }
 
-// Today's tile grown into a soft block with a face. At rest its top wears the agent's colour, the
-// only colour on it; at work, broken or waiting, the whole block takes the state's colour instead.
 export function BuddyArt({ uid, id, mood, look, plain, geometry = BUDDY_GEOMETRY, lit = !plain, faceScale = 1 }: BuddyArtProps) {
     const body = plain ?? BUDDY_STATE_COLOR[mood]
     const resting = mood === 'idle' || mood === 'asleep'

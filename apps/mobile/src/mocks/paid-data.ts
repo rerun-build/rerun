@@ -42,7 +42,6 @@ const emailCalls = EMAILS.map(({ full_name, domain, email, verdict }, i) =>
     )
 )
 
-// A lead hunt that bought from three sources: Google Maps read through a scraper, then two data vendors.
 export const PAID_DATA_TURN: UIMessage[] = [
     { id: 'paid-user', role: 'user', parts: [{ type: 'text', text: 'Find me restaurant owners in Lyon 2 with their work email.' }] },
     {

@@ -1,11 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-// What Linkup posts to /api/webhooks/linkup, signed per webhook, for every app alike. Pure, so the
-// route stays a thin shell over it and every rule here is tested. What an event means to a coworker
-// is each app's own reading, in its events.ts.
-
-// A delivery older than this is refused even with a valid signature: a captured request replayed
-// later must not wake a coworker again.
 export const SIGNATURE_TOLERANCE_SECONDS = 5 * 60
 
 export function verifyLinkupSignature(secret: string, timestamp: string, signature: string, rawBody: string, nowSeconds: number): boolean {
@@ -19,7 +13,6 @@ export function verifyLinkupSignature(secret: string, timestamp: string, signatu
 
 export type LinkupPerson = { name?: string; profile_url?: string; job_title?: string; subtitle?: string; message?: string; phone_number?: string; jid?: string; is_self_sent?: boolean }
 
-// `url` is LinkedIn's own link, private and short-lived: `download_url` is the one to follow.
 export type LinkupAttachment = {
     type?: string
     name?: string
@@ -75,8 +68,6 @@ export function parseEnvelope(rawBody: string): LinkupEnvelope | null {
 
 export type EnvelopeKind<E extends string = string> = { kind: 'wake'; event: E } | { kind: 'disconnection'; reason: string } | { kind: 'ignored' }
 
-// Older deliveries in the docs omit `event_id`: a hash of the body stands in, so a retry of the
-// same payload still dedupes.
 export function eventIdOf(envelope: LinkupEnvelope, rawBody: string, header: string | null): string {
     return envelope.event_id || header || createHmac('sha256', 'linkup-event').update(rawBody).digest('hex')
 }

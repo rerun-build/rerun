@@ -57,8 +57,6 @@ describe('remainingMicros', () => {
         expect(remainingMicros(budget({ budgetMicros: 5_000_000, usedMicros: 1_000_000, topupMicros: 0 }))).toBe(4_000_000)
     })
 
-    // consume_rerun_credit takes the top-up down as it spends it, so a spent budget must not be
-    // counted against it a second time: a signup allowance half spent still has its other half.
     it('does not charge a spent budget against the top-up', () => {
         expect(remainingMicros(budget({ budgetMicros: 0, usedMicros: 100_000, topupMicros: 400_000 }))).toBe(400_000)
         expect(hasRemainingBudget(budget({ budgetMicros: 0, usedMicros: 500_000, topupMicros: 0 }))).toBe(false)

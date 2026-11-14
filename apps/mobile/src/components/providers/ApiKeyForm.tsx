@@ -27,8 +27,6 @@ type ApiKeyFormProps = {
     onBack: () => void
 }
 
-// The web's AddProviderPage for a key: a name, the key, its guide folded under it. OpenRouter also
-// takes the base URL of a router of the user's own.
 export function ApiKeyForm({ entry, name, onName, apiKey, onApiKey, baseUrl, onBaseUrl, busy, error, onConnect, onBack }: ApiKeyFormProps) {
     const theme = useTheme()
     const [guideOpen, setGuideOpen] = useState(false)

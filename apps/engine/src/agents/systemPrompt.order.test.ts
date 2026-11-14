@@ -21,9 +21,6 @@ const { buildTools } = await import('../tools/registry.js')
 const { HITL_TOOL_NAMES, HITL_TOOL_SET } = await import('../tools/builtin/hitl.js')
 const { cardCallTiming, turnOrder } = await import('./turn-order.js')
 
-// Every runtime reads the same rules, so the one place that orders a turn is the only text allowed
-// to say whether the message or a call comes first. A Rerun alias reaches here already resolved to
-// the model the hub serves it with.
 const RUNTIMES = [
     ['rerun', 'anthropic/claude-haiku-5.5'],
     ['rerun', 'openai/gpt-6-sol'],
@@ -34,7 +31,6 @@ const RUNTIMES = [
     ['codex', 'gpt-6-sol'],
 ] as const
 type Provider = (typeof RUNTIMES)[number][0]
-// The big-spend rule stops "before the call that crosses" the credit line: that is about money, not about the turn.
 const ORDER_WORDING = /before (this|the) call(?! that crosses)|after (this|the) call|right before (writing )?(that|your) final message|call it first|produce no further output/i
 
 const quiet = { warn() {}, info() {}, error() {}, debug() {} }

@@ -14,8 +14,6 @@ function parseStored(raw: string | null): string[] {
     }
 }
 
-// The conversations left open on a coworker, kept on the device from one visit to the next, as the
-// web keeps its tabs.
 export function useOpenChats(agentId: string, sessionId: string | null): [string[], (id: string) => void] {
     const [openIds, setOpenIds] = useState<string[]>(() => (sessionId ? [sessionId] : []))
     const [loaded, setLoaded] = useState(false)

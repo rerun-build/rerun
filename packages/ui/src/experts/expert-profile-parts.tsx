@@ -21,8 +21,6 @@ export function ChipList({ title, items }: { title: string; items: string[] }) {
 
 const SOCIAL_ICONS = { xUrl: XIcon, linkedinUrl: LinkedInIcon, githubUrl: GitHubIcon, websiteUrl: GlobeIcon } as const
 
-// Every social URL is filled in by the expert on their own fiche, so these links are user generated
-// and must not pass any ranking signal. The profile states the same identities in its JSON-LD sameAs.
 export const SOCIAL_LINK_REL = 'noopener noreferrer nofollow ugc'
 
 export function SocialLinks({ expert }: { expert: Expert }) {

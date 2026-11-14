@@ -13,7 +13,6 @@ import { summarizePendingHitl } from './summary'
 
 const DECISION = '#f97316'
 
-// The web's scroll-to-bottom arrow grown into what the coworker is waiting for, down the thread.
 export function PendingHitlPill({ kind, input, onJump }: { kind: HitlKind; input: Record<string, unknown>; onJump: () => void }) {
     const t = useTranslations('mobileHitl')
     const theme = useTheme()

@@ -6,8 +6,6 @@ import { decideSkillProposal, fetchSkillProposals } from '@/api/chat'
 import { useAuth } from '@/auth/AuthProvider'
 import { translatorFor } from '@/i18n/translator'
 
-// The writing job is bounded on the engine, so the poll can follow it to the end: quick at first,
-// then relaxed for the minutes a CLI provider can take. The web's values.
 const POLL_QUICK_MS = 1500
 const POLL_RELAXED_MS = 10_000
 const POLL_QUICK_WINDOW_MS = 60_000
@@ -28,10 +26,6 @@ function reload(current: Loaded, sessionId: string, proposals: Map<string, Skill
     return { sessionId, proposals, pinnedIds: sameIds(held, next) ? held : next }
 }
 
-// The web's useSkillProposals: the rules a coworker offered to remember in one conversation, keyed by
-// their own id (the transcript finds a row through the id the tool returned). `pinned` is what the dock
-// above the composer holds, only what still waits on the person. Null `sessionId` for the Foreman,
-// which proposes none, and for a conversation not created yet.
 export function useSkillProposals(sessionId: string | null, busy: boolean) {
     const { session, me } = useAuth()
     const caller = useMemo(() => (session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null), [session, me])
@@ -59,7 +53,6 @@ export function useSkillProposals(sessionId: string | null, busy: boolean) {
         }
     }, [sessionId, caller, load])
 
-    // A proposal is raised during a turn, so a new row can only exist once one is over.
     const wasBusy = useRef(busy)
     useEffect(() => {
         if (wasBusy.current && !busy) refresh().catch(() => {})
@@ -79,15 +72,12 @@ export function useSkillProposals(sessionId: string | null, busy: boolean) {
         return () => clearTimeout(timer)
     }, [writing, refresh])
 
-    // An app that slept through the writing catches up the moment it is back in front.
     useEffect(() => {
         if (!writing) return
         const subscription = AppState.addEventListener('change', state => state === 'active' && refresh().catch(() => {}))
         return () => subscription.remove()
     }, [writing, refresh])
 
-    // A dismissed row stays up long enough to report its outcome where the person is looking, then
-    // goes back to its own place in the transcript.
     useEffect(() => {
         const timers = releaseTimers.current
         for (const id of settledPinnedIds(pinnedIds, proposals.values())) {
@@ -115,7 +105,6 @@ export function useSkillProposals(sessionId: string | null, busy: boolean) {
         }
     }, [])
 
-    // Oldest first, so the freshest proposal sits closest to the composer.
     const pinned = useMemo(() => [...proposals.values()].filter(proposal => pinnedIds.has(proposal.id)).sort((a, b) => a.createdAt.localeCompare(b.createdAt)), [proposals, pinnedIds])
 
     const decide = useCallback(

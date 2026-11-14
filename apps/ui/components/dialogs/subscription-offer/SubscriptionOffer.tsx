@@ -21,12 +21,9 @@ type SubscriptionOfferProps = {
     onKeys: (provider: AddableProvider, keys: Record<string, string>) => Promise<KeysResult>
     onSkip: () => void
     onDone: () => void
-    // Whether OpenCode can be offered as a third plan: its flag and the machine's engine both allow it.
     opencodeOffered?: boolean
 }
 
-// The left column of the offer. The board beside it is the dialog's aside, and stays put whatever
-// step this column is on.
 export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'claude', onPick, onKeys, onSkip, onDone, opencodeOffered = false }: SubscriptionOfferProps) {
     const [step, setStep] = useState<SubscriptionOfferStep>(initialStep)
     const [provider, setProvider] = useState<AddableProvider>(initialStep === 'claude' || initialStep === 'codex' ? initialStep : initialProvider)
@@ -46,7 +43,6 @@ export function SubscriptionOffer({ initialStep = 'offer', initialProvider = 'cl
         return result
     }
 
-    // A plan's own steps end on the connected state, so they stay on screen once the keys land.
     const savePlanKeys = (next: SubscriptionProvider) => (keys: Record<string, string>) => onKeys(next, keys)
 
     return (

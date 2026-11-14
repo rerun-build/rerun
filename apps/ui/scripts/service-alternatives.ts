@@ -4,25 +4,8 @@ import { ALTERNATIVE_THRESHOLD, MANUAL_ALTERNATIVE_MODEL } from '../lib/services
 import { createServiceRoleClient } from '../supabase/serviceRole'
 import { selectAll, selectMany } from '../supabase/supabase-helpers'
 
-// Maps each catalogue service to its alternatives (connectors that do the same job) with
-// TypeSafe's Jev decision model, called through OpenRouter's decisions endpoint.
-//
-//   ../engine/node_modules/.bin/tsx --env-file=.env scripts/service-alternatives.ts run <out.json> [slug...] [--write]
-//
-// Without slugs the whole catalogue is mapped. `--write` replaces the rows of every mapped service
-// in `service_alternatives`, except the pairs an admin set by hand; without it the run only prints
-// and dumps the report. Add
-// `--env-file=.env.profile.staging` after `.env` to target the staging project.
-//
-// Every service is rated against the whole catalogue, one Score question per other service,
-// packed into a few requests. A shortlist by embedding or by a Jev Choice was tried first: it
-// missed a real alternative (brevo -> lumail) for a quarter of the cost, which is negligible.
-// The relation is directed: Brevo replaces Mailchimp's transactional connector, not the reverse.
-
 const DECISIONS_URL = 'https://openrouter.ai/api/alpha/decisions'
 const MODEL = 'typesafe/jev-1.13'
-// Pairs between this floor and the threshold are kept so a reader can widen its cut-off or queue
-// them for review without a new run. Jev's answer to the same question drifts by about 0.08.
 const STORED_FLOOR = 0.3
 const PARALLEL_SERVICES = 6
 const MAX_ATTEMPTS = 4

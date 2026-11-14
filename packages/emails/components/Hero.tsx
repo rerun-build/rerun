@@ -11,14 +11,6 @@ import {
 } from "../assets";
 import { theme } from "../theme";
 
-// A reporting email opens on the icon stripe, a re-engagement email on a rendered scene, a
-// newsletter on the render drawn for that one issue: one of the three, never two, so they are the
-// three arms of the same prop. The stripe is the odd one out, a thin band of icons rather than a
-// picture, so it alone keeps its own dimensions.
-//
-// `board` is a capture of the reader's own workspace (/og/board), framed like a scene. It replaces
-// the stripe or the scene when the sender managed to have it captured before sending; the arm is
-// still given so a message whose capture did not come back keeps its usual picture.
 export type HeroProps =
   | { variant: HeroVariant; board?: string }
   | { scene: HeroScene; board?: string }

@@ -15,7 +15,6 @@ jest.mock('react-native-reanimated', () => ({
     },
 }))
 
-// The worklet calls back on the React Native thread, a microtask in Jest.
 async function keyboardMovesTo(state: KeyboardState) {
     mockKeyboardState.value = state
     if (!mockReaction) return

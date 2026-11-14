@@ -11,7 +11,6 @@ import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useLayoutEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
 
-// The reading column every brain page sits in, centred with the margins Notion gives a page.
 export function PageColumn({ children, className }: { children: ReactNode; className?: string }) {
     return <div className={cn('mx-auto w-full max-w-[720px] px-6 pb-24 pt-8 sm:px-12 sm:pt-12', className)}>{children}</div>
 }
@@ -29,7 +28,6 @@ type PageTitleProps = {
     onEnter?: () => void
 }
 
-// A heading you type into: no border, grows with what it holds, Enter moves on to the body.
 export function PageTitle({ value, autoFocus, readOnly, onChange, onCommit, onEnter }: PageTitleProps) {
     const t = useTranslations('brain.parts')
     const ref = useRef<HTMLTextAreaElement>(null)
@@ -79,8 +77,6 @@ export function PageProperty({ label, children }: { label: string; children: Rea
     )
 }
 
-// The sections the seed imported from the public web: the coworkers take them as a guess until a
-// person edits or confirms them.
 export function UnconfirmedSections({ headings, confirming, onConfirm }: { headings: string[]; confirming: boolean; onConfirm: () => void }) {
     const t = useTranslations('brain.parts')
     return (

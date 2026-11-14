@@ -10,14 +10,10 @@ import { Loader2Icon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-// Template titles are editorial and unbounded, so they are clamped before reaching a button.
 function short(title: string): string {
     return title.length > 40 ? `${title.slice(0, 39)}…` : title
 }
 
-// Shown when the user returns from Stripe checkout with something parked: a first-agent draft, or a
-// template opened through a shared link. Once the subscription is live (webhook applied the plan,
-// surfaced via realtime), starting claims a Space from the pool and lands the parked work inside it.
 export function PostPaymentDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('billing.postPayment')
     const { workspace } = useSession()
@@ -25,8 +21,6 @@ export function PostPaymentDialog({ open, onOpenChange }: { open: boolean; onOpe
     const pendingTemplate = useOnboardingStore(s => s.pendingTemplate)
     const [starting, setStarting] = useState(false)
 
-    // The plan is applied by the Stripe webhook, which can land a moment after the redirect. We wait
-    // for it to flow in (realtime) before letting the user start, so the claim isn't gated.
     const subscriptionReady = isSubscriptionEntitled(workspace?.subscription_status)
 
     const handleStart = async () => {
@@ -40,8 +34,6 @@ export function PostPaymentDialog({ open, onOpenChange }: { open: boolean; onOpe
         }
     }
 
-    // Une template parkée depuis sa fiche n'a jamais été placée : la suite est le board, pas une
-    // installation qui se ferait toute seule.
     const needsPlacement = !!pendingTemplate?.needsPlacement
     const readyDescription = pendingTemplate
         ? needsPlacement

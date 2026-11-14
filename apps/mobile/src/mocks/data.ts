@@ -1,6 +1,3 @@
-// Mock data for the design phase: no API is wired yet. Shapes follow what the hub already serves
-// (agents and their `sessions`), so swapping in /api/v1 later changes the source, not the UI.
-
 import { FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
 
 export type CoworkerStatus = 'idle' | 'working' | 'waiting_human' | 'error' | 'offline'
@@ -16,7 +13,6 @@ export type Coworker = {
     role: string
     status: CoworkerStatus
     unread: boolean
-    // Minutes ago, so the mock always reads as fresh.
     updatedMinutesAgo: number
     modelId: string
     suggestions: string[]
@@ -25,11 +21,9 @@ export type Coworker = {
 export type Session = {
     id: string
     coworkerId: string
-    // Null until the hub names it from the first message, like `generateSessionTitle` on the web.
     title: string | null
     messages: Message[]
     updatedMinutesAgo: number
-    // What a coworker in `waiting_human` asks; answered from the composer.
     pendingQuestion?: string
     run?: { phase: RunPhase; startedAt: number }
 }
@@ -142,7 +136,6 @@ export const sessions: Session[] = [
 
 const STATUS_RANK: Record<CoworkerStatus, number> = { waiting_human: 0, error: 1, working: 2, idle: 3, offline: 4 }
 
-// The Foreman first, then whoever needs you, then by recency.
 export function orderCoworkers(list: Coworker[]): Coworker[] {
     const foreman = list.filter(coworker => coworker.kind === 'foreman')
     const others = list.filter(coworker => coworker.kind === 'coworker').sort((a, b) => STATUS_RANK[a.status] - STATUS_RANK[b.status] || a.updatedMinutesAgo - b.updatedMinutesAgo)
@@ -153,12 +146,10 @@ export const CANNED_REPLIES = ['On it. I will come back to you here as soon as i
 
 export const MOCK_TRANSCRIPT = 'Can you check what is left to do on this before Friday?'
 
-// A spoken sentence's loudness, the shape a voice message keeps of itself.
 export const MOCK_VOICE_PEAKS = [0.1, 0.3, 0.55, 0.7, 0.45, 0.2, 0.6, 0.85, 0.9, 0.65, 0.4, 0.15, 0.08, 0.35, 0.7, 0.8, 0.55, 0.3, 0.5, 0.75, 0.6, 0.25, 0.1, 0.05, 0.3, 0.6, 0.9, 1, 0.7, 0.45, 0.3, 0.55, 0.65, 0.4, 0.2, 0.1, 0.45, 0.7, 0.5, 0.3, 0.6, 0.4, 0.2, 0.35, 0.25, 0.15, 0.08, 0.05]
 
 const TITLE_WORDS = 5
 
-// Stands in for the hub's title generation: the first words of the first message.
 export function mockTitle(text: string): string {
     const words = text
         .replace(/[^\p{L}\p{N}\s’'-]/gu, ' ')

@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils'
 
 const POLICY_ORDER: readonly PublishPolicy[] = ['people', 'anyone', 'never']
 
-// The policy as the workspace holds it, and the one picked in the form until it is saved.
 export function usePublishPolicyDraft(enabled: boolean) {
     const [settings, setSettings] = useState<PublishSettings | null>(null)
     const [draft, setDraft] = useState<PublishPolicy | null>(null)

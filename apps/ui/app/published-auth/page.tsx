@@ -28,8 +28,6 @@ function param(search: Search, key: string): string | undefined {
     return Array.isArray(value) ? value[0] : value
 }
 
-// The round trip a member makes to open a page of their workspace: the page's host never sees the
-// app's session, so the app proves membership here and hands that host a one-minute ticket.
 export default async function PublishedAuthPage({ searchParams }: { searchParams: Promise<Search> }) {
     const search = await searchParams
     const slug = param(search, 'slug')?.trim() ?? ''

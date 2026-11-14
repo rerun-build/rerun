@@ -1,26 +1,19 @@
 import { paidDataEntry, paidDataRouteMaxCostUsd, type PaidDataCapability } from '@rerun/contracts'
 
 const TREG_BASE_URL = 'https://treg.to'
-// A routed call walks its providers one after the other and polls an async one for up to 60
-// seconds before answering 202, so it needs well over a plain API call.
 const TIMEOUT_MS = 90_000
 
 export type TregOutcome = 'ok' | 'miss' | 'pending' | 'error'
 
 export type TregCall = {
-    // Null when Treg could not be reached at all.
     status: number | null
     outcome: TregOutcome
     costMicros: number
     servedBy: string | null
     callId: string | null
-    // `output` as Treg gave it, plus the notes Treg adds for the caller (verification, advice, ignored
-    // filters). The provider's raw answer is left out: it repeats `output` at several times the size.
     result: unknown
-    // The answer as Treg gave it, when asked for: the engine saves it so nothing paid is ever lost.
     full: TregFullAnswer | null
     error: string | null
-    // Treg's machine-readable reason, e.g. `route_max_cost`.
     errorCode: string | null
 }
 
@@ -41,23 +34,17 @@ function outcomeOf(capability: PaidDataCapability, body: TregBody, status: numbe
 
 const asText = (value: unknown): string | null => (typeof value === 'string' ? value : null)
 
-// Treg answers its own errors either flat or under `detail`, a string or an object.
 function errorOf(body: TregBody | null, status: number): { error: string; errorCode: string | null } {
     const detail = (body?.detail && typeof body.detail === 'object' ? body.detail : {}) as TregDetail
     const errorCode = asText(body?.error) ?? asText(detail.error)
     return { error: asText(detail.message) ?? asText(body?.message) ?? asText(body?.detail) ?? errorCode ?? `Treg answered ${status}`, errorCode }
 }
 
-// What Treg paid its providers stays out of anything the coworker or the user reads: they are billed
-// in credits, at a price of our own.
 function withoutCost(value: unknown): unknown {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return value
     return Object.fromEntries(Object.entries(value).filter(([key]) => !/(cost|charge|price)/i.test(key)))
 }
 
-// A provider's raw answer can carry its own bill too (`cost`, `creditsCharged`, `credits_remaining`),
-// at any depth. A key is read word by word: it goes when every word is about billing, and stays as
-// soon as one word is data, so `Credit cards`, `billing_address` or `cost_of_living` are kept.
 const BILLING_WORDS = new Set(['cost', 'costs', 'credit', 'credits', 'charge', 'charged', 'charges', 'billing', 'billed', 'quota'])
 const BILLING_MODIFIERS = new Set(['remaining', 'used', 'consumed', 'job', 'info', 'micros', 'total', 'amount', 'per', 'call', 'request', 'unit', 'currency', 'usd', 'balance', 'left'])
 
@@ -92,7 +79,6 @@ type TregRowsNote = { asked: number; returned: number; total?: number }
 
 type Shown = { output: Record<string, unknown> | null; rows?: TregRowsNote; omittedFields?: string[] }
 
-// Each row cut down to the fields the catalog shows, with the names of those it left in the full answer.
 function withShownFields(list: unknown[], fields: readonly string[]): { list: unknown[]; omittedFields: string[] } {
     const omitted = new Set<string>()
     const shown = list.map(row => {
@@ -103,9 +89,6 @@ function withShownFields(list: unknown[], fields: readonly string[]): { list: un
     return { list: shown, omittedFields: [...omitted] }
 }
 
-// A provider that ignores `limit` answers with its own page size: a caller that takes the full
-// answer sees the rows it asked for and is told about the rest, which stays in that full answer. A
-// caller that does not gets every row it was billed for, every field of them too.
 function shownOutput(capability: PaidDataCapability, output: Record<string, unknown> | undefined, asked: number | undefined, full: boolean): Shown {
     const { missField: field, shownFields } = paidDataEntry(capability)
     const list = output?.[field]
@@ -125,7 +108,6 @@ function resultOf(capability: PaidDataCapability, body: TregBody, asked: number 
     return { output, verification, advice, ignoredFilters, ...(rows ? { rows } : {}), ...(omittedFields ? { omittedFields } : {}) }
 }
 
-// Returns null when no token is configured: the caller has nothing to call Treg with.
 export async function callTregCapability(
     capability: PaidDataCapability,
     params: Record<string, unknown>,
@@ -135,11 +117,9 @@ export async function callTregCapability(
     const token = process.env.TREG_API_TOKEN
     if (!token) return null
 
-    // Set here and never by the model: it is what lets Treg's usage be reconciled per workspace.
     const meta = [`customer=ws_${tags.workspaceId}`, tags.agentId ? `agent=${tags.agentId.replace(/[^\w-]/g, '_')}` : null].filter(Boolean).join(', ')
 
     try {
-        // The ceiling bounds the whole provider waterfall: a provider past it is refused unbilled.
         const routeHeaders: Readonly<Record<string, string>> = paidDataEntry(capability).routeHeaders ?? {}
         const asked = options.full ? askedRows(capability, params) : undefined
         const res = await fetch(`${TREG_BASE_URL}/call/treg.${capability}`, {

@@ -5,7 +5,6 @@ import { useId } from 'react'
 import { Field } from '@/components/ui/field'
 import { IntakeField } from './IntakeField'
 
-/** The last question, a name. Nothing to pick from, so nothing but the field. */
 export function IntakeTextStep({ label, value, placeholder, disabled, onChange, onEnter }: { label: string; value: string; placeholder: string; disabled?: boolean; onChange: (value: string) => void; onEnter: () => void }) {
     const id = useId()
     return (

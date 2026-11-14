@@ -10,13 +10,10 @@ import { useState, type ReactNode } from 'react'
 type EditableCellProps = {
     value: unknown
     column: FriendlyColumn
-    /** A display format the active view chose: it wins over the kind guessed for the column. */
     format?: string
     context: CellContext
     currency?: string
-    /** Absent when the row cannot be written back, e.g. a table without rowid. */
     onCommit?: (text: string) => Promise<boolean>
-    /** Shown after the value, outside its truncation, e.g. the check of an email. */
     adornment?: ReactNode
 }
 

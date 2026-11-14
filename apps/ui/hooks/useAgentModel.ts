@@ -2,23 +2,12 @@
 
 import { useCallback, useSyncExternalStore } from 'react'
 
-// Per-agent model selection used as a per-message override. Kept in localStorage
-// and shared across mounted instances (the in-chat ModelSelector and the chat
-// transport) via a tiny external store so a switch takes effect on the very next
-// message without mutating the agent's persisted default config.
-//
-// An empty selection ({}) means "no override" — the engine falls back to the
-// agent's configured connection and model.
-
 export type ModelSelection = { connectionId?: string; model?: string }
 
 function storageKey(agentId: string) {
     return `rerun-agent-model-${agentId}`
 }
 
-// A selection written before credentials moved to the Box named a provider, not a connection, and
-// there is no telling which of two Claude subscriptions it meant. Dropped rather than guessed: the
-// agent falls back to its own default on the next message.
 function load(agentId: string): ModelSelection {
     if (typeof window === 'undefined') return {}
     try {
@@ -76,7 +65,6 @@ function subscribe(agentId: string, listener: () => void) {
     }
 }
 
-// For a transport building its body at send time, outside of any render.
 export function readAgentModel(agentId: string): ModelSelection {
     return getSnapshot(agentId)
 }

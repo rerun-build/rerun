@@ -6,7 +6,6 @@ const DAY = 24 * HOUR
 
 const START = new Date('2026-10-10T14:00:00.000Z')
 const TRIAL_ENDS_AT = new Date(START.getTime() + 5 * DAY)
-// The Getting Started reward adds three days to a running trial.
 const EXTENDED_ENDS_AT = new Date(START.getTime() + 8 * DAY)
 
 const at = (hours: number) => new Date(START.getTime() + hours * HOUR)

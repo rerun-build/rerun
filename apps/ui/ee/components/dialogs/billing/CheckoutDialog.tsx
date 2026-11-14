@@ -44,8 +44,6 @@ import { BilledFlow, CardOnFile, Headline, IntervalToggle, PayFooter, PayHeader,
 import { StripeCheckoutProvider, StripePaymentFields, StripePaymentFieldsSkeleton, StripePromoCode } from './StripeCheckout'
 import { usePlanQuote } from './usePlanQuote'
 
-// The yearly price is what the dialog opens on, as designed; the toggle is one click away. Not during
-// a trial: subscribing ends it and bills today, and a year upfront is not what a trial user expects.
 const DEFAULT_INTERVAL: BillingInterval = 'yearly'
 const OUTCOME_POLL_MS = 2_000
 const OUTCOME_TIMEOUT_MS = 30_000
@@ -55,8 +53,6 @@ type Done = 'paid' | 'card_saved' | 'trial_started' | 'restoring'
 
 const DAY_MS = 86_400_000
 
-// A plan already running keeps its add-ons: an app slot put on during the trial would otherwise be
-// dropped by the change that ends it.
 function selectionOf(interval: BillingInterval, current?: AddonQuantities): PlanSelection {
     return { quantities: current ?? ZERO_QUANTITIES, interval }
 }
@@ -66,7 +62,6 @@ function billedLabel(t: BillingTranslator, interval: BillingInterval, priceArm: 
     return t.rich(interval === 'yearly' ? 'parts.interval.perYear' : 'parts.interval.perMonth', { amount: () => amount })
 }
 
-// A year from now reads with its year: "Oct 2" alone would read as today.
 function invoiceDateLabel(interval: BillingInterval, locale: string): string {
     const date = nextInvoiceDate(interval)
     return interval === 'yearly' ? longDate(date, locale) : shortDate(date, locale)
@@ -98,7 +93,6 @@ export function CheckoutDialog({
     const parkedTemplate = useOnboardingStore(s => s.pendingTemplate)
     const parked = useOnboardingStore(s => hasPendingStart(s))
     const startPending = useStartPending()
-    // A subscription keeps the price it was sold at; before there is one, the workspace's arm prices it.
     const workspacePriceArm = usePriceArm()
     const priceArm = state?.priceArm ?? workspacePriceArm
 
@@ -106,7 +100,6 @@ export function CheckoutDialog({
     const [interval, setBillingInterval] = useState<BillingInterval>(fixedPlan || workspace?.subscription_status === 'trialing' ? 'monthly' : DEFAULT_INTERVAL)
     const [done, setDone] = useState<Done | null>(null)
     const [placing, setPlacing] = useState(false)
-    // Sent here by the trial's coworker cap: what lifts it is paying now, so the dialog opens on that.
     const [payNow, setPayNow] = useState(() => route.variant === 'trial_card' && useBillingStore.getState().trigger === AGENT_LIMIT_TRIGGER)
     const [usageOpen, setUsageOpen] = useState(false)
     const [newCard, setNewCard] = useState(false)
@@ -115,7 +108,6 @@ export function CheckoutDialog({
     const credit = useCreditUsage({ enabled: workspace?.subscription_status === 'trialing' })
     const [openedAt] = useState(() => Date.now())
 
-    // A card trial opens on the trial itself, nothing due today: paying before its end is one step further.
     const trialView = route.variant === 'trial_card' && !payNow
     const planFixed = fixedPlan || trialView
     const trialEndsAt = workspace?.trial_ends_at ? new Date(workspace.trial_ends_at) : null
@@ -137,25 +129,19 @@ export function CheckoutDialog({
     const copy = checkoutCopy(t, route.variant === 'trial_card' && payNow ? 'trial_card_pay_now' : route.variant, context)
     const selection = selectionOf(interval, state?.quantities)
 
-    // On a trial, more credit comes with Pro: the card's button leads to paying now, or back to the
-    // pane that already sells it.
     const startProNow = () => {
         setUsageOpen(false)
         if (route.variant === 'trial_card') setPayNow(true)
     }
 
     const finish = async (outcome: Done) => {
-        // The stopped task picks back up behind the dialog, whether it is then closed or clicked through.
         if (outcome === 'paid') upgrade?.onPaid?.()
         await refreshWorkspace()
         onChanged()
-        // Arrived on a template or a shared coworker: the column installs it the moment the plan is
-        // on, so the dialog gets out of the way instead of asking for a click that starts nothing.
         if (useForemanStore.getState().arrival) return onClose()
         setDone(outcome)
     }
 
-    // Once paid, the trial badge would count down days of a trial that just ended.
     const intro = <Headline badge={done === 'paid' ? undefined : copy.badge} title={copy.title} subtitle={copy.subtitle} />
     const left = (
         <>
@@ -256,7 +242,6 @@ function successCopy(t: BillingTranslator, done: Done, { interval, priceArm, tri
     }
 }
 
-// Paying from a chat that ran out of trial credit: what came with Pro, and the way back to the task.
 function creditUnlockedCopy(t: BillingTranslator, interval: BillingInterval, priceArm: PriceArm, upgrade: BillingUpgrade | null, locale: string) {
     return {
         title: t('checkout.success.paid.title'),
@@ -280,12 +265,8 @@ function creditUnlockedCopy(t: BillingTranslator, interval: BillingInterval, pri
 
 type PaneCopy = { cta: string; payCta?: (amount: string) => string; refusal?: (message: string) => string; footnote?: string }
 
-// --- A new subscription: the plan Checkout, the card form in this column ---
-
 type SessionState = { clientSecret: string; sessionId: string } | { error: string } | null
 
-// The server decides whether the session carries the trial, so "$0 due today" is read off the session
-// it created rather than off the variant the browser guessed.
 type PlanSessionState = { clientSecret: string; sessionId: string; trial: boolean } | { error: string } | null
 
 function SubscribePane({ selection, priceArm, copy, onDone, onTrialRefused }: { selection: PlanSelection; priceArm: PriceArm; copy: PaneCopy; onDone: (trialStarted: boolean) => void; onTrialRefused: () => void }) {
@@ -325,7 +306,6 @@ function SubscribeForm({
     onTrialRefused,
 }: {
     sessionId: string
-    // The selection the session was created with: anything picked since is still to be sent.
     sessionSelection: PlanSelection
     selection: PlanSelection
     priceArm: PriceArm
@@ -348,12 +328,6 @@ function SubscribeForm({
     const key = JSON.stringify(selection)
     const stale = syncedKey !== key
 
-    // The interval toggle moves the session's line items; Stripe recomputes the totals and
-    // `runServerUpdate` reloads them. A selection counts as synced only once Stripe has it: until then
-    // the pay button stays off, so what is confirmed is always what is shown. `runServerUpdate`
-    // hands back a new `checkout` mid-flight, which re-runs this effect: the in-flight guard keeps it
-    // from sending the same selection twice, and `updating` in the deps lets a selection moved
-    // during the flight go out once it lands. A failed selection waits for a retry or a new one.
     useEffect(() => {
         if (trial || checkout.type !== 'success' || !stale || failedKey === key || inFlight.current) return
         const timer = setTimeout(async () => {
@@ -386,12 +360,9 @@ function SubscribeForm({
     const loaded = checkout.type === 'success' ? checkout.checkout : null
     const interval = selection.interval
     const amount = trial ? usd(0) : <UsdFlow cents={loaded?.total.total.minorUnitsAmount ?? planPriceCents(selection.quantities, interval, priceArm)} />
-    // The price after the trial follows a promotion code; without one it stays the list price.
     const nextInvoice = loaded?.discountAmounts?.length ? loaded.recurring?.dueNext : null
     const afterTrialCents = nextInvoice ? Math.max(0, nextInvoice.subtotal.minorUnitsAmount - nextInvoice.discount.minorUnitsAmount) : planPriceCents(selection.quantities, 'monthly', priceArm)
 
-    // Recorded when the box is ticked, never on the pay click: Safari only opens the Apple Pay sheet
-    // inside the tap itself, so nothing may be awaited between that tap and `confirm`.
     const acceptTerms = async (checked: boolean) => {
         setAccepted(checked)
         if (!checked) return
@@ -456,8 +427,6 @@ function SubscribeForm({
     )
 }
 
-// The webhook writes the entitlement, so a confirmed payment is followed by a read until it lands.
-// Past the timeout the payment went through all the same: the board catches up through realtime.
 async function awaitOutcome(sessionId: string): Promise<'entitled' | 'trial_refused' | 'pending'> {
     const deadline = Date.now() + OUTCOME_TIMEOUT_MS
     while (Date.now() < deadline) {
@@ -467,8 +436,6 @@ async function awaitOutcome(sessionId: string): Promise<'entitled' | 'trial_refu
     }
     return 'pending'
 }
-
-// --- A trial without a card: the card form, then paying now or at the end of the trial ---
 
 function CardFormPane({ selection, priceArm, copy, trialEnds, onDone }: { selection: PlanSelection; priceArm: PriceArm; copy: PaneCopy; trialEnds: string | null; onDone: (outcome: 'paid' | 'card_saved') => void }) {
     const [session, setSession] = useState<SessionState>(null)
@@ -553,8 +520,6 @@ function CardForm({ sessionId, selection, priceArm, copy, trialEnds, onDone }: {
         </>
     )
 }
-
-// --- A trial with a card: the right column is the bill, paying is one click ---
 
 function CardOnFilePane({
     selection,
@@ -646,8 +611,6 @@ function CardOnFilePane({
         </>
     )
 }
-
-// --- A trial with a card, as opened from the pill: what it costs today, when the card is charged ---
 
 function TrialPane({
     state,

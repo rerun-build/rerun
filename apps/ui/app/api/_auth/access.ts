@@ -6,30 +6,16 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { getSessionWorkspace } from '@/supabase/session/getServerSession'
 import { selectAll, selectMany, selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
 
-// Access by Box. A person reaches a Box, and therefore every coworker in it, or does not; a coworker
-// carries no access of its own. This file is the server's copy of the rule; the database holds the
-// same one in `visible_space_ids()` / `manageable_space_ids()` for RLS, and the board store a third
-// for the buttons. All three must answer the same thing.
-//
-//   admin                                    -> manage
-//   a `space_members` row                    -> its level (use | manage)
-//   scope `all` and the Box open to everyone -> use
-//   otherwise                                -> none
-
 export type BoxAccess = 'none' | 'use' | 'manage'
 export type AccessLevel = 'use' | 'manage'
 export type SpaceVisibility = 'workspace' | 'restricted'
 
-// Who is asking. A person signed in, or the workspace itself: an API key, the onboarding, a foreman
-// turn with no person behind it. The workspace stands for its admins, so it reaches every Box.
 export type Actor = { kind: 'user'; userId: string; workspaceId: number; role: WorkspaceRole; boxScope: BoxScope } | { kind: 'workspace'; workspaceId: number }
 
 export const BOX_MANAGE_ONLY = 'boxManagerOnly' satisfies ErrorCode
 export const COWORKER_NOT_FOUND = 'coworkerNotFound' satisfies ErrorCode
 export const BOX_NOT_FOUND = 'boxNotFound' satisfies ErrorCode
 
-// Reached the resource but may not do this to it. The v1 API answers it with a 403, where any other
-// AuthorizationError past authentication reads as a 404.
 export class AccessDeniedError extends AuthorizationError {
     constructor(code: ErrorCode = BOX_MANAGE_ONLY) {
         super(code)
@@ -37,8 +23,6 @@ export class AccessDeniedError extends AuthorizationError {
     }
 }
 
-// For an action that answers with a result rather than a throw: which refusal it folded in, so the
-// v1 route hands back the 403 or 404 a thrown one would have. Nothing for any other error.
 export type DeniedCode = 'forbidden' | 'not_found'
 
 export function deniedCode(err: unknown): DeniedCode | undefined {
@@ -67,7 +51,6 @@ export function isAdminActor(actor: Actor): boolean {
     return actor.kind === 'workspace' || actor.role === 'admin'
 }
 
-// The signed-in caller as an actor, in a single read: the membership row the session already proves.
 export async function requireLightSessionActor(): Promise<Actor> {
     const { user, workspaceRefused, membership } = await getSessionWorkspace()
     if (workspaceRefused) throw new AuthorizationError('notMember')
@@ -75,7 +58,6 @@ export async function requireLightSessionActor(): Promise<Actor> {
     return { kind: 'user', userId: user.id, workspaceId: user.workspace_id, role: membership.role, boxScope: toBoxScope(membership.box_scope) }
 }
 
-// The rule itself, with every input already read. Pure, so the matrix is tested without a database.
 export function boxAccessOf(actor: Actor, space: { workspace_id: number; visibility: string | null }, grant: AccessLevel | null): BoxAccess {
     if (space.workspace_id !== actor.workspaceId) return 'none'
     if (isAdminActor(actor)) return 'manage'
@@ -106,8 +88,6 @@ export async function readSpaceAccess(actor: Actor, spaceId: string): Promise<Bo
     return spaceAccessFor(actor, space)
 }
 
-// Throws the way the caller expects: a Box the actor cannot see does not exist, a Box it only uses
-// refuses the change with a reason it can show.
 export function enforce(have: BoxAccess, need: AccessLevel, notFound: ErrorCode): void {
     if (have === 'none') throw new AuthorizationError(notFound)
     if (!hasAccess(have, need)) throw new AccessDeniedError()
@@ -130,8 +110,6 @@ export async function assertAgentAccess(agentId: string, need: AccessLevel, acto
     return { actor: resolved, access, agent }
 }
 
-// Every Box of the workspace with the actor's level on it, in two reads. The lists and the board use
-// it; a single Box goes through spaceAccessFor.
 export async function spaceAccessMap(actor: Actor): Promise<Map<string, BoxAccess>> {
     const supabase = createServiceRoleClient()
     const grantsRead = actor.kind === 'user' && actor.role !== 'admin' ? selectMany(supabase, 'space_members', ['space_id', 'access'] as const, { user_id: actor.userId, workspace_id: actor.workspaceId }) : Promise.resolve({ data: [] })
@@ -140,7 +118,6 @@ export async function spaceAccessMap(actor: Actor): Promise<Map<string, BoxAcces
     return new Map((spaces ?? []).map(space => [space.id, boxAccessOf(actor, space, grantBySpace.get(space.id) ?? null)]))
 }
 
-// 'all' when nothing needs filtering (an admin, or the workspace), otherwise the ids.
 export async function visibleSpaceIds(actor: Actor): Promise<'all' | Set<string>> {
     if (isAdminActor(actor)) return 'all'
     const map = await spaceAccessMap(actor)
@@ -161,9 +138,6 @@ export async function visibleAgentIds(actor: Actor): Promise<'all' | Set<string>
     return new Set((agents ?? []).map(agent => agent.id))
 }
 
-// For a run started in someone's name: the engine ids of the coworkers they reach, which the engine
-// narrows `call_agent` to. Undefined when they reach every Box, so the engine offers the whole
-// machine as before.
 export async function callableEngineAgentIds(actor: Actor): Promise<string[] | undefined> {
     if (isAdminActor(actor)) return undefined
     const map = await spaceAccessMap(actor)
@@ -182,15 +156,10 @@ export function keepVisible<T>(rows: T[], visible: 'all' | Set<string>, idOf: (r
     })
 }
 
-// Asserts the caller reaches the agent at the level asked. Returns the row so callers don't fetch it
-// twice. Replaces the workspace-only check: reaching the workspace no longer means reaching the Box.
 export async function assertAgentInWorkspace(agentId: string, need: AccessLevel = 'use', actor?: Actor): Promise<{ workspace_id: number; space_id: string; engine_agent_id: string | null }> {
     return (await assertAgentAccess(agentId, need, actor)).agent
 }
 
-// For an OAuth callback, which lands in a popup that names no workspace: the agent names its own,
-// held to the caller's membership like a workspace a tab names. Connecting an app to a coworker
-// changes what it is, so it takes `manage` on its Box.
 export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel = 'manage'): Promise<number> {
     const { user } = await getSessionWorkspace()
     if (!user?.id) throw new UnauthenticatedError()
@@ -205,9 +174,6 @@ export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel
 
 type OwnedSession = { id: string; agent_id: string; engine_session_id: string | null; engine_agent_id: string | null }
 
-// Asserts a session belongs to an agent the caller can use (session -> agent -> Box), mirroring the
-// RLS policy on sessions. The session, its agent and its Box come back in one read. `actor` is
-// passed in by a caller that already started resolving it.
 export async function assertSessionInWorkspace(sessionId: string, actor?: Promise<Actor> | Actor): Promise<OwnedSession> {
     const [callerActor, session] = await Promise.all([actor ?? requireLightSessionActor(), readSessionWithAgent(sessionId)])
     if (!session?.agent || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('sessionNotFound')
@@ -220,15 +186,12 @@ async function readSessionWithAgent(sessionId: string) {
         createServiceRoleClient(),
         'sessions',
         ['id', 'agent_id', 'engine_session_id'] as const,
-        // Named, because origin_agent_id points at agents too.
         { agent: { table: 'agents', foreignKey: 'agents!sessions_agent_id_fkey', columns: ['workspace_id', 'space_id', 'engine_agent_id'] } } as const,
         { id: sessionId },
     )
     return data
 }
 
-// A member named by something the hub signed (a foreman turn's token), held to their membership
-// as it stands now: someone who left since the token was minted reaches nothing.
 export async function memberActor(workspaceId: number, userId: string): Promise<Actor | null> {
     const { data: membership } = await selectMaybeSingle(createServiceRoleClient(), 'workspace_members', ['role', 'box_scope'] as const, { user_id: userId, workspace_id: workspaceId })
     if (!membership) return null

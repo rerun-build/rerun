@@ -49,7 +49,6 @@ function billed(cents: number, interval: BillingInterval, t: BillingTranslator):
     return t(interval === 'yearly' ? 'plan.billed.yearly' : 'plan.billed.monthly', { price: usd(cents) })
 }
 
-// What the plan bills each interval at `quantities`, with the legacy price and the promos it keeps.
 function planBillCents(state: SubscriptionState, quantities: AddonQuantities, interval: BillingInterval): number {
     return Math.max(0, planPriceCents(quantities, interval, state.priceArm) - planDiscountCents(state, interval))
 }
@@ -61,7 +60,6 @@ function statusOf(state: SubscriptionState, locale: string, t: BillingTranslator
     return { label: t('plan.status.active'), tone: 'green' }
 }
 
-// `appSlots` stands in for the fetched accounts, for the lab only.
 export function PlanDialog({
     state,
     highlightAddon,
@@ -297,7 +295,6 @@ function OverviewPane({
     )
 }
 
-// What switching the billing or the app slots would do, quoted before anything is applied.
 function ChangePane({
     state,
     currentBillCents,
@@ -441,8 +438,6 @@ function CancelPendingPane({ state, currentBillCents, onResumed }: { state: Subs
         </>
     )
 }
-
-// --- The card: a setup session in the app's own UI, for a new card or a failed payment ---
 
 function useSetupSession(): { clientSecret: string; sessionId: string } | { error: string } | null {
     const [session, setSession] = useState<{ clientSecret: string; sessionId: string } | { error: string } | null>(null)
@@ -594,7 +589,6 @@ function invoiceStatusLabel(status: string, t: ReturnType<typeof useTranslations
     return known ? t(`status.${known}`) : status
 }
 
-// Rerun credit is a monthly quantity on the plan: each pack adds its credit every month.
 function CreditPane({ state, onBack, onDone }: { state: SubscriptionState; onBack: () => void; onDone: (success: Success) => void }) {
     const t = useTranslations('billing')
     const errorText = useErrorText()

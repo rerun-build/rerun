@@ -4,7 +4,6 @@ import { assertPathId } from '@/app/api/v1/_lib/path-ids'
 
 export const dynamic = 'force-dynamic'
 
-// One task of a delegation stopped, the rest of the run carries on.
 export const POST = apiRoute({ auth: 'member' }, async ({ params }) => {
     const runId = assertPathId(params.runId, 'Run not found')
     const taskId = assertPathId(params.taskId, 'Task not found')

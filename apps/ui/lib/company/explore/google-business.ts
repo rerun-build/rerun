@@ -24,7 +24,6 @@ export type GooglePlace = {
     reviews?: { text?: string | null; stars?: number; publishedAtDate?: string }[]
 }
 
-// `website` is how we know the place is this company and not a namesake down the road.
 export type GoogleBusinessFindings = { query: string; location: string | null; matchesWebsite: boolean; place: GooglePlace }
 
 const KEPT_FIELDS = [
@@ -70,7 +69,6 @@ export const googleBusinessCollector: Collector<'googleBusiness'> = {
                 maxReviews: 5,
                 scrapeReviewsPersonalData: false,
             },
-            // A name with no local business behind it sends the scraper wandering the map for minutes.
             { limit: 1, waitSecs: 75 }
         )
         if (!items[0]) throw new CollectorSkipped(`Aucune fiche Google pour « ${query} »`)

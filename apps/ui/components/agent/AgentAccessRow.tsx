@@ -14,7 +14,6 @@ import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-// Access is read from the coworker and set on its Box: the row only says who reaches it.
 export function AgentAccessRow({ agent }: { agent: Pick<IsoAgent, 'id' | 'spaceId'> }) {
     const t = useTranslations('agent')
     const tSummary = useTranslations('agent.accessSummary')

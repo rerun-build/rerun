@@ -18,14 +18,9 @@ type PhoneNumberInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value'
     onCountryChange: (country: CountryCode) => void
 }
 
-// One field for the whole number. The calling code on the left is text, and the search field of its
-// own list: a click puts the caret in it and drops the countries underneath, digits or a name narrow
-// them, a complete code settles by itself. It also follows what is typed in the number, so `+32…`
-// or a pasted international number flips the country.
 export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputProps>(({ label, labelTrailing, value, onChange, country, onCountryChange, onKeyDown, disabled, ...props }, ref) => {
     const t = useTranslations('ui.phone')
     const listId = useId()
-    // Null while the code is at rest, a string (possibly empty) while it is being searched.
     const [query, setQuery] = useState<string | null>(null)
     const [activeIndex, setActiveIndex] = useState(0)
     const boxRef = useRef<HTMLDivElement>(null)
@@ -64,7 +59,6 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
             setActiveIndex(index => Math.max(0, Math.min(matches.length - 1, index + step)))
         }
         if (event.key === 'Enter') {
-            // Prevented even with nothing to pick: Enter in the code must not submit the form.
             event.preventDefault()
             const active = matches[activeIndex]
             if (active) pick(active.code)
@@ -79,8 +73,6 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
         onKeyDown?.(event)
         if (event.defaultPrevented) return
         if (event.key === 'Enter') {
-            // The code is a second text field, and a browser only submits on Enter by itself when a
-            // form without a submit button holds a single one.
             event.preventDefault()
             event.currentTarget.form?.requestSubmit()
             return
@@ -96,7 +88,6 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
         const read = readTypedPhone(typed, country)
         if (read.country !== country) onCountryChange(read.country)
         if (read.phone !== typed) return onChange(read.phone)
-        // Reformatting a deletion or an edit in the middle would fight the caret.
         const appending = typed.length > value.length && event.target.selectionStart === typed.length
         onChange(appending ? formatAsTyped(typed, country) : typed)
     }
@@ -113,7 +104,6 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
                             <span ref={dialogProbeRef} key={country} aria-hidden className="animate-in text-base leading-none duration-200 fade-in-0 slide-in-from-bottom-1">
                                 {countryFlag(country)}
                             </span>
-                            {/* The hidden twin gives the code its width, the input lies over it. */}
                             <span className="relative inline-grid border-b border-dotted border-transparent transition-colors duration-200 group-hover:border-muted-foreground group-focus-within:border-primary">
                                 <span aria-hidden className="invisible whitespace-pre tabular-nums">
                                     {query || currentCode}
@@ -170,7 +160,6 @@ export const PhoneNumberInput = forwardRef<HTMLInputElement, PhoneNumberInputPro
                                 key={candidate.code}
                                 role="option"
                                 aria-selected={index === activeIndex}
-                                // Keeps the caret in the code: a blur would close the list before the click lands.
                                 onMouseDown={event => event.preventDefault()}
                                 onMouseMove={() => setActiveIndex(index)}
                                 onClick={() => pick(candidate.code)}

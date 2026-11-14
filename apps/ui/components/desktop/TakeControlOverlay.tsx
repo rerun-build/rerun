@@ -2,7 +2,6 @@
 
 import { MousePointer2Icon } from '@/lib/icons'
 
-// Covers a screen whose parent is a `group`: hovering it darkens the screen and names what a click does.
 export function TakeControlOverlay({ label, onClick }: { label: string; onClick: () => void }) {
     return (
         <button

@@ -18,20 +18,15 @@ function jwt(claims: Record<string, unknown>): string {
     return `header.${body}.signature`
 }
 
-// An access token that is still comfortably valid, so ensureCodexAuth never tries to refresh.
 const FRESH_TOKEN = jwt({ exp: Math.floor(Date.now() / 1000) + 3600 })
 
 type Connection = NonNullable<Parameters<typeof ensureCodexAuth>[0]>
 
-// A far-off expiry by default: without it ensureCodexAuth treats the token as stale and reaches out
-// to the real OAuth endpoint.
 function connection(env: Record<string, string>): Connection {
     const withExpiry = env.CODEX_OAUTH_TOKEN ? { CODEX_OAUTH_EXPIRES_AT: String(Date.now() + 3_600_000), ...env } : env
     return { id: CONNECTION_ID, config: connectionConfigSchema.parse({ name: 'codex', provider: 'codex', createdAt: new Date().toISOString() }), env: withExpiry }
 }
 
-// A valid token must never cost a round trip to OpenAI; this catches a regression that would make
-// every run refresh.
 let fetchCalls = 0
 const realFetch = globalThis.fetch
 globalThis.fetch = (...args: Parameters<typeof realFetch>) => {
@@ -98,7 +93,6 @@ describe('syncCodexAuth', () => {
         expect(live.env.CODEX_OAUTH_REFRESH_TOKEN).toBe('refresh-2')
         expect(live.env.CODEX_OAUTH_ACCOUNT_ID).toBe('acct-2')
 
-        // A stale refresh token on disk would fail the next run, so it has to reach the .env too.
         const persisted = await readEnvFile(connectionEnvPath(CONNECTION_ID))
         expect(persisted.CODEX_OAUTH_TOKEN).toBe(rotated)
         expect(persisted.CODEX_OAUTH_REFRESH_TOKEN).toBe('refresh-2')

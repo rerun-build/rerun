@@ -1,7 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
-// Shaped on CreatorPayoutsPanel: header, status card, then the three how-it-works rows, so nothing
-// moves when the account lands.
 export function CreatorPayoutsPanelSkeleton() {
     return (
         <div className="flex min-h-0 flex-1 flex-col gap-5 p-5">

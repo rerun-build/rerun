@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# Gives each Paseo worktree its own block of 10 ports, the way Conductor's $CONDUCTOR_PORT did:
-# ui on the base, landing +1, Metro +2, emails +3, admin +4. `pnpm verify:ui` and `pnpm dev:mobile`
-# read the base from CONDUCTOR_PORT, which the setup of paseo.json writes into the worktree's
-# .claude/settings.local.json for the agents.
-#
-#   workspace-port.sh            the base port of this worktree, claiming a free block on the first call
-#   workspace-port.sh <service>  the port of one service (Paseo calls it as worktree.servicePorts.portScript)
 set -euo pipefail
 
 worktree="${PASEO_WORKTREE_PATH:-$(git rev-parse --show-toplevel)}"
@@ -19,7 +12,6 @@ if [ ! -s "$port_file" ]; then
     claim="$claims_dir/$candidate"
     if [ -f "$claim" ]; then
       owner=$(cat "$claim")
-      # A block stays taken while the worktree that claimed it still exists.
       if [ "$owner" != "$worktree" ] && [ -d "$owner" ]; then continue; fi
     fi
     if lsof -nP -iTCP:"$candidate-$((candidate + 9))" -sTCP:LISTEN >/dev/null 2>&1; then continue; fi

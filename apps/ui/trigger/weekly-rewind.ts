@@ -9,12 +9,9 @@ const BATCH_SIZE = 500
 
 type BuildPayload = {
     workspaceId: number
-    // The Monday of the week to tell, `YYYY-MM-DD`. Defaults to the last completed week.
     weekStart?: string
 }
 
-// Several workspaces often share nothing, but boxes on one Incus host do: a few at a time keeps the
-// Monday sweep from landing on every engine at once.
 const rewindQueue = queue({ name: 'weekly-rewind', concurrencyLimit: 5 })
 
 export const buildRewind = task({
@@ -46,13 +43,10 @@ export const weeklyRewindSchedule = schedules.task({
     maxDuration: 300,
     retry: { maxAttempts: 1 },
     run: async (_payload, { ctx }) => {
-        // apps/ui/.env points at production, so a local `pnpm trigger:dev` would hit every real Box.
         if (ctx.environment.type === 'DEVELOPMENT') {
             logger.log('weekly rewind: skipped, dev environment')
             return null
         }
-        // Le garde tient sur le dispatch seul : buildRewind reste déclenchable à la main depuis
-        // /admin/rewind, c'est par là qu'on rattrapera les semaines non calculées au lancement.
         if (!REWIND_RELEASED) {
             logger.log('weekly rewind: skipped, feature not released')
             return null

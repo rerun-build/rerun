@@ -21,8 +21,6 @@ vi.mock('@/lib/confetti', () => ({ fireRerunConfetti: vi.fn() }))
 vi.mock('@/lib/templates/install-feedback', () => ({ reportDuplicate: vi.fn(), reportInstall: vi.fn(), reportShareInstall: vi.fn() }))
 vi.mock('@rerun/analytics/client', () => ({ track: vi.fn() }))
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), warning: vi.fn(), success: vi.fn() } }))
-// The store builds its client once, at import: the fake lives here so a test can read its writes
-// and make a table refuse them.
 const db = vi.hoisted(() => ({ fake: undefined as unknown as FakeSupabase, refusing: new Set<string>() }))
 vi.mock('@/supabase/client', async () => {
     const { fakeSupabase } = await import('@/test/supabase-fake')

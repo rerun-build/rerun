@@ -4,10 +4,7 @@ import type { VerificationChannel } from '@/lib/phone/verification'
 import { BIRD_RESEND_COOLDOWN_MS, type VerificationFailure } from '@/lib/sms/bird-verify'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
-// Bird holds a resend on the same verification for this long, so a code asked for sooner would
-// not leave anyway.
 export const MIN_RESEND_INTERVAL_MS = BIRD_RESEND_COOLDOWN_MS
-// Moving to the other channel is the answer to a code that never came: it waits less than a resend.
 export const MIN_SWITCH_INTERVAL_MS = 20_000
 export const SEND_WINDOW_MS = 60 * 60_000
 export const MAX_SENDS_PER_WINDOW = 5
@@ -21,8 +18,6 @@ const secondsUntil = (time: number, now: number) => Math.max(1, Math.ceil((time 
 
 export type SendLedger = { lastSentAt: string | null; lastChannel: VerificationChannel | null; sendCount: number; windowStartedAt: string | null }
 
-// Where a number stands before one more code leaves for it: how long to wait, if it has to, and
-// how many codes its window has already counted.
 export function sendStanding(ledger: SendLedger, channel: VerificationChannel, now: number) {
     const interval = ledger.lastChannel && ledger.lastChannel !== channel ? MIN_SWITCH_INTERVAL_MS : MIN_RESEND_INTERVAL_MS
     const nextSendAt = ledger.lastSentAt ? Date.parse(ledger.lastSentAt) + interval : 0
@@ -37,10 +32,6 @@ export function sendStanding(ledger: SendLedger, channel: VerificationChannel, n
     return { refusal: null, retryAfterSeconds: undefined, windowIsOpen, sentInWindow }
 }
 
-// The wall's "Skip for now": the account enters without a number and is asked again by the
-// getting-started checklist. `unverifiedPhone` is the number the wall takes in without a code: it is
-// kept with the consent the wall asked for, and the checklist counts the step done. A number verified
-// meanwhile keeps its row as it is.
 export async function skipPhoneVerification(userId: string, unverifiedPhone?: string): Promise<boolean> {
     const stamp = new Date().toISOString()
     const { error } = await createServiceRoleClient()

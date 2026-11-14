@@ -23,10 +23,6 @@ import { spacing, type ColorScheme } from '@/theme/tokens'
 
 import { MockPane, type LabState } from './lab-foreman'
 
-// Dev only: a coworker's General with its threads hanging between the messages, General pinned first
-// in the header and the pager, the open threads after it. A tap on a thread slides to it.
-//   /lab-threads?scheme=dark&general=empty&threads=none
-//   general=empty: General has no message yet, its threads lead. threads=none: General alone, no thread yet.
 const GENERAL_ID = 'lab-general'
 const THREAD_STATES: Record<string, LabState> = { 'th-week': 'running', 'th-approval': 'approval' }
 

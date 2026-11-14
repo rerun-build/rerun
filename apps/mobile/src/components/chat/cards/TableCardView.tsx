@@ -84,8 +84,6 @@ function ListRows({ card, agentId }: { card: TableCard; agentId: string }) {
     )
 }
 
-// Every row takes the same column widths: the card's width shared out, never narrower than a column
-// can be read at, past which the grid scrolls sideways.
 function Grid({ card, agentId }: { card: TableCard; agentId: string }) {
     const theme = useTheme()
     const formats = card.formats ?? {}
@@ -115,8 +113,6 @@ function Grid({ card, agentId }: { card: TableCard; agentId: string }) {
     )
 }
 
-// Rows a coworker filled, frozen in the message as it sent them. A layout with named fields reads as a
-// list; a plain table keeps its columns and scrolls sideways.
 export function TableCardView({ card, agentId }: { card: TableCard; agentId: string }) {
     const t = useTranslations('mobileCards.table')
     const locale = useLocale()

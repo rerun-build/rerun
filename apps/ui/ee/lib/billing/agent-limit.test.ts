@@ -17,7 +17,6 @@ describe('activeAgentLimitFor', () => {
         expect(activeAgentLimitFor(9, 'active')).toBe(9)
     })
 
-    // A late invoice is a subscription Stripe is still retrying, and that card has already paid.
     it('leaves a late renewal alone', () => {
         expect(activeAgentLimitFor(PLAN_AGENTS, 'past_due')).toBe(PLAN_AGENTS)
     })

@@ -4,7 +4,6 @@ import { SignInFlowProvider, type SignInStep } from '@/components/auth/SignInFlo
 import { SignInSheet } from '@/components/auth/SignInSheet'
 import type { StartLayout } from '@/components/auth/steps/StartStep'
 
-// Dev only: the sign-in sheet in each of its steps, reachable while signed in.
 const STEPS: Record<string, SignInStep> = {
     start: { name: 'start' },
     phone: { name: 'phone' },

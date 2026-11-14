@@ -9,11 +9,8 @@ import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { ClipboardPasteIcon, FolderIcon, GlobeIcon, TerminalIcon, XIcon } from '@/lib/icons'
 
 type DesktopNotchProps = {
-    // False when the screen has a dock of its own: only what it cannot do stays here.
     launchers: boolean
-    // The notch opened the agent's browser, so the same button closes it again.
     browsing: boolean
-    // Why the notch cannot open the browser, when something else already holds it.
     browserLockedReason?: string
     disabled?: boolean
     takeoverReason?: string
@@ -25,8 +22,6 @@ type DesktopNotchProps = {
 
 const SHOULDER = 'absolute top-0 size-3'
 
-// Everything the app adds to an agent's screen, hung from the top edge of its dialog so nothing
-// else covers the screen. Render it inside a positioned box, within the dialog it closes.
 export function DesktopNotch({ launchers, browsing, browserLockedReason, disabled, takeoverReason, onOpenApp, onToggleBrowser, onPaste, onDone }: DesktopNotchProps) {
     const t = useTranslations('desktop.notch')
     const browserLabel = browsing ? t('closeBrowser') : t('browser')

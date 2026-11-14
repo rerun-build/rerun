@@ -8,8 +8,6 @@ export function buildIsTooOld(build: number, minBuild: number): boolean {
     return build < minBuild
 }
 
-// Checked again each time the app comes back to the foreground: an app can sit suspended for weeks.
-// A failed check lets the app through, so being offline never locks anyone out.
 export function useUpdateRequired(): boolean {
     const [required, setRequired] = useState(false)
 

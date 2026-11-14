@@ -32,7 +32,6 @@ describe('CODEX_VERSION', () => {
         expect(pinsIn('Dockerfile')).toEqual([CODEX_VERSION])
     })
 
-    // The installer of Rerun Cloud's boxes lives in the private cloud/ folder.
     it.skipIf(!existsSync(resolve(ENGINE_DIR, BOX_INSTALLER)))('is the exact version a new box installs', () => {
         expect(pinsIn(BOX_INSTALLER)).toEqual([CODEX_VERSION])
     })

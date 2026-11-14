@@ -17,8 +17,6 @@ type BrainProposalsPanelProps = {
     onOpenPage: (slug: string) => void
 }
 
-// What agents learned about the company and want written down. Nothing reaches a page until a
-// person accepts it here.
 export function BrainProposalsPanel({ proposals, onDecided, onOpenPage }: BrainProposalsPanelProps) {
     const t = useTranslations('brain.proposals')
     const errorText = useErrorText()

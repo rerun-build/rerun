@@ -72,7 +72,6 @@ vi.mock('node:fs', async importOriginal => {
     return { ...real, existsSync, default: { ...real, existsSync } }
 })
 
-// updateCliTools removes the Claude install under the home it runs in: never the developer's own.
 vi.mock('node:os', async importOriginal => {
     const real = await importOriginal<typeof import('node:os')>()
     return { ...real, homedir: () => FAKE_HOME, default: { ...real, homedir: () => FAKE_HOME } }
@@ -93,7 +92,6 @@ vi.mock('../../datadir/ladder.js', () => ({
     },
 }))
 
-// The release mechanics have their own tests; here only their place in the sequence matters.
 vi.mock('./release.js', async importOriginal => ({
     ...(await importOriginal<typeof import('./release.js')>()),
     requireFreeSpace: (dir: string, bytes?: number) => {

@@ -13,7 +13,6 @@ export async function readAgentConfig(id: string): Promise<AgentConfig> {
     return agentConfigSchema.parse(JSON.parse(await readFile(configPath(id), 'utf8')))
 }
 
-// Everything but the agent's secrets: what a read of the agent hands out, which never includes them.
 export async function loadAgentView(id: string): Promise<Omit<LoadedAgent, 'env'>> {
     const config = await readAgentConfig(id)
     const soul = existsSync(soulPath(id)) ? await readFile(soulPath(id), 'utf8') : ''

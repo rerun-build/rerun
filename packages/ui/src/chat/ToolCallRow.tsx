@@ -11,13 +11,10 @@ export type ToolCallStatus = 'running' | 'done' | 'error'
 export type ToolCallRowProps = {
     label: string
     icon?: LucideIcon
-    /** A brand logo URL, for the surfaces that name the connector rather than the tool. */
     iconSrc?: string
     status: ToolCallStatus
     elapsed?: ReactNode
-    /** A muted second line under the label, for a call whose progress is worth reading while folded. */
     summary?: ReactNode
-    /** Controls the fold from outside. Left out, the row keeps its own state and starts folded. */
     open?: boolean
     onOpenChange?: (open: boolean) => void
     children?: ReactNode
@@ -30,11 +27,6 @@ function StatusIndicator({ status }: { status: ToolCallStatus }) {
     return <IconBadge tone="green" icon={CheckIcon} />
 }
 
-/**
- * One tool call in a transcript: the row you can fold open, plus whatever the caller wants to show
- * underneath. It starts folded, even while the call runs, so raw commands and payloads only show when
- * the reader asks for them.
- */
 export function ToolCallRow({ label, icon, iconSrc, status, elapsed, summary, open: openProp, onOpenChange, children, className }: ToolCallRowProps) {
     const running = status === 'running'
     const [ownOpen, setOwnOpen] = useState(false)

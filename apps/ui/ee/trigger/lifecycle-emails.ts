@@ -6,9 +6,7 @@ import { lifecycleFloor, type LifecycleSequenceKey } from '@/ee/lib/lifecycle/se
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
 type SweepPayload = {
-    // Decide and log, send nothing and record nothing. The only way to see what a tick would do.
     dryRun?: boolean
-    // Narrows the whole sweep to a few accounts, for trying one sequence end to end.
     userIds?: string[]
 }
 
@@ -62,7 +60,6 @@ function agentNameFor(names: Map<string, string>, candidate: LifecycleCandidate)
     return candidate.agentId ? (names.get(candidate.agentId) ?? null) : null
 }
 
-// Triggered by hand, which is how a sequence is checked end to end against one account.
 export const lifecycleSweep = task({
     id: 'lifecycle-sweep',
     queue: lifecycleQueue,
@@ -76,23 +73,16 @@ export const lifecycleSweepSchedule = schedules.task({
     cron: '*/15 * * * *',
     queue: lifecycleQueue,
     maxDuration: 300,
-    // The next tick is the retry. Retrying inside one would re-read the same rows minutes apart for
-    // no gain, and a partially delivered sweep is already recorded row by row.
     retry: { maxAttempts: 1 },
     run: async (_payload, { ctx }) => {
-        // apps/ui/.env holds the production Supabase credentials, so a local `pnpm trigger:dev`
-        // session would otherwise email real people every fifteen minutes.
         if (ctx.environment.type === 'DEVELOPMENT') {
             logger.log('lifecycle sweep: skipped, dev environment')
             return null
         }
-        // Without a floor the first tick after a deploy reaches back over every window at once. It
-        // is the one guard that cannot be recovered from after the fact.
         if (!lifecycleFloor()) {
             logger.error('lifecycle sweep: skipped, LIFECYCLE_EMAILS_START_AT is not set')
             return null
         }
-        // Staging runs on a clone of production, where every recipient is a real person.
         if (ctx.environment.type !== 'PRODUCTION' && !process.env.EMAIL_REDIRECT_TO) {
             logger.error('lifecycle sweep: skipped, EMAIL_REDIRECT_TO is not set outside production')
             return null

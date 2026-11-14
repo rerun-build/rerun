@@ -15,18 +15,10 @@ import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase
 import { resolveWorkspaceOwner } from './workspace-owner.service'
 import { findWorkspaceEngine } from './workspace-engine.service'
 
-// The board's getting-started checklist. A step is written where the thing is born: Postgres
-// triggers for agents and invitations, the engine webhook for AI connections and schedules, the
-// card form and the Stripe webhook for the payment method. What is left here is writing those
-// rows, reporting them to analytics, catching up on what happened before any of them existed, and
-// granting the trial days once all five are in, with the phone of an account that was asked for one.
-
 type GettingStartedInsert = Database['public']['Tables']['workspace_getting_started']['Insert']
 type GettingStartedUpdate = Database['public']['Tables']['workspace_getting_started']['Update']
 type ServiceRoleClient = ReturnType<typeof createServiceRoleClient>
 
-// The catch-up runs on the board's first paint: a machine or a Stripe call that does not answer
-// fast is read as "not yet", not waited for.
 const ENGINE_CHECK_TIMEOUT_MS = 4000
 
 const STEP_IDS = new Set<string>(GETTING_STARTED_STEPS.map(step => step.id))
@@ -44,11 +36,6 @@ export async function markGettingStarted(supabase: ServiceRoleClient, workspaceI
     await reportGettingStartedSteps(supabase, workspaceId)
 }
 
-/**
- * Tells analytics about every step not told yet, whoever wrote its row: this service, or a trigger
- * that has no way to. The update is the claim, so two tabs loading the board report a step once,
- * and the event is dated from when the step was done, not from when someone next opened the board.
- */
 export async function reportGettingStartedSteps(supabase: ServiceRoleClient, workspaceId: number): Promise<void> {
     try {
         const { data, error } = await supabase
@@ -76,19 +63,16 @@ export async function restoreGettingStarted(supabase: ServiceRoleClient, workspa
     if (error) throw new Error(error.message)
 }
 
-/** A read that fails counts as a number never asked for, the same as the wall does. */
 async function readPhoneStatus(supabase: ServiceRoleClient, userId: string): Promise<PhoneStatus> {
     const { data } = await selectMaybeSingle(supabase, 'user_phones', PHONE_STATUS_COLUMNS, { user_id: userId })
     return phoneStatusOf(data)
 }
 
-/** The engine webhook's side: `token` is the box's RERUN_API_KEY, which names its workspace. */
 export async function recordGettingStartedEvent(workspaceId: number, event: EngineCreatedEvent['event']): Promise<void> {
     const step = GETTING_STARTED_EVENT_STEP[event]
     if (step) await markGettingStarted(createServiceRoleClient(), workspaceId, [step])
 }
 
-/** Best effort: the card is on file either way, and the next board load catches up on a miss. */
 export async function markPaymentMethodAdded(workspaceId: number): Promise<void> {
     try {
         await markGettingStarted(createServiceRoleClient(), workspaceId, ['payment_method'])
@@ -109,11 +93,6 @@ async function hasSchedule(supabase: ServiceRoleClient, conn: EngineConnection, 
     return lists.some(list => list.length > 0)
 }
 
-/**
- * What lives on the machine and happened before it could tell the hub: a box that has not taken
- * the update yet, or a provider plugged in before the checklist existed. Anything that fails reads
- * as not done; the next board load asks again.
- */
 export async function catchUpEngineSteps(supabase: ServiceRoleClient, workspaceId: number, items: ReadonlySet<GettingStartedItem>): Promise<GettingStartedItem[]> {
     const wantsProvider = !items.has('ai_provider')
     const wantsSchedule = !items.has('schedule')
@@ -129,11 +108,6 @@ export async function catchUpEngineSteps(supabase: ServiceRoleClient, workspaceI
     return found
 }
 
-/**
- * A card put on file anywhere but the checklist's form: a trial started through the card Checkout,
- * or a card added from the billing portal. A plan that is paid, or entitled without Stripe behind
- * it, has nothing left to add. Anything that fails reads as not done.
- */
 export async function catchUpPaymentMethod(supabase: ServiceRoleClient, workspaceId: number, items: ReadonlySet<GettingStartedItem>): Promise<GettingStartedItem[]> {
     if (items.has('payment_method')) return []
 
@@ -149,12 +123,6 @@ export async function catchUpPaymentMethod(supabase: ServiceRoleClient, workspac
     }
 }
 
-/**
- * Adds the trial days once, when the steps are in and a trial is still running. The phone is the
- * owner's, whose trial it is, whichever member's board asked: an owner whose signup asked for a
- * number has to have verified it. The `reward` row is claimed before Stripe is called, so two tabs
- * reaching the end together extend it once; a failed call releases the claim for the next attempt.
- */
 export async function grantGettingStartedReward(supabase: ServiceRoleClient, workspaceId: number, items: ReadonlySet<GettingStartedItem>): Promise<void> {
     if (items.has('reward') || !isComplete(progressOf(items, null))) return
 

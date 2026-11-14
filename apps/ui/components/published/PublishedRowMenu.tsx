@@ -31,8 +31,6 @@ export function PublishedRowMenu({ file, onShare, onUnpublished }: { file: Publi
         onUnpublished(file.slug)
     }
 
-    // Every click inside (the menu and the confirmation portal included) would otherwise bubble up
-    // the React tree to the row or the card, which opens the share dialog.
     return (
         <span className="contents" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
             <DropdownMenu>

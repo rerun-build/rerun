@@ -33,34 +33,18 @@ import { triggerWebhookUrl } from '@/lib/triggers/webhook'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 
-// Recall floor for the vector retrieval. Kept low on purpose: pgvector only shortlists
-// candidates, and the Haiku re-rank (lib/services/rerank.ts) does the actual relevance
-// gating. Query-to-document similarities with text-embedding-3-small are compressed (a
-// genuine match like "refund a customer" → Stripe scores ~0.21), so a low floor avoids
-// dropping real matches before the model ever sees them.
 const CANDIDATE_FLOOR = 0.15
 const CANDIDATE_COUNT = 10
 
-// Default page size for the paginated catalog browse (no query).
 const BROWSE_PAGE_SIZE = 60
 
-// Cap on the literal name lookup merged ahead of the semantic results, so a broad substring
-// (e.g. "a") can't flood the list before the semantic matches.
 const LITERAL_MATCH_LIMIT = 25
 
-// Fallback only: if the re-rank model is unavailable we degrade to the raw vector ranking,
-// keeping the top hit and others within this fraction of it.
 const RELATIVE_MARGIN = 0.65
 
-// A registry entry outlives the catalog: a service that moved off the managed path leaves
-// entries pointing at a provider we no longer serve. Dropping the target here makes the UI
-// fall back to its "no sign-in target" branch, which offers a reinstall instead of a Connect
-// button that could only ever fail.
 function liveManaged<T extends { provider: string }>(managed: T | undefined): T | undefined {
     return managed && getManagedProvider(managed.provider) ? managed : undefined
 }
-
-// --- Catalog (UI database) ---
 
 export async function loadManifest(slugOrKey: string): Promise<ServiceManifest | null> {
     const supabase = createServiceRoleClient()
@@ -69,7 +53,6 @@ export async function loadManifest(slugOrKey: string): Promise<ServiceManifest |
     return serviceManifestSchema.parse(data.manifest)
 }
 
-// Client-safe view of a service's auth methods (never leaks mcpServers/envKeys).
 export function toAuthMethodSummaries(manifest: ServiceManifest): AuthMethodSummary[] {
     return manifest.authMethods.map(m => ({
         id: m.id,
@@ -81,9 +64,6 @@ export function toAuthMethodSummaries(manifest: ServiceManifest): AuthMethodSumm
     }))
 }
 
-// Which services are installed is the AGENT's own state, read from its engine-side
-// registry (see lib/services/registry.ts) — never from the UI database. The status comes
-// along: a declared entry still waiting for a sign-in is not an installed connector.
 async function installedStatuses(agentId: string, actor?: Actor): Promise<Map<string, AgentServiceStatus>> {
     try {
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
@@ -91,28 +71,19 @@ async function installedStatuses(agentId: string, actor?: Actor): Promise<Map<st
         const slugs = new Set(Object.keys(reg.services).map(key => parseServiceRegistryKey(key).slug))
         return new Map([...slugs].map(slug => [slug, primaryStatusOfSlug(reg, slug) as AgentServiceStatus]))
     } catch (err) {
-        // An unreachable engine legitimately degrades to "nothing installed". An authorization
-        // failure does not: it would tell the agent its working connectors are missing, so it
-        // surfaces instead of quietly turning every service into a setup prompt.
         if (err instanceof AuthorizationError) throw err
         console.warn(`[services] could not read the registry of agent ${agentId}:`, err instanceof Error ? err.message : err)
         return new Map()
     }
 }
 
-// Mark a service as pending config in the agent registry without compiling anything
-// (used when an install is triggered but required inputs are still missing). Records the
-// chosen method so the config form re-opens on the right one.
 export async function markServiceNeedsConfig(agentId: string, key: string, authMethodId?: string, actor?: Actor, seed?: { instanceId: string; label: string }): Promise<void> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
-    // Pending: no engine footprint yet (empty mcpServers/envKeys/skills).
     await upsertRegistryEntry(conn, engineAgentId, key, { status: 'needs_config', config: {}, authMethodId, mcpServers: [], envKeys: [], skills: [], ...seed, installedAt: new Date().toISOString() })
 }
 
 export type ServiceInstanceSeed = ServiceInstanceTarget & { label: string }
 
-// A fresh key for another account of an app the coworker may already hold, labelled after the
-// accounts it already shows until its sign-in gives it an email.
 export async function allocateServiceInstance(agentId: string, manifest: ServiceManifest, actor?: Actor): Promise<ServiceInstanceSeed> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const reg = await readRegistry(conn, engineAgentId)
@@ -120,8 +91,6 @@ export async function allocateServiceInstance(agentId: string, manifest: Service
     const instanceId = newServiceInstanceId(taken)
     return { key: serviceRegistryKey(manifest.slug, instanceId), instanceId, label: ordinalInstanceLabel(manifest.name, reg, manifest.slug) }
 }
-
-// --- Public service functions ---
 
 type CatalogRow = { slug: string; name: string; category: string; summary: string; icon: string | null; manifest: unknown; verified?: boolean }
 
@@ -147,20 +116,11 @@ function toSearchResult(s: CatalogRow, installed: Map<string, AgentServiceStatus
     }
 }
 
-// Semantic capability search over the library. A natural-language query ("schedule social
-// posts") is embedded and matched by cosine similarity against each service, so the right
-// service surfaces even with no shared keywords. Falls back to substring matching when
-// there's no query or no embedding key configured — nothing breaks before the backfill.
 export async function searchServices(agentId: string, query?: string, category?: string, actor?: Actor): Promise<{ results: ServiceSearchResult[] }> {
     const installed = await installedStatuses(agentId, actor)
     return { results: await searchCatalog(installed, query, category) }
 }
 
-// Vector shortlist shared by search and use-case suggestion: embed the query, let pgvector
-// return the semantically closest candidates. Falls back to a keyword substring match when
-// there's no query, no embedding key, or the vector retrieval surfaced nothing. `viaVector`
-// tells the caller whether the rows carry meaningful similarities (worth re-ranking) or came
-// from the keyword fallback.
 async function shortlistCandidates(
     supabase: ReturnType<typeof createServiceRoleClient>,
     q: string,
@@ -192,10 +152,6 @@ async function shortlistCandidates(
 
 const LITERAL_COLS = ['slug', 'name', 'category', 'summary', 'icon', 'manifest', 'verified'] as const
 
-// Literal name search, straight from the database — the "classic" lookup that always finds a
-// service by its name/slug even when the semantic re-rank would drop it. A single substring
-// `ilike` OR'd across name, slug and summary, ranked so name/slug hits come before summary-only
-// hits and an exact/prefix name match floats to the top.
 async function literalMatches(
     supabase: ReturnType<typeof createServiceRoleClient>,
     q: string,
@@ -225,11 +181,6 @@ async function literalMatches(
     return ((data ?? []) as CatalogRow[]).slice().sort((a, b) => rank(a) - rank(b))
 }
 
-// Shared search core: a literal name lookup merged ahead of the semantic vector retrieval +
-// Haiku re-rank, with a keyword substring fallback. Literal name/slug matches are surfaced
-// first and bypass the re-rank gate (they are exactly what the user typed), then the semantic
-// results fill in, deduped by slug. The `installed` map is the only per-agent input — pass an
-// empty map for the agent-less catalog browse.
 async function searchCatalog(installed: Map<string, AgentServiceStatus>, query?: string, category?: string): Promise<ServiceSearchResult[]> {
     const supabase = createServiceRoleClient()
     const q = (query ?? '').trim()
@@ -259,8 +210,6 @@ async function searchCatalog(installed: Map<string, AgentServiceStatus>, query?:
     return merged
 }
 
-// Semantic half of searchCatalog: vector shortlist + Haiku re-rank, with the keyword substring
-// fallback when embeddings are unavailable. Assumes a non-empty query.
 async function semanticCatalog(
     supabase: ReturnType<typeof createServiceRoleClient>,
     installed: Map<string, AgentServiceStatus>,
@@ -273,14 +222,10 @@ async function semanticCatalog(
         const vrows = rows as Array<CatalogRow & { similarity: number }>
         const bySlug = new Map(vrows.map(r => [r.slug, r]))
         try {
-            // Haiku keeps only the candidates that genuinely match — or none, in
-            // which case the semantic half is empty and only literal matches remain.
             const ranked = await rerankRelevant(q, vrows.map(r => ({ slug: r.slug, name: r.name, summary: r.summary })))
             const ordered = ranked.map(slug => bySlug.get(slug)).filter((r): r is CatalogRow & { similarity: number } => Boolean(r))
             return ordered.map(s => toSearchResult(s, installed, s.similarity))
         } catch {
-            // Re-rank unavailable → degrade to the raw vector ranking with a
-            // relative cutoff rather than black-holing the search.
             const cutoff = vrows[0].similarity * RELATIVE_MARGIN
             return vrows.filter(s => s.similarity >= cutoff).map(s => toSearchResult(s, installed, s.similarity))
         }
@@ -289,15 +234,10 @@ async function semanticCatalog(
     return rows.map(s => toSearchResult(s, installed))
 }
 
-// Semantic catalog search with no agent context. Same pipeline as searchServices, but `installed`
-// is always empty since there is no agent to install into.
 export async function searchCatalogServices(query?: string, category?: string): Promise<ServiceSearchResult[]> {
     return searchCatalog(new Map(), query, category)
 }
 
-// Paginated catalog browse without an agent context. No per-agent install state, so `installed`
-// is always false. Ordered by (category, name) for a stable, groupable infinite scroll; the
-// caller keeps loading pages until a short one comes back.
 export async function listCatalogServices(opts?: { category?: string; limit?: number; offset?: number }): Promise<ServiceSearchResult[]> {
     const supabase = createServiceRoleClient()
     const limit = opts?.limit ?? BROWSE_PAGE_SIZE
@@ -311,9 +251,6 @@ export async function listCatalogServices(opts?: { category?: string; limit?: nu
     return ((data ?? []) as CatalogRow[]).map(s => toSearchResult(s, new Map()))
 }
 
-// Resolve full catalog metadata for a specific set of slugs. Seeds the agent-creation
-// dialog's tile cache in "finish setup" mode, where the checklist slugs may fall outside the
-// browse pages loaded — so their tiles/icons still render.
 export async function getCatalogServicesBySlugs(slugs: string[]): Promise<ServiceSearchResult[]> {
     if (slugs.length === 0) return []
     const supabase = createServiceRoleClient()
@@ -321,8 +258,6 @@ export async function getCatalogServicesBySlugs(slugs: string[]): Promise<Servic
     return (data ?? []).map(s => toSearchResult(s, new Map()))
 }
 
-// The best replacements for each slug, strongest first. Disabled services drop out here rather
-// than in the pair table, which keeps pointing at them.
 export async function getServiceAlternatives(slugs: string[]): Promise<Record<string, ServiceAlternative[]>> {
     if (slugs.length === 0) return {}
     const supabase = createServiceRoleClient()
@@ -343,9 +278,6 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
 
-    // A registry entry alone proves nothing: needs_config and needs_auth entries are declared
-    // on the agent but unusable, and reporting them as installed leaves the user with no way
-    // to finish the setup and the agent believing it holds tools it cannot call.
     let installStatus: AgentServiceStatus | null = null
     let installedMethodId: string | undefined
     let oauth: ServiceDetails['oauth']
@@ -367,8 +299,6 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
         composio = entry?.composio
         app = entry?.app
     } catch (err) {
-        // Unreachable engine → treat as not installed. An authorization failure is a different
-        // story: reporting a working connector as absent is worse than failing the call.
         if (err instanceof AuthorizationError) throw err
         console.warn(`[services] could not read ${slugOrKey} on agent ${agentId}:`, err instanceof Error ? err.message : err)
     }
@@ -394,11 +324,6 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
     }
 }
 
-// Install a service using the chosen auth method (falls back to the default). Returns
-// needs_config (without compiling) when the method's required inputs are missing, so the
-// caller (chat renderer / settings panel) can show the config form.
-// `newInstance` adds another account next to the ones the coworker holds, only for an app whose
-// manifest allows it: anywhere else it is ignored and the base account is (re)installed.
 export async function installService(
     agentId: string,
     slugOrKey: string,
@@ -430,7 +355,6 @@ export async function installService(
         return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, composio, message: `${manifest.name} needs the user to connect their account. A Connect button has been shown to them.` }
     }
     if (app) {
-        // A coworker that already picked an account (a reinstall) is ready at once.
         const bound = isAppSlug(app.appSlug) ? await boundAccountLabel(agentId, app.appSlug) : null
         if (bound === null) {
             return { status: 'needs_auth', key, slug: manifest.slug, name: manifest.name, app, message: `${manifest.name} needs the user to pick the account you act with. A picker has been shown to them.` }
@@ -440,8 +364,6 @@ export async function installService(
     return { status: 'installed', key, slug: manifest.slug, name: manifest.name, toolNames, message: `${manifest.name} installed. Its tools become available on your next turn.` }
 }
 
-// Which registry entry an install writes: null for the base account, a fresh key for a new
-// account, or the existing extra account the caller addressed by its key (keeping its label).
 async function installTarget(agentId: string, manifest: ServiceManifest, slugOrKey: string, newInstance: boolean, actor?: Actor): Promise<ServiceInstanceSeed | null> {
     if (newInstance && manifest.multiInstance) return allocateServiceInstance(agentId, manifest, actor)
     const { instanceId } = parseServiceRegistryKey(slugOrKey)
@@ -451,8 +373,6 @@ async function installTarget(agentId: string, manifest: ServiceManifest, slugOrK
     return { key: slugOrKey, instanceId, label: reg.services[slugOrKey]?.label ?? ordinalInstanceLabel(manifest.name, reg, manifest.slug) }
 }
 
-// The label of the account a coworker acts with in a paid app, '' when it has none yet, null when
-// the coworker picked none or its account is gone.
 async function boundAccountLabel(agentId: string, appSlug: AppSlug): Promise<string | null> {
     const supabase = createServiceRoleClient()
     const { data: binding } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: appSlug })
@@ -462,7 +382,6 @@ async function boundAccountLabel(agentId: string, appSlug: AppSlug): Promise<str
     return connection.label ?? ''
 }
 
-// Flip a paid app's service to active once the coworker has picked the account it acts with.
 export async function markAppAuthorized(agentId: string, key: string, accountLabel?: string, actor?: Actor): Promise<void> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
@@ -471,16 +390,12 @@ export async function markAppAuthorized(agentId: string, key: string, accountLab
     await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active', app })
 }
 
-// Flip an OAuth service to active after the user completes the sign-in popup (the callback
-// route has already written the token to the engine token store).
 export async function markServiceAuthorized(agentId: string, key: string, actor?: Actor): Promise<void> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (entry) await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active' })
 }
 
-// Flip a managed service to active and record the connected account label, after the managed
-// OAuth callback wrote the token to the engine token store.
 export async function markManagedAuthorized(agentId: string, key: string, accountEmail?: string, actor?: Actor): Promise<void> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
@@ -489,8 +404,6 @@ export async function markManagedAuthorized(agentId: string, key: string, accoun
     await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active', managed, ...(accountEmail ? { label: accountEmail } : {}) })
 }
 
-// Flip a Composio service to active once its connected account is verified ACTIVE. The
-// connectedAccountId is what uninstall/reconnect later delete at Composio to revoke access.
 export async function markComposioAuthorized(agentId: string, key: string, connectedAccountId: string, accountLabel?: string, actor?: Actor): Promise<void> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
@@ -499,19 +412,11 @@ export async function markComposioAuthorized(agentId: string, key: string, conne
     await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'active', composio, ...(accountLabel ? { label: accountLabel } : {}) })
 }
 
-// Send a connected service back to its sign-in step without tearing down what the install
-// compiled: an expired or wrong-account token is the whole problem, so only the token goes and
-// the mcp servers / env keys / skills stay. A service with no sign-in (API key, stdio) has no
-// token to drop — it keeps working until the user actually submits new values, since
-// compileService is idempotent and the submit overwrites in place.
 export async function resetServiceConnection(agentId: string, key: string, actor?: Actor): Promise<ResetConnectionResult> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
     if (!entry) return { mode: 'config' }
 
-    // A paid app's account belongs to the workspace, so a reset only sends the coworker back to
-    // picking one: the account itself stays connected for the other coworkers. A coworker still
-    // bound keeps working while the picker is open, since closing it without a pick changes nothing.
     if (entry.app?.serverName) {
         const app = { appSlug: entry.app.appSlug, serverName: entry.app.serverName }
         const bound = isAppSlug(app.appSlug) ? await boundAccountLabel(agentId, app.appSlug) : null
@@ -520,8 +425,6 @@ export async function resetServiceConnection(agentId: string, key: string, actor
         return { mode: 'auth', app }
     }
 
-    // A Composio connection has no engine token: resetting means deleting the connected
-    // account at Composio (best-effort) and sending the entry back to its sign-in step.
     if (entry.composio?.serverName && entry.composio.toolkit) {
         if (entry.composio.connectedAccountId) {
             await deleteConnectedAccount(entry.composio.connectedAccountId).catch(err => {
@@ -533,15 +436,11 @@ export async function resetServiceConnection(agentId: string, key: string, actor
         return { mode: 'auth', composio }
     }
 
-    // A legacy entry can carry a half-filled target: without a server name there is no token to
-    // clear, and without a url / provider the UI has no sign-in step to render.
     const entryManaged = liveManaged(entry.managed)
     const serverName = entry.oauth?.serverName ?? entryManaged?.serverName
     if (!serverName || !(entry.oauth?.url || entryManaged?.provider)) return { mode: 'config', authMethodId: entry.authMethodId }
 
     await deleteMcpToken(conn, engineAgentId, serverName).catch(() => {})
-    // provider/serverName are what markManagedAuthorized reads back after the new sign-in; only
-    // the account label is stale.
     const managed = entryManaged ? { provider: entryManaged.provider, serverName: entryManaged.serverName } : undefined
     await upsertRegistryEntry(conn, engineAgentId, key, { ...entry, status: 'needs_auth', ...(managed ? { managed } : {}) })
     return { mode: 'auth', oauth: entry.oauth, managed }
@@ -552,12 +451,10 @@ export async function listInstalledServices(agentId: string, actor?: Actor): Pro
     return { services: await installedFromRegistry(await readRegistry(conn, engineAgentId)) }
 }
 
-// One row per account, every account of an app grouped under it, the base one first.
 export async function installedFromRegistry(reg: ServiceRegistry): Promise<InstalledService[]> {
     const slugs = [...new Set(Object.keys(reg.services).map(key => parseServiceRegistryKey(key).slug))]
     if (slugs.length === 0) return []
 
-    // Resolve display metadata from the catalog (best-effort).
     const supabase = createServiceRoleClient()
     const { data: svcs } = await selectMany(supabase, 'services', ['slug', 'name', 'icon', 'category'] as const, { slug: { in: slugs } })
     const bySlug = new Map((svcs ?? []).map(s => [s.slug, s]))
@@ -587,9 +484,6 @@ export async function installedFromRegistry(reg: ServiceRegistry): Promise<Insta
     )
 }
 
-// Full teardown: reverse exactly what the install added (per the registry footprint),
-// then drop the registry entry. needs_config entries have an empty footprint → no-op
-// teardown, just the registry removal.
 export async function uninstallService(agentId: string, key: string, actor?: Actor): Promise<void> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
     const reg = await readRegistry(conn, engineAgentId)
@@ -602,8 +496,6 @@ export async function uninstallService(agentId: string, key: string, actor?: Act
         if (agent) await unbindAgent(supabase, agent.workspace_id, agentId, entry.app.appSlug)
     }
 }
-
-// --- Hub dispatch (called by app/api/hub/route.ts) ---
 
 function asString(v: unknown): string | undefined {
     return typeof v === 'string' ? v : undefined
@@ -626,9 +518,6 @@ function asStringRecord(v: unknown): Record<string, string> {
     return out
 }
 
-// The caller is the engine, authenticated by its Box key, so there is no browser session to
-// resolve a workspace from: the route hands over the one it authenticated. Without it every
-// registry read below fails authorization and the agent is told its live connectors are absent.
 export async function dispatchHubTool(agentId: string, name: string, args: Record<string, unknown>, workspaceId: number): Promise<unknown> {
     const actor = workspaceActor(workspaceId)
     switch (name) {
@@ -655,8 +544,6 @@ export async function dispatchHubTool(agentId: string, name: string, args: Recor
             return unpublishFile(agentId, { path: asString(args.path), slug: asString(args.slug) })
         case 'list_published':
             return listPublished(agentId)
-        // The engine addresses agents by its own local ids, so only the hub can build a trigger's
-        // public URL. No DB read: the caller already proved it owns this agent's engine.
         case 'trigger_url':
             return { url: await triggerWebhookUrl(agentId, requireString(args.slug, 'slug'), requireString(args.token, 'token')) }
         default:

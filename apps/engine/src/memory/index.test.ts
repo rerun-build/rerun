@@ -79,8 +79,6 @@ describe('buildMemoryIndex', () => {
         expect(index).toContain('1 dormant memory is not listed;')
     })
 
-    // The index sits in the cached system prompt: an update must not reorder it, only a new memory
-    // appends a line.
     it('sorts oldest first by creation, whatever was updated since', async () => {
         state.files = [
             file('old', 'created long ago, never updated', '2026-01-01T00:00:00.000Z'),

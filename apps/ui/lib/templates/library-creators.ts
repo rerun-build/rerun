@@ -21,8 +21,6 @@ type CreatorRow = {
     accepted_at: string | null
 }
 
-// `accepted_at` is only written when the expert publishes the fiche from their own account. A
-// template author is verified whatever the fiche says: signing a template takes an account.
 function toLibraryCreator(row: CreatorRow, { authorsTemplates }: { authorsTemplates: boolean }): LibraryCreator {
     return {
         slug: row.slug,
@@ -37,9 +35,6 @@ function toLibraryCreator(row: CreatorRow, { authorsTemplates }: { authorsTempla
     }
 }
 
-// The byline of every listed template in two reads rather than two per card. An account points at
-// its fiche rather than the other way around, hence the hop through `users`. A fiche still in draft
-// does not sign, the same rule the public template page follows.
 export async function loadLibraryCreators(supabase: SupabaseClient<Database>, creatorIds: string[]): Promise<Map<string, LibraryCreator>> {
     const creators = new Map<string, LibraryCreator>()
     const ids = [...new Set(creatorIds)]
@@ -61,8 +56,6 @@ export async function loadLibraryCreators(supabase: SupabaseClient<Database>, cr
 
 const DIRECTORY_SIZE = 12
 
-// The people the library introduces beyond the bylines: published fiches with a face, the ones the
-// community page features first. Template authors are merged in on the client, where the counts are.
 export async function loadCreatorDirectory(supabase: SupabaseClient<Database>): Promise<LibraryCreator[]> {
     const { data } = await selectMany(supabase, 'experts', CREATOR_COLUMNS, { status: 'published', avatar_url: { notNull: true } }, { column: 'featured', ascending: false }, DIRECTORY_SIZE)
     return (data ?? []).map(row => toLibraryCreator(row, { authorsTemplates: false }))

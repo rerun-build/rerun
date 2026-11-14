@@ -1,11 +1,6 @@
 import { isSetupAnswered } from '@rerun/contracts'
 import { describe, expect, it } from 'vitest'
 
-// Four places ask the same question of a template author (the capture review, the agent's Install
-// tab, create_agent/update_agent, the capture itself). What they must agree on is that a "yes" with
-// no instructions is not an answer: the copy would carry `required: true` and no INSTALL.md, so the
-// engine never counts it as pending and the install the card promises never runs.
-
 describe('isSetupAnswered', () => {
     it('treats an unanswered question as unanswered', () => {
         expect(isSetupAnswered({ required: null, prompt: '' })).toBe(false)

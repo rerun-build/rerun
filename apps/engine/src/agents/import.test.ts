@@ -24,7 +24,6 @@ const { create } = await import('tar')
 
 const SOURCE_ID = 'importsource'
 const SOURCE_TRIGGER_TOKEN = 'tok-source-webhook-secret'
-// The pair the source agent runs on, which lives on the author's box and must not follow the copy.
 const SOURCE_CONNECTION_ID = 'cnxsource'
 const SOURCE_MODEL = 'claude-opus-4-8'
 
@@ -48,13 +47,10 @@ const config = agentConfigSchema.parse({
     mcpServers: [srv('fal', { FAL_KEY: '${RERUN_SVC_FAL_FAL_KEY}' }, { 'x-rerun-agent': SOURCE_ID })],
 })
 
-// `importAgent` reads the body as a web stream, the shape Hono hands it.
 function bodyOf(path: string): ReadableStream<Uint8Array> {
     return Readable.toWeb(createReadStream(path)) as ReadableStream<Uint8Array>
 }
 
-// A tarball assembled from literal entries, for the cases that are about what the archive says
-// rather than about what a real capture produces.
 async function tarballOf(files: Record<string, string>): Promise<string> {
     const scratch = mkdtempSync(resolve(tmpdir(), 'rerun-imt-'))
     const staging = resolve(scratch, 'payload')
@@ -122,9 +118,6 @@ describe('importAgent', () => {
         expect((await listAgentIndex()).some(row => row.id === result.id && row.name === 'source_2')).toBe(true)
     })
 
-    // The capture handed the source agent id back as `${agent.id}` because the engine's own
-    // resolver rejects the dot. Leaving it in place would have the copy call a managed proxy
-    // under someone else's name.
     it('rebinds the agent id the capture turned into a token', async () => {
         const result = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_3' })
         const imported = agentConfigSchema.parse(JSON.parse(await readFile(resolve(agentDir(result.id), 'config.json'), 'utf8')))
@@ -133,8 +126,6 @@ describe('importAgent', () => {
         expect(imported.mcpServers[0].env.FAL_KEY).toBe('${RERUN_SVC_FAL_FAL_KEY}')
     })
 
-    // The author marked their own agent as set up without ever installing it. A copy has its own
-    // connectors to wire, so it has to start pending again or its user never gets the button.
     it('carries the setup instructions and hands the copy a pending install', async () => {
         const result = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_setup' })
         const imported = agentConfigSchema.parse(JSON.parse(await readFile(resolve(agentDir(result.id), 'config.json'), 'utf8')))
@@ -153,20 +144,14 @@ describe('importAgent', () => {
         expect((await stat(resolve(agentDir(result.id), '.env'))).mode & 0o777).toBe(0o600)
     })
 
-    // The author's pair is theirs: their pinned model may cost ten times what this owner picked, or
-    // not be offered on this box at all. A copy starts where a from-scratch agent starts.
     it('drops the pair the template was captured on', async () => {
         const result = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_pair' })
         const config = JSON.parse(await readFile(resolve(agentDir(result.id), 'config.json'), 'utf8'))
 
         expect(config).toMatchObject({ connectionId: null, provider: null, model: null })
-        // The point of the three nulls: what the copy actually runs comes off the box's own ladder.
-        // This box has no connection at all, which is its last rung.
         expect((await loadAgentFromDisk(result.id)).resolved).toMatchObject({ provider: 'rerun', model: RERUN_MODEL })
     })
 
-    // A hand-made tarball is the case the capture's own scrub cannot cover, exactly as it is for a
-    // planted webhook token: an archive nobody of ours built must not pin the installer's agent.
     it('drops a pair the archive planted rather than trusting it', async () => {
         const pinned = agentConfigSchema.parse({ name: 'pinned', connectionId: 'cnxplanted', provider: 'openai', model: 'gpt-5.4', setup: { required: false, completedAt: null } })
         const tarball = await tarballOf({ 'config.json': JSON.stringify(pinned), 'SOUL.md': 'Ready to run.' })
@@ -177,7 +162,6 @@ describe('importAgent', () => {
         expect(config).toMatchObject({ connectionId: null, provider: null, model: null })
     })
 
-    // Templates captured before these settings were removed still carry them; they must not come back.
     it('drops the step limit and temperature an older template still carries', async () => {
         const legacy = { ...agentConfigSchema.parse({ name: 'legacy', setup: { required: false, completedAt: null } }), stepLimit: 40, temperature: 0.4 }
         const tarball = await tarballOf({ 'config.json': JSON.stringify(legacy), 'SOUL.md': 'Ready to run.' })
@@ -189,9 +173,6 @@ describe('importAgent', () => {
         expect(config).not.toHaveProperty('temperature')
     })
 
-    // Same reason, and worth its own case: a schedule and a trigger each name a pair of their own,
-    // so clearing the agent's alone would leave the template's model running the unattended half.
-    // `onboard` has neither cron nor runAt, which is the one the rebaseline pass skips over.
     it('drops the pair its schedules and triggers carried', async () => {
         const result = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_autopair' })
 
@@ -205,8 +186,6 @@ describe('importAgent', () => {
         }
     })
 
-    // The memory index lives in `data/system.db`, which never travels: without a reindex the copy
-    // holds memories it cannot recall.
     it('makes the imported memories recallable again', async () => {
         const result = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_5' })
         expect(result.memoriesIndexed).toBe(1)
@@ -225,8 +204,6 @@ describe('importAgent', () => {
         expect(registry.services['gmail@k3x9ab']).toEqual({ status: 'active', instanceId: 'k3x9ab', mcpServers: ['gmail-k3x9ab'], composio: { serverName: 'gmail-k3x9ab' } })
     })
 
-    // The captured `lastRunAt` is the source's, so every schedule it ever ran is already overdue
-    // for the copy and the scheduler would fire it within a tick, on blank credentials.
     it('moves the imported schedules to their next genuine slot', async () => {
         const result = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_7' })
         const daily = await readFile(resolve(agentDir(result.id), 'schedules/daily.md'), 'utf8')
@@ -235,9 +212,6 @@ describe('importAgent', () => {
         expect(daily).toMatch(/lastRunAt: '?20\d\d-/)
     })
 
-    // Templates are routinely captured with their crons switched off, because their author
-    // switched them off while building them. An agent with nothing to install has no later moment
-    // to switch them back on, so the import is that moment.
     it('switches on the captured schedules of an agent that needs no setup', async () => {
         const noSetup = agentConfigSchema.parse({ name: 'nosetup', setup: { required: false, completedAt: null } })
         const tarball = await tarballOf({ 'config.json': JSON.stringify(noSetup), 'SOUL.md': 'Ready to run.', 'schedules/daily.md': '---\nname: Daily\ncron: 0 9 * * *\nenabled: false\n---\n\nReport.' })
@@ -247,8 +221,6 @@ describe('importAgent', () => {
         expect(await readFile(resolve(agentDir(result.id), 'schedules/daily.md'), 'utf8')).toContain('enabled: true')
     })
 
-    // The URL is the secret, so two copies of the same template must not answer to the same one,
-    // and neither must answer to the source's.
     it('issues every imported webhook a token of its own', async () => {
         const first = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_8' })
         const second = await importAgent({ body: bodyOf(await archiveOfSource()), name: 'source_9' })
@@ -266,8 +238,6 @@ describe('importAgent', () => {
         expect(tokenOf(await read(first.id))).not.toBe(tokenOf(await read(second.id)))
     })
 
-    // A hand-made tarball is the case the capture's own redaction cannot cover: its author knows
-    // the token they wrote, so trusting it would hand them a live URL on the installer's account.
     it('reissues a token even when the archive shipped one', async () => {
         const noSetup = agentConfigSchema.parse({ name: 'nosetup', setup: { required: false, completedAt: null } })
         const tarball = await tarballOf({
@@ -280,12 +250,9 @@ describe('importAgent', () => {
         const raw = await readFile(resolve(agentDir(result.id), 'triggers/inbound.md'), 'utf8')
 
         expect(raw).not.toContain('planted-token')
-        // Nothing left to install, so the webhook the capture switched off starts listening now.
         expect(raw).toContain('enabled: true')
     })
 
-    // The copy has connectors to wire and values to be asked for: a cron that fired before that
-    // conversation would run on blank credentials.
     it('leaves them off while an install is still pending', async () => {
         const tarball = await tarballOf({
             'config.json': JSON.stringify(config),
@@ -301,16 +268,11 @@ describe('importAgent', () => {
         expect(await readFile(resolve(agentDir(result.id), 'triggers/inbound.md'), 'utf8')).toContain('enabled: false')
     })
 
-    // node-tar calls the filter synchronously from its own header parser, so a throw would escape
-    // the request and take the engine process with it.
     it('answers 400 rather than dying when the archive unpacks past the ceiling', async () => {
         const scratch = mkdtempSync(resolve(tmpdir(), 'rerun-imz-'))
         const staging = resolve(scratch, 'payload')
         await mkdir(resolve(staging, 'workspace'), { recursive: true })
         await writeFile(resolve(staging, 'config.json'), JSON.stringify(config))
-        // Two bits of entropy per byte: compressible enough that the body stays under the ceiling
-        // on the compressed bytes, nowhere near compressible enough to trip tar's own ratio guard.
-        // Only the extraction filter can catch this one.
         const fat = randomBytes(22 * 1024 * 1024).map(byte => byte & 0x03)
         const files = Math.floor(ARCHIVE_LIMITS.maxTotalBytes / fat.length) + 1
         for (let i = 0; i < files; i++) await writeFile(resolve(staging, `workspace/fat${i}.bin`), fat)
@@ -320,8 +282,6 @@ describe('importAgent', () => {
         await expect(importAgent({ body: bodyOf(tarball), name: 'fat' })).rejects.toThrow(/unpacks to more than/)
     }, 30_000)
 
-    // Every root is matched the same way, so a prefix test alone would let `data/agent.db/x`
-    // through and leave the copy with a directory where its database has to be a file.
     it('refuses a directory planted where a file root belongs', async () => {
         const scratch = mkdtempSync(resolve(tmpdir(), 'rerun-imd-'))
         const staging = resolve(scratch, 'payload')
@@ -348,8 +308,6 @@ describe('importAgent', () => {
         await expect(importAgent({ body: bodyOf(tarball), name: 'nope' })).rejects.toThrow(/not an agent folder/)
     })
 
-    // A tarball travels through a bucket and arrives over HTTP: extraction re-applies the
-    // capture's allowlist rather than trusting what the entries claim to be.
     it('drops a link, an unlisted root and a path that climbs out', async () => {
         const scratch = mkdtempSync(resolve(tmpdir(), 'rerun-imh-'))
         const staging = resolve(scratch, 'payload')

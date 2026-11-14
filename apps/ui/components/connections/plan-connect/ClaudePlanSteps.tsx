@@ -47,8 +47,6 @@ export function ClaudePlanSteps({ oauth, lastStep }: { oauth: ClaudeOAuth; lastS
     )
 }
 
-// The field takes the code Claude shows, or a `claude setup-token` token typed or pasted by hand.
-// A code pasted straight in goes to the exchange at once; a token waits for Enter or a blur.
 function CodeInput({ oauth }: { oauth: ClaudeOAuth }) {
     const t = useTranslations('connections.claude')
     const [value, setValue] = useState('')
@@ -68,8 +66,6 @@ function CodeInput({ oauth }: { oauth: ClaudeOAuth }) {
         void submit(text)
     }
 
-    // The browser may ask for permission, or not offer the clipboard at all: the field is the way
-    // back in.
     const pasteFromClipboard = async () => {
         const text = await navigator.clipboard?.readText?.().catch(() => '')
         setPasteRefused(!text?.trim())

@@ -4,8 +4,6 @@ import { MAX_RECORDING_MS, RECORDING_BITS_PER_SECOND, markRecordingFormatBroken,
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-// 20 samples a second: a 5-minute recording is 6000 amplitudes before they are downsampled to
-// the 48 peaks kept in the message.
 const SAMPLE_INTERVAL_MS = 50
 
 export type VoiceRecording = { blob: Blob; durationMs: number; levels: number[]; format: RecordingFormat }
@@ -44,25 +42,16 @@ function startBackupTake(stream: MediaStream, primary: RecordingFormat): Take[] 
 
 export type VoiceRecorderStatus = 'idle' | 'starting' | 'recording'
 
-/** The recording bar's timer. Polled rather than pushed, so the chat around it does not re-render 20 times a second. */
 export type VoiceLiveState = { durationMs: number }
 
 type Options = {
     onError: (message: string) => void
-    /** Fired once when the recording hits MAX_RECORDING_MS, so the caller can finish it as if the user had. */
     onLimitReached: () => void
 }
 
-/**
- * Microphone capture for the composer. Owns the MediaStream, the MediaRecorder and the analyser
- * feeding the live waveform, and hands back the finished blob together with the amplitudes
- * captured along the way (they become the waveform stored in the message).
- */
 export function useVoiceRecorder({ onError, onLimitReached }: Options) {
     const t = useTranslations('chat.voice')
     const [status, setStatus] = useState<VoiceRecorderStatus>('idle')
-    // Handed to the waveform so it draws off the microphone we already hold instead of opening
-    // a second capture of the same voice.
     const [stream, setStream] = useState<MediaStream | null>(null)
 
     const onErrorRef = useRef(onError)
@@ -72,9 +61,6 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
         onLimitReachedRef.current = onLimitReached
     })
 
-    // The primary take is AAC where the browser offers it, so the iOS app can play the message.
-    // The backup records the same stream in the next format, because a browser can claim AAC and
-    // still fail to encode it: the backup is only sent when the primary comes back empty.
     const takesRef = useRef<Take[]>([])
     const streamRef = useRef<MediaStream | null>(null)
     const audioContextRef = useRef<AudioContext | null>(null)
@@ -83,8 +69,6 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
     const startedAtRef = useRef(0)
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const limitFiredRef = useRef(false)
-    // Bumped by every start and every settle, so a recording cancelled while the permission prompt
-    // is still open does not quietly come to life once the user allows it.
     const sessionRef = useRef(0)
 
     const releaseHardware = useCallback(() => {
@@ -100,7 +84,6 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
         setStream(null)
     }, [])
 
-    // The mic indicator must go out even if the chat unmounts mid-recording.
     useEffect(() => releaseHardware, [releaseHardware])
 
     const sample = useCallback(() => {
@@ -113,8 +96,6 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
                 const centered = (value - 128) / 128
                 sum += centered * centered
             }
-            // RMS is quiet by nature for speech, so it is scaled up and clamped: the waveform is
-            // there to show the voice moving, not to be a calibrated meter.
             allLevelsRef.current.push(Math.min(1, Math.sqrt(sum / buffer.length) * 3))
         }
 
@@ -161,8 +142,6 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
             const analyser = audioContext.createAnalyser()
             analyser.fftSize = 1024
             audioContext.createMediaStreamSource(stream).connect(analyser)
-            // Built a tick after the click that granted the microphone, so it can come up
-            // suspended: a suspended analyser reads as silence and the stored peaks come out flat.
             void audioContext.resume().catch(() => {})
 
             streamRef.current = stream
@@ -208,10 +187,8 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
         [releaseHardware]
     )
 
-    /** Stops and returns the recording. Null when nothing usable was captured. */
     const stop = useCallback(() => settle(true), [settle])
 
-    /** Stops and throws the recording away. */
     const cancel = useCallback(() => {
         void settle(false)
     }, [settle])

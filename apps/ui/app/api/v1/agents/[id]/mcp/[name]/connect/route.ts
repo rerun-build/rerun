@@ -7,7 +7,6 @@ import type { ConnectTarget } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// Mints the ticket the in-app browser opens the server's sign-in with.
 export const POST = apiRoute({ auth: 'member' }, async ({ req, ctx, params }): Promise<ConnectTarget> => {
     const actor = actorFromContext(ctx)
     await assertAgentInWorkspace(params.id, 'manage', actor)

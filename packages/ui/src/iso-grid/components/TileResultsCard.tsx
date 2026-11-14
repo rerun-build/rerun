@@ -11,7 +11,6 @@ import { BUDDY_BADGE_GAP } from './TileBuddy'
 import { FlagCheckeredIcon } from '../../icons'
 
 const CARD_ROWS = 3
-// Room left between the card and the pill it rises from.
 const CARD_GAP = 8
 
 type Props = {
@@ -20,15 +19,12 @@ type Props = {
     reducedMotion?: boolean
 }
 
-// What the hovered coworker finished: one line per result, newest first, three at most then the
-// rest as a count. The pill under it does not move, so nothing here repeats the delay.
 export const TileResultsCard = memo(function TileResultsCard({ tile, worldOffset, reducedMotion }: Props) {
     const results = tile?.style.results
     if (!tile || !results || results.count === 0 || tile.style.badge) return null
 
     const span = tile.span ?? DEFAULT_SPAN
     const pos = isoPosition(tile.position.col, tile.position.row)
-    // The same point TileBlock floats its pill at.
     const headTop = tile.style.buddy
         ? ((span * TILE_H) / 2) * (1 - buddyFootprintShare(tile.style)) - tileTopLift(tile.style, span) - BUDDY_BADGE_GAP
         : -(tile.style.depth ?? BLOCK_HEIGHT) - 18

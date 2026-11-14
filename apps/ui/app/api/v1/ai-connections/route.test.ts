@@ -3,8 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const workspace = { id: 7, subscription_status: 'active', is_sandbox: false, rerun_used_micros: 2_000_000, rerun_budget_micros: 10_000_000, rerun_topup_micros: 0, current_period_end: '2026-11-01T00:00:00Z' }
 let signedIn = true
 let role: 'admin' | 'member' = 'admin'
-// The dialog of a workspace on Rerun Cloud's plans: the billing of ee/ is pinned here, whatever the
-// build resolves @rerun/cloud/billing to.
 vi.mock('@rerun/cloud/billing', async () => ({
     ...(await vi.importActual<typeof import('@/ee/lib/billing/entitlement')>('@/ee/lib/billing/entitlement')),
     ...(await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')),
@@ -187,7 +185,6 @@ describe('OpenCode', () => {
         expect(engine.createConnection).toHaveBeenLastCalledWith(conn, expect.objectContaining({ provider: 'opencode', keys: { OPENCODE_API_KEY: 'oc_sk_key' }, models: expect.arrayContaining(['go/deepseek-v4-pro']) }))
     })
 
-    // An iOS build that predates OpenCode parses the provider strictly and would drop the whole list.
     it('stays out of the list an older iOS build reads, or one that sends no header', async () => {
         opencodeEnabled = true
         engine.listConnections.mockResolvedValue({ connections: [rerun, opencode], default: { connectionId: 'cnx-oc', model: 'go/deepseek-v4-pro' } })
@@ -230,8 +227,6 @@ describe('custom endpoints', () => {
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
 
-    // On Rerun Cloud the box would send the key to the host's own network; a self-hosted install
-    // runs on its owner's, where Ollama listens.
     it('refuse a private address on Rerun Cloud and take it on a self-hosted install', async () => {
         engine.supportsCustomProvider.mockResolvedValue(true)
         const refused = await create({ baseUrl: 'http://192.168.1.20:11434/v1' })
@@ -324,8 +319,6 @@ describe('subscription sign-ins', () => {
     const claudeTicket = () => mintClaudeSignIn('user-1', { verifier: 'v', state: 's' })
     const codexTicket = () => mintCodexSignIn('user-1', { deviceAuthId: 'd', userCode: 'ABCD' })
 
-    // A sign-in ends in storeSignInKeys, which adds a provider or replaces its keys: the same writes
-    // POST /ai-connections and PUT /:id/keys refuse a member, so every step of it is admin only.
     it('answers 403 to a member at every step, start and finish alike', async () => {
         role = 'member'
         expect((await send(claudeStart.POST, 'POST', '/claude/start')).status).toBe(403)

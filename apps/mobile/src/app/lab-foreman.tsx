@@ -26,8 +26,6 @@ import { coworkers, MOCK_VOICE_PEAKS, sessions } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// Dev only: the Foreman's row on a Home of mock coworkers; a tap opens its chat in the given state.
-//   /lab-foreman?state=conversation   state: loading | empty | conversation | long | running | streaming | question | approval
 export type LabState = 'loading' | 'empty' | 'conversation' | 'long' | 'running' | 'streaming' | 'question' | 'approval'
 
 const noop = () => {}
@@ -84,7 +82,6 @@ function MockHome({ onForeman }: { onForeman: () => void }) {
     )
 }
 
-// A reply written a few words at a time, as the stream hands them over, then starting again.
 function useStreamedReply(active: boolean) {
     const [length, setLength] = useState(0)
     useEffect(() => {
@@ -95,8 +92,6 @@ function useStreamedReply(active: boolean) {
     return { text: STREAMED.slice(0, length), done: length >= STREAMED.length }
 }
 
-// RER-72: the keyboard height the pane is lifted by (Reanimated) beside the one React Native last
-// heard of, to catch the lift that stays up once the keyboard is gone.
 function KeyboardProbe({ keyboard }: { keyboard: AnimatedKeyboardInfo }) {
     const [lifted, setLifted] = useState({ height: 0, state: 0 })
     const [heard, setHeard] = useState({ height: 0, visible: false })
@@ -122,7 +117,6 @@ function KeyboardProbe({ keyboard }: { keyboard: AnimatedKeyboardInfo }) {
     )
 }
 
-// The same layout as ConversationPane, fed by mock messages, lifted above the keyboard the same way.
 export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = FOREMAN_DISPLAY_NAME, probe = false }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string; probe?: boolean }) {
     const insets = useSafeAreaInsets()
     const [draft, setDraft] = useState('')

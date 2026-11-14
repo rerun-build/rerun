@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-// Last pan/zoom of a canvas, so coming back to Rerun restores the framing the user left off at
-// instead of snapping to the default view. Scoped per canvas: `board:<workspaceId>` for the iso board.
 const cameraSchema = z.object({
     pan: z.object({ x: z.number().finite(), y: z.number().finite() }),
     zoom: z.number().min(0.3).max(3),
@@ -27,12 +25,9 @@ function commit(): void {
     try {
         localStorage.setItem(keyFor(scope), JSON.stringify(camera))
     } catch {
-        // Quota exceeded or private mode: the framing simply won't survive a reload.
     }
 }
 
-// Leading + trailing throttle: the leading write means a quick pan followed by an immediate reload
-// is still preserved, the trailing one means the final position of a gesture always lands.
 export function writeCamera(scope: string, camera: Camera): void {
     if (!flushBound && typeof window !== 'undefined') {
         flushBound = true
@@ -53,8 +48,6 @@ export function flushCamera(): void {
     commit()
 }
 
-// Returns the saved framing, or null if absent / corrupted. A corrupted entry is dropped whole
-// rather than partially salvaged, so a bad zoom can't strand the view on a valid-looking pan.
 export function readCamera(scope: string | null): Camera | null {
     if (!scope) return null
     try {

@@ -31,7 +31,6 @@ const COLLECTORS: { [K in CollectorId]: Collector<K> } = {
     synthesis: synthesisCollector,
 }
 
-// Past this a collector is reported as failed, so one stuck call never holds up the synthesis.
 const COLLECTOR_TIMEOUT_MS = 240_000
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
@@ -42,8 +41,6 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     return Promise.race([promise, timeout]).finally(() => clearTimeout(timer))
 }
 
-// Every collector starts at once and waits only for the ones it reads, so the free and fast
-// sources land in a second while LinkedIn and the synthesis are still on their way.
 export async function exploreCompany(input: ExploreInput, enabled: ReadonlySet<CollectorId>, emit: (event: ExploreEvent) => void): Promise<void> {
     const startedAt = Date.now()
     const results = new Map<CollectorId, Promise<unknown>>()
@@ -72,7 +69,6 @@ export async function exploreCompany(input: ExploreInput, enabled: ReadonlySet<C
         }
     }
 
-    // Deferred by a microtask so every promise is registered before any collector looks one up.
     for (const id of COLLECTOR_IDS) results.set(id, Promise.resolve().then(() => run(COLLECTORS[id] as Collector<typeof id>)))
 
     await Promise.all(results.values())

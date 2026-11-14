@@ -1,4 +1,3 @@
-# Fixtures and public identifiers that look like secrets to the default rules.
 [extend]
 useDefault = true
 

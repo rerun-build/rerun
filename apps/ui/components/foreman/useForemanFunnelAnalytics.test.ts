@@ -33,7 +33,6 @@ describe('the interview cards', () => {
         ])
     })
 
-    // A "Neither" picked nothing, so the job is still to be counted on the next card.
     it('tells a "Neither" apart, and keeps the job for the card after it', () => {
         run('ask_either', card, { answered: false, reason: 'neither' }, true)
         run('ask_either', card, { answered: true, question: card.title, answers: ['Answering emails'] }, true)
@@ -103,7 +102,6 @@ describe('the plan step', () => {
         expect(events()).toEqual([])
     })
 
-    // No card went up: the kickoff carries the line written under the welcome card.
     it('counts the line written under the welcome card as the plan', () => {
         emitOwnAsk(once, true)
 

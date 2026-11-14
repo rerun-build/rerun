@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { pickLifecycleEmail, type LifecycleSnapshot } from './decide'
 import type * as Sequences from './sequences'
 
-// The activation group is paused, not removed: these cases keep pinning how it behaves once it is
-// switched back on.
 vi.mock('./sequences', async importOriginal => {
     const actual = await importOriginal<typeof Sequences>()
     const LIFECYCLE_LADDER = actual.LIFECYCLE_SEQUENCE_KEYS.filter(key => key !== 'trial_started' && (!actual.PAUSED_LIFECYCLE_SEQUENCES.has(key) || actual.ACTIVATION_SEQUENCES.has(key))).sort(
@@ -112,9 +110,6 @@ describe('pickLifecycleEmail', () => {
         expect(pickLifecycleEmail(trialOver, NOW)?.sequenceKey).toBe('trial_ended')
     })
 
-    // A muted rung hands over to the one below rather than ending the pass. Muting billing is the
-    // asymmetric case: every billing rung left in the ladder is an end-of-access notice, and those
-    // ignore the preference entirely (see 'the end-of-access rungs' below).
     it('hands over to the rung below a muted category', () => {
         const both = snapshot({
             trialEndsAt: ago(HOUR),
@@ -197,8 +192,6 @@ describe('the end-of-access rungs', () => {
         expect(pickLifecycleEmail(endsIn(12 * HOUR), NOW)?.sequenceKey).toBe('subscription_ending_24h')
     })
 
-    // A cancellation scheduled at the last minute must not replay the whole ladder: the two wider
-    // rungs have already gone stale by the time their deadline arrives.
     it('sends only the last reminder when the cancellation lands late', () => {
         const late = snapshot({ ...paying, subscriptionCancelAt: ahead(6 * HOUR) })
         expect(pickLifecycleEmail(late, NOW)?.sequenceKey).toBe('subscription_ending_24h')
@@ -209,8 +202,6 @@ describe('the end-of-access rungs', () => {
         expect(pickLifecycleEmail(snapshot({ ...paying, subscriptionCancelAt: null }), NOW)).toBeNull()
     })
 
-    // A cancelled trial is never charged: telling it its plan starts in two hours is false, and the
-    // subscription countdown is for paid plans only. It hears once, when the trial is over.
     it('says nothing to a cancelled trial until it ends', () => {
         const cancelled = (endsIn: number) => snapshot({ subscriptionPaid: false, subscriptionCancelAt: ahead(endsIn), trialEndsAt: ahead(endsIn) })
         expect(pickLifecycleEmail(cancelled(12 * HOUR), NOW)).toBeNull()
@@ -228,9 +219,6 @@ describe('the end-of-access rungs', () => {
         expect(pickLifecycleEmail(resumed, NOW)?.sequenceKey).toBe('trial_ending_3d')
     })
 
-    // Workspace 11306 in production: trial started 2026-10-05 19:09:55 UTC and cancelled 72 seconds
-    // later, so Stripe set `cancel_at` to the trial end. It still got both reminders, the second one
-    // telling it the card on file was about to be charged.
     describe('a trial cancelled 72 seconds after it started (workspace 11306)', () => {
         const trialEndsAt = new Date('2026-10-08T19:09:55.000Z')
         const cancelledTrial = (sentSoFar: LifecycleSnapshot['sent'] = []) =>
@@ -255,7 +243,6 @@ describe('the end-of-access rungs', () => {
         expect(pickLifecycleEmail(over, NOW)?.sequenceKey).toBe('trial_ended')
     })
 
-    // A reminder missed in its window is not replayed on top of the two-hour notice.
     it('sends only the two-hour notice in the last two hours', () => {
         const lastHours = snapshot({ trialEndsAt: ahead(HOUR) })
         expect(pickLifecycleEmail(lastHours, NOW)?.sequenceKey).toBe('trial_ending_2h')
@@ -266,8 +253,6 @@ describe('the end-of-access rungs', () => {
         expect(pickLifecycleEmail(snapshot({ trialEndsAt: ahead(HOUR), subscriptionPaid: true }), NOW)).toBeNull()
     })
 
-    // Right after the deadline a card-backed trial reads `active` with nothing paid while Stripe
-    // prepares the first charge. It has not lapsed, and must not be told its workspace is going.
     it('waits for the first charge before calling a trial over', () => {
         const charging = snapshot({ trialEndsAt: ago(HOUR), subscriptionEntitled: true, subscriptionPaid: true })
         expect(pickLifecycleEmail(charging, NOW)).toBeNull()
@@ -276,8 +261,6 @@ describe('the end-of-access rungs', () => {
         expect(pickLifecycleEmail(declined, NOW)?.sequenceKey).toBe('trial_ended')
     })
 
-    // They announce that a machine is about to be switched off. No email preference reads as
-    // declining that, and the daily cap does not get to hold one back either.
     it('ignores the category opt-out and the daily cap', () => {
         const muted = snapshot({
             ...paying,
@@ -298,7 +281,6 @@ describe('the end-of-access rungs', () => {
 describe('the archive expiry notice', () => {
     const archivedAt = ago(85 * DAY)
 
-    // Paused after its trial lapsed, its archive expiring in five days.
     function paused(overrides: Partial<LifecycleSnapshot> = {}): LifecycleSnapshot {
         return snapshot({
             trialEndsAt: ago(86 * DAY),
@@ -329,12 +311,10 @@ describe('the archive expiry notice', () => {
         expect(pickLifecycleEmail(paused({ pausedArchive: null }), NOW)).toBeNull()
     })
 
-    // Entitled with the machine still archived is a restore under way.
     it('says nothing once access is back', () => {
         expect(pickLifecycleEmail(paused({ subscriptionEntitled: true, trialLapsed: false }), NOW)).toBeNull()
     })
 
-    // A never-paid trial whose first charge was declined reads `past_due`, which is entitled.
     it('treats a lapsed trial still on past_due as paused', () => {
         expect(pickLifecycleEmail(paused({ subscriptionEntitled: true, trialLapsed: true }), NOW)?.sequenceKey).toBe('workspace_archive_expiring')
     })
@@ -343,7 +323,6 @@ describe('the archive expiry notice', () => {
         expect(pickLifecycleEmail(paused({ sent: [sent('workspace_archive_expiring', { sentAt: ago(DAY) })] }), NOW)).toBeNull()
         expect(pickLifecycleEmail(paused({ sent: [sent('workspace_archive_expiring', { sentAt: archivedAt })] }), NOW)).toBeNull()
 
-        // Sent about an earlier pause, before this archive was taken.
         const earlier = sent('workspace_archive_expiring', { sentAt: new Date(archivedAt.getTime() - DAY) })
         expect(pickLifecycleEmail(paused({ sent: [earlier] }), NOW)?.sequenceKey).toBe('workspace_archive_expiring')
     })
@@ -367,7 +346,6 @@ describe('the renewal reminder', () => {
         expect(pickLifecycleEmail(snapshot({ ...paying, renewalReminderAt: ago(5 * DAY) }), NOW)).toBeNull()
     })
 
-    // Asked for, so sent to whoever asked: the founder rule of the other billing emails does not apply.
     it('reaches the person who asked even when they are not the founder', () => {
         expect(pickLifecycleEmail(snapshot({ ...paying, isFounder: false, renewalReminderAt: ago(HOUR) }), NOW)?.sequenceKey).toBe('renewal_reminder_7d')
     })

@@ -32,8 +32,6 @@ export function prepareSession(partition: string, serverOrigin: string | null): 
         const mediaType = 'mediaType' in details ? details.mediaType : undefined
         return decidePermission({ permission, requestingOrigin: originOf(requestingOrigin), mediaType }, serverOrigin)
     })
-    // The screenshot attached to a message: the system's own picker where there is one (macOS 15+),
-    // the whole main screen elsewhere.
     session.setDisplayMediaRequestHandler(
         (request, callback) => {
             if (!serverOrigin || originOf(request.securityOrigin ?? request.frame?.url) !== serverOrigin) return callback({})
@@ -41,7 +39,6 @@ export function prepareSession(partition: string, serverOrigin: string | null): 
         },
         { useSystemPicker: true },
     )
-    // macOS checks spelling with its own dictionaries, in the languages of the system.
     if (process.platform !== 'darwin') session.setSpellCheckerLanguages(app.getPreferredSystemLanguages().filter((language) => session.availableSpellCheckerLanguages.includes(language)))
     return session
 }

@@ -14,8 +14,6 @@ import { radius, spacing } from '@/theme/tokens'
 import { HitlAction, HitlCard } from './HitlCard'
 import type { HitlWidgetProps } from './registry'
 
-// What a coworker asks leave to spend on paid data, priced by the hub, answered the way the web
-// answers it. "Not now" declines at once: the coworker finishes with its free tools.
 export function SpendWidget({ pending, agentId, onAnswer, webUrl }: HitlWidgetProps) {
     const t = useTranslations('mobileHitl')
     const tTools = useTranslations('tools')
@@ -29,8 +27,6 @@ export function SpendWidget({ pending, agentId, onAnswer, webUrl }: HitlWidgetPr
     const quote = readSpendQuote(pending.output)
     if (!quote) return null
     const request = pendingSpend(pending.input)
-    // The credit the workspace had when the hub priced it: the app does not follow the balance live,
-    // the web card does, and topping up happens there.
     const short = quote.totalMicros > quote.creditLeftMicros
 
     const answer = (decision: SpendDecision) => {
@@ -47,7 +43,6 @@ export function SpendWidget({ pending, agentId, onAnswer, webUrl }: HitlWidgetPr
             await setPaidDataAlwaysAllow(caller, agentId, true)
             answer({ purpose: request.purpose, decision, always: true })
         } catch {
-            // The approval still stands, held to its estimate: only the setting could not be written.
             setFailed(true)
             answer({ purpose: request.purpose, decision })
         } finally {

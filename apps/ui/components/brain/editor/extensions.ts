@@ -7,8 +7,6 @@ import { Markdown } from 'tiptap-markdown'
 import { FileLink } from './file-link'
 import { Wikilink } from './wikilink'
 
-// tiptap-markdown only tracks tightness on bullet and ordered lists, so a to-do list would come
-// back with a blank line between every item.
 const TightTaskLists = Extension.create({
     name: 'brainTightTaskLists',
     addGlobalAttributes: () => [
@@ -32,8 +30,6 @@ export type BrainExtensionOptions = {
     placeholder?: string
 }
 
-// Everything a brain page can hold and round-trip through its markdown file. A heading level the
-// slash menu does not offer is still parsed, so a page written elsewhere keeps its `#` titles.
 export function brainExtensions({ titleOf, onOpenPage, onOpenFile, placeholder }: BrainExtensionOptions = {}): Extensions {
     return [
         StarterKit.configure({

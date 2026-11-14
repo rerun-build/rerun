@@ -7,8 +7,6 @@ import { CreatorOnboarding } from './CreatorOnboarding'
 import { JoinShell } from './JoinShell'
 import { getTranslations } from 'next-intl/server'
 
-// The resume point of the flow, and the target of the conditions wall on the home. No token here:
-// the account already carries the fiche, so anyone landing on it without one has nothing to resume.
 export default async function CreatorJoinResumePage() {
     const { session } = await getServerSession()
     if (!session?.email) redirect(routes.auth)

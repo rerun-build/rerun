@@ -1,5 +1,3 @@
-// The proxy countries Linkup can sign in from. LinkedIn trusts a login from where the person usually
-// is, so the default is read off the browser's locale and the user can change it.
 export const LINKUP_COUNTRIES: readonly { code: string; name: string }[] = [
     { code: 'US', name: 'United States' },
     { code: 'CA', name: 'Canada' },
@@ -36,8 +34,6 @@ export const LINKUP_COUNTRIES: readonly { code: string; name: string }[] = [
 
 const FALLBACK_COUNTRY = 'US'
 
-// English keeps the names above; another language asks the browser for its own, under the ISO code
-// (Linkup's UK is GB there).
 export function linkupCountryName(country: { code: string; name: string }, locale: string): string {
     if (locale.startsWith('en')) return country.name
     try {
@@ -47,7 +43,6 @@ export function linkupCountryName(country: { code: string; name: string }, local
     }
 }
 
-// Linkup says UK where the locale says GB.
 export function countryFromLocale(locale: string | undefined): string {
     const region = locale?.split(/[-_]/)[1]?.toUpperCase()
     const code = region === 'GB' ? 'UK' : region

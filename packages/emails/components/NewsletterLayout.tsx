@@ -4,28 +4,18 @@ import { Layout } from "./Layout";
 import { Panel } from "./Panel";
 import { text } from "../theme";
 
-/** What an issue needs from the sender: the reader's own unsubscribe link, and where the app lives. */
 export interface NewsletterProps {
   appUrl: string;
   unsubscribeUrl: string;
 }
 
-/**
- * Who an issue goes to. `product` is every account that kept product emails on; `waitlist` narrows
- * that to the accounts still parked behind the machine waitlist.
- */
 export type NewsletterAudience = "product" | "waitlist";
 
-/** Everything the admin list and the send need to know about an issue without rendering it. */
 export interface NewsletterMeta {
-  /** Stable key of the issue, used as the database key of a send. */
   slug: string;
   subject: string;
-  /** The preheader, the line inboxes show next to the subject. */
   preview: string;
-  /** Editorial date of the issue, ISO. */
   date: string;
-  /** Absent means `product`. */
   audience?: NewsletterAudience;
 }
 
@@ -33,7 +23,6 @@ export interface NewsletterLayoutProps extends NewsletterProps {
   meta: NewsletterMeta;
   title: string;
   intro: React.ReactNode;
-  /** Framed preamble above the lead, for what the reader needs before the issue itself. */
   note?: React.ReactNode;
   children: React.ReactNode;
 }

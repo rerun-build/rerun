@@ -5,14 +5,10 @@ import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 import { LOGO_MAX_BYTES } from './logo-input'
 
 const FETCH_TIMEOUT_MS = 5000
-// The favicon service answers with a redirect to its CDN, so a hop or two has to be followed, each
-// one checked like the first.
 const MAX_REDIRECTS = 3
 
 type FetchedLogo = { ok: true; bytes: Uint8Array } | ActionFailure
 
-// Downloads the image a logo link points at: public http(s) only, every redirect re-checked, an
-// image content type, and never more than LOGO_MAX_BYTES read off the wire.
 export async function fetchLogoBytes(url: string, redirectsLeft = MAX_REDIRECTS): Promise<FetchedLogo> {
     if (!URL.canParse(url)) return failure('noLogoFound')
     const { protocol, hostname } = new URL(url)
@@ -51,9 +47,6 @@ export async function fetchLogoBytes(url: string, redirectsLeft = MAX_REDIRECTS)
     return { ok: true, bytes }
 }
 
-// sharp draws an SVG at its own declared size, often a 24px viewBox, and the resize that follows
-// never enlarges: the logo would be stored as a smudge. So a vector is drawn at the density that
-// lands it on the target size first.
 export async function rasterizeVectorLogo(bytes: Uint8Array, targetSize: number): Promise<Uint8Array> {
     const { default: sharp } = await import('sharp')
     const { format, width, height } = await sharp(bytes).metadata()

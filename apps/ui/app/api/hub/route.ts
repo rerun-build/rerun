@@ -10,11 +10,6 @@ import { foremanHubTokenRequired, verifyForemanHubToken } from '@/lib/foreman/hu
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// Rerun Hub REST endpoint. The engine's built-in `rerun_hub_*` tools call this over
-// the public internet, authenticated with its RERUN_API_KEY (same identity as the engine
-// webhooks), which names one workspace. The `x-rerun-agent` header carries the ENGINE agent
-// id, resolved here to the Supabase agent of that workspace. Every coworker of the box holds that
-// key, so `foreman` must also carry the token the hub signed into the foreman's brief.
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request): Promise<Response> {
@@ -29,10 +24,7 @@ export async function POST(req: Request): Promise<Response> {
     const engineAgentId = req.headers.get('x-rerun-agent') ?? ''
     if (!engineAgentId) return new Response('Missing x-rerun-agent header', { status: 400 })
 
-    // The foreman has no agent row: it speaks for the whole workspace the engine key names.
     const isForeman = engineAgentId === FOREMAN_AGENT_ID
-    // The person the foreman's turn speaks for, from its signed token: their access, not the
-    // workspace's. A token without one (minted before, or no token at all) acts as the workspace.
     let foremanActor: Actor = workspaceActor(engine.workspaceId)
     if (isForeman) {
         const foremanToken = req.headers.get(FOREMAN_HUB_TOKEN_HEADER)

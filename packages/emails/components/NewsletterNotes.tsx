@@ -4,22 +4,17 @@ import { NOTE_ICON_SIZE, noteIconUrl, type NoteIcon } from "../assets";
 import { text, theme } from "../theme";
 
 export interface NewsletterNote {
-  /** From the closed set in assets.ts: a note is skimmed, so its glyph is recognised, not read. */
   icon: NoteIcon;
   title: string;
-  /** One line. A note that needs two lines to land is a section, not a note. */
   body: string;
 }
 
 export interface NewsletterNotesProps {
-  /** Short kicker above the block. */
   label?: string;
   title: string;
   notes: NewsletterNote[];
 }
 
-/** The tail of an issue: the fixes and the small improvements, one line each, stacked. Carries no
- *  picture and no button, so the eye slides down it and stops at the sign-off. */
 export function NewsletterNotes({
   label = "Also",
   title,
@@ -57,8 +52,6 @@ export function NewsletterNotes({
           {notes.map((note, index) => (
             <tr key={note.title}>
               <td style={glyphCell}>
-                {/* Decorative, so no alt: a blocked image leaves the gutter empty rather than
-                    painting a word next to the title it illustrates. */}
                 <Img
                   src={noteIconUrl(note.icon)}
                   width={NOTE_ICON_SIZE}
@@ -121,7 +114,6 @@ const list: React.CSSProperties = {
 
 const glyphCell: React.CSSProperties = {
   paddingRight: "12px",
-  // Lines the glyph up with the cap height of the title next to it rather than with its box.
   paddingTop: "3px",
   verticalAlign: "top",
   width: `${NOTE_ICON_SIZE}px`,

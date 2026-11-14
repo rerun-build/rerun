@@ -28,7 +28,6 @@ export async function fetchForemanMessages(caller: Caller, sessionId: string): P
     return foremanEngineMessagesSchema.parse(await api(`${ENGINE}?sessionId=${encodeURIComponent(sessionId)}`, caller)).messages
 }
 
-// Only the last conversation says which run it has going.
 export async function fetchForemanActiveRun(caller: Caller, sessionId: string): Promise<string | null> {
     const conversation = await fetchForemanConversation(caller)
     return conversation?.sessionId === sessionId ? (conversation.activeRunId ?? null) : null

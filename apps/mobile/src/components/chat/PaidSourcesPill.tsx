@@ -102,7 +102,6 @@ function SourcesSheet({ turn, open, onClose }: { turn: PaidTurnSources; open: bo
     )
 }
 
-// The web's source pill under a reply that bought data: the logos of where it came from, the detail in a sheet.
 export function PaidSourcesPill({ turn }: { turn: PaidTurnSources }) {
     const theme = useTheme()
     const [open, setOpen] = useState(false)

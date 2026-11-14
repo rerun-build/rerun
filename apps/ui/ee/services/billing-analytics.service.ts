@@ -9,11 +9,6 @@ import { foremanClientSchema, type ForemanClient } from '@rerun/contracts'
 import type Stripe from 'stripe'
 import { findWorkspaceId } from './billing.service'
 
-// PostHog reporters for the Stripe subscription lifecycle. Everything here is best effort: a
-// capture failure must never 500 the webhook into a Stripe retry loop, so every reporter swallows
-// and logs. Idempotency is layered: the stripe_events claim table, the previous-status transition
-// guard, and a deterministic uuid per (event, object) that makes PostHog dedupe whatever slips.
-
 export { resolveWorkspaceMemberEmail, resolveWorkspaceOwner }
 
 function trialOrigin(origin: string | undefined): ForemanClient {
@@ -23,9 +18,6 @@ function trialOrigin(origin: string | undefined): ForemanClient {
 function lifecycleProps(subscription: Stripe.Subscription, workspaceId: number, owner: WorkspaceOwner): SubscriptionLifecycleProps {
     const items = subscription.items?.data ?? []
     const { quantities } = quantitiesFromItems(items)
-    // From the plan table rather than the items: an item's `unit_amount` is the price's default
-    // amount, which says nothing about what a subscription minted in another currency is billed.
-    // Only a legacy base price, checked on its currency, is taken off it.
     const interval = intervalOfItems(items)
     const mrr = (perMonthCents(quantities, interval, priceArmOfItems(items)) - legacyBaseDiscountCents(items)) / 100
     const billing_period: BillingPeriod = interval === 'yearly' ? 'annual' : 'monthly'
@@ -44,13 +36,8 @@ function lifecycleProps(subscription: Stripe.Subscription, workspaceId: number, 
     }
 }
 
-// Statuses that mean the workspace already had a live subscription before this sync. past_due and
-// unpaid count: a recovered payment is not a new start, and a trial cannot begin from them.
 const LIVE_STATUSES = new Set(['active', 'trialing', 'past_due', 'unpaid'])
 
-// Routes the status transition observed by applySubscriptionToWorkspace to its lifecycle event.
-// `previousStatus` is the workspace row as it stood before this sync, so a Stripe retry that gets
-// past the idempotency claim finds the transition already consumed.
 export async function reportSubscriptionTransition(subscription: Stripe.Subscription, workspaceId: number, previousStatus: string | null): Promise<void> {
     try {
         const wasLive = LIVE_STATUSES.has(previousStatus ?? '')
@@ -74,9 +61,6 @@ export async function reportSubscriptionTransition(subscription: Stripe.Subscrip
     }
 }
 
-// Reported from the first real charge, never from the status: Stripe moves a trial to `active`
-// before it attempts the card, so a declined card would count as a conversion. A subscription
-// taken without a trial already reported `subscription_started`.
 export async function reportTrialConverted(subscription: Stripe.Subscription, workspaceId: number): Promise<void> {
     try {
         if (!subscription.trial_end) return
@@ -90,9 +74,6 @@ export async function reportTrialConverted(subscription: Stripe.Subscription, wo
     }
 }
 
-// What the customer answered in the cancel flow (the portal's survey before it). `reason` only says who ended the
-// subscription (a request, a failed payment, a dispute); `comment` is what they wrote, and
-// `feedback` the reason a model filed it under (the one they picked, before 9 Oct 2026).
 function cancellationFeedbackProps(subscription: Stripe.Subscription) {
     return {
         cancellation_reason: subscription.cancellation_details?.reason ?? undefined,
@@ -101,9 +82,6 @@ function cancellationFeedbackProps(subscription: Stripe.Subscription) {
     }
 }
 
-// A cancel arrives as `customer.subscription.updated` with cancel_at_period_end flipping to
-// true; the caller detects the flip off the event's previous_attributes. The uuid is keyed on the
-// Stripe event id, not the subscription: cancel → uncancel → cancel again must count twice.
 export async function reportSubscriptionCancelRequested(subscription: Stripe.Subscription, eventId: string): Promise<void> {
     try {
         if (isTemplateSubscription(subscription)) return
@@ -158,11 +136,6 @@ export async function reportTrialPaymentFailed(subscription: Stripe.Subscription
     }
 }
 
-// The trial that never was: the card had already spent one on another workspace, so the
-// subscription was cancelled before anything was charged. Kept under its original name so the
-// PostHog funnels built on it survive. Watch it against `checkout_started`: someone who lands here
-// and comes back to subscribe for real is the legitimate case, someone who never returns is the
-// abuse signal the whole check exists for.
 export async function reportTrialSkippedForCardReuse(subscription: Stripe.Subscription, workspaceId: number): Promise<void> {
     try {
         const owner = await resolveWorkspaceOwner(workspaceId)
@@ -175,8 +148,6 @@ export async function reportTrialSkippedForCardReuse(subscription: Stripe.Subscr
     }
 }
 
-// Every paid plan invoice, renewals and add-on prorations alike — billing_reason keeps them
-// apart in the dashboard. The amount filter drops the $0 invoice that opens a trial.
 export async function reportPlanInvoicePaid(invoice: Stripe.Invoice): Promise<void> {
     try {
         if (!invoice.amount_paid) return

@@ -29,13 +29,10 @@ function subscribe(listener: () => void) {
     }
 }
 
-// iOS's action sheet on Android: a bottom sheet of rows, dismissed by the back gesture or a tap
-// outside, which answers the cancel index as iOS does.
 export function showActionSheet(request: ActionSheetRequest, onSelect: (index: number) => void): void {
     show({ kind: 'sheet', request, onSelect })
 }
 
-// iOS's Alert.prompt, which Android does not have: a dialog with one text field.
 export function promptText(request: TextPromptRequest): void {
     openings += 1
     show({ kind: 'prompt', request, opening: openings })
@@ -44,7 +41,6 @@ export function promptText(request: TextPromptRequest): void {
 const GRABBER = { width: 36, height: 4 }
 const ROW_HEIGHT = 52
 const DIALOG_MAX_WIDTH = 420
-// A long list (the coworkers of a big workspace) scrolls under the sheet's title.
 const ROWS_MAX_SHARE = 0.7
 const KEYBOARD_DELAY_MS = 250
 
@@ -112,8 +108,6 @@ function TextPrompt({ request }: { request: TextPromptRequest }) {
         request.onSubmit(text)
     }
     return (
-        // The keyboard only opens once the modal's window has the focus, a moment after it shows: autoFocus,
-        // or a focus right on onShow, leaves the field focused with the keyboard closed.
         <Modal visible transparent animationType="fade" statusBarTranslucent navigationBarTranslucent onRequestClose={cancel} onShow={focusWhenShown}>
             <Pressable testID="prompt-backdrop" accessibilityLabel={request.cancelLabel ?? t('actions.cancel')} onPress={cancel} style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
             <View style={{ flex: 1, alignItems: 'center', paddingTop: '28%', paddingHorizontal: spacing.xl }} pointerEvents="box-none">

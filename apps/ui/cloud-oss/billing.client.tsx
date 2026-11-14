@@ -5,8 +5,6 @@ import { DEFAULT_PRICE_ARM, type PriceArm } from '@rerun/contracts'
 import type { SubscriptionProvider } from '@/components/agent/ModelPickerProviders'
 import type { TrialStep } from '@/lib/foreman/next-steps'
 
-// Nothing is sold in this build, so every surface that would sell or meter the plan renders
-// nothing. Their callers only reach them on states a self-hosted workspace never takes.
 export function BillingDialog() {
     return null
 }

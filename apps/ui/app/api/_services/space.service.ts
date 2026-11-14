@@ -10,9 +10,6 @@ import type { Box } from '@rerun/contracts'
 
 export { buildBaseUrl }
 
-// A Box no longer holds a machine: the workspace does. These keep their names and their
-// signatures so the agent-scoped callers that start from a `space_id` column do not move, but what
-// they resolve is the workspace's one engine.
 export async function getSpaceConnection(spaceId: string): Promise<EngineConnection> {
     const supabase = createServiceRoleClient()
 
@@ -27,12 +24,6 @@ export async function getSpaceConnection(spaceId: string): Promise<EngineConnect
 
 export type SpaceTarget = { spaceId: string; conn: EngineConnection }
 
-// The door of the two public contracts that still address a Box by its id: the REST route
-// /api/v1/boxes/[id]/* and the space tools of the MCP server. It both proves the Box belongs to the
-// caller and hands back the connection, so neither has to pair an assertion with a separate
-// unchecked fetch. Inside the app a server action has no Box to name: it goes through
-// requireWorkspaceConnection. `workspaceId` is passed in when the caller proved its identity with
-// an API key rather than a browser session; omitted, it comes from the session.
 export async function resolveSpaceTarget(spaceId: string, workspaceId?: number): Promise<SpaceTarget> {
     const supabase = createServiceRoleClient()
     const [callerWorkspaceId, { data: space }] = await Promise.all([
@@ -43,9 +34,6 @@ export async function resolveSpaceTarget(spaceId: string, workspaceId?: number):
     return { spaceId, conn: await getWorkspaceConnection(callerWorkspaceId) }
 }
 
-// A Box read carries only what a Box is: a name, a rectangle's identity, who sees it and the
-// caller's level on it. `managed` describes the machine the whole workspace runs on, kept on the
-// public /api/v1/boxes contract that the mobile app still reads.
 const BOX_COLUMNS = ['id', 'name', 'created_at', 'visibility'] as const
 
 type BoxRow = Pick<Database['public']['Tables']['spaces']['Row'], (typeof BOX_COLUMNS)[number]>
@@ -54,7 +42,6 @@ function boxFromRow(row: BoxRow, managed: boolean, access: AccessLevel): Box {
     return { id: row.id, name: row.name, createdAt: row.created_at, managed, visibility: toVisibility(row.visibility), access }
 }
 
-// The Boxes the actor reaches, a Box closed to it left out.
 export async function listBoxes(actor: Actor): Promise<Box[]> {
     const [{ data, error }, engine, accessBySpace] = await Promise.all([
         selectMany(createServiceRoleClient(), 'spaces', BOX_COLUMNS, { workspace_id: actor.workspaceId }, { column: 'created_at' }),

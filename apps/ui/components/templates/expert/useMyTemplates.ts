@@ -18,9 +18,6 @@ import type { ExpertTemplate, ExpertTemplateDetail, TemplateAuthorInput } from '
 
 type ListResult = Awaited<ReturnType<typeof listMyTemplatesAction>>
 
-// Fetched when the panel opens, reloaded after every write: the list is short and the panel is modal,
-// so there is nothing to keep in sync while it is closed. `templates === null` means loading, and so
-// does `detail === null` while an id is selected.
 export function useMyTemplates(open: boolean, selectedId: string | null) {
     const t = useTranslations('templates.expert.toasts')
     const errorText = useErrorText()
@@ -38,8 +35,6 @@ export function useMyTemplates(open: boolean, selectedId: string | null) {
 
     const load = useCallback(() => listMyTemplatesAction().then(apply), [apply])
 
-    // Which template the last fetch was for: a slower answer for a template the author has already
-    // moved away from is dropped instead of replacing the one on screen.
     const requestedRef = useRef<string | null>(null)
 
     const loadDetail = useCallback((id: string) => {
@@ -62,7 +57,6 @@ export function useMyTemplates(open: boolean, selectedId: string | null) {
         if (selectedId) void loadDetail(selectedId)
     }, [selectedId, loadDetail])
 
-    // Every write can change both views: the row (title, status) and the document the editor holds.
     const reload = useCallback(async () => {
         await load()
         if (selectedId) await loadDetail(selectedId)
@@ -135,8 +129,6 @@ export function useMyTemplates(open: boolean, selectedId: string | null) {
         [load, errorText],
     )
 
-    // Capture and removal rewrite the row out of band, so the panel picks the change up the same way
-    // it does after a save: by reloading what it renders from.
     const removeAgent = useCallback(
         async (templateId: string, agentKey: string): Promise<boolean> => {
             const result = await removeMyTemplateAgentAction({ templateId, agentKey })
@@ -150,7 +142,5 @@ export function useMyTemplates(open: boolean, selectedId: string | null) {
         [reload, errorText],
     )
 
-    // Matched on identity rather than cleared on selection: the editor never renders the previous
-    // template's document under the newly selected id, without a setState inside an effect.
     return { templates, detail: detail?.id === selectedId ? detail : null, create, save, submit, withdraw, remove, removeAgent, reload }
 }

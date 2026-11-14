@@ -83,7 +83,6 @@ describe('updateMemory', () => {
         const agent = agentNamed('update-embed-agent')
         const id = await writeMemory(agent, 'the ceo is alice', 'fact')
         vectors.set('the ceo is bob', axis(3))
-        // No word in common with the memory, so full-text recall cannot stand in for the vector.
         vectors.set('leadership', axis(3))
         await updateMemory(agent, id, 'the ceo is bob')
         const hits = await recallMemory(agent, 'leadership', 5, { reinforce: 'none' })
@@ -134,7 +133,6 @@ describe('deleteAllMemories', () => {
         expect(await ftsRecall(agent.id, 'apples', 5)).toEqual([])
         expect((await listMemories(other.id)).map(r => r.id)).toEqual([kept])
 
-        // Looks wrong: deleteMemoriesForAgent never clears memories_fts, so the full-text rows leak.
         const { client } = await getSystemDb(agent.id)
         const leaked = await client.execute('SELECT count(*) AS n FROM memories_fts')
         expect(Number(leaked.rows[0].n)).toBe(2)

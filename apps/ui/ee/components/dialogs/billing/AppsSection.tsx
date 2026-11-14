@@ -30,14 +30,12 @@ export function withAppSlots(quantities: AddonQuantities, slots: AppSlots): Addo
 
 type BillingTranslator = ReturnType<typeof useTranslations<'billing'>>
 
-// " + 2 LinkedIn slots + 1 WhatsApp slot", for the lines that name a whole plan.
 export function appSlotsLabel(slots: AppSlots, t: BillingTranslator): string {
     return APP_SLUGS.filter(slug => slots[slug] > 0)
         .map(slug => t('apps.slotsSuffix', { count: slots[slug], provider: appInfo(slug).providerLabel }))
         .join('')
 }
 
-// The accounts behind each app's slots: a slot only goes back once nothing fills it.
 export function useAppSlots(slugs: AppSlug[], skip = false): Partial<Record<AppSlug, AppSlotsState>> {
     const enabled = useEnabledPaidApps()
     const wanted = skip ? [] : slugs.filter(slug => enabled.includes(slug))
@@ -68,8 +66,6 @@ type AppsSectionProps = {
     onChange: (slug: AppSlug, value: number) => void
 }
 
-// The paid apps of the workspace, billed on the plan but each shown as its own app: plain lines
-// under the plan and the credits, so they do not read as products of their own.
 export function AppsSection({ rows, interval, renewal, disabled = false, onChange }: AppsSectionProps) {
     const t = useTranslations('billing.apps')
     return (
@@ -177,8 +173,6 @@ function trialUntil(trialEndsAt: string, locale: string): string {
     return formatDate(trialEndsAt, locale, { month: 'long', day: 'numeric' })
 }
 
-// The subscriber trial's slot is not on Stripe: the stepper shows it on top of the paid ones but never
-// sends it back as a quantity, and the line says apart the day it turns into a paid one.
 function TrialSlotsCount({ value, inUse, trialEndsAt, price }: { value: number; inUse: number | null; trialEndsAt: string; price: string }) {
     const locale = useLocale()
     const t = useTranslations('billing.apps')

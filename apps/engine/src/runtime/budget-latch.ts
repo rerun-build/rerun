@@ -1,7 +1,5 @@
 import { APICallError } from 'ai'
 
-// In-memory on purpose: a restart or a top-up must not leave schedules paused, and the next
-// successful managed run clears it anyway. After the TTL the next due run is the probe.
 const LATCH_MS = 10 * 60_000
 
 let latchedUntil = 0

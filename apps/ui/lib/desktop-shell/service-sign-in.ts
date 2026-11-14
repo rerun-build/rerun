@@ -1,15 +1,9 @@
 import { desktopShell } from './client'
 
-// A service's sign-in from the desktop app: Google and most providers refuse a web view, so it runs
-// in the system browser, through the iOS app's chain. The hub mints a ticket for this window, the
-// browser signs in and the callback parks the token, the app is handed back a claim through its URL
-// scheme, and this page claims it with its own session.
-
 export type DesktopServiceTarget = { agentId: string; key: string } | { agentId: string; server: string }
 
 export type DesktopServiceSignIn = { ok: true } | { ok: false; error: string }
 
-// The provider's own screens can take a while (a password manager, a second factor), not forever.
 const RETURN_TIMEOUT_MS = 10 * 60_000
 
 export function desktopServiceSignInAvailable(): boolean {

@@ -7,10 +7,6 @@ import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useCallback } from 'react'
 
-// Replays whatever is parked (a first-agent draft or a shared template) after an anonymous user
-// converts. Where it lands depends on the account it converts into: an already-entitled workspace
-// (active/trialing) starts straight away; a not-yet-entitled one (fresh, expired or canceled) opens
-// the paywall, and the work happens on the checkout return.
 export function useResumePendingStart() {
     const { workspace } = useSession()
     const startPending = useStartPending()

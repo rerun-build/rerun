@@ -5,7 +5,6 @@ import { OptionalMark } from './optional-mark'
 
 export interface FieldProps {
     label?: string
-    /** Rendu juste après le titre, en colonne seulement (un badge, une pastille). */
     labelTrailing?: React.ReactNode
     optional?: boolean
     hideRequired?: boolean

@@ -19,8 +19,6 @@ import { shortenUrl } from './markdown/short-link'
 import { useOpenWorkspaceFile } from './markdown/useOpenWorkspaceFile'
 import { openExternalUrl } from '@/lib/url'
 
-// `page`: an answer's block standing on the thread. `bubble`: inside an answer's grey bubble.
-// `brand`: inside the user's violet bubble, where every colour turns white.
 export type MarkdownSurface = 'page' | 'bubble' | 'brand'
 
 type MarkdownScope = { surface: MarkdownSurface; owner: FileOwner | null; shortLinks: boolean; muted: boolean }
@@ -34,8 +32,6 @@ const HEADINGS: Record<number, TextStyle> = {
 }
 const SMALL_HEADING: TextStyle = { fontSize: 16, lineHeight: 24 }
 
-// The web's streamed words (streamdown, apps/ui/lib/chat/stream-animation.ts) blur in over 120 ms; a
-// word on a phone cannot blur alone, so it fades and rises the few points of the web's `slideUp`.
 const WORD_ENTERING = FadeInDown.duration(120)
     .easing(EASE_OUT)
     .withInitialValues({ opacity: 0, transform: [{ translateY: 4 }] })
@@ -148,8 +144,6 @@ function wordsOf(tokens: Token[] | undefined, style: TextStyle, words: Word[] = 
     return words
 }
 
-// While a paragraph is still being written each word is its own view, keyed by its place: a word
-// already there stays put and only the new ones come in. Once the turn ends it is plain text again.
 function StreamingParagraph({ tokens }: { tokens: Token[] | undefined }) {
     const ink = useInk()
     return (
@@ -169,7 +163,6 @@ function StreamingParagraph({ tokens }: { tokens: Token[] | undefined }) {
     )
 }
 
-// An image sits on its own line: a phone cannot float one inside a run of text.
 function ParagraphWithImages({ tokens, streaming }: { tokens: Token[]; streaming: boolean }) {
     const { owner } = use(Scope)
     const pieces: ({ kind: 'text'; tokens: Token[] } | { kind: 'image'; token: Tokens.Image })[] = []
@@ -278,21 +271,12 @@ function Blocks({ tokens, streaming }: { tokens: Token[]; streaming: boolean }) 
 
 type MarkdownProps = {
     text: string
-    // Animates the words of the last paragraph as they arrive, the one a running turn still writes.
     streaming?: boolean
     surface?: MarkdownSurface
-    // Whose files a relative image or a workspace link points at.
     owner?: FileOwner | null
-    // Bare URLs read as their short label, as they did in the composer.
     shortLinks?: boolean
 }
 
-/**
- * The markdown of the web's chat (Streamdown with GFM), drawn natively: headings, lists and task
- * lists, quotes, tables, code with highlighting, drafts, links, images, and `$$` math shown as its
- * source. A half-written answer is closed first, the way Streamdown's `remend` does, so an open `**`
- * or fence never shows raw.
- */
 export function Markdown({ text, streaming = false, surface = 'page', owner = null, shortLinks = false }: MarkdownProps) {
     const tokens = useMemo(() => Lexer.lex(remend(text), { gfm: true }), [text])
     const scope = useMemo(() => ({ surface, owner, shortLinks, muted: false }), [surface, owner, shortLinks])

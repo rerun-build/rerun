@@ -1,7 +1,3 @@
-// The three ways a conversation starts without the user typing: a webhook, a routine, a guided
-// install. Each one is a marker in the run's first user message; every client draws a divider for it
-// instead of a bubble.
-
 export type TriggerPayload = {
     prompt: string
     slug: string
@@ -15,9 +11,6 @@ export type TriggerPayload = {
     isJson: boolean
 }
 
-// Mirrors buildTriggerMessage in apps/engine/src/triggers/message.ts: the block is appended at the
-// very end of the run's first user message. Attribute values are always quoted and their inner
-// quotes are already escaped, so a value carrying a `>` cannot end the tag early.
 const TRIGGER_BLOCK = /\n*<trigger_payload ((?:[^>"]|"[^"]*")*)>\n?([\s\S]*?)\n?<\/trigger_payload>\s*$/
 const TRIGGER_ATTRIBUTE = /([\w-]+)="([^"]*)"/g
 
@@ -53,9 +46,6 @@ export function parseTriggerPayload(text: string): TriggerPayload | null {
 
 export type ScheduledRun = { slug: string; name: string; prompt: string }
 
-// Mirrors buildScheduledRunMessage in apps/engine/src/schedules/message.ts. The block is the entire
-// message, so a user who merely quotes the tag is never mistaken for a scheduled run. A run fired
-// by an engine older than the marker carries the bare prompt and stays an ordinary bubble.
 const SCHEDULED_BLOCK = /^<scheduled_run schedule="([^"]*)" name="([^"]*)">\n?([\s\S]*?)\n?<\/scheduled_run>$/
 const SCHEDULED_CLOSING_TAG = '</scheduled_run>'
 const ESCAPED_SCHEDULED_CLOSING_TAG = '<\\/scheduled_run>'
@@ -77,9 +67,6 @@ export function parseScheduledRun(text: string): ScheduledRun | null {
 
 export type InstallMessage = { agentName: string; guide: string }
 
-// The guided install travels as the run's first user message: the agent reads its whole guide, and
-// the chat draws a setup block instead of the guide as if the user had typed it. The block is the
-// entire message, so a user who merely quotes the tag is never mistaken for an install.
 const INSTALL_BLOCK = /^<agent_install agent="([^"]*)">\n?([\s\S]*?)\n?<\/agent_install>$/
 const INSTALL_CLOSING_TAG = '</agent_install>'
 const ESCAPED_INSTALL_CLOSING_TAG = '<\\/agent_install>'

@@ -143,7 +143,6 @@ describe('run stream hub', () => {
         first.close()
         await vi.advanceTimersByTimeAsync(3 * 60 * 1000)
 
-        // Looks wrong: the eviction deletes by run id, not by buffer, so the still-running second stream is dropped.
         expect(subscribeRunStream('overlap-run')).toBeNull()
     })
 })

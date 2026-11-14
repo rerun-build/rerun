@@ -27,8 +27,6 @@ function failureReason(e: unknown, signal: AbortSignal, timeoutMs: number): stri
 
 const refusal = (verb: string, e: NonPublicHostError, url: string): HostAttempt => ({ text: `${verb} refused: ${e.message} (${url}), ${PUBLIC_HTTP_URL_MESSAGE}.`, failed: false })
 
-// What a coworker auditing a site must not read as a fact about it: the status went to our reader,
-// from a datacenter with our user agent, and a URL it guessed proves nothing when it does not exist.
 function statusLine(status: number, url: string): string {
     if (isFailureStatus(status)) return `[${status}] ${url} (sent to Rerun's reader: not proof that Google or visitors get the same)`
     if (status === 404 || status === 410) return `[${status}] ${url} (no page here: if you guessed this URL instead of following a link, that is not proof of a broken page)`
@@ -63,8 +61,6 @@ function isRefusal(status: number | null): boolean {
     return status === null || status === 403 || status === 429 || status >= 500
 }
 
-// Second try for a page the box could not read itself: the hub reads it from a network sites do not
-// refuse. Null whenever that does not yield a page, so the caller reports its own failure.
 type HubPage = { markdown: string; rawHtml: string | null }
 
 async function fetchThroughHub(caller: HubCaller, url: string, directStatus: number | null, runSignal?: AbortSignal): Promise<HubPage | null> {

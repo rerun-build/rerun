@@ -2,7 +2,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 const ROW_WIDTHS = ['w-28', 'w-36', 'w-24', 'w-32', 'w-28', 'w-40']
 
-// Shaped on CreatorRevenuePanel: header row, four tiles, the chart block, then the table.
 export function CreatorRevenuePanelSkeleton() {
     return (
         <div className="flex min-h-0 flex-1 flex-col gap-5 p-5">

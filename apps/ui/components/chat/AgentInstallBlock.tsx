@@ -5,12 +5,9 @@ import { ThreadDividerDialog } from '@/components/chat/ThreadDividerDialog'
 import { ThreadDividerDot, ThreadDividerLine, ThreadDividerLink } from '@/components/chat/ThreadDividerLine'
 import { Box3Icon, CheckCircle2Icon } from '@/lib/icons'
 import { useBoardStore } from '@/stores/board.store'
-// Nucleo glyph with no lucide counterpart, so no name to add to the `@/lib/icons` shim.
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-// `agentName` is the name the install was sent under; the board's is preferred so a rename since
-// then still reads right.
 export function AgentInstallBlock({ agentId, agentName, guide, installing = false }: { agentId: string | undefined; agentName: string; guide: string; installing?: boolean }) {
     const t = useTranslations('chat.agentInstall')
     const liveName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name)

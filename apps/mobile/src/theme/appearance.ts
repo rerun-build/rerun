@@ -12,14 +12,11 @@ export function parseAppearance(stored: string | null): AppearancePreference {
     return stored === 'light' || stored === 'dark' ? stored : 'system'
 }
 
-// Overriding the scheme app-wide, rather than in the theme context, is what makes the glass, the
-// native menus and the SwiftUI views follow too.
 export function applyAppearance(preference: AppearancePreference) {
     current = preference
     Appearance.setColorScheme(preference === 'system' ? 'unspecified' : preference)
 }
 
-// Read before the splash hides, so the app never shows a frame in the wrong theme.
 export async function loadAppearance(): Promise<AppearancePreference> {
     const preference = parseAppearance(await SecureStore.getItemAsync(APPEARANCE_KEY).catch(() => null))
     applyAppearance(preference)

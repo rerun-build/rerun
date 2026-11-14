@@ -29,28 +29,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type ModelSelectorProps = {
     agentId: string
-    // Notified whenever the effective model becomes usable (an active connection + a picked model)
-    // or not — lets the composer block sending until a connection is set up.
     onReadyChange?: (ready: boolean) => void
-    // Notified whether the Box holds a connection of its own beyond the keyless Rerun one — lets
-    // the composer pitch bringing an AI subscription only to those who have none.
     onOwnConnectionChange?: (hasOwn: boolean) => void
-    // Notified of the connection the next turn runs on, so an auth error can open that one.
     onConnectionChange?: (connectionId: string | null) => void
-    // Notified of why the subscription refuses the model the next turn would run, or null: the
-    // composer says it while it holds the message back.
     onRefusedModelChange?: (reason: string | null) => void
-    // The key a notice outside the composer requests this picker open by (see model-picker.store).
     pickerKey?: string
 }
 
-// In-chat model picker shown in the prompt footer. One group per Box connection, so two Claude
-// subscriptions read as two distinct choices rather than one ambiguous "Claude". Selecting a model
-// sets a per-conversation override (see useAgentModel) that the chat transport sends with every
-// message — it does NOT mutate the agent's persisted default config; the star does that.
-//
-// The "Box default" entry is the one exception: it is not a per-conversation choice but a statement
-// about the agent, so it clears both the override and the pin in one click.
 export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey }: ModelSelectorProps) {
     const t = useTranslations('agent.modelSelector')
     const tShared = useTranslations('agent.modelsShared')
@@ -60,8 +45,6 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const { availableGroups, connectionOf, pinnedModel, pinnedConnectionId, resolvedModel, resolvedConnectionId, followsBoxDefault, supportsBoxDefault, boxDefaultPick, setDefault, followBoxDefault, refreshConnections, loading } =
         useAvailableModels(agentId)
     const { selection, select } = useAgentModel(agentId)
-    // Picking a model for this conversation stays open: only what the coworker runs by default is
-    // managed through its Box. The foreman has no Box, so its default is left as it was.
     const canManageCoworker = useCanManageAgent(agentId)
     const isBoardCoworker = useBoardStore(state => state.agents.some(agent => agent.id === agentId))
     const canSetDefault = canManageCoworker || !isBoardCoworker
@@ -77,30 +60,18 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const connectedProviders = useMemo(() => new Set(availableGroups.map(group => group.provider)), [availableGroups])
     const missingSubscriptions = SUBSCRIPTION_PROVIDERS.filter(provider => !connectedProviders.has(provider))
     const hasOwnConnection = availableGroups.some(group => group.connectionId !== RERUN_CONNECTION_ID)
-    // Only when nothing at all was chosen: an override on this conversation is still a choice, and
-    // the trigger has to say which model that turn will bill.
     const showingBoxDefault = followsBoxDefault && !selection.model
-    // The engine resolves an agent that follows the Box on every run, so there is nothing to repair
-    // here: an override written for it would freeze the conversation on whatever the picker read.
     const engineResolvesModel = showingBoxDefault && supportsBoxDefault
 
-    // The pick is only usable when the connection it names still serves the model. A connection
-    // deleted from the Box, or a model switched off on it, lands here.
     const active = useMemo(() => {
         const group = availableGroups.find(g => g.connectionId === connectionId)
         return group?.models.some(m => m.id === model) ? group : undefined
     }, [availableGroups, connectionId, model])
 
-    // A pick the subscription refuses is kept, not swapped behind the user's back: the message is
-    // held and the picker offers the models the plan does serve.
     const refusedReason = refusedModelReason(active, model)
     const modelText = model ? modelLabel(model) : t('select')
     const refusedMessage = refusedReason ? t('refused', { model: modelText, reason: refusedReason }) : null
 
-    // A pin or an override that no longer resolves (a template just imported, a connection removed)
-    // is repointed at whatever the Box can actually run, the Box default first: Rerun only heads the
-    // list, it is not what the owner chose. Writing the override rather than just the display
-    // matters: the chat transport sends the stored selection.
     useEffect(() => {
         if (loading || active || !hasAvailable || engineResolvesModel) return
         const fallback = connectionOf(model, connectionId) ?? availableGroups.find(group => group.connectionId === boxDefaultPick?.connectionId) ?? availableGroups[0]
@@ -108,7 +79,6 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         select({ connectionId: fallback.connectionId, model: nextModel })
     }, [loading, active, hasAvailable, engineResolvesModel, availableGroups, connectionOf, boxDefaultPick, model, connectionId, select])
 
-    // With nothing to pick from, the request lands where a model gets set up.
     useEffect(() => {
         if (!pickerKey || pickerRequestedFor !== pickerKey || loading) return
         consumePickerRequest()
@@ -116,15 +86,10 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
         else openAiProviders()
     }, [pickerRequestedFor, pickerKey, loading, hasAvailable, consumePickerRequest, openAiProviders])
 
-    // A picker otherwise only loads the connections once per session, and a plan's limits move with
-    // every run: opening the list is the moment someone is about to read them.
     useEffect(() => {
         if (open) void refreshConnections()
     }, [open, refreshConnections])
 
-    // One click, one statement: this agent stops choosing and follows the Box, now and whenever the
-    // Box default changes. Clearing the conversation override too, or the next message would still
-    // carry the model the user just walked away from.
     const useBoxDefault = useCallback(() => {
         select({})
         if (canSetDefault) followBoxDefault()
@@ -132,8 +97,6 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     }, [select, followBoxDefault, canSetDefault])
 
     useEffect(() => {
-        // Don't report "not ready" while still loading — that would block the composer and flash a
-        // false "no model" state before the fetch resolves.
         if (loading) return
         onReadyChange?.((Boolean(active) || (engineResolvesModel && hasAvailable)) && !refusedMessage)
         onOwnConnectionChange?.(hasOwnConnection)
@@ -230,8 +193,6 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
                                     <CommandItem className="flex-1" value="workspace default model" data-checked={showingBoxDefault} disabled={!canSetDefault && !followsBoxDefault} onSelect={useBoxDefault}>
                                         <span className="min-w-0 flex-1 truncate">{t('workspaceDefault')}</span>
                                         <span className="shrink-0 text-[11px] whitespace-nowrap text-muted-foreground">{modelLabel(boxDefaultPick.model)}</span>
-                                        {/* The star says what the agent runs by default, not what this conversation picked, so
-                                            it stays filled while an override is in force. */}
                                         {followsBoxDefault && <StarIcon className="size-3.5 text-primary [&_polygon]:fill-current" />}
                                     </CommandItem>
                                 </TooltipDisabledReason>

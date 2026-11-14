@@ -21,7 +21,6 @@ export async function POST(req: Request) {
 
     if (!(await authenticateEngineToken(token))) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // A memory stored without its vector is still found by keyword; a 500 would only lose the reason.
     try {
         return Response.json({ embedding: await embedText(parsed.data.text) })
     } catch (err) {

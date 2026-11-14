@@ -5,7 +5,6 @@ const TIMEOUT_MS = 10_000
 
 type BraveResponse = { web?: { results?: { title?: string; url?: string; description?: string }[] } }
 
-// Returns null when no key is configured: the caller has nothing to search with.
 export async function searchBrave(query: string, count: number): Promise<WebSearch | null> {
     const apiKey = process.env.BRAVE_SEARCH_API_KEY
     if (!apiKey) return null

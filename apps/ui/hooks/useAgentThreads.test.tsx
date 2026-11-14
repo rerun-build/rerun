@@ -5,11 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 
-// A server action whose request never reaches the server (a laptop waking up before its network,
-// one going back to sleep mid-request) rejects with the browser's own TypeError. The threads are
-// read again on every realtime event and every resync of the channel, with nobody waiting on the
-// answer: such a rejection used to surface as an unhandled "Failed to fetch" (RER-94).
-
 const mocks = vi.hoisted(() => ({ listAgentThreadsAction: vi.fn() }))
 vi.mock('@/app/api/_actions/session.actions', () => ({ listAgentThreadsAction: mocks.listAgentThreadsAction }))
 vi.mock('@/stores/board.store', () => ({ useBoardStore: (select: (state: { sessions: [] }) => unknown) => select({ sessions: [] }) }))

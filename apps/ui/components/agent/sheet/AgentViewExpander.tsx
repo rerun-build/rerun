@@ -8,7 +8,6 @@ import { SURFACE_EASE } from '@/components/agent/sheet/floating'
 
 type Size = { width: number; height: number }
 
-/** The button a screen was opened from, measured in the panel's body: the screen grows out of it and folds back into it. */
 export type CardOrigin = { tab: CardDestination; shape: CardDestinationShape; top: number; left: number; width: number; height: number; panel: Size }
 
 export function measureCardOrigin(tab: CardDestination, shape: CardDestinationShape, element: HTMLElement): CardOrigin {
@@ -20,18 +19,12 @@ export function measureCardOrigin(tab: CardDestination, shape: CardDestinationSh
 
 const transition = (duration: number, delay = 0) => ({ duration, delay, ease: SURFACE_EASE })
 
-/**
- * The clicked button opens up from its exact place until it fills the panel, then folds back into
- * it on the way out. Its edges move, nothing is scaled: the screen inside already has its final
- * size, the surface uncovers it as it grows instead of laying it out again on every frame.
- */
 export function AgentViewExpander({ origin, ghost, onGrown, children }: { origin: CardOrigin; ghost: ReactNode; onGrown: () => void; children: ReactNode }) {
     const ref = useRef<HTMLDivElement>(null)
     const isPresent = useIsPresent()
     const [size, setSize] = useState<Size>(origin.panel)
     const from = { top: origin.top, left: origin.left, width: origin.width, height: origin.height, borderRadius: 10 }
 
-    // The mobile sheet is dragged between detents and the desktop panel resized while a screen is open.
     useLayoutEffect(() => {
         const body = ref.current?.parentElement
         if (!body) return

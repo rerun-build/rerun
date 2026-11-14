@@ -1,9 +1,3 @@
-// Delivery for one candidate. What the ladder could not settle is settled here: the recipient has
-// to have an address, and the recommendation email rebuilds its list for real and backs out if the
-// catalogue no longer has two solid picks for this account. The unique indexes on
-// `lifecycle_emails` are what make a second attempt harmless.
-//
-// No 'server-only' anywhere in the import graph, see lib/email/client.ts.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { captureServer, deterministicUuid } from '@rerun/analytics/server'
 import type { Database } from '@/app/api/database.types'
@@ -56,7 +50,6 @@ export type DeliverInput = {
 
 export type DeliverResult = { sent: true } | { sent: false; reason: string }
 
-// Whole days, which is the only granularity these emails ever speak in.
 function relativeLabel(from: Date, now: Date, t: EmailTranslator): string {
     const hours = Math.max(1, Math.round((now.getTime() - from.getTime()) / (60 * 60_000)))
     if (hours < 24) return t('agentIdle.createdHoursAgo', { count: hours })
@@ -64,15 +57,10 @@ function relativeLabel(from: Date, now: Date, t: EmailTranslator): string {
     return days === 1 ? t('agentIdle.createdYesterday') : t('agentIdle.createdDaysAgo', { count: days })
 }
 
-// A guess made before the archive exists: the bucket keeps it this long from upload, and the
-// upload is the pause itself.
 function keptUntilLabel(pausedAt: Date, locale: Locale): string {
     return emailDateLabel(new Date(pausedAt.getTime() + ARCHIVE_RETENTION_DAYS * 24 * 60 * 60_000), locale)
 }
 
-// Asked of Stripe at send time: nothing in the database says which kind of trial this is. A failed
-// lookup answers `false`, whose copy ("add a card or the workspace is paused") is still true, only
-// alarming, for someone who does have one.
 async function trialHasCard(customerId: string | null): Promise<boolean> {
     if (!customerId) return false
     try {
@@ -85,8 +73,6 @@ async function trialHasCard(customerId: string | null): Promise<boolean> {
     }
 }
 
-// The declined first charge, payable in one click from Stripe's own page, which is also where a
-// 3-D Secure confirmation happens.
 async function openInvoiceUrl(customerId: string | null): Promise<string | null> {
     if (!customerId) return null
     try {
@@ -98,8 +84,6 @@ async function openInvoiceUrl(customerId: string | null): Promise<string | null>
     }
 }
 
-// What the renewal will charge, tax and any discount included, quoted from Stripe's own preview of
-// the next invoice. Undefined when it cannot be read: the email then states the date alone.
 async function renewalAmountLabel(subscriptionId: string | null): Promise<string | undefined> {
     if (!subscriptionId) return undefined
     try {
@@ -118,17 +102,10 @@ function periodLabel(from: Date, now: Date, t: EmailTranslator): string {
 }
 
 function unsubscribeFor(candidate: LifecycleCandidate): string | null {
-    // An end-of-access notice carries no unsubscribe link. It is sent whatever the category
-    // preference says, and offering a one-click opt-out that the ladder then ignores is a worse
-    // answer than offering none: the footer then shows no link at all.
     if (LIFECYCLE_SEQUENCES[candidate.sequenceKey].mandatory) return null
-    // The POST route reads `category`, so a one-click unsubscribe on an activation email leaves the
-    // billing ones alone.
     return `${buildUnsubscribeUrl(candidate.userId)}&category=${candidate.category}`
 }
 
-// Whole days, rounded up: an email that says "3 days" the moment 2.6 remain is not wrong, and one
-// that says "0 days" is.
 function daysUntil(deadline: Date, now: Date): number {
     return Math.max(1, Math.ceil((deadline.getTime() - now.getTime()) / (24 * 60 * 60_000)))
 }
@@ -141,7 +118,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
     const timeLabel = (value: Date) => emailTimeLabel(value, locale)
     const agentUrl = candidate.agentId ? `${APP_URL}/?agent=${candidate.agentId}` : APP_URL
     const billingUrl = `${APP_URL}/?billing=1`
-    // Asked for only once a case knows it sends, so a skipped candidate never costs a capture.
     const banner = (status: TeamStatus) => emailBoardBanner(supabase, candidate.workspaceId, status, BANNER_WARM_BACKGROUND_MS)
 
     switch (candidate.sequenceKey) {
@@ -155,10 +131,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
             if (!result.ok) return { skip: 'no solid recommendation' }
             const company = answers as { company_name?: string; company_url?: string } | null
 
-            // The cards are captured here rather than left to the reader's mail client: a cold
-            // screenshot takes seconds, and an image proxy that gives up leaves a hole in the
-            // message. A pick whose capture did not come back travels without one and the email
-            // draws its text row instead.
             const ready = await warmTemplateEmailCards(result.picks.map(pick => pick.imageUrl))
             const templates = result.picks.map(pick => (ready.has(pick.imageUrl) ? pick : { ...pick, imageUrl: undefined }))
 
@@ -205,9 +177,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
             if (!snapshot.trialEndsAt) return { skip: 'no trial' }
             const reason = snapshot.trialPaymentFailed ? 'payment_failed' : 'no_card'
             const invoiceUrl = reason === 'payment_failed' ? await openInvoiceUrl(workspace?.stripe_customer_id ?? null) : null
-            // Each counted the way the teardown counts it, so the time in the email is the time
-            // that will be honoured: a day from the declined charge, or two hours from this send
-            // and not from the trial's end date, even if this email is going out late.
             const declinedAt = reason === 'payment_failed' && workspace?.payment_failed_at ? new Date(workspace.payment_failed_at) : null
             const pausedAt = declinedAt ? new Date(declinedAt.getTime() + PAYMENT_FAILED_GRACE_MS) : new Date(now.getTime() + BOX_DELETION_GRACE_MS)
             const boardUrl = await banner('offline')
@@ -219,8 +188,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                         trialEndedLabel: dateLabel(snapshot.trialEndsAt as Date),
                         pausedLabel: timeLabel(pausedAt),
                         keptUntilLabel: keptUntilLabel(pausedAt, locale),
-                        // Left out entirely for a workspace that produced nothing: three zeros make
-                        // a worse case for coming back than saying nothing.
                         summary: snapshot.successfulRuns > 0 ? { agents: snapshot.agentCount, runs: snapshot.successfulRuns } : undefined,
                         billingUrl: invoiceUrl ?? billingUrl,
                         boardUrl,
@@ -233,8 +200,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
             if (snapshot.trialEndsAt <= now) return { skip: 'trial already over' }
             const trialEndsAt = snapshot.trialEndsAt
             const hasCard = await trialHasCard(workspace?.stripe_customer_id ?? null)
-            // `trial_ended` goes out on the first sweep after the deadline and the grace runs from
-            // that send, so this is the earliest the workspace can be paused.
             const pausedAt = new Date(trialEndsAt.getTime() + BOX_DELETION_GRACE_MS)
             const boardUrl = await banner('working')
             return {
@@ -272,8 +237,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
         case 'subscription_ending_7d':
         case 'subscription_ending_3d':
         case 'subscription_ending_24h': {
-            // The rung fired on a date the discovery pass read; a cancellation undone since is the
-            // one thing worth re-checking, and it makes the whole email false.
             if (!snapshot.subscriptionCancelAt) return { skip: 'cancellation withdrawn' }
             const endsAt = snapshot.subscriptionCancelAt
             const boardUrl = await banner('working')
@@ -282,12 +245,7 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
                     sendSubscriptionEndingEmail(to, candidate.sequenceKey, {
                         workspaceName: workspace?.name ?? null,
                         endsLabel: dateLabel(endsAt),
-                        // Measured, not taken from the rung's name. A cancellation scheduled five
-                        // days out opens the seven-day rung immediately, and a subject reading
-                        // "in 7 days" over a date five days away is a contradiction the reader
-                        // sees at a glance.
                         daysLeft: daysUntil(endsAt, now),
-                        // A paid account is archived as soon as its subscription is over.
                         keptUntilLabel: keptUntilLabel(endsAt, locale),
                         billingUrl,
                         boardUrl,
@@ -313,8 +271,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
         }
 
         case 'renewal_reminder_7d': {
-            // The plan may have been cancelled or lapsed since the request: a reminder about a
-            // renewal that will not happen is the one thing this email must never say.
             if (!snapshot.subscriptionPaid || snapshot.subscriptionCancelAt) return { skip: 'no longer renewing' }
             if (!workspace?.current_period_end) return { skip: 'no renewal date' }
             const renewsAt = new Date(workspace.current_period_end)
@@ -344,8 +300,6 @@ async function build(supabase: Client, input: DeliverInput, recipient: Lifecycle
     }
 }
 
-// The survey stores whatever the analysis settled on, which is usually a full URL but can be the
-// bare domain the person typed.
 function hostnameOf(url: string | undefined): string | null {
     if (!url) return null
     try {
@@ -355,10 +309,6 @@ function hostnameOf(url: string | undefined): string | null {
     }
 }
 
-/**
- * Sends one candidate and records it. Recording happens whatever the outcome: a `failed` row keeps
- * its slot under the unique index, which is what stops a dead address being retried every tick.
- */
 export async function deliverLifecycleEmail(supabase: Client, input: DeliverInput): Promise<DeliverResult> {
     const recipient = await loadRecipient(supabase, input.candidate.userId)
     if (!recipient) return { sent: false, reason: 'no address' }
@@ -369,9 +319,6 @@ export async function deliverLifecycleEmail(supabase: Client, input: DeliverInpu
 
     const result = await built.send()
     if (!result.ok) {
-        // A rate limit says nothing about this address, so recording it would spend the sequence
-        // slot on a passing shortage. Leaving no row at all is what puts the candidate back in
-        // front of the next sweep, fifteen minutes later.
         if (isRetriableFailure(result.error)) return { sent: false, reason: result.error }
         await recordLifecycleEmail(supabase, input.candidate, 'failed', { error: result.error })
         return { sent: false, reason: result.error }
@@ -388,12 +335,10 @@ export async function deliverLifecycleEmail(supabase: Client, input: DeliverInpu
         { uuid: result.id ? deterministicUuid(`lifecycle_email_sent:${result.id}`) : undefined },
     ).catch(err => console.error('[lifecycle] analytics capture failed', err))
 
-    // The email is out, but without its row the next sweep picks the same candidate and sends it again.
     if (outcome === 'failed') return { sent: false, reason: 'delivered but not recorded, the next sweep may send it again' }
     return { sent: true }
 }
 
-// Tried twice: a passing database error is worth a second insert, since a missing row means a repeat email.
 async function recordSent(supabase: Client, candidate: LifecycleCandidate, emailId: string | null) {
     const outcome = await recordLifecycleEmail(supabase, candidate, 'sent', { emailId })
     return outcome === 'failed' ? recordLifecycleEmail(supabase, candidate, 'sent', { emailId }) : outcome

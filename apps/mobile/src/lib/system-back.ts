@@ -17,8 +17,6 @@ export function subscribeBack(latest: RefObject<() => void>): () => void {
     return () => subscription.remove()
 }
 
-// While `enabled`, Android's back gesture runs `onBack` instead of leaving the screen or the app. iOS has
-// no such gesture: the hook does nothing there.
 export function useSystemBack(enabled: boolean, onBack: () => void): void {
     const latest = useLatestBack(onBack)
     useEffect(() => {

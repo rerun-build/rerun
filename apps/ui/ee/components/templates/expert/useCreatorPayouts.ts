@@ -6,9 +6,6 @@ import { toast } from 'sonner'
 import { getCreatorAccountAction, openCreatorDashboardAction, startCreatorOnboardingAction } from '@/ee/actions/creator-billing.actions'
 import type { CreatorAccountState } from '@/ee/services/connect.service'
 
-// `account === null` means loading, the same convention useMyTemplates uses. Reloaded on mount even
-// when the user is coming back from Stripe: `account.updated` may still be in flight, and the panel
-// must not show a stale "not set up" to someone who just finished onboarding.
 export function useCreatorPayouts(active: boolean) {
     const [account, setAccount] = useState<CreatorAccountState | null>(null)
     const errorText = useErrorText()
@@ -30,8 +27,6 @@ export function useCreatorPayouts(active: boolean) {
         if (active) void reload()
     }, [active, reload])
 
-    // Account links are single-use and expire in minutes, so one is minted per click and the user
-    // leaves the app immediately.
     const startOnboarding = useCallback(async () => {
         setPending('onboarding')
         const result = await startCreatorOnboardingAction()

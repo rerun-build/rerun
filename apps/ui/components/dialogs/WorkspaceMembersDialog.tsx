@@ -74,8 +74,6 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
         void loadAccess(member)
     }
 
-    // Every change made from the drill-in reads the person's Boxes again: one level moved can
-    // change where another comes from.
     const changeAccess = async (member: WorkspaceMember, action: () => Promise<Result>) => {
         if (busy) return
         setBusy(true)
@@ -99,7 +97,6 @@ export function WorkspaceMembersDialog({ open, onOpenChange }: { open: boolean; 
             return result
         })
 
-    // Named first, so the person never loses the Box between the two writes.
     const restrictBox = (member: WorkspaceMember, box: MemberBoxAccess) =>
         changeAccess(member, async () => {
             if (box.source !== 'assigned') {

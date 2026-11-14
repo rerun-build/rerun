@@ -11,13 +11,6 @@ import { useBillingStore } from '@/stores/billing.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useAwaitTemplatePurchase } from './useAwaitTemplatePurchase'
 
-// The twin of PostPaymentDialog, for a marketplace purchase rather than a plan. Same contract: wait
-// for the asynchronous half to land before enabling the button, never let the user press something
-// that will fail.
-//
-// Nothing was mid-placement when the user left for Stripe: the buy CTA fires before
-// `beginTemplatePlacement`, so "resuming" here means starting that handover for the first time,
-// exactly as the library CTA would have.
 export function TemplatePurchaseSuccessDialog({ slug, sessionId, onOpenChange }: { slug: string; sessionId: string | null; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('billing.templatePurchase')
     const { workspace } = useSession()

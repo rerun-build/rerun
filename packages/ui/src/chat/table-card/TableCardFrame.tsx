@@ -14,13 +14,11 @@ export type TableCardFrameProps = {
     onOpen?: () => void
     openDisabledReason?: string
     noun?: string
-    /** Appended to the row count, e.g. what a board is grouped by. */
     footerNote?: string
     className?: string
     children: ReactNode
 }
 
-/** The header and footer every layout shares, so only the body changes from one layout to the next. */
 export function TableCardFrame({ card, onOpen, openDisabledReason, noun, footerNote, className, children }: TableCardFrameProps) {
     const t = useKitTranslations()
     const count = noun ? `${card.total} ${noun}` : t('chat.table.rows', { count: card.total })

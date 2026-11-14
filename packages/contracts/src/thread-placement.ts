@@ -1,14 +1,10 @@
 export type ThreadPlacement<T> = {
-    // Threads opened before the first message of General, or while it had none.
     leading: T[]
-    // Threads opened after the message at that index and before the next one.
     after: Map<number, T[]>
 }
 
 const timeOf = (iso: string) => new Date(iso).getTime()
 
-// Where each thread hangs in General: under the last message that was there when it opened, in the
-// order they opened. `messageTimes` is one ISO time per message, as the transcript shows them.
 export function threadsByMessage<T extends { createdAt: string }>(messageTimes: readonly string[], threads: readonly T[]): ThreadPlacement<T> {
     const leading: T[] = []
     const after = new Map<number, T[]>()

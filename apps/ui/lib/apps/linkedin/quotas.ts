@@ -2,10 +2,6 @@ import { defineQuotas, type QuotaLimit } from '@/lib/apps/quotas'
 
 export { isoWeekKey } from '@/lib/apps/quotas'
 
-// What one LinkedIn account may do through its coworkers. Lower than what Linkup calls safe for a
-// seasoned paid account: the account that gets restricted is the user's own, and most connected
-// accounts are neither paid nor warmed up.
-
 export type QuotaAction = 'invitation' | 'message' | 'profile_view' | 'search_result' | 'engagement' | 'post' | 'attachment_download'
 
 const DEFAULT_QUOTAS: Record<QuotaAction, QuotaLimit[]> = {

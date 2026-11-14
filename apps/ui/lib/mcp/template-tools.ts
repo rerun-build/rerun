@@ -7,13 +7,6 @@ import {
     TEMPLATE_TITLE_MAX_LENGTH,
 } from '@rerun/contracts'
 
-// The template-authoring half of the account server: turning agents that already work in the
-// caller's sandbox into a marketplace listing other people install in one click.
-//
-// Same audience and same rule as account-tools.ts: these descriptions are the only documentation
-// the calling model gets. Two things every tool here shares and none of them repeats — the key has
-// to belong to an expert account's sandbox (the gate says so itself on the first call), and
-// publication is never the caller's decision: an author writes a draft and hands it over.
 export const TEMPLATE_TOOL_DEFS = [
     {
         name: 'list_templates',

@@ -7,8 +7,6 @@ import { Icon } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 import { brand, spacing } from '@/theme/tokens'
 
-// One model in a picker: ticked when it is the one, a lock when the plan does not include it.
-// `disabled` keeps the tick: the choice is shown, only not changeable.
 export function ModelRow({ id, label, description, selected, locked, disabled, leading, onPress }: { id: string; label: string; description?: string; selected: boolean; locked?: boolean; disabled?: boolean; leading: ReactNode; onPress: () => void }) {
     const theme = useTheme()
     const inactive = locked || disabled

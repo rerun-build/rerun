@@ -14,8 +14,6 @@ import { readEither, readQuestion, type QuestionOutput } from '../parts'
 
 type CardProps = { input: unknown; onAnswer: (output: QuestionOutput) => void }
 
-// ask_choice and ask_input, drawn as the coworkers' question card: a pick answers a single choice on the
-// spot, the free row and a question without options take a typed answer.
 export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 'ask_choice' | 'ask_input' }) {
     const { question, options, multiple } = readQuestion(widget, input)
     const [picked, setPicked] = useState<string[]>([])
@@ -67,7 +65,6 @@ export function QuestionCard({ widget, input, onAnswer }: CardProps & { widget: 
     )
 }
 
-// ask_either: a title, the line that says why, one button per answer and a way to turn both down.
 export function EitherCard({ input, onAnswer }: CardProps) {
     const { title, description, options } = readEither(input)
     const t = useTranslations('mobileOnboarding')

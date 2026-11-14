@@ -4,29 +4,22 @@ import { Directory, File, Paths } from 'expo-file-system'
 
 import type { BoardRead } from '@/api/board'
 
-// Bumped when what is stored changes shape: a file of another version is read as nothing. What comes
-// from the hub is also checked against its contract, so a file left by an older app is read as nothing too.
 const VERSION = 1
 const MEMORY_LIMIT = 60
-// Per family of keys: a burst of transcripts never pushes the home's board off the phone.
 const FILE_LIMIT = 40
 const MESSAGE_LIMIT = 200
 
 export type CoworkerScreen = { view: AgentView | null; models: AgentModels | null; conversations: Conversation[] | null }
 
-// The cache folder, not documents: iOS may empty it when short of space, and the hub still has it all.
 const folder = () => new Directory(Paths.cache, 'chat-cache')
 const fileOf = (key: string) => new File(folder(), `${key.replace(/[^\w-]/g, '_')}.json`)
 const familyOf = (key: string) => key.slice(0, key.indexOf('-') + 1)
 
-// A key read and found nowhere, so a screen asking at each render does not go to the disk each time.
 const MISSING = Symbol('missing')
 const memory = new Map<string, unknown>()
 const inFlight = new Map<string, Promise<UIMessage[]>>()
-// Moves on at each sign-out: a write or a read still on its way from before is dropped.
 let generation = 0
 
-// Least recently used goes first: a Map keeps the order its keys were set in.
 function remember(key: string, value: unknown) {
     memory.delete(key)
     memory.set(key, value)
@@ -66,7 +59,6 @@ function prune(family: string) {
         .forEach(file => file.delete())
 }
 
-// On the device after the frame: a long transcript takes a moment to write.
 function write(key: string, value: unknown) {
     remember(key, value)
     const writtenFor = generation
@@ -83,7 +75,6 @@ function write(key: string, value: unknown) {
 export type CacheEntry<T> = {
     read: () => T | null
     save: (value: T) => void
-    // The hub's answer, kept unless the person signed out while it was on its way.
     load: (fetch: () => Promise<T>) => Promise<T>
 }
 
@@ -94,7 +85,6 @@ function entry<T>(key: string, parse: (value: unknown) => T): CacheEntry<T> {
         load: fetch => {
             const askedFor = generation
             return fetch().then(value => {
-                // The home reads again at every move of a run: an answer that changed nothing is not written again.
                 if (askedFor === generation && JSON.stringify(read(key, parse)) !== JSON.stringify(value)) write(key, value)
                 return value
             })
@@ -114,7 +104,6 @@ export const cachedBoard = (workspaceId: number): CacheEntry<BoardRead> =>
         return { agents: boardAgentSchema.array().parse(agents), overview: agentConversationsOverviewSchema.parse(overview), boxes: boxSchema.array().parse(boxes) }
     })
 
-// Only where the workspace stands once past its onboarding: the onboarding itself is never replayed from the phone.
 export type SettledRoute = 'app' | 'waitlist'
 
 export const cachedRoute = (workspaceId: number): CacheEntry<SettledRoute> =>
@@ -187,8 +176,6 @@ export function saveTranscript(workspaceId: number, sessionId: string, messages:
     write(transcriptKey(workspaceId, sessionId), messages.slice(-MESSAGE_LIMIT))
 }
 
-// One read per conversation at a time: the row touched on the home starts it, the page opening
-// behind takes the same answer instead of asking again.
 export function loadTranscript(workspaceId: number, sessionId: string, fetchMessages: () => Promise<UIMessage[]>): Promise<UIMessage[]> {
     const key = transcriptKey(workspaceId, sessionId)
     const pending = inFlight.get(key)
@@ -216,7 +203,6 @@ export function sameTranscript(a: UIMessage[], b: UIMessage[]): boolean {
     return a.length === b.length && JSON.stringify(a) === JSON.stringify(b)
 }
 
-// Nothing the hub said stays on the phone once the person signs out.
 export function clearLocalCache() {
     generation += 1
     memory.clear()

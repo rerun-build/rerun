@@ -29,16 +29,6 @@ describe('resolveWithin', () => {
     })
 })
 
-// A tree where every link leaves or stays inside a real root:
-//   base/outside/secret.txt
-//   base/root/inside/file.txt
-//   base/root/link-out      -> base/outside
-//   base/root/key-out       -> base/outside/secret.txt
-//   base/root/link-in       -> base/root/inside/file.txt
-//   base/root/dangling-out  -> base/outside/missing.txt
-//   base/root/dangling-in   -> base/root/inside/missing.txt
-//   base/root/loop-a        -> base/root/loop-b -> base/root/loop-a
-//   base/rootlink           -> base/root
 describe('resolveWithinReal', () => {
     const base = mkdtempSync(resolve(tmpdir(), 'rerun-sandbox-real-'))
     const outside = resolve(base, 'outside')
@@ -129,7 +119,6 @@ describe('assertCommandAllowed', () => {
         expect(() => assertCommandAllowed(command)).not.toThrow()
     })
 
-    // A best-effort denylist, not a boundary: these are pinned so a change to it is deliberate.
     it.each(['rm -fr /', 'rm -r -f /', 'rm -rf /*', 'dd of=/dev/sda if=/dev/zero'])('does not catch the rewritten form %j', command => {
         expect(() => assertCommandAllowed(command)).not.toThrow()
     })

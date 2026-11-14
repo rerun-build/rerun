@@ -12,8 +12,6 @@ import { selectMany } from '@/supabase/supabase-helpers'
 
 type CatalogLook = { name: string; icon: string }
 
-// A server registered by hand for a brand the catalog already draws (mcp.linear.app, or a server
-// named "notion") takes that drawing: it is sharper than any favicon.
 async function catalogLooks(servers: EngineMcpServer[]): Promise<Map<string, CatalogLook>> {
     const candidates = new Set<string>()
     for (const server of servers) {
@@ -41,8 +39,6 @@ export async function customMcpServersOf(conn: EngineConnection, engineAgentId: 
     return Promise.all(servers.map(async server => toCustomMcpServer(server, await lookOf(server, catalog))))
 }
 
-// The catalog apps and the servers registered outside it, read off one registry so the two lists
-// never disagree on who owns a server. An unreachable engine still lists the apps.
 export async function listAgentConnectors(agentId: string, actor?: Actor): Promise<{ services: InstalledService[]; custom: CustomMcpServer[] }> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
     const reg = await readRegistry(conn, engineAgentId)
@@ -60,7 +56,6 @@ export async function getCustomMcpStatuses(agentId: string, actor?: Actor): Prom
     return statuses.map(({ name, status, toolCount, error }) => ({ name, status, toolCount, ...(error ? { error } : {}) }))
 }
 
-// One server, probed alone: the chat card waits on it, and dialing every other server would slow it down.
 export async function getCustomMcpServer(agentId: string, name: string, actor?: Actor): Promise<{ server: CustomMcpServer; status: CustomMcpLiveStatus } | null> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
     const server = (await customMcpServersOf(conn, engineAgentId, await readRegistry(conn, engineAgentId))).find(candidate => candidate.name === name)

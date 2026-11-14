@@ -8,13 +8,9 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 
 export type SuggestAgentIdeasPayload = { workspaceId: number }
 
-// The agents imagined for a company once its Brain is written, kept for the New agent dialog. Its
-// own task rather than the tail of the brain seed: two model calls of up to three minutes each do
-// not fit in the seed's budget, and a run that finds nothing must not fail a seed that worked.
 export const suggestAgentIdeasTask = task({
     id: 'suggest-agent-ideas',
     maxDuration: 600,
-    // A second attempt would pay for the two model calls again to hear the same answer.
     retry: { maxAttempts: 1 },
     run: (payload: SuggestAgentIdeasPayload) => suggestAgentIdeasRun(payload),
 })

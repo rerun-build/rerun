@@ -6,9 +6,6 @@ export type HitlCallPart = { type: string; toolName?: string; input?: unknown; o
 
 type MessageLike = { role: string; parts: readonly { type: string }[] }
 
-// The question a user reply answers: the last human-in-the-loop call of the assistant turn right
-// before it. The reply text alone says what was decided; this call holds what was asked (slugs,
-// labels, details). The part itself is returned, not a copy, so the memoised message keeps its props.
 export function hitlCallBefore(messages: readonly MessageLike[], index: number): HitlCallPart | undefined {
     const previous = messages[index - 1]
     if (messages[index]?.role !== 'user' || previous?.role !== 'assistant') return undefined
@@ -27,8 +24,6 @@ export function hitlCallKind(call: HitlCallPart | undefined): HitlKind | null {
     return call ? hitlKindOf(toolNameOf(call)) : null
 }
 
-// What the paid data calls billed between a spend reply and the user's next message: the run the
-// approval started, so its receipt fills as the calls land.
 export function spentAfter(messages: readonly MessageLike[], index: number): number {
     let total = 0
     for (let i = index + 1; i < messages.length && messages[i].role !== 'user'; i++) {

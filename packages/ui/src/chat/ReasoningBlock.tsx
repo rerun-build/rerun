@@ -10,17 +10,11 @@ import { useKitTranslations } from '../locale'
 export type ReasoningBlockProps = {
     text: string
     streaming?: boolean
-    /** A frozen duration, for a scripted transcript that has no live run behind it. */
     seconds?: number
     renderText?: (text: string) => ReactNode
     className?: string
 }
 
-/**
- * The model thinking out loud: a header that shimmers while it lasts, and the thought itself in a
- * bordered column that follows the text as it arrives. It folds itself once the thought settles,
- * which the reader can override by hand.
- */
 export function ReasoningBlock({ text, streaming = false, seconds, renderText = text => text, className }: ReasoningBlockProps) {
     const [open, setOpen] = useState(streaming)
     useEffect(() => {
@@ -50,11 +44,6 @@ export function ReasoningBlock({ text, streaming = false, seconds, renderText = 
     )
 }
 
-/**
- * Label + chrono. Split out to own the 100ms tick: it re-renders this line alone, never the thought
- * below it. A scripted duration skips the chrono entirely, so a replayed thought does not count up
- * to a number it already knows.
- */
 function ReasoningHeader({ streaming, seconds }: { streaming: boolean; seconds?: number }) {
     const t = useKitTranslations()
     const live = useElapsed(streaming && seconds === undefined)

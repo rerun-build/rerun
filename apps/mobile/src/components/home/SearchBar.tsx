@@ -7,7 +7,6 @@ import { GLASS_BUTTON_SIZE, GLASS_INSET } from '@/components/ui/GlassButton'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// The Home's search, a glass capsule pinned to the bottom like iMessage's: a tap opens the search screen.
 export function SearchBar({ height = GLASS_BUTTON_SIZE, onPress }: { height?: number; onPress: () => void }) {
     const theme = useTheme()
     const tint = theme.mutedForeground

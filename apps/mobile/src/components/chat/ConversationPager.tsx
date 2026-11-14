@@ -7,7 +7,6 @@ import * as Haptics from '@/lib/haptics'
 
 import type { ConversationPage } from './conversation-pages'
 
-// How far past the first or the last page, in pages, a drag goes before it bumps into the end of the row.
 const EDGE_BUMP = 0.08
 
 const tickOnto = (draft: boolean) => (draft ? Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) : Haptics.selectionAsync())
@@ -16,19 +15,14 @@ const bumpIntoEdge = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)
 type ConversationPagerProps = {
     pages: ConversationPage[]
     activeIndex: number
-    // Written here, in pages: the header's chips read it to slide with the finger.
     progress: SharedValue<number>
     onSettle: (index: number) => void
     renderPage: (page: ConversationPage, onScreen: boolean) => ReactNode
 }
 
-// The coworker's conversations side by side, swiped through as the header's tabs. Only the page on
-// screen and its two neighbours are mounted, so a drag already shows the next transcript.
 export function ConversationPager({ pages, activeIndex, progress, onSettle, renderPage }: ConversationPagerProps) {
     const scroll = useAnimatedRef<Animated.ScrollView>()
     const reduceMotion = useReducedMotion()
-    // `offset` is where the row sits when it mounts or resizes. Fabric moves the native view the
-    // moment the `contentOffset` prop changes, so it only follows the layout: a tab picked scrolls on its own.
     const [size, setSize] = useState({ width: 0, height: 0, offset: 0 })
     const pageWidth = useSharedValue(0)
     const dragging = useSharedValue(false)
@@ -36,9 +30,6 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
     const restingKey = useRef(pages[activeIndex]?.key)
     const lastIndex = pages.length - 1
 
-    // A tab picked in the header slides there, even one just added before the draft. Tabs read late
-    // from the device shift the row under the resting page, and the pager jumps to stay on the same
-    // conversation.
     useEffect(() => {
         const rowStable = pages[restingIndex.current]?.key === restingKey.current
         restingKey.current = pages[activeIndex]?.key
@@ -74,7 +65,6 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
         },
     })
 
-    // Only the finger ticks: a tab picked in the header slides across the row in silence.
     useAnimatedReaction(
         () => Math.round(progress.value),
         (nearest, previous) => {

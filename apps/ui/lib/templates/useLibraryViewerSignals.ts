@@ -6,9 +6,6 @@ import { workTypeTemplateCategory } from '@/lib/onboarding/work-types'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useMemo } from 'react'
 
-// What the workspace's profile says about its viewer, which ranks the library's "For you" picks.
-// Two fallbacks behind the industry read off the company website: the work type the survey asked
-// before it, and the `sector` its three-question version stored before that.
 export function useLibraryViewerSignals(): Required<ViewerSignals> {
     const { workspaceAnswers } = useSession()
     return useMemo(() => {

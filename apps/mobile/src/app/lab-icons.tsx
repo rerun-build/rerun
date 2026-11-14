@@ -12,9 +12,6 @@ import { IconTile } from '@/components/ui/IconTile'
 import { ThemeScope, useTheme } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: every icon of the app at the sizes it is drawn at, and the controls that carry one.
-//   /lab-icons?scheme=dark   /lab-icons?size=24
-
 const noop = () => {}
 const CELL = 76
 

@@ -13,8 +13,6 @@ export interface OnboardingResumeProps {
   locale?: EmailLocale;
 }
 
-// Nothing is stored while the survey is open, so this email never claims a saved position. What it
-// promises is what is true: the questions come back on the next visit and they are short.
 export default function OnboardingResume({
   firstName,
   resumeUrl,

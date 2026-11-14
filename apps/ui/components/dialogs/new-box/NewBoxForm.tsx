@@ -14,14 +14,8 @@ import { useBoxDraft } from './useBoxDraft'
 
 const STAGE_FADE = 'linear-gradient(to bottom, transparent 0%, #000 12%, #000 72%, transparent 100%)'
 
-// A moment the form is opened on, for a capture: the name it starts with, the Box drawn finished
-// rather than tracing itself, and the drawn caret and cursor a screenshot cannot take.
 export type NewBoxStill = { name: string; frozen?: boolean; drawnCaret?: boolean; aim?: string; cursorRef?: RefObject<HTMLDivElement | null>; overlay?: ReactNode }
 
-// The Box leads, alone and large, with the Foreman standing in it; the field comes after, where the
-// eye lands once it has seen what it is naming.
-//
-// Nothing is created here: `onCreate` receives the name, and what it throws is shown under the field.
 export type NewBoxIntro = { heading: string; description: string }
 
 export function NewBoxForm({
@@ -77,8 +71,6 @@ export function NewBoxForm({
                     }
                     className="absolute inset-x-0 top-0 h-(--stage)"
                 />
-                {/* The sheet this becomes on a phone drops the safe-area padding of the frame, so the
-                    last row carries it. */}
                 <div className="relative z-20 flex w-full max-w-[640px] flex-col items-center pt-[calc(var(--stage)_-_16px)] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pb-0">
                     <h2 className="text-center font-heading text-2xl font-medium tracking-tight">{heading}</h2>
                     <p className="mt-1.5 text-center text-sm text-muted-foreground">{description}</p>

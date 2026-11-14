@@ -4,9 +4,6 @@ import { isPathSegment } from '../config/paths.js'
 import { connectionExists, listConnectionIds, loadConnectionFromDisk } from './loader.js'
 import type { LoadedConnection } from './types.js'
 
-// One instance per connection, shared by every agent pointing at it. Deliberate: a token refresh
-// mutates this single object, so the whole box sees the fresh credential at once instead of each
-// agent carrying its own copy and racing to rotate it.
 const cache = new Map<string, LoadedConnection>()
 
 export async function getConnection(id: string): Promise<LoadedConnection> {
@@ -28,8 +25,6 @@ export async function listConnections(): Promise<LoadedConnection[]> {
     return Promise.all(ids.map(id => getConnection(id)))
 }
 
-// Agents hold a reference to the shared instance, so dropping a connection from the cache has to
-// drop them too — otherwise a reloaded connection would leave every agent on the stale object.
 export function unloadConnection(id: string): void {
     cache.delete(id)
     clearAgentCache()

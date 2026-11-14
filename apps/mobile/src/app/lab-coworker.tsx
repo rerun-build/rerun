@@ -11,10 +11,6 @@ import { CoworkerRoutines, routineKey } from '@/components/coworker/CoworkerRout
 import { MOCK_APPS, MOCK_APPS_TO_CONNECT, MOCK_FILES, MOCK_ROUTINES, mockFileUrl } from '@/mocks/coworkerDetails'
 import { coworkers } from '@/mocks/data'
 
-// Dev only: the coworker details and the pages they open, on mock data, in each state.
-// `rerun://lab-coworker?screen=details&state=normal`.
-
-// `use`: the caller only uses the coworker's Box, so what changes the coworker is greyed.
 type LabState = 'normal' | 'loading' | 'to-connect' | 'empty' | 'off' | 'muted' | 'use'
 
 const SCOUT = coworkers.find(coworker => coworker.id === 'agent-scout')!

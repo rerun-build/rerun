@@ -6,7 +6,6 @@ import { useToolDisplay } from '@/hooks/useToolDisplay'
 import type { ApprovalChoice } from '@/lib/engine/types'
 import { useCallback, useState } from 'react'
 
-// The choice is posted back to the engine, which is holding the run open.
 type ApprovalBlockProps = {
     toolName: string
     input?: unknown

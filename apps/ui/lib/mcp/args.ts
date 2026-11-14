@@ -1,7 +1,3 @@
-// Argument coercion for the MCP servers. A tool call arrives as whatever JSON the calling model
-// decided to send, so every handler reads its arguments through these rather than trusting the
-// shape. Errors are written for that model to read and correct itself.
-
 export function requireString(v: unknown, field: string): string {
     if (typeof v !== 'string' || !v) throw new Error(`Missing required argument: ${field}`)
     return v
@@ -35,9 +31,6 @@ export function requireConfirmation(args: Record<string, unknown>, what: string)
     if (args.confirm !== true) throw new Error(`This deletes ${what} for good. Call again with confirm: true once the account owner has agreed.`)
 }
 
-// Same reflex as requireConfirmation, for a call that gives something away rather than destroying
-// it: sending the agent alone needs no ceremony, sending someone's memories out of the workspace
-// does.
 export function requireAgreement(args: Record<string, unknown>, what: string): void {
     if (args.confirm !== true) {
         throw new Error(`This sends ${what} out of the workspace, readable by anyone holding the link. Call again with confirm: true once the account owner has agreed.`)

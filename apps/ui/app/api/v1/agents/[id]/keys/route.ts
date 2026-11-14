@@ -6,7 +6,6 @@ import { updateAgentKeysSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// Variable names only, in both directions: a value is written once onto the Box and never read back.
 export const GET = apiRoute({ auth: 'member' }, async ({ ctx, params }) => {
     const { conn, engineAgentId } = await resolveAgentTarget(params.id, actorFromContext(ctx), 'manage')
     return getAgentKeys(conn, engineAgentId)

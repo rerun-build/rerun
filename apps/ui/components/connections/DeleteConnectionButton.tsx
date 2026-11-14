@@ -20,8 +20,6 @@ type DeleteConnectionButtonProps = {
 
 type ConnectionsT = ReturnType<typeof useTranslations<'connections'>>
 
-// Deleting a connection lives here, at the bottom of its detail view, rather than in the grid:
-// nothing destructive should sit one stray click away from a list you only meant to scan.
 export function DeleteConnectionButton({ connection, onDelete, onDeleted }: DeleteConnectionButtonProps) {
     const t = useTranslations('connections')
     const errorText = useErrorText()
@@ -63,13 +61,10 @@ function moversSentence(t: ConnectionsT, usage: BoxConnectionUsage, group: 'fall
     return null
 }
 
-// The engine never refuses the delete: it moves everything that named the connection back onto the
-// Box default first. So this announces what is about to move, not what to go fix by hand.
 function describeUsage(t: ConnectionsT, usage: BoxConnectionUsage | null): string {
     if (!usage) return t('remove.checking')
     const moved = moversSentence(t, usage, 'fallBack')
     const sentences = moved ? [moved] : []
-    // The Box default is not a pointer anything holds by name, so it has to be named on its own.
     if (usage.isBoxDefault) sentences.push(t('remove.holdsDefault'))
     if (sentences.length === 0) return t('remove.nothingRuns')
     return sentences.join(' ')

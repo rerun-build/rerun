@@ -36,7 +36,6 @@ function describeConnection(connection: LoadedConnection) {
     }
 }
 
-// The credit lives on the hub: a hub that does not answer leaves it out rather than failing the read.
 async function readRerunCredit(ctx: RunContext) {
     try {
         const { credit } = (await callHub(ctx.agent, 'rerun_credit', {})) as { credit?: HubRerunCredit | null }
@@ -61,8 +60,6 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
             inputSchema: z.object({}),
             execute: async () => {
                 const connections = await listConnections()
-                // Deliberately before the wait, unlike the connections list: the question is about
-                // the quota, so the coworker waits (capped) for the reading it starts here.
                 refreshStaleCodexPlanLimits(connections)
                 refreshStaleOpencodePlanLimits(connections)
                 const [, boxDefault, rerunCredit, answering] = await Promise.all([awaitPendingPlanLimits(connections), readBoxDefault(), readRerunCredit(ctx), answeringModel(ctx.provider, ctx.model)])

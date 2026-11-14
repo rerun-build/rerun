@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { toToolInputSchema } from './mcp-schema.js'
 
-// The two TrendTrack tools that made Anthropic refuse every request of the agent carrying them.
 const SCAN_AD = {
     type: 'object',
     properties: {

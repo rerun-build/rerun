@@ -8,16 +8,12 @@ import type { TableListResult } from '@/lib/data/source'
 import type { EngineDbRows } from '@/lib/engine/types'
 import { refusal, refusalOf, type ErrorCode, type ActionRefusal, type SuccessResult } from '@/lib/i18n/action-error'
 
-// An engine that predates the shared database answers a bare 404 on this route, which reads as
-// "unreachable" unless we name it: the workspace is fine, its machine is just behind.
 function describe(err: unknown, fallback: ErrorCode): ActionRefusal {
     const message = err instanceof Error ? err.message : ''
     if (/failed: 404\b/.test(message)) return refusal('sharedDbNeedsEngineUpdate')
     return message ? refusalOf(err) : refusal(fallback)
 }
 
-// Resolving the workspace fails with messages written for the user (not a member, signed out); the
-// engine call fails with transport details that are not.
 export async function listWorkspaceTablesAction(): Promise<TableListResult> {
     let conn: Awaited<ReturnType<typeof requireWorkspaceConnection>>
     try {

@@ -20,15 +20,12 @@ describe('affiliateReferralMetadata', () => {
         expect(await affiliateReferralMetadata()).toEqual({})
     })
 
-    // An empty string is not "no referral" to Affonso, it is a referral it cannot resolve.
     it('drops a referral cookie that was emptied', async () => {
         cookieJar.set('affonso_referral', '')
         expect(await affiliateReferralMetadata()).toEqual({})
     })
 })
 
-// The pixel is loaded `afterInteractive` while the sign-up lands right after a redirect, so the
-// helper has to survive arriving first.
 describe('reportAffiliateSignup', () => {
     const signup = { email: 'buyer@example.com', externalUserId: 'user_1' }
 

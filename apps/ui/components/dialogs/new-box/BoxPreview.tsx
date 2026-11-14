@@ -5,10 +5,8 @@ import type { CSSProperties, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
-// The Box being named, alone on the floor, five cells on a side like a Box fresh off the board.
 const RECT = { col_start: 0, row_start: 0, col_end: 4, row_end: 4 }
 const CENTER_ISO = isoPosition(GRID_SIZE / 2, GRID_SIZE / 2)
-// The name stands on the Box's top-left edge, above the floor the bounds are measured on.
 const LABEL_RISE = 34
 const INSET = 0.66
 const MAX_ZOOM = 1.3
@@ -30,9 +28,6 @@ function fit(frame: { width: number; height: number }) {
     return { zoom, pan: { x: -(BOUNDS.left + BOUNDS.right) / 2, y: -(BOUNDS.top + BOUNDS.bottom) / 2 } }
 }
 
-// A dashed outline until the Box has a name; then it traces itself, its floor takes the Orb's light
-// and its name rises on its edge. Each new `drawKey` remounts the footprint, which replays all of it.
-// `onFloor` stands on the middle of the floor, its bottom edge on the centre.
 export function BoxPreview({ name, drawKey, onFloor, mask, className, style }: { name: string | null; drawKey: string | null; onFloor?: ReactNode; mask?: string; className?: string; style?: CSSProperties }) {
     const { ref, frame } = useRenderedFrame()
     const camera = frame ? fit(frame) : null
@@ -62,8 +57,6 @@ export function BoxPreview({ name, drawKey, onFloor, mask, className, style }: {
     )
 }
 
-// Flattened like the floor it lies on: twice as wide as it is deep. Screened on the dark theme,
-// where it lightens, multiplied on the light one, where coloured light can only tint.
 function FloorGlow({ at, width, rising }: { at: { x: number; y: number }; width: number; rising: boolean }) {
     const place = { left: at.x, top: at.y, width, height: width / 2 }
     return (

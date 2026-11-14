@@ -11,10 +11,6 @@ type Answer = { table: string; rows: readonly Row[]; byRow: Map<Row, RowSources>
 
 const rowidOf = (row: Row): string | null => (row.__rowid === undefined || row.__rowid === null ? null : String(row.__rowid))
 
-/**
- * One request per page of rows. A row object that changes (an edit, the next page) asks again; until
- * the answer is in, a row keeps the sources its rowid had, so the column does not blink.
- */
 export function useTableSources(source: DataSource, table: string | null, rows: readonly Row[]) {
     const [answer, setAnswer] = useState<Answer | null>(null)
     const asks = Boolean(source.readSources && table && rows.length > 0)

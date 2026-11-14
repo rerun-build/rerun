@@ -5,8 +5,6 @@ import { acceptProposal, countOpenProposals, dismissProposal, listProposals } fr
 import { seedBrain } from '../../brain/seed.js'
 import { notFound } from '../../lib/errors.js'
 
-// The hub is the only caller and has already checked the person belongs to the workspace; it
-// passes who they are as the author, since the engine has no notion of users.
 export const brainRoutes = new Hono()
 
 async function pageResponse(slug: string) {

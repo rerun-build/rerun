@@ -9,8 +9,6 @@ import { payoutStateLabel, payoutStateTone } from '@/ee/lib/templates/payouts'
 import type { CreatorPane } from '@/stores/creator.store'
 import { cn } from '@/lib/utils'
 
-// Pinned under the template list, same row geometry as ExpertTemplateRow: getting paid belongs in
-// the same panel as pricing a template, not behind a separate entry point.
 export function CreatorSidebarFooter({ pane, account, onSelect }: { pane: CreatorPane; account: CreatorAccountState | null; onSelect: (pane: CreatorPane) => void }) {
     const t = useTranslations('templates.payouts.sidebar')
     const tPayouts = useTranslations('templates.payouts')

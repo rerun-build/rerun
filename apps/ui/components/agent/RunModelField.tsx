@@ -14,12 +14,8 @@ import { useBillingStore } from '@/stores/billing.store'
 import { useTranslations } from 'next-intl'
 import { useCallback, useMemo, useState } from 'react'
 
-// A model id alone no longer identifies a choice: two Claude subscriptions both serve `opus`. The
-// Select carries the pair, and this is the only place that knows how it is spelled.
 const SEPARATOR = '::'
 
-// Radix reserves the empty string for "no value", so "follow the agent" needs a sentinel of its own
-// rather than the empty encoding a null pair would otherwise produce.
 const AGENT_DEFAULT = 'agent-default'
 
 export type RunModelPick = { connectionId: string | null; model: string | null }
@@ -35,15 +31,10 @@ function decode(value: string): RunModelPick {
     return { connectionId: value.slice(0, at) || null, model: value.slice(at + SEPARATOR.length) }
 }
 
-// Model picker for a run that fires without a user: a schedule or a webhook trigger. A new routine
-// starts on the agent's own model, which is itself the Box default when the agent picked nothing,
-// so it follows the Box instead of freezing today's pair forever.
 export function useRunModel(agentId: string) {
     const { availableGroups, resolvedModel } = useAvailableModels(agentId)
     const [pick, setPick] = useState<RunModelPick>({ connectionId: null, model: null })
 
-    // The engine stores a provider next to the connection for its telemetry and its prompt caching.
-    // An id no group knows is one the user typed in: served by OpenRouter, like every custom model.
     const providerFor = useCallback(
         (value: RunModelPick): EngineProvider | null => (value.model ? ((availableGroups.find(g => g.connectionId === value.connectionId)?.provider ?? 'openrouter') as EngineProvider) : null),
         [availableGroups]
@@ -58,22 +49,18 @@ type RunModelFieldProps = {
     onChange: (pick: RunModelPick) => void
     availableGroups: ConnectionGroup[]
     helperText: string
-    // What the agent's own model resolves to today, so the default entry is not a blind choice.
     agentModel?: string | null
     disabled?: boolean
 }
 
 export function RunModelField({ id, value, onChange, availableGroups, helperText, agentModel, disabled }: RunModelFieldProps) {
     const t = useTranslations('agent.runModelField')
-    // Keep a pair that is no longer available (connection deleted, model switched off) selectable,
-    // so the routine stays editable instead of silently losing it.
     const orphan = useMemo(
         () => (value.model && !availableGroups.some(g => g.connectionId === value.connectionId && g.models.some(m => m.id === value.model)) ? { connectionId: value.connectionId, model: value.model } : null),
         [availableGroups, value]
     )
 
     const agentDefaultLabel = agentModel ? t('coworkerDefaultWithModel', { model: modelLabel(agentModel) }) : t('coworkerDefault')
-    // Spelled out rather than mirrored from the picked item: a tier's item is a two-line row.
     const triggerLabel = value.model ? modelName(value.connectionId ?? '', value.model) : agentDefaultLabel
 
     const pick = (encoded: string) => {

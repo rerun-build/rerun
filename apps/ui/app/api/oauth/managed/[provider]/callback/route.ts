@@ -14,8 +14,6 @@ import type { DesktopShellChannel } from '@rerun/contracts'
 
 type CallbackResult = { ok: true; email?: string; claim?: string } | { ok: false; error: string }
 
-// `key` lets a page holding several Connect buttons of one app tell which account just finished.
-// It is absent when the context could not be read, so every listener still hears that failure.
 function htmlResult(result: CallbackResult, key?: string): NextResponse {
     const target = key ? { key } : {}
     return oauthPopupResponse({
@@ -25,9 +23,6 @@ function htmlResult(result: CallbackResult, key?: string): NextResponse {
     })
 }
 
-// Managed OAuth redirect target on our own domain. Exchanges the code for tokens using Rerun's
-// client, hands the bundle to the ENGINE token store (never Supabase), marks the service
-// active, then messages the opener popup and closes.
 export async function GET(req: Request, { params }: { params: Promise<{ provider: string }> }) {
     const { provider: providerId } = await params
     const url = new URL(req.url)
@@ -35,9 +30,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
     const state = url.searchParams.get('state')
     const providerError = url.searchParams.get('error')
 
-    // Only known once the context is decoded, and `finish` is what every exit path goes through.
     let mobile = false
-    // The desktop app's channel, when it started the sign-in: where the browser goes back to.
     let desktop: DesktopShellChannel | undefined
     let key: string | undefined
 
@@ -73,13 +66,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
         const grant = callbackGrant(ctx)
         desktop = grant?.desktop
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
-        // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
         const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, actor, 'manage')
         const token = await exchangeManagedCode(provider.oauth, clientId, clientSecret, ctx, code)
         const email = provider.oauth.accountEmail ? await provider.oauth.accountEmail(token.accessToken).catch(() => undefined) : undefined
 
-        // The app has no session here: the token waits for its claim, the client secret stays in the env.
         if (grant) {
             await parkSignIn(grant, { kind: 'managed', key: ctx.key, provider: ctx.provider, serverName: ctx.serverName, token: { accessToken: token.accessToken, refreshToken: token.refreshToken, expiresAt: token.expiresAt, scope: token.scope }, email })
             return finish({ ok: true, email, claim: grant.jti })

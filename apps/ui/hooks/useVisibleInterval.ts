@@ -2,8 +2,6 @@
 
 import { useEffect } from 'react'
 
-// A background tab has nobody reading the result, so polling stops there and catches up the moment
-// the tab is shown again. A poll that fails, the network not back yet, is retried at the next tick.
 export function useVisibleInterval(callback: () => void | Promise<void>, ms: number) {
     useEffect(() => {
         let interval: ReturnType<typeof setInterval> | undefined

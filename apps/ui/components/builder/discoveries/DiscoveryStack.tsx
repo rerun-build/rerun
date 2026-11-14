@@ -19,8 +19,6 @@ const INSTANT: Transition = { duration: 0 }
 
 type Placement = { depth: number; offset: number; frontHeight: number; expanded: boolean }
 
-// Repliée, la pile ne laisse dépasser que le haut des deux cartes d'avant, rognées à la hauteur de
-// celle de devant : une carte plus haute dépasserait sinon par-dessous.
 function target({ depth, offset, frontHeight, expanded }: Placement, height: number) {
     if (expanded) return { y: -offset, scale: 1, opacity: 1, height: height || 'auto' }
     if (depth === 0) return { y: 0, scale: 1, opacity: 1, height: height || 'auto' }
@@ -71,8 +69,6 @@ function StackedCard({
     )
 }
 
-// Ce que la recherche a trouvé, en une pile : la dernière trouvaille devant, les autres dessous. Le
-// survol la déplie vers le haut ; au doigt, un tap fait la même chose.
 export function DiscoveryStack({ entries, still, className }: { entries: FindingEntry[]; still: boolean; className?: string }) {
     const [expanded, setExpanded] = useState(false)
     const [heights, setHeights] = useState<Record<string, number>>({})
@@ -95,7 +91,6 @@ export function DiscoveryStack({ entries, still, className }: { entries: Finding
 
     return (
         <div
-            // La gouttière loge l'ombre des cartes : `overflow-y-auto` rogne aussi sur les côtés.
             className={cn('pointer-events-auto box-content flex max-h-[calc(100%-6rem)] flex-col-reverse p-6', open && 'no-scrollbar overflow-y-auto', className)}
             onPointerEnter={event => event.pointerType === 'mouse' && setExpanded(true)}
             onPointerLeave={event => event.pointerType === 'mouse' && setExpanded(false)}

@@ -3,8 +3,6 @@ import { meteredFetch } from './openrouter-usage'
 
 const answer = { choices: [{ message: { content: 'hi' } }], usage: { prompt_tokens: 10, completion_tokens: 2, cost: 0.001 } }
 
-// What `fetch` hands back from a gzipped OpenRouter answer: the body already decoded, the headers
-// still describing the compressed one.
 function decodedGzipAnswer(): Response {
     return new Response(JSON.stringify(answer), { status: 200, headers: { 'content-type': 'application/json', 'content-encoding': 'gzip', 'content-length': '123' } })
 }

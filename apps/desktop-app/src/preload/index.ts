@@ -3,11 +3,6 @@ import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
 import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
-// Runs before any script of the page, in an isolated world, in the main frame only. It asks the
-// main process who the page is: the configured server gets `window.rerunShell`, the shell's own
-// pages get `window.rerunShellLocal`, any other page gets nothing. The main process checks the
-// sender again on every call, so this is the courtesy, not the lock.
-
 function subscribe<T>(channel: string, callback: (value: T) => void): () => void {
     const listener = (_event: IpcRendererEvent, value: T) => callback(value)
     ipcRenderer.on(channel, listener)

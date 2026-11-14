@@ -4,15 +4,6 @@ import { useEffect, useState } from 'react'
 import { getSharedTemplateAction } from '@/app/api/_actions/template.actions'
 import type { LibraryTemplate } from '@/lib/templates/library'
 
-// One template, by slug, for a surface that holds a slug and nothing else — the foreman's card is
-// drawn from what its model wrote, and the model cannot write a board capture. The read goes
-// through the shared-link action rather than the library listing: `show_in_library` has no say on a
-// link somebody arrived on, an unlisted template is exactly the case it serves, and it comes back
-// as one row instead of the whole catalogue.
-//
-// The cache lives at module scope, like the library's: a card replayed from the transcript on every
-// re-render must not refetch, and two cards on the same slug must not fetch twice.
-
 export type TemplateBySlug = { status: 'loading' } | { status: 'found'; template: LibraryTemplate } | { status: 'missing' }
 
 const cache = new Map<string, LibraryTemplate | null>()
@@ -34,8 +25,6 @@ export function useTemplateBySlug(slug: string | null): TemplateBySlug {
             .then(found => {
                 cache.set(slug, found)
             })
-            // A failed action must not pin the slug as "still loading" forever: it reads as missing,
-            // which is the fallback the card already knows how to draw.
             .catch(() => {
                 cache.set(slug, null)
             })

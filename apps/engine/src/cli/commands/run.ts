@@ -42,16 +42,12 @@ export async function runCommand(): Promise<void> {
     const stopScheduler = startScheduler()
     logger.info('scheduler started')
     const { RERUN_PORT, RERUN_HOST, RERUN_API_KEY } = env()
-    // Node closes any request that takes more than 5 minutes, which a 100 MB upload on a slow link
-    // reaches. Raised rather than disabled: a zero here would drop the Slowloris guard with it.
     const serverOptions = { requestTimeout: 30 * 60 * 1000, headersTimeout: 60_000 }
     const server = serve({ fetch: createServer().fetch, port: RERUN_PORT, hostname: RERUN_HOST, serverOptions }, info => {
         logger.info({ port: info.port, host: RERUN_HOST, authenticated: Boolean(RERUN_API_KEY) }, 'rerun-engine listening')
         void pairWithHub()
     })
     attachDesktopBridge(server as Server)
-    // The pooled MCP servers are closed before the process goes, within a short grace: one that does
-    // not answer its close is left to systemd, which stops the whole cgroup.
     const shutdown = () => {
         stopScheduler()
         const grace = new Promise<void>(resolve => setTimeout(resolve, 2_000).unref())

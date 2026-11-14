@@ -5,7 +5,6 @@ import { env } from '../../config/env.js'
 import { embedBaseUrl } from '../../memory/embed.js'
 import { runDataDirChecks } from '../../datadir/checks.js'
 
-// Read-only, like GET /doctor: it reports the data-dir as it is and leaves migrating to `rerun migrate`.
 export async function doctorCommand(): Promise<void> {
     const lines: string[] = []
     lines.push(`data dir: ${dataDir()} ${existsSync(dataDir()) ? 'ok' : 'missing'}`)

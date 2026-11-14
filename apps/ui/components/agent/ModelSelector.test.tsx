@@ -3,10 +3,6 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-// The picker writes the conversation's override, which the chat transport sends with every message.
-// One it writes on its own pins the conversation for good: a workspace running on Claude ended up
-// spending its Rerun credit, and being told it was used up, after a single failed read of the agent.
-
 const mocks = vi.hoisted(() => ({ getAgentContextAction: vi.fn(), listAiConnectionsAction: vi.fn(), updateAgentConfigAction: vi.fn(), canManage: true, boardAgentIds: [] as string[] }))
 
 vi.mock('@/app/api/_actions/agent.actions', () => ({ getAgentContextAction: mocks.getAgentContextAction, updateAgentConfigAction: mocks.updateAgentConfigAction }))
@@ -75,8 +71,6 @@ const storedOverride = (agentId: string) => {
     return raw ? (JSON.parse(raw) as Record<string, unknown>) : null
 }
 
-// Each test imports ModelSelector afresh after vi.resetModules(), its whole module graph with it: on a
-// loaded machine that alone can pass vitest's default 5 s.
 const REIMPORT_TIMEOUT = { timeout: 20_000 }
 
 describe('ModelSelector override', REIMPORT_TIMEOUT, () => {

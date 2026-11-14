@@ -11,9 +11,6 @@ const schema = z.object({ name: z.string().trim().min(1).max(BOX_NAME_MAX) })
 
 export type BoxFormValues = z.infer<typeof schema>
 
-// The name, and the beat the preview replays its drawing on: the first letter typed, and every pill
-// picked. A capture freezes animations at their first frame, so `frozen` gets the finished Box
-// instead.
 export function useBoxDraft({ initialName, frozen }: { initialName: string; frozen: boolean }) {
     const form = useForm<BoxFormValues>({ resolver: zodResolver(schema), defaultValues: { name: initialName } })
     const name = useWatch({ control: form.control, name: 'name' })

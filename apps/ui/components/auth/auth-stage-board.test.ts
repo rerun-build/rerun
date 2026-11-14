@@ -6,10 +6,6 @@ import type { AxisRoute } from '@/lib/board/iso-route'
 
 import { buildAuthStage, stageLinkId } from './auth-stage-board'
 
-// Le décor est tiré par un glouton scoré : il dégrade au lieu d'échouer, donc rien à l'exécution ne
-// signale qu'un connecteur de plus a fait repasser la scène sous la barre. Ces tests sont ce
-// garde-fou, sur le cast et le scénario tels qu'ils sont écrits.
-
 const stage = buildAuthStage()
 
 const tileById = new Map(stage.tiles.map(tile => [tile.id, tile]))
@@ -85,9 +81,6 @@ describe('buildAuthStage', () => {
         }
     })
 
-    // La borne haute est celle de l'anneau, pas un goût : à sept outils autour d'une même box le
-    // glouton n'a plus de cellule propre et se met à faire passer des câbles sous les tuiles. Six
-    // tient, et c'est ce qu'il faut à Content, dont l'éditeur social est branché sur trois réseaux.
     it('donne à chaque box entre 2 et 6 connecteurs, et pas toujours le même nombre', () => {
         const counts = stage.containers.map(container => cableRoutes.filter(cable => containerOf(cable.sourceId) === container.id).length)
 
@@ -103,8 +96,6 @@ describe('buildAuthStage', () => {
         expect(new Set(services).size).toBe(services.length)
     })
 
-    // Le cadrage déborde du viewport, donc les bords du contenu sont coupés. Un carré tranché se lit
-    // comme un décor qui continue ; une icône de service tranchée se lit comme un bug.
     it('garde chaque connecteur dans la bande visible', () => {
         for (const cable of cableRoutes) {
             const cell = tileById.get(cable.targetId)!.position
@@ -113,12 +104,6 @@ describe('buildAuthStage', () => {
     })
 })
 
-// ---------------------------------------------------------------------------
-// Le scénario
-// ---------------------------------------------------------------------------
-// buildAuthStage jette déjà si deux fils tiennent le même agent en même temps : ce qui suit vérifie
-// ce que le scénario doit *montrer*, et qu'aucune contrainte de placement ne peut garantir.
-
 const script = stage.script
 const changes = script.frames.flatMap(frame => frame.changes.map(change => ({ ...change, at: frame.at })))
 const statusChanges = changes.filter(
@@ -126,9 +111,6 @@ const statusChanges = changes.filter(
 )
 const agentIds = new Set(stage.agentIds)
 const beams = stage.links.filter(link => link.variant === 'beam')
-// Les deux familles de beams ne se jugent pas pareil : celui qui relie deux agents traverse le
-// plateau et doit rester droit, celui qui va vers un outil se superpose au câble et n'a donc rien à
-// éviter que le câble n'évite déjà.
 const agentBeams = beams.filter(beam => agentIds.has(beam.source) && agentIds.has(beam.target))
 const toolBeams = beams.filter(beam => !agentIds.has(beam.target))
 
@@ -158,15 +140,11 @@ describe('le scénario du décor', () => {
         expect(missing).toEqual([])
     })
 
-    // La règle du décor : un câble est de la plomberie entre un agent et son outil, jamais un lien
-    // entre deux agents. Elle est tenue par construction, ce test l'empêche de se perdre.
     it('ne relie jamais deux agents par un câble', () => {
         const wrong = cableRoutes.filter(cable => agentIds.has(cable.targetId))
         expect(wrong.map(cable => cable.id)).toEqual([])
     })
 
-    // Un agent qui travaille sur un outil doit se voir : le câble est toujours là, c'est le beam
-    // posé par-dessus qui dit que l'appel a lieu maintenant.
     it('double chaque câble d\'un beam, pour que l\'appel en cours se distingue de la plomberie', () => {
         const cables = cableRoutes.map(cable => cable.id).sort()
         const doubled = toolBeams.map(beam => stageLinkId(beam.source, beam.target)).sort()
@@ -194,9 +172,6 @@ describe('le scénario du décor', () => {
         }
     })
 
-    // Les deux diagonales du cadre portent les échanges inter-box, et chacune dans les deux sens :
-    // sinon une moitié du décor ne parle qu'à elle-même. Plusieurs beams peuvent emprunter la même
-    // diagonale, c'est le test du coude qui garantit qu'ils restent lisibles.
     it('fait collaborer les boxes entre elles, dans les deux sens de chaque diagonale', () => {
         const pairs = new Set(
             agentBeams
@@ -216,8 +191,6 @@ describe('le scénario du décor', () => {
         for (const beam of agentBeams) {
             if (containerOf(beam.source) === containerOf(beam.target)) continue
 
-            // Sur une paire en diagonale d'écran, les deux tuiles sont quasi alignées sur un seul
-            // axe iso : c'est ce qui garde le tracé droit au lieu d'un coude à travers le cadre.
             const source = tileById.get(beam.source)!
             const target = tileById.get(beam.target)!
             const du = Math.abs(target.position.col - source.position.col)
@@ -226,9 +199,6 @@ describe('le scénario du décor', () => {
         }
     })
 
-    // Une collaboration se lit à ce que le beam est tenu par ses *deux* bouts : une passe n'est tirée
-    // que par celui qui la fait, un travail à deux est tenu des deux côtés. C'est cet instant-là qui
-    // doit durer, pas le relais.
     const collaborations = (() => {
         const held = new Map<string, string[]>()
         const open = new Map<string, number>()
@@ -269,9 +239,6 @@ describe('le scénario du décor', () => {
         expect(new Set(boxPairs).size).toBeGreaterThanOrEqual(2)
     })
 
-    // Le décor est un fond, mais un fond où il se passe quelque chose : si tout est bleu en
-    // permanence, autant ne rien animer. Il montre le travail et les décisions humaines, jamais un
-    // incident rouge sur une surface d'accueil.
     it('joue les statuts utiles à l’auth sans jamais passer en erreur', () => {
         const played = new Set(statusChanges.map(change => change.status))
         expect([...played].sort()).toEqual(['idle', 'waiting_human', 'working'])
@@ -298,8 +265,6 @@ describe('le scénario du décor', () => {
         }
 
         expect(peak, 'tout le plateau s\'allume en même temps').toBeLessThanOrEqual(stage.agentIds.length - 3)
-        // Le décor a le droit d'être calme, pas d'être mort : hors de l'entrée en scène, il ne reste
-        // jamais longtemps sans une seule tuile allumée.
         expect(dark / samples, 'le plateau est éteint trop souvent').toBeLessThanOrEqual(0.1)
     })
 

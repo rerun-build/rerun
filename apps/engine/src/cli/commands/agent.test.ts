@@ -72,7 +72,6 @@ describe('rerun agent create', () => {
         expect(state.events).toEqual([['prepareDataDir']])
     })
 
-    // Looks wrong: a --key without '=' slices at index -1, storing { FO: 'FOO' } instead of refusing.
     it('mangles a --key given without an equals sign', async () => {
         await agentCommand(['create', '--name', 'Scout', '--key', 'FOO'])
         expect(created().keys).toEqual({ FO: 'FOO' })

@@ -1,8 +1,3 @@
-// Faux workspaces : un board isométrique plausible (des Box, des agents, quelques appels en cours)
-// tiré au sort à partir d'une seed, pour en capturer des visuels. La scène est décrite avec le
-// vocabulaire métier du board réel (SpacePublic / IsoAgent / AgentLink), pas avec des Tiles : c'est
-// l'adaptateur de l'app qui fait la traduction, donc l'image est celle que l'app rendrait.
-
 import { CONTAINER_SIDES, GRID_SIZE, hashUnit, isoPosition, TILE_H, TILE_W } from '@rerun/ui/iso-grid/iso'
 import type { IsoCamera } from '@rerun/ui/iso-grid'
 
@@ -31,12 +26,8 @@ export type WorkspaceScene = {
 export const MAX_SCENE_BOXES = 4
 export const MIN_AGENTS_PER_BOX = 2
 export const MAX_AGENTS_PER_BOX = 6
-// Deux agents dans une Box de 8×8, c'est un workspace qui vient d'être créé : le tirage part de
-// trois, la valeur reste accessible en la forçant depuis l'admin.
 const RANDOM_MIN_AGENTS = 3
 
-// Une seule Box la plupart du temps : c'est ce que voit un utilisateur réel, et c'est le cadrage où
-// les agents sont assez gros pour se lire sur X.
 const BOX_COUNT_WEIGHTS: readonly [number, number][] = [
     [1, 0.55],
     [2, 0.25],
@@ -44,8 +35,6 @@ const BOX_COUNT_WEIGHTS: readonly [number, number][] = [
     [4, 0.05],
 ]
 
-// Un visuel de marque ne montre jamais un workspace en panne : ni 'error', ni 'offline', ni un
-// agent éteint. Seuls les trois statuts sains sont tirés.
 const STATUS_WEIGHTS: readonly [AgentStatus, number][] = [
     ['idle', 0.56],
     ['working', 0.3],
@@ -81,31 +70,18 @@ const AGENT_NAMES = [
     'Roadmap keeper',
 ]
 
-// Les captures ne sont pas des exports marketing : une largeur ronde sent le gabarit, alors qu'un
-// vrai screenshot porte la taille de la fenêtre de celui qui l'a pris. Les gabarits d'export et les
-// largeurs d'écran sont des multiples de 8 (1200, 1440, 1512, 1728, 1920) : on tire à côté, jamais
-// dessus, et la hauteur s'écarte du 16:9 exact de quelques pixels.
 const MIN_WIDTH = 1283
 const WIDTH_STEPS = 58
 const HEIGHT_JITTER = 32
 
-// Plafond de zoom par nombre de Box : plus il y a de Box, plus il faut reculer pour les tenir.
 const ZOOM_CEILING: Record<number, number> = { 1: 2.3, 2: 1.7, 3: 1.35, 4: 1.15 }
 
-// Mêmes constantes que le cadrage interne de l'isogrid (cf. WORLD_OFFSET / FIT_PADDING dans
-// IsoGrid) : la caméra est calculée ici plutôt que déléguée à `fitToContent`, parce que l'aperçu de
-// l'admin vit sous un `transform: scale()` et que l'ajustement automatique se mesure, lui, sur la
-// boîte déjà réduite.
 const CENTER_ISO = isoPosition(GRID_SIZE / 2, GRID_SIZE / 2)
 const WORLD_OFFSET = { left: -CENTER_ISO.left, top: -CENTER_ISO.top }
 const FIT_PADDING = TILE_W / 2
 const AGENT_SPAN = 2
 
-// Ancres possibles d'un agent dans une Box de 8 : trois pas de 3 cellules laissent une cellule de
-// vide entre deux empreintes 2×2 et deux cellules de marge contre les bords de la Box.
 const SLOT_OFFSETS = [0, 3, 6]
-// Deux tuiles de même (col - row) tombent dans la même colonne écran, l'une derrière l'autre. Une
-// paire se lit encore comme de la profondeur, un trio se lit comme une pile.
 const MAX_TILES_PER_SCREEN_COLUMN = 2
 
 type Rng = () => number
@@ -148,8 +124,6 @@ function toSpaceRect(rect: NewSpaceRect): SpaceRect {
     return { col_start: rect.colStart, row_start: rect.rowStart, col_end: rect.colEnd, row_end: rect.rowEnd }
 }
 
-// Les Box se posent comme dans l'app : la première au centre, les suivantes contre une face d'une
-// Box déjà là, avec le même écart que le bouton « + » du board.
 function layoutBoxes(rng: Rng, count: number): SpaceRect[] {
     const rects: SpaceRect[] = [toSpaceRect(findFreeRect([]))]
     while (rects.length < count) {
@@ -262,7 +236,6 @@ export function buildWorkspaceScene(seed: string, options: SceneOptions = {}): W
         }
     }
 
-    // Un board mort ne raconte rien : au moins un agent tourne, et c'est de lui que part un appel.
     if (agents.length > 0 && !agents.some(a => a.status === 'working')) {
         agents[Math.floor(rng() * agents.length)].status = 'working'
     }

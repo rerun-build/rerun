@@ -27,7 +27,6 @@ function request(body: Record<string, unknown>) {
     return new Request('https://rerun.test/api/chat', { method: 'POST', body: JSON.stringify({ agentId: 'agent', sessionId: 'session', text: 'ship it', ...body }) })
 }
 
-// The route sleeps between retries; without fake timers the queued cases would take 25 seconds.
 async function settle(response: Promise<Response>): Promise<Response> {
     await vi.runAllTimersAsync()
     return response

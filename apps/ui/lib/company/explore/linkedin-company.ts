@@ -18,16 +18,12 @@ export type RawLinkedinCompany = Record<string, unknown> & {
     locations?: { city?: string; country?: string; headquarter?: boolean }[]
 }
 
-// `web` is a page that came up when searching for the exact domain, so it cites the site; `name` is
-// LinkedIn's own search by company name, the one that finds namesakes.
 export type LinkedinCompanySource = 'site' | 'web' | 'name'
 
 export type LinkedinCompanyFindings = { source: LinkedinCompanySource; query: string; matchesWebsite: boolean; company: RawLinkedinCompany }
 
 const SOURCE_LABELS: Record<LinkedinCompanySource, string> = { site: 'le lien du site', web: 'la recherche web sur le domaine', name: 'recherche par nom' }
 
-// The actor sends back similar and affiliated pages too: useful for competitors, too long for a
-// prompt as is.
 function trimCompany(company: RawLinkedinCompany): RawLinkedinCompany {
     const { similarOrganizations, affiliatedPages, ...rest } = company
     delete rest.logos

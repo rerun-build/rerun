@@ -3,8 +3,6 @@ import { z } from 'zod'
 
 import { BUDGET_OPTIONS, EXPERT_AVAILABILITIES, EXPERT_TYPES, LANGUAGE_OPTIONS, SKILL_OPTIONS } from './options'
 
-// Owner-facing schema: what an expert may edit about their own fiche, from the landing claim link or
-// from the app. No React here, so both apps' server actions re-parse it at their boundary.
 export { EXPERT_AVAILABILITIES, EXPERT_TYPES } from './options'
 
 const budgetValues: readonly string[] = BUDGET_OPTIONS
@@ -13,7 +11,6 @@ const languageValues: readonly string[] = LANGUAGE_OPTIONS
 
 export type ExpertValidationMessage = keyof typeof englishKit.experts.validation
 
-// The server parses with the English messages; the wizard builds its own copy with the reader's.
 export function buildEditExpertSchema(message: (key: ExpertValidationMessage) => string) {
     return z.object({
         name: z

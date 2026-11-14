@@ -24,7 +24,6 @@ export function SpendCard({ request, quote, onSubmit, onAddCredits }: SpendCardP
     const tTools = useTranslations('tools')
     const locale = useLocale()
     const [submitted, setSubmitted] = useState(false)
-    // Answering twice starts two runs on the same conversation: the latch has to be a ref.
     const submittedRef = useRef(false)
     const short = isShort(quote)
 
@@ -68,7 +67,6 @@ export function SpendCard({ request, quote, onSubmit, onAddCredits }: SpendCardP
 
             {short && <MissingCredits quote={quote} />}
 
-            {/* Narrow, the main answer takes a row of its own so three buttons never squeeze into one. */}
             <div className="grid grid-cols-2 gap-2 @sm:flex @sm:items-center">
                 <Button size="sm" variant="destructive" disabled={submitted} onClick={() => decide({ decision: 'declined' })} data-hitl="decline" className={cn('@sm:mr-auto', short && 'col-span-2')}>
                     {t('notNow')}
@@ -92,7 +90,6 @@ export function SpendCard({ request, quote, onSubmit, onAddCredits }: SpendCardP
     )
 }
 
-// The bar is what the task needs: the credits the workspace has in solid, the gap in red stripes.
 function MissingCredits({ quote }: { quote: SpendQuote }) {
     const t = useTranslations('chat.spend')
     const locale = useLocale()

@@ -2,20 +2,15 @@ import type { Database } from '@/app/api/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { randomUuid } from '@/lib/random-uuid'
 
-// Paths are random UUIDs, so an object is never overwritten and can be cached forever.
 const IMMUTABLE_CACHE_CONTROL = '31536000'
 
 const DEFAULT_MAX_SIZE = 1600
 
 export type PublicImageOptions = {
     maxSize?: number
-    // Downscaling from a much larger source softens the edges; a light pass gets the bite back.
     sharpen?: boolean
 }
 
-// Shared image ingest for every admin surface that accepts an upload: normalise the
-// orientation, cap the dimensions and store one webp in a public bucket. Callers only
-// choose the bucket and the folder inside it.
 export async function uploadPublicImage(
     supabase: SupabaseClient<Database>,
     bytes: ArrayBuffer | Uint8Array,

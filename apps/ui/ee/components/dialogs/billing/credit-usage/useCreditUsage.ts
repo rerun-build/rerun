@@ -8,17 +8,14 @@ import { creditBalance, type CreditBalance, type CreditUsage } from '@/ee/lib/bi
 import { useSession } from '@/supabase/session/SessionProvider'
 
 export type CreditUsageState = {
-    // null while the split is loading: the figures come from the workspace row, only the split waits.
     balance: CreditBalance | null
     usage: CreditUsage | null
     loading: boolean
     trial: boolean
     resetsOn: Date | null
-    // A member paused the credit: the hub refuses every Rerun model and paid data call until it is resumed.
     paused: boolean
 }
 
-// Read once when a billing dialog opens: the card under the plan and the usage pane share it.
 export function useCreditUsage({ enabled = true }: { enabled?: boolean } = {}): CreditUsageState {
     const { workspace } = useSession()
     const [usage, setUsage] = useState<CreditUsage | null>(null)

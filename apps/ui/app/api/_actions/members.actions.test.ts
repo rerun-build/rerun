@@ -9,7 +9,6 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({ get EMAIL_DELIVERY() { return mocks.emailDelivery }, sendWorkspaceInviteEmail: mocks.sendWorkspaceInviteEmail, BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => 'https://app.rerun.build/og/board?sig=x') }))
 vi.mock('next/server', () => ({ after: (task: () => Promise<unknown>) => void mocks.afterTasks.push(task()) }))
 
-// The invitation email leaves after the response, so a test reads it once those tasks settled.
 const afterResponse = () => Promise.all(mocks.afterTasks.splice(0))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
@@ -21,7 +20,6 @@ const WORKSPACE_ID = 7
 const ME = 'user-me'
 const DAY_MS = 24 * 60 * 60 * 1000
 
-// Answers each read, and each write that returns its rows, from in-memory rows filtered on the chain's eq/in/is calls, the way PostgREST would.
 function tableResolver(rows: Record<string, Row[]>) {
     return (table: string, calls: readonly SupabaseCall[]) => {
         if (writeMethodOf(calls) && !calls.some(call => call.method === 'select')) return undefined
@@ -209,8 +207,6 @@ describe('setMemberRoleAction', () => {
     it('takes the role back when the other admin stepped down in the same instant', async () => {
         const rows = { workspace_members: [member(ME), member('user-2')] }
         const resolve = tableResolver(rows)
-        // The other admin's demotion lands between the check and the write: every update of the
-        // workspace_members table is applied, and the first one carries that concurrent demotion too.
         const db = fakeSupabase((table, calls) => {
             const update = calls.find(call => call.method === 'update')
             if (table === 'workspace_members' && update) {

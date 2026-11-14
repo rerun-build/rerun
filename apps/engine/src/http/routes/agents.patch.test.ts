@@ -30,9 +30,6 @@ async function patchConfig(body: unknown): Promise<Detail> {
 describe('PATCH /agents/:id', () => {
     beforeEach(seedAgent)
 
-    // Zod's `.partial()` keeps every `.default()`, so parsing a one-field body hands back a whole
-    // config with provider, model and description reverted. Anything the caller did not send has to
-    // survive, or saving the verbosity silently resets the model.
     it('leaves untouched fields alone instead of reverting them to their defaults', async () => {
         const { config } = await patchConfig({ verbosity: 'concise' })
         expect(config.verbosity).toBe('concise')
@@ -62,14 +59,11 @@ describe('PATCH /agents/:id', () => {
         expect(config.model).toBe('claude-sonnet-4-6')
     })
 
-    // A PATCH cannot clear a field by sending `undefined` (JSON drops it), so null is the way back
-    // to "no connection of its own", which resolves to a box fallback at load time.
     it('detaches the agent from its connection with null', async () => {
         const { config } = await patchConfig({ connectionId: null })
         expect(config.connectionId).toBeNull()
     })
 
-    // Null is also how the picker says "stop choosing": the agent then runs whatever the box does.
     it('clears the pin back to the box default', async () => {
         const { config } = await patchConfig({ connectionId: null, provider: null, model: null })
         expect(config.model).toBeNull()
@@ -77,8 +71,6 @@ describe('PATCH /agents/:id', () => {
         expect(config.connectionId).toBeNull()
     })
 
-    // Existing agents carry provider and model written on disk, so flipping the schema defaults to
-    // null cannot unpin them behind the user's back.
     it('keeps an explicit pin across an unrelated patch', async () => {
         await patchConfig({ verbosity: 'concise' })
         expect((await patchConfig({ tools: { shell: false } })).config.model).toBe('acme/router-large')
@@ -90,8 +82,6 @@ describe('PATCH /agents/:id', () => {
         expect(detail.config.setup).toEqual({ required: true, completedAt: null, sessionId: null })
     })
 
-    // Answering "no setup needed" has to take the instructions away with it: a leftover INSTALL.md
-    // would be replayed by every copy of the agent.
     it('erases the install prompt when it is sent empty', async () => {
         await patchConfig({ install: 'Ask for the Stripe key.', setup: { required: true } })
         const detail = await patchConfig({ install: '', setup: { required: false, completedAt: '2026-08-13T00:00:00.000Z' } })
@@ -103,8 +93,6 @@ describe('PATCH /agents/:id', () => {
 describe('POST /agents', () => {
     beforeAll(() => migrate())
 
-    // An agent built from outside the app should not need a follow-up PATCH to carry the setup it
-    // was designed with: the folder is complete on the first call or the template capture is not.
     it('creates an agent with its install prompt and setup answer', async () => {
         const res = await agentRoutes.request('/', {
             method: 'POST',

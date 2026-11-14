@@ -36,8 +36,6 @@ import {
     saveBusinessDetails,
 } from './billing.service'
 
-// Hoisted so the portal tests, which reload the service to reset its cached configuration id, still
-// reach the same spies.
 const m = vi.hoisted(() => ({
     createServiceRoleClient: vi.fn(),
     requireWorkspaceId: vi.fn(),
@@ -94,7 +92,6 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString()
 
 type Row = Record<string, unknown> | null
 
-// Every read of `workspaces` answers the same row: each function only picks the columns it asked for.
 function useDb({ row = null, updateError = null, members = 1, invites = 0 }: { row?: Row; updateError?: unknown; members?: number; invites?: number } = {}) {
     const fake = fakeSupabase((table, calls) => {
         if (table === 'workspaces') return writeMethodOf(calls) ? { error: updateError } : { data: row }
@@ -646,8 +643,6 @@ describe('changePlan on the same interval', () => {
         expect(stripe.subscriptions.retrieve).not.toHaveBeenCalled()
     })
 
-    // A decrease bills nothing back: deleting the legacy pack here would lose the unused part of the
-    // period, which the migration script credits when it removes the item.
     it('bills an increase today and leaves a legacy agent pack for the migration to credit', async () => {
         useDb({ row: editable })
         await expect(changePlan({ quantities: { credit_pack: 2, linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' })).resolves.toEqual({ trialEnded: false, switchAt: null, paymentClientSecret: null })
@@ -1334,7 +1329,6 @@ describe('changePlan', () => {
         })
     })
 
-    // A phase discount read back carries every reference it has; written back it takes exactly one.
     it.each([
         { name: 'the discount already on the subscription', read: { discount: 'di_1', coupon: 'co_1', promotion_code: 'promo_1' }, written: { discount: 'di_1' } },
         { name: 'the promotion code when the discount has no id', read: { discount: null, coupon: { id: 'co_1' }, promotion_code: { id: 'promo_1' } }, written: { promotion_code: 'promo_1' } },

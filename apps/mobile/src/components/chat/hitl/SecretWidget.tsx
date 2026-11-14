@@ -13,8 +13,6 @@ import { spacing } from '@/theme/tokens'
 import { HitlAction, HitlCard } from './HitlCard'
 import type { HitlWidgetProps } from './registry'
 
-// The keys a coworker needs, written straight onto the Box as its variables: the hub passes them on
-// and the model never sees a value, only that it was provided.
 export function SecretWidget({ pending, agentId, onAnswer, onDismiss }: HitlWidgetProps) {
     const t = useTranslations('mobileHitl')
     const { session, me } = useAuth()

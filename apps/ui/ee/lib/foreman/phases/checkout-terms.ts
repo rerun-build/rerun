@@ -4,11 +4,6 @@ import { shortDate } from '@/ee/lib/billing/dates'
 
 import type { ForemanState } from '@/lib/foreman/phase'
 
-// What starting the plan costs this workspace, in the sentence the foreman says it with. A workspace
-// that never had a trial starts it without a card, from the offer card in the chat, or through the
-// card form on the card arm of the trial test; one whose trial is spent goes through the card form
-// and is billed today. The trial's limits and its charge date are spelled out so the foreman
-// never answers "is it free?" with something the card form contradicts.
 export function checkoutTerms(state: Pick<ForemanState, 'trialSpent' | 'trialNeedsCard' | 'priceArm'>, now: Date = new Date()): string {
     const price = `${formatAmount(basePriceCents(state.priceArm), PLAN_CURRENCY)} a month`
     if (state.trialSpent) return `Their free trial has already been used, so the plan is billed today: ${price} plus local tax, cancel any time from Billing in the workspace menu.`

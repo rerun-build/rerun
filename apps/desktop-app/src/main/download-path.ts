@@ -1,7 +1,5 @@
 import { basename, extname, join } from 'node:path'
 
-// Characters no file system takes, and the separators: a server-chosen name never escapes the
-// Downloads folder nor overwrites what is there.
 export function safeFilename(name: string): string {
     const cleaned = basename(name.replace(/\\/g, '/'))
         .replace(/[<>:"|?*\u0000-\u001f]/g, '_')

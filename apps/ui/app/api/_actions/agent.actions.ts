@@ -100,9 +100,6 @@ const duplicateInputSchema = z.object({
 
 export type DuplicateAgentResult = { ok: true; agentId: string; agentName: string; inactive: boolean; schedules: string[]; triggers: string[] } | ActionFailure
 
-// Both ends are checked against the session rather than trusted, by duplicateAgent itself: the
-// source has to be reachable, and the Box the copy lands in managed. Any Box of the workspace is a
-// valid destination: they all run on the same engine, where the copy never leaves the machine.
 export async function duplicateAgentAction(input: unknown): Promise<DuplicateAgentResult> {
     try {
         const { agentId, spaceId, position } = duplicateInputSchema.parse(input)
@@ -118,8 +115,6 @@ const moveInputSchema = z.object({ agentId: z.string().uuid(), spaceId: z.string
 
 export type MoveAgentResult = { ok: true; position: { col: number; row: number } } | ActionFailure
 
-// Both ends are checked by moveAgentToBox: `manage` on the Box it leaves and on the one it joins.
-// Nothing moves on the engine, only the rectangle the agent is drawn in.
 export async function moveAgentAction(input: unknown): Promise<MoveAgentResult> {
     try {
         const { agentId, spaceId } = moveInputSchema.parse(input)
@@ -129,8 +124,6 @@ export async function moveAgentAction(input: unknown): Promise<MoveAgentResult> 
     }
 }
 
-// Ownership goes through assertAgentInWorkspace rather than the usual chat target: that one throws
-// on a disabled agent, which is precisely the agent this acts on.
 export async function activateAgentAction(agentId: string): Promise<{ ok: true } | ActionFailure> {
     try {
         await assertAgentInWorkspace(agentId, 'manage')
@@ -145,8 +138,6 @@ export async function renameAgentAction(agentId: string, newName: string): Promi
     await assertAgentInWorkspace(agentId, 'manage')
     return renameAgent(agentId, newName)
 }
-
-// --- Agent config (Settings tab) ---
 
 export async function getAgentDetailAction(agentId: string): Promise<EngineAgentDetail | null> {
     try {
@@ -166,9 +157,6 @@ export async function listAgentToolsAction(agentId: string): Promise<EngineToolF
     }
 }
 
-// Skipping the install is still the end of it, so the agent's schedules and webhooks are switched
-// on as if it had closed the setup itself. Silent on failure, like the setup read above: an
-// unreachable box, or an engine too old to know the route, must not turn a skip into an error.
 export async function activateAgentAutomationsAction(agentId: string): Promise<void> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
@@ -180,7 +168,6 @@ export async function updateAgentConfigAction(agentId: string, patch: EngineAgen
     try {
         const { conn, engineAgentId, contentLocked } = await resolveRunTarget(agentId, 'manage')
         await assertModelEntitled(patch.model)
-        // Same reason as the skill body: a sealed soul is dropped from the patch, not written back.
         await enginePatchAgent(conn, engineAgentId, contentLocked ? { ...patch, soul: undefined } : patch)
         return { success: true }
     } catch (err) {
@@ -188,9 +175,6 @@ export async function updateAgentConfigAction(agentId: string, patch: EngineAgen
     }
 }
 
-// A connector owns its MCP servers: install and uninstall write them through the compiler, which
-// calls the engine directly. Editing one from the panel would leave the registry describing a
-// footprint that no longer exists, so this path refuses to touch them.
 export async function patchAgentMcpServersAction(agentId: string, body: { upsert?: EngineMcpServer[]; remove?: string[] }): Promise<SuccessResult & { detail?: EngineAgentDetail }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
@@ -214,21 +198,10 @@ export async function getAgentKeysAction(agentId: string): Promise<{ keys: strin
     }
 }
 
-// `connectionId` / `model` are the pin the agent carries, null when it picked nothing and follows
-// the Box default. `resolved*` is what the engine would actually run it on, which is the pin when
-// there is one and the Box default otherwise. `loaded` keeps "the fetch failed" apart from
-// "this agent chose nothing": both leave the pin null and they are not the same state.
 export type ModelSelectorContext = { connectionId: string | null; model: string | null; resolvedConnectionId: string | null; resolvedModel: string | null; loaded: boolean }
 
-// The guided-setup state the chat needs before it can decide between the composer and the
-// install button. An engine that cannot be reached, or one too old to know about INSTALL.md,
-// answers null: no gate rather than a chat nobody can type in. `sessionId` is the conversation the
-// install was started in, as the row the agent panel opens.
 export type AgentSetupInfo = { required: boolean | null; completedAt: string | null; prompt: string; sessionId: string | null }
 
-// What a conversation needs about the agent itself, from the one read of it both the in-chat
-// ModelSelector and the setup gate draw on. The connections are a machine-level fetch (see
-// listBoxConnectionsAction) shared by every agent of the workspace. The foreman has no setup.
 export type AgentContext = { model: ModelSelectorContext; setup: AgentSetupInfo | null }
 
 export async function getAgentContextAction(agentId: string): Promise<AgentContext> {
@@ -269,10 +242,6 @@ export async function updateAgentKeysAction(agentId: string, body: { set?: Recor
     }
 }
 
-// A coworker asking for a credential in the chat is answered by whoever can talk to it, so this path
-// takes `use` only. What makes that safe is that it writes nothing but the keys the pending request
-// of that conversation names, read back from the engine rather than from the caller. Any other key
-// goes through updateAgentKeysAction, which takes `manage`.
 export async function answerSecretRequestAction(sessionId: string, values: Record<string, string>): Promise<SuccessResult> {
     try {
         const session = await assertSessionInWorkspace(sessionId)
@@ -289,10 +258,6 @@ export async function answerSecretRequestAction(sessionId: string, values: Recor
     }
 }
 
-// --- Data tab (agent's private SQLite database, read-only) ---
-
-// Resolving the coworker fails with messages written for the user (inactive, not found); the engine
-// call fails with transport details that are not.
 export async function listAgentTablesAction(agentId: string): Promise<TableListResult> {
     let target: Awaited<ReturnType<typeof getAgentChatTarget>>
     try {
@@ -337,8 +302,6 @@ export async function dropAgentTableAction(agentId: string, table: string): Prom
     }
 }
 
-// An engine that predates the purge route answers a bare 404, which reads as a broken agent
-// unless we name it: the agent is fine, the machine it runs on is just behind.
 function describeDataError(err: unknown, fallback: ErrorCode): ActionRefusal {
     const message = err instanceof Error ? err.message : ''
     if (/failed: 404\b/.test(message)) return refusal('purgeNeedsEngineUpdate')
@@ -355,8 +318,6 @@ export async function purgeAgentTableAction(agentId: string, table: string): Pro
     }
 }
 
-// Everything the Monitoring tab draws, behind one resolution of the agent: the tab polls, and as
-// separate actions its charts used to queue one after the other on every tick.
 export async function readAgentMonitoringAction(agentId: string, usageRange: UsageTimeRange, queries: StatsQuery[]): Promise<{ usage: EngineUsageBucket[] | null; stats: (EngineStatsPoint[] | null)[] }> {
     try {
         const parsed = queries.map(query => statsQuerySchema.parse(query))
@@ -371,10 +332,6 @@ export async function readAgentMonitoringAction(agentId: string, usageRange: Usa
     }
 }
 
-// --- Skills tab ---
-
-// A connector's skill is the connector's: the panels open it read-only, and every write path has
-// to say the same thing, since the client flag is only a flag.
 async function connectorSkillError(conn: EngineConnection, engineAgentId: string, slug: string): Promise<ActionRefusal | null> {
     const owner = connectorSkillOwners(await readRegistry(conn, engineAgentId)).get(slug)
     return owner ? refusal('connectorSkillReadOnly', { slug, service: owner }) : null
@@ -385,16 +342,12 @@ export async function listSkillsAction(agentId: string): Promise<EngineSkillWith
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId)
         const [skills, registry] = await Promise.all([engineListSkills(conn, engineAgentId), readRegistry(conn, engineAgentId)])
         const fromConnector = connectorSkillSlugs(registry)
-        // The listing carries every body, so it is sealed like the editor is: what stays readable
-        // here is the shelf (names and descriptions), not what is written on the pages.
         return skills.map(s => ({ ...sealSkill(s, contentLocked), fromConnector: fromConnector.has(s.slug) }))
     } catch {
         return []
     }
 }
 
-// The shelf alone, for the `/` menu of the composer: no body, no file list, no registry read. Names
-// and descriptions stay readable on a sealed agent, so there is nothing to seal here.
 export async function listSkillSummariesAction(agentId: string): Promise<EngineSkillSummary[]> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId)
@@ -446,8 +399,6 @@ export async function readSkillFileAction(agentId: string, slug: string, path: s
 export async function writeSkillFileAction(agentId: string, slug: string, path: string, content: string): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
-        // The editor showed filler, so a save here would write that filler over the real file.
-        // Deleting is left alone: it destroys nothing the user could not already destroy.
         if (contentLocked) return { success: false, ...refusal('lockedWrite') }
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
         if (readOnly) return { success: false, ...readOnly }
@@ -486,8 +437,6 @@ export async function updateSkillAction(agentId: string, slug: string, patch: { 
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
         const readOnly = await connectorSkillError(conn, engineAgentId, slug)
         if (readOnly) return { success: false, ...readOnly }
-        // The body in a sealed form is the filler the server sent, so it is dropped rather than
-        // saved back over the real procedure. Everything else about the skill stays editable.
         const skill = await engineUpdateSkill(conn, engineAgentId, slug, contentLocked ? { ...patch, body: undefined } : patch)
         return { success: true, skill }
     } catch (err) {
@@ -506,8 +455,6 @@ export async function deleteSkillAction(agentId: string, slug: string): Promise<
         return { success: false, ...refusalOf(err, 'deleteSkillFailed') }
     }
 }
-
-// --- Memories tab ---
 
 export async function listMemoriesAction(agentId: string): Promise<EngineMemory[]> {
     try {
@@ -557,11 +504,6 @@ export async function clearMemoriesAction(agentId: string): Promise<SuccessResul
     }
 }
 
-// --- Scheduled tasks tab (cron / one-shot) ---
-// rerun-engine exposes schedule CRUD under /agents/:id/schedules. Per-fire run
-// history is read via the /runs endpoints (see listRunsAction /
-// listScheduleRunsAction below).
-
 export async function listSchedulesAction(agentId: string): Promise<EngineSchedule[]> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId)
@@ -575,16 +517,11 @@ export type WorkspaceRoutine = Pick<EngineSchedule, 'slug' | 'name' | 'cron' | '
     agentId: string
     nextRunAt: string | null
     runningSince: string | null
-    // The coworker's install is still running: its routines stay off until it finishes, and turning
-    // one on would start a second install beside it.
     setupPending: boolean
 }
 
 export type WorkspaceRoutines = { routines: WorkspaceRoutine[]; canRename: boolean }
 
-// The engine only lists schedules per agent, so this fans out over the workspace's agents on its one
-// machine, the ones the caller can see. An agent whose box call fails drops out rather than emptying
-// the whole list.
 export async function listWorkspaceRoutinesAction(): Promise<WorkspaceRoutines> {
     const actor = await requireLightSessionActor()
     const workspaceId = actor.workspaceId
@@ -657,9 +594,7 @@ export async function updateScheduleAction(agentId: string, slug: string, patch:
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId, 'manage')
         await assertModelEntitled(patch.model)
-        // Pausing or rescheduling a sealed task is ordinary use; only its prompt is held back.
         const schedule = await engineUpdateSchedule(conn, engineAgentId, slug, contentLocked ? { ...patch, body: undefined } : patch)
-        // A box that predates renaming drops the unknown field and still answers 200.
         if (patch.name !== undefined && schedule.name !== patch.name.trim()) return { success: false, ...refusal('renameRoutineNeedsUpdate') }
         return { success: true, schedule }
     } catch (err) {
@@ -696,10 +631,6 @@ export async function deleteScheduleAction(agentId: string, slug: string): Promi
     }
 }
 
-// --- Triggers tab (public webhook URLs) ---
-// rerun-engine owns the trigger definitions under /agents/:id/triggers, exactly like schedules.
-// Firing one is not here: that happens on the public /api/t/... route, with no session at all.
-
 export async function listTriggersAction(agentId: string): Promise<EngineTrigger[]> {
     try {
         const { conn, engineAgentId, contentLocked } = await getAgentChatTarget(agentId)
@@ -711,7 +642,6 @@ export async function listTriggersAction(agentId: string): Promise<EngineTrigger
 
 const OUTCOME_RUNS = 100
 
-// How each scheduled task and trigger of the coworker last ended, keyed by `outcomeKey`.
 export async function listTaskOutcomesAction(agentId: string): Promise<Record<string, TaskOutcome>> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId)
@@ -773,12 +703,6 @@ export async function deleteTriggerAction(agentId: string, slug: string): Promis
     }
 }
 
-// --- Runs (execution history) ---
-// Every fire (chat / one-off / scheduled / triggered) is audited in the engine's
-// `runs` table. The list is agent-wide; listScheduleRunsAction and
-// listTriggerRunsAction narrow it to one routine by matching the engine sessions
-// titled `schedule: <slug>` / `trigger: <slug>`.
-
 export async function listRunsAction(agentId: string, limit?: number): Promise<EngineRun[]> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId)
@@ -815,8 +739,6 @@ export async function getRunToolsAction(agentId: string, runId: string): Promise
     }
 }
 
-// Returns whether the engine took the cancellation. `abortRun` frees the session claim before it
-// answers, so awaiting this is what tells a caller it may start the next run on that conversation.
 export async function cancelRunAction(agentId: string, runId: string): Promise<boolean> {
     try {
         const { conn, engineAgentId } = await resolveRunTarget(agentId)

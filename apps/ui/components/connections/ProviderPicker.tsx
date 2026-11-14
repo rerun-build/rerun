@@ -8,11 +8,8 @@ import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 type ProviderPickerProps = {
-    // Providers already plugged in are still offered, since two people can bring two Claude plans.
     taken: Set<string>
     onPick: (provider: AddableProvider) => void
-    // What this machine can run: OpenCode only joins the plans, and a custom endpoint the API keys,
-    // where the engine knows them.
     providers: AddableProvider[]
     children: ReactNode
 }

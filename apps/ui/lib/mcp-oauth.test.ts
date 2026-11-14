@@ -4,7 +4,6 @@ import { type OAuthContext, buildAuthorizeUrl, callbackUrl, clientMetadataDocume
 vi.mock('node:dns/promises', () => ({ lookup: async () => [{ address: '93.184.216.34', family: 4 }] }))
 
 const AUTH_META = { authorization_endpoint: 'https://auth.example/authorize', token_endpoint: 'https://auth.example/token' }
-// What a server publishes about itself, with no protected-resource document naming another issuer.
 const SELF_META = { authorization_endpoint: 'https://mcp.example/authorize', token_endpoint: 'https://mcp.example/token' }
 const FIRECRAWL_META = { authorization_endpoint: 'https://www.firecrawl.dev/authorize', token_endpoint: 'https://www.firecrawl.dev/token' }
 

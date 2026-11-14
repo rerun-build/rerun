@@ -1,6 +1,3 @@
-// No 'server-only', see lib/email/client.ts: the whole lifecycle module is bundled into a
-// Trigger.dev task. One function per sequence, each owning its own subject line: the subject is part
-// of the copy, and it has no business being assembled at the call site.
 import * as React from 'react'
 import {
     AgentIdle,
@@ -32,14 +29,8 @@ import { LIFECYCLE_SEQUENCES, type LifecycleSequenceKey } from '@/ee/lib/lifecyc
 
 export type { RecommendedTemplate, TrialEndedReason, TrialSummary }
 
-// `unsubscribeUrl` is null for the mandatory end-of-access notices. They travel without a
-// List-Unsubscribe header rather than offering an opt-out the sweeper then ignores. Without a locale
-// the email is written in English.
 type Recipient = { to: string; unsubscribeUrl: string | null; locale?: Locale }
 
-// A billing email reports a fact with consequences and has to reach the inbox, so it keeps the
-// transactional domain. Everything else here is a nudge nobody asked for, and it answers for its own
-// complaints on the marketing domain.
 function senderFor(key: LifecycleSequenceKey): string {
     return LIFECYCLE_SEQUENCES[key].category === 'billing' ? TRANSACTIONAL_FROM : MARKETING_FROM
 }
@@ -123,8 +114,6 @@ export function sendTrialEndedEmail(
     recipient: Recipient,
     input: { reason: TrialEndedReason; workspaceName: string | null; trialEndedLabel: string; pausedLabel: string; keptUntilLabel: string; summary?: TrialSummary; billingUrl: string; boardUrl?: string },
 ): Promise<SendEmailResult> {
-    // The deadline belongs in the subject: this is the one email in the set whose whole point is a
-    // date, and an inbox that shows only subject lines has to carry it.
     const t = emailTranslator(recipient.locale)
     const subject = input.reason === 'payment_failed' ? t('subjects.trialEndedPaymentFailed') : t('subjects.trialEndedNoCard')
     return deliver(recipient, 'trial_ended', subject, React.createElement(TrialEnded, { ...input, appUrl: APP_URL, unsubscribeUrl: recipient.unsubscribeUrl ?? undefined, locale: recipient.locale }))
@@ -137,8 +126,6 @@ export function sendPaymentFailedEmail(
     return deliver(recipient, 'payment_failed', emailTranslator(recipient.locale)('subjects.paymentFailed'), React.createElement(PaymentFailed, { ...input, appUrl: APP_URL, unsubscribeUrl: recipient.unsubscribeUrl ?? undefined, locale: recipient.locale }))
 }
 
-// One email for the three rungs of the cancellation ladder, so the rung it was sent for has to
-// travel with it: the sender domain and the log line are read from it.
 export function sendSubscriptionEndingEmail(
     recipient: Recipient,
     key: LifecycleSequenceKey,

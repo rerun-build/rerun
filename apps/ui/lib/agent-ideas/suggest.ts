@@ -11,8 +11,6 @@ import { judgeCandidates } from './judge'
 import { selectIdeas } from './select'
 import type { CatalogApp, Selection, StepData, SuggestEvent, SuggestStep } from './types'
 
-// Under this the models have nothing to tell this company from the next one, and what comes out is
-// the generic list the whole pipeline is there to avoid.
 const MIN_EVIDENCE = 8
 
 const CATALOG_COLUMNS = ['slug', 'name', 'category', 'summary', 'icon'] as const
@@ -25,9 +23,6 @@ async function loadCatalog(supabase: SupabaseClient<Database>): Promise<CatalogA
 
 type StepResult<K extends SuggestStep> = { data: StepData[K]; highlights: string[]; cost?: CollectorCost }
 
-// Agents made to measure for one workspace, from everything we know about its company. Each step
-// reports as it lands so the lab can show where an idea came from and where it died; a step that
-// fails ends the run there, since every later one reads its output.
 export async function suggestAgents(supabase: SupabaseClient<Database>, workspaceId: number, emit: (event: SuggestEvent) => void): Promise<Selection | null> {
     const startedAt = Date.now()
 

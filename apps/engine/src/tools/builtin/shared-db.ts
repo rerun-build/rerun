@@ -9,8 +9,6 @@ const paramSchema = z.array(z.union([z.string(), z.number(), z.boolean(), z.null
 
 const TABLE_IN_ERROR = /\b(?:table|column)\b[^:]*:?\s*"?([A-Za-z_][\w$]*)"?/i
 
-// A failed statement is where an agent finds out the other agents already shaped this table
-// differently, so the error carries the current shape back instead of leaving a dead end.
 async function withCurrentShape(message: string): Promise<string> {
     const name = TABLE_IN_ERROR.exec(message)?.[1]
     if (!name) return message

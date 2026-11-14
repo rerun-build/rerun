@@ -15,10 +15,6 @@ import { LAB_CONVERSATIONS, type LabConversation } from '@/mocks/conversations'
 import { useTheme } from '@/theme/theme'
 import { fonts, radius, spacing } from '@/theme/tokens'
 
-// Dev only: the sheet a tap on the chat header's chip could open, to find a conversation by its state.
-//   /lab-conversations-sheet?variant=b   b: one list by date, filtered by chips; c: grouped by state,
-//   a routine's runs folded under one row
-
 const ACTIVE_ID = 'c1'
 const PULSE = { id: 'agent-pulse', kind: 'coworker' as const, name: 'clem cv', status: 'working' as const }
 
@@ -111,7 +107,6 @@ const SECTIONS: { state: ConversationState; label: string }[] = [
     { state: 'earlier', label: 'Earlier' },
 ]
 
-// A routine leaves one conversation per run: the runs already read fold under their newest one.
 function foldRoutines(conversations: LabConversation[]): { head: LabConversation; runs: LabConversation[] }[] {
     const groups: { head: LabConversation; runs: LabConversation[] }[] = []
     for (const conversation of [...conversations].sort((a, b) => a.minutesAgo - b.minutesAgo)) {
@@ -164,7 +159,6 @@ export default function ConversationsSheetLab() {
     const found = LAB_CONVERSATIONS.filter(conversation => conversation.title.toLowerCase().includes(query.trim().toLowerCase()))
     const close = () => router.back()
 
-    // A form sheet lays out its scroll view itself: the header lives inside it, or the list covers it.
     return (
         <ScrollView style={{ backgroundColor: theme.background }} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl }}>
             <View collapsable={false} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, marginBottom: spacing.md }}>

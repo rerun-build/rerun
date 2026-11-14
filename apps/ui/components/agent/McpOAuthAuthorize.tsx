@@ -15,10 +15,8 @@ type McpOAuthAuthorizeProps = {
     url: string
     agentId: string
     serverName: string
-    // The registry key when the server is a catalog app; absent for a server added by hand.
     serviceKey?: string
     onAuthorized: () => void
-    // Starts the sign-in at mount, in the window the caller opened inside its click handler.
     autoStart?: boolean
     pendingPopup?: Window | null
 }

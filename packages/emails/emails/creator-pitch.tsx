@@ -8,7 +8,6 @@ import { text } from "../theme";
 
 export interface CreatorPitchProps {
   firstName: string | null;
-  /** The agent they actually built, when there is one worth naming. */
   agentName: string | null;
   creatorUrl: string;
   appUrl: string;
@@ -16,7 +15,6 @@ export interface CreatorPitchProps {
   locale?: EmailLocale;
 }
 
-// No hero: this one is a proposition, not a report, and the band would dress it up.
 export default function CreatorPitch({
   firstName,
   agentName,

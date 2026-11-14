@@ -12,9 +12,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     const { data } = await selectMaybeSingle(supabase, 'templates', ['updated_at'] as const, { slug })
     if (!data) return ogFallbackResponse(req)
 
-    // The version travels in the captured URL, so it is part of the cache key on both sides: editing
-    // a template invalidates its card everywhere without anyone having to purge anything, and
-    // bumping OG_VERSION does the same for every card at once when the layout itself changes.
     const version = `${OG_VERSION}.${data.updated_at ?? ''}`
 
     return captureOgCard({

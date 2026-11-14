@@ -63,43 +63,29 @@ import { ThreadBranch } from './threads/ThreadBranch'
 import { TimedTurns } from './TimedTurns'
 import { useKeyboardShown } from './useKeyboardShown'
 
-// The transcript scrolls under the suggestions and the composer, going out of focus this far above
-// them; scrolled to the end, the last message rests just above that band, sharp.
 export const BLUR_ABOVE_FOOTER = 32
-// How far above the end the thread still counts as at the bottom, and keeps following what comes.
 const AT_BOTTOM = 24
-// Under the fade at the top of the thread a block is not really seen, even when it is on screen.
 const SEEN_BAND = 24
 
 export type ChatCoworker = { id: string; kind: 'coworker' | 'foreman'; name: string; role: string; status: AgentView['agent']['status'] }
 
 type ConversationPaneProps = {
     coworker: ChatCoworker
-    // Called once per page: a new conversation is named by its first send.
     makeEndpoints: () => ChatEndpoints
     initialSessionId: string | null
     onSessionCreated: (sessionId: string) => void
     models: AgentModels | null
-    // What the hub says the conversation waits on. A call the app cannot name is one to answer only
-    // when the session waits on a human; a notification is pinned until read.
     status: SessionStatus | null
     onStatusChange: () => void
-    // Where the conversation opens on the web, which draws every block.
     webUrl: string
-    // False on the pager's neighbouring pages, mounted but off screen.
     onScreen?: boolean
-    // The coworker that opened this conversation on this one, when it was not a person.
     startedBy?: StartedBy | null
-    // Sent as soon as a new conversation is ready, the text someone asked from the search.
     initialMessage?: string
-    // False where the machine would refuse the upload: the Foreman of a box that predates its files.
     canAttach?: boolean
-    // General only: the coworker's threads, each hung under the message it was opened after.
     threads?: ThreadItem[]
     onOpenThread?: (sessionId: string) => void
 }
 
-// One conversation on screen: the transcript, what waits on an answer, and the composer.
 export function ConversationPane({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
@@ -107,15 +93,12 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const t = useTranslations('mobileChat.pane')
     const tc = useTranslations('mobileCommon.errors')
     const scroll = useRef<ScrollViewInstance>(null)
-    // The transcript a conversation opens on is shown already at its end; only what comes after scrolls.
     const shownTranscript = useRef(false)
     const [endpoints] = useState(makeEndpoints)
-    // A message the engine refused while a run held the conversation waits behind it, as on the web.
     const enqueueRef = useRef<(text: string, behindRunId: string | null) => void>(() => {})
     const chat = useCoworkerChat({ endpoints, initialSessionId, onSessionCreated, onRefused: (text, behindRunId) => enqueueRef.current(text, behindRunId) })
     const queue = useQueuedMessage(`${coworker.id}-${chat.sessionId ?? 'new'}`)
     const proposals = useSkillProposals(coworker.kind === 'coworker' ? chat.sessionId : null, chat.busy)
-    // A decision lifts the wait the proposal raised on the session, as on the web.
     const skillProposals = { ...proposals, decide: (proposalId: string, decision: 'accept' | 'dismiss') => proposals.decide(proposalId, decision).then(onStatusChange) }
     const feedback = useMessageFeedback(chat.sessionId, coworker.kind === 'foreman' ? 'foreman' : 'agent')
     enqueueRef.current = queue.enqueue
@@ -125,9 +108,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const [attachments, setAttachments] = useState<ComposerAttachment[]>([])
     const [uploading, setUploading] = useState(false)
     const [belowFold, setBelowFold] = useState(0)
-    // The web's stick-to-bottom: the thread follows what arrives only while the person sits at its
-    // end. Scrolling up lets go; scrolling back down, sending or the arrow takes it again. Only the
-    // person's own scrolling decides, never the scrolls the pane makes itself.
     const stuck = useRef(true)
     const [following, setFollowing] = useState(true)
     const stick = (value: boolean) => {
@@ -142,8 +122,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const [viewport, setViewport] = useState(0)
     const [threadTop, setThreadTop] = useState(0)
     const [screenBox, setScreenBox] = useState<{ y: number; height: number } | null>(null)
-    // The full screen opened over the conversation drives the coworker's screen: the thread lets go
-    // of its own connection meanwhile, as the web hides its thumbnail.
     const [focused, setFocused] = useState(true)
     useFocusEffect(
         useCallback(() => {
@@ -160,20 +138,12 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const messageTimes = useMessageTimes(chat.messages)
     const threadRows = useMemo(() => threadsByMessage(messageTimes, threads ?? []), [messageTimes, threads])
     const threadBranches = (rows: ThreadItem[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} onOpen={() => onOpenThread?.(thread.id)} />)
-    // The Foreman is the person's own assistant: nobody else writes there, so nothing is signed.
     const authorIds = coworker.kind === 'foreman' ? [] : [...new Set(chat.messages.flatMap(message => authorIdOf(message) ?? []))]
     const profileOf = useMemberProfiles(authorIds)
     const [dismissedCallId, setDismissedCallId] = useState<string | null>(null)
-    // A live call never reads `idle` (it goes `working`, then `awaiting_*`): an idle session is one whose
-    // block was closed, and it stays closed across a reload, as on the web.
-    // A transcript kept from the last visit may hold a question answered since, on the web or by a
-    // teammate: what acts on the run waits for the hub's own copy.
     const settled = chat.fresh && !chat.busy && !chat.error
     const pending = !settled || status === 'idle' ? null : findPendingHitl(chat.messages, dismissedCallId)
-    // A block the app draws is answered inside it, so the composer steps aside as on the web. The
-    // fallback card keeps it: typing is the only way to answer what the app cannot draw.
     const replacesComposer = pending !== null && widgetFor(pending, HITL_WIDGETS) !== null
-    // Scrolled up past the whole block: the cue says what waits down the thread, as on the web.
     const blockOutOfSight = pending !== null && blockHeight > 0 && belowFold > blockHeight
     const [acknowledged, setAcknowledged] = useState<string | null>(null)
     const waitingOnHuman = status !== null && status !== 'error' && needsHuman(status)
@@ -181,13 +151,10 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const alert = pendingAlert && (pendingAlert.toolCallId ?? pendingAlert.message) !== acknowledged ? pendingAlert : null
     const unknownCall = pending || alert || !settled || !waitingOnHuman ? null : findUnknownPendingCall(chat.messages)
     const replies = !settled || pending || unknownCall || lastAssistant < 0 || lastAssistant !== chat.messages.length - 1 ? [] : quickRepliesOf(chat.messages[lastAssistant])
-    // A General with no message yet but threads already opened shows them, not the empty state, as on the web.
     const empty = chat.history === 'ready' && chat.messages.length === 0 && !chat.busy && threadRows.leading.length === 0
-    // A takeover the app can draw is asked on the screen it is about, not in a block of its own.
     const takeoverPending = pending?.kind === 'takeover' && replacesComposer ? pending : null
     const runOnScreen = useMemo(() => runUsesScreen(chat.messages), [chat.messages])
     const paidSourcesByTurn = useMemo(() => paidDataSourcesByTurn(chat.messages), [chat.messages])
-    // The live screen stands in for the run's status while the run works on it.
     const screenShown = coworker.kind === 'coworker' && chat.history === 'ready' && ((chat.busy && runOnScreen) || !!takeoverPending)
     const screen = useAgentScreen(coworker.id, screenShown && onScreen && focused)
     const screenUnavailable = screen.status === 'error' || screen.status === 'disconnected'
@@ -200,8 +167,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     useEffect(() => mirror(floatingShown), [mirror, floatingShown])
     const phase = runPhase(chat.status, chat.messages.at(-1))
 
-    // Photos go to the coworker's folder first; the message then names their paths, as on the web, and
-    // shows them from the phone until the transcript comes back.
     const sessionId = chat.sessionId
     useEffect(() => {
         if (!onScreen) return
@@ -209,16 +174,12 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
         return () => setConversationOnScreen(null)
     }, [sessionId, onScreen])
 
-    // A field in a waiting block sits above the composer: once the keyboard is up, the block's own
-    // buttons are scrolled back into view.
     useKeyboardShown(() => stuck.current && scroll.current?.scrollToEnd({ animated: true }))
 
     const followEnd = () => {
         stick(true)
         scroll.current?.scrollToEnd({ animated: true })
     }
-    // While a run holds the conversation, what the person sends waits behind it and leaves on its
-    // own once the run ends, the web's queue.
     const send = (text: string, files?: Parameters<typeof chat.send>[1]) => {
         stick(true)
         if (chat.busy) {
@@ -245,8 +206,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
         queue.clear()
     }, [canFlush, queue, chat])
 
-    // A message found waiting when the conversation opened only keeps waiting while a run still
-    // holds it; otherwise it goes back to the composer rather than leaving days later on its own.
     const restored = queue.queued && queue.queued.id === queue.restoredId ? queue.queued : null
     useEffect(() => {
         if (!restored || !chat.fresh || chat.busy || status === 'working') return
@@ -268,8 +227,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
         setStopping(false)
     }
 
-    // The web's `bringBlockIn`: a block taller than the room left between the header and the footer
-    // comes in by its top, so its first line is read before its buttons.
     const jumpToPending = () => {
         const top = insets.top + CHAT_HEADER_HEIGHT + spacing.sm
         const room = metrics.current.viewport - top - footerHeight
@@ -278,11 +235,8 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
         const blockBottom = metrics.current.content - footerHeight - BLUR_ABOVE_FOOTER
         scroll.current?.scrollTo({ y: Math.max(0, blockBottom - blockHeight - top), animated: true })
     }
-    // Following the end counts as being there, as on the web: the stream outruns the scroll for a
-    // moment on every chunk, and the arrow must not blink through it.
     const cue = scrollCueOf({ pending: pending !== null, pendingInView: !blockOutOfSight, atBottom: following || belowFold <= AT_BOTTOM })
 
-    // A reply that announces a value the user still has to type is finished in the composer, as on the web.
     const pickReply = (reply: string) => {
         const draftReply = quickReplyDraft(reply)
         if (!draftReply) return void submit(reply)
@@ -313,8 +267,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
         }
     }
 
-    // A voice message carries the attachments picked before it, their marker after its own, as on the web.
-    // A throw keeps the recording for a retry.
     const voice: VoiceSender | undefined = caller
         ? {
               upload: uri => uploadVoiceRecording(caller, endpoints.fileOwner(chat.sessionId), uri),
@@ -341,8 +293,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const workspaceAgents = useWorkspaceAgents()
     const boxes = me ? (cachedBoard(me.workspace.id).read()?.boxes ?? []) : []
     const mentionAgents = workspaceAgents ? mentionAgentsOf(workspaceAgents, boxes, isForeman ? null : coworker.id) : []
-    // The web's chat notices: a dead sign-in opens the connection the coworker runs on, used-up
-    // credits open the two plans. Rerun itself has no sign-in, so it opens the list.
     const runsOn = models?.resolved?.connectionId ?? models?.boxDefault?.connectionId
     const openModel = () => router.push({ pathname: '/model', params: { agent: coworker.id } })
     const errorActions: Omit<ErrorCardActions, 'onRetry'> = {
@@ -413,8 +363,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                     )}
                     {empty && (isForeman ? <ForemanEmptyState onSend={submit} onPrefill={setDraft} /> : <CoworkerEmptyState agentId={coworker.id} mood={moodOf(coworker.status)} asleep={coworker.status === 'offline'} onSend={submit} />)}
                     {chat.history === 'ready' && !empty && (
-                        // The transcript a conversation opens on is already there; the first bubble of a
-                        // new conversation, sent as the list appears, still rises.
                         <LayoutAnimationConfig skipEntering={!chat.busy}>
                             <View style={{ gap: spacing.xl }} onLayout={event => setThreadTop(event.nativeEvent.layout.y)}>
                                 {startedBy && <StartedByBanner startedBy={startedBy} />}
@@ -506,8 +454,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                             <QueuedMessagePill text={queue.queued.text} busy={chat.busy} pending={stopping} onSendNow={sendQueuedNow} onDiscard={queue.clear} />
                         </Animated.View>
                     )}
-                    {/* The composer's glass goes blank under a parent below full opacity, and when it mounts mid-slide:
-                        it slides rather than fades, and the page opens with it already in place. */}
                     <LayoutAnimationConfig skipEntering>
                         {!replacesComposer && (
                             <Animated.View entering={SlideInDown.duration(280)} exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>

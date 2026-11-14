@@ -20,7 +20,6 @@ function useCaller() {
     return session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
 }
 
-// The app's logo in the card's tile, or nothing and the tile keeps its glyph.
 function logoOf(uri: string | null | undefined) {
     return uri?.startsWith('http') ? <Image source={{ uri }} contentFit="contain" style={{ width: 20, height: 20 }} /> : undefined
 }
@@ -31,8 +30,6 @@ const humanize = (name: string) =>
         .trim()
         .replace(/\b\w/g, c => c.toUpperCase())
 
-// The tool output is frozen at the time of the call, so whether the sign-in is still owed is asked
-// again: an old card in the history must not keep offering a connection made since.
 function NeedsAuthCard({ agentId, slug, name }: { agentId: string; slug: string; name: string }) {
     const t = useTranslations('mobileCards.connect')
     const caller = useCaller()
@@ -86,8 +83,6 @@ function McpStatusBadge({ status }: { status: McpServerView['status'] }) {
     return null
 }
 
-// The tool output is frozen at the time of the call, so the server is looked up again: an old card
-// follows the sign-in made since, and shows no status once the server is gone.
 function McpServerCard({ agentId, card }: { agentId: string; card: McpRegisterCard }) {
     const t = useTranslations('mobileCards.connect')
     const caller = useCaller()

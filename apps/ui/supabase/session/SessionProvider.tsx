@@ -63,36 +63,23 @@ installWorkspaceHeader()
 
 const WORKSPACE_COLUMNS = ['id', 'name', 'icon_url', 'created_at', 'plan', 'stripe_customer_id', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'rerun_used_micros', 'rerun_budget_micros', 'rerun_topup_micros', 'rerun_period_anchor', 'rerun_credit_paused_at', 'is_sandbox', 'boxes_disabled_at', 'boxes_archived_at', 'onboarded_at', 'price_arm', 'locale'] as const
 
-// Whether a verified phone number stands between this account and the app. `unknown` is the gap
-// between an account being born and its signup reaching this tab: nothing may start on its own
-// until it is settled, or the foreman would open the conversation under the wall about to rise.
 export type PhoneStep = 'unknown' | 'pending' | 'clear'
 
 export type SessionContextValue = {
     user: User | null
     workspace: Workspace | null
-    // What the workspace's onboarding learned about the company (industry, tools…). Read once per
-    // workspace and again when it is stamped onboarded, rather than streamed: it is only ever read
-    // to pre-filter suggestions.
     workspaceAnswers: WorkspaceAnswers | null
-    // The caller's role in the tab's workspace, `null` until it is read.
     role: WorkspaceRole | null
-    // Whether the caller uses every Box open to the workspace or only the ones named to them,
-    // `null` until it is read. Meaningless for an admin, who reaches every Box.
     boxScope: BoxScope | null
     workspaces: Workspace[]
     session: Session | null
     isAnonymous: boolean
     phoneStep: PhoneStep
-    // `null` until it is read, like `unknown` for the wall.
     phoneStatus: PhoneStatus | null
     refreshPhoneStep: () => Promise<void>
     loading: boolean
     signOut: () => Promise<void>
-    // On-demand re-read of the workspace row, for a caller that just changed it server-side and
-    // cannot wait on the realtime channel.
     refreshWorkspace: () => Promise<void>
-    // Same for the `users` row: the signup form calls it once the server has stamped the signup.
     refreshUser: () => Promise<void>
 }
 
@@ -117,19 +104,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
     const loadedWorkspaceRef = useRef<{ userId: string; workspaceId: number } | null>(null)
     const storedWorkspaceIdRef = useRef<number | null>(null)
 
-    // The `users` row is read from the auth events alone: INITIAL_SESSION fires as soon as the
-    // listener is attached, so a read on mount on top of it fetched the same row twice.
     useEffect(() => {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((event, session) => {
-            // Signing into an existing account swaps the account under the app: the `users` row and
-            // the workspace still in hand belong to the anonymous visitor being left behind, and the
-            // fetch that replaces them is asynchronous. Dropping them here, loading flags included,
-            // is what keeps everything reading the session from deciding on that stale identity in
-            // between: an empty workspace whose onboarding was never completed, which is what
-            // replayed the survey to someone who had done it long ago. An in-place upgrade (email
-            // sign-up, Google identity linking) keeps the same id and is left untouched.
             const nextUserId = session?.user?.id ?? null
             const switchedAccount = event !== 'INITIAL_SESSION' && event !== 'SIGNED_OUT' && nextUserId !== sessionUserId.current
             sessionUserId.current = nextUserId
@@ -141,7 +119,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
                 useBoardStore.getState().reset()
                 useForemanStore.getState().reset()
                 clearTabWorkspace()
-                // Every event until the new workspace loads would otherwise carry the one left behind.
                 posthog.unregister('workspace_id')
             }
 
@@ -149,17 +126,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
                 useBoardStore.getState().reset()
                 clearTabWorkspace()
                 posthog.reset()
-                // The middleware clears it too, but the navigation that follows a sign-out can be
-                // served from the router cache without ever reaching it, and the landing would keep
-                // offering a dashboard to someone who just left.
                 clearSessionHintCookie()
                 setUser(null)
                 setWorkspace(null)
                 setWorkspaces([])
             }
             setSession(session)
-            // A refreshed token carries the same account: the row it would read back is the one in
-            // hand, and the realtime channel below already follows its changes.
             if (event === 'TOKEN_REFRESHED' && !switchedAccount && loadedUserIdRef.current === nextUserId) return
             fetchUser()
         })
@@ -167,11 +139,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         return () => subscription.unsubscribe()
     }, [])
 
-    // Keyed on what the read depends on, not on the row object: every realtime update of `users`
-    // hands a new object, and each one used to re-read the workspace. `user.workspace_id` is the
-    // tab's own workspace, which a switch made in another tab leaves alone. Should it still move,
-    // the app reloads like any switch: swapping the context alone would leave every cache and
-    // store on the previous workspace.
     useEffect(() => {
         if (!user?.workspace_id) return
         const loaded = loadedWorkspaceRef.current
@@ -205,7 +172,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         }
     }, [memberId, workspaceId, roleReads])
 
-    // Keyed by workspace so a switch never shows the previous workspace's answers while the new ones load.
     const workspaceAnswers = loadedAnswers && loadedAnswers.workspaceId === workspaceId ? loadedAnswers.answers : null
     useEffect(() => {
         if (workspaceId === null) return
@@ -218,8 +184,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         }
     }, [workspaceId, workspace?.onboarded_at])
 
-    // `is_internal` lets PostHog filter the team out of every funnel, and the $set_once UTMs
-    // freeze first-touch attribution on the person even when the event-level cookie is gone.
     useEffect(() => {
         const email = session?.user?.email
         if (email) {
@@ -236,31 +200,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
         }
     }, [session?.user?.email])
 
-    // Super property: every client event carries the workspace it happened in, which is the id
-    // Stripe metadata and the server-side lifecycle events are keyed on. Cleared by
-    // posthog.reset() on sign-out.
     useEffect(() => {
         if (workspace?.id) posthog.register({ workspace_id: workspace.id })
     }, [workspace?.id])
 
-    // Le bras du test A/B est tiré sur la landing et vit dans le cookie `rerun-ab`, posé sur
-    // `.rerun.build` : le relire ici est ce qui fait porter le bras aux events de l'app, du signup
-    // jusqu'à l'activation. S'en remettre à la propagation des super-properties de PostHog ne
-    // suffirait pas, sa persistance est `localStorage+cookie` et le localStorage ne traverse pas les
-    // sous-domaines. Rejoué à chaque changement d'identité, parce que `posthog.reset()` les efface.
     useEffect(() => {
         for (const stale of STALE_EXPERIMENT_PROPERTIES) posthog.unregister(stale)
         const properties = experimentProperties(readExperimentCookie())
         if (Object.keys(properties).length > 0) posthog.register(properties)
     }, [session?.user?.id])
 
-    // Once there is a workspace, its price is the one the column froze, not the cookie's: a second
-    // device or an invited teammate carries another draw, or none. The cookie is brought back in line
-    // so the landing quotes the same price, and the arm goes on the person as well as on the events:
-    // the billing events are sent by the server, which has no super property to carry it.
-    //
-    // A workspace from before the test has no arm and is left out: nothing is written for it, nor
-    // for a visitor who has since refused the cookie.
     const priceArm = workspace?.price_arm ? parsePriceArm(workspace.price_arm) : null
     useEffect(() => {
         if (!priceArm || readConsentCookie() === 'denied') return
@@ -270,9 +219,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         posthog.setPersonProperties({ [PRICE_PROPERTY]: priceArm })
     }, [priceArm, session?.user?.id])
 
-    // The trial test is drawn from the workspace, so only a workspace still facing the offer is
-    // enrolled. The person property, set once, is what splits the server-side events
-    // (`trial_started`, `subscription_started`), which carry no super property.
     const trialTestArm = workspace && !workspace.trial_ends_at && !workspace.is_sandbox && !isSubscriptionEntitled(workspace.subscription_status) ? trialArm(workspace.id) : null
     useEffect(() => {
         if (!trialTestArm) return
@@ -280,10 +226,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         posthog.setPersonProperties(undefined, { [TRIAL_CARD_PROPERTY]: trialTestArm })
     }, [trialTestArm, session?.user?.id])
 
-    // The intent cookie says an account is about to be born: every sign-in path that can land on an
-    // account already signed up leaves it out, or has it cleared (`/auth/callback` for Google). It is
-    // emitted once `signed_up_at` reaches this row through realtime, the server stamping it the moment
-    // an account stops being anonymous. The freshness window only guards against a forgotten cookie.
     const signedUpAt = user?.id === session?.user?.id ? user?.signed_up_at : null
     useEffect(() => {
         const authUser = session?.user
@@ -296,8 +238,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
             return
         }
         track('account_created', { method, ...readAttribution() })
-        // The only moment an affiliate can be credited: the referral cookie is still there, and
-        // this effect is the one place that knows the account is new rather than merely signed in.
         reportAffiliateSignup({ email: authUser.email, externalUserId: authUser.id })
         setSharedCookie('rr_signup_at', String(Date.now()))
         deleteSharedCookie(SIGNUP_INTENT_COOKIE)
@@ -305,10 +245,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
     const accountId = session?.user && !session.user.is_anonymous ? session.user.id : null
 
-    // An anonymous visitor who just signed up keeps their id: the row in hand is theirs, read before
-    // the server stamped it. The stamp normally comes back through realtime, or through the signup
-    // form's own refresh; this keeps asking in case neither arrives, which a mobile webview whose
-    // socket had just reconnected once managed, leaving the tab without a wall nor a foreman.
     useEffect(() => {
         if (!accountId || user?.id !== accountId || user.signed_up_at) return
         const controller = new AbortController()
@@ -318,9 +254,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         return () => controller.abort()
     }, [accountId, user?.id, user?.signed_up_at])
 
-    // The server requires the phone before it stamps the signup, so by the time `signed_up_at`
-    // reaches this tab the row is there to be read, or never will be. A failed read leaves the app
-    // open rather than lock someone behind a wall that cannot tell whether it applies.
     const readPhoneStep = useCallback(async () => {
         if (!accountId) return null
         const { data } = await selectMaybeSingle(supabase, 'user_phones', PHONE_STATUS_COLUMNS, { user_id: accountId })
@@ -331,8 +264,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
     }, [signedUpAt, readPhoneStep])
     const refreshPhoneStep = useCallback(async () => setPhoneRead(await readPhoneStep()), [readPhoneStep])
 
-    // Another tab, the installed app or a phone sign-in can verify the number: the wall follows the
-    // row. A resync waits for the signup like the first read, or it would find no row yet and clear.
     useRealtimeSubscription('user_phones', {
         channelId: 'phone-step-provider',
         filter: accountId ? { column: 'user_id', value: accountId } : undefined,
@@ -383,8 +314,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         onResync: () => setRoleReads(reads => reads + 1),
     })
 
-    // Only the latest read lands: an older one still in flight, the one SIGNED_IN fired before the
-    // signup was stamped or the one for an account since left, would otherwise write over a newer row.
     async function fetchUser() {
         const seq = ++userReadSeq.current
         const { data } = await selectSingle(supabase, 'users', ['id', 'created_at', 'workspace_id', 'email_notification_prefs', 'account_role', 'expert_profile_id', 'signed_up_at', 'locale'], {})
@@ -396,10 +325,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         setUserLoading(false)
     }
 
-    // The tab's pin stands only while the account still belongs to it: one left behind by an
-    // anonymous visit or a removal falls back on the stored workspace. Checked on the membership,
-    // since every workspace row is readable. A workspace named in the URL comes first: it is the
-    // landing of a flow that just moved the account (an accepted invitation, a creator's sandbox).
     async function resolveTabWorkspace(row: User): Promise<number> {
         const pinned = readUrlWorkspace() ?? readTabWorkspace()
         if (pinned === null || pinned === row.workspace_id) return row.workspace_id
@@ -417,8 +342,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         if (!user?.id) return
         const { data: memberships } = await selectMany(supabase, 'workspace_members', ['workspace_id'], { user_id: user.id })
         const ids = (memberships ?? []).map(m => m.workspace_id)
-        // Removed from the workspace this tab is on: it reloads onto the one the server moved the
-        // account to. Not when that is the stored one, which would reload into the same place.
         const tabWorkspaceId = user.workspace_id
         if (tabWorkspaceId && tabWorkspaceId !== storedWorkspaceIdRef.current && !ids.includes(tabWorkspaceId) && !isWorkspaceSwitchInFlight()) {
             enterActiveWorkspace()
@@ -442,12 +365,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
     return <SessionContext.Provider value={{ user, workspace, workspaceAnswers, role, boxScope, workspaces, session, isAnonymous: session?.user?.is_anonymous ?? false, phoneStep, phoneStatus, refreshPhoneStep, loading: userLoading || workspaceLoading, signOut, refreshWorkspace: fetchWorkspace, refreshUser: fetchUser }}>{children}</SessionContext.Provider>
 }
 
-// For the render labs, which draw session-bound components with no signed-in user behind them.
 export function SessionFixture({ value, children }: PropsWithChildren<{ value: SessionContextValue }>) {
     return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
 }
 
-// For forms also drawn outside the dashboard (/unsubscribe, the render labs), where no provider exists.
 export function useOptionalSession() {
     return useContext(SessionContext)
 }
@@ -460,8 +381,6 @@ export function useSession() {
     return context
 }
 
-// An admin of the tab's workspace, as opposed to `useIsAdmin`, which is Rerun staff. False while the
-// role is still loading, so an admin-only control starts disabled rather than flashing open.
 export function useIsWorkspaceAdmin(): boolean {
     return useSession().role === 'admin'
 }

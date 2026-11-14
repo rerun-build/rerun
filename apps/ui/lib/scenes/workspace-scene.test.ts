@@ -55,8 +55,6 @@ describe('buildWorkspaceScene', () => {
         }
     })
 
-    // Le grain « vrai screenshot » : jamais un gabarit d'export, et une hauteur qui n'est pas
-    // exactement 9/16 de la largeur.
     it('draws odd 16:9-ish frames', () => {
         const widths = new Set<number>()
         for (const seed of SEEDS) {

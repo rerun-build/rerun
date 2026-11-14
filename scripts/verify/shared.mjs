@@ -1,7 +1,3 @@
-// What `pnpm verify:ui` and `pnpm verify:desktop` share: the checks that the hub runs on the local
-// stack and never on production, the hub itself, the throwaway test account and its engine, and how a
-// page is watched and judged settled.
-
 import { execFileSync, spawn } from 'node:child_process'
 import { createWriteStream, existsSync, readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -42,8 +38,6 @@ export function localStack() {
     return { url: read('API_URL'), secretKey: read('SECRET_KEY') ?? read('SERVICE_ROLE_KEY') }
 }
 
-// The Docker stack is shared by every worktree of the Mac and lags behind the branch: a column the
-// code selects and the stack lacks answers 400 and the page renders as broken.
 export function assertMigrated() {
     const listed = execFileSync('pnpm', ['exec', 'supabase', 'migration', 'list', '--local'], { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
     const pending = listed
@@ -75,8 +69,6 @@ export function processCwd(pid) {
     return out.split('\n').find((line) => line.startsWith('n'))?.slice(1) ?? ''
 }
 
-// Variables the process environment would hand Next ahead of `.env`: a session that exports
-// production's Supabase or Bird keys would otherwise put the local hub back on production.
 export function cleanServerEnv() {
     const env = { ...process.env }
     for (const key of Object.keys(env)) if (/SUPABASE|STRIPE|EXPO_PUBLIC/.test(key)) delete env[key]
@@ -171,8 +163,6 @@ export async function deleteTestAccount(admin, email) {
     log(`Deleted ${email} and its pool row.`)
 }
 
-// The web asks every new account for a phone number before the app opens. The throwaway account
-// takes the wall's own "Skip for now".
 export async function skipPhoneStep(admin, userId) {
     const { error } = await admin.from('user_phones').update({ skipped_at: new Date().toISOString() }).eq('user_id', userId).is('skipped_at', null)
     if (error) log(`Could not skip the phone step: ${error.message}`)
@@ -184,16 +174,13 @@ export async function signIn(context, base, account) {
     await page.close()
 }
 
-// Spends the account's magic link in a page already open (a browser tab, the desktop app's window).
 export async function signInPage(page, base, account) {
     await page.goto(`${base}/auth/confirm?token_hash=${account.tokenHash}&type=magiclink`)
-    // The confirm page is in the browser's language: its one submit button, whatever it says.
     await page.locator('form button[type="submit"]').first().click()
     await page.waitForURL((url) => !url.pathname.startsWith('/auth'), { timeout: 60_000 })
     await skipPhoneStep(account.admin, account.userId)
 }
 
-// Records what goes wrong on a page into `report`. Returns what stops the recording.
 export function watch(page, report) {
     const onConsole = (message) => {
         if (message.type() === 'error' && !message.text().includes('/_next/hmr')) report.consoleErrors.push(message.text().slice(0, 500))
@@ -245,9 +232,6 @@ export async function timings(page) {
 
 export const SETTLE_TIMEOUT_MS = 20_000
 
-// Waits for the network to calm down and for every loading state (a "Loading…" label, a pulsing
-// skeleton) to leave the screen. Answers false when one is still there at the deadline: a page stuck
-// loading is a finding, not a capture to judge.
 export async function settle(page) {
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
     const settled = await page

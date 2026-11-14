@@ -3,8 +3,6 @@ import type Stripe from 'stripe'
 export type TaxIdType = Stripe.CustomerCreateTaxIdParams.Type
 export type TaxIdStatus = Stripe.TaxId.Verification.Status
 
-// The ones a buyer types for themselves. `eu_oss_vat` is left out: it is the seller's One-Stop-Shop
-// registration, never a customer's number.
 const COUNTRY_TAX_ID_TYPES = [
     'ad_nrt', 'ae_trn', 'al_tin', 'am_tin', 'ao_tin', 'ar_cuit', 'au_abn', 'au_arn', 'aw_tin', 'az_tin',
     'ba_tin', 'bb_tin', 'bd_bin', 'bf_ifu', 'bg_uic', 'bh_vat', 'bj_ifu', 'bo_tin', 'br_cnpj', 'br_cpf',
@@ -22,8 +20,6 @@ const COUNTRY_TAX_ID_TYPES = [
 
 const EU_COUNTRIES = ['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK'] as const
 
-// The intra-community number comes first in an EU country: it is the one that reverse-charges the
-// VAT, the national ones (de_stn, es_cif…) only identify the business.
 export function taxIdTypesFor(country: string | null | undefined): TaxIdType[] {
     if (!country) return []
     const code = country.toUpperCase()
@@ -39,7 +35,6 @@ export function taxIdFieldLabel(type: TaxIdType | undefined): string {
     return type?.endsWith('_vat') ? 'VAT number' : 'Tax ID'
 }
 
-// Greece files its intra-community numbers under EL, not GR.
 function vatPrefix(country: string): string {
     const code = country.toUpperCase()
     return code === 'GR' ? 'EL' : code
@@ -47,9 +42,6 @@ function vatPrefix(country: string): string {
 
 const EU_VAT_PREFIXES = new Set(EU_COUNTRIES.map(vatPrefix))
 
-// Stripe wants an EU VAT number with its country prefix, which people often leave out. Checked
-// against the real prefixes rather than "two letters": a French number starts with a two-character
-// key that can be letters.
 export function normalizeTaxIdValue(type: TaxIdType, value: string, country: string): string {
     if (type !== 'eu_vat') return value.trim()
     const compact = value.replace(/[\s.\-]/g, '').toUpperCase()
@@ -65,6 +57,5 @@ export const TAX_ID_STATUS_BADGE: Record<TaxIdStatus, { label: string; tone: 'gr
     verified: { label: 'Verified', tone: 'green' },
     pending: { label: 'Checking', tone: 'neutral' },
     unverified: { label: 'Not verified', tone: 'orange' },
-    // The type has no registry Stripe can query: nothing to claim either way.
     unavailable: null,
 }

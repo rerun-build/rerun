@@ -6,8 +6,6 @@ import { mintConnectTicket } from '@/lib/oauth/mobile-ticket'
 import type { InstallResult, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
 import { type DesktopShellChannel, type InstallResultView, type PendingAuth, type ResolvedService, type ServiceSearchResultView, parseDesktopShellUserAgent, parseServiceRegistryKey } from '@rerun/contracts'
 
-// The app never holds a sign-in target: it gets which flow is waiting, and the hub reads the target
-// back from the registry when the flow starts.
 function pendingAuthOf(target: { oauth?: unknown; managed?: unknown; composio?: unknown; app?: unknown }): PendingAuth | null {
     if (target.app) return 'app'
     if (target.managed) return 'managed'
@@ -40,9 +38,6 @@ function notFound(slug: string, reason?: string): ResolvedService {
     return { slug, name: slug, category: 'other', summary: '', icon: null, verified: false, reason, authMethods: [], installStatus: null, pendingAuth: null, notFound: true, multiInstance: false }
 }
 
-// One card per suggested slug, in the agent's order. A slug the catalog does not know (or with no
-// auth method at all) becomes a `notFound` card rather than failing the whole block. A registry key
-// (`gmail@k3x9ab`) resolves to that one account of the app.
 export async function resolveServices(agentId: string, suggested: { slug: string; reason?: string }[], actor: Actor): Promise<ResolvedService[]> {
     const keys = suggested.map(s => s.slug)
     const [details, catalog] = await Promise.all([
@@ -56,14 +51,10 @@ export async function resolveServices(agentId: string, suggested: { slug: string
     })
 }
 
-// Whether Next hands a dynamic segment over decoded has varied between versions. A registry key never
-// holds a '%', so decoding one that already is changes nothing.
 export function serviceKeyParam(params: Record<string, string>): string {
     return decodeURIComponent(params.slug)
 }
 
-// The desktop app asks from its own window, its User-Agent naming its channel: the sign-in returns
-// to its URL scheme instead of the iOS app's.
 export function requestingDesktop(req: Request): DesktopShellChannel | undefined {
     return parseDesktopShellUserAgent(req.headers.get('user-agent'))?.channel
 }

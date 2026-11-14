@@ -10,16 +10,11 @@ import { text } from "../theme";
 export interface TrialStartedProps {
   workspaceName: string | null;
   trialDays: number;
-  /** "12 March", preformatted. */
   trialEndsLabel: string;
-  /** "$49", preformatted. */
   monthlyPriceLabel: string;
-  /** "3 coworkers and 350 credits", what the trial holds. */
   includedLabel: string;
-  /** False on the cardless arm of the trial test: nothing rolls over on its own at the end. */
   hasCard?: boolean;
   workspaceUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;

@@ -9,7 +9,6 @@ import { useForemanStore } from '@/stores/foreman.store'
 const closeForeman = () => useForemanStore.getState().close()
 const outsideTheFunnel = () => useForemanStore.getState().funnel !== 'guided'
 
-/** Sans cran retenu, la sheet du Foreman est haute comme son contenu (voir `useForemanSheetHeight`). */
 export function useForemanSheetResize({ panelRef }: { panelRef: RefObject<HTMLDivElement | null> }) {
     return useSheetResize({
         panelRef,

@@ -1,6 +1,3 @@
-// No 'server-only' and no Next primitive: the lifecycle sweeper imports this from a Trigger.dev
-// task. The Supabase client is a parameter for the same reason, and `OnboardingAnswers` is a type
-// import only, because its module pulls in the browser client.
 import { generateObject } from 'ai'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -21,12 +18,8 @@ const SHORTLIST_SIZE = 8
 const PER_CATEGORY_CAP = 2
 const MAX_PICKS = 3
 const MIN_PICKS = 2
-// A setup asking for half a stack is not a first agent, whatever it scores on everything else.
 const MAX_CONNECTORS = 4
 
-// `unlisted` exists precisely so a template appears in no listing, and an email nobody asked for is
-// a listing. `show_in_library` is the right second gate: the call to action opens the in-app
-// library, so what the marketplace shows has no say here.
 const RECOMMEND_FILTERS: Filters<'templates'> = { status: ['published'], show_in_library: true }
 
 const RECOMMEND_COLUMNS = ['slug', 'title', 'tagline', 'category', 'featured', 'published_at', 'connectors', 'agents', 'agent_archives', 'setup_minutes', 'pricing_model', 'updated_at', 'card_image_dark_url'] as const
@@ -42,7 +35,6 @@ export type TemplateCandidate = {
     connectorNames: string[]
     setupMinutes: number
     free: boolean
-    // What makes this template's captured card stale, so the email image URL changes with it.
     cardStamp: string
 }
 
@@ -52,8 +44,6 @@ export type TemplateRecommendation = {
     line: string
     setupMinutes: number
     url: string
-    // The card of the template, captured at the width of an email column. The sender drops it when
-    // the capture is not there, and the email falls back to its text row.
     imageUrl: string
 }
 
@@ -84,7 +74,6 @@ const DAY = 24 * 60 * 60_000
 export function toCandidate(row: Record<string, unknown>): TemplateCandidate | null {
     const archives = archivesFromRow.parse(row.agent_archives)
     const agents = agentsFromRow.parse(row.agents)
-    // No captured agent folder means the call to action is a dead end.
     if (archiveAgentNames(archives, agents).length === 0) return null
 
     const tagline = typeof row.tagline === 'string' ? row.tagline.trim() : ''
@@ -113,11 +102,6 @@ export function toCandidate(row: Record<string, unknown>): TemplateCandidate | n
     }
 }
 
-/**
- * The survey stores the stack in the order it was picked and nothing has ever read that order. It is
- * the strongest signal available here, so a match on the first tool someone named weighs more than a
- * match on the last, and a setup that needs three services they never mentioned is pushed down.
- */
 export function scoreCandidate(candidate: TemplateCandidate, context: RecommendContext): number {
     const matched = candidate.connectorSlugs.filter(slug => context.tools.includes(slug))
     const overlap = matched.reduce((total, slug) => total + Math.max(WEIGHTS.connectorTop - WEIGHTS.connectorDecay * context.tools.indexOf(slug), WEIGHTS.connectorFloor), 0)
@@ -136,19 +120,12 @@ export function scoreCandidate(candidate: TemplateCandidate, context: RecommendC
     )
 }
 
-// A curated template qualifies on its own, which is the whole point of the featured flag. What can
-// never qualify is an off-category, unfeatured template with no overlap that scraped a passing score
-// off recency alone.
 function isSolid(candidate: TemplateCandidate, score: number, context: RecommendContext): boolean {
     if (score < SOLID_SCORE) return false
     const matches = candidate.connectorSlugs.some(slug => context.tools.includes(slug))
     return matches || candidate.featured || (context.industry !== null && context.industry !== 'other' && candidate.category === context.industry)
 }
 
-/**
- * The candidates the model is allowed to choose from, best first. Sorting ends on the slug because a
- * Trigger.dev retry has to build the same email as the attempt it replaces.
- */
 export function shortlistTemplates(candidates: TemplateCandidate[], context: RecommendContext): TemplateCandidate[] {
     const scored = candidates
         .map(candidate => ({ candidate, score: scoreCandidate(candidate, context) }))
@@ -160,7 +137,6 @@ export function shortlistTemplates(candidates: TemplateCandidate[], context: Rec
             return published !== 0 ? published : a.candidate.slug.localeCompare(b.candidate.slug)
         })
 
-    // Capped per category so the model is not handed eight variations of one idea.
     const perCategory = new Map<string, number>()
     const shortlist: TemplateCandidate[] = []
     for (const { candidate } of scored) {
@@ -181,7 +157,6 @@ export function recommendContext(answers: OnboardingAnswers | null, now: Date): 
     }
 }
 
-/** Every installable template, read once and scored in memory for as many accounts as needed. */
 export async function loadRecommendCandidates(supabase: SupabaseClient<Database>): Promise<TemplateCandidate[]> {
     const { data, error } = await selectAll(supabase, 'templates', RECOMMEND_COLUMNS, RECOMMEND_FILTERS, { column: 'published_at', ascending: false })
     if (error || !data) return []
@@ -234,11 +209,6 @@ function describeContext(answers: OnboardingAnswers | null, shortlist: TemplateC
     ].join('\n')
 }
 
-/**
- * Turns what the model chose into cards, dropping anything that is not in the shortlist. The zod
- * enum already constrains the decoding; this is the belt to that pair of braces, and it is also
- * where a repeated slug is dropped.
- */
 export function resolvePicks(shortlist: TemplateCandidate[], picks: { slug: string; line: string }[], appUrl: string): TemplateRecommendation[] {
     const bySlug = new Map(shortlist.map(candidate => [candidate.slug, candidate]))
     const seen = new Set<string>()
@@ -263,8 +233,6 @@ export function resolvePicks(shortlist: TemplateCandidate[], picks: { slug: stri
 async function pickWithModel(shortlist: TemplateCandidate[], answers: OnboardingAnswers | null, context: RecommendContext, appUrl: string): Promise<TemplateRecommendation[] | null> {
     if (!hasOpenRouterKey()) return null
 
-    // Built from the shortlist at call time: constrained decoding is what actually stops the model
-    // naming a template that does not exist, the instruction is only a courtesy.
     const slugs = shortlist.map(candidate => candidate.slug) as [string, ...string[]]
     const schema = z.object({
         picks: z
@@ -301,15 +269,9 @@ async function pickWithModel(shortlist: TemplateCandidate[], answers: Onboarding
 
 export type RecommendResult = { ok: true; picks: TemplateRecommendation[] } | { ok: false; reason: 'too_few' }
 
-/**
- * The model only ever writes one field. The title, the connectors, the setup time and the link all
- * come off the row, so the worst a bad generation can produce is a clumsy sentence, never a dead
- * link or a template nobody can install.
- */
 export async function recommendTemplates(candidates: TemplateCandidate[], answers: OnboardingAnswers | null, options: { appUrl: string; now?: Date; useModel?: boolean }): Promise<RecommendResult> {
     const context = recommendContext(answers, options.now ?? new Date())
     const shortlist = shortlistTemplates(candidates, context)
-    // Checked before the model runs, so a skipped email costs nothing.
     if (shortlist.length < MIN_PICKS) return { ok: false, reason: 'too_few' }
 
     const picked = options.useModel === false ? null : await pickWithModel(shortlist, answers, context, options.appUrl)

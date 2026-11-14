@@ -31,11 +31,8 @@ const SOURCE_KEYS = {
 
 type BrainSourceKey = `sources.${'website' | (typeof SITE_PAGE_KEYS)[keyof typeof SITE_PAGE_KEYS] | (typeof SOURCE_KEYS)[keyof typeof SOURCE_KEYS]}`
 
-// The `brain` namespace, as far as these labels read it.
 export type BrainLabelCopy = (key: BrainSourceKey | 'authors.seed' | 'authors.foreman') => string
 
-// The engine stores who wrote a page as `seed`, `user:<email>` or `agent:<name>`. The foreman
-// writes as `agent:foreman`, a name the user never sees.
 export function brainAuthorLabel(author: string, t: BrainLabelCopy): string {
     if (author === 'seed') return t('authors.seed')
     if (author === `agent:${FOREMAN_AGENT_ID}`) return t('authors.foreman')
@@ -46,7 +43,6 @@ export function brainAuthorLabel(author: string, t: BrainLabelCopy): string {
 
 const URL_LABEL_MAX = 40
 
-// A product page's own address would stretch the badge across the page.
 function urlLabel(tag: string): string | null {
     if (!/^https?:\/\//i.test(tag.trim())) return null
     try {
@@ -62,8 +58,6 @@ const hasKey = <T extends object>(map: T, key: string): key is Extract<keyof T, 
 
 type BrainSource = { key: BrainSourceKey } | { text: string }
 
-// The website research tags its facts `site:<what>`, `linkedin:company`… A link is shown by its
-// host and path; anything else, such as a source an agent cited, is shown as written.
 function brainSourceOf(tag: string): BrainSource {
     const normalized = tag.trim().toLowerCase()
     if (normalized === 'site' || normalized.startsWith('site:')) {

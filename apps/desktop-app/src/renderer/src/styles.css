@@ -25,7 +25,6 @@ body {
     user-select: none;
 }
 
-/* The shell's pages have no web app strip to drag the window by: the top of the page is the strip. */
 .shell-drag {
     app-region: drag;
 }

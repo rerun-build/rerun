@@ -4,9 +4,6 @@ import { currentServer, getMainWindow, loadAppPath, openExternal, PRELOAD_PATH, 
 import { partitionFor } from './server'
 import { decideNavigation } from './url-policy'
 
-// A global shortcut opens a small window over whatever the person is doing, with one field: what to
-// ask the Chief of Staff. Sent, it closes and the main window opens on the conversation.
-
 export const QUICK_ASK_ACCELERATOR = QUICK_ASK_SHORTCUT
 
 const WIDTH = 640
@@ -14,7 +11,6 @@ const HEIGHT = 180
 
 let quickWindow: BrowserWindow | null = null
 let shownAt = 0
-// Showing the window from another app can blur it at once, before it ever had the keyboard.
 const BLUR_GRACE_MS = 500
 let registered = false
 
@@ -39,7 +35,6 @@ function createQuickWindow(origin: string): BrowserWindow {
     })
     window.setAlwaysOnTop(true, 'floating')
     window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-    // Clicked away from, it goes, the way a launcher does.
     window.on('blur', () => {
         if (Date.now() - shownAt > BLUR_GRACE_MS) window.hide()
     })
@@ -61,7 +56,6 @@ function createQuickWindow(origin: string): BrowserWindow {
     return window
 }
 
-// Placed in the top third of the display the pointer is on, centered.
 function place(window: BrowserWindow): void {
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
     const { x, y, width, height } = display.workArea
@@ -77,7 +71,6 @@ export function toggleQuickAsk(): void {
     place(window)
     const reveal = () => {
         shownAt = Date.now()
-        // The shortcut is pressed in another app: the app comes forward so the field gets the keys.
         if (process.platform === 'darwin') app.focus({ steal: true })
         window.show()
         window.focus()
@@ -91,7 +84,6 @@ export function hideQuickAsk(): void {
     quickWindow?.hide()
 }
 
-// The message left: the main window comes forward on what the page names.
 export function quickAskSent(path: string): void {
     hideQuickAsk()
     showMainWindow()
@@ -107,7 +99,6 @@ export function setQuickAskShortcut(enabled: boolean): boolean {
     return registered
 }
 
-// A new server (the person switched) gets a new window in its own session.
 export function resetQuickAsk(): void {
     quickWindow?.destroy()
     quickWindow = null

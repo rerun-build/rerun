@@ -10,7 +10,6 @@ import { spacing } from '@/theme/tokens'
 
 import { SheetFrame } from './bits'
 
-// What coworkers with no model of their own run on: every model a ready connection lets them use.
 export function DefaultModelPicker({ view, onPick, onBack }: { view: AiConnectionsView; onPick: (choice: ModelChoice) => void; onBack: () => void }) {
     const t = useTranslations('mobileProviders.defaultModel')
     const ready = view.connections.filter(connection => connection.status === 'connected' && connection.models.some(model => model.enabled))

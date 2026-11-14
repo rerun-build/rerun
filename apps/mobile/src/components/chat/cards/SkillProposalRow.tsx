@@ -19,7 +19,6 @@ type Copy = { headline: string; detail: string; accept?: string; dismiss?: strin
 
 type SkillTranslator = ReturnType<typeof useTranslations<'mobileCards.skill'>>
 
-// The web's copy (SkillProposalBlock), state by state.
 function copyFor({ title, summary, status, instructions, error }: SkillProposal, t: SkillTranslator): Copy {
     const firstRule = instructions[0] || summary
     if (status === 'accepted') return { headline: t('remembering'), detail: firstRule }
@@ -53,8 +52,6 @@ function Outcome({ status }: { status: SkillProposal['status'] }) {
     return null
 }
 
-// A rule the coworker offered to remember, where the transcript raised it. It never pauses the run:
-// accepting starts the writing, and the same row reports how it went.
 export function SkillProposalRow({ proposal, pending, onDecide }: SkillProposalRowProps) {
     const t = useTranslations('mobileCards.skill')
     const copy = copyFor(proposal, t)
@@ -65,8 +62,6 @@ export function SkillProposalRow({ proposal, pending, onDecide }: SkillProposalR
     )
 }
 
-// The same proposal pinned above the composer while it waits on a decision. Its second line unfolds
-// into the rules exactly as the coworker worded them, what accepting writes into the skill.
 export function PinnedSkillProposal({ proposal, pending, onDecide }: SkillProposalRowProps) {
     const t = useTranslations('mobileCards.skill')
     const theme = useTheme()

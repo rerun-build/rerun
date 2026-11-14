@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
-// The geometry and the alpha ramp of the web's waveforms (components/ui/live-waveform and
-// chat/VoiceWaveform), so a message plays back in the same visual language on both.
 const BAR_WIDTH = 3
 const BAR_GAP = 1
 const BAR_RADIUS = 1.5
@@ -17,7 +15,6 @@ const barHeightOf = (value: number, height: number) => Math.max(MIN_BAR_HEIGHT, 
 const alphaOf = (value: number) => 0.4 + value * 0.6
 const clampLevel = (value: number) => Math.max(MIN_LEVEL, Math.min(1, value))
 
-// The web fades the bars out on both sides with a gradient mask; here each bar takes its share of it.
 function edgeFade(index: number, count: number) {
     const fade = Math.min(EDGE_FADE, count * STEP * 0.3)
     if (fade <= 0) return 1
@@ -26,9 +23,6 @@ function edgeFade(index: number, count: number) {
     return Math.min(1, left / fade, right / fade)
 }
 
-// The web draws a frequency spectrum mirrored around the middle. The recorder here only meters one
-// loudness, so the spectrum's shape is rebuilt from it: louder in the middle, each bar breathing at
-// a pace of its own, eased frame to frame like the analyser's smoothing.
 function liveFrame(previous: number[], count: number, level: number, time: number) {
     const half = Math.max(1, count / 2)
     return Array.from({ length: count }, (_, i) => {
@@ -40,7 +34,6 @@ function liveFrame(previous: number[], count: number, level: number, time: numbe
     })
 }
 
-// The web's processing wave: three waves weighted to the middle, morphing out of the last live frame.
 function processingFrame(last: number[], count: number, time: number, transition: number) {
     const half = Math.max(1, Math.floor(count / 2))
     return Array.from({ length: count }, (_, i) => {
@@ -55,13 +48,11 @@ function processingFrame(last: number[], count: number, time: number, transition
 
 type LiveWaveformProps = {
     processing: boolean
-    // Read on every frame rather than pushed down as props, so the composer around it does not re-render.
     getLevel: () => number
     color: string
     height?: number
 }
 
-/** The waveform of a recording in progress, then of the recording on its way out. */
 export function LiveWaveform({ processing, getLevel, color, height = 48 }: LiveWaveformProps) {
     const t = useTranslations('mobileChat.voice')
     const [width, setWidth] = useState(0)
@@ -106,16 +97,13 @@ export function LiveWaveform({ processing, getLevel, color, height = 48 }: LiveW
 const UNPLAYED_ALPHA_SCALE = 0.3
 
 type VoiceWaveformProps = {
-    // Amplitudes in 0..1, spread across the full width whatever its size.
     peaks: readonly number[]
-    // 0..1. Bars before it read as played.
     progress: number
     color: string
     width: number
     height?: number
 }
 
-/** The waveform of a sent voice message, doubling as its progress bar. */
 export function VoiceWaveform({ peaks, progress, color, width, height = 32 }: VoiceWaveformProps) {
     const count = Math.max(1, Math.floor(width / STEP))
     const playedUntil = progress * count

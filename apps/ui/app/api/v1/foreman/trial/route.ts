@@ -8,9 +8,6 @@ import type { ForemanTrialResult } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// The "Build my team" button of the app: the trial without a card, whatever the arm of the trial
-// test, since the app sells nothing. The answer only says whether the workspace is now on; the build
-// itself is the next turn of the onboarding conversation.
 export const POST = apiRoute({ auth: 'admin' }, async ({ req, ctx }): Promise<ForemanTrialResult> => {
     const platform = appPlatformOf(req)
     const alreadyOn = isSubscriptionEntitled(ctx.workspace.subscription_status)

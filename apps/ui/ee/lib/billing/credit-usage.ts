@@ -5,7 +5,6 @@ export type CreditKind = 'ai' | 'data'
 
 export type CreditSource = { kind: 'ai'; tier: RerunTier } | { kind: 'data'; capability: PaidDataCapability }
 
-// `id` is the agents row, what AgentBuddy draws from; null on a charge no coworker can be named for.
 export type CreditCoworker = { id: string; name: string } | null
 
 export type CreditUsage = {
@@ -16,7 +15,6 @@ export type CreditUsage = {
     latest: { day: string; coworker: CreditCoworker; source: CreditSource; micros: number; calls: number }[]
 }
 
-// One row of rerun_credit_usage: the credit spent on one UTC day, by one source, by one coworker.
 export type CreditUsageRow = { day: string; kind: string; source: string; engine_agent_id: string | null; micros: number; calls: number }
 
 type AgentRow = { id: string; name: string; engine_agent_id: string | null }
@@ -102,9 +100,6 @@ export type CreditBalance = {
     wholeMicros: number
 }
 
-// The figures come from the workspace columns, the only exact ones: the events only say how the
-// spend splits between the models and paid data. consume_rerun_credit spends the month first and
-// takes the top-up down as it goes, so the top-up column is already what is left of it.
 export function creditBalance({ budgetMicros, usedMicros, topupMicros }: CreditColumns, usage: Pick<CreditUsage, 'bySource'> | null): CreditBalance {
     const ai = usage?.bySource.filter(total => total.source.kind === 'ai').reduce((sum, total) => sum + total.micros, 0) ?? 0
     const data = usage?.bySource.filter(total => total.source.kind === 'data').reduce((sum, total) => sum + total.micros, 0) ?? 0
@@ -120,8 +115,6 @@ export function creditBalance({ budgetMicros, usedMicros, topupMicros }: CreditC
     }
 }
 
-// The day the credit runs out if the coworkers keep spending at the pace they have so far, or null
-// when it lasts until the period ends.
 export function runsOutOn(balance: CreditBalance, period: { start: string; end: string }, now: Date): Date | null {
     const used = balance.usedAiMicros + balance.usedDataMicros
     if (used <= 0) return null
@@ -130,12 +123,10 @@ export function runsOutOn(balance: CreditBalance, period: { start: string; end: 
     return out < new Date(period.end) ? out : null
 }
 
-// The days are UTC days, as rerun_credit_usage buckets them: shown as such, whatever the browser's zone.
 export function dayLabel(day: string, locale: string): string {
     return formatDate(`${day}T00:00:00Z`, locale, { month: 'short', day: 'numeric', timeZone: 'UTC' })
 }
 
-// How many day slots the period spans, at least the days already gone.
 export function periodDayCount(usage: Pick<CreditUsage, 'period' | 'days'>): number {
     const firstDay = new Date(`${usage.period.start.slice(0, 10)}T00:00:00Z`).getTime()
     return Math.max(Math.ceil((new Date(usage.period.end).getTime() - firstDay) / DAY_MS), usage.days.length, 1)

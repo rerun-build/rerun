@@ -13,8 +13,6 @@ import { toast } from 'sonner'
 
 export { brainChangeOf, type BrainChange, type BrainChangeStatus } from '@rerun/contracts'
 
-// What the Rerun agent leaves in its conversation when it changed the company brain itself, the
-// counterpart of an agent's proposal row: here the change has already landed.
 export function BrainChangeBlock({ change }: { change: BrainChange }) {
     const openBrainPage = useWorkspaceSettingsStore(s => s.openBrainPage)
     const brainChanged = useBrainStore(s => s.brainChanged)

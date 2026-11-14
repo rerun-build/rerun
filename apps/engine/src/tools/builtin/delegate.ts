@@ -60,20 +60,12 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     config.name = `${ctx.agent.config.name} delegate`
                     config.ephemeral = true
                     config.tools.delegate = false
-                    // A card is addressed to the user, and nobody reads a delegate's session.
                     config.tools.cards = false
-                    // The delegate's workspace dies with its task: the shared space is the only
-                    // place a file it produced survives, so it gets the tools to write there.
                     config.tools.shared = true
-                    // Nobody can answer a delegate either: a question would end its run on a wait
-                    // nobody sees, and the caller would get an empty result.
                     config.tools.askUser = false
                     config.tools.requestApproval = false
                     config.tools.suggestService = false
                     config.tools.requestSecret = false
-                    // A delegate does one task and reports to its caller: nothing it could install,
-                    // schedule or publish on the account is wanted, nobody is there to be notified,
-                    // and a spend it cannot ask for only runs where the user waived the asking.
                     config.tools.hub = false
                     config.tools.trigger = false
                     config.tools.schedule = false
@@ -81,9 +73,6 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     config.tools.notify = false
                     if (!config.paidDataAlwaysAllow) config.tools.paidData = false
                     config.selfImprovement.enabled = false
-                    // Pinned from the run rather than copied from the config: a parent following the
-                    // box default would hand the child a null model, and the child would resolve the
-                    // box default again instead of the model this turn is actually running on.
                     config.connectionId = ctx.agent.resolved.connection?.id ?? null
                     config.provider = ctx.provider
                     config.model = ctx.model

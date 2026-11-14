@@ -1,11 +1,3 @@
-// The sharing half of the account server: handing one agent to one person by link, outside the
-// marketplace. A share is a template capture without the page — the same engine archive, uploaded
-// once and reachable by URL.
-//
-// Same audience and same rule as account-tools.ts: these descriptions are the only documentation
-// the calling model gets. Three things every tool here shares and none of them repeats — the link
-// is a bearer capability with no expiry, the copy it carries is frozen at creation, and this API
-// only ever emits links: opening one and placing the agent on a board needs a browser.
 export const SHARE_TOOL_DEFS = [
     {
         name: 'plan_agent_share',

@@ -5,9 +5,6 @@ import { logger } from '../lib/logger.js'
 
 export type NotificationKind = 'info' | 'question' | 'approval' | 'connector' | 'done' | 'error'
 
-// `agent.schedule.created`, `agent.trigger.created` and `box.connection.connected` carry no message
-// for anyone: they tell the hub an automation now exists, or a step of the workspace's
-// getting-started checklist just happened on the box.
 export type NotificationEvent =
     | 'agent.notification'
     | 'agent.message.completed'
@@ -21,7 +18,6 @@ export type NotificationEvent =
 export type NotificationPayload = {
     event: NotificationEvent
     kind: NotificationKind
-    // `null` for a box-wide event, which belongs to no agent.
     agentId: string | null
     sessionId: string | null
     runId: string | null
@@ -46,7 +42,6 @@ export type NotificationInput = {
     originAgentId?: string | null
 }
 
-// The member whose chat message started the run, so the hub can route the event to them.
 export function authorMetadata(author: MessageAuthor | undefined): { authorId?: string } {
     return author ? { authorId: author.id } : {}
 }

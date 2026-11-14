@@ -33,10 +33,6 @@ function firstInvalidTab(errors: FieldErrors<TemplateFormValues>): TemplateEdito
     return EDITOR_TABS.find(tab => TAB_FIELDS[tab].some(field => errors[field] !== undefined)) ?? 'details'
 }
 
-// The author's editor: the same sections as the admin console, over the same document, with the
-// slug and the social card hidden by the `author` scope. The form holds the whole document rather
-// than the author's slice of it, because that is what the sections and `toTemplateBrief` are typed
-// against; the server merges only what it accepts back over the stored row.
 export function MyTemplateEditor({
     template,
     payoutsReady,
@@ -69,14 +65,10 @@ export function MyTemplateEditor({
         formState: { isSubmitting },
     } = form
 
-    // A capture writes `agents` straight to the row, so the reloaded document is the only place the
-    // new list exists: the form was seeded once at mount and would otherwise keep showing the old one.
     React.useEffect(() => {
         form.reset(current => ({ ...current, agents: template.document.agents }))
     }, [form, template.document.agents])
 
-    // Parsed rather than hand-picked: the schema is the list of what an author may send, and the
-    // server re-parses the same one on the way in.
     const save = form.handleSubmit(
         async values => {
             if (await onSave(templateAuthorSchema.parse(values))) form.reset(values)
@@ -100,7 +92,6 @@ export function MyTemplateEditor({
                         </div>
 
                         <ScrollFade className="min-h-0 flex-1 px-5 pb-5">
-                            {/* These stay mounted so tab changes cannot reset editor, field-array or upload state. */}
                             <TabsContent forceMount value="details">
                                 <fieldset disabled={readOnly || isSubmitting} className="flex flex-col gap-5 pt-5">
                                     <TemplateMetaSection />
@@ -127,9 +118,6 @@ export function MyTemplateEditor({
                             </TabsContent>
 
                             <TabsContent forceMount value="agents">
-                                {/* Its own fieldset: capturing writes the row directly, and a save in flight is
-                                    replaying a document read before that write, so it would put a removed coworker
-                                    back. Kept out of the editorial fieldset so `readOnly` stays the block's call. */}
                                 <fieldset disabled={isSubmitting} className="pt-5">
                                     <ExpertTemplateAgents agents={template.agents} readOnly={readOnly} onCapture={onCapture} onRemove={onRemoveAgent} />
                                 </fieldset>

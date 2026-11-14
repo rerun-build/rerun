@@ -3,14 +3,6 @@ import { serviceManifestSchema } from '../lib/services/manifest'
 import { createServiceRoleClient } from '../supabase/serviceRole'
 import { selectSingle } from '../supabase/supabase-helpers'
 
-// One-shot: pins the email-imap-smtp service to port 587 with STARTTLS. Hetzner drops outbound 25
-// and 465 on every engine host, so a box can only send over 587: the port and encryption fields go
-// away from the install form instead of steering users onto a dead port.
-//
-//   ../engine/node_modules/.bin/tsx --env-file=.env scripts/email-smtp-587.ts [--write]
-//
-// Add `--env-file=.env.profile.staging` after `.env` to target the staging project.
-
 const SLUG = 'email-imap-smtp'
 const REMOVED_INPUTS = ['SMTP_PORT', 'SMTP_SECURE']
 const HOST_HELP_SUFFIX = ' It must accept STARTTLS on port 587.'

@@ -12,8 +12,6 @@ import { spacing } from '@/theme/tokens'
 
 const PRIVACY_URL = 'https://rerun.build/privacy'
 
-// Asked before anything the person types or shares leaves for an AI provider (App Store guideline
-// 5.1.2(i)): the website of the onboarding is the first, then every message, photo and voice note.
 export function AiConsent({ onAgree, onDecline }: { onAgree: () => Promise<void>; onDecline: () => void }) {
     const insets = useSafeAreaInsets()
     const [agreeing, setAgreeing] = useState(false)

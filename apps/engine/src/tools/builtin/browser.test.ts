@@ -10,7 +10,6 @@ type RouteHandler = (route: { request: () => { url: () => string; resourceType: 
 
 const dns = vi.hoisted(() => ({ lookups: [] as string[] }))
 
-// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
 vi.mock('node:dns/promises', () => ({
     lookup: async (host: string) => {
         dns.lookups.push(host)
@@ -145,7 +144,6 @@ function ctxWith(id = agentId) {
     return { agent: { id, config: { tools: { browser: true }, ephemeral: false, kind: 'user' } }, sessionId: 's', logger: { warn() {} }, hostBreaker: new HostBreaker() } as any
 }
 
-// The line saying where the whole page is saved is asserted on its own, in the saved-page tests.
 const withoutSavedLine = (text: string): string => text.replace(/\nSaved whole: [^\n]*/, '')
 
 async function navigate(ctx: any, args: Record<string, unknown>): Promise<string> {

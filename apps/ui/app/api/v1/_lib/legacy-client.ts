@@ -1,11 +1,6 @@
 import { type AgentModels, type AgentView, type AiConnectionsView, type Provider } from '@rerun/contracts'
 import { clientOf } from './client-platform'
 
-// The iOS builds already in people's hands parse `providerSchema` strictly: one provider they do not
-// know anywhere in a response fails the whole parse, and with it as the machine's default that is
-// every coworker's sheet. Until the build that knows a provider is the minimum, the routes those
-// builds read leave it out. Each provider names the env var holding its first build; unset, every
-// build is treated as one that does not know it. The Android app was born after every one of them.
 const FIRST_IOS_BUILD_ENV: Partial<Record<Provider, string>> = {
     opencode: 'MOBILE_IOS_OPENCODE_BUILD',
     custom: 'MOBILE_IOS_CUSTOM_BUILD',
@@ -19,7 +14,6 @@ function firstIosBuild(provider: Provider): number | null {
     return Number.isInteger(build) && build > 0 ? build : null
 }
 
-// A request without the header is an old iOS build: only the app sends it, and only recent ones do.
 export function clientKnowsProvider(req: Request, provider: Provider): boolean {
     if (!FIRST_IOS_BUILD_ENV[provider]) return true
     const client = clientOf(req)
@@ -50,8 +44,6 @@ export function agentModelsForClient(req: Request, models: AgentModels): AgentMo
     return { ...models, groups: models.groups.filter(group => !unknownToLegacy(group.provider)) }
 }
 
-// Both pairs are nullable already: an old build reads them as "follows the machine" and "not
-// resolved yet", which is what it can show without knowing the provider.
 export function agentViewForClient(req: Request, view: AgentView): AgentView {
     const unknownToLegacy = unknownTo(req)
     if (!unknownToLegacy || !view.detail) return view

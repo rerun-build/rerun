@@ -4,7 +4,6 @@ import type { CreatorPane } from '@/stores/creator.store'
 
 type CreatorAccountState = { state: 'not_started' | 'incomplete' | 'pending_verification' | 'restricted' | 'ready'; stripeAccountId: string | null; chargesEnabled: boolean }
 
-// A template that costs nothing is installed on the spot: there is no checkout to open.
 export async function startTemplateCheckoutAction(_slug: string): Promise<{ ok: true; outcome: { kind: 'checkout'; url: string } | { kind: 'owned' } | { kind: 'free' } } | { ok: false; error: string; needsPlan?: true }> {
     return { ok: true, outcome: { kind: 'free' } }
 }

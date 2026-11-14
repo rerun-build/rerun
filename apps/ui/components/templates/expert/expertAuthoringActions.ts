@@ -7,9 +7,6 @@ import {
 } from '@/app/api/_actions/expert-authoring.actions'
 import type { TemplateAuthoringActions } from '@/components/templates/authoring/actions-context'
 
-// An author addresses their template by id, and every action re-checks that they own it and that it
-// is still editable. `folder` is dropped on the way through: the author surface only ever uploads
-// into the gallery.
 export function expertAuthoringActions(templateId: string): TemplateAuthoringActions {
     return {
         uploadImage: formData => uploadMyTemplateImageAction(templateId, formData),

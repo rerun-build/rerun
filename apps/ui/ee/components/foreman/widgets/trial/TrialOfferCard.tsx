@@ -13,21 +13,13 @@ import { CalendarClockIcon, CircleCheckIcon, CreditCardIcon, type LucideIcon } f
 import { TRIAL_ENDING_LEAD_MS } from '@/ee/lib/lifecycle/sequences'
 import { TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, formatAmount } from '@rerun/contracts'
 
-// The trial, sold where it is asked for. On the cardless arm of the trial test the button starts it on
-// the spot, so the card has to say out loud that something starts the moment they press it. On the
-// card arm it opens the card form, and a workspace whose trial is spent gets the same card billed
-// today.
-
 type TrialOfferCardProps = {
     offer: TrialOffer
     priceArm: PriceArm
     submitting: boolean
     error?: string | null
     onStart: () => void
-    // What the trial puts to work, when it is not a team the assistant designed: the template or the
-    // shared coworker they arrived on, named so the card sells that and not a plan.
     subject?: string
-    // A paid template is bought right after the trial starts, and the card says so before the click.
     thenPay?: string
 }
 
@@ -43,7 +35,6 @@ function offerPitch(t: Translate, offer: TrialOffer, price: string, chargeDate: 
 function TimelineStep({ icon, title, description }: { icon: LucideIcon; title: string; description: string }) {
     return (
         <li className="relative flex gap-3 pb-3 last:pb-0">
-            {/* Opaque behind the icon's translucent tile, so the rail stops at its edge. */}
             <span className="relative z-10 shrink-0 rounded-lg bg-background">
                 <Icon icon={icon} size="sm" className="text-muted-foreground" />
             </span>

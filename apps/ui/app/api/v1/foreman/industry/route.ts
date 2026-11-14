@@ -4,5 +4,4 @@ import { foremanIndustryRequestSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// The fast guess at an industry from a site or a sentence, while the card is still being answered.
 export const POST = apiRoute({ auth: 'member', body: foremanIndustryRequestSchema }, async ({ body }) => ({ industry: await decideIndustryAction(body.input) }))

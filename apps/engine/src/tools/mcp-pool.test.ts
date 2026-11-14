@@ -154,8 +154,6 @@ describe('acquireMcp', () => {
         expect(mcp.connects).toHaveLength(2)
     })
 
-    // A run can go longer than the idle spell between two MCP calls: the handle it holds must not
-    // be stuck on the client the pool closed meanwhile.
     it('dials again on a call made after the idle spell closed the connection', async () => {
         vi.useFakeTimers()
         const pooled = await acquireMcp('a1', server('gh'), spawn)

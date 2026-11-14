@@ -15,13 +15,11 @@ import { mentionText, type MentionItem } from './mentions'
 const ROW = 48
 const MAX_ROWS = 5
 
-// The web composer's `@` and `/` menu, above the composer: a tap puts the token in the text.
 export function MentionSuggestions({ trigger, items, onPick }: { trigger: '@' | '/'; items: MentionItem[]; onPick: (item: MentionItem) => void }) {
     const theme = useTheme()
     const glass = useGlassStyle()
     const t = useTranslations('mobileChat.composer')
     const { height } = usePaneSize()
-    // A short screen with the keyboard up keeps the conversation's header in sight.
     const maxHeight = Math.min(ROW * MAX_ROWS, height * 0.3)
     return (
         <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutDown.duration(200)}>

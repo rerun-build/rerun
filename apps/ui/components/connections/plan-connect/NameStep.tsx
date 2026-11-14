@@ -17,7 +17,6 @@ type NameStepParams = {
     error: string | null
 }
 
-// A plain function rather than a hook, so its strings come from small components.
 function NameStepText({ part }: { part: 'title' | 'remark' }) {
     const t = useTranslations('connections.nameStep')
     return t(part)
@@ -42,8 +41,6 @@ function NameStepBody({ linked, name, placeholder, onName, onDone, saving, error
     )
 }
 
-// The last step of adding a plan: the connection already exists once the token lands (that is when
-// the engine says whether the plan is accepted), so the name only renames it before its page opens.
 export function nameStep(params: NameStepParams): TrackStep {
     return {
         title: <NameStepText part="title" />,

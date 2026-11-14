@@ -4,13 +4,6 @@ import { poolHasRoom } from '@rerun/cloud/engines'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// Whether a workspace that still has no machine must wait for one. Decided from the pool on every
-// read rather than from a stored state: the wall lifts on its own the moment an engine is available
-// again, and nothing has to admit anyone. `waitlisted_at` is only the record of who was turned away
-// and when, stamped once and never cleared.
-//
-// A paused workspace is never turned away: it already had a machine, its customer is paying to get
-// it back, and the restore retries on its own until a machine frees up.
 export async function resolveEngineWaitlist(workspaceId: number): Promise<boolean> {
     if (await findWorkspaceEngine(workspaceId)) return false
 

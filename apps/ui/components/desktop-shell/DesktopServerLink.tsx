@@ -7,7 +7,6 @@ import { useSyncExternalStore } from 'react'
 
 const noSubscription = () => () => {}
 
-// Under the sign-in methods of the desktop app: the way to a self-hosted server.
 export function DesktopServerLink() {
     const t = useTranslations('desktopShell.server')
     const available = useSyncExternalStore(noSubscription, () => desktopShell('server') !== null, () => false)

@@ -74,7 +74,6 @@ describe('files store', () => {
     })
 })
 
-// `outside/` sits next to `root/`: `links/dir` points at it and `links/file` at the file in it.
 describe('symlinks', () => {
     const outside = resolve(dataDir, 'outside')
     const bytes = () => new ReadableStream<Uint8Array>({ start: c => (c.enqueue(new Uint8Array([1])), c.close()) })

@@ -4,5 +4,4 @@ import { foremanIntakeSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// The welcome card's answers: writes the profile and closes discovery, as the web card does.
 export const POST = apiRoute({ auth: 'member', body: foremanIntakeSchema }, ({ body }) => saveForemanIntakeAction(body))

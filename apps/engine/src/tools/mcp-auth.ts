@@ -15,9 +15,6 @@ export type StoredToken = {
     refreshToken?: string
     expiresAt?: number
     scope?: string
-    // Present for browser authorization-code tokens (UI-driven OAuth): the token
-    // endpoint + client the engine must reuse to refresh, independent of the
-    // device-code discovery path below. Absent for device-code tokens.
     tokenEndpoint?: string
     clientId?: string
     clientSecret?: string
@@ -107,9 +104,6 @@ function logRefreshRefused(res: Response, data: Record<string, unknown>): void {
     logger.warn({ status: res.status, error: data.error, description: data.error_description }, 'mcp token refresh refused')
 }
 
-// Refresh an authorization-code token straight against its stored token endpoint
-// (RFC 6749 form-encoded grant). Used for UI-driven OAuth, where the client id and
-// endpoint are known up front and no device-code discovery is needed.
 async function refreshWithEndpoint(token: StoredToken): Promise<StoredToken | null> {
     if (!token.refreshToken || !token.tokenEndpoint) return null
     try {
@@ -158,14 +152,11 @@ async function refreshToken(auth: DeviceAuth, token: StoredToken): Promise<Store
     return null
 }
 
-// Tokens are the agent's credentials: the folder and its files are readable by the engine's uid only.
 export async function saveToken(agentId: string, name: string, token: StoredToken): Promise<void> {
     await mkdir(mcpDir(agentId), { recursive: true, mode: 0o700 })
     await writeFileAtomic(mcpTokenPath(agentId, name), JSON.stringify(token, null, 4), { mode: 0o600 })
 }
 
-// A legacy server name that could never have been saved under has nothing stored: the read paths
-// answer that instead of throwing, so the agent carrying it keeps running and the name stays removable.
 export async function loadToken(agentId: string, name: string): Promise<StoredToken | null> {
     if (!isPathSegment(name)) return null
     const path = mcpTokenPath(agentId, name)
@@ -205,9 +196,6 @@ export async function clearPending(agentId: string, name: string): Promise<void>
     if (existsSync(path)) await rm(path)
 }
 
-// Keyed per agent and server, and held across the read of the token file too: two runs starting
-// together would otherwise both refresh with the same refresh token, and a provider that rotates
-// them (Affonso) answers the reuse by revoking the whole grant.
 const inFlight = new Map<string, Promise<string | null>>()
 
 function ensureAccessToken(agentId: string, server: McpServer): Promise<string | null> {

@@ -1,4 +1,3 @@
-// No 'server-only': the archive, restore and trial sweeps that call this run as Trigger.dev tasks.
 import * as React from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { AgentNotification, renderEmail } from '@rerun/emails'
@@ -23,13 +22,9 @@ export type AppNotice = {
     appName: string
     message: string
     copy: NoticeCopy
-    // Who hears about it by email on top of the bell: a fact that costs money or stops the coworkers
-    // is worth an email, a reconnect reminder after a restore is not.
     email: boolean
 }
 
-// The bell for the whole workspace, and an email to the members who keep billing emails on. Never
-// throws: a notice that fails must not undo the change it reports.
 export async function notifyWorkspace(supabase: Client, workspaceId: number, notice: AppNotice): Promise<void> {
     try {
         const { error } = await supabase.from('notifications').insert<NotificationInsert>({

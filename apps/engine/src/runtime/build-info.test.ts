@@ -60,7 +60,6 @@ describe('build info', () => {
         expect(isBuildCommit('abc1234')).toBe(false)
     })
 
-    // The public export is checked from a plain folder, before it becomes a commit.
     it.skipIf(!existsSync(resolve(REPO_ROOT, '.git')))('asks git in a checkout', async () => {
         const dir = releaseDir({ commit: FULL })
         const { buildCommit, buildInfo } = await loadWithLayout({ kind: 'monorepo', root: REPO_ROOT, packageDir: dir })

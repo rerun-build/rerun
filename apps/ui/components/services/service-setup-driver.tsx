@@ -19,7 +19,6 @@ const SERVER_DRIVER: ServiceSetupDriver = {
 
 const ServiceSetupDriverContext = createContext<ServiceSetupDriver>(SERVER_DRIVER)
 
-// Only the labs provide one, to walk the setup card end to end without an engine behind it.
 export const ServiceSetupDriverProvider = ServiceSetupDriverContext.Provider
 
 export function useServiceSetupDriver(): ServiceSetupDriver {

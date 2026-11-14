@@ -6,11 +6,9 @@ import { ChevronDownIcon, WorkflowIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { Markdown } from '@rerun/ui/markdown'
 import { Stripes } from '@rerun/ui/primitives'
-// Nucleo glyph with no lucide counterpart, so no name to add to the `@/lib/icons` shim.
 
 const HINT_CLASS_NAME = 'text-xs text-muted-foreground/80 [&_p]:leading-snug [&_code]:py-0 [&_code]:text-[0.8em]'
 
-// Ordered list items become numbered pips through a CSS counter, so the author writes plain `1.`.
 const STEPS_CLASS_NAME = cn(
     '[&_ol]:mt-0 [&_ol]:list-none [&_ol]:space-y-3 [&_ol]:pl-0 [&_ol]:[counter-reset:step]',
     '[&_li]:relative [&_li]:mt-0 [&_li]:pl-8 [&_li]:text-sm [&_li]:leading-6 [&_li]:[counter-increment:step]',
@@ -19,8 +17,6 @@ const STEPS_CLASS_NAME = cn(
     '[&_li]:before:content-[counter(step)]',
 )
 
-// Most labels open on a brand ("Stripe secret key") or an acronym ("API key") and keep their case;
-// only a leading common word is lowered, so "Secret key" reads as "secret key" mid-sentence.
 const COMMON_LEADING_WORDS = new Set(['access', 'account', 'admin', 'authorization', 'bot', 'client', 'personal', 'private', 'public', 'secret', 'service', 'user'])
 
 function inSentence(label: string): string {

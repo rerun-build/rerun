@@ -26,7 +26,6 @@ function ReceiptCard({ title, count, children }: { title: string; count?: string
     )
 }
 
-// The answers sent to a question block, drawn back instead of the text written for the coworker.
 export function QuestionReceipt({ answers }: { answers: QuestionAnswer[] }) {
     const t = useTranslations('mobileHitl.receipts')
     const theme = useTheme()
@@ -114,7 +113,6 @@ export function ApprovalReceipt({ decisions }: { decisions: Omit<ApprovalDecisio
     )
 }
 
-// What the user answered on a spend card. The web adds what the run then billed; the app keeps to the decision.
 export function SpendReceipt({ decision }: { decision: SpendDecision }) {
     const t = useTranslations('mobileHitl.receipts')
     const approved = decision.decision === 'approved'

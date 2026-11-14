@@ -3,14 +3,6 @@ import { cn } from '../cn'
 
 const ARROW = 'M1.8 4.4 7 36.2c.3 1.8 2.6 2.3 3.6.8l3.9-5.7c1.7-2.5 4.5-4.1 7.5-4.3l6.9-.5c1.8-.1 2.5-2.4 1.1-3.5L5 2.5c-1.4-1.1-3.5 0-3.3 1.9Z'
 
-// The arrow and its name pill, with no positioning of their own: whoever renders a cursor owns the
-// box it sits in. `align` says which way the pill grows, so a cursor near the right edge does not
-// push its name out of the frame. A role opts into the taller teammate badge; callers that only
-// carry a name keep the compact live-cursor mark byte for byte.
-//
-// What rides in the pill is a photo (`photoUrl`) for a person, or anything drawn (`avatar`) for an
-// agent, whose face is an SVG and not a picture. A mark with an avatar and no name is legitimate:
-// the face already says who is driving.
 export function CursorMark({
     name,
     role,
@@ -26,9 +18,6 @@ export function CursorMark({
     avatar?: ReactNode
     align?: 'right' | 'left'
 }) {
-    // `max-w-none`: the pill's containing block is the 20px arrow, so its shrink-to-fit width is its
-    // min-content width, and Safari counts an image under preflight's `max-width: 100%` as 0px
-    // there. The pill came out a photo too narrow and the end of the name spilled off it.
     const leading = avatar ?? (photoUrl ? <img src={photoUrl} alt="" width={role ? 40 : 32} height={role ? 40 : 32} decoding="async" className={cn('max-w-none shrink-0 rounded-full object-cover ring-1 ring-white/30', role ? 'size-5' : 'size-4')} /> : null)
 
     return (

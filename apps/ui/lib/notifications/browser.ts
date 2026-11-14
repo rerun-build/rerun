@@ -24,9 +24,6 @@ export async function requestBrowserPermission(): Promise<BrowserPermission> {
 
 type ShowNotificationArgs = { title: string; body?: string; tag?: string; icon?: string; onClick?: () => void }
 
-// The desktop app shows its own system notifications: one as soon as the person is in another app
-// (a window can be on screen without being looked at), and its click brings the window back before
-// the page opens what the notification is about.
 const desktopClicks = new Map<string, () => void>()
 const MAX_PENDING_CLICKS = 50
 let listeningToDesktopClicks = false
@@ -50,8 +47,6 @@ function showDesktopNotification(shell: DesktopShellApi, { title, body, tag, onC
     void shell.notifications.show({ id, title, body, silent: true })
 }
 
-// Fires an OS-level notification only when permission is granted and the tab is hidden: while the tab
-// is visible the in-app toast is the surface, so an OS notification would be a redundant duplicate.
 export function showBrowserNotification({ title, body, tag, icon = '/icon-192.png', onClick }: ShowNotificationArgs): void {
     const shell = desktopShell('notifications')
     if (shell) return showDesktopNotification(shell, { title, body, tag, onClick })
@@ -65,7 +60,6 @@ export function showBrowserNotification({ title, body, tag, icon = '/icon-192.pn
             onClick?.()
         }
     } catch {
-        // Some browsers throw when constructing Notification outside a service worker; ignore.
     }
 }
 
@@ -76,9 +70,6 @@ const SOUND_CLAIM_KEY = 'rerun:notification-sound-claim'
 const CLAIM_HOLD_MS = 10_000
 const CLAIM_SETTLE_MS = 60
 
-// Every open tab receives the same notification. Only the first to claim its id plays the sound, so
-// three tabs ring once. The lock is held long enough that a slower tab finds it taken; a browser
-// without Web Locks falls back to a claim in localStorage, read back after a beat to settle a race.
 export function playNotificationSoundOnce(notificationId: string): void {
     if (typeof window === 'undefined') return
     if (navigator.locks) {
@@ -132,6 +123,5 @@ export function playNotificationSound(): void {
         sound.currentTime = 0
         void sound.play().catch(() => {})
     } catch {
-        // Autoplay may be blocked until the first user gesture; best-effort.
     }
 }

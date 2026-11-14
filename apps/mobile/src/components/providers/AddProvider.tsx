@@ -9,7 +9,6 @@ import { LOGO_TILE, ProviderRow, SheetFrame } from './bits'
 
 const TITLES = { plan: 'subscriptions', key: 'apiKeys' } as const satisfies Record<Exclude<AiConnectionKind, 'included'>, string>
 
-// Every provider a connection can be added for, or only one kind when the list's Add row opened it.
 export function AddProvider({ addable, only, onPick, onBack }: { addable: AiConnectionsView['addable']; only?: Exclude<AiConnectionKind, 'included'>; onPick: (provider: AddableProvider) => void; onBack: () => void }) {
     const t = useTranslations('mobileProviders.add')
     const kinds = only ? [only] : (['plan', 'key'] as const)

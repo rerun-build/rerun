@@ -18,7 +18,6 @@ function prunablePart(part: ToolResultPart): boolean {
     return outputSize(part.output) > COMPACTION_PRUNE_OUTPUT_CHAR_THRESHOLD
 }
 
-// A paid answer or a page saved whole stays reachable once its result is pruned: the pointer survives.
 function savedPointerOf(output: ToolResultOutput): string {
     const value = output.value as { saved?: unknown } | string | undefined
     const page = typeof value === 'string' ? /Saved whole: (\.rerun\/pages\/\S+)/.exec(value)?.[1] : undefined

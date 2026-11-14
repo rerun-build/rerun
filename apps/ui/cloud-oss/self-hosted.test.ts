@@ -11,8 +11,6 @@ import { DEFAULT_SENDERS, DEFAULT_WHATSAPP_FROM } from './senders'
 import { SERVERS_ENABLED } from './servers'
 import { SUPPORT_CHAT_ENABLED } from './support'
 
-// What a checkout without `cloud/` runs: a self-hosted install that sells nothing, sends no email of
-// its own, has its own servers and nobody of Rerun's behind a chat.
 describe('the self-hosted side of @rerun/cloud', () => {
     it('is not Rerun Cloud and sells nothing', () => {
         expect(RERUN_CLOUD).toBe(false)

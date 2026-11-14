@@ -12,10 +12,6 @@ import { useKitTranslations, useUiLocale } from '../locale'
 
 import { AppLogo } from './marks'
 
-// Three ways for the agent to start, one per block: the timing read in the description first and
-// ticked until another is picked, then the clock (two presets and a custom week), then on demand.
-// The time zone closes it, quiet, since every hour above depends on it. Picking the ticked option
-// again gives the timing back to the description.
 export function SchedulePlanner({ read, app, choice, onChoice }: { read: JobSchedule | null; app?: CatalogEntry; choice: ScheduleChoice; onChoice: (choice: ScheduleChoice) => void }) {
     const t = useKitTranslations()
     const [lastCustom, setLastCustom] = useState(DEFAULT_CUSTOM)

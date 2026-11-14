@@ -5,14 +5,10 @@ import type { CountryCode } from 'libphonenumber-js/min'
 type SentRequest = { phone: string; country: CountryCode; channel: VerificationChannel }
 export type SentCode = { request: SentRequest; sentAt: number }
 
-// A code out on its way survives the tab being reloaded while its owner reads it in WhatsApp: Chrome
-// on Android discards a tab left in the background, and a deploy reloads a hidden one. Kept per tab,
-// and dropped once Bird has forgotten the code anyway.
 export const SENT_CODE_KEPT_MS = 10 * 60_000
 
 const storageKey = (key: string) => `phone-code-sent:${key}`
 
-// Some in-app browsers refuse storage altogether: the form then simply forgets, as it always did.
 function storage(): Storage | null {
     try {
         return globalThis.sessionStorage ?? null

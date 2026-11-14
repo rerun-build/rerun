@@ -7,8 +7,6 @@ import { BorderBeam, type BorderBeamProps } from '@rerun/ui'
 import type { ForemanCorner } from '@/lib/foreman-layout'
 import { cn } from '@/lib/utils'
 
-// The card sits on the screen side of the ball and its tail points back at the ball's centre,
-// 28px in from the edge the two share.
 const PLACEMENT: Record<ForemanCorner, string> = {
     'top-left': 'top-full left-0 mt-4',
     'top-right': 'top-full right-0 mt-4',
@@ -25,7 +23,6 @@ const TAIL: Record<ForemanCorner, string> = {
 
 type ForemanDockBubbleProps = { corner: ForemanCorner; tone?: BorderBeamProps['tone']; children: ReactNode }
 
-/** What the parked Foreman holds up above its pill: a question it stopped on, or its answer. */
 export function ForemanDockBubble({ corner, tone, children }: ForemanDockBubbleProps) {
     const reducedMotion = useReducedMotion()
     const rise = corner.startsWith('bottom') ? 6 : -6

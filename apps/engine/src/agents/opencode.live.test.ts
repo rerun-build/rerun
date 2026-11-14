@@ -1,9 +1,3 @@
-// Against the real OpenCode, with a real key: skipped unless both `RERUN_LIVE=1` and
-// `OPENCODE_API_KEY` are set (`apps/engine/.env` is read by the engine's own env loader, not here):
-//
-//   RERUN_LIVE=1 OPENCODE_API_KEY=oc_sk_… pnpm --filter rerun-engine exec vitest run src/agents/opencode.live.test.ts
-//
-// Writes what every Go model managed to `.context/opencode/compat.md` at the repo root.
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'

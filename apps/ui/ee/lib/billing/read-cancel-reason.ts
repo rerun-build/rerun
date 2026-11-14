@@ -1,21 +1,9 @@
 import { CANCEL_REASONS, CANCEL_REASON_GLOSS, type CancelReason } from './cancel-flow'
 
-// Reads what a customer typed as their reason for cancelling: is it a reason at all, and which of
-// Stripe's feedback values it comes under.
-//
-// A decision model rather than a chat one: it returns typed choices with calibrated probabilities
-// and answers in well under a second, which is what a Continue button can afford. Same alpha
-// endpoint as lib/company/decide-industry.ts, hence the hand-written fetch and the rule that
-// nothing here throws: a null lets the customer through, since no one is kept from cancelling by a
-// model that did not answer.
-
 const DECISION_URL = 'https://openrouter.ai/api/alpha/decisions'
 const DECISION_MODEL = process.env.RERUN_DECISION_MODEL ?? 'typesafe/jev-1.13'
 const TIMEOUT_MS = 3000
 
-// Doubt goes to the customer: a short or clumsy answer is still an answer, and turning down a real
-// one costs more than letting a lazy one through. Measured on 9 Oct 2026: keyboard mashing and
-// filler all come back at 1.00, and the weakest real answers ("not for me") stay under 0.6.
 const REJECTION_FLOOR = 0.75
 const CATEGORY_FLOOR = 0.5
 

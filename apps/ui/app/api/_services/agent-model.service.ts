@@ -11,14 +11,10 @@ import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { FOREMAN_AGENT_ID, type AgentModels, type ModelChoice, type SetAgentModelInput } from '@rerun/contracts'
 
-// The foreman has no agent row, so it resolves the way the web's picker resolves it, and stays every
-// member's own to set. A coworker's model is part of what it is: setting it takes `manage`.
 const targetOf = (ctx: WorkspaceContext, agentId: string, access: AccessLevel) => (agentId === FOREMAN_AGENT_ID ? resolveRunTarget(agentId) : resolveAgentTarget(agentId, actorFromContext(ctx), access))
 
 const choiceOf = (connectionId: string | null | undefined, model: string | null | undefined): ModelChoice | null => (connectionId && model ? { connectionId, model } : null)
 
-// The app's model picker for one coworker: the same groups as the web picker, with what the coworker
-// pinned and what it runs today.
 export async function readAgentModels(ctx: WorkspaceContext, agentId: string): Promise<AgentModels> {
     const { conn, engineAgentId } = await targetOf(ctx, agentId, 'use')
     const [detail, list, t] = await Promise.all([
@@ -41,8 +37,6 @@ export async function readAgentModels(ctx: WorkspaceContext, agentId: string): P
     }
 }
 
-// Same patch as the web picker: a pin names its connection's provider, and following the box clears
-// all three fields so no stale connection keeps showing in its usage.
 export async function setAgentModel(ctx: WorkspaceContext, agentId: string, choice: SetAgentModelInput): Promise<void> {
     const { conn, engineAgentId } = await targetOf(ctx, agentId, 'manage')
     if (choice.model === null) {

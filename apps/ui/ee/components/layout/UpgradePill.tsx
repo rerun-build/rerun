@@ -17,11 +17,6 @@ function trialDaysLeftLabel(t: ReturnType<typeof useTranslations<'billing'>>, tr
     return remaining < DAY_MS ? t('layout.pill.underADayLeft') : t('layout.pill.daysLeft', { count: Math.ceil(remaining / DAY_MS) })
 }
 
-/**
- * Beside the workspace pill until the workspace is on a paid plan. The billing dialog it opens
- * already knows the way out of each state: a trial to start, a card to add, a trial to convert,
- * a failed invoice to fix.
- */
 export function UpgradePill() {
     const t = useTranslations('billing')
     const { workspace, isAnonymous } = useSession()

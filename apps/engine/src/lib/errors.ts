@@ -19,8 +19,6 @@ export const agentDisabled = () => new HttpError(403, 'This coworker is switched
 
 export const setupPending = () => new HttpError(409, 'This coworker is still being set up. Its tasks can run once the setup is finished.')
 
-// The code names the hold a scheduled run ran into, so the scheduler can tell a routine skip from
-// a failure without reading the HTTP status.
 export const coworkerBusy = () => new HttpError(409, 'Another run of this coworker is live and it drives a screen; the scheduled run waits for it to end.', 'coworker_busy')
 
 export const subscriptionLimited = () => new HttpError(429, "This coworker's subscription has hit its usage limit; scheduled runs are paused until it resets.", 'subscription_limited')

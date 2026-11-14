@@ -44,7 +44,6 @@ export const runStepSchema = z.object({
     cachedInputTokens: z.number().nullable(),
     reasoningTokens: z.number().nullable(),
     totalTokens: z.number().nullable(),
-    // Absent on an engine that predates the `step-cache-cost` migration (system.db v3).
     cacheWriteTokens: z.number().nullable().optional(),
     costMicros: z.number().nullable().optional(),
     toolCallCount: z.number(),

@@ -72,8 +72,6 @@ describe('xhrUpload', () => {
         expect(seen).toEqual([30, 100])
     })
 
-    // The bytes leaving the browser and the server having written them are two different moments,
-    // and the gap is where a bar parked at 100% reads as a freeze.
     it('signals the handover before the response arrives', async () => {
         const onSent = vi.fn()
         const { handle, xhr } = upload({ onSent })

@@ -11,14 +11,10 @@ import { AppText } from '@/components/ui/AppText'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: the coworker's screen as a block of the thread, in every state, and its floating
-// thumbnail, to drag and resize. `rerun://lab-screen?scheme=dark` forces a theme.
-
 const noop = () => {}
 
 const takeover = (opened: boolean, locked = false): TakeoverRequestState => ({ reason: 'Sign in to LinkedIn so I can read the shared list.', site: 'linkedin.com', opened, locked, finishing: locked, onOpen: noop, onSkip: noop, onDone: noop })
 
-// A desktop as the engine draws it: dark wallpaper, top bar, one browser window.
 function FakeScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: '#14121f' }}>

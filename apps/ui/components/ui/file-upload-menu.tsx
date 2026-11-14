@@ -11,8 +11,6 @@ type FileUploadMenuProps = {
     onPick: (entries: UploadEntry[]) => void
 }
 
-// Picking files no longer blocks: the upload reports itself in the tray, so this stays a plain
-// trigger with no pending state of its own.
 export function FileUploadMenu({ onPick }: FileUploadMenuProps) {
     const t = useTranslations('ui.upload')
     const fileInputRef = useRef<HTMLInputElement>(null)

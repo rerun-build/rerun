@@ -18,14 +18,12 @@ type MarkdownNode = {
 
 export { agentWorkspacePathFromHref }
 
-/** Where the bytes of an image the agent wrote in Markdown live, through the file proxy. */
 export function agentImageSrc(agentId: string, src: string | undefined): string | null {
     const ref = agentImageRef(src)
     if (!ref) return null
     return ref.scope === 'shared' ? sharedFileRawUrl(ref.path) : agentFileRawUrl(agentId, ref.path)
 }
 
-/** Rewrites agent workspace links to a custom HAST element, and the agent's own images to the file proxy. */
 export function remarkAgentWorkspaceLinks(options?: { agentId?: string }) {
     const agentId = options?.agentId
     return (tree: MarkdownNode) => {

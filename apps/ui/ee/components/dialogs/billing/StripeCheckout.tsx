@@ -13,8 +13,6 @@ import { cn } from '@/lib/utils'
 
 import { Notice, PromoCodeField, usd } from './parts'
 
-// No `verification` option: the element refuses to load with it on an account without Stripe Tax
-// Complete. The number is still checked against VIES once it lands on the customer.
 const TAX_ID_OPTIONS = { visibility: 'auto' } as const
 
 function appearanceFor(theme: string | undefined): Appearance {
@@ -24,9 +22,6 @@ function appearanceFor(theme: string | undefined): Appearance {
     }
 }
 
-// A Checkout Session rendered by the app (`ui_mode: 'elements'`). Every child reads the session
-// through `useCheckout`: its totals, `confirm`, `runServerUpdate`. The appearance is read once: the
-// options of a mounted provider cannot change.
 export function StripeCheckoutProvider({ clientSecret, children }: { clientSecret: string; children: ReactNode }) {
     const { resolvedTheme } = useTheme()
     const [options] = useState(() => ({ clientSecret, elementsOptions: { appearance: appearanceFor(resolvedTheme) } }))
@@ -57,9 +52,6 @@ export function StripePaymentFieldsSkeleton() {
     )
 }
 
-// The Payment Element never offers Apple Pay in a Chromium browser nor Google Pay in Safari: only the
-// Express Checkout Element set to `always` does. Once it is on the page, Stripe moves the wallets
-// out of the Payment Element, so they are never shown twice. Link stays in the Payment Element.
 const WALLET_OPTIONS: StripeCheckoutExpressCheckoutElementOptions = {
     buttonHeight: 44,
     buttonTheme: undefined,
@@ -71,14 +63,9 @@ const WALLET_OPTIONS: StripeCheckoutExpressCheckoutElementOptions = {
 
 export type WalletPayment = {
     onConfirm: (event: StripeExpressCheckoutElementConfirmEvent) => void
-    // This mode of the element has no click hook, so a wallet that may not pay yet is greyed out and
-    // its clicks never reach the iframe.
     disabledReason?: string
 }
 
-// The wallets, the card and the billing address. The address is not optional: the tax is computed from
-// it, and a wallet hands over its own. The tax ID sits behind Stripe's own "purchasing as a business"
-// box: in this mode `tax_id_collection` on the session draws nothing by itself.
 export function StripePaymentFields({ wallet }: { wallet?: WalletPayment }) {
     const t = useTranslations('billing.stripe')
     const checkout = useCheckout()
@@ -90,8 +77,6 @@ export function StripePaymentFields({ wallet }: { wallet?: WalletPayment }) {
         <div className="flex flex-col gap-4">
             {wallet && (
                 <div className={cn('flex flex-col gap-4', !walletsShown && 'hidden')}>
-                    {/* The tooltip sits on a layer above the element rather than around it: wrapping it
-                        only while disabled would remount the element, and Stripe draws it back empty. */}
                     <div className="relative">
                         <div className={cn(wallet.disabledReason && 'pointer-events-none opacity-50')}>
                             <ExpressCheckoutElement
@@ -123,8 +108,6 @@ export function StripePaymentFields({ wallet }: { wallet?: WalletPayment }) {
     )
 }
 
-// The session takes promotion codes, but in this mode Stripe draws no field for them. The discount
-// reads off the next invoice when nothing is due today, which is every trial.
 export function StripePromoCode({ disabled }: { disabled?: boolean }) {
     const t = useTranslations('billing.stripe')
     const checkout = useCheckout()

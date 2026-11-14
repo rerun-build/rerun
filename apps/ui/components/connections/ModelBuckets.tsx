@@ -19,7 +19,6 @@ type Bucket = 'available' | 'hidden'
 
 const MODEL_GRID = 'grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-1.5'
 
-// Seeded by the model id so the server render and the drag overlay land on the same angle.
 function beamAngle(modelId: string) {
     let hash = 0
     for (const char of modelId) hash = (hash * 31 + char.charCodeAt(0)) | 0
@@ -39,8 +38,6 @@ function ChipFace({ model, muted, lifted, corner }: { model: CatalogModel; muted
     )
 }
 
-// `unavailable` is why the subscription's CLI cannot run the model on this box: still curated like any
-// other, shown muted so a model that is switched on but cannot run does not read as ready.
 function ModelChip({
     model,
     bucket,
@@ -112,13 +109,10 @@ function ModelZone({ bucket, title, aside, empty, count, children }: { bucket: B
 
 type ModelBucketsProps = {
     connection: BoxConnection
-    // The workspace default when it sits on this connection, which can never be turned off.
     defaultModel: string | null
     onModelsChange: (models: string[]) => void
 }
 
-// Which of a connection's models agents may pick: dragged between two zones, or moved with the
-// button each chip shows on hover.
 export function ModelBuckets({ connection, defaultModel, onModelsChange }: ModelBucketsProps) {
     const t = useTranslations('connections.models')
     const tConnections = useTranslations('connections')
@@ -129,7 +123,6 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
     const hidden = offered.filter(m => !isModelEnabled(connection, m.id))
 
     if (connection.id === RERUN_CONNECTION_ID || offered.length <= 1) {
-        // A custom endpoint's lone model is still the one thing saying what the server answered.
         if (available.length === 0 || (available.length === 1 && connection.provider !== 'custom')) return null
         return (
             <DetailBlock title={t('title')}>
@@ -193,7 +186,6 @@ export function ModelBuckets({ connection, defaultModel, onModelsChange }: Model
                     ))}
                 </ModelZone>
             </div>
-            {/* PanelSteps slides with a transform, which would pin a fixed overlay to the panel instead of the viewport. */}
             {typeof document !== 'undefined' && createPortal(<DragOverlay dropAnimation={null}>{dragging && <ChipFace model={dragging} muted={!isModelEnabled(connection, dragging.id)} lifted />}</DragOverlay>, document.body)}
         </DndContext>
     )

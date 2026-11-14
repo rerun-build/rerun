@@ -14,9 +14,6 @@ import { resolveServerSecrets } from './mcp-resolve.js'
 import { toToolInputSchema } from './mcp-schema.js'
 import { logger } from '../lib/logger.js'
 
-// What a stdio server started for an agent runs in: the bare essentials of the engine's own
-// environment, the agent's keys, and its workspace as the working directory. Never the engine's
-// `process.env`, which holds its API key: a probe asked for by the agent itself spawns the command too.
 export type McpSpawn = { cwd: string; env: Record<string, string> }
 export type McpTool = Awaited<ReturnType<Client['listTools']>>['tools'][number]
 export type McpCallResult = Awaited<ReturnType<Client['callTool']>>
@@ -24,8 +21,6 @@ export type McpCall = (name: string, args: Record<string, unknown>) => Promise<M
 export type McpTransport = 'stdio' | 'sse' | 'http'
 export type McpProbe = { ok: boolean; transport: McpTransport; toolNames: string[]; error?: string }
 
-// The name the model of a run sees for a server's tool: the CLIs namespace it themselves, Rerun's own
-// loop registers it through `mcpToolSet`.
 export function mcpToolNameFor(provider: Provider | undefined, serverName: string, toolName: string): string {
     return provider && CLI_PROVIDERS.has(provider) ? `mcp__${serverName}__${toolName}` : `${serverName}_${toolName}`
 }
@@ -64,8 +59,6 @@ export async function openMcpClient(server: McpServer, spawn: McpSpawn): Promise
     }
 }
 
-// A tool as the model may be handed it, whichever provider carries it: a root union Anthropic would
-// refuse is lifted into plain properties, and the rule it carried is appended to the description.
 export function modelReadyMcpTool(serverName: string, tool: McpTool): McpTool {
     const { schema, note } = toToolInputSchema(tool.inputSchema)
     if (schema === tool.inputSchema) return tool
@@ -74,7 +67,6 @@ export function modelReadyMcpTool(serverName: string, tool: McpTool): McpTool {
     return { ...tool, description: note ? `${description}\n\n${note}` : description, inputSchema: schema as McpTool['inputSchema'] }
 }
 
-// The server's tools as AI SDK tools named `<server>_<tool>`, for the providers the engine drives itself.
 export function mcpToolSet(serverName: string, tools: McpTool[], call: McpCall): ToolSet {
     const set: ToolSet = {}
     for (const original of tools) {
@@ -88,12 +80,6 @@ export function mcpToolSet(serverName: string, tools: McpTool[], call: McpCall):
     return set
 }
 
-// The only way to turn a stored server into a dialable one, and the order is forced: the OAuth
-// bearer first, then the agent's ${VAR}s — the url has to be resolved before it can be recognised
-// as ours — then the hub identity headers last, so they are literal and final. An `npx` launch is
-// swapped for the package installed once, when it is. `${RERUN_WORKSPACE}` names the agent's own
-// workspace, for a server that needs an absolute folder (the mail server's attachment root).
-// `hubAgentId` is who the hub sees calling: the agent itself, or the coworker a delegate works for.
 export async function prepareMcpServer(agentId: string, server: McpServer, env: Record<string, string>, hubAgentId = agentId): Promise<McpServer> {
     const resolvable = { ...env, RERUN_WORKSPACE: workspaceDir(agentId) }
     return withInstalledPackage(withHubHeaders(resolveServerSecrets(await withAuth(agentId, server), resolvable), hubAgentId))
@@ -105,8 +91,6 @@ export class McpProbeTimeoutError extends Error {
     }
 }
 
-// A client that answers after the deadline is closed as soon as it shows up, so a slow stdio
-// server never outlives the probe that gave up on it.
 async function withDeadline<T extends { client: Client }>(opening: Promise<T>, timeoutMs: number | undefined): Promise<T> {
     if (timeoutMs === undefined) return opening
     let timer: NodeJS.Timeout | undefined
@@ -123,9 +107,6 @@ async function withDeadline<T extends { client: Client }>(opening: Promise<T>, t
     }
 }
 
-// The SDK keeps the HTTP status on `code` and only quotes the response body in the message, so a
-// bare 401 (Linear answers one with an empty body) would read as an unexplained failure, never as a
-// sign-in to make.
 function probeErrorMessage(e: unknown): string {
     const message = (e as Error).message
     const code = (e as { code?: unknown }).code

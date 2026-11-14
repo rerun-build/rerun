@@ -1,4 +1,3 @@
-// The four questions a new conversation with a coworker offers, on every client.
 export const COWORKER_STARTER_SUGGESTIONS = ['What can you help me with?', 'Summarize your recent work', 'Review my project files', 'What tools do you have access to?']
 
 export type TeamAgent = { id: string; name: string; handle: string | null; status: string; disabledAt: string | null }
@@ -15,8 +14,6 @@ export type TeamPulse = {
 
 export type TeamEmptyStateModel = { title: string; subtitle: string | null; pulse: TeamPulse | null; rows: TeamEmptyStateRow[] }
 
-// Every word of the empty state, in one place so a client can hand its own language. The texts sent
-// or prefilled are the user's own words to the Foreman, so they follow the same language.
 export type TeamEmptyStateCopy = {
     greeting: (firstName: string) => string
     greetingWithTeam: (greeting: string) => string
@@ -49,9 +46,6 @@ function mentionOf(agent: TeamAgent): string {
     return `@${agent.handle || agent.name}`
 }
 
-// What the Foreman opens on when the conversation is empty: a greeting, the team at a glance, and
-// three things to ask that send or prefill the composer. `nextRoutine` comes computed: reading cron
-// expressions is the caller's business.
 export function teamEmptyStateOf({ agents, nextRoutine, firstName, copy = ENGLISH_TEAM_EMPTY_STATE_COPY }: { agents: TeamAgent[]; nextRoutine: TeamPulse['nextRoutine']; firstName: string; copy?: TeamEmptyStateCopy }): TeamEmptyStateModel {
     const greeting = copy.greeting(firstName)
     const team = agents.filter(agent => !agent.disabledAt)

@@ -46,8 +46,6 @@ import { findModel } from '@/mocks/models'
 import { ThemeScope, useTheme } from '@/theme/theme'
 import { palette, radius, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: every piece of the app in both themes, and a door to each screen in each state. This is
-// where the design is judged before anything is wired to the API.
 const SIZES = [20, 44, 72]
 const SAMPLE_IDS = ['agent-scout', 'agent-inbox', 'agent-ledger', 'agent-pulse', 'agent-recap', 'cw-inbox']
 
@@ -221,7 +219,6 @@ const LAB_WORKSPACES: WorkspaceSummary[] = [
 ]
 const hitlProps = (toolCallId: string, input: Record<string, unknown>, kind: 'question' | 'approval' | 'secret' | 'takeover' = 'question', output?: unknown) => ({ pending: { kind, toolCallId, input, output }, agentId: 'agent-scout', coworkerName: 'Scout', webUrl: 'https://app.rerun.build', onAnswer: noop, onDismiss: noop })
 
-// The microphone records for real; the upload and the transcription take a beat, then nothing is sent.
 const LAB_VOICE: VoiceSender = {
     upload: () => new Promise(resolve => setTimeout(() => resolve('chat-uploads/lab-voice.m4a'), 1200)),
     transcribe: () => new Promise(resolve => setTimeout(() => resolve(MOCK_TRANSCRIPT), 1600)),

@@ -23,18 +23,13 @@ export type CoworkerSummary = { id: string; name: string; status: CoworkerStatus
 
 type CoworkerDetailsProps = {
     coworker: CoworkerSummary
-    // Null while on their way.
     files: CoworkerFiles | null
     apps: InstalledServiceView[] | null
     routines: RoutineView[] | null
-    // The caller's rule for this coworker in words, null while on its way.
     notifications: string | null
-    // What could not be read (a switched-off coworker, a Box that did not answer): its row stays empty.
     unavailable?: Partial<Record<'files' | 'apps' | 'routines', boolean>>
-    // Why the coworker's screen cannot be opened (switched off, no machine), or null when it can.
     computerUnavailable: string | null
     canDelete: boolean
-    // Whether the caller can change the coworker, and why not when they cannot.
     lock: ManageLock
     onBack: () => void
     onEdit: () => void
@@ -66,8 +61,6 @@ function routinesValue(routines: RoutineView[], t: DetailsTranslator): string {
     return t('routinesOn', { count: routines.filter(routine => routine.enabled).length })
 }
 
-// The coworker at a glance, from its conversation: what it made, what it is connected to, what runs on its own, its
-// screen, and what of it reaches you. Anything deeper stays on the web, or is asked in the chat.
 export function CoworkerDetails({ coworker, files, apps, routines, notifications, unavailable = {}, computerUnavailable, canDelete, lock, onBack, onEdit, onDelete, onFiles, onApps, onRoutines, onComputer, onNotifications }: CoworkerDetailsProps) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()

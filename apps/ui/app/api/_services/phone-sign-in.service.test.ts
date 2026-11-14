@@ -44,7 +44,6 @@ const sends = (client: FakeSupabase) => client.writes('phone_sign_in_sends').map
 const getUser = vi.fn()
 const verifyOtp = vi.fn()
 const TOKENS = { accessToken: 'access', refreshToken: 'refresh' }
-// generateLink answers for the account the address is filed under, whoever it turns out to be.
 const linkFor = (userId: string) => ({ data: { user: { id: userId }, properties: { hashed_token: 'hash' } }, error: null })
 const session = { auth: { getUser, verifyOtp } } as unknown as SupabaseClient<Database>
 
@@ -227,7 +226,6 @@ describe('completePhoneSignIn', () => {
 
         expect(await completePhoneSignIn(session, PHONE, '123456', 'sms')).toEqual({ ok: true, created: true, session: TOKENS })
         expect(admin.generateLink).toHaveBeenCalledWith({ type: 'magiclink', email: PLACEHOLDER })
-        // Without its verified row, the phone wall would rise again on the account it just opened.
         expect(supabase.writes('user_phones').map(write => write.payload)).toEqual([{ user_id: 'user-3', phone: PHONE, channel: 'sms', verified_at: STAMP, contact_consent_at: STAMP }])
     })
 

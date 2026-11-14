@@ -1,7 +1,4 @@
 export const COMPACTION_TRIGGER_RATIO = 0.75
-// The window alone is a poor trigger on an API model: a 922k tier would carry 690k tokens of
-// history before its first summary, and every step pays that history again. A CLI keeps the ratio,
-// its window is already the plan's allowance, far below the model's.
 export const COMPACTION_MAX_TRIGGER_TOKENS = 150_000
 export const COMPACTION_TAIL_TOKEN_BUDGET = 20_000
 export const COMPACTION_SUMMARY_TOKENS_CEILING = 12_000

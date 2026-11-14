@@ -23,14 +23,12 @@ type SuggestionMenuOptions = {
     pluginKey: PluginKey
     char: string
     allowSpaces?: boolean
-    // Null lets the trigger follow any character, as `[[` does mid-word.
     allowedPrefixes?: string[] | null
     items: (query: string) => MenuItem[]
     onState: (state: MenuState | null) => void
     onKeyDown: (event: KeyboardEvent) => boolean
 }
 
-// The popup itself is React state in the editor: the callbacks here only report what to show.
 export function suggestionMenu({ name, pluginKey, char, allowSpaces = false, allowedPrefixes = [' '], items, onState, onKeyDown }: SuggestionMenuOptions) {
     return Extension.create({
         name,
@@ -63,7 +61,6 @@ export function suggestionMenu({ name, pluginKey, char, allowSpaces = false, all
 type SuggestionMenuProps = {
     state: MenuState
     index: number
-    // Where the popup is anchored: the caret, relative to the box the menu is positioned in.
     position: { top: number; left: number }
     emptyLabel: string
     onHover: (index: number) => void

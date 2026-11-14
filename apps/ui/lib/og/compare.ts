@@ -1,6 +1,3 @@
-// Kept in step with `COMPARE_SLUGS` in cloud/apps/landing/components/compare/paths.ts: the slug is the
-// public URL of the page the card is shared for. A mark that is already an app icon fills its tile,
-// a bare glyph sits inside it.
 export type CompareOgCompetitor = { slug: string; title: string; mark: string; glyph?: boolean }
 
 const mark = (file: string) => `/og/competitors/${file}`

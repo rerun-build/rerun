@@ -1,9 +1,6 @@
 import type { LanguageModelMiddleware } from 'ai'
 import { logger } from '../lib/logger.js'
 
-// A model sometimes types a tool call as text in the legacy XML format instead of making it, then
-// goes on to write its result, the user's answers included. Nothing reached the user, and the
-// history replayed on the next turn would hold answers they never gave.
 export const FAKE_TOOL_CALL_MARKERS = ['<function_calls>', '<function_results>'] as const
 
 const FENCE = /^\s*```/
@@ -18,14 +15,8 @@ const couldOpenFakeCall = (line: string): boolean => {
     return FAKE_TOOL_CALL_MARKERS.some(marker => marker.startsWith(start))
 }
 
-// `released` counts the characters of the current line already sent: a line partly out can no
-// longer open a fake call. `gap` is trailing whitespace held back so a cut leaves none behind.
 type LineState = { line: string; released: number; inFence: boolean; gap: string }
 
-// Cuts one model call's text at the first fake call, delta by delta. A marker only counts at the
-// start of a line and outside a code fence, so a coworker writing about the format keeps its text.
-// Only the start of a line that could still become a marker is held back. Once a marker shows up,
-// every later text of the call goes too: it is written as if the user had answered.
 export class FakeToolCallSplitter {
     private readonly states = new Map<string, LineState>()
     private cut = false

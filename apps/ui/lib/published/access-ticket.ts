@@ -1,10 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-// A published page lives on its own `<slug>.rerun.site` origin, which never sees the app's session.
-// Whoever passes its gate gets a signed grant instead: the app hands it over in a ticket (a minute,
-// in the URL), and the page's host trades the ticket for a cookie that only that host holds.
-// `v` is the access version of the link: changing who may open it bumps it, and every cookie
-// granted before stops opening the page.
 export type AccessGrant = 'member' | 'password' | 'invite' | 'shot'
 
 export type AccessClaims = { slug: string; v: number; grant: AccessGrant; sub: string; exp: number }
@@ -30,8 +25,6 @@ function seal(kind: Kind, claims: Omit<AccessClaims, 'exp'>, ttlMs: number): str
     return `${payload}.${sign(payload)}`
 }
 
-// Null for anything that is not a live token of this kind for this slug: a ticket never opens as a
-// cookie, nor a cookie of another page as this one's.
 function unseal(kind: Kind, raw: string | null | undefined, slug: string): AccessClaims | null {
     const [payload, signature] = (raw ?? '').split('.')
     if (!payload || !signature) return null

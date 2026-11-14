@@ -1,6 +1,3 @@
-// The shape of every human-in-the-loop tool call the engine can pause on, read back from the raw
-// tool input. Lives here because the web chat and the iOS one both parse it, and because the
-// strings sent back are a protocol the agent reads: two wordings would be two protocols.
 import { appendAttachmentsRef, attachmentDisplayName, buildAttachmentsRef, parseAttachments } from './chat-attachments.js'
 import { stripBridgePrefix, toolNameOf } from './chat-tool-name.js'
 import type { TakeoverResult } from './desktop.js'
@@ -33,7 +30,6 @@ export type TakeoverRequest = { url: string; reason: string }
 
 export type McpSignInRequest = { name: string; reason?: string }
 
-// A spend request is the coworker asking to spend Rerun credit on paid data, priced by the hub.
 export type SpendRequest = { purpose: string; soFar?: string }
 
 export type SpendDecision = { purpose: string; decision: 'approved' | 'declined'; always?: boolean }
@@ -54,8 +50,6 @@ export function hitlKindOf(toolName: string): HitlKind | null {
     return HITL_TOOL_NAMES[stripBridgePrefix(toolName) as keyof typeof HITL_TOOL_NAMES] ?? null
 }
 
-// What the run is resumed with when the user closes a block instead of answering it. The agent
-// reads these, so both surfaces have to send the very same sentence.
 export const HITL_CANCELLED = {
     question: '[User dismissed the questions without answering]',
     secret: '[User declined to provide the credentials]',
@@ -74,7 +68,6 @@ function coerceJsonArray(value: unknown): unknown {
 }
 
 const HITL_INPUT_KEYS: Record<HitlKind, string[]> = {
-    // The singular keys are the legacy shapes persisted before these tools took batches.
     question: ['questions', 'question'],
     approval: ['approvals', 'action'],
     secret: ['secrets'],
@@ -84,9 +77,6 @@ const HITL_INPUT_KEYS: Record<HitlKind, string[]> = {
     spend: ['purpose', 'calls'],
 }
 
-// A rejected tool call reaches the UI with its input stripped, and the forms below would then render
-// their placeholders: an empty question card the user cannot answer. Better to fall through to the
-// regular tool step, which at least shows what went wrong.
 export function hitlInputIsUsable(kind: HitlKind, input: Record<string, unknown>): boolean {
     return HITL_INPUT_KEYS[kind].some(key => input[key] !== undefined && input[key] !== null)
 }
@@ -122,9 +112,6 @@ export function pendingQuestions(input: Record<string, unknown>): QuestionItem[]
     return [toQuestionItem(input.question, Array.isArray(input.options) ? input.options : input.suggestions, input.multiple)]
 }
 
-// An option written as an object (a label with its description) is the first ask_user shape an iOS
-// build that shipped before it cannot draw: it would hand the object to a text node. The server
-// stamps such a call v2 on its way to every client, since the model never writes `v` itself.
 const QUESTION_OPTIONS_VERSION = 2
 
 function questionsCarryOptionObjects(input: Record<string, unknown>): boolean {
@@ -147,8 +134,6 @@ export function withHitlVersion<T>(toolName: string | undefined, input: T): T {
 
 export type QuestionAnswer = { question: string; answers: string[]; attachments?: string[] }
 
-// Each block names its own files so the agent knows which answer they belong to, while the paths
-// travel once in the trailing marker, which is what renders them as tiles in the bubble.
 export function serializeAnswers(answers: QuestionAnswer[]): string {
     const blocks = answers.map(a => {
         const values = a.answers.map(value => value.trim()).filter(Boolean)
@@ -175,7 +160,6 @@ export function pendingApprovals(input: Record<string, unknown>): ApprovalItem[]
         })
     }
 
-    // Read compatibility for approval calls persisted before request_approval accepted batches.
     return [
         {
             action: String(input.action ?? 'The coworker requests approval'),
@@ -230,7 +214,6 @@ const TAKEOVER_SAVED = 'Whatever I did there is saved in your browser profile.'
 const TAKEOVER_CLOSED = 'The window is closed: open the page again with computer_open_app when you were working on your screen, with browser_navigate otherwise, and check what it shows before you go on.'
 const TAKEOVER_LEFT_OPEN = 'The window is still open on your screen, on that page: take a screenshot to see where it stands before you go on. browser_navigate reads in that same window.'
 
-// The page the browser was on tells the agent whether the wall was passed, without it having to ask.
 export function serializeTakeoverResult({ url, open }: TakeoverResult): string {
     return `${TAKEOVER_HEADER}\n${url ? `I left your browser on ${url}` : 'I closed your browser.'}\n\n${TAKEOVER_SAVED} ${url && open ? TAKEOVER_LEFT_OPEN : TAKEOVER_CLOSED}`
 }
@@ -242,20 +225,14 @@ export function parseTakeoverResult(text: string): { url: string | null } | null
     return match ? { url: match[1] ?? null } : null
 }
 
-// Resumes the run with the names of the variables that were filled, never a value: the
-// credentials go straight to the engine's agent .env and must not reach the conversation.
 export function serializeSecretResult(secrets: SecretRequestItem[], providedKeys: string[]): string {
     const provided = new Set(providedKeys)
     const lines = secrets.map(item => `- ${item.key}: ${provided.has(item.key) ? 'provided (stored as a coworker variable)' : 'skipped'}`)
     return `Credential setup result:\n${lines.join('\n')}\n\nReference a provided variable as \${KEY} in an MCP server config (headers, url, env, args) or in a command. Never ask for the value itself: it is not available to you.`
 }
 
-// A reset the user walked away from is not the same as never touching the connector: the agent
-// must not read it as "the user declined this one".
 export type ServiceSetupOutcome = 'connected' | 'skipped' | 'reset' | 'not-found'
 
-// `replaces` is the name of the app the agent asked for when the user picked an alternative in its
-// place, so the agent knows to work with the other app rather than wait for the one it named.
 export function serializeServiceSetupResult(entries: { slug: string; name: string; outcome: ServiceSetupOutcome; replaces?: string }[]): string {
     const lines = entries.length === 0 ? ['- (no apps suggested)'] : entries.map(entry => {
         if (entry.outcome === 'not-found') return `- ${entry.slug}: not found in the catalog`
@@ -275,9 +252,6 @@ type HitlPart = { type: string; toolCallId?: string; toolName?: string; input?: 
 
 export type PendingHitl = { kind: HitlKind; toolCallId: string; input: Record<string, unknown>; output: unknown }
 
-// The question, approval, secret... the agent stopped on, when the transcript ends on one: the last
-// HITL call of the closing assistant message. Shared by the web and the app chat. The caller still
-// rules out a live stream and a session already idle, whose block was closed.
 export function findPendingHitl(messages: readonly { role: string; parts: readonly unknown[] }[], dismissedCallId: string | null = null): PendingHitl | null {
     const last = messages[messages.length - 1]
     if (!last || last.role !== 'assistant') return null
@@ -286,24 +260,15 @@ export function findPendingHitl(messages: readonly { role: string; parts: readon
         const toolName = part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : '')
         const kind = hitlKindOf(toolName)
         if (!kind || !part.toolCallId) continue
-        // A call rejected by input validation keeps its payload in `rawInput`, the AI SDK moving it
-        // out of `input`. Recover it so the form still holds the real questions, and skip the call
-        // entirely when nothing usable is left.
         const input = (part.input ?? part.rawInput ?? {}) as Record<string, unknown>
         if (!hitlInputIsUsable(kind, input)) return null
         if (part.toolCallId === dismissedCallId) return null
-        // A spend the hub could not price never reached the user: the coworker read the error instead.
         if (kind === 'spend' && !readSpendQuote(part.output)) return null
         return { kind, toolCallId: part.toolCallId, input, output: part.output }
     }
     return null
 }
 
-// How a HITL input grows without stranding a client that shipped earlier, the iOS app above all,
-// which only updates when its users do: a field is never removed nor given another meaning, and a
-// shape a client could not read the old way takes a new version in `v` (absent means 1). A client
-// draws the versions it knows and, past them, shows what is asked as text to be answered in its
-// composer.
 export function hitlVersionOf(input: Record<string, unknown>): number {
     const version = input.v
     return typeof version === 'number' && Number.isInteger(version) && version > 0 ? version : 1
@@ -311,9 +276,6 @@ export function hitlVersionOf(input: Record<string, unknown>): number {
 
 export type UnknownPendingCall = { toolCallId: string; toolName: string; input: Record<string, unknown> }
 
-// The tool call the closing assistant message stopped on, still without a result, when it is no HITL
-// this client knows: one an engine newer than the client pauses on. A run that died mid-call ends the
-// same way, so the caller only asks once the session says it waits on a human.
 export function findUnknownPendingCall(messages: readonly { role: string; parts: readonly unknown[] }[]): UnknownPendingCall | null {
     const last = messages[messages.length - 1]
     if (!last || last.role !== 'assistant') return null
@@ -332,10 +294,6 @@ export type PendingAlert = { toolCallId: string | null; message: string }
 
 const ALERT_FALLBACK_MESSAGE = 'The coworker sent you a notification.'
 
-// The notification the session is waiting on: the last `notify_user` raised with kind `info`. It is
-// not necessarily the last tool call, since it does not stop the run. The status in the database is
-// what decides whether one is pending, so a transcript that no longer holds the call (history
-// trimmed, notification raised in an earlier run) still gets a block to acknowledge.
 export function findPendingAlert(messages: readonly { role: string; parts: readonly unknown[] }[]): PendingAlert {
     for (let i = messages.length - 1; i >= 0; i--) {
         const message = messages[i]
@@ -344,7 +302,6 @@ export function findPendingAlert(messages: readonly { role: string; parts: reado
             const part = message.parts[j] as { type: string; toolCallId?: string; toolName?: string; input?: unknown }
             if (typeof part?.type !== 'string' || toolNameOf(part) !== 'notify_user') continue
             const input = (part.input ?? {}) as Record<string, unknown>
-            // `kind` defaults to `info` in the tool schema, so a call that left it out is one of these.
             if ((input.kind ?? 'info') !== 'info') continue
             return { toolCallId: part.toolCallId ?? null, message: typeof input.message === 'string' && input.message.trim() ? input.message : ALERT_FALLBACK_MESSAGE }
         }
@@ -361,10 +318,6 @@ export function serializeApprovalDecisions(decisions: ApprovalDecision[]): strin
 
     return `Here are my approval decisions:\n\n${blocks.join('\n\n')}\n\nPerform only the approved actions. Do not perform any declined action or attempt any workaround to achieve the same result.`
 }
-
-// The replies above, read back so the thread can draw what the user decided instead of the prose
-// written for the agent. Each parser only accepts the exact shape its serializer writes: anything
-// else is something the user typed, and stays a bubble.
 
 const SERVICE_RESULT = /^App setup result:\n([\s\S]*)\n\nPlease continue\.$/
 const SERVICE_SUFFIXES: [string, ServiceSetupOutcome][] = [
@@ -388,7 +341,6 @@ function parseServiceLine(line: string): ServiceSetupEntry | null {
     return replaced ? { name: replaced[1], outcome, replaces: replaced[2] } : { name: label, outcome }
 }
 
-// A `not-found` entry carries the slug the agent asked for, since the catalog had no name for it.
 export function parseServiceSetupResult(text: string): ServiceSetupEntry[] | null {
     const match = SERVICE_RESULT.exec(text.trim())
     if (!match) return null
@@ -398,7 +350,6 @@ export function parseServiceSetupResult(text: string): ServiceSetupEntry[] | nul
 }
 
 const SECRET_RESULT = /^Credential setup result:\n([\s\S]*)\n\nReference a provided variable as/
-// Transcripts written before the copy said "coworker" still carry "an agent variable".
 const SECRET_LINE = /^- (\S+): (provided \(stored as (?:an agent|a coworker) variable\)|skipped)$/
 
 export function parseSecretResult(text: string): { key: string; provided: boolean }[] | null {
@@ -443,8 +394,6 @@ export function serializeSpendDecision({ purpose, decision, always }: SpendDecis
     return `${head}${always ? `\n${SPEND_ALWAYS_LINE}` : ''}\n\n${SPEND_APPROVED_NEXT}`
 }
 
-// A decline written between 14 and 22 October 2026 could carry a reason, up to the blank line before
-// the closing instruction: still read as a decline, the reason left out.
 const SPEND_RESULT = /^Spend decision: \*\*(APPROVED|DECLINED)\*\* — ([^\n]*)(?:\nReason: [\s\S]*?)?(\nAlways allowed: paid data tools no longer ask for this coworker\.)?\n\n(?:Go on with the paid calls|Do not call any paid data tool)/
 
 export function parseSpendDecision(text: string): SpendDecision | null {
@@ -459,8 +408,6 @@ const ANSWERS_HEADER = 'Here are my answers:\n\n'
 const QUESTION_LINE = /^\*\*(.+)\*\*$/
 const ATTACHED_LINE = /^Attached: (.+)$/
 
-// A block starts at a bold line after a blank one. An answer typed with a line of its own in bold
-// would split there, which only costs that one answer its layout.
 export function parseAnswers(text: string): QuestionAnswer[] | null {
     const withFiles = parseAttachments(text)
     const body = (withFiles?.text ?? text).trim()

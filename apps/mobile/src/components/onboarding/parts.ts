@@ -1,10 +1,6 @@
 import { asRecord } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
-// Reading the onboarding conversation the hub streams: which cards it carries, what they hold and
-// how they were answered. Pure, the same reading as the web's widgets, so a card redraws from the
-// transcript alone after a relaunch.
-
 export const ONBOARDING_WIDGETS = ['ask_choice', 'ask_input', 'ask_either', 'show_starter_pack', 'show_plan', 'open_checkout', 'build_team'] as const
 
 export type OnboardingWidget = (typeof ONBOARDING_WIDGETS)[number]
@@ -28,8 +24,6 @@ export function widgetOf(part: { type: string }): WidgetPart | null {
     return { widget: name, toolCallId: loose.toolCallId, input: loose.input, output: loose.output, answered: loose.state === 'output-available' || loose.state === 'output-error' }
 }
 
-// The card the conversation is stopped on: the last message is the hub's and still carries one nothing
-// has answered. While it waits the composer steps aside, as on the web.
 export function pendingWidget(messages: UIMessage[]): WidgetPart | null {
     const last = messages.at(-1)
     if (!last || last.role !== 'assistant') return null
@@ -91,11 +85,8 @@ export type PlanAgent = { name: string; role: string; when: string; gets: string
 
 export type PlanBox = { name: string | null; agents: PlanAgent[] }
 
-// `title` is null when the assistant gave none: the card then reads its own default.
 export type ShownPlan = { title: string | null; boxes: PlanBox[] }
 
-// Grouped the way the web card groups it: the declared Boxes in their order, then an agent filed under a
-// Box nobody declared, so no agent ever drops off the card. A Box nobody works in has nothing to say.
 export function readPlan(input: unknown): ShownPlan {
     const args = asRecord(input)
     const entries = (Array.isArray(args.items) ? args.items : []).flatMap(row => {
@@ -118,8 +109,6 @@ export function readPlanOutput(output: unknown): PlanOutput | null {
     return value.answered === false ? { answered: false } : null
 }
 
-// What the trial card answers. The app never sells, so the only outcomes are a workspace that is on, one
-// whose trial is spent (the web takes it from there), and a hiccup the card retries.
 export type TrialOutput = { ok: true; status: 'entitled' } | { ok: false; reason: 'trial_refused' | 'dismissed' | 'pending' }
 
 export function readTrialOutput(output: unknown): TrialOutput | null {
@@ -133,8 +122,6 @@ export type BuildTaskStatus = 'queued' | 'running' | 'done' | 'error' | 'stopped
 
 export type BuildTask = { title: string; status: BuildTaskStatus }
 
-// The live progress of the build rides in `data-delegate` parts keyed on the build's call, each one the
-// whole list as it stands: the last one is the truth.
 export function buildTasks(message: UIMessage, toolCallId: string): BuildTask[] {
     const parts = message.parts as LoosePart[]
     const last = parts.filter(part => part.type === 'data-delegate' && part.id === toolCallId).at(-1)
@@ -157,7 +144,6 @@ export function readBuildResult(output: unknown): BuildResult | null {
     return { lead: asText(lead.agentId) ? { agentId: asText(lead.agentId), name: asText(lead.name) } : null, agents: Array.isArray(value.agents) ? value.agents.length : 0, failed }
 }
 
-// `[[foreman:start…]]` is the app opening the conversation, never something the person wrote.
 export function isKickoff(message: UIMessage): boolean {
     return message.role === 'user' && message.parts.some(part => part.type === 'text' && part.text.trim().startsWith('[[foreman:start'))
 }

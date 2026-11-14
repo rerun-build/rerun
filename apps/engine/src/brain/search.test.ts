@@ -6,8 +6,6 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-brain-search-'))
 process.env.RERUN_API_KEY = ''
 
-// A toy embedding: each axis is one meaning, so "how much do we charge" lands next to a section
-// about prices without sharing a single word with it.
 const embed = vi.hoisted(() => ({ down: false }))
 vi.mock('../memory/embed.js', () => ({
     embedText: async (text: string) => {

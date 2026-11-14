@@ -12,11 +12,8 @@ import { cn } from '@/lib/utils'
 
 import { arrivalGestures, gestureIndex, type ArrivalStep } from './flow'
 
-// `name` is what the headings call it: the coworker's own name when there is one to give.
 export type ArrivalPick = { title: string; name?: string; by?: string | null; image?: TemplateCardImage | null; connectors?: TemplateConnector[] }
 
-// What the visitor came for, carried on every screen until it is running: the one thing that tells
-// them this account, this card and this wait are all about what they picked.
 export function ArrivalPassport({ pick, className }: { pick: ArrivalPick; className?: string }) {
     const t = useTranslations('foreman.arrival')
     return (
@@ -56,7 +53,6 @@ export function GestureRail({ step, paid = false, className }: { step: ArrivalSt
     )
 }
 
-/** The top of the column for the whole arrival: where they are, what they picked, and what this step is for. */
 export function ArrivalHeader({ pick, step, paid, className }: { pick: ArrivalPick; step: ArrivalStep; paid?: boolean; className?: string }) {
     const t = useTranslations('foreman.arrival.headings')
     const name = pick.name ?? pick.title

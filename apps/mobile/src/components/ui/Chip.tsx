@@ -6,7 +6,6 @@ import { fonts, mix, radius } from '@/theme/tokens'
 
 export const CHIP_HEIGHT = 34
 
-// Port of packages/ui/src/primitives/chip.tsx.
 export function Chip({ label, onPress, selected = false }: { label: string; onPress: () => void; selected?: boolean }) {
     const theme = useTheme()
     return (

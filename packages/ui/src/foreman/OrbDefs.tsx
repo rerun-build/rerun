@@ -1,16 +1,10 @@
 import type { Ref } from 'react'
 
-/** Les dégradés et les flous du néon. Un seul jeu par instance : les ids sont préfixés. */
 export function OrbDefs({ uid, initialPath, pathRef, rimRef }: { uid: string; initialPath: string; pathRef: Ref<SVGPathElement>; rimRef: Ref<SVGLinearGradientElement> }) {
     return (
         <defs>
-            {/* Le contour est dessiné UNE fois et réutilisé par chaque couche du néon : la boucle
-                d'animation n'a qu'un seul `d` à réécrire par frame, quel que soit le nombre de
-                halos empilés. */}
             <path ref={pathRef} id={`${uid}-d`} d={initialPath} />
 
-            {/* La lumière qui court sur le liseré. Le dégradé tourne, la forme non : c'est ce qui
-                donne les reflets roses qui glissent sans faire tourner la bille. */}
             <linearGradient ref={rimRef} id={`${uid}-rim`} x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#ffdcf8" />
                 <stop offset="14%" stopColor="#ff7ae2" />
@@ -27,8 +21,6 @@ export function OrbDefs({ uid, initialPath, pathRef, rimRef }: { uid: string; in
                 <stop offset="100%" stopColor="#0a0322" />
             </radialGradient>
 
-            {/* L'épaisseur du verre, vue de l'intérieur : deux plis qui ne s'allument que sur un
-                quart du tour, sinon la bille redevient un anneau régulier. */}
             <linearGradient id={`${uid}-sheen`} x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
                 <stop offset="22%" stopColor="#f0e2ff" stopOpacity="0.85" />
@@ -50,8 +42,6 @@ export function OrbDefs({ uid, initialPath, pathRef, rimRef }: { uid: string; in
                 <stop offset="100%" stopColor="#d9b8ff" />
             </radialGradient>
 
-            {/* `userSpaceOnUse` sur toute la boîte : la région par défaut d'un filtre est la boîte de
-                l'objet + 10%, elle couperait net un flou de cette largeur. */}
             <filter id={`${uid}-bloom`} filterUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
                 <feGaussianBlur stdDeviation="2.6" />
             </filter>

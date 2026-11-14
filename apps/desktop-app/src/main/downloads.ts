@@ -13,11 +13,8 @@ function report(item: DownloadItem, id: string, state: DesktopDownloadEvent['sta
     getMainWindow()?.webContents.send(IPC_EVENTS.download, event)
 }
 
-// Every download (a link with `download`, a blob, an attachment the server sends) goes straight to
-// the Downloads folder, without a save dialog, as a browser does, and the web app shows its toast.
 export function trackDownloads(session: Session): void {
     session.on('will-download', (_event, item, contents) => {
-        // A window opened only to fetch a file (a data export) has nothing left to show.
         const opener = BrowserWindow.fromWebContents(contents)
         if (opener && opener !== getMainWindow() && !contents.navigationHistory.canGoBack()) item.once('done', () => opener.close())
         const id = randomUUID()

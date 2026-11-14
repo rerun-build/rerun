@@ -1,8 +1,5 @@
 import { listTriggers } from './loader.js'
 
-// Neither the token nor the call count is here: this index goes into every system prompt, where the
-// token would end up in every transcript and every prompt cache, and the count would move the
-// cached prefix on every call. The agent reads both with trigger_get.
 export async function buildTriggerIndex(agentId: string): Promise<string> {
     const triggers = (await listTriggers(agentId)).filter(t => t.enabled).sort((a, b) => a.slug.localeCompare(b.slug))
     if (triggers.length === 0) return ''

@@ -10,17 +10,14 @@ import { cn } from '@/lib/utils'
 import { useState } from 'react'
 
 type MessageAttachmentsProps = {
-    /** Absent on read-only transcripts rendered outside a Box: tiles then stay inert. */
     agentId?: string
     paths: readonly string[]
-    /** Where the bytes come from when they are not a Box's: the foreman's bucket, the design lab. */
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     align?: 'start' | 'end'
     className?: string
 }
 
-/** Files the user sent with a message, shown as thumbnails above the bubble and opening in a lightbox. */
 export function MessageAttachments({ agentId, paths, rawUrlFor, readFile, align = 'end', className }: MessageAttachmentsProps) {
     const [openIndex, setOpenIndex] = useState<number | null>(null)
     const rawUrl = rawUrlResolver(agentId, rawUrlFor)

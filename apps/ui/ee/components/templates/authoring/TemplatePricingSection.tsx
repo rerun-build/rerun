@@ -16,9 +16,6 @@ import { useTemplateAuthoring } from '@/components/templates/authoring/actions-c
 import { EnumSelect } from '@/components/templates/authoring/EnumSelect'
 import { PricePayoutPreview } from './PricePayoutPreview'
 
-// The form holds cents, the input holds a string. Deriving the text from the number would make a
-// trailing dot or a leading zero impossible to type, so the two are kept side by side and only the
-// number is authoritative.
 function centsToText(cents: number): string {
     if (!cents) return ''
     return cents % 100 === 0 ? String(cents / 100) : (cents / 100).toFixed(2)
@@ -43,7 +40,6 @@ export function TemplatePricingSection() {
     const changeModel = (next: TemplatePricingModel) => {
         setValue('pricingModel', next, { shouldDirty: true })
         if (next !== 'free') return
-        // A free template carries no amount, and the schema refuses one.
         setAmountText('')
         setValue('priceAmountCents', 0, { shouldDirty: true })
     }

@@ -1,4 +1,3 @@
-// No 'server-only': the subscriber trial sweep reaches this from Trigger.dev.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AddonQuantities } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
@@ -14,8 +13,6 @@ type WorkspaceAppInsert = Database['public']['Tables']['workspace_apps']['Insert
 type WorkspaceAppUpdate = Database['public']['Tables']['workspace_apps']['Update']
 type ConnectionUpdate = Database['public']['Tables']['app_connections']['Update']
 
-// Pauses this module puts on and takes off as slots come and go. A pause for a LinkedIn limit is
-// not its business.
 export const SLOT_PAUSE_REASONS = ['slots', 'trial_payment_failed'] as const
 
 export function subscriberTrialOpen(app: { trial_ends_at: string | null; trial_settled_at: string | null } | null | undefined): boolean {
@@ -45,7 +42,6 @@ async function syncAppSlots(supabase: Client, workspaceId: number, slug: AppSlug
     const { data: connections } = await selectMany(supabase, 'app_connections', APP_CONNECTION_COLUMNS, { workspace_id: workspaceId, app_slug: slug, status: [...SLOT_HOLDING_STATUSES] })
     const holding = connections ?? []
 
-    // A slot bought back lifts the pause it had put on, oldest account first.
     const pausedForSlots = holding.filter(connection => connection.status === 'paused' && (SLOT_PAUSE_REASONS as readonly string[]).includes(connection.pause_reason ?? ''))
     const running = holding.length - pausedForSlots.length
     const toResume = [...pausedForSlots].sort((a, b) => a.created_at.localeCompare(b.created_at)).slice(0, Math.max(0, allowed - running))
@@ -57,8 +53,6 @@ async function syncAppSlots(supabase: Client, workspaceId: number, slug: AppSlug
         if (error) throw new Error(error.message)
     }
 
-    // A slot given back lands at the renewal; whatever it no longer covers then is paused, never
-    // deleted, so buying the slot again puts it straight back.
     if (!periodAdvanced) return
     const resumed = new Set(toResume.map(connection => connection.id))
     const occupying = holding.filter(connection => !pausedForSlots.includes(connection) || resumed.has(connection.id))
@@ -76,10 +70,6 @@ async function syncAppSlots(supabase: Client, workspaceId: number, slug: AppSlug
     })
 }
 
-/**
- * Called by the Stripe webhook with the add-on quantities it just read off the subscription.
- * `periodAdvanced` is what lets a decrease land, exactly like the held limits of max_agents.
- */
 export async function syncWorkspaceAppSlots(supabase: Client, workspaceId: number, quantities: AddonQuantities, { periodAdvanced }: { periodAdvanced: boolean }): Promise<void> {
     for (const slug of APP_SLUGS) {
         await syncAppSlots(supabase, workspaceId, slug, quantities[appDefinition(slug).addonKey], periodAdvanced)

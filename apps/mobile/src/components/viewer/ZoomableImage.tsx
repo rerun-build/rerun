@@ -11,19 +11,12 @@ const DISMISS_DISTANCE = 120
 type ZoomableImageProps = {
     uri: string
     headers?: Record<string, string>
-    // Off screen in the pager: its zoom resets so the page comes back whole.
     active: boolean
     onZoomChange: (zoomed: boolean) => void
     onDismiss: () => void
-    // How far the page is dragged down, for the backdrop to fade with it.
     onDrag: (progress: number) => void
 }
 
-/**
- * One photo of the viewer: pinch or double-tap to zoom, drag to look around once zoomed, drag down
- * to close while it is not. Paging between photos is the pager's, which only scrolls while the photo
- * is at its own size.
- */
 export function ZoomableImage({ uri, headers, active, onZoomChange, onDismiss, onDrag }: ZoomableImageProps) {
     const { width, height } = useWindowDimensions()
     const scale = useSharedValue(1)
@@ -70,7 +63,6 @@ export function ZoomableImage({ uri, headers, active, onZoomChange, onDismiss, o
             settle(scale.value)
         })
 
-    // Zoomed in, a drag moves the photo; at its own size, a vertical drag takes it away.
     const pan = Gesture.Pan()
         .activeOffsetY([-12, 12])
         .failOffsetX([-24, 24])
@@ -97,7 +89,6 @@ export function ZoomableImage({ uri, headers, active, onZoomChange, onDismiss, o
             runOnJS(onDrag)(0)
         })
 
-    // Once zoomed, a horizontal drag also moves the photo rather than paging.
     const zoomedPan = Gesture.Pan()
         .manualActivation(true)
         .onTouchesMove((_, manager) => {

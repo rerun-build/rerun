@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { AGENT_SHARE_INCLUDE_NONE, agentShareIncludeSchema, resolveShareInclude, shareContents, shareExcludePaths, type AgentArchivePlan } from '@rerun/contracts'
 
-// The exclusion policy is the whole security argument of a share link: an agent leaves one person's
-// box for another's, and what the tarball carries is decided here and nowhere else.
-
 function entry(path: string, over: Partial<AgentArchivePlan['files'][number]> = {}): AgentArchivePlan['files'][number] {
     return { path, bytes: 100, flagged: [], defaultExcluded: false, note: '', ...over }
 }
@@ -74,14 +71,11 @@ describe('shareContents', () => {
         expect(shareContents(PLAN)).toEqual({
             memories: { count: 2, bytes: 200 },
             database: { count: 1, bytes: 4096 },
-            // `workspace/.env.backup` is flagged and `services.json` is not data, so neither counts.
             files: { count: 1, bytes: 100 },
         })
     })
 })
 
-// The other half of the same argument: what a caller who is not the dialog gets when it says
-// nothing. The MCP tools parse `include` through here.
 describe('resolveShareInclude', () => {
     it('sends nothing when nothing is named', () => {
         expect(resolveShareInclude(undefined)).toEqual(AGENT_SHARE_INCLUDE_NONE)

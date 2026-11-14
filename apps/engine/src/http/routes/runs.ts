@@ -33,9 +33,6 @@ runRoutes.post('/:rid/cancel', async c => {
     const aborted = abortRun(rid)
     if (run.status === 'running') {
         await cancelRun(agentId, rid)
-        // When the run loop is still there it announces its own end. When it is not -- the process
-        // restarted, or the row outlived its loop -- nobody would ever tell the hub, and the
-        // conversation would stay "working" on the dashboard with no way back.
         if (!aborted) {
             await emitRunTerminal({
                 agentId,

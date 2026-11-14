@@ -11,7 +11,6 @@ type CreditTone = 'ok' | 'low' | 'out'
 
 const LOW_SHARE = 0.15
 
-// `!` because the menu item forces its children to the accent colour on focus, which would wash the warning out.
 const TONE_TEXT: Record<CreditTone, string> = { ok: 'text-foreground', low: 'text-destructive!', out: 'text-destructive!' }
 
 function toneOf(leftMicros: number, wholeMicros: number): CreditTone {
@@ -19,8 +18,6 @@ function toneOf(leftMicros: number, wholeMicros: number): CreditTone {
     return leftMicros / wholeMicros < LOW_SHARE ? 'low' : 'ok'
 }
 
-// The Rerun credit at a glance in the workspace menu: coworkers spend it without asking, so what is
-// left has to be one click away. The split by AI and paid data stays in the billing dialog.
 export function CreditMeter({ usedMicros, wholeMicros, trial, onOpen, onAdd }: { usedMicros: number; wholeMicros: number; trial: boolean; onOpen: () => void; onAdd?: () => void }) {
     const locale = useLocale()
     const t = useTranslations('billing')

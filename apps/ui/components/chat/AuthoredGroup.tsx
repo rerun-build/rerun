@@ -11,10 +11,6 @@ const asIs = (path: string) => path
 
 const firstNameOf = (author: AuthorProfile) => (author.id === FORMER_MEMBER.id ? author.name : author.name.split(' ')[0])
 
-/**
- * Consecutive messages one person sent, signed once by their avatar at the foot of the group.
- * A `null` author is one not resolved yet: the avatar's place is held so the bubbles never shift.
- */
 export function AuthoredGroup({ author, children }: { author: AuthorProfile | null; children: ReactNode }) {
     return (
         <div className="flex items-end gap-2">

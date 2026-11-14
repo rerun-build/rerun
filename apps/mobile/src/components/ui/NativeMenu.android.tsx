@@ -17,19 +17,13 @@ export type { MenuBadge, MenuIcon } from '@/components/ui/menu-types'
 
 const GLYPH = 18
 const BADGE = 22
-// A Compose host clips to its bounds: the trigger sits inset by this much so its shadow is not cut,
-// and the host gives the room back with a negative margin so the layout does not move.
 const SHADOW_ROOM = 8
 
-// A single-line row as tall as an iOS menu row; Compose's default (48 dp) read as too tall.
 const ROW_HEIGHT = 44
 const NESTED_INDENT = spacing.lg
 
-// A row closes the menu it sits in before it runs its action, as a system menu does.
 const CloseMenu = createContext<() => void>(() => {})
 
-// `iconColumn`: some row of the menu has an icon, so a row without one keeps the column empty and its
-// label lines up with the others. `depth`: how many submenus the row is unfolded in.
 const RowLayout = createContext({ iconColumn: false, depth: 0 })
 
 function someRowHasIcon(rows: ReactNode): boolean {
@@ -45,9 +39,6 @@ function useRowModifiers({ singleLine }: { singleLine: boolean }) {
     return [...(singleLine ? [height(ROW_HEIGHT)] : []), ...(depth > 0 ? [padding(NESTED_INDENT * depth, 0, 0, 0)] : [])]
 }
 
-// Each opening mounts the rows afresh, so a submenu unfolded last time is folded again. A menu opened over
-// the keyboard leaves it the focus (see AnchoredMenu): the back gesture then reaches the app, which
-// closes the menu.
 function useMenuState() {
     const [open, setOpen] = useState(false)
     const [openings, setOpenings] = useState(0)
@@ -68,11 +59,6 @@ function useMenuState() {
 
 type MenuState = ReturnType<typeof useMenuState>
 
-// The menu itself, anchored under `children` (above when the screen has no room below): Compose's
-// DropdownMenu on the theme's card, the app's font and icons, no Material look. The popup takes the focus,
-// so a tap outside only closes it, as on iOS, except over the keyboard: there it would take the focus
-// from the text field and close the keyboard without the screen hearing of it, the composer stranded
-// over an empty space.
 function AnchoredMenu({ menu, items, children }: { menu: MenuState; items: ReactNode; children: ReactElement }) {
     const theme = useTheme()
     return (
@@ -95,8 +81,6 @@ function AnchoredMenu({ menu, items, children }: { menu: MenuState; items: React
     )
 }
 
-// The iOS system menu's Android twin: a tap on `trigger` opens a menu anchored to it. TalkBack reads the
-// pressable around the trigger, not the trigger: it takes the trigger's label when the menu has none.
 export function NativeMenu({ trigger, children, glass, label }: NativeMenuProps) {
     const theme = useTheme()
     const menu = useMenuState()
@@ -145,7 +129,6 @@ function IconSpace() {
     )
 }
 
-// The row's icon, an empty column when another row has one, nothing in a menu without icons.
 function LeadingSlot({ children }: { children: ReactNode }) {
     const { iconColumn } = use(RowLayout)
     if (children) return <DropdownMenuItem.LeadingIcon>{children}</DropdownMenuItem.LeadingIcon>
@@ -196,7 +179,6 @@ export function MenuItem({ label, icon, subtitle, destructive = false, disabled 
     )
 }
 
-// A checked row: the check sits at the end, where Android menus put it.
 export function MenuToggle({ label, icon, badge, isOn, onChange }: MenuToggleProps) {
     const theme = useTheme()
     const close = use(CloseMenu)
@@ -222,7 +204,6 @@ export function MenuToggle({ label, icon, badge, isOn, onChange }: MenuTogglePro
     )
 }
 
-// A hairline, then the section's title in small muted type, then its rows.
 export function MenuSection({ title, children }: MenuSectionProps) {
     const theme = useTheme()
     return (
@@ -238,7 +219,6 @@ export function MenuSection({ title, children }: MenuSectionProps) {
     )
 }
 
-// Android menus do not cascade: a submenu is a row that unfolds its rows in place.
 export function SubMenu({ label, icon, children }: SubMenuProps) {
     const theme = useTheme()
     const [open, setOpen] = useState(false)
@@ -260,7 +240,6 @@ export function SubMenu({ label, icon, children }: SubMenuProps) {
     )
 }
 
-// A tap runs `onPress`, a long press opens the same anchored menu as NativeMenu.
 export function LongPressMenu({ onPress, label, items, children }: LongPressMenuProps) {
     const theme = useTheme()
     const menu = useMenuState()

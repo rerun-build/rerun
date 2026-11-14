@@ -11,7 +11,6 @@ import { requirePayoutReadyAccount } from './connect.service'
 import { confirmTemplateCheckoutSession, createTemplateCheckoutSession, NO_PLAN_ERROR } from './template-checkout.service'
 import { recordTemplatePurchase } from './template-purchase.service'
 
-// Rerun Cloud's marketplace, where a paid template has to be bought; the open source build gives every template away.
 vi.mock('@rerun/cloud/marketplace', async () => (await import('@/test/cloud-fakes')).CLOUD_MARKETPLACE)
 vi.mock('@/ee/lib/billing/stripe', async importOriginal => ({ ...(await importOriginal<typeof import('@/ee/lib/billing/stripe')>()), stripe: (await import('@/ee/test/stripe-fake')).fakeStripe() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -92,8 +91,6 @@ describe('createTemplateCheckoutSession', () => {
         await expect(createTemplateCheckoutSession('seo-team')).resolves.toEqual({ kind: 'checkout', url: 'https://checkout.stripe.test/cs_1' })
     })
 
-    // Decided: a workspace with an unpaid plan invoice settles it before it buys anything more, even
-    // though it keeps the rest of its plan for the grace period.
     it('refuses a template to a past_due workspace while it keeps the rest of its plan', async () => {
         subscriptionStatus = 'past_due'
         expect(isSubscriptionEntitled('past_due')).toBe(true)

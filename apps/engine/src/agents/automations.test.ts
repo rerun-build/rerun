@@ -76,9 +76,6 @@ describe('activateAutomations', () => {
         expect((await readTrigger(AGENT_ID, 'inbound')).enabled).toBe(true)
     })
 
-    // The platform switches an agent off when the plan has no slot left, or when a template
-    // subscription ends, and records the schedules it paused. Rallying them here would leave that
-    // record lying.
     it('does nothing at all for an agent the platform switched off', async () => {
         await writeSchedule('daily', 'name: Daily\ncron: 0 9 * * *\nenabled: false')
         await writeTrigger('inbound', 'name: Inbound\nenabled: false\ntoken: tok')

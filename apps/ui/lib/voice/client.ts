@@ -6,12 +6,10 @@ async function errorFrom(res: Response, fallback: string): Promise<Error> {
         const message = (payload as { error?: unknown }).error
         if (typeof message === 'string' && message) return new Error(message)
     } catch {
-        // A non-JSON body is the normal shape of a proxy-level rejection.
     }
     return new Error(fallback)
 }
 
-/** Drops the recording where the conversation keeps its files and returns the path to open it by. */
 export async function uploadVoiceRecording({ target, dir, name, blob }: { target: UploadTarget; dir: string; name: string; blob: Blob }): Promise<string> {
     const res = await fetch(uploadUrl(target, dir, name, blob.size), {
         method: 'POST',

@@ -10,8 +10,6 @@ type ParticipantInsert = Database['public']['Tables']['session_participants']['I
 type UserUpdate = Database['public']['Tables']['users']['Update']
 type SessionReadInsert = Database['public']['Tables']['session_reads']['Insert']
 
-// Who wrote in a conversation is who its notifications reach. Best-effort: a message that went out
-// must never fail because this bookkeeping did.
 export async function recordSessionParticipant(sessionId: string | null | undefined, userId: string | null | undefined): Promise<void> {
     if (!sessionId || !userId) return
     try {
@@ -24,7 +22,6 @@ export async function recordSessionParticipant(sessionId: string | null | undefi
     }
 }
 
-// Answering a conversation means its earlier results were read, even from a tab that never opened it.
 export async function recordSessionRead(sessionId: string | null | undefined, userId: string | null | undefined): Promise<void> {
     if (!sessionId || !userId) return
     try {
@@ -45,8 +42,6 @@ export async function writeNotificationPrefs(userId: string, prefs: Notification
     if (error) throw new Error(error.message)
 }
 
-// The author of a scheduled task or a trigger follows its coworker, unless they already decided:
-// a « Stop following » stays a stop. Best-effort, like the participant above.
 export async function followCoworker(userId: string | null | undefined, agentId: string | null | undefined): Promise<void> {
     if (!userId || !agentId) return
     try {
@@ -61,8 +56,6 @@ export async function followCoworker(userId: string | null | undefined, agentId:
     }
 }
 
-// A schedule or a trigger the coworker wrote during a chat names the member who asked for it. Checked
-// against the workspace, so a box can never make someone outside it follow anything.
 export async function followAuthorOfCreatedTask(workspaceId: number, event: EngineCreatedEvent): Promise<void> {
     const authorId = event.metadata?.authorId
     if (event.event === 'box.connection.connected' || typeof authorId !== 'string' || !event.agentId) return

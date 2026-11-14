@@ -4,10 +4,8 @@ import { skillProposalDecideRequestSchema, type SkillProposal } from '@rerun/con
 
 export const dynamic = 'force-dynamic'
 
-// The rules the coworker offered to remember in this conversation, with where each one stands.
 export const GET = apiRoute({ auth: 'member' }, async ({ params }): Promise<{ proposals: SkillProposal[] }> => ({ proposals: await listSkillProposalsAction(params.id) }))
 
-// Accepting only starts the writing: the row reads `accepted` until a later GET finds it settled.
 export const POST = apiRoute({ auth: 'member', body: skillProposalDecideRequestSchema }, async ({ params, body }): Promise<{ proposal: SkillProposal }> => {
     const decided = await decideSkillProposalAction(params.id, body.proposalId, body.decision)
     if (!decided.success || !decided.proposal) throw new ApiError(deniedStatus(decided.denied, 503), decided.error ?? 'Failed to update the proposal')

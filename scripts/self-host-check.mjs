@@ -1,9 +1,4 @@
 #!/usr/bin/env node
-// Checks `.env` before the first `docker compose up`: fills the secrets left empty, stops on what
-// only you can provide, saying where to find it, then asks Supabase whether the schema is in place
-// and the secret key is the right one.
-//
-//   node scripts/self-host-check.mjs
 
 import { randomBytes } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
@@ -61,8 +56,6 @@ console.log(`
   docker compose${/localhost:54421/.test(supabaseUrl) ? ' --profile local-supabase' : ''} up -d --build
   open ${appUrl}`)
 
-// The sign-in calls this function with the secret key before it sends any code, so it fails here the
-// same way the sign-in would, with "We could not send your code" and nothing in the logs.
 async function askSupabase(url, secretKey) {
     let response
     try {
@@ -79,7 +72,6 @@ async function askSupabase(url, secretKey) {
     const body = await response.json().catch(() => ({}))
     if (body.code === 'PGRST202') return `The database has no Rerun schema yet. Apply it, then run this check again:\n  ${schemaCommand(url)}`
     const notThisProject = 'SUPABASE_SECRET_KEY is not a key of this Supabase project: copy the secret (service_role) key from Supabase > Project settings > API keys'
-    // An unknown `sb_secret_` key is served as anon by some gateways, so it is refused like the anon key.
     if (body.code === '42501') return secretKey.startsWith('sb_secret_') ? notThisProject : 'SUPABASE_SECRET_KEY holds the publishable (anon) key: put the secret (service_role) key there, from Supabase > Project settings > API keys'
     if (response.status === 401 || response.status === 403) return notThisProject
     return `Supabase answered ${response.status}: ${body.message ?? 'no detail'}`

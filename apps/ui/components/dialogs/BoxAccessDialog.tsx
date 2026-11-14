@@ -15,8 +15,6 @@ import { toast } from 'sonner'
 
 type Result = { ok: true } | { ok: false; error: string }
 
-// Who can use a Box, and so every coworker in it. Admin only: the menu that opens it is disabled for
-// a member, and every action refuses one anyway.
 export function BoxAccessDialog({ spaceId, boxName, open, onOpenChange }: { spaceId: string | null; boxName?: string | null; open: boolean; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('dialogs.boxAccess')
     const errorText = useErrorText()

@@ -75,7 +75,6 @@ describe('automationModel', () => {
         expect(warn).not.toHaveBeenCalled()
     })
 
-    // A silent swap changes both the bill and the quality of the answer, so it has to be visible.
     it('warns with what was asked and what runs instead when it falls back', async () => {
         await ensureRerunConnection()
         const claude = await connect('claude', {})

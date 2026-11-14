@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ForemanState } from './phase'
 
-// The foreman_builds row of one workspace, with the semantics of claimBuild: free when absent or
-// finished, taken while a build runs, released only by the claim that holds it.
 let row: { finished: boolean; result: unknown; claimedAt?: string } | null = null
 let claims = 0
 const claimBuild = vi.fn(async () => {

@@ -55,9 +55,6 @@ const planSelectionSchema = z.object({
     interval: z.enum(BILLING_INTERVALS),
 })
 
-// What an embedded checkout ended up doing to the workspace. The widget polls this beside the
-// realtime workspace row: the row is faster when the webhook lands, this is the one that can say
-// "the trial was refused" rather than leaving the widget waiting forever.
 export async function readCheckoutOutcomeAction(sessionId: string): Promise<{ ok: true; outcome: CheckoutOutcome } | ActionFailure> {
     try {
         const outcome = await readCheckoutOutcome(z.string().trim().min(1).max(200).parse(sessionId))
@@ -67,8 +64,6 @@ export async function readCheckoutOutcomeAction(sessionId: string): Promise<{ ok
     }
 }
 
-// The trial the cardless arm of the trial test starts from the offer card, without a card. `entitled:
-// false` is not an error: the workspace simply goes through the card checkout instead.
 export async function startTrialAction(): Promise<{ ok: true; entitled: boolean } | ActionFailure> {
     try {
         await requireBillingAdmin()
@@ -78,9 +73,6 @@ export async function startTrialAction(): Promise<{ ok: true; entitled: boolean 
     }
 }
 
-// What follows a completed setup session: the card is attached to the subscription, and a pay-now
-// session converts the trial on the spot, while a card-only one leaves the trial running. The
-// session id comes from the client, so the session must prove it belongs to the caller.
 export async function confirmCardSetupAction(sessionId: string): Promise<{ ok: true } | ActionFailure> {
     try {
         const { workspace } = await requireBillingAdmin()
@@ -102,9 +94,6 @@ export async function confirmCardSetupAction(sessionId: string): Promise<{ ok: t
 
 
 
-// Live subscription state for the billing dialog: paid add-on quantities plus any
-// downgrade pending until the next renewal. null when the workspace has no plan
-// subscription yet.
 export async function getSubscriptionStateAction(): Promise<{ ok: true; state: SubscriptionState | null } | ActionFailure> {
     try {
         return { ok: true, state: await getSubscriptionState() }
@@ -113,8 +102,6 @@ export async function getSubscriptionStateAction(): Promise<{ ok: true; state: S
     }
 }
 
-// What the cancel dialog quotes: dates, the share of the month already paid, and the retention
-// offer if this workspace can still have it.
 export async function getCancelFlowStateAction(): Promise<{ ok: true; state: CancelFlowState } | ActionFailure> {
     try {
         return { ok: true, state: await getCancelFlowState() }
@@ -123,8 +110,6 @@ export async function getCancelFlowStateAction(): Promise<{ ok: true; state: Can
     }
 }
 
-// The agents and their runs, read off the workspace's engine. Best effort: null when the machine
-// does not answer, and the dialog simply leaves those figures out.
 export async function getCancelFlowActivityAction(): Promise<{ ok: true; activity: CancelFlowActivity | null } | ActionFailure> {
     try {
         return { ok: true, activity: await loadCancelFlowActivity(await requireWorkspaceId()) }
@@ -133,8 +118,6 @@ export async function getCancelFlowActivityAction(): Promise<{ ok: true; activit
     }
 }
 
-// Whether what the customer wrote reads as a reason, and which one. A model that does not answer
-// lets them through: the dialog counts the refusals and stops refusing, this never holds anyone.
 export async function checkCancelReasonAction(text: string): Promise<{ ok: true; genuine: boolean; reason: CancelReason } | ActionFailure> {
     try {
         await requireBillingAdmin()
@@ -150,8 +133,6 @@ const cancelInputSchema = z.object({
     comment: cancelReasonTextSchema,
 })
 
-// The text is read again here rather than trusting the dialog with its own verdict, and whatever
-// the reading says the cancellation goes through: it only decides how the answer is filed.
 export async function cancelSubscriptionAction(input: z.input<typeof cancelInputSchema>): Promise<{ ok: true } | ActionFailure> {
     try {
         await requireBillingAdmin()
@@ -192,10 +173,6 @@ export async function requestRenewalReminderAction(): Promise<{ ok: true; remind
     }
 }
 
-// --- The plan dialogs ---
-
-// The plan Checkout rendered by the dialog itself. On a card trial the server sells the base plan
-// monthly whatever the selection says, and `trial` tells the dialog so.
 export async function createPlanCheckoutAction(selection: PlanSelection): Promise<({ ok: true } & PlanCheckoutSession) | ActionFailure> {
     try {
         await requireBillingAdmin()
@@ -205,7 +182,6 @@ export async function createPlanCheckoutAction(selection: PlanSelection): Promis
     }
 }
 
-// Called through the Checkout client's `runServerUpdate`, which reloads the session afterwards.
 export async function updatePlanCheckoutAction(sessionId: string, selection: PlanSelection): Promise<{ ok: true } | ActionFailure> {
     try {
         await requireBillingAdmin()
@@ -226,8 +202,6 @@ export async function acceptPlanTermsAction(sessionId: string): Promise<{ ok: tr
     }
 }
 
-// The card form of the plan dialogs: the card goes on file, or settles a failed payment. Completed
-// through confirmCardSetupAction; a trial paying today then runs the plan change from the dialog.
 export async function createPlanCardSetupAction(): Promise<{ ok: true; clientSecret: string; sessionId: string } | ActionFailure> {
     try {
         await requireBillingAdmin()
@@ -254,9 +228,6 @@ export async function changePlanAction(selection: PlanSelection): Promise<({ ok:
     }
 }
 
-// The service already words a declined charge for the customer. Stripe's own wording is for
-// developers except on a card error, so anything else Stripe throws reaches the customer as one
-// readable line and the log keeps the rest.
 function planChargeFailure(err: unknown): ActionFailure {
     const stripeError = err as { type?: string; code?: string; message?: string } | null
     if (!stripeError?.type?.startsWith('Stripe')) return failureOf(err, 'changePlanFailed')
@@ -275,7 +246,6 @@ export async function cancelPendingSwitchAction(): Promise<{ ok: true } | Action
     }
 }
 
-// Where the workspace's Rerun credit went this period, for the billing dialog.
 export async function getCreditUsageAction(): Promise<{ ok: true; usage: CreditUsage } | ActionFailure> {
     try {
         const ctx = await requireWorkspaceContext()
@@ -285,8 +255,6 @@ export async function getCreditUsageAction(): Promise<{ ok: true; usage: CreditU
     }
 }
 
-// An admin can pause the Rerun credit, and resume it: while it is paused the hub refuses every Rerun
-// model and paid data call, so nothing is spent without someone turning it back on.
 export async function setRerunCreditPausedAction(paused: boolean): Promise<{ ok: true } | ActionFailure> {
     try {
         const { workspace, supabase } = await requireBillingAdmin()
@@ -309,7 +277,6 @@ export async function listInvoicesAction(): Promise<{ ok: true; invoices: Invoic
     }
 }
 
-// The type is only shaped here: the service checks it against the billing country.
 const businessDetailsSchema = z.object({
     name: z.string().trim().min(1, 'businessNameRequired').max(256),
     type: z.string().regex(/^[a-z]{2}_[a-z_]+$/),

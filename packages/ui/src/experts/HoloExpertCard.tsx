@@ -252,8 +252,6 @@ export function HoloExpertCard({ data, className, revealed = true }: { data: Hol
                     '--holo-sparkle-y': sparkleY,
                 } as unknown as CSSProperties
             }
-            // `dark` en dur : les effets holographiques reposent sur des blend modes (color-dodge,
-            // screen) qui n'ont pas d'équivalent sur fond clair. La carte reste sombre dans les deux thèmes.
             className={cn(
                 'dark holo-card group relative w-full max-w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(130%_80%_at_50%_0%,#2c1d54,#0b0713)] will-change-transform',
                 className,

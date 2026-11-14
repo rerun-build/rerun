@@ -9,10 +9,6 @@ import { negotiatedProtocolVersion, rpcError, rpcResult, toolError, toolResult, 
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// A paid app's MCP server, hosted by the hub. Same trust model as /api/mcp/composio/<slug>: the
-// engine proves its workspace with `x-rerun-key`, names its coworker with `x-rerun-agent`, and the
-// account the call acts with is looked up here from that coworker, never taken from the call. The
-// Linkup key stays on this server.
 export const dynamic = 'force-dynamic'
 export const maxDuration = 90
 
@@ -75,7 +71,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     if (missing.length > 0) return toolError(id, `Missing ${missing.join(', ')}.`)
 
     try {
-        // The stricter limit is claimed first: refused there, the call has not eaten the other one.
         const extra = await tool.extraQuota?.(connection.provider_account_id, linkupParams)
         const claims = [...(extra ? [{ action: extra, amount: 1 }] : []), ...(tool.quota ? [{ action: tool.quota.action, amount: tool.quota.amount?.(linkupParams) ?? 1 }] : [])]
         for (const claim of claims) {

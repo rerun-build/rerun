@@ -1,25 +1,16 @@
 import { cn } from '../cn'
 
-// The Orb's own colours, split the way its light would be: the indigo-violet of its body carries
-// far, the pink-lilac of its rim only reaches a short way before it melts into the rest.
 const BODY = '104, 80, 252'
 const RIM = '192, 124, 255'
-// Light catching an edge goes nearly white: only a breath of the Orb's lilac is left in it.
 const EDGE = '226, 216, 255'
 
 const DITHER = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")`
 
-// The light only falls: whole along its axis, it eases out to nothing at `spread` degrees either
-// side of it, so its upper bound climbs back to the Orb instead of cutting across. The axis is
-// straight down, swung by --light-angle toward wherever the pointer is; the further it swings the
-// narrower it gets, like a spot being aimed, so its upper edge never rises past the horizon.
 export function fall(spread: number, at = '50% 0%') {
     const edge = `min(${spread}deg, calc(88deg - var(--light-tilt, 0deg)))`
     return `conic-gradient(from calc(180deg - var(--light-angle, 0deg)) at ${at}, #000 0deg, #000 calc(${edge} * 0.6), transparent ${edge}, transparent calc(360deg - ${edge}), #000 calc(360deg - ${edge} * 0.6), #000 360deg)`
 }
 
-// And it thins out with the distance to the Orb, gently first then for good, so it never draws a
-// rim of its own.
 function reach(width: number, height: number) {
     return `radial-gradient(${width}px ${height}px at 50% 0%, #000, rgba(0, 0, 0, 0.66) 30%, rgba(0, 0, 0, 0.28) 60%, rgba(0, 0, 0, 0.08) 82%, transparent)`
 }
@@ -37,13 +28,6 @@ function LightSheet({ sheet, grain = false }: { sheet: Sheet; grain?: boolean })
     )
 }
 
-// The one light of the dialog, with its apex on the Orb's centre, behind the creature. The Orb sits
-// too close to the field for a narrow cone to cover it, so the light is a wide, soft fall that
-// reaches the field's corners, with a stronger core running from the Orb to the middle of the field.
-// It is drawn over the field so it carries on across the card's edge instead of stopping behind it:
-// screened on the dark theme, where it lightens, multiplied on the light one, where coloured light
-// on a white page can only tint it. `focused` is the Orb thinking over a typed job: the light
-// gathers onto the field.
 export function OrbLight({ focused, top, className }: { focused: boolean; top: number; className?: string }) {
     return (
         <>
@@ -67,9 +51,6 @@ function Fall({ focused, top, tone, className }: { focused: boolean; top: number
     )
 }
 
-// Where that light lands: the card faces it, so its surface gives back a little more than the air
-// around it, and its top edge catches it. Both narrow with the light when the Orb is thinking, and
-// slide along the card by --light-dx as the light swings.
 export function FieldLight({ focused }: { focused: boolean }) {
     return (
         <>

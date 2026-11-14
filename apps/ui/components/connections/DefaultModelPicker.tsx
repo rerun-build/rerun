@@ -24,8 +24,6 @@ type DefaultModelPickerProps = {
     children: ReactNode
 }
 
-// Grouped by source, like the chat's model picker: a model only means something next to who pays
-// for it.
 export function DefaultModelPicker({ connections, current, credit, onPick, children }: DefaultModelPickerProps) {
     const t = useTranslations('connections')
     const [open, setOpen] = useState(false)

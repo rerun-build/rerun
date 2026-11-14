@@ -4,8 +4,6 @@ import { TRANSCRIPTION_FORMATS } from '@/lib/voice/recording'
 
 export const runtime = 'nodejs'
 
-// The middleware tees request bodies and truncates them at 10 MB, so anything larger would
-// reach us corrupted rather than whole. The composer caps recordings well below this.
 const MAX_AUDIO_BYTES = 10 * 1024 * 1024
 
 export async function POST(request: Request) {

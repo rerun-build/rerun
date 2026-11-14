@@ -14,12 +14,10 @@ import {
 import { z } from 'zod'
 import { cellInputText } from '@/lib/data/views'
 
-/** Select value standing for "no column" or "no format": Radix refuses an empty item value. */
 export const NONE = '__none'
 
 const fieldsSchema = z.object(Object.fromEntries(CARD_FIELD_ROLES.map(role => [role, z.string()])) as Record<(typeof CARD_FIELD_ROLES)[number], z.ZodString>)
 
-// The `dialogs.viewSettings` catalog.
 export type ViewFormCopy = (key: 'nameRequired' | 'titleColumnRequired' | 'groupByRequired') => string
 
 export const viewFormSchema = (t: ViewFormCopy) =>
@@ -33,9 +31,7 @@ export const viewFormSchema = (t: ViewFormCopy) =>
         shape: z.enum(CARD_GALLERY_SHAPES),
         sortColumn: z.string(),
         sortDir: z.enum(['asc', 'desc']),
-        /** Column name to format, NONE for plain text. */
         formats: z.record(z.string(), z.string()),
-        /** Badge value to tone, NONE for the automatic one. */
         tones: z.record(z.string(), z.string()),
     })
     .superRefine((values, ctx) => {
@@ -64,20 +60,17 @@ export function viewToFormValues(view: TableView | undefined, columns: string[])
     }
 }
 
-/** The columns a layout actually draws, which are the ones worth a format. */
 export function columnsInUse(values: Pick<ViewFormValues, 'layout' | 'columns' | 'fields' | 'groupBy'>): string[] {
     if (values.layout === 'table') return values.columns
     const roles = values.layout === 'list' ? CARD_FIELD_ROLES : CARD_FIELD_ROLES.filter(role => role !== 'date')
     return [...new Set([...roles.map(role => values.fields[role]), values.groupBy].filter(column => column && column !== NONE))]
 }
 
-/** The column whose values get a color: the board columns, or the badge. */
 export function toneColumn(values: Pick<ViewFormValues, 'layout' | 'fields' | 'groupBy'>): string | undefined {
     if (values.layout === 'board') return unpick(values.groupBy)
     return unpick(values.fields.badge)
 }
 
-// `where` has no editor yet: a filter the agent saved survives an edit made in the app.
 export function formValuesToInput(values: ViewFormValues, base?: TableView): TableViewInput {
     const used = new Set(columnsInUse(values))
     const roles = values.layout === 'table' ? [] : CARD_FIELD_ROLES.filter(role => values.layout === 'list' || role !== 'date')
@@ -110,8 +103,6 @@ function freeName(base: string, taken: string[]): string {
     return `${base} ${n}`
 }
 
-// Falls back on the column of the sampled rows with the fewest distinct values, as long as they
-// still repeat: a column where every row differs is an id, not a status.
 function guessGroupColumn(columns: string[], rows: Record<string, unknown>[]): string | undefined {
     const named = columns.find(column => GROUP_COLUMN.test(column))
     if (named) return named
@@ -124,7 +115,6 @@ function guessGroupColumn(columns: string[], rows: Record<string, unknown>[]): s
     return best?.column
 }
 
-/** A view added in one click, filled with guessed defaults; null when a board has nothing to group by. `baseName` is the layout's name in the reader's language. */
 export function quickViewInput(layout: CardLayout, sample: { columns: string[]; rows: Record<string, unknown>[]; takenNames: string[]; baseName: string }): TableViewInput | null {
     const { columns, rows, takenNames, baseName } = sample
     const values = viewToFormValues(undefined, columns)
@@ -143,7 +133,6 @@ export function quickViewInput(layout: CardLayout, sample: { columns: string[]; 
 
 const PREVIEW_ROWS = { table: 5, list: 5, gallery: 6, board: 3 } as const
 
-/** A chat card drawn from the rows already on screen, so the editor shows the view before it is saved. */
 export function previewCard(input: TableViewInput, sample: { table: string; scope: TableCard['scope']; columns: string[]; rows: Record<string, unknown>[]; total: number }): TableCard {
     const { layout, fields = {}, groupBy, sort } = input
     const rows = sort ? [...sample.rows].sort((a, b) => compare(a[sort.column], b[sort.column]) * (sort.dir === 'desc' ? -1 : 1)) : sample.rows

@@ -5,15 +5,12 @@ import { tableColumns, withBusyRetry } from './sqlStore.js'
 
 export const VIEWS_TABLE = '_rerun_views'
 
-// Created on the first write rather than when the database opens: most databases never get a view,
-// and an agent reading its file with sqlite3 should not find a table it never made.
 const VIEWS_DDL = `CREATE TABLE IF NOT EXISTS ${VIEWS_TABLE} (id TEXT PRIMARY KEY, table_name TEXT NOT NULL, name TEXT NOT NULL, position INTEGER NOT NULL, config TEXT NOT NULL, updated_at TEXT NOT NULL, UNIQUE (table_name, name))`
 
 const MISSING_TABLE = /no such table/i
 
 type ViewColumns = Pick<TableViewConfig, 'layout' | 'columns' | 'fields' | 'formats' | 'groupBy' | 'sort' | 'where'>
 
-/** Throws on the first column a view or a card names that the table does not have, listing the real ones. */
 export function checkViewColumns(table: string, allColumns: string[], view: ViewColumns): void {
     const requireColumn = (column: string, where: string) => {
         if (!allColumns.includes(column)) throw new Error(`Unknown column "${column}" in ${where}. Columns of ${table}: ${allColumns.join(', ')}`)
@@ -31,8 +28,6 @@ export function checkViewColumns(table: string, allColumns: string[], view: View
     if (view.layout === 'board' && !view.groupBy) throw new Error('A board needs groupBy, the column whose values become its columns.')
 }
 
-// A column dropped or renamed after the view was saved must not break the tab: what points at it is
-// forgotten, and a layout left without its title or its groupBy falls back to a plain table.
 function sanitize(config: TableViewConfig, allColumns: string[]): TableViewConfig {
     const known = (column: string | undefined) => column !== undefined && allColumns.includes(column)
     const fields = Object.fromEntries(CARD_FIELD_ROLES.filter(role => known(config.fields?.[role])).map(role => [role, config.fields![role]]))
@@ -91,7 +86,6 @@ export async function findView(client: Client, table: string, name: string, hidd
     return views.find(view => view.name === name) ?? views.find(view => view.name.toLowerCase() === name.toLowerCase())
 }
 
-/** View names per table, for the schema the agent reads. */
 export async function viewNamesByTable(client: Client): Promise<Map<string, string[]>> {
     const rows = await readRows(client, `SELECT table_name, name, config FROM ${VIEWS_TABLE} ORDER BY position, name`, []).catch(() => [])
     const byTable = new Map<string, string[]>()
@@ -107,11 +101,6 @@ export async function viewNamesByTable(client: Client): Promise<Map<string, stri
 
 type SaveOptions = { id?: string; hidden?: string[]; replaceByName?: boolean }
 
-/**
- * Updates the view `id` when given, otherwise appends a new one. The agent addresses views by name,
- * so with `replaceByName` a save under a taken name replaces that view; the app addresses them by
- * id, and a new view of its own must not silently overwrite another.
- */
 export async function saveView(client: Client, table: string, input: TableViewInput, { id, hidden = [], replaceByName = false }: SaveOptions = {}): Promise<TableView> {
     const allColumns = (await tableColumns(client, table, hidden)).map(c => c.name)
     const config = configOf(input)
@@ -151,7 +140,6 @@ export async function saveView(client: Client, table: string, input: TableViewIn
     return saved
 }
 
-/** Deletes by id, or by name for the agent. Returns whether a view was removed. */
 export async function deleteView(client: Client, table: string, idOrName: string): Promise<boolean> {
     try {
         const rs = await withBusyRetry(() => client.execute({ sql: `DELETE FROM ${VIEWS_TABLE} WHERE table_name = ? AND (id = ? OR name = ?)`, args: [table, idOrName, idOrName] }))

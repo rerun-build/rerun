@@ -6,8 +6,6 @@ export type TaskOutcome = { runId: string; sessionId: string; status: 'done' | '
 
 export const outcomeKey = (source: TaskSource, slug: string) => `${source}:${slug}`
 
-// How each scheduled task and trigger last ended, from the coworker's recent runs. A stopped run
-// says nothing about the task, so the one before it speaks.
 export function latestOutcomes(runs: EngineRun[]): Record<string, TaskOutcome> {
     const outcomes: Record<string, TaskOutcome> = {}
     const ended = runs.filter(run => (run.status === 'done' || run.status === 'error') && run.triggerSlug && (run.triggerSource === 'schedule' || run.triggerSource === 'trigger'))

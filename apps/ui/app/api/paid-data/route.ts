@@ -7,18 +7,12 @@ import { BILLING_ENABLED } from '@rerun/cloud/billing'
 import { billedMicros, paidDataPriceMultiplier } from '@/lib/paid-data/pricing'
 import { callTregCapability, type TregCall, type TregFullAnswer } from '@/lib/paid-data/treg'
 
-// The one door a coworker's paid data tools go through. The engine calls it with its RERUN_API_KEY,
-// which names one workspace: the Treg token never leaves the app, and every call is billed on that
-// workspace's Rerun credit at what Treg charged times the price multiplier.
 export const dynamic = 'force-dynamic'
 
-// A provider's raw body past this would weigh on the engine's disk for nothing `output` lacks.
 const MAX_RAW_CHARS = 15_000_000
 
-// Read by the coworker after "Failed: ": the waterfall stopped at the ceiling the catalog price sets.
 const ROUTE_MAX_COST_MESSAGE = 'no source answered this at the catalog price: the ones within it found nothing, and the next one charges more than the catalog says. Do not retry the same lookup; narrow the inputs (a company domain, a title) or move on'
 
-// `tool` is how an engine not updated to the catalog yet names what it buys.
 const bodySchema = z.object({ capability: z.string().optional(), tool: z.string().optional(), params: z.record(z.string(), z.unknown()).default({}) })
 
 function bearerToken(req: Request): string {
@@ -26,8 +20,6 @@ function bearerToken(req: Request): string {
     return header.startsWith('Bearer ') ? header.slice(7) : ''
 }
 
-// What the engine needs before it offers paid data: whether this hub sells any (it bills them on the
-// Rerun credit, so only a deployment that sells plans does), and the multiplier POST bills with.
 export async function GET(req: Request): Promise<Response> {
     const token = bearerToken(req)
     if (!token || !(await getWorkspaceBudgetByEngineKey(token))) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -88,15 +80,11 @@ export async function POST(req: Request): Promise<Response> {
         console.error('[paid-data] could not bill the call:', call.callId, err instanceof Error ? err.message : err)
     }
 
-    // A 402 that is not a cost cap means our own Treg balance ran dry: every workspace is cut off
-    // until it is topped up, so it is shouted about rather than handed to the coworker as its fault.
     if (call.status === 402 && call.errorCode !== PAID_DATA_ROUTE_MAX_COST_ERROR) {
         console.error('[paid-data] the Treg balance is exhausted, every paid data call fails until it is topped up')
         return Response.json({ error: 'Paid data is temporarily unavailable' }, { status: 503 })
     }
     if (call.errorCode === PAID_DATA_ROUTE_MAX_COST_ERROR) return Response.json({ error: ROUTE_MAX_COST_MESSAGE, costMicros: 0 }, { status: 422 })
-    // The engine reads a 503 as "this source is down": the coworker carries on and retries once,
-    // instead of firing new lookups at a provider that cannot answer any of them.
     if (isProviderUnavailable(call) && billed === 0) {
         console.warn('[paid-data] the data provider is unavailable:', call.status ?? 'unreachable', call.callId, call.error)
         return Response.json({ error: 'Paid data is temporarily unavailable', costMicros: 0 }, { status: 503 })

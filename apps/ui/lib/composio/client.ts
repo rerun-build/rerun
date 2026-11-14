@@ -1,16 +1,3 @@
-// Minimal Composio API client (v3.1). Composio brokers the third-party OAuth and holds the
-// tokens; Rerun executes tools scoped by user_id. The org-wide COMPOSIO_API_KEY can act for
-// ANY user_id, so this module is server-only and the key never reaches an engine or a manifest.
-//
-// user_id convention: `<namespace>_agent_<agents.id>` (the Supabase UUID — stable across box
-// migrations, unlike engine agent ids which are only unique per engine). Derived server-side
-// on every path, never accepted from a caller. The namespace matters because staging runs on
-// a clone of the prod database: the same agent id exists in both, and without the prefix a
-// staging agent would be handed a real customer's connection. Defaults to 'local' rather than
-// 'prod' so forgetting it can only isolate, never collide.
-// An extra account of an app (registry key `<slug>@<instanceId>`) gets its own user_id, suffixed
-// with the instance id, so Composio holds one connected account per instance.
-
 const COMPOSIO_API_BASE = 'https://backend.composio.dev/api/v3.1'
 
 const TOOLS_CACHE_TTL_MS = 10 * 60 * 1000
@@ -86,8 +73,6 @@ type ComposioToolRow = { slug?: string; name?: string; description?: string; inp
 
 const toolsCache = new Map<string, { tools: ComposioTool[]; fetchedAt: number }>()
 
-// A stale list is far better than an agent session with no tools at all, so an expired cache
-// entry is served when Composio itself is the thing failing.
 export async function listToolkitTools(toolkit: string): Promise<ComposioTool[]> {
     const cached = toolsCache.get(toolkit)
     if (cached && Date.now() - cached.fetchedAt < TOOLS_CACHE_TTL_MS) return cached.tools

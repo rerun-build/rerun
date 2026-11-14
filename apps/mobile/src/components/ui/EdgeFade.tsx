@@ -3,9 +3,6 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { useTheme } from '@/theme/theme'
 
-// The background fading in at a screen edge, so content scrolling under a floating bar dissolves
-// instead of being cut. `solid` keeps that much of it fully opaque from the edge, for a bar that hides
-// what passes under it instead of letting it show through.
 export function EdgeFade({ edge, height, solid }: { edge: 'top' | 'bottom'; height: number; solid?: number }) {
     const theme = useTheme()
     const id = `fade-${edge}`

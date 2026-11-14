@@ -3,11 +3,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll, selectMany } from '@/supabase/supabase-helpers'
 import { getCreatorAccountState } from './connect.service'
 
-// The split: store what Stripe cannot group, read from Stripe what it owns. Stripe knows the
-// connected account and the transfer, not which template a transfer came from, so per-template
-// revenue is aggregated from our own `template_sales` ledger. Balance and payouts stay Stripe's:
-// the Express dashboard is one login link away and answers every question this panel does not.
-
 export type RevenueRange = '30d' | '12m' | 'all'
 
 export type CreatorRevenue = {
@@ -55,8 +50,6 @@ export async function getCreatorRevenue(userId: string, range: RevenueRange): Pr
     ])
 
     const rows = sales ?? []
-    // A refund is stored with negative amounts, so it nets out of the totals on its own and only
-    // needs to be singled out for the "refunded" figure.
     const refunds = rows.filter(row => row.kind === 'refund')
 
     const totals = {
@@ -108,8 +101,6 @@ export async function getCreatorRevenue(userId: string, range: RevenueRange): Pr
     }
 }
 
-// An account still mid-onboarding has no balance to read, and that must not take the whole panel
-// down with it.
 async function readBalance(stripeAccountId: string | null): Promise<CreatorRevenue['balance']> {
     if (!stripeAccountId) return null
     try {

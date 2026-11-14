@@ -57,13 +57,9 @@ import { useTranslations } from 'next-intl'
 
 const TRANSITION_MS = 300
 
-// `open` vaut `null` tant que la préférence n'est pas tranchée, le temps de l'hydratation : la piste
-// de grille s'ouvre quand même (le défaut desktop), mais le panneau reste hors de la tabulation, au
-// cas où l'écran serait un téléphone — là le calque est translaté hors champ.
 export function ForemanColumn({ open, placement }: { open: boolean | null; placement: ForemanPlacement }) {
     const sessionId = useForemanStore(state => state.sessionId)
     const guided = useForemanStore(state => state.funnel === 'guided')
-    // Le tunnel guidé n'affiche pas de tabs : un onglet resté ouvert avant ne doit pas y cacher le chat.
     const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided
     const intakeOpen = useForemanStore(state => state.intake)
     const { isAnonymous, workspace, phoneStep } = useSession()
@@ -72,10 +68,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     const { messages, sendMessage, status, error, stop, stopping, regenerate, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
 
-    // Ce que le board dessine à gauche pendant tout le tunnel. L'organisation vit dans le transcript
-    // et non dans un state à nous, donc elle survit à « Looks good », au checkout et au rechargement.
-    // La clé est le plan sérialisé parce que `messages` change à chaque token : sans elle, le board
-    // reconstruirait sa scène des dizaines de fois par message.
     const planKey = useMemo(() => {
         const input = lastShownPlan(messages) ?? lastShownTemplatePlan(messages) ?? lastShownStarterPlan(messages)
         return input ? JSON.stringify(input) : null
@@ -93,11 +85,7 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     }, [])
     const [uploading, setUploading] = useState(false)
 
-    // The kickoff marker goes through here too, and the store turns it away like every message of
-    // the funnel: the browser notification permission is only asked once the onboarding is over.
     const askNotificationPermission = useNotificationsStore(state => state.askPermission)
-    // What the last send carried, and whether it came from the queue: a conversation that refuses
-    // the message has to give it back rather than swallow it.
     const lastSent = useRef<{ text: string; queued: boolean } | null>(null)
     const send = useCallback(
         (text: string) => {
@@ -108,30 +96,18 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         },
         [sendMessage, askNotificationPermission]
     )
-    // Typed while the turn was about to resume on its own: it leaves right after, like a message
-    // typed during the turn.
     const sendOrQueue = useCallback(
         (text: string) => {
             if (!send(text)) enqueueMessage(text, null)
         },
         [send, enqueueMessage]
     )
-    // A draft already in the composer wins: `restore` leaves it alone and the action only focuses it.
     const prefill = useCallback((text: string) => {
         composerRef.current?.restore(text)
         composerRef.current?.focus()
     }, [])
-    // Un nouvel arrivant n'a rien à taper : le Foreman ouvre sa colonne et parle le premier. Sauf en
-    // découverte, où c'est la carte d'accueil qui tient l'écran et `start` qui attend qu'elle ait
-    // fini.
     const { start, firstName, arrival, prompted } = useForemanKickoff({ send, messageCount: messages.length, restoreDone })
 
-    // La carte écrit le profil elle-même, donc quand elle rend la main la phase est déjà `plan` : le
-    // kickoff fait monter le starter pack de leur industrie, sans un tour de modèle. Arrivé sur un
-    // template ou un partage, c'est la carte du lien qui monte à sa place.
-    //
-    // Un anonyme n'écrit rien : ses réponses sont parquées, la carte se ferme et c'est un bouton de
-    // création de compte qui prend la place du composer. Le kickoff les écrit une fois le compte créé.
     const intakeHandlers = useMemo(
         () => ({
             onDecideIndustry: (input: string) => decideIndustryAction(input),
@@ -145,18 +121,13 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
                     useForemanStore.getState().closeIntake()
                     return
                 }
-                // The full read of the site can file them under another industry than the one the
-                // board has been drawing, and the plan lays out the Boxes of the stored one.
                 const saved = await saveForemanIntakeAction(intake).catch(err => {
-                    // The composer already let go of the line: it goes back where they wrote it.
                     if (ownAsk) composerRef.current?.restore(ownAsk)
                     throw err
                 })
                 useForemanStore.getState().setIntakePreview(intakePreviewPlan(saved.industry))
                 useForemanStore.getState().closeIntake()
                 track('onboarding_step_viewed', { step: 'plan' })
-                // A line written under the card is the plan: the funnel counts it off the kickoff that
-                // carries it (useForemanFunnelAnalytics), as it counts a line written over the pack.
                 start(ownAsk)
             },
         }),
@@ -164,16 +135,11 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     )
     const intake = useForemanIntake({ firstName, handlers: intakeHandlers })
 
-    // Le composer reste sous la carte d'accueil et sous le starter pack : ce qui s'y écrit est le
-    // coworker qu'ils veulent. Sous la carte il coupe court aux questions, sous le pack il y répond
-    // comme une carte choisie. Pas sous la carte d'un lien : ils sont venus pour ce qu'il installe.
-    // Ni sous celle d'un prompt écrit sur la landing : ils l'ont déjà dit, la ligne l'écraserait.
     const packPending = pendingWidget?.toolName === SHOW_STARTER_PACK_TOOL ? pendingWidget : null
     const ownEntry = (intakeOpen && !arrival && !prompted) || !!packPending
     const sendFromComposer = useCallback(
         (text: string) => {
             if (intakeOpen) {
-                // The field is already empty when a line is refused (a first one still saving).
                 if (!intake.sendOwn(text)) composerRef.current?.restore(text)
                 return
             }
@@ -183,9 +149,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         [intakeOpen, intake, packPending, answerWidget, sendOrQueue]
     )
 
-    // Arrived on a template or a shared coworker: until it is installed the column is its tunnel.
-    // The account and the phone code take the whole of it, the rest is the conversation itself,
-    // where the trial, the purchase and the build already live.
     const arrivalStep = guided && arrival && !arrival.installed ? arrivalStepOf({ isAnonymous, phonePending: phoneStep === 'pending', messages }) : null
     const arrivalWall = arrivalStep === 'account' || arrivalStep === 'phone' ? arrivalStep : null
     const linkTemplate = useTemplateFlowStore(state => state.linkTemplate)
@@ -194,8 +157,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         const template = arrival.kind === 'template' && linkTemplate?.title === arrival.title ? linkTemplate : null
         return template ? { title: arrival.title, name: arrival.coworker, by: template.creator?.name, image: templateCardImage(template), connectors: template.connectors } : { title: arrival.title, name: arrival.coworker }
     }, [arrival, linkTemplate])
-    // Le tunnel se lit dans les outils qui passent : plus de stepper à instrumenter depuis que
-    // c'est une conversation.
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
     useForemanFunnelAnalytics({ messages, guided, restoreDone, entitled })
     useForemanScriptedSteps({ messages, status, guided, restoreDone, send })
@@ -204,10 +165,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     const nextSteps = useMemo(() => foremanNextSteps(messages, { entitled, t: tNextSteps }), [messages, entitled, tNextSteps])
     const trialGate = useMemo(() => (guided ? trialStep(messages, { entitled }) : null), [guided, messages, entitled])
 
-    // Une étape de la checklist du board, confiée depuis l'extérieur de la colonne. Elle attend la
-    // conversation restaurée et un tour fini, puis s'y ajoute : jamais un nouveau chat, qui perdrait
-    // ce que le Foreman sait déjà et ferait la course avec la restauration. Hors du tunnel seulement,
-    // la pastille n'existant qu'en companion.
     const pendingPrompt = useForemanStore(state => state.pendingPrompt)
     const companion = useForemanStore(state => state.funnel === 'companion')
     useEffect(() => {
@@ -215,16 +172,12 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         if (send(pendingPrompt)) useForemanStore.getState().clearPendingPrompt()
     }, [pendingPrompt, restoreDone, busy, companion, send])
 
-    // Sur le hub, couper le flux suffit : la boucle meurt avec lui. Sur l'engine, `stop` annule aussi
-    // le run là-bas.
     const handleStop = useCallback(() => void stop(), [stop])
 
     const displayedError = runError || error ? unwrapChatError(runError ?? error?.message) : null
     const noticeError = useMemo(() => (displayedError === null ? null : { kind: classifyChatError(displayedError), message: displayedError }), [displayedError])
     useForemanDockFeed({ messages, busy, open: open === true, pending: pendingWidget, failed: displayedError !== null })
 
-    // ⌘K lands in whichever composer is on screen: this one once the column is open, the pill's
-    // otherwise. A request made while the column was closed belongs to the pill and stays there.
     const focusRequest = useForemanStore(state => state.composerFocusRequest)
     const handledFocusRequest = useRef(focusRequest)
     useEffect(() => {
@@ -233,13 +186,8 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         if (open) composerRef.current?.focus()
     }, [focusRequest, open])
 
-    // L'orbe en tête de colonne est décorative : Escape et le bouton de l'en-tête sont les deux
-    // seules sorties, et le tunnel les condamne toutes les deux : la carte d'accueil vit ici. Ouvrir un agent ne fait que mettre la colonne en retrait (BoardChatSplit) :
-    // elle revient quand sa sheet se referme.
     useEffect(() => {
         if (!open || guided) return
-        // Un Escape tapé dans une dialog ouverte par-dessus (le compte, le checkout) ferme la dialog,
-        // pas la colonne d'où elle a été ouverte.
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key !== 'Escape' || (event.target instanceof Element && event.target.closest('[role="dialog"], [role="alertdialog"], [role="menu"]'))) return
             useForemanStore.getState().close()
@@ -248,13 +196,11 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         return () => window.removeEventListener('keydown', onKeyDown)
     }, [open, guided])
 
-    // Le message en attente part dès que le tour en cours est fini, comme dans le chat d'un agent.
     const flushingRef = useRef<string | null>(null)
     useEffect(() => {
         if (status !== 'streaming' && status !== 'submitted') flushingRef.current = null
     }, [status])
 
-    // `stopping` holds the message until the stop has answered, whichever button asked for it.
     const canFlush = shouldFlush({ queued, busy: busy || stopping, uploading, status, hasError: displayedError !== null })
     useEffect(() => {
         if (!canFlush || !queued || flushingRef.current) return
@@ -264,9 +210,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         clearQueued()
     }, [canFlush, queued, clearQueued, sendMessage])
 
-    // The engine refused the send because the conversation still holds a run. A queued message goes
-    // back to waiting, it left on its own and will leave on its own again; a typed one goes back to
-    // the composer the user is still looking at.
     useEffect(() => {
         if (!error || classifyChatError(unwrapChatError(error.message)) !== 'run_in_flight') return
         const sent = lastSent.current
@@ -276,9 +219,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         else composerRef.current?.restore(sent.text)
     }, [error, enqueueMessage])
 
-    // Un message trouvé en attente à l'ouverture ne part jamais tout seul : le tour derrière lequel
-    // il patientait est mort avec le flux, donc il retourne dans le composer plutôt que de surgir
-    // des jours plus tard.
     useEffect(() => {
         if (!open || !queued || queued.id !== restoredQueuedId || busy || flushingRef.current || stopping) return
         if (!composerRef.current?.restore(queued.text)) return
@@ -301,9 +241,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         [queued, stopping, enqueueMessage, sendQueuedNow, clearQueued]
     )
 
-    // Les fichiers du Foreman ne vivent pas sur une Box : les vignettes, la lightbox et la lecture
-    // du vocal passent par le seau du hub, sous la clé de cette conversation.
-    // On the engine they live in the foreman's own workspace there, once the engine can take them.
     const surface = useForemanStore(state => state.surface)
     const [filesOnEngine, setFilesOnEngine] = useState(false)
     useEffect(() => {
@@ -320,14 +257,10 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     const rawUrlFor = useCallback((path: string) => (engineFiles ? agentFileRawUrl(FOREMAN_AGENT_ID, path) : foremanFileRawUrl(sessionId, path)), [engineFiles, sessionId])
     const readFile = useCallback((path: string) => (engineFiles ? readFileAction(FOREMAN_AGENT_ID, path) : readForemanFileAction(sessionId, path)), [engineFiles, sessionId])
     const sharedFiles = useMemo(() => (engineFiles ? { rawUrlFor: sharedFileRawUrl, readFile: readWorkspaceFileAction } : undefined), [engineFiles])
-    // A file joined to an engine question has to land where the foreman's tools can open it, which is
-    // its own workspace on the Box. Until the engine can take them, the question carries no paperclip.
     const answerAttachments = useMemo(() => (engineFiles ? { target: { kind: 'agent', agentId: FOREMAN_AGENT_ID } as const, maxFileSize: MAX_UPLOAD_FILE_BYTES } : null), [engineFiles])
 
     const stopTask = useMemo(() => (activeRunId ? (taskId: string) => void cancelSubRunAction(FOREMAN_AGENT_ID, activeRunId, taskId) : undefined), [activeRunId])
 
-    // Regenerate and the thumbs belong to the foreman on the engine. The onboarding's turns build
-    // things, and replaying one would build them twice.
     const feedback = useMessageFeedback(backend === 'engine' ? sessionId : null, 'foreman')
     const { rate: rateMessage, votes } = feedback
     const messageActions = useMemo(() => (backend === 'engine' ? { onRegenerate: regenerate, onRate: rateMessage, ratingOf: (messageId: string) => votes.get(messageId)?.rating ?? null } : null), [backend, regenerate, rateMessage, votes])
@@ -350,10 +283,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
         [onSheetPointerDown, onHeaderPointerDown]
     )
 
-    // Redimensionner la piste de grille redimensionne le layer GPU du board à chaque frame : on le
-    // gèle le temps de la transition, par le canal qui met déjà le board en pause sous une dialog.
-    // Pas au montage, sinon on gèlerait l'atterrissage des tuiles au premier rendu du board. Ouvrir
-    // ou fermer la fenêtre flottante ne touche à aucune piste : là rien à geler.
     const mounted = useRef(false)
     useEffect(() => {
         if (!mounted.current) {
@@ -380,15 +309,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
     }, [dragging])
 
     return (
-        // `inert` plutôt que `hidden` : la colonne repliée garde sa position de scroll, elle doit
-        // seulement quitter l'ordre de tabulation le temps qu'elle est à zéro. Sous `md` elle n'est
-        // pas une piste de la grille mais une sheet qui monte du bas, haute comme ce qu'elle porte
-        // (voir `useForemanSheetHeight`) tant qu'on ne l'a pas tirée sur un cran (voir
-        // `useForemanSheetResize`), et le board reste vivant au-dessus : le placement choisi
-        // sur desktop ne s'y applique pas. Là-haut, docké, rien ne bouge : c'est la
-        // piste qui s'anime et jamais le panneau. Flottant, le panneau quitte la grille pour un coin
-        // du viewport, et c'est lui qui apparaît. Tenu par l'en-tête, il suit le pointeur depuis
-        // l'origine du viewport, `useForemanDrag` écrit sa translation.
         <div
             ref={panelRef}
             inert={!open}
@@ -410,22 +330,10 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
                     : cn(
                           'md:relative md:inset-auto md:z-auto md:row-start-1 md:block md:transition-none',
                           dockSide === 'left' ? 'md:col-start-1' : 'md:col-start-3',
-                          // Ouverte, la piste ne découpe que du côté du board, là où elle révèle le panneau :
-                          // partout ailleurs elle couperait l'ombre de la carte qu'il devient.
-                          // Fermée elle découpe tout, sinon cette ombre dépasserait dans la gouttière.
                           open !== false && (dockSide === 'left' ? 'md:overflow-visible md:[clip-path:inset(-1rem_0_-1rem_-1rem)]' : 'md:overflow-visible md:[clip-path:inset(-1rem_-1rem_-1rem_0)]')
                       )
             )}
         >
-            {/* Docké : la largeur de la piste et bord extérieur collé à celui de la piste, le panneau
-                ne se reflow pas pendant l'ouverture, la piste qui s'ouvre le révèle depuis le bord de
-                l'écran en le décollant de l'`overflow-hidden`. Les deux lisent --foreman-dock-track,
-                posé par BoardChatSplit. Sur mobile le fond est opaque : là le panneau n'est pas une piste
-                de la grille mais une sheet posée sur le board, et le board ne doit pas se lire à
-                travers. Docké à partir de `md`, il devient une carte comme le board, rentrée de l'écart
-                qui les sépare. Flottant il est une carte posée sur le board. La
-                largeur du panneau ne s'applique qu'à partir de `md` : ancrée sur un écran de 390px,
-                elle pousserait le composer hors champ. */}
             <div
                 className={cn(
                     'absolute inset-y-0 flex w-full flex-col bg-background pb-[var(--consent-inset)]',
@@ -438,8 +346,6 @@ export function ForemanColumn({ open, placement }: { open: boolean | null; place
                 )}
             >
                 <ForemanHeader placement={placement} onDragPointerDown={handleHeaderPointerDown} onToggleSheetDetent={toggleDetent} onNewChat={startNewChat} />
-                {/* Masqués et pas démontés hors de l'onglet Assistant : un aller-retour sur Routines
-                    ne doit perdre ni le brouillon du composer ni la position dans la conversation. */}
                 {arrivalStep && arrivalPick && (
                     <div className={cn('flex flex-col gap-6 px-5 pt-14', arrivalWall ? 'min-h-0 flex-1 overflow-y-auto pb-5' : 'shrink-0')}>
                         <ArrivalHeader pick={arrivalPick} step={arrivalStep} paid={!!arrival?.paid || arrivalStep === 'purchase'} />

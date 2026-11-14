@@ -5,13 +5,6 @@ import { BLOCK_HEIGHT, GRID_SIZE, TILE_H, TILE_W, hashUnit, isoPosition, tileTop
 import { type AgentStatus, agentTileStyle, connectorTileStyle } from './presets'
 import type { Tile, TileLink } from './types'
 
-// The layout of a template's board, shared by the free-running preview (TemplateBoardPreview) and
-// the scripted story player: both stage the same tiles in the same slots, so a story reads as the
-// board the visitor already saw on the card, only directed.
-
-// Anchors of the 2x2 agent footprints: a diamond that stays compact in iso projection. Two
-// anchors are always 4 cells apart, so footprints never touch. The corridor they leave is too
-// narrow for a connector to sit there with clearance, so connectors always fan out of the cluster.
 const AGENT_SLOTS = [
     { col: 5, row: 5 },
     { col: 9, row: 5 },
@@ -23,9 +16,6 @@ const AGENT_SLOTS = [
     { col: 9, row: 13 },
 ]
 
-// Ring of connector cells around a 2x2 footprint, every one of them keeping a free cell between
-// the connector and its agent so the cable stays visible. Listed in interleaved order rather than
-// clockwise: an agent that only takes the first few still gets them spread all around.
 const CONNECTOR_RING = [
     { col: -2, row: 0 },
     { col: 3, row: 1 },
@@ -39,15 +29,12 @@ const CONNECTOR_RING = [
     { col: -1, row: 3 },
 ]
 
-// A lone agent gets the whole ring; with several agents the board reads better kept sparse.
 function connectorBudget(agentCount: number) {
     return agentCount === 1 ? CONNECTOR_RING.length : 3
 }
 
 export type BoardFrame = { width: number; height: number }
 
-// Share of the rendered box the board is fitted into, so the outermost connectors and their cables
-// keep some air rather than sitting flush against the edges.
 const FIT_INSET = 0.92
 
 const CENTER_ISO = isoPosition(GRID_SIZE / 2, GRID_SIZE / 2)
@@ -70,7 +57,6 @@ function agentCenter(anchor: Cell) {
     return { x: left + TILE_W / 2, y: top + TILE_H }
 }
 
-// Where a ring offset lands on screen, relative to the center of its agent.
 function offsetDirection(offset: Cell) {
     const x = (offset.col - offset.row) * (TILE_W / 2)
     const y = (offset.col + offset.row) * (TILE_H / 2) - TILE_H / 2
@@ -78,9 +64,6 @@ function offsetDirection(offset: Cell) {
     return { x: x / length, y: y / length }
 }
 
-// Connectors read best when they open away from the rest of the board rather than into it. With a
-// single agent the board center is the agent itself, so the sort is a no-op and the interleaved
-// ring order stands.
 function ringFor(anchor: Cell, boardCenter: { x: number; y: number }) {
     const center = agentCenter(anchor)
     const outward = { x: center.x - boardCenter.x, y: center.y - boardCenter.y }
@@ -110,25 +93,16 @@ function pickCell(ring: Cell[], anchor: Cell, keepOut: Set<string>, connectorCel
     return null
 }
 
-// The board draws a tile per agent and a ring of connectors around it, so it needs nothing else off
-// an agent. Stated as its own type rather than TemplateAgent so a caller that only holds this much
-// (an admin lab projecting rows down before sending them to the client) can render one too. A
-// template has no state to show, so `status` is only stated by a caller staging a scene of its own.
 export type BoardAgent = Pick<TemplateAgent, 'key' | 'name' | 'connectorSlugs'> & { status?: AgentStatus }
 
-// L'identité d'un lien telle que TileLinks la reconstruit, pour qu'un appelant puisse en désigner un.
 export function templateLinkId(source: string, target: string) {
     return `${source}->${target}`
 }
 
-// Le board se pose en deux vagues en cascade : les agents l'un après l'autre, puis les connecteurs,
-// chacun suivi de son câble qui se branche. Un pas fixe seul sonnerait comme un métronome, d'où le
-// jitter — déterministe, car buildTiles tourne aussi au rendu serveur.
 const AGENT_STEP = 110
 const CONNECTOR_GAP = 220
 const CONNECTOR_STEP = 80
 const CONNECTOR_JITTER = 70
-// Le câble se branche quand son connecteur est aux deux tiers de sa chute, pas quand elle démarre.
 const CABLE_LAG = 380
 
 export function buildTemplateBoard(agents: BoardAgent[], connectors: TemplateConnector[], highlightedSlugs: ReadonlySet<string>) {
@@ -139,13 +113,8 @@ export function buildTemplateBoard(agents: BoardAgent[], connectors: TemplateCon
     const linkIdsByAgent = new Map<string, string[]>()
     const dropDelays = new Map<string, number>()
     const appearDelays = new Map<string, number>()
-    // Quand chaque agent peut se mettre au travail : une fois posé, et une fois tous ses câbles
-    // branchés. Sans cette seconde borne un agent partirait en « working » et allumerait un courant
-    // dans un câble encore rentré.
     const wakeDelays = new Map<string, number>()
 
-    // Every agent footprint grown by one cell: no connector may land there, not even one belonging
-    // to another agent, or its cable would be swallowed by the neighbour.
     const keepOut = new Set<string>()
     for (const anchor of anchors) {
         for (let col = anchor.col - 1; col <= anchor.col + 2; col++) {
@@ -171,8 +140,6 @@ export function buildTemplateBoard(agents: BoardAgent[], connectors: TemplateCon
         y: anchors.reduce((sum, anchor) => sum + agentCenter(anchor).y, 0) / anchors.length,
     }
     const connectorCells = new Set<string>()
-    // Compté à plat sur tout le board : la seconde vague est une seule cascade, pas une cascade par
-    // agent qui repartirait de zéro à chaque fois.
     const connectorWave = agents.length * AGENT_STEP + CONNECTOR_GAP
     let connectorIndex = 0
 
@@ -186,7 +153,6 @@ export function buildTemplateBoard(agents: BoardAgent[], connectors: TemplateCon
             const connector = bySlug.get(slug)
             if (!connector) continue
 
-            // Connectors keep a free cell between them too, but only while the ring can afford it.
             const position = pickCell(ring, anchor, keepOut, connectorCells, true) ?? pickCell(ring, anchor, keepOut, connectorCells, false)
             if (!position) break
 
@@ -217,8 +183,6 @@ export function buildTemplateBoard(agents: BoardAgent[], connectors: TemplateCon
     return { tiles, links, agentKeys: agents.map(agent => agent.key), agentCount: agents.length, linkIdsByAgent, dropDelays, appearDelays, wakeDelays }
 }
 
-// Same world coordinates as the grid itself (cf. WORLD_OFFSET in IsoGrid): pan is applied inside
-// the scale, so panning by the opposite of the content center puts the board dead center.
 export function frameTemplateBoard(tiles: Tile[], frame: BoardFrame, maxZoom: number, inset = FIT_INSET) {
     let left = Infinity
     let right = -Infinity
@@ -228,7 +192,6 @@ export function frameTemplateBoard(tiles: Tile[], frame: BoardFrame, maxZoom: nu
     for (const tile of tiles) {
         const span = tile.span ?? 2
         const { left: isoLeft, top: isoTop } = isoPosition(tile.position.col, tile.position.row)
-        // Same horizontal centering as TileBlock: the anchor is the north cell of the footprint.
         const tileLeft = isoLeft - ((span - 1) * TILE_W) / 2
         left = Math.min(left, tileLeft - CENTER_ISO.left)
         right = Math.max(right, tileLeft + span * TILE_W - CENTER_ISO.left)
@@ -241,11 +204,6 @@ export function frameTemplateBoard(tiles: Tile[], frame: BoardFrame, maxZoom: nu
 }
 
 
-// Where the ground diamond of a tile sits in the grid's world layer, for anything drawn over it
-// through IsoGrid's worldOverlay. Same placement as TileBlock: the anchor is the north cell of the
-// footprint, and the diamond's centre is half a footprint below it.
-// How far a tile's top face stands above what a flat tile's does: what an overlay floating over a
-// tile has to clear on top of the room it already leaves.
 export function tileWorldRise(tile: Tile) {
     return tileTopLift(tile.style, tile.span ?? 2) - BLOCK_HEIGHT
 }

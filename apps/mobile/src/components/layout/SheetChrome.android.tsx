@@ -5,9 +5,6 @@ import { radius, withAlpha } from '@/theme/tokens'
 
 const GRABBER = { width: 36, height: 4, top: 8 }
 
-// react-native-screens draws neither a grabber nor an edge on Android, and a dark sheet on the dimmed
-// screen behind it has no visible top. The sheet's route lays both over its content, as its last child
-// so they stay on top. The edge follows the sheet's corners (sheetCornerRadius in sheet-options).
 export function SheetChrome() {
     const theme = useTheme()
     return (

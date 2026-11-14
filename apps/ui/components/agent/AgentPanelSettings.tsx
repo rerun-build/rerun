@@ -35,7 +35,6 @@ type AgentPanelSettingsProps = {
 
 type ConfigValues = { soul: string; verbosity: EngineVerbosity }
 
-// Le bouton de sauvegarde vit dans le footer sticky, hors du <form> : il le vise par son id.
 const SETTINGS_FORM_ID = 'agent-settings-form'
 
 export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
@@ -92,9 +91,6 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
 
     const handleSave = form.handleSubmit(async ({ soul, verbosity }) => {
         setError(null)
-        // Note: provider/model are intentionally omitted here — they are owned by the
-        // in-chat ModelSelector. Including them would overwrite the user's selection.
-        // A sealed soul is dropped server-side, so the rest of this form still saves.
         const result = await updateAgentConfigAction(agent.id, { soul, verbosity })
         if (result.success) {
             setSaved(true)
@@ -134,8 +130,6 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                     />
                 </TooltipDisabledReason>
 
-                {/* Un agent éteint ne répond plus : son détail engine est inatteignable par construction,
-                    pas par panne. Seuls le renommage et la suppression restent utiles ici. */}
                 {agent.disabledAt ? <p className="text-xs text-muted-foreground">{t('inactive')}</p> : error && <p className="text-xs text-destructive">{error}</p>}
 
                 <Separator />

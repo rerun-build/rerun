@@ -65,8 +65,6 @@ describe('agent registry', () => {
         expect(activeAgentCount()).toBe(0)
     })
 
-    // The pool keeps an agent's MCP connections across runs: a reload closes only those to servers
-    // the agent no longer declares, an unload closes them all.
     it('closes the MCP connections of servers the agent dropped on reload, and all of them on unload', async () => {
         await mkdir(agentDir('mcp'), { recursive: true })
         await writeAgentConfig('mcp', agentConfigSchema.parse({ name: 'mcp', mcpServers: [{ name: 'gh', url: 'https://gh.example/mcp' }] }))

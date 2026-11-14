@@ -87,7 +87,6 @@ const FIXTURE_CONNECTOR_NAMES: Record<string, string> = { gmail: 'Gmail', hubspo
 
 export const FIXTURE_CONNECTOR_SLUGS = Object.keys(FIXTURE_CONNECTOR_NAMES)
 
-// Icons only exist in the services catalog, so the labs pass it in; a slug it lacks keeps a name and no icon.
 export function rewindFixtures(catalog: ConnectorCatalog) {
     const withNames: ConnectorCatalog = new Map(FIXTURE_CONNECTOR_SLUGS.map(slug => [slug, catalog.get(slug) ?? { name: FIXTURE_CONNECTOR_NAMES[slug], icon: null }]))
     return {

@@ -14,10 +14,6 @@ import { CHATGPT_SECURITY_URL, STUCK_AFTER_MS } from './chatgpt-setup'
 import { ForemanTrack, type TrackStep } from './ForemanTrack'
 import { StepError } from './step-bits'
 
-// OpenAI only takes the device code once the account allows it, a switch in ChatGPT's own settings
-// (or the workspace admin's, on a Business or Enterprise plan). Nothing tells us it is off: the
-// approval just never comes. So the switch is the first step, one click away for whoever already
-// flipped it ("It's already on" goes straight for the code), and the wait brings it back up.
 export function ChatGptPlanSteps({ auth, lastStep }: { auth: CodexDeviceAuth; lastStep: (linked: boolean) => TrackStep }) {
     const t = useTranslations('connections.chatgpt')
     const [settingsOpened, setSettingsOpened] = useState(false)

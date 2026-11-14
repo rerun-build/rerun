@@ -9,24 +9,16 @@ import { text } from "../theme";
 
 export interface RenewalReminderProps {
   workspaceName: string | null;
-  /** "29 October", preformatted. */
   renewsLabel: string;
   daysLeft: number;
-  /** "$49.00", preformatted. Left out when Stripe could not quote the invoice. */
   amountLabel?: string;
   billingUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
 }
 
-/**
- * The reminder a paying customer asked for from the cancel flow instead of cancelling on the spot.
- * It keeps the promise made there and nothing more: the date, the amount, and how to cancel before
- * the card is charged.
- */
 export default function RenewalReminder({
   workspaceName,
   renewsLabel,

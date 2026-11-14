@@ -16,14 +16,11 @@ import type { ConnectorCatalog } from './types'
 import { AppLogo } from './marks'
 import { useKitTranslations } from '../locale'
 
-// The whole catalogue, searched by name and narrowed by category. What is ticked here is what the
-// agent starts with: the apps read in the description come ticked, and unticking one keeps it off.
 export function AppsPicker({ catalog, selected, onToggle }: { catalog: ConnectorCatalog | null; selected: string[]; onToggle: (slug: string) => void }) {
     const t = useKitTranslations()
     const [category, setCategory] = useState<ServiceCategory | null>(null)
     const [listEl, setListEl] = useState<HTMLDivElement | null>(null)
     const mask = useScrollFade(listEl)
-    // Frozen when the picker opens: a row ticked while it is open keeps its place under the cursor.
     const [pinned] = useState(selected)
     if (!catalog) return <AppsPickerSkeleton />
 

@@ -12,9 +12,6 @@ import { getCreatorRevenue, type CreatorRevenue, type RevenueRange } from '@/ee/
 import type { ActionResult } from '@/app/api/_actions/space.actions'
 import { failureOf } from '@/lib/i18n/action-error'
 
-// Payouts and revenue are the creator's own money: every action here resolves the caller and reads
-// nothing from the client. There is no id to pass, which is the point.
-
 export async function getCreatorAccountAction(): Promise<ActionResult<{ account: CreatorAccountState }>> {
     try {
         const userId = await requireExpertUserId()

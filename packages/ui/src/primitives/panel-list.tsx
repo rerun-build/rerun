@@ -22,8 +22,6 @@ export function PanelSection({ label, children, className }: { label: ReactNode;
     )
 }
 
-// `countLabel` is the count already worded by the caller in the reader's language ("3 triggers");
-// `count` + `noun` is the older English-only form.
 type PanelListHeaderProps = { children?: ReactNode; className?: string } & (
     | { count: number; noun: string; countLabel?: never }
     | { countLabel: string; count?: never; noun?: never }

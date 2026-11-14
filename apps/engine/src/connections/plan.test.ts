@@ -72,8 +72,6 @@ describe('model resolution on a trial box', () => {
         expect((await resolveRunModel(agent, { model: 'gpt-6-astra' })).model).toBe('gpt-6-sol')
     })
 
-    // The hub names a connection and a model in a chat, never a provider: the substitute has to be
-    // spelled for the connection the override picked, not for the one the agent runs on.
     it('steps a run down in the spelling of the connection the override names', async () => {
         await writeBoxPlan({ premiumModels: false })
         const agent = await pinnedAgent('codex', 'gpt-6-sol')

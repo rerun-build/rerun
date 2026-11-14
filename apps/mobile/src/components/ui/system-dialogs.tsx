@@ -25,7 +25,6 @@ export function promptText({ title, message, defaultValue, cancelLabel, submitLa
     )
 }
 
-// iOS draws both as system alerts: nothing to mount.
 export function SystemDialogHost() {
     return null
 }

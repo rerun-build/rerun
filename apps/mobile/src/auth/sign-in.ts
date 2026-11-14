@@ -7,8 +7,6 @@ export const CODE_LENGTH = 6
 
 export type CodeMethod = 'phone' | 'email'
 
-// `reason` (with the `method` the code went by) picks the sentence the screen shows in the app's
-// language; `message` is the English one, shown as it is for a reason the app does not know yet.
 export class SignInError extends Error {
     constructor(
         message: string,
@@ -38,7 +36,6 @@ export async function sendPhoneCode(request: PhoneCodeRequest): Promise<PhoneCha
     return channel
 }
 
-// Returns whether the number had no account yet: this sign-in created it.
 export async function signInWithPhone(request: PhoneCodeRequest, code: string): Promise<boolean> {
     const { created, session } = await hubCall('phone', appSessionSchema, '/api/v1/auth/phone/session', { ...request, code })
     const { error } = await supabase.auth.setSession({ access_token: session.accessToken, refresh_token: session.refreshToken })
@@ -46,8 +43,6 @@ export async function signInWithPhone(request: PhoneCodeRequest, code: string): 
     return created
 }
 
-// The hub mails a code still good again rather than let Supabase void it, or opens the account of a new
-// address; in that second case the code comes from Supabase itself.
 export async function sendEmailCode(email: string): Promise<void> {
     const { mailed } = await hubCall('email', emailCodePreparedSchema, '/api/v1/auth/email/code', { email })
     if (mailed) return

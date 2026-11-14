@@ -2,10 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { MAX_PLAN_BOXES, readPlanBoxes, readPlanItems } from './plan-items'
 
-// The second barrier behind the schema: what the model reads about is narrowed by the phase, and
-// what it writes down is checked here. Both exist because a template item is what hands
-// install_template back to the build phase.
-
 const agent = { kind: 'agent', name: 'Scout', role: 'research', box: 'Marketing' }
 
 describe('readPlanItems', () => {
@@ -39,13 +35,10 @@ describe('readPlanItems', () => {
         expect(() => readPlanItems([agent, { kind: 'share', token: 'abc' }], ['agent', 'share'])).toThrow(/holds nothing else/)
     })
 
-    // The onboarding builds one agent: a second one on the card is refused with a reason the model
-    // can act on, rather than built and left waiting on the board.
     it('refuses a second agent on a first plan', () => {
         expect(() => readPlanItems([agent, { ...agent, name: 'Closer' }], ['agent'])).toThrow(/holds one coworker, and this one has 2/)
     })
 
-    // The starter pack hires up to the trial's ceiling, each opened on the skill its card sold.
     it('takes up to three coworkers picked off the starter pack, and refuses a fourth', () => {
         const pick = (slug: string) => ({ kind: 'template', slug, title: slug, focus: `Focus ${slug}`, box: 'Sales' })
         expect(readPlanItems([pick('a'), pick('b'), pick('c')], ['template'])).toEqual([

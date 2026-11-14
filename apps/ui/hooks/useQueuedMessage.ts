@@ -16,15 +16,8 @@ function read(uid: string): QueuedMessage | null {
     }
 }
 
-// `restoredId` names what was already waiting when the chat opened, as opposed to what the user
-// just queued: only the former has to prove the run it was queued behind is still the one running.
 type QueueState = { queued: QueuedMessage | null; restoredId: string | null }
 
-/**
- * The single message waiting behind the run in flight. Stored next to the composer draft (see
- * useComposerDraft) so it survives a reload while the run keeps going, and so a second tab on the
- * same conversation drops its pill as soon as this one sends or discards it.
- */
 export function useQueuedMessage(uid: string) {
     const [{ queued, restoredId }, setState] = useState<QueueState>({ queued: null, restoredId: null })
 
@@ -33,7 +26,6 @@ export function useQueuedMessage(uid: string) {
         setState({ queued: found, restoredId: found?.id ?? null })
     }, [uid])
 
-    // The storage event only fires in the other tabs, which is exactly who needs telling.
     useEffect(() => {
         const key = getStorageKey(uid)
         const onStorage = (event: StorageEvent) => {

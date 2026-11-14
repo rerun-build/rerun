@@ -4,33 +4,25 @@ type Stop = [offset: number, color: string]
 
 export type ForemanMaterial = {
     label: string
-    // Across the two visible walls: 0 is the left silhouette, 0.5 the front fold, 1 the right one.
     side: Stop[]
-    // How dark the walls get towards the floor.
     shade: number
     top: [lit: string, far: string]
     topGloss: number
-    // The lit chamfer under the top's front edges.
     bevel: string
     outline: string[]
-    // The outline glows and runs down the fold and around the base, like the orb's rim.
     neon?: boolean
     sheen: string
     plate: [upper: string, lower: string]
     eyeTint: string
     eyeLight: string
-    // The ink of a face set straight into the material, without a plate.
     bareInk: 'light' | 'dark'
     aura?: string
     ball: ForemanBallPaint
 }
 
 export type ForemanBallPaint = {
-    // From the hot spot on the upper left out to the far silhouette.
     stops: Stop[]
-    // The light the floor sends back into the lower right.
     bounce: string
-    // The dark line a mirror shows where the room meets the floor: what tells chrome from grey.
     horizon?: string
 }
 
@@ -132,8 +124,6 @@ export const FOREMAN_MATERIALS: Record<ForemanMaterialKey, ForemanMaterial> = {
 
 export const FOREMAN_MATERIAL_KEYS = Object.keys(FOREMAN_MATERIALS) as ForemanMaterialKey[]
 
-// An agent's walls are 15 high on the board and 30 away from it: the first step is an agent's own
-// height, every other one stands above it.
 export const FOREMAN_HEIGHTS = [
     { depth: 30, label: 'Agent' },
     { depth: 48, label: 'Tall' },
@@ -141,7 +131,6 @@ export const FOREMAN_HEIGHTS = [
     { depth: 84, label: 'Tower' },
 ]
 
-// A ball's diameter, as a share of an agent's width.
 export const FOREMAN_BALL_SIZES = [
     { scale: 1, label: 'Agent' },
     { scale: 1.15, label: 'Big' },

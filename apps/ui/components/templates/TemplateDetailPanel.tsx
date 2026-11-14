@@ -20,12 +20,8 @@ export function TemplateDetailPanel({ template, showStatus, onImported }: { temp
     const tCategory = useTranslations('templates.categories')
     const locale = useLocale()
     return (
-        // w-full min-w-0 : la dialog qui accueille ce panneau est une grille, et une piste `auto`
-        // s'élargit jusqu'à la min-content de son contenu. Sans ça, une URL dans la description
-        // suffit à pousser le panneau hors de la dialog, qui le rogne à droite.
         <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
             <ScrollFade className="min-h-0 flex-1">
-                {/* Keyed on the slug: the active media slot has to reset when another template is picked. */}
                 <TemplateDetailMedia key={template.slug} template={template} showStatus={showStatus} />
 
                 <div className="flex flex-col gap-5 p-5">
@@ -64,8 +60,6 @@ export function TemplateDetailPanel({ template, showStatus, onImported }: { temp
 
                     {template.agents.length > 0 && (
                         <Section title={t('coworkers')} count={template.agents.length}>
-                            {/* A lone agent takes the full width; from two on, cards leave the next one peeking
-                                out to hint at the scroll. */}
                             <CardCarousel
                                 label={t('carousel')}
                                 fadeClassName="from-popover"

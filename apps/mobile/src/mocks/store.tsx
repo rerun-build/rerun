@@ -27,8 +27,6 @@ type Store = {
 
 const StoreContext = createContext<Store | null>(null)
 
-// Holds the mock coworkers and their conversations, and fakes a run that wakes, thinks, works and
-// answers, so the flow can be judged end to end before any API exists.
 export function MockStore({ children }: { children: ReactNode }) {
     const [coworkerList, setCoworkers] = useState(seedCoworkers)
     const [sessionList, setSessions] = useState(seedSessions)

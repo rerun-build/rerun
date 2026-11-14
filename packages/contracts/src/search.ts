@@ -1,6 +1,3 @@
-// The search of the control center (⌘F on the web, the search screen on iOS): a leading `@` limits
-// it to coworkers, `/` to commands, and a hit on the name always ranks above one on a keyword.
-
 export type QueryScope = 'all' | 'agents' | 'commands'
 
 export type ParsedQuery = { scope: QueryScope; text: string }
@@ -26,8 +23,6 @@ function startsAWord(haystack: string, needle: string): boolean {
     return haystack.split(/[\s\-_/.]+/).some(word => word.startsWith(needle))
 }
 
-// Lower is better, null is no match. A hit on the label always beats one on a keyword, so typing
-// a name never ranks a setting that merely mentions it above the thing itself.
 export function matchRank(item: Searchable, text: string): number | null {
     const label = item.label.toLowerCase()
     if (label.startsWith(text)) return LABEL_PREFIX
@@ -40,7 +35,6 @@ export function matchRank(item: Searchable, text: string): number | null {
     return null
 }
 
-// An empty text keeps every item in its given order.
 export function searchItems<T extends Searchable>(items: readonly T[], text: string, limit = Infinity): T[] {
     if (!text) return items.slice(0, limit)
     const ranked: { item: T; rank: number; index: number }[] = []

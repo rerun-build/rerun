@@ -1,11 +1,3 @@
-// Sign-in through the system browser, end to end on the local hub:
-//   pnpm verify:desktop --signed-out --scenario apps/desktop-app/e2e/sign-in.mjs
-//
-// The "system browser" is a Chromium of its own, signed in as the test account: it opens the URL
-// the app hands to `shell.openExternal`, confirms, and the link it would open is handed to the app as
-// macOS does (`open-url`). The code's own rules (one use, two minutes, the verifier) are played
-// against the hub's route directly.
-
 import { createHash, randomBytes } from 'node:crypto'
 import { chromium, localStack, signInPage, testAccount } from '../../../scripts/verify/shared.mjs'
 
@@ -59,7 +51,6 @@ async function stubSystemBrowser(app) {
     return () => app.evaluate(() => globalThis.__opened)
 }
 
-// The browser half: opens the hand-off page, confirms, and reads back the code and the link.
 async function approveInBrowser(browserPage, url, step) {
     await browserPage.goto(url)
     await browserPage.getByRole('button', { name: 'Continue', exact: true }).waitFor({ timeout: 60_000 })
@@ -80,7 +71,6 @@ async function openLink(app, link) {
 }
 
 export default async function signInScenario({ app, page, step, base, shell }) {
-    // 1. A first launch opens on the sign-in page: no anonymous visitor in the app.
     await page.goto(base)
     await waitUntil(() => page.url(), (url) => new URL(url).pathname === '/auth', 'the app opens on /auth')
     const sessionCookies = await app.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].webContents.session.cookies.get({})).filter((cookie) => cookie.name.startsWith('sb-')).length)
@@ -96,7 +86,6 @@ export default async function signInScenario({ app, page, step, base, shell }) {
         await signInPage(browserPage, base, account)
         const opened = await stubSystemBrowser(app)
 
-        // 2. The app hands the browser the hand-off page, with a PKCE challenge and a state.
         await page.evaluate(() => {
             window.__authResults = []
             window.rerunShell.auth.onResult((result) => window.__authResults.push(result))
@@ -109,13 +98,11 @@ export default async function signInScenario({ app, page, step, base, shell }) {
         check(handoff.searchParams.get('provider') === 'google' && handoff.pathname === '/auth/desktop' && /^[\w-]{43}$/.test(handoff.searchParams.get('challenge')) && handoff.searchParams.get('channel') === 'dev', `the browser gets /auth/desktop with a challenge (${handoff.pathname})`)
         check(!handoff.searchParams.has('verifier') && !handoffUrl.includes('verifier'), 'the verifier never leaves the app')
 
-        // 3. A link with another state is refused, and spends nothing.
         const first = await approveInBrowser(browserPage, handoffUrl, step)
         await openLink(app, `rerun-desktop-dev://auth/callback?code=${first.code}&state=${'x'.repeat(32)}`)
         await waitUntil(() => page.evaluate(() => window.__authResults), (results) => results.some((result) => result.reason === 'state-mismatch'), 'a foreign state is refused')
         check(new URL(page.url()).pathname === '/auth', 'the app stays signed out after a foreign link')
 
-        // 4. The right link signs the app in, on its own session.
         await openLink(app, first.link)
         await waitUntil(() => page.url(), (url) => new URL(url).pathname !== '/auth', 'the app leaves the sign-in page', 60_000)
         await page.waitForLoadState('domcontentloaded')
@@ -124,7 +111,6 @@ export default async function signInScenario({ app, page, step, base, shell }) {
         const cookiesAfter = await app.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].webContents.session.cookies.get({})).filter((cookie) => cookie.name.startsWith('sb-')).length)
         check(cookiesAfter > 0, `the window holds its own session cookies (${cookiesAfter}, /api/v1/me answered ${user})`)
 
-        // 5. The code's own rules, on the route.
         const pair = pkcePair()
         const good = await seedCode(account.admin, account.userId, pair.challenge)
         check((await exchange(base, { code: good, verifier: pkcePair().verifier })).status === 400, 'a wrong verifier is refused')
@@ -138,7 +124,6 @@ export default async function signInScenario({ app, page, step, base, shell }) {
         check((await exchange(base, { code: fresh, verifier: pair.verifier }, 'Mozilla/5.0 Chrome/156')).status === 403, 'a browser cannot spend a code')
         check((await exchange(base, { code: 'short', verifier: pair.verifier })).status === 400, 'a malformed code is refused')
 
-        // 6. Signed out again, the code pasted by hand works as well.
         await app.evaluate(async ({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].webContents.session.clearStorageData({ storages: ['cookies'] }))
         await page.goto(base)
         await waitUntil(() => page.url(), (url) => new URL(url).pathname === '/auth', 'the app is back on /auth without cookies')

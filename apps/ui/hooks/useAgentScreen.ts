@@ -4,8 +4,6 @@ import { openDesktopAction } from '@/app/api/_actions/desktop.actions'
 
 export type AgentScreen = { status: 'loading' } | { status: 'live'; socketUrl: string } | { status: 'error' } | { status: 'disconnected' }
 
-// A connection to watch an agent's screen, opened on mount. Its ticket only lives a minute, so
-// watching again means mounting again.
 export function useAgentScreen(agentId: string): { screen: AgentScreen; onDisconnect: () => void } {
     const [screen, setScreen] = useState<AgentScreen>({ status: 'loading' })
 

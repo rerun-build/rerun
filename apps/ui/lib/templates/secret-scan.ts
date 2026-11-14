@@ -1,9 +1,5 @@
 import { scanTextForSecrets, type TemplateDocument } from '@rerun/contracts'
 
-// Every column of a template is readable by anonymous visitors, so a credential pasted into
-// a description walks straight onto the public page. This is a heuristic net, not a proof:
-// it blocks publishing and only warns on a draft.
-
 export type SecretHit = { where: string; label: string }
 
 function scanText(text: string, where: string, hits: SecretHit[]) {

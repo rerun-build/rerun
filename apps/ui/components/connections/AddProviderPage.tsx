@@ -24,13 +24,9 @@ type AddProviderPageProps = {
     onOpen: (connectionId: string) => void
     onRename: (connectionId: string, name: string) => Promise<{ success: boolean; error?: string }>
     takenNames: string[]
-    // Whether the engine will adopt this one as the workspace default the moment it is plugged in.
     willBecomeBoxDefault: boolean
 }
 
-// Name the connection, hand it a credential. The name is what the model picker shows, so it is the
-// difference between "Claude" twice and "Claude Clement" / "Claude Theo". A plan is named last, once
-// signed in: the connection is created under the suggested name and renamed on Done.
 export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, takenNames, willBecomeBoxDefault }: AddProviderPageProps) {
     const t = useTranslations('connections')
     const tCommon = useTranslations('common')
@@ -84,8 +80,6 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
         <div className="flex min-h-0 flex-1 flex-col">
             <ProviderHeader provider={provider} onBack={onBack} />
             <PanelScroller className="space-y-4 p-4">
-                {/* The two plans create the connection from inside their own flow, the moment the token lands,
-                    and Done in the last step opens it. */}
                 {isPlan ? (
                     <PlanConnect provider={method === 'device-codex' ? 'codex' : 'claude'} onKeys={create} surface="add_provider" lastStep={lastStep} />
                 ) : (
@@ -98,7 +92,6 @@ export function AddProviderPage({ provider, onBack, onCreate, onOpen, onRename, 
 
                 {willBecomeBoxDefault && <p className="text-[11px] text-muted-foreground">{t('becomesDefault')}</p>}
 
-                {/* A plan's own widget already shows why its token was refused. */}
                 {needsPlan && <NoPlanNotice />}
 
                 {!isPlan && (

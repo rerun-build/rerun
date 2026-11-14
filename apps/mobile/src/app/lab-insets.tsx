@@ -14,10 +14,6 @@ import ChatLab from './lab-chat'
 import { DetailsLab } from './lab-coworker'
 import { MockHome } from './lab-home'
 
-// Dev only: the screens under forced horizontal safe-area insets (a landscape phone with a cutout, which
-// no supported orientation gives today), alone or in the detail column beside the Home sidebar.
-//   /lab-insets?screen=home|coworker|chat|onboarding|noplan&split=1&inset=44&scheme=dark
-
 type LabScreen = 'home' | 'coworker' | 'chat' | 'onboarding' | 'noplan'
 
 function Screen({ screen }: { screen: LabScreen }) {

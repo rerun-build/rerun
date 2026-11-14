@@ -16,15 +16,9 @@ import { Trash2Icon, UnplugIcon } from '@/lib/icons'
 
 type ServiceListProps = {
     services: ServiceSearchResult[]
-    // When provided, each not-yet-installed service gets an Install button (used by the
-    // Services settings tab). In chat we omit it — the agent drives installs via tools.
     onInstall?: (slug: string) => void
-    // When provided alongside onInstall, a half-installed service can also be removed straight
-    // from its library card instead of only from the Installed section.
     onUninstall?: (slug: string) => void
-    // An installed app that takes several accounts offers to connect another one.
     onAddAccount?: (slug: string) => void
-    // Why installing, finishing or adding an account is out of reach: the buttons stay, disabled.
     disabledReason?: string
 }
 

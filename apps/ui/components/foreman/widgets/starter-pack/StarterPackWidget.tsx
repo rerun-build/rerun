@@ -13,11 +13,6 @@ import { cn } from '@/lib/utils'
 import { StarterPackRail } from './StarterPackRail'
 import { useStarterPicks } from './useStarterPicks'
 
-// The starter pack of their industry, put up by the app right after the welcome card: the coworkers
-// a company like theirs starts with, up to three of them picked off their cards, or one line saying
-// what they need instead, written in the composer that stays under the cards (ForemanColumn).
-// Picking is the plan: nothing is asked after it but the trial.
-
 type StarterPackWidgetProps = {
     input: unknown
     output?: unknown
@@ -67,7 +62,6 @@ function StarterPackPicker({ cards, onAnswer }: { cards: StarterPackCard[]; onAn
     )
 }
 
-// The places the trial holds, filling as cards are picked: read before the fourth card is tried.
 function PickProgress({ count }: { count: number }) {
     const t = useTranslations('foreman.starterPack')
     return (
@@ -80,8 +74,6 @@ function PickProgress({ count }: { count: number }) {
     )
 }
 
-// Replayed from the transcript once answered: what was hired, as a line each, rather than an
-// invitation to choose again.
 function StarterPackVerdict({ cards, answer }: { cards: StarterPackCard[]; answer: StarterPackAnswer }) {
     const t = useTranslations('foreman')
     if (!answer.answered) return null

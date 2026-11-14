@@ -27,7 +27,6 @@ export function usd(cents: number): string {
     return formatAmount(cents, PLAN_CURRENCY)
 }
 
-// The animated twins of `usd` and a plain count, for every figure the slider or the toggle moves.
 export function UsdFlow({ cents }: { cents: number }) {
     return <NumberFlow value={cents / 100} format={amountFormat(cents, PLAN_CURRENCY)} locales={AMOUNT_LOCALE} />
 }
@@ -57,8 +56,6 @@ export function Headline({ badge, title, subtitle }: { badge?: { label: string; 
 
 export type TimelineStep = { when: string; title: string; detail: ReactNode }
 
-// One column per step, never narrower than a short line of detail: where the column is too narrow
-// for all of them, the row scrolls sideways and the edge still hiding a step fades.
 export function Timeline({ steps }: { steps: TimelineStep[] }) {
     const [scroller, setScroller] = useState<HTMLDivElement | null>(null)
     const fadeMask = useScrollFade(scroller, { axis: 'x', fadeSize: 40 })
@@ -112,8 +109,6 @@ export function IntervalToggle({ value, onChange, disabled }: { value: BillingIn
 
 const RICH_STRONG = { b: (chunks: ReactNode) => <span className="font-medium text-foreground">{chunks}</span> }
 
-// On a free trial the lines that differ from Pro say the trial's own limits first: the card sits under
-// a subtitle quoting them, and Pro's figures alone would read as what the trial gives.
 function features(t: ReturnType<typeof useTranslations<'billing.parts.features'>>, freeTrial: boolean): { id: string; icon: LucideIcon; text: ReactNode }[] {
     if (freeTrial) {
         return [
@@ -149,10 +144,6 @@ function FeatureGrid({ freeTrial = false }: { freeTrial?: boolean }) {
     )
 }
 
-// The plan: its name and billing on the left, the price per month on the right. `discountCents` is
-// what comes off each invoice for a workspace grandfathered on a legacy price or holding a permanent
-// promo. `freeTrial` prices the card at what the trial costs, the plan's price struck beside it.
-// `priceArm` is the price this workspace is sold the base plan at.
 export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents = 0, freeTrial = false }: { interval: BillingInterval; priceArm?: PriceArm; discountCents?: number; freeTrial?: boolean }) {
     const t = useTranslations('billing.parts.plan')
     const quantities = ZERO_QUANTITIES
@@ -179,7 +170,6 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
                             <UsdFlow cents={freeTrial ? 0 : monthCents} />
                         </span>
                         {struckListPrice && (
-                            // A drawn strike: `line-through` does not reach NumberFlow's inline-block digits.
                             <span className="relative text-base text-muted-foreground tabular-nums after:absolute after:inset-x-0 after:top-1/2 after:h-px after:bg-current">
                                 <UsdFlow cents={perMonthCents(quantities, 'monthly', priceArm)} />
                             </span>
@@ -195,8 +185,6 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
 
 const ROTATE_MS = 6000
 
-// Social proof under the plan: one segment per quote, the active one fills while it shows. A build
-// without quotes shows nothing.
 export function TestimonialStrip() {
     return TESTIMONIALS.length ? <TestimonialRotation /> : null
 }
@@ -311,7 +299,6 @@ export function CardOnFile({ card, action, onAction }: { card: SavedCardView | n
 
 export type AppliedPromoCode = { code: string; discount: string }
 
-// `onApply` and `onRemove` answer the message to show when Stripe refuses, null when it went through.
 export function PromoCodeField({
     applied,
     onApply,
@@ -481,8 +468,6 @@ export function RightTitle({ children, onBack, backLabel }: { children: ReactNod
     )
 }
 
-// The immediate-performance acknowledgement the hosted Checkout used to print above its button. The
-// Elements mode refuses Stripe's `custom_text`, so the dialog asks for it itself.
 export function TermsConsent({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) {
     const t = useTranslations('billing.parts')
     return (

@@ -26,8 +26,6 @@ type ConfirmDialogBaseProps = {
     onConfirm: (event: MouseEvent<HTMLButtonElement>) => void
 }
 
-// Le mode contrôlé existe pour les triggers qui vivent dans un calque qui se ferme sur
-// interact-outside (Popover, DropdownMenu) : la dialog doit alors être montée en dehors.
 type ConfirmDialogProps = ConfirmDialogBaseProps &
     (
         | { children: ReactNode; open?: undefined; onOpenChange?: undefined }

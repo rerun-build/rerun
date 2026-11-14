@@ -12,14 +12,11 @@ function refuse(socket: Duplex, status: string): void {
     socket.end(`HTTP/1.1 ${status}\r\nConnection: close\r\n\r\n`)
 }
 
-// KeyEvent, PointerEvent, and the extended key event noVNC prefers when the server offers it.
 const INPUT_MESSAGE_TYPES = new Set([4, 5, 255])
 const SHORTEST_INPUT_MESSAGE = 6
 
 const POINTER_EVENT = 5
 
-// The handshake never opens on one of these bytes with this length, so no RFB state is tracked.
-// A pointer that moves with no button down is a person looking around, not one taking the screen.
 const isInput = (data: Buffer): boolean => data.length >= SHORTEST_INPUT_MESSAGE && INPUT_MESSAGE_TYPES.has(data[0]!) && (data[0] !== POINTER_EVENT || data[1] !== 0)
 
 async function pipeToVnc(ws: WebSocket, agentId: string, mode: DesktopViewMode): Promise<void> {
@@ -55,8 +52,6 @@ async function pipeToVnc(ws: WebSocket, agentId: string, mode: DesktopViewMode):
     ws.once('error', leave)
 }
 
-// The only route a browser reaches directly, so it accepts one path and nothing without a ticket.
-// The screen it opens is the one of the agent the ticket names, never one the caller picks.
 export function attachDesktopBridge(server: Server): void {
     const wss = new WebSocketServer({ noServer: true })
     server.on('upgrade', (request: IncomingMessage, socket: Duplex, head: Buffer) => {

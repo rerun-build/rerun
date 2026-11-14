@@ -10,7 +10,6 @@ import { useForemanStore } from '@/stores/foreman.store'
 
 type ResizeState = { pointerId: number; startX: number; startY: number; startWidth: number; startHeight: number; width: number; height: number }
 
-/** La poignée vit sur le coin opposé à celui où la fenêtre est aimantée : ce coin-là ne bouge jamais. */
 const HANDLE_CLASSES: Record<ForemanCorner, string> = {
     'bottom-right': 'top-0 left-0 cursor-nwse-resize rounded-tl-xl border-t-2 border-l-2',
     'bottom-left': 'top-0 right-0 cursor-nesw-resize rounded-tr-xl border-t-2 border-r-2',

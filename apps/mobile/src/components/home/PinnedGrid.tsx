@@ -21,8 +21,6 @@ const UNREAD_DOT = 14
 
 export type PinnedCell = { width: number; disc: number; columns: number }
 
-// The size of a cell of the grid in this pane: three across on an iPhone, more on a wider pane, the disc
-// capped on a wide one.
 export function usePinnedCell(): PinnedCell {
     const { width } = usePaneSize()
     const inner = width - 2 * HOME_GUTTER
@@ -31,7 +29,6 @@ export function usePinnedCell(): PinnedCell {
     return { width: cellWidth, disc: Math.min(DISC_MAX, cellWidth - 2 * spacing.md), columns }
 }
 
-// A pinned coworker as iMessage draws a pinned contact: a round disc, the name under it.
 export function PinnedAvatar({ coworker, cell, animated = true }: { coworker: HomeCoworker; cell: PinnedCell; animated?: boolean }) {
     const theme = useTheme()
     const unread = coworker.pending > 0
@@ -54,12 +51,9 @@ type PinnedGridProps = {
     onOpen: (coworker: HomeCoworker) => void
     onUnpin: (coworker: HomeCoworker) => void
     onDetails: (coworker: HomeCoworker) => void
-    // Absent with a single pin: there is nothing to reorder.
     onEdit?: () => void
 }
 
-// The pinned coworkers in a grid at the top of the Home. A tap opens the chat, a long press the
-// system's context menu.
 export function PinnedGrid({ coworkers, onOpen, onUnpin, onDetails, onEdit }: PinnedGridProps) {
     const cell = usePinnedCell()
     const t = useTranslations('mobileHome')

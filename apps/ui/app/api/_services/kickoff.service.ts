@@ -10,11 +10,6 @@ import type { MessageAuthor } from '@rerun/contracts'
 
 export type KickoffResult = { ok: true; sessionId: string; runId: string | null } | { ok: false; error: string; agentGone: boolean }
 
-// Sends a freshly created agent's first message entirely server-side, so delivery never depends
-// on the chat panel mounting client-side. The engine pumps the run stream itself
-// (registerRunStream), so the run completes even though nobody consumes the HTTP response here;
-// the UI re-attaches to it afterwards via /api/chat/resume with the returned run id.
-// `actor` is the v1 route's caller; omitted, the browser session's.
 export async function startKickoff(agentId: string, input: { kickoff?: string; description?: string }, author: MessageAuthor, actor?: Actor): Promise<KickoffResult> {
     let target: Awaited<ReturnType<typeof resolveAgentTarget>>
     try {

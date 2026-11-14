@@ -26,33 +26,17 @@ import { writeAgentConfig } from './config-write.js'
 import { loadAgentFromDisk } from './loader.js'
 import { defaultSoul } from './soul.js'
 
-// The mirror of `buildArchive`. What matters here is that the tarball is untrusted input: it
-// travelled through a bucket and arrives over HTTP, so extraction re-applies the capture's own
-// allowlist rather than trusting what the entries claim to be. `mcp/` and `data/system.db` stay
-// out on the way in for the same reason they stayed out on the way out, and every webhook token
-// the tarball carries is reissued rather than trusted.
-//
-// Split by kind, because the same prefix match on both would let an archive plant a directory
-// where the engine expects a file: `data/agent.db/x` passes a `data/agent.db/` prefix test, and
-// the copy's database is then a folder every `db_*` call fails on.
 const FILE_ROOTS = new Set<string>([...ARCHIVE_ROOTS.filter(root => root.includes('.')), MANIFEST_PATH])
 const DIR_ROOTS = ARCHIVE_ROOTS.filter(root => !FILE_ROOTS.has(root))
 
-// An entry count no honest capture reaches. Rejected entries cost nothing to unpack but do cost
-// a line in `skipped`, so a tarball of a million empty headers would otherwise be a free way to
-// exhaust the engine's heap.
 const MAX_ENTRIES = 100_000
 const MAX_SKIPPED_REPORTED = 100
 
-// Same device as the agent folder, so the staging directory becomes the agent folder with a
-// rename rather than a copy. Outside `agents/` so a half-extracted folder is never scanned as an
-// agent.
 const importsDir = () => resolve(dataDir(), '.imports')
 
 function isAllowed(path: string, isDirectory: boolean): boolean {
     if (FILE_ROOTS.has(path)) return !isDirectory
     if (DIR_ROOTS.some(root => path === root || path.startsWith(`${root}/`))) return true
-    // A directory only because it is on the way to a file root, e.g. `data` above `data/agent.db`.
     return isDirectory && [...FILE_ROOTS].some(root => root.startsWith(`${path}/`))
 }
 
@@ -68,9 +52,6 @@ async function extractArchive(tarball: string, staging: string): Promise<Extract
     let entries = 0
     let refusal: string | null = null
 
-    // Never thrown from: node-tar calls the filter synchronously from its own header parser, with
-    // no try/catch on the way, so a throw here escapes `extract()` entirely and takes the process
-    // down instead of failing the request. A ceiling breach is recorded and re-raised after.
     const refuse = (reason: string) => {
         refusal ??= reason
         return false
@@ -80,17 +61,12 @@ async function extractArchive(tarball: string, staging: string): Promise<Extract
         await extract({
             file: tarball,
             cwd: staging,
-            // `preservePaths` stays off so tar itself refuses absolute paths and `..`, and the
-            // filter refuses everything else: a link of any kind, an unlisted root, a file over
-            // the capture's own ceiling, or a payload that only expands past it once unpacked.
             filter: (path, entry) => {
                 if (refusal) return false
                 if (++entries > MAX_ENTRIES) return refuse(`This archive holds more than ${MAX_ENTRIES} entries.`)
 
                 const rel = normalizeEntryPath(path)
                 if (!rel) return true
-                // `Stats` is the shape tar passes when creating; extraction always hands over a
-                // `ReadEntry`, which is the only one carrying the entry type.
                 const type = 'type' in entry ? entry.type : 'File'
                 const isDirectory = type === 'Directory'
 
@@ -114,9 +90,6 @@ async function extractArchive(tarball: string, staging: string): Promise<Extract
     return { skipped }
 }
 
-// `scrubConfig` handed the source agent id back as `${agent.id}` on the way out. The engine's own
-// resolver rejects the dot, so the substitution is the importer's job, exactly as it is the UI
-// compiler's at install time.
 function rebindAgentId(config: AgentConfig, id: string): AgentConfig {
     const bind = (value: string) => value.replaceAll('${agent.id}', id)
     const bindRecord = (record: Record<string, string>) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, bind(value)]))
@@ -142,15 +115,7 @@ async function readConfig(staging: string, id: string, name: string, displayName
     } catch (err) {
         throw badRequest(`This archive carries a config.json the engine cannot read: ${err instanceof Error ? err.message : 'unknown error'}`)
     }
-    // The source agent was marked set up by its author, who never had to install it. A copy has
-    // not been through its own INSTALL.md yet, so it starts pending again, in no conversation.
     const setup = { ...parsed.setup, completedAt: null, sessionId: null }
-    // The pair the author ran on belongs to their box, not to this one: their pinned model may cost
-    // ten times what this owner picked, or not be offered here at all. All three fields go, which is
-    // what `followBoxDefault` writes when someone asks for the box default by hand, and it leaves a
-    // copy exactly where an agent created from scratch starts.
-    // Spending credit without asking is the source owner's choice for their own workspace: the
-    // copy asks its new owner first, whatever an archive made before the scrub says.
     return rebindAgentId({ ...parsed, kind: 'user', name, displayName: displayName || parsed.displayName, setup, connectionId: null, provider: null, model: null, paidDataAlwaysAllow: false }, id)
 }
 
@@ -165,13 +130,6 @@ async function readManifestMcpAuth(id: string): Promise<AgentArchiveMcpAuth[] | 
     }
 }
 
-// The archive carries `memory/*.md` but not the index that makes them recallable: it lives in
-// `data/system.db`, which never travels. Without this pass the copy holds memories it cannot
-// find. An embedding failure is not fatal, full-text recall still works.
-//
-// Batched, because the embedding is a network hop with a 5 second timeout of its own and the
-// import response waits on the whole pass: an agent with a few hundred memories would otherwise
-// hold the request open long past the caller's budget.
 const REINDEX_BATCH = 8
 
 export async function reindexMemories(id: string): Promise<number> {
@@ -194,22 +152,10 @@ export async function reindexMemories(id: string): Promise<number> {
     return indexed
 }
 
-// A copied schedule brings its `lastRunAt` with it, which the scheduler reads as its cron
-// baseline: left alone, every schedule the source ever ran is already overdue the moment the copy
-// lands and fires within a tick. Marking them as just fired keeps them enabled as captured and
-// moves the first run to the next time they are genuinely due. A one-shot whose moment has passed
-// is retired the same way, rather than firing once on arrival.
-//
-// `clearModel` is what separates an import from a duplication. A schedule names a connection and a
-// model of its own; an archive's belong to the box its author ran on, so they go, for every
-// schedule rather than only the timed ones, and a manual schedule is not left as the one place the
-// template's model still lives. A copy staying on the same box keeps them: they are still valid.
 export async function rebaselineSchedules(id: string, clearModel: boolean): Promise<string[]> {
     const slugs: string[] = []
     for (const schedule of await listSchedules(id).catch(() => [])) {
         if (clearModel) await clearScheduleModel(id, schedule.slug).catch(err => logger.warn({ agentId: id, schedule: schedule.slug, err: String(err) }, 'schedule model reset failed'))
-        // A manual schedule has no clock of its own, so it is neither rebaselined nor reported: a
-        // copy carrying one starts nothing on its own account.
         if (!schedule.cron && !schedule.runAt) continue
         slugs.push(schedule.slug)
         await markFired(id, schedule.slug, nowIso()).catch(err => logger.warn({ agentId: id, schedule: schedule.slug, err: String(err) }, 'schedule rebaseline failed'))
@@ -217,13 +163,6 @@ export async function rebaselineSchedules(id: string, clearModel: boolean): Prom
     return slugs
 }
 
-// A webhook URL is a capability: whoever holds it fires the agent, and the token is also how the
-// engine tells one trigger from another. Both callers reissue it unconditionally, for reasons that
-// happen to coincide. An import must: the tarball is untrusted input, and one carrying a token its
-// author kept a copy of would hand them a live URL on somebody else's account. A duplication must
-// too: two triggers answering to the same secret is at best an ambiguous URL.
-//
-// `clearModel` follows `rebaselineSchedules`, for the same reason.
 export async function rotateTriggers(id: string, clearModel: boolean): Promise<string[]> {
     const slugs: string[] = []
     for (const trigger of await listTriggers(id).catch(() => [])) {
@@ -232,9 +171,6 @@ export async function rotateTriggers(id: string, clearModel: boolean): Promise<s
             await rotateTriggerToken(id, trigger.slug)
             slugs.push(trigger.slug)
         } catch (err) {
-            // Whatever token the archive carried is still on disk, so the trigger goes rather than
-            // stays: an unreachable webhook is a nuisance, one answering to a secret somebody else
-            // knows is a way in.
             logger.error({ agentId: id, trigger: trigger.slug, err: String(err) }, 'trigger token remint failed, dropping the trigger')
             await deleteTrigger(id, trigger.slug).catch(() => {})
         }
@@ -271,15 +207,11 @@ export async function importAgent(input: ImportAgentInput): Promise<AgentImportR
         await mkdir(resolve(agentDir(id), 'memory'), { recursive: true })
         await writeAgentConfig(id, config)
         if (!existsSync(soulPath(id))) await writeFile(soulPath(id), defaultSoul(config), 'utf8')
-        // Rewritten rather than left as extracted: tar restores the archived mode, and the copy's
-        // `.env` deserves the same 0600 a freshly created agent gets.
         await writeAgentEnv(id, env)
         await rebaselineSchedules(id, true)
         const triggers = await rotateTriggers(id, true)
 
         const agent = await loadAgentFromDisk(id)
-        // An agent with nothing to install is already as configured as it will ever be, so its
-        // automations start now rather than waiting for a setup conversation that never happens.
         if (!hasPendingSetup(agent)) await activateAutomations(agent)
 
         const registry = await readRegistry(id)
@@ -297,8 +229,6 @@ export async function importAgent(input: ImportAgentInput): Promise<AgentImportR
             skippedPaths: skipped,
         })
 
-        // Last, as in `createAgent`: nothing may fail after the index row exists, or the engine
-        // would list an agent whose folder the rollback below has already removed.
         await insertAgentIndex(id, config.name)
         return result
     } catch (err) {
@@ -310,8 +240,6 @@ export async function importAgent(input: ImportAgentInput): Promise<AgentImportR
     }
 }
 
-// `existsSync` answers true for a directory too, and a hostile archive is exactly where a `.env`
-// that is not a file comes from. A folder there means no keys, not a failed import.
 async function readStagedEnv(staging: string): Promise<Record<string, string>> {
     try {
         return parseEnvFile(await readFile(resolve(staging, '.env'), 'utf8'))

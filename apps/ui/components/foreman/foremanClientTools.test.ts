@@ -18,8 +18,6 @@ const member = { ...admin, isAdmin: false }
 describe('open_settings', () => {
     beforeEach(() => vi.clearAllMocks())
 
-    // The workspace menu greys these two for a member: the foreman's door has to be shut the same way,
-    // or the dialog opens with buttons the server then refuses.
     it('refuses the workspace settings and the API keys to a member, with a reason the foreman can say', () => {
         for (const panel of ['workspace', 'api_keys']) {
             const out = runForemanClientTool('open_settings', { panel }, member)

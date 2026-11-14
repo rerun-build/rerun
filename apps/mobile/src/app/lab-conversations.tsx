@@ -15,9 +15,6 @@ import { spacing } from '@/theme/tokens'
 
 import { MockPane } from './lab-foreman'
 
-// Dev only: ways to find a conversation by its state from a coworker's chat header.
-//   /lab-conversations?variant=a   a: the native menu, in sections; b and c: the chip opens a sheet,
-//   see lab-conversations-sheet
 const ACTIVE = LAB_CONVERSATIONS[0]
 const COWORKER = { id: 'agent-pulse', kind: 'coworker' as const, name: 'clem cv', status: 'working' as const }
 const CHIP_MAX_WIDTH = 220
@@ -28,7 +25,6 @@ function MenuRow({ conversation }: { conversation: LabConversation }) {
     return <MenuItem label={conversation.title} icon={glyphOf(conversation)} subtitle={detail ?? null} onPress={() => {}} />
 }
 
-// What waits elsewhere, on the chip: the count of the other conversations that need the person.
 function ChipBadge({ count }: { count: number }) {
     const theme = useTheme()
     if (count === 0) return null

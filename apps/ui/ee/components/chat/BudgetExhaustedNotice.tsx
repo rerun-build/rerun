@@ -19,33 +19,6 @@ import { NOTICE_PERKS } from '@/ee/lib/billing/pro-perks'
 
 type SubscriptionProvider = 'claude' | 'codex'
 
-// `onConnectProvider` opens the workspace's AI providers on the sign-in of the plan that was picked.
-// A chat with no board behind it has nowhere to send the user, so it leaves the two buttons out
-// rather than showing dead ones, and the notice is down to its one paid way out.
-//
-// `preTrial` is the foreman's case: the credit that just ran out is the signup allowance, a top-up
-// that does not come back, on a workspace with no plan. Telling that user about a monthly reset and
-// selling them credits would be wrong twice. Passed in rather than read from the session, so the
-// notice keeps rendering in the UI kit, outside every provider.
-//
-// `trialing` is the same signup allowance running out during the trial: it does not reset either,
-// and credit packs are not sold on a trial. What opens more is the plan itself, paid today.
-//
-// `paused` is a member having turned the credit off: the hub answers the same 402, but nothing ran
-// out, and the one way out is turning it back on.
-// `ownConnection` is a Claude or ChatGPT plan already connected to the Box while this conversation
-// still ran on Rerun: inviting to connect it again would only sign in once more and change nothing.
-// Running the conversation on it is the way out that works.
-//
-// `noCredit` is a workspace that never had any Rerun credit, such as a workspace added before its
-// plan: nothing was used up, so the notice does not say it was.
-//
-// `lifetime` is a workspace on the lifetime plan (an AppSumo code): it has no Rerun credit by design
-// and nothing is sold to it, so its only way out is its own AI.
-//
-// On a trial, `coworker` names who stopped, `onPaid` hands the checkout a way to pick the task back
-// up, and `resuming` is the moment between paying and the plan landing, when the notice turns into
-// the receipt. `onResumeNow` is the hand-held way back if that moment drags on.
 export type BudgetNoticeOwnConnection = { label: string; provider: string; onUse: () => void }
 
 type TrialUpgrade = { coworker?: string; priceArm?: PriceArm; onPaid?: () => void; resuming?: boolean; onResumeNow?: () => void }
@@ -100,7 +73,6 @@ export function BudgetExhaustedNotice({
 
     if (trialing && !noCredit) return <TrialUpgradeNotice {...upgrade} onConnectProvider={onConnectProvider} ownConnection={ownConnection} />
 
-    // A workspace with no credit at all has no month that will refill it: what opens credit is the plan.
     const paidWayOut: NoticeAction = trialing || noCredit
         ? {
               key: 'plan',

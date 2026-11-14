@@ -2,13 +2,6 @@ import { stripe } from '@/ee/lib/billing/stripe'
 
 const SETTLED_SUBSCRIPTION_STATUSES = new Set(['canceled', 'incomplete_expired'])
 
-/**
- * Stops Stripe from charging for a trial that is being paused. A declined first charge leaves a
- * `past_due` subscription that Stripe keeps retrying for weeks, and cancelling it is not enough: its
- * open invoice stays collectable until it is voided. Coming back is a new subscription, through
- * the billing dialog. Reached for a customer with no paid invoice, and for one whose account is
- * being deleted once nothing is left to renew.
- */
 export async function stopBilling(customerId: string | null): Promise<string | null> {
     if (!customerId) return null
     try {

@@ -5,12 +5,8 @@ import { BorderBeam } from '../BorderBeam'
 import { TooltipDisabledReason } from '../Tooltip'
 import { cn } from '../cn'
 
-/** `--chrome-size` in px, for the few places that animate to it in JS. */
 export const CHROME_SIZE = 40
 
-// Un bloc tient son élément de bord à la même distance du côté que du haut : un avatar de 24px
-// dans une coque de 40 est à 8px des deux, un glyphe de 16 à 12, un contrôle de 32 à 4. Le texte,
-// qui n'a pas de boîte à centrer, se cale à 16. Chaque valeur compte la bordure de 1px.
 export type ChromeInset = 'control' | 'avatar' | 'gauge' | 'icon' | 'text'
 
 const INSET_START: Record<ChromeInset, string> = {
@@ -39,7 +35,6 @@ function ChromeBeam({ beamTone = 'white', beamAnimated = false }: ChromeBeamProp
 
 export type ChromePillProps = ComponentProps<'button'> & ChromeBeamProps & { start?: ChromeInset; end?: ChromeInset }
 
-/** A block that is its own control: the whole surface is the button. */
 export function ChromePill({ start = 'text', end = 'text', beamTone, beamAnimated, className, children, ...props }: ChromePillProps) {
     return (
         <button
@@ -55,7 +50,6 @@ export function ChromePill({ start = 'text', end = 'text', beamTone, beamAnimate
 
 export type ChromeBarProps = ComponentProps<'div'> & ChromeBeamProps & { orientation?: 'horizontal' | 'vertical'; start?: ChromeInset; end?: ChromeInset }
 
-/** A block that holds controls or a status line. Vertical, it is one control wide. */
 export function ChromeBar({ orientation = 'horizontal', start = 'control', end = 'control', beamTone, beamAnimated, className, children, ...props }: ChromeBarProps) {
     return (
         <div
@@ -79,7 +73,6 @@ export type ChromeButtonProps = ComponentProps<'button'> & {
     disabledReason?: string | null
 }
 
-/** A control inside a `ChromeBar`: a round icon button, or a labelled one. */
 export function ChromeButton({ icon: Icon, label, disabledReason, disabled, className, children, ...props }: ChromeButtonProps) {
     const labelled = label !== undefined || children !== undefined
     return (

@@ -1,7 +1,3 @@
-/* La boule du Foreman (`ForemanBall`). Importé via @rerun/ui/styles.css. */
-
-/* The glint that crosses the material: what makes it read as polished and not as painted. It rests
-   off the shape for the second half of its period. */
 @keyframes foreman-buddy-sheen {
     0% { transform: translateX(0); }
     55%, 100% { transform: translateX(170px); }
@@ -11,8 +7,6 @@
     animation: foreman-buddy-sheen var(--foreman-sheen-period, 6s) ease-in-out infinite;
 }
 
-/* A ball has no walls to stretch: it leaves the floor whole, lands squashed, and its shadow tightens
-   while it is in the air. --foreman-amp sets how high, so each state keeps its rhythm. */
 @keyframes foreman-ball-body {
     0%, 100% {
         transform: translateY(0) scale(calc(1 + var(--foreman-amp) * 0.7), calc(1 - var(--foreman-amp) * 0.7));

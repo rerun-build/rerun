@@ -23,8 +23,6 @@ function readDismissed(): string[] {
     }
 }
 
-// A workspace only hears about the providers it has its own connection to. The Rerun hub alone
-// never raises the banner: it goes through OpenRouter, which no status page here speaks for.
 export function ProviderStatusBanner() {
     const { connections } = useWorkspaceConnections()
     const pages = statusPagesFor(connections.filter(connection => connection.connected).map(connection => connection.provider))
@@ -40,12 +38,10 @@ function ProviderIncidentsBanner({ pages }: { pages: string[] }) {
 
     if (incidents.length === 0) return null
 
-    // Incidents only ever arrive from the client poll, so storage is never read during a server render.
     const dismissed = dismissedNow ?? readDismissed()
     const active = incidents.filter(incident => !dismissed.includes(incident.id))
     if (active.length === 0) return null
 
-    // Keyed by incident, so the next one shows again. Only the live ids are kept: the list never grows.
     const dismiss = () => {
         const next = incidents.map(incident => incident.id)
         localStorage.setItem(DISMISSED_KEY, JSON.stringify(next))

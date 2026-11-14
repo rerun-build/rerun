@@ -30,14 +30,10 @@ export const createTriggerSchema = z.object({
     methods: z.array(triggerMethodSchema).min(1).optional(),
     enabled: z.boolean().optional(),
     connectionId: z.string().nullable().optional(),
-    // Null means "whatever the agent runs", which is itself the box default when the agent picked
-    // nothing. A routine that names no model follows its agent instead of freezing a pair.
     provider: providerSchema.nullable().default(null),
     model: z.string().nullable().default(null),
 })
 
-// The slug is derived from the name and the public URL is built from the slug, so renaming
-// would silently break every caller. The name is fixed at creation.
 export const updateTriggerSchema = z.object({
     description: z.string().optional(),
     body: z.string().optional(),
@@ -48,8 +44,6 @@ export const updateTriggerSchema = z.object({
     model: z.string().nullable().optional(),
 })
 
-// What the UI forwards to the engine when the public URL is called. The caller's headers are
-// deliberately absent: they carry credentials and are trivially spoofed.
 export const triggerFireSchema = z.object({
     token: z.string().min(1),
     method: triggerMethodSchema,

@@ -64,7 +64,6 @@ export function BusinessDetailsRow({ business, onOpen }: { business: BusinessDet
     )
 }
 
-// Only reached with a billing country: the row stays disabled without one.
 export function BusinessDetailsPane({ business, onBack, onSaved }: { business: BusinessDetails; onBack: () => void; onSaved: () => Promise<void> }) {
     const t = useTranslations('billing.business')
     const errorText = useErrorText()

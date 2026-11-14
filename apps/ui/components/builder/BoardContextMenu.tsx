@@ -15,7 +15,6 @@ import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
-// A menu entry the caller sees but may not use: disabled, with the reason on hover.
 function Forbidden({ reason, children }: { reason: string | undefined; children: ReactNode }) {
     if (!reason) return <>{children}</>
     return (

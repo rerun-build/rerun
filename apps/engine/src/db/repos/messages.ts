@@ -5,9 +5,6 @@ import { getSystemDb } from '../systemDb.js'
 import { messages, type MessageRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'
 
-// What was said, which is not everything that carries a `text`: a reasoning part does too, and so
-// does the context the engine appends to a user turn. It feeds both the search index and the
-// `output` of a run.
 export function extractText(content: unknown): string {
     return visibleText(content, ' ')
 }
@@ -30,8 +27,6 @@ export async function appendMessage(agentId: string, sessionId: string, message:
     return row
 }
 
-// The replies the model closed its answer with live beside the row, never in `content_json`: the
-// history the model reads back must not show them, the chat and a reload must.
 export async function setMessageToolCalls(agentId: string, messageId: string, calls: unknown[]): Promise<void> {
     const { db } = await getSystemDb(agentId)
     await db.update(messages).set({ toolCallsJson: JSON.stringify(calls) }).where(eq(messages.id, messageId))
@@ -42,7 +37,6 @@ export async function listMessages(agentId: string, sessionId: string): Promise<
     return db.select().from(messages).where(eq(messages.sessionId, sessionId)).orderBy(asc(messages.createdAt))
 }
 
-// Two messages of one turn can share a millisecond, so the insertion order breaks the tie.
 export async function lastMessageId(agentId: string, sessionId: string): Promise<string | undefined> {
     const { db } = await getSystemDb(agentId)
     const [row] = await db.select({ id: messages.id }).from(messages).where(eq(messages.sessionId, sessionId)).orderBy(desc(messages.createdAt), desc(sql`rowid`)).limit(1)

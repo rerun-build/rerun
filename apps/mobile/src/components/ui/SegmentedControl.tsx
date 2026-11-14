@@ -4,7 +4,6 @@ import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers'
 import type { SegmentedControlProps } from '@/components/ui/segmented-types'
 import { useTheme } from '@/theme/theme'
 
-// The system's segmented picker, stretched to its container.
 export function SegmentedControl<Value extends string>({ options, value, onChange }: SegmentedControlProps<Value>) {
     const theme = useTheme()
     return (

@@ -12,9 +12,7 @@ type IconProps = {
     name: IconName
     size?: number
     color: string
-    // Nucleo's color-2: the accent stroke of a two-tone glyph.
     secondaryColor?: string
-    // A heavier stroke, for a glyph that sits on a filled button.
     bold?: boolean
     accessibilityLabel?: string
     style?: StyleProp<ViewStyle>
@@ -43,8 +41,6 @@ function shapeElement(shape: IconShape, key: number, paint: { stroke: string; fi
     return <Shape key={key} {...(shape[1] as object)} {...paint} strokeLinecap="round" strokeLinejoin="round" />
 }
 
-// An icon of the app, the same on iOS and Android: Nucleo in Rerun Cloud, lucide in a self-hosted
-// build (`@rerun/cloud-mobile/icons`), drawn by react-native-svg.
 export function Icon({ name, size = 18, color, secondaryColor = color, bold = false, accessibilityLabel, style }: IconProps) {
     const maskId = `icon${useId().replace(/[^a-zA-Z0-9]/g, '')}`
     const glyph = ICONS[name]

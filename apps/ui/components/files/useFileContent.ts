@@ -12,7 +12,6 @@ type UseFileContentProps = {
 
 type ReadResult = { path: string; content: string | null; truncated: boolean; error: string | null }
 
-// Only text files are read: every other kind is rendered straight from its raw URL.
 export function useFileContent({ path, name, read }: UseFileContentProps) {
     const t = useTranslations('files.preview')
     const readFailedRef = useRef(t('readFailed'))
@@ -37,7 +36,6 @@ export function useFileContent({ path, name, read }: UseFileContentProps) {
 
     const ready = result?.path === path ? result : null
 
-    // What was just written, so the preview shows it without a round trip.
     const replaceContent = useCallback(
         (content: string) => setResult(current => (current?.path === path ? { ...current, content } : current)),
         [path],

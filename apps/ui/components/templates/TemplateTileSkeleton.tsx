@@ -1,7 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
-// Mirrors TemplateTile: the board, the agent's name over the title, then the byline and its apps.
 export function TemplateTileSkeleton({ className }: { className?: string }) {
     return (
         <div aria-hidden className={cn('flex min-w-0 flex-col', className)}>

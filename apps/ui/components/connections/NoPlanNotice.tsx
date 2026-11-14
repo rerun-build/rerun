@@ -9,8 +9,6 @@ import { startPlan } from '@rerun/cloud/billing.client'
 import { cn } from '@/lib/utils'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// A plan or a key lives on the workspace's machine, and only a workspace on a plan has one: before
-// that, whatever the user pastes has nowhere to go.
 export function useNeedsPlanToConnect(): boolean {
     const { workspace } = useSession()
     return !!workspace && !isSubscriptionEntitled(workspace.subscription_status)

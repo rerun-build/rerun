@@ -5,8 +5,6 @@ import { openStore } from './sqlStore.js'
 
 const STORE_KEY = 'brain'
 
-// The markdown files in brain/ are the source of truth; everything here is either rebuilt from them
-// (pages, chunks, links) or only exists here (proposals, revisions).
 const BRAIN_DDL = `
 CREATE TABLE IF NOT EXISTS brain_pages (
     slug TEXT PRIMARY KEY,
@@ -79,8 +77,6 @@ async function addColumn(client: Client, table: string, column: string, type: st
     await client.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`)
 }
 
-// A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
-// A file from before the ladder sits at version 0 with the baseline tables already there.
 export const BRAIN_DB_MIGRATIONS: SqliteMigration[] = [
     {
         version: 1,

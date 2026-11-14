@@ -9,7 +9,6 @@ export function isLastSignInMethod(value: unknown): value is LastSignInMethod {
     return value === 'email' || value === 'phone' || isOAuthProvider(value)
 }
 
-// Written once the session is open, never on the click: a provider left halfway marks nothing.
 export function rememberSignInMethod(method: LastSignInMethod) {
     document.cookie = `${LAST_SIGN_IN_COOKIE}=${method}; path=/; max-age=${LAST_SIGN_IN_MAX_AGE_SECONDS}; samesite=lax`
 }
@@ -24,7 +23,6 @@ function readLastSignInMethod(): LastSignInMethod | null {
 
 const neverChanges = () => () => {}
 
-// Null on the server and during hydration: the badge only joins in once the page is live.
 export function useLastSignInMethod(): LastSignInMethod | null {
     return useSyncExternalStore(neverChanges, readLastSignInMethod, () => null)
 }

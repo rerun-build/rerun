@@ -1,7 +1,5 @@
 import type { AiConnectionView, AiConnectionsView, ConnectionUsage } from '@rerun/contracts'
 
-// Dev only: what GET /api/v1/ai-connections answers, in the states the lab shows.
-
 const RERUN: AiConnectionView = {
     id: 'rerun',
     name: 'Rerun',
@@ -86,7 +84,6 @@ const OPENROUTER: AiConnectionView = {
     planWindows: [],
 }
 
-// Sold as a plan, connected with a key: the Go models paid by the plan, the Console ones by credits.
 const OPENCODE: AiConnectionView = {
     id: 'cnx-opencode',
     name: 'OpenCode',
@@ -216,7 +213,6 @@ export const AI_CONNECTIONS_FULL: AiConnectionsView = {
     addable: ADDABLE.map(entry => (entry.provider === 'claude' ? { ...entry, suggestedName: 'Claude 2' } : entry.provider === 'codex' ? { ...entry, suggestedName: 'ChatGPT 2' } : entry.provider === 'openrouter' ? { ...entry, suggestedName: 'OpenRouter 2' } : entry)),
 }
 
-// Every provider plugged in with its own key, no subscription: the App Store screenshot.
 export const AI_CONNECTIONS_KEYS: AiConnectionsView = {
     connections: [{ ...RERUN, isDefault: false }, { ...ANTHROPIC, isDefault: true }, OPENAI, GOOGLE, OPENROUTER],
     default: { connectionId: 'cnx-anthropic', model: 'claude-opus-5-5', label: 'Opus 5.5' },
@@ -241,7 +237,6 @@ export const AI_CONNECTIONS_CREDIT_USED_UP: AiConnectionsView = {
     credit: { percent: 100, usedUp: true, backOn: 'on Nov 1' },
 }
 
-// A trial: the premium models are listed but locked, as the hub marks them.
 export const AI_CONNECTIONS_TRIAL: AiConnectionsView = {
     ...AI_CONNECTIONS_FULL,
     connections: AI_CONNECTIONS_FULL.connections.map(connection => ({ ...connection, models: connection.models.map(model => ({ ...model, locked: /opus|fable|astra/.test(model.id) })) })),

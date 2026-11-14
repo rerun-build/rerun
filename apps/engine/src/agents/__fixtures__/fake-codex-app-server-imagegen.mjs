@@ -1,7 +1,3 @@
-// Stands in for `codex app-server --listen stdio://`: answers the handshake, then answers every turn
-// with the image_gen tool of Codex 0.166 (an `imageGeneration` item, started then completed) and a
-// short message. FAKE_IMAGE_STATUS=failed makes the generation fail; FAKE_IMAGE_SAVED_PATH names a
-// file the item points at, with or without inline bytes (FAKE_IMAGE_INLINE=0 leaves them out).
 import { appendFileSync } from 'node:fs'
 import { createInterface } from 'node:readline'
 
@@ -27,7 +23,6 @@ createInterface({ input: process.stdin }).on('line', line => {
     if (method === 'initialize') return send({ id, result: { userAgent: 'codex_cli_rs/0.166.0', capabilities: {} } })
     if (method === 'thread/start' || method === 'thread/resume') return send({ id, result: { thread: { id: THREAD_ID } } })
     if (method !== 'turn/start') {
-        // Anything else the engine asks (the config, the models) gets an empty answer rather than a hang.
         if (id !== undefined) send({ id, result: {} })
         return
     }

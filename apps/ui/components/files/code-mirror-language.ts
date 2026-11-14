@@ -2,9 +2,6 @@ import type { LanguageSupport } from '@codemirror/language'
 
 import { fileExtension } from '@/lib/files/preview'
 
-// Each grammar is its own chunk, pulled only when a file of that kind is opened. A workspace holds
-// mostly markdown, json and scripts; anything else opens without highlighting rather than dragging
-// a parser it will never use.
 const LOADERS: Record<string, () => Promise<LanguageSupport>> = {
     json: () => import('@codemirror/lang-json').then(m => m.json()),
     md: () => import('@codemirror/lang-markdown').then(m => m.markdown()),

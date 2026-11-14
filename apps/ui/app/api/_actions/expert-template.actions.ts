@@ -16,13 +16,6 @@ import { templateAuthorSchema, type ExpertTemplate, type ExpertTemplateDetail } 
 import type { ActionResult } from './space.actions'
 import { failureOf } from '@/lib/i18n/action-error'
 
-// An expert authors templates from their sandbox. Ownership is `templates.creator_id`, so every
-// action here re-resolves the caller and never trusts an id from the client for anything but the
-// row to load. Publication stays admin-only: an author writes drafts and hands them over.
-//
-// The work itself lives in `lib/templates/author.ts`, which the MCP server calls with the same
-// arguments: these are the browser's door to it, not a second implementation.
-
 export async function listMyTemplatesAction(): Promise<ActionResult<{ templates: ExpertTemplate[] }>> {
     try {
         return { ok: true, templates: await listAuthorTemplates(await requireExpertUserId()) }
@@ -31,8 +24,6 @@ export async function listMyTemplatesAction(): Promise<ActionResult<{ templates:
     }
 }
 
-// The editor works on the full document: it mounts the same sections as the admin console, and
-// `toTemplateBrief` describes a template from the form rather than from the row.
 export async function getMyTemplateAction(id: string): Promise<ActionResult<{ template: ExpertTemplateDetail }>> {
     try {
         return { ok: true, template: await loadAuthorTemplate(await requireExpertUserId(), id) }

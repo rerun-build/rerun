@@ -17,8 +17,6 @@ export function newServiceInstanceId(taken: Iterable<string> = []): string {
     }
 }
 
-// A single `-`: `@` and `:` are refused in a server name, and `__` would be read by the Claude Code
-// SDK as the end of the server part of `mcp__<server>__<tool>`.
 export function instanceServerName(templateName: string, instanceId: string): string {
     return `${templateName.slice(0, MCP_SERVER_NAME_MAX - instanceId.length - 1)}-${instanceId}`
 }
@@ -34,7 +32,6 @@ export function defaultInstanceEnvVar(slug: string, instanceId: string | undefin
     return `RERUN_SVC_${scope}_${sanitizeEnvPart(inputKey)}`
 }
 
-// "Gmail 2", "Gmail 3"… the first number no other account of the app already shows.
 export function ordinalInstanceLabel(serviceName: string, reg: ServiceRegistry, slug: string): string {
     const labels = new Set(entriesOfSlug(reg, slug).map(({ entry }) => entry.label))
     let n = 2

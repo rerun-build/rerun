@@ -18,8 +18,6 @@ type ScreenCardProps = {
     ref?: Ref<HTMLDivElement>
 }
 
-// The coworker's screen as a block of its thread, where the run uses it. A takeover the run asks for
-// joins the same block, under a rule: the screen it is about, then what to do.
 export function ScreenCard({ live, site, screen, takeover, onTakeControl, ref }: ScreenCardProps) {
     const t = useTranslations('desktop.screenCard')
     return (
@@ -39,7 +37,6 @@ export function ScreenCard({ live, site, screen, takeover, onTakeControl, ref }:
                     <TakeoverAsk takeover={takeover} />
                 </div>
             )}
-            {/* Last and above, or the opaque screen paints over the ring. */}
             {takeover && <BorderBeam animated pattern="arcs" tone="brand" glow width={1} duration={7} className="z-10" />}
         </div>
     )

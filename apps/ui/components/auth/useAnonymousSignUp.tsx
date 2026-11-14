@@ -26,18 +26,10 @@ import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 
 const SETTLE_TIMEOUT_MS = 5_000
 
-// How an anonymous visitor becomes an account, wherever the form is drawn: the account dialog and
-// the arrival column mount the same thing. A brand-new email upgrades the anonymous user in place
-// (updateUser, confirmed by an email_change code); an existing email signs them into that account
-// instead. Either way the parked draft is flagged for replay (markResume) and the board finishes
-// the job once the session settles.
-//
-// `active` is whether the form is on screen: it is what opens and closes the signup the funnel counts.
 export function useAnonymousSignUp({ surface, active, onEntered }: { surface: SignupSurface; active: boolean; onEntered?: (created: boolean) => void }): { form: ReactNode; abandon: () => void; reset: () => void; movedOn: boolean } {
     const t = useTranslations('auth')
     const locale = useLocale()
     const [formKey, setFormKey] = useState(0)
-    // Past the first screen: a method switched to, or a code asked for.
     const [movedOn, setMovedOn] = useState(false)
     const errorText = useErrorText()
     const supabase = createClient()
@@ -67,14 +59,10 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
                 if (error) throw error
                 return
             }
-            // The code email is Supabase's template, which reads the language from the metadata.
             const { error } = await supabase.auth.updateUser({ email, data: { locale } })
             if (error) throw error
         })
 
-    // Existing account: sign in. The anonymous workspace is left behind; the parked draft is replayed
-    // on the account the user just signed into. New account: the code confirms the email the anonymous
-    // user claimed, so the workspace, and the agent about to be created, stay on the same id.
     const verifyCode = async (email: string, code: string) => {
         const { error } = await supabase.auth.verifyOtp({ email, token: code, type: emailIsNew.current ? 'email_change' : 'email' })
         if (error) throw error
@@ -82,10 +70,6 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
         await enter(emailIsNew.current)
     }
 
-    // The signup is stamped by the server on the next request, and the phone wall or the foreman
-    // only rise once this tab holds the stamp. Waiting for it here, with the code button still
-    // pending, is what lets the dialog close onto the right screen. Never throws: the code was
-    // right, and the forms would show it as wrong. Should the wait fail, the provider keeps asking.
     const settleSignup = async () => {
         try {
             await Promise.race([completeSignupAction(), new Promise(resolve => setTimeout(resolve, SETTLE_TIMEOUT_MS))])
@@ -93,9 +77,6 @@ export function useAnonymousSignUp({ surface, active, onEntered }: { surface: Si
         await refreshUser?.().catch(() => {})
     }
 
-    // A phone number follows the same two paths, decided on the server: a number no account holds
-    // upgrades the anonymous user, a known one signs into its account. `markConverted` comes before
-    // any await, so closing the dialog during the settle is not counted as an abandon.
     const enter = async (created: boolean) => {
         funnel.markConverted()
         markResume()

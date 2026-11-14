@@ -4,8 +4,6 @@ import type { Provider } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { newId } from '../lib/ids.js'
 
-// Dropped in one go rather than one per step: every eviction rewrites the prompt from that picture
-// on, and a provider's prefix cache only survives when that happens rarely.
 const MAX_KEPT = 6
 const KEPT_AFTER_EVICTION = 3
 
@@ -16,9 +14,6 @@ export type ScreenshotStore = {
     get: (id: string) => StoredScreenshot | undefined
 }
 
-// A tool result is frozen into the conversation the moment it is produced, so a picture put there
-// would be stored, replayed and counted as text forever. The result only names its screenshot, the
-// pictures live here for the length of the run, and each model call gets the recent ones attached.
 export function createScreenshotStore(): ScreenshotStore {
     const kept = new Map<string, StoredScreenshot>()
     return {
@@ -32,8 +27,6 @@ export function createScreenshotStore(): ScreenshotStore {
     }
 }
 
-// A chat-completions tool message is text only: a provider speaking that format gets the picture
-// in a user message right after it.
 export type ScreenshotDelivery = 'tool-result' | 'user-message'
 const CHAT_COMPLETIONS_PROVIDERS = new Set<Provider>(['rerun', 'openrouter', 'custom'])
 
@@ -85,8 +78,6 @@ export function withScreenshots(messages: ModelMessage[], store: ScreenshotStore
     })
 }
 
-// A model that cannot see never gets the picture: OpenCode would drop it without a word, and the
-// model would answer about a screen it never saw.
 export function stepWithScreenshots(messages: ModelMessage[], store: ScreenshotStore | undefined, provider: Provider, model = '', connection?: LoadedConnection | null): { messages?: ModelMessage[] } {
     if (!store || !modelSeesImages(provider, model, connection)) return {}
     return { messages: withScreenshots(messages, store, CHAT_COMPLETIONS_PROVIDERS.has(behaviourOf(provider, model)) ? 'user-message' : 'tool-result') }

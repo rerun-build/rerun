@@ -13,7 +13,6 @@ import { LOADING_ACTIVITIES, liveActivityLabel } from '@/lib/agent-chat-loader'
 type ChatActivityLoaderProps = {
     agentId?: string
     message?: Parameters<typeof liveActivityLabel>[0]
-    /** Ce qui tourne à gauche du label. Le Foreman y met sa bête, un agent garde les points. */
     indicator?: ReactNode
 }
 
@@ -25,9 +24,6 @@ export function ChatActivityLoader({ agentId, message, indicator }: ChatActivity
 
     return (
         <Message from="assistant">
-            {/* La bulle coupe ce qui déborde, et le bloom de l'orbe déborde de sa boîte par
-                construction : sans ça il est raboté net au ras du contour, à gauche comme en haut.
-                Rien d'autre ne déborde ici, le `px-3` de la pile absorbe le reste. */}
             <MessageContent className="overflow-visible">
                 <div className="flex h-8 items-center gap-2">
                     {indicator ?? <DotSpinner variant="light" size="xs" />}

@@ -25,7 +25,6 @@ export function canSudo(): boolean {
 
 export const isRoot = (): boolean => process.getuid?.() === 0
 
-// Directly as root, through a non-interactive sudo otherwise. Callers check `canSudo()` first.
 export function asRoot(command: string[], input?: string): void {
     if (isRoot()) run(command[0]!, command.slice(1), { input })
     else run('sudo', ['-n', ...command], { input })

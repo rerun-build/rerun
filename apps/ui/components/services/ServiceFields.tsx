@@ -12,8 +12,6 @@ type ServiceFieldsProps = {
     onChange: (key: string, value: string) => void
 }
 
-// Presentational credential inputs shared by the inline ServiceConfigForm (chat + Services tab).
-// Renders a select or input per field based on its type.
 export function ServiceFields({ inputs, values, onChange }: ServiceFieldsProps) {
     const t = useTranslations('services.fields')
     return (

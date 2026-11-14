@@ -1,5 +1,3 @@
-// Copy of the hub's apps/ui/lib/net/public-fetch.ts (plus a typed error and the caller's own abort
-// signal): the engine has no runtime package shared with the hub, the two files are kept in step by hand.
 import { lookup } from 'node:dns/promises'
 import { BlockList, isIP } from 'node:net'
 
@@ -41,8 +39,6 @@ export const isHttpUrl = (url: string): boolean => {
     }
 }
 
-// The request leaves from our own network, so the host is judged by where it resolves, not by how
-// it is spelled: a public name pointing at 169.254.169.254 is refused like the address itself.
 export async function resolvesToPublicAddresses(hostname: string): Promise<boolean> {
     const host = hostname.replace(/^\[|\]$/g, '')
     try {
@@ -64,8 +60,6 @@ export async function assertPublicUrl(url: string): Promise<URL> {
     return parsed
 }
 
-// Only GET and HEAD follow a redirect, each hop re-checked. A POST gets its 3xx back as is: a token
-// or registration endpoint has no reason to redirect, and replaying the body elsewhere would leak it.
 export async function fetchPublic(url: string, init: RequestInit = {}, { timeoutMs = FETCH_TIMEOUT_MS, maxRedirects = MAX_REDIRECTS }: { timeoutMs?: number; maxRedirects?: number } = {}): Promise<Response> {
     const method = (init.method ?? 'GET').toUpperCase()
     const followsRedirects = method === 'GET' || method === 'HEAD'

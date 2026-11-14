@@ -19,20 +19,11 @@ export type AttentionSession = {
     engineSessionId: string | null
     status: SessionStatus
     title: string
-    /** The question, approval, heads-up or error the agent left for the user, when one was recorded. */
     message: string | null
     updatedAt: string | null
-    /**
-     * Why the notification that put it here reached the user. `null` when it did not reach them, `legacy` when it was
-     * stored before recipients existed or when no notification explains it, `undefined` until loaded.
-     */
     reason?: NotificationReason | 'legacy' | null
 }
 
-/**
- * What the « To handle » list shows: one agent's sessions waiting on the user, or every agent's when
- * `agentId` is left out. The store only carries ids and statuses, so titles are read on the side.
- */
 export function useAttentionSessions(agentId?: string): AttentionSession[] {
     const sessions = useBoardStore(s => s.sessions)
     const { user } = useSession()

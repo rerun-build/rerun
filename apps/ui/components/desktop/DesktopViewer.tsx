@@ -11,8 +11,6 @@ const KEYSYM_CONTROL_LEFT = 0xffe3
 const KEYSYM_V = 0x0076
 const KEYSYM_RETURN = 0xff0d
 
-// X11 keysyms: Latin-1 is its own code point, anything else is the code point offset into the
-// Unicode range, and a line break is Return.
 function keysymOf(char: string): number {
     if (char === '\n') return KEYSYM_RETURN
     const codePoint = char.codePointAt(0) ?? 0
@@ -20,22 +18,16 @@ function keysymOf(char: string): number {
 }
 
 export type DesktopViewerHandle = {
-    // The remote clipboard is not this computer's: a paste has to be pushed there, then typed.
     paste: (text: string) => void
-    // One key pressed and released, for a keyboard that cannot reach the canvas (a phone's).
     key: (keysym: number, code: string) => void
-    // Text typed key by key: unlike a paste, it lands in a terminal as well as in a form.
     type: (text: string) => void
 }
 
 type DesktopViewerProps = {
     socketUrl: string
     onDisconnect: () => void
-    // A screen to watch: nothing typed or clicked reaches the machine, and the pointer goes through
-    // to whatever holds the viewer.
     viewOnly?: boolean
     ref?: Ref<DesktopViewerHandle>
-    // The canvas the screen is painted on once connected, null when it goes: what a mirror copies.
     onCanvas?: (canvas: HTMLCanvasElement | null) => void
     className?: string
 }

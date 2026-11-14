@@ -8,7 +8,6 @@ describe('boxNameSuggestions', () => {
         expect(boxNameSuggestions(undefined, [])).toEqual(DEFAULT_BOX_NAMES.slice(0, 4))
     })
 
-    // The value comes out of a jsonb column, so a label a later revision drops still lands here.
     it('falls back to the defaults on a label that is no longer a category', () => {
         expect(boxNameSuggestions('healthcare', [])).toEqual(DEFAULT_BOX_NAMES.slice(0, 4))
     })
@@ -26,7 +25,6 @@ describe('boxNameSuggestions', () => {
         expect(boxNameSuggestions('saas', ['  pRoDuCt ', 'MARKETING'])).toEqual(['Engineering', 'Support', 'Sales', 'Finance'])
     })
 
-    // A Box created before this existed can carry no name at all, which the hook passes through as ''.
     it('ignores an unnamed Box', () => {
         expect(boxNameSuggestions('saas', [''])).toEqual(INDUSTRY_BOX_NAMES.saas.slice(0, 4))
     })
@@ -37,8 +35,6 @@ describe('boxNameSuggestions', () => {
         }
     })
 
-    // Six each is what lets four survive once a couple of Boxes exist. A list that drifts under that
-    // would quietly start showing three pills, then two.
     it('keeps enough spare names behind the four', () => {
         for (const [category, names] of Object.entries(INDUSTRY_BOX_NAMES)) {
             if (category === 'other') continue

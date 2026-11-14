@@ -9,9 +9,6 @@ import { NotificationCenter } from '@/components/notifications/NotificationCente
 import { MOCK_ROUTINES } from '@/mocks/coworkerDetails'
 import { coworkers } from '@/mocks/data'
 
-// Dev only: the notification settings and a coworker's own rule, on mock data, in each state.
-// `rerun://lab-notifications?screen=center&state=normal`, `screen=coworker&state=muted`.
-
 type LabState = 'normal' | 'loading' | 'failed' | 'push-off' | 'push-undetermined' | 'nothing' | 'rules' | 'muted' | 'no-tasks'
 
 const COWORKERS = coworkers.filter(coworker => coworker.kind === 'coworker').map(({ id, name }) => ({ id, name }))

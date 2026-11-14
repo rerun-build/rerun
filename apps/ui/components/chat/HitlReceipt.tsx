@@ -24,8 +24,6 @@ const USER_SIDE = 'ml-auto w-full max-w-[85%]'
 
 type HitlReceiptProps = {
     reply: HitlReply
-    // The call the reply answers, when the thread still holds it: it adds what the reply text drops
-    // (icons, key labels, approval details, the options a question offered).
     call?: HitlCallPart
     spentMicros?: number
     spendRunning?: boolean
@@ -34,7 +32,6 @@ type HitlReceiptProps = {
     readFile?: ReadChatFile
 }
 
-// What the user decided in a setup block, drawn in place of the reply written for the agent.
 export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false, agentId, rawUrlFor, readFile }: HitlReceiptProps) {
     const input = hitlCallInput(call)
     switch (reply.kind) {
@@ -77,8 +74,6 @@ const SERVICE_STATUS: Record<ServiceSetupOutcome, { labelKey: 'connected' | 'ski
     'not-found': { labelKey: 'notFound', tone: 'red' },
 }
 
-// The reply names an app picked as an alternative but not its slug, so its icon is found among the
-// alternatives of the apps the agent asked for.
 function useAlternativeIcons(slugs: string[]): Map<string, string> {
     const key = slugs.join(',')
     const [icons, setIcons] = useState(new Map<string, string>())

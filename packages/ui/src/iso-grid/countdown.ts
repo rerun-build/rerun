@@ -14,7 +14,6 @@ export function countdownShort(remainingMs: number, t: KitTranslator = englishKi
     return t('isoGrid.countdown.days', { count: Math.round(remainingMs / DAY) })
 }
 
-// Past 99 the exact count no longer reads at a glance and only widens the pill.
 export const resultsCount = (count: number) => (count > 99 ? '99+' : String(count))
 
 export function isCountdownSoon(remainingMs: number): boolean {

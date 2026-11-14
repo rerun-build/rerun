@@ -3,8 +3,6 @@
 import { AnimatePresence, motion } from 'motion/react'
 import type { ReactNode } from 'react'
 
-// Step transitions slide in the direction of travel (forward → in from the right, back → in from the
-// left) so moving between steps reads as motion rather than an abrupt swap.
 export const STEP_TRANSITION = { duration: 0.16, ease: [0.22, 1, 0.36, 1] } as const
 
 const bodyVariants = {

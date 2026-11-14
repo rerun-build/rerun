@@ -19,7 +19,6 @@ type Takeover = {
     ready: Promise<void>
     context: BrowserContext | null
     endWhenUnwatched: boolean
-    // Until then a window handed back waits for the run it resumes, watched or not.
     keptUntil: number
     rearmExpiry: () => void
     runHolds: number
@@ -35,7 +34,6 @@ function lastUrl(context: BrowserContext): string | null {
     return url && url !== 'about:blank' ? url : null
 }
 
-// A refused page leaves the window on about:blank rather than on a LAN or local address.
 async function openable(url: string): Promise<boolean> {
     try {
         await assertPublicUrl(url)
@@ -46,18 +44,11 @@ async function openable(url: string): Promise<boolean> {
     }
 }
 
-// The person drives the agent's own profile, so a sign-in they complete is the agent's from then on.
-// The profile lock is held for the whole session: a browser_navigate of the same agent waits behind
-// it rather than clearing the lock files of a Chromium that is still running.
-// A browser opened from the dock of the screen has nobody to say it is done, so it closes once the
-// screen has gone unwatched, unless the agent asks for a takeover on it in the meantime.
-// A run that drives the browser itself holds it open past both limits, until the run lets go.
 export async function startTakeover(agentId: string, url?: string, { endWhenUnwatched = false }: TakeoverOptions = {}): Promise<void> {
     const open = () => joinActive(agentId, url, endWhenUnwatched)
     const already = open()
     if (already) return already
     const { display } = await ensureDesktop(agentId)
-    // Asked again synchronously: a second start may have opened the browser while the screen came up.
     const meanwhile = open()
     if (meanwhile) return meanwhile
     const release = holdDesktop(agentId)
@@ -141,10 +132,6 @@ export async function finishTakeover(agentId: string): Promise<TakeoverResult> {
     return takeover.closed
 }
 
-// The person is done but the window stays on the agent's screen, where the run they resume picks it
-// up: reopening it would land on an empty screen, and a web app like WhatsApp starts its sync over.
-// From then on it is the agent's, closed like one it opened itself once nobody uses it. A window left
-// on no page has nothing to carry on in, and closes.
 export async function handBackTakeover(agentId: string): Promise<TakeoverResult> {
     const takeover = active.get(agentId)
     const context = takeover && !takeover.closing ? takeover.context : null
@@ -156,14 +143,11 @@ export async function handBackTakeover(agentId: string): Promise<TakeoverResult>
     return { url, open: true }
 }
 
-// For a run that drives the browser with its own hands. Letting go closes a browser nobody is
-// looking at; one a person watches or asked for stays theirs to close.
 export async function holdBrowser(agentId: string, url?: string): Promise<() => void> {
     await startTakeover(agentId, url, { endWhenUnwatched: true })
     return holdOpenBrowser(agentId)
 }
 
-// Holds the window already open, if any, without opening one.
 export function holdOpenBrowser(agentId: string): () => void {
     const takeover = active.get(agentId)
     if (!takeover || takeover.closing) return () => {}
@@ -178,8 +162,6 @@ export function holdOpenBrowser(agentId: string): () => void {
     }
 }
 
-// The browser tool takes the profile lock a session holds for as long as it lives, so it works in
-// the open window instead of waiting behind it. Null when there is no window to join.
 export function joinableBrowser(agentId: string): Promise<BrowserContext | null> | null {
     const takeover = active.get(agentId)
     if (!takeover || takeover.closing) return null

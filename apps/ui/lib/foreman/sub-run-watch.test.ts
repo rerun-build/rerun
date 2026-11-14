@@ -6,8 +6,6 @@ import { beginSubRun, endSubRun, snapshotSubRun, type SubRunProgress } from './s
 const progressOf = (): SubRunProgress => ({ title: 'Scout', status: 'queued', steps: 0 })
 
 describe('snapshotSubRun', () => {
-    // The producer and the block share `SubRunTask`, and this is the assertion that the wire between
-    // them holds: what goes out is exactly what subRunProgressOf reads back.
     it('hands the block a task it reads back whole, idle time included', () => {
         const progress = progressOf()
         beginSubRun(progress)

@@ -11,10 +11,6 @@ import { ALL_DONE, ALL_FAILED, callAgentMessage, cliDelegateMessage, delegateMes
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: a delegate_tasks (and a call_agent) in a coworker's chat, in every state the web lab has.
-//   /lab-delegate?scenario=live&scheme=dark   scenario: one of SCENARIOS, all of them when left out;
-//   scheme forces a theme
-
 const DONE = { state: 'output-available' as const, output: 'Done' }
 
 const SCENARIOS: Record<string, { label: string; message: UIMessage }> = {
@@ -31,7 +27,6 @@ const SCENARIOS: Record<string, { label: string; message: UIMessage }> = {
     answered: { label: 'Coworker answered', message: callAgentMessage('answered', 'Growth', { status: 'done', steps: 6, toolCalls: 8, startedAt: 0, finishedAt: 42_000 }, DONE) },
 }
 
-// The web's scripted delegation, replayed in a loop: each round mounts a new message, as a new delegation would.
 function useLiveTasks(): { round: number; tasks: SubRunTask[] } {
     const [elapsed, setElapsed] = useState(0)
     useEffect(() => {

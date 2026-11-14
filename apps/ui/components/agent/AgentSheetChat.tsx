@@ -26,7 +26,6 @@ type AgentSheetChatProps = {
     onOpenInstall?: (sessionId: string) => void
     onRunFinished?: () => void
     onNewConversation?: () => void
-    // The coworker's General: its first message opens it on the hub, its feed hangs the threads.
     kind?: 'general'
     title?: string
     threads?: ThreadRow[]
@@ -37,8 +36,6 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, onSessionCreat
     const t = useTranslations('agent')
     const boardAgents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
-    // Every agent of the workspace answers to `call_agent`, whichever Box it sits in. Its own Box
-    // opens the list, and only the others carry a Box name, so a single-Box workspace sees none.
     const mentionAgents = useMemo<MentionAgent[]>(() => {
         const self = boardAgents.find(a => a.id === agentId)
         if (!self) return []
@@ -62,15 +59,12 @@ export function AgentSheetChat({ uid, active, agentId, sessionId, onSessionCreat
     const onSessionInsert = useBoardStore(s => s._onSessionInsert)
     const setSessionStatus = useBoardStore(s => s.setSessionStatus)
 
-    // Deux booléens plutôt que le tableau : un onglet monté en arrière-plan ne se re-rend pas parce
-    // qu'une session d'un autre agent a bougé.
     const sessionWorking = useBoardStore(s => s.sessions.some(entry => entry.id === sessionId && entry.status === 'working'))
     const alertPending = useBoardStore(s => s.sessions.some(entry => entry.id === sessionId && entry.status === 'awaiting_ack'))
     const sessionIdle = useBoardStore(s => s.sessions.some(entry => entry.id === sessionId && entry.status === 'idle'))
 
     const body = useMemo(() => ({ source: 'builder' as const, ...(kind === 'general' && { kind }) }), [kind])
     const agentName = boardAgents.find(a => a.id === agentId)?.name ?? t('panelsShared.yourCoworker')
-    // A thread keeps the default name until the hub has named it after its first message.
     const composerPlaceholder = kind === 'general' || !sessionId || !title || title === NEW_THREAD_TITLE ? t('agentSheetChat.messagePlaceholder', { name: agentName }) : t('agentSheetChat.replyPlaceholder', { title })
 
     const header = originAgentName ? (

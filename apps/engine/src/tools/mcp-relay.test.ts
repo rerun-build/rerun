@@ -33,8 +33,6 @@ async function clientOf(relay: Relay) {
     return client
 }
 
-// send_email as mcp-mail-server@2.1.2 lists it on an engine box: the root anyOf kept it away from the
-// model of every claude agent carrying the Email (IMAP/SMTP) app.
 const SIGNATURE = {
     type: 'object',
     anyOf: [{ required: ['text'] }, { required: ['html'] }],

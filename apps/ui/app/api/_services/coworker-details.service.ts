@@ -10,8 +10,6 @@ import { coworkerRuleOf } from '@/lib/notifications/prefs'
 import { humanCron } from '@/lib/schedules/cron'
 import type { CoworkerFile, CoworkerFiles, CoworkerNotifications, CoworkerNotifyMode, RenameCoworkerInput, RoutineKind, RoutinesView, SkillSummariesView } from '@rerun/contracts'
 
-// Renaming and deleting reach a coworker the engine may not answer for (switched off, not set up),
-// so they only check the caller's Box, without asking the engine.
 export async function renameCoworker(ctx: WorkspaceContext, agentId: string, input: RenameCoworkerInput): Promise<void> {
     await assertAgentAccess(agentId, 'manage', actorFromContext(ctx))
     await renameAgent(agentId, input.name)
@@ -57,15 +55,12 @@ export async function readCoworkerNotifications(ctx: WorkspaceContext, agentId: 
     return { mode: coworkerRuleOf(await readNotificationPrefs(ctx.userId), agentId).mode }
 }
 
-// Only the mode moves: whether the caller follows the coworker's scheduled tasks is kept as it was.
 export async function setCoworkerNotifications(ctx: WorkspaceContext, agentId: string, mode: CoworkerNotifyMode): Promise<void> {
     await assertAgentAccess(agentId, 'use', actorFromContext(ctx))
     const rule = coworkerRuleOf(await readNotificationPrefs(ctx.userId), agentId)
     await patchNotificationPrefs(ctx.userId, { coworkers: { [agentId]: { ...rule, mode } } })
 }
 
-// The engine lists one folder at a time, so the walk is bounded: a coworker that cloned a repository
-// must not turn opening its details into hundreds of calls to its Box.
 const FILE_WALK = { maxListings: 40, maxDepth: 5, maxFiles: 300 }
 const MEDIA_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'heic', 'heif', 'avif'])
 const SKIPPED_DIRS = new Set(['node_modules'])

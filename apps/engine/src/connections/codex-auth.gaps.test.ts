@@ -139,8 +139,6 @@ describe('ensureCodexAuth refresh', () => {
         expect((await authFile()).tokens.refresh_token).toBe('')
     })
 
-    // Several agents share one subscription: a burst of runs must not spend the refresh token twice,
-    // since the second call would present one the first already rotated away.
     it('shares one refresh between concurrent callers of the same connection', async () => {
         answer(200, { access_token: 'shared', refresh_token: 'refresh-new' })
         const live = connection({ ...STALE_ENV })

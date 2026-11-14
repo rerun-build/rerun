@@ -12,7 +12,6 @@ export async function GET() {
     return new Response(new Uint8Array(png), {
         headers: {
             'Content-Type': 'image/png',
-            // Versioned by the caller, like the banner: a rendered mark never has to be revalidated.
             'Cache-Control': 'public, max-age=31536000, immutable',
         },
     })

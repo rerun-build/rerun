@@ -13,7 +13,6 @@ export async function setAgentModel(caller: Caller, agentId: string, choice: Set
     await api(`/api/v1/agents/${encodeURIComponent(agentId)}/model`, { ...caller, method: 'PUT', body: choice })
 }
 
-// The mark a connection's provider shows under: five logos cover every provider the engine runs.
 export function logoOf(provider: Provider): ModelProvider {
     if (provider === 'rerun' || provider === 'openrouter') return 'rerun'
     if (provider === 'anthropic' || provider === 'claude') return 'claude'
@@ -22,7 +21,6 @@ export function logoOf(provider: Provider): ModelProvider {
     return 'google'
 }
 
-// The model a coworker runs today, as the chip names it.
 export function runningModel(models: AgentModels | null): { id: string; label: string; provider: ModelProvider } | undefined {
     const running = models?.resolved ?? models?.boxDefault
     if (!models || !running) return undefined

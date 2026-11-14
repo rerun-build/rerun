@@ -28,14 +28,11 @@ export async function listConnectionIds(): Promise<string[]> {
     return entries.filter(e => e.isDirectory() && connectionExists(e.name)).map(e => e.name)
 }
 
-// The keyless `rerun` connection is served by the hub, which holds the shared key: it counts as
-// connected when the box knows where to reach the hub and how to authenticate against it.
 export function isConnected(connection: LoadedConnection): boolean {
     if (connection.id === RERUN_CONNECTION_ID) {
         const { RERUN_HUB_BASE_URL, RERUN_API_KEY } = env()
         return !!RERUN_HUB_BASE_URL && !!RERUN_API_KEY
     }
-    // A custom endpoint is reached by its address; the key is optional, a local server takes none.
     if (connection.config.provider === 'custom') return !!connection.config.baseUrl
     const key = CONNECTION_TOKEN_KEY[connection.config.provider]
     return !!key && !!connection.env[key]

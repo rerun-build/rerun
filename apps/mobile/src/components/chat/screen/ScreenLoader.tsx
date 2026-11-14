@@ -6,8 +6,6 @@ import Svg, { Path } from 'react-native-svg'
 
 import { useTheme } from '@/theme/theme'
 
-// The web's compact `DesktopScreenLoader`: a grid of cells a diagonal wave sweeps, drawn as one path
-// per shade so a frame stays a handful of shapes.
 const CELL = { size: 6, gap: 2, radius: 1.5 }
 const PITCH = CELL.size + CELL.gap
 const OPACITY_STEPS = 6

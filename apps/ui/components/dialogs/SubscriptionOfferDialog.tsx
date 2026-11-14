@@ -12,9 +12,6 @@ import { suggestName, type AddableProvider } from '@/lib/engine/ai-sources'
 import { useSubscriptionOfferStore } from '@/stores/subscription-offer.store'
 import { useTranslations } from 'next-intl'
 
-// Offered once, before the first install starts: the moment a workspace meets its first coworker is
-// the one where it learns that coworker can run on a plan it already pays for. Every way out marks
-// the offer made and lets the install start, Escape included.
 export function SubscriptionOfferDialog() {
     const t = useTranslations('dialogs.subscriptionOffer')
     const open = useSubscriptionOfferStore(state => state.open)
@@ -22,8 +19,6 @@ export function SubscriptionOfferDialog() {
 
     return (
         <Dialog open={open} onOpenChange={next => !next && answer()}>
-            {/* A stray click outside would spend the only time this is offered, and cut the wait
-                on the ChatGPT code short. */}
             <SplitDialogContent aside={<OfferBoardPanel className="border-l" />} onInteractOutside={event => event.preventDefault()}>
                 <DialogTitle className="sr-only">{t('title')}</DialogTitle>
                 <ConnectedOffer onClose={answer} />
@@ -32,8 +27,6 @@ export function SubscriptionOfferDialog() {
     )
 }
 
-// Mounted with the dialog rather than with the app: the connections are only asked for once there
-// is a machine to hold them.
 function ConnectedOffer({ onClose }: { onClose: () => void }) {
     const { connections, opencodeOffered, create } = useWorkspaceConnections()
 

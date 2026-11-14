@@ -2,8 +2,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from './database.types'
 
-// The single owner of the experts image storage layout, shared by the three write paths: the admin
-// form (`admin/`), the landing claim wizard and the in-app profile dialog (both `claimed/`).
 export const EXPERT_PHOTOS_BUCKET = 'expert-photos'
 export const EXPERT_BANNERS_BUCKET = 'banner-illustrations'
 
@@ -33,9 +31,6 @@ export async function uploadExpertImage(
     return { ok: true, url: supabase.storage.from(EXPERT_PHOTOS_BUCKET).getPublicUrl(path).data.publicUrl }
 }
 
-// banner_url is NOT NULL on experts, so imported profiles get a randomly assigned illustration.
-// Rather than maintaining a duplicated file list, we read the banner-illustrations bucket at
-// runtime (same source the admin banners generator writes to).
 export async function listExpertBannerUrls(supabase: SupabaseClient<Database>): Promise<string[]> {
     const { data, error } = await supabase.storage.from(EXPERT_BANNERS_BUCKET).list('', { limit: 1000 })
     if (error || !data) return []
@@ -45,9 +40,6 @@ export async function listExpertBannerUrls(supabase: SupabaseClient<Database>): 
         .map(f => supabase.storage.from(EXPERT_BANNERS_BUCKET).getPublicUrl(f.name).data.publicUrl)
 }
 
-// Storage lists alphabetically and every filename starts with its dominant color, so the raw order
-// stacks all the blues, then all the violets. Ordering on a hash of the name breaks those runs up
-// while keeping the grid stable from one open to the next.
 function scrambleSeed(name: string): number {
     let hash = 0
     for (let i = 0; i < name.length; i++) hash = (Math.imul(hash, 31) + name.charCodeAt(i)) | 0

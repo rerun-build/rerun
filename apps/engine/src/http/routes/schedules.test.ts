@@ -153,7 +153,6 @@ describe('PATCH a schedule', () => {
         expect(await (await send('GET', '/keep-my-name')).json()).toMatchObject({ name: 'Keep my name' })
     })
 
-    // Looks wrong: the create route insists on exactly one of cron or runAt, the PATCH lets both stand.
     it('keeps the cron when a runAt is added', async () => {
         await create({ name: 'Both timings', body: 'x', cron: '0 9 * * *' })
         expect(await patch('both-timings', { runAt: '2030-01-01T09:00:00.000Z' })).toMatchObject({ cron: '0 9 * * *', runAt: '2030-01-01T09:00:00.000Z' })

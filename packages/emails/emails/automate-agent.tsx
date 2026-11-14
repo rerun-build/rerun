@@ -10,12 +10,9 @@ import { text } from "../theme";
 export interface AutomateAgentProps {
   agentName: string;
   manualRuns: number;
-  /** "the last two weeks", preformatted. */
   periodLabel: string;
-  /** The last thing the agent reported. No panel without it. */
   lastResult?: string;
   scheduleUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;

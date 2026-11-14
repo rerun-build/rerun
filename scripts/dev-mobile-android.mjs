@@ -1,18 +1,3 @@
-// The Expo Android app in this workspace's own emulator, from a bare checkout to a running bundle.
-//
-//   pnpm dev:mobile --android             reusing a dev client already built for the same native inputs
-//   pnpm dev:mobile --android --rebuild   ignore the cached dev client and force the native build
-//
-// Same shape as the iOS path of dev-mobile.mjs. Each workspace gets its own AVD, "Rerun_<workspace>"
-// (a Pixel 9 on the latest Google APIs image, for Play Services: Google Sign-In and push), and only one
-// emulator runs at a time on the Mac: starting this one shuts down the others. The emulator reaches the
-// Mac's Metro and Next through `adb reverse`, so the app calls `localhost` like the iOS simulator.
-// The debug APK only depends on the native inputs, the JS comes from Metro, so every build is kept in a
-// cache shared by the workspaces of this Mac. As on iOS, the key leaves pnpm-lock.yaml out: a native
-// module bumped through the lockfile alone needs --rebuild.
-// The dev client installs as `build.rerun.app.dev` (RERUN_ANDROID_DEV_CLIENT, see app.config.ts),
-// beside a store build.
-
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs'
@@ -35,18 +20,14 @@ const KEPT_CLIENTS = 4
 const AVD_PREFIX = 'Rerun_'
 const AVD_DEVICE = 'pixel_9'
 const AVD_RAM_MB = 3072
-// Named after the workspace's folder, the name the cleanup of archived workspaces compares against
-// (a Conductor workspace's display name can differ from its folder).
 const WORKSPACE_PATH = process.env.CONDUCTOR_WORKSPACE_PATH || process.env.ORCA_WORKTREE_PATH || REPO_ROOT
 const avdNameOf = (folder) => `${AVD_PREFIX}${folder.replace(/[^A-Za-z0-9._-]/g, '_')}`
 const AVD_NAME = avdNameOf(basename(WORKSPACE_PATH))
 const API_PORT = Number(process.env.CONDUCTOR_PORT ?? 3050)
 const METRO_PORT = API_PORT + 2
 const PACKAGE = 'build.rerun.app.dev'
-// The emulator of the Mac's single running AVD: the default console port, so its serial is stable.
 const EMULATOR_PORT = 5554
 const SERIAL = `emulator-${EMULATOR_PORT}`
-// Only the emulator's ABI: a debug build for the four ABIs takes three times as long.
 const ABI = 'arm64-v8a'
 
 const { log, fail } = createLogger('android')
@@ -60,8 +41,6 @@ function dotenvValue(key) {
 const remoteApiUrl = process.env.EXPO_PUBLIC_API_URL || dotenvValue('EXPO_PUBLIC_API_URL')
 const usesLocalApi = !remoteApiUrl
 
-// A hub on the Mac given by URL (say, one already running on the staging database) is the emulator's
-// localhost only through `adb reverse`, like the hub this script starts.
 function macPortOf(url) {
     try {
         const { hostname, port, protocol } = new URL(url)
@@ -110,7 +89,6 @@ function adb(...args) {
     return spawnSync('adb', ['-s', SERIAL, ...args], { encoding: 'utf8', env })
 }
 
-// The newest Google APIs image installed for the Mac's ABI, which is what the AVD boots.
 function systemImage() {
     const images = join(ANDROID_HOME, 'system-images')
     const levels = existsSync(images) ? readdirSync(images).filter(name => /^android-\d+$/.test(name)) : []
@@ -129,7 +107,6 @@ function avds() {
         .filter(Boolean)
 }
 
-// The AVDs of archived workspaces would keep their disk images (several GB each) forever.
 function deleteArchivedWorkspaceAvds() {
     if (WORKSPACE_PATH === REPO_ROOT && !process.env.CONDUCTOR_WORKSPACE_PATH && !process.env.ORCA_WORKTREE_PATH) return
     const workspaces = new Set(readdirSync(dirname(WORKSPACE_PATH)).map(avdNameOf))
@@ -161,7 +138,6 @@ function runningAvd() {
     return adb('emu', 'avd', 'name').stdout.split('\n')[0].trim() || null
 }
 
-// One emulator at a time: each takes 3 to 4 GB, and the Mac also runs Docker and the iOS simulators.
 function stopOtherEmulators() {
     for (const line of capture('adb', ['devices']).split('\n')) {
         const serial = line.split('\t')[0]
@@ -189,12 +165,9 @@ async function bootEmulator() {
     log(`${AVD_NAME} is up`)
 }
 
-// The local modules' Kotlin and their expo-module.config.json go into the APK too, so they are native
-// inputs. Sorted, with their paths, so the key only moves when a file is added, removed or changed.
 function localModuleInputs() {
     if (!existsSync(LOCAL_MODULES_DIR)) return []
     const files = []
-    // Gradle writes its outputs to android/build, android/.gradle and android/.cxx.
     const walk = (dir, isModuleRoot) => {
         for (const entry of readdirSync(dir, { withFileTypes: true })) {
             if (entry.name.startsWith('.') || (isModuleRoot && entry.name === 'build')) continue
@@ -225,7 +198,6 @@ function clientKey() {
     return createHash('sha256').update(nativeInputsHash()).update([PACKAGE, ABI, jdk].join('|')).digest('hex')
 }
 
-// A quiet gradle prints nothing for minutes on a cold build, so it gets a heartbeat.
 function runGradle(args) {
     return new Promise(done => {
         const startedAt = Date.now()
@@ -317,7 +289,6 @@ export async function runAndroid() {
     await bootEmulator()
     install(client)
 
-    // The emulator's localhost is its own: these make the Mac's Metro and Next answer there.
     const apiPort = usesLocalApi ? API_PORT : macPortOf(remoteApiUrl)
     for (const port of [METRO_PORT, ...(apiPort ? [apiPort] : [])]) adb('reverse', `tcp:${port}`, `tcp:${port}`)
 

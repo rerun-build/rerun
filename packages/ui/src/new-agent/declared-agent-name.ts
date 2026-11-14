@@ -8,7 +8,6 @@ const POSSESSIVE = /['’]s$/i
 const MAX_NAME_WORDS = 4
 const LINES_LOOKED_AT = 3
 
-// A heading that titles the document rather than naming the coworker.
 const SECTION_HEADINGS = new Set(['soul', 'soul.md', 'identity', 'role', 'mission', 'instructions', 'system prompt', 'prompt', 'overview', 'context', 'brief', 'persona', 'purpose', 'goal', 'goals', 'about', 'rules', 'agent', 'coworker', 'who you are', 'identité', 'rôle', 'contexte', 'objectif', 'objectifs', 'consignes'])
 
 function clause(text: string): string {
@@ -27,8 +26,6 @@ function nameFromHeading(heading: string): string | null {
     return bounded(words)
 }
 
-// "You are Gig Applier, working for…": the capitalised words right after the preamble, up to the
-// first punctuation or the first lowercase word. "You are a helpful assistant" names no one.
 function nameFromPreamble(line: string): string | null {
     const preamble = line.match(PREAMBLE)
     if (!preamble) return null
@@ -39,15 +36,11 @@ function nameFromPreamble(line: string): string | null {
         words.push(word)
     }
     if (words.length === 0 || words.length > MAX_NAME_WORDS) return null
-    // After an article, a lone capitalised word that the sentence goes on from describes a role
-    // ("an AI assistant that…", "the Head of Sales"), it does not name the coworker.
     const articled = preamble[1] !== undefined
     if (articled && words.length === 1 && clauseWords.length > 1) return null
     return bounded(words)
 }
 
-// The name a pasted brief or SOUL gives the coworker itself, read without a model so it holds even
-// when the reading of the text has not come back yet.
 export function declaredAgentName(text: string): string | null {
     const lines = text
         .split('\n')

@@ -79,8 +79,6 @@ export function isFailureResult(output: unknown): boolean {
     return status !== null && isFailureStatus(Number(status[1]))
 }
 
-// Idle time is computed here rather than by the reader: the UI clock can drift from the engine's,
-// and a stream replayed after a reload would otherwise date every part at the moment of the replay.
 export function snapshotSubRun<T extends SubRunProgress>(progress: T): Omit<T, 'lastActivityAt' | 'calls'> & { idleMs?: number; calls: SubRunCallSnapshot[] } {
     const { lastActivityAt, calls, ...rest } = progress
     const now = Date.now()
@@ -148,12 +146,6 @@ type FollowOptions = {
 
 type StreamPart = { type: string; text?: string; toolName?: string; toolCallId?: string; input?: unknown; output?: unknown; error?: unknown }
 
-/**
- * Drains a sub-run into `progress` and returns its text. A run that goes silent for the idle timeout,
- * whose parent is stopped, or whose task is stopped by hand, is aborted: a hung provider stream never
- * ends on its own, and the parent tool call would otherwise wait on it forever. Whatever the run had
- * already said comes back with the stop reason, so the caller keeps the partial work.
- */
 export async function followSubRun(
     run: Pick<AgentRun, 'result' | 'runId'> & Partial<Pick<AgentRun, 'settled'>>,
     progress: SubRunProgress,
@@ -168,8 +160,6 @@ export async function followSubRun(
     let idleTimer: NodeJS.Timeout | undefined
     const armIdleTimer = () => {
         clearTimeout(idleTimer)
-        // A run waiting on its own sub-run says nothing until that sub-run ends, and the watcher of
-        // that sub-run already stops it if it hangs.
         if ([...openCalls.values()].some(call => SUB_RUN_TOOLS.has(call.tool))) return
         idleTimer = setTimeout(() => stop(`no activity for ${Math.round(idleTimeoutMs / 60_000)} min, sub-coworker stopped`), idleTimeoutMs)
         idleTimer.unref?.()

@@ -45,8 +45,6 @@ agentRoutes.post('/', async c => {
     return c.json(publicView(agent.id, agent.config, agent.soul, agent.install, agent.resolved), 201)
 })
 
-// The body is the gzipped folder itself rather than a multipart field: an archive runs to
-// 150 MB and `parseBody` would hold all of it in memory before anything is written.
 agentRoutes.post('/import', async c => {
     const name = c.req.query('name')
     if (!name) throw badRequest('An import needs a `name` for the copy')
@@ -68,16 +66,12 @@ agentRoutes.get('/:id/tools', async c => {
     return c.json({ families: agentToolCatalog(await readAgentConfig(id)) })
 })
 
-// The host's way of closing an installation the user skipped: `install_complete` is the agent's,
-// and a skipped setup never reaches it.
 agentRoutes.post('/:id/automations/activate', async c => {
     const id = c.req.param('id')
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
     return c.json(await activateAutomations(await loadAgentFromDisk(id)))
 })
 
-// A copy on this same box, which is why it takes a JSON body and not a tarball: nothing leaves
-// the engine, so nothing has to be packed, redacted or re-authorized on the way.
 agentRoutes.post('/:id/duplicate', async c => {
     const id = c.req.param('id')
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
@@ -109,9 +103,6 @@ agentRoutes.patch('/:id', async c => {
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
     const body = (await c.req.json()) as Record<string, unknown>
     if ('mcpServers' in body) return c.json({ error: 'mcpServers cannot be set here; use PATCH /agents/:id/mcp-servers with { upsert, remove }' }, 400)
-    // `.partial()` makes every field optional but still materialises its `.default()`, so parsing
-    // `{ verbosity }` hands back a full config where provider, model and description have silently
-    // reverted. Keep only the fields the caller actually sent, or a PATCH would reset the rest.
     const validated = agentConfigSchema.partial().parse(body) as Record<string, unknown>
     const patch = Object.fromEntries(Object.entries(validated).filter(([field]) => field in body))
     const agent = await withAgentLock(id, async () => {
@@ -131,13 +122,10 @@ agentRoutes.patch('/:id', async c => {
         if (typeof body.soul === 'string' && body.soul.trim().length > 0) {
             await writeFile(soulPath(id), `${body.soul.trim()}\n`, 'utf8')
         } else if (next.displayName && current.displayName?.trim() && next.displayName !== current.displayName && existsSync(soulPath(id))) {
-            // The soul is written once, at creation, with the name the agent had then.
             const soul = await readFile(soulPath(id), 'utf8')
             const renamed = replaceDisplayName(soul, current.displayName.trim(), next.displayName)
             if (renamed !== soul) await writeFile(soulPath(id), renamed, 'utf8')
         }
-        // Unlike the soul, an install prompt has to be erasable: answering "no setup needed"
-        // means the file goes away, not that the previous instructions stay behind.
         if (typeof body.install === 'string') {
             const install = body.install.trim()
             if (install.length > 0) await writeFile(installPath(id), `${install}\n`, 'utf8')
@@ -145,8 +133,6 @@ agentRoutes.patch('/:id', async c => {
         }
         return { renamedFrom: next.name !== current.name ? current.name : null, loaded: await reloadAgent(id) }
     })
-    // Outside the lock: the rewrite takes every other agent's lock in turn, and two renames each
-    // holding their own while waiting on the other's would never finish.
     if (agent.renamedFrom) await rewriteRenamedAgentReferences(id, agent.renamedFrom, agent.loaded.config.name)
     const view = agent.renamedFrom ? await reloadAgent(id) : agent.loaded
     return c.json(publicView(id, view.config, view.soul, view.install, view.resolved))
@@ -168,7 +154,6 @@ agentRoutes.patch('/:id/mcp-servers', async c => {
     return c.json(publicView(id, agent.config, agent.soul, agent.install, agent.resolved))
 })
 
-// Dials every server for real, so it is slow by nature: a caller asks for the names it needs.
 agentRoutes.get('/:id/mcp-servers/status', async c => {
     const id = c.req.param('id')
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)

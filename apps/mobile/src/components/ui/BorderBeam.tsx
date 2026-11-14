@@ -6,10 +6,6 @@ import Svg, { Circle, Path } from 'react-native-svg'
 import { useTheme } from '@/theme/theme'
 import { mix } from '@/theme/tokens'
 
-// Port of the web `BorderBeam` arcs (packages/ui/src/BorderBeam.tsx): a conic gradient with two
-// opposite arcs spins behind the card, and the card's surface covers all of it but a 1px ring. The
-// gradient is drawn once and only its rotation runs, on the native driver: Reanimated commits the shadow
-// tree every frame and cost ~4% CPU per card, the native driver touches the view alone.
 const BEAM_COLORS = {
     brand: '#b7a8ff',
     orange: '#f97316',
@@ -26,7 +22,6 @@ const ARC_STOPS: [number, number][] = [
     [0.22, REST_SHARE],
 ]
 
-// The web arcs: `beam-2 0%, beam-1 10%, beam-2 22%`, then the same half a turn later.
 function shareAt(turn: number) {
     const within = turn % 0.5
     for (let i = 1; i < ARC_STOPS.length; i++) {
@@ -68,11 +63,8 @@ function ConicArcs({ side, beam, rest }: { side: number; beam: string; rest: str
     )
 }
 
-// The web's neutral arcs are the foreground at a low alpha over the surface: 40% / 8% in light, 55% / 10% in dark.
 const NEUTRAL_SHARES = { light: { beam: 0.4, rest: 0.08 }, dark: { beam: 0.55, rest: 0.1 } } as const
 
-// First child of a card with a 1px border: it repaints the card's `surface` and turns its border into
-// the beam. `radius` is the card's border radius. A static beam stays at `angle`, as the web's.
 export function BorderBeam({ tone = 'brand', radius, surface, animated = true, angle = 220 }: { tone?: BeamTone; radius: number; surface: string; animated?: boolean; angle?: number }) {
     const theme = useTheme()
     const reduceMotion = useReducedMotion()

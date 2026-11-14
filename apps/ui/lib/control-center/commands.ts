@@ -32,7 +32,6 @@ export type ControlCommand = {
     label: string
     keywords: string[]
     disabledReason: string | null
-    // Paid plans only: selecting it on another plan opens billing instead of the panel.
     paid: boolean
 }
 
@@ -46,7 +45,6 @@ export type ControlGates = {
     darkTheme: boolean
 }
 
-// Why a command is disabled, in the reader's language. The English is for the tests and the labs.
 export type ControlReasons = { sandbox: string; admin: string; singleBox: string }
 
 const ENGLISH_REASONS: ControlReasons = { sandbox: 'The expert sandbox has none of its own', admin: 'Admins only', singleBox: 'A sandbox has a single Box' }
@@ -83,7 +81,6 @@ export function buildControlCommands(gates: ControlGates, reasons: ControlReason
 
 const MAX_RECENT_AGENTS = 5
 
-// Most recent first, each agent once.
 export function pushRecentAgent(recent: readonly string[], agentId: string): string[] {
     return [agentId, ...recent.filter(id => id !== agentId)].slice(0, MAX_RECENT_AGENTS)
 }

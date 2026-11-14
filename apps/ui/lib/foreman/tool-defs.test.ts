@@ -9,11 +9,6 @@ import { toolIconOf } from '@/lib/tool-meta'
 import { ACCOUNT_TOOL_NAMES } from '@/lib/mcp/account-tools'
 import { ALL_PLAN_KINDS, FOREMAN_BOX_TOOL_DEFS, FOREMAN_ONBOARDING_TOOL_DEFS, FOREMAN_WIDGET_TOOL_DEFS, FOREMAN_CLIENT_TOOL_DEFS, FOREMAN_CLIENT_TOOL_NAMES, FOREMAN_MCP_TOOL_NAMES, FOREMAN_TOOL_DEFS, FOREMAN_TOOL_NAMES, showPlanDef, showTemplatesDef } from './tool-defs'
 
-// The belts are assembled from places that know nothing about each other: names borrowed from the
-// MCP server, Box tools dispatched onto server actions, and tools the browser resolves. A name that
-// drifts in any of them fails silently at runtime, as a tool the model calls and nobody answers, so
-// the seams are checked here.
-
 const boxHandlerNames = [...readFileSync(path.resolve(import.meta.dirname, 'box-tools.ts'), 'utf8').matchAll(/case '([a-z_]+)':/g)].map(match => match[1])
 
 const onboardingHandlerSource = readFileSync(path.resolve(import.meta.dirname, 'onboarding-tools.ts'), 'utf8')
@@ -33,8 +28,6 @@ describe('foreman tool defs', () => {
         expect(FOREMAN_MCP_TOOL_NAMES.filter(name => !ACCOUNT_TOOL_NAMES.includes(name))).toEqual([])
     })
 
-    // The onboarding gets to know them and lays a plan out: everything that acts on the workspace is
-    // the engine foreman's, once the build has claimed the machine.
     it('hands the onboarding belt nothing that acts on the workspace', () => {
         const workspaceTools = [...FOREMAN_MCP_TOOL_NAMES, ...FOREMAN_BOX_TOOL_DEFS.map(def => def.name), 'install_template', 'install_shared_agent', 'start_agent_setup', 'list_templates']
         expect(workspaceTools.filter(name => (FOREMAN_TOOL_NAMES as readonly string[]).includes(name))).toEqual([])
@@ -56,9 +49,6 @@ describe('foreman tool defs', () => {
         expect(FOREMAN_WIDGET_TOOL_DEFS.map(def => def.name).filter(name => !widgetRendererSource.includes(`case '${name}':`))).toEqual([])
     })
 
-    // The plan card is the only tool whose schema depends on the conversation: what the model can
-    // write down is narrowed to what it can really land, and a funnel that never met a ready-made
-    // team must not read that a template item exists at all.
     it('offers the plan kinds the conversation can land, and no others', () => {
         for (const def of [showPlanDef(['agent'])]) {
             const properties = (def.inputSchema as PlanSchema).properties.items.items.properties
@@ -77,8 +67,6 @@ describe('foreman tool defs', () => {
         }
     })
 
-    // During the onboarding the Boxes are the ones the welcome card drew: the model is handed no
-    // way to write one, only the names it may file an agent under.
     it('asks for agents only once the Boxes are pinned', () => {
         const pinned = showPlanDef(['agent'], ['Sales', 'Marketing']).inputSchema as PlanSchema & { properties: { boxes?: unknown }; required: string[] }
         expect(pinned.properties.boxes).toBeUndefined()
@@ -107,16 +95,12 @@ describe('foreman tool defs', () => {
         expect(AGENT_FOCUS_TABS.filter(tab => !focusAgent.description.includes(`\`${tab}\` ("${AGENT_TAB_LABELS[tab]}"`))).toEqual([])
     })
 
-    // Without it the chat tab opens on a blank composer while the run the foreman just started
-    // plays in a conversation the user never sees.
     it('lets focus_agent name the conversation to land on', () => {
         const focusAgent = FOREMAN_CLIENT_TOOL_DEFS.find(def => def.name === 'focus_agent')!
         expect(focusAgent.inputSchema.properties.conversationId).toBeDefined()
         expect(focusAgent.inputSchema.required).toEqual(['agentId', 'tab'])
     })
 
-    // The row is what replaced the panel the assistant used to open on its own: it has to carry
-    // everything focus_agent did, or the chat it leads to is an empty one.
     it('lets a show_agents row lead to a tab and to a running conversation', () => {
         const showAgents = FOREMAN_CLIENT_TOOL_DEFS.find(def => def.name === 'show_agents')!
         const row = showAgents.inputSchema.properties.agents.items
@@ -132,8 +116,6 @@ describe('foreman tool defs', () => {
         expect(SETTINGS_PANELS.filter(panel => !openSettings.description.includes(`\`${panel}\` ("${SETTINGS_PANEL_LABELS[panel]}"`))).toEqual([])
     })
 
-    // toolIconOf never fails, it falls back to a title-cased name under a wrench. That fallback is
-    // right for an unknown MCP tool and wrong for ours, so the assertion is on the icon.
     it('gives every tool a label of its own in the chat', () => {
         expect(FOREMAN_TOOL_NAMES.filter(name => toolIconOf(name) === WrenchIcon)).toEqual([])
     })
@@ -158,15 +140,12 @@ describe('the discovery schemas', () => {
     const widget = (name: string) => FOREMAN_WIDGET_TOOL_DEFS.find(def => def.name === name) as { inputSchema: { properties: Record<string, { type?: string }>; required?: string[] } }
     const onboarding = (name: string) => FOREMAN_ONBOARDING_TOOL_DEFS.find(def => def.name === name) as { inputSchema: { properties: Record<string, { type?: string; items?: { type?: string } }> } }
 
-    // The multiple flag is what turns the one question of the funnel into a list they tick. The
-    // form has always known how to render it; without it in the schema the model cannot ask for it.
     it('lets ask_choice be asked as a list to tick, and does not demand it', () => {
         const schema = widget('ask_choice').inputSchema
         expect(schema.properties.multiple?.type).toBe('boolean')
         expect(schema.required).not.toContain('multiple')
     })
 
-    // Two buttons is the whole card: a third answer has nowhere to be drawn.
     it('asks ask_either for a title, a line and exactly two answers', () => {
         const schema = widget('ask_either').inputSchema as { properties: Record<string, { minItems?: number; maxItems?: number }>; required?: string[] }
         expect(schema.required).toEqual(['title', 'description', 'options'])
@@ -190,8 +169,6 @@ describe('the discovery schemas', () => {
         expect(schema.properties.use_cases?.items?.type).toBe('string')
     })
 
-    // Kept declared rather than removed: the rows in production carry it, and a model that sends it
-    // anyway must not trip the schema on the one call that closes discovery.
     it('still accepts the single pain a profile used to carry', () => {
         expect(onboarding('save_profile').inputSchema.properties.pain?.type).toBe('string')
     })

@@ -1,8 +1,5 @@
 import { WORKSPACE_HEADER, WORKSPACE_PARAM } from './workspace-header'
 
-// Each tab stays on the workspace it opened, whatever another tab switches to. `users.workspace_id`
-// is only the last one picked anywhere, which a tab with no pin of its own (a new one, or one that
-// just switched) opens on. sessionStorage is per tab, survives a reload and follows a duplicated tab.
 const TAB_WORKSPACE_KEY = 'rerun:tab-workspace'
 
 export function readTabWorkspace(): number | null {
@@ -14,8 +11,6 @@ export function readTabWorkspace(): number | null {
     }
 }
 
-// A page load that names its workspace (`/?workspace=`): the landing of a flow that just moved
-// `users.workspace_id` server-side, which the tab's own pin would otherwise override.
 export function readUrlWorkspace(): number | null {
     try {
         const raw = new URL(window.location.href).searchParams.get(WORKSPACE_PARAM)
@@ -54,9 +49,6 @@ function isSameOrigin(input: RequestInfo | URL) {
 
 const WRAPPED = Symbol.for('rerun.workspace-header')
 
-// Server actions and RSC navigations go through the global fetch, so this is the one place every
-// request to our own server can name the tab's workspace. Same-origin only: Supabase and third
-// parties never see the header, nor pay a CORS preflight for it.
 export function installWorkspaceHeader() {
     if (typeof window === 'undefined') return
     const original = window.fetch as typeof window.fetch & { [WRAPPED]?: true }

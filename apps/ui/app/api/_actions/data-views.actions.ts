@@ -10,16 +10,12 @@ import { refusal, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-e
 
 type ActionResult<T = object> = ({ success: true } & T) | ({ success: false } & ActionRefusal)
 
-// The views, groups and row edits of a table, for both databases a workspace has: an agent's private
-// one and the one its agents share. Ownership is settled here, in the scope, never by the caller.
 async function resolve(scope: DataScope): Promise<{ conn: EngineConnection; base: string }> {
     if (scope.kind === 'shared') return { conn: await requireWorkspaceConnection(), base: engine.SPACE_DATA_BASE }
     const { conn, engineAgentId } = await getAgentChatTarget(scope.agentId)
     return { conn, base: engine.agentDataBase(engineAgentId) }
 }
 
-// The engine answers `{ error }` with a 400 for a refusal it can explain, and a bare 404 when it
-// predates these routes: the machine is fine, it just needs the update.
 function describe(err: unknown, fallback: ErrorCode): ActionRefusal {
     const message = err instanceof Error ? err.message : ''
     if (/failed: 404\b/.test(message)) return refusal('dataNeedsEngineUpdate')
@@ -79,8 +75,6 @@ export async function updateTableRowAction(scope: DataScope, table: string, rowi
     }
 }
 
-// Null on any failure, a 404 from an engine that predates the route included: the provenance of the
-// rows is a hint over the table, never a reason to show an error.
 export async function readTableSourcesAction(scope: DataScope, rows: TableSourcesRequest['rows']): Promise<TableSourcesResult | null> {
     try {
         const { conn, base } = await resolve(scope)

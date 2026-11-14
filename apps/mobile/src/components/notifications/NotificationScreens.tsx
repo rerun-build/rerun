@@ -15,7 +15,6 @@ import { useNotificationPrefs } from '@/data/useNotificationPrefs'
 import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
 import { usePushPermission } from '@/notifications/usePushPermission'
 
-// Opened straight from the inbox, the page is the first of its sheet: its button closes it.
 function SettingsSheet({ title, children }: { title: string; children: ReactNode }) {
     const first = (useNavigation().getState()?.index ?? 0) === 0
     return (
@@ -60,8 +59,6 @@ function useCoworkerRoutines(agentId: string) {
     return { routines, failed }
 }
 
-// A coworker's own rule. In the settings sheet when reached from the settings or the inbox, as a
-// full page when reached from the coworker's details.
 export function CoworkerNotificationsScreen({ frame }: { frame: 'sheet' | 'page' }) {
     const { id: agentId, name = '' } = useLocalSearchParams<{ id: string; name?: string }>()
     const { prefs, update, setCoworkerRule } = useNotificationPrefs()

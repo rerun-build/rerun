@@ -1,8 +1,5 @@
 import type { UIMessage } from 'ai'
 
-// The onboarding conversation at each of its steps, for the lab: the parts the hub streams, written
-// by hand.
-
 const say = (id: string, text: string): UIMessage => ({ id, role: 'assistant', parts: [{ type: 'text', text }] })
 const user = (id: string, text: string): UIMessage => ({ id, role: 'user', parts: [{ type: 'text', text }] })
 const tool = (name: string, toolCallId: string, input: unknown, output?: unknown) => (output === undefined ? { type: `tool-${name}`, toolCallId, state: 'input-available', input } : { type: `tool-${name}`, toolCallId, state: 'output-available', input, output })

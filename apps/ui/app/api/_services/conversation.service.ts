@@ -31,9 +31,6 @@ export type SessionHistoryEntry = {
     firstMessage: string | null
 }
 
-// Session history for an agent: Supabase-mirrored sessions merged with
-// engine-only sessions that were initiated by another agent (call_agent),
-// so those show up in the history like regular ones until adopted.
 export async function listAgentSessions(agentId: string, actor?: Actor): Promise<SessionHistoryEntry[]> {
     const { actor: caller } = await assertAgentAccess(agentId, 'use', actor)
 
@@ -87,8 +84,6 @@ export async function listAgentSessions(agentId: string, actor?: Actor): Promise
             agentId,
             engineSessionId: s.id,
             title: s.title,
-            // The engine's own status only says the session exists ('open'); nothing runs on it
-            // from the hub's point of view until it is adopted.
             status: sessionStatusSchema.catch('idle').parse(s.status),
             updatedAt: s.updatedAt,
             source: s.source,
@@ -115,20 +110,13 @@ export type ThreadRow = {
     originAgentId: string | null
     automationName: string | null
     outcome: SessionOutcome | null
-    // What the thread opened with, when a person typed it in the app; null for a run the engine
-    // started and for threads older than the column.
     firstMessage: string | null
 }
 
 export const THREAD_COLUMNS = ['id', 'title', 'status', 'source', 'created_at', 'updated_at', 'origin_agent_id', 'automation_name', 'outcome', 'first_message'] as const
 
-// PostgREST caps a select at 1000 rows: General shows the newest threads, the Threads list stays
-// the way to every older one.
 export const THREAD_FEED_LIMIT = 200
 
-// The threads General hangs under its messages, newest first. Read from Supabase alone: the engine
-// mirrors every conversation it opens on its own (`agent.session.created`), and the live state
-// comes from the board store, so there is nothing to ask the Box for here.
 export async function listAgentThreads(agentId: string, actor?: Actor): Promise<ThreadRow[]> {
     await assertAgentAccess(agentId, 'use', actor)
     const { data, error } = await selectMany(createServiceRoleClient(), 'sessions', THREAD_COLUMNS, { agent_id: agentId, kind: 'thread' }, { column: 'created_at', ascending: false }, THREAD_FEED_LIMIT)
@@ -147,14 +135,11 @@ export async function listAgentThreads(agentId: string, actor?: Actor): Promise<
     }))
 }
 
-// The app's list of a coworker's conversations: the history, plus what the inbox knows of each one,
-// whether a run finished since the caller last opened it, and what a waiting one asks.
 export async function listAgentConversations(ctx: WorkspaceContext, agentId: string): Promise<Conversation[]> {
     const entries = await listAgentSessions(agentId, actorFromContext(ctx))
     const waiting = entries.flatMap(entry => (entry.id && needsHuman(entry.status) ? [{ id: entry.id, agent_id: entry.agentId, engine_session_id: entry.engineSessionId, title: entry.title, updated_at: entry.updatedAt }] : []))
     const filter = attentionNotificationsFilter(waiting)
 
-    // `unseen_runs` answers for `auth.uid()`: it runs as the caller, not through the service role.
     const asCaller = await createClient()
     const [unseen, notifications, tErrors] = await Promise.all([
         asCaller.rpc('unseen_runs', { p_workspace_id: ctx.workspace.id }),
@@ -171,7 +156,6 @@ export async function listAgentConversations(ctx: WorkspaceContext, agentId: str
     }))
 }
 
-// The workspace's coworkers whose Box the caller reaches: every list of conversations stops there.
 async function reachableAgents(ctx: WorkspaceContext): Promise<{ id: string; name: string }[]> {
     const [{ data, error }, spaces] = await Promise.all([selectMany(ctx.supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: ctx.workspace.id }), visibleSpaceIds(actorFromContext(ctx))])
     if (error) throw error
@@ -180,19 +164,10 @@ async function reachableAgents(ctx: WorkspaceContext): Promise<{ id: string; nam
 
 const OVERVIEW_COLUMNS = ['id', 'agent_id', 'title', 'status', 'updated_at', 'engine_session_id', 'source'] as const
 
-// What the app badges on an agent row: a conversation it cannot move forward without a human. An
-// errored one is not counted, the row says "Error" on its own.
 const PENDING_STATUSES = ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'awaiting_ack'] as const
 
-// PostgREST caps a select at 1000 rows, so the scan that finds each agent's latest conversation is
-// ordered and bounded explicitly rather than left to that cap (see the board's live sessions, same
-// trap). The pending count is a query of its own: filtered on the four statuses it is small by
-// construction, and stays exact however many conversations the workspace holds.
 const LATEST_SCAN_LIMIT = 1000
 
-// The whole Chats screen in one request. Engine-only conversations (opened on this agent by
-// another one, not adopted yet) are left out on purpose: they are always idle, so they change
-// neither the count nor the latest row, and skipping them is what keeps this off the Boxes.
 export async function listWorkspaceConversationOverview(ctx: WorkspaceContext): Promise<AgentConversationsOverview> {
     const agentIds = (await reachableAgents(ctx)).map(a => a.id)
     if (agentIds.length === 0) return []
@@ -214,8 +189,6 @@ export async function listWorkspaceConversationOverview(ctx: WorkspaceContext): 
             status: row.status,
             source: (row.source ?? 'dashboard') as SessionSource,
             updatedAt: row.updated_at,
-            // Resolving the origin agent would cost a second lookup for a label the row never
-            // shows: the Chats screen prints the status, the agent's own history prints the name.
             originAgentName: null,
         })
     }
@@ -233,10 +206,6 @@ const AGENT_RECENT_LIMIT = 8
 
 export type { ConversationHit } from '@rerun/contracts'
 
-// Conversations found by their title, newest first, for the control center. Scoped through the
-// coworkers the caller reaches, which is also what proves a given `agentId` is the caller's to read. With
-// an agent and no text it lists that agent's latest ones. Engine-only conversations have no row to
-// match and are left out, as in the overview above.
 export async function searchWorkspaceConversations(ctx: WorkspaceContext, query: string, agentId?: string): Promise<ConversationHit[]> {
     const text = sanitizeIlike(query)
     if (!text && !agentId) return []
@@ -254,17 +223,11 @@ export async function searchWorkspaceConversations(ctx: WorkspaceContext, query:
 
 const TO_HANDLE_COLUMNS = ['id', 'agent_id', 'title', 'status', 'updated_at'] as const
 
-// The three requests an agent is blocked on, and the three states it merely leaves behind. They are
-// read separately so the blocking ones are never pushed out of the page by a pile of old errors,
-// which is exactly what a busy workspace accumulates.
 const BLOCKING_STATUSES = ['awaiting_question', 'awaiting_approval', 'awaiting_connector'] as const
 const TRAILING_STATUSES = ATTENTION_STATUSES.filter(status => !BLOCKING_STATUSES.includes(status as (typeof BLOCKING_STATUSES)[number]))
 
-// How many rows each half of the page brings back. The count beside them stays exact.
 const TO_HANDLE_PAGE = 50
 
-// Everything in the workspace waiting on its human, the list the web's To handle tab shows for one
-// agent at a time, bounded and with the blocking requests first.
 export async function listWorkspaceToHandle(ctx: WorkspaceContext): Promise<ToHandleList> {
     const namesById = new Map((await reachableAgents(ctx)).map(a => [a.id, a.name]))
     if (namesById.size === 0) return { items: [], total: 0 }
@@ -293,11 +256,6 @@ export async function listWorkspaceToHandle(ctx: WorkspaceContext): Promise<ToHa
     return { items, total: counted.data ?? items.length }
 }
 
-// Acknowledging without answering, the same write the board store makes behind « Mark as read ».
-// `'all'` empties what the caller reaches, which is what the button of that name promises even when
-// the list it sits above only showed a page. The agent filter is what scopes the write; the
-// status filter is the race guard: a conversation back in `working` between the render and the tap
-// belongs to its run.
 export async function markSessionsHandled(ctx: WorkspaceContext, sessionIds: string[] | 'all'): Promise<void> {
     const agentIds = (await reachableAgents(ctx)).map(a => a.id)
     if (agentIds.length === 0) return
@@ -312,8 +270,6 @@ export async function markSessionsHandled(ctx: WorkspaceContext, sessionIds: str
     await update
 }
 
-// Creates the Supabase mirror row for an engine-only session so it can be
-// opened and continued like a regular session. Idempotent per engine session.
 export async function adoptEngineSession(agentId: string, engineSessionId: string, title: string, actor?: Actor): Promise<string> {
     const { actor: caller, agent } = await assertAgentAccess(agentId, 'use', actor)
     const workspaceId = agent.workspace_id
@@ -324,8 +280,6 @@ export async function adoptEngineSession(agentId: string, engineSessionId: strin
 
     const target = await resolveAgentTarget(agentId, caller)
     const session = (await getSession(target.conn, target.engineAgentId, engineSessionId)) ?? (await listSessions(target.conn, target.engineAgentId)).find(s => s.id === engineSessionId)
-    // A row is only ever a mirror of a session this agent holds: the column is unique across
-    // workspaces, so a made-up id would otherwise squat another workspace's session.
     if (!session) throw new AuthorizationError('conversationNotFound')
 
     let originAgentId: string | null = null
@@ -355,8 +309,6 @@ export type SessionSnapshot = {
 
 export const EMPTY_SESSION_SNAPSHOT: SessionSnapshot = { messages: [], usage: null, lastError: null, activeRunId: null, proposals: [] }
 
-// Everything a reopened conversation shows, from one resolution of the session and one read of its
-// runs. Each part fails on its own: a transcript with no usage gauge beats no transcript at all.
 export async function readSessionSnapshot(sessionId: string): Promise<SessionSnapshot> {
     const ctx = await getSessionEngineContext(sessionId)
     if (!ctx || !ctx.engineSessionId) return EMPTY_SESSION_SNAPSHOT
@@ -374,9 +326,6 @@ export async function readSessionSnapshot(sessionId: string): Promise<SessionSna
     return { messages, usage, lastError: lastRunError(runs?.latest), activeRunId: runs?.running?.id ?? null, proposals }
 }
 
-// Stop covers the whole conversation, not just the run this client happens to be streaming. A run
-// nobody holds the id of anymore — a tab closed mid-stream, a duplicate send that raced — would
-// otherwise keep going and write its answer minutes later, on top of what the agent already said.
 export async function cancelSessionRuns(sessionId: string): Promise<void> {
     const ctx = await getSessionEngineContext(sessionId)
     if (!ctx || !ctx.engineSessionId) return
@@ -385,9 +334,6 @@ export async function cancelSessionRuns(sessionId: string): Promise<void> {
     await Promise.all(running.map(r => cancelRun(ctx.conn, ctx.engineAgentId, r.id).catch(() => {})))
 }
 
-// `onlyWhileWorking` is the reconnection's safety net: the engine's notification already settles a run's
-// end (`done` to idle, a card to `awaiting_*`), so that write may only catch a session left `working`
-// and never move one that waits on an answer. A stop or a closed card passes no option.
 export async function finalizeSession(sessionId: string, status: 'idle' | 'error', options?: { onlyWhileWorking?: boolean }): Promise<void> {
     await assertSessionInWorkspace(sessionId)
     if (!options?.onlyWhileWorking) return updateSessionStatus(sessionId, status)

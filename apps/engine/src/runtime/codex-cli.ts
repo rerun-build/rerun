@@ -4,9 +4,6 @@ import { dirname, join } from 'node:path'
 import { env } from '../config/env.js'
 import { detectLayout } from './layout.js'
 
-// The one Codex every box runs, installed by `rerun update-cli-tools` from the release that names it.
-// The installer of Rerun Cloud's boxes and the Dockerfile carry the same version (codex-cli.test.ts holds them to it).
-// The subscription is only ever as capable as this binary: a model it has never heard of is refused.
 export const CODEX_VERSION = '0.166.0'
 
 export type CodexCommand = { cmd: string; args: string[] }
@@ -23,10 +20,6 @@ function codexOnPath(): string | null {
     return globalCodex
 }
 
-// The configured path, then on a release or an image the global install `update-cli-tools` keeps at
-// the pin. Undefined leaves the provider on the copy it carries as an optional dependency, an older
-// Codex than the pin. On a checkout that copy runs unless RERUN_CODEX_PATH says otherwise: the global
-// `codex` there is the developer's own, at whatever version.
 export function codexPath(): string | undefined {
     const configured = env().RERUN_CODEX_PATH
     if (configured) return configured
@@ -45,7 +38,6 @@ export function codexCommand(): CodexCommand {
     }
 }
 
-// A version that could not be read says nothing about the binary: only a read one is off the pin.
 export function codexOffPin(version: string | null): boolean {
     return version !== null && version !== CODEX_VERSION
 }

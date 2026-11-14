@@ -7,9 +7,6 @@ import { selectSingle } from '@/supabase/supabase-helpers'
 import { createAgent } from './agent.service'
 import { type ServiceInstanceSeed, markServiceNeedsConfig, toAuthMethodSummaries } from './services.service'
 
-// Install each catalog service onto an agent. Services with required secrets can't be
-// auto-supplied, so they're marked needs_config and returned in the checklist for the user
-// to finish; the rest are compiled immediately. Unknown/disabled slugs are skipped.
 export async function installServiceSlugs(agentId: string, slugs: string[], actor?: Actor): Promise<ServiceChecklistItem[]> {
     const supabase = createServiceRoleClient()
     const checklist: ServiceChecklistItem[] = []
@@ -23,10 +20,6 @@ export async function installServiceSlugs(agentId: string, slugs: string[], acto
     return checklist
 }
 
-// Auto-install only when there's no choice to make: a single method with no required secrets
-// (pure OAuth / skill-only). Anything else (secrets, or multiple methods) is deferred to the
-// finish-setup wizard so the user picks a method and fills it in. `instance` declares another
-// account of the app instead of its base one.
 export async function declareService(agentId: string, manifest: ServiceManifest, actor?: Actor, instance?: ServiceInstanceSeed): Promise<'compiled' | 'needs_config'> {
     const method = autoInstallableMethod(manifest)
     if (method) {
@@ -37,9 +30,6 @@ export async function declareService(agentId: string, manifest: ServiceManifest,
     return 'needs_config'
 }
 
-// Create an agent and install the services the user picked. Services with required secrets
-// can't be auto-supplied, so they are marked needs_config and returned in the checklist for
-// the user to finish configuring.
 export async function createAgentWithSetup(params: { name: string; description?: string; serviceSlugs?: string[]; workspaceId: number; spaceId: string; actor: Actor; col?: number; row?: number }): Promise<{ agentId: string; active: boolean; checklist: ServiceChecklistItem[] }> {
     const agent = await createAgent({
         name: params.name,

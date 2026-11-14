@@ -13,10 +13,6 @@ import { Icon } from '@/components/ui/icon'
 import { CircleCheckIcon } from '@/lib/icons'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// A paid template, bought inside the conversation between the trial and its install. The payment
-// itself is Stripe's page: the card waits for the workspace to own the template, which is what the
-// way back from that page lands on, and answering is what starts the build.
-
 export type TemplatePurchaseResult = { ok: true } | { ok: false; reason: 'dismissed' }
 
 export type TemplatePurchaseOffer = { slug: string; title: string; pricing: TemplatePricing }
@@ -24,7 +20,6 @@ export type TemplatePurchaseOffer = { slug: string; title: string; pricing: Temp
 type PurchaseInput = TemplatePurchaseOffer
 
 const POLL_MS = 2000
-// The webhook lands within seconds of the way back; past this the card stays up with its button.
 const POLL_ATTEMPTS = 30
 
 function readInput(input: unknown): PurchaseInput | null {
@@ -38,8 +33,6 @@ export function TemplatePurchaseWidget({ input, output, onDone }: { input: unkno
     const { workspace } = useSession()
     const purchase = readInput(input)
     const bought = (output as TemplatePurchaseResult | null | undefined)?.ok === true
-    // A card sealed unanswered is read back from the transcript and can no longer answer: the app
-    // puts a fresh one up when the conversation resumes (useForemanScriptedSteps).
     const settled = output !== undefined && output !== null
     const answered = useRef(settled)
     const [owned, setOwned] = useState(false)
@@ -47,8 +40,6 @@ export function TemplatePurchaseWidget({ input, output, onDone }: { input: unkno
     const [error, setError] = useState<string | null>(null)
     const slug = purchase?.slug
 
-    // Answered once, wherever the ownership came from: the poll after the way back from Stripe, or
-    // a checkout that answered "already yours".
     useEffect(() => {
         if (!owned || answered.current) return
         answered.current = true

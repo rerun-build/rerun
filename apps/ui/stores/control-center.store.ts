@@ -32,7 +32,6 @@ export const useControlCenterStore = create<ControlCenterState>((set, get) => ({
         try {
             window.localStorage.setItem(RECENT_AGENTS_KEY, JSON.stringify(recentAgentIds))
         } catch {
-            // Private mode or a full quota: the list still lives for the session.
         }
     },
 }))

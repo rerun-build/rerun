@@ -25,7 +25,6 @@ type Filter = 'all' | PublishedAccess
 
 const SKELETON_CARDS = 6
 
-// Every link the coworkers of the workspace shared, filtered by who can open it. Shown in the Brain.
 export function WorkspacePublishedList() {
     const t = useTranslations('published.list')
     const accessCopy = useAccessCopy()

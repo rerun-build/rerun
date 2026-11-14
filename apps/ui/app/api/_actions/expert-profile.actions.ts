@@ -16,12 +16,6 @@ import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
-// Self-serve edition of the caller's own marketplace fiche, the in-app twin of the landing claim
-// link. The capability is the account: `users.expert_profile_id` is the only way in, and the fiche
-// id is resolved here rather than accepted from the client. Reads go through the service-role
-// client because the RLS policy on `experts` only exposes published rows, and `email` is not
-// granted to `authenticated` at all.
-
 const OWNER_EXPERT_COLUMNS = [
     'id',
     'slug',
@@ -141,8 +135,6 @@ export async function updateMyExpertProfileAction(values: EditExpertValues): Pro
 
         if (error) throw new Error(error.message)
 
-        // Deduped on the fiche, not on the save: what the funnel measures is the listing going
-        // live once, and every later edit republishes the same row.
         after(() =>
             captureServer(
                 expertDistinctId(existing),

@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { hasPeriodAdvanced, rerunPeriodUpdate } from './period'
 
-// The exact pair that let a trial refill its $2 credit 23 times in 27 hours: same instant, two
-// renderings, and the lexicographic comparison this replaces called it an advance every time.
 const STORED_FROM_POSTGREST = '2026-09-19T02:29:39+00:00'
 const INCOMING_FROM_STRIPE = '2026-09-19T02:29:39.000Z'
 
@@ -43,7 +41,6 @@ describe('rerunPeriodUpdate', () => {
     it('writes nothing at all when the period did not move', () => {
         const update = rerunPeriodUpdate(false, 'active', now)
         expect(update).toEqual({})
-        // Asserted as an absent key, not as undefined: a spread would still write an explicit undefined.
         expect('rerun_used_micros' in update).toBe(false)
         expect('rerun_period_anchor' in update).toBe(false)
     })

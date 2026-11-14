@@ -27,7 +27,6 @@ type MessageFeedbackDialogProps = {
     open: boolean
     rating: MessageFeedbackRating
     onOpenChange: (open: boolean) => void
-    // Resolves to whether the details were saved, which is what closes the dialog.
     onSubmit: (details: MessageFeedbackDetails) => Promise<boolean>
 }
 

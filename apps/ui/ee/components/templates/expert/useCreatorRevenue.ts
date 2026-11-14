@@ -6,8 +6,6 @@ import { toast } from 'sonner'
 import { getCreatorRevenueAction } from '@/ee/actions/creator-billing.actions'
 import type { CreatorRevenue, RevenueRange } from '@/ee/services/creator-revenue.service'
 
-// `revenue === null` means loading, like every other panel here. The range is part of the fetch
-// rather than a client-side filter: "all time" on a busy creator is more rows than a dialog needs.
 export function useCreatorRevenue(active: boolean) {
     const [range, setRange] = useState<RevenueRange>('30d')
     const errorText = useErrorText()

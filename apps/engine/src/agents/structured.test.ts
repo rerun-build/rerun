@@ -17,8 +17,6 @@ const model = 'test-model' as never
 const prompt = 'Write it.'
 
 describe('generateStructured', () => {
-    // The Claude Code CLI answers a schema through a tool call, so the step finishes on
-    // `tool-calls` and the SDK never fills `output`: the JSON is only in the text.
     it('reads the object from the text when the SDK produced no output', async () => {
         answer.next = async () => ({ text: '{"name":"Publishing","body":"Draft, review, publish."}' })
         expect(await generateStructured({ model, schema, prompt })).toEqual({ name: 'Publishing', body: 'Draft, review, publish.' })
@@ -34,7 +32,6 @@ describe('generateStructured', () => {
         expect(await generateStructured({ model, schema, prompt })).toEqual({ name: 'Publishing', body: 'Draft.' })
     })
 
-    // An API provider validates on its own and throws with the raw text attached.
     it('recovers the object an API provider rejected for its fences', async () => {
         answer.next = async () => {
             throw new NoObjectGeneratedError({ message: 'No object generated', text: '```json\n{"name":"Publishing","body":"Draft."}\n```', response: undefined, usage: undefined, finishReason: 'stop' } as never)

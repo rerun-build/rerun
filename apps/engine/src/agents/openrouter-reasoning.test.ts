@@ -52,9 +52,6 @@ describe('OpenRouter reasoning', () => {
         expect(parts.map(p => p.type)).toEqual(['reasoning-start', 'reasoning-delta', 'raw', 'text-start', 'reasoning-end', 'text-delta'])
     })
 
-    // OpenRouter puts `content: ""` next to every reasoning delta, so the chat model opens its text
-    // block and emits an empty text delta between two thoughts. Taking those for the answer cut one
-    // thought into one collapsed block per chunk.
     it('keeps one block across the empty text deltas that shadow a thought', async () => {
         const parts = await streamOf([
             chunk({ reasoning: 'Let me', content: '' }),
@@ -108,8 +105,6 @@ describe('OpenRouter reasoning', () => {
         expect(sent[2]).toBe('not json')
     })
 
-    // The usage frame is the last chunk of the stream, after the one carrying the finish reason:
-    // its cost and its cache writes land on the finish part, where the run loop reads them.
     it('grafts the cost and the cache writes of the usage frame onto the finish part', async () => {
         const usageFrame = { type: 'raw', rawValue: { choices: [], usage: { prompt_tokens: 2723, cost: 0.0001, cost_details: { upstream_inference_cost: 0.0005 }, prompt_tokens_details: { cached_tokens: 0, cache_write_tokens: 2719 } } } }
         const finish = { type: 'finish', finishReason: 'stop', usage: { inputTokens: 2723, inputTokenDetails: { noCacheTokens: 4, cacheReadTokens: 0, cacheWriteTokens: undefined } }, providerMetadata: { openai: {} } }

@@ -1,18 +1,8 @@
 // @ts-nocheck
-// Drawn on the vendored kernel of @lucasmarkes/hairline (MIT), flat instead of in perspective.
 import { HL } from './kernel'
 
-/**
- * Approve: a phone seen straight on, its foot fading out under the frame, a
- * sign-in request on its screen. Under the question sit two keys, a narrow one
- * to deny and a wide one to approve. The key under the pointer sinks onto its
- * lip; when it is the approve key, the badge at the top of the screen turns into
- * a check. With no pointer, the figure presses approve on its own, on a quicker
- * beat than the kernel's tour. The slider is the key's travel, in viewBox units.
- */
 const { open, poly, rrect, fade, reducedMotion, tdone, tset, tval, tween, disposer, mk, pointer, register } = HL;
 
-// Laid out on a phone 124 wide, then scaled up from the top centre so the foot runs past the frame.
 const SCALE = 1.45, TOP = 14;
 const at = ([u, v]) => [200 + (u - 200) * SCALE, TOP + v * SCALE];
 const PHONE = [138, 0, 262, 276], R = 22, BEZEL = 6;
@@ -65,7 +55,6 @@ function mount({ stage, svg, read }, value) {
   const [rowLeft, rowTop] = at([KEYS[0].u[0], KEY_TOP]), [rowRight, rowBottom] = at([KEYS[1].u[1], KEY_TOP + KEY_H]);
   const split = at([(KEYS[0].u[1] + KEYS[1].u[0]) / 2, 0])[0];
 
-  /** The key the point is over, 0 deny or 1 approve: anywhere on the key row picks the nearer one; -1 off it. */
   function hit([x, y]) {
     if (y < rowTop - 20 || y > rowBottom + 20 || x < rowLeft - 10 || x > rowRight + 10) return -1;
     return x < split ? 0 : 1;

@@ -69,8 +69,6 @@ function Backlinks({ links, onOpenPage }: { links: BrainPageData['backlinks']; o
     )
 }
 
-// A brain page is its own editor: the title, the type and the body are typed in place and saved as
-// they change, the way Notion does it.
 export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, onOpenFile, onReviewProposals, onSaved, onHistory, onDelete }: BrainPageProps) {
     const t = useTranslations('brain')
     const tPage = useTranslations('brain.page')

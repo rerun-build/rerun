@@ -3,12 +3,8 @@ import type { useTranslations } from 'next-intl'
 
 type ConnectionsT = ReturnType<typeof useTranslations<'connections'>>
 
-// A server like Together lists hundreds of models: switching them all on would flood every model
-// picker. The rest stay one click away in the connection's hidden list.
 export const MODELS_ON_AT_CONNECT = 10
 
-// A cloud machine cannot reach the owner's own computer, so the presets that listen there are only
-// offered where the engine runs beside it.
 export function presetsFor(cloud: boolean): readonly CustomPreset[] {
     return cloud ? CUSTOM_PRESETS.filter(preset => !preset.local) : CUSTOM_PRESETS
 }
@@ -21,7 +17,6 @@ function hostOf(baseUrl: string): string {
     }
 }
 
-// What the form says under the button when the endpoint did not take the connection. Null when it did.
 export function probeProblemMessage(t: ConnectionsT, result: CustomProbeResult, model: string | undefined, cloud: boolean): string | null {
     switch (result.problem) {
         case null:

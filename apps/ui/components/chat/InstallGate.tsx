@@ -8,20 +8,10 @@ import { Spinner } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { type ReactNode, useState } from 'react'
 
-// A rough guess, the install guide carries no duration: a minute or so per app to connect, on top of
-// the questions and the test run.
 function setupMinutes(apps: CatalogEntry[]): number {
     return Math.max(2, 1 + apps.length)
 }
 
-// Stands where the composer stands, because a message typed before the setup runs lands on an
-// agent with no credentials and nothing connected. The escape hatch is deliberate: skipping is
-// the user's call, and it never tells the agent its install is done.
-// `modelSlot` carries the composer's model picker: the install is a normal run, so it has to be
-// switchable before it starts, or a workspace out of Rerun credit has no way through.
-// `inProgress`: the install already runs in another conversation, and starting it here would ask the
-// user everything a second time. The gate leads there instead.
-// `onStart` answers whether the install went out: false (no model ready) leaves the button ready.
 export function InstallGate({
     agentId,
     agentName,

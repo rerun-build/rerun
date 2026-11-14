@@ -8,8 +8,6 @@ import { AppText } from '@/components/ui/AppText'
 import { Markdown } from '../Markdown'
 import { HitlAction, HitlCard } from './HitlCard'
 
-// A notification the coworker raised and the conversation waits on until it is read. Pinned above the
-// composer as on the web, so a long one scrolls inside rather than pushing the composer away.
 export function AlertWidget({ message, onAcknowledge }: { message: string; onAcknowledge: () => Promise<void> }) {
     const t = useTranslations('mobileHitl.alert')
     const { height } = usePaneSize()

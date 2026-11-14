@@ -15,8 +15,6 @@ export function workspaceInitials(workspace: Pick<WorkspaceSummary, 'name'> | un
         .join('')
 }
 
-// A sandbox points at a page of the web app, and rows written by older code may hold anything: only
-// a full web address is an image the app can fetch.
 export function logoUrlOf(iconUrl: string | null | undefined): string | null {
     const value = iconUrl?.trim()
     return value && /^https?:\/\//i.test(value) ? value : null
@@ -28,8 +26,6 @@ function hashOf(value: string): string {
     return (hash >>> 0).toString(36)
 }
 
-// A menu row only takes an image from a local file, so each logo is downloaded once to the cache. The
-// file is named after its address, so a changed logo is fetched again.
 export function useWorkspaceLogoFiles(workspaces: Pick<WorkspaceSummary, 'id' | 'iconUrl'>[]): Map<number, string> {
     const [files, setFiles] = useState<Map<number, string>>(new Map())
 

@@ -4,9 +4,6 @@ import { useCallback, useState } from 'react'
 
 import { MAX_STARTER_PICKS } from '@/lib/onboarding/starter-packs'
 
-// The cards picked so far, and the wall past the trial's ceiling. `blocked` is the card someone tried
-// to add once the three places were taken, so that card can say why it did not take.
-
 export type StarterPicks = {
     picked: string[]
     full: boolean

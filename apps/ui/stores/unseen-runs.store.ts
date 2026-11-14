@@ -11,7 +11,6 @@ type UnseenRunsState = {
     userId: string | null
     runs: UnseenRun[]
     seenLocally: Record<string, number>
-    // Conversations on screen right now: a run finishing in one of them is seen as it lands.
     viewing: Record<string, number>
     hydrate: (workspaceId: number, userId: string) => void
     refresh: () => Promise<void>
@@ -60,8 +59,6 @@ export const useUnseenRunsStore = create<UnseenRunsState>()((set, get) => ({
         const { userId, runs } = get()
         const ids = sessionIds.filter(id => runs.some(run => run.session_id === id))
         if (!userId || !ids.length) return
-        // Hidden outright until the server says when it stamped the read: its clock, not the
-        // browser's, is what `unseen_runs` compares the runs to.
         set(state => ({
             runs: state.runs.filter(run => !ids.includes(run.session_id)),
             seenLocally: { ...state.seenLocally, ...Object.fromEntries(ids.map(id => [id, Number.POSITIVE_INFINITY])) },

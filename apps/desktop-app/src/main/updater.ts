@@ -6,10 +6,6 @@ import { CHANNEL } from './identity'
 import { getMainWindow, markQuitting } from './main-window'
 import { t } from './messages'
 
-// Updates download in the background and install on the next restart, or at once when the person
-// clicks the toast the web app shows. The feed (`publish` in electron-builder.config.ts) is a folder
-// per channel on downloads.rerun.build; a staged rollout is `stagingPercentage` in its latest*.yml.
-
 const FIRST_CHECK_DELAY_MS = 10_000
 const CHECK_EVERY_MS = 4 * 60 * 60 * 1000
 
@@ -17,8 +13,6 @@ let state: DesktopUpdateState = { status: 'idle' }
 let updater: AppUpdater | null = null
 let interactiveCheck = false
 
-// A development build has no feed; `RERUN_DESKTOP_UPDATE_TEST=1` lets a packaged development build
-// update from the feed it was built with, to test the whole loop locally.
 export function updatesEnabled(): boolean {
     if (!app.isPackaged) return false
     return CHANNEL !== 'dev' || process.env.RERUN_DESKTOP_UPDATE_TEST === '1'
@@ -72,7 +66,6 @@ export async function checkForUpdates(interactive: boolean): Promise<void> {
         if (interactive) upToDateDialog()
         return
     }
-    // An update already waiting is not fetched again: the menu then offers to install it.
     if (state.status === 'ready') {
         if (interactive) await offerInstall(state.version)
         return
@@ -99,6 +92,5 @@ async function offerInstall(version: string): Promise<void> {
 export function installUpdate(): void {
     if (!updater || state.status !== 'ready') return
     markQuitting()
-    // `isSilent` false: the Windows installer shows its progress; `isForceRunAfter`: the app reopens.
     updater.quitAndInstall(false, true)
 }

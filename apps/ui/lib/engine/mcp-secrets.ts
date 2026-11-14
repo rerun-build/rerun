@@ -1,18 +1,9 @@
-// Credential values never belong in an agent's config.json: they go to the engine key store and
-// the config keeps only a ${VAR} reference, which the engine substitutes at connect time (see the
-// engine's mcp-resolve.ts, which resolves command, args, url, env and headers alike).
-
 const PLACEHOLDER = /\$\{[A-Za-z_][A-Za-z0-9_]*\}/
 
-// A value already carrying a ref points at a stored secret, so it is left whole — including the
-// `Bearer ${VAR}` shape the connector compiler emits. Externalizing that would store the ref
-// itself as a literal, and the engine resolver only substitutes once.
 export function hasRef(value: string): boolean {
     return PLACEHOLDER.test(value)
 }
 
-// A stored key name has to be something hasRef matches: a name it cannot match would be
-// externalized again on the next save, overwriting the secret with its own ref.
 export function sanitize(value: string): string {
     return value
         .replace(/[^A-Za-z0-9_]/g, '_')
@@ -25,8 +16,6 @@ const NEVER_SECRET_PREFIX = /^(-|\/|\.{1,2}\/|~\/|@[^/\s]+\/|github:|gitlab:|npm
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const HEX = /^[A-Fa-f0-9]{24,}$/
 const TOKEN_CHARSET = /^[A-Za-z0-9_\-.+/=]+$/
-// Lowercase words joined by - _ . read as a package or a slug, never as a token. This is the one
-// shape the entropy test gets wrong often enough to be worth excluding by hand.
 const READABLE_SLUG = /^[a-z0-9]+([-_.][a-z0-9]+)+$/
 
 function shannonEntropy(value: string): number {
@@ -44,11 +33,6 @@ function characterClasses(value: string): number {
     return Number(/[a-z]/.test(value)) + Number(/[A-Z]/.test(value)) + Number(/[0-9]/.test(value))
 }
 
-// Env and header values can be externalized wholesale, since their key names them. Arguments and
-// URL parts cannot: `-y`, `github:owner/repo` and `https://mcp.notion.com/sse` have to stay
-// readable. Hence a detector, deliberately biased towards a false positive — externalizing a
-// harmless argument stores its exact value and resolves back to it, whereas a missed token stays
-// in cleartext for anyone who opens the panel.
 export function isSecretLike(value: string): boolean {
     const candidate = value.trim()
     if (candidate.length < 12) return false
@@ -102,9 +86,6 @@ const SENSITIVE_PARAM = /(token|key|secret|auth|pass|sig|signature|credential)/i
 
 type Span = { start: number; end: number; hint: string }
 
-// Spans are cut out of the original string rather than rebuilt through `new URL()`: rebuilding
-// normalizes the trailing slash, the parameter order and the encoding, rewriting a URL the user
-// typed by hand.
 function secretSpans(url: string): Span[] {
     const spans: Span[] = []
     const schemeEnd = url.indexOf('://')
@@ -199,6 +180,5 @@ export function externalizeArgs(args: string[], serverName: string): Externalize
     return { value, keys }
 }
 
-// Both warnings run the real externalizer, so what the field announces is exactly what the save does.
 export const argsHaveSecret = (args: string[]) => Object.keys(externalizeArgs(args, 'x').keys).length > 0
 export const urlHasSecret = (url: string) => Object.keys(externalizeUrl(url, 'x').keys).length > 0

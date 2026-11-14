@@ -6,7 +6,6 @@ export function isAiStatusHubTool(name: string): name is 'rerun_credit' {
     return name === 'rerun_credit'
 }
 
-// A self-hosted install sells no credit, so it has none to report.
 export async function readRerunCredit(workspaceId: number): Promise<{ credit: HubRerunCredit | null }> {
     if (!BILLING_ENABLED) return { credit: null }
     const stored = await getWorkspaceBudget(workspaceId)

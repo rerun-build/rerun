@@ -50,8 +50,6 @@ async function upload(req: Request) {
             const result = await engine.uploadFileStream(conn, base, { dir, name, body: req.body, size: size || null, signal: req.signal })
             return Response.json(result, { status: 201 })
         } catch (err) {
-            // The capability cache can outlive a Box that rolled back. Falling back once beats
-            // failing an upload the old route could still have carried.
             if (err instanceof engine.EngineUploadError && (err.status === 404 || err.status === 405)) {
                 engine.forgetEngineCapabilities(conn)
                 return Response.json({ error: t('machineUpdating') }, { status: 409 })
@@ -63,8 +61,6 @@ async function upload(req: Request) {
     }
 }
 
-// A machine whose engine predates the streamed route can still take the multipart one, as long as the
-// file is small enough for it to hold in memory twice.
 type UploadCopy = Awaited<ReturnType<typeof getTranslations<'files.uploadOutcome'>>>
 
 async function uploadThroughLegacyRoute(conn: EngineConnection, base: string, input: { dir: string; name: string; size: number; req: Request }, t: UploadCopy): Promise<Response> {

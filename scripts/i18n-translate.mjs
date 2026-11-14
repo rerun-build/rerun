@@ -1,13 +1,4 @@
 #!/usr/bin/env node
-// `pnpm i18n:translate [--locale fr] [--ns chat] [--accept] [--dry-run] [--max-usd 20]`
-//
-// Translates the strings of the English source that are new or changed since the last run (the
-// lock keeps a hash of each source string) into every pack, with Claude, then checks each answer:
-// same ICU placeholders, an `other` branch, no dash, the glossary kept, not much longer than the
-// English. A failed check is sent back once with its reasons; a second failure stops the run.
-//
-// `--accept` translates nothing: it records the strings a person fixed by hand in a pack as current,
-// once they pass the same checks.
 import Anthropic from '@anthropic-ai/sdk'
 import {
     contextOf,
@@ -34,7 +25,6 @@ const MODEL = 'claude-sonnet-5-5'
 const INPUT_USD_PER_TOKEN = 2 / 1_000_000
 const OUTPUT_USD_PER_TOKEN = 10 / 1_000_000
 const BATCH_SIZE = 60
-// Pack files translated at once: a new language is ~160 calls, too long one after the other.
 const CONCURRENT_JOBS = 6
 const LANGUAGE_NAMES = { fr: 'French', es: 'Spanish', de: 'German', it: 'Italian', pt: 'Brazilian Portuguese', nl: 'Dutch' }
 
@@ -63,7 +53,6 @@ for (const locale of locales) {
     mkdirSync(path.join(MESSAGES_DIR, locale), { recursive: true })
 }
 
-// What each pack owes: the keys missing, translated from an older source, or failing a check.
 function pendingWork() {
     const work = []
     for (const locale of locales) {
@@ -123,7 +112,6 @@ function chunk(list, size) {
     return Array.from({ length: Math.ceil(list.length / size) }, (_, index) => list.slice(index * size, index * size + size))
 }
 
-// A key the English source dropped leaves the lock with it.
 function pruneLock() {
     for (const locale of Object.keys(lock)) {
         for (const id of Object.keys(lock[locale])) {
@@ -197,7 +185,6 @@ if (args.accept) accept(work)
 else {
     const promptTokens = work.reduce((sum, job) => sum + estimateTokens(systemPrompt(job.locale)) * Math.ceil(job.keys.length / BATCH_SIZE) + estimateTokens(userPrompt(job, job.keys, [])), 0)
     const answerTokens = work.reduce((sum, job) => sum + job.keys.reduce((total, key) => total + estimateTokens(job.source[key]) * 1.6 + 8, 0), 0)
-    // Doubled for the retries and the thinking the model does before it answers.
     const estimateUsd = 2 * (promptTokens * INPUT_USD_PER_TOKEN + answerTokens * OUTPUT_USD_PER_TOKEN)
     const total = work.reduce((sum, job) => sum + job.keys.length, 0)
     console.log(`${total} string(s) to translate across ${work.length} pack file(s), about $${estimateUsd.toFixed(2)} (cap $${args.maxUsd}).`)

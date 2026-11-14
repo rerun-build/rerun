@@ -60,8 +60,6 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         className={cn(
-          // Under sm this is a bottom sheet rather than a centered card. It stays a plain CSS
-          // restyle instead of a vaul drawer: a destructive confirmation must not be swipeable.
           "group/alert-dialog-content fixed inset-x-0 bottom-[var(--consent-inset)] z-50 grid max-h-[calc(96dvh_-_var(--consent-inset))] w-full gap-4 overflow-auto rounded-t-2xl bg-popover p-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none",
           "sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[calc(100dvh-2rem)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl sm:p-4 data-[size=default]:sm:max-w-sm data-[size=lg]:sm:max-w-md data-[size=sm]:sm:max-w-xs",
           "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom-4",
@@ -99,8 +97,6 @@ function AlertDialogFooter({
       data-slot="alert-dialog-footer"
       className={cn(
         "-mx-4 -mb-4 flex flex-col-reverse gap-2 border-t bg-muted/50 p-4 group-data-[size=sm]/alert-dialog-content:grid group-data-[size=sm]/alert-dialog-content:grid-cols-2 sm:flex-row sm:justify-end sm:rounded-b-xl",
-        // -mb-4 only cancels the 1rem of p-4, so the safe area padding the sheet adds would survive
-        // and float this bar above the sheet's bottom edge.
         "max-sm:pb-[max(1rem,env(safe-area-inset-bottom))]",
         className
       )}

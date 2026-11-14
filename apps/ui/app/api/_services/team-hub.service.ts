@@ -23,7 +23,6 @@ async function assertTeamSwitchedOn(callerAgentId: string, workspaceId: number):
     if (!config.tools.team) throw new Error('Reading other coworkers is switched off for this coworker.')
 }
 
-// A trigger URL carries its secret: a coworker that reads it could fire the other one.
 function withoutTriggerUrls(result: unknown): unknown {
     const { triggers } = result as { triggers: Array<Record<string, unknown>> }
     return { triggers: triggers.map(({ url: _url, ...trigger }) => trigger) }

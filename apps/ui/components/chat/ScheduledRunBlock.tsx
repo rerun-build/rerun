@@ -8,7 +8,6 @@ import { type ScheduledRun } from '@/lib/schedules/scheduled-run'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-// The routine speaks, not the user: a divider marks where it fired, its prompt one click away.
 export function ScheduledRunBlock({ agentId, run }: { agentId: string | undefined; run: ScheduledRun }) {
     const t = useTranslations('chat.scheduledRun')
     const [promptOpen, setPromptOpen] = useState(false)

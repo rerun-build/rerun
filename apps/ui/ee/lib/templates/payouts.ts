@@ -2,11 +2,7 @@ import type { BadgeTone } from '@rerun/ui/primitives'
 import type { PayoutState } from '@/ee/services/connect.service'
 import type { useTranslations } from 'next-intl'
 
-// The screens hand in the `templates.payouts` catalog; the English maps below are for the tests.
 type PayoutsTranslator = ReturnType<typeof useTranslations<'templates.payouts'>>
-
-// The five payout states as the panel shows them, mapped once here the way template statuses are.
-// A badge is never styled inline.
 
 const PAYOUT_TONES: Record<PayoutState, BadgeTone> = {
     not_started: 'neutral',
@@ -32,10 +28,6 @@ export function payoutStateLabel(state: PayoutState, t?: PayoutsTranslator): str
     return t ? t(`stateLabels.${state}`) : PAYOUT_LABELS[state]
 }
 
-// Stripe names its requirements in dotted paths ("individual.verification.document"), which are
-// unreadable in a list. Only the common ones are spelled out; the rest fall back to a humanised
-// form of the path rather than being hidden, because a requirement nobody can read is still a
-// requirement blocking their payouts.
 const REQUIREMENT_LABELS: Record<string, string> = {
     'business_profile.url': 'A business website',
     'business_profile.mcc': 'Your line of business',

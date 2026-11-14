@@ -7,7 +7,6 @@ import { strong } from "../components/rich";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text, type ToneName } from "../theme";
 
-// All emailable kinds except `error`, which has its own RunFailed template.
 export type AgentNotificationKind =
   | "done"
   | "info"
@@ -19,12 +18,9 @@ export interface AgentNotificationProps {
   agentName: string;
   kind: AgentNotificationKind;
   message: string;
-  /** Why this recipient gets the email, e.g. "You started this conversation." */
   reason?: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
-  /** Opens the conversation the email is about. Without it the button opens the board. */
   conversationUrl?: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;

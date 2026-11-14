@@ -129,8 +129,6 @@ export async function cancelRun(agentId: string, id: string): Promise<void> {
 
 export type InterruptedRun = { id: string; sessionId: string; triggerSource: string | null; triggerSlug: string | null; startedAt: string }
 
-// Returns the rows it repaired rather than a count: a run interrupted mid-flight also left a
-// conversation stuck on the hub, and only these ids can tell it the run is over.
 export async function failInterruptedRuns(agentId: string): Promise<InterruptedRun[]> {
     const { db } = await getSystemDb(agentId)
     const stale = await db

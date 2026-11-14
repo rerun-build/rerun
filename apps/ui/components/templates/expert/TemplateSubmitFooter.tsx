@@ -14,9 +14,6 @@ import { templateSubmitChecklist } from '@/lib/templates/submit'
 import { useCreatorStore } from '@/stores/creator.store'
 import { cn } from '@/lib/utils'
 
-// The one place a template changes hands. The checklist is computed from the live form, so the
-// button explains itself instead of failing server-side: it is the same list `submitMyTemplateAction`
-// enforces.
 export function TemplateSubmitFooter({
     status,
     reviewNote,
@@ -28,8 +25,6 @@ export function TemplateSubmitFooter({
 }: {
     status: string
     reviewNote: string | null
-    // Only a paid template needs it, and the server re-resolves it on submit: this is what the
-    // checklist renders, not what decides.
     payoutsReady: boolean
     saving: boolean
     onSubmit: () => Promise<boolean>
@@ -37,12 +32,10 @@ export function TemplateSubmitFooter({
     onDelete: () => Promise<boolean>
 }) {
     const t = useTranslations('templates.expert.footer')
-    // Subscribes the footer to every field: the checklist has to move as the author types.
     const { watch, formState } = useFormContext<TemplateFormValues>()
     const values = watch()
     const setPane = useCreatorStore(state => state.setPane)
     const [pending, startTransition] = React.useTransition()
-    // Which button to spin: the transition is shared, so `pending` alone would light them all up.
     const [running, setRunning] = React.useState<'submit' | 'withdraw' | 'delete' | null>(null)
 
     const run = (action: 'submit' | 'withdraw' | 'delete', act: () => Promise<boolean>) => {
@@ -88,7 +81,6 @@ export function TemplateSubmitFooter({
     const metCount = checklist.filter(requirement => requirement.met).length
     const ready = metCount === checklist.length
     const readyTone = ready ? 'text-emerald-500' : 'text-muted-foreground'
-    // Submitting reads the stored row, so an unsaved edit would not be part of what we review.
     const blocker = !ready ? t('completeChecklist') : formState.isDirty ? t('saveFirst') : null
 
     return (

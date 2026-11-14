@@ -4,14 +4,9 @@ import { isTemplateCategory } from '@rerun/contracts'
 
 import { agentSuggestionsForIndustry, DEFAULT_AGENT_SUGGESTIONS, INDUSTRY_AGENT_SUGGESTIONS, type AgentSuggestion } from './agent-suggestions'
 
-// What a Box is for, read off its name: a Box has nothing else to say it, and the names people give
-// one are the divisions the name picker offers (`box-name-suggestions.ts`) or close to them.
 export const BOX_THEMES = ['marketing', 'sales', 'support', 'operations', 'finance', 'product', 'clients', 'recruiting', 'legal', 'personal'] as const
 export type BoxTheme = (typeof BOX_THEMES)[number]
 
-// Whole words of a Box name, the longest first so "new business" wins over a word inside it. A name
-// that says what the company sells rather than a division ("Store", "Listings", the company's own
-// name) is left without a theme on purpose: the industry list already is the right answer for it.
 const THEME_WORDS: [string, BoxTheme][] = [
     ['customer care', 'support'],
     ['customer service', 'support'],
@@ -82,7 +77,6 @@ export function boxTheme(name: string | null | undefined): BoxTheme | null {
     return THEME_WORDS.find(([word]) => padded.includes(` ${word} `))?.[1] ?? null
 }
 
-// The functions of the made-to-measure ideas (`Lens`) that belong in a Box of each theme.
 export const THEME_LENSES: Record<BoxTheme, Lens[]> = {
     marketing: ['acquisition', 'content', 'watch'],
     sales: ['sales', 'acquisition'],
@@ -96,7 +90,6 @@ export const THEME_LENSES: Record<BoxTheme, Lens[]> = {
     personal: [],
 }
 
-// The few jobs no industry list carries, for the themes that would otherwise run short.
 const EXTRA_SUGGESTIONS: AgentSuggestion[] = [
     {
         id: 'support-help-center',
@@ -140,7 +133,6 @@ const EXTRA_SUGGESTIONS: AgentSuggestion[] = [
     },
 ]
 
-// Ids from the industry lists, the default list and the extras above, the most universal first.
 const THEME_SUGGESTION_IDS: Record<BoxTheme, string[]> = {
     marketing: ['default-seo', 'default-content', 'ecommerce-newsletter', 'creators-content-calendar', 'ecommerce-ads', 'creators-repurpose', 'agencies-case-studies', 'creators-analytics', 'creators-scheduler', 'real-estate-social'],
     sales: ['sales-prospect-research', 'sales-follow-ups', 'sales-outreach', 'sales-crm-hygiene', 'sales-reply-sorter', 'sales-lead-responder', 'sales-call-notes', 'sales-pipeline', 'agencies-proposal'],
@@ -163,21 +155,16 @@ export function themeSuggestions(theme: BoxTheme): AgentSuggestion[] {
 
 const nameKey = (name: string) => name.trim().toLowerCase()
 
-// The made-to-measure ideas that belong in this Box, minus the ones already recruited: an idea is
-// imagined once, and the agent created from it keeps its name.
 export function boxIdeas(boxName: string | null | undefined, ideas: StoredIdea[], agentNames: string[]): StoredIdea[] {
     const theme = boxTheme(boxName)
     const recruited = new Set(agentNames.map(nameKey))
     return ideas.filter(idea => !recruited.has(nameKey(idea.name)) && (!theme || THEME_LENSES[theme].includes(idea.lens)))
 }
 
-// The pill is one unbroken line across the Box, in whatever language it is written.
 const CTA_MAX_CHARS = 34
 
-// The `builder.isoBoard` catalog.
 export type BoxCtaCopy = (key: 'boxCta' | 'boxCtaFallback', values?: Record<string, string>) => string
 
-// What the pill of an empty Box says once hovered: what the click opens, in the Box's own name.
 export function boxCtaLabel(boxName: string | null | undefined, t: BoxCtaCopy): string {
     const name = boxName?.trim()
     const named = name ? t('boxCta', { name }) : null
@@ -187,8 +174,6 @@ export function boxCtaLabel(boxName: string | null | undefined, t: BoxCtaCopy): 
 const CTA_EXAMPLE_MAX_CHARS = 28
 const MAX_CTA_EXAMPLES = 5
 
-// What the pill of an empty Box rolls through while nobody hovers it: the first titles the dialog
-// will open on, so the pill never promises a job the click does not show.
 export function boxCtaExamples(input: Parameters<typeof boxSuggestions>[0], localize: (suggestion: AgentSuggestion) => AgentSuggestion = suggestion => suggestion): string[] {
     return boxSuggestions(input)
         .map(suggestion => localize(suggestion).title)
@@ -196,14 +181,6 @@ export function boxCtaExamples(input: Parameters<typeof boxSuggestions>[0], loca
         .slice(0, MAX_CTA_EXAMPLES)
 }
 
-// What the New agent dialog offers when it is opened for one Box. The ideas imagined for the company
-// lead, since they are the only ones true of nobody else. Then the jobs of the Box's theme, the ones
-// written for this industry first, then the industry's own list.
-//
-// The whole pool comes back, in that order, not just the three cards the dialog draws: Reload
-// slides on through the rest, and what never fits on the first screen is what a Box whose own ideas
-// already took the places falls back on. `boxName` is null when the dialog was opened from the
-// toolbar, for no Box in particular.
 export function boxSuggestions({ boxName, industry, ideas, agentNames }: { boxName: string | null | undefined; industry: string | null | undefined; ideas: StoredIdea[]; agentNames: string[] }): AgentSuggestion[] {
     const theme = boxTheme(boxName)
     const ofIndustry = agentSuggestionsForIndustry(industry)

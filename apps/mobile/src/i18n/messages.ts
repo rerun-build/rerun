@@ -71,7 +71,6 @@ import deMobileSteps from '@rerun/i18n/messages/de/mobileSteps.json'
 import deSubRuns from '@rerun/i18n/messages/de/subRuns.json'
 import deTools from '@rerun/i18n/messages/de/tools.json'
 
-// Only the app's own namespaces ship in the bundle: the web's strings would weigh on every launch.
 const english = { chatErrors: enChatErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
 const french = { chatErrors: frChatErrors, mobileAuth: frMobileAuth, mobileCards: frMobileCards, mobileChat: frMobileChat, mobileCommon: frMobileCommon, mobileCoworker: frMobileCoworker, mobileHitl: frMobileHitl, mobileHome: frMobileHome, mobileOnboarding: frMobileOnboarding, mobileProviders: frMobileProviders, mobileSettings: frMobileSettings, mobileSteps: frMobileSteps, subRuns: frSubRuns, tools: frTools }
 const spanish = { chatErrors: esChatErrors, mobileAuth: esMobileAuth, mobileCards: esMobileCards, mobileChat: esMobileChat, mobileCommon: esMobileCommon, mobileCoworker: esMobileCoworker, mobileHitl: esMobileHitl, mobileHome: esMobileHome, mobileOnboarding: esMobileOnboarding, mobileProviders: esMobileProviders, mobileSettings: esMobileSettings, mobileSteps: esMobileSteps, subRuns: esSubRuns, tools: esTools }
@@ -84,7 +83,6 @@ const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { e
 
 const merged = new Map<Locale, MobileMessages>()
 
-// The English source under the pack, so a key the pack lacks still reads in English.
 export function messagesFor(locale: Locale): MobileMessages {
     if (locale === DEFAULT_LOCALE) return english
     let messages = merged.get(locale)

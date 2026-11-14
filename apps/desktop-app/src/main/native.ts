@@ -15,13 +15,6 @@ import { readSettings, updateSettings } from './settings'
 import { QUICK_ASK_ACCELERATOR, setQuickAskShortcut, toggleQuickAsk } from './quick-ask'
 import { isExternalUrl } from './url-policy'
 
-// What makes the app feel installed rather than a tab: system notifications that bring back the
-// right conversation, the count of what waits on the Dock or the taskbar, an icon in the menu bar or
-// the notification area, launching at login, and a right-click menu.
-
-// --- notifications ----------------------------------------------------------------------------------
-
-// Held until clicked or closed: a notification the garbage collector takes stops answering clicks.
 const shown = new Map<string, Notification>()
 
 export function showNotification(notification: DesktopNotification): boolean {
@@ -41,15 +34,12 @@ export function showNotification(notification: DesktopNotification): boolean {
     return true
 }
 
-// --- badge --------------------------------------------------------------------------------------------
-
 let waiting = 0
 
 export function setBadge(count: number): void {
     waiting = Math.max(0, Math.min(Math.floor(count) || 0, 9999))
     const platform = shellPlatform()
     if (platform === 'win') {
-        // Windows has no count on the taskbar button: a dot over it, and the count in its tooltip.
         getMainWindow()?.setOverlayIcon(waiting > 0 ? nativeImage.createFromPath(badgeDot) : null, waiting > 0 ? t('tray.waiting', { count: waiting }) : '')
     } else {
         app.setBadgeCount(waiting)
@@ -57,11 +47,8 @@ export function setBadge(count: number): void {
     refreshTray()
 }
 
-// --- launch at login -----------------------------------------------------------------------------------
-
 const HIDDEN_FLAG = '--hidden'
 
-// Started by the system at login, the app stays in the tray instead of opening its window.
 export function startedAtLogin(): boolean {
     if (process.platform === 'darwin') return app.getLoginItemSettings().wasOpenedAtLogin === true
     return process.argv.includes(HIDDEN_FLAG)
@@ -103,8 +90,6 @@ export function changeDesktopSettings(patch: Partial<DesktopSettings>): DesktopS
     refreshTray()
     return next
 }
-
-// --- tray ---------------------------------------------------------------------------------------------
 
 let tray: Tray | null = null
 let trayActions: { checkForUpdates: () => void; quit: () => void } | null = null
@@ -149,8 +134,6 @@ export function createTray(actions: { checkForUpdates: () => void; quit: () => v
     trayActions = actions
     if (tray) return refreshTray()
     tray = new Tray(trayImage())
-    // A left click opens the window where the system sends it to the app (Windows); the menu stays on
-    // the right click, and on macOS on any click.
     tray.on('click', () => {
         if (process.platform !== 'darwin') showMainWindow()
     })
@@ -163,7 +146,6 @@ export function hasTray(): boolean {
 
 let explainedBackground = false
 
-// The first time the window closes into the tray on Windows, a balloon says the app still runs.
 export function explainBackgroundOnce(): void {
     if (explainedBackground || process.platform !== 'win32' || !tray || readSettings().explainedTray) return
     explainedBackground = true
@@ -171,10 +153,6 @@ export function explainBackgroundOnce(): void {
     tray.displayBalloon({ title: PRODUCT_NAME, content: t('tray.stillRunning', { name: PRODUCT_NAME }) })
 }
 
-// --- context menu ---------------------------------------------------------------------------------------
-
-// Electron draws no right-click menu of its own: the usual editing entries, the spelling suggestions,
-// and what to do with a link or an image under the pointer.
 export function attachContextMenu(contents: WebContents): void {
     contents.on('context-menu', (_event, params) => {
         const items: MenuItemConstructorOptions[] = []

@@ -6,8 +6,6 @@ import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { JoinCard } from './JoinShell'
 
-// Same handoff as the workspace invite: the cookie survives the round trip through Google, which
-// drops the query string, and `/auth/callback` reads it back as the destination.
 export function CreatorJoinRedirect({ token, name, email }: { token: string; name: string; email: string | null }) {
     const t = useTranslations('auth.creatorJoin')
     const next = `/creator/join/${token}`

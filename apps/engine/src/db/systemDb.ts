@@ -184,18 +184,12 @@ const RUN_TELEMETRY_COLUMNS = [
 
 const MEMORY_DECAY_COLUMNS = ['last_accessed_at TEXT', 'access_count INTEGER NOT NULL DEFAULT 0']
 
-// The pair the proposing conversation ran on, so the writing job bills the same subscription.
 const SKILL_PROPOSAL_MODEL_COLUMNS = ['connection_id TEXT', 'provider TEXT', 'model TEXT']
 
 const MESSAGE_AUTHOR_COLUMNS = ['author_id TEXT', 'author_name TEXT']
 
-// What a step wrote into the prompt cache and what it cost: the two numbers that tell whether a
-// turn reused the one before it, which the run row cannot say.
 const RUN_STEP_CACHE_COST_COLUMNS = ['cache_write_tokens INTEGER', 'cost_micros INTEGER']
 
-// Every paid data call indexed by the values it returned, so a table cell can be traced back to the
-// call it came from. `fields_json` keeps the item's fields and the link to show for it. `system_meta`
-// holds the one-off markers of the file, such as the end of the paid calls backfill.
 const PAID_SOURCES_DDL = `
 CREATE TABLE IF NOT EXISTS system_meta (
     key TEXT PRIMARY KEY,
@@ -223,7 +217,6 @@ CREATE TABLE IF NOT EXISTS paid_keys (
 );
 `
 
-// A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
         version: 1,

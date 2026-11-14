@@ -5,8 +5,6 @@ import { opencodeUserAgent } from '../runtime/build-info.js'
 const FETCH_TIMEOUT_MS = 10_000
 const STALE_AFTER_MS = 30 * 60_000
 
-// One reading for the whole box, in memory like the CLI model lists: the catalog is public, the
-// same for every key, and the next boot reads it again.
 type Reading = { models: OpencodeModel[]; at: number }
 const readings = new Map<OpencodePlan, Reading>()
 let attemptedAt = 0
@@ -19,8 +17,6 @@ async function fetchPlan(plan: OpencodePlan): Promise<OpencodeModel[] | null> {
     return models.length ? models : null
 }
 
-// A plan that cannot be read keeps its previous reading: a catalog that answered once is a better
-// guess than the snapshot, and the snapshot a better one than nothing.
 export function refreshOpencodeCatalog(): Promise<void> {
     if (inFlight) return inFlight
     attemptedAt = Date.now()
@@ -40,7 +36,6 @@ export function refreshOpencodeCatalog(): Promise<void> {
     return inFlight
 }
 
-// Paced on the last attempt, so a catalog that cannot be reached is not asked again on every list.
 export function refreshStaleOpencodeCatalog(): void {
     if (Date.now() - attemptedAt < STALE_AFTER_MS) return
     void refreshOpencodeCatalog()
@@ -50,8 +45,6 @@ function modelsOf(plan: OpencodePlan): OpencodeModel[] {
     return readings.get(plan)?.models ?? OPENCODE_SNAPSHOT.filter(model => model.plan === plan)
 }
 
-// Synchronous on purpose: `resolveModel` is. The live reading first, the snapshot this build was
-// cut with otherwise.
 export function opencodeModel(id: string): OpencodeModel | undefined {
     for (const plan of OPENCODE_PLANS) {
         if (!id.startsWith(`${plan}/`)) continue
@@ -64,18 +57,15 @@ export function opencodeModels(): OpencodeModel[] {
     return OPENCODE_PLANS.flatMap(modelsOf)
 }
 
-// What the hub lists for an OpenCode connection.
 export function opencodeProviderModels(): ProviderModel[] {
     return opencodeModels().map(toProviderModel)
 }
 
-// Only a live reading may say a model is gone: the snapshot cannot know what was retired since.
 export function liveOpencodeProviderModels(): ProviderModel[] | null {
     if (!OPENCODE_PLANS.every(plan => readings.has(plan))) return null
     return opencodeModels().map(toProviderModel)
 }
 
-// The answer to an unsupported model is a reason to read the catalog again right away.
 export function forceOpencodeCatalogRefresh(): void {
     void refreshOpencodeCatalog()
 }

@@ -13,7 +13,6 @@ function timeoutError(): Error {
 
 afterEach(() => vi.unstubAllGlobals())
 
-// A box that does not answer must never reach the screen as undici's bare "fetch failed".
 describe('engine client, box unreachable', () => {
     it('turns a refused connection into a readable error that keeps its cause', async () => {
         const refused = new TypeError('fetch failed')

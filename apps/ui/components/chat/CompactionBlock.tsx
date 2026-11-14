@@ -18,7 +18,6 @@ export type CompactionData = {
 
 const COMPACTION_LABEL_KEYS = { running: 'running', error: 'failed', done: 'done' } as const satisfies Record<CompactionData['status'], string>
 
-/** The compaction on one line of the folded steps. */
 export function CompactionStep({ data }: { data: CompactionData }) {
     const t = useTranslations('chat.compaction')
     const locale = useLocale()

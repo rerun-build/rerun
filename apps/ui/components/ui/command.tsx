@@ -28,7 +28,6 @@ function CommandDialog({
 }) {
   const t = useTranslations("ui")
   return (
-    // asSheet={false}: a bottom sheet would sit under the virtual keyboard the search field opens.
     <Dialog {...props} asSheet={false}>
       <DialogHeader className="sr-only">
         <DialogTitle>{title ?? t("command.title")}</DialogTitle>

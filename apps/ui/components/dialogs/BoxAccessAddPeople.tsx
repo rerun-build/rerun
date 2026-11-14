@@ -19,11 +19,9 @@ import { useMemo, useState } from 'react'
 type BoxAccessAddPeopleProps = {
     boxName: string
     members: SpaceAccessMember[]
-    // Already named on the Box: they are changed from their row, not added twice.
     listedUserIds: Set<string>
     profileOf: (userId: string) => AuthorProfile | null
     onBack: () => void
-    // Resolves true once the rows are written, so the page can close.
     onAdd: (userIds: string[], access: AccessLevel) => Promise<boolean>
 }
 

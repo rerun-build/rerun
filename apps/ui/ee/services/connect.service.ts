@@ -9,17 +9,6 @@ import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AppError } from '@/lib/i18n/action-error'
 
-// The creator half of the marketplace. Rerun takes the charge and transfers the creator's share
-// afterwards, so the connected account never does anything but receive money.
-//
-// Neither `country` nor `capabilities` is set when the account is created, and that absence is
-// load-bearing: Stripe freezes an account's country the moment the platform names one or requests a
-// single capability, which silently made every creator Luxembourgish, like Rerun itself. Left unset,
-// Stripe-hosted onboarding asks the creator where they are. The countries it offers and the
-// capabilities requested for each one live in the platform's Connect onboarding options, which must
-// stay at `transfers` alone: requesting `card_payments` would drag the creator through a much heavier
-// onboarding for a capability they never use.
-
 type CreatorAccountInsert = Database['public']['Tables']['creator_accounts']['Insert']
 type CreatorAccountUpdate = Database['public']['Tables']['creator_accounts']['Update']
 
@@ -34,8 +23,6 @@ const ACCOUNT_COLUMNS = [
     'default_currency',
 ] as const
 
-// What the payouts panel renders. `state` collapses Stripe's four booleans into the one question
-// the creator is actually asking: can I be paid yet, and if not whose move is it.
 export type PayoutState = 'not_started' | 'incomplete' | 'pending_verification' | 'restricted' | 'ready'
 
 export type CreatorAccountState = {
@@ -62,15 +49,10 @@ const NOT_STARTED: CreatorAccountState = {
     defaultCurrency: null,
 }
 
-// Readiness is `payouts_enabled` alone, deliberately. A recipient account holds the `transfers`
-// capability and nothing else, so it can never create a charge of its own and `charges_enabled` stays
-// false however complete the onboarding is. Gating on it would have kept every paid template
-// unsellable for good. The flag is still stored, it is simply not a condition.
 function resolveState(row: { charges_enabled: boolean; payouts_enabled: boolean; details_submitted: boolean; disabled_reason: string | null; requirements_due: string[] }): PayoutState {
     if (row.payouts_enabled) return 'ready'
     if (row.disabled_reason) return 'restricted'
     if (!row.details_submitted) return 'incomplete'
-    // Everything is submitted and nothing is due: Stripe is still looking at it.
     return row.requirements_due.length > 0 ? 'incomplete' : 'pending_verification'
 }
 
@@ -92,9 +74,6 @@ export async function getCreatorAccountState(userId: string): Promise<CreatorAcc
     }
 }
 
-// Stripe's `return_url` is not a promise that onboarding finished, and `account.updated` can be
-// late or lost, so the panel pulls the truth from Stripe instead of waiting for a webhook. Skipped
-// once the account is ready: from then on the row only ever changes through an event.
 export async function refreshCreatorAccount(userId: string): Promise<CreatorAccountState> {
     const current = await getCreatorAccountState(userId)
     if (!current.stripeAccountId || current.state === 'ready') return current
@@ -122,9 +101,6 @@ export async function ensureCreatorAccount(userId: string): Promise<string> {
     return account.id
 }
 
-// The onboarding link is only ever minted from a deliberate click on "set up payouts", next to the
-// notice that says what accepting means, so that click is the acceptance. Accounts created before a
-// version bump reaccept here rather than being grandfathered onto terms they never saw.
 async function acceptCurrentCreatorTerms(accountId: string): Promise<string> {
     const account = await stripe.accounts.retrieve(accountId)
     if (account.metadata?.creator_terms_version === CREATOR_TERMS_VERSION) return accountId
@@ -133,8 +109,6 @@ async function acceptCurrentCreatorTerms(accountId: string): Promise<string> {
     return accountId
 }
 
-// Account links are single-use and expire within minutes, so one is minted on every click and none
-// is ever stored. `connect=refresh` is what Stripe redirects to when the link has died on the way.
 export async function createCreatorOnboardingLink(userId: string): Promise<string> {
     const origin = await getAppOrigin()
     const link = await stripe.accountLinks.create({
@@ -146,8 +120,6 @@ export async function createCreatorOnboardingLink(userId: string): Promise<strin
     return link.url
 }
 
-// Stripe rejects a login link on an account that never finished onboarding, so the check is here
-// rather than in the caller.
 export async function createCreatorDashboardLink(userId: string): Promise<string> {
     const account = await getCreatorAccountState(userId)
     if (!account.stripeAccountId || !account.detailsSubmitted) throw new AppError('finishStripeSetup')
@@ -156,18 +128,11 @@ export async function createCreatorDashboardLink(userId: string): Promise<string
     return link.url
 }
 
-// The net Rerun casts under the onboarding options: a creator who submitted everything and still
-// holds no `transfers` capability is one whose country is not requesting it, and would otherwise wait
-// forever for a payout that can never be enabled. Asking for it only once `details_submitted` is
-// true is what makes this safe, since a capability requested any earlier would have frozen their
-// country to Rerun's own. They get one more pass through onboarding, not a dead account.
 async function ensureTransfersRequested(account: Stripe.Account): Promise<Stripe.Account> {
     if (!account.details_submitted || account.capabilities?.transfers) return account
     return stripe.accounts.update(account.id, { capabilities: { transfers: { requested: true } } })
 }
 
-// The `account.updated` handler. Looked up by the Stripe id rather than by metadata, so an account
-// edited by hand in the dashboard still lands on the right row.
 export async function syncCreatorAccount(account: Stripe.Account): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: existing } = await selectMaybeSingle(supabase, 'creator_accounts', ['user_id', 'onboarded_at'] as const, { stripe_account_id: account.id })
@@ -190,8 +155,6 @@ export async function syncCreatorAccount(account: Stripe.Account): Promise<void>
     await supabase.from('creator_accounts').update<CreatorAccountUpdate>(update).eq('stripe_account_id', account.id)
 }
 
-// A creator who revokes the Rerun app from their Stripe dashboard: the account id is still ours but
-// nothing can be transferred to it any more.
 export async function markCreatorAccountDeauthorized(accountId: string | undefined): Promise<void> {
     if (!accountId) return
     const supabase = createServiceRoleClient()
@@ -206,8 +169,6 @@ export async function markCreatorAccountDeauthorized(accountId: string | undefin
         .eq('stripe_account_id', accountId)
 }
 
-// The gate every paid checkout goes through. The message says nothing about the creator's account:
-// it is the buyer who reads it.
 export async function requirePayoutReadyAccount(creatorId: string | null): Promise<string> {
     if (!creatorId) throw new AppError('templateNotPurchasableNow')
 
@@ -218,8 +179,6 @@ export async function requirePayoutReadyAccount(creatorId: string | null): Promi
     return account.stripeAccountId
 }
 
-// The publish gate reads the same fact but must not throw: an incomplete account is a reason to
-// refuse a status change, not an error.
 export async function isPayoutReady(creatorId: string | null): Promise<boolean> {
     if (!creatorId) return false
     const account = await getCreatorAccountState(creatorId)

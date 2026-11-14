@@ -6,7 +6,6 @@ import { recallMemory, writeMemory, updateMemory } from './store.js'
 import { logger } from '../lib/logger.js'
 import type { LoadedAgent } from '../agents/types.js'
 
-// Past this the memory is written as a new one, which is what a failed reconcile already does.
 const RECONCILE_TIMEOUT_MS = 10 * 60 * 1000
 
 const decisionSchema = z.object({

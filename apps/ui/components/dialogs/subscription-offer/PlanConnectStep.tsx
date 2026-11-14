@@ -62,8 +62,6 @@ function letsGo(provider: SubscriptionProvider, onDone: () => void, t: PlanTrans
 
 type PlanConnectFrameProps = { provider: SubscriptionProvider; connected: boolean; onBack: () => void; onSkip: () => void; children: ReactNode }
 
-// Once connected, "Let's go" in the last step is the way on: going back or staying on Rerun credits
-// no longer means anything, so the footer goes.
 function PlanConnectFrame({ provider, connected, onBack, onSkip, children }: PlanConnectFrameProps) {
     const t = useTranslations('dialogs.subscriptionOffer.plan')
     return (

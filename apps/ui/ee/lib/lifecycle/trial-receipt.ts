@@ -1,8 +1,3 @@
-// The one lifecycle email the sweeper does not own. A receipt that lands fifteen minutes after the
-// fact is a worse receipt, so this goes out inline from the billing service.
-//
-// No 'server-only': billing.service.ts is a Next module, but this file also has to stay importable
-// from the sweeper's bundle so both paths share the same guards.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { PLAN_CURRENCY, basePriceCents, parsePriceArm } from '@/ee/lib/billing/plans'
@@ -21,12 +16,6 @@ import { recordLifecycleEmail } from './store'
 
 const SEQUENCE_KEY = 'trial_started' as const
 
-/**
- * `applySubscriptionToWorkspace` runs from the trial start and again from every
- * `customer.subscription.*` webhook, so this is deliberately not gated on "trial_ends_at was null
- * before": it is gated on the unique index over (workspace_id, 'trial_started'), which is the only
- * thing that survives a webhook replay.
- */
 export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>, workspaceId: number, trialEndsAt: string, trialDays: number, hasCard: boolean): Promise<void> {
     try {
         const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox', 'price_arm'] as const, { id: workspaceId })
@@ -39,7 +28,6 @@ export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>
         const { data: user } = await selectSingle(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: owner.user_id })
         if (!user || !wantsCategoryEmail(user.email_notification_prefs, 'billing')) return
 
-        // Claim the slot before sending: two webhooks landing together must not both mail.
         const claimed = await recordLifecycleEmail(supabase, { sequenceKey: SEQUENCE_KEY, userId: owner.user_id, workspaceId, agentId: null }, 'sent')
         if (claimed !== 'recorded') return
 
@@ -54,8 +42,6 @@ export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>
                 workspaceName: workspace.name,
                 trialDays,
                 trialEndsLabel: emailDateLabel(new Date(trialEndsAt), locale),
-                // The price this workspace is sold the plan at, before any promotion code entered at
-                // Checkout: it lowers the first charge, and overstating is the safe direction for a receipt.
                 monthlyPriceLabel: formatAmount(basePriceCents(parsePriceArm(workspace.price_arm)), PLAN_CURRENCY),
                 includedLabel: emailTranslator(locale)('trialStarted.included', { coworkers: TRIAL_ACTIVE_AGENTS, credits: TRIAL_CREDITS }),
                 hasCard,
@@ -64,7 +50,6 @@ export async function sendTrialStartedReceipt(supabase: SupabaseClient<Database>
             },
         )
     } catch (err) {
-        // A receipt is never worth failing a Stripe webhook over.
         console.error('[lifecycle] trial receipt failed', err)
     }
 }

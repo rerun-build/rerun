@@ -19,16 +19,11 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
 
 const WORD = String.raw`\p{L}\p{N}_`
 
-// Case-insensitive like call_agent's own resolution. The look-behind keeps an address such as
-// `team@scout.io` intact, the look-ahead keeps `@scout_2` pointing at the other agent.
 export function replaceMention(text: string, fromHandle: string, toHandle: string): string {
     if (!fromHandle) return text
     return text.replace(new RegExp(`(?<![${WORD}.@])@${escapeRegExp(fromHandle)}(?![${WORD}])`, 'giu'), () => `@${toHandle}`)
 }
 
-// Case-sensitive on purpose: a display name such as "Scout" is also an ordinary word, and only the
-// capitalised form written into the soul at creation is the agent's name. A mention is left to
-// replaceMention.
 export function replaceDisplayName(text: string, fromName: string, toName: string): string {
     const from = fromName.trim()
     if (!from) return text
@@ -56,14 +51,11 @@ async function skillFiles(id: string): Promise<string[]> {
     return entries.filter(e => e.isDirectory()).map(e => resolve(skillsDir(id), e.name, 'SKILL.md'))
 }
 
-// Only the live memories: `memory/archive` is what the agent let go of, and stays as it was.
 async function memoryFiles(id: string): Promise<string[]> {
     const dir = resolve(agentDir(id), 'memory')
     return (await markdownSlugs(dir)).map(slug => resolve(dir, `${slug}.md`))
 }
 
-// One file that cannot be rewritten must not leave every file after it unrewritten, nor fail a
-// rename that has already landed in config.json.
 async function attempt(what: Record<string, string>, fn: () => Promise<unknown>): Promise<void> {
     try {
         await fn()
@@ -87,9 +79,6 @@ async function rewriteAgentMentions(id: string, fromHandle: string, rewrite: (te
     if (systemDbExists(id)) await attempt({ agentId: id, part: 'memories' }, () => rewriteMemoryText(id, `@${fromHandle}`, rewrite))
 }
 
-// The handle is how every other agent names this one in text, so moving it means moving each
-// `@old` written anywhere a prompt is read from. Without it, a rename silently breaks every call
-// to the agent: nothing fails at write time, only at run time. Past chats are left as they were.
 export async function rewriteRenamedAgentReferences(agentId: string, fromHandle: string, toHandle: string): Promise<void> {
     const rewrite = (text: string) => replaceMention(text, fromHandle, toHandle)
     for (const { id } of await listAgentIndex()) await rewriteAgentMentions(id, fromHandle, rewrite)

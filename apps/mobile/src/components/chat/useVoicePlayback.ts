@@ -5,29 +5,20 @@ import { useEffect, useState } from 'react'
 import { cachedFile, ownedFileUrl, type FileOwner } from '@/api/files'
 import { useAuth } from '@/auth/AuthProvider'
 
-// A recording made in Chrome is WebM, which the iOS player does not read: the bubble still shows its
-// shape and length, with play turned off.
 const playableOnIos = (src: string) => !src.toLowerCase().endsWith('.webm')
 
 export type VoicePlayback = {
-    /** False for a WebM recording, which iOS cannot play. */
     readable: boolean
     playable: boolean
     loaded: boolean
     loading: boolean
     playing: boolean
     elapsedMs: number
-    /** 0 to 1 through the recording. */
     progress: number
     toggle: () => void
     seekAt: (ratio: number) => void
 }
 
-/**
- * Plays a voice message, held above the bubble so what sits under it (the transcript) follows the
- * same clock. The audio is fetched only on the first play, so opening a long conversation does not
- * pull every recording in it.
- */
 export function useVoicePlayback(voice: VoiceMessage, owner: FileOwner | null): VoicePlayback {
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null

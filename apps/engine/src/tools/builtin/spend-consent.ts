@@ -3,9 +3,6 @@ import { extractText, listMessages } from '../../db/repos/messages.js'
 import { canonicalHitlName } from './hitl.js'
 import type { RunContext } from '../../runtime/context.js'
 
-// How far past its estimate an approval stretches before the user is asked again. Not a cap on the
-// credit: a real bill lands on either side of a rough estimate, and asking again over a few cents
-// would only teach the user to stop reading the card.
 export const SPEND_OVERRUN_FACTOR = 1.5
 
 export type SpendApproval = { approvalId: string; estimateMicros: number }
@@ -14,11 +11,6 @@ export type SpendConsent = { granted: true; approvalId: string | null } | { gran
 
 type StoredMessage = { role: string; contentJson: string }
 
-// Spend counted against each approval while this engine runs. Messages only reach the database when
-// a run settles, so the history cannot tell what a run in flight has already spent. A restart
-// forgets the count, which at worst lets the run in flight go past its estimate once more: an
-// approval closes with the user's next free message, so an old one never reopens. The hub's ledger
-// keeps the real bill either way.
 const spentByApproval = new Map<string, number>()
 
 export function recordSpend(approvalId: string | null, micros: number): void {
@@ -58,10 +50,6 @@ function quotedMicros(messages: StoredMessage[], toolCallId: string): number {
 
 const isHitlReply = (message: StoredMessage) => parseHitlReply(extractText(parseContent(message.contentJson))) !== null
 
-// The latest request_spend of the session, and whether the user approved it. Only the latest counts:
-// a newer request the user declined or has not answered yet closes whatever an older one opened.
-// An approval covers the run it starts, through the cards that run may raise (a question, an
-// approval): the next free message of the user is a new task, which asks for its own card.
 export function findSpendApproval(messages: StoredMessage[]): SpendApproval | null {
     for (let i = messages.length - 1; i >= 0; i--) {
         if (messages[i].role !== 'assistant') continue
@@ -73,7 +61,6 @@ export function findSpendApproval(messages: StoredMessage[]): SpendApproval | nu
         if (decision?.decision !== 'approved') return null
         if (afterReply.some(message => !isHitlReply(message))) return null
 
-        // A CLI provider runs the tool itself and stores the result in the assistant turn, next to the call.
         const estimateMicros = quotedMicros(messages.slice(i), toolCallId)
         return estimateMicros > 0 ? { approvalId: toolCallId, estimateMicros } : null
     }
@@ -86,9 +73,6 @@ const NO_APPROVAL =
 const NO_ONE_TO_APPROVE =
     'Not run, nothing was billed: this tool spends the workspace Rerun credit and nobody here can approve it. Tell the user to switch on Request approval for you, or to switch on Spend without asking.'
 
-// Read once per run: messages only reach the database when a run settles, so what the history says
-// cannot change while this run makes its paid calls. The user's reply is still on its way to the
-// database when the run starts, hence the wait before the first read.
 const approvalByRun = new WeakMap<RunContext, Promise<SpendApproval | null>>()
 
 function loadApproval(ctx: RunContext): Promise<SpendApproval | null> {

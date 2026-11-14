@@ -7,7 +7,6 @@ jest.mock('expo-sharing', () => ({ shareAsync: jest.fn() }))
 jest.mock('@/config/environment', () => ({ environment: { apiUrl: 'https://hub.test' } }))
 
 const table = { kind: 'table', scope: 'agent', table: 'leads', columns: ['name'], rows: [{ name: 'Acme' }], total: 40, columnsTruncated: false }
-// What the engine hands back once the transcript is reloaded: the MCP content array, as a JSON string, in an envelope.
 const reloaded = (payload: object) => ({ type: 'json', value: JSON.stringify([{ type: 'text', text: JSON.stringify(payload) }]) })
 
 describe('cardOf', () => {

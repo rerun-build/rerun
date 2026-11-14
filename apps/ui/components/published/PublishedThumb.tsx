@@ -16,8 +16,6 @@ function KindIcon({ file, className }: { file: Pick<PublishedFile, 'kind' | 'con
     return <FileIcon className={className} />
 }
 
-// The capture taken after each publish, 16:10 and pinned to the top of the page. Until it exists,
-// or when it fails to load, a tile with the kind of file stands in its place.
 export function PublishedThumb({ file, className }: { file: Pick<PublishedFile, 'kind' | 'contentType' | 'path' | 'thumbnailUrl'>; className?: string }) {
     const [broken, setBroken] = useState<string | null>(null)
     const src = file.thumbnailUrl && broken !== file.thumbnailUrl ? file.thumbnailUrl : null

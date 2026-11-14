@@ -1,7 +1,3 @@
-// The notice the sweeper does not own. A declined charge leaves the workspace a day before the
-// teardown pauses it, and that day only counts if the owner hears about it the minute it starts.
-//
-// No 'server-only', for the same reason as trial-receipt.ts.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
@@ -28,8 +24,6 @@ export type DeclinedInvoice = {
     amountDueCents: number
     currency: string
     hostedUrl: string | null
-    // A trial's first charge. Its email is `trial_ended`, which the sweeper sends with what the
-    // trial produced, so only the WhatsApp message leaves from here.
     firstCharge: boolean
 }
 
@@ -55,8 +49,6 @@ async function emailOwner(supabase: SupabaseClient<Database>, workspace: { id: n
     await recordLifecycleEmail(supabase, { sequenceKey: SEQUENCE_KEY, userId, workspaceId: workspace.id, agentId: null }, result.ok ? 'sent' : 'failed', { invoice_id: invoice.id })
 }
 
-// The button cannot carry Stripe's hosted invoice, which lives on another domain: the billing
-// dialog offers the same payment.
 async function messageOwner(supabase: SupabaseClient<Database>, workspaceId: number, team: TeamMember[], userId: string, invoice: DeclinedInvoice): Promise<void> {
     await deliverWhatsApp(supabase, {
         userId,
@@ -67,15 +59,6 @@ async function messageOwner(supabase: SupabaseClient<Database>, workspaceId: num
     })
 }
 
-/**
- * Tells the owner their charge was declined and their workspace is paused in a day, by WhatsApp and
- * by email, each on its own: an account born from a phone number has no address to write to.
- * Mandatory, like every end-of-access notice: no preference is read and no unsubscribe link travels
- * with the email.
- *
- * The caller sends it for the first declined attempt only. There is no unique index behind this
- * sequence, because a workspace can miss a renewal more than once in its life; the row is the trace.
- */
 export async function sendPaymentFailedNotice(supabase: SupabaseClient<Database>, workspaceId: number, invoice: DeclinedInvoice, now: Date = new Date()): Promise<void> {
     try {
         const { data: workspace } = await selectSingle(supabase, 'workspaces', ['id', 'name', 'is_sandbox'] as const, { id: workspaceId })
@@ -89,7 +72,6 @@ export async function sendPaymentFailedNotice(supabase: SupabaseClient<Database>
         const results = await Promise.allSettled([invoice.firstCharge ? null : emailOwner(supabase, workspace, team, owner.user_id, invoice, now), messageOwner(supabase, workspaceId, team, owner.user_id, invoice)])
         for (const result of results) if (result.status === 'rejected') console.error('[lifecycle] payment failed notice failed', result.reason)
     } catch (err) {
-        // A notice is never worth failing a Stripe webhook over.
         console.error('[lifecycle] payment failed notice failed', err)
     }
 }

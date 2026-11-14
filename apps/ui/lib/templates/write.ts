@@ -12,8 +12,6 @@ import { renderTemplateCard } from './card-render'
 
 export type TemplateWriteResult = { ok: true; slug: string; warnings: string[] } | { ok: false; status: number; error: string }
 
-// `currentSlug` is the row the caller is about to write: a template keeps its own slug instead
-// of being pushed to `-2` every time its metadata is regenerated.
 export async function uniqueTemplateSlug(supabase: SupabaseClient<Database>, base: string, currentSlug?: string): Promise<string> {
     for (let i = 1; ; i++) {
         const candidate = i === 1 ? base : `${base}-${i}`
@@ -24,25 +22,15 @@ export async function uniqueTemplateSlug(supabase: SupabaseClient<Database>, bas
     }
 }
 
-// A published or unlisted template is a public page, so it must be complete. Drafts may be
-// saved in any state. `metaTitle` is not required, the public page falls back to the title. The
-// meta description is: a tagline is written for a card, and is almost never the length a search
-// result needs.
 function publishGate(doc: TemplateDocument): string[] {
     if (!isPublicStatus(doc.status)) return []
     const missing: string[] = []
     if (!doc.tagline.trim()) missing.push('a tagline')
     if (!isSeoDescriptionLength(doc.metaDescription)) missing.push(submitRequirementLabel('metaDescription', englishTranslator('templates.expert.footer')).toLowerCase())
-    // The cards draw the board of a captured agent, so an image is only the fallback thumbnail of a
-    // template that has none.
     if (doc.gallery.length === 0 && doc.agents.length === 0) missing.push('at least one image or captured coworker')
     return missing.length > 0 ? [`Cannot publish without ${missing.join(' and ')}`] : []
 }
 
-// Selling requires somewhere to send the money. Checked on the way to the public page rather than
-// at save time, so an author can price a draft before finishing their Stripe onboarding. Every
-// write path funnels through buildRow, so this one insertion covers the admin editor, the review
-// approval and anything added later.
 async function paidPublishBlockers(supabase: SupabaseClient<Database>, doc: TemplateDocument): Promise<string[]> {
     if (!isPublicStatus(doc.status) || doc.pricingModel === 'free') return []
     if (!doc.creatorId) return ['A paid template must belong to a creator account']
@@ -58,8 +46,6 @@ type BuiltRow = { ok: false; error: string } | { ok: true; row: ReturnType<typeo
 async function buildRow(supabase: SupabaseClient<Database>, doc: TemplateDocument): Promise<BuiltRow> {
     const { connectors, warnings: connectorWarnings } = await resolveAgentConnectors(supabase, doc.agents)
 
-    // The scan is a heuristic, so a false positive must never cost the author their draft:
-    // it only turns blocking on the way to the public page.
     const publishing = isPublicStatus(doc.status)
     const secretHits = scanDocumentForSecrets(doc).map(describeSecretHit)
     const blocking = [...publishGate(doc), ...(await paidPublishBlockers(supabase, doc)), ...(publishing ? secretHits : [])]
@@ -81,13 +67,10 @@ export async function createTemplate(supabase: SupabaseClient<Database>, doc: Te
         .insert<Database['public']['Tables']['templates']['Insert']>({ ...built.row, published_at: isPublicStatus(doc.status) ? new Date().toISOString() : null })
     if (error) return { ok: false, status: 500, error: error.message }
 
-    // A draft has no landing page, so revalidating it would ping a 404 on every creation.
     if (isPublicStatus(doc.status)) await pingTemplateRevalidate(doc.slug, null, [doc.category])
     return { ok: true, slug: doc.slug, warnings: built.warnings }
 }
 
-// The review columns are not part of the document: they describe the handover between an author
-// and us, not the page. They ride along here so a status change and its trace are one write.
 export type TemplateReviewPatch = { submitted_at?: string | null; review_note?: string | null }
 
 export async function updateTemplateBySlug(
@@ -116,13 +99,10 @@ export async function updateTemplateBySlug(
         .eq('id', existing.id)
     if (error) return { ok: false, status: 500, error: error.message }
 
-    // A slug change orphans the old landing path, so both have to be revalidated.
     await pingTemplateRevalidate(doc.slug, doc.slug === slug ? null : slug, [doc.category, existing.category])
     return { ok: true, slug: doc.slug, warnings: built.warnings }
 }
 
-// Categories are their own indexable landing routes, so a template moving between them
-// leaves both listings stale.
 export async function pingTemplateRevalidate(slug: string | null, previousSlug: string | null, categories: (string | null)[] = []) {
     const categoryPaths = [...new Set(categories.filter(Boolean))].map(category => `/templates/category/${category}`)
     const paths = [
@@ -132,11 +112,7 @@ export async function pingTemplateRevalidate(slug: string | null, previousSlug: 
         ...categoryPaths,
     ]
 
-    // The editorial change lands now, so unpublishing stays instant.
     await revalidateLanding(paths)
 
-    // The board capture is two round trips to Rerun Shot, which the author must not sit through, so
-    // it runs detached and revalidates a second time once the row points at the new images. Without
-    // that second ping the pages would have been rebuilt mid-capture and would keep the old card.
     if (slug) void renderTemplateCard(slug).then(changed => (changed ? revalidateLanding(paths) : undefined))
 }

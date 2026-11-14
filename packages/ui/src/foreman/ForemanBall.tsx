@@ -10,34 +10,25 @@ import type { OrbActivity } from './Orb'
 import { FACE_EYE_SHARE, FOREMAN_VIEW_MARGIN, FOREMAN_VIEW_WIDTH, ForemanFacePlate, LISTENING_FACE_SCALE, MOTION, SMALL_BELOW, type ForemanFace, type ForemanFacing } from './foreman-face'
 import { FOREMAN_MATERIALS, type ForemanMaterialKey } from './foreman-materials'
 
-// Drawn in the buddy's units: a ball as wide as an agent's block, resting on the floor line.
 const RADIUS = 40
 const CENTER = { x: 50, y: 44 }
 const FLOOR = CENTER.y + RADIUS
 const MARGIN = FOREMAN_VIEW_MARGIN
 const BELOW_FLOOR = 5
 const VIEW_HEIGHT = RADIUS * 2 + MARGIN + BELOW_FLOOR
-// How far under its floor line the ball's box ends, as a share of its width.
 export const FOREMAN_BALL_FLOOR_SHARE = BELOW_FLOOR / FOREMAN_VIEW_WIDTH
-// What a ball asked to be one diameter wide needs: how much wider its box is than its sphere, and
-// how far the sphere sits from the box's top left corner, as a share of the diameter.
 export const FOREMAN_BALL_FRAME = { scale: FOREMAN_VIEW_WIDTH / (RADIUS * 2), inset: MARGIN / (RADIUS * 2) }
 
 const FACE_SCALE = 1.4
 const SMALL_FACE_SCALE = 1.7
-// Where the eyes sit on the ball: off-centre towards the front-left, the way a buddy looks.
 const FACE_AT = { x: CENTER.x - 9, y: CENTER.y - 3 }
-// A buddy's wall leans by 0.5; a ball only hints at the same turn.
 const FACE_LEAN = 0.2
 const MAX_FACE_LEAN = 0.35
 const EYE_Y = 10
 
 const REST_PITCH = Math.asin((CENTER.y - FACE_AT.y) / RADIUS)
-// Where the ball is turned when nothing moves it, in radians: the pose that puts the face on `FACE_AT`.
 export const FOREMAN_FACE_REST = { yaw: Math.asin((FACE_AT.x - CENTER.x) / (RADIUS * Math.cos(REST_PITCH))), pitch: REST_PITCH }
 
-// The face carried by a ball turned by `yaw` (to the right) and `pitch` (upwards): it slides over the
-// sphere, flattens as it nears the rim and is gone once it has turned to the far side.
 export function foremanFacePose(yaw: number, pitch: number) {
     const towards = Math.cos(yaw)
     if (towards <= 0) return 'scale(0)'
@@ -51,12 +42,10 @@ export function foremanFacePose(yaw: number, pitch: number) {
 
 const REST_YAW_SIDE: Record<ForemanFacing, number> = { left: 1, front: 0, right: -1 }
 
-// The resting pose of a ball asked to look one way: the same tilt, turned to the other side or not at all.
 export function foremanFaceRest(facing: ForemanFacing) {
     return { yaw: FOREMAN_FACE_REST.yaw * REST_YAW_SIDE[facing], pitch: FOREMAN_FACE_REST.pitch }
 }
 
-// Scales and lifts its children from the point where the ball touches the floor.
 function FromFloor({ className, children }: { className: string; children: ReactNode }) {
     return (
         <g transform={`translate(${CENTER.x} ${FLOOR})`}>
@@ -73,18 +62,14 @@ export function foremanBallHeight(size: number, scale: number) {
 
 type ForemanBallProps = {
     material: ForemanMaterialKey
-    // Diameter as a share of an agent's width.
     scale: number
-    // Width in pixels of an agent standing next to it: the ball is `scale` times that.
     size: number
     face?: ForemanFace
     eyes?: BuddyEyes
     state?: OrbActivity
     animated?: boolean
     facing?: ForemanFacing
-    // The group holding the eyes, in the face's own units, for whoever moves the gaze.
     eyesRef?: RefObject<SVGGElement | null>
-    // The group that places the face on the sphere, for whoever turns the ball: see `foremanFacePose`.
     faceRef?: RefObject<SVGGElement | null>
     className?: string
 }

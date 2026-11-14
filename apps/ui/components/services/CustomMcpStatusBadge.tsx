@@ -11,8 +11,6 @@ type CustomMcpStatusBadgeProps = {
     loading: boolean
 }
 
-// The live answer of a custom server. An engine too old to probe, or a server the probe never
-// reached, shows nothing rather than a guess.
 export function CustomMcpStatusBadge({ status, loading }: CustomMcpStatusBadgeProps) {
     const t = useTranslations('services.customMcp.status')
     if (!status) return loading ? <Skeleton className="h-4 w-16 rounded-full" /> : null

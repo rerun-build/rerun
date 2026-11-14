@@ -13,10 +13,6 @@ import { spacing } from '@/theme/tokens'
 
 import { MockPane, type LabState } from './lab-foreman'
 
-// Dev only: a coworker's conversations with their tabs, over mock messages, swiped through as on a coworker.
-//   /lab-chat?tabs=3&active=1&state=loading&coworker=foreman   tabs: how many are open; active: the index
-//   on screen; state: what every open conversation shows, loading also leaving the tabs unnamed;
-//   coworker: whose chat, Pulse when left out; probe=1: the keyboard heights the pane is lifted by
 const TITLES = ['Lyon agencies', 'LinkedIn post on pricing', 'Salutation amicale et prise de nouvelles', 'Q4 prospects', 'Weekly recap', 'Support triage']
 const AUTOMATED_RUNS: ChatTab[] = [
     { id: 'lab-run-1', title: '4 applications sent: Doctolib, Qonto, Alan', running: false, empty: false, automationName: 'Daily missions apply', updatedAt: new Date(Date.now() - 3 * 3_600_000).toISOString() },

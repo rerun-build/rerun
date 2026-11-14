@@ -1,12 +1,5 @@
-// Helpers for collecting files to upload while preserving their folder
-// structure. `subDir` is the folder of the file relative to the upload root
-// (the current path in the file panel); '' for a plain file at the root.
-
 export type UploadEntry = { file: File; subDir: string }
 
-// From an <input type="file"> (with or without `webkitdirectory`). When the
-// input has `webkitdirectory`, each File carries a `webkitRelativePath` like
-// "folder/sub/file.txt" — we keep everything but the filename as the subDir.
 export function entriesFromFileList(files: FileList | File[]): UploadEntry[] {
     return Array.from(files).map(file => ({
         file,
@@ -14,9 +7,6 @@ export function entriesFromFileList(files: FileList | File[]): UploadEntry[] {
     }))
 }
 
-// From a drag & drop DataTransfer, preserving nested folder structure via the
-// webkitGetAsEntry API. Falls back to a flat list of dt.files when the entries
-// API is unavailable.
 export async function entriesFromDataTransfer(dt: DataTransfer): Promise<UploadEntry[]> {
     const roots = Array.from(dt.items)
         .filter(item => item.kind === 'file')
@@ -51,8 +41,6 @@ function walkEntry(entry: FileSystemEntry, parentDir: string, out: UploadEntry[]
 
     return new Promise(resolve => {
         const children: FileSystemEntry[] = []
-        // readEntries returns at most ~100 entries per call, so keep reading
-        // until it yields an empty batch, then recurse into the children.
         const readBatch = () => {
             reader.readEntries(
                 async batch => {

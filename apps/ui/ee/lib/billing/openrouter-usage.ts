@@ -1,13 +1,3 @@
-// OpenRouter reports what a call really cost, but only if asked, and only in the last frame of the
-// stream. Both Rerun callers need that number: the proxy the boxes speak to
-// (app/api/llm/chat/completions) and the foreman, which runs its own streamText on the hub.
-// So the asking and the reading live here, as a fetch wrapper the caller hands to its provider.
-//
-// A call served on our own provider key (BYOK) is charged twice: `cost` is then only OpenRouter's
-// fee, and what the provider billed comes apart in `cost_details.upstream_inference_cost`, which is
-// 0 or null on every other call. The cost handed to the caller is the sum, so it is what we pay
-// whichever way the call was routed.
-
 export type OpenRouterUsage = { prompt_tokens?: number; completion_tokens?: number; cost?: number; cost_details?: { upstream_inference_cost?: number | null } | null }
 
 export function readUsage(value: unknown): OpenRouterUsage | null {
@@ -30,9 +20,6 @@ function withUsageAsked(body: BodyInit | null | undefined): BodyInit | null | un
     }
 }
 
-// `fetch` already undid the upstream compression, so an answer rebuilt from its text must not
-// announce it any more: the caller would try to gunzip plain JSON, and trust a length that was the
-// compressed one.
 function decodedHeaders(headers: Headers): Headers {
     const decoded = new Headers(headers)
     decoded.delete('content-encoding')
@@ -40,8 +27,6 @@ function decodedHeaders(headers: Headers): Headers {
     return decoded
 }
 
-// Passes the response through untouched and calls `onUsage` once, when the stream ends. A
-// non-streaming answer is read in one go; anything that is not JSON is left alone.
 export function meteredFetch(onUsage: (usage: OpenRouterUsage) => void): typeof globalThis.fetch {
     return async (input, init) => {
         const upstream = await fetch(input as RequestInfo, init ? { ...init, body: withUsageAsked(init.body) } : init)

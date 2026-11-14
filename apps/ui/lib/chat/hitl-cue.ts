@@ -21,7 +21,6 @@ const ICONS: Record<HitlKind, { icon: LucideIcon; tone: string }> = {
     spend: { icon: CoinsIcon, tone: DECISION_TONE },
 }
 
-// What the scroll cue says is waiting at the end of the thread, once the block is out of sight.
 export function summarizePendingHitl(kind: HitlKind, input: Record<string, unknown>, t: HitlCueCopy): PendingHitlSummary {
     return { ...ICONS[kind], label: pendingHitlLabel(kind, input, t) }
 }

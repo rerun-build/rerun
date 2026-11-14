@@ -60,8 +60,6 @@ afterEach(() => {
 })
 
 describe('mergeRunStream', () => {
-    // Claude prefixes the bridged tools with mcp__rerun__, Codex with rerun__ on some builds: the
-    // dashboard only renders a HITL card for the bare name.
     it('hands the dashboard the bare HITL tool names whatever the CLI prefixed them with', async () => {
         const { run, writer, merged } = fakeRun([
             { type: 'tool-input-start', toolCallId: 'c1', toolName: 'mcp__rerun__ask_user' },
@@ -78,8 +76,6 @@ describe('mergeRunStream', () => {
         expect(chunks[1]).toMatchObject({ toolCallId: 'c1', input: { questions: [] } })
     })
 
-    // An iOS build that shipped before option descriptions would hand an option object to a text
-    // node: the v2 stamp makes it fall back to its text card instead.
     it('stamps v2 on an ask_user call whose options carry a description, and only on it', async () => {
         const described = { questions: [{ question: 'Format?', header: 'Format', options: [{ label: 'One-pager', description: 'One page' }, 'Deck'] }] }
         const plain = { questions: [{ question: 'Format?', header: 'Format', options: ['One-pager', 'Deck'] }] }
@@ -173,7 +169,6 @@ describe('cutOffWhenSettled edge cases', () => {
         await expect(vi.advanceTimersByTimeAsync(5_000)).resolves.toBeDefined()
     })
 
-    // Codex fails a turn by erroring its stream rather than with an error part.
     it('hands the chat the run error when the source itself errors', async () => {
         const codexRefusal = `Error: {"detail":"The 'gpt-6-sol' model is not supported when using Codex with a ChatGPT account."}`
         const source = pendingSource()

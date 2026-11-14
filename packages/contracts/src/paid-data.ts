@@ -1,7 +1,3 @@
-// The paid data a coworker buys with its workspace's Rerun credit: a catalog of routed capabilities
-// on Treg, reached through one `paid_data` tool. Treg picks the provider and falls back to the next
-// one on a miss, the hub bills what it was charged. Shared because the engine builds the tool and
-// its index from it, the hub validates and prices against it, and the UI labels calls with it.
 import { z } from 'zod'
 
 import { formatCreditsLabel } from './credits.js'
@@ -9,21 +5,13 @@ import { unwrapToolOutputEnvelope } from './tool-output.js'
 
 const MICROS_PER_USD = 1_000_000
 
-// What a workspace pays for a paid data call as a multiple of what Treg charged, when the hub's
-// env sets no PAID_DATA_PRICE_MULTIPLIER: at cost. The hub hands its multiplier to the engine, which
-// prices the catalog with it, so what the coworker reads is what the workspace is billed.
 export const PAID_DATA_DEFAULT_PRICE_MULTIPLIER = 1
 
-// Treg walks the providers of a routed call cheapest first and lets that waterfall reach one dollar
-// per call by default: a people search catalogued at a few credits a row once landed on a provider
-// billing a hundred. The ceiling sent with each call bounds the waterfall to a multiple of the
-// catalog price, so a dear provider is refused unbilled rather than served.
 export const PAID_DATA_ROUTE_MAX_COST_FACTOR = 3
 export const PAID_DATA_ROUTE_MAX_COST_ERROR = 'route_max_cost'
 
 export const PAID_DATA_TOOL = 'paid_data'
 export const PAID_DATA_CATALOG_TOOL = 'paid_data_catalog'
-// Sent by an engine that saves each paid answer whole: the hub then adds it to its reply.
 export const PAID_DATA_FULL_ANSWER_HEADER = 'x-rerun-paid-data-full'
 
 const text = z.string().min(1)
@@ -34,7 +22,6 @@ const language = z.string().min(2).max(5).optional().describe('Language code of 
 const searchFilters = { country, language }
 
 const limit = (max: number) => z.number().int().min(1).max(max).optional().describe('How many to return.')
-// A capability billed per row returned: its default is the row count the estimate assumes.
 const DEFAULT_BILLED_ROWS = 10
 const billedRows = z.number().int().min(1).max(100).default(DEFAULT_BILLED_ROWS).describe(`Rows to return, ${DEFAULT_BILLED_ROWS} by default. Each row is billed: ask for what you need, not more.`)
 
@@ -63,22 +50,14 @@ export type PaidDataGroup = (typeof PAID_DATA_GROUPS)[number]
 
 type CatalogEntry = {
     group: PaidDataGroup
-    // The index line: the inputs it takes, then what it returns.
     summary: string
     params: z.ZodObject
-    // Inputs of which at least one must be set: the schema alone cannot say it.
     oneOf?: readonly string[]
-    // The field of `output` Treg leaves empty when no provider found anything.
     missField: string
     unit: 'call' | 'row'
-    // What Treg is expected to charge for one unit, measured on real calls and rounded up: a miss on
-    // a provider that bills it adds to the charge before the next one answers.
     unitCostMicros: number
-    // The plural noun its units are counted in.
     label: string
     routeHeaders?: Readonly<Record<string, string>>
-    // The fields each row of `missField` shows in the tool result when the whole answer is saved:
-    // the rest of a row stays in the saved file, so a batch of searches does not fill the context.
     shownFields?: readonly string[]
 }
 
@@ -111,7 +90,6 @@ export const PAID_DATA_CATALOG = {
         unit: 'call',
         unitCostMicros: 30_000,
         label: 'work emails',
-        // Treg refuses the in-call verification on every other route.
         routeHeaders: { 'X-Treg-Route-Verify': 'true' },
     },
     'people.email.verify': {
@@ -690,11 +668,8 @@ export function paidDataUnitPriceMicros(capability: PaidDataCapability, multipli
     return Math.round(paidDataEntry(capability).unitCostMicros * multiplier)
 }
 
-// Null when the hub could not say what it bills: the catalog then gives no price rather than a wrong one.
 export type PaidDataPriceMultiplier = number | null
 
-// In dollars, the unit Treg reads the ceiling in: the catalog cost of the rows the call asks for
-// (its default page when it names none), or of the one call, times the factor.
 export function paidDataRouteMaxCostUsd(capability: PaidDataCapability, params: Record<string, unknown>): number {
     const entry = paidDataEntry(capability)
     const rows = entry.unit === 'row' ? (typeof params.limit === 'number' && params.limit > 0 ? params.limit : DEFAULT_BILLED_ROWS) : 1
@@ -710,9 +685,6 @@ const indexLine = (capability: PaidDataCapability, multiplier: PaidDataPriceMult
 
 export const PAID_DATA_PRICES_UNAVAILABLE = 'Prices are not available right now: each paid_data answer says what it billed.'
 
-// What the model reads through paid_data_catalog: a group is one line per capability, the whole
-// catalog is every group, the overview is only the ids. Nothing of it sits in a tool description,
-// which the CLI bridges truncate and some model providers refuse past a thousand characters.
 export function paidDataGroupIndex(group: PaidDataGroup, multiplier: PaidDataPriceMultiplier): string {
     const index = `${GROUP_TITLES[group]}:\n${groupCapabilities(group).map(capability => indexLine(capability, multiplier)).join('\n')}`
     return multiplier === null ? `${index}\n${PAID_DATA_PRICES_UNAVAILABLE}` : index
@@ -752,8 +724,6 @@ export type PaidDataCatalogLookup = z.infer<typeof paidDataCatalogLookupSchema>
 
 export type ParsedPaidDataParams = { ok: true; params: Record<string, unknown> } | { ok: false; error: string }
 
-// Validated by the engine before it asks the hub, and again by the hub: an engine reached through
-// a CLI bridge skips the tool schema, and the hub never trusts what an engine sends.
 export function parsePaidDataParams(capability: string, params: unknown): ParsedPaidDataParams {
     if (!isPaidDataCapability(capability)) return { ok: false, error: `Unknown capability "${capability}": pick one from ${PAID_DATA_CATALOG_TOOL}.` }
     const entry = paidDataEntry(capability)
@@ -774,8 +744,6 @@ export const paidDataCallSchema = z.object({
 })
 export type PaidDataCallInput = z.infer<typeof paidDataCallSchema>
 
-// The tools #1216 shipped, one per capability. Stored conversations still hold calls to them, and
-// an engine not updated yet still sends them to the hub.
 export const LEGACY_PAID_DATA_TOOLS = {
     leads_people_search: 'people.search',
     leads_email_find: 'people.email.find',
@@ -793,7 +761,6 @@ export function isPaidDataTool(toolName: string): boolean {
     return toolName === PAID_DATA_TOOL || legacyPaidDataCapability(toolName) !== null
 }
 
-// The capability a paid data call bought, whichever tool it went through.
 export function capabilityOfCall(toolName: string, input: unknown): PaidDataCapability | null {
     if (toolName === PAID_DATA_TOOL) {
         const capability = (input as { capability?: unknown } | null | undefined)?.capability
@@ -812,8 +779,6 @@ const plannedCallsSchema = z.array(z.object({ capability: z.enum(PAID_DATA_CAPAB
 export const paidDataEstimateSchema = z.object({ calls: plannedCallsSchema })
 export type PaidDataEstimateInput = z.infer<typeof paidDataEstimateSchema>
 
-// The tool names the capability as a plain string: the enum of every id would ride along in the
-// tool's schema on each step, and the hub refuses an unknown one when it prices the spend anyway.
 const plannedCallsInputSchema = z.array(z.object({ capability: z.string().min(1).describe('A capability id from paid_data_catalog, e.g. people.email.find.'), ...plannedCallShape })).min(1)
 
 export const requestSpendSchema = z.object({
@@ -823,11 +788,9 @@ export const requestSpendSchema = z.object({
 })
 export type RequestSpendInput = z.infer<typeof requestSpendSchema>
 
-// The "Always allow" of a spend card, written on the coworker from the app.
 export const paidDataAlwaysAllowSchema = z.object({ alwaysAllow: z.boolean() })
 export type PaidDataAlwaysAllowInput = z.infer<typeof paidDataAlwaysAllowSchema>
 
-// `units` is what the user is billed for: calls, or rows for a search that returns several.
 export type PaidDataEstimateLine = { capability: PaidDataCapability; count: number; units: number; micros: number }
 
 export type PaidDataEstimate = {
@@ -835,13 +798,8 @@ export type PaidDataEstimate = {
     lines: PaidDataEstimateLine[]
 }
 
-// What a workspace is expected to pay for a batch of paid data calls, as the hub priced it when the
-// coworker asked, next to the credit the workspace had left then.
 export type SpendQuote = PaidDataEstimate & { creditLeftMicros: number }
 
-// What Treg is expected to charge us, before the hub's price multiplier. A rough figure on purpose:
-// a routed call costs whatever the provider that served it bills, so this only gives an order of
-// magnitude. The bill is always the real charge.
 export function estimatePaidDataProviderCost(input: PaidDataEstimateInput, multiplier = 1): PaidDataEstimate {
     const lines = input.calls.map(({ capability, count, limit }) => {
         const entry = paidDataEntry(capability)
@@ -853,7 +811,6 @@ export function estimatePaidDataProviderCost(input: PaidDataEstimateInput, multi
 
 const isCount = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0
 
-// A quote line stored before the catalog named capabilities carries the tool instead.
 function readQuoteLine(line: unknown): PaidDataEstimateLine | null {
     const raw = line as { capability?: unknown; tool?: unknown; count?: unknown; units?: unknown; micros?: unknown } | null
     const capability = isPaidDataCapability(raw?.capability) ? raw.capability : legacyPaidDataCapability(String(raw?.tool))
@@ -861,7 +818,6 @@ function readQuoteLine(line: unknown): PaidDataEstimateLine | null {
     return { capability, count: isCount(raw?.count) ? raw.count : raw.units, units: raw.units, micros: raw.micros }
 }
 
-// The quote request_spend returned, read back from its stored tool output.
 export function readSpendQuote(output: unknown): SpendQuote | null {
     const quote = (unwrapToolOutputEnvelope(output) as { quote?: Partial<SpendQuote> } | null | undefined)?.quote
     if (!quote || !isCount(quote.totalMicros) || !Array.isArray(quote.lines)) return null
@@ -869,14 +825,11 @@ export function readSpendQuote(output: unknown): SpendQuote | null {
     return { totalMicros: quote.totalMicros, lines, creditLeftMicros: isCount(quote.creditLeftMicros) ? quote.creditLeftMicros : 0 }
 }
 
-// What one paid data call billed, read back from its tool output.
 export function billedMicrosOf(output: unknown): number {
     const billed = (unwrapToolOutputEnvelope(output) as { billedMicros?: unknown } | null | undefined)?.billedMicros
     return isCount(billed) ? billed : 0
 }
 
-// The reason a paid data call carries when the hub refused it for want of credit: the chat shows the
-// top-up notice on it.
 export const PAID_DATA_OUT_OF_CREDIT = 'out_of_credit'
 
 export function isPaidDataOutOfCredit(output: unknown): boolean {

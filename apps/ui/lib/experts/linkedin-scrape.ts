@@ -1,10 +1,5 @@
 import { runApifyActor } from './apify'
 
-// Scrapes a LinkedIn profile through Apify. Default actor is apimaestro/linkedin-profile-detail
-// (no cookies, no permission approval, pay-per-result). It takes a `username` — the /in/<slug>
-// segment of the profile URL — and returns a nested object (basic_info, experience, education…).
-// The whole JSON is handed to the LLM for field mapping (see enrich.ts); the type stays loose.
-
 const DEFAULT_ACTOR = 'apimaestro/linkedin-profile-detail'
 
 export type RawLinkedinProfile = Record<string, unknown> & {

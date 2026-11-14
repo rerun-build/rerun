@@ -34,15 +34,11 @@ chatRoutes.post('/chat', async c => {
     const session = claim ? claim.session : await resolveSession(agentId, body.sessionId, source)
     if (!session) return c.json({ error: ENGINE_SESSION_NOT_FOUND }, 404)
     const override = { connectionId: body.connectionId, provider: body.provider, model: body.model }
-    // The same resolution the run makes, so the message names the pair that really ran: the
-    // provider of the connection the override picked, and the model the plan lets it run.
     const { provider, model } = await resolveRunModel(agent, override)
     const meta = { provider, model }
     const runId = newId()
     const holder = claimSession(session.id, runId, body.author?.id)
     if (holder) {
-        // `startedAt` lets the dashboard say how long the conversation has been busy and offer to
-        // stop it, instead of showing a dead end the user cannot act on.
         const claim = sessionClaim(session.id)
         return c.json({ error: 'a run is already in flight on this session', code: 'run_in_flight', runId: holder, sessionId: session.id, startedAt: claim ? new Date(claim.claimedAt).toISOString() : null, authorId: claim?.authorId ?? null }, 409)
     }
@@ -55,8 +51,6 @@ chatRoutes.post('/chat', async c => {
             const agentRun = await runAgent(runAgentView, session.id, body.message, override, writer, run.id, { source: 'chat', author: body.author, userLanguage: claim ? body.userLanguage : undefined, callableAgentIds: body.callableAgentIds })
             mergeRunStream(writer, agentRun, meta)
         } catch (err) {
-            // runAgent registers the run's abort controller itself, and unregistering it is what
-            // frees the session. It never got that far here, so free the claim by hand.
             releaseSession(run.id)
             throw err
         }

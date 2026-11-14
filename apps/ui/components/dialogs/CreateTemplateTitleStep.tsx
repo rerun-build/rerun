@@ -14,8 +14,6 @@ import { TITLE_LIMIT } from '@/lib/templates/limits'
 
 type FormValues = { title: string }
 
-// A title is enough to get a draft: it is what the slug and the archive paths are addressed by, so
-// the rest of the wizard needs a row to exist before it can capture anything into it.
 export function CreateTemplateTitleStep({ onCreate, onCancel }: { onCreate: (title: string) => Promise<void>; onCancel: () => void }) {
     const t = useTranslations('dialogs.createTemplate')
     const tCommon = useTranslations('common')

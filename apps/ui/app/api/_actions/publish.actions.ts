@@ -24,8 +24,6 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { failure, failureOf, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
 
-// A link is the coworker's that published it: reaching the link by its slug takes reaching that
-// coworker's Box, the way the coworker's Published tab does. An admin reaches them all.
 async function reachablePublishedWorkspaceId(slug: string): Promise<number> {
     const actor = await requireLightSessionActor()
     if (isAdminActor(actor)) return actor.workspaceId
@@ -34,9 +32,6 @@ async function reachablePublishedWorkspaceId(slug: string): Promise<number> {
     return actor.workspaceId
 }
 
-// Files an agent has published (see lib/services/publish.ts). Read by the Files tab
-// (components/AgentPanelFiles.tsx) to mark which workspace files are published, and by the
-// coworker's Published tab.
 export async function listPublishedAction(agentId: string): Promise<PublishedFile[]> {
     try {
         await assertAgentInWorkspace(agentId)
@@ -64,8 +59,6 @@ export async function getPublishedAction(slug: string): Promise<PublishedFile | 
     }
 }
 
-// Publish a workspace file by hand from the Files tab. It starts with the access the workspace
-// gives a new link, and the share dialog opens right after to change it.
 export async function publishFileAction(agentId: string, path: string): Promise<{ success: boolean; url?: string; slug?: string } & Partial<ActionRefusal>> {
     try {
         await assertAgentInWorkspace(agentId)
@@ -76,7 +69,6 @@ export async function publishFileAction(agentId: string, path: string): Promise<
     }
 }
 
-// Revoke a published file by its slug: deletes the copy and makes its URL stop working.
 export async function unpublishFileAction(agentId: string, slug: string): Promise<{ success: boolean } & Partial<ActionRefusal>> {
     try {
         await assertAgentInWorkspace(agentId)
@@ -131,7 +123,6 @@ export async function getPublishSettingsAction(): Promise<PublishSettings | null
     }
 }
 
-// An admin's to change. "Nothing goes public" closes the links already public on the way.
 export async function updatePublishPolicyAction(policy: PublishPolicy): Promise<ActionResult<{ closed: number }>> {
     try {
         if (!isPublishPolicy(policy)) return failure('unknownPolicy')

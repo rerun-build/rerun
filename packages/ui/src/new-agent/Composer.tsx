@@ -8,9 +8,6 @@ import { FieldFooter, type FieldFooterProps } from './FieldFooter'
 import { JobField } from './JobField'
 import { FieldLight } from './OrbLight'
 
-// The raised card the Orb's light falls on: the description, and under it everything Rerun reads in
-// it, the name first. `mark` is the passage the timing was read from, underlined while the planner
-// is open.
 export function Composer({ text, onText, onSubmit, mark, preview, drawnCaret = false, placeholder, maxLength, className, ...footer }: FieldFooterProps & { text: string; onText: (text: string) => void; onSubmit: () => void; mark: string | null; preview?: string | null; drawnCaret?: boolean; placeholder?: ReactNode; maxLength?: number; className?: string }) {
     return (
         <form

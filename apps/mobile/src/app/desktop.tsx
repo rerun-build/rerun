@@ -44,10 +44,6 @@ function KeyButton({ label, onPress }: { label: string; onPress: () => void }) {
     )
 }
 
-// A coworker's screen, driven from the phone. The page that opens it leaves what for in memory: with
-// `call`, it answers a takeover, the coworker's own browser opens on `url`, and Done hands it back with
-// the page it was left on. Only the coworker comes from the route, so a link can at most show a screen.
-// A phone's keyboard cannot reach the screen's canvas, so text is typed here and sent there key by key.
 export default function Desktop() {
     const { agent } = useLocalSearchParams<{ agent: string }>()
     const [intent] = useState(() => takePendingDesktopOpen(agent))
@@ -93,7 +89,6 @@ export default function Desktop() {
         requestScreen().then(setConnection)
     }
 
-    // A dropped socket is reopened with a fresh ticket, a few times, before saying so.
     const onMessage = (event: WebViewMessageEvent) => {
         const type = messageTypeOf(event.nativeEvent.data)
         if (type === 'connected') reconnects.current = 0
@@ -119,8 +114,6 @@ export default function Desktop() {
         }
     }
 
-    // Android's back is Done: a takeover is handed back to the coworker rather than left waiting on a
-    // screen nobody holds any more.
     const onBack = useEffectEvent(() => {
         if (!finishing) void done()
         return true

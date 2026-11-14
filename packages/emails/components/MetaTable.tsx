@@ -5,10 +5,6 @@ export interface MetaTableProps {
   rows: { label: string; value: React.ReactNode }[];
 }
 
-/**
- * Label/value rows. A two-column table rather than `justify-content: space-between`, which
- * the Word engine behind Outlook and Gmail's sanitiser both ignore.
- */
 export function MetaTable({ rows }: MetaTableProps) {
   return (
     <SplitTable>

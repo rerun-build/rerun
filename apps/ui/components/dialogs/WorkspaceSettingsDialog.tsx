@@ -31,8 +31,6 @@ import { z } from 'zod'
 
 type FormValues = { name: string }
 
-// `current` keeps the icon the workspace already has, which can be a company favicon rather than
-// one of the illustrations. Sending no logo field for it is what stops a rename from replacing it.
 type LogoDraft = { kind: 'current' } | { kind: 'blob'; file: string } | { kind: 'link'; link: LogoLink } | { kind: 'upload'; file: File; previewUrl: string }
 
 const VISIBLE_ILLUSTRATIONS = 10
@@ -143,8 +141,6 @@ export function WorkspaceSettingsForm({
 
         const result = await onSave(formData)
         if (result.ok) return
-        // The favicon service answers an unknown domain with a placeholder globe the browser shows
-        // happily, so only the server can tell the link found nothing.
         if (logo.kind === 'link' && result.error === NO_LOGO_FOUND) setBrokenSrc(logoSrc)
         else form.setError('root', { message: errorText(result) })
     })

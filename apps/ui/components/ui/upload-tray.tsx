@@ -69,7 +69,6 @@ function UploadRow({ item, onCancel, onRetry }: { item: UploadItem; onCancel: (i
 export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss }: UploadTrayProps) {
     const t = useTranslations('ui.upload')
     const [expanded, setExpanded] = useState(false)
-    // `null` = personne n'a touché au chevron, le tray suit la règle automatique.
     const [open, setOpen] = useState<boolean | null>(null)
     const reduceMotion = useReducedMotion()
     const listId = useId()
@@ -79,11 +78,8 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
     const done = items.filter(item => item.status === 'done').length
     const failed = items.filter(item => item.status === 'error').length
     const settled = done + failed === items.length
-    // Une fois tout monté sans casse, la liste n'a plus rien à dire et rend le bas du panneau.
     const isOpen = open ?? !(settled && failed === 0)
 
-    // A dropped folder can carry hundreds of files, and rendering a row per file turns the panel into
-    // a wall. What is still moving or broken is what the user needs to see.
     const ordered = [...items].sort((a, b) => rank(a) - rank(b))
     const visible = expanded ? ordered : ordered.slice(0, COLLAPSED_ROWS)
     const hidden = ordered.length - visible.length
@@ -92,7 +88,6 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
 
     return (
         <div className="absolute inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur">
-            {/* `relative` sur les enfants sinon les hachures, absolues, se peindraient par-dessus. */}
             <div className="relative overflow-hidden">
                 <Stripes />
                 <div className="relative flex items-center gap-2 px-3 py-2">
@@ -111,15 +106,12 @@ export function UploadTray({ items, totalProgress, onCancel, onRetry, onDismiss 
                         </button>
                     )}
                 </div>
-                {/* Le total reste hors du repli : c'est le résumé, il doit survivre à la fermeture. */}
                 {!settled && (
                     <div className="relative px-3 pb-2">
                         <Progress value={totalProgress * 100} size="md" label={t('totalProgress')} />
                     </div>
                 )}
             </div>
-            {/* Le tray est ancré en bas, donc la hauteur animée pousse le header vers le haut plutôt
-                que de faire glisser la liste sous le panneau. */}
             <AnimatePresence initial={false}>
                 {isOpen && (
                     <motion.div

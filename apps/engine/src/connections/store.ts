@@ -31,8 +31,6 @@ async function writeConfig(id: string, config: ConnectionConfig): Promise<void> 
     await rename(tmp, target)
 }
 
-// A custom endpoint has no default address to fall back on: without one it would read as a
-// connection that can never be reached.
 function assertCustomHasBaseUrl(config: ConnectionConfig): void {
     if (config.provider === 'custom' && !config.baseUrl) throw badRequest('A custom connection needs a base URL')
 }
@@ -49,7 +47,6 @@ export async function createConnection(input: CreateConnectionInput, id = newId(
         createdAt: nowIso(),
     })
     assertCustomHasBaseUrl(config)
-    // Refused keys must fail before the folder exists, or the box lists a connection nobody created.
     serializeEnv(input.keys)
     await mkdir(connectionDir(id), { recursive: true, mode: 0o700 })
     await writeConfig(id, config)
@@ -59,8 +56,6 @@ export async function createConnection(input: CreateConnectionInput, id = newId(
 
 export async function patchConnection(id: string, patch: UpdateConnectionInput): Promise<LoadedConnection> {
     if (id === RERUN_CONNECTION_ID && patch.name !== undefined) throw badRequest('The Rerun connection cannot be renamed')
-    // Rerun Balanced is the one model a box always has, so switching every model off can never
-    // leave it with nothing to run on.
     if (id === RERUN_CONNECTION_ID && patch.models && !patch.models.includes(RERUN_MODEL)) throw badRequest('Rerun Balanced cannot be switched off')
     return withConnectionLock(id, async () => {
         const current = await getConnection(id)
@@ -80,7 +75,6 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
         for (const key of remove) delete next[key]
         for (const [key, value] of Object.entries(set)) next[key] = value
         await writeEnvFile(path, next)
-        // New keys can be another account altogether, and its plan stands somewhere else.
         forgetPlanLimits(id)
         forgetCliModels(id)
         forgetOpencodePlanLimitsAttempt(id)
@@ -91,8 +85,6 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
     })
 }
 
-// Exported because a delete releases everything pointing at the connection before it removes it,
-// and detaching a fleet of agents only to refuse the delete afterwards would be worse than either.
 export function assertConnectionDeletable(id: string): void {
     if (id === RERUN_CONNECTION_ID) throw badRequest('The Rerun connection cannot be deleted')
 }
@@ -108,14 +100,9 @@ export async function deleteConnection(id: string): Promise<void> {
     await rm(connectionDir(id), { recursive: true, force: true })
 }
 
-// The keyless connection every box carries. Provisioned on boot rather than special-cased at read
-// time, so it lists, patches and resolves through exactly the same paths as any other.
 export async function ensureRerunConnection(): Promise<void> {
     await mkdir(connectionsDir(), { recursive: true })
     if (connectionExists(RERUN_CONNECTION_ID)) {
-        // Boxes provisioned when Rerun had a single model, and those where it was switched off
-        // before it became mandatory. Balanced goes first, the tiers that came later go last, so
-        // what the connection runs when no model is named does not move.
         const { models } = (await getConnection(RERUN_CONNECTION_ID)).config
         const missing = DEFAULT_CONNECTION_MODELS.rerun.filter(id => !models.includes(id))
         if (missing.length === 0) return

@@ -7,8 +7,6 @@ import { decideSkillProposalAction, listSkillProposalsAction } from '@/app/api/_
 import { nextPinnedIds, RELEASE_DELAY_MS, settledPinnedIds } from '@rerun/contracts'
 import type { EngineSkillProposal } from '@/lib/engine/types'
 
-// The writing job is bounded on the engine (a timeout, and a sweep on restart), so the poll can
-// follow it to the end: quick at first, then relaxed for the minutes a CLI provider can take.
 const POLL_QUICK_MS = 1500
 const POLL_RELAXED_MS = 10_000
 const POLL_QUICK_WINDOW_MS = 60_000
@@ -27,25 +25,12 @@ function sameIds(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
     return a.size === b.size && [...a].every(id => b.has(id))
 }
 
-// Held from the set the conversation already had, so a row keeps its place in the dock across a
-// refresh. A fetch landing on another conversation starts from nothing.
 function reload(current: Loaded, sessionId: string, proposals: Map<string, EngineSkillProposal>): Loaded {
     const held = current.sessionId === sessionId ? current.pinnedIds : NO_IDS
     const next = nextPinnedIds(held, proposals.values())
     return { sessionId, proposals, pinnedIds: sameIds(held, next) ? held : next }
 }
 
-/**
- * The proposals of one conversation, keyed by their own id: the MCP bridge the CLI providers go
- * through rewrites tool call ids, so the transcript matches a row through the id the tool returned.
- * The engine answers an accept before the writing job is done, so a row being written is polled
- * until it settles. Tagged with its session, so switching conversations never shows the previous
- * one's rows while the new fetch is in flight.
- *
- * `pinned` is what the dock above the composer holds: only what still waits on the user. Accepting
- * hands the row back to the transcript at once, since the writing runs in the background, and a
- * dismissal is released a beat later. The two never show the same proposal at once.
- */
 export function useSkillProposals(sessionId: string | null, runStatus: string) {
     const [loaded, setLoaded] = useState<Loaded>(EMPTY)
     const [pendingId, setPendingId] = useState<string | null>(null)
@@ -60,8 +45,6 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
         setLoaded(previous => reload(previous, sessionId, byId(rows)))
     }, [sessionId])
 
-    // A proposal is raised during a turn, so a new row can only exist once one is over. The first
-    // read of a conversation is the opener's: the session snapshot hands it over through `seed`.
     const previousStatusRef = useRef(runStatus)
     useEffect(() => {
         const previous = previousStatusRef.current
@@ -88,7 +71,6 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
         return () => clearTimeout(timer)
     }, [writing, refresh])
 
-    // A tab that slept through the writing catches up the moment it is looked at again.
     useEffect(() => {
         if (!writing) return
         const onVisible = () => {
@@ -98,8 +80,6 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
         return () => document.removeEventListener('visibilitychange', onVisible)
     }, [writing, refresh])
 
-    // A dismissed row stays up long enough to report its outcome where the user is looking, then
-    // it is released and the transcript renders it back in its own place.
     useEffect(() => {
         const timers = releaseTimers.current
         for (const id of settledPinnedIds(pinnedIds, proposals.values())) {
@@ -127,7 +107,6 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
         }
     }, [])
 
-    // Oldest first, so the freshest proposal sits closest to the composer.
     const pinned = useMemo(() => [...proposals.values()].filter(p => pinnedIds.has(p.id)).sort((a, b) => a.createdAt.localeCompare(b.createdAt)), [proposals, pinnedIds])
 
     const decide = useCallback(

@@ -25,13 +25,8 @@ import { CheckoutDialog } from './billing/CheckoutDialog'
 import { PlanDialog } from './billing/PlanDialog'
 import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscriptionDialog'
 
-// What the dialog shows, decided when it opens and held until it closes: a payment rewrites the
-// workspace through the webhook, and re-deciding then would swap the success panel for the next
-// dialog under the user's eyes.
 type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'error' }
 
-// Every openBilling() lands here. Two dialogs: the checkout, which sells a plan (or ends a trial),
-// and the plan dialog, which manages one that is paid.
 export function BillingDialog() {
     const { workspace, role } = useSession()
     const { open, highlightAddon, trigger, setOpen } = useBillingStore()
@@ -43,7 +38,6 @@ export function BillingDialog() {
 
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
 
-    // `offer` is forced once the server refused a trial the browser thought was still there.
     const resolve = useCallback(
         (subscription: SubscriptionState | null, offer = trialOffer(workspace)) => {
             const route = checkoutRouteFor({
@@ -61,19 +55,13 @@ export function BillingDialog() {
         [workspace, access, parked, trigger],
     )
 
-    // A failed read keeps the state already shown: dropping it would leave the plan dialog nothing
-    // to draw but its skeleton.
     const loadState = useCallback(async () => {
         const result = await getSubscriptionStateAction()
         if (result.ok) setState(result.state)
         return result
     }, [])
 
-    // An entitled workspace whose Stripe read failed is not one without a plan: deciding on nothing
-    // would offer a paying customer to subscribe.
     const decide = useCallback(async () => {
-        // Paid once, outside Stripe: there is nothing to sell, and a Pro subscription would overwrite
-        // the plan, so cancelling it later would take the lifetime access away.
         if (isLifetimePlan(workspace)) {
             setResolved({ kind: 'lifetime' })
             track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: 'lifetime' })
@@ -141,8 +129,6 @@ export function BillingDialog() {
     )
 }
 
-// Every upgrade, top-up and trial button of the app lands here, so a member is told once, in place,
-// rather than refused by the server after a click.
 function AdminOnlyShell({ onClose }: { onClose: () => void }) {
     const t = useTranslations('billing.dialog')
     return (

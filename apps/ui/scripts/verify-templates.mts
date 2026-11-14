@@ -1,7 +1,3 @@
-// End-to-end check of the templates write path against the real database.
-// Creates a throwaway draft, exercises the validation gates and the anon grant, then
-// deletes it. Run: ../engine/node_modules/.bin/tsx --env-file=.env scripts/verify-templates.mts
-
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../app/api/database.types'
 import { templateDocumentSchema, type TemplateAgent, type TemplateDocument } from '@rerun/contracts'
@@ -11,8 +7,6 @@ import { rowToDocument, TEMPLATE_DOC_COLUMNS, type TemplateRow } from '../lib/te
 import { uploadPrivateFile } from '../lib/storage/private'
 import { createTemplate, updateTemplateBySlug } from '../lib/templates/write'
 import { createServiceRoleClient } from '../supabase/serviceRole'
-// Straight from the package rather than through `@/supabase/supabase-helpers`: that barrel is a
-// star re-export, which the tsx runner cannot read named exports from.
 import { selectMany, selectMaybeSingle } from '@rerun/db/helpers'
 
 const SLUG = 'zz-verify-scratch-template'
@@ -30,8 +24,6 @@ function check(label: string, ok: boolean, detail?: string) {
     }
 }
 
-// The app only ever gets an agent from a capture, so the fixture is built here rather than
-// exported from the write path.
 function agent(key: string): TemplateAgent {
     return { key, name: 'New agent', role: '', description: '', connectorSlugs: [], setupRequired: false, skills: [], schedules: [], triggers: [], tools: [] }
 }
@@ -55,8 +47,6 @@ async function main() {
     const supabase = createServiceRoleClient()
     await supabase.from('templates').delete().eq('slug', SLUG)
 
-    // Denormalisation is checked against a real catalog entry rather than a fixture: the whole
-    // point is that the write path resolves name and icon off `services`.
     const { data: services } = await selectMany(supabase, 'services', ['slug', 'name'] as const, { enabled: true }, { column: 'slug' }, 1)
     const service = services?.[0]
     if (!service) throw new Error('No enabled service in the catalog to test connectors against')
@@ -71,8 +61,6 @@ async function main() {
     const { data: counted } = await selectMaybeSingle(supabase, 'templates', ['agent_count'] as const, { slug: SLUG })
     check('agent_count is generated from agents', counted?.agent_count === 2, `agent_count=${counted?.agent_count}`)
 
-    // The connector list is derived from the agents, never authored, so every assertion here
-    // goes through an agent carrying the slug.
     console.log('\nconnectors')
     const withConnector = await updateTemplateBySlug(supabase, SLUG, doc({ agents: [{ ...agent('agent_1'), connectorSlugs: [service.slug] }] }))
     check('saves an agent carrying a catalog connector', withConnector.ok, withConnector.ok ? undefined : withConnector.error)
@@ -135,19 +123,14 @@ async function main() {
     const publishWithSecretSkill = await updateTemplateBySlug(supabase, SLUG, doc({ ...complete, ...leakingSkill }))
     check('refuses to publish a token pasted into a skill description', !publishWithSecretSkill.ok, publishWithSecretSkill.ok ? 'it published' : publishWithSecretSkill.error)
 
-    // The anon checks below read a published row, and the two writes above left a draft.
     const republished = await updateTemplateBySlug(supabase, SLUG, doc(complete))
     check('publishes again once the key is gone', republished.ok, republished.ok ? undefined : republished.error)
 
-    // A column added after the column-level grant inherits nothing, so this is the guard against
-    // a migration that half-lands and leaves the public page with no agents.
     console.log('\nanon grant')
     const anon = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!)
     const publicRead = await anon.from('templates').select('slug, title, agents, connectors, agent_count').eq('slug', SLUG)
     check('anon can read the editorial columns', publicRead.error === null && publicRead.data?.length === 1, publicRead.error?.message)
 
-    // `status` is the master gate, the two flags pick the surfaces — and the RLS policies,
-    // not the callers, are what keep a library-only template out of the public marketplace.
     console.log('\nsurface visibility')
     const libraryOnly = await updateTemplateBySlug(supabase, SLUG, doc({ ...complete, showInMarketplace: false }))
     check('saves a library-only template', libraryOnly.ok, libraryOnly.ok ? undefined : libraryOnly.error)
@@ -163,8 +146,6 @@ async function main() {
     const backOnMarketplace = await anon.from('templates').select('slug').eq('slug', SLUG)
     check('anon reads it again once the marketplace flag is back on', (backOnMarketplace.data ?? []).length === 1, backOnMarketplace.error?.message)
 
-    // Unlisted is the one status whose page survives the marketplace flag being off: the row stays
-    // readable by slug, while every listing filters it out.
     console.log('\nunlisted')
     const incompleteUnlisted = await updateTemplateBySlug(supabase, SLUG, doc({ status: 'unlisted', tagline: '' }))
     check('holds an unlisted template to the publish gate', !incompleteUnlisted.ok, incompleteUnlisted.ok ? 'it saved' : incompleteUnlisted.error)
@@ -183,8 +164,6 @@ async function main() {
 
     await updateTemplateBySlug(supabase, SLUG, doc(complete))
 
-    // Removing an agent is the only path that deletes an archive, and an orphaned .tar.gz in a
-    // private bucket is invisible from the admin, so it is checked against real storage.
     console.log('\ncaptured agents')
     await updateTemplateBySlug(supabase, SLUG, doc({ ...complete, agents: [{ ...agent('agent_1'), connectorSlugs: [service.slug] }] }))
     const path = archivePath(SLUG, 'agent_1')

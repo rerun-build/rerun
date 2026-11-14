@@ -26,11 +26,8 @@ import { z } from 'zod'
 export type PhoneCodeRequest = { phone: string; country: CountryCode; channel: VerificationChannel }
 export type PhoneCodeStep = 'phone' | 'code'
 
-// The server holds a new code on the same channel back for a minute (MIN_RESEND_INTERVAL_MS), and
-// one on the other channel for 20 seconds (MIN_SWITCH_INTERVAL_MS).
 const RESEND_COOLDOWN_MS = 60_000
 const SWITCH_COOLDOWN_MS = 20_000
-// Long enough for a code that is coming to have come: past it, the other channel is offered outright.
 const NUDGE_AFTER_MS = 30_000
 
 const CHANNEL_NAMES: Record<VerificationChannel, string> = { sms: 'SMS', whatsapp: 'WhatsApp' }
@@ -63,7 +60,6 @@ function WhatsAppIcon() {
     )
 }
 
-// A phone number, then the code sent to it over the channel the visitor picked.
 export function PhoneCodeForm({
     initialSent = null,
     sendCode,
@@ -74,18 +70,13 @@ export function PhoneCodeForm({
     persistKey,
     phoneLastUsed = false,
 }: {
-    // A code already out when the form mounts, for the lab to open on the second step.
     initialSent?: PhoneCodeRequest | null
-    // Names the code this form sent in the tab's storage, so a reload comes back to the code step.
     persistKey?: string
-    // Resolves with the channel the code actually went by, when the server knows it.
     sendCode: (request: PhoneCodeRequest) => Promise<VerificationChannel | void>
     verifyCode: (code: string, request: PhoneCodeRequest) => Promise<void>
-    // Shown around the number step only: the other ways in, where this form is one of several.
     beforePhone?: ReactNode
     afterPhone?: ReactNode
     onStepChange?: (step: PhoneCodeStep) => void
-    // This number was the way in last time on this browser, badged beside the field's title.
     phoneLastUsed?: boolean
 }) {
     const t = useTranslations('auth.phone')
@@ -94,7 +85,6 @@ export function PhoneCodeForm({
     const phoneSchema = useMemo(() => phoneSchemaFor(t), [t])
     const codeSchema = useMemo(() => codeSchemaFor(t), [t])
     const [step, setStep] = useState<PhoneCodeStep>(initialSent ? 'code' : 'phone')
-    // The server has no idea where the visitor is, so the guess only joins in on the client.
     const localeCountry = useSyncExternalStore(
         neverChanges,
         () => countryFromLocale(navigator.language),
@@ -104,18 +94,14 @@ export function PhoneCodeForm({
     const country = pickedCountry ?? localeCountry
     const [sent, setSent] = useState<PhoneCodeRequest | null>(initialSent)
     const [sending, setSending] = useState<VerificationChannel | null>(null)
-    // Timestamps, read against `now`: when the last code left, and when each next one may.
     const [sentAt, setSentAt] = useState(0)
     const [resendAt, setResendAt] = useState(0)
     const [switchAt, setSwitchAt] = useState(0)
-    // The wait the server asked for on the number step, for the number it refused.
     const [retryAt, setRetryAt] = useState(0)
     const [now, setNow] = useState(0)
 
     const phoneForm = useForm<z.infer<typeof phoneSchema>>({ resolver: zodResolver(phoneSchema), defaultValues: { phone: '' } })
     const codeForm = useForm<z.infer<typeof codeSchema>>({ resolver: zodResolver(codeSchema), defaultValues: { code: '' } })
-    // The picker keeps its country on a shared calling code, the number itself does not: the
-    // channels follow the number as soon as it is complete, as the server will.
     const typedPhone = useWatch({ control: phoneForm.control, name: 'phone' })
     const channels = reachableChannels(countryOfTyped(typedPhone, country), 'verify')
 
@@ -144,8 +130,6 @@ export function PhoneCodeForm({
         const restored = readSentCode(persistKey)
         if (!restored) return
         const { request, sentAt: restoredSentAt } = restored
-        // The tab's storage only exists once hydrated: read during render, the server and the
-        // browser would draw two different steps.
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSent(request)
         setPickedCountry(request.country)

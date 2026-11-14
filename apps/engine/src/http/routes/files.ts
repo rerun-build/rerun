@@ -31,9 +31,6 @@ function mimeFor(path: string): string {
     return MIME_TYPES[ext] ?? 'application/octet-stream'
 }
 
-// A browser plays a video by asking for it piece by piece: Safari refuses one served whole, and
-// seeking anywhere needs it. Several ranges in one request, or a malformed one, get the whole file,
-// which the spec allows.
 export function parseByteRange(header: string | undefined, size: number): store.ByteRange | 'unsatisfiable' | null {
     const match = header?.trim().match(/^bytes=(\d*)-(\d*)$/)
     if (!match) return null
@@ -60,10 +57,6 @@ function requirePath(c: Context, key = 'path'): string {
 export function createFilesRouter(getRoot: (c: Context) => string): Hono {
     const router = new Hono()
 
-    // Asking for a file that is not there is an answer, not a failure: an agent that installed no
-    // connector has no .rerun/services.json, and the UI asks for it on every load. Left to reach
-    // the app-wide handler it came back 500 and logged an unhandled error for the most ordinary
-    // state there is. Scoped to this router so an ENOENT raised anywhere else still surfaces.
     router.onError((err, c) => {
         if ((err as NodeJS.ErrnoException).code === 'ENOENT') return c.json({ error: 'file not found' }, 404)
         if ((err as NodeJS.ErrnoException).code === 'ENOSPC') return c.json({ error: 'The Box has no disk space left.' }, 507)
@@ -120,8 +113,6 @@ export function createFilesRouter(getRoot: (c: Context) => string): Hono {
         return c.json({ path, bytes: data.byteLength }, 201)
     })
 
-    // The bytes are the body rather than a multipart field, and they are piped straight to disk. The
-    // multipart POST above holds the whole file in memory twice, which a 512 MB Box does not survive.
     router.put('/raw', async c => {
         const body = c.req.raw.body
         if (!body) throw badRequest('Expected the file bytes as the request body')
@@ -131,8 +122,6 @@ export function createFilesRouter(getRoot: (c: Context) => string): Hono {
         const path = c.req.query('path') ?? (name ? [dir.replace(/\/$/, ''), name].filter(Boolean).join('/') : null)
         if (!path) throw badRequest('Missing "name" or "path" query parameter')
 
-        // `Content-Length` is a forbidden header for fetch, so the sender passes the size here instead.
-        // It only buys an early refusal; the cap that counts runs inside the pipe.
         const declared = Number(c.req.query('size') ?? 0)
         if (declared > MAX_UPLOAD_FILE_BYTES) throw badRequest(`This file is larger than the ${MAX_UPLOAD_FILE_BYTES / 1024 / 1024} MB upload limit.`)
 

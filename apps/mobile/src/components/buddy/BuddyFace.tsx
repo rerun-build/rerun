@@ -6,8 +6,6 @@ import { mix } from '@/theme/tokens'
 import type { BuddyEyes, BuddyMood, BuddyMouth } from './look'
 import { Blinking } from './motion'
 
-// Ported from packages/ui/src/iso-grid/components/buddy/BuddyFace.tsx, without the eye glow filter.
-// Drawn in the front-left wall's plane: the face is centred on x = 21, the eyes 10 units apart.
 const CENTER = 21
 export const BUDDY_FACE_CENTER = CENTER
 const GAP = 5
@@ -46,9 +44,6 @@ function star(x: number, y: number, r: number) {
 type Paints = { ink: string; white: string; pupil: string; glass: string; lens: string; light: string; heart: string }
 type Paint = (own: string) => string
 
-// One eye shape set into the wall like a lit screen: a light lip under a dark socket, then the eye.
-// `paint` turns the shape's own colour into the colour of the pass being drawn; `backing` is true
-// for the two passes behind the eye. Unlit, the shape is painted flat.
 function Solid({ lit, children }: { lit: boolean; children: (paint: Paint, backing: boolean) => ReactNode }) {
     const eye = children(own => own, false)
     if (!lit) return <>{eye}</>
@@ -116,7 +111,6 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
     const glint = (x: number, y: number, r = 0.62) => (lit ? <Ellipse cx={x - 0.55} cy={y} rx={r} ry={r * 1.15} fill="#fff" fillOpacity={0.95} /> : null)
 
     if (mood === 'asleep') return solid(paint => <Pair y={baseY}>{({ x, y }) => closed(x, y, paint(P.ink))}</Pair>)
-    // Glasses and visors keep their frame when broken; everything else shows the crossed eyes.
     if (mood === 'error' && style !== 'visor' && style !== 'shades' && style !== 'glasses') return solid(paint => <Pair y={baseY}>{({ x, y }) => cross(x, y, paint(P.ink))}</Pair>)
 
     const lookX = mood === 'working' ? 1 : 0
@@ -313,7 +307,6 @@ type BuddyFaceProps = {
     depth: number
     light: string
     lit: boolean
-    // The colour the eyes pick up towards their lower edge.
     tint: string
 }
 

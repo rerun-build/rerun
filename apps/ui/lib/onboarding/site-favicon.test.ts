@@ -2,10 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { faviconUrl, siteDomain } from './site-favicon'
 
-// What this guards is the half-typed input: the tile is driven straight off `siteDomain`, so
-// anything it lets through fires a request and pops a mark on screen for an address that does not
-// exist yet.
-
 describe('siteDomain', () => {
     it('reads an address out of whatever form it was typed in', () => {
         expect(siteDomain('acme.com')).toBe('acme.com')

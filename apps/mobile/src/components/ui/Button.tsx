@@ -15,10 +15,8 @@ type ButtonProps = {
     variant?: ButtonVariant
     size?: ControlSize
     symbol?: IconName
-    // For a glyph outside the icon set (a provider logo, the Apple logo).
     icon?: ReactNode
     iconOnly?: boolean
-    // Shares the row's width with its siblings, iconOnly included.
     stretch?: boolean
     loading?: boolean
     disabled?: boolean
@@ -60,8 +58,6 @@ function lookOf(theme: Theme, variant: ButtonVariant, size: ControlSize, pressed
     }
 }
 
-// The web Button (packages/ui/src/primitives/button-variants.ts) at touch sizes: same variants, same
-// reliefs, same one-pixel sink on press. Loading stays the native spinner.
 export function Button({ label, onPress, variant = 'default', size = 'md', symbol, icon, iconOnly, stretch, loading, disabled }: ButtonProps) {
     const theme = useTheme()
     const inactive = disabled || loading

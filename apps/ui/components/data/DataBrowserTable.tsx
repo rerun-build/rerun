@@ -22,20 +22,16 @@ export function rowKey(row: DbRow): string | null {
 
 type DataBrowserTableProps = {
     table: Table<DbRow>
-    /** The friendly reading of every column, by column name. */
     friendly: Map<string, FriendlyColumn>
     canSelectRows: boolean
     allPageSelected: boolean
     selectedRowIds: Set<string>
     onToggleRow: (key: string) => void
     onToggleAllPage: () => void
-    /** Column name to display format, from the active view. */
     formats?: Record<string, string>
     cellContext: CellContext
     onEditCell: (row: DbRow, column: string, text: string) => Promise<boolean>
-    /** Where each row's paid data came from, when the database can tell. */
     sourcesOf?: (row: DbRow) => RowSources | null
-    /** Adds the Sources column at the end. It is not a column of the table: never sorted, never saved in a view. */
     showSources?: boolean
     onOpenSources?: (row: DbRow) => void
 }

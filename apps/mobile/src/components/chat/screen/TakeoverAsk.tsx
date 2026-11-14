@@ -9,8 +9,6 @@ import { spacing } from '@/theme/tokens'
 
 import type { TakeoverRequestState } from './useTakeoverRequest'
 
-// The web's `TakeoverAsk`: what the run asks of the person while it waits on its screen, under the
-// screen it is about.
 export function TakeoverAsk({ takeover }: { takeover: TakeoverRequestState }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.takeover')

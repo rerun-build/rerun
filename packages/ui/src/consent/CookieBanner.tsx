@@ -17,19 +17,10 @@ type CookieBannerProps = {
 
 const CONSENT_INSET = '--consent-inset'
 
-// No close cross, no click outside, no Escape: "no choice" has to stay "no choice". Both buttons
-// share a size, a width and a row, refusing having to cost exactly one click like accepting. Not a
-// modal, so no focus trap either. Under sm the card flattens into a single full width row, because
-// a bottom sheet owns that same corner of the screen there.
-// Both layouts carry `pointer-events-auto`: an open Radix modal puts `pointer-events: none` on
-// <body>, which the banner would otherwise inherit, leaving its buttons dead.
 export function CookieBanner({ policyHref, onGrant, onRevoke, className }: CookieBannerProps) {
     const t = useKitTranslations()
-    // Decided in an effect and never during the render: the landing is prerendered and served from
-    // a CDN, so a banner rendered from the status would ship in the static HTML of every visitor.
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
-    // Safe to branch the markup on: nothing renders before the effect above has run client side.
     const isMobile = useIsMobile()
 
     useEffect(() => {
@@ -39,10 +30,6 @@ export function CookieBanner({ policyHref, onGrant, onRevoke, className }: Cooki
         return () => window.removeEventListener(COOKIE_SETTINGS_EVENT, reopen)
     }, [])
 
-    // Radix dismisses a layer from a `pointerdown` listener on the document, so a click on the
-    // banner would close whatever dialog or popover is open underneath it. Stopping the native
-    // event on the banner itself keeps it from ever reaching the document; a React handler would
-    // not, the App Router mounts the React root on the document too.
     useEffect(() => {
         const node = ref.current
         if (!node) return
@@ -51,9 +38,6 @@ export function CookieBanner({ policyHref, onGrant, onRevoke, className }: Cooki
         return () => node.removeEventListener('pointerdown', swallow)
     }, [open])
 
-    // The bar owns the bottom of the screen on mobile, where a sheet would otherwise render right
-    // under it. Publishing its measured height lets those layers sit on top of it instead. Floating
-    // in a corner on desktop, it overlaps nothing and claims no inset.
     useEffect(() => {
         const node = ref.current
         if (!node || !isMobile) return

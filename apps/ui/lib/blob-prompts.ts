@@ -1,7 +1,3 @@
-// Random "fluid glass / blob" illustration prompts, ported from the blob-prompt-generator
-// prototype. Each axis is a list of interchangeable phrases; a prompt picks one per axis and
-// assembles them into a single sentence. No suffix params (gpt-image-2 doesn't need them).
-
 const COLOR = [
     'vibrant purple with electric acid-green and black accents',
     'deep navy blue glass with cyan and ice-blue highlights',
@@ -74,8 +70,6 @@ export function randomBlobPrompt(): string {
     ].join(' ')
 }
 
-// n distinct prompts. Mirrors the prototype's guard against an infinite loop when the
-// combination space can't fill the requested count.
 export function randomBlobPrompts(n: number): string[] {
     const seen = new Set<string>()
     let guard = 0

@@ -9,8 +9,6 @@ import { useTranslations } from 'next-intl'
 
 const COLLAPSED_HEIGHT = 208
 
-// The shared prose styles are sized for the landing page; in a 420px column the headings have to
-// come back down to the panel's own scale.
 const COMPACT_PROSE = 'break-words text-xs leading-relaxed text-muted-foreground [&>*:first-child]:mt-0 [&_h2]:mt-4 [&_h2]:mb-1.5 [&_h2]:text-sm [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:text-xs [&_p:not(:first-child)]:mt-2 [&_ul]:mt-2 [&_ol]:mt-2 [&_blockquote]:mt-2'
 
 export function TemplateDetailAbout({ content }: { content: string }) {

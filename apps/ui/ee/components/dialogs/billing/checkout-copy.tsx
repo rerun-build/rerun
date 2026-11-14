@@ -21,19 +21,15 @@ export function nextInvoiceDate(interval: BillingInterval, from = new Date()): D
 }
 
 export type CheckoutContext = {
-    // The price of one invoice with its period, "$29/mo" or "$276/yr", animated as the toggle moves.
     billed: ReactNode
     nextInvoice: string
     trialEnds: string | null
     trialDaysLeft: number | null
-    // The day before the trial ends, when the reminder email goes out. null once that day is past.
     reminderOn: string | null
-    // What the card is charged when the trial rolls into Pro.
     firstCharge: string
     trialCancelled: boolean
     keptUntil: string | null
     parked: { title: string; agentCount: number } | null
-    // The coworker that stopped on its trial credit, when the paywall was opened from its chat.
     coworker: string | null
 }
 
@@ -43,9 +39,7 @@ export type CheckoutCopy = {
     subtitle: string
     timeline: TimelineStep[]
     cta: string
-    // The pay button once the amount due today is known, so it reads exactly what is charged.
     payCta?: (amount: string) => string
-    // How a refused payment reads, for a screen where the customer must hear their trial is safe.
     refusal?: (message: string) => string
     footnote?: string
 }
@@ -67,8 +61,6 @@ function upgradeTimeline(t: BillingTranslator, context: CheckoutContext): Timeli
     return [{ when: t('checkout.timeline.today'), title: t('checkout.timeline.proStarts'), detail: t('checkout.timeline.unlimitedCoworkers') }, nextInvoiceStep(t, context), cancelStep(t)]
 }
 
-// Subscribing during a trial ends it on the spot and bills the whole plan today: said on the first
-// step, never left for the invoice to reveal.
 function endTrialTimeline(t: BillingTranslator, context: CheckoutContext): TimelineStep[] {
     return [
         { when: t('checkout.timeline.today'), title: t('checkout.timeline.trialEndsProStarts'), detail: t.rich('checkout.timeline.chargedToday', { billed: () => context.billed }) },
@@ -77,8 +69,6 @@ function endTrialTimeline(t: BillingTranslator, context: CheckoutContext): Timel
     ]
 }
 
-// A failed end of trial leaves everything as it was: Stripe holds the change until the bank says yes.
-// The test reads the server's English message, which phase 3 of the language packs turns into a code.
 function trialUnchanged(t: BillingTranslator) {
     return (message: string) => (/nothing was charged/i.test(message) ? t('checkout.refusal.unchanged', { message }) : t('checkout.refusal.nothingCharged', { message }))
 }
@@ -88,7 +78,6 @@ function parkedLabel(t: BillingTranslator, parked: CheckoutContext['parked']): s
     return parked.agentCount > 1 ? t('checkout.badge.parkedMany', { title: parked.title, count: parked.agentCount }) : parked.title
 }
 
-// `trial_card_pay_now` is not a route: it is the trial screen once the user asks to pay before the end.
 export type CheckoutCopyKey = CheckoutVariant | 'trial_card_pay_now'
 
 function trialTimeline(t: BillingTranslator, trialEnds: string, context: CheckoutContext): TimelineStep[] {

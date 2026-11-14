@@ -17,8 +17,6 @@ import { useCreatorRevenue } from './useCreatorRevenue'
 
 const RANGES: RevenueRange[] = ['30d', '12m', 'all']
 
-// What Rerun can answer that Stripe cannot: revenue per template. Everything else, payout history
-// included, is one login link away in the Express dashboard.
 export function CreatorRevenuePanel({ active }: { active: boolean }) {
     const t = useTranslations('templates.revenue')
     const { revenue, range, changeRange } = useCreatorRevenue(active)

@@ -122,8 +122,6 @@ describe('prepareRunHistory', () => {
         expect(await prepareRunHistory(ctx, 'system')).toEqual([{ role: 'assistant', content: [{ type: 'text', text: 'answer' }] }])
     })
 
-    // The old tool's calls fill stored turns; a model that reads them imitates a call that no
-    // longer exists. A call-first turn held nothing but the call, and goes with it.
     it('drops the calls of the old quick replies tool, and the turn that only held one', async () => {
         state.rows = [
             row(0, 'assistant', [{ type: 'tool-call', toolCallId: 'q1', toolName: 'mcp__rerun__suggest_replies', input: { replies: ['Go on'] } }]),
@@ -221,8 +219,6 @@ describe('prepareRunHistory', () => {
         expect(logger.info).toHaveBeenCalledWith(expect.objectContaining({ messagesCompacted: 10 }), 'context compacted')
     })
 
-    // A CLI reads its token at spawn, and the run only refreshed it after the history was prepared:
-    // a compaction on a token that lapsed failed with "OAuth access token has expired".
     it('refreshes the CLI login before it summarises', async () => {
         state.rows = longHistory()
         const { ctx } = context()

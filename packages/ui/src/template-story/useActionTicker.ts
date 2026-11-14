@@ -3,9 +3,6 @@
 import { STORY_ACTION_MS, STORY_CARD_ENTER_MS } from '@rerun/contracts'
 import { useEffect, useRef, useState } from 'react'
 
-// Which of a step's actions the card is telling: 0 to count - 1 while they tick by, count once they
-// are all told. Paused with the story, and a pause keeps what is left of the action on screen, the
-// same way the story clock keeps what is left of its step.
 export function useActionTicker(count: number, playing: boolean, skip: boolean) {
     const [told, setTold] = useState(0)
     const remaining = useRef(STORY_CARD_ENTER_MS + STORY_ACTION_MS)

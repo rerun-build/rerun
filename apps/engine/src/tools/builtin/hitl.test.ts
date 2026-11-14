@@ -296,7 +296,6 @@ describe('findPendingHitl', () => {
         expect(findPendingHitl([askUserCall('c1'), toolResult('c1', { type: 'error-text', value: 'Invalid input for tool ask_user' })])).toBeNull()
     })
 
-    // A CLI that proposes a skill after its card would otherwise hide the card it sent.
     it('looks past the skill proposal that follows a card', () => {
         const trailing = { role: 'assistant', content: [{ type: 'tool-call', toolCallId: 'p1', toolName: 'mcp__rerun__skill_propose', input: {} }] } as unknown as ModelMessage
         const pending = findPendingHitl([askUserCall('c1'), toolResult('c1', { type: 'text', value: 'delivered' }), trailing])
@@ -328,8 +327,6 @@ describe('lastStepHasHitlCall', () => {
         expect(lastStepHasHitlCall([{ toolCalls: [{ toolName: 'ask_user' }] }, { toolCalls: [{ toolName: 'fs_read' }] }])).toBe(false)
     })
 
-    // A card is displayed and the agent keeps working. Widening the HITL set to canonicalize other
-    // bridged names would end the turn here instead.
     it('does not stop the turn on a bridged card call', () => {
         expect(lastStepHasHitlCall([{ toolCalls: [{ toolName: 'mcp__rerun__card_table' }] }])).toBe(false)
     })

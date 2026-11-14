@@ -11,12 +11,6 @@ import { useForemanStore } from '@/stores/foreman.store'
 
 type ResizeState = { pointerId: number; startX: number; startWidth: number; width: number; release: () => void }
 
-/**
- * Le bord intérieur du dock, posé sur la gouttière qui le sépare du board. Pendant le geste la
- * largeur ne passe pas par React : elle s'écrit dans --foreman-dock-w du cadre, que la piste de
- * grille, le panneau et le fantôme lisent tous, et la transition de la piste est coupée pour
- * qu'elle suive le pointeur. Le lâcher la range dans le placement.
- */
 export function ForemanDockResizeHandle({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement & { mode: 'dock' } }) {
     const t = useTranslations('foreman')
     const resizeRef = useRef<ResizeState | null>(null)
@@ -86,8 +80,6 @@ export function ForemanDockResizeHandle({ panelRef, placement }: { panelRef: Ref
             onLostPointerCapture={finishResize}
             onDoubleClick={() => commit(clampForemanDockWidth(FOREMAN_DOCK_DEFAULT_WIDTH, window.innerWidth))}
         >
-            {/* Une rainure creusée dans la gouttière plutôt qu'un trait posé dessus : ombre interne en
-                haut, liseré clair sous la lèvre du bas, comme la famille relief mais retournée. */}
             <div className="absolute top-1/2 left-1/2 h-16 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/[0.07] opacity-0 shadow-[inset_0_1px_2px_rgb(0_0_0/0.28),0_1px_0_rgb(255_255_255/0.8)] transition-[opacity,height] duration-200 group-hover:opacity-100 group-data-[resizing=true]:h-24 group-data-[resizing=true]:bg-black/[0.12] group-data-[resizing=true]:opacity-100 dark:bg-white/[0.14] dark:shadow-[inset_0_1px_2px_rgb(0_0_0/0.9),0_1px_0_rgb(255_255_255/0.16)] dark:group-data-[resizing=true]:bg-white/[0.2]" />
         </div>
     )

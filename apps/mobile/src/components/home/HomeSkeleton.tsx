@@ -7,8 +7,6 @@ import { radius, spacing } from '@/theme/tokens'
 
 export const SKELETON_ROWS = 6
 
-// Where a CoworkerRow draws its avatar, its name and its status line. The native launch screen
-// draws the same shapes (plugins/with-home-launch-screen.js), so the app takes over without a jump.
 export const SKELETON = {
     avatarTop: (COWORKER_ROW_HEIGHT - AVATAR) / 2,
     textLeft: HOME_GUTTER + AVATAR + spacing.lg,
@@ -18,12 +16,10 @@ export const SKELETON = {
     statusHeight: 12,
 } as const
 
-// How far each bar reaches across the text column, in percent: uneven, the way real names are.
 export function skeletonBarWidths(index: number) {
     return { name: 40 + ((index * 17) % 30), status: 60 + ((index * 23) % 30) }
 }
 
-// The shape of the rows to come, as the web loads: never a spinner in the middle of the screen.
 export function HomeSkeleton({ rows = SKELETON_ROWS }: { rows?: number }) {
     const t = useTranslations('mobileHome')
     return (

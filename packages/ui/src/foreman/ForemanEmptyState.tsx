@@ -10,8 +10,6 @@ export function ForemanEmptyState({ suggestions, onSuggestion, className }: { su
     const t = useKitTranslations()
     return (
         <div className={cn('flex size-full flex-col items-center justify-center gap-4 p-8 text-center', className)}>
-            {/* La même orbe que l'accueil, et pas un glyphe : c'est elle qui est le Foreman, du coin
-                du board au bouton d'envoi. */}
             <Orb size={WELCOME_ORB_SIZE} />
             <div className="space-y-1">
                 <h3 className="font-medium text-sm text-foreground">{t('foreman.empty.title')}</h3>

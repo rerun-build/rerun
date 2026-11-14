@@ -8,7 +8,6 @@ import { theme, text } from "../theme";
 
 export interface BudgetExhaustedProps {
   workspaceName: string | null;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;

@@ -5,5 +5,4 @@ import type { useKitTranslations } from './locale'
 
 export type KitTranslator = ReturnType<typeof useKitTranslations>
 
-// For a helper called outside React (a test, a default argument): it reads the English source.
 export const englishKitTranslator: KitTranslator = createTranslator({ locale: 'en', messages: { kit: englishKit }, namespace: 'kit' })

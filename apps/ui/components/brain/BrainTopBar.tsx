@@ -12,8 +12,6 @@ export const BrainChromeContext = createContext<BrainChrome>({ onClose: () => {}
 
 export type BrainCrumb = { label: string; icon?: LucideIcon; onClick?: () => void }
 
-// The bar on top of whatever the sidebar opened: where it sits, how its save is going, what can be
-// done with it, and the way out of the dialog.
 export function BrainTopBar({ crumbs, status, children }: { crumbs: BrainCrumb[]; status?: ReactNode; children?: ReactNode }) {
     const t = useTranslations('brain.topBar')
     const { onClose, onToggleSidebar } = useContext(BrainChromeContext)

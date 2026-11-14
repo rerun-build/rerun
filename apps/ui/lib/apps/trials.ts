@@ -1,4 +1,3 @@
-// No 'server-only': swept hourly from Trigger.dev.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { stripe } from '@/ee/lib/billing/stripe'
@@ -38,16 +37,11 @@ async function settle(supabase: Client, workspaceId: number, slug: AppSlug, upda
     if (error) throw new Error(error.message)
 }
 
-// A charge Stripe refused for the card itself, as opposed to Stripe being unreachable: only the first
-// is the customer's answer, the second is retried on the next tick.
 function isPaymentRefusal(err: unknown): boolean {
     const type = (err as { type?: string } | null)?.type
     return type === 'StripeCardError' || (err as { code?: string } | null)?.code === 'subscription_payment_intent_requires_action'
 }
 
-// Settled before Stripe is called: a crash between the two must not charge the slot twice on the
-// next tick. The idempotency key covers a retry of the very same call, and an error that is not a
-// refusal unsettles the trial so the next tick tries again.
 async function convert(supabase: Client, workspaceId: number, slug: AppSlug): Promise<'charged' | 'nothing_to_charge' | 'declined'> {
     const app = appDefinition(slug)
     await settle(supabase, workspaceId, slug, { trial_settled_at: new Date().toISOString() })
@@ -57,7 +51,6 @@ async function convert(supabase: Client, workspaceId: number, slug: AppSlug): Pr
     const holding = connections ?? []
     const subscription = workspace?.stripe_subscription_id ? await stripe.subscriptions.retrieve(workspace.stripe_subscription_id) : null
     const paidSlots = subscription ? slotQuantity(subscription, app.addonKey) : 0
-    // Disconnected during the trial: the user said no, and nothing is charged.
     if (holding.length <= paidSlots) return 'nothing_to_charge'
 
     const newest = [...holding].sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
@@ -105,7 +98,6 @@ export async function sweepSubscriberTrials(supabase: Client, now: Date): Promis
                 report.reminded++
             }
             if (step === 'convert' && row.status !== 'active') {
-                // A paused or removed workspace has no account left to bill: its trial simply ends.
                 await settle(supabase, row.workspace_id, row.app_slug, { trial_settled_at: now.toISOString() })
                 report.free++
             } else if (step === 'convert') {

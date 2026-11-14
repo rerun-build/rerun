@@ -5,13 +5,6 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'electron-vite'
 import { buildDefines } from './build-config'
 
-// Three bundles: the main process (ESM), the preload (CommonJS, because a sandboxed preload is run as
-// a plain script that may only `require('electron')`), and the shell's own pages (React, served from
-// the `rerun-shell://` scheme). The channel and the default server are baked in at build time.
-
-// `@rerun/ui` draws its icons through `@rerun/cloud/ui-icons`: the shell always takes the self-hosted
-// set (lucide, MIT) from `apps/ui/cloud-oss`, whatever the checkout holds, so its binary carries no
-// licensed icon pack and builds from the desktop app's own dependencies.
 const ICONS = resolve(import.meta.dirname, '../ui/cloud-oss/ui-icons.ts')
 const require = createRequire(import.meta.url)
 
@@ -21,8 +14,6 @@ export default defineConfig(() => {
         main: {
             define,
             build: {
-                // `@rerun/contracts` is a workspace package: bundled, so the packaged app carries no
-                // node_modules beyond the updater.
                 externalizeDeps: { exclude: ['@rerun/contracts'] },
             },
         },
@@ -42,8 +33,6 @@ export default defineConfig(() => {
             resolve: {
                 alias: [
                     { find: '@rerun/cloud/ui-icons', replacement: ICONS },
-                    // What that file imports, resolved from here: a CI install of the shell alone has no
-                    // apps/ui/node_modules to find them in.
                     { find: /^lucide-react$/, replacement: require.resolve('lucide-react') },
                     { find: '@rerun/ui/primitives/spinner', replacement: require.resolve('@rerun/ui/primitives/spinner') },
                 ],

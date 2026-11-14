@@ -1,9 +1,3 @@
-// Every Supabase read of one sweep. The rest of the module works off resolved snapshots, so this is
-// the only file that has to know how a signal is stored.
-//
-// Two shapes recur. Anti-joins ("agents that never ran", "workspaces with no agent") are done by
-// fetching the positive side over the same bounded id list and subtracting with a Set: PostgREST has
-// no NOT EXISTS.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import type { OnboardingAnswers } from '@/app/actions/onboarding'
@@ -16,17 +10,12 @@ import type { LifecycleAgent, LifecycleArchive, LifecycleSnapshot } from './deci
 import { ARCHIVE_EXPIRING_LEAD_MS, LIFECYCLE_SEQUENCES, SUBSCRIPTION_ENDING_LEADS, TRIAL_ENDING_LEAD_MS, lifecycleFloor } from './sequences'
 import { loadSentIndex, sendsFor } from './store'
 
-// Enough to drain any realistic backlog at one email per user per tick, and short enough to keep the
-// IN lists well under PostgREST's URL limit.
 const CANDIDATE_LIMIT = 200
 const RUN_SCAN_LIMIT = 5000
 const RUN_SCAN_PAGE = 1000
 
-// Every run the engine reports ends on one of these, whatever started it.
 const RUN_COMPLETION_EVENTS = ['agent.message.completed', 'agent.schedule.completed', 'agent.trigger.completed']
 
-// A run started from the chat carries no `source`: the engine cannot send 'chat', which is not a
-// session_source on the hub side. See apps/engine/src/runtime/loop.ts.
 const MANUAL_EVENT = 'agent.message.completed'
 
 const MIN_MANUAL_RUNS = 2
@@ -49,8 +38,6 @@ export type WorkspaceRow = {
     payment_failed_at: string | null
     renewal_reminder_at: string | null
     renewal_reminder_user_id: string | null
-    // What the workspace's onboarding learned, read from workspace_onboarding and kept beside the
-    // row because the recommendation email is the only thing that needs it.
     onboarding_answers: unknown
 }
 
@@ -76,7 +63,6 @@ type MemberRow = { workspace_id: number; user_id: string; created_at: string }
 
 export type LifecycleContext = {
     snapshots: LifecycleSnapshot[]
-    // Carried beside the snapshots because the emails need them and the decision does not.
     users: Map<string, UserRow>
     workspaces: Map<number, WorkspaceRow>
     agentNames: Map<string, string>
@@ -87,8 +73,6 @@ function since(now: Date, ms: number, floor: Date | null): string {
     return (floor && floor > start ? floor : start).toISOString()
 }
 
-// Onboarding is a workspace fact, so whether a signup finished it is only known once their workspace
-// is read: every recent signup comes in, and the rung itself leaves out the onboarded ones.
 async function findCandidateUsers(supabase: Client, now: Date): Promise<Set<string>> {
     const { data } = await selectMany(
         supabase,
@@ -113,9 +97,6 @@ async function findOnboardedWorkspaces(supabase: Client, now: Date): Promise<Set
     return new Set((data ?? []).map(row => row.id))
 }
 
-// Newest first on both sides of the deadline, with the lower bounds applied in TypeScript. Read
-// oldest first, the trials already handled filled the limit and the newest ones never got their
-// notice, which also meant their box was never torn down.
 async function findCandidateWorkspaces(supabase: Client, now: Date): Promise<Set<number>> {
     const trialsByLatestEnd = (upTo: Date) =>
         selectMany(supabase, 'workspaces', ['id', 'trial_ends_at'] as const, { trial_ends_at: { lte: upTo.toISOString() }, is_sandbox: false }, { column: 'trial_ends_at', ascending: false }, CANDIDATE_LIMIT)
@@ -129,7 +110,6 @@ async function findCandidateWorkspaces(supabase: Client, now: Date): Promise<Set
     ])
 }
 
-// The workspaces whose subscription has an end date in the next week.
 async function findEndingWorkspaces(supabase: Client, now: Date): Promise<Set<number>> {
     const { data } = await selectMany(
         supabase,
@@ -143,9 +123,6 @@ async function findEndingWorkspaces(supabase: Client, now: Date): Promise<Set<nu
     return new Set((data ?? []).filter(row => row.subscription_cancel_at && Date.parse(row.subscription_cancel_at) <= horizon).map(row => row.id))
 }
 
-// Archives expiring within the notice's week, soonest first, then checked against each workspace's
-// latest archive: an older one left by an earlier pause can be expiring while the current one has
-// months to go.
 async function findExpiringArchives(supabase: Client, now: Date): Promise<Map<number, LifecycleArchive>> {
     const { data: expiring } = await selectMany(
         supabase,
@@ -167,8 +144,6 @@ async function findExpiringArchives(supabase: Client, now: Date): Promise<Map<nu
     return paused
 }
 
-// The people whose renewal reminder is due. They are recipients in their own right, not through
-// their workspace's founder: the reminder goes to whoever asked for it.
 async function findReminderRequesters(supabase: Client, now: Date): Promise<Set<string>> {
     const { data } = await selectMany(
         supabase,
@@ -213,8 +188,6 @@ type RunScan = {
     scheduledAgents: Set<string>
 }
 
-// Page by page: PostgREST answers at most `max_rows` (1000) whatever the limit asked, so a single
-// read of RUN_SCAN_LIMIT rows silently stopped at the first thousand.
 async function readRecentRuns(supabase: Client, now: Date) {
     const rows: { workspace_id: number; agent_id: string | null; event: string; kind: string; source: string | null; created_at: string }[] = []
     for (let offset = 0; offset < RUN_SCAN_LIMIT; offset += RUN_SCAN_PAGE) {
@@ -223,8 +196,6 @@ async function readRecentRuns(supabase: Client, now: Date) {
             'notifications',
             ['workspace_id', 'agent_id', 'event', 'kind', 'source', 'created_at'] as const,
             { created_at: { gte: since(now, LIFECYCLE_SEQUENCES.automate_agent.maxAgeMs, lifecycleFloor()) }, agent_id: { notNull: true }, event: RUN_COMPLETION_EVENTS },
-            // Newest first: past the limit it is the far end of the window that is dropped, and a
-            // workspace whose first result landed this morning is exactly who these emails are for.
             { column: 'created_at', ascending: false },
             RUN_SCAN_PAGE,
             offset,
@@ -235,8 +206,6 @@ async function readRecentRuns(supabase: Client, now: Date) {
     return rows
 }
 
-// One pass over the run log serves both the team invite and the automation nudge, which read the
-// same rows for different reasons.
 async function scanRuns(supabase: Client, now: Date): Promise<RunScan> {
     const rows = await readRecentRuns(supabase, now)
 
@@ -260,8 +229,6 @@ async function scanRuns(supabase: Client, now: Date): Promise<RunScan> {
     return scan
 }
 
-// The run scan only proves no schedule fired inside its window. The "ever" half is confirmed one
-// query per finalist, a handful per tick, rather than by widening the scan for everyone.
 async function neverScheduled(supabase: Client, agentIds: string[]): Promise<Set<string>> {
     const never = new Set<string>()
     await Promise.all(
@@ -294,8 +261,6 @@ async function loadAgentNames(supabase: Client, agentIds: string[]): Promise<Map
     return new Map((data ?? []).map(row => [row.id, row.name]))
 }
 
-// The catalogue is read once for the whole tick, and only when someone could actually receive the
-// recommendation email.
 async function loadTemplatesIfNeeded(supabase: Client, users: UserRow[], workspaces: Map<number, WorkspaceRow>, agentCounts: Map<number, number>): Promise<TemplateCandidate[] | null> {
     const needed = users.some(user => workspaces.get(user.workspace_id)?.onboarded_at && (agentCounts.get(user.workspace_id) ?? 0) === 0)
     return needed ? loadRecommendCandidates(supabase) : null
@@ -307,10 +272,6 @@ function habitAgentsFor(runs: RunScan, confirmed: Set<string>, names: Map<string
         .map(([agentId, entry]) => ({ id: agentId, name: names.get(agentId) ?? 'your coworker', at: entry.last, runs: entry.count }))
 }
 
-/**
- * One snapshot per person the sweeper should consider. `only` narrows the whole sweep to a few
- * accounts, which is how the task is exercised by hand without touching anybody else.
- */
 export async function loadLifecycleContext(supabase: Client, now: Date, only?: string[]): Promise<LifecycleContext> {
     const empty: LifecycleContext = { snapshots: [], users: new Map(), workspaces: new Map(), agentNames: new Map() }
 
@@ -336,8 +297,6 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
     for (const entry of runs.manualByAgent.values()) workspaceIds.add(entry.workspaceId)
     if (workspaceIds.size === 0 && userIds.size === 0) return empty
 
-    // Read once here to turn the candidate workspaces into recipients, and again below over the
-    // wider set, once the users have brought their own workspaces in.
     const { data: memberRows } = await selectAll(supabase, 'workspace_members', ['workspace_id', 'user_id', 'created_at'] as const, { workspace_id: [...workspaceIds] }, { column: 'created_at' })
     for (const founder of foundersOf(memberRows ?? []).values()) userIds.add(founder)
 
@@ -351,7 +310,6 @@ export async function loadLifecycleContext(supabase: Client, now: Date, only?: s
     const [{ data: workspaceRows }, { data: onboardingRows }, { data: allMembers }, { data: allAgents }] = await Promise.all([
         selectAll(supabase, 'workspaces', WORKSPACE_COLUMNS, { id: allWorkspaceIds }, { column: 'id' }),
         selectAll(supabase, 'workspace_onboarding', ['workspace_id', 'answers'] as const, { workspace_id: allWorkspaceIds }, { column: 'workspace_id' }),
-        // Rows rather than a count per workspace: one query beats one per workspace.
         selectAll(supabase, 'workspace_members', ['workspace_id', 'user_id', 'created_at'] as const, { workspace_id: allWorkspaceIds }, { column: 'created_at' }),
         selectAll(supabase, 'agents', ['workspace_id'] as const, { workspace_id: allWorkspaceIds }, { column: 'id' }),
     ])

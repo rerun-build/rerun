@@ -9,8 +9,6 @@ import { useKitTranslations } from '../../locale'
 
 export const RESULTS_GREEN = '#34d399'
 
-// The pill above the head: what is waiting to be seen, then what comes next. Results come first,
-// they want you now.
 export function TileCountdownBadge({ countdown, results }: { countdown?: TileCountdown; results?: TileResults }) {
     const t = useKitTranslations()
     const now = useCountdownNow(countdown?.at ?? 0)

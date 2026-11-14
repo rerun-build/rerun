@@ -33,21 +33,16 @@ type MutationResult = { success: boolean; error?: string }
 type ConnectionDetailProps = {
     connection: BoxConnection
     credit: RerunCredit
-    // The workspace default when it sits on this connection.
     defaultModel: string | null
-    // The provider turned the credential away while it is still on file, so `connected` cannot tell.
     reconnectRequested?: boolean
     onReconnected?: () => void
     onBack: () => void
     onUpdate: (id: string, patch: UpdateBoxConnectionInput) => Promise<MutationResult>
     onUpdateKeys: (id: string, body: { set?: Record<string, string>; remove?: string[] }) => Promise<MutationResult>
     onDelete: (id: string) => Promise<DeleteResult>
-    // A member reads the connection; every control is held disabled, the reason on top.
     readOnlyReason?: string
 }
 
-// Everything one named credential of the workspace owns. Every edit persists immediately: a moved
-// model is a PATCH, a pasted key is a PATCH, and a failed one says so under the header.
 export function ConnectionDetail({ connection, credit, defaultModel, reconnectRequested = false, onReconnected, onBack, onUpdate, onUpdateKeys, onDelete, readOnlyReason }: ConnectionDetailProps) {
     const t = useTranslations('connections')
     const errorText = useErrorText()
@@ -67,9 +62,6 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
 
     const applyKeys = useCallback(
         async (keys: Record<string, string>) => {
-            // A credential replaced by hand carries no refresh material, so whatever an earlier
-            // OAuth connect left behind goes with it: the engine would otherwise keep refreshing
-            // against a lineage this token does not belong to.
             const remove = CONNECTION_SATELLITE_KEYS[connection.provider].filter(name => !(name in keys))
             const result = await onUpdateKeys(connection.id, { set: keys, remove })
             if (result.success && rejected) {
@@ -85,7 +77,6 @@ export function ConnectionDetail({ connection, credit, defaultModel, reconnectRe
         <div className="flex min-h-0 flex-1 flex-col">
             <DetailHeader source={connection} credit={credit} onBack={onBack} onRename={readOnlyReason ? undefined : name => void patch({ name })} />
             <PanelScroller className="p-4">
-                {/* `display: contents` drops the fieldset's own box, so the spacing has to live on it rather than on the scroller. */}
                 <fieldset disabled={!!readOnlyReason} className="contents space-y-5">
                 {readOnlyReason && <p className="text-xs text-muted-foreground">{t('detail.readOnly', { reason: readOnlyReason })}</p>}
                 {error && <p className="text-[11px] text-destructive">{error}</p>}
@@ -124,7 +115,6 @@ function AlertBlock({ children }: { children: ReactNode }) {
     )
 }
 
-// Renders nothing while a source works: switching account or key is remove, then add again.
 function SourceAlert({ connection, credit, reconnectRequested, onKeys }: { connection: BoxConnection; credit: RerunCredit; reconnectRequested: boolean; onKeys: (keys: Record<string, string>) => Promise<MutationResult> }) {
     const t = useTranslations('connections')
     const tCommon = useTranslations('common')

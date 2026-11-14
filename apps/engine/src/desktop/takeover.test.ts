@@ -3,7 +3,6 @@ import { vi } from 'vitest'
 
 process.env.RERUN_API_KEY = ''
 
-// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
 vi.mock('node:dns/promises', () => ({
     lookup: async (host: string) => [{ address: host.startsWith('internal.') ? '10.0.0.7' : '93.184.216.34', family: 4 }],
 }))

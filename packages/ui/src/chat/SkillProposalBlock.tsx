@@ -19,16 +19,12 @@ export type SkillProposalBlockProps = {
     summary: string
     state: SkillProposalState
     count?: number
-    // The rules exactly as the agent worded them: what accepting writes into the skill.
     instructions?: string[]
     error?: string | null
     pending?: boolean
-    // Pinned above the composer rather than sitting in the transcript: the row gains a card of its
-    // own, in the calm register of AlertBlock rather than the beam of a question that blocks.
     pinned?: boolean
     onAccept?: () => void
     onDismiss?: () => void
-    // Why this viewer cannot decide: the card still shows, its buttons disabled.
     decisionDisabledReason?: string
     onOpenSkill?: () => void
     className?: string
@@ -45,10 +41,6 @@ function copyFor({ title, summary, state, instructions, error }: SkillProposalBl
     return { headline: t('chat.skillProposal.question'), detail: firstRule, accept: t('chat.skillProposal.remember'), dismiss: t('chat.skillProposal.no') }
 }
 
-/**
- * The row an agent leaves behind when it spots a rule worth keeping. It never pauses the run and
- * never asks a question: accepting starts the writing on its own, and the same row reports it.
- */
 export function SkillProposalBlock(props: SkillProposalBlockProps) {
     const { state, pinned, onOpenSkill, className } = props
     const t = useKitTranslations()
@@ -85,18 +77,12 @@ export function SkillProposalBlock(props: SkillProposalBlockProps) {
     )
 }
 
-// One line of text-xs with room for the +N badge, in px: motion cannot tween between `auto` and a rem length.
 const COLLAPSED_DETAIL_HEIGHT = 18
 
-/**
- * The pinned card while it waits on a decision: the compact row of every other state, plus a
- * chevron. Unfolding turns its second line, in place, into the rules exactly as the agent worded them.
- */
 function PinnedDecision(props: SkillProposalBlockProps & Copy) {
     const { state, instructions = [], className, headline, detail } = props
     const t = useKitTranslations()
     const [expanded, setExpanded] = useState(false)
-    // The full wording stays mounted until the card has folded back, so the closing has something to animate.
     const [unfolded, setUnfolded] = useState(false)
     const failed = state === 'failed'
     const toggle = () => {

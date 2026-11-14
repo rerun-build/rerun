@@ -1,10 +1,3 @@
-# Rerun on one machine: the web app and the engine of your first workspace.
-#
-#   cp .env.example .env && node scripts/self-host-check.mjs   # fills the secrets, checks the rest
-#   docker compose up -d --build
-#
-# Supabase runs outside this file: a free project on supabase.com, or `npx supabase start` on this
-# machine (then add `--profile local-supabase`). See https://docs.rerun.build/self-host.
 name: rerun
 
 services:
@@ -23,10 +16,8 @@ services:
         NEXT_PUBLIC_HCAPTCHA_SITE_KEY: ${NEXT_PUBLIC_HCAPTCHA_SITE_KEY:-}
     env_file: .env
     environment:
-      # The engine below goes to the first workspace that needs one.
       RERUN_ENGINE_URL: http://engine:3000
       RERUN_ENGINE_API_KEY: ${RERUN_ENGINE_API_KEY}
-      # Where a browser reaches the engine below, to watch a coworker's screen.
       RERUN_ENGINE_BROWSER_URL: ${RERUN_ENGINE_BROWSER_URL:-http://localhost:3001}
     ports:
       - "${RERUN_APP_PORT:-3000}:3000"
@@ -46,16 +37,11 @@ services:
       - "${RERUN_ENGINE_PORT:-3001}:3000"
     volumes:
       - engine-data:/data
-    # The engine calls your own model when you connect one: Ollama or LM Studio on this machine
-    # answer it at host.docker.internal.
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # 2 GB of shared memory keeps Chromium from crashing on heavy pages.
     shm_size: 2gb
     restart: unless-stopped
 
-  # Only with `npx supabase start` on this machine: makes the local Supabase answer on the same
-  # address inside the app container as in your browser (http://localhost:54421).
   supabase-bridge:
     image: alpine/socat:1.8.0.3
     profiles: ["local-supabase"]

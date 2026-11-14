@@ -70,7 +70,6 @@ describe('canEndTrialNow', () => {
         expect(canEndTrialNow({ status: 'trialing', hasPaymentMethod: false, cancelAtPeriodEnd: false })).toBe(false)
     })
 
-    // Billing a full cycle to a subscription that ends with the period is charging for nothing.
     it('refuses a trial already set to cancel', () => {
         expect(canEndTrialNow({ status: 'trialing', hasPaymentMethod: true, cancelAtPeriodEnd: true })).toBe(false)
     })
@@ -89,7 +88,6 @@ describe('isTrialLapsed', () => {
         expect(isTrialLapsed('unpaid', null)).toBe(true)
     })
 
-    // Stripe attempts the first charge about an hour after the trial ends.
     it('waits while the first charge is still to come', () => {
         expect(isTrialLapsed('trialing', null)).toBe(false)
         expect(isTrialLapsed('active', null)).toBe(false)

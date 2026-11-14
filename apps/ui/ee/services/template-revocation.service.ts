@@ -3,13 +3,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { pauseAgentSchedules, resumeAgentSchedules } from '@/app/api/_services/agent.service'
 
-// A recurring template stops being owned the moment its subscription ends, and what it installed
-// has to stop with it.
-//
-// The split matters: the DB writes here are synchronous because they are what the library and the
-// install and chat gates read, while reaching the engine to pause schedules can hang on a box that
-// is asleep. The webhook does the first and hands the second to a Trigger task.
-
 type AgentUpdate = Database['public']['Tables']['agents']['Update']
 type PurchaseUpdate = Database['public']['Tables']['template_purchases']['Update']
 
@@ -17,9 +10,6 @@ export function revocationReason(templateId: string): string {
     return `template_revoked:${templateId}`
 }
 
-// Everything the webhook must have done before it answers Stripe: one purchase row and one bulk
-// flag, no engine call. The status says why access ended, which the library turns into either
-// "Resubscribe" or a plain "Buy".
 export async function revokeTemplateAccess(workspaceId: number, templateId: string, status: 'canceled' | 'refunded' = 'canceled'): Promise<void> {
     const supabase = createServiceRoleClient()
     const now = new Date().toISOString()
@@ -38,7 +28,6 @@ export async function revokeTemplateAccess(workspaceId: number, templateId: stri
         .is('disabled_at', null)
 }
 
-// The Trigger task's job: the agents are already flagged, this is what actually stops them.
 export async function pauseTemplateAgentSchedules(workspaceId: number, templateId: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: agents } = await selectMany(supabase, 'agents', ['id'] as const, {
@@ -52,9 +41,6 @@ export async function pauseTemplateAgentSchedules(workspaceId: number, templateI
     }
 }
 
-// Buying again gives the agents back rather than a second copy of them: the ones a previous
-// revocation disabled are exactly the ones restored here. Engine failures are logged rather than
-// raised, because the buyer's entitlement must land whatever the state of their box.
 export async function reenableAgentsForTemplate(workspaceId: number, templateId: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const reason = revocationReason(templateId)

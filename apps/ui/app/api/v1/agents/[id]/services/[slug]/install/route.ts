@@ -6,8 +6,6 @@ import { installServiceInputSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// A `needs_auth` result comes back with its sign-in URL already minted, so the app opens the
-// in-app browser without a second round trip.
 export const POST = apiRoute({ auth: 'member', body: installServiceInputSchema }, async ({ req, ctx, params, body }) => {
     const result = await installService(params.id, serviceKeyParam(params), body.values, body.authMethodId, actorFromContext(ctx))
     return toInstallResultView(result, req, ctx, params.id)

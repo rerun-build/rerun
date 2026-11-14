@@ -7,14 +7,12 @@ const user = (id: string, text: string): UIMessage => ({ id, role: 'user', parts
 const answer = (id: string, text: string): UIMessage => ({ id, role: 'assistant', parts: [{ type: 'text', text }] })
 
 describe('dedupeMessagesById', () => {
-    // Two answers to the same message, pushed over each other until both streams ended.
     it('keeps each answer once, with its furthest copy', () => {
         const messages = [user('u1', 'I am a video editor'), answer('a', 'Got'), answer('b', 'Got it'), answer('a', 'Got it, Ali.'), answer('b', 'Got it, Ali, you are'), user('u2', 'Next')]
 
         expect(dedupeMessagesById(messages)).toEqual([user('u1', 'I am a video editor'), answer('a', 'Got it, Ali.'), answer('b', 'Got it, Ali, you are'), user('u2', 'Next')])
     })
 
-    // The previous turn resumed under the message typed over its question: it stays where it was said.
     it('keeps a resumed answer above the message that followed it', () => {
         const messages = [user('k', 'start'), answer('x', 'Hi'), user('u3', 'voice chat app'), answer('y', 'Which'), answer('x', 'Hi there'), answer('y', 'Which one?')]
 

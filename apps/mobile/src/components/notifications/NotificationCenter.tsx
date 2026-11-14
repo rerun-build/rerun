@@ -62,7 +62,6 @@ function PushOff({ push, onEnablePush, onOpenSettings }: Pick<NotificationCenter
     )
 }
 
-// The rule is what the row is for: a long name gives way before it does.
 function CoworkerRuleRow({ name, value, onPress }: { name: string; value: string; onPress: () => void }) {
     const theme = useTheme()
     const t = useTranslations('mobileSettings.notifications.perCoworker')
@@ -98,8 +97,6 @@ function CenterSkeleton() {
     )
 }
 
-// The web's notification settings: which runs are worth hearing about, the email, a rule for a
-// coworker apart, and the account emails. Toast and sound live in the browser, so they stay there.
 export function NotificationCenter({ prefs, failed, coworkers, push, onEnablePush, onOpenSettings, onPatch, onOpenCoworker }: NotificationCenterProps) {
     const t = useTranslations('mobileSettings.notifications')
     const tSettings = useTranslations('mobileSettings')

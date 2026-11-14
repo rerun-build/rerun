@@ -17,7 +17,6 @@ import { CoworkerPage, LoadFailed } from './CoworkerPage'
 
 export const routineKey = (routine: Pick<RoutineView, 'kind' | 'slug'>) => `${routine.kind}:${routine.slug}`
 
-// The cron's own words come from the hub, in English.
 export function whenOf(routine: RoutineView): string {
     if (routine.cronLabel) return routine.cronLabel
     const t = translatorFor('mobileCoworker')
@@ -67,18 +66,14 @@ function RoutinesSkeleton() {
 
 type CoworkerRoutinesProps = {
     name: string
-    // Null while on its way.
     routines: RoutineView[] | null
     savingKeys: string[]
     onToggle: (routine: RoutineView, enabled: boolean) => void
     failed?: boolean
-    // Whether the caller can switch the coworker's routines, and why not when they cannot.
     lock?: ManageLock
     onBack: () => void
 }
 
-// What the coworker runs on its own, each with its switch. Creating or changing one goes through the
-// chat.
 export function CoworkerRoutines({ name, routines, savingKeys, onToggle, failed, lock = OPEN_LOCK, onBack }: CoworkerRoutinesProps) {
     const t = useTranslations('mobileCoworker.routines')
     const tAccess = useTranslations('mobileCoworker.access')

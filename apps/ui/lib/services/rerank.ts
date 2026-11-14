@@ -1,18 +1,6 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { generateText } from 'ai'
 
-// LLM re-rank on top of the vector retrieval. pgvector gives good recall but query-to-
-// document cosine similarities are too compressed to gate relevance on their own (a real
-// Stripe capability like "refund a customer" scores ~0.21, while unrelated queries like
-// "send sms via twilio" score Stripe ~0.26). A hyper-fast model (Gemini Flash Lite via
-// OpenRouter) reads the shortlisted candidates and keeps only the ones that genuinely
-// provide the capability — or none, which is the signal the agent uses to build it itself.
-//
-// We ask for a plain JSON array rather than using the AI SDK's Output.object: structured
-// output (response_format json_schema) is not supported for Gemini through the
-// openai-compatible provider on OpenRouter. Throws on generation failure so the caller can
-// fall back to the raw vector ranking rather than silently returning nothing.
-
 const RERANK_MODEL = process.env.RERUN_RERANK_MODEL ?? 'google/gemini-2.5-flash-lite'
 
 function rerankModel() {
@@ -21,7 +9,6 @@ function rerankModel() {
     return createOpenAICompatible({ name: 'openrouter', apiKey, baseURL: 'https://openrouter.ai/api/v1' })(RERANK_MODEL)
 }
 
-// Pull the first JSON array out of the model's reply (tolerates code fences / stray prose).
 function parseSlugs(text: string): string[] {
     const match = text.match(/\[[\s\S]*?\]/)
     if (!match) return []

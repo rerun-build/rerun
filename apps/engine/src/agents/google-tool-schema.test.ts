@@ -3,7 +3,6 @@ import { asSchema } from 'ai'
 import { z } from 'zod'
 import { geminiCompatibleSchema, googleToolSchemaMiddleware } from './google-tool-schema.js'
 
-// Buffer's `create_post`, as its MCP server describes `thumbnailUrl`.
 const BUFFER_THUMBNAIL = { anyOf: [{ type: 'string', format: 'uri' }, { type: 'string', const: '' }] }
 
 describe('geminiCompatibleSchema', () => {

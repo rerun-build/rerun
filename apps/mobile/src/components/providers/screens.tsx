@@ -19,10 +19,8 @@ import { DefaultModelPicker } from './DefaultModelPicker'
 import { ProvidersList } from './ProvidersList'
 import { connectHref, leave } from './routes'
 
-// The providers are the workspace's: a member reads them, only an admin changes them.
 const useReadOnlyReason = () => (useIsWorkspaceAdmin() ? null : AI_PROVIDERS_ADMIN_ONLY)
 
-// A step only an admin takes, reached by a link that does not know the caller's role.
 export function ProvidersAdminOnly() {
     const t = useTranslations('mobileProviders.list')
     return (
@@ -76,7 +74,6 @@ export function DefaultModelScreen() {
     return <DefaultModelPicker view={view} onPick={pick} onBack={() => leave()} />
 }
 
-// Every edit persists at once, shown before the hub answers and read back after.
 export function ConnectionDetailScreen({ connectionId }: { connectionId: string }) {
     const { view, caller, reload, setView } = useAiConnections()
     const [error, setError] = useState<string | null>(null)

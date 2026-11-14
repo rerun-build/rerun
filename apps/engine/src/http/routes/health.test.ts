@@ -45,7 +45,6 @@ describe('GET /health', () => {
         expect(await health()).toMatchObject({ lastUpdate: last })
     })
 
-    // Nothing migrated this data-dir, so it reads as one from before the ladder.
     it('reports where the data-dir is against where this build takes it', async () => {
         expect(await health()).toMatchObject({ dataVersion: 0, dataVersionTarget: DATA_DIR_VERSION })
     })

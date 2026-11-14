@@ -38,8 +38,6 @@ export function Layout({
       <Head>
         <meta name="color-scheme" content="dark" />
         <meta name="supported-color-schemes" content="dark" />
-        {/* Declaring the scheme is what stops iOS Mail and the Gmail apps from running their
-            own inversion pass over greys that are already dark. */}
         <style>{HEAD_STYLE}</style>
       </Head>
       <Preview>{preview}</Preview>
@@ -80,7 +78,6 @@ export function Layout({
   );
 }
 
-// The lockup points at the site, not at the app: the CTAs already carry `appUrl`.
 const SITE_URL = "https://rerun.build";
 
 const HEAD_STYLE = `
@@ -114,9 +111,6 @@ const logoCell: React.CSSProperties = {
   verticalAlign: "middle",
 };
 
-// Colour stated rather than left to react-email, whose `Link` defaults to its own blue. It is
-// only ever seen when images are blocked: what is painted then is the `alt`, and the alt reads
-// "Rerun" right next to the wordmark.
 const logoLink: React.CSSProperties = {
   color: theme.text.strong,
   display: "block",
@@ -131,7 +125,6 @@ const brandCell: React.CSSProperties = {
   verticalAlign: "middle",
 };
 
-// Weight 500, per the design system rule that headings are medium and never bold.
 const brand: React.CSSProperties = {
   color: theme.text.strong,
   fontSize: "17px",

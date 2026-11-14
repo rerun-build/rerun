@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
 
-/* Rerun design tokens, mirrored from packages/ui/src/theme.css */
 :root {
   --rr-container-radius: 0.875rem;
   --rr-surface: #ffffff;
@@ -11,13 +10,10 @@
   --rr-surface: #171717;
 }
 
-/* The content panel is a surface, so it sits above the page instead of
-   sharing its tone. Dark already steps from #09090b to #0a0a0a. */
 :root:not(.dark) #content-container {
   background-color: #ffffff;
 }
 
-/* Rerun containers are 14px, almond ships 16px */
 .card,
 .callout,
 .code-block,
@@ -28,8 +24,6 @@
   border-radius: var(--rr-container-radius);
 }
 
-/* A surface always sits one step above the page it lives on.
-   In dark almond paints cards with the page color, so they read flat. */
 .card,
 .code-block {
   background-color: var(--rr-surface);

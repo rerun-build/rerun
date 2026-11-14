@@ -12,8 +12,6 @@ export type SectionChange = {
 
 const HEADING = /^(#{1,6})\s+(.*)$/
 
-// A lone "-" or blank bullet is what the seed leaves behind when a fact was missing: noise for the
-// reviewer, never a change worth reading.
 const isNoiseLine = (line: string) => /^\s*-?\s*$/.test(line)
 
 const normalizeBody = (body: string) =>
@@ -23,8 +21,6 @@ const normalizeBody = (body: string) =>
         .join('\n')
         .trim()
 
-// The page title already sits above the page, so a `# Title` line the agent adds is formatting,
-// not content. Only `##` and deeper split the page.
 export function sectionsOf(markdown: string): Section[] {
     const sections: Section[] = [{ heading: null, body: '' }]
     for (const line of markdown.split('\n')) {
@@ -56,15 +52,12 @@ export const changedOnly = (changes: SectionChange[]) => changes.filter(change =
 
 export const proposalChanges = (proposal: BrainProposal) => changedOnly(sectionChanges(proposal.currentContent, proposal.content))
 
-// A proposal made before the coworkers wrote a headline, or on an engine not updated yet, has none.
-// The `brain.proposals` catalog.
 export type ProposalHeadlineCopy = (key: 'headlineCreate' | 'headlineEdit', values: { title: string }) => string
 
 export const proposalHeadline = (proposal: BrainProposal, t: ProposalHeadlineCopy) => proposal.headline ?? t(proposal.mode === 'create' ? 'headlineCreate' : 'headlineEdit', { title: proposal.title })
 
 export const humanAgentName = (name: string) => name.replace(/_/g, ' ').replace(/^\w/, letter => letter.toUpperCase())
 
-// A stable angle per seed, so every beam catches the light somewhere else without moving between renders.
 export function beamAngle(seed: string) {
     let hash = 0
     for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0

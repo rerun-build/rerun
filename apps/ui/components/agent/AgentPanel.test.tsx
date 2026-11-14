@@ -3,10 +3,6 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-// A screen opened from the coworker's card grows over the thread, its pills, the scrim and the card,
-// all kept mounted underneath. Kept painted too, their blurred and faded layers ran a phone's GPU out of
-// tiles: on Android Chrome the Apps screen showed holes, a black block and the card through it (RER-93).
-
 type BoardState = {
     agents: { id: string; name: string; disabledAt: string | null }[]
     selectedAgentId: string | null
@@ -47,8 +43,6 @@ vi.mock('@/hooks/useWorkspaceAccess', () => ({ useWorkspaceAccess: () => ({ acce
 vi.mock('@rerun/ui', () => ({ BorderBeam: () => null }))
 vi.mock('@rerun/ui/iso-grid', () => ({ AgentBuddy: () => null }))
 
-// happy-dom's Web Animations reject on cancel, which motion does on every retarget: without them motion
-// runs its own frame loop, which completes like a browser's.
 for (const proto of [Element.prototype, HTMLElement.prototype]) Reflect.deleteProperty(proto, 'animate')
 
 const { AgentPanel } = await import('@/components/agent/AgentPanel')

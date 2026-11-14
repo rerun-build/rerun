@@ -25,7 +25,6 @@ import { useState } from 'react'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// The person whose Boxes are open in the drill-in, and those Boxes once read.
 export type OpenedMember = { member: WorkspaceMember; access: MemberAccessView | null }
 
 export type WorkspaceMembersViewProps = {
@@ -34,12 +33,10 @@ export type WorkspaceMembersViewProps = {
     invites: WorkspaceInviteRow[]
     currentUserId: string | null
     currentRole: WorkspaceRole | null
-    // Null when the workspace has no cap, the case of every trial and paid plan.
     maxSeats: number | null
     inviteLink: { email: string; url: string } | null
     busy: boolean
     profileOf: (userId: string) => AuthorProfile | null
-    // Resolves true once the invitation is out, so the field can be cleared.
     onInvite: (email: string, boxScope: BoxScope) => Promise<boolean>
     onRoleChange: (member: WorkspaceMember, role: WorkspaceRole) => void
     onRemove: (member: WorkspaceMember) => void

@@ -4,13 +4,10 @@ import { activateAgentAutomationsAction } from '@/app/api/_actions/agent.actions
 import { invalidateAgentContext, useAgentContext } from '@/hooks/useAgentContext'
 import { useCallback, useState } from 'react'
 
-// `sessionId` is the conversation the install was started in: pending with one means under way.
 export type AgentSetupState = { pending: boolean; prompt: string; skipped: boolean; sessionId: string | null }
 
 const skipKey = (agentId: string) => `setup-skipped-${agentId}`
 
-// Skipping is the user's, not the agent's: the engine still has an install to run, so the state
-// stays local and per agent rather than closing the setup for everyone.
 function readSkipped(agentId: string): boolean {
     try {
         return localStorage.getItem(skipKey(agentId)) === '1'
@@ -26,8 +23,6 @@ export function useAgentSetup(agentId: string): AgentSetupState & { refresh: () 
     const pending = setup !== null && setup.required === true && setup.completedAt === null && setup.prompt.trim().length > 0
     const skipped = pending && (skipChoice?.agentId === agentId ? skipChoice.skipped : readSkipped(agentId))
 
-    // Only an install still running can end during a run: the agent closes it by calling
-    // install_complete, which only the engine knows about.
     const refresh = useCallback(() => {
         if (pending) invalidateAgentContext(agentId)
     }, [agentId, pending])
@@ -37,8 +32,6 @@ export function useAgentSetup(agentId: string): AgentSetupState & { refresh: () 
             localStorage.setItem(skipKey(agentId), '1')
         } catch {}
         setSkipChoice({ agentId, skipped: true })
-        // The install is over as far as the user is concerned, so what the agent carries starts
-        // running. The engine does the same thing itself when the agent calls install_complete.
         void activateAgentAutomationsAction(agentId)
     }, [agentId])
 

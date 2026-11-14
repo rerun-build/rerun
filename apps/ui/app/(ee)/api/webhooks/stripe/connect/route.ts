@@ -3,9 +3,6 @@ import { markCreatorAccountDeauthorized, syncCreatorAccount } from '@/ee/service
 import { stripe } from '@/ee/lib/billing/stripe'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent, unclaimedResponse } from '../idempotency'
 
-// The Connect endpoint, configured separately from the platform one in the Stripe dashboard. Two
-// routes rather than one switch: events about a connected account arrive with their own signing
-// secret, so the platform handler never has to ask whose account an event is about.
 export async function POST(req: Request) {
     const secret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET
     if (!secret) return Response.json({ error: 'STRIPE_CONNECT_WEBHOOK_SECRET is not configured' }, { status: 500 })

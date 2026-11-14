@@ -11,8 +11,6 @@ import { useState } from 'react'
 
 type OpenDialog = 'prompt' | 'payload' | null
 
-// The webhook speaks, not the user: a divider marks where it fired, with its prompt and what the
-// caller sent each one click away.
 export function WebhookRunBlock({ agentId, payload }: { agentId: string | undefined; payload: TriggerPayload }) {
     const t = useTranslations('chat.webhookRun')
     const [openDialog, setOpenDialog] = useState<OpenDialog>(null)

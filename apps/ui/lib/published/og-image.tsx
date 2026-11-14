@@ -21,7 +21,6 @@ function truncate(text: string, max: number): string {
     return text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`
 }
 
-// Satori draws no icon font: the lock is its own small drawing.
 function Lock({ size, color }: { size: number; color: string }) {
     return (
         <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -49,9 +48,6 @@ export type PublishedOgInput = {
     thumbnailDataUrl: string | null
 }
 
-// The 1200×630 card a crawler fetches for a published link. A crawler never passes a gate, so a link
-// that is not public only ever gets the locked card: no title, no capture, nothing a forwarded link
-// would leak.
 export async function publishedOgImage(input: PublishedOgInput): Promise<ImageResponse> {
     const fonts = await loadFonts()
     const title = input.locked ? 'Protected page' : truncate(input.title, MAX_TITLE_LENGTH)

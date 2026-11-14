@@ -14,9 +14,6 @@ import { intakeBoxes } from '@/lib/onboarding/intake'
 import { siteDomain } from '@/lib/onboarding/site-favicon'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 
-// Le pied de la colonne quand un anonyme a répondu à la carte d'accueil : rien ne peut partir vers
-// le Foreman sans compte, donc le composer cède la place au seul geste qui reste. La dialog ne
-// s'ouvre que sur ce clic, et se referme sans rien perdre : le bouton est toujours là.
 export function ForemanSignupGate() {
     const t = useTranslations('foreman.signupGate')
     const [open, setOpen] = useState(false)

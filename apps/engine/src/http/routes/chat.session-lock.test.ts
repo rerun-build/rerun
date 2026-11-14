@@ -29,8 +29,6 @@ describe('one live run per session', () => {
         releaseSession('run-2')
     })
 
-    // The claim is taken in the route but freed by the run loop, which only ever unregisters the
-    // abort controller. If the two ever drift apart, a finished run keeps its session locked forever.
     it('frees the session when the run unregisters its abort controller', () => {
         expect(claimSession('sess-b', 'run-3')).toBeNull()
         registerRunAbort('run-3', 'agent-1')
@@ -51,8 +49,6 @@ describe('one live run per session', () => {
         })
 
         expect(res.status).toBe(409)
-        // `code` and `startedAt` are what let the dashboard offer to stop the run instead of
-        // showing a dead end the user cannot act on.
         const body = (await res.json()) as { code?: string; startedAt?: string }
         expect(body).toMatchObject({ code: 'run_in_flight', runId: 'run-in-flight', sessionId: session.id })
         expect(Number.isNaN(Date.parse(body.startedAt ?? ''))).toBe(false)

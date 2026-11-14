@@ -8,8 +8,6 @@ type LifecycleInsert = Database['public']['Tables']['lifecycle_emails']['Insert'
 
 const SENT_COLUMNS = ['user_id', 'workspace_id', 'agent_id', 'sequence_key', 'sent_at'] as const
 
-// A conflict means another tick, or the inline trial receipt, already sent this one. That is the
-// unique index doing its job, not a failure.
 const UNIQUE_VIOLATION = '23505'
 
 export type SentIndex = {
@@ -21,11 +19,6 @@ function toSend(row: { user_id: string; agent_id: string | null; sequence_key: s
     return { sequenceKey: row.sequence_key as LifecycleSequenceKey, agentId: row.agent_id, sentAt: new Date(row.sent_at), recipientId: row.user_id }
 }
 
-/**
- * Everything already sent to these people, and everything already sent inside their workspaces. Both
- * are needed: the first is the daily cap, the second is what stops a workspace-scoped email going
- * out twice when ownership moved between the two sends.
- */
 export async function loadSentIndex(supabase: SupabaseClient<Database>, userIds: string[], workspaceIds: number[]): Promise<SentIndex> {
     const index: SentIndex = { byUser: new Map(), byWorkspace: new Map() }
     if (userIds.length === 0) return index

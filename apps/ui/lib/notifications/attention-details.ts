@@ -10,19 +10,12 @@ export type AttentionNotificationRow = { agent_id: string | null; engine_session
 
 export const ATTENTION_NOTIFICATION_COLUMNS = ['agent_id', 'engine_session_id', 'kind', 'message', 'metadata', 'recipients'] as const
 
-// A cron that called notify_user ends with a "Schedule … completed" a few seconds later: a finished run
-// never says what waits on the user, and taking it would bury the heads-up under the same line every time.
 export function attentionNotificationsFilter(sessions: AttentionSessionRow[]) {
     const engineSessionIds = sessions.flatMap(s => (s.engine_session_id ? [s.engine_session_id] : []))
-    // engine_session_id has no index: the agent_id filter is what lets the (agent_id, event) index narrow the scan.
     const agentIds = [...new Set(sessions.map(s => s.agent_id))]
     return engineSessionIds.length ? { agent_id: { in: agentIds }, engine_session_id: { in: engineSessionIds }, kind: { neq: 'done' as const } } : null
 }
 
-/**
- * The session row has no room for what the agent is waiting on: that text is the message of the notification which
- * flipped the status, and it only links back through the agent and the engine session id. `notifications` comes newest first.
- */
 export function attentionDetailsOf(sessions: AttentionSessionRow[], notifications: AttentionNotificationRow[], userId: string | null | undefined, tErrors: ChatErrorCopy): Record<string, AttentionDetail> {
     const latest = new Map<string, { message: string; reason: NotificationReason | 'legacy' | null }>()
     for (const n of notifications) {
@@ -38,8 +31,6 @@ export function attentionDetailsOf(sessions: AttentionSessionRow[], notification
     )
 }
 
-// The message of a failed run is `Schedule "<name>" failed: <provider error>`: every error row would open on the
-// same words. The row says what went wrong instead, in the chat's own words when it has some.
 export function errorHeadline(notification: { message: string; metadata: Json | null }, tErrors: ChatErrorCopy): string {
     const metadata = notification.metadata as { error?: unknown } | null
     const error = typeof metadata?.error === 'string' ? metadata.error : notification.message

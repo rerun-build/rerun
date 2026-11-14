@@ -4,9 +4,6 @@ import { attachmentUrl, audioFormatOf, baseMime, extensionOf, parseAttachmentRef
 import { downloadAttachment } from './linkup/client'
 import { AppToolRefusal, type AppTool, type AppToolContext } from './tools'
 
-// The one tool both apps share: a file somebody sent, made usable. The bytes are streamed once from
-// Linkup, into the coworker's files and, for a voice note asked to be transcribed, to Whisper.
-
 const TRANSCRIBE_TIMEOUT_MS = 60_000
 
 function timestamp(now: Date): string {

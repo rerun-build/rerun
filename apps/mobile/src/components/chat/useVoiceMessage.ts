@@ -6,9 +6,7 @@ export type VoiceMessageStatus = 'idle' | 'starting' | 'recording' | 'processing
 
 export type VoiceMessageError = 'silent' | 'sendFailed'
 
-// What a recording needs from its conversation to leave: a place for the audio, what was said, the send.
 export type VoiceSender = {
-    /** Absent when the voice is a dictation: nothing is kept, and `send` gets the bare transcript. */
     upload?: (uri: string) => Promise<string>
     transcribe: (uri: string) => Promise<string>
     send: (text: string) => Promise<void>
@@ -19,7 +17,6 @@ export type VoiceLiveState = { level: number; durationMs: number }
 type Recording = { uri: string; durationMs: number; levels: number[]; path?: string }
 
 const SAMPLE_MS = 50
-// Metering is in dBFS: speech sits roughly between -55 (quiet room) and -5 (close and loud).
 const FLOOR_DB = -55
 const RANGE_DB = 50
 
@@ -28,9 +25,6 @@ function levelOf(metering: number | undefined) {
     return Math.min(1, Math.max(0, (metering - FLOOR_DB) / RANGE_DB))
 }
 
-// The composer's voice message, as on the web: record, upload the audio next to the conversation's
-// files while it is transcribed, then send the transcript with the marker that turns the bubble back
-// into a player. A recording that fails on its way out is kept for a retry.
 export function useVoiceMessage(sender: VoiceSender | undefined) {
     const recorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true })
     const [status, setStatus] = useState<VoiceMessageStatus>('idle')
@@ -40,7 +34,6 @@ export function useVoiceMessage(sender: VoiceSender | undefined) {
     const pendingRef = useRef<Recording | null>(null)
     const senderRef = useRef(sender)
     const finishRef = useRef<() => void>(() => {})
-    // Bumped by every start, stop and discard: an await that wakes up to a newer one gives up.
     const takeRef = useRef(0)
 
     const process = useCallback(async (recording: Recording) => {
@@ -51,7 +44,6 @@ export function useVoiceMessage(sender: VoiceSender | undefined) {
         setStatus('processing')
         try {
             const upload = current.upload
-            // A retry after a failed transcription reuses the file already uploaded instead of leaving an orphan copy.
             const [path, transcript] = await Promise.all([
                 upload
                     ? (recording.path ??
@@ -82,8 +74,6 @@ export function useVoiceMessage(sender: VoiceSender | undefined) {
         return recorder.uri
     }, [recorder])
 
-    // Entering 'processing' before awaiting the recorder keeps the composer from flashing back to its
-    // text field for a frame between the last bar and the transcription.
     const finish = useCallback(async () => {
         const take = ++takeRef.current
         setStatus('processing')

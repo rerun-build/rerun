@@ -61,8 +61,6 @@ describe('mergeMcpServers', () => {
 })
 
 describe('agentConfigSchema', () => {
-    // Agents predate every field added since they were created; a config.json written before one
-    // exists must still load, or loadAgentFromDisk throws and the agent disappears from the API.
     it('reads a config.json written before box connections existed', () => {
         const legacy = { name: 'legacy', description: '', provider: 'openrouter', model: 'anthropic/claude-opus-4.8', temperature: 0.7, tools: {}, mcpServers: [], selfImprovement: {} }
         const parsed = agentConfigSchema.parse(legacy)

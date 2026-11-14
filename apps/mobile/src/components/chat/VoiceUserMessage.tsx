@@ -18,14 +18,12 @@ import { VoiceTranscript } from './VoiceTranscript'
 
 type VoiceUserMessageProps = {
     voice: VoiceMessage
-    // Where the recording sits; none in a mock thread, which has nothing to play.
     owner: FileOwner | null
     media?: ViewerItem[]
     stamp?: MessageStamp
     defaultTranscriptOpen?: boolean
 }
 
-/** A voice message the person sent: the player in the bubble, and under it Transcript and Copy, always shown on a phone. */
 export function VoiceUserMessage({ voice, owner, media, stamp, defaultTranscriptOpen = false }: VoiceUserMessageProps) {
     const playback = useVoicePlayback(voice, owner)
     const [open, setOpen] = useState(defaultTranscriptOpen)

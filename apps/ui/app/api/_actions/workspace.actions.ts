@@ -27,9 +27,6 @@ async function requireUserId(): Promise<string> {
     return user.id
 }
 
-// Sets the caller's active workspace. The active workspace is `users.workspace_id`,
-// which scopes the UI and the service-role API layer. We only allow switching to a
-// workspace the caller is actually a member of.
 export async function switchWorkspaceAction(workspaceId: number): Promise<ActionResult> {
     const userId = await requireUserId()
     const supabase = createServiceRoleClient()
@@ -42,12 +39,6 @@ export async function switchWorkspaceAction(workspaceId: number): Promise<Action
     return { ok: true }
 }
 
-// Renames the workspace, and swaps its logo when one was picked. The name rides on every invitation
-// email, so it is not a preference each member holds their own version of.
-//
-// The logo arrives as a catalogue file name, an uploaded file or a link, never as a URL to store:
-// `icon_url` is rendered as a bare <img>, down to anonymous pages, so a file or a link is fetched and
-// re-hosted in our bucket here, and only that address is written.
 export async function updateWorkspaceAction(formData: FormData): Promise<ActionResult> {
     const ctx = await requireAdminContext('adminOnlySettings').catch((err: unknown) => {
         if (err instanceof AuthorizationError) return err
@@ -114,8 +105,6 @@ async function rehostLogo(bytes: ArrayBuffer | Uint8Array, workspaceId: number):
     }
 }
 
-// Creates a new workspace owned by the caller, adds the owner membership, and
-// makes it the active workspace.
 export async function createWorkspaceAction(name: string, iconUrl?: string): Promise<ActionResult<{ workspaceId: number }>> {
     const userId = await requireUserId()
     const icon = iconUrl ? BLOB_ILLUSTRATIONS.find(blob => blob.url === iconUrl) : undefined
@@ -130,10 +119,7 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
             icon_url: icon?.url ?? randomBlob()?.url ?? null,
             plan: BASE_PLAN_SLUG,
             ...baseLimitsToColumns(),
-            // No subscription behind this workspace yet, so no monthly budget either: the plan's
-            // budget lands when the plan does. It starts on the signup allowance, granted below.
             rerun_budget_micros: 0,
-            // One person is quoted one price, whichever of their workspaces they stand in.
             price_arm: current?.price_arm ?? null,
         })
         .select('id')
@@ -150,8 +136,6 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
     })
     if (membershipError) return { ok: false, error: membershipError.message }
 
-    // Without it the workspace starts at zero and its trial adds nothing: every Rerun model answers
-    // "credits used up" on the first message, though none was ever used.
     await grantRerunTopup(workspaceId, SIGNUP_BUDGET_MICROS)
 
     const { error: switchError } = await supabase.from('users').update<Database['public']['Tables']['users']['Update']>({ workspace_id: workspaceId }).eq('id', userId)
@@ -160,22 +144,15 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
     return { ok: true, workspaceId }
 }
 
-// Enters the caller's sandbox, creating it on first use. Restricted to expert accounts server-side —
-// the switcher gate is only cosmetic.
 export async function enterSandboxAction(): Promise<ActionResult<{ workspaceId: number }>> {
     const userId = await requireUserId()
 
     if (!(await isExpertAccount(userId))) return failure('sandboxExpertOnly')
-    // The creator flow claims the sandbox itself, before the conditions screen. Everywhere else the
-    // wall holds: no switching into a sandbox whose program conditions are still unsigned.
     if (await hasPendingCreatorTerms(userId)) return failure('acceptCreatorTermsFirst')
 
     return enterSandbox(userId)
 }
 
-// Restores the sandbox invariant — an active sandbox always has its Space — for a caller who is
-// already inside it: a reload lands straight on `users.workspace_id` without going through the
-// switcher, so enterSandboxAction never gets a chance to re-claim an engine.
 export async function ensureSandboxSpaceAction(): Promise<ActionResult | { ok: false; error: string; locked: true }> {
     const workspaceId = await requireSandboxWorkspaceId()
     return (await ensureSandboxSpace(workspaceId)) ?? { ok: true }

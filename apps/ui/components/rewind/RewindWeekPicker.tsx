@@ -9,7 +9,6 @@ import { weekEndOf } from '@/lib/rewind/week'
 import { cn } from '@/lib/utils'
 import { useRewindStore } from '@/stores/rewind.store'
 
-// The story overlay sits at z-[100]; the portalled list has to clear it.
 const CONTENT_LAYER = 'z-[110]'
 
 export function RewindWeekPicker({ currentId, onOpenChange, className }: { currentId: string; onOpenChange: (open: boolean) => void; className?: string }) {

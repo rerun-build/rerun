@@ -1,7 +1,5 @@
 export type ByteRange = { start: number; end: number }
 
-// Same reading as the engine's raw route (apps/engine/src/http/routes/files.ts): several ranges in
-// one request, or a malformed one, get the whole file, which the spec allows.
 export function parseByteRange(header: string | null, size: number): ByteRange | 'unsatisfiable' | null {
     const match = header?.trim().match(/^bytes=(\d*)-(\d*)$/)
     if (!match) return null

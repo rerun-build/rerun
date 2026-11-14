@@ -1,7 +1,3 @@
-// lib/billing/stripe.ts builds its client and reads the add-on price ids the moment it is imported,
-// and Stripe refuses to construct without a key. Most of the server code imports it transitively, so
-// without these a test of anything near billing fails at import time rather than on an assertion.
-// The client is never reached: tests that go near it replace `stripe` with test/stripe-fake.ts.
 process.env.STRIPE_SECRET_KEY ??= 'sk_test_vitest'
 process.env.STRIPE_PRICE_BASE ??= 'price_base'
 process.env.STRIPE_PRICE_BASE_LEGACY ??= 'price_base_legacy'

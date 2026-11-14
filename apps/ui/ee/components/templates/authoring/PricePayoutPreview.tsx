@@ -4,11 +4,6 @@ import { creatorNetCents, formatAmount, marketplaceFeeLabel, rerunFeeCents, type
 import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 
-// What the author actually earns, spelled out before they commit to a number. Every figure comes
-// from the shared helpers so the panel and the invoice can never disagree.
-//
-// Prices are tax-exclusive, so VAT is added on top of the creator's figure rather than taken out of
-// it. The earnings are the same whoever buys, which is why they are quoted as one exact number.
 export function PricePayoutPreview({ model, amountCents, currency }: { model: TemplatePricingModel; amountCents: number; currency: string }) {
     const t = useTranslations('templates.pricing.payout')
     const recurring = model === 'recurring' ? 'true' : 'false'

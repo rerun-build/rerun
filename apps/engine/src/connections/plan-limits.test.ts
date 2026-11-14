@@ -80,7 +80,6 @@ describe('plan limit latch', () => {
         forgetPlanLimits('spent')
     })
 
-    // Claude reads its usage when a run ends well, so a refused run leaves the reading under 100%.
     it('holds for half an hour when no reading says when the limit resets', () => {
         recordPlanLimits('stale', [{ kind: 'session', label: null, usedPercent: 97, resetsAt: '2026-11-04T18:00:00Z' }])
         armPlanLimitLatch('stale', now)
@@ -93,7 +92,6 @@ describe('plan limit latch', () => {
         forgetPlanLimits('stale')
     })
 
-    // Codex refreshes its windows during the run's teardown, after the refusal armed the hold.
     it('picks up the reset time a reading records after the hold is armed', () => {
         recordPlanLimits('late', [{ kind: 'weekly', label: null, usedPercent: 97, resetsAt: '2026-11-07T15:00:00Z' }])
         armPlanLimitLatch('late', now)

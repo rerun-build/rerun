@@ -4,12 +4,9 @@ import { G, Rect, type GProps } from 'react-native-svg'
 
 import { liftedBy, stretchedFrom } from './wall-motion'
 
-// G takes a `matrix` and hands it to the native group as is; its typings only list the shorthands.
 const AnimatedMatrixG = Animated.createAnimatedComponent(G as ComponentType<GProps & { matrix?: number[] }>)
 const AnimatedRect = Animated.createAnimatedComponent(Rect)
 
-// One clock for every buddy on screen, in seconds. Each buddy reads it with its own offset, so a
-// list of them never bobs nor blinks in step.
 const Clock = createContext<SharedValue<number> | null>(null)
 
 export function BuddyClock({ children }: { children: ReactNode }) {
@@ -29,8 +26,6 @@ export function BuddyMotionScope({ motion, children }: { motion: BuddyMotion | n
     return <Motion value={motion}>{children}</Motion>
 }
 
-// The web keyframes iso-buddy-bob-wall and iso-buddy-shudder-wall: how tall the walls stand, the
-// top riding on them.
 const BOB = { period: 1.2, at: [0, 0.35, 0.62, 0.78, 1], stretch: [1, 1.2, 0.92, 1.02, 1] }
 const SHUDDER = { period: 2.4, at: [0, 0.6, 0.66, 0.72, 0.78, 0.84, 1], stretch: [1, 1, 0.9, 1.06, 0.95, 1.02, 1] }
 const BLINK = { period: 4.6, at: [0, 0.92, 0.95, 1], scale: [1, 1, 0.08, 1] }
@@ -50,7 +45,6 @@ function useStretch() {
     return { stretch, still: !clock || !keys }
 }
 
-// Scales its children's height from the horizontal line `y`, the way a wall grows from the floor.
 export function GrowsFrom({ y, children }: { y: number; children: ReactNode }) {
     const { stretch, still } = useStretch()
     const animatedProps = useAnimatedProps(() => ({ matrix: stretchedFrom(y, stretch()) }))
@@ -58,7 +52,6 @@ export function GrowsFrom({ y, children }: { y: number; children: ReactNode }) {
     return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
 }
 
-// The top face, lifted by as much as the walls under it grew.
 export function RidesOnWalls({ depth, children }: { depth: number; children: ReactNode }) {
     const { stretch, still } = useStretch()
     const animatedProps = useAnimatedProps(() => ({ matrix: liftedBy((1 - stretch()) * depth) }))
@@ -66,7 +59,6 @@ export function RidesOnWalls({ depth, children }: { depth: number; children: Rea
     return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
 }
 
-// The eyes squashed from the line `y`, as one.
 export function Blinking({ y, children }: { y: number; children: ReactNode }) {
     const clock = use(Clock)
     const motion = use(Motion)
@@ -80,7 +72,6 @@ export function Blinking({ y, children }: { y: number; children: ReactNode }) {
     return <AnimatedMatrixG animatedProps={animatedProps}>{children}</AnimatedMatrixG>
 }
 
-// A band of light crossing the top while the agent works.
 export function Sweep({ x, y, width, height, fill }: { x: number; y: number; width: number; height: number; fill: string }) {
     const clock = use(Clock)
     const motion = use(Motion)

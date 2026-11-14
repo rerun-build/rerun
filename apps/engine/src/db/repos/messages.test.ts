@@ -7,7 +7,6 @@ describe('extractText', () => {
         expect(extractText([{ type: 'text', text: 'first' }, { type: 'text', text: 'second' }])).toBe('first second')
     })
 
-    // It feeds the FTS index and the `output` a schedule, a trigger or a delegation reads back.
     it('never leaks what the agent only thought', () => {
         const content = [
             { type: 'reasoning', text: 'The user probably means the second invoice.' },
@@ -18,8 +17,6 @@ describe('extractText', () => {
         expect(extractText(content)).toBe('Invoice #2 is overdue.')
     })
 
-    // The memories recalled for a turn and its timestamp are stored with it, for the model: a
-    // search must not find them, and a schedule must not read them back as its prompt.
     it('leaves out the context the engine appended to a user turn', () => {
         const content = [
             { type: 'text', text: 'is the invoice paid?' },

@@ -28,7 +28,6 @@ const BLUR_ABOVE_FOOTER = 32
 export type OnboardingConversationProps = {
     messages: UIMessage[]
     busy: boolean
-    // A turn that did not go through, with the way to send it again.
     failed: boolean
     onRetry: () => void
     teamStart: TeamStartState
@@ -43,8 +42,6 @@ export type OnboardingConversationProps = {
 
 type Segment = { parts: UIMessage['parts'] } | { widget: WidgetPart }
 
-// What the hub said and the cards it put up, in the order it put them up: each run of text between two
-// cards is its own bubble, so two steps never read as one sentence.
 function segmentsOf(message: UIMessage): Segment[] {
     const segments: Segment[] = []
     for (const part of message.parts) {
@@ -79,8 +76,6 @@ function Answered({ widget }: { widget: WidgetPart }) {
     return null
 }
 
-// The hub's onboarding conversation: what it says in bubbles, each card where it was asked, and the
-// composer only while no card waits on an answer.
 export function OnboardingConversation({ messages, busy, failed, onRetry, teamStart, leadStarting, onAnswer, onSend, onStop, onRetryStart, onRetryBuild, onStartLead }: OnboardingConversationProps) {
     const insets = useSafeAreaInsets()
     const scroll = useRef<ScrollViewInstance>(null)
@@ -94,10 +89,8 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
     const pending = busy ? null : pendingWidget(messages)
     const building = messages.some(message => message.parts.some(part => widgetOf(part)?.widget === 'build_team'))
     const trialUp = messages.some(message => message.parts.some(part => widgetOf(part)?.widget === 'open_checkout'))
-    // Past the plan nothing can be typed, as on the web: the trial and the build run on their own.
     const composer = !pending && !trialUp && !building
     const shown = messages.filter(message => !isKickoff(message))
-    // Only the last build can be run again: an earlier one that failed is history.
     const lastBuild = messages.flatMap(message => message.parts.flatMap(part => (widgetOf(part)?.widget === 'build_team' ? [widgetOf(part)?.toolCallId] : []))).at(-1)
 
     const render = (widget: WidgetPart, message: UIMessage) => {

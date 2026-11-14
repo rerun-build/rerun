@@ -2,8 +2,6 @@ import { canonicalModelId, providerSchema, type Provider } from '@rerun/contract
 
 import type { BoxConnection } from '@/lib/engine/types'
 
-// What a coworker, a scheduled task or a trigger is told to run on. All three null is "pick
-// nothing": a coworker then follows the workspace default, an automation follows its coworker.
 export type ModelPin = { connectionId: string | null; provider: Provider | null; model: string | null }
 
 const FOLLOW: ModelPin = { connectionId: null, provider: null, model: null }
@@ -12,8 +10,6 @@ export function connectionModels(connection: BoxConnection): string[] {
     return [...connection.models, ...connection.extraModels]
 }
 
-// The id as the connection spells it: a box written by an older build still lists a renamed model
-// under its former id, and that spelling is the one its runs resolve.
 function servedModel(connection: BoxConnection, model: string): string | undefined {
     return connectionModels(connection).find(id => id === model || canonicalModelId(id) === canonicalModelId(model))
 }
@@ -43,13 +39,10 @@ function targetConnection(args: Record<string, unknown>, connections: BoxConnect
         if (!parsed.success) throw new Error(`Unknown provider "${provider}". Expected one of: ${providerSchema.options.join(', ')}`)
         const matches = connections.filter(entry => entry.provider === parsed.data)
         if (matches.length === 0) throw new Error(`This workspace has no ${provider} connection. It has: ${describeConnections(connections)}.`)
-        // Picking one of them in silence is how a coworker ends up billed to the wrong account.
         if (matches.length > 1) throw new Error(`This workspace has several ${provider} connections, pass connectionId to say which: ${describeConnections(matches)}.`)
         return matches[0]
     }
 
-    // A model alone keeps the connection already in use when it serves that model, and otherwise
-    // only resolves when a single connection does.
     const current = connections.find(entry => entry.id === currentConnectionId)
     if (current && model && servedModel(current, model)) return current
     const serving = connections.filter(entry => model && servedModel(entry, model))
@@ -58,9 +51,6 @@ function targetConnection(args: Record<string, unknown>, connections: BoxConnect
     throw new Error(`Several AI connections serve "${model}", pass connectionId to say which: ${describeConnections(serving)}.`)
 }
 
-// Reads `connectionId`, `provider` and `model` as one decision and checks it against what the
-// workspace really holds. Undefined when the call names none of the three, so a caller patching
-// something else leaves the pin alone.
 export function readModelPin(args: Record<string, unknown>, connections: BoxConnection[], currentConnectionId?: string | null): ModelPin | undefined {
     if (args.connectionId === undefined && args.provider === undefined && args.model === undefined) return undefined
     if (args.model === null) return FOLLOW

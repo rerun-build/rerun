@@ -6,8 +6,6 @@ import { clearAgentCache } from '../agents/registry.js'
 
 const UNRESTRICTED: BoxPlan = { premiumModels: true }
 
-// Read synchronously and held: `pairFor` resolves a model without awaiting, and every write to the
-// file goes through this module.
 let cached: BoxPlan | undefined
 
 export function readBoxPlan(): BoxPlan {
@@ -21,7 +19,6 @@ export function readBoxPlan(): BoxPlan {
     return cached
 }
 
-// Same reason as the box default: every cached agent holds a pair resolved under the old plan.
 export async function writeBoxPlan(next: BoxPlan): Promise<BoxPlan> {
     const target = boxPlanPath()
     const tmp = `${target}.tmp`
@@ -32,8 +29,6 @@ export async function writeBoxPlan(next: BoxPlan): Promise<BoxPlan> {
     return next
 }
 
-// The model a run really gets. The pin itself is never rewritten, so paying gives Opus back to every
-// agent that asked for it.
 export function allowedModel(provider: Provider, model: string): string {
     return readBoxPlan().premiumModels ? model : trialModelFor(provider, model)
 }

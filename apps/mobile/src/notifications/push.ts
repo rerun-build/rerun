@@ -18,16 +18,12 @@ const ASKED_KEY = 'rerun.push-asked'
 
 const projectId: string | undefined = Constants.expoConfig?.extra?.eas?.projectId
 
-// An Android token comes from Firebase, which a build without google-services.json does not have.
 const tokenProviderConfigured = Platform.OS !== 'android' || Boolean(Constants.expoConfig?.android?.googleServicesFile)
 
-// Pushes go out through Rerun's Expo project, which only Rerun Cloud sends with: on a server of the
-// person's own, or in a build with no project to get a token from, the app never asks for them.
 export const pushAvailable = !onCustomServer && Boolean(projectId) && tokenProviderConfigured
 
 let registeredToken: string | null = null
 
-// The conversation on screen: a push about it is not shown while the person is reading it.
 let conversationOnScreen: string | null = null
 
 export function setConversationOnScreen(id: string | null) {
@@ -47,8 +43,6 @@ Notifications.setNotificationHandler({
     },
 })
 
-// Android 13 only shows its permission prompt once a channel exists, and a push naming a channel the
-// phone does not know is dropped. Set again on every launch: it renames them in the current language.
 async function createAndroidChannels(): Promise<void> {
     if (Platform.OS !== 'android') return
     const t = translatorFor('mobileSettings')
@@ -69,8 +63,6 @@ async function createAndroidChannels(): Promise<void> {
     ])
 }
 
-// Expo answers with no token when the phone cannot reach Firebase (no Play Services) or a build was
-// made without it: push is then off for this phone, quietly, as where it is not offered at all.
 async function expoPushToken(): Promise<string | null> {
     try {
         return (await Notifications.getExpoPushTokenAsync({ projectId })).data
@@ -79,8 +71,6 @@ async function expoPushToken(): Promise<string | null> {
     }
 }
 
-// Registered on every launch once allowed: Expo can rotate the token, and the hub keeps the last
-// time it was seen. A simulator has no token to give.
 export async function registerDevice(caller: Caller): Promise<void> {
     if (!pushAvailable || !Device.isDevice) return
     await createAndroidChannels()
@@ -92,7 +82,6 @@ export async function registerDevice(caller: Caller): Promise<void> {
     registeredToken = token
 }
 
-// Asked once, after the first message the person sends: by then a coworker has something to say back.
 export async function askForPushOnce(caller: Caller): Promise<void> {
     if (!pushAvailable) return
     if (await SecureStore.getItemAsync(ASKED_KEY)) return
@@ -114,14 +103,12 @@ export async function turnOnPush(caller: Caller): Promise<Notifications.Permissi
     return status
 }
 
-// Signing out stops this phone ringing for that account.
 export async function unregisterDevice(caller: Caller): Promise<void> {
     if (!registeredToken) return
     await api('/api/v1/me/devices', { ...caller, method: 'DELETE', body: { token: registeredToken, platform: clientPlatform } })
     registeredToken = null
 }
 
-// Android leaves the badge to the launcher: some show the count, some a dot, some nothing.
 export async function setBadge(count: number): Promise<void> {
     await Notifications.setBadgeCountAsync(count)
 }

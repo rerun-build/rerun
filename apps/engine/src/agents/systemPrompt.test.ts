@@ -8,7 +8,6 @@ const { afterEach, describe, expect, it, vi } = await import('vitest')
 const { agentConfigSchema } = await import('@rerun/contracts')
 const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, currentTimeNote, nowBlock, userBlock, userLanguageBlock } = await import('./systemPrompt.js')
 
-// The tests read the prompt as the model does, both blocks joined.
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))
 
 const agent = {
@@ -221,8 +220,6 @@ describe('current time', () => {
         expect(nowBlock(new Date('2026-08-16T14:32:07Z'))).toBe('<now>\n2026-08-16T14:32:07Z (Sunday, 16 August 2026, 14:32 UTC)\n</now>')
     })
 
-    // A routine written in English by a French team still reports in French; without a workspace
-    // language the run keeps the language of its instruction, as before.
     it('falls back on the workspace language for a run nobody started', async () => {
         const french = { ...agent, config: agentConfigSchema.parse({ name: 'Prompt test', provider: 'rerun', language: 'fr', tools: { memory: false, db: false, schedule: false } }) }
         expect(await buildSystemPrompt(french, { source: 'schedule', slug: 'daily', name: 'daily' })).toContain('and failing that French, the language of this workspace')
@@ -358,8 +355,6 @@ describe('reporting failures', () => {
 })
 
 describe('quick replies section', () => {
-    // The replies are a block of the message, never a call: a tool to call right before or after
-    // the message had the model drafting that message in its thinking instead of writing it.
     it('tells a regular agent to close its message with the block, on every provider', async () => {
         for (const provider of ['rerun', 'claude', 'codex'] as const) {
             const prompt = await buildSystemPrompt(agent, { source: 'chat' }, provider)

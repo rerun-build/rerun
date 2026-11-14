@@ -21,8 +21,6 @@ const emptyText = [
     { type: 'text-start', id: '0' },
     { type: 'text-delta', id: '0', delta: '' },
 ]
-// What `@ai-sdk/openai` emits when the server hangs up on it: its flush closes the text block and
-// makes up a finish of its own.
 const cutFinish = { type: 'finish', finishReason: { unified: 'other', raw: undefined }, usage: noUsage }
 const realFinish = { type: 'finish', finishReason: { unified: 'stop', raw: 'stop' }, usage }
 const answer = [streamStart, { type: 'text-start', id: '0' }, { type: 'text-delta', id: '0', delta: 'done' }, { type: 'text-end', id: '0' }, realFinish]

@@ -17,8 +17,6 @@ const PURPOSE = 'Find the emails of 40 restaurant owners'
 
 let callSeq = 0
 
-// The request as the engine stores it: the call in the assistant turn, the hub's quote in the tool
-// result that follows.
 function spendRequest(totalMicros = 2_000_000, toolName = 'request_spend', line: Record<string, string> = { capability: 'people.email.find' }) {
     const toolCallId = `spend-${++callSeq}`
     const call = { role: 'assistant', contentJson: JSON.stringify([{ type: 'text', text: 'Here is the plan.' }, { type: 'tool-call', toolCallId, toolName, input: { purpose: PURPOSE, calls: [{ ...line, count: 40 }] } }]) }
@@ -31,7 +29,6 @@ function userReply(decision: 'approved' | 'declined') {
     return { role: 'user', contentJson: JSON.stringify(serializeSpendDecision({ purpose: PURPOSE, decision })) }
 }
 
-// A decline written while the card still asked why.
 const DECLINE_WITH_REASON = { role: 'user', contentJson: JSON.stringify(`Spend decision: **DECLINED** — ${PURPOSE}\nReason: Only 20 of them\n\nDo not call any paid data tool for this plan.`) }
 
 const freeText = (text: string) => ({ role: 'user', contentJson: JSON.stringify([{ type: 'text', text }]) })

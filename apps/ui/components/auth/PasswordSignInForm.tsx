@@ -17,8 +17,6 @@ const passwordSignInSchemaFor = (t: ReturnType<typeof useTranslations<'auth.pass
         password: z.string().min(1, t('errors.passwordRequired')),
     })
 
-// Reached only through /auth?method=password, which nothing links to. A password exists only on
-// the accounts an admin gave one in /admin/users, so this form never signs anyone up.
 export function PasswordSignInForm({ onSignedIn }: { onSignedIn: () => void }) {
     const t = useTranslations('auth.password')
     const passwordSignInSchema = useMemo(() => passwordSignInSchemaFor(t), [t])

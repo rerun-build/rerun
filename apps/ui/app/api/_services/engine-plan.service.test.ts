@@ -30,7 +30,6 @@ describe('engine plan', () => {
         expect(setBoxPlan).toHaveBeenLastCalledWith(CONN, { premiumModels: true })
     })
 
-    // An engine older than plans answers 404, a box asleep does not answer at all.
     it('never fails the caller when the box cannot be reached', async () => {
         workspace('active')
         vi.mocked(setBoxPlan).mockRejectedValueOnce(new Error('404'))

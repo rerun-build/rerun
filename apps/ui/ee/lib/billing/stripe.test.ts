@@ -178,8 +178,6 @@ describe('intervalOfItems', () => {
     })
 })
 
-// subscriptionOfInvoice calls the module's own client, which a vi.mock of the export would not
-// reach, so the real instance is spied on instead.
 describe('subscriptionOfInvoice', () => {
     function spyRetrieve() {
         return vi.spyOn(stripe.subscriptions, 'retrieve').mockImplementation((async (id: string) => ({ id }) as unknown as Stripe.Response<Stripe.Subscription>) as never)

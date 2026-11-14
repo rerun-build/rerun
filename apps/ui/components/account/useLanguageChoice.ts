@@ -8,7 +8,6 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-// The pseudo-locale lives in the cookie alone, so it is read back from the page's locale.
 export function useLanguageChoice() {
     const t = useTranslations('account.language')
     const { user, refreshUser } = useSession()
@@ -23,7 +22,6 @@ export function useLanguageChoice() {
             toast.error(t('failed'))
             return
         }
-        // No success toast: it would speak the language being left, and the screen switching says it.
         await refreshUser()
         router.refresh()
     }

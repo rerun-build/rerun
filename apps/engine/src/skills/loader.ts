@@ -107,10 +107,6 @@ export async function writeSkill(agentId: string, name: string, description: str
     return readSkill(agentId, slug)
 }
 
-// Whole-folder upsert: SKILL.md and the supplied files are staged outside skills/ (so a
-// half-written folder is never listed as a skill) and swapped in only once everything is on
-// disk. A failure anywhere leaves the existing skill exactly as it was. Files already in the
-// folder and not supplied here are carried over.
 export async function writeSkillFolder(
     agentId: string,
     input: { slug?: string; name: string; description: string; body: string; files: { path: string; content: string }[] }

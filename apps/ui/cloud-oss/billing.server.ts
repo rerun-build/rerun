@@ -1,7 +1,5 @@
 import 'server-only'
 
-// No Stripe in this build: there is no trial to extend, no customer to keep in sync, and the
-// foreman's usage is not metered against a credit.
 export async function extendTrial(_subscriptionId: string, _days: number, _idempotencyKey: string): Promise<boolean> {
     return false
 }

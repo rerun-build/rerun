@@ -20,7 +20,6 @@ import { ThreadDivider } from './ThreadDivider'
 
 const METHOD_TONES: Record<string, string> = { GET: 'cyan', POST: 'green', PUT: 'orange', PATCH: 'orange', DELETE: 'red' }
 
-// The web's `ThreadDividerDialog`, as an iOS sheet: what the divider only names, read in full.
 function OriginSheet({ open, onClose, symbol, title, aside, children }: { open: boolean; onClose: () => void; symbol: IconName; title: string; aside?: ReactNode; children: ReactNode }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
@@ -115,8 +114,6 @@ function PayloadDetails({ payload }: { payload: TriggerPayload }) {
     )
 }
 
-// The webhook speaks, not the user: a divider marks where it fired. The web links its prompt and
-// what the caller sent separately; a phone line has room for one link, so one sheet holds both.
 export function WebhookRunDivider({ payload, owner }: { payload: TriggerPayload; owner: FileOwner | null }) {
     const t = useTranslations('mobileChat.origins')
     const [open, setOpen] = useState(false)
@@ -147,7 +144,6 @@ export function WebhookRunDivider({ payload, owner }: { payload: TriggerPayload;
     )
 }
 
-// The routine speaks, not the user: a divider marks where it fired, its prompt a tap away.
 export function ScheduledRunDivider({ run, owner }: { run: Pick<ScheduledRun, 'name' | 'prompt'>; owner: FileOwner | null }) {
     const t = useTranslations('mobileChat.origins')
     const [open, setOpen] = useState(false)
@@ -168,7 +164,6 @@ export function ScheduledRunDivider({ run, owner }: { run: Pick<ScheduledRun, 'n
     )
 }
 
-// The coworker installs itself from a guide: the divider flows while it works through it.
 export function InstallDivider({ agentName, guide, installing, owner }: { agentName: string; guide: string; installing: boolean; owner: FileOwner | null }) {
     const t = useTranslations('mobileChat.origins')
     const [open, setOpen] = useState(false)

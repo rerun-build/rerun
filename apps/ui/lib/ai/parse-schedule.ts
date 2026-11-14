@@ -31,10 +31,6 @@ function isValidCron(cron: string): boolean {
     }
 }
 
-// Translates a free-text recurrence description ("every weekday at 8am", "demain à 15h")
-// into a structured schedule. Auto-detects whether the user means a recurring job (cron)
-// or a single run (runAt), resolving relative dates against the provided ctx. Returns null
-// when the model output can't be parsed or the produced cron is invalid.
 export async function parseSchedule(input: string, ctx: { nowIso: string; timezone: string }): Promise<ParsedSchedule | null> {
     const prompt = `You convert a natural-language schedule description into a structured schedule for a cron-like task runner.
 

@@ -13,8 +13,6 @@ import { attachContextMenu, desktopSettings, explainBackgroundOnce, hasTray } fr
 
 export const PRELOAD_PATH = join(import.meta.dirname, '../preload/index.cjs')
 
-// The strip the web app draws at the top of the window to drag it by (`ShellTitleBar`): 28 px on
-// macOS, 32 px on Windows and Linux where the native caption buttons are drawn over it.
 export const TITLE_BAR_HEIGHT = { mac: 28, win: 32, linux: 32 } as const
 
 const LIGHT = { background: '#fafafa', symbol: '#0a0a0a' }
@@ -33,12 +31,9 @@ function titleBarOptions(): Electron.BrowserWindowConstructorOptions {
 
 let mainWindow: BrowserWindow | null = null
 let currentOrigin: string | null = null
-// The last page of the server the window showed, to come back to after the offline page.
 let lastAppUrl: string | null = null
 let quitting = false
 
-// Set before anything that quits: a window closed then really closes instead of hiding (Squirrel's
-// install closes every window first and never sends `before-quit`).
 export function markQuitting(): void {
     quitting = true
 }
@@ -71,9 +66,6 @@ export async function openExternal(url: string): Promise<boolean> {
     return true
 }
 
-// A page of the server opened in a new window (the hop to a published page, a data export) lives in
-// the app's session. Once it heads for another site, the site opens in the browser and the window
-// goes: the hop to a published page hands its one-minute ticket over to the browser that way.
 function guardChildWindow(contents: WebContents, origin: string): void {
     contents.setWindowOpenHandler(({ url }) => {
         if (isExternalUrl(url)) void openExternal(url)
@@ -89,9 +81,6 @@ function guardChildWindow(contents: WebContents, origin: string): void {
     contents.on('will-redirect', leave)
 }
 
-// Stripe's page in a window of its own, the app's session included (Checkout reads the customer's
-// cookie-less session from its URL, the return lands on the app). When Stripe sends the person back
-// to the server, the window closes and the app opens the return page.
 function openPaymentWindow(url: string, origin: string): void {
     const parent = getMainWindow()
     const payment = new BrowserWindow({
@@ -147,8 +136,6 @@ function guardNavigation(window: BrowserWindow, origin: string): void {
     contents.on('did-create-window', (child) => guardChildWindow(child.webContents, origin))
 }
 
-// A page that refuses to unload (a coworker still working, a file with unsaved edits) would block the
-// window silently: Electron shows no prompt of its own.
 function confirmUnload(window: BrowserWindow): void {
     window.webContents.on('will-prevent-unload', (event) => {
         const choice = dialog.showMessageBoxSync(window, {
@@ -176,7 +163,6 @@ export function showOfflinePage(reason: 'offline' | 'unavailable'): void {
 function watchLoadFailures(window: BrowserWindow, origin: string): void {
     const contents = window.webContents
     contents.on('did-fail-load', (_event, errorCode, _description, url, isMainFrame) => {
-        // -3 is an aborted load: a navigation replaced by another, not a failure.
         if (!isMainFrame || errorCode === -3 || !isSameOrigin(url, origin)) return
         lastAppUrl = url
         showOfflinePage('offline')
@@ -184,7 +170,6 @@ function watchLoadFailures(window: BrowserWindow, origin: string): void {
     contents.on('did-navigate', (_event, url, httpResponseCode) => {
         if (!isSameOrigin(url, origin)) return
         lastAppUrl = url
-        // The proxy in front of the app answers 502 to 504 while a deploy swaps containers.
         if (httpResponseCode >= 502 && httpResponseCode <= 504) showOfflinePage('unavailable')
     })
     contents.on('did-navigate-in-page', (_event, url, isMainFrame) => {
@@ -237,9 +222,6 @@ function appWindowOptions(partition: string, bounds: { x?: number; y?: number; w
             nodeIntegration: false,
             webSecurity: true,
             spellcheck: true,
-            // A hidden window keeps its realtime channel and its timers: notifications and the badge
-            // depend on it. Whether someone is looking is told by `window.onState`, not by
-            // `document.visibilityState`.
             backgroundThrottling: false,
         },
     }
@@ -247,9 +229,6 @@ function appWindowOptions(partition: string, bounds: { x?: number; y?: number; w
 
 const CASCADE = 28
 
-// Another window of the app, on the page the main one shows: same session, same rules. Each window
-// keeps its own workspace (the web holds it per tab, in sessionStorage). The main window stays the
-// one notifications, links and Quick ask come back to.
 export function openNewWindow(): BrowserWindow | null {
     const origin = currentOrigin
     const main = getMainWindow()
@@ -267,8 +246,6 @@ export function openNewWindow(): BrowserWindow | null {
     return window
 }
 
-// Without a server yet (a build from the sources, a person who has to pick theirs), the window opens
-// on the server picker, in a session of its own.
 const NO_SERVER_PARTITION = 'persist:no-server'
 
 export function createMainWindow(origin: string | null, options: { hidden?: boolean } = {}): BrowserWindow {
@@ -299,13 +276,9 @@ export function createMainWindow(origin: string | null, options: { hidden?: bool
         if (!options.hidden && process.env.RERUN_DESKTOP_START_HIDDEN !== '1') window.show()
     }
     window.once('ready-to-show', show)
-    // A slow first paint still shows the window, on the page's own loading state.
     setTimeout(show, 3000)
 
-    // macOS keeps an app alive with its window closed: the window hides and comes back from the Dock
-    // with everything (the realtime channel, the open conversation) as it was.
     window.on('close', (event) => {
-        // Windows and Linux: the window goes to the tray, when there is one and the person wants it.
         if (process.platform !== 'darwin' && !quitting && hasTray() && desktopSettings().closeToTray) {
             event.preventDefault()
             window.hide()
@@ -348,7 +321,6 @@ export function showIncompatiblePage(minShellVersion: string): void {
     void window.loadURL(localPageUrl('offline', { host: hostOf(currentOrigin), reason: 'incompatible', version: minShellVersion, theme: currentTheme() }))
 }
 
-// The app moves to another server: a new window in that server's session, where the old one stood.
 export function replaceMainWindow(origin: string): void {
     const previous = getMainWindow()
     const next = createMainWindow(origin)
@@ -359,7 +331,6 @@ export function replaceMainWindow(origin: string): void {
     }
 }
 
-// The page's theme, as it last told it: the shell's own pages follow the app, not the system.
 let appTheme: 'light' | 'dark' | null = null
 
 export function currentTheme(): 'light' | 'dark' {

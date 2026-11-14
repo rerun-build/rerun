@@ -170,7 +170,6 @@ export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     useEffect(() => {
         if (!open) return
         void refresh()
-        // A server started from the command attaches itself: the dialog notices on its own.
         const timer = setInterval(() => void refresh(), POLL_MS)
         return () => clearInterval(timer)
     }, [open, refresh])

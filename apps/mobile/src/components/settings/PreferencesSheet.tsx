@@ -33,7 +33,6 @@ const GROUPINGS: { value: GroupMode; label: 'groupRecent' | 'groupByBox' }[] = [
     { value: 'box', label: 'groupByBox' },
 ]
 
-// Each language in its own words, whatever the current one: Hermes has no Intl.DisplayNames.
 const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', fr: 'Français', es: 'Español', pt: 'Português', de: 'Deutsch' }
 
 const AVATAR_SIZE = 44
@@ -59,7 +58,6 @@ export function PreferencesSheet() {
         router.push('/providers')
     }
 
-    // A form sheet lays out its scroll view itself: wrapped in a view, it is laid out at no height.
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>

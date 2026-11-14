@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-// `pnpm i18n:check`: every pack has every key of the English source, carries its placeholders, was
-// translated from the source as it reads today, and has no key the source dropped. No network: the
-// CI runs it, `pnpm i18n:translate` is what fixes what it reports.
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import {

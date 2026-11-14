@@ -1,8 +1,5 @@
 import { z } from 'zod'
 
-// Client-safe description of the explorers: the lab page lists them, the orchestrator runs them.
-// The order is the order the lab shows them in.
-
 export const COLLECTOR_IDS = ['dns', 'stack', 'site', 'search', 'registry', 'linkedinPerson', 'linkedinCompany', 'googleBusiness', 'catalog', 'synthesis'] as const
 export type CollectorId = (typeof COLLECTOR_IDS)[number]
 

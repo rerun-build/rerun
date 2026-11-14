@@ -9,8 +9,6 @@ const STATE_PATTERN = /^[A-Za-z0-9_-]{16,128}$/
 
 type Params = { challenge?: string; state?: string; channel?: string; provider?: string }
 
-// Opened in the system browser by the desktop app (`auth.startBrowserSignIn`). Signed in here, the
-// person confirms which account the app gets; signed out, they sign in first and come back.
 export default async function DesktopAuthPage({ searchParams }: { searchParams: Promise<Params> }) {
     const { challenge, state, channel, provider } = await searchParams
     const t = await getTranslations('desktopShell.handoff')

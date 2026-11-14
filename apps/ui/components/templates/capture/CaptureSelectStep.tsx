@@ -43,8 +43,6 @@ export function CaptureSelectStep({
 
     if (loading) return <SkeletonList rows={4} />
 
-    // A failed load already states why underneath, and an empty state on top of it would read as
-    // "there is nothing to capture" rather than "we could not ask".
     if (spaces.length === 0) {
         if (failed) return null
         return (
@@ -58,8 +56,6 @@ export function CaptureSelectStep({
 
     return (
         <div className="flex flex-col gap-4">
-            {/* A single source Box is already selected for the flow, so the control would only ever
-                confirm itself. Its name moves into the list title instead. */}
             {spaces.length > 1 && (
                 <Field label={t('box')}>
                     <Select value={spaceId} onValueChange={onSpaceChange}>

@@ -8,7 +8,6 @@ import { opaqueSurface } from '@/components/ui/surface'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing, withAlpha } from '@/theme/tokens'
 
-// The Home's search pinned to the bottom, as on iOS but on an opaque capsule: a tap opens the search screen.
 export function SearchBar({ height = GLASS_BUTTON_SIZE, onPress }: { height?: number; onPress: () => void }) {
     const theme = useTheme()
     const t = useTranslations('mobileHome')

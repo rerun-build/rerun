@@ -23,8 +23,6 @@ export type Expert = {
     seoIndexed: boolean
 }
 
-// Private contact details, only ever loaded on an owner path (claim token or linked account). Kept
-// out of `Expert` so no public component can render it.
 export type OwnerExpert = Expert & { email: string | null; status: ExpertStatus }
 
 export type ExpertUploadResult = { ok: true; url: string } | { ok: false; error: string }

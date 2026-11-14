@@ -9,7 +9,6 @@ import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// The Foreman at the head of the list, drawn as a coworker's row: no time, its last conversation under its name.
 export function ForemanRow({ last, selected = false, onPress, pin }: { last: ForemanLast; selected?: boolean; onPress: () => void; pin?: PinControl }) {
     const theme = useTheme()
     const t = useTranslations('mobileHome')

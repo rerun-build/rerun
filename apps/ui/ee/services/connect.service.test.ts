@@ -6,7 +6,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, writeMethodOf, type FakeSupabase } from '@/test/supabase-fake'
 import { markCreatorAccountDeauthorized, syncCreatorAccount } from './connect.service'
 
-// The shared fake has no accounts.update, which the transfers capability request goes through.
 vi.mock('@/ee/lib/billing/stripe', async importOriginal => {
     const fake = (await import('@/ee/test/stripe-fake')).fakeStripe()
     return { ...(await importOriginal<typeof import('@/ee/lib/billing/stripe')>()), stripe: { ...fake, accounts: { ...fake.accounts, update: vi.fn() } } }

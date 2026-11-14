@@ -18,11 +18,6 @@ import { ZoomableImage } from './ZoomableImage'
 
 const isOnPhone = (url: string) => url.startsWith('file:') || url.startsWith('data:')
 
-/**
- * The web's `AttachmentLightbox` as a full-screen viewer: the photos and files of one message or card,
- * swiped through one by one, with their name, where they sit in the set, and the share sheet to save
- * or send one on. Mounted once at the root; anything in the thread opens it through `openViewer`.
- */
 export function MediaViewerHost() {
     const t = useTranslations('mobileCommon')
     const state = useViewerState()
@@ -44,7 +39,6 @@ export function MediaViewerHost() {
         setDrag(0)
     }, [state])
 
-    // A window that resizes (an iPad in Split View, an iPhone Duo folding) keeps the item on screen.
     useEffect(() => {
         if (!state) return
         requestAnimationFrame(() => pager.current?.scrollTo({ x: index * width, animated: false }))
@@ -73,7 +67,6 @@ export function MediaViewerHost() {
     return (
         <Modal visible={state !== null} animationType="fade" presentationStyle="overFullScreen" transparent onRequestClose={closeViewer} supportedOrientations={['portrait', 'landscape']}>
             <StatusBar barStyle="light-content" />
-            {/* A modal sits outside the app's gesture root: its pinches need one of their own. */}
             <GestureHandlerRootView style={{ flex: 1, backgroundColor: `rgba(0,0,0,${1 - drag * 0.7})` }}>
                 <ScrollView
                     ref={pager}

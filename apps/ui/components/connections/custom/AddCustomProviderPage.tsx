@@ -22,7 +22,6 @@ type Probe = typeof probeCustomEndpointAction
 
 type AddCustomProviderPageProps = {
     onBack: () => void
-    // The machine's probe; the lab hands in a scripted one.
     probe?: Probe
     onCreate: (params: CreateBoxConnectionInput) => Promise<CreateConnectionResult>
     onOpen: (connectionId: string) => void
@@ -30,8 +29,6 @@ type AddCustomProviderPageProps = {
     willBecomeBoxDefault: boolean
 }
 
-// Name, address, key: the machine asks the server which models it serves before the connection
-// exists, so a typo in the address is caught here rather than on the first run.
 export function AddCustomProviderPage({ onBack, probe = probeCustomEndpointAction, onCreate, onOpen, takenNames, willBecomeBoxDefault }: AddCustomProviderPageProps) {
     const t = useTranslations('connections')
     const tCommon = useTranslations('common')

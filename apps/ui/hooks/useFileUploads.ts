@@ -33,7 +33,6 @@ export type UseFileUploadsOptions = {
     onRejected?: (message: string) => void
 }
 
-// `bytesPerSecond` ne sort pas du job : plus rien ne l'affiche, il ne sert qu'à lisser l'ETA.
 type Job = UploadItem & { file: File; attempt: number; bytesPerSecond: number | null }
 
 const MB = 1024 * 1024
@@ -55,11 +54,6 @@ function publicItem(job: Job): UploadItem {
     }
 }
 
-/**
- * Drives one upload request per file so each gets its own progress, cancel and retry. Jobs live in a
- * ref and are published on a timer: progress events fire dozens of times a second per file, and a
- * setState on each one would re-render the whole surrounding panel continuously.
- */
 type UploadCopy = ReturnType<typeof useTranslations<'files.uploadOutcome'>>
 
 function uploadErrorText(err: unknown, t: UploadCopy): string {
@@ -121,8 +115,6 @@ export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, o
         pendingWaiters.forEach(resolve => resolve(settled))
     }, [])
 
-    // `pump` reschedules itself when a slot frees up. The recursion goes through a ref so the callback
-    // does not have to reference its own binding before it exists.
     const pumpRef = useRef<() => void>(() => {})
 
     const pump = useCallback(() => {
@@ -145,7 +137,6 @@ export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, o
                     const elapsed = (now - lastAt) / 1000
                     if (elapsed > 0.15) {
                         const instant = (loaded - lastLoaded) / elapsed
-                        // Raw instant speed swings wildly between packets and makes the ETA unreadable.
                         job.bytesPerSecond = job.bytesPerSecond == null ? instant : job.bytesPerSecond * (1 - SPEED_SMOOTHING) + instant * SPEED_SMOOTHING
                         lastAt = now
                         lastLoaded = loaded
@@ -181,8 +172,6 @@ export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, o
                         publish(true)
                         return
                     }
-                    // Only a dropped connection is worth retrying on its own; a refusal would just be
-                    // refused again, and repeating it hides the message the user needs to read.
                     const retriable = !(err instanceof UploadHttpError) && job.attempt === 0
                     if (retriable) {
                         job.attempt += 1
@@ -293,13 +282,9 @@ export function useFileUploads({ target, concurrency = 3, nameFor, onFileDone, o
         publish(true)
     }, [publish])
 
-    // Resolves once nothing is in flight, with the final state of every job. The chat composer waits
-    // on this so a send typed mid-upload leaves on its own when the last byte lands. It resolves with
-    // the items rather than relying on `items`, which is still the pre-await render's value there.
     const waitForAll = useCallback((): Promise<UploadItem[]> => {
         const pending = [...jobs.current.values()].some(job => job.status === 'queued' || job.status === 'uploading' || job.status === 'finishing')
         if (!pending) return Promise.resolve([...jobs.current.values()].map(publicItem))
-        // oxlint-disable-next-line eslint-plugin-promise(avoid-new)
         return new Promise(resolve => waiters.current.push(resolve))
     }, [])
 

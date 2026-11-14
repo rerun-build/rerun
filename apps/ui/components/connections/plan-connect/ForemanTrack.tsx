@@ -7,14 +7,12 @@ import { useId, type ReactNode } from 'react'
 import { ExplainerCheck } from '@/components/dialogs/ExplainerPanel'
 import { cn } from '@/lib/utils'
 
-// `remark` is what the Foreman says once the plan is linked and it stands on this step.
 export type TrackStep = { title: ReactNode; body?: ReactNode; remark?: ReactNode }
 
 type StepStatus = 'done' | 'active' | 'next'
 
 type ForemanTrackProps = {
     steps: [TrackStep, TrackStep, TrackStep]
-    // The step the Foreman stands on, and how many steps above the line are behind the user.
     at: number
     done: number
     orb: OrbActivity
@@ -22,9 +20,6 @@ type ForemanTrackProps = {
     thinking?: boolean
 }
 
-// The Foreman is the cursor of the stepper: it walks down the line to the step that needs the user,
-// and says one line there. The line runs from one dot to the next: it starts under the dot (28px,
-// the Orb is 32px) and reaches 8px into the next row, where its dot sits.
 export function ForemanTrack({ steps, at, done, orb, remark, thinking = false }: ForemanTrackProps) {
     const group = useId()
 

@@ -13,17 +13,13 @@ import { cachedMe, clearLocalCache } from '@/data/local-cache'
 import { forgetPerson, identifyPerson, registerWorkspace } from '@/lib/analytics'
 import { registerDevice, unregisterDevice } from '@/notifications/push'
 
-// Each device keeps its own active workspace, as the hub expects: it is named on every request
-// instead of moving the account's default under the web session.
 const WORKSPACE_KEY = 'rerun.workspace-id'
 
 type AuthState = {
-    // False until the stored session has been read: the app shows nothing rather than flash sign-in.
     ready: boolean
     session: Session | null
     me: Me | null
     switchWorkspace: (workspaceId: number) => Promise<void>
-    // Reads the account again, for what changes under it: a workspace that just started its plan.
     refreshMe: () => Promise<void>
     signOut: () => Promise<void>
 }
@@ -35,8 +31,6 @@ async function storedWorkspaceId(): Promise<number | null> {
     return raw && /^\d+$/.test(raw) ? Number(raw) : null
 }
 
-// The account's default workspace comes back from bootstrap. The one this device last picked wins over
-// it, unless the account has since left it.
 async function loadMe(accessToken: string): Promise<Me> {
     const provisioned = await bootstrap(accessToken)
     const picked = await storedWorkspaceId()
@@ -58,7 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         supabase.auth.getSession().then(({ data }) => {
             setSession(data.session)
-            // The account as last read: the home opens on it while the hub is asked again.
             if (data.session) setMe(cachedMe(data.session.user.id).read())
             setReady(true)
         })
@@ -83,7 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (workspaceId) registerWorkspace(workspaceId)
     }, [workspaceId])
 
-    // Keyed on the user, not the session: a token refresh hands back a new session for the same person.
     const userId = session?.user.id
     useEffect(() => {
         if (!userId) return
@@ -106,7 +98,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (!accessToken || !workspaceId) return
         registerDevice({ accessToken, workspaceId }).catch(error => console.warn('[push] registering the device failed', error))
-        // Once per signed-in person, not per refreshed token.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userId, workspaceId])
 
@@ -124,10 +115,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setMe(await cachedMe(session.user.id).load(() => fetchMe({ accessToken: session.access_token, workspaceId: me.workspace.id })))
     }, [session, me])
 
-    // The screen leaves first: the hub call, supabase-js's lock or the auth event must never hold the
-    // person on a home they asked to leave. A local sign-out still tells Supabase to revoke this
-    // session's refresh token, and leaves the person's other devices signed in; the device is
-    // unregistered behind, while the access token is still good.
     const signOut = useCallback(async () => {
         const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
         setSession(null)
@@ -149,7 +136,6 @@ export function useAuth(): AuthState {
     return value
 }
 
-// Read off the active workspace's account, so switching workspace switches the role with it.
 export function useIsWorkspaceAdmin(): boolean {
     return isAdminRole(useAuth().me?.workspace.role)
 }

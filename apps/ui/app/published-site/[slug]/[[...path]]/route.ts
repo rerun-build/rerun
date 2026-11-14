@@ -28,10 +28,6 @@ import { PUBLISHED_BUCKET } from '@/lib/services/publish'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// What `<slug>.rerun.site` serves, reached only through the host rewrite in proxy.ts: the site's
-// files once the visitor may open the link, and the reserved `/__rerun/` paths (the gate's forms,
-// the raw file, the preview image). The bytes live in the private `published` bucket and only
-// ever leave it through here, after the same access check the proxy made.
 export const dynamic = 'force-dynamic'
 
 const BASE_HEADERS = {
@@ -83,9 +79,6 @@ async function signedUrl(key: string): Promise<string | null> {
 
 const RELAYED_MEDIA_HEADERS = ['Content-Length', 'Content-Range', 'Accept-Ranges'] as const
 
-// A player asks for byte ranges as it plays, seeks and resumes, sometimes minutes apart. Each range
-// comes through here and passes the access check again, then goes to Storage with a fresh signed
-// URL: a redirect would hand the player a URL that dies a minute later and freezes the playback.
 async function streamMedia(entry: PublishedEntry, request: Request, key: string, contentType: string): Promise<Response> {
     const url = await signedUrl(key)
     if (!url) return notFound()
@@ -126,7 +119,6 @@ async function serveObject(entry: PublishedEntry, request: Request, key: string,
     if (!blob) return notFound()
 
     const html = isHtmlContentType(contentType)
-    // A page answers fresh every time: who may open it can change from one request to the next.
     const cacheControl = html ? 'private, no-cache' : entry.access === 'public' ? 'public, max-age=300' : 'private, max-age=300'
     const headers = { ...BASE_HEADERS, 'Content-Type': contentType, 'Cache-Control': cacheControl }
     if (!html) return new Response(blob.stream(), { headers })
@@ -156,8 +148,6 @@ function contentDisposition(name: string): string {
     return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(name)}`
 }
 
-// The viewer's own fetches (pdf.js above all) stay on this origin: a redirect to Storage would make
-// them cross-origin.
 async function serveRaw(entry: PublishedEntry, request: Request): Promise<Response> {
     if (entry.kind === 'site') return notFound()
     const name = fileNameOf(entry.source_path)
@@ -168,8 +158,6 @@ async function serveRaw(entry: PublishedEntry, request: Request): Promise<Respon
 
     const { data: blob } = await createServiceRoleClient().storage.from(PUBLISHED_BUCKET).download(entry.storage_key)
     if (!blob) return notFound()
-    // Served from the page's own origin, so a file a browser would run scripts in (HTML, SVG) only
-    // ever comes down as an attachment, never as a document of this host.
     const attachment = download || !isInlineSafeContentType(contentType)
     const headers: Record<string, string> = {
         ...BASE_HEADERS,
@@ -188,8 +176,6 @@ async function thumbnailDataUrl(key: string | null): Promise<string | null> {
     return `data:${data.type || 'image/png'};base64,${Buffer.from(await data.arrayBuffer()).toString('base64')}`
 }
 
-// Satori only draws raster images it can fetch: a workspace logo is re-encoded to PNG, and left out
-// when that fails.
 async function logoDataUrl(url: string | null): Promise<string | null> {
     if (!url) return null
     try {
@@ -223,8 +209,6 @@ async function serveOgImage(entry: PublishedEntry): Promise<Response> {
     return new Response(image.body, { status: 200, headers })
 }
 
-// A member's round trip through the app, or the capture service, lands here with a ticket minted a
-// minute ago for this link and this access version, and leaves with the cookie.
 function redeemTicket(entry: PublishedEntry, request: Request): Response {
     const url = new URL(request.url)
     const next = safeNextPath(url.searchParams.get('next'))
@@ -270,7 +254,6 @@ async function checkCode(entry: PublishedEntry, request: Request): Promise<Respo
     return intoPage(entry.slug, request, next, entry, 'invite', email)
 }
 
-// Reachable on the app host by its internal path too, where agent HTML must never run.
 async function resolve(request: Request, { params }: Params): Promise<{ entry: PublishedEntry | null; slug: string; path: string[] } | null> {
     const { slug, path = [] } = await params
     if (extractPublishedSlug(request.headers.get('host')) !== slug) return null

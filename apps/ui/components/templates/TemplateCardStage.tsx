@@ -16,8 +16,6 @@ export type TemplateCardStageProps = {
     highlightedConnectorSlugs?: readonly string[]
 }
 
-// The card thumbnail is the board and nothing else: the title, the price and the connector icons are
-// already drawn by the card around it, and repeating them inside the image only shrinks the board.
 export function TemplateCardStage({
     agents,
     connectors,
@@ -30,8 +28,6 @@ export function TemplateCardStage({
 }: TemplateCardStageProps) {
     return (
         <div
-            // Both themes are named, never just `dark` or nothing: custom properties inherit, so a
-            // light stage sitting inside a dark page would otherwise pick up the dark palette.
             className={`${theme} relative overflow-hidden ${rounded ? 'rounded-2xl border border-border' : ''}`}
             style={{ width, height, background: CARD_BACKGROUND[theme] }}
         >

@@ -11,7 +11,6 @@ export function TableLayout({ card, context, mobileColumns }: { card: TableCard;
     const hidden = (index: number) => mobileColumns !== undefined && index >= mobileColumns
 
     return (
-        // The fade needs the overflow clipped: a mask over a scrolling box hides its own content.
         <div className="max-h-56 overflow-hidden [mask-image:linear-gradient(to_bottom,black_55%,transparent)] [&_[data-slot=table-container]]:overflow-x-hidden">
             <Table>
                 <TableHeader>

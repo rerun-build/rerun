@@ -4,8 +4,6 @@ import type { KeyboardEvent, MouseEvent } from 'react'
 
 import { cn } from '@/lib/utils'
 
-// Kept inside the field: the option rows answer to number keys, and a digit typed in an address
-// would otherwise tick an industry.
 export function intakeFieldHandlers(onEnter: () => void) {
     return {
         onClick: (event: MouseEvent<HTMLInputElement>) => event.stopPropagation(),
@@ -18,8 +16,6 @@ export function intakeFieldHandlers(onEnter: () => void) {
     }
 }
 
-// The free field of the card, which is the one from QuestionForm: same sizing, same placeholder
-// weight, Enter answers. Kept borderless because the row it sits in carries the border.
 export function IntakeField({ id, value, placeholder, disabled, autoFocus, onChange, onEnter, className }: { id?: string; value: string; placeholder: string; disabled?: boolean; autoFocus?: boolean; onChange: (value: string) => void; onEnter: () => void; className?: string }) {
     return (
         <input

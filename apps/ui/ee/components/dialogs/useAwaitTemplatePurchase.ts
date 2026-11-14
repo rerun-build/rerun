@@ -11,9 +11,6 @@ export type PurchaseWait = 'waiting' | 'ready' | 'timeout'
 const POLL_INTERVAL_MS = 2000
 const GIVE_UP_MS = 30_000
 
-// The buyer is back before Stripe has finished delivering the webhook. Two paths race: confirming
-// the checkout session directly (the fast lane, same writer as the webhook and just as idempotent),
-// and polling the entitlement. Whichever answers first wins.
 export function useAwaitTemplatePurchase(slug: string, sessionId: string | null) {
     const [state, setState] = useState<PurchaseWait>('waiting')
     const [template, setTemplate] = useState<LibraryTemplate | null>(null)

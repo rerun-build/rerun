@@ -6,8 +6,6 @@ const SECONDS_SHOWN_UNDER_MS = 2 * 60_000
 const FAST_TICK_MS = 1000
 const SLOW_TICK_MS = 15_000
 
-// The clock a countdown reads, ticking by the second only once seconds are what it shows. Null
-// until mounted: a clock read during the server render would not match the client's.
 export function useCountdownNow(at: number | null): number | null {
     const [now, setNow] = useState<number | null>(null)
 

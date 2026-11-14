@@ -13,14 +13,9 @@ import { LIVE_STEPS, STEP_SCENARIOS, stepsMessage } from '@/mocks/steps'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: the folded steps of a coworker's turn, in every state the web's tool-list lab has.
-//   /lab-steps?scenario=live&scheme=dark   scenario: live, paid or one of STEP_SCENARIOS, all of them
-//   when left out; scheme forces a theme
-
 const LIVE_TICK_MS = 1100
 const LIVE_PAUSE_TICKS = 4
 
-// The web's useLiveSteps: a step every tick, the answer, a pause, and again.
 function useLiveCount(): number {
     const [tick, setTick] = useState(0)
     useEffect(() => {
@@ -30,7 +25,6 @@ function useLiveCount(): number {
     return (tick % (LIVE_STEPS.length + LIVE_PAUSE_TICKS)) + 1
 }
 
-// Wrapped in the bubble's tap that brings the time up, as in a real conversation.
 function useStamp(): MessageStamp {
     const [shown, setShown] = useState(false)
     return { createdAt: '2026-10-28T09:12:00.000Z', shown, onToggle: () => setShown(!shown) }
@@ -38,7 +32,6 @@ function useStamp(): MessageStamp {
 
 const LAB_AGENT = 'scout'
 
-// A coworker's turn draws its buddy beside the steps; the Foreman's has no agent, so no buddy.
 function Turn({ message, running = false, agentId = LAB_AGENT, paidSources }: { message: UIMessage; running?: boolean; agentId?: string | null; paidSources?: PaidTurnSources }) {
     const stamp = useStamp()
     return <MessageView message={message} isLastAssistant={running} running={running} agentId={agentId} fileOwner={null} coworkerName="Scout" hiddenCallId={null} stamp={stamp} paidSources={paidSources} />

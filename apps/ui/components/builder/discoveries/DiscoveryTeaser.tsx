@@ -7,8 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { DiscoverySource } from '@/lib/company/explore/findings'
 import { DISCOVERY_CARD_CLASS, useDiscoverySourceLabel } from './DiscoveryCard'
 
-// Each teaser is drawn in the shape of the card it turns into, so the swap reads as the same card
-// being filled in rather than one card replaced by another.
 type TeaserShape = 'identity' | 'person' | 'chips' | 'stat' | 'line'
 
 const TEASER_SHAPE: Record<DiscoverySource, TeaserShape> = {

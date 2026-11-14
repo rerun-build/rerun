@@ -1,18 +1,12 @@
-// The rules of the in-app cancel flow, kept pure so the dialog, the server actions and the tests
-// read the same answers. Server-safe: no Stripe client, no React.
 import { RENEWAL_REMINDER_LEAD_MS, TRIAL_ENDING_LEAD_MS } from '@/ee/lib/lifecycle/sequences'
 import { z } from 'zod'
 import { LIST_PRICE_ARM, PLAN_CURRENCY, PRICE_ARMS, basePriceCents, type PriceArm } from './plans'
 
-// Stripe's `cancellation_details.feedback` values, minus `customer_service`: there is no support
-// interaction in the product for it to be about.
 export const CANCEL_REASONS = ['too_expensive', 'unused', 'too_complex', 'low_quality', 'missing_features', 'switched_service', 'other'] as const
 export type CancelReason = (typeof CANCEL_REASONS)[number]
 
-// What the customer writes about why they leave, checked the same way in the dialog and on the server.
 export const cancelReasonTextSchema = z.string().trim().min(1, 'Tell us in a few words why you are leaving.').max(1000, 'Keep it under 1,000 characters.')
 
-// What each reason covers, for the model that files a customer's own words under one of them.
 export const CANCEL_REASON_GLOSS: Record<CancelReason, string> = {
     too_expensive: 'the price, the cost of the model credit, a tight budget, not worth the money',
     unused: 'not using it, no time for it, no need for it anymore, the project it was for ended or is on hold, only wanted to try it',
@@ -23,22 +17,16 @@ export const CANCEL_REASON_GLOSS: Record<CancelReason, string> = {
     other: 'a real reason that none of the above covers',
 }
 
-// How the customer's own words were read: `rejected` went through on the last try allowed,
-// `unchecked` means the model did not answer.
 export const CANCEL_REASON_CHECKS = ['genuine', 'rejected', 'unchecked'] as const
 export type CancelReasonCheck = (typeof CANCEL_REASON_CHECKS)[number]
 
 export const CANCEL_COMEBACKS = ['coming_back', 'maybe', 'not_coming_back'] as const
 export type CancelComeback = (typeof CANCEL_COMEBACKS)[number]
 
-// `trial` is a trial with a card: the one whose end charges a card. A trial without one expires on
-// its own and has nothing to cancel, so it gets no flow at all.
 export type CancelPhase = 'paid' | 'trial'
 
 export type RetentionOfferKind = 'base_1usd' | 'trial_half'
 
-// Written on the subscription when an offer is claimed: an offer is given once per workspace, and
-// the plan subscription is the workspace's for life.
 export const RETENTION_CLAIMED_METADATA_KEY = 'retention_offer_claimed_at'
 export const CANCEL_COMEBACK_METADATA_KEY = 'cancel_comeback'
 export const CANCEL_REASON_CHECK_METADATA_KEY = 'cancel_reason_check'
@@ -48,9 +36,6 @@ const BASE_OFFER_PRICE_CENTS = 100
 const BASE_OFFER_COUPON_ID = 'rerun_retention_base_1usd'
 const TRIAL_OFFER_COUPON_ID = 'rerun_retention_trial_half'
 
-// Fixed ids so the coupon is created once and found again by id, never minted twice. The $1 offer
-// is an amount off, so each arm of the price test has its own: the one sized for $49 would take
-// more than the whole base plan off a $29 one. The list arm keeps the id it had before the test.
 export function retentionCouponId(kind: RetentionOfferKind, arm: PriceArm): string {
     if (kind === 'trial_half') return TRIAL_OFFER_COUPON_ID
     return arm === LIST_PRICE_ARM ? BASE_OFFER_COUPON_ID : `${BASE_OFFER_COUPON_ID}_${arm}`
@@ -71,15 +56,12 @@ export function cancelFlowPhase(status: string | null | undefined, hasPaymentMet
     return null
 }
 
-// When the "remind me" email goes out, or null once that moment has passed: the first screen of the
-// flow is then skipped, since it would promise an email that can no longer be sent in time.
 export function reminderDate(phase: CancelPhase, endsAt: Date, now: Date): Date | null {
     const lead = phase === 'paid' ? RENEWAL_REMINDER_LEAD_MS : TRIAL_ENDING_LEAD_MS
     const at = new Date(endsAt.getTime() - lead)
     return at > now ? at : null
 }
 
-// The share of this period's bill that is still ahead, which leaving now does not give back.
 export function paidLeftCents(monthlyCents: number, periodStart: Date, periodEnd: Date, now: Date): number {
     const length = periodEnd.getTime() - periodStart.getTime()
     if (length <= 0) return 0
@@ -87,8 +69,6 @@ export function paidLeftCents(monthlyCents: number, periodStart: Date, periodEnd
     return Math.round(monthlyCents * left)
 }
 
-// One offer per workspace, never stacked on another discount: a grandfathered price is a discount
-// too, and $48 off a $24 base would hand out a free month.
 export function retentionOfferFor(phase: CancelPhase, subscription: { metadata: Record<string, string> | null | undefined; discountCount: number; legacyBase: boolean }): RetentionOfferKind | null {
     if (subscription.metadata?.[RETENTION_CLAIMED_METADATA_KEY]) return null
     if (subscription.discountCount > 0 || subscription.legacyBase) return null
@@ -101,8 +81,6 @@ export function retentionOfferOfCoupon(couponId: string | null | undefined): Ret
     return null
 }
 
-// What the next invoice comes to under the offer, before tax. The $1 covers the base plan only:
-// add-ons keep their price.
 export function offerPriceCents(kind: RetentionOfferKind, monthlyCents: number, arm: PriceArm): number {
     if (kind === 'base_1usd') return monthlyCents - baseOfferAmountOff(arm)
     return Math.round(monthlyCents / 2)

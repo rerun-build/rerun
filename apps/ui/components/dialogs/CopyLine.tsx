@@ -5,9 +5,6 @@ import { CheckIcon, CopyIcon } from '@/lib/icons'
 import { useCopy } from '@/lib/use-copy'
 import { cn } from '@/lib/utils'
 
-// A snippet next to the one button that matters for it. The value scrolls sideways rather than
-// wrapping: these are single-line commands, and a wrapped command reads like a paragraph. The
-// min-w-0 is what keeps a long command from widening the dialog it sits in.
 export function CopyLine({ value, label, className }: { value: string; label: string; className?: string }) {
     const { copied, copy } = useCopy()
 

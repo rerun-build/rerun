@@ -53,8 +53,6 @@ describe('spend receipts', () => {
     })
 })
 
-// Reloaded from the engine, a tool output sits behind the AI SDK `{ type: 'json', value }` envelope
-// the live stream never has. The spend card, its guard and its receipt read the same figures either way.
 describe('paid call figures reloaded from history', () => {
     const quote = { totalMicros: 90_000, lines: [{ capability: 'tiktok.user.profile', count: 5, units: 5, micros: 90_000 }], creditLeftMicros: 24_790_000 }
 

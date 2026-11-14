@@ -13,11 +13,9 @@ import { useNotificationsStore } from '@/stores/notifications.store'
 type InboxRowMenuProps = {
     agentId: string
     agentName: string
-    /** The menu is portaled out of the inbox card, which would close on its clicks. */
     onOpenChange: (open: boolean) => void
 }
 
-// Behind the ⋯ of an inbox row, the switch that turns off the reason it reached you, with an Undo.
 export function InboxRowMenu({ agentId, agentName, onOpenChange }: InboxRowMenuProps) {
     const t = useTranslations('notifications.inbox.rowMenu')
     const { ruleOf, setCoworkerRule } = useNotificationPrefs()

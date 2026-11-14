@@ -25,7 +25,6 @@ function ModelMarks() {
     )
 }
 
-// The Pro tier of the pricing page, line for line, minus the model credit.
 const BENEFITS: { icon: LucideIcon; title: string; detail: string; extra?: ReactNode }[] = [
     { icon: RobotIcon, title: 'A team of coworkers', detail: 'Working for you, side by side' },
     { icon: Users, title: 'Unlimited seats', detail: 'No per-user fees' },

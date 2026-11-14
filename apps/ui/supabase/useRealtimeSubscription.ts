@@ -20,43 +20,15 @@ type FilterConfig = {
 }
 
 type UseRealtimeSubscriptionOptions<T extends TableName> = EventCallbacks<T> & {
-    /** Filtre optionnel pour écouter uniquement les changements d'un enregistrement spécifique */
     filter?: FilterConfig
-    /** Activer/désactiver la subscription (default: true) */
     enabled?: boolean
-    /** Identifiant unique pour éviter les conflits de channels entre composants */
     channelId: string
-    /**
-     * Appelé après un (re)subscribe, au retour de l'onglet au premier plan, ou au retour réseau.
-     * Le consommateur re-fetch les lignes autoritatives et réconcilie les événements manqués
-     * pendant que le socket était coupé (le hook reste générique, il ne sait pas quoi refetch).
-     */
     onResync?: () => void
 }
 
-/**
- * Hook générique pour écouter les changements en temps réel sur une table Supabase
- *
- * @example
- * // Écouter tous les dialogs d'un projet
- * useRealtimeSubscription("dialogs", {
- *   filter: { column: "project_id", value: projectId },
- *   onInsert: (dialog) => console.log("New dialog:", dialog),
- *   onUpdate: (dialog, old) => console.log("Updated:", old, "->", dialog),
- *   onDelete: (dialog) => console.log("Deleted:", dialog),
- * })
- *
- * @example
- * // Écouter un speaker spécifique
- * useRealtimeSubscription("speakers", {
- *   filter: { column: "id", value: speakerId },
- *   onUpdate: (speaker) => setSpeaker(speaker),
- * })
- */
 export function useRealtimeSubscription<T extends TableName>(table: T, options: UseRealtimeSubscriptionOptions<T>) {
     const { filter, onInsert, onUpdate, onDelete, onResync, enabled = true, channelId } = options
 
-    // Refs pour éviter les re-subscriptions inutiles quand les callbacks changent
     const callbacksRef = useRef({ onInsert, onUpdate, onDelete, onResync })
     callbacksRef.current = { onInsert, onUpdate, onDelete, onResync }
 
@@ -81,13 +53,8 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
 
         const connect = (): RealtimeChannel => {
             let alive = true
-            // Topic unique par connexion : le client browser est un singleton et `channel(topic)`
-            // rend le canal EXISTANT sur collision — un canal encore joint dont les `.on()`
-            // throwent ("cannot add callbacks after subscribe"). Le filtrage postgres_changes est
-            // server-side, le nom du topic n'y joue aucun rôle.
             const channel = supabase.channel(`${channelId}:${randomUuid()}`)
 
-            // INSERT et UPDATE supportent les filtres
             if (callbacksRef.current.onInsert) {
                 channel.on<Tables<T>>(
                     'postgres_changes',
@@ -118,7 +85,6 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
                 )
             }
 
-            // DELETE ne supporte PAS les filtres - on filtre manuellement côté client
             if (callbacksRef.current.onDelete) {
                 channel.on<Tables<T>>(
                     'postgres_changes',
@@ -126,7 +92,6 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
                         event: 'DELETE',
                         schema: 'public',
                         table,
-                        // Pas de filter ici !
                     },
                     payload => {
                         const oldRecord = payload.old as Tables<T>
@@ -141,9 +106,6 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
                     attempt = 0
                     scheduleResync()
                 } else if (subStatus === 'CHANNEL_ERROR' || subStatus === 'TIMED_OUT' || subStatus === 'CLOSED') {
-                    // Un même canal émet souvent plusieurs statuts d'échec (erreur de join puis
-                    // phx_close) : chacun reprogrammait un connect(), les canaux doublaient à chaque
-                    // cycle jusqu'à des milliers. Le premier statut retire le canal, les suivants sont ignorés.
                     alive = false
                     const delay = Math.min(1000 * 2 ** attempt, 15000)
                     attempt++
@@ -151,8 +113,6 @@ export function useRealtimeSubscription<T extends TableName>(table: T, options: 
                     reconnectTimer = setTimeout(async () => {
                         reconnectTimer = null
                         if (disposed) return
-                        // Attendre la fin du teardown avant de reconnecter, sinon le nouveau
-                        // subscribe se fait no-op sur un socket en train de fermer.
                         await supabase.removeChannel(channel)
                         if (disposed) return
                         current = connect()

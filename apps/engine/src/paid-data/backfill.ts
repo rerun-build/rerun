@@ -22,7 +22,6 @@ function parseJson(text: unknown): unknown {
     }
 }
 
-// The whole answer of a call too big for its tool result, while the workspace still keeps it.
 async function savedOutput(agentId: string, saved: unknown): Promise<unknown> {
     if (typeof saved !== 'string' || !saved.startsWith(SAVED_ANSWERS_DIR)) return undefined
     const name = saved.slice(SAVED_ANSWERS_DIR.length)
@@ -62,10 +61,6 @@ async function backfillDone(client: Client): Promise<boolean> {
     return rs.rows.length > 0
 }
 
-// Indexes the paid calls a coworker made before the index existed: every tool call is kept in
-// `tool_calls`, so the leads it already wrote into its tables can be traced too. Done once per
-// file: the marker is written after the whole scan, so a crash midway replays it, and every insert
-// ignores what is already there.
 export async function backfillPaidSources(client: Client): Promise<void> {
     if (await backfillDone(client)) return
     const names = (await client.execute('SELECT DISTINCT tool_name FROM tool_calls')).rows.map(row => String(row.tool_name)).filter(name => isPaidDataTool(stripBridgePrefix(name)))
@@ -76,7 +71,6 @@ export async function backfillPaidSources(client: Client): Promise<void> {
             args: [...names, PAGE, offset],
         })
         for (const row of page.rows) {
-            // One unreadable call must not keep the rest of the history from being indexed.
             await backfillCall(client, row).catch(err => logger.warn({ err: String(err), toolCallId: row.tool_call_id }, 'could not index a past paid data call'))
             indexed += 1
         }
@@ -88,8 +82,6 @@ export async function backfillPaidSources(client: Client): Promise<void> {
 
 let queue: Promise<void> = Promise.resolve()
 
-// Off the opening of the file, and one agent at a time: a box that opens every system.db at once
-// (the shared data sources) must not run every scan in parallel.
 export function scheduleBackfillPaidSources(client: Client, agentId: string): void {
     queue = queue.then(() => backfillPaidSources(client)).catch(err => logger.warn({ err: String(err), agentId }, 'could not index the past paid data calls'))
 }

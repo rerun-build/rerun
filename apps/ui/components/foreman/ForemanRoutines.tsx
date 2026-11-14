@@ -19,8 +19,6 @@ import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
 import { RoutineList, routineKey } from '@rerun/ui/foreman'
 
-// The engine writes a run's trigger slug a beat after the session row lands, so an immediate
-// refetch on a new working session would still see the routine as idle.
 const RUN_SETTLE_MS = 1500
 
 function useNow(intervalMs: number): number {
@@ -33,7 +31,6 @@ function useNow(intervalMs: number): number {
 }
 
 function leaveForTheBoard() {
-    // En sheet, le Foreman couvre le board : le panneau de l'agent s'ouvrirait dessous.
     if (coversTheBoard()) useForemanStore.getState().close()
 }
 
@@ -45,8 +42,6 @@ export function ForemanRoutines({ docked, className }: { docked: boolean; classN
     const [data, setData] = useState<WorkspaceRoutines | null>(null)
     const [saving, setSaving] = useState<string[]>([])
     const [renamingKey, setRenamingKey] = useState<string | null>(null)
-    // A switched row keeps the place it had when it was switched, until that hour has passed: paused,
-    // it would otherwise drop at once into the folded Paused group, out of sight of the hand that did it.
     const [heldNextRuns, setHeldNextRuns] = useState<Record<string, string | null>>({})
     const agents = useBoardStore(state => state.agents)
     const schedulesRefreshKey = useBoardStore(state => state.schedulesRefreshKey)
@@ -181,7 +176,6 @@ function RoutineMenu({ routine, canRename, onRename, onEdit, onRunNow }: Routine
                     <EllipsisIcon />
                 </Button>
             </DropdownMenuTrigger>
-            {/* The rename field takes the focus a beat later; the menu handing it back would steal it. */}
             <DropdownMenuContent align="end" onCloseAutoFocus={event => event.preventDefault()}>
                 {canRename && <DropdownMenuItem onSelect={onRename}>{t('rename')}</DropdownMenuItem>}
                 <DropdownMenuItem onSelect={onEdit}>{t('edit')}</DropdownMenuItem>

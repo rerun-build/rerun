@@ -17,19 +17,14 @@ import { checkForUpdates, startUpdater } from './updater'
 import { createTray, desktopSettings, refreshTray, startedAtLogin } from './native'
 import { setQuickAskShortcut, toggleQuickAsk } from './quick-ask'
 
-// Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
-// Windows shows a notification only for the app its shortcut names, by this id.
 if (process.platform === 'win32') app.setAppUserModelId(APP_ID)
-// Linux docks match the badge and the global shortcut portal by the app's desktop entry.
 if (process.platform === 'linux') app.setDesktopName(`${CHANNEL_IDENTITIES[CHANNEL].executableName}.desktop`)
 const userDataOverride = !app.isPackaged || CHANNEL !== 'stable' ? process.env.RERUN_DESKTOP_USER_DATA : undefined
 app.setPath('userData', userDataOverride ?? join(app.getPath('appData'), PRODUCT_NAME))
 
 registerLocalScheme()
 
-// Links to the app's scheme: macOS sends them as `open-url`, before `ready` for the one that launched
-// the app; Windows and Linux start a second instance with the link in its arguments.
 let ready = false
 const waitingLinks: string[] = []
 
@@ -68,15 +63,11 @@ if (!app.requestSingleInstanceLock()) {
     void app.whenReady().then(start)
 }
 
-// A packaged app declares its scheme in its bundle; registering it again makes it the handler. Run
-// from the sources, only Windows can point the scheme at Electron with the app's path; macOS and
-// Linux need the packaged app.
 function registerScheme(): void {
     if (app.isPackaged) app.setAsDefaultProtocolClient(SCHEME)
     else if (process.platform === 'win32' && process.argv[1]) app.setAsDefaultProtocolClient(SCHEME, process.execPath, [resolve(process.argv[1])])
 }
 
-// No page of any origin may embed a <webview>: it would run outside every rule set here.
 app.on('web-contents-created', (_event, contents) => {
     contents.on('will-attach-webview', (event) => event.preventDefault())
 })
@@ -111,8 +102,6 @@ function menu(): void {
     })
 }
 
-// The window loads at once; the server is asked in parallel whether it serves this version. An
-// unreachable server is the offline page's business, the window finds out by itself.
 async function verifyServer(origin: string): Promise<void> {
     const session = electronSession.fromPartition(partitionFor(origin))
     const check = await checkServer(origin, app.getVersion(), session.fetch.bind(session))

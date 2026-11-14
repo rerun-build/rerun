@@ -87,7 +87,6 @@ describe('db tools', () => {
         expect(await run('db_execute', { sql: 'NOT SQL' })).toMatch(/^Execution failed: .*syntax error/)
     })
 
-    // Looks wrong: the tool is described as read-only, yet it runs a DELETE because it only refuses ATTACH.
     it('runs a DELETE through db_query', async () => {
         await run('db_execute', { sql: "INSERT INTO notes (body, n) VALUES ('doomed', 99)" })
         expect(await run('db_query', { sql: 'DELETE FROM notes WHERE n = 99' })).toBe('0 row(s)\n[]')

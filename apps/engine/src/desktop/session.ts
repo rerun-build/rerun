@@ -12,22 +12,17 @@ import { HttpError } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 import { barConfig, dockConfig, openboxConfig } from './panels.js'
 
-// The X convention: display :N is served on 5900 + N, so two agents never share a port.
 const VNC_BASE_PORT = 5900
 const REQUIRED_BINARIES = ['openbox', 'x11vnc', 'xdotool']
-// Without these the screen still works, bare: the app then draws the launcher itself.
 const PANEL_BINARIES = ['tint2', 'curl']
 export const SCREEN_CAPTURE_BINARY = 'maim'
 const ASSETS_DIR = fileURLToPath(new URL('../../assets/desktop', import.meta.url))
 const DEFAULT_DATA_DIRS = '/usr/local/share:/usr/share'
 const IDLE_STOP_MS = 5 * 60_000
-// Long enough to cover the pause between two clicks, short enough that the agent picks its work back up.
 const DRIVER_QUIET_MS = 5_000
 const VNC_READY_TIMEOUT_MS = 5_000
 const VNC_READY_POLL_MS = 100
-// x11vnc can wedge in its own SIGTERM handler and keep its port forever, starving every later screen on that display.
 const KILL_GRACE_MS = 2_000
-// A restart right after a stop finds our own x11vnc still leaving: the stop gives it the grace, then the SIGKILL takes a moment.
 const PORT_FREE_TIMEOUT_MS = KILL_GRACE_MS + 500
 
 export type Desktop = { display: string; vncPort: number }
@@ -36,7 +31,6 @@ type Screen = { desktop: Promise<RunningDesktop> | null; viewers: number; driver
 export type DesktopOptions = { timeZone?: string }
 
 const screens = new Map<string, Screen>()
-// Read synchronously by the exit hook, where nothing can be awaited.
 const liveChildren = new Set<ChildProcess>()
 let available = false
 let computer = false
@@ -46,22 +40,16 @@ export function onPath(binary: string): boolean {
     return (process.env.PATH ?? '').split(delimiter).some(dir => dir && existsSync(resolve(dir, binary)))
 }
 
-// Only a yes is remembered: the packages can land while the engine runs, installed in the
-// background by the first boot of a build that expects them.
 export function desktopAvailable(): boolean {
     available ||= desktopEnabled() && process.platform === 'linux' && REQUIRED_BINARIES.every(onPath)
     return available
 }
 
-// Kept apart from the binaries a screen needs: a box still waiting for the capture tool keeps the
-// screen a person watches.
 export function computerAvailable(): boolean {
     computer ||= desktopAvailable() && onPath(SCREEN_CAPTURE_BINARY)
     return computer
 }
 
-// Shared by every process on the screen, the agent's own included: nothing of the engine's
-// configuration beyond what any agent process inherits.
 export function desktopEnv(display: string): Record<string, string> {
     return { ...inheritedEnv(), DISPLAY: display, GTK_THEME: 'Adwaita:dark' }
 }
@@ -135,8 +123,6 @@ function writeConfig(name: string, content: string): string {
     return file
 }
 
-// The dock asks this engine to open what is clicked, so each panel is told whose screen it sits on.
-// The panels are the one child given the engine's key: their click handler authenticates with it.
 async function startPanels(agentId: string, display: string, timeZone?: string): Promise<ChildProcess[]> {
     const apiKey = env().RERUN_API_KEY
     const panelEnv = {
@@ -158,7 +144,6 @@ async function start(agentId: string, { timeZone }: DesktopOptions): Promise<Run
         throw new HttpError(503, 'This box has no display.')
     }
     const vncPort = VNC_BASE_PORT + Number(/:(\d+)/.exec(display)?.[1] ?? 0)
-    // A listener left on this port would pass the readiness probe in place of our x11vnc, which cannot bind it.
     if (!(await settles(async () => !(await vncAnswers(vncPort)), PORT_FREE_TIMEOUT_MS))) {
         releaseDisplay()
         logger.warn({ agentId, vncPort }, 'desktop port already taken')
@@ -166,7 +151,6 @@ async function start(agentId: string, { timeZone }: DesktopOptions): Promise<Run
     }
     const options = { stdio: 'ignore' as const, env: desktopEnv(display) }
     const themed = { ...options, env: { ...options.env, XDG_DATA_DIRS: `${ASSETS_DIR}:${process.env.XDG_DATA_DIRS || DEFAULT_DATA_DIRS}` } }
-    // The panels fake their transparency from the picture on the root window, so it is painted first.
     if (onPath('hsetroot')) spawn('hsetroot', ['-cover', resolve(ASSETS_DIR, 'wallpaper.png')], options).once('error', () => {})
     const children = [
         spawn('openbox', ['--config-file', writeConfig('openbox.xml', openboxConfig())], themed),
@@ -174,7 +158,6 @@ async function start(agentId: string, { timeZone }: DesktopOptions): Promise<Run
     ]
     for (const child of children) {
         child.once('error', err => logger.warn({ err: String(err), agentId }, 'desktop process failed'))
-        // A stop of our own removes the child from liveChildren before its exit arrives.
         child.once('exit', () => {
             if (liveChildren.has(child)) void stopDesktop(agentId)
         })
@@ -183,7 +166,6 @@ async function start(agentId: string, { timeZone }: DesktopOptions): Promise<Run
     const panels = PANEL_BINARIES.every(onPath) ? await startPanels(agentId, display, timeZone) : []
     for (const panel of panels) {
         panel.once('error', err => logger.warn({ err: String(err), agentId }, 'desktop panel failed'))
-        // A screen that lost its dock stays up: the app goes back to drawing the launcher.
         panel.once('exit', () => {
             if (!liveChildren.has(panel)) return
             const screen = screens.get(agentId)
@@ -266,7 +248,6 @@ export function viewerLeft(agentId: string): void {
     armIdleStop(agentId)
 }
 
-// Opening the control view takes nothing from the agent: only a click or a key does.
 export function driverJoined(agentId: string): void {
     screenOf(agentId).drivers++
 }
@@ -286,7 +267,6 @@ export function humanDriving(agentId: string, now: number = Date.now()): boolean
     return !!screen && screen.drivers > 0 && now - screen.lastDriverInput < DRIVER_QUIET_MS
 }
 
-// A takeover keeps the screen up for as long as its browser is open, watched or not.
 export function holdDesktop(agentId: string): () => void {
     screenOf(agentId).holds++
     armIdleStop(agentId)

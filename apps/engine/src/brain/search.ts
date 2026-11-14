@@ -10,15 +10,11 @@ const RRF_K = 60
 const PASSAGES_PER_PAGE = 2
 const MAX_RELATED = 8
 
-// Unicode-aware on purpose: the brain of a French company is written in French, and stripping
-// everything outside a-z would turn "procédure" into "proc dure".
 export function toMatchQuery(query: string): string {
     const terms = query.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? []
     return [...new Set(terms.filter(t => t.length > 1))].map(t => `"${t}"`).join(' OR ')
 }
 
-// Vector distances and FTS ranks live on different scales, so they are fused by rank rather than
-// by raw score.
 function addRanked(scores: Map<string, number>, ids: string[]): void {
     ids.forEach((id, rank) => scores.set(id, (scores.get(id) ?? 0) + 1 / (RRF_K + rank + 1)))
 }
@@ -80,8 +76,6 @@ export async function searchBrain(query: string, limit = 5): Promise<BrainSearch
     return { hits, related: await relatedPages(hits.map(h => h.slug)) }
 }
 
-// One hop along the [[links]], both ways: the page about a customer surfaces the competitor it is
-// compared to even when the query only matched the customer.
 async function relatedPages(slugs: string[]): Promise<BrainPageRef[]> {
     if (slugs.length === 0) return []
     const client = await getBrainDb()

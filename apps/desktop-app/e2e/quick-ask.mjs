@@ -1,9 +1,3 @@
-// Quick ask: the floating field for the Chief of Staff, end to end on the local hub:
-//   pnpm verify:desktop --onboarded --scenario apps/desktop-app/e2e/quick-ask.mjs
-//
-// Playwright cannot press a global shortcut: the window is opened by the File menu's item, which
-// runs the same toggle, and the shortcut's registration is checked on its own.
-
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
@@ -50,7 +44,6 @@ export default async function quickAskScenario({ app, page, step, base }) {
     check((await page.evaluate(() => localStorage.getItem('rerun:quick-ask'))) === null, 'the handed-over text is taken once')
     await step('question asked in the main window')
 
-    // Escape puts it away without sending anything.
     await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').click())
     await waitUntil(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((candidate) => candidate.webContents.getURL().endsWith('/quick-ask'))?.isVisible() ?? false), Boolean, 'the window opens again')
     await quick.fill('[data-quick-ask] textarea', 'never sent')

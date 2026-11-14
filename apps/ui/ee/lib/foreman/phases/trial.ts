@@ -2,18 +2,10 @@ import { checkoutTerms } from './checkout-terms'
 import { isMobileApp, type ForemanState } from '@/lib/foreman/phase'
 import type { PhaseSpec } from '@/lib/foreman/phases/spec'
 
-// The step between an agent the user has agreed to and the agent being built. The offer itself is the
-// app's: the moment the plan comes back confirmed it puts the trial card in the chat, and the moment
-// the trial starts it builds the agent, neither of which waits on a model. Nothing can be typed here:
-// the composer gives way to the trial the moment the card is up, otherwise this free model would
-// answer anything for as long as they kept writing. The foreman only speaks when the card comes back
-// without a plan, refused or still waiting on Stripe, once, to say what happens next.
 export const TRIAL_PHASE: PhaseSpec = {
     phase: 'trial',
     instructions: state => {
         const plan = state.foreman.plan
-        // Read back as what they saw on the card: paying for something described differently from
-        // the card is how a trial gets cancelled the same day.
         const team = plan?.items.length ? `What they agreed to: ${plan.items.map(item => (item.kind === 'template' ? (item.title ?? item.slug) : item.kind === 'share' ? (item.name ?? 'a shared coworker') : item.name)).join(', ')}.` : ''
         const divisions = plan?.boxes?.length ? ` Laid out across ${plan.boxes.length} Boxes: ${plan.boxes.map(box => box.name).join(', ')}.` : ''
 
@@ -32,9 +24,6 @@ How to run this:
     tools: ['search_docs', 'contact_team'],
 }
 
-// In the app the card is a "Build my team" button that starts the trial without a card, and nothing
-// about paying is ever said there: what can stop it is a trial already spent, which only the web can
-// take further, or a hiccup the button simply retries.
 function mobileAppInstructions(state: ForemanState, agreed: string): string {
     const blocked = state.trialSpent
         ? 'This workspace cannot be started from the app. Say so in one line, and that they can finish setting it up at rerun.build. Nothing else.'

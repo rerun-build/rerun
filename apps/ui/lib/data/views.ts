@@ -10,7 +10,6 @@ export const LAYOUT_ICONS: Record<CardLayout, LucideIcon> = {
     board: KanbanIcon,
 }
 
-/** The id under which the plain grid of every column is remembered, next to the saved views. */
 export const ALL_ROWS = '__all'
 
 export function findView(views: TableView[], idOrName: string | undefined): TableView | undefined {
@@ -34,15 +33,12 @@ export function writeLastView(storageKey: string, table: string, viewId: string)
     } catch {}
 }
 
-/** The text an editor starts from for a stored value. */
 export function cellInputText(value: unknown): string {
     if (value === null || value === undefined) return ''
     if (typeof value === 'object') return JSON.stringify(value)
     return String(value)
 }
 
-// SQLite keeps whatever it is handed, so a number typed into an INTEGER column has to leave as a
-// number, or sorting and summing it later goes wrong. An empty field is NULL where the column allows it.
 export function coerceCellInput(text: string, column: EngineDbColumn | undefined): SqlValue {
     if (text === '') return column?.notnull ? '' : null
     const type = column?.type.toUpperCase() ?? ''
@@ -61,8 +57,6 @@ export type BoardColumn = { key: string; value: SqlValue; label: string; total: 
 
 export const groupKey = (value: SqlValue) => JSON.stringify(value)
 
-// Columns named in `tones` come first and in that order, the way a card orders them, and keep their
-// place even when empty so a row can still be dragged into them.
 export function boardColumns(groups: EngineDbGroup[], tones: Record<string, string> | undefined): BoardColumn[] {
     const columns: BoardColumn[] = groups.map(group => ({ key: groupKey(group.value), value: group.value, label: group.value === null ? '' : String(group.value), total: group.total, sum: group.sum }))
     const order = Object.keys(tones ?? {})

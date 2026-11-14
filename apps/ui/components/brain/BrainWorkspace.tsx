@@ -37,12 +37,10 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-// What the rest of the app asks the Brain to open on: a page, a section, a table of the database.
 export type BrainRequest = { selection: BrainSelection | null; data: DataFocus | null }
 
 type PageState = { slug: string; detail: BrainPageDetail | null; missing: boolean; version: number }
 
-// A read that failed outright, the machine down or the network gone, rather than a box that answered.
 type Overview = BrainOverview | { available: false; reason: 'unreachable' }
 
 const UNREACHABLE: Overview = { available: false, reason: 'unreachable' }
@@ -72,8 +70,6 @@ function PageSkeleton() {
 
 const toSummary = ({ slug, title, type, hash, updatedAt, updatedBy }: BrainPageDetail['page']): BrainPageSummary => ({ slug, title, type, hash, updatedAt, updatedBy })
 
-// The Brain as one workspace: a sidebar holding everything the company shares with its agents, and
-// whatever is selected in it, open in the main panel.
 export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, onClose }: { request: BrainRequest | null; publishedEnabled: boolean; onRequestConsumed: () => void; onClose: () => void }) {
     const t = useTranslations('brain')
     const errorText = useErrorText()
@@ -126,7 +122,6 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         setOpenProposals(list.length)
     }, [setOpenProposals])
 
-    // Two quick clicks fire two reads, and the later-resolving one would otherwise win.
     const readSeq = useRef(0)
     const loadPage = useCallback(async (slug: string) => {
         const seq = ++readSeq.current
@@ -160,7 +155,6 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         [select, onRequestConsumed, publishedEnabled],
     )
 
-    // A request made before mount is the first selection; one made while open replaces the current.
     const mountRequest = useRef(request)
     const loadWorkspace = useCallback(() => {
         void reloadTables()
@@ -185,8 +179,6 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         consumeRequest(request)
     }, [request, consumeRequest])
 
-    // The Rerun agent wrote the brain from its chat while this was open. The open page only reloads
-    // if it is the one that changed, so a page nobody touched keeps its caret.
     const brainVersion = useBrainStore(s => s.version)
     const seenBrainVersion = useRef(brainVersion)
     const pageStateRef = useRef(pageState)
@@ -211,7 +203,6 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
     useEffect(() => {
         const onKey = (event: KeyboardEvent) => {
             if (event.key?.toLowerCase() !== 'k' || !(event.metaKey || event.ctrlKey)) return
-            // The agent chat under the dialog also listens for ⌘K, to open a new conversation.
             event.preventDefault()
             event.stopPropagation()
             setSidebarOpen(true)
@@ -300,7 +291,6 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         [reloadTables, select],
     )
 
-    // The database on its own has nothing to show but its first table, once the tables are listed.
     useEffect(() => {
         if (selection?.kind !== 'database' || !tables?.[0]) return
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -319,8 +309,6 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         [reloadOverview, setOpenProposals],
     )
 
-    // Without a machine, or with one that does not answer, there is no page, file or table to list:
-    // the sidebar goes and the main panel says why.
     const offline = overview && !overview.available && overview.reason !== 'outdated' ? overview.reason : null
 
     const chrome = useMemo(() => ({ onClose, onToggleSidebar: isMobile && !offline ? () => setSidebarOpen(true) : null }), [onClose, isMobile, offline])

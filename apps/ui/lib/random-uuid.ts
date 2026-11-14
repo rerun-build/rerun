@@ -1,5 +1,3 @@
-// crypto.randomUUID only exists in a secure context (HTTPS or localhost): a self-host opened over plain
-// HTTP on a LAN IP has it undefined, while crypto.getRandomValues works everywhere.
 export function randomUuid(): string {
     if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
     const bytes = crypto.getRandomValues(new Uint8Array(16))

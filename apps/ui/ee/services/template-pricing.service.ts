@@ -4,21 +4,7 @@ import { TAX_BEHAVIOR } from '@/ee/lib/billing/plans'
 import { stripe } from '@/ee/lib/billing/stripe'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// The platform is the merchant of record, so the Product and the Price live on the platform account
-// and the connected account only ever receives a transfer. Nothing here passes a `{ stripeAccount }`
-// request option, and that is on purpose.
-//
-// Provisioning runs at approval rather than on every save: the price is part of what we review, and
-// syncing on each autosave would litter the Stripe catalogue with dead Price objects.
-
 type TemplateUpdate = Database['public']['Tables']['templates']['Update']
-
-// Template prices follow the plan: the creator's figure is the pre-tax base, and Stripe adds the
-// buyer's local tax on top of it. That keeps the creator's earnings a single number they can be
-// quoted up front, instead of one that moves with each buyer's country.
-//
-// The classification Stripe needs to pick a rate comes from the account's preset product tax code
-// (Dashboard > Tax > Settings), which also covers the products minted here at approval time.
 
 const PRICING_COLUMNS = [
     'id',
@@ -50,9 +36,6 @@ export async function syncTemplateStripePrice(supabase: SupabaseClient<Database>
         return
     }
 
-    // Stripe prices are immutable, so a change mints a new one. Subscribers stay on the price they
-    // signed up for until they cancel and buy again, which is the grandfathering the creator UI
-    // announces.
     const price = await stripe.prices.create({
         product: productId,
         unit_amount: template.price_amount_cents,
@@ -91,8 +74,6 @@ async function priceMatches(priceId: string, template: PricingRow): Promise<bool
             price.unit_amount === template.price_amount_cents &&
             price.currency === template.price_currency &&
             (price.recurring?.interval === 'month') === wantsRecurring &&
-            // A price left on `unspecified` makes `automatic_tax` fail the whole checkout, and Stripe
-            // only lets that field be set once, so a stale one is re-minted rather than patched.
             price.tax_behavior === TAX_BEHAVIOR
         )
     } catch {

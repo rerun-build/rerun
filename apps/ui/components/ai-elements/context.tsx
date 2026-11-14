@@ -35,7 +35,6 @@ function UsageRow({ label, value }: { label: string; value: number }) {
     )
 }
 
-// The gauge only shows once the context is getting short: below this there is nothing to act on.
 const CONTEXT_GAUGE_FROM = 0.75
 
 export function Context({ usedTokens, maxTokens, usage, modelId }: ContextProps) {

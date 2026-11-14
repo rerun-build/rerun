@@ -18,8 +18,6 @@ export type RateMessageResult = { ok: true; id: string } | ActionFailure
 export type MessageFeedbackResult = { ok: true } | ActionFailure
 export type SessionFeedbackEntry = { id: string; messageId: string; rating: MessageFeedbackRating }
 
-// Whose conversation the id names: an agent's session, or one of the foreman's on the engine, which
-// has no sessions row and is keyed on its own column.
 export type FeedbackScope = 'agent' | 'foreman'
 
 const rateSchema = z.object({
@@ -36,9 +34,6 @@ const detailsSchema = z.object({
     details: z.string().trim().max(5_000),
 })
 
-// The vote lands on the click, before any details are asked for: a dialog dismissed still counts.
-// The conversation is copied from the engine now, since the Box holding it may be gone by the
-// time anyone reads the feedback.
 export async function rateMessageAction(input: z.input<typeof rateSchema>): Promise<RateMessageResult> {
     const parsed = rateSchema.safeParse(input)
     if (!parsed.success) return failure('invalidFeedback')
@@ -48,8 +43,6 @@ export async function rateMessageAction(input: z.input<typeof rateSchema>): Prom
     const { userId, workspace, supabase } = ctx
     const owner = scope === 'foreman' ? await foremanFeedbackOwner(ctx, sessionId) : await agentFeedbackOwner(ctx, sessionId)
     if (!owner) return failure('conversationNotFound')
-    // A vote names a message of the conversation it is about, not any string: each one copies the
-    // transcript with it.
     if (owner.transcript.length > 0 && !owner.transcript.some(message => (message as { id?: unknown }).id === messageId)) return failure('messageNotFound')
 
     const { data, error } = await supabase
@@ -83,8 +76,6 @@ async function agentFeedbackOwner(ctx: WorkspaceContext, sessionId: string): Pro
     return { keys: { agent_id: session.agent_id, session_id: sessionId }, onConflict: 'session_id,message_id', transcript }
 }
 
-// A vote on a coworker's message is reached through that coworker, like its conversation. The
-// foreman's have no coworker and stay the workspace's.
 async function reachableFeedbackWorkspaceId(id: string): Promise<number> {
     const actor = await requireLightSessionActor()
     if (isAdminActor(actor)) return actor.workspaceId

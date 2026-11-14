@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { sendWhatsAppTemplate, whatsappDestination, type SendWhatsAppInput } from './client'
 
-// The sender a deployment ships with: Rerun Cloud's own number, none on a self-hosted install.
 const senders = vi.hoisted(() => ({ DEFAULT_WHATSAPP_FROM: '+15550100000' as string | null }))
 vi.mock('@rerun/cloud/senders', () => senders)
 

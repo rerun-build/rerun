@@ -12,9 +12,7 @@ export type SpendProgress = { spentMicros: number; running: boolean }
 
 type SpendReceiptProps = {
     decision: SpendDecision
-    // Null when the request is no longer in the transcript: the receipt then shows the decision alone.
     totalMicros: number | null
-    // Read off the billed paid calls that follow the reply: the receipt fills while the coworker works.
     progress?: SpendProgress
 }
 

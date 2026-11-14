@@ -8,7 +8,6 @@ describe('STARTER_PACKS', () => {
         for (const industry of TEMPLATE_CATEGORIES) expect(STARTER_PACKS[industry].length).toBeGreaterThan(MAX_STARTER_PICKS)
     })
 
-    // Two cards on one template would install a single coworker for two picks.
     it('never puts the same template on two cards of one pack', () => {
         for (const industry of TEMPLATE_CATEGORIES) {
             const slugs = STARTER_PACKS[industry].map(card => card.template)

@@ -5,8 +5,6 @@ import { Icon } from '@/components/ui/icon'
 import { BASE_PLAN_CREDITS, CREDITS_PER_PACK, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS } from '@/ee/lib/billing/plans'
 import { PRO_PERKS, type ProPerk } from '@/ee/lib/billing/pro-perks'
 
-// The perks are listed in lib with their English copy; the rows this table knows by id read from the
-// language pack, an unknown one keeps its own wording.
 function perkCopy(t: ReturnType<typeof useTranslations<'billing.perks'>>, perk: ProPerk): { title: string; trial: string; pro: string } {
     switch (perk.id) {
         case 'credits':

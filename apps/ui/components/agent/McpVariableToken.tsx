@@ -10,11 +10,7 @@ import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-// Horizontal padding is cancelled by an equal negative margin, and the outline is an inset ring
-// rather than a border: the token sits in a mirror layered over a plain textarea, so anything that
-// takes up space would drift the highlight away from the text underneath it.
 const TOKEN_BASE = 'pointer-events-auto inline cursor-pointer rounded-[3px] -mx-0.5 px-0.5 ring-1 ring-inset transition-colors'
-// Status colours rather than the brand accent, matching the tones the popover badge uses.
 const TOKEN_SET = 'bg-emerald-400/10 text-emerald-600 ring-emerald-400/40 hover:bg-emerald-400/20 dark:text-emerald-400'
 const TOKEN_UNSET = 'bg-orange-500/10 text-orange-600 ring-orange-500/40 hover:bg-orange-500/20 dark:text-orange-400'
 
@@ -87,8 +83,6 @@ export function McpVariableToken({ name, vars }: { name: string; vars: AgentVari
                 </PopoverContent>
             </Popover>
 
-            {/* Hors du Popover : l'ouverture de la dialog compte comme une interaction extérieure et
-            ferme le popover, qui emporterait la dialog avec lui. */}
             <ConfirmDialog open={confirmRemove} onOpenChange={setConfirmRemove} title={t('removeConfirm', { name })} description={t('removeDescription')} confirmLabel={t('removeAction')} onConfirm={() => run(vars.remove(name))} />
         </>
     )

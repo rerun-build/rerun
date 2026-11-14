@@ -14,7 +14,6 @@ export async function generateIdeasObject<T>(input: { schema: z.ZodType<T>; syst
         schema: input.schema,
         system: input.system,
         prompt: input.prompt,
-        // The model's thinking counts against the same cap as the answer.
         maxOutputTokens: 16_000,
         abortSignal: AbortSignal.timeout(TIMEOUT_MS),
     })

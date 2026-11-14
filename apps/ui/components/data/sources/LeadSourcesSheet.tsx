@@ -60,7 +60,6 @@ function FieldRowContent({ field }: { field: LeadField }) {
     )
 }
 
-/** Every field of a row, each traced one with the logo of where it came from; a tap tells the rest. */
 export function LeadFieldList({ fields, className }: { fields: readonly LeadField[]; className?: string }) {
     return (
         <div className={cn('flex flex-col rounded-xl border border-border bg-background', className)}>
@@ -95,7 +94,6 @@ export function leadFields(row: Row, columns: readonly FriendlyColumn[], sources
         .map(column => {
             const value = row[column.key]
             const source = sources?.cells[column.key]
-            // A traced field is a button, and a link cannot sit inside one.
             const shown = column.kind === 'url' && source ? <span className="break-all">{domainOf(String(value))}</span> : <FriendlyCell value={value} column={column} currency={currency} tones={tones} maxTags={6} wrap />
             return { key: column.key, label: column.label, value: shown, source }
         })
@@ -109,7 +107,6 @@ function rowTitle(row: Row, columns: readonly FriendlyColumn[], fallback: string
 type LeadSourcesSheetProps = {
     row: Row | null
     onOpenChange: (open: boolean) => void
-    /** The columns to list, in order. */
     columns: readonly FriendlyColumn[]
     sources: RowSources | null
     tones?: Record<string, BadgeTone>

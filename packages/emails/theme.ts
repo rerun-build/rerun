@@ -1,9 +1,5 @@
 import * as React from "react";
 
-// Every value below is a solid hex. Email clients built on the Word engine drop `rgba()`
-// outright, so the design system's opacity ramps on --foreground are flattened here against
-// the surface they sit on rather than expressed as alpha.
-
 function channels(hex: string): [number, number, number] {
   const v = hex.replace("#", "");
   const full = v.length === 3 ? v.replace(/./g, (c) => c + c) : v;
@@ -19,7 +15,6 @@ function toHex(r: number, g: number, b: number): string {
   return `#${[r, g, b].map((n) => clamp(n).toString(16).padStart(2, "0")).join("")}`;
 }
 
-/** `ratio` of `fg` laid over `bg`, resolved to a solid hex. */
 export function mix(fg: string, bg: string, ratio: number): string {
   const [r1, g1, b1] = channels(fg);
   const [r2, g2, b2] = channels(bg);
@@ -61,8 +56,6 @@ export const theme = {
     card: 520,
   },
   font: {
-    // No web font: the only clients that would honour one are the Apple stack, which already
-    // resolves to a face close enough to Inter. Inter leads in case it is installed locally.
     sans: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     mono: "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace",
   },
@@ -78,17 +71,11 @@ export type ToneName =
   | "brand";
 
 export type Tone = {
-  /** The pure tone, as documented on /brand/ui/foundations. Drives the illustration. */
   solid: string;
-  /** The tone as text on the card surface. */
   text: string;
-  /** Tone at 12% over the card. */
   fill: string;
-  /** Tone at 40% over the card. */
   border: string;
-  /** Tone at 8% over the inset surface, for framed blocks. */
   insetFill: string;
-  /** Tone at 28% over the inset surface. */
   insetBorder: string;
 };
 
@@ -103,8 +90,6 @@ function tone(solid: string, text = solid): Tone {
   };
 }
 
-// Status colours come straight from the design system: the isometric board's agent states
-// and the semantic set documented next to them.
 export const TONES: Record<ToneName, Tone> = {
   done: tone("#34d399"),
   error: tone("#f87171"),

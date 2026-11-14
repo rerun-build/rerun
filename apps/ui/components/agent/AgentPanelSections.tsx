@@ -13,7 +13,6 @@ export type PanelSection<T extends string> = {
     tabs: { id: T; label: string }[]
 }
 
-/** Un nombre s'écrit en compteur, `'dot'` en simple point rouge. */
 export type PanelSectionBadges<T extends string> = Partial<Record<T, number | 'dot'>>
 
 export function CountPastille({ count, className }: { count: number; className?: string }) {
@@ -24,7 +23,6 @@ export function DotPastille({ className }: { className?: string }) {
     return <span className={cn('size-2 rounded-full bg-red-500', className)} />
 }
 
-/** Les sections du panneau en largeur pleine, libellé sous l'icône. Un tap ouvre le premier onglet de la section. */
 export function SectionBar<T extends string>({
     sections,
     current,
@@ -68,7 +66,6 @@ export function SectionBar<T extends string>({
     )
 }
 
-/** Le header dont le titre est la liste des onglets de la section : le second niveau n'ajoute pas de bande. */
 export function SectionTabsHeader<T extends string>({
     current,
     tabId,

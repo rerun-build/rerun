@@ -23,8 +23,6 @@ describe('workspaceNameFrom', () => {
         expect(workspaceNameFrom({ firstName: 'jihane' })).toBe("Jihane's workspace")
     })
 
-    // The survey writes whatever the model read off the page, so a blank field must not win over the
-    // rung behind it.
     it('ignores a blank company name', () => {
         expect(workspaceNameFrom({ companyName: '   ', firstName: 'Clément' })).toBe("Clément's workspace")
     })

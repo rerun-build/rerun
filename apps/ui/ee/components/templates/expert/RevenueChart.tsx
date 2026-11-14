@@ -7,9 +7,6 @@ import { useMemo } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import type { CreatorRevenue } from '@/ee/services/creator-revenue.service'
 
-// One series, so no legend and one color: the question is "how much did I make each month", not a
-// comparison between anything.
-
 function monthLabel(month: string, locale: string): string {
     const date = new Date(`${month}-01T00:00:00`)
     return Number.isNaN(date.getTime()) ? month : formatDate(date, locale, { month: 'short', year: '2-digit' })

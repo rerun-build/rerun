@@ -11,15 +11,12 @@ const DAY_MS = 86_400_000
 
 type PeriodColumns = { rerun_period_anchor: string | null; subscription_status: string | null; trial_ends_at: string | null }
 
-// The stretch the credit is counted over: the month since the anchor, or the trial since it began.
-// A workspace with no anchor yet is shown its last thirty days.
 export function creditPeriod({ rerun_period_anchor, subscription_status, trial_ends_at }: PeriodColumns, now: Date): { start: Date; end: Date } {
     const start = rerun_period_anchor ? new Date(rerun_period_anchor) : new Date(now.getTime() - 30 * DAY_MS)
     const end = subscription_status === 'trialing' && trial_ends_at ? new Date(trial_ends_at) : rerun_period_anchor ? addOneMonth(start) : now
     return { start, end: end > start ? end : now }
 }
 
-// Billing, and a spend per coworker across every Box: an admin's to read.
 export async function getCreditUsage(supabase: SupabaseClient<Database>, actor: Actor, now = new Date()): Promise<CreditUsage> {
     if (!isAdminActor(actor)) throw new AccessDeniedError(ADMIN_ONLY)
     const { workspaceId } = actor

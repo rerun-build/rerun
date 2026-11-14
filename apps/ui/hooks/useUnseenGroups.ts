@@ -9,8 +9,6 @@ import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 
 export type LabeledUnseenGroup = UnseenGroup & { label: string; scheduled: boolean }
 
-// The unseen runs as the inbox and the board show them: a scheduled task under its name rather than
-// the `schedule: <slug>` title its sessions carry.
 export function useUnseenGroups(): LabeledUnseenGroup[] {
     const runs = useUnseenRunsStore(state => state.runs)
     const schedules = useBoardStore(state => state.agentSchedules)

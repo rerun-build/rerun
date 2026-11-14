@@ -9,7 +9,6 @@ export type MediaAlbumItem = { path: string; name: string; src: string }
 
 const MAX_ALBUM_TILES = 4
 
-/** Whether a list of files reads as an album: images and videos only. */
 export function isMediaAlbum(names: readonly string[]): boolean {
     return names.length > 0 && names.every(name => ['image', 'video'].includes(filePreviewKind(name)))
 }
@@ -26,7 +25,6 @@ function MediaTile({ item, shape, onOpen }: { item: MediaAlbumItem; shape: Media
             aria-label={t('open', { name: item.name })}
             className={cn('overflow-hidden rounded-2xl bg-muted transition-opacity hover:opacity-90', natural ? 'max-h-72 max-w-full' : cn('w-full', MEDIA_CELL_ASPECT[shape]))}
         >
-            {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary proxied file bytes, no fixed dimensions or configured loader */}
             <img src={item.src} alt={item.name} loading="lazy" decoding="async" className={natural ? 'max-h-72 max-w-full object-contain' : 'size-full object-cover'} />
         </button>
     )
@@ -34,16 +32,11 @@ function MediaTile({ item, shape, onOpen }: { item: MediaAlbumItem; shape: Media
 
 type MediaAlbumProps = {
     items: readonly MediaAlbumItem[]
-    /** An agent's files carry their names, so candidates can be told apart; a user's own upload does not. */
     captions: boolean
     align?: 'start' | 'end'
     onOpen: (index: number) => void
 }
 
-/**
- * Images and videos sent together, grouped the way a messenger does: a lone one keeps its own
- * proportions, several share a two-column album whose last cell counts what did not fit.
- */
 export function MediaAlbum({ items, captions, align = 'start', onOpen }: MediaAlbumProps) {
     const t = useTranslations('chat.attachments')
     if (items.length === 1) {

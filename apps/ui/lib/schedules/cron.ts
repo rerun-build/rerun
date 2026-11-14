@@ -10,10 +10,8 @@ import type { EngineSchedule } from '@/lib/engine/types'
 
 type ScheduleTiming = Pick<EngineSchedule, 'enabled' | 'cron' | 'runAt' | 'timezone' | 'lastRunAt'>
 
-// The `agent` namespace, as far as a routine's timing reads it.
 export type ScheduleCopy = (key: `schedule.${'once' | 'onceOn' | 'everyMinutes' | 'everyDay' | 'weekdays' | 'everyWeekday' | 'monthly'}`, values?: Record<string, string>) => string
 
-// Only the packs' languages are loaded: cronstrue/i18n would ship its 30 others to the browser.
 const CRONSTRUE_LOCALES: Record<string, string> = { fr: 'fr', es: 'es', pt: 'pt_BR', de: 'de' }
 
 export function humanCron(cron: string, locale = 'en'): string | null {
@@ -43,13 +41,10 @@ function clockTimes(hours: string, minute: number, locale?: string): string | nu
     return list.map(hour => clockTime(hour, minute, locale)).join(', ')
 }
 
-// 2024-01-07 is a Sunday, the cron's day 0.
 function weekdayName(day: number, locale?: string): string {
     return formatDate(Date.UTC(2024, 0, 7 + day), locale, { weekday: 'long', timeZone: 'UTC' })
 }
 
-// "Every day at 8:15 AM" where cronstrue says "At 08:15 AM": covers the shapes coworkers write and
-// falls back to cronstrue for the rest. Times are the cron's own, read in the routine's timezone.
 export function routineFrequency(schedule: Pick<EngineSchedule, 'cron' | 'runAt'>, t: ScheduleCopy, locale?: string): string {
     if (schedule.runAt) return t('schedule.onceOn', { date: formatDate(schedule.runAt, locale, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) })
     if (!schedule.cron) return ''
@@ -68,7 +63,6 @@ export function routineFrequency(schedule: Pick<EngineSchedule, 'cron' | 'runAt'
     return humanCron(schedule.cron, locale) ?? schedule.cron
 }
 
-// Mirrors nextRunAt in apps/engine/src/schedules/cron.ts: the engine never sends it over HTTP.
 export function nextRunAt(schedule: ScheduleTiming, now: Date): string | null {
     if (!schedule.enabled) return null
     if (schedule.runAt) return schedule.lastRunAt ? null : schedule.runAt

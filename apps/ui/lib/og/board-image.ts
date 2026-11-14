@@ -5,17 +5,12 @@ import { z } from 'zod'
 
 import { CARD_HEIGHT, CARD_THEME, CARD_THEMES, CARD_WIDTH } from './size'
 
-// No 'server-only': the URL of a board image is also built from the Trigger.dev lifecycle tasks,
-// which are bundled outside the Next.js RSC pipeline.
-
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.rerun.build'
 
 const AGENT_STATUSES = ['idle', 'working', 'waiting_human', 'error', 'offline'] as const satisfies readonly AgentStatus[]
 
 const slugSchema = z.string().trim().min(1).max(64)
 
-// The board is described by the request itself and never read off a template or a workspace, so a
-// picture can show a coworker that does not exist yet. Eight is the number of slots the layout has.
 export const boardSceneSchema = z.object({
     agents: z
         .array(
@@ -44,8 +39,6 @@ export type BoardImageOptions = z.input<typeof boardImageOptionsSchema>
 
 export type BoardImageRequest = z.output<typeof boardImageOptionsSchema> & {
     scene: z.output<typeof boardSceneSchema>
-    // The signed query as it was verified, signature included: the capture route hands it on to the
-    // render page, which checks it a second time.
     query: string
 }
 
@@ -62,9 +55,6 @@ function sign(query: string): string {
     return createHmac('sha256', getSecret()).update(query).digest('base64url')
 }
 
-// Every capture starts a browser, and the render page draws whatever text it is given on our own
-// domain: only a URL our server built is honoured. Sorted so the signature does not depend on the
-// order a mail client or a proxy puts the parameters back in.
 export function signedBoardImageQuery(scene: BoardScene, options: BoardImageOptions = {}): string {
     boardImageOptionsSchema.parse(options)
 
@@ -116,8 +106,6 @@ export function readBoardImageRequest(search: URLSearchParams): BoardImageReques
     return { ...options.data, scene, query: signed.toString() }
 }
 
-// A buddy takes its face and its colour from its tile id, so the id is the name: the same coworker
-// keeps the same look from one picture to the next, wherever it stands on the board.
 export function boardAgentsOfScene(scene: BoardImageRequest['scene'], knownConnectorSlugs: ReadonlySet<string>): BoardAgent[] {
     const seen = new Map<string, number>()
     return scene.agents.map(agent => {

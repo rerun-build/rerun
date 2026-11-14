@@ -5,8 +5,6 @@ import { CaptureReviewStep } from './CaptureReviewStep'
 import { CaptureSelectStep } from './CaptureSelectStep'
 import type { CaptureFlow, CaptureStep } from './useCaptureFlow'
 
-// Titles and bodies live together so the two shells that mount this flow cannot describe the same
-// step differently.
 export function useCaptureStepCopy(): Record<CaptureStep, { title: string; description: string }> {
     const t = useTranslations('templates.capture.steps')
     return {

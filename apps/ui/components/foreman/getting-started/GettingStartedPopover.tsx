@@ -14,16 +14,11 @@ type GettingStartedPopoverProps = GettingStartedState & {
     onOpenChange: (open: boolean) => void
     onStep: OnGettingStartedStep
     onHide: () => void
-    /** Bumped each time a step lands live: the pill sends out one ring to say so. */
     pulse?: number
 }
 
 const HOVER_CLOSE_DELAY_MS = 150
 
-/**
- * Board furniture, in the corner and in the workspace pill's material: the checklist belongs to the
- * workspace, not to the Foreman it hands every step to. A mouse opens it by hovering, a finger by tapping.
- */
 export function GettingStartedPopover({ progress, reward, open, onOpenChange, onStep, onHide, pulse = 0 }: GettingStartedPopoverProps) {
     const t = useTranslations('foreman.gettingStarted')
     const reducedMotion = useReducedMotion()
@@ -48,14 +43,11 @@ export function GettingStartedPopover({ progress, reward, open, onOpenChange, on
         openedByHover.current = true
         onOpenChange(true)
     }
-    // The click that follows a hover would toggle the list shut right as it appeared.
     const keepHoverOpen = (event: MouseEvent) => {
         if (!openedByHover.current) return
         openedByHover.current = false
         event.preventDefault()
     }
-    // The gap between the pill and the panel is crossed on the way in, so leaving one only closes
-    // once the pointer has not landed on the other.
     const closeOnLeave = (event: PointerEvent) => {
         if (event.pointerType !== 'mouse') return
         cancelClose()

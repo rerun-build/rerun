@@ -8,8 +8,6 @@ import { useNotificationPrefs } from '@/hooks/useNotificationPrefs'
 import { useBoardStore } from '@/stores/board.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 
-// The board keeps every schedule of the workspace; triggers are only loaded by their own panel, so
-// the bell asks for them when it opens.
 export function CoworkerNotificationBell({ agentId, name }: { agentId: string; name: string }) {
     const { prefs, setCoworkerRule, ruleOf } = useNotificationPrefs()
     const scheduleCount = useBoardStore(s => s.agentSchedules.filter(schedule => schedule.agentId === agentId).length)

@@ -26,7 +26,6 @@ function positionChoiceOf(placement: ForemanPlacement): PositionChoice {
     return placement.mode === 'float' ? 'float' : `dock-${placement.side}`
 }
 
-/** Faire flotter depuis le menu pose la fenêtre en bas, du côté où elle était dockée. */
 function placementFor(choice: PositionChoice, current: ForemanPlacement): ForemanPlacement {
     const size = { width: current.width, height: current.height, dockWidth: current.dockWidth }
     if (choice === 'dock-left') return { mode: 'dock', side: 'left', ...size }
@@ -35,14 +34,6 @@ function placementFor(choice: PositionChoice, current: ForemanPlacement): Forema
     return { mode: 'float', corner: current.side === 'left' ? 'bottom-left' : 'bottom-right', ...size }
 }
 
-/**
- * Posé par-dessus la pile, sur un voile flouté qui s'évanouit vers le bas plutôt qu'une barre
- * opaque : les vieux messages continuent de se dissoudre dessous, mais les contrôles se détachent.
- * Sous `md` elle est la poignée de la sheet : on la tire pour changer de hauteur ou la refermer, et
- * un tap sur le grabber bascule entre les deux crans. À partir de `md` c'est la poignée de la
- * colonne : on l'attrape pour la docker à gauche, à droite, ou la faire flotter dans un coin. Le
- * menu de position fait la même chose au clavier.
- */
 export function ForemanHeader({
     placement,
     onDragPointerDown,
@@ -58,7 +49,6 @@ export function ForemanHeader({
     const close = useForemanStore(state => state.close)
     const open = useForemanStore(selectForemanOpen)
     const activity = useForemanStore(state => state.activity)
-    // Repartir de zéro en plein tunnel jette la conversation guidée et ce que le Foreman y a appris.
     const guided = useForemanStore(state => state.funnel === 'guided')
     const intakeOpen = useForemanStore(state => state.intake)
     const { isAnonymous } = useSession()
@@ -98,7 +88,6 @@ export function ForemanHeader({
                             </DropdownMenuRadioGroup>
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    {/* Sous `md`, le tunnel masque la pastille Sign in du board : la sheet la recouvre. */}
                     {guided && isAnonymous && (
                         <>
                             <Button variant="outline" size="sm" className="md:hidden" onClick={() => setSignInOpen(true)}>
@@ -116,7 +105,6 @@ export function ForemanHeader({
                     )}
                 </>
             }
-            // Le tunnel guidé n'a qu'une conversation, pas de tabs.
             tabs={guided ? undefined : <ForemanTabs />}
         />
     )

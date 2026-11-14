@@ -10,16 +10,12 @@ import { CreatorPayoutsPanelSkeleton } from './CreatorPayoutsPanelSkeleton'
 import { PayoutStatusCard } from './PayoutStatusCard'
 import { useCreatorPayouts } from './useCreatorPayouts'
 
-// Payouts live inside the creator panel rather than in a page of their own: getting paid and
-// pricing a template are the same job, one click apart.
 export function CreatorPayoutsPanel({ active }: { active: boolean }) {
     const t = useTranslations('templates.payouts')
     const { account, pending, reload, startOnboarding, openDashboard } = useCreatorPayouts(active)
     const connectRefresh = useCreatorStore(state => state.connectRefresh)
     const setConnectRefresh = useCreatorStore(state => state.setConnectRefresh)
 
-    // Stripe sends the user back here when the onboarding link died on the way. Minting a fresh one
-    // straight away is its documented handling, so the user never sees a dead end.
     React.useEffect(() => {
         if (!active || !connectRefresh) return
         setConnectRefresh(false)

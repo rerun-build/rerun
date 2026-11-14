@@ -2,8 +2,6 @@ export const SOCIAL_NETWORKS = ['linkedin', 'instagram', 'x', 'facebook', 'youtu
 export type SocialNetwork = (typeof SOCIAL_NETWORKS)[number]
 export type SocialProfiles = Partial<Record<SocialNetwork, string>>
 
-// Company-level profiles only: a share button, a single post or a person's page is not where the
-// company lives.
 const PROFILE_PATTERNS: Record<SocialNetwork, RegExp> = {
     linkedin: /^https?:\/\/([a-z]{2,3}\.)?(www\.)?linkedin\.com\/(company|school|showcase)\/[^/?#]+/i,
     instagram: /^https?:\/\/(www\.)?instagram\.com\/(?!p\/|reel\/|explore\/|accounts\/)[a-z0-9._]+\/?(?:[?#]|$)/i,
@@ -40,8 +38,6 @@ function foldAccents(text: string): string {
         .toLowerCase()
 }
 
-// True when every word of the name shows up in the text, accents and case aside. Loose on
-// purpose: "Hélène Dubois" has to match the slug "helenedubois" as well as a page title.
 export function mentionsName(text: string, name: string): boolean {
     const haystack = foldAccents(text).replace(/[^a-z0-9]/g, '')
     const words = foldAccents(name)
@@ -50,14 +46,10 @@ export function mentionsName(text: string, name: string): boolean {
     return words.length > 0 && words.every(word => haystack.includes(word))
 }
 
-// "acme" for acme.co.uk, "doctolib" for www.doctolib.fr: a stand-in name for the queries that run
-// before anything has told us what the company calls itself.
 export function domainLabel(domain: string): string {
     return domain.replace(/^www\./, '').split('.')[0]
 }
 
-// Whether a URL some third party lists for the company (LinkedIn, Google) points to the site we
-// were given: the cheapest way to tell the company from a namesake.
 export function pointsToDomain(url: string | null | undefined, domain: string): boolean {
     if (!url) return false
     try {

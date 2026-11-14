@@ -2,9 +2,6 @@ import { z } from 'zod'
 
 import type { EngineProvider } from '@/lib/engine/types'
 
-// `components` are the status page ids of what Rerun actually calls, `providers` the engine
-// providers that reach them: an incident elsewhere on the page (a console, a consumer app) or on a
-// provider the workspace has no connection to concerns nobody here.
 export type StatusPage = { id: string; label: string; url: string; components: string[]; providers: EngineProvider[] }
 
 export const PROVIDER_STATUS_PAGES: StatusPage[] = [
@@ -12,8 +9,6 @@ export const PROVIDER_STATUS_PAGES: StatusPage[] = [
         id: 'openai',
         label: 'OpenAI',
         url: 'https://status.openai.com',
-        // Chat Completions and Responses. The Codex components are missing from summary.json, and
-        // the Codex CLI runs on Responses anyway.
         components: ['01JMXBRMFE6N2NNT7DG6XZQ6PW', '01JP8CD9JR3HR6Y7G4Q75N4DVW'],
         providers: ['openai', 'codex'],
     },
@@ -21,7 +16,6 @@ export const PROVIDER_STATUS_PAGES: StatusPage[] = [
         id: 'anthropic',
         label: 'Anthropic',
         url: 'https://status.claude.com',
-        // Claude API and Claude Code.
         components: ['k8w3r06qmzrp', 'yyzkbfz2thpt'],
         providers: ['anthropic', 'claude'],
     },
@@ -45,7 +39,6 @@ const summarySchema = z.object({
     incidents: z.array(z.object({ id: z.string(), name: z.string(), components: z.array(z.object({ id: z.string() })).optional() })).optional(),
 })
 
-// A `degraded_performance` is slowness, not a failure worth a banner.
 const SEVERITY_BY_COMPONENT_STATUS: Record<string, ProviderIncident['severity']> = {
     partial_outage: 'degraded',
     major_outage: 'outage',
@@ -60,7 +53,6 @@ export function parseStatusSummary(page: StatusPage, json: unknown): ProviderInc
     if (down.length === 0) return null
 
     const downIds = down.map(component => component.id)
-    // OpenAI lists no components on its incidents, so an incident naming none may be the one.
     const incident =
         incidents.find(candidate => candidate.components?.some(component => downIds.includes(component.id))) ??
         incidents.find(candidate => !candidate.components?.length)
@@ -82,8 +74,6 @@ const lastKnown = new Map<string, ProviderIncident | null>()
 let fetchedAt = 0
 let inFlight: Promise<void> | null = null
 
-// A status page that fails to answer keeps its last known state: our own fetch error must neither
-// raise a banner nor make a live one blink.
 async function refresh(page: StatusPage): Promise<void> {
     try {
         const res = await fetch(`${page.url}/api/v2/summary.json`, { cache: 'no-store', signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })

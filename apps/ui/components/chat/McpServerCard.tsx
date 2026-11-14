@@ -20,8 +20,6 @@ import { cn } from '@/lib/utils'
 
 type McpServerCardProps = McpRegisterCard & { agentId?: string; signInPending?: boolean }
 
-// The tool output is frozen at the time of the call, so the server is looked up again: an old card
-// in the history follows the sign-in made since, and shows no status once the server is gone.
 export function McpServerCard({ agentId, name, url, outcome, failure, signInPending }: McpServerCardProps) {
     const t = useTranslations('chat')
     const tServices = useTranslations('services')
@@ -33,7 +31,6 @@ export function McpServerCard({ agentId, name, url, outcome, failure, signInPend
     const server = connectors.custom.find(s => s.name === name)
     const status = statuses.get(name)
 
-    // A card drawn right after the agent registered the server can predate both stores.
     useEffect(() => {
         if (!agentId || outcome !== 'saved' || refetched.current || !connectors.loaded || loading) return
         if (server && status) return

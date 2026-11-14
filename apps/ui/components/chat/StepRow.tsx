@@ -28,7 +28,6 @@ type StepRowProps = {
     children?: ReactNode
 }
 
-/** One step of an agent's work on a single 28px line, which opens on what went in and what came out. */
 export function StepRow({ iconProps, label, detail, status, elapsed, children }: StepRowProps) {
     const [open, setOpen] = useState(false)
     const expandable = !!children

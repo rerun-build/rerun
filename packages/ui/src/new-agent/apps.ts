@@ -1,8 +1,5 @@
 import { MAX_APPS_AT_CREATION } from './reading'
 
-// The apps the new agent starts with: those of the suggestion it was picked from, those read in the
-// description, then those added by hand. One taken off by hand stays off, whatever a later reading
-// finds again.
 export type AppSelection = { added: string[]; removed: string[] }
 
 export const NO_APP_SELECTION: AppSelection = { added: [], removed: [] }
@@ -17,7 +14,6 @@ export function toggleApp(selection: AppSelection, slug: string, selected: boole
     return { added: [...selection.added, slug], removed: selection.removed.filter(app => app !== slug) }
 }
 
-// The suggestion a typed description is closest to: the one sharing the most apps with it, if any.
 export function closestSuggestion<T extends { apps: string[] }>(apps: string[], suggestions: T[]): T | null {
     let best: T | null = null
     let score = 0

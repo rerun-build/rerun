@@ -29,8 +29,6 @@ import { failure, failureOf, type ActionFailure, type ErrorCode } from '@/lib/i1
 
 type Result<T> = { ok: true; value: T } | (ActionFailure & { reason?: AppActionError['reason'] })
 
-// A paid app moves money and logs into somebody's account: hiding the button is not enough, every
-// action checks the app's flag on the server, the way template purchases check theirs.
 async function run<T>(slug: AppSlug, fallback: ErrorCode, body: () => Promise<T>): Promise<Result<T>> {
     try {
         const app = appSlug.parse(slug)
@@ -44,8 +42,6 @@ async function run<T>(slug: AppSlug, fallback: ErrorCode, body: () => Promise<T>
     }
 }
 
-// Slots are billed and accounts are the workspace's: an admin adds and links them, a coworker's
-// binding to an account stays with whoever configures the coworker.
 async function runAsAdmin<T>(slug: AppSlug, fallback: ErrorCode, body: () => Promise<T>): Promise<Result<T>> {
     return run(slug, fallback, async () => {
         await requireAdminContext('adminOnlyPaidApps')
@@ -66,18 +62,14 @@ export async function getAppsOverviewAction(slug: AppSlug): Promise<Result<AppsO
     return run(slug, 'loadAppsFailed', () => getAppsOverview(slug))
 }
 
-// `requestId` is minted by the button, once per click: a retry of the same click is folded into one
-// charge, a new click is a new slot.
 export async function addAppSlotAction(slug: AppSlug, requestId: string): Promise<Result<{ trialSlot: boolean }>> {
     return runAsAdmin(slug, 'addSlotFailed', () => addAppSlot(slug, id.parse(requestId)))
 }
 
-// The password goes to Linkup and nowhere else: it is neither stored nor logged here.
 export async function connectLinkedinAction(input: z.input<typeof linkedinConnectSchema>): Promise<Result<ConnectOutcome>> {
     return runAsAdmin('linkedin', 'connectLinkedinFailed', () => connectLinkedin(linkedinConnectSchema.parse(input)))
 }
 
-// E.164: a plus, a country code that never starts with 0, then digits.
 const whatsappConnectSchema = z.object({ connectionId: id.optional(), phoneNumber: z.string().trim().regex(/^\+[1-9]\d{6,14}$/), pairingCode: z.boolean() })
 
 export async function connectWhatsappAction(input: z.input<typeof whatsappConnectSchema>): Promise<Result<ConnectOutcome>> {
@@ -110,7 +102,6 @@ export async function getAgentAppBindingAction(slug: AppSlug, agentId: string): 
     return run(slug, 'loadCoworkerAccountFailed', () => getAgentAppBinding(slug, id.parse(agentId)))
 }
 
-// Picking the account is the coworker's whole sign-in for a paid app: its service goes active here.
 export async function attachAgentToConnectionAction(slug: AppSlug, agentId: string, connectionId: string): Promise<Result<null>> {
     return run(slug, 'attachAccountFailed', async () => {
         const actor = await requireLightSessionActor()

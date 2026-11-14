@@ -19,9 +19,6 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-// What a switched-off agent shows instead of its tabs. There is no matching "deactivate": the plan
-// says how many agents run, the user says which ones, and freeing a slot means deleting an agent
-// (Settings stays reachable behind this, which is where that lives).
 export function AgentLockedOverlay({ agent }: { agent: IsoAgent }) {
     const { access, keptUntil, paymentFailed, sandboxArchived } = useWorkspaceAccess()
     if (sandboxArchived) return <SandboxArchivedOverlay name={agent.name} keptUntil={keptUntil} />
@@ -30,7 +27,6 @@ export function AgentLockedOverlay({ agent }: { agent: IsoAgent }) {
     return <AgentSlotOverlay agent={agent} />
 }
 
-// The whole workspace is off, its machine archived: nothing here is about a slot.
 export function WorkspacePausedOverlay({ name, keptUntil, paymentFailed = false }: { name: string; keptUntil: Date | null; paymentFailed?: boolean }) {
     const t = useTranslations('agent.agentLockedOverlay')
     const locale = useLocale()
@@ -50,7 +46,6 @@ export function WorkspacePausedOverlay({ name, keptUntil, paymentFailed = false 
     )
 }
 
-// No button here: the request lives on the board's banner, where its answer is shown too.
 function SandboxArchivedOverlay({ name, keptUntil }: { name: string; keptUntil: Date | null }) {
     const t = useTranslations('agent.agentLockedOverlay')
     const locale = useLocale()
@@ -118,8 +113,6 @@ function AgentSlotOverlay({ agent }: { agent: IsoAgent }) {
             {!fromTemplate &&
                 (noFreeAgentSlot ? (
                     <div className="space-y-2">
-                        {/* Only a trial's cap is lifted by paying: a paid plan runs unlimited coworkers, so a number left on
-                            a subscribed workspace was set by hand from the admin and no checkout raises it. */}
                         <TooltipDisabledReason reason={capFixedByHand ? t('slot.fixedLimit') : undefined}>
                             <Button variant="outline" highlight disabled={capFixedByHand} onClick={gate}>
                                 {t('slot.upgradeToActivate')}

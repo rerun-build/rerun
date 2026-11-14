@@ -35,7 +35,6 @@ vi.mock('./mcp-shares.service', () => ({ dispatchShareTool: vi.fn() }))
 
 const WORKSPACE_ID = 7
 const FOREIGN_WORKSPACE_ID = 99
-// The API key and the foreman act as the workspace itself, which reaches every Box.
 const ACTOR = { kind: 'workspace', workspaceId: WORKSPACE_ID }
 
 const AGENTS: Record<string, Record<string, unknown>> = {

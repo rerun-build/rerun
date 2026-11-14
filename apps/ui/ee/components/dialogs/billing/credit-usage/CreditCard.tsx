@@ -16,8 +16,6 @@ import { KindLegend, SplitBar } from './parts'
 import { RerunCreditSwitch } from './RerunCreditSwitch'
 import type { CreditUsageState } from './useCreditUsage'
 
-// Out of credit, the card leads with it: the coworkers are stopped, and getting more is the one thing
-// to do, so the button moves from the header into the alert. On a trial, more credit comes with Pro.
 function OutOfCredits({ trial, resetsOn, onAdd }: { trial: boolean; resetsOn: Date | null; onAdd?: () => void }) {
     const locale = useLocale()
     const t = useTranslations('billing')
@@ -44,8 +42,6 @@ function OutOfCredits({ trial, resetsOn, onAdd }: { trial: boolean; resetsOn: Da
     )
 }
 
-// The Rerun credit under the plan: one bar split by what spent it, AI models and paid data, then
-// what is left. The details are one click away, in the usage pane.
 export function CreditCard({ credit, highlight = false, onAdd, onOpenUsage }: { credit: CreditUsageState; highlight?: boolean; onAdd?: () => void; onOpenUsage?: () => void }) {
     const locale = useLocale()
     const t = useTranslations('billing')

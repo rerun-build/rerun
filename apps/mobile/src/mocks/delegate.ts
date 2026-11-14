@@ -1,8 +1,6 @@
 import type { SubRunCall, SubRunTask } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
-// The web's sub-run labs (apps/ui/app/render/lab/sub-runs, delegate-tree), for the iOS one.
-
 const BASE_TIME = Date.UTC(2026, 8, 17, 9, 12, 35)
 const MINUTE = 60_000
 
@@ -21,8 +19,6 @@ export function delegateMessage(id: string, tasks: SubRunTask[], outcome: ToolOu
     } as UIMessage
 }
 
-// What a claude or codex run streams: the tool row carries the model's id under the bridged name,
-// the progress part an id the MCP bridge made up.
 export function cliDelegateMessage(id: string, tasks: SubRunTask[]): UIMessage {
     return {
         id,

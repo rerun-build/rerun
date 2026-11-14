@@ -2,18 +2,12 @@ import { friendlyError, type ChatErrorCopy } from '@/lib/chat-error'
 import type { NotificationKind } from '@/lib/engine/types'
 import type { StoredNotification } from '@/lib/notifications/inbound'
 
-// Android shows no subtitle, so its title carries what happened: a finished routine has no body and
-// would otherwise land as the coworker's name alone.
 export type PushCopy = { title: string; subtitle: string; androidTitle: string; body?: string; silent: boolean }
 
-// The `push` namespace, in the language of whoever receives it.
 export type PushTranslator = (key: `states.${NotificationKind}` | 'subtitle' | 'androidTitle', values?: Record<string, string>) => string
 
 const BODY_LIMIT = 180
 
-// An engine since `metadata.sourceName` names the routine on its own. An older one writes
-// `Schedule "<name>" failed: <error>` and keeps only the slug, so the name is read back from that
-// English sentence.
 const SCHEDULED_RUN = /^(?:Schedule|Trigger) "(.+?)" (?:failed|completed|stopped)/
 const RUN_PREFIX = /^(?:(?:Schedule|Trigger) ".+?" failed|Message failed): /
 
@@ -36,7 +30,6 @@ function errorOf(notification: StoredNotification): string {
 
 function bodyOf(notification: StoredNotification, tErrors: ChatErrorCopy): string | undefined {
     if (notification.kind === 'error') return friendlyError(errorOf(notification), tErrors)
-    // A finished schedule only says "completed", which the subtitle already does.
     if (notification.kind === 'done' && isScheduledEvent(notification.event)) return undefined
     return notification.message
 }
@@ -47,7 +40,6 @@ function oneLine(text: string | undefined): string | undefined {
     return line.length > BODY_LIMIT ? `${line.slice(0, BODY_LIMIT - 1).trimEnd()}…` : line
 }
 
-// Every push reads the same way on a lock screen: who, then where and what, then the detail.
 export function pushCopyOf({ agentName, notification, t, tErrors }: { agentName: string; notification: StoredNotification; t: PushTranslator; tErrors: ChatErrorCopy }): PushCopy {
     const sourceName = sourceNameOf(notification)
     const state = t(`states.${notification.kind}`)

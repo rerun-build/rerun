@@ -30,8 +30,6 @@ async function connect(agentId: string, takeover: TakeoverTarget | null): Promis
     return opened.ok ? { status: 'live', socketUrl: opened.socketUrl, dock: opened.dock } : { status: 'error', refusal: opened }
 }
 
-// The screen of the agent whose sheet is open, in a dialog to drive it. Watching it happens in that
-// agent's chat. It follows the sheet: another agent, or no sheet at all, closes it.
 export function AgentDesktopView() {
     const t = useTranslations('desktop.session')
     const agentId = useDesktopStore(s => s.agentId)
@@ -66,7 +64,6 @@ function DesktopSession({ agentId, takeover }: { agentId: string; takeover: Take
     const [busy, setBusy] = useState(false)
     const [browsing, setBrowsing] = useState(false)
     const viewerRef = useRef<DesktopViewerHandle>(null)
-    // Two clicks on Done would hand the browser back twice, and resume the run twice.
     const finishingRef = useRef(false)
     const browsingRef = useRef(false)
 
@@ -77,11 +74,8 @@ function DesktopSession({ agentId, takeover }: { agentId: string; takeover: Take
         })
         return () => {
             alive = false
-            // A browser opened from the notch holds the agent's profile for as long as it is open, so
-            // it closes with the view instead of being left to its fifteen-minute limit.
             if (browsingRef.current) void finishTakeoverAction(agentId)
         }
-        // Mounted once per session: the parent remounts this component for another agent or takeover.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 

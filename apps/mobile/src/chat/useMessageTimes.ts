@@ -7,11 +7,6 @@ const createdAtOf = (message: TimedMessage) => {
     return typeof createdAt === 'string' ? createdAt : undefined
 }
 
-/**
- * When each message was written, as on the web. The history carries the engine's time; a message sent
- * or streamed while the conversation is open has none until it is read back, so it is dated the moment
- * it first showed up.
- */
 export function useMessageTimes(messages: readonly TimedMessage[]): string[] {
     const [firstSeen] = useState(() => new Map<string, string>())
     return useMemo(

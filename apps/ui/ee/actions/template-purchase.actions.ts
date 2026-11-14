@@ -15,9 +15,6 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import type { ActionResult } from '@/app/api/_actions/space.actions'
 
-// A purchase is made by a workspace: any member may start one, and the button says whose card it
-// lands on. `purchased_by` keeps the record of who clicked.
-
 const slugSchema = z.string().trim().min(1).max(200)
 
 export type StartCheckoutResult = ActionResult<{ outcome: TemplateCheckoutOutcome }> | (ActionFailure & { needsPlan: true })
@@ -41,8 +38,6 @@ export async function confirmTemplatePurchaseAction(sessionId: string): Promise<
     }
 }
 
-// What the purchase dialog polls while it waits for the webhook, and what the library re-reads
-// after one lands.
 export async function getTemplateAccessAction(slug: string): Promise<ActionResult<{ access: PurchaseAccess }>> {
     try {
         const workspaceId = await requireWorkspaceId()

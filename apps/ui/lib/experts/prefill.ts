@@ -8,10 +8,6 @@ import { isValidTimeZone } from './schedule/window'
 import { detectExpertSource, type ExpertSource } from './source'
 import { canonicalXUrl, xUsername } from './x-scrape'
 
-// Same scrape + LLM pipeline as `importExpert`, but against a row that already exists: a program
-// application only carries what the candidate typed. Everything here only ever fills a blank, so a
-// task retry or a second run can never overwrite what they wrote themselves.
-
 export const PREFILL_COLUMNS = [
     'id',
     'slug',
@@ -34,9 +30,6 @@ export type PrefillResult = { ok: true; slug: string; source: ExpertSource } | {
 
 type PrefilledUrl = { url: string; source: ExpertSource }
 
-// LinkedIn carries a real career history, X only a 160-character bio and tweets, so LinkedIn wins
-// when both are given. Each candidate is validated on its parsed hostname rather than trusted,
-// so a website pasted in the LinkedIn field falls through to X instead of failing the scrape.
 export function pickProfileUrl(expert: Pick<ExpertPrefillRow, 'linkedin_url' | 'x_url'>): PrefilledUrl | null {
     for (const candidate of [expert.linkedin_url, expert.x_url]) {
         const url = candidate?.trim()
@@ -94,8 +87,6 @@ export async function prefillExpertFromProfile(supabase: SupabaseClient<Database
 
     const avatarUrl = !expert.avatar_url && scraped.photoUrl ? await rehostAvatar(supabase, scraped.photoUrl, expert.slug) : null
 
-    // The banner is left alone: the application already got one from the illustrations bucket, and
-    // an X header is rarely better than it.
     const patch = prefillPatch(expert, enriched, picked.source, picked.url, avatarUrl)
     if (Object.keys(patch).length === 0) return { ok: true, slug: expert.slug, source: picked.source }
 

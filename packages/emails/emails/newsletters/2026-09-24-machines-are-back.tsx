@@ -16,9 +16,6 @@ export const meta = {
   audience: "waitlist",
 } as const satisfies NewsletterMeta;
 
-// Not a NewsletterLayout: this is an access notice for people stuck on the waitlist, not a product
-// update, and it reuses a scene already served in production rather than a per-issue banner.
-// Nothing is reserved for the reader, so the copy never promises a machine.
 export default function MachinesAreBack({
   appUrl,
   unsubscribeUrl,

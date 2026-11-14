@@ -5,7 +5,6 @@ import { useEffect, useRef } from 'react'
 
 import { pushDataOf } from './push'
 
-// A tap on a push opens the conversation it is about, whether the app was running or launched by it.
 export function PushRouting() {
     const response = Notifications.useLastNotificationResponse()
     const handled = useRef<string | null>(null)

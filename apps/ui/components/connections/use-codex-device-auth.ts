@@ -18,7 +18,6 @@ export type CodexDeviceAuth = {
     error: string | null
     opening: boolean
     copied: boolean
-    // Since the code was handed out, ticking while it waits for OpenAI's approval.
     waitedMs: number
     start: () => Promise<void>
     copy: () => void
@@ -26,13 +25,8 @@ export type CodexDeviceAuth = {
 
 type KeysHandler = (keys: Record<string, string>) => Promise<{ success: boolean } & Refusal>
 
-// A second click asks OpenAI for a second code and opens a second tab, the first code then goes
-// nowhere.
 const OPEN_LOCK_MS = 5000
 
-// Codex has no pasteable token: the user types a short code on OpenAI's own page while we poll for
-// the approval. The direction of the code is the reverse of Claude's — we hand one out instead of
-// taking one in.
 export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSurface): CodexDeviceAuth {
     const t = useTranslations('connections.errors')
     const tCommon = useTranslations('common')
@@ -47,7 +41,6 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
     const [now, setNow] = useState(0)
     const [opening, setOpening] = useState(false)
     const openingRef = useRef(false)
-    // Callers pass an inline handler: keyed on it, the poll would restart on every render above.
     const onKeysRef = useRef(onKeys)
     useEffect(() => {
         onKeysRef.current = onKeys
@@ -92,8 +85,6 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
         return () => clearInterval(timer)
     }, [pending])
 
-    // Poll until the user approves, the request expires, or the row unmounts. `cancelled` guards the
-    // in-flight action so a late resolution cannot revive a torn-down flow.
     useEffect(() => {
         if (!pending) return
         let cancelled = false
@@ -109,7 +100,6 @@ export function useCodexDeviceAuth(onKeys: KeysHandler, surface: AiConnectionSur
                 }
                 return
             }
-            // A poll that failed to reach the server is retried on the next tick, like a pending one.
             const res = await pollCodexDeviceAuthAction(pending.deviceAuthId, pending.userCode).catch(() => ({ status: 'pending' as const }))
             if (cancelled || res.status === 'pending') return
             clearInterval(timer)

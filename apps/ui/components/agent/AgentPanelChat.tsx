@@ -19,12 +19,8 @@ import { CloseRunningTabDialog } from '@/components/dialogs/CloseRunningTabDialo
 import { Button } from '@/components/ui/button'
 import { ArrowRightIcon, WrenchIcon } from '@/lib/icons'
 
-// Combien de conversations restent montées derrière celle qu'on lit. Un onglet gardé vivant garde
-// tout son transcript dans le DOM, donc le coût d'un re-render du panneau grandit avec le nombre de
-// conversations ouvertes depuis le chargement de la page.
 const KEEP_ALIVE_TABS = 3
 
-// L'onglet d'une conversation qui tourne possède son stream : il ne se démonte pas, même vieux.
 function trimMountedTabs(uids: string[], busy: Set<string>): string[] {
     const kept = [...uids]
     for (let i = 0; kept.length > KEEP_ALIVE_TABS && i < kept.length - 1; ) {
@@ -37,12 +33,9 @@ function trimMountedTabs(uids: string[], busy: Set<string>): string[] {
 type AgentPanelChatProps = {
     agentId: string
     agentName: string
-    // The coworker on screen and unlocked. Several stay mounted behind it: only this one shows its
-    // tabs and answers the keyboard.
     selected: boolean
     openSessionRequest?: { sessionId: string; title: string; runId: string | null } | null
     onOpenSessionConsumed?: () => void
-    // The list of this coworker's conversations, floating over the thread while it is open.
     chats: ChatsFilter | null
     onCloseChats: () => void
 }
@@ -52,9 +45,6 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     const { tabs, activeIndex, createNew, selectTab, closeTab, openTab, updateTabByUid, updateTabTitle, setGeneralSessionId } = useSessionTabs(agentId)
     const { threads, refresh: refreshThreads } = useAgentThreads(agentId)
 
-    // General's row exists once someone has spoken in it; until then its tab opens on nothing, and
-    // the first message sent there creates it. A General opened after this read, by another tab or
-    // a teammate, arrives through the sessions channel below.
     useEffect(() => {
         let alive = true
         getGeneralSessionAction(agentId).then(general => alive && general && setGeneralSessionId(general.id)).catch(() => {})
@@ -63,18 +53,13 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         }
     }, [agentId, setGeneralSessionId])
     const [pendingCloseIndex, setPendingCloseIndex] = useState<number | null>(null)
-    // Read once per agent rather than per conversation tab: every tab shows the same gate, and it
-    // is the engine that decides when the install is over.
     const setup = useAgentSetup(agentId)
     const refreshSetup = setup.refresh
-    // A run can close the install and write skills: both are re-read once it is over.
     const handleRunFinished = useCallback(() => {
         refreshSetup()
         invalidateAgentSkillSummaries(agentId)
     }, [refreshSetup, agentId])
 
-    // A conversation that just opened may be the install starting: re-read the agent so every other
-    // tab learns it is under way, rather than offering to start it a second time.
     const setupStartable = setup.pending && !setup.sessionId
     const handleSessionCreated = useCallback(
         (uid: string, id: string) => {
@@ -93,21 +78,14 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
 
     const activeUid = tabs[activeIndex]?.uid
 
-    // An install runs in a thread of its own, never in General: while it is due, General hands over
-    // to a blank thread, where its gate stands.
     const installDue = setup.pending && !setup.skipped
     useEffect(() => {
         if (installDue && isGeneralTab(tabs[activeIndex])) createNew()
     }, [installDue, tabs, activeIndex, createNew])
 
-    // Session de kickoff créée côté serveur juste après la création de l'agent : on ouvre son
-    // onglet et on garde le run id sous la main pour que le chat se rattache au stream en cours.
     const pendingOpenSession = useBoardStore(s => s.pendingOpenSession)
     const clearPendingOpenSession = useBoardStore(s => s.clearPendingOpenSession)
     const [kickoffRun, setKickoffRun] = useState<{ sessionId: string; runId: string | null } | null>(null)
-    // A conversation opened from outside the panel (notification, inbox, search) lands on its end,
-    // even when its tab was already open and scrolled up. Counted per conversation so a tab's count
-    // never moves unless it is the one being opened.
     const [arrivals, setArrivals] = useState<Record<string, number>>({})
     const arriveAt = useCallback((sessionId: string) => setArrivals(prev => ({ ...prev, [sessionId]: (prev[sessionId] ?? 0) + 1 })), [])
 
@@ -119,10 +97,6 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         clearPendingOpenSession()
     }, [pendingOpenSession, agentId, openTab, clearPendingOpenSession, arriveAt])
 
-    // Keep-alive: on garde montés les derniers onglets visités pour ne pas perdre le stream/état en
-    // cours en changeant d'onglet. Un onglet n'est monté qu'une fois affiché (montage paresseux),
-    // et rangé du plus ancien au plus récent, le plafond évacuant les plus vieux. Un onglet démonté
-    // relit son transcript sur l'engine au retour.
     const [mountedUids, setMountedUids] = useState<string[]>(() => (activeUid ? [activeUid] : []))
 
     useEffect(() => {
@@ -132,7 +106,6 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         setMountedUids(prev => (prev[prev.length - 1] === activeUid ? prev : trimMountedTabs([...prev.filter(uid => uid !== activeUid), activeUid], busy)))
     }, [activeUid, tabs])
 
-    // Oublier les onglets fermés pour libérer la mémoire.
     useEffect(() => {
         const live = new Set(tabs.map(t => t.uid))
         setMountedUids(prev => {
@@ -160,8 +133,6 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         onOpenSessionConsumed?.()
     }, [openSessionRequest, openTab, onOpenSessionConsumed, arriveAt])
 
-    // Cmd/Ctrl+K : nouvelle conversation. Cmd/Ctrl+Backspace : fermer l'onglet actif, hors d'un champ
-    // où le raccourci efface le mot précédent.
     useEffect(() => {
         if (!selected) return
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -181,8 +152,6 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
         return () => document.removeEventListener('keydown', handleKeyDown)
     }, [selected, createNew, requestCloseTab, activeIndex])
 
-    // One channel on the coworker's sessions: a General opened elsewhere takes its pinned tab, a
-    // title the hub generated reaches its tab, and the threads of General are read again.
     useRealtimeSubscription('sessions', {
         channelId: `sessions-title-${agentId}`,
         filter: { column: 'agent_id', value: agentId },
@@ -201,14 +170,12 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
 
     return (
         <div className="flex flex-col h-full">
-            {/* Room for the pills that float over the top of the panel, and the open conversations under them. */}
             <div className="h-24 shrink-0" />
             {selected && (
                 <div className="absolute inset-x-0 top-[3.75rem] z-20">
                     <OpenChatsTabs tabs={tabs} activeIndex={activeIndex} onSelect={selectTab} onClose={requestCloseTab} onCreate={createNew} />
                 </div>
             )}
-            {/* Skipping hides the gate, not the fact that the agent still has nothing connected. */}
             {setup.pending && setup.skipped && (
                 <div className="flex shrink-0 items-center gap-2 border-b border-border bg-muted/40 py-1 pr-1.5 pl-3 text-xs text-muted-foreground">
                     <WrenchIcon className="size-3.5 shrink-0" />
@@ -218,8 +185,6 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                         variant="outline"
                         onClick={() => {
                             setup.unskip()
-                            // The gate only stands where a composer would, so it needs a conversation
-                            // nobody has spoken in: coming back to the setup opens one.
                             if (tabs[activeIndex]?.id) createNew()
                         }}
                     >

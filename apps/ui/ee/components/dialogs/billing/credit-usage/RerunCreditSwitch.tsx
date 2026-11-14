@@ -9,8 +9,6 @@ import { setRerunCreditPausedAction } from '@/ee/actions/billing.actions'
 import { Field } from '@/components/ui/field'
 import { Switch } from '@/components/ui/switch'
 
-// On by default. Off, the hub refuses every Rerun model and paid data call, so nothing is spent until
-// a member turns it back on. The workspace row follows over realtime, the switch only holds the click.
 export function RerunCreditSwitch({ paused }: { paused: boolean }) {
     const t = useTranslations('billing')
     const errorText = useErrorText()

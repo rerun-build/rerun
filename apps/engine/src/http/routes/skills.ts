@@ -50,8 +50,6 @@ export function createSkillFilesRouter(): Hono {
 
 skillRoutes.get('/', async c => {
     const agentId = requireAgent(c)
-    // The summary leaves out each body and file list: a listing that only shows names reads one
-    // frontmatter per skill instead of walking every skill folder.
     if (c.req.query('summary') === '1') return c.json({ skills: await listSkillSummaries(agentId) })
     return c.json({ skills: await listSkills(agentId) })
 })

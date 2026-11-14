@@ -12,8 +12,6 @@ export type RunTerminal = {
     runId: string | null
     trigger: RunTrigger
     kind: RunTerminalKind
-    // Set on a run the user or the engine stopped on purpose. The hub applies the session status
-    // without filing a notification: a Stop must clear the "working" state, not post "Run finished".
     cancelled?: boolean
     text?: string
     error?: string
@@ -25,8 +23,6 @@ export type RunTerminal = {
     costMicros?: number | null
 }
 
-// A stored run only keeps the trigger's slug, not its display name; the slug is the best label
-// available when the terminal event is rebuilt outside the run loop.
 export function triggerFromRun(run: { triggerSource: string | null; triggerSlug: string | null }): RunTrigger {
     if (run.triggerSource === 'schedule') return { source: 'schedule', slug: run.triggerSlug ?? '', name: run.triggerSlug ?? 'schedule' }
     if (run.triggerSource === 'trigger') return { source: 'trigger', slug: run.triggerSlug ?? '', name: run.triggerSlug ?? 'trigger' }
@@ -54,8 +50,6 @@ function describe(terminal: RunTerminal): { event: NotificationEvent; message: s
     }
 }
 
-// The one place a run announces it is over. Every terminal path goes through it: the run loop's
-// settle, the cancel route when it finds an orphan, and the boot reconciliation.
 export async function emitRunTerminal(terminal: RunTerminal): Promise<void> {
     const { event, message } = describe(terminal)
     const { trigger } = terminal
@@ -70,22 +64,12 @@ export async function emitRunTerminal(terminal: RunTerminal): Promise<void> {
     }
     if (trigger.source === 'schedule') metadata.scheduleSlug = trigger.slug
     if (trigger.source === 'trigger') metadata.triggerSlug = trigger.slug
-    // The routine's display name on its own, so the hub writes the notification in the reader's
-    // language instead of parsing the English `message`, which stays for the hubs that still do.
     if (trigger.source !== 'chat') metadata.sourceName = trigger.name
-    // The hub titles an automated session after what its run did, from this answer: the routine's
-    // name alone makes every run of it look the same in the list.
     const finalText = terminal.text?.trim()
     if (trigger.source !== 'chat' && finalText) metadata.finalText = finalText.slice(0, FINAL_TEXT_MAX)
-    // Who sent the message, so the hub credits the run to that member rather than to the owner.
     if (trigger.source === 'chat' && trigger.author) metadata.authorId = trigger.author.id
     if (terminal.error) metadata.error = terminal.error
     if (terminal.errorCode) metadata.errorCode = terminal.errorCode
-    // The hub classifies a notification as interactive or scheduled from the top-level `source`,
-    // and without it every failing cron was read as an interactive run: the "Scheduled tasks"
-    // preference silenced nothing and the errors arrived under the wrong switch. `chat` is not a
-    // `session_source` on the hub side, and sending it would fail validation of the whole payload,
-    // so an interactive run stays null.
     const source = trigger.source === 'chat' ? null : trigger.source
     await sendNotification({ event, kind: terminal.kind, agentId: terminal.agentId, sessionId: terminal.sessionId, runId: terminal.runId, message, source, metadata }).catch(() => {})
 }

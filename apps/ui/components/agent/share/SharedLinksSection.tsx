@@ -17,8 +17,6 @@ import type { WorkspaceShare } from '@/lib/agents/share-read'
 import { useCopy } from '@/lib/use-copy'
 import { useTranslations } from 'next-intl'
 
-// A link has no expiry, so revoking is the only way it ever ends: it has to be reachable from the
-// agent it came from, not only from the dialog that created it.
 export function SharedLinksSection({ agentId }: { agentId: string }) {
     const [shares, setShares] = React.useState<WorkspaceShare[] | null>(null)
     const canManage = useCanManageAgent(agentId)
@@ -29,8 +27,6 @@ export function SharedLinksSection({ agentId }: { agentId: string }) {
     React.useEffect(() => {
         let cancelled = false
         void listAgentSharesAction().then(result => {
-            // Filtered on the id rather than the name: two agents can share a name, and the name on
-            // a link is the one frozen when it was made.
             if (!cancelled) setShares(result.ok ? result.shares.filter(share => share.sourceAgentId === agentId) : [])
         })
         return () => {

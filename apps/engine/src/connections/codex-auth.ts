@@ -7,9 +7,6 @@ import { forgetCredentialRejected, recordCredentialRejected } from './credential
 import { withConnectionLock } from './lock.js'
 import type { LoadedConnection } from './types.js'
 
-// The Codex CLI's own public OAuth client. Same trade-off as claude-token.ts: an undocumented flow
-// we mirror so a user can connect a ChatGPT subscription without a terminal. See the UI's
-// lib/engine/codex-oauth.ts for the device-code half.
 const CODEX_OAUTH_CLIENT_ID = 'app_EMoamEEZ73f0CkXaXp7hrann'
 const CODEX_OAUTH_TOKEN_URL = 'https://auth.openai.com/oauth/token'
 const REFRESH_SKEW_MS = 5 * 60_000
@@ -20,7 +17,6 @@ const ID_TOKEN_KEY = 'CODEX_OAUTH_ID_TOKEN'
 const ACCOUNT_KEY = 'CODEX_OAUTH_ACCOUNT_ID'
 const EXPIRES_KEY = 'CODEX_OAUTH_EXPIRES_AT'
 
-// The on-disk shape the CLI reads and rewrites.
 type CodexAuthFile = {
     OPENAI_API_KEY: string | null
     tokens: { id_token: string; access_token: string; refresh_token: string; account_id: string | null }
@@ -69,7 +65,6 @@ async function refresh(connection: LoadedConnection, refreshToken: string): Prom
     })
     const data = (await res.json().catch(() => ({}))) as { access_token?: string; refresh_token?: string; id_token?: string }
     if (!res.ok || !data.access_token) {
-        // Same reading as claude-token.ts: a 400/401 is a refresh token OpenAI no longer honours.
         const dead = res.status === 400 || res.status === 401
         logger[dead ? 'error' : 'warn']({ connection: connection.id, status: res.status, hasAccessToken: !!data.access_token }, 'codex token refresh failed')
         if (dead) recordCredentialRejected(connection.id)
@@ -87,7 +82,6 @@ async function refresh(connection: LoadedConnection, refreshToken: string): Prom
     logger.info({ connection: connection.id, rotatedRefreshToken: !!data.refresh_token }, 'codex token refreshed')
 }
 
-// The access token is a JWT; its `exp` claim is the only expiry the token endpoint gives us.
 export function jwtExpiresAt(jwt: string): number | undefined {
     const payload = jwt.split('.')[1]
     if (!payload) return undefined
@@ -99,9 +93,6 @@ export function jwtExpiresAt(jwt: string): number | undefined {
     }
 }
 
-// Refresh the access token if it is about to lapse, then materialise `$CODEX_HOME/auth.json` so the
-// CLI picks it up. Refreshing here rather than leaving it to the CLI keeps the .env authoritative
-// for as long as possible; syncCodexAuth reconciles whatever the CLI rotates mid-run.
 export async function ensureCodexAuth(connection: LoadedConnection | null): Promise<void> {
     if (!connection) return
     if (!connection.env[TOKEN_KEY]) {
@@ -126,9 +117,6 @@ export async function ensureCodexAuth(connection: LoadedConnection | null): Prom
     return task
 }
 
-// The CLI refreshes on its own during long runs and rotates the refresh token when it does. Read the
-// file back so the connection's .env keeps the live lineage — a stale refresh token would fail the
-// next run, and now for every agent sharing the subscription rather than just one.
 export async function syncCodexAuth(connection: LoadedConnection | null): Promise<void> {
     if (!connection) return
     const raw = await readFile(codexAuthPath(connection.id), 'utf8').catch(() => null)

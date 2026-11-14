@@ -41,9 +41,6 @@ export type AppAccountPickerViewProps = {
     onWakeChange: (events: string[]) => void
 }
 
-// The coworker's whole sign-in to a paid app: the account was connected once for the workspace,
-// the coworker only picks which one it acts with, and whether its events wake it up. Picking is
-// the install, so there is nothing to confirm after it.
 export function AppAccountPickerView({ title, ...props }: AppAccountPickerViewProps) {
     const t = useTranslations('services.appAccount')
     const accounts = props.overview?.connections.filter(connection => PICKABLE.has(connection.status)) ?? []

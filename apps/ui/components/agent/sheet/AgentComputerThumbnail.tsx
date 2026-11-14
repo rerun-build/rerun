@@ -15,15 +15,10 @@ type Screen = { status: 'loading' } | { status: 'live'; socketUrl: string } | { 
 type AgentComputerThumbnailProps = {
     agentId: string
     working: boolean
-    // Why the machine cannot be reached at all: nothing is opened, the reason takes the screen's place.
     disabledReason: string | null
     onOpen: () => void
 }
 
-/**
- * What the coworker has in front of it, watched rather than described. A click opens the screen to
- * drive it. Key it on the agent and the reason: it connects once per mount.
- */
 export function AgentComputerThumbnail({ agentId, working, disabledReason, onOpen }: AgentComputerThumbnailProps) {
     const t = useTranslations('agent.agentComputerThumbnail')
     const errorText = useErrorText()

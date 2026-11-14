@@ -15,7 +15,6 @@ import { radius, spacing } from '@/theme/tokens'
 import { HitlAction, HitlCard } from './HitlCard'
 import type { HitlWidgetProps } from './registry'
 
-// The web's status badge: an unknown status shows nothing rather than a guess.
 function StatusBadge({ status }: { status: McpServerView['status'] }) {
     const t = useTranslations('mobileHitl.mcp')
     if (status === 'connected') return <Badge size="xs" tone="green" label={t('connected')} />
@@ -77,8 +76,6 @@ export function McpSignInCard({ name, reason, server, loading, busy, error, onSk
     )
 }
 
-// The sign-in a coworker asks for after registering a server that answered 401: the person connects
-// here in the in-app browser and the coworker picks up on its own, as on the web.
 export function McpWidget({ pending, agentId, onAnswer }: HitlWidgetProps) {
     const t = useTranslations('mobileHitl.mcp')
     const { session, me } = useAuth()

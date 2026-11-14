@@ -6,8 +6,6 @@ import { track } from '@rerun/analytics/client'
 import type { SignupStep, SignupSurface } from '@rerun/analytics'
 import { useCallback, useEffect, useRef } from 'react'
 
-// Opens and closes the signup the funnel counts, wherever the form is drawn. `active` is whether the
-// form is on screen; one signup is abandoned at most once, and never once it has led into an account.
 export function useSignupFunnel({ surface, active, initialStep }: { surface: SignupSurface; active: boolean; initialStep: SignupStep }) {
     const step = useRef(initialStep)
     const openedAt = useRef(0)
@@ -34,8 +32,6 @@ export function useSignupFunnel({ surface, active, initialStep }: { surface: Sig
         [surface]
     )
 
-    // A wall that cannot be dismissed is never closed, so the page itself going away is watched too.
-    // `beforeunload` is what tells its hidden step from a tab switch: see `createLeaveWatcher`.
     useEffect(() => {
         if (!active) return
         const watcher = createLeaveWatcher(leave)

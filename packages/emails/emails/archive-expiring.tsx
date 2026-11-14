@@ -10,26 +10,17 @@ import { text } from "../theme";
 
 export interface ArchiveExpiringProps {
   workspaceName: string | null;
-  /** When the workspace was paused, "12 March". Preformatted. */
   pausedLabel: string;
-  /** When the saved copy is deleted, "10 June". Preformatted. */
   deletionLabel: string;
   agentCount: number;
   billingUrl: string;
-  /** An archived sandbox comes back through a request to us, not through a subscription. */
   sandbox?: boolean;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
 }
 
-/**
- * The last word on a paused workspace, a week before its saved copy is deleted. Every email before
- * this one could truthfully say nothing was deleted; this one cannot, so it states the date and
- * says plainly that it is the last chance.
- */
 export default function ArchiveExpiring({
   workspaceName,
   pausedLabel,

@@ -28,11 +28,6 @@ type OpenChatsTabsProps = {
     onCreate: () => void
 }
 
-/**
- * The coworker's open conversations, left-aligned under the pills: General pinned first, out of the
- * row that scrolls, then the open threads, the active one on a muted fill, the others as plain text.
- * Too many to fit, the row scrolls and only the edge still hiding a tab fades.
- */
 export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }: OpenChatsTabsProps) {
     const t = useTranslations('agent.openChatsTabs')
     const [scroller, setScroller] = useState<HTMLDivElement | null>(null)
@@ -105,12 +100,6 @@ export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate }
     )
 }
 
-/**
- * The main chat's tab sits outside the threads' scrolling row, so it never scrolls away nor closes.
- * A beam sets it apart from the threads' tabs: it spins in the brand color while it is the one open,
- * and pauses where it is in the default color otherwise. Two beams fade into each other, so the
- * color changes without the ring jumping.
- */
 function MainChatTab({ active, onSelect }: { active: boolean; onSelect: () => void }) {
     const t = useTranslations('agent.openChatsTabs')
     const animationPlayState = active ? 'running' : 'paused'

@@ -26,8 +26,6 @@ const fresh: ForemanState = {
 const plan = { title: 'Retalk SEO Team', items: [{ kind: 'agent' as const, name: 'Scout', role: 'keyword research' }] }
 
 describe('createForemanTurn', () => {
-    // The bug this exists for: save_profile used to land on a phase resolved before the turn
-    // started, so the model kept the belt of the step it had just left.
     it('walks discover to the plan when the profile is saved mid-turn', () => {
         const turn = createForemanTurn(fresh)
         expect(turn.state().phase).toBe('discover')

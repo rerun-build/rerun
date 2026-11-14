@@ -51,7 +51,6 @@ function App() {
     const settled = signedIn && me !== null
     const aiConsent = useAiConsent(session?.user.id ?? null)
     const consentKnown = !signedIn || aiConsent.state !== 'loading'
-    // The first coworker the onboarding started, opened once the app has taken over from it.
     const [lead, setLead] = useState<LeadStarted | null>(null)
 
     useEffect(() => {
@@ -85,7 +84,6 @@ function App() {
 
     return (
         <ThemeProvider value={navigationTheme}>
-            {/* iOS picks the bar's ink from the appearance on its own; Android keeps light icons unless told. */}
             <StatusBar barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'} />
             <BuddyClock>
                 {updateRequired ? (
@@ -172,7 +170,6 @@ function App() {
 export default function RootLayout() {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            {/* Before App, whose first render waits on the fonts: the screens it mounts then already read it. */}
             <ReducedMotionOverride />
             <AuthProvider>
                 <I18nProvider>

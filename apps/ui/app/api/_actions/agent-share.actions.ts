@@ -13,11 +13,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AppError, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 
-// Unlike a template capture, none of this is gated on the sandbox: a share is a transfer to one
-// person behind an unguessable, revocable token, not a page anyone installs from. What replaces
-// that gate is the freeze (the snapshot cannot grow after it is sent), the redaction (the engine
-// strips every credential on the way out) and revocation (the object is deleted, not flagged).
-
 type ActionResult<T = unknown> = ({ ok: true } & T) | ActionFailure
 
 export async function planAgentShareAction(agentId: string): Promise<ActionResult<{ plan: AgentSharePlan }>> {
@@ -66,9 +61,6 @@ export async function revokeAgentShareAction(shareId: string): Promise<ActionRes
     }
 }
 
-// No session at all: the token is the capability, and this is what a visitor without an account
-// reads before deciding to sign up. A revoked, swept or never-real token answers the same `null`,
-// so the link cannot be used to confirm that something once existed here.
 export async function getSharedAgentAction(token: string): Promise<AgentSharePreview | null> {
     const parsed = z.string().trim().max(64).safeParse(token)
     if (!parsed.success) return null
@@ -83,12 +75,6 @@ const installInputSchema = z.object({
 
 export type InstallSharedAgentResult = ({ ok: true } & AgentShareInstallOutcome) | ActionFailure
 
-// The target space comes from the client but its workspace never does: assertSpaceAccess resolves
-// it from the session, so an id from somewhere else resolves to "Box not found".
-//
-// The plan gate is re-checked here for the same reason it is on a template install: this action
-// lands paid compute from a link anyone can hold, so UI-only gating would mean calling the action
-// by hand is enough to skip it.
 export async function installSharedAgentAction(input: unknown): Promise<InstallSharedAgentResult> {
     try {
         const { token, spaceId, position } = installInputSchema.parse(input)

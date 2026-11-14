@@ -23,8 +23,6 @@ function parseWindow(value: string): number | null | undefined {
     return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined
 }
 
-// What the server does not say about itself. Each field saves on blur, like the rest of the detail;
-// a value that could not be valid yet is an edit in progress, not something to send.
 export function CustomEndpointSettings({ connection, onPatch }: CustomEndpointSettingsProps) {
     const t = useTranslations('connections.custom')
     const locale = useLocale()

@@ -1,8 +1,5 @@
 import { cn } from '../cn'
 
-// Le papier millimétré sous les faisceaux, masqué en ellipse pour que la grille s'éteigne avant
-// les bords. Le rect déborde largement du viewBox : le motif reste continu quel que soit le
-// cadrage. `id` est obligatoire, deux grilles sur la même page ne peuvent pas partager un pattern.
 export function BeamGrid({ id, viewW, viewH, grid = 40, className }: { id: string; viewW: number; viewH: number; grid?: number; className?: string }) {
     return (
         <svg

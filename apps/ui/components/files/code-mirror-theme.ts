@@ -3,8 +3,6 @@ import { EditorView } from '@codemirror/view'
 import { tags } from '@lezer/highlight'
 import type { Extension } from '@codemirror/state'
 
-// The chrome borrows the design tokens so the editor sits in the panel without a seam. Syntax
-// colours cannot: the token set is deliberately greyscale, and code needs hue to be readable.
 const CHROME = EditorView.theme({
     '&': { backgroundColor: 'transparent', color: 'var(--foreground)', height: '100%' },
     '&.cm-focused': { outline: 'none' },

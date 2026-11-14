@@ -5,29 +5,14 @@ import { type RefObject, useEffect, useRef } from 'react'
 
 type Point = { x: number; y: number }
 
-// How the Foreman answers the pointer. The eyes take its direction over a short reach, the creature
-// leans a few pixels toward it, and its light swings to fall where it points, never higher than the
-// horizon: a light that rose would leave the field it is there to light.
 const LOOK_REACH = 320
 const LEAN = { x: 0.035, y: 0.025, max: 14 }
 const SWING_MAX = 48
-// From the Orb's centre down to the top of the field, where the swung light lands, in the New agent
-// dialog. A layout that sets the Orb elsewhere says its own.
 const DIALOG_FIELD_DROP = 108
 const REST = 0.01
 
 const clamp = (value: number, max: number) => Math.max(-max, Math.min(max, value))
 
-// Drives everything from one loop, without a render: the eyes through the returned ref, the lean
-// and the light through CSS variables on the root (--orb-x, --orb-y, --light-angle and its absolute
-// value --light-tilt, --light-dx), and the drawn cursor of a capture through `cursorRef`. `aim` is a
-// selector inside the root the pointer rests on before any real one moves, for a still that has to
-// show where it points.
-//
-// `anchorRef` is where the Orb rests, on an element its lean does not move: the dialog's height
-// follows the window, so the Orb's place in it is measured rather than known.
-//
-// Someone who asked for less motion gets an Orb that stays put and a light that falls straight.
 export function useFollow({ rootRef, anchorRef, cursorRef, aim, fieldDrop = DIALOG_FIELD_DROP }: { rootRef: RefObject<HTMLElement | null>; anchorRef: RefObject<HTMLElement | null>; cursorRef?: RefObject<HTMLElement | null>; aim?: string; fieldDrop?: number }) {
     const gazeRef = useRef<OrbGaze | null>(null)
 
@@ -70,9 +55,6 @@ export function useFollow({ rootRef, anchorRef, cursorRef, aim, fieldDrop = DIAL
                 cursor.style.opacity = pointer ? '1' : '0'
                 if (pointer) cursor.style.transform = `translate(${pointer.x}px, ${pointer.y}px)`
             }
-            // With no pointer and everything back at rest there is nothing left to draw: the loop
-            // stops instead of rewriting the same five variables sixty times a second, which on a
-            // phone is its whole life.
             const atRest = !pointer && Math.abs(current.ox) < REST && Math.abs(current.oy) < REST && Math.abs(current.angle) < REST
             frame = atRest ? null : requestAnimationFrame(tick)
         }
@@ -111,7 +93,6 @@ function anchorIn(root: HTMLElement, anchor: HTMLElement | null): Point {
     return { x: box.left - origin.left + box.width / 2, y: box.top - origin.top + box.height / 2 }
 }
 
-// A little inside the element's centre, where a hand resting on it would put the arrow's tip.
 function aimAt(root: HTMLElement, selector: string): Point | null {
     const target = root.querySelector(selector)
     if (!target) return null

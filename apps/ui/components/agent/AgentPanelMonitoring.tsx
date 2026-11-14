@@ -54,7 +54,6 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
     const [expandedKey, setExpandedKey] = useState<string | null>(null)
 
     const load = useCallback(async () => {
-        // The usage endpoint has no 90d bucket, so widen it to all-time for that range.
         const usageRange: UsageTimeRange = range === '90d' ? 'all' : range
         const { usage: usageResult, stats: statsResults } = await readAgentMonitoringAction(
             agentId,

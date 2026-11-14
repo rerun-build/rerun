@@ -47,8 +47,6 @@ function reasonSchemaOf(t: BillingT) {
 
 type ReasonValues = z.infer<ReturnType<typeof reasonSchemaOf>>
 
-// An answer that does not read as a reason is turned down this many times, then let through: the
-// check is there to get a real answer, never to keep someone from cancelling.
 const MAX_REASON_REFUSALS = 2
 
 export type CancelInput = { comeback: CancelComeback; comment: string }
@@ -61,11 +59,9 @@ export type CancelFlowProps = {
     activityLoading: boolean
     agentCount: number
     creditLeftLabel: string
-    // Each resolves to whether it went through; the flow only moves on when it did.
     onRemind: () => Promise<boolean>
     onClaim: () => Promise<boolean>
     onCancel: (input: CancelInput) => Promise<boolean>
-    // null when the answer could not be read at all, which lets it through.
     onCheckReason: (text: string) => Promise<CancelReasonCheckResult | null>
     onResume: () => Promise<boolean>
     onClose: () => void
@@ -368,8 +364,6 @@ function offerCopyOf(t: BillingT, offer: NonNullable<CancelFlowState['offer']>, 
         }
     }
 
-    // The $1 is the base plan's price: with add-ons the card shows the base plan against its list
-    // price, and the add-ons, billed as usual, are spelled out underneath.
     const addonsCents = offer.fullPriceCents - offer.basePriceCents
     return {
         headline: t('cancel.offer.nextMonth.headline'),

@@ -8,8 +8,6 @@ import { logger } from '../lib/logger.js'
 
 const dataVersionSchema = z.object({ version: z.number().int().nonnegative(), commit: z.string().nullable(), migratedAt: z.string() })
 
-// A missing file is a folder from before the ladder. An unreadable one is treated the same way: every
-// step is re-runnable, so replaying from v0 is safe where guessing a version would not be.
 export function readDataVersion(): number {
     const path = dataVersionPath()
     if (!existsSync(path)) return 0

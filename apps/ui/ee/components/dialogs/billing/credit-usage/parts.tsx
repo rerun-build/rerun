@@ -11,8 +11,6 @@ import { BrainIcon, CpuIcon, UsersIcon, ZapIcon, type LucideIcon } from '@/lib/i
 import { paidDataIcon } from '@/lib/paid-data/spend'
 import { cn } from '@/lib/utils'
 
-// Validated with the dataviz palette checker against both surfaces: indigo is the brand, amber stays
-// apart from it under every colour-vision deficiency.
 export const KIND_FILL: Record<CreditKind, string> = {
     ai: 'bg-[#4d34f7] dark:bg-[#7a66ff]',
     data: 'bg-[#c27a12] dark:bg-[#c8841f]',
@@ -24,7 +22,6 @@ function sourceIcon(source: CreditSource): LucideIcon {
     return source.kind === 'ai' ? TIER_ICON[source.tier] : paidDataIcon(source.capability)
 }
 
-// A Rerun model reads by its tier, a paid data source by its capability.
 export function useSourceLabel(): (source: CreditSource) => string {
     const t = useTranslations('billing')
     return source => (source.kind === 'ai' ? t(`usage.tier.${source.tier}`) : t(`usage.paidData.${source.capability}`))
@@ -56,9 +53,6 @@ const HATCH = { backgroundImage: 'repeating-linear-gradient(65deg, color-mix(in 
 
 type Segment = { key: string; micros: number; className: string; label: string; hatched?: boolean }
 
-// The whole credit on one track: what AI and paid data spent, then what is left of the month, then
-// the top-up that outlives the reset, hatched so it reads as a reserve rather than more month. A
-// trial's credit is all top-up and never resets, so it is simply what is left.
 export function SplitBar({ balance, trial = false }: { balance: CreditBalance; trial?: boolean }) {
     const locale = useLocale()
     const t = useTranslations('billing')

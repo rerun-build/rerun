@@ -4,10 +4,6 @@ import { extname, resolve } from 'node:path'
 import type { FileCard } from '@rerun/contracts'
 import { workspaceDir } from '../config/paths.js'
 
-// Codex's own image tool, named by the provider patch. Codex writes the picture under the
-// connection's CODEX_HOME, a folder the chat cannot reach, and tells the model it is "already
-// displayed to the user": the only way it shows is to copy it into the coworker's workspace and hand
-// the chat the same card card_file would.
 export const IMAGE_GENERATION_TOOL = 'image_generation'
 export const GENERATED_IMAGES_DIR = 'generated-images'
 
@@ -62,8 +58,6 @@ const BASE64_MAGIC: Array<[prefix: string, extension: ImageExtension]> = [
     ['UklGR', 'webp'],
 ]
 
-// The extension of the file Codex saved when it names one, the magic bytes of the inline data
-// otherwise: the card and the MIME type the hub serves follow the name.
 function extensionOf(item: ImageGenerationItem): ImageExtension {
     const saved = item.savedPath ? extname(item.savedPath).slice(1).toLowerCase() : ''
     if (saved === 'jpeg' || saved === 'jpg') return 'jpg'
@@ -74,9 +68,6 @@ function extensionOf(item: ImageGenerationItem): ImageExtension {
 
 const fileSafe = (id: string) => id.replace(/[^a-zA-Z0-9._-]/g, '_') || 'generated_image'
 
-// Copies the picture into the workspace, from the file Codex saved when it is readable, from the
-// inline bytes otherwise. The original stays where Codex put it: the model refers to that path for
-// a later edit.
 export async function saveGeneratedImage(agentId: string, item: ImageGenerationItem): Promise<FileCard> {
     const name = `${fileSafe(item.id)}.${extensionOf(item)}`
     const dir = resolve(workspaceDir(agentId), GENERATED_IMAGES_DIR)
@@ -97,10 +88,6 @@ export async function saveGeneratedImage(agentId: string, item: ImageGenerationI
     return { kind: 'file', files: [{ path: `${GENERATED_IMAGES_DIR}/${name}`, name, size, scope: 'agent' }] }
 }
 
-// The provider hands the whole item as the tool input and as its result, inline bytes included: the
-// input shrinks to the prompt, the result becomes a file card or an error, so neither the stored
-// transcript nor the stream carries a wall of base64. An input delta only names its call id, so the
-// ids of the image calls are remembered from their `tool-input-start`.
 export async function rewriteImageGenerationPart<Part extends { type: string }>(agentId: string, part: Part, imageCalls: Set<string> = new Set()): Promise<Part> {
     const item = part as Part & ToolPart
     if (item.type === 'tool-input-delta') {

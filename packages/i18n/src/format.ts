@@ -6,8 +6,6 @@ const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 const WEEK = 7 * DAY
 
-// The English output predates the packs: short dates read day first (en-GB) and long ones the US
-// way. Kept as they were, so turning the packs on changes nothing for an English reader.
 function tag(locale: string, english: 'en-GB' | 'en-US'): string {
     return locale === DEFAULT_LOCALE || locale === PSEUDO_LOCALE ? english : locale
 }
@@ -34,7 +32,6 @@ function dayMonth(date: Date, locale: string, now: Date): string {
     return date.toLocaleDateString(tag(locale, 'en-GB'), { day: '2-digit', month: '2-digit', ...(sameYear ? {} : { year: '2-digit' }) })
 }
 
-/** "now", "5m", "3h", "2d", then a short date: how long ago, in as few characters as possible. */
 export function shortRelativeTime(iso: string, locale: string = DEFAULT_LOCALE, now: Date = new Date()): string {
     const date = new Date(iso)
     const diff = now.getTime() - date.getTime()
@@ -46,7 +43,6 @@ export function shortRelativeTime(iso: string, locale: string = DEFAULT_LOCALE, 
     return dayMonth(date, locale, now)
 }
 
-/** "now", "in 5m", "in 3h", then a short date: how long until. */
 export function shortUntil(iso: string, locale: string = DEFAULT_LOCALE, now: Date = new Date()): string {
     const date = new Date(iso)
     const diff = date.getTime() - now.getTime()
@@ -64,7 +60,6 @@ export function fullDateTime(iso: string, locale: string = DEFAULT_LOCALE): stri
 
 const clocks = new Map<string, Intl.DateTimeFormat>()
 
-// The 12 or 24 hour clock is the browser's, whatever the language of the words.
 function clock(locale: string): Intl.DateTimeFormat {
     let format = clocks.get(locale)
     if (!format) {
@@ -83,7 +78,6 @@ export function calendarDaysBetween(earlier: Date, later: Date): number {
     return Math.round((startOf(later) - startOf(earlier)) / DAY)
 }
 
-/** "Today", "Yesterday", a weekday within the week, a date beyond. */
 export function messageDayLabel(iso: string, locale: string = DEFAULT_LOCALE, now: Date = new Date()): string {
     const date = new Date(iso)
     const daysAgo = calendarDaysBetween(date, now)
@@ -94,22 +88,18 @@ export function messageDayLabel(iso: string, locale: string = DEFAULT_LOCALE, no
     return date.toLocaleDateString(language, { weekday: 'short', month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) })
 }
 
-/** "Mar 5" */
 export function shortDate(date: Date | string, locale: string = DEFAULT_LOCALE): string {
     return new Date(date).toLocaleDateString(tag(locale, 'en-US'), { month: 'short', day: 'numeric' })
 }
 
-/** "12 March": the day of a deadline, in UTC, as an email states it. */
 export function dayAndMonth(date: Date | string, locale: string = DEFAULT_LOCALE): string {
     return new Date(date).toLocaleDateString(tag(locale, 'en-GB'), { day: 'numeric', month: 'long', timeZone: 'UTC' })
 }
 
-/** "16:00": a time of day in UTC, on the 24-hour clock whatever the reader's. */
 export function utcClockTime(date: Date | string, locale: string = DEFAULT_LOCALE): string {
     return new Date(date).toLocaleTimeString(tag(locale, 'en-GB'), { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
 }
 
-/** "Mar 5, 2026" */
 export function longDate(date: Date | string, locale: string = DEFAULT_LOCALE): string {
     return new Date(date).toLocaleDateString(tag(locale, 'en-US'), { month: 'short', day: 'numeric', year: 'numeric' })
 }
@@ -132,7 +122,6 @@ export function formatBytes(bytes: number, locale: string = DEFAULT_LOCALE): str
     return new Intl.NumberFormat(locale, { style: 'unit', unit: BYTE_UNITS[power], unitDisplay: 'short', minimumFractionDigits: power ? 1 : 0, maximumFractionDigits: power ? 1 : 0 }).format(value)
 }
 
-/** "45s", "12 min", "2h 5m": how long something took. */
 export function formatDuration(ms: number, locale: string = DEFAULT_LOCALE): string {
     const minutes = Math.round(ms / MINUTE)
     if (isEnglish(locale)) {
@@ -150,21 +139,17 @@ export function formatDuration(ms: number, locale: string = DEFAULT_LOCALE): str
     return rest ? `${unit(hours, 'hour', 'narrow')} ${unit(rest, 'minute', 'narrow')}` : unit(hours, 'hour', 'narrow')
 }
 
-/** "Mar 2 to Mar 8": a range of UTC days. */
 export function formatDayRange(start: Date, end: Date, locale: string = DEFAULT_LOCALE): string {
     const format = new Intl.DateTimeFormat(tag(locale, 'en-US'), { month: 'short', day: 'numeric', timeZone: 'UTC' })
     if (isEnglish(locale)) return `${format.format(start)} to ${format.format(end)}`
     return format.formatRange(start, end)
 }
 
-/** The short weekday names, Monday first. */
 export function weekdayNames(locale: string = DEFAULT_LOCALE): string[] {
     const format = new Intl.DateTimeFormat(tag(locale, 'en-US'), { weekday: 'short', timeZone: 'UTC' })
-    // 2024-01-01 is a Monday.
     return Array.from({ length: 7 }, (_, day) => capitalize(format.format(new Date(Date.UTC(2024, 0, 1 + day))), locale))
 }
 
-/** Any date with its own options: the English reading keeps the US form it always had. */
 export function formatDate(date: Date | string | number, locale: string = DEFAULT_LOCALE, options?: Intl.DateTimeFormatOptions): string {
     return new Date(date).toLocaleString(tag(locale, 'en-US'), options)
 }

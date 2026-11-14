@@ -19,7 +19,6 @@ import { CoworkerPage, LoadFailed } from './CoworkerPage'
 const ICON_SIZE = 32
 const ROW_INSET = spacing.lg + ICON_SIZE + spacing.md
 
-// The web's ServiceList words.
 const ATTENTION: Partial<Record<InstalledServiceView['status'], { label: 'needsSignIn' | 'needsSetup' | 'error'; tone: 'orange' | 'red' }>> = {
     needs_auth: { label: 'needsSignIn', tone: 'orange' },
     needs_config: { label: 'needsSetup', tone: 'orange' },
@@ -84,18 +83,14 @@ function AppsSkeleton() {
 
 type CoworkerAppsProps = {
     name: string
-    // Null while on its way.
     apps: InstalledServiceView[] | null
     connectingKey: string | null
     onConnect: (app: InstalledServiceView) => void
     failed?: boolean
-    // Whether the caller can change the coworker's apps, and why not when they cannot.
     lock?: ManageLock
     onBack: () => void
 }
 
-// What the coworker is connected to. Adding an app goes through the chat: the coworker picks it, and
-// its card connects it.
 export function CoworkerApps({ name, apps, connectingKey, onConnect, failed, lock = OPEN_LOCK, onBack }: CoworkerAppsProps) {
     const t = useTranslations('mobileCoworker.apps')
     const tAccess = useTranslations('mobileCoworker.access')

@@ -4,11 +4,6 @@ import { BUDGET_OPTIONS, EXPERT_TYPES, LANGUAGE_OPTIONS, SKILL_OPTIONS } from '@
 import { openrouter } from '@/lib/ai/openrouter'
 import type { ExpertSource } from './source'
 
-// Turns a raw scraped profile into a clean expert record. The zod schema constrains every
-// list-backed field to the allowed marketplace values, so the model can only map onto what the
-// landing filters understand — anything it can't confidently map is left empty. Only the source
-// instructions differ between LinkedIn and X: the fields we want out are the same.
-
 const ENRICH_MODEL = process.env.EXPERTS_ENRICH_MODEL ?? 'anthropic/claude-sonnet-5'
 
 const enrichedExpertSchema = z.object({

@@ -24,13 +24,6 @@ import type { BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault,
 import { customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
 import { refusal, refusalOf, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
-// The AI providers of the workspace, for the web dialog. The workspace of the session is the whole
-// scope, so these actions take no id at all; the logic is shared with the app in ai-connection.service.
-//
-// Server Actions cannot surface a thrown message in production (Next redacts it to a digest), so
-// the mutations answer with a serializable result instead of throwing. A workspace with no engine
-// yet reads as empty rather than as an error.
-
 type Refusal = { success: false } & ActionRefusal
 type Result = { success: true } | Refusal
 
@@ -46,12 +39,8 @@ function refusedNoPlan(code: ErrorCode): Refusal & { reason: 'no_plan' } {
     return { success: false, ...refusal(code), reason: 'no_plan' }
 }
 
-// `no_plan` lets the caller offer the trial instead of a dead end: without a plan there is no machine
-// to hold a credential, whatever the user pastes.
 type CreateResult = { success: true; connection: BoxConnection } | (Refusal & { reason?: 'no_plan' })
 
-// `opencodeOffered`: whether this workspace may add OpenCode, behind its flag and on an engine that
-// runs it. `customOffered`: whether its engine runs custom endpoints.
 type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
 
 async function readAiConnections(): Promise<AiConnectionsList> {
@@ -68,8 +57,6 @@ export async function listAiConnectionsAction(): Promise<AiConnectionsList> {
     }
 }
 
-// The same list for a store that already holds one: null when the hub or the engine did not answer,
-// so the caller keeps what it has instead of taking the empty list for the workspace's.
 export async function refreshAiConnectionsAction(): Promise<AiConnectionsList | null> {
     try {
         return await readAiConnections()
@@ -137,9 +124,6 @@ export async function deleteAiConnectionAction(id: string): Promise<{ success: t
         return refused(err, 'deleteConnectionFailed')
     }
 }
-
-// The exchange returns the keys rather than persisting them: the caller either creates a
-// connection with them or patches an existing one, and only it knows which.
 
 export async function startClaudeOAuthAction(): Promise<ClaudeOAuthStart> {
     return startClaudeSignIn()

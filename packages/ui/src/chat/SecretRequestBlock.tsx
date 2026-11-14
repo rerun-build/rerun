@@ -18,10 +18,8 @@ export type SecretRequestBlockProps = {
     existingKeys?: string[]
     onSubmit: (values: Record<string, string>) => Promise<void> | void
     onSkip?: () => void
-    // The close button, when it must mean something else than Skip. Falls back to Skip.
     onDismiss?: () => void
     disabled?: boolean
-    // Rendered in the conversation's own scroll rather than pinned above the composer: no dock margin.
     inline?: boolean
     className?: string
 }
@@ -35,9 +33,6 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
     const [submitted, setSubmitted] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    // The states above only drive the disabled styling. Answering the agent twice starts two runs
-    // on the same conversation, so the latch that guards it has to be a ref: two callbacks fired
-    // from the same render both read the same stale `saving` / `submitted`.
     const busyRef = useRef(false)
 
     const locked = disabled || saving || submitted
@@ -50,11 +45,9 @@ export function SecretRequestBlock({ secrets, reason, existingKeys = [], onSubmi
         setError(null)
         try {
             await onSubmit(Object.fromEntries(filled.map(item => [item.key, values[item.key].trim()])))
-            // The values only ever live in this form: drop them as soon as the engine has them.
             form.reset(blankValues)
             setSubmitted(true)
         } catch (err) {
-            // The credentials were not stored, so the block has to stay answerable.
             busyRef.current = false
             setError(err instanceof Error ? err.message : t('chat.secret.saveFailed'))
         } finally {

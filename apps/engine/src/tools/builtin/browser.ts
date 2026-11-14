@@ -25,8 +25,6 @@ const RENDER_SETTLE_MS = 5_000
 const CONSENT_TIMEOUT_MS = 2_000
 const BLOCKED_RESOURCE_TYPES = new Set(['image', 'media', 'font'])
 const PROFILE_LOCK_FILES = ['SingletonLock', 'SingletonCookie', 'SingletonSocket']
-// Only cookies, consents and storage are worth keeping between calls; the caches would grow every
-// agent's profile by tens of MB on boxes whose disk is already short.
 const PROFILE_CACHE_DIRS = ['Default/Cache', 'Default/Code Cache', 'Default/GPUCache', 'Default/DawnWebGPUCache', 'Default/DawnGraphiteCache', 'Default/Service Worker/CacheStorage', 'BrowserMetrics']
 const PROFILE_IN_USE = /ProcessSingleton|profile appears to be in use/i
 
@@ -45,8 +43,6 @@ type LaunchOptions = NonNullable<Parameters<typeof chromium.launchPersistentCont
 type RouteHandler = Parameters<BrowserContext['route']>[1]
 type ContextGuards = { blockHeavyResources?: boolean }
 
-// Every request of the context, main document, redirect hop, sub-frame or asset, goes to a public
-// host over http(s), judged by where its name resolves. One verdict per hostname for the life of the context.
 export function publicRequestsOnly({ blockHeavyResources = false }: ContextGuards = {}): RouteHandler {
     const verdicts = new Map<string, Promise<boolean>>()
     const allowed = (hostname: string): Promise<boolean> => {
@@ -69,8 +65,6 @@ async function launchPersistentContext(profileDir: string, options: LaunchOption
     try {
         return await chromium.launchPersistentContext(profileDir, options)
     } catch (e) {
-        // A Chromium killed with the engine leaves its lock behind; calls of one agent are serialized,
-        // so nothing else on this box can be holding the profile.
         if (!PROFILE_IN_USE.test((e as Error).message)) throw e
         await Promise.all(PROFILE_LOCK_FILES.map(name => rm(resolve(profileDir, name), { force: true })))
         return chromium.launchPersistentContext(profileDir, options)
@@ -94,7 +88,6 @@ export async function dropProfileCaches(agentId: string): Promise<void> {
     await Promise.all(PROFILE_CACHE_DIRS.map(dir => rm(resolve(browserProfileDir(agentId), dir), { recursive: true, force: true })))
 }
 
-// undefined while the page is mid-navigation (a challenge redirecting to the real page).
 async function currentBotWall(page: Page): Promise<BotWall | null | undefined> {
     try {
         const [html, text] = await Promise.all([page.content(), page.innerText('body')])
@@ -114,8 +107,6 @@ async function waitOutBotWall(page: Page, timeoutMs: number): Promise<BotWall | 
     return wall ?? null
 }
 
-// Some consent walls (YouTube, Google) submit a form and navigate to the real page: the text is
-// only worth reading once that page has loaded.
 async function acceptCookieBanner(page: Page, timeoutMs: number): Promise<boolean> {
     const button = page.locator(CONSENT_SELECTORS).or(page.getByRole('button', { name: CONSENT_BUTTON_NAME })).first()
     try {
@@ -149,10 +140,8 @@ async function readLinks(page: Page): Promise<string> {
     return `\n\nLinks:\n${lines.length ? lines.join('\n') : 'none'}`
 }
 
-// `reload: false` reads a tab already showing the page as it is: it has no status of its own to report.
 async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, links, timeoutMs }: Visit, { reload = true } = {}): Promise<HostAttempt> {
     let documentStatus: number | undefined
-    // Detached once read: a tab reused for every visit to its site would pile one up per visit.
     const onResponse = (response: PageResponse) => {
         if (response.request().resourceType() === 'document' && response.frame() === page.mainFrame()) documentStatus = response.status()
     }
@@ -192,9 +181,6 @@ const navigationRefused = (e: NonPublicHostError, url: string): HostAttempt => (
 const originOf = (url: string): string | null => (URL.canParse(url) ? new URL(url).origin : null)
 const withoutHash = (url: string): string => Object.assign(new URL(url), { hash: '' }).href
 
-// The tab stays open and loads everything: it is on the screen the agent and a person look at. A tab
-// already on the site is reused rather than doubled: a second WhatsApp Web tab takes the session from
-// the first, and reloading the page it already shows starts the app's sync over.
 async function readInOpenBrowser(ctx: RunContext, context: BrowserContext, visit: Visit): Promise<HostAttempt> {
     try {
         const tab = context.pages().findLast(page => originOf(page.url()) === originOf(visit.url))
@@ -227,8 +213,6 @@ export function browserTools(ctx: RunContext): ToolSet {
                         if (e instanceof NonPublicHostError) return navigationRefused(e, visit.url)
                         throw e
                     }
-                    // Nothing is awaited when there is no window to join, so the lock below is
-                    // taken before a session opening right now can take it and be missed.
                     const joining = joinableBrowser(id)
                     const open = joining && (await joining)
                     if (open) return readInOpenBrowser(ctx, open, visit)

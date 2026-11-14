@@ -10,7 +10,6 @@ export type FriendlyColumn = {
     key: string
     label: string
     kind: ColumnKind
-    /** Left out of the grid. */
     hidden?: boolean
 }
 
@@ -74,7 +73,6 @@ function inferKind(column: EngineDbColumn, values: unknown[]): ColumnKind {
     if (/(^|_)(price|amount|revenue|mrr|arr|cost|pricing)(_|$)|_value$/.test(lower)) return 'currency'
     if (lower === 'rating' || lower.endsWith('_rating')) return 'rating'
     if (/(rate|ratio|percent|pct|lift)$/.test(lower)) return 'percent'
-    // Identifiers and the like are numbers nobody sums: no thousands separators for them.
     if (/(^|_)id$/.test(lower)) return 'code'
     if (/(^|_)(year|zip|zipcode|postal_code|phone|phone_number)$/.test(lower)) return 'text'
     const allNumbers = present.length > 0 && present.every(value => typeof value === 'number')
@@ -89,12 +87,10 @@ function inferKind(column: EngineDbColumn, values: unknown[]): ColumnKind {
     return 'text'
 }
 
-// An INTEGER primary key is the rowid under another name: a counter, never something a person reads.
 export function isRowidAlias(column: EngineDbColumn) {
     return column.pk && /INT/i.test(column.type) && /^(id|rowid)$/i.test(column.name)
 }
 
-/** Every column with a kind and a label in words. The one that names a row becomes its title. */
 export function friendlyColumns(columns: EngineDbColumn[], rows: FriendlyRow[]): FriendlyColumn[] {
     const inferred: FriendlyColumn[] = columns.map(column => ({
         key: column.name,
@@ -109,13 +105,11 @@ export function friendlyColumns(columns: EngineDbColumn[], rows: FriendlyRow[]):
     if (inferred.some(column => column.kind === 'cents' || column.kind === 'currency')) {
         const currency = inferred.find(column => column.key.toLowerCase() === 'currency')
         const codes = currency ? rows.map(row => row[currency.key]).filter(value => !isEmpty(value)) : []
-        // Once the amounts carry their symbol, a column that only repeats "usd" says nothing more.
         if (currency && codes.length > 0 && codes.every(value => typeof value === 'string' && CURRENCY_CODE.test(value))) currency.hidden = true
     }
     return inferred
 }
 
-/** The grid order: the title leads, unless a view set the order itself. */
 export function gridColumns(columns: FriendlyColumn[], order?: string[]): FriendlyColumn[] {
     const shown = columns.filter(column => !column.hidden)
     if (order?.length) return order.flatMap(key => columns.find(column => column.key === key) ?? [])
@@ -125,7 +119,6 @@ export function gridColumns(columns: FriendlyColumn[], order?: string[]): Friend
 
 function parseDate(text: string) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return Date.parse(`${text}T00:00:00`)
-    // SQLite's datetime('now') writes UTC with a space and no zone.
     if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/.test(text)) return Date.parse(`${text.replace(' ', 'T')}Z`)
     return Date.parse(text)
 }
@@ -164,7 +157,6 @@ export function domainOf(url: string) {
 
 const BARE_DOMAIN = /^[a-z0-9-]+(\.[a-z0-9-]+)+(:\d+)?([/?#]\S*)?$/i
 
-/** Where a link to an outside page points. An agent often writes `instagram.com/x` without a scheme, which a browser reads as a path inside the app. */
 export function externalHref(value: string): string | undefined {
     const trimmed = value.trim()
     if (/^https?:\/\/\S+$/i.test(trimmed)) return trimmed
@@ -173,7 +165,6 @@ export function externalHref(value: string): string | undefined {
     return undefined
 }
 
-/** The currency a row states for its amounts, when it has a `currency` column holding an ISO code. */
 export function rowCurrency(row: FriendlyRow): string | undefined {
     const value = row.currency ?? row.Currency
     return typeof value === 'string' && CURRENCY_CODE.test(value) ? value.toUpperCase() : undefined
@@ -190,7 +181,6 @@ function money(amount: number, currency: string | undefined, fractionDigits: num
     }
 }
 
-/** A value as a person would write it. Money only gets a symbol when the row says which currency it is in. */
 export function plainValue(value: unknown, kind: ColumnKind, currency?: string, locale: string = DEFAULT_LOCALE): string {
     if (isEmpty(value)) return ''
     const number = Number(value)

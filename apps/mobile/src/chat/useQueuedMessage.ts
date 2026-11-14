@@ -3,7 +3,6 @@ import { randomUUID } from 'expo-crypto'
 import { Directory, File, Paths } from 'expo-file-system'
 import { useCallback, useEffect, useState } from 'react'
 
-// A file per conversation, not SecureStore: a value there is capped at 2 KB and a message is not.
 const folder = () => new Directory(Paths.document, 'queued-messages')
 const fileOf = (key: string) => new File(folder(), `${key.replace(/[^\w-]/g, '_')}.json`)
 
@@ -16,15 +15,8 @@ function read(key: string): QueuedMessage | null {
     }
 }
 
-// `restoredId` names what was already waiting when the conversation opened, as opposed to what the
-// person just queued: only the former has to prove the run it was queued behind is still the one
-// running.
 type QueueState = { queued: QueuedMessage | null; restoredId: string | null }
 
-/**
- * The web's `useQueuedMessage`: the single message waiting behind the run in flight, kept on the
- * phone so it survives the app being closed while the run keeps going.
- */
 export function useQueuedMessage(key: string) {
     const [{ queued, restoredId }, setState] = useState<QueueState>(() => {
         const found = read(key)

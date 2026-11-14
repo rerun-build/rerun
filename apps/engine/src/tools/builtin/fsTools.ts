@@ -8,7 +8,6 @@ type FsToolsOptions = {
     prefix: string
     label: string
     rootDir: string | ((input: Record<string, unknown>) => Promise<string>)
-    // Extra input fields that pick the root, read by a rootDir function.
     scope?: z.ZodRawShape
 }
 

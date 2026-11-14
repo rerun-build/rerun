@@ -2,9 +2,6 @@ import { estimatePaidDataProviderCost, paidDataEstimateSchema } from '@rerun/con
 import { ensureCurrentPeriod, getWorkspaceBudgetByEngineKey, RERUN_CREDIT_PAUSED_ERROR, remainingMicros } from '@/ee/services/rerunBudget.service'
 import { paidDataPriceMultiplier } from '@/lib/paid-data/pricing'
 
-// What a planned batch of paid data calls should cost the workspace, at the hub's current price
-// multiplier, next to the credit it has left. The coworker shows it to the user before asking to
-// spend it.
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request): Promise<Response> {

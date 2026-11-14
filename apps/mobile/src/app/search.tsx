@@ -23,8 +23,6 @@ import { useTimeAgo } from '@/lib/time'
 import { fonts, radius, spacing } from '@/theme/tokens'
 import { useTheme } from '@/theme/theme'
 
-// The web's control center, minus its commands: coworkers by name, conversations by title. Same rules
-// as the web: a leading `@` keeps to coworkers, conversations are looked up from two letters on.
 const MIN_CONVERSATION_QUERY = 2
 const DEBOUNCE_MS = 250
 
@@ -75,8 +73,6 @@ function ConversationRow({ hit, coworker, onPress }: { hit: ConversationHit; cow
 
 type Team = { coworkers: HomeCoworker[]; boxes: Box[] }
 
-// The coworkers and Boxes the Home kept, read again once without the Home's Realtime channel: the
-// Home stays mounted under this screen and already holds that channel's name.
 function useTeam(): Team | null {
     const { session, me } = useAuth()
     const accessToken = session?.access_token

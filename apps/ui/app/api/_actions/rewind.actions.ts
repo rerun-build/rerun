@@ -9,7 +9,6 @@ const MAX_WEEKS = 52
 
 export type RewindWeekEntry = { id: string; weekStart: string; viewed: boolean }
 
-// Newest first. No payloads: the picker only needs the weeks, a story is read when it is opened.
 export async function listRewindsAction(): Promise<RewindWeekEntry[]> {
     const { supabase, workspace, userId } = await requireWorkspaceContext()
     const { data: rewinds } = await selectMany(supabase, 'workspace_rewinds', ['id', 'week_start'] as const, { workspace_id: workspace.id }, { column: 'week_start', ascending: false }, MAX_WEEKS)

@@ -42,10 +42,6 @@ async function mcpOAuthRedirect(req: Request, target: { agentId: string; serverN
     return redirect(buildAuthorizeUrl(metadata, ctx, challenge, state), { name: OAUTH_COOKIE_PREFIX + state, value: encodeContext(ctx), path: OAUTH_COOKIE_PATH })
 }
 
-// The sign-in entry point for the iOS app. The app opens it inside the auth session rather than
-// fetching it, so the one-request PKCE cookie lands in the browser's own jar and the callback can
-// read it back, exactly like the web popup. A signed capability ticket stands in for the session
-// the in-app browser does not carry.
 export async function GET(req: Request) {
     let ticket: ConnectTicket
     try {
@@ -55,16 +51,11 @@ export async function GET(req: Request) {
     }
 
     const { agentId, workspaceId, userId, jti } = ticket
-    // The ticket is only minted for someone who manages the coworker's Box, and its claim checks that again.
     const actor = workspaceActor(workspaceId)
     try {
-        // The ticket is spent here: the row it opens is where the callback parks the token, and what
-        // the app claims afterwards with its bearer.
         await openPendingGrant(ticket)
         const mobileGrant = mintCallbackGrant({ agentId, workspaceId, userId, jti, desktop: ticket.desktop })
 
-        // The server's url is read off the agent now, never carried from the app: it is where the
-        // token will be sent.
         if (ticket.server !== undefined) {
             const custom = await getCustomMcpServer(agentId, ticket.server, actor)
             if (!custom?.server.signInUrl) throw new Error(`${ticket.server} has no sign-in to open from here.`)
@@ -72,8 +63,6 @@ export async function GET(req: Request) {
         }
 
         const key = ticket.key
-        // The registry is the only source of truth for what signing in means here, so the target is
-        // read now rather than carried from the app.
         const details = await getServiceDetails(agentId, key, actor)
 
         if (details.managed) {

@@ -1,12 +1,8 @@
 import { open, seal } from '@/lib/oauth/mobile-ticket'
 
-// What a subscription sign-in keeps between its two hub calls: the PKCE pair of a Claude sign-in, the
-// device code of a Codex one. Sealed and handed to the app rather than kept in a table, and bound to
-// the person who started it: a code pasted or a device auth polled by someone else goes nowhere.
 type ClaudeSignInTicket = { kind: 'claude-sign-in'; userId: string; verifier: string; state: string; exp: number }
 type CodexSignInTicket = { kind: 'codex-sign-in'; userId: string; deviceAuthId: string; userCode: string; exp: number }
 
-// Claude shows a code the person copies by hand; OpenAI's device auth lives about fifteen minutes.
 const CLAUDE_TTL_MS = 15 * 60_000
 const CODEX_TTL_MS = 20 * 60_000
 const SOMEONE_ELSE = 'This sign-in was started from another account. Start it again.'

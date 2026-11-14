@@ -11,8 +11,6 @@ import { track } from '@rerun/analytics/client'
 import { useTranslations } from 'next-intl'
 import { desktopBrowserSignInAvailable, startDesktopBrowserSignIn } from '@/components/desktop-shell/desktop-sign-in'
 
-// Where the provider refuses an in-app browser the button is not drawn at all, and the other ways in
-// are what is left.
 export function OAuthSignInButton({
     provider,
     verb,
@@ -24,7 +22,6 @@ export function OAuthSignInButton({
     verb: 'Sign in with' | 'Continue with'
     linkAnonymous?: boolean
     onLeave?: () => void
-    // Forced by the lab; read from this browser everywhere else.
     lastUsed?: LastSignInMethod | null
 }) {
     const t = useTranslations('auth.oauth')
@@ -36,7 +33,6 @@ export function OAuthSignInButton({
 
     const onClick = async () => {
         track('signup_method_selected', { method: provider })
-        // The desktop app's window is a web view Google refuses: the sign-in happens in the browser.
         if (desktopBrowserSignInAvailable()) return startDesktopBrowserSignIn(provider)
         onLeave?.()
         await startOAuthSignIn(provider, { linkAnonymous })

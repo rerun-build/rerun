@@ -1,30 +1,14 @@
-// Codex device-code auth — lets a user connect their ChatGPT subscription without a terminal.
-//
-// Codex's browser login is not reproducible from a web app: its `redirect_uri` is hardcoded to
-// http://localhost:1455/auth/callback and that URI is the only one allowlisted for the CLI's OAuth
-// client. The device-code flow is, though — it is plain HTTP, needs no local listener, and unlike
-// `codex login --with-access-token` it returns a real refresh token, so the engine can keep the
-// credentials alive instead of forcing a reconnect every hour (see apps/engine codex-auth.ts).
-//
-// Constants below are read from the shipped Codex CLI (crate `codex-login`). They are an
-// undocumented/private flow: OpenAI can change or revoke them at any time.
-//
-// This module runs server-side only. Import from server actions.
-
 export const CODEX_OAUTH = {
     clientId: 'app_EMoamEEZ73f0CkXaXp7hrann',
     deviceCodeUrl: 'https://auth.openai.com/api/accounts/deviceauth/usercode',
     devicePollUrl: 'https://auth.openai.com/api/accounts/deviceauth/token',
     tokenUrl: 'https://auth.openai.com/oauth/token',
-    // Where the user types the code. Not a redirect we control — OpenAI hosts it.
     verificationUrl: 'https://auth.openai.com/codex/device',
-    // The device flow's own callback, echoed back at the exchange step. Never actually visited.
     redirectUri: 'https://auth.openai.com/deviceauth/callback',
 } as const
 
 export type CodexDeviceAuthStart = {
     deviceAuthId: string
-    // Shown to the user to type into CODEX_OAUTH.verificationUrl.
     userCode: string
     verificationUrl: string
     pollIntervalMs: number
@@ -42,7 +26,6 @@ export type CodexOAuthTokens = {
 const DEFAULT_POLL_INTERVAL_S = 5
 const DEFAULT_TTL_MS = 15 * 60_000
 
-// The access token is a JWT; its `exp` claim is the only expiry the endpoint gives us.
 function jwtExpiresAt(jwt: string): number | undefined {
     const payload = jwt.split('.')[1]
     if (!payload) return undefined
@@ -54,7 +37,6 @@ function jwtExpiresAt(jwt: string): number | undefined {
     }
 }
 
-// The account id lives in the id_token's claims, not in the token response body.
 function jwtAccountId(jwt: string): string | null {
     const payload = jwt.split('.')[1]
     if (!payload) return null
@@ -78,7 +60,6 @@ export async function startCodexDeviceAuth(): Promise<CodexDeviceAuthStart> {
         if (res.status === 404) throw new Error('Device login is not enabled for this account')
         throw new Error(`Could not start the connection (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ''}`)
     }
-    // `interval` comes back as a string, and `expires_at` as an ISO date.
     const json = (await res.json()) as { device_auth_id?: string; user_code?: string; interval?: string | number; expires_at?: string }
     if (!json.device_auth_id || !json.user_code) throw new Error('Malformed device authorization response')
 
@@ -93,8 +74,6 @@ export async function startCodexDeviceAuth(): Promise<CodexDeviceAuthStart> {
     }
 }
 
-// One poll. Returns null while the user has not approved yet — the endpoint answers 403 with
-// `deviceauth_authorization_pending`, which is a normal state, not a failure.
 export async function pollCodexDeviceAuth(deviceAuthId: string, userCode: string): Promise<CodexOAuthTokens | null> {
     const res = await fetch(CODEX_OAUTH.devicePollUrl, {
         method: 'POST',
@@ -109,7 +88,6 @@ export async function pollCodexDeviceAuth(deviceAuthId: string, userCode: string
         throw new Error(body.error?.message ?? `Device authorization failed (${res.status})`)
     }
 
-    // OpenAI generates the PKCE pair itself and hands it back with the code; we only relay it.
     const json = (await res.json()) as { authorization_code?: string; code_verifier?: string }
     if (!json.authorization_code || !json.code_verifier) throw new Error('Malformed device authorization response')
     return exchangeCodexDeviceCode(json.authorization_code, json.code_verifier)
@@ -142,7 +120,6 @@ async function exchangeCodexDeviceCode(code: string, verifier: string): Promise<
     }
 }
 
-// The engine reads these back from the agent's .env (apps/engine codex-auth.ts).
 export function codexKeysFrom(tokens: CodexOAuthTokens): Record<string, string> {
     const keys: Record<string, string> = {
         CODEX_OAUTH_TOKEN: tokens.accessToken,

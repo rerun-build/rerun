@@ -44,8 +44,6 @@ async function workspacesOf(admin: Client, userId: string): Promise<OwnWorkspace
     }))
 }
 
-// The workspaces only this user is left in, whose subscription has to be cancelled through the
-// billing flow before the account can go. Shared workspaces carry on with their other members.
 async function blockersAmong(workspaces: OwnWorkspace[]): Promise<AccountDeletionBlocker[]> {
     const candidates = workspaces.filter(workspace => !workspace.shared && workspace.stripeSubscriptionId && LIVE_SUBSCRIPTION_STATUSES.has(workspace.subscriptionStatus ?? ''))
     const charging = await Promise.all(candidates.map(workspace => subscriptionStillCharges(workspace.stripeSubscriptionId!)))
@@ -56,8 +54,6 @@ export async function accountDeletionBlockers(admin: Client, userId: string): Pr
     return blockersAmong(await workspacesOf(admin, userId))
 }
 
-// The last admin leaving hands the workspace to the earliest member, so it is never left with no one
-// who can pay for it or let anyone in.
 async function leaveSharedWorkspace(admin: Client, userId: string, workspace: OwnWorkspace) {
     if (await isLastAdmin(admin, workspace.id, userId)) {
         const { data: members } = await selectMany(admin, 'workspace_members', ['user_id'] as const, { workspace_id: workspace.id, user_id: { neq: userId } }, { column: 'created_at' }, 1)
@@ -71,8 +67,6 @@ async function leaveSharedWorkspace(admin: Client, userId: string, workspace: Ow
     if (error) throw new Error(error.message)
 }
 
-// The workspace, its agents and its Boxes stay, with the membership that ties them to the
-// anonymized user: they are what a bug report is traced back through. Only what costs or runs goes.
 async function shutDownOwnWorkspace(admin: Client, workspace: OwnWorkspace) {
     await stopWorkspaceCharges(admin, workspace)
 
@@ -111,11 +105,6 @@ async function erasePersonalData(admin: Client, userId: string) {
     if (error) throw new Error(error.message)
 }
 
-/**
- * Deletes an account the way Rerun does: the rows stay, nothing in them points to the person any
- * more, and nobody can sign into them again. Every step can run twice, and the auth row goes last,
- * so a failure halfway leaves a session the user can retry from.
- */
 export async function anonymizeAccount(admin: Client, userId: string): Promise<{ ok: true } | { ok: false; blockers: AccountDeletionBlocker[] }> {
     const workspaces = await workspacesOf(admin, userId)
     const blockers = await blockersAmong(workspaces)

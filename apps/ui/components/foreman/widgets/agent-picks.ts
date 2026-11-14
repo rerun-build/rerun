@@ -8,8 +8,6 @@ function text(entry: object, key: string): string | null {
     return typeof value === 'string' && value ? value : null
 }
 
-// Tolerant on purpose: the call is rendered while it streams, so the array and its last entry can
-// be half written. A tab the panel does not have leaves a row that still selects the coworker.
 export function readAgentPicks(input: unknown): AgentPick[] {
     const agents = input && typeof input === 'object' ? (input as { agents?: unknown }).agents : undefined
     if (!Array.isArray(agents)) return []
@@ -28,7 +26,6 @@ export function isAgentShortcutTool(toolName: string): boolean {
     return SHORTCUT_TOOL_NAMES.has(toolName)
 }
 
-// open_connector_setup leaves the same row as show_agents, pointed at the Apps tab.
 export function shortcutPicks(toolName: string, input: unknown): AgentPick[] {
     if (toolName === 'open_connector_setup') return readAgentPicks({ agents: [{ ...(input && typeof input === 'object' ? input : {}), tab: 'services' }] })
     return readAgentPicks(input)
@@ -37,10 +34,6 @@ export function shortcutPicks(toolName: string, input: unknown): AgentPick[] {
 type ShortcutMessage = { role: string; parts: readonly { type: string }[] }
 type ShortcutToolPart = { type: string; toolCallId: string; toolName?: string; state: string; input?: unknown }
 
-// The model often leaves several rows in one turn, a connector row, then a chat row, then a recap
-// of both: drawn one card per call they stack up as duplicates under the same message. Every
-// shortcut of a message is folded into its first call, which keeps the card where it appeared while
-// streaming; the later calls map to null and draw nothing.
 export function planAgentShortcuts(messages: readonly ShortcutMessage[]): Map<string, AgentPick[] | null> {
     const plan = new Map<string, AgentPick[] | null>()
     for (const message of messages) {

@@ -16,9 +16,6 @@ import { coworkers, sessions } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
-// Dev only: the cold start played over a mock Home, to judge it, replay it and slow it down. The
-// launch screen is stood in for by HomeBoot, which draws the same skeleton.
-
 const LAUNCH_HOLD = 700
 const READ_DELAY = 300
 const SETTLE = 900

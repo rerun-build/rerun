@@ -1,21 +1,14 @@
 import type { CliModels } from '@rerun/contracts'
 import { clearAgentCache } from '../agents/registry.js'
 
-// In memory, like the plan limits: a reading is only as good as the binary and the account it was
-// taken against, and the next one refills it after a restart.
 const readings = new Map<string, CliModels>()
 
-// Models a run was turned down on although the CLI listed them, with when. The provider's answer to
-// a real request outranks its list, until the credential changes or the refusal expires: a plan
-// upgraded on the same account brings the model back without a reconnect.
 const refusals = new Map<string, Map<string, number>>()
 
 export const REFUSAL_TTL_MS = 6 * 60 * 60 * 1000
 
 const servedKey = (models: string[]): string => [...models].sort().join('\n')
 
-// Every cached agent holds a pair resolved against the previous reading: one following the box
-// default has to be resolved again once a model it runs turns out to be refused.
 function servedSetChanged(connectionId: string, before: CliModels | null): void {
     const after = readCliModels(connectionId)
     if (servedKey(before?.models ?? []) !== servedKey(after?.models ?? [])) clearAgentCache()

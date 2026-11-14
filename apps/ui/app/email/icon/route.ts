@@ -10,8 +10,6 @@ function isNoteIcon(value: string | null): value is NoteIcon {
 export async function GET(req: Request) {
     const name = new URL(req.url).searchParams.get('name')
 
-    // A closed enumeration, no free text, for the same reason as the banner route: this is the
-    // handful of glyphs the issues ask for, not an image generator sitting on our domain.
     if (!isNoteIcon(name)) return new Response('Unknown icon', { status: 400 })
 
     const { default: sharp } = await import('sharp')
@@ -23,7 +21,6 @@ export async function GET(req: Request) {
     return new Response(new Uint8Array(png), {
         headers: {
             'Content-Type': 'image/png',
-            // The URL carries a version, so a rendered glyph never has to be revalidated.
             'Cache-Control': 'public, max-age=31536000, immutable',
         },
     })

@@ -6,8 +6,6 @@ import type { CSSProperties } from 'react'
 
 const PERCENT_FORMAT = { minimumFractionDigits: 1, maximumFractionDigits: 1 } as const
 
-// Animated usage percentage. `className` carries the size/layout (always applied);
-// `mutedColor` is the resting color, overridden to red when the budget is exhausted.
 function UsagePercent({ percent, exhausted, className, mutedColor }: { percent: number; exhausted: boolean; className?: string; mutedColor: string }) {
     const locale = useLocale()
     return <NumberFlow value={percent} suffix="%" format={PERCENT_FORMAT} locales={locale} className={cn('font-mono leading-none font-medium tabular-nums', className, exhausted ? 'text-red-500 dark:text-red-400' : mutedColor)} />
@@ -20,10 +18,6 @@ type CreditsUsageBarProps = {
     className?: string
 }
 
-// The ticks are a repeating mask over two layers, not one node per tick. The bar sits on surfaces
-// that resize, so a fixed tick count would grow fat ticks as they widen, and a measured count would
-// re-render hundreds of nodes on every drag frame. A pitch expressed in pixels keeps the tick width
-// constant and lets their number follow the width for free.
 type TickGeometry = { width: number; gap: number; height: number }
 
 const TICKS: TickGeometry = { width: 4, gap: 3, height: 21 }
@@ -52,12 +46,8 @@ export function CreditsUsageBar({ usedMicros, budgetMicros, resetAt, className }
     const accent = exhausted ? '#ef4444' : 'var(--color-brand)'
 
     const bar = (
-        // The height is inline because the mask tile has to match it exactly.
         <div className="relative" style={{ height: TICKS.height }}>
-            {/* The empty ticks are a tint of the text color, not `bg-muted`: the bar sits on surfaces
-                that are themselves `bg-muted` and the track would vanish into them. */}
             <div className="absolute inset-0 bg-muted-foreground/25" style={mask} />
-            {/* The glow lives on the wrapper: a filter on the masked box itself would be clipped away by the mask. */}
             <div className="credits-bar-glow absolute inset-y-0 left-0" style={{ width: `${percent}%`, '--credits-accent': accent } as CSSProperties}>
                 <div className="size-full" style={{ ...mask, backgroundImage: `linear-gradient(90deg, color-mix(in oklab, ${accent}, white var(--credits-highlight)), ${accent})` }} />
             </div>

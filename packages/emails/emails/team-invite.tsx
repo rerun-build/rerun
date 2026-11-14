@@ -10,7 +10,6 @@ export interface TeamInviteProps {
   workspaceName: string;
   agentName: string;
   inviteUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;

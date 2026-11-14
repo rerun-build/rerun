@@ -13,11 +13,6 @@ import { useForemanStore } from '@/stores/foreman.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-/**
- * The checklist in the board's bottom-left corner. Steps without a settings panel are handed to the Foreman,
- * so it only shows once the Foreman on the engine has taken over: never over the onboarding funnel it
- * would talk over, and never for a workspace with no machine, which has no Foreman to hand them to.
- */
 export function GettingStartedPill() {
     const t = useTranslations('foreman.gettingStarted.prompts')
     const { isAnonymous, workspace } = useSession()
@@ -30,12 +25,10 @@ export function GettingStartedPill() {
         enabled,
         onLiveStep: ({ complete }) => {
             setPulse(value => value + 1)
-            // The last tick opens the list once, on the celebration it earned.
             if (complete) setOpen(true)
         },
     })
 
-    // The profile menu's "Getting started": opens the list, and brings it back first if it was hidden.
     const openRequest = useForemanStore(state => state.gettingStartedOpenRequest)
     const handledOpenRequest = useRef(openRequest)
     useEffect(() => {
@@ -50,7 +43,6 @@ export function GettingStartedPill() {
     const handleStep = (step: GettingStartedStep) => {
         setOpen(false)
         track('getting_started_step_clicked', { step: step.id })
-        // The billing dialog takes the card: beside a running trial it offers to pay at its end.
         if (step.id === 'phone') useAccountStore.getState().openAccount('sign-in', 'phone')
         else if (step.id === 'payment_method') useBillingStore.getState().openBilling(undefined, 'getting_started')
         else if (step.panel) useWorkspaceSettingsStore.getState().openWorkspacePanel(step.panel)

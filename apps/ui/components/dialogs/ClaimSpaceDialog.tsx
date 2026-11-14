@@ -10,19 +10,10 @@ import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 
-// `target` porte la face de la Box d'où part la création : c'est le board qui l'ouvre, en cliquant
-// un « + » posé sur une face. Fermée quand il vaut null, sauf si `open` la demande sans face : la
-// Box s'empile alors sous les autres.
 export type ClaimSpaceTarget = { spaceId: string; side: SpaceSide }
 
-// A marker the callers pass as `intro`: the dialog swaps it for its translated copy.
 export const BOX_FIRST_INTRO: NewBoxIntro = { heading: 'Create a Box first', description: 'Your new coworker lands in it, and you manage it.' }
 
-// One column rather than the house form and aside, like New agent: the Box being named is the
-// illustration, and it leads. The frame keeps the house size.
-//
-// `onCreated`, when given, is called instead of `onClose` once the Box exists: a flow that asked
-// for the Box goes on, while `onClose` alone means it was dismissed.
 export function ClaimSpaceDialog({ target, open = !!target, onClose, onCreated, intro }: { target: ClaimSpaceTarget | null; open?: boolean; onClose: () => void; onCreated?: () => void; intro?: NewBoxIntro }) {
     const t = useTranslations('dialogs.claimBox')
     const { workspace } = useSession()

@@ -41,30 +41,20 @@ export function BuilderToolbar() {
     const placingFromQueue = !!placement && !placement.installing
     const placing = !!placingAgentId || placingFromQueue
 
-    // Une template pose plusieurs agents à la suite : on nomme celui qu'on attend, et la jauge dit où
-    // on en est du lot. Un agent seul n'a pas de progression à afficher.
     const placementPrompt = placement ? t('placementPrompt', { name: placementLabel(placement) }) : t('placementPromptDefault')
     const placementQueue = placement && placement.labels.length > 1 ? placement : null
     const placementProgressLabel = placementQueue ? t('placementProgress', { current: placementQueue.placed.length + 1, total: placementQueue.labels.length }) : ''
 
-    // Pendant l'onboarding « recrute ton premier agent » (placeholder sur la grille), on masque les deux
-    // boutons pour forcer le passage par le bloc fantôme ; le logout reste dans le switcher.
     const recruitingFirstAgent = hydrated && spaces.length === 0
 
-    // Nothing in the bar is for an anonymous visitor: the sign-in pill in the top corner is their
-    // only way in. The store-driven dialogs stay mounted.
     if (isAnonymous) return <ToolbarDialogs />
 
     const showBar = placing || !recruitingFirstAgent || unplacedAgents.length > 0
 
     const bar = (
-        // Le bas n'est pas toujours le bas : la bannière cookies est `fixed bottom-0 z-60` en
-        // mobile, donc la barre s'assoit sur l'inset qu'elle publie — sinon le prompt de placement
-        // et son Cancel passent dessous pendant la toute première session.
         <ChromeBar className="absolute bottom-[calc(1rem+var(--consent-inset))] left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2">
             <div className="flex min-w-0 items-center gap-1 overflow-x-auto rounded-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {placing ? (
-                    // En placement : la barre change entièrement de contenu (message shimmer + Cancel).
                     <div className="relative flex shrink-0 items-center gap-2 pl-3">
                         {placementQueue && (
                             <TooltipLabeled label={placementProgressLabel}>
@@ -87,7 +77,6 @@ export function BuilderToolbar() {
                                     <ChromeDivider />
                                     <ChromeButton icon={GridIcon} label={t('template')} disabledReason={needsMachineReason} onClick={() => openLibrary()} />
                                 </div>
-                                {/* Below `sm` the two labels crowd the notification bell: one "+" opens both choices. */}
                                 <div className="flex shrink-0 sm:hidden">
                                     <DropdownMenu>
                                         <TooltipDisabledReason reason={needsMachineReason ?? undefined} side="top" className="rounded-full">
@@ -133,8 +122,6 @@ export function BuilderToolbar() {
     return (
         <>
             {showBar && bar}
-            {/* Dialogs montés en permanence (Radix les portale). Une Box, elle, se crée depuis une
-                face d'une Box existante sur le board (cf. IsoBoard). */}
             <NewAgentDialog open={newAgentOpen} onOpenChange={setNewAgentOpen} onBrowseTemplates={openLibrary} />
             <TemplateLibraryDialog open={libraryOpen} onOpenChange={setLibraryOpen} priorityCategory={viewerSignals.category} preferredConnectorSlugs={viewerSignals.connectorSlugs} initialSlug={librarySlug} onCreateFromScratch={openNewAgent} />
             <ClaimSpaceDialog target={null} open={newBoxOpen} onClose={() => setNewBoxOpen(false)} />

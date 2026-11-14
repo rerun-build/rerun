@@ -26,8 +26,6 @@ describe('buildScheduleIndex', () => {
         expect(await buildScheduleIndex('allOff')).toBe('')
     })
 
-    // The next run moves after every fire, and the index sits in the cached system prompt: the
-    // schedule_* tools carry it instead.
     it('lists cron and one-off schedules by slug, without their next run', async () => {
         vi.useFakeTimers({ now: new Date('2026-09-30T08:00:00.000Z'), toFake: ['Date'] })
         await writeSchedule('routines', { name: 'Daily report', body: 'Report.', cron: '0 9 * * *', timezone: 'UTC' })

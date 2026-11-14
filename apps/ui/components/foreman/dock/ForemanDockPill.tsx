@@ -22,11 +22,9 @@ type ForemanDockPillProps = {
     mod: string
     inputRef: RefObject<HTMLInputElement | null>
     onSubmit: (text: string) => void
-    /** The field took the caret: whatever it needs to send had better be on its way. */
     onEngage: () => void
 }
 
-/** The pill in whichever of its three lives the Foreman is in: a field, its run, or a voice. */
 export function ForemanDockPill({ side, mode, tone, hidden, mod, inputRef, onSubmit, onEngage }: ForemanDockPillProps) {
     const [draft, setDraft] = useState('')
     const [focused, setFocused] = useState(false)

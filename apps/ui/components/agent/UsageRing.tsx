@@ -29,11 +29,9 @@ function Arc({ radius, stroke, percent }: { radius: number; stroke: number; perc
     )
 }
 
-/** A provider's mark inside the rings of its plan: the session inside, the longer window outside. */
 export function UsageRing({ usage, children }: { usage: PillUsage; children: ReactNode }) {
     const double = usage.outer !== null
     return (
-        // The negative margin keeps the pill at the height its bare 14px logo gave it.
         <span className="relative -my-0.5 inline-flex size-4.5 shrink-0 items-center justify-center">
             <svg className="absolute inset-0 size-full" viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden>
                 <g transform={`rotate(-90 ${CENTER} ${CENTER})`}>

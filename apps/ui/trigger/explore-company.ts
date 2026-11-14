@@ -17,11 +17,8 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 export type ExploreCompanyPayload = { workspaceId: number; url: string }
 
-// `catalog` is optional: a run cached under its idempotency key before the catalogue existed has none.
 export type ExploredCompany = SynthesisFindings & { catalog?: CatalogFindings | null }
 
-// Firecrawl allows 25 requests a minute and a burst fails every one of them, so explorations run
-// one at a time however many workspaces sign up together.
 const companyExploreQueue = queue({ name: 'company-explore', concurrencyLimit: 1 })
 
 type Signup = { personName: string | null; email: string | null }
@@ -37,7 +34,6 @@ function metadataString(metadata: Record<string, unknown> | undefined, key: stri
     return typeof value === 'string' ? value.trim() : ''
 }
 
-// The earliest member is the one who signed up, the person the LinkedIn collectors look for.
 export async function readSignup(supabase: SupabaseClient<Database>, workspaceId: number): Promise<Signup> {
     const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId }, { column: 'created_at' }, 1)
     const owner = members?.[0]
@@ -59,16 +55,9 @@ export async function writeCompanyFindings(supabase: SupabaseClient<Database>, w
     if (error) logger.warn('company explore: findings not written', { workspaceId, error: error.message })
 }
 
-// Everything we can learn about the company behind the site, shown card by card on the onboarding
-// board as it lands and kept for the Company Brain: seed-company-brain waits on this same run, under
-// the same idempotency key, rather than paying for a second one.
-//
-// It never throws. A failed run is cached under its idempotency key like a finished one, and the
-// seed would get the failure back for weeks; a `null` it knows how to skip.
 export const exploreCompanyTask = task({
     id: 'explore-company',
     queue: companyExploreQueue,
-    // Two waves of collectors capped at 240 s each, then the synthesis.
     maxDuration: 900,
     retry: { maxAttempts: 1 },
     run: (payload: ExploreCompanyPayload) => exploreCompanyRun(payload),
@@ -80,7 +69,6 @@ export async function exploreCompanyRun({ workspaceId, url }: ExploreCompanyPayl
     let row: CompanyFindingsRow = { url, status: 'running', pending: [], findings: [] }
     await writeCompanyFindings(supabase, workspaceId, row)
 
-    // Events are translated and written one after the other, in the order the collectors sent them.
     let writing = Promise.resolve()
     const record = (translate: () => Promise<DiscoveryEvent[]>) => {
         writing = writing.then(async () => {
@@ -94,10 +82,8 @@ export async function exploreCompanyRun({ workspaceId, url }: ExploreCompanyPayl
     try {
         const [answers, signup] = await Promise.all([readAnswers(supabase, workspaceId), readSignup(supabase, workspaceId)])
         const translator = createDiscoveryTranslator({ domain, icons: serviceIconLookup(supabase) })
-        // What the welcome card read off the home page is already saved: the identity card does not wait for the synthesis.
         if (answers.company_name) record(() => translator.fromProfile({ name: answers.company_name, description: answers.company_description, audience: answers.company_audience }))
 
-        // Assigned from the callback, which TypeScript does not follow: without the cast it stays `null` below.
         let synthesis = null as SynthesisFindings | null
         let catalog = null as CatalogFindings | null
         await exploreCompany({ url, domain, personName: signup.personName, email: signup.email, linkedinUrl: null }, new Set(COLLECTOR_IDS), event => {

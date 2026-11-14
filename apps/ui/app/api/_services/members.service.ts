@@ -21,8 +21,6 @@ export async function resolveMemberIdentities(supabase: SupabaseClient<Database>
     return identities
 }
 
-// Who signs a message in a conversation: every member of the workspace, with the name and photo of
-// their auth record.
 export async function listMemberProfiles({ workspace, supabase }: WorkspaceContext): Promise<MemberProfile[]> {
     const { data: memberRows } = await selectAll(supabase, 'workspace_members', ['user_id', 'role'] as const, { workspace_id: workspace.id }, { column: 'created_at', ascending: true })
     const rows = memberRows ?? []
@@ -32,8 +30,6 @@ export async function listMemberProfiles({ workspace, supabase }: WorkspaceConte
 
 export const LAST_ADMIN = 'The workspace needs at least one admin'
 
-// Whether taking `userId` out of the admins (removal, demotion, departure) would leave the
-// workspace with none. A member is never the last admin.
 export async function isLastAdmin(supabase: SupabaseClient<Database>, workspaceId: number, userId: string): Promise<boolean> {
     const { data: target } = await selectMaybeSingle(supabase, 'workspace_members', ['role'] as const, { workspace_id: workspaceId, user_id: userId })
     if (target?.role !== 'admin') return false
@@ -50,8 +46,6 @@ export async function setMemberRole(supabase: SupabaseClient<Database>, workspac
     return { error: error?.message ?? null }
 }
 
-// Two admins stepping down at the same time both pass `isLastAdmin`, so the admins are counted
-// again once the demotion is written: the one who finds none left takes the role back.
 export async function demoteKeepingAnAdmin(supabase: SupabaseClient<Database>, workspaceId: number, userId: string): Promise<{ error: string | null }> {
     const { error } = await setMemberRole(supabase, workspaceId, userId, 'member')
     if (error) return { error }

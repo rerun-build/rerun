@@ -4,16 +4,11 @@ import { computeStrength, DORMANT_THRESHOLD } from './decay.js'
 import { ftsRecall, indexMemory, reindexMemory, deleteMemory as repoDeleteMemory, deleteMemoriesForAgent, vectorRecall, bumpMemoryAccess, type MemoryHit } from '../db/repos/memories.js'
 import type { LoadedAgent } from '../agents/types.js'
 
-// Below this cosine a memory has nothing to do with the message. Measured on the memory benchmark
-// (text-embedding-3-small): every memory that answers a question sits above it, and a message with
-// nothing to recall ("hello", "try again") brings back 0.4 memory on average instead of 5.
 export const AUTO_RECALL_MIN_SIMILARITY = 0.25
 
 export type RecallOptions = {
     includeDormant?: boolean
     reinforce?: 'full' | 'touch' | 'none'
-    // Drops the hits whose cosine to the query is known and below this. A hit with no cosine (the
-    // hub is unreachable, or the memory was stored without a vector) is kept: nothing says it is off.
     minSimilarity?: number
 }
 
@@ -49,14 +44,8 @@ export async function deleteAllMemories(agent: LoadedAgent): Promise<void> {
     await deleteMemoriesForAgent(agent.id)
 }
 
-// What a keyword hit containing every term of the query adds to its cosine. Enough for an exact
-// name or reference to win over a vaguely related memory, too little for one shared common word to
-// overturn the semantic order.
 const KEYWORD_BONUS = 0.15
 
-// A cosine and a BM25 rank live on different scales, and taking the higher of the two let any
-// keyword match outrank every semantic one. The cosine ranks, the keyword leg only adds to it. A
-// hit with no cosine starts from the floor: nothing says it is closer or further than that.
 function fuse(vectorHits: MemoryHit[], ftsHits: MemoryHit[]): MemoryHit[] {
     const fused = new Map<string, MemoryHit>(vectorHits.map(hit => [hit.id, hit]))
     for (const hit of ftsHits) fused.set(hit.id, { ...hit, similarity: fused.get(hit.id)?.similarity ?? hit.similarity })

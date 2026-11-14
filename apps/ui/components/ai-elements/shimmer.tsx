@@ -3,12 +3,6 @@ import { TextShimmer, type TextShimmerProps } from "@rerun/ui";
 
 export type { TextShimmerProps };
 
-/**
- * App-flavored shimmer text. Thin wrapper over the shared `@rerun/ui` TextShimmer
- * that preserves the previous behavior: renders as <p> by default, scales the
- * gradient spread with text length, and themes via --color-muted-foreground /
- * --color-background (so existing className overrides keep working).
- */
 export function Shimmer({
   as = "p",
   spread = 2,

@@ -1,8 +1,5 @@
 import { loadStripe, type Stripe } from '@stripe/stripe-js'
 
-// The browser half of Stripe, kept away from lib/billing/stripe.ts, which holds the secret key and
-// is server-only. Loaded once per tab: `loadStripe` injects a script tag, and calling it per render
-// would inject it again.
 let cached: Promise<Stripe | null> | null = null
 
 export function stripeBrowser(): Promise<Stripe | null> {

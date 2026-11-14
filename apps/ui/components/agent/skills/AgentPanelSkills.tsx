@@ -44,8 +44,6 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : tShared('boxManageReason')
 
-    // Kept in refs rather than in load's deps: the slug is honoured once, and the callback comes
-    // inline from the panel, so a fresh identity on every render would refetch forever.
     const requestedSlugRef = useRef(focusSlug ?? null)
     const consumeRequestedRef = useRef(onFocusConsumed)
     useEffect(() => {
@@ -57,8 +55,6 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
         const list = await listSkillsAction(agentId)
         setSkills(list)
         setAgentSkillSummaries(agentId, list)
-        // Resolved here rather than in an effect: the row carries the readOnly flag, so the drill-in
-        // has to wait for the list anyway.
         const requested = requestedSlugRef.current
         if (requested) {
             requestedSlugRef.current = null

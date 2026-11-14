@@ -3,9 +3,7 @@ export type ImportSourceId = 'openclaw' | 'hermes' | 'grok' | 'other'
 export type ImportSource = {
     id: ImportSourceId
     label: string
-    // Where the source keeps what makes the agent itself, in the words the prompt hands it.
     whereToLook: string
-    // Grok reads a connector URL from its settings before it can call anything.
     connectorStep?: string
 }
 
