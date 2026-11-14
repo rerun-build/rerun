@@ -43,6 +43,23 @@ Every design and every UI implementation is responsive from the first version, n
 
 When a design is proposed (mockup, preview, screenshot), it shows the small-screen version too.
 
+# Dialogs share one header
+
+Every dialog of `apps/ui` opens on the same header: `DialogHeaderBar`
+(`apps/ui/components/dialogs/DialogHeaderBar.tsx`). It carries an icon tile, the title, the
+description and a line under it, with the same padding in every frame. A wizard uses
+`StepDialogHeader`, which is that header with the progress bars under the title.
+
+- Never put a `className` on `DialogHeader` or `DialogTitle` to change padding, border, size or
+  alignment, and never hand-roll a title row: a dialog that looks different is a bug.
+- Every dialog has an icon, from `@/lib/icons` (or the app's logo for a dialog about one app).
+- The body under it uses the same `p-4`, and the footer is the plain `DialogFooter`.
+- Exceptions, on purpose: confirmations (`ConfirmDialog`), the hero and marketing dialogs (sign-in,
+  billing and plans, new coworker, subscription offer, changelog, deep links) and the full-screen
+  viewers (Knowledge base, Desktop, template library, lightbox).
+
+Follow the `create-dialog` skill.
+
 # Verify in the app before calling it done
 
 Rerun has paying customers: a change that shows anywhere (a screen, a dialog, a button, a flow, an
