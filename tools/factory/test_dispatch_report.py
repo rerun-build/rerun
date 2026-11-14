@@ -57,6 +57,13 @@ class Report(unittest.TestCase):
         self.assertEqual(r[1][1]["snapshot"]["beat"], 2)
         self.assertEqual(r[0][1]["snapshot"]["repo"], "o/r")
 
+    def test_the_report_carries_the_epics(self):
+        self.make()
+        self.d.store.put_job("60", "queued", {"issue": 60, "title": "T", "body": "**Part of**: #50\n"})
+        self.d.gh = lambda args: json.dumps({"title": "Epic T", "labels": [{"name": "feature"}]}) if args[:2] == ["issue", "view"] else "[]"
+        self.d.report_line()
+        self.assertEqual(self.reports()[0][1]["snapshot"]["epics"], [{"issue": 50, "title": "Epic T", "kind": "feature"}])
+
     def test_a_failed_or_unknown_tool_answer_is_logged_once_and_the_beat_goes_on(self):
         self.make(D.Error("account factory_report failed: HTTP 404"))
         text = self.once() + self.once()
