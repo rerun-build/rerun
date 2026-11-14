@@ -259,7 +259,6 @@ import {
     RefreshCwIcon as LucideRefreshCwIcon,
     Repeat as LucideRepeat,
     Repeat2 as LucideRepeat2,
-    RewindIcon as LucideRewindIcon,
     RocketIcon as LucideRocketIcon,
     RotateCwIcon as LucideRotateCwIcon,
     Satellite as LucideSatellite,
@@ -611,7 +610,6 @@ export const RefreshCw: LucideIcon = LucideRefreshCw
 export const RefreshCwIcon: LucideIcon = LucideRefreshCwIcon
 export const Repeat: LucideIcon = LucideRepeat
 export const Repeat2: LucideIcon = LucideRepeat2
-export const RewindIcon: LucideIcon = LucideRewindIcon
 export const RocketIcon: LucideIcon = LucideRocketIcon
 export const RotateCwIcon: LucideIcon = LucideRotateCwIcon
 export const Satellite: LucideIcon = LucideSatellite

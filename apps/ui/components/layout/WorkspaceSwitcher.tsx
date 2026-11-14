@@ -25,7 +25,7 @@ import { ThemeMenuRow } from '@/components/layout/ThemeMenuRow'
 import { ViewMenuRow } from '@/components/workspace-view/ViewMenuRow'
 import { LanguageMenuRow } from '@/components/layout/LanguageMenuRow'
 import { HelpButton } from '@/components/layout/HelpButton'
-import { WeeklyRewindMenuItem, WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
+import { WhatsNewMenuItem } from '@/components/layout/ToolbarActions'
 import { WorkspacePowerDialog, WorkspacePowerMenuItems, type PowerAction } from '@/components/layout/WorkspacePowerControl'
 import { WorkspaceLogoImage, WorkspacePill } from '@rerun/ui/chrome'
 import { Badge, Stripes, useIsMobile } from '@rerun/ui/primitives'
@@ -341,7 +341,6 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                 </DisabledWithReason>
             )}
             <WhatsNewMenuItem />
-            <WeeklyRewindMenuItem />
             {!workspace.is_sandbox && appsInMenu.length > 0 && <AppsMenuSection apps={appsInMenu} onOpen={slug => openApp(slug)} />}
         </>
     )

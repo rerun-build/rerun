@@ -4,7 +4,7 @@ import { creditsFromMicros, formatCredits, type SpendDecision } from '@rerun/con
 import { Badge, PANEL_CARD } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 
-import { RewindCount } from '@/components/rewind/RewindCount'
+import { SpendCount } from '@/components/chat/spend/SpendCount'
 import { CoinsIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
@@ -42,7 +42,7 @@ export function SpendReceipt({ decision, totalMicros, progress = { spentMicros: 
                         <div className={cn('h-full rounded-full transition-[width] duration-500', running ? 'bg-orange-500' : 'bg-emerald-500')} style={{ width: `${Math.min(100, (spentMicros / totalMicros) * 100)}%` }} />
                     </div>
                     <span className="text-xs tabular-nums text-muted-foreground">
-                        <RewindCount value={creditsFromMicros(spentMicros)} delay={0} className="text-foreground" /> {t('ofTotal', { amount: formatCredits(totalMicros, locale), count: creditsFromMicros(totalMicros) })}
+                        <SpendCount value={creditsFromMicros(spentMicros)} className="text-foreground" /> {t('ofTotal', { amount: formatCredits(totalMicros, locale), count: creditsFromMicros(totalMicros) })}
                     </span>
                 </div>
             )}

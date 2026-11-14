@@ -10,7 +10,6 @@
         "restoring.steps.machineActive": "Same step, in progress.",
         "workspaceMenu.summary.trial": "{limits} is the summary.limits text.",
         "workspaceMenu.brain": "Name of the workspace knowledge base feature.",
-        "menu.weeklyRewind": "Name of a weekly recap feature (Rewind).",
         "controlCenter.title": "Command palette of the app (search agents, settings, conversations).",
         "controlCenter.quotedQuery": "What the person typed, quoted, beside \"Ask your Chief of Staff\".",
         "controlCenter.hints.searchPage": "Footer hint. <keys></keys> is replaced by the keyboard keys (⌘ F): pressing them again opens the browser's own find in page.",
@@ -38,7 +37,6 @@
         "contactSupport": "Contact support"
     },
     "menu": {
-        "weeklyRewind": "Weekly Rewind",
         "whatsNew": "What's new",
         "gettingStarted": "Getting started",
         "docs": "Docs",

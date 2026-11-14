@@ -10,7 +10,7 @@ const DAY_MS = 24 * 60 * 60 * 1000
 const AUTO_OPEN_WINDOW_MS = 30 * DAY_MS
 
 // `ready` retient l'annonce tant qu'autre chose tient l'écran — le mur d'auth, un onboarding, un
-// deep link, ou le Rewind qui s'ouvre au même chargement.
+// deep link.
 export function useChangelogLauncher(userId: string | undefined, ready: boolean) {
     const handledUser = useRef<string | null>(null)
 

@@ -1,5 +1,5 @@
 import { isAdminEmail } from '@/lib/auth/admin-emails'
-import { COMPUTER_RELEASED, I18N_RELEASED, PUBLISHED_ACCESS_RELEASED, REWIND_RELEASED, SIMPLE_VIEW_RELEASED, VAULT_RELEASED } from '@/lib/features'
+import { COMPUTER_RELEASED, I18N_RELEASED, PUBLISHED_ACCESS_RELEASED, SIMPLE_VIEW_RELEASED, VAULT_RELEASED } from '@/lib/features'
 import { createClient } from '@/supabase/server'
 import { dedupe, flag } from 'flags/next'
 
@@ -23,13 +23,6 @@ export const releasedOrEarlyAccess =
         const domain = email?.split('@')[1]
         return !!domain && earlyAccessDomains.includes(domain)
     }
-
-export const rewindFlag = flag<boolean, Entities>({
-    key: 'rewind',
-    defaultValue: false,
-    identify,
-    decide: releasedOrEarlyAccess(REWIND_RELEASED),
-})
 
 export const computerFlag = flag<boolean, Entities>({
     key: 'computer',

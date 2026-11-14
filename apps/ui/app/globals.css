@@ -14,9 +14,6 @@
 @source "../node_modules/@streamdown/cjk/dist/*.js";
 
 @custom-variant dark (&:is(.dark *));
-/* Rewind slides follow the shape of their story card, not the viewport: a wide card splits text and visual in two columns. */
-@custom-variant story-landscape (@media (orientation: landscape) and (width >= 40rem) and (height >= 30rem));
-@custom-variant rewind-wide (@container rewind (width >= 40rem) and (aspect-ratio > 1));
 
 /* Core design tokens (background/foreground/card/popover/primary/secondary/muted/
    accent/destructive/border/input/ring + radius-sm..xl) : source partagée dans

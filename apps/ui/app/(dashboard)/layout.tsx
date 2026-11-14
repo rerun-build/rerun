@@ -8,7 +8,7 @@ import { QuickAskReceiver } from '@/components/desktop-shell/QuickAskReceiver'
 import { paidAppFlags } from '@rerun/cloud/apps.server'
 import { startBackgroundSchedules } from '@rerun/cloud/tasks'
 import { WorkspaceViewProvider } from '@/components/workspace-view/WorkspaceViewProvider'
-import { computerFlag, i18nFlag, publishedAccessFlag, rewindFlag, simpleViewFlag, vaultFlag } from '@/flags'
+import { computerFlag, i18nFlag, publishedAccessFlag, simpleViewFlag, vaultFlag } from '@/flags'
 import { FOREMAN_PLACEMENT_COOKIE, parseForemanPlacement } from '@/lib/foreman-layout'
 import { FOREMAN_OPEN_COOKIE, parseForemanOpen } from '@/lib/foreman-open'
 import { parseWorkspaceView, WORKSPACE_VIEW_COOKIE } from '@/lib/workspace-view'
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
     // Once per server process, on the first board anyone opens: the crons a self-hosted app runs itself.
     startBackgroundSchedules()
-    const [rewind, computer, published, i18n, vault, simpleView, apps] = await Promise.all([rewindFlag(), computerFlag(), publishedAccessFlag(), i18nFlag(), vaultFlag(), simpleViewFlag(), paidAppFlags()])
+    const [computer, published, i18n, vault, simpleView, apps] = await Promise.all([computerFlag(), publishedAccessFlag(), i18nFlag(), vaultFlag(), simpleViewFlag(), paidAppFlags()])
     // Les miroirs des préférences de la colonne, ouverture et placement, pour la rendre déjà à sa place.
     const cookieStore = await cookies()
     const foremanOpen = parseForemanOpen(cookieStore.get(FOREMAN_OPEN_COOKIE)?.value)
@@ -32,7 +32,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
     return (
         <SessionProvider>
-            <FeatureFlagsProvider rewind={rewind} computer={computer} published={published} i18n={i18n} vault={vault} simpleView={simpleView} apps={apps}>
+            <FeatureFlagsProvider computer={computer} published={published} i18n={i18n} vault={vault} simpleView={simpleView} apps={apps}>
                 <WorkspaceViewProvider initialView={workspaceView}>
                     <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
                     <CrispChat hideLauncher position="left" />

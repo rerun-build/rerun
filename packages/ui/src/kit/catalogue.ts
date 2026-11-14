@@ -26,7 +26,7 @@ export const KIT_CATEGORIES: KitCategory[] = [
     { host: 'app', slug: 'agent-box', label: 'Coworker, Box and data', blurb: 'The coworker panel and its tabs, model selector, triggers, skills, connections and the data browser.' },
     { host: 'app', slug: 'templates', label: 'Templates', blurb: 'Template cards, rows, the detail panel, the capture wizard and the creator revenue views.' },
     { host: 'app', slug: 'files', label: 'Files', blurb: 'The file browser of a Box, with its drawn glyphs, its tiles and its empty state.' },
-    { host: 'app', slug: 'scenes', label: 'Scenes and stories', blurb: 'The auth scene, the explainers, the tour, the ten Rewind slides and the OG stages.' },
+    { host: 'app', slug: 'scenes', label: 'Scenes and stories', blurb: 'The auth scene, the explainers, the tour and the OG stages.' },
 ]
 
 export const LANDING_CATEGORIES = KIT_CATEGORIES.filter(category => category.host === 'landing')

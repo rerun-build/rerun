@@ -30,7 +30,7 @@ Decision shortcut: **if you hesitate between two glyphs, or if you have to expla
 ## The rules that go with it
 
 1. **Same action = same icon everywhere in the app.** Before choosing, look for the icon already used for this action (see Verification). The same action drawn three ways is never learned.
-2. **One icon = one action.** If the glyph already serves something else in the app, pick another one or put nothing. Example: `HistoryIcon` is reserved for "Version history", "Weekly Rewind" took `RewindIcon`.
+2. **One icon = one action.** If the glyph already serves something else in the app, pick another one or put nothing. Example: `HistoryIcon` is reserved for "Version history", "What's new" took `MegaphoneIcon`.
 3. **Labels stay aligned.** In a menu where some items have an icon, the items without an icon reserve the empty column, so that the text forms a single column:
    - `DropdownMenuItem`, `DropdownMenuSubTrigger`, `DropdownMenuLabel`: `inset` prop (`pl-7` = padding 6 + icon 16 + gap 6). Only pass `inset` when it is true: `inset={false}` sets `data-inset="false"`, and the style still kicks in.
    - A menu whose items carry `gap-2` (the workspace menu) shifts the text to 30 px: the row without an icon takes `pl-7.5` there, not `inset`.
@@ -84,7 +84,7 @@ Anti-patterns:
 <DropdownMenuItem>Rename</DropdownMenuItem>
 
 // ❌ same glyph for two different product actions
-<DropdownMenuItem><HistoryIcon /> Weekly Rewind</DropdownMenuItem>
+<DropdownMenuItem><HistoryIcon /> What's new</DropdownMenuItem>
 <DropdownMenuItem><HistoryIcon /> Version history</DropdownMenuItem>
 
 // ❌ icon alone in a vertical menu
