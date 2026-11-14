@@ -4,7 +4,7 @@
 # ship Linux builds that need glibc 2.38 or newer, which Debian 12 lacks.
 FROM node:26-trixie-slim AS base
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN npm install -g corepack && corepack enable
+RUN npm install -g corepack@0.36.0 && corepack enable
 WORKDIR /app
 
 FROM base AS build

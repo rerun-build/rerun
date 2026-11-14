@@ -5,7 +5,7 @@ pull request gets in.
 
 ## Run it from source
 
-You need Node 22, pnpm 8 (`corepack enable`), Docker (for the local Supabase) and an OpenRouter key.
+You need Node 26 and pnpm 12 (`npm install -g pnpm@12.18.0`), Docker (for the local Supabase) and an OpenRouter key.
 
 ```bash
 pnpm install
