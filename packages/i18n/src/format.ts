@@ -150,20 +150,6 @@ export function formatDuration(ms: number, locale: string = DEFAULT_LOCALE): str
     return rest ? `${unit(hours, 'hour', 'narrow')} ${unit(rest, 'minute', 'narrow')}` : unit(hours, 'hour', 'narrow')
 }
 
-/** "Mar 2 to Mar 8": a range of UTC days. */
-export function formatDayRange(start: Date, end: Date, locale: string = DEFAULT_LOCALE): string {
-    const format = new Intl.DateTimeFormat(tag(locale, 'en-US'), { month: 'short', day: 'numeric', timeZone: 'UTC' })
-    if (isEnglish(locale)) return `${format.format(start)} to ${format.format(end)}`
-    return format.formatRange(start, end)
-}
-
-/** The short weekday names, Monday first. */
-export function weekdayNames(locale: string = DEFAULT_LOCALE): string[] {
-    const format = new Intl.DateTimeFormat(tag(locale, 'en-US'), { weekday: 'short', timeZone: 'UTC' })
-    // 2024-01-01 is a Monday.
-    return Array.from({ length: 7 }, (_, day) => capitalize(format.format(new Date(Date.UTC(2024, 0, 1 + day))), locale))
-}
-
 /** Any date with its own options: the English reading keeps the US form it always had. */
 export function formatDate(date: Date | string | number, locale: string = DEFAULT_LOCALE, options?: Intl.DateTimeFormatOptions): string {
     return new Date(date).toLocaleString(tag(locale, 'en-US'), options)
