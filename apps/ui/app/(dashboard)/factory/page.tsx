@@ -85,6 +85,7 @@ export default function FactoryPage() {
             <FactoryWorld
                 {...(snapshot ? { scene, selectedIssue: selected, onSelectJob: onSelect, onOpenCoworker: openByName } : {})}
                 {...(workspace ? { workspace: String(workspace.id) } : {})}
+                snapshot={snapshot ?? null}
                 rightInset={collapsed ? RAIL_PX : COLUMN_PX}
             />
             <div className="absolute left-4 top-4">

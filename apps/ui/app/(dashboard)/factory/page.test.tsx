@@ -161,4 +161,12 @@ describe('factory page', () => {
         await click(host.querySelector('[data-rail]')!)
         expect(host.querySelector('[data-column]')).not.toBeNull()
     })
+
+    it('hands the live snapshot to the floor for the bar, and null before it arrives', async () => {
+        await mount()
+        expect(mocks.world.current!.snapshot).toBeNull()
+        mocks.answer = snapshotWith([job(1)])
+        await remount()
+        expect(mocks.world.current!.snapshot).toEqual((mocks.answer as { snapshot: unknown }).snapshot)
+    })
 })
