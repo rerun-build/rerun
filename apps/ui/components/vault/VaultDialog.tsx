@@ -2,8 +2,10 @@
 
 import { useTranslations } from 'next-intl'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
-import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
+import { LockKeyholeIcon } from '@/lib/icons'
 import { useVault } from './useVault'
 import { VaultPanel } from './VaultPanel'
 
@@ -16,10 +18,7 @@ export function VaultDialog({ open, onOpenChange }: { open: boolean; onOpenChang
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <PanelDialogContent className="sm:h-[min(48rem,90dvh)] sm:max-w-2xl">
-                <DialogHeader className="border-b px-4 py-4">
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>{t('description')}</DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={LockKeyholeIcon} title={t('title')} description={t('description')} />
                 <div className="flex min-h-0 flex-1 flex-col">
                     <VaultPanel listing={listing} paid={paid} error={error} onChanged={reload} />
                 </div>
