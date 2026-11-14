@@ -92,21 +92,37 @@ export type VaultCatalogApp = { slug: string; name: string; icon: string | null;
 
 const CATALOG_COLUMNS = ['slug', 'name', 'icon', 'category', 'summary', 'manifest'] as const
 
+type CatalogRow = { slug: string; name: string; icon: string | null; category: string; summary: string; manifest: unknown }
+
 // The catalog as the Vault offers it: no coworker to read installs from, and only the sign-in methods
 // the Vault holds. An app none of whose methods it holds is left out until it does.
-export async function vaultCatalog(query?: string): Promise<VaultCatalogApp[]> {
-    const supabase = createServiceRoleClient()
-    const text = sanitizeIlike(query ?? '')
-    const pattern = `%${text}%`
-    const filters = text ? { enabled: true, or: { name: { ilike: pattern }, slug: { ilike: pattern } } } : { enabled: true }
-    const { data } = await selectMany(supabase, 'services', CATALOG_COLUMNS, filters, { column: 'name' }, 60)
-    return (data ?? []).flatMap(row => {
+function toVaultCatalogApps(rows: CatalogRow[]): VaultCatalogApp[] {
+    return rows.flatMap(row => {
         const parsed = serviceManifestSchema.safeParse(row.manifest)
         if (!parsed.success) return []
         const authMethods = toAuthMethodSummaries(parsed.data).filter(method => VAULT_DIALOG_METHOD_KINDS.has(method.kind))
         if (authMethods.length === 0) return []
         return [{ slug: row.slug, name: row.name, icon: row.icon, category: row.category, summary: row.summary, multiInstance: parsed.data.multiInstance, authMethods }]
     })
+}
+
+export async function vaultCatalog(query?: string): Promise<VaultCatalogApp[]> {
+    const supabase = createServiceRoleClient()
+    const text = sanitizeIlike(query ?? '')
+    const pattern = `%${text}%`
+    const filters = text ? { enabled: true, or: { name: { ilike: pattern }, slug: { ilike: pattern } } } : { enabled: true }
+    const { data } = await selectMany(supabase, 'services', CATALOG_COLUMNS, filters, { column: 'name' }, 60)
+    return toVaultCatalogApps(data ?? [])
+}
+
+// What an empty Vault offers first. The catalog is sorted by name, so its own first apps would be
+// whatever starts with an A.
+const VAULT_POPULAR_SLUGS = ['notion', 'slack', 'hubspot', 'linear', 'github', 'airtable']
+
+export async function vaultPopularApps(): Promise<VaultCatalogApp[]> {
+    const { data } = await selectMany(createServiceRoleClient(), 'services', CATALOG_COLUMNS, { enabled: true, slug: VAULT_POPULAR_SLUGS })
+    const apps = toVaultCatalogApps(data ?? [])
+    return VAULT_POPULAR_SLUGS.flatMap(slug => apps.filter(app => app.slug === slug))
 }
 
 export type AddVaultSecretInput = { name: string; key: string; value: string; agentIds?: string[] }

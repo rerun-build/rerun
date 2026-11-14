@@ -4,8 +4,7 @@ import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import type { VaultEntryView, VaultListing } from '@/app/api/_services/vault.service'
-import { AddButton, EmptyPitch } from '@/components/connections/AiProvidersPanel'
-import { Button } from '@/components/ui/button'
+import { AddButton } from '@/components/connections/AiProvidersPanel'
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
@@ -18,16 +17,18 @@ import { useCatalogServices } from '@/hooks/useCatalogServices'
 import { KeyIcon, SearchIcon, ServerIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
 import { Badge } from '@rerun/ui/primitives'
-import { VaultAddApp } from './VaultAddApp'
+import { VaultAddApp, type VaultAddKind } from './VaultAddApp'
+import { VaultEmpty } from './VaultEmpty'
 import { VaultEntryDetail } from './VaultEntryDetail'
 import { AppIcon } from '@/components/apps/PaidAppViews'
 import { PaidAccountStatusBadge, VaultPaidAccountDetail } from './VaultPaidAccountDetail'
 import type { VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
+import type { VaultCatalogApp } from '@/app/api/_services/vault-install.service'
 import { VaultAppTile } from './VaultAppTile'
 import { VaultCoworkerFaces, type VaultUsage } from './VaultCoworkerFaces'
 import { matchesVaultQuery, vaultGroupOf } from './vault-text'
 
-type VaultPage = { kind: 'list' } | { kind: 'detail'; id: string } | { kind: 'paid'; connectionId: string } | { kind: 'add' }
+type VaultPage = { kind: 'list' } | { kind: 'detail'; id: string } | { kind: 'paid'; connectionId: string } | { kind: 'add'; app?: VaultCatalogApp; addKind?: VaultAddKind }
 
 // Past this many entries the list gets a search field: a handful is read at a glance.
 const SEARCH_FROM = 8
@@ -37,9 +38,11 @@ type Props = {
     paid?: VaultPaidAccount[]
     error: string | null
     onChanged: () => Promise<void>
+    // The lab has no session to read the catalog with.
+    loadPopularApps?: () => Promise<VaultCatalogApp[]>
 }
 
-export function VaultPanel({ listing, paid = [], error, onChanged }: Props) {
+export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularApps }: Props) {
     const t = useTranslations('vault')
     const [page, setPage] = useState<VaultPage>({ kind: 'list' })
     const [query, setQuery] = useState('')
@@ -76,6 +79,8 @@ export function VaultPanel({ listing, paid = [], error, onChanged }: Props) {
                     {page.kind === 'add' && listing ? (
                         <VaultAddApp
                             listing={listing}
+                            initialApp={page.app}
+                            initialKind={page.addKind}
                             onBack={back}
                             onAdded={async id => {
                                 await onChanged()
@@ -89,17 +94,8 @@ export function VaultPanel({ listing, paid = [], error, onChanged }: Props) {
                     ) : !listing ? (
                         error ? <p className="p-4 text-sm text-muted-foreground">{error}</p> : <VaultSkeleton />
                     ) : empty ? (
-                        <PanelScroller className="p-4">
-                            <EmptyPitch
-                                text={t('empty')}
-                                actions={
-                                    <TooltipDisabledReason reason={addReason}>
-                                        <Button variant="outline" disabled={!!addReason} onClick={() => setPage({ kind: 'add' })}>
-                                            {t('addApp')}
-                                        </Button>
-                                    </TooltipDisabledReason>
-                                }
-                            />
+                        <PanelScroller className="flex flex-col p-4">
+                            <VaultEmpty addReason={addReason} loadApps={loadPopularApps} onPick={app => setPage({ kind: 'add', app })} onAdd={addKind => setPage({ kind: 'add', addKind })} />
                         </PanelScroller>
                     ) : (
                         <PanelScroller className="space-y-4 p-4">
