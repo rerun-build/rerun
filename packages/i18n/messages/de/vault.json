@@ -8,8 +8,8 @@
         "secrets": "Secrets"
     },
     "add": "Hinzufügen",
-    "addApp": "App hinzufügen",
-    "empty": "Der Vault ist leer. Melde dich einmal bei einer App an, jeder Coworker, den du wählst, kann sie nutzen.",
+    "emptyTitle": "Einmal anmelden, mit deinen Coworkern teilen",
+    "otherApp": "Andere App",
     "row": {
         "everyone": "Alle Coworker",
         "everyoneShort": "Alle",

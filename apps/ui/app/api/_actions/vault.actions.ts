@@ -2,7 +2,7 @@
 
 import type { VaultItemSummary } from '@rerun/contracts'
 
-import { addVaultMcp, addVaultSecret, addVaultService, reconfigureVaultService, vaultCatalog, type AddVaultMcpInput, type AddVaultSecretInput, type AddVaultServiceInput, type VaultAddResult, type VaultCatalogApp } from '@/app/api/_services/vault-install.service'
+import { addVaultMcp, addVaultSecret, addVaultService, reconfigureVaultService, vaultCatalog, vaultPopularApps, type AddVaultMcpInput, type AddVaultSecretInput, type AddVaultServiceInput, type VaultAddResult, type VaultCatalogApp } from '@/app/api/_services/vault-install.service'
 import { requireLightSessionActor } from '@/app/api/_auth/access'
 import { attachVaultPaidAccount, detachVaultPaidAccount, vaultPaidAccounts, type VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
 import { isAppSlug } from '@/lib/apps/types'
@@ -72,6 +72,13 @@ export async function vaultCatalogAction(query?: string): Promise<Result<VaultCa
     return attempt(async () => {
         await requireLightSessionActor()
         return vaultCatalog(query)
+    })
+}
+
+export async function vaultPopularAppsAction(): Promise<Result<VaultCatalogApp[]>> {
+    return attempt(async () => {
+        await requireLightSessionActor()
+        return vaultPopularApps()
     })
 }
 

@@ -18,8 +18,8 @@
         "secrets": "Secrets"
     },
     "add": "Add",
-    "addApp": "Add an app",
-    "empty": "Nothing in the Vault yet. Sign in to an app once, every coworker you pick can use it.",
+    "emptyTitle": "Sign in once, share with your coworkers",
+    "otherApp": "Other app",
     "row": {
         "everyone": "Every coworker",
         "everyoneShort": "All",
