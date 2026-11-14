@@ -23,6 +23,7 @@ END = ("merged", "rejected", "blocked", "failed", "returned")
 BACK = {"building": "queued", "reviewing": "review_wait", "fixing": "fix_wait"}  # where a transient failure sends a job back to
 LOST_BEATS = 3  # beats a send without a run id is looked for in list_runs
 RECONCILE_BEATS = 10  # a pass reads GitHub once; an end state fixed by hand needs no faster answer
+REPORT_QUIET_S = 90  # a report failure in the first seconds after the start is not logged unless it lasts
 RECONCILE_MAX = 20  # jobs looked at in one pass
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 
@@ -254,6 +255,7 @@ class Dispatcher:
         self.beats = 0
         self.renewal_unreadable = False
         self.report_logged = set()
+        self.started = now()
         self.names = pools.names(cfg)
 
     def fill_ids(self):
@@ -830,7 +832,7 @@ class Dispatcher:
             self.report_logged.clear()
         except Exception as e:  # noqa: BLE001 - the report only, never the beat
             text = str(e) if isinstance(e, Error) else type(e).__name__
-            if text not in self.report_logged:
+            if self.now() - self.started >= REPORT_QUIET_S and text not in self.report_logged:
                 self.report_logged.add(text)
                 log("-", "factory_report: %s" % text)
 

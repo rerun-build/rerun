@@ -18,11 +18,12 @@ class Reply:
 
 
 class Report(unittest.TestCase):
-    def make(self, fail=None):
+    def make(self, fail=None, warm=True):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         self.calls = []
         self.fail = fail
+        self.t = 1794000000.0
 
         def account(tool, args, timeout=30):
             self.calls.append((tool, args, timeout))
@@ -35,8 +36,10 @@ class Report(unittest.TestCase):
                "heartbeat_file": os.path.join(tmp.name, "hb"),
                "builders": [{"id": "b1", "name": "B1"}], "reviewers": [{"id": "r1", "name": "R1"}]}
         gh = lambda args: "[]"
-        self.d = D.Dispatcher(cfg, account, gh, now=lambda: 1794000000.0)
+        self.d = D.Dispatcher(cfg, account, gh, now=lambda: self.t)
         self.addCleanup(self.d.close)
+        if warm:
+            self.t += 100
 
     def once(self):
         out = io.StringIO()
@@ -75,6 +78,22 @@ class Report(unittest.TestCase):
         self.once()  # a good report clears the log set
         self.fail = KeyError("x")
         self.assertEqual(self.once().count("factory_report: KeyError"), 1)
+
+    def test_a_failure_in_the_first_90_seconds_is_not_logged_unless_it_lasts(self):
+        self.make(D.Error("account factory_report failed: HTTP 404"), warm=False)
+        self.t += 89
+        self.assertNotIn("factory_report", self.once())
+        self.t += 2
+        text = self.once() + self.once()
+        self.assertEqual(text.count("factory_report: account factory_report failed: HTTP 404"), 1)
+        self.assertEqual(len(self.reports()), 3)
+
+    def test_a_report_that_works_within_90_seconds_logs_nothing(self):
+        self.make(D.Error("account factory_report failed: HTTP 404"), warm=False)
+        self.assertNotIn("factory_report", self.once())
+        self.fail = None
+        self.t += 200
+        self.assertNotIn("factory_report", self.once())
 
     def test_make_account_passes_the_timeout_and_keeps_30_by_default(self):
         seen = []
