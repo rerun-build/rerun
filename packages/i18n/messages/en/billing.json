@@ -68,8 +68,6 @@
         "plan.change.monthlyFrom": "Value of a summary row. The <price> tag is replaced by the animated price per month.",
         "plan.change.planLabel": "Names a whole plan. {slots} is empty or a list of paid app slots, like \" + 2 LinkedIn slots\".",
         "plan.change.switchOn": "Button. {date} is the renewal date, or \"your renewal\".",
-        "plan.credit.perMonth": "Under the number of packs: the credits they add each month.",
-        "plan.credit.then": "Label of a summary row: what the plan bills afterwards.",
         "plan.invoices.status.open": "Status of an invoice that is not paid yet.",
         "plan.invoices.status.uncollectible": "Status of an invoice Stripe gave up collecting.",
         "plan.invoices.status.void": "Status of an invoice that was cancelled.",
@@ -92,7 +90,9 @@
         "usage.pane.periodLeft": "{start} and {end} are short dates of the billing period, {left} the credits left.",
         "usage.paidData": "Names of the paid data sources a coworker can buy, as rows of the credit usage breakdown (plural nouns: what was bought).",
         "perks.headlines.credits": "Short perk of the paid plan, in a row of checkmarks: the monthly credit allowance.",
-        "perks.headlines.team": "Short perk of the paid plan, in a row of checkmarks: teammates can be invited."
+        "perks.headlines.team": "Short perk of the paid plan, in a row of checkmarks: teammates can be invited.",
+        "plan.credit.packCredits": "Under the number of packs: the credits they add, which never expire.",
+        "plan.credit.dueBeforeTax": "Label of a summary row: the amount due today, tax added on the Stripe page."
     },
     "credits": "{count, plural, one {# credit} other {# credits}}",
     "plan": {
@@ -209,19 +209,18 @@
         },
         "credit": {
             "addedTitle": "Credits added",
-            "addedBody": "You now get {count, plural, one {# credit} other {# credits}} every month. Your coworkers pick up where they stopped.",
-            "unchangedBody": "Your credits stay as they are until your renewal.",
-            "title": "Add Rerun credits",
-            "eachPack": "Each pack adds {count, plural, one {# credit} other {# credits}} every month, for {price}.",
+            "addedBody": "{count, plural, one {# credit is} other {# credits are}} in your workspace. They never expire, and your coworkers pick up where they stopped.",
+            "title": "Buy Rerun credits",
+            "eachPack": "Each pack adds {count, plural, one {# credit} other {# credits}} for {price}, paid once. They never expire.",
             "packs": "{count, plural, one {# pack} other {# packs}}",
-            "perMonth": "+{count, plural, one {# credit} other {# credits}} a month",
+            "packCredits": "{count, plural, one {# credit} other {# credits}}, never expire",
             "lessAria": "One pack less",
             "moreAria": "One pack more",
-            "then": "Then",
-            "add": "Add credits",
-            "pickPacks": "Pick a number of packs",
-            "removeAtRenewal": "Remove at renewal",
-            "chargedNow": "Charged now, prorated to your renewal."
+            "dueBeforeTax": "Due today, before tax",
+            "buy": "Buy credits",
+            "payOnStripe": "Pay on Stripe",
+            "chargedOnce": "Charged once to this card.",
+            "checkoutFootnote": "You pay on a secure Stripe page, then come back here."
         }
     },
     "apps": {
@@ -600,11 +599,6 @@
                 "title": "Teammates",
                 "trial": "Just you",
                 "pro": "Invite your whole team"
-            },
-            "topup": {
-                "title": "Top-ups",
-                "trial": "Not available",
-                "pro": "+{credits, plural, one {# credit} other {# credits}} when you need them"
             }
         },
         "headlines": {

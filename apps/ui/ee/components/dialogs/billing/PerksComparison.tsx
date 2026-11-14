@@ -2,7 +2,7 @@ import { BorderBeam } from '@rerun/ui'
 import { useTranslations } from 'next-intl'
 
 import { Icon } from '@/components/ui/icon'
-import { BASE_PLAN_CREDITS, CREDITS_PER_PACK, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS } from '@/ee/lib/billing/plans'
+import { BASE_PLAN_CREDITS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS } from '@/ee/lib/billing/plans'
 import { PRO_PERKS, type ProPerk } from '@/ee/lib/billing/pro-perks'
 
 // The perks are listed in lib with their English copy; the rows this table knows by id read from the
@@ -15,8 +15,6 @@ function perkCopy(t: ReturnType<typeof useTranslations<'billing.perks'>>, perk: 
             return { title: t('rows.coworkers.title'), trial: t('rows.coworkers.trial', { count: TRIAL_ACTIVE_AGENTS }), pro: t('rows.coworkers.pro') }
         case 'team':
             return { title: t('rows.team.title'), trial: t('rows.team.trial'), pro: t('rows.team.pro') }
-        case 'topup':
-            return { title: t('rows.topup.title'), trial: t('rows.topup.trial'), pro: t('rows.topup.pro', { credits: CREDITS_PER_PACK }) }
         default:
             return perk
     }

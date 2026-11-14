@@ -25,8 +25,7 @@ export function SpendRequestBlock({ input, output, onSubmit }: SpendRequestBlock
 
     const request = pendingSpend(input)
     const quote = { ...priced, creditLeftMicros: Math.max(budgetMicros - usedMicros, 0) }
-    // Credit packs are not sold on a trial: what opens more credit there is the plan itself.
-    const addCredits = () => (workspace?.subscription_status === 'trialing' ? openBilling(undefined, 'spend_short_trial') : openBilling('credit_pack', 'spend_short'))
+    const addCredits = () => openBilling('credit_pack', workspace?.subscription_status === 'trialing' ? 'spend_short_trial' : 'spend_short')
 
     return <SpendCard request={request} quote={quote} onSubmit={decision => onSubmit({ purpose: request.purpose, ...decision })} onAddCredits={addCredits} />
 }

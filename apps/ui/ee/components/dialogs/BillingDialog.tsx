@@ -22,16 +22,19 @@ import { useSession } from '@/supabase/session/SessionProvider'
 
 import { BillingDialogShell } from './billing/BillingDialogShell'
 import { CheckoutDialog } from './billing/CheckoutDialog'
+import { CreditPane, type CreditPurchased } from './billing/CreditPane'
+import { SuccessPanel } from './billing/parts'
 import { PlanDialog } from './billing/PlanDialog'
 import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscriptionDialog'
 
 // What the dialog shows, decided when it opens and held until it closes: a payment rewrites the
 // workspace through the webhook, and re-deciding then would swap the success panel for the next
 // dialog under the user's eyes.
-type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'error' }
+type Resolved = { kind: 'loading' } | { kind: 'checkout'; route: CheckoutRoute } | { kind: 'plan' } | { kind: 'lifetime' } | { kind: 'credit' } | { kind: 'error' }
 
 // Every openBilling() lands here. Two dialogs: the checkout, which sells a plan (or ends a trial),
-// and the plan dialog, which manages one that is paid.
+// and the plan dialog, which manages one that is paid. Rerun credit is sold to every workspace: one
+// with no paid plan to manage buys it from a dialog of its own.
 export function BillingDialog() {
     const { workspace, role } = useSession()
     const { open, highlightAddon, trigger, setOpen } = useBillingStore()
@@ -75,8 +78,9 @@ export function BillingDialog() {
         // Paid once, outside Stripe: there is nothing to sell, and a Pro subscription would overwrite
         // the plan, so cancelling it later would take the lifetime access away.
         if (isLifetimePlan(workspace)) {
-            setResolved({ kind: 'lifetime' })
-            track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: 'lifetime' })
+            const kind = highlightAddon === 'credit_pack' ? 'credit' : 'lifetime'
+            setResolved({ kind })
+            track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: kind })
             return
         }
         setResolved({ kind: 'loading' })
@@ -86,7 +90,9 @@ export function BillingDialog() {
             return
         }
         const route = resolve(read?.state ?? null)
-        track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: route?.variant ?? 'plan' })
+        const credit = !!route && highlightAddon === 'credit_pack'
+        if (credit) setResolved({ kind: 'credit' })
+        track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: credit ? 'credit' : (route?.variant ?? 'plan') })
     }, [workspace, entitled, loadState, resolve, trigger, highlightAddon])
 
     const opened = useRef(false)
@@ -119,6 +125,8 @@ export function BillingDialog() {
                         useWorkspaceSettingsStore.getState().openAiProviders()
                     }}
                 />
+            ) : resolved.kind === 'credit' ? (
+                <CreditPurchaseShell onClose={close} />
             ) : resolved.kind === 'error' ? (
                 <ErrorShell onRetry={() => void decide()} />
             ) : resolved.kind === 'checkout' ? (
@@ -158,6 +166,27 @@ function AdminOnlyShell({ onClose }: { onClose: () => void }) {
                     </Button>
                 }
             />
+        </DialogContent>
+    )
+}
+
+function CreditPurchaseShell({ onClose }: { onClose: () => void }) {
+    const t = useTranslations('billing')
+    const { refreshWorkspace } = useSession()
+    const [success, setSuccess] = useState<CreditPurchased | null>(null)
+    return (
+        <DialogContent aria-describedby={undefined} className="flex max-h-[calc(100dvh_-_2rem)] flex-col overflow-y-auto bg-popover sm:max-w-md">
+            <DialogTitle className="sr-only">{t('plan.credit.title')}</DialogTitle>
+            {success ? (
+                <SuccessPanel title={success.title} body={success.body} cta={t('plan.success.done')} onDone={onClose} />
+            ) : (
+                <CreditPane
+                    onDone={async next => {
+                        await refreshWorkspace()
+                        setSuccess(next)
+                    }}
+                />
+            )}
         </DialogContent>
     )
 }

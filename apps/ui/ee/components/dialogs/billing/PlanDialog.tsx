@@ -21,8 +21,8 @@ import { Button } from '@/components/ui/button'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { BASE_PLAN_CREDITS, CREDITS_PER_PACK, PLAN_PRICES_CENTS, formatCredits, planDiscountCents, planPriceCents, type AddonKey, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
-import { ChevronRightIcon, CoinsIcon, ExternalLinkIcon, MinusIcon, PlusIcon, Receipt } from '@/lib/icons'
+import { formatCredits, planDiscountCents, planPriceCents, type AddonKey, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
+import { ChevronRightIcon, CoinsIcon, ExternalLinkIcon, Receipt } from '@/lib/icons'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import { BillingDialogShell } from './BillingDialogShell'
@@ -33,6 +33,7 @@ import { appInfo } from '@/lib/apps/catalog'
 import { APP_SLUGS, type AppSlug } from '@/lib/apps/types'
 import { usePaidAppsStore } from '@/stores/paid-apps.store'
 import { CreditCard } from './credit-usage/CreditCard'
+import { CreditPane } from './CreditPane'
 import { UsagePane } from './credit-usage/UsagePane'
 import { useCreditUsage } from './credit-usage/useCreditUsage'
 import { longDate, shortDate } from './checkout-copy'
@@ -183,7 +184,7 @@ export function PlanDialog({
                 ) : drill === 'invoices' ? (
                     <InvoicesPane onBack={() => setDrill('overview')} />
                 ) : drill === 'credit' ? (
-                    <CreditPane state={state} onBack={() => setDrill('overview')} onDone={next => void done(next)} />
+                    <CreditPane onBack={() => setDrill('overview')} onDone={next => void done(next)} />
                 ) : drill === 'usage' ? (
                     <UsagePane credit={credit} onBack={() => setDrill('overview')} />
                 ) : drill === 'business' ? (
@@ -594,74 +595,3 @@ function invoiceStatusLabel(status: string, t: ReturnType<typeof useTranslations
     return known ? t(`status.${known}`) : status
 }
 
-// Rerun credit is a monthly quantity on the plan: each pack adds its credit every month.
-function CreditPane({ state, onBack, onDone }: { state: SubscriptionState; onBack: () => void; onDone: (success: Success) => void }) {
-    const t = useTranslations('billing')
-    const errorText = useErrorText()
-    const current = state.quantities.credit_pack
-    const [packs, setPacks] = useState(current + 1)
-    const [accepted, setAccepted] = useState(false)
-    const [submitting, setSubmitting] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    const selection: PlanSelection = { quantities: { ...state.quantities, credit_pack: packs }, interval: state.interval }
-    const increase = packs > current
-    const packPrice = PLAN_PRICES_CENTS[state.interval].credit_pack
-    const quote = usePlanQuote(selection, increase)
-
-    const apply = async () => {
-        setSubmitting(true)
-        setError(null)
-        const result = await runPlanChange(selection)
-        setSubmitting(false)
-        if (!result.ok) return setError(errorText(result))
-        onDone({
-            title: increase ? t('plan.credit.addedTitle') : t('plan.change.changeScheduledTitle'),
-            body: increase ? t('plan.credit.addedBody', { count: BASE_PLAN_CREDITS + packs * CREDITS_PER_PACK }) : t('plan.credit.unchangedBody'),
-        })
-    }
-
-    return (
-        <>
-            <RightTitle onBack={onBack}>{t('plan.credit.title')}</RightTitle>
-            <p className="mt-2 text-sm text-muted-foreground">
-                {t('plan.credit.eachPack', { count: CREDITS_PER_PACK, price: billed(packPrice, state.interval, t) })}
-            </p>
-            <div className="mt-6 flex flex-col gap-3">
-                <div className="flex items-center justify-between rounded-xl bg-background/60 px-4 py-3 ring-1 ring-border">
-                    <div>
-                        <p className="text-sm font-medium">{t('plan.credit.packs', { count: packs })}</p>
-                        <p className="text-xs text-muted-foreground">{t('plan.credit.perMonth', { count: packs * CREDITS_PER_PACK })}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon-sm" aria-label={t('plan.credit.lessAria')} onClick={() => setPacks(value => Math.max(0, value - 1))} disabled={packs === 0}>
-                            <MinusIcon />
-                        </Button>
-                        <Button variant="outline" size="icon-sm" aria-label={t('plan.credit.moreAria')} onClick={() => setPacks(value => value + 1)}>
-                            <PlusIcon />
-                        </Button>
-                    </div>
-                </div>
-                {increase && (
-                    <SummaryRows
-                        rows={[
-                            { label: t('plan.change.dueTodayTaxIncluded'), value: quote === 'loading' ? <Skeleton className="inline-block h-4 w-14" /> : quote ? usd(quote.dueTodayCents) : '-', strong: true },
-                            { label: t('plan.credit.then'), value: billed(planBillCents(state, selection.quantities, state.interval), state.interval, t), muted: true },
-                        ]}
-                    />
-                )}
-                <CardOnFile card={state.card} />
-            </div>
-            <PayFooter
-                cta={increase ? t('plan.credit.add') : packs === current ? t('plan.credit.pickPacks') : t('plan.credit.removeAtRenewal')}
-                footnote={increase ? t('plan.credit.chargedNow') : t('plan.change.nothingToday')}
-                onClick={() => void apply()}
-                loading={submitting}
-                disabled={packs === current || (increase && (!accepted || quote === 'loading'))}
-                disabledReason={increase && !accepted ? t('plan.acceptTerms') : undefined}
-                error={error}
-            >
-                {increase && <TermsConsent checked={accepted} onChange={setAccepted} />}
-            </PayFooter>
-        </>
-    )
-}

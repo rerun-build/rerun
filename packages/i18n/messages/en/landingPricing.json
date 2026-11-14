@@ -6,10 +6,11 @@
         "price.perMonthBilledYearly": "Suffix after the monthly price of a yearly plan; the argument \"total\" is the yearly amount, e.g. \"$276\".",
         "tiers.pro.creditsNote": "Small note next to the monthly included credits: more credits can be bought at any time.",
         "socialApps.price": "Price of a paid app add-on, e.g. \"+$9/month\".",
-        "addons.items.credit_pack.unit": "How many credits one pack adds per month, e.g. \"+1,000 credits/mo\".",
+        "addons.items.credit_pack.unit": "How many credits one pack adds, bought once and never expiring, e.g. \"+1,000 credits, never expire\".",
         "plan.trialNote": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
         "faq.items.trial.answer": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
-        "comparison.versus": "Link to the page comparing Rerun with a competitor, e.g. \"Rerun vs Zapier\"."
+        "comparison.versus": "Link to the page comparing Rerun with a competitor, e.g. \"Rerun vs Zapier\".",
+        "price.once": "Suffix right after a price paid a single time, e.g. \"$10 once\"."
     },
     "seo": {
         "title": "Pricing",
@@ -23,7 +24,8 @@
     },
     "price": {
         "perMonth": "/month",
-        "perMonthBilledYearly": "/month, billed {total}/yr"
+        "perMonthBilledYearly": "/month, billed {total}/yr",
+        "once": "once"
     },
     "billing": {
         "label": "Billing period",
@@ -140,12 +142,12 @@
     "addons": {
         "label": "Add-ons",
         "title": "Grow one piece at a time.",
-        "lede": "Add-ons are quantities on the plan you already have, not another tier. Take one when you need it, drop it when you do not.",
+        "lede": "Not another tier. Take more when you need it.",
         "items": {
             "credit_pack": {
                 "title": "Rerun credits",
-                "unit": "+{credits, plural, one {# credit} other {# credits}}/mo",
-                "caption": "More credits for the models we host, on top of the plan."
+                "unit": "+{credits, plural, one {# credit} other {# credits}}, never expire",
+                "caption": "More credits for the models we host, on top of the plan. Paid once."
             }
         }
     },
@@ -184,7 +186,7 @@
             },
             "addons": {
                 "question": "How do add-ons work?",
-                "answer": "They are quantities on your existing subscription, not another plan. Add credits whenever you need them, and remove them the same way."
+                "answer": "They are not another plan. Rerun credits are paid once and never expire: buy more whenever you need them."
             },
             "removeAddon": {
                 "question": "What happens when I remove an add-on?",
