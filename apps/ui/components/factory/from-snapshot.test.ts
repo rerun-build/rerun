@@ -22,10 +22,10 @@ describe('sceneFromSnapshot', () => {
         expect(f.counts).toMatchObject({ queued: 1, building: 2, review: 1, checks: 0, merged: 1 })
     })
 
-    it('puts the blocked job in blocked with its reason and keeps its pod where it is', () => {
+    it('puts the blocked job in blocked with its reason and draws no pod for it', () => {
         const f = sceneFromSnapshot(sample(), NOW)
         expect(f.blocked).toEqual([{ issue: 334, reason: 'plan: worktree tool refused the branch' }])
-        expect(pod(f, 334)).toMatchObject({ state: 'queued', path: ['Delegator', 'code'], travel: 0 })
+        expect(pod(f, 334)).toBeUndefined()
     })
 
     it('holds sending while a hold runs: held, holdLeftMs, queued pods held', () => {
@@ -75,9 +75,33 @@ describe('sceneFromSnapshot', () => {
         s.jobs[5].parent = 320
         const g = sceneFromSnapshot(s, NOW)
         expect(g.cabinets).toHaveLength(1)
-        expect(g.cabinets[0]).toMatchObject({ issue: 320, title: '#320', tasks: [330, 335] })
+        expect(g.cabinets[0]).toMatchObject({ issue: 320, title: '', tasks: [330, 335] })
         expect(g.cabinets[0].slots.find(x => x.issue === 335)?.state).toBe('merged')
         expect(g.tiles.some(t => t.id === 'cab-320')).toBe(true)
+    })
+
+    it('draws no pod for any ended job: merged, rejected, blocked, failed, returned', () => {
+        for (const state of ['merged', 'rejected', 'blocked', 'failed', 'returned'] as const) {
+            const s = sample()
+            s.jobs = [{ ...s.jobs[0], state }]
+            expect(pod(sceneFromSnapshot(s, NOW), 330), state).toBeUndefined()
+        }
+    })
+
+    it('still lists a blocked job in blocked with its reason', () => {
+        const s = sample()
+        s.jobs = [{ ...s.jobs[0], state: 'blocked', reason: 'plan: wrong' }]
+        expect(sceneFromSnapshot(s, NOW).blocked).toEqual([{ issue: 330, reason: 'plan: wrong' }])
+    })
+
+    it('prints the feature number once: the cabinet title is empty and the aria label has the number once', () => {
+        const s = sample()
+        s.jobs[0].parent = 320
+        const g = sceneFromSnapshot(s, NOW)
+        expect(g.cabinets[0].title).toBe('')
+        const label = g.tiles.find(t => t.id === 'cab-320')?.ariaLabel ?? ''
+        expect(label).toMatch(/^Feature #320: /)
+        expect(label.match(/#320/g)).toHaveLength(1)
     })
 
     it('every state of the contracts enum is mapped', () => {
