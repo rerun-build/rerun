@@ -46,6 +46,7 @@ type Link = {
     variant: 'beam' | 'cable' | 'trace' | 'belt'
     appearDelay: number
     color?: string
+    still?: boolean
 }
 
 // Même convention d'écran que tileBox/ContainerBlock : isoPosition().left + TILE_W/2. Les tracés
@@ -130,7 +131,7 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
     const links = useMemo<Link[]>(() => {
         const tileById = new Map(tiles.map(t => [t.id, t]))
         const byKey = new Map<string, Link>()
-        const add = (sourceId: string | null, targetId: string, variant: 'beam' | 'cable' | 'trace' | 'belt', appearDelay: number, color?: string) => {
+        const add = (sourceId: string | null, targetId: string, variant: 'beam' | 'cable' | 'trace' | 'belt', appearDelay: number, color?: string, still?: boolean) => {
             if (!sourceId || sourceId === targetId) return
             const source = tileById.get(sourceId)
             const target = tileById.get(targetId)
@@ -138,9 +139,9 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
             if (!isPlaced(source.position) || !isPlaced(target.position)) return
             const id = `${sourceId}->${targetId}`
             const key = `${variant}:${id}`
-            if (!byKey.has(key)) byKey.set(key, { id, key, source, target, variant, appearDelay, color })
+            if (!byKey.has(key)) byKey.set(key, { id, key, source, target, variant, appearDelay, color, still })
         }
-        for (const l of liveLinks) add(l.source, l.target, l.variant ?? 'beam', l.appearDelay ?? 0, l.color)
+        for (const l of liveLinks) add(l.source, l.target, l.variant ?? 'beam', l.appearDelay ?? 0, l.color, l.still)
         // Les câbles d'abord : un beam est peint par-dessus la plomberie qu'il emprunte.
         return Array.from(byKey.values()).sort((a, b) => Number(a.variant === 'beam') - Number(b.variant === 'beam'))
     }, [tiles, liveLinks])
@@ -180,7 +181,7 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
     if (routes.length === 0) return null
 
     const cables = routes.filter(route => route.link.variant === 'cable')
-    const traces = routes.filter(route => route.link.variant === 'trace' || route.link.variant === 'belt')
+    const traces = routes.filter(route => (route.link.variant === 'trace' || route.link.variant === 'belt') && !route.link.still)
 
     return (
         <>
@@ -221,12 +222,12 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
                                         {/* Edge glow in the link's colour, the belt's body over it, then its running slats. */}
                                         <path d={d} fill="none" stroke={color} strokeWidth={BELT_WIDTH + 2.4} strokeLinejoin="round" opacity={0.55} />
                                         <path d={d} fill="none" stroke="#0d1122" strokeWidth={BELT_WIDTH} strokeLinejoin="round" />
-                                        <path d={d} className="iso-belt-slats" fill="none" stroke="rgb(var(--iso-glint) / 0.09)" strokeWidth={BELT_WIDTH - 3} strokeDasharray={BELT_SLATS} />
+                                        {!link.still && <path d={d} className="iso-belt-slats" fill="none" stroke="rgb(var(--iso-glint) / 0.09)" strokeWidth={BELT_WIDTH - 3} strokeDasharray={BELT_SLATS} />}
                                     </>
                                 ) : (
                                     <path d={d} fill="none" strokeWidth={1} strokeLinecap="round" strokeLinejoin="round" style={{ stroke: 'rgb(var(--iso-glint) / 0.14)' }} />
                                 )}
-                                {TRACE_TRAIL.map(layer => {
+                                {!link.still && TRACE_TRAIL.map(layer => {
                                     const lit = Math.max(6, length * layer.share)
                                     return (
                                         <path

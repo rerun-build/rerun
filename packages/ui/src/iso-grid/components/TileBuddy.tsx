@@ -128,6 +128,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
             <div
                 className="absolute pointer-events-none"
                 data-buddy-motion={motion}
+                data-buddy-still={style.still ? '' : undefined}
                 data-buddy-stretched={stretched ? '' : undefined}
                 style={{
                     ['--buddy-stretch' as string]: SELECTED_STRETCH,
