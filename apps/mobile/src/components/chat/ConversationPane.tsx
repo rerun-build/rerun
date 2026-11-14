@@ -1,6 +1,6 @@
-import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -18,6 +18,7 @@ import type { ChatEndpoints } from '@/chat/endpoints'
 import { useCoworkerChat } from '@/chat/useCoworkerChat'
 import { useMessageTimes } from '@/chat/useMessageTimes'
 import { useMessageFeedback } from '@/chat/useMessageFeedback'
+import { setDraft, useDraft } from '@/chat/composer-drafts'
 import { useQueuedMessage } from '@/chat/useQueuedMessage'
 import { useSkillProposals } from '@/chat/useSkillProposals'
 import { cachedBoard } from '@/data/local-cache'
@@ -113,14 +114,19 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     // A message the engine refused while a run held the conversation waits behind it, as on the web.
     const enqueueRef = useRef<(text: string, behindRunId: string | null) => void>(() => {})
     const chat = useCoworkerChat({ endpoints, initialSessionId, onSessionCreated, onRefused: (text, behindRunId) => enqueueRef.current(text, behindRunId) })
-    const queue = useQueuedMessage(`${coworker.id}-${chat.sessionId ?? 'new'}`)
+    // Names the conversation's queued message and its draft, as the web keys both.
+    const conversationKey = `${coworker.id}-${chat.sessionId ?? 'new'}`
+    const queue = useQueuedMessage(conversationKey)
     const proposals = useSkillProposals(coworker.kind === 'coworker' ? chat.sessionId : null, chat.busy)
     // A decision lifts the wait the proposal raised on the session, as on the web.
     const skillProposals = { ...proposals, decide: (proposalId: string, decision: 'accept' | 'dismiss') => proposals.decide(proposalId, decision).then(onStatusChange) }
     const feedback = useMessageFeedback(chat.sessionId, coworker.kind === 'foreman' ? 'foreman' : 'agent')
-    enqueueRef.current = queue.enqueue
+    // Before any effect runs: a refusal reported in the same commit queues under the current key.
+    useLayoutEffect(() => {
+        enqueueRef.current = queue.enqueue
+    }, [queue.enqueue])
     const [stopping, setStopping] = useState(false)
-    const [draft, setDraft] = useState('')
+    const draft = useDraft(conversationKey)
     const composer = useRef<ComposerHandle>(null)
     const [attachments, setAttachments] = useState<ComposerAttachment[]>([])
     const [uploading, setUploading] = useState(false)
@@ -251,9 +257,8 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     useEffect(() => {
         if (!restored || !chat.fresh || chat.busy || status === 'working') return
         if (shouldKeepQueued(restored, chat.activeRunId())) return
-        setDraft(current => current || queuedPreview(restored.text).text)
-        queue.clear()
-    }, [restored, chat, status, queue])
+        queue.returnToComposer(conversationKey)
+    }, [restored, chat, status, queue, conversationKey])
 
     const askedRef = useRef(false)
     useEffect(() => {
@@ -286,24 +291,26 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const pickReply = (reply: string) => {
         const draftReply = quickReplyDraft(reply)
         if (!draftReply) return void submit(reply)
-        setDraft(draftReply)
+        setDraft(conversationKey, draftReply)
         composer.current?.focus()
     }
 
     const submit = async (text: string) => {
         const message = text.trim()
         if (!message && attachments.length === 0) return
+        // The conversation the text was typed in: the upload below can outlast it.
+        const key = conversationKey
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
         if (caller) askForPushOnce(caller).catch(() => {})
         if (attachments.length === 0 || !caller) {
-            setDraft('')
+            setDraft(key, '')
             send(message)
             return
         }
         setUploading(true)
         try {
             const { paths, files } = await uploadAttachments(caller, coworker.id, attachments)
-            setDraft('')
+            setDraft(key, '')
             setAttachments([])
             send(appendAttachmentsRef(message, buildAttachmentsRef(paths)), files)
         } catch {
@@ -411,7 +418,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                             <PillButton label={t('retry')} variant="secondary" onPress={chat.retry} />
                         </View>
                     )}
-                    {empty && (isForeman ? <ForemanEmptyState onSend={submit} onPrefill={setDraft} /> : <CoworkerEmptyState agentId={coworker.id} mood={moodOf(coworker.status)} asleep={coworker.status === 'offline'} onSend={submit} />)}
+                    {empty && (isForeman ? <ForemanEmptyState onSend={submit} onPrefill={text => setDraft(conversationKey, text)} /> : <CoworkerEmptyState agentId={coworker.id} mood={moodOf(coworker.status)} asleep={coworker.status === 'offline'} onSend={submit} />)}
                     {chat.history === 'ready' && !empty && (
                         // The transcript a conversation opens on is already there; the first bubble of a
                         // new conversation, sent as the list appears, still rises.
@@ -511,7 +518,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                     <LayoutAnimationConfig skipEntering>
                         {!replacesComposer && (
                             <Animated.View entering={SlideInDown.duration(280)} exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                                <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} />
+                                <Composer ref={composer} draftKey={conversationKey} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} />
                             </Animated.View>
                         )}
                     </LayoutAnimationConfig>

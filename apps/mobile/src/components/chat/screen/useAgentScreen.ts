@@ -90,10 +90,13 @@ export function useAgentScreen(agentId: string, enabled: boolean): AgentScreen {
     }, [agentId, key, frames])
 
     // Enabled again, the screen starts from a connection never seen: the last one's socket is gone.
+    const [wasEnabled, setWasEnabled] = useState(enabled)
+    if (wasEnabled !== enabled) {
+        setWasEnabled(enabled)
+        if (!enabled) setAttempt(count => count + 1)
+    }
     useEffect(() => {
-        if (enabled) return
-        reconnects.current = 0
-        setAttempt(count => count + 1)
+        if (!enabled) reconnects.current = 0
     }, [enabled])
 
     const onMessage = useCallback(

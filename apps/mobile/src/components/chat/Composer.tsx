@@ -3,6 +3,7 @@ import { type Ref, useEffect, useEffectEvent, useImperativeHandle, useRef, useSt
 import { Text, TextInput, View, type TextInputInstance } from 'react-native'
 import { useTranslations } from 'use-intl'
 
+import { restoreDraft, setDraft, useDraft } from '@/chat/composer-drafts'
 import { addPasteImagesListener } from '@/chat/composer-paste'
 import { useGlassStyle } from '@/components/ui/GlassButton'
 import { GlassSurface } from '@/components/ui/GlassSurface'
@@ -23,11 +24,17 @@ import { VoiceRecorderBar } from './VoiceRecorderBar'
 
 const LINE_HEIGHT = 21
 
-export type ComposerHandle = { focus: () => void }
+export type ComposerHandle = {
+    focus: () => void
+    /** Puts text back in the composer, unless something is already typed there. */
+    restore: (text: string) => boolean
+}
 
 type ComposerProps = {
-    value: string
-    onChangeText: (text: string) => void
+    // Either held by the caller through `value`, or the conversation's draft kept under `draftKey`.
+    value?: string
+    onChangeText?: (text: string) => void
+    draftKey?: string
     attachments?: ComposerAttachment[]
     onAttachmentsChange?: (attachments: ComposerAttachment[]) => void
     onSend: () => void
@@ -48,12 +55,18 @@ type ComposerProps = {
 }
 
 // A pill at rest, a card once in use (focused, holding text or attachments, or listening).
-export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], autoFocus, ref }: ComposerProps) {
+export function Composer({ value: heldValue, onChangeText, draftKey, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], autoFocus, ref }: ComposerProps) {
     const theme = useTheme()
     const glass = useGlassStyle()
     const [focused, setFocused] = useState(Boolean(autoFocus))
     const input = useRef<TextInputInstance>(null)
-    useImperativeHandle(ref, () => ({ focus: () => input.current?.focus() }), [])
+    const draft = useDraft(draftKey ?? '')
+    const value = heldValue ?? draft
+    const change = (text: string) => {
+        if (heldValue === undefined && draftKey !== undefined) setDraft(draftKey, text)
+        onChangeText?.(text)
+    }
+    useImperativeHandle(ref, () => ({ focus: () => input.current?.focus(), restore: (text: string) => draftKey !== undefined && restoreDraft(draftKey, text) }), [draftKey])
     const [caret, setCaret] = useState(value.length)
     // Where the caret goes once the text a menu just wrote is on screen.
     const pendingCaret = useRef<number | null>(null)
@@ -79,7 +92,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     const write = (next: { text: string; caret: number }) => {
         pendingCaret.current = next.caret
         setCaret(next.caret)
-        onChangeText(next.text)
+        change(next.text)
     }
 
     const pickMention = (item: MentionItem) => {
@@ -153,7 +166,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                                     {placeholder}
                                 </Text>
                             )}
-                            <TextInput ref={input} value={value} onChangeText={onChangeText} onSelectionChange={event => setCaret(event.nativeEvent.selection.end)} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} autoFocus={autoFocus} multiline accessibilityLabel={placeholder} testID="composer-input" style={[inputText, { minHeight: expanded ? 44 : CONTROL, maxHeight: 132, color: theme.foreground }]} />
+                            <TextInput ref={input} value={value} onChangeText={change} onSelectionChange={event => setCaret(event.nativeEvent.selection.end)} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} autoFocus={autoFocus} multiline accessibilityLabel={placeholder} testID="composer-input" style={[inputText, { minHeight: expanded ? 44 : CONTROL, maxHeight: 132, color: theme.foreground }]} />
                         </View>
                     ) : (
                         <VoiceRecorderBar status={recorder.status} error={recorder.error} getLiveState={recorder.getLiveState} />
