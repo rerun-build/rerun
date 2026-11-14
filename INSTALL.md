@@ -70,6 +70,17 @@ SUPABASE_SECRET_KEY=<Secret key from supabase status>
 Sign-in codes land in Mailpit, at http://localhost:54424. Tell them: this setup is for one person on
 one computer, never for a server reachable from the internet.
 
+On Fedora with SELinux enforcing, the template files must carry a label the containers can read,
+or Kong answers 403 and Auth falls back to its default email, which has no six-digit code. From
+the repository root:
+
+```bash
+chcon -t container_file_t supabase/templates/confirmation.html supabase/templates/email_change.html supabase/templates/magic_link.html
+```
+
+Reapply it if a checkout or relabel resets the files. The check in step 6 catches this before
+you start.
+
 **A project on supabase.com:** walk them through it, they do the clicks.
 
 1. Create a free project on https://supabase.com and note the database password.
@@ -114,8 +125,8 @@ node scripts/self-host-check.mjs
 ```
 
 It generates the remaining secrets, asks Supabase whether the schema is in place and the secret
-key is the right one, and prints the exact start command. When it stops, its message says what to
-fix: do that and run it again. Then run the start command. With
+key is the right one, asks Kong whether it can read the sign-in email templates, and prints the
+exact start command. When it stops, its message says what to fix: do that and run it again. Then run the start command. With
 Supabase on this computer it is:
 
 ```bash
