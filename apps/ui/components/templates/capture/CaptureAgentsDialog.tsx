@@ -4,6 +4,7 @@ import { useStepper } from '@rerun/ui/steps'
 import { useLayoutEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
+import { DownloadIcon } from '@/lib/icons'
 import { StepDialogHeader } from '@/components/dialogs/StepDialogHeader'
 import { Dialog } from '@/components/ui/dialog'
 import { CaptureProgressPanel } from './CaptureProgressPanel'
@@ -58,21 +59,22 @@ function CaptureFlow({ stepper, actions, onCaptured, onClose }: { stepper: Stepp
     const copy = useCaptureStepCopy()[step]
 
     return (
-        <div className="flex min-h-0 flex-col p-6">
-            <StepDialogHeader count={STEPS.length} index={stepper.index} direction={stepper.direction} title={copy.title} description={copy.description} />
-
-            <CaptureStepPanel
-                flow={flow}
-                step={step}
-                direction={stepper.direction}
-                onStepChange={next => {
-                    if (next === 'done') onCaptured()
-                    goTo(STEPS.indexOf(next))
-                }}
-                onClose={onClose}
-                cancelLabel={t('cancel')}
-                doneLabel={t('done')}
-            />
+        <div className="flex min-h-0 flex-col">
+            <StepDialogHeader icon={DownloadIcon} count={STEPS.length} index={stepper.index} direction={stepper.direction} title={copy.title} description={copy.description} />
+            <div className="flex min-h-0 flex-1 flex-col p-4">
+                <CaptureStepPanel
+                    flow={flow}
+                    step={step}
+                    direction={stepper.direction}
+                    onStepChange={next => {
+                        if (next === 'done') onCaptured()
+                        goTo(STEPS.indexOf(next))
+                    }}
+                    onClose={onClose}
+                    cancelLabel={t('cancel')}
+                    doneLabel={t('done')}
+                />
+            </div>
         </div>
     )
 }

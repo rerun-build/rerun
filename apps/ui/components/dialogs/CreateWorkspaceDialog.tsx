@@ -5,17 +5,18 @@ import { inviteToWorkspaceAction } from '@/app/api/_actions/members.actions'
 import { createWorkspaceAction } from '@/app/api/_actions/workspace.actions'
 import { CreateWorkspacePreview } from '@/components/dialogs/CreateWorkspacePreview'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
+import { StepDialogHeader } from '@/components/dialogs/StepDialogHeader'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogFooter } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { ScrollFade } from '@rerun/ui/primitives'
-import { StepTransition, StepperBar, useStepper } from '@rerun/ui/steps'
+import { StepTransition, useStepper } from '@rerun/ui/steps'
 import { BLOB_ILLUSTRATIONS, getBlobByFile, randomBlob } from '@/lib/blobs/catalog'
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CheckIcon, Loader2Icon, XIcon } from '@/lib/icons'
+import { CheckIcon, LayersIcon, Loader2Icon, XIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -110,25 +111,17 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <SplitDialogContent aside={<CreateWorkspacePreview name={name} iconFile={iconFile} members={members} />}>
                 <Form {...form}>
-                    <form onSubmit={onSubmit} className="flex min-h-0 flex-col p-6">
-                        <StepperBar count={STEPS.length} current={step} className="mb-6" />
+                    <form onSubmit={onSubmit} className="flex min-h-0 flex-col">
+                        <StepDialogHeader
+                            icon={LayersIcon}
+                            count={STEPS.length}
+                            index={step}
+                            direction={direction}
+                            title={{ Name: t('steps.name.title'), Icon: t('steps.icon.title'), Team: t('steps.team.title') }[current]}
+                            description={{ Name: t('steps.name.description'), Icon: t('steps.icon.description'), Team: t('steps.team.description') }[current]}
+                        />
 
-                        <DialogHeader className="mb-4">
-                            <StepTransition stepKey={step} direction={direction} variant="header" className="grid gap-1">
-                                <DialogTitle>
-                                    {current === 'Name' && t('steps.name.title')}
-                                    {current === 'Icon' && t('steps.icon.title')}
-                                    {current === 'Team' && t('steps.team.title')}
-                                </DialogTitle>
-                                <p className="text-sm text-muted-foreground">
-                                    {current === 'Name' && t('steps.name.description')}
-                                    {current === 'Icon' && t('steps.icon.description')}
-                                    {current === 'Team' && t('steps.team.description')}
-                                </p>
-                            </StepTransition>
-                        </DialogHeader>
-
-                        <ScrollFade className="-mx-1 -mt-1 min-h-0 flex-1 px-1 pb-6 pt-1">
+                        <ScrollFade className="min-h-0 flex-1 p-4">
                             <StepTransition stepKey={step} direction={direction}>
                                 {current === 'Name' && (
                                     <div className="space-y-4">
@@ -212,7 +205,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                             {form.formState.errors.root && <p className="mt-4 text-sm text-destructive">{form.formState.errors.root.message}</p>}
                         </ScrollFade>
 
-                        <DialogFooter className="mt-auto -mx-6 -mb-6 border-t bg-muted/50 px-6 py-4">
+                        <DialogFooter className="m-0">
                             {created ? (
                                 <Button type="button" onClick={enterActiveWorkspace}>
                                     {t('open')}

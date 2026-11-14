@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage, Input, MultiSelect
 import { Button, Icon, ScrollFade } from '../primitives'
 import { RichTextEditor } from '../rich-text-editor'
 import { Field } from '../forms'
-import { StepTransition, StepperBar, useStepper } from '../steps'
+import { StepTransition, useStepper } from '../steps'
 import { ExpertImageFields } from './ExpertImageFields'
 import { ExpertProfilePreview } from './ExpertProfilePreview'
 import { availabilityDot, badgeFromType, BUDGET_OPTIONS, LANGUAGE_OPTIONS, SKILL_OPTIONS } from './options'
@@ -50,7 +50,11 @@ interface ExpertProfileWizardProps {
     submitLabel: string
     submittingLabel: string
     previewAction?: React.ReactNode
+    // The app's dialog header, which this package cannot import: it carries the dialog title.
+    renderHeader: (step: ExpertWizardStepHeader) => React.ReactNode
 }
+
+export type ExpertWizardStepHeader = { count: number; index: number; direction: number; title: string; description: string }
 
 function toDefaults(expert: OwnerExpert): EditExpertValues {
     return {
@@ -94,7 +98,7 @@ export function toExpertPreview(expert: Expert, values: EditExpertValues): Exper
     }
 }
 
-export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploadBanner, onSubmit, submitLabel, submittingLabel, previewAction }: ExpertProfileWizardProps) {
+export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploadBanner, onSubmit, submitLabel, submittingLabel, previewAction, renderHeader }: ExpertProfileWizardProps) {
     const t = useKitTranslations()
     const [error, setError] = React.useState<string | null>(null)
     const schema = React.useMemo(() => buildEditExpertSchema(key => t(`experts.validation.${key}`)), [t])
@@ -136,18 +140,10 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
         // or the sheet keeps its full height under an open keyboard and buries the footer.
         <div className="flex min-h-0 flex-col sm:grid sm:h-[min(36rem,88dvh)] sm:grid-cols-2">
             <Form {...form}>
-                <form onSubmit={handleSubmit} className="flex min-h-0 flex-col p-4 sm:p-6">
-                    <StepperBar count={STEPS.length} current={index} className="mb-6" />
+                <form onSubmit={handleSubmit} className="flex min-h-0 flex-col">
+                    {renderHeader({ count: STEPS.length, index, direction, title: t(`experts.wizard.steps.${step}.title`), description: t(`experts.wizard.steps.${step}.description`) })}
 
-                    <div className="mb-4 flex flex-col gap-2">
-                        <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">{t('experts.wizard.step', { step: index + 1 })}</p>
-                        <StepTransition stepKey={step} direction={direction} variant="header" className="grid gap-1">
-                            <h2 className="font-heading text-base leading-none font-medium">{t(`experts.wizard.steps.${step}.title`)}</h2>
-                            <p className="text-sm text-muted-foreground">{t(`experts.wizard.steps.${step}.description`)}</p>
-                        </StepTransition>
-                    </div>
-
-                    <ScrollFade className="-mx-1 -mt-1 min-h-0 flex-1 px-1 pb-6 pt-1">
+                    <ScrollFade className="min-h-0 flex-1 p-4">
                         <StepTransition stepKey={step} direction={direction} className="space-y-4">
                             {step === 'identity' && (
                                 <>
@@ -364,9 +360,9 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
                         </StepTransition>
                     </ScrollFade>
 
-                    {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+                    {error && <p className="px-4 pb-3 text-sm text-destructive">{error}</p>}
 
-                    <div className="-mx-4 -mb-4 mt-auto flex flex-row gap-2 border-t bg-muted/50 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:-mx-6 sm:-mb-6 sm:justify-end sm:px-6 sm:pb-4">
+                    <div className="mt-auto flex flex-row gap-2 border-t bg-muted/50 px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:justify-end sm:pb-4">
                         {!isFirst && (
                             <Button type="button" variant="outline" size="icon" onClick={back} aria-label={t('experts.wizard.back')} className="sm:w-auto sm:px-2.5">
                                 <ArrowLeft className="sm:hidden" />

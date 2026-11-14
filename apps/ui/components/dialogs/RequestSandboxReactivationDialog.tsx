@@ -1,11 +1,13 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { BoxIcon } from '@/lib/icons'
 import { useErrorText } from '@/hooks/useErrorText'
 import { requestSandboxReactivationAction } from '@/app/api/_actions/workspace-restore.actions'
 import { ExplainerPanel, type ExplainerPoint } from '@/components/dialogs/ExplainerPanel'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogFooter } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import { useTranslations } from 'next-intl'
@@ -44,17 +46,14 @@ export function RequestSandboxReactivationDialog({ open, onOpenChange, onRequest
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <SplitDialogContent aside={<ExplainerPanel title={t('asideTitle')} points={points} />}>
-                <div className="flex min-h-0 flex-col p-6">
-                    <DialogHeader className="mb-4">
-                        <DialogTitle>{t('title')}</DialogTitle>
-                        <p className="text-sm text-muted-foreground">{t('description')}</p>
-                    </DialogHeader>
-                    <div className="-mx-1 -mt-1 min-h-0 flex-1 overflow-y-auto px-1 pt-1">
+                <div className="flex min-h-0 flex-col">
+                    <DialogHeaderBar icon={BoxIcon} title={t('title')} description={t('description')} />
+                    <div className="min-h-0 flex-1 overflow-y-auto p-4">
                         <Field label={t('noteLabel')} htmlFor={NOTE_ID} error={error} helperText={t('noteHint')}>
                             <Textarea id={NOTE_ID} value={note} onChange={event => setNote(event.target.value)} rows={6} maxLength={1000} autoFocus />
                         </Field>
                     </div>
-                    <DialogFooter className="-mx-6 mt-auto -mb-6 border-t bg-muted/50 px-6 py-4">
+                    <DialogFooter className="m-0">
                         <Button variant="outline" onClick={() => handleOpenChange(false)}>
                             {tCommon('cancel')}
                         </Button>

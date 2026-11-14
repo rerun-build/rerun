@@ -1,10 +1,12 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { BellIcon } from '@/lib/icons'
 import { AgentCombobox } from '@/components/agent/AgentCombobox'
-import { DIALOG_TABS_CONTENT, DIALOG_TABS_HEADER, DialogTabs } from '@/components/dialogs/DialogTabs'
+import { DIALOG_TABS_CONTENT, DialogTabs } from '@/components/dialogs/DialogTabs'
 import { CoworkerNotificationSettings } from '@/components/notifications/settings/CoworkerNotificationSettings'
 import { AccountEmails } from '@/components/notifications/settings/NotificationChannels'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { useNotificationPrefs } from '@/hooks/useNotificationPrefs'
 import { useBoardStore } from '@/stores/board.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
@@ -48,10 +50,7 @@ function NotificationsDialogBody() {
             tab={activeTab}
             onTabChange={setActiveTab}
             header={
-                <DialogHeader className={DIALOG_TABS_HEADER}>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>{t(`descriptions.${activeTab}`)}</DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={BellIcon} title={t('title')} description={t(`descriptions.${activeTab}`)} />
             }
         >
             {activeTab === 'coworkers' && (

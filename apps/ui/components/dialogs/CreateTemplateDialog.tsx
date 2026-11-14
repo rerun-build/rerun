@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useMemo, useState } from 'react'
 import { CreateTemplateTitleStep } from '@/components/dialogs/CreateTemplateTitleStep'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
+import { LayoutGridIcon } from '@/lib/icons'
 import { StepDialogHeader } from '@/components/dialogs/StepDialogHeader'
 import { CaptureProgressPanel } from '@/components/templates/capture/CaptureProgressPanel'
 import { useCaptureStepCopy } from '@/components/templates/capture/CaptureStepBody'
@@ -93,29 +94,30 @@ function CreateTemplateFlow({ stepper, createdKey, onCreated, onCreate, captureA
     const copy = step === 'title' ? { title: t('title'), description } : captureCopy[step]
 
     return (
-        <div className="flex min-h-0 flex-col p-6">
-            <StepDialogHeader count={STEPS.length} index={stepper.index} direction={stepper.direction} title={copy.title} description={copy.description} />
-
-            {step === 'title' ? (
-                <CreateTemplateTitleStep
-                    onCancel={onClose}
-                    onCreate={async title => {
-                        const key = await onCreate(title)
-                        if (!key) return
-                        onCreated(key)
-                        goTo(1)
-                    }}
-                />
-            ) : (
-                <CaptureStepPanel
-                    flow={flow}
-                    step={step as CaptureStep}
-                    direction={stepper.direction}
-                    onStepChange={next => goTo(STEPS.indexOf(next))}
-                    onClose={onClose}
-                    doneLabel={t('doneLabel')}
-                />
-            )}
+        <div className="flex min-h-0 flex-col">
+            <StepDialogHeader icon={LayoutGridIcon} count={STEPS.length} index={stepper.index} direction={stepper.direction} title={copy.title} description={copy.description} />
+            <div className="flex min-h-0 flex-1 flex-col p-4">
+                {step === 'title' ? (
+                    <CreateTemplateTitleStep
+                        onCancel={onClose}
+                        onCreate={async title => {
+                            const key = await onCreate(title)
+                            if (!key) return
+                            onCreated(key)
+                            goTo(1)
+                        }}
+                    />
+                ) : (
+                    <CaptureStepPanel
+                        flow={flow}
+                        step={step as CaptureStep}
+                        direction={stepper.direction}
+                        onStepChange={next => goTo(STEPS.indexOf(next))}
+                        onClose={onClose}
+                        doneLabel={t('doneLabel')}
+                    />
+                )}
+            </div>
         </div>
     )
 }

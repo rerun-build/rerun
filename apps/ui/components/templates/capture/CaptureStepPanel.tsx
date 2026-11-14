@@ -36,7 +36,7 @@ export function CaptureStepPanel({ flow, step, direction, onStepChange, onClose,
                 {flow.error && <p className="mt-4 text-sm text-destructive">{flow.error}</p>}
             </ScrollFade>
 
-            <DialogFooter className="mt-auto -mx-6 -mb-6 border-t bg-muted/50 px-6 py-4">
+            <DialogFooter className="mt-auto">
                 {step === 'select' && (
                     <>
                         {cancelLabel && (

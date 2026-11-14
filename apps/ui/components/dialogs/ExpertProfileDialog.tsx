@@ -14,6 +14,8 @@ import {
     uploadMyExpertBannerAction,
 } from '@/app/api/_actions/expert-profile.actions'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { StepDialogHeader } from '@/components/dialogs/StepDialogHeader'
+import { UserRoundIcon } from '@/lib/icons'
 
 type Loaded = { expert: OwnerExpert; bannerOptions: string[] }
 
@@ -49,7 +51,6 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent showCloseButton={false} aria-describedby={undefined} className="gap-0 overflow-hidden p-0 sm:max-w-5xl">
-                <DialogTitle className="sr-only">{t('title')}</DialogTitle>
                 {loaded ? (
                     <ExpertProfileWizard
                         expert={loaded.expert}
@@ -58,6 +59,7 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
                         uploadBanner={uploadMyExpertBannerAction}
                         submitLabel={t('submit')}
                         submittingLabel={t('submitting')}
+                        renderHeader={header => <StepDialogHeader icon={UserRoundIcon} {...header} />}
                         onSubmit={async values => {
                             const result = await updateMyExpertProfileAction(values)
                             if (result.ok) {
@@ -69,6 +71,7 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
                     />
                 ) : (
                     <div className="flex h-[24rem] items-center justify-center sm:h-[min(36rem,88dvh)]">
+                        <DialogTitle className="sr-only">{t('title')}</DialogTitle>
                         {error ? <p className="px-6 text-center text-sm text-destructive">{error}</p> : <Spinner className="size-5 text-muted-foreground" />}
                     </div>
                 )}

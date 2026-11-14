@@ -109,7 +109,6 @@
     },
     "experts": {
         "wizard": {
-            "step": "Étape {step}",
             "steps": {
                 "identity": {
                     "title": "Votre identité",

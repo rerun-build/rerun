@@ -81,7 +81,6 @@
     "share": {
         "title": "Compartilhar",
         "description": "Escolha quem pode abrir este link.",
-        "close": "Fechar",
         "updateFailed": "Não foi possível atualizar o link",
         "unpublishFailed": "Não foi possível despublicar",
         "unpublish": "Despublicar",

@@ -105,7 +105,6 @@
     "share": {
         "title": "Share",
         "description": "Choose who can open this link.",
-        "close": "Close",
         "updateFailed": "Could not update the link",
         "unpublishFailed": "Could not unpublish",
         "unpublish": "Unpublish",

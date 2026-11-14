@@ -54,7 +54,7 @@ export function CreateTemplateTitleStep({ onCreate, onCancel }: { onCreate: (tit
                     />
                 </div>
 
-                <DialogFooter className="mt-auto -mx-6 -mb-6 border-t bg-muted/50 px-6 py-4">
+                <DialogFooter className="mt-auto">
                     <Button type="button" variant="outline" onClick={onCancel}>
                         {tCommon('cancel')}
                     </Button>

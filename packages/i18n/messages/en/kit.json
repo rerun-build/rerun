@@ -187,7 +187,6 @@
     },
     "experts": {
         "wizard": {
-            "step": "Step {step}",
             "steps": {
                 "identity": {
                     "title": "Your identity",

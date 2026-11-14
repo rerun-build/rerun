@@ -1,12 +1,14 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { SlidersHorizontalIcon } from '@/lib/icons'
 import { useErrorText } from '@/hooks/useErrorText'
 import { LayoutTile } from '@/components/data/LayoutTile'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
 import { ViewSettingsPreview } from '@/components/dialogs/ViewSettingsPreview'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogFooter } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -75,15 +77,14 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
         <Dialog open={open} onOpenChange={onOpenChange}>
             <SplitDialogContent aside={<ViewSettingsPreview card={card} fileUrl={source.fileUrl} />}>
                 <Form {...form}>
-                    <form onSubmit={onSubmit} className="flex min-h-0 flex-col p-6">
-                        <DialogHeader className="mb-4">
-                            <DialogTitle>{view ? t('editTitle') : t('newTitle')}</DialogTitle>
-                            <p className="text-sm text-muted-foreground">
-                                {t.rich('description', { table, mono: chunks => <span className="font-mono">{chunks}</span> })}
-                            </p>
-                        </DialogHeader>
+                    <form onSubmit={onSubmit} className="flex min-h-0 flex-col">
+                        <DialogHeaderBar
+                            icon={SlidersHorizontalIcon}
+                            title={view ? t('editTitle') : t('newTitle')}
+                            description={t.rich('description', { table, mono: chunks => <span className="font-mono">{chunks}</span> })}
+                        />
 
-                        <ScrollFade className="-mx-1 -mt-1 min-h-0 flex-1 px-1 pb-6 pt-1">
+                        <ScrollFade className="min-h-0 flex-1 p-4">
                             <div className="space-y-5">
                                 <FormField
                                     control={form.control}
@@ -224,7 +225,7 @@ export function ViewSettingsDialog({ open, onOpenChange, source, table, columns,
                             </div>
                         </ScrollFade>
 
-                        <DialogFooter className="mt-auto -mx-6 -mb-6 border-t bg-muted/50 px-6 py-4">
+                        <DialogFooter className="m-0">
                             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                                 {tCommon('cancel')}
                             </Button>

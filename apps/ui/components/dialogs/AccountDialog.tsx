@@ -1,5 +1,7 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { UserRoundIcon } from '@/lib/icons'
 import { useErrorText } from '@/hooks/useErrorText'
 import { resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
 import {
@@ -21,11 +23,11 @@ import { useLanguageChoice } from '@/components/account/useLanguageChoice'
 import { ProfilePanel } from '@/components/account/ProfilePanel'
 import { SignInMethodsPanel } from '@/components/account/SignInMethodsPanel'
 import { EmailCodeForm } from '@/components/auth/EmailCodeForm'
-import { DIALOG_TABS_CONTENT, DIALOG_TABS_HEADER } from '@/components/dialogs/DialogTabs'
+import { DIALOG_TABS_CONTENT } from '@/components/dialogs/DialogTabs'
 import { useLanguagePacksEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PHONE_ENABLED } from '@rerun/cloud/phone'
 import { PhoneChangeForm } from '@rerun/cloud/phone.client'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { PanelEditorBody, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import type { AccountDeletionBlocker } from '@/lib/auth/account-deletion'
@@ -284,10 +286,7 @@ export function AccountDialog() {
                     showLanguage={showLanguage}
                     showDesktop={showDesktop}
                     header={
-                        <DialogHeader className={DIALOG_TABS_HEADER}>
-                            <DialogTitle>{t('title')}</DialogTitle>
-                            <DialogDescription>{description}</DialogDescription>
-                        </DialogHeader>
+                        <DialogHeaderBar icon={UserRoundIcon} title={t('title')} description={description} />
                     }
                 >
                     <TabContent />

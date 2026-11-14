@@ -38,7 +38,6 @@
     },
     "editor": {
         "unsaved": "Unsaved",
-        "close": "Close editor",
         "cancel": "Cancel",
         "noChanges": "No changes to save",
         "save": "Save changes",
