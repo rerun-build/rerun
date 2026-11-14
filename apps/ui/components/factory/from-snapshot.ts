@@ -69,7 +69,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         const since = now - Date.parse(job.enteredAt)
         const steps = job.steps ?? 0
         const pod = (path: string[], travel: number, band: PodView['band'], state: PodView['state'], level: number, extra: Partial<PodView> = {}) =>
-            pods.push({ id: `pod-${job.issue}`, issue: job.issue, title: job.title, path, travel, queue: 0, level, band, state, scan: 0, ...extra })
+            pods.push({ id: `pod-${job.issue}`, issue: job.issue, title: job.title, path, travel, queue: 0, level, band, state, scan: 0, since: Date.parse(job.enteredAt), holder: job.coworker ? (job.copy ? `${job.coworker} · ${job.copy}` : job.coworker) : undefined, pr: job.pr ?? undefined, ...extra })
         switch (job.state) {
             case 'waiting':
             case 'queued':

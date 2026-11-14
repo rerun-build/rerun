@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
 import { type BuddyLook, buddyColor, buddyEyes, buddyMouth, TileBuddy } from '@rerun/ui/iso-grid'
 import { sceneFromSnapshot } from './from-snapshot'
-import { factoryScene } from './factory-scene'
+import { factoryScene, LOOP_MS } from './factory-scene'
 
 const sampleTime = vi.hoisted(() => ({ t: 0 }))
 vi.mock('./factory-scene', async importOriginal => {
@@ -276,5 +276,30 @@ describe('belts ask for chevrons', () => {
         expect(copy.style.opacity).toBeLessThan(1)
         expect(html(copy.style)).toContain('data-buddy-stretched')
         expect(f.tiles.find(t => t.id === 'code')!.style.opacity ?? 1).toBe(1)
+    })
+})
+
+describe('pod card facts', () => {
+    it('carries since, holder and pr from the job on its pod', () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        expect(pod(f, 330)).toMatchObject({ since: Date.parse('2026-11-14T03:21:05Z'), holder: 'code · 2' })
+        expect(pod(f, 330)!.pr).toBeUndefined()
+        expect(pod(f, 331)).toMatchObject({ since: Date.parse('2026-11-14T03:23:40Z'), holder: 'LINUS · 1', pr: 341 })
+        expect(pod(f, 332)).toMatchObject({ since: Date.parse('2026-11-14T03:21:05Z') })
+        expect(pod(f, 332)!.holder).toBeUndefined()
+        expect(pod(f, 332)!.pr).toBeUndefined()
+        expect(pod(f, 333)).toMatchObject({ holder: 'code · 1', pr: 343 })
+    })
+
+    it('gives every pod of the sample loop a since in the last loop', () => {
+        for (const t of [0, 6_000, 50_000]) {
+            const f = factoryScene(t, 1_000_000)
+            expect(f.pods.length).toBeGreaterThan(0)
+            for (const p of f.pods) {
+                expect(typeof p.since, `${p.id} at ${t}`).toBe('number')
+                expect(p.since!).toBeLessThanOrEqual(1_000_000)
+                expect(p.since!).toBeGreaterThanOrEqual(1_000_000 - LOOP_MS)
+            }
+        }
     })
 })
