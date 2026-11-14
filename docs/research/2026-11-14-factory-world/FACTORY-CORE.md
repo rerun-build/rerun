@@ -52,6 +52,40 @@ Healing and improving are not schedules or a person's review: they are reactions
   before it is judged again, and a new setting must beat the old one by a clear margin, not by noise. The
   epic scorecard remains as the summary of what the beats did.
 
+## 0a. Liveness (mandatory; owner: "If coworkers or sessions get stuck due to various reasons we absolutely cannot afford waiting on them indefinitely. Liveness check is mandatory")
+
+**The rule: nothing waits without a deadline, and silence is a signal.** Every wait (a tool call, a run, a
+job in a state, a run waiting on another run, the delegator itself) has a limit, ends on every terminal
+state (not only on success), and a missing answer is acted on, never waited out.
+
+**Each layer is watched by the one outside it**, so no single hang can stop everything unnoticed:
+
+| Layer | What can hang | Watched by | Action |
+|---|---|---|---|
+| Tool call | a command waiting on input, a server started in the foreground, a watch-mode test | the engine | the tool's own time limit (600 s for shell); a command with no output and an idle process is stopped early and the model is told why ("it waited on input"), so the run continues instead of dying |
+| Run (every coworker, not only factory jobs) | a provider stream that stops sending, a wedged tool, a model loop | the engine | the run reports `lastActivityAt` and its current tool; no activity while not inside a tool for the idle limit ends the provider request and retries it once; still silent ends the run as `stalled`; a wall-clock limit per run kind as the last bound |
+| Run waiting on a run | a coworker calling another (`call_agent`, Boss waiting on a helper) | the engine | the wait names the child run; the child's end, of any kind, is delivered to the parent; a stalled child is reported to the parent, which is never left waiting |
+| Waiting on a person | a run asking the owner | the delegator and the page | its own state, shown and counted, never mistaken for stuck; the line never stops for one answer: work that does not need it goes on |
+| Job (delegator) | a run that stops moving; a job stuck in a state | the delegator, every beat | step progress per run (stall clock); a deadline per state (queued with free pools, review wait, fix wait, checks); a job waiting on a need that is blocked or failed is re-planned (section 4), never left waiting |
+| Delegator process | the beat loop hanging (a lock, a call without a time limit) | a watchdog thread in the delegator | a beat not finished within three beat lengths: write the stack to the log and exit; the container's restart policy brings it back and it resumes from the ledger |
+| Engine and app processes | a blocked event loop | an in-process watchdog | event-loop blocked past its limit: log and exit; the restart policy restarts it |
+| The whole line | the delegator silent; the engine not answering | the app (a different process) | the Factory page shows "not answering" after two beats; past a few minutes the owner gets one notification, not repeated until it recovers |
+
+**The action ladder on a suspected stall**: notice (a signal; a clock badge on the floor) → probe (is the
+process working: stream bytes, CPU, a tool running within its limit?) → nudge (stop the stuck tool inside
+the run and tell the model) → cancel and re-dispatch a fresh run (another copy, perhaps another model),
+with the reason written into the new brief ("the last attempt hung on X") → after two, the job is blocked
+and section 4 re-plans around it → the learning loop records the cause (a builder starting a dev server in
+the foreground becomes a brief rule).
+
+**Limits are measured, not guessed** (lesson of 2026-11-13: the stall clock was switched off because the
+step count stood still through healthy 25-minute builds of command-line coworkers). Today's facts: the step
+count now moves live with every tool call (a build went from 3 to 7 steps within one minute on
+2026-11-14); one shell call is limited to 600 s and one `ci-wait` call blocks at most 450 s, so a healthy
+run's count moves at least every ~14 minutes even at worst. Interim stall limit: 1,200 s (20 minutes).
+The delegator then records every gap between count changes (it overwrites the last one today), and the
+limit becomes a policy set from the measured distribution with a margin, retuned on the heartbeat.
+
 ## 1. The chunker: any epic into a graph that runs in parallel
 - **A planner proposes, the chunker decides.** Boss (or any planner) writes a cut; the chunker validates it
   in the factory before anything runs: file overlaps between parallel tasks, needs that do not exist,
@@ -106,6 +140,9 @@ the dispatcher adjust their numbers from it; every adjustment and its measured e
 change that made things worse is visible and rolled back. Measure, change, measure.
 
 ## 6. Order of building
+0. Liveness first (section 0a): the stall clock on at 1,200 s; the delegator's watchdog; gap recording;
+   per-state deadlines; then the engine's run liveness (`lastActivityAt`, the tool-input stop, child runs)
+   and the app's alert when the line goes silent.
 1. The signal record: every signal above written to the ledger with its time, and shown in the ledger.
 2. The chunker's validator in `tools/factory` (replaces `check_cut.py`).
 3. The epic scorecard and the policy table (policies as data, versioned).
