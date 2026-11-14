@@ -9,6 +9,11 @@ level on the floor is exact and every motion says something true. Nothing moves 
 
 ## 0. Shape language (binding; owner, 2026-11-14)
 
+**The first rule.** Owner: "Anything animating, glowing or otherwise seeking attention should do so only to
+convey some visual meaning/message to the viewer." Every motion, glow, pulse or colour change on the floor
+must answer "what is it telling the viewer?" with a true fact about the line right now. If it has no answer,
+it does not move or light. An idle floor is therefore still.
+
 Owner: "shapes must mean something", "like in diagrams a shape says something", "the ghosts or replicas
 are the only things transparent", "idle coworkers or other shapes, do not animate the body shape, only
 their faces". Every object on the floor takes its meaning from a flowchart shape (ISO 5807) or, for work in
