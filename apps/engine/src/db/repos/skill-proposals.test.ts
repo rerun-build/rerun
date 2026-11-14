@@ -6,7 +6,7 @@ const dataDir = mkdtempSync(resolve(tmpdir(), 'rerun-proposal-repo-'))
 process.env.RERUN_DATA_DIR = dataDir
 
 const { describe, expect, it } = await import('vitest')
-const { insertSkillProposal, transitionSkillProposal, getSkillProposal, openSkillProposalForSession } = await import('./skill-proposals.js')
+const { insertSkillProposal, transitionSkillProposal, getSkillProposal, openSkillProposalForSession, findSkillProposalByFingerprint } = await import('./skill-proposals.js')
 
 const id = 'repo-agent'
 
@@ -48,5 +48,46 @@ describe('transitionSkillProposal', () => {
         expect((await openSkillProposalForSession(id, row.sessionId))?.id).toBe(row.id)
         await transitionSkillProposal(id, row.id, ['proposed'], 'dismissed')
         expect(await openSkillProposalForSession(id, row.sessionId)).toBeUndefined()
+    })
+})
+
+describe('findSkillProposalByFingerprint', () => {
+    it('still matches a live proposal', async () => {
+        const row = await proposal()
+        expect((await findSkillProposalByFingerprint(id, `fp-${seq}`))?.id).toBe(row.id)
+    })
+
+    it('does not match a failed proposal, so the rule can be raised again', async () => {
+        const row = await proposal()
+        await transitionSkillProposal(id, row.id, ['proposed'], 'failed', { error: 'No object generated: could not parse the response.' })
+        expect(await findSkillProposalByFingerprint(id, `fp-${seq}`)).toBeUndefined()
+    })
+
+    it('finds the live row when a failed row shares the fingerprint', async () => {
+        const fingerprint = 'fp-shared'
+        const failed = await insertSkillProposal(id, {
+            sessionId: 'session-shared-failed',
+            runId: null,
+            toolCallId: 'call-shared-failed',
+            mode: 'create',
+            slug: null,
+            title: 'Shared rule',
+            summary: 'Shared',
+            instruction: 'Every invoice is checked twice.',
+            fingerprint,
+        })
+        await transitionSkillProposal(id, failed.id, ['proposed'], 'failed', { error: 'No object generated' })
+        const live = await insertSkillProposal(id, {
+            sessionId: 'session-shared-live',
+            runId: null,
+            toolCallId: 'call-shared-live',
+            mode: 'create',
+            slug: null,
+            title: 'Shared rule',
+            summary: 'Shared',
+            instruction: 'Every invoice is checked twice.',
+            fingerprint,
+        })
+        expect((await findSkillProposalByFingerprint(id, fingerprint))?.id).toBe(live.id)
     })
 })

@@ -115,6 +115,22 @@ describe('skill_propose', () => {
         expect(announced).toHaveLength(2)
     })
 
+    // A failed apply is a system error, not a decision: the user never got to say yes or no,
+    // so the same rule must be raisable again once the row is failed.
+    it('lets the same rule be proposed again after the first proposal failed', async () => {
+        const failedSession = runOn('session-failed', 'claude-sub', 'claude', 'claude-opus-5-5', { skillProposals: [] })
+        const invoiceRule = { ...rule, title: 'Invoice checks', instruction: 'Every invoice is checked twice before it goes out.' }
+        const first = parse(await propose(failedSession, invoiceRule))
+        expect(first.status).toBe('shown')
+        const rows = await listSessionSkillProposals(id, 'session-failed')
+        expect(rows).toHaveLength(1)
+        await transitionSkillProposal(id, rows[0].id, ['proposed'], 'failed', { error: 'No object generated: could not parse the response.' })
+
+        const second = parse(await propose(otherSession, invoiceRule))
+        expect(second.status).toBe('shown')
+        expect(second.proposalId).not.toBe(first.proposalId)
+    })
+
     it('saves proposals whose bridge request ids repeat across runs', async () => {
         const firstRun = runOn('session-run-1', 'claude-sub', 'claude', 'claude-opus-5-5', { skillProposals: [] })
         const secondRun = runOn('session-run-2', 'claude-sub', 'claude', 'claude-opus-5-5', { skillProposals: [] })
