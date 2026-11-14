@@ -2,7 +2,11 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { factoryJobStateSchema, factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { createElement } from 'react'
+import { TileBuddy } from '@rerun/ui/iso-grid'
 import { sceneFromSnapshot } from './from-snapshot'
+import { factoryScene } from './factory-scene'
 
 const sampleTime = vi.hoisted(() => ({ t: 0 }))
 vi.mock('./factory-scene', async importOriginal => {
@@ -127,7 +131,7 @@ const nothingRunning = (): FactorySnapshot => {
     s.pools = s.pools.map(p => ({ ...p, coworkers: p.coworkers.map(c => ({ ...c, out: 0 })) }))
     return s
 }
-const look = (style: object) => { const { buddy: _b, label: _l, ...rest } = style as Record<string, unknown>; return rest }
+const look = (style: object) => { const { buddy: _b, label: _l, shape: _s, ...rest } = style as Record<string, unknown>; return rest }
 
 describe('sceneFromSnapshot: live tiles', () => {
     it('gives every coworker and the loader the same neutral idle style when nothing runs, whatever the sample time', () => {
@@ -162,5 +166,37 @@ describe('sceneFromSnapshot: live tiles', () => {
         const f = sceneFromSnapshot(sample(), LATER)
         expect(sample().jobs.some(j => j.state === 'merged')).toBe(true)
         expect(f.tiles.find(x => x.id === 'Delegator')!.style.results).toBeUndefined()
+    })
+
+    it('draws the Loader as a capsule on the live floor, and no other tile', () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        expect(f.held).toBe(true)
+        expect(f.tiles.find(x => x.id === 'Delegator')!.style).toMatchObject({ shape: 'capsule', badge: 'lock' })
+        expect(f.tiles.filter(x => x.id !== 'Delegator' && x.style.shape)).toEqual([])
+    })
+
+    it('draws the Loader as a capsule in the sample loop at any time', () => {
+        for (const t of [0, 6_000, 25_000, 50_000]) {
+            const tiles = factoryScene(t, 0).tiles
+            expect(tiles.find(x => x.id === 'Delegator')!.style.shape).toBe('capsule')
+            expect(tiles.filter(x => x.id !== 'Delegator' && x.style.shape)).toEqual([])
+        }
+    })
+
+    it('renders no face on the Loader of the sample loop', () => {
+        const tiles = factoryScene(6_000, 0).tiles
+        const html = (id: string) => renderToStaticMarkup(createElement(TileBuddy, { id, style: tiles.find(x => x.id === id)!.style, width: 120, height: 120, floorOffset: 0 } as never))
+        expect(html('Delegator')).toContain('data-capsule')
+        expect(html('Delegator')).not.toContain('iso-buddy-eyes')
+        expect(html('code')).toContain('iso-buddy-eyes')
+    })
+
+    it('draws a running copy in its coworker own colours, see-through, and the coworker itself solid', () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        const copy = f.tiles.find(x => x.id === 'code-copy-330')!.style
+        expect(copy.color).not.toBe('#f59e0b')
+        expect(copy.color).toBe(f.tiles.find(x => x.id === 'code')!.style.color)
+        expect(copy.opacity).toBeLessThan(1)
+        expect(f.tiles.find(x => x.id === 'code')!.style.opacity).toBe(1)
     })
 })

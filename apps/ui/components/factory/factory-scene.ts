@@ -285,7 +285,7 @@ export function factoryScene(t: number, now: number): FactoryFrame {
     tiles.push(coworker('DIETER', 'DIETER', DIETER, 'studio', t % 26_000 > 12_000 ? 'working' : 'idle'))
 
     const loader = coworker('Delegator', 'Delegator', LOADER, 'dispatch', held ? 'waiting_human' : counts.queued + counts.checks > 0 ? 'working' : 'idle')
-    loader.style = { ...loader.style, label: 'Loader', ...(held ? { badge: 'lock' as const } : {}), ...(merged.length && !held ? { results: { count: merged.length, items: merged.slice(-6).reverse() } } : {}) }
+    loader.style = { ...loader.style, label: 'Loader', shape: 'capsule' as const, ...(held ? { badge: 'lock' as const } : {}), ...(merged.length && !held ? { results: { count: merged.length, items: merged.slice(-6).reverse() } } : {}) }
     tiles.push(loader)
     if (held) toast(HOLD.from + 300, 'Delegator', 'Loader', 'Sending held: sign-in renewal. Running builds finish.')
 
