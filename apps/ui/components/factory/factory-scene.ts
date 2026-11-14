@@ -301,7 +301,7 @@ export function factoryScene(t: number, now: number): FactoryFrame {
         for (let i = 1; i < p.path.length; i++) { lineColor.set(`${p.path[i - 1]}>${p.path[i]}`, color); lineColor.set(`${p.path[i]}>${p.path[i - 1]}`, color) }
     }
     for (const [a, b] of lines) {
-        links.push({ source: a, target: b, variant: 'belt', color: held ? STATUS_COLOR.held : lineColor.get(`${a}>${b}`) ?? QUIET })
+        links.push({ source: a, target: b, variant: 'belt', color: held ? STATUS_COLOR.held : lineColor.get(`${a}>${b}`) ?? QUIET, chevrons: true })
     }
 
     return { containers: BOXES, tiles, links, toasts, pods, cabinets, rejects, held, holdLeftMs: held ? HOLD.to - t : 0, counts }

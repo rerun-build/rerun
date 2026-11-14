@@ -151,7 +151,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     const belts: TileLink[] = [
         ...base.links.filter(l => KEEP.includes(l.source) && KEEP.includes(l.target) && l.variant === 'belt'),
         ...cabinets.map(c => ({ source: 'Delegator', target: `cab-${c.issue}`, variant: 'belt' as const, color: QUIET })),
-    ].map(l => ({ ...l, color: held ? STATUS_COLOR.held : lineColor.get(`${l.source}>${l.target}`) ?? QUIET, still: !lineColor.has(`${l.source}>${l.target}`) }))
+    ].map(l => ({ ...l, color: held ? STATUS_COLOR.held : lineColor.get(`${l.source}>${l.target}`) ?? QUIET, still: !lineColor.has(`${l.source}>${l.target}`), chevrons: true }))
 
     return {
         containers: base.containers,
