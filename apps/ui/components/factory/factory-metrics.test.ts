@@ -67,4 +67,20 @@ describe('barModel', () => {
     it('defines all twelve metrics, in the same order', () => {
         expect(METRICS.map(m => m.key)).toEqual(['queued', 'building', 'review', 'checks', 'shipped', 'runs', 'totalTokens', 'cachedShare', 'avgDuration', 'errorRate', 'planWeek', 'signIn'])
     })
+
+    it('shows a dash for tokens when no run of today has a known count: none today, or all with tokensIn and tokensOut at 0', () => {
+        const today = new Date(NOW - 60_000)
+        const yesterday = new Date(NOW - 30 * 3_600_000)
+        const dash = { text: '—', title: 'no data yet' }
+        expect(bar(withRuns([run(today, 0, 0)])).values.totalTokens).toEqual(dash)
+        expect(bar(withRuns([run(today, 0, 0), run(today, 0, 0)])).values.totalTokens).toEqual(dash)
+        expect(bar(withRuns([run(yesterday, 900, 100)])).values.totalTokens).toEqual(dash)
+        expect(bar(withRuns([run(today, 0, 0)])).values.runs.text).toBe('1') // the run still counts as a run
+    })
+
+    it('adds only the known runs: a 0/0 run next to a counted one changes nothing, and 0 in one field alone is a known count', () => {
+        const today = new Date(NOW - 60_000)
+        expect(bar(withRuns([run(today, 0, 0), run(today, 1500, 0)])).values.totalTokens.text).toBe('2k')
+        expect(bar(withRuns([run(today, 0, 40)])).values.totalTokens.text).toBe('40')
+    })
 })
