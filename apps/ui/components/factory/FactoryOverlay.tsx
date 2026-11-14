@@ -1,7 +1,7 @@
 'use client'
 
 // The factory's moving parts, drawn in the board's world through IsoGrid's worldOverlay: task spheres
-// riding the belts (the same route TileLinks draws, so a sphere sits on its belt), the scanner gates of
+// riding the belts (the same route TileLinks draws, so a sphere sits on its belt), the gates of
 // review, the reject bin and the feature spheres. The spheres move on the scene's clock with a short
 // transition between ticks; the slosh, shakes and glows are CSS. Under reduced motion the transitions
 // and loops stop and the spheres step from place to place.
@@ -9,6 +9,7 @@
 import { type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
 
 import { along, atDistance, centreOf, inScanner, podPath, restDistances, settles, toWorld, type P } from './factory-rest'
+import { Gate, GATE_CSS } from './FactoryGate'
 import { STATUS_COLOR, type CabinetView, type PodView } from './factory-scene'
 
 const QUEUE_GAP = 40 // px between waiting spheres on the loader's line
@@ -24,7 +25,7 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, s
     const rests = restDistances(pods, tiles, routes)
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
-            <style>{FAB_CSS}</style>
+            <style>{FAB_CSS + GATE_CSS}</style>
             {byId.get('rejects') && <RejectBin tile={byId.get('rejects')!} count={rejects} />}
             {cabinets.map(c => {
                 const t = byId.get(`cab-${c.issue}`)
@@ -35,7 +36,7 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, s
                 if (pts.length < 2) return null
                 const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : settles(p) ? atDistance(pts, (rests.get(p.id) ?? 0) * p.travel) : along(pts, p.travel)
                 return inScanner(p)
-                    ? <Scanner key={p.id} pod={p} at={at}><Orb pod={p} at={{ x: 0, y: 0 }} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} /></Scanner>
+                    ? <Gate key={p.id} pod={p} at={at}><Orb pod={p} at={{ x: 0, y: 0 }} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} /></Gate>
                     : <Orb key={p.id} pod={p} at={at} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} />
             })}
         </div>
@@ -88,28 +89,6 @@ function Orb({ pod, at, selected = false, onSelectJob }: { pod: PodView; at: P; 
                 </svg>
                 <span className="fab-orb-tag">#{pod.issue}<b>{Math.round(pod.level * 100)}%</b></span>
             </div>
-        </div>
-    )
-}
-
-// A review is an X-ray scanner standing on the belt: the sphere waits inside the gate while a line of
-// light sweeps it, then the gate glows green and lets it on, or glows red, shakes, and turns it aside.
-function Scanner({ pod, at, children }: { pod: PodView; at: P; children: React.ReactNode }) {
-    const W = 30, H = 46, D = 15 // half-width of the gate's footprint, its height, half-depth
-    const sweep = (pod.scan * 3) % 1
-    return (
-        <div className="fab-scanner absolute" data-verdict={pod.verdict} style={{ left: 0, top: 0, transform: `translate(${at.x}px, ${at.y}px)` }}>
-            <svg className="absolute overflow-visible" width="1" height="1">
-                {/* Back wall of the gate, then the sphere, then the front frame over it. */}
-                <path d={`M${-W},${-H} L0,${-H - D} L${W},${-H} L${W},0 L0,${-D} L${-W},0 Z`} className="fab-scan-back" />
-            </svg>
-            <div className="absolute" style={{ left: 0, top: -6 }}>{children}</div>
-            <svg className="absolute overflow-visible" width="1" height="1">
-                <line x1={-W + 3} x2={W - 3} y1={-H + 6 + sweep * (H - 12)} y2={-H + 6 + sweep * (H - 12)} className="fab-scan-line" style={{ opacity: pod.verdict ? 0 : 0.9 }} />
-                <path d={`M${-W},0 L${-W},${-H} L0,${-H + D} L${W},${-H} L${W},0`} className="fab-scan-frame" />
-                <path d={`M${-W},${-H} L0,${-H - D} L${W},${-H} L0,${-H + D} Z`} className="fab-scan-top" />
-                <circle cx={W - 6} cy={-H + 6} r={2} className="fab-scan-lamp" />
-            </svg>
         </div>
     )
 }
@@ -196,14 +175,6 @@ const FAB_CSS = `
 .fab-orb[data-state='held'] .fab-orb-rim { stroke: #ef4444; }
 .fab-orb[data-state='complete'] .fab-orb-rim { stroke: #ffe08a; stroke-width: 1.2; }
 .fab-orb[data-state='complete'] .fab-orb-glow { opacity: .9; }
-.fab-scan-back { fill: rgba(14,18,34,.8); stroke: rgba(160,175,230,.25); stroke-width: .8; }
-.fab-scan-frame { fill: none; stroke: #9fb0e8; stroke-width: 2.4; stroke-linejoin: round; opacity: .85; transition: stroke .3s ease; }
-.fab-scan-top { fill: rgba(60,72,120,.55); stroke: rgba(170,185,240,.5); stroke-width: .8; }
-.fab-scan-line { stroke: #2dd4a3; stroke-width: 1.4; filter: drop-shadow(0 0 3px #2dd4a3); transition: opacity .2s ease; }
-.fab-scan-lamp { fill: #2dd4a3; }
-.fab-scanner[data-verdict='pass'] .fab-scan-frame { stroke: #2dd4a3; filter: drop-shadow(0 0 4px #2dd4a3); }
-.fab-scanner[data-verdict='fail'] .fab-scan-frame { stroke: #ef4444; filter: drop-shadow(0 0 5px #ef4444); }
-.fab-scanner[data-verdict='fail'] .fab-scan-lamp { fill: #ef4444; }
 .fab-bin-left { fill: rgba(80,18,22,.55); stroke: rgba(248,113,113,.45); stroke-width: .8; }
 .fab-bin-right { fill: rgba(110,24,28,.55); stroke: rgba(248,113,113,.5); stroke-width: .8; }
 .fab-bin-rim { fill: rgba(30,8,10,.75); stroke: #f87171; stroke-width: 1; }
@@ -225,7 +196,6 @@ const FAB_CSS = `
   .fab-orb[data-state='complete'] { animation: fab-shake 700ms cubic-bezier(.36,.07,.19,.97) 1; }
   .fab-orb[data-state='rejected'] { animation: fab-reject 500ms ease-out 1; }
   .fab-scanner[data-verdict='fail'] { animation: fab-reject 500ms ease-out 1; }
-  .fab-scanner[data-verdict='pass'] .fab-scan-frame { animation: fab-glow 900ms ease-out 1; }
   .fab-feature[data-full] .fab-feature-glow { animation: fab-glow 2.8s ease-in-out infinite; }
 }
 @keyframes fab-slosh { 0%, 100% { transform: rotate(-4deg) scaleY(1); } 50% { transform: rotate(4deg) scaleY(1.25); } }
