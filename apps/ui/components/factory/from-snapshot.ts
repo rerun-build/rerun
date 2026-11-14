@@ -50,7 +50,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         const own = tileOf(who)
         copyTiles.push({
             id, position: cell, span: 2, containerId: slots.room, selectable: false, draggable: false, justPlaced: true,
-            style: { ...own.style, ...agentTileStyle('working', who), buddy: own.style.buddy, opacity: 0.55 }, ariaLabel: `${who}, a copy`,
+            style: { ...own.style, ...agentTileStyle('idle', who), glow: agentTileStyle('working', who).glow, buddy: own.style.buddy, opacity: 0.55 }, ariaLabel: `${who}, a copy`,
         })
         copyLinks.push({ source: who, target: id, variant: 'trace', color: who === 'LINUS' ? STATUS_COLOR.review : who === 'code' ? STATUS_COLOR.build : '#f472b6' })
         return id
@@ -131,15 +131,14 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     // Coworker tiles: working when the pool has a run out, else idle.
     const out = new Map<string, number>()
     for (const pool of snapshot.pools) for (const c of pool.coworkers) out.set(c.name, c.out)
-    const mergedItems = jobs.filter(j => j.state === 'merged').slice(-6).reverse().map(j => ({ label: `#${j.issue} ${j.title}`, count: 1, at: Date.parse(j.enteredAt) }))
     const tiles: Tile[] = base.tiles.filter(t => KEEP.includes(t.id)).map(tile => {
         if (tile.id === 'rejects') return { ...tile, ariaLabel: `Reject bin: ${rejects}` }
         if (tile.id === 'Delegator') {
             const state = held ? 'waiting_human' : counts.queued + counts.checks > 0 ? 'working' : 'idle'
-            return { ...tile, style: { ...tile.style, ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', ...(held ? { badge: 'lock' as const } : {}), ...(mergedItems.length && !held ? { results: { count: mergedItems.length, items: mergedItems } } : {}) } }
+            return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', shape: 'capsule' as const, ...(held ? { badge: 'lock' as const } : {}) } }
         }
         const working = (out.get(tile.id) ?? 0) > 0
-        return { ...tile, style: { ...tile.style, ...agentTileStyle(working ? 'working' : 'idle', tile.id), buddy: tile.style.buddy, opacity: working ? 1 : tile.style.opacity } }
+        return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy } }
     })
 
     // Belts: the base ones between kept tiles, then one to each cabinet. Red when held, else the colour of what runs on it.
@@ -152,7 +151,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     const belts: TileLink[] = [
         ...base.links.filter(l => KEEP.includes(l.source) && KEEP.includes(l.target) && l.variant === 'belt'),
         ...cabinets.map(c => ({ source: 'Delegator', target: `cab-${c.issue}`, variant: 'belt' as const, color: QUIET })),
-    ].map(l => ({ ...l, color: held ? STATUS_COLOR.held : lineColor.get(`${l.source}>${l.target}`) ?? QUIET }))
+    ].map(l => ({ ...l, color: held ? STATUS_COLOR.held : lineColor.get(`${l.source}>${l.target}`) ?? QUIET, still: !lineColor.has(`${l.source}>${l.target}`), chevrons: true }))
 
     return {
         containers: base.containers,

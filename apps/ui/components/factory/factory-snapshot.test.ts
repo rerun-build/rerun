@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { FACTORY_SNAPSHOT_MAX_BYTES, factoryJobStateSchema, factorySnapshotSchema } from '@rerun/contracts'
+import { FACTORY_SNAPSHOT_MAX_BYTES, factoryDepartmentSchema, factoryEpicKindSchema, factoryJobStateSchema, factorySnapshotSchema } from '@rerun/contracts'
 
 // The picture the delegator pushes each beat. The sample in packages/contracts/fixtures is the one
 // the delegator's own report is to be tested against too.
@@ -120,5 +120,49 @@ describe('factorySnapshotSchema', () => {
         const b = sample()
         b.jobs[0].runs[0].extra = 1
         expect(factorySnapshotSchema.safeParse(b).success).toBe(false)
+    })
+
+    it('accepts the old shape: no department, departments or epics', () => {
+        const s = sample()
+        for (const j of s.jobs) { delete j.department; delete j.departments }
+        delete s.epics
+        expect(factorySnapshotSchema.safeParse(s).success).toBe(true)
+    })
+
+    it('accepts the new shape in the sample: departments on jobs, epics on the snapshot', () => {
+        const s = factorySnapshotSchema.parse(sample())
+        expect(s.jobs[0].department).toBe('frontend')
+        expect(s.jobs[1].departments).toEqual(['backend'])
+        expect(s.jobs[3].department).toBeUndefined()
+        expect(s.jobs[3].departments).toBeUndefined()
+        expect(s.epics!.length).toBeGreaterThanOrEqual(1)
+        for (const e of s.epics!) expect(factoryEpicKindSchema.options).toContain(e.kind)
+    })
+
+    it('holds the seven departments and the seven epic kinds', () => {
+        expect(factoryDepartmentSchema.options).toEqual(['design', 'database', 'engine', 'backend', 'frontend', 'tooling', 'docs'])
+        expect(factoryEpicKindSchema.options).toEqual(['feature', 'review_fix', 'fix', 'upgrade', 'refactor', 'research', 'other'])
+    })
+
+    it('refuses one past each new limit and an unknown department or kind', () => {
+        const epic = () => sample().epics[0]
+        const withEpics = (n: number) => { const s = sample(); s.epics = Array.from({ length: n }, () => epic()); return s }
+        expect(factorySnapshotSchema.safeParse(withEpics(50)).success).toBe(true)
+        expect(factorySnapshotSchema.safeParse(withEpics(51)).success).toBe(false)
+        const title = (n: number) => { const s = sample(); s.epics[0].title = 'x'.repeat(n); return s }
+        expect(factorySnapshotSchema.safeParse(title(256)).success).toBe(true)
+        expect(factorySnapshotSchema.safeParse(title(257)).success).toBe(false)
+        for (const poke of [
+            (s: Sample) => { s.jobs[0].department = 'kitchen' },
+            (s: Sample) => { s.jobs[0].departments = ['kitchen'] },
+            (s: Sample) => { s.jobs[0].departments = Array.from({ length: 7 }, () => 'docs') },
+            (s: Sample) => { s.epics[0].kind = 'dream' },
+            (s: Sample) => { s.epics[0].extra = 1 },
+            (s: Sample) => { s.epics[0].issue = 0 },
+        ]) {
+            const s = sample()
+            poke(s)
+            expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
+        }
     })
 })

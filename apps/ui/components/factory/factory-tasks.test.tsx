@@ -92,7 +92,7 @@ describe('FactoryTasks', () => {
         expect(rows()).toHaveLength(1)
         expect(rows()[0].textContent).toContain('#2')
         act(() => chip('Waiting').click())
-        expect(rows()).toHaveLength(3)
+        expect(rows()).toHaveLength(2)
     })
 
     it('says the line is idle with the merged count', () => {
@@ -132,23 +132,23 @@ describe('FactoryTasks', () => {
     it('keeps only jobs that ended on the local today in Ended today and puts older ended jobs in a collapsed Earlier group with its count', () => {
         render([
             job({ issue: 1, state: 'merged', enteredAt: at(14, 9, 5) }),
-            job({ issue: 2, state: 'failed', enteredAt: at(13, 22, 10) }),
-            job({ issue: 3, state: 'blocked', enteredAt: at(13, 8, 30) }),
+            job({ issue: 2, state: 'merged', enteredAt: at(13, 22, 10) }),
+            job({ issue: 3, state: 'merged', enteredAt: at(13, 8, 30) }),
         ])
         expect(chipOf('Ended today').textContent).toContain('1')
         expect(chipOf('Earlier').textContent).toContain('2')
-        expect(rows()).toHaveLength(1)
+        expect(rows()).toHaveLength(0)
         expect(earlierHeader().getAttribute('aria-expanded')).toBe('false')
         act(() => earlierHeader().click())
         expect(earlierHeader().getAttribute('aria-expanded')).toBe('true')
-        expect(rows()).toHaveLength(3)
+        expect(rows()).toHaveLength(2)
     })
 
     it('chip counts follow the split and the Earlier chip filters and opens the group', () => {
         render([
             job({ issue: 1 }), job({ issue: 2, state: 'queued' }),
             job({ issue: 3, state: 'merged', enteredAt: at(14, 9, 5) }),
-            job({ issue: 4, state: 'rejected', enteredAt: at(12, 9, 5) }),
+            job({ issue: 4, state: 'merged', enteredAt: at(12, 9, 5) }),
         ])
         expect(chipOf('Active').textContent).toContain('1')
         expect(chipOf('Waiting').textContent).toContain('1')
@@ -170,8 +170,9 @@ describe('FactoryTasks', () => {
             job({ issue: 6, state: 'merged', enteredAt: at(9, 19, 48) }),
         ])
         act(() => earlierHeader().click())
+        act(() => Array.from(host.querySelectorAll<HTMLButtonElement>('button[aria-expanded]')).find((b) => b.textContent?.includes('Ended today'))!.click())
         const cells = Array.from(host.querySelectorAll('[data-ended-at]')).map((e) => e.textContent)
-        expect(cells).toEqual(['09:05', '10:06', '11:07', '07:08', '06:09', 'Mon 19:48'])
+        expect(cells).toEqual(['10:06', '11:07', '07:08', '06:09', '09:05', 'Mon 19:48'])
     })
 
     it('running rows keep the ticking time in state', () => {
@@ -190,5 +191,59 @@ describe('FactoryTasks', () => {
         expect(isLocalToday(after, now)).toBe(true)
         expect(formatEndedAt(before, now)).toBe('Fri 23:59')
         expect(formatEndedAt(after, now)).toBe('00:01')
+    })
+
+    describe('Problems pinned first, ended groups collapsed', () => {
+        const chips = () => Array.from(host.querySelectorAll<HTMLButtonElement>('[data-chip]')).map((c) => c.textContent)
+        const group = (g: string) => host.querySelector<HTMLElement>(`section[data-group="${g}"]`)
+        const heading = (name: string) => Array.from(host.querySelectorAll<HTMLButtonElement>('button[aria-expanded]')).find((b) => b.textContent?.includes(name))!
+        const mixed = () => [
+            job({ issue: 1 }), job({ issue: 2, state: 'queued' }),
+            job({ issue: 3, state: 'merged', enteredAt: at(14, 9, 5) }), job({ issue: 4, state: 'merged', enteredAt: at(14, 9, 6) }),
+            job({ issue: 5, state: 'blocked', reason: 'why', enteredAt: at(14, 9, 7) }), job({ issue: 6, state: 'failed', enteredAt: at(13, 9, 5) }),
+            job({ issue: 7, state: 'returned', enteredAt: at(14, 8, 5) }), job({ issue: 8, state: 'rejected', enteredAt: at(12, 9, 5) }),
+            job({ issue: 9, state: 'merged', enteredAt: at(11, 9, 5) }),
+        ]
+
+        it('puts a Problems chip first with the count of blocked, failed, returned and rejected jobs of any day', () => {
+            render(mixed())
+            expect(chips()).toEqual(['Problems 4', 'Active 1', 'Waiting 1', 'Ended today 2', 'Earlier 1'])
+        })
+
+        it('pins the problem rows above every other group, once each, with the reason under blocked', () => {
+            render(mixed())
+            const sections = Array.from(host.querySelectorAll<HTMLElement>('section[data-group]')).map((x) => x.dataset.group)
+            expect(sections[0]).toBe('problems')
+            expect(Array.from(group('problems')!.querySelectorAll('[data-row]')).map((r) => r.textContent?.match(/#(\d+)/)?.[1])).toEqual(['5', '6', '7', '8'])
+            expect(group('problems')!.textContent).toContain('why')
+            expect(host.querySelectorAll('[data-row]').length).toBe(6) // 4 problems, 1 active, 1 waiting; the merged are folded
+        })
+
+        it('folds Ended today and Earlier by default and shows their counts on the headings', () => {
+            render(mixed())
+            expect(heading('Ended today').getAttribute('aria-expanded')).toBe('false')
+            expect(heading('Ended today').textContent).toContain('2')
+            expect(heading('Earlier').getAttribute('aria-expanded')).toBe('false')
+            expect(heading('Earlier').textContent).toContain('1')
+            expect(group('ended')!.querySelectorAll('[data-row]')).toHaveLength(0)
+        })
+
+        it('opens a folded group from its heading, and from its chip, which also filters to it', () => {
+            render(mixed())
+            act(() => heading('Ended today').click())
+            expect(group('ended')!.querySelectorAll('[data-row]')).toHaveLength(2)
+            act(() => heading('Ended today').click())
+            expect(group('ended')!.querySelectorAll('[data-row]')).toHaveLength(0)
+            act(() => chipOf('Earlier').click())
+            expect(rows()).toHaveLength(1)
+            expect(rows()[0].textContent).toContain('#9')
+            expect(heading('Earlier').getAttribute('aria-expanded')).toBe('true')
+        })
+
+        it('the Problems chip filters to the problem rows', () => {
+            render(mixed())
+            act(() => chipOf('Problems').click())
+            expect(rows()).toHaveLength(4)
+        })
     })
 })

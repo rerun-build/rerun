@@ -38,8 +38,10 @@ jobs:
       # Every package that has a lint script: the app, the engine and the contracts package.
       - run: pnpm -r --if-present lint
       # Capped: the self-hosted host is shared, and one worker per core starves the other jobs on it.
-      - run: pnpm --filter rerun run test --maxWorkers=8
-      - run: pnpm --filter rerun-engine run test --maxWorkers=8
+      # One test worker per CPU. 8 was set for the self-hosted pool; on GitHub's ubuntu-latest (4 CPUs) it ran
+      # two workers per core and tests near vitest's 5 s limit timed out at random (three on 2026-11-14).
+      - run: pnpm --filter rerun run test --maxWorkers=4
+      - run: pnpm --filter rerun-engine run test --maxWorkers=4
 
   migrations:
     # Runs in the open source repository and its fork, not in a private clone of it. Hosted: it

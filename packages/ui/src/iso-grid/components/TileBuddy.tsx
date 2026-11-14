@@ -7,6 +7,7 @@ import type { TileStyle } from '../types'
 import { useKitTranslations } from '../../locale'
 import { tileStatusLabel } from '../status-label'
 import { BUDDY_GEOMETRY, BUDDY_VIEW, BuddyArt } from './buddy/BuddyArt'
+import { CAPSULE_HELD, CAPSULE_STEEL, CapsuleArt } from './buddy/CapsuleArt'
 import { BUDDY_STATE_COLOR, buddyColor, buddyLook, buddyMood, type BuddyMood } from './buddy/buddy-look'
 
 // A tile drawn as a buddy standing on its footprint. What keeps it from looking pasted on is what
@@ -66,7 +67,8 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
     const look = buddyLook(style)
     const mood = ghost ? 'asleep' : buddyMood(style)
     const plain = ghost ? (ghost.valid ? 'var(--iso-tile-muted)' : '#ef4444') : undefined
-    const light = plain ?? (mood === 'idle' ? buddyColor(id, look) : BUDDY_STATE_COLOR[mood])
+    const capsule = style.shape === 'capsule'
+    const light = plain ?? (capsule && mood === 'idle' ? CAPSULE_STEEL : capsule && mood === 'waiting' ? CAPSULE_HELD : mood === 'idle' ? buddyColor(id, look) : BUDDY_STATE_COLOR[mood])
     const delay = `${(-hashUnit(id, 7) * 4).toFixed(2)}s`
 
     const blockWidth = BUDDY_GEOMETRY.halfW * 2
@@ -79,7 +81,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
     const shadowWidth = blockWidth * unit * 1.02
     const labelTop = floor.y - BUDDY_GEOMETRY.depth * unit * (stretched ? 1 + SELECTED_STRETCH : 1)
 
-    const motion = reducedMotion ? undefined : MOTION[mood]
+    const motion = reducedMotion || capsule ? undefined : MOTION[mood]
     const poolMotion = reducedMotion ? undefined : POOL_MOTION[mood]
     const poolStrength = active && mood === 'idle' ? ACTIVE_POOL_STRENGTH : POOL_STRENGTH[mood]
     const pinned = ghost ? null : style.status?.pinned ?? null
@@ -128,6 +130,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
             <div
                 className="absolute pointer-events-none"
                 data-buddy-motion={motion}
+                data-buddy-still={style.still ? '' : undefined}
                 data-buddy-stretched={stretched ? '' : undefined}
                 style={{
                     ['--buddy-stretch' as string]: SELECTED_STRETCH,
@@ -142,7 +145,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
                 }}
             >
                 <svg viewBox={`${BUDDY_VIEW.x} ${BUDDY_VIEW.y} ${BUDDY_VIEW.w} ${BUDDY_VIEW.h}`} width="100%" height="100%" style={{ overflow: 'visible' }}>
-                    <BuddyArt uid={uid} id={id} mood={mood} look={look} plain={plain} />
+                    {capsule ? <CapsuleArt uid={uid} mood={mood} plain={plain} /> : <BuddyArt uid={uid} id={id} mood={mood} look={look} plain={plain} />}
                 </svg>
             </div>
 

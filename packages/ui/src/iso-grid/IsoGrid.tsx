@@ -9,6 +9,7 @@ import { TileStatusBubble } from './components/TileStatusBubble'
 import { TileToastBubble } from './components/TileToastBubble'
 import { TileLinks } from './components/TileLinks'
 import { BeamRing } from './components/BeamRing'
+import { DROP_REFUSAL_MS, DropHint } from './components/DropHint'
 import { ContainerBlock } from './components/ContainerBlock'
 import { ContainerDrawPreview } from './components/ContainerDrawPreview'
 import { ContainerAddHandles } from './components/ContainerAddHandles'
@@ -230,6 +231,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         onConfirmPlacement,
         onTileMove,
         onTileMoveRefused,
+        canDropTile,
         onTileContextMenu,
         onResizeContainerLocal,
         onResizeContainerCommit,
@@ -304,6 +306,20 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
 
     const [dragState, setDragState] = useState<{ tileId: string; startPos: { col: number; row: number }; span: number; containerId: string | null } | null>(null)
     const [dragGhostCell, setDragGhostCell] = useState<{ col: number; row: number } | null>(null)
+    // A refused drop stays on screen for DROP_REFUSAL_MS (only when the host passes canDropTile).
+    const [refusal, setRefusal] = useState<{ cell: { col: number; row: number }; span: number; reason: string } | null>(null)
+    const refusalTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const clearRefusal = useCallback(() => {
+        if (refusalTimerRef.current) clearTimeout(refusalTimerRef.current)
+        refusalTimerRef.current = null
+        setRefusal(null)
+    }, [])
+    useEffect(
+        () => () => {
+            if (refusalTimerRef.current) clearTimeout(refusalTimerRef.current)
+        },
+        []
+    )
 
     // Appui sur une tile déplaçable, pas encore tranché entre clic et drag. La sélection attend le
     // relâchement : la sélectionner à l'appui ouvrirait la fiche de l'agent qu'on veut juste déplacer.
@@ -878,8 +894,9 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
                 return
             }
             const anchor = getTileAnchorFromClient(e.clientX, e.clientY, span)
+            clearRefusal()
             setDragState({ tileId, startPos, span, containerId })
-            setDragGhostCell(anchor ? clampAnchorToContainer(containerId, span, anchor) : startPos)
+            setDragGhostCell(anchor ? (canDropTile ? anchor : clampAnchorToContainer(containerId, span, anchor)) : startPos)
             return
         }
 
@@ -947,7 +964,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
             const hovered = dragState.containerId && cell ? containers.find(c => containerContainsCell(c, cell)) : undefined
             const containerId = hovered?.id ?? dragState.containerId
             if (containerId !== dragState.containerId) setDragState({ ...dragState, containerId })
-            setDragGhostCell(clampAnchorToContainer(containerId, dragState.span, dragAnchor))
+            setDragGhostCell(canDropTile ? dragAnchor : clampAnchorToContainer(containerId, dragState.span, dragAnchor))
             return
         }
 
@@ -1019,7 +1036,17 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
 
         if (dragState && dragGhostCell) {
             const didMove = dragGhostCell.col !== dragState.startPos.col || dragGhostCell.row !== dragState.startPos.row
-            if (didMove && onTileMove) {
+            if (didMove && onTileMove && canDropTile) {
+                const holder = containers.find(ct => containerContainsCell(ct, dragGhostCell))
+                const reason = canDropTile(dragState.tileId, dragGhostCell, holder?.id ?? null)
+                if (reason === null) onTileMove(dragState.tileId, dragGhostCell, holder?.id)
+                else {
+                    clearRefusal()
+                    setRefusal({ cell: dragGhostCell, span: dragState.span, reason })
+                    refusalTimerRef.current = setTimeout(clearRefusal, DROP_REFUSAL_MS)
+                    onTileMoveRefused?.(dragState.tileId)
+                }
+            } else if (didMove && onTileMove) {
                 const tile = tiles.find(t => t.id === dragState.tileId)
                 // A tile can be dropped in any container, not only the one it came from: the host
                 // is told which one it landed in and decides what that means.
@@ -1337,8 +1364,21 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
                         )
                     })()}
 
+                {refusal && canDropTile && !dragState && <DropHint box={tileBox(refusal.cell.col, refusal.cell.row, refusal.span, worldOffset)} span={refusal.span} reason={refusal.reason} zIndex={tileZ(refusal.cell.col, refusal.cell.row, refusal.span, 10000)} />}
+
                 {dragState &&
                     dragGhostCell &&
+                    canDropTile &&
+                    (() => {
+                        const isStart = dragGhostCell.col === dragState.startPos.col && dragGhostCell.row === dragState.startPos.row
+                        const holder = containers.find(ct => containerContainsCell(ct, dragGhostCell))
+                        const reason = isStart ? null : canDropTile(dragState.tileId, dragGhostCell, holder?.id ?? null)
+                        return <DropHint box={tileBox(dragGhostCell.col, dragGhostCell.row, dragState.span, worldOffset)} span={dragState.span} reason={reason} zIndex={tileZ(dragGhostCell.col, dragGhostCell.row, dragState.span, 10000)} />
+                    })()}
+
+                {dragState &&
+                    dragGhostCell &&
+                    !canDropTile &&
                     (() => {
                         const box = tileBox(dragGhostCell.col, dragGhostCell.row, dragState.span, worldOffset)
                         const W = dragState.span * TILE_W

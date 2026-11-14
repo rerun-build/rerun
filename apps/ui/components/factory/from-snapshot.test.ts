@@ -1,8 +1,18 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { factoryJobStateSchema, factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { createElement } from 'react'
+import { TileBuddy } from '@rerun/ui/iso-grid'
 import { sceneFromSnapshot } from './from-snapshot'
+import { factoryScene } from './factory-scene'
+
+const sampleTime = vi.hoisted(() => ({ t: 0 }))
+vi.mock('./factory-scene', async importOriginal => {
+    const actual = await importOriginal<typeof import('./factory-scene')>()
+    return { ...actual, factoryScene: (_t: number, now: number) => actual.factoryScene(sampleTime.t, now) }
+})
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')
@@ -109,6 +119,108 @@ describe('sceneFromSnapshot', () => {
             const s = sample()
             s.jobs = [{ ...s.jobs[0], state }]
             expect(() => sceneFromSnapshot(s, NOW), state).not.toThrow()
+        }
+    })
+})
+
+const COWORKERS = ['code', 'LARRY', 'LINUS', 'BRUCE', 'search', 'DIETER']
+const nothingRunning = (): FactorySnapshot => {
+    const s = sample()
+    s.jobs = s.jobs.map(j => ({ ...j, state: 'merged' as const }))
+    s.holds = []
+    s.pools = s.pools.map(p => ({ ...p, coworkers: p.coworkers.map(c => ({ ...c, out: 0 })) }))
+    return s
+}
+const look = (style: object) => { const { buddy: _b, label: _l, shape: _s, ...rest } = style as Record<string, unknown>; return rest }
+
+describe('sceneFromSnapshot: live tiles', () => {
+    it('gives every coworker and the loader the same neutral idle style when nothing runs, whatever the sample time', () => {
+        for (const t of [0, 2_000, 5_000, 9_000, 14_000, 20_000, 31_000]) {
+            sampleTime.t = t
+            const f = sceneFromSnapshot(nothingRunning(), NOW)
+            const ids = [...COWORKERS, 'Delegator']
+            const styles = ids.map(id => look(f.tiles.find(x => x.id === id)!.style))
+            for (const [i, st] of styles.entries()) {
+                expect(st, `${ids[i]} at t=${t}`).toEqual(styles[0])
+                expect(st).toMatchObject({ glow: 'var(--iso-tile-idle-glow)', color: 'var(--iso-tile-idle)', opacity: 1 })
+            }
+        }
+        sampleTime.t = 0
+    })
+
+    it('shows the working look only for a coworker the pools say has a run out, and for the loader when jobs are queued or in checks', () => {
+        sampleTime.t = 14_000
+        const s = nothingRunning()
+        s.pools = s.pools.map(p => ({ ...p, coworkers: p.coworkers.map(c => (c.name === 'LINUS' ? { ...c, out: 1 } : c)) }))
+        const f = sceneFromSnapshot(s, NOW)
+        const st = (id: string) => f.tiles.find(x => x.id === id)!.style
+        expect(st('LINUS').glow).toBe('rgba(245, 158, 11, 0.6)')
+        expect(st('code').glow).toBe('var(--iso-tile-idle-glow)')
+        expect(st('Delegator').glow).toBe('var(--iso-tile-idle-glow)')
+        s.jobs[0].state = 'queued'
+        expect(sceneFromSnapshot(s, NOW).tiles.find(x => x.id === 'Delegator')!.style.glow).toBe('rgba(245, 158, 11, 0.6)')
+        sampleTime.t = 0
+    })
+
+    it('puts no results flag on the loader, merged jobs or not', () => {
+        const f = sceneFromSnapshot(sample(), LATER)
+        expect(sample().jobs.some(j => j.state === 'merged')).toBe(true)
+        expect(f.tiles.find(x => x.id === 'Delegator')!.style.results).toBeUndefined()
+    })
+
+    it('draws the Loader as a capsule on the live floor, and no other tile', () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        expect(f.held).toBe(true)
+        expect(f.tiles.find(x => x.id === 'Delegator')!.style).toMatchObject({ shape: 'capsule', badge: 'lock' })
+        expect(f.tiles.filter(x => x.id !== 'Delegator' && x.style.shape)).toEqual([])
+    })
+
+    it('draws the Loader as a capsule in the sample loop at any time', () => {
+        for (const t of [0, 6_000, 25_000, 50_000]) {
+            const tiles = factoryScene(t, 0).tiles
+            expect(tiles.find(x => x.id === 'Delegator')!.style.shape).toBe('capsule')
+            expect(tiles.filter(x => x.id !== 'Delegator' && x.style.shape)).toEqual([])
+        }
+    })
+
+    it('renders no face on the Loader of the sample loop', () => {
+        const tiles = factoryScene(6_000, 0).tiles
+        const html = (id: string) => renderToStaticMarkup(createElement(TileBuddy, { id, style: tiles.find(x => x.id === id)!.style, width: 120, height: 120, floorOffset: 0 } as never))
+        expect(html('Delegator')).toContain('data-capsule')
+        expect(html('Delegator')).not.toContain('iso-buddy-eyes')
+        expect(html('code')).toContain('iso-buddy-eyes')
+    })
+
+    it('draws a running copy in its coworker own colours, see-through, and the coworker itself solid', () => {
+        const f = sceneFromSnapshot(sample(), NOW)
+        const copy = f.tiles.find(x => x.id === 'code-copy-330')!.style
+        expect(copy.color).not.toBe('#f59e0b')
+        expect(copy.color).toBe(f.tiles.find(x => x.id === 'code')!.style.color)
+        expect(copy.opacity).toBeLessThan(1)
+        expect(f.tiles.find(x => x.id === 'code')!.style.opacity).toBe(1)
+    })
+})
+
+describe('belts ask for chevrons', () => {
+    it('asks for chevrons on every belt of the live floor, and on no trace', () => {
+        for (const now of [NOW, LATER]) {
+            const links = sceneFromSnapshot(sample(), now).links
+            const belts = links.filter(l => l.variant === 'belt')
+            expect(belts.length).toBeGreaterThan(0)
+            expect(belts.every(l => l.chevrons === true)).toBe(true)
+            const traces = links.filter(l => l.variant === 'trace')
+            expect(traces.length).toBeGreaterThan(0)
+            expect(traces.some(l => l.chevrons)).toBe(false)
+        }
+    })
+
+    it('asks for chevrons on every belt of the sample loop', () => {
+        for (const t of [0, 6_000, 50_000]) {
+            const links = factoryScene(t, 0).links
+            const belts = links.filter(l => l.variant === 'belt')
+            expect(belts.length).toBeGreaterThan(0)
+            expect(belts.every(l => l.chevrons === true)).toBe(true)
+            expect(links.filter(l => l.variant === 'trace').some(l => l.chevrons)).toBe(false)
         }
     })
 })

@@ -1,0 +1,128 @@
+import contextlib, io, json, os, sys, tempfile, unittest
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import dispatch as D
+
+
+class Reconcile(unittest.TestCase):
+    def make(self, closed=(), prs=None):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.calls = []
+        self.closed = list(closed)
+        self.prs = prs or {}
+
+        def gh(args):
+            self.calls.append(args)
+            if args[:2] == ["issue", "list"]:
+                if "closed" in args:
+                    return json.dumps([{"number": n} for n in self.closed])
+                return "[]"
+            if args[:2] == ["pr", "view"]:
+                return json.dumps({"state": self.prs.get(int(args[2]), "OPEN")})
+            return "[]"
+
+        cfg = {"repo": "o/r", "label": "factory", "max_jobs": 8, "auto_plan_marker": True,
+               "ledger_file": os.path.join(tmp.name, "ledger.db"), "json_state_file": os.path.join(tmp.name, "d.json"),
+               "heartbeat_file": os.path.join(tmp.name, "hb"),
+               "builders": [{"id": "b1", "name": "B1"}], "reviewers": [{"id": "r1", "name": "R1"}]}
+        self.d = D.Dispatcher(cfg, lambda t, a, timeout=30: {}, gh, now=lambda: 1794000000.0)
+        self.addCleanup(self.d.close)
+
+    def seed(self, n, state="blocked", pr=None, relabelled=True):
+        j = {"issue": n, "title": "t", "body": "", "state": state, "round": 1, "worker": "coder", "paths": [], "test": "x",
+             "relabelled": relabelled, "commented": True}
+        if pr:
+            j["pr"] = pr
+        self.d.store.put_job(str(n), state, j, "seed")
+
+    def once(self, n=1):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            for _ in range(n):
+                self.d.once()
+        return out.getvalue()
+
+    def count(self, *head, extra=None):
+        return len([c for c in self.calls if c[:len(head)] == list(head) and (extra is None or extra in c)])
+
+    def state(self, n):
+        return self.d.store.transitions_of(str(n))
+
+    def job(self, n):
+        return [j for j in self.d.jobs() if j["issue"] == n][0]
+
+    def test_closed_issue_with_a_merged_pr_ends_merged_with_a_transition(self):
+        self.make([5], {9: "MERGED"})
+        self.seed(5, "blocked", pr=9)
+        text = self.once(10)
+        self.assertEqual(self.job(5)["state"], "merged")
+        t = self.state(5)[-1]
+        self.assertEqual((t["from_state"], t["to_state"]), ("blocked", "merged"))
+        self.assertIn("merged outside the delegator", t["reason"])
+        self.assertEqual(text.count("merged outside the delegator"), 1)
+        self.assertEqual(self.count("issue", "comment"), 0)
+        self.assertEqual(self.count("issue", "edit"), 0)
+
+    def test_closed_issue_with_an_unmerged_pr_keeps_its_state_and_is_not_read_again(self):
+        self.make([5], {9: "CLOSED"})
+        self.seed(5, "failed", pr=9)
+        self.once(10)
+        self.assertEqual(self.job(5)["state"], "failed")
+        self.assertEqual(self.count("pr", "view"), 1)
+        n = len(self.state(5))
+        self.once(10)
+        self.assertEqual(self.count("pr", "view"), 1)
+        self.assertEqual(self.job(5)["state"], "failed")
+        self.assertEqual(len(self.state(5)), n)
+
+    def test_a_closed_job_without_a_pr_skips_the_pr_view(self):
+        self.make([5])
+        self.seed(5, "returned")
+        self.once(10)
+        self.assertEqual(self.count("pr", "view"), 0)
+        self.assertEqual(self.job(5)["state"], "returned")
+        self.assertIn("closed_seen", self.d.store.get_all("5"))
+
+    def test_an_open_issue_is_untouched(self):
+        self.make([], {9: "MERGED"})
+        self.seed(5, "blocked", pr=9)
+        self.once(10)
+        self.assertEqual(self.job(5)["state"], "blocked")
+        self.assertEqual(self.count("pr", "view"), 0)
+
+    def test_a_relabelled_job_is_untouched(self):
+        self.make([5], {9: "MERGED"})
+        self.seed(5, "queued", pr=9)
+        self.once(10)
+        self.assertEqual(self.job(5)["state"], "queued")
+        self.assertEqual(self.count("pr", "view"), 0)
+
+    def test_the_pass_runs_only_every_10th_beat_with_one_closed_list(self):
+        self.make([5])
+        self.seed(5, "blocked")
+        self.seed(6, "blocked")
+        self.once(9)
+        self.assertEqual(self.count("issue", "list", extra="closed"), 0)
+        self.once(1)
+        self.assertEqual(self.count("issue", "list", extra="closed"), 1)
+        self.once(10)
+        self.assertEqual(self.count("issue", "list", extra="closed"), 2)
+
+    def test_no_candidate_means_no_closed_list(self):
+        self.make([5])
+        self.seed(5, "blocked", relabelled=False)
+        self.d.store.put_job("5", "merged", {"issue": 5, "state": "merged", "relabelled": True, "commented": True}, "seed")
+        self.once(10)
+        self.assertEqual(self.count("issue", "list", extra="closed"), 0)
+
+    def test_at_most_20_jobs_change_in_one_pass(self):
+        self.make(range(100, 125))
+        for n in range(100, 125):
+            self.seed(n, "blocked")
+        self.once(10)
+        seen = [n for n in range(100, 125) if "closed_seen" in self.d.store.get_all(str(n))]
+        self.assertEqual(len(seen), 20)
+
+
+if __name__ == "__main__":
+    unittest.main()

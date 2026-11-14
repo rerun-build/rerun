@@ -22,6 +22,8 @@ RUNNING = ("building", "reviewing", "fixing")
 END = ("merged", "rejected", "blocked", "failed", "returned")
 BACK = {"building": "queued", "reviewing": "review_wait", "fixing": "fix_wait"}  # where a transient failure sends a job back to
 LOST_BEATS = 3  # beats a send without a run id is looked for in list_runs
+RECONCILE_BEATS = 10  # a pass reads GitHub once; an end state fixed by hand needs no faster answer
+RECONCILE_MAX = 20  # jobs looked at in one pass
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 
 
@@ -396,6 +398,24 @@ class Dispatcher:
             self.save(job, "queued")
             log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
 
+    def reconcile(self):
+        """Every RECONCILE_BEATS beats: a reported end state whose issue was closed by hand ends merged or is recorded closed."""
+        if self.beats % RECONCILE_BEATS:
+            return
+        cands = [j for j in self.jobs() if j["state"] in ("blocked", "failed", "returned") and j.get("relabelled")
+                 and "closed_seen" not in self.store.get_all(str(j["issue"]))]
+        if not cands:
+            return
+        closed = {c["number"] for c in json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "closed",
+                                                           "--json", "number", "--limit", "1000"]) or "[]")}
+        cands.sort(key=lambda j: j["issue"])
+        for j in [j for j in cands if j["issue"] in closed][:RECONCILE_MAX]:
+            if j.get("pr") and json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "MERGED":
+                self.end(j, "merged", "merged outside the delegator")
+            else:
+                self.store.set(str(j["issue"]), "closed_seen", self.now())
+                log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+
     # --- coworker runs
 
     def send(self, j, agent, step, message, state, copy=1):
@@ -438,6 +458,7 @@ class Dispatcher:
         r = self.account("get_run", {"agentId": j["agent"], "runId": j["run"]})
         if r.get("status") == "running":
             return self.clock_check(j, r)
+        self.record_tokens(j, r)
         if r.get("status") == "done":
             j["attempt"] = 1
             g = r.get("goal")
@@ -452,15 +473,27 @@ class Dispatcher:
         row = dict(r, runId=r.get("runId") or j["run"], startedAt=r.get("startedAt") or "1970-01-01T00:00:00Z")
         kind, _ = clocks.outcome(row, None, self.now(), self.cfg.get("clocks"))
         if clocks.klass(kind, row) == "transient":
-            self.store.close_run(j["run"], "error", error=why[:200])
+            self.store.close_run(j["run"], "error", error=why[:200], **self.kept_tokens(j["run"]))
             return self.transient(j, why)
         if clocks.klass(kind, row) == "plan_limit":
             return self.plan_limit(j, why, str(r.get("error") or "-"))
         return self.failed_attempt(j, why, "ended")
 
+    def record_tokens(self, j, r):
+        """Write the ended run's token counts into its fire; status and ended_at stay as they are."""
+        ti, to = r.get("inputTokens"), r.get("outputTokens")
+        if all(isinstance(x, int) and not isinstance(x, bool) and x >= 0 for x in (ti, to)):
+            self.store.db.execute("UPDATE fires SET tokens_in=?, tokens_out=? WHERE run_id=?", (ti, to, j["run"]))
+        else:
+            log(j["issue"], "token counts of run %s unknown: left at 0" % j["run"])
+
+    def kept_tokens(self, run_id):
+        row = self.store.db.execute("SELECT tokens_in, tokens_out FROM fires WHERE run_id=?", (run_id,)).fetchone()
+        return {"tokens_in": row[0], "tokens_out": row[1]} if row else {}
+
     def plan_limit(self, j, why, error):
         """Class plan_limit: back to the state it was sent from, no failed attempt, no retry count; all sending held."""
-        self.store.close_run(j["run"], "error", error=why[:200])
+        self.store.close_run(j["run"], "error", error=why[:200], **self.kept_tokens(j["run"]))
         now = self.now()
         holds.arm(self.store, "plan limit", now + holds.PLAN_LIMIT_HOLD_S)
         j.update(state=BACK[j["state"]], retry_attempt=j.get("attempt", 1), sending=None)
@@ -761,6 +794,10 @@ class Dispatcher:
             self.intake()
         except (Error, ValueError, KeyError) as e:
             log("-", "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.reconcile()
+        except (Error, ValueError, KeyError) as e:
+            log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
         for j in self.jobs():
             try:
                 if j["state"] not in END:
@@ -780,11 +817,15 @@ class Dispatcher:
                     self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
         self.report_line()
 
+    def read_epic(self, n):
+        return json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,labels"]))
+
     def report_line(self):
         """Each beat: the whole line to the app, once. Never raises: a failed report must not stop the beat."""
         try:
             now = self.now()
-            snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats)
+            snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
+                                           read_epic=self.read_epic)
             self.account("factory_report", {"snapshot": snap}, timeout=10)
             self.report_logged.clear()
         except Exception as e:  # noqa: BLE001 - the report only, never the beat

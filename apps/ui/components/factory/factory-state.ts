@@ -32,3 +32,6 @@ export const JOB_GROUPS: Record<JobGroup, FactoryJobState[]> = {
 export function groupOf(state: FactoryJobState): JobGroup {
     return (Object.keys(JOB_GROUPS) as JobGroup[]).find((g) => JOB_GROUPS[g].includes(state)) ?? 'ended'
 }
+
+// The id of the Loader's tile on the floor (factory-scene.ts, from-snapshot.ts).
+export const LOADER_TILE = 'Delegator'

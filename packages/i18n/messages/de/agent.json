@@ -875,7 +875,15 @@
         "step": "Schritt {number}",
         "noSteps": "Für diese Ausführung wurden keine Schritte aufgezeichnet.",
         "input": "Eingabe",
-        "output": "Ausgabe"
+        "output": "Ausgabe",
+        "filters": { "running": "Läuft", "failed": "Fehlgeschlagen", "done": "Fertig" },
+        "search": "Läufe durchsuchen",
+        "nothingRunning": "Nichts läuft. Siehe <failed>Fehlgeschlagen</failed> oder <done>Fertig</done>.",
+        "currentStep": "jetzt: {tool}",
+        "rowTitle": "{stage} #{n}: {title}",
+        "stage": "{stage, select, build {Build} review {Review} fix {Korrektur} other {Lauf}}",
+        "goalRow": "Ziel: {prefix}",
+        "noMatch": "Kein Lauf passt zu „{query}“"
     },
     "agentRunHistory": {
         "tokens": "{total} Tokens",

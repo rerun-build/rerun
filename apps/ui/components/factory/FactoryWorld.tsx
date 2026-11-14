@@ -2,13 +2,15 @@
 
 import type { FactorySnapshot } from '@rerun/contracts'
 import { IsoGrid, frameTemplateBoard, routeTileLinks, useRenderedFrame, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 
 import { fireRerunConfetti } from '@/lib/confetti'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { applyMoves, canMove, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
+import { applyMoves, canMove, dropReason, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
 import { METRICS, barModel, type MetricDef, type MetricKey, type MetricValues } from './factory-metrics'
+import { FactoryBarFrame } from './FactoryBarFrame'
+import { floorFrame } from './factory-camera'
 import { FactoryOverlay } from './FactoryOverlay'
 import { LOOP_MS, factoryScene, type Cell, type FactoryFrame } from './factory-scene'
 
@@ -41,14 +43,14 @@ function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }
         return () => clearInterval(id)
     }, [])
     const frame = scene((now - start) % LOOP_MS, now)
-    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} />
+    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} holdLeftMs={frame.holdLeftMs} links={frame.links} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} />
 }
 
 // The factory, drawn by the board's own world. The world takes the whole stage; a thin glass bar
 // carries the gauges and the counts, and a band drops in while sending is held.
 // `workspace` keys the owner's own arrangement of the floor in the browser. `rightInset` is the width a
 // column laid over the stage's right edge covers: the floor and the bar fit in what is left of it.
-export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker, rightInset = 0, snapshot = null }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void; rightInset?: number; snapshot?: FactorySnapshot | null }) {
+export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker, rightInset = 0, snapshot = null, topBar }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void; rightInset?: number; snapshot?: FactorySnapshot | null; topBar?: ReactNode }) {
     const [clock, setClock] = useState(() => ({ start: Date.now(), now: Date.now() }))
     const [expired, setExpired] = useState<Set<string>>(() => new Set())
     useEffect(() => {
@@ -71,10 +73,11 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     // the floor.
     const boxes = frame.containers
     const moves = useMemo(() => readMoves(saved, sceneTiles, boxes), [saved, sceneTiles, boxes])
-    const tiles = useMemo(() => applyMoves(sceneTiles, moves), [sceneTiles, moves])
+    const tiles = useMemo(() => applyMoves(sceneTiles, moves, boxes), [sceneTiles, moves, boxes])
     const onTileMove = useCallback((id: string, cell: Cell) => {
         if (canMove(sceneTiles, moves, id, cell, boxes)) saveLayout(storageKey, { ...moves, [id]: cell })
     }, [sceneTiles, moves, storageKey, boxes])
+    const canDropTile = useCallback((id: string, cell: Cell) => dropReason(sceneTiles, moves, id, cell, boxes), [sceneTiles, moves, boxes])
     const moved = Object.keys(moves).length > 0
     const links = useStable(frame.links)
     // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
@@ -96,6 +99,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
 
     const { ref, frame: size } = useRenderedFrame()
     const { ref: barRef, frame: bar } = useRenderedFrame()
+    const { ref: topRef, frame: top } = useRenderedFrame()
     const corners = useMemo(() => frame.containers.flatMap(c => [
         { id: `${c.id}-a`, position: { col: c.col_start, row: c.row_start }, span: 1, style: { color: '' } },
         { id: `${c.id}-b`, position: { col: c.col_end, row: c.row_end }, span: 1, style: { color: '' } },
@@ -105,19 +109,20 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     // The floor is framed in what the column and the bar leave visible, and centred there: the pan is
     // in world px inside the zoom, so a shift of k screen px is k / zoom.
     const barSpace = bar ? bar.height + 2 * BAR_MARGIN_PX : BAR_PX
+    const topSpace = topBar ? (top ? top.height + 2 * BAR_MARGIN_PX : BAR_PX) : 0
     const camera = useMemo(() => {
         if (!size) return null
-        const visible = Math.max(1, size.width - rightInset - 2 * SIDE_PX)
+        const { width, height, shiftX, shiftY } = floorFrame({ stage: size, rightInset, topSpace, bottomSpace: barSpace, overhead: OVERHEAD_PX, side: SIDE_PX })
         // The whole floor is always in view: in a narrow stage it is framed below the board's usual
         // zoom floor rather than cut.
-        const c = frameTemplateBoard(corners, { width: visible, height: Math.max(1, size.height - OVERHEAD_PX - barSpace) }, 2, 0.94, 0.1)
-        return { zoom: c.zoom, pan: { x: c.pan.x - rightInset / 2 / c.zoom, y: c.pan.y + (OVERHEAD_PX - barSpace) / 2 / c.zoom } }
-    }, [size, corners, rightInset, barSpace])
+        const c = frameTemplateBoard(corners, { width, height }, 2, 0.94, 0.1)
+        return { zoom: c.zoom, pan: { x: c.pan.x + shiftX / c.zoom, y: c.pan.y + shiftY / c.zoom } }
+    }, [size, corners, rightInset, barSpace, topSpace])
 
     const { sample, values } = barModel({ snapshot, counts: frame.counts, held: frame.held, now: clock.now, start: clock.start })
 
     return (
-        <div ref={ref} className={`${theme} relative h-dvh w-full overflow-hidden bg-background text-foreground`}>
+        <div ref={ref} className={`${theme} relative h-dvh w-full overflow-hidden bg-background text-foreground`} style={{ '--factory-drop-max': `${size ? size.height - topSpace - barSpace : 0}px` } as CSSProperties}>
             <IsoGrid
                 tiles={gridTiles}
                 containers={frame.containers}
@@ -128,6 +133,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
                 cameraTransitionMs={0}
                 showLinks
                 onTileMove={onTileMove}
+                canDropTile={canDropTile}
                 selectedTileId={null}
                 {...(onOpenCoworker ? { onTileSelect } : {})}
                 scrollGestures
@@ -136,31 +142,35 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
 
             {/* The bar lives in the visible part of the stage and wraps its groups onto more rows when
                 that part is narrow, so no number is ever cut. */}
-            <div className="pointer-events-none absolute bottom-0 left-0 flex justify-center p-5" style={{ right: rightInset }}>
-                <div ref={barRef} className="pointer-events-auto flex max-w-full flex-wrap items-stretch justify-center gap-x-4 gap-y-3 rounded-2xl border border-border/60 bg-background/75 px-5 py-3 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl">
-                    <div className="flex items-center gap-2 pr-1">
-                        <span className={`size-2 rounded-full ${frame.held ? 'bg-red-500' : 'animate-pulse bg-emerald-500 motion-reduce:animate-none'}`} />
-                        <span className="text-sm font-semibold tracking-tight">Factory</span>
-                        {sample && <span className="text-[10px] text-muted-foreground">sample</span>}
-                    </div>
-                    {(['jobs', 'runs', 'plan'] as const).map(group => (
-                        <div key={group} className="flex flex-wrap items-center justify-center gap-4 border-l border-border/70 pl-4">
-                            {METRICS.filter(m => m.group === group).map(m => <Metric key={m.key} def={m} value={values[m.key]} />)}
-                        </div>
-                    ))}
-                    {moved && (
-                        <div className="flex items-center border-l border-border/70 pl-4">
-                            <Button type="button" variant="outline" size="sm" onClick={() => saveLayout(storageKey, null)}>
-                                Reset layout
-                            </Button>
-                        </div>
-                    )}
+            <FactoryBarFrame edge="bottom" rightInset={rightInset} frameRef={barRef}>
+                <div className="flex items-center gap-2 pr-1">
+                    <span className={`size-2 rounded-full ${frame.held ? 'bg-red-500' : 'animate-pulse bg-emerald-500 motion-reduce:animate-none'}`} />
+                    <span className="text-sm font-semibold tracking-tight">Factory</span>
+                    {sample && <span className="text-[10px] text-muted-foreground">sample</span>}
                 </div>
-            </div>
+                {(['jobs', 'runs', 'plan'] as const).map(group => (
+                    <div key={group} className="flex flex-wrap items-center justify-center gap-4 border-l border-border/70 pl-4">
+                        {METRICS.filter(m => m.group === group).map(m => <Metric key={m.key} def={m} value={values[m.key]} />)}
+                    </div>
+                ))}
+                {moved && (
+                    <div className="flex items-center border-l border-border/70 pl-4">
+                        <Button type="button" variant="outline" size="sm" onClick={() => saveLayout(storageKey, null)}>
+                            Reset layout
+                        </Button>
+                    </div>
+                )}
+            </FactoryBarFrame>
+
+            {topBar && (
+                <FactoryBarFrame edge="top" rightInset={rightInset} frameRef={topRef}>
+                    {topBar}
+                </FactoryBarFrame>
+            )}
 
             <div
-                className="pointer-events-none absolute left-0 top-6 flex justify-center transition-all duration-500 motion-reduce:transition-none"
-                style={{ right: rightInset, opacity: frame.held ? 1 : 0, transform: frame.held ? 'translateY(0)' : 'translateY(-12px)' }}
+                className="pointer-events-none absolute left-0 flex justify-center transition-all duration-500 motion-reduce:transition-none"
+                style={{ right: rightInset, top: 24 + topSpace, opacity: frame.held ? 1 : 0, transform: frame.held ? 'translateY(0)' : 'translateY(-12px)' }}
             >
                 <div className="flex items-center gap-3 rounded-full border border-red-500/40 bg-red-500/15 px-4 py-1.5 text-sm text-red-600 shadow-[0_0_24px_rgba(239,68,68,0.35)] backdrop-blur-xl dark:text-red-300">
                     <span className="font-semibold">Line held</span>

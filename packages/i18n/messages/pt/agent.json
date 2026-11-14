@@ -875,7 +875,15 @@
         "step": "Passo {number}",
         "noSteps": "Nenhum passo registrado nesta execução.",
         "input": "Entrada",
-        "output": "Saída"
+        "output": "Saída",
+        "filters": { "running": "Em curso", "failed": "Falhadas", "done": "Concluídas" },
+        "search": "Pesquisar execuções",
+        "nothingRunning": "Nada em curso. Veja <failed>Falhadas</failed> ou <done>Concluídas</done>.",
+        "currentStep": "agora: {tool}",
+        "rowTitle": "{stage} #{n}: {title}",
+        "stage": "{stage, select, build {Build} review {Revisão} fix {Correção} other {Execução}}",
+        "goalRow": "Objetivo: {prefix}",
+        "noMatch": "Nenhuma execução corresponde a \"{query}\""
     },
     "agentRunHistory": {
         "tokens": "{total} tokens",

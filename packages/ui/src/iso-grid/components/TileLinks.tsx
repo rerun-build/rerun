@@ -46,6 +46,8 @@ type Link = {
     variant: 'beam' | 'cable' | 'trace' | 'belt'
     appearDelay: number
     color?: string
+    still?: boolean
+    chevrons?: boolean
 }
 
 // Même convention d'écran que tileBox/ContainerBlock : isoPosition().left + TILE_W/2. Les tracés
@@ -122,6 +124,43 @@ function cometPath(points: ScreenPoint[], overshoot: number) {
     return `${d} L ${at(all[all.length - 1])}`
 }
 
+const CHEVRON_STEP = 44
+const CHEVRON_FIRST = 22
+const CHEVRON_TAIL = 6
+const CHEVRON_ANGLE = (40 * Math.PI) / 180
+
+// Chevron "V" marks along a route, every CHEVRON_STEP from CHEVRON_FIRST, none closer than CHEVRON_FIRST
+// to either end (one in the middle when the route is too short for that). Each one has its tip on the
+// route and its tails CHEVRON_TAIL back, so it points the way the route runs.
+function chevronPoints(points: ScreenPoint[], length: number): string[] {
+    const marks: number[] = []
+    for (let s = CHEVRON_FIRST; s <= length - CHEVRON_FIRST + 1e-6; s += CHEVRON_STEP) marks.push(s)
+    if (marks.length === 0) marks.push(length / 2)
+    const out: string[] = []
+    for (const s of marks) {
+        let left = s
+        for (let i = 1; i < points.length; i++) {
+            const seg = distance(points[i - 1], points[i])
+            if (seg === 0) continue
+            if (left <= seg || i === points.length - 1) {
+                const tip = towards(points[i - 1], points[i], left)
+                const dx = (points[i].x - points[i - 1].x) / seg
+                const dy = (points[i].y - points[i - 1].y) / seg
+                const tail = (sign: number) => {
+                    const a = sign * CHEVRON_ANGLE
+                    const bx = -(dx * Math.cos(a) - dy * Math.sin(a))
+                    const by = -(dx * Math.sin(a) + dy * Math.cos(a))
+                    return `${(tip.x + bx * CHEVRON_TAIL).toFixed(1)},${(tip.y + by * CHEVRON_TAIL).toFixed(1)}`
+                }
+                out.push(`${tail(1)} ${tip.x.toFixed(1)},${tip.y.toFixed(1)} ${tail(-1)}`)
+                break
+            }
+            left -= seg
+        }
+    }
+    return out
+}
+
 export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers, worldOffset, svgHalfW, svgHalfH }: TileLinksProps) {
     // Un lien par paire source→target *et par variante* : un câble est une installation, un beam est
     // l'appel qui y passe, et les deux coexistent sur la même paire — le beam se superpose alors
@@ -130,7 +169,7 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
     const links = useMemo<Link[]>(() => {
         const tileById = new Map(tiles.map(t => [t.id, t]))
         const byKey = new Map<string, Link>()
-        const add = (sourceId: string | null, targetId: string, variant: 'beam' | 'cable' | 'trace' | 'belt', appearDelay: number, color?: string) => {
+        const add = (sourceId: string | null, targetId: string, variant: 'beam' | 'cable' | 'trace' | 'belt', appearDelay: number, color?: string, still?: boolean, chevrons?: boolean) => {
             if (!sourceId || sourceId === targetId) return
             const source = tileById.get(sourceId)
             const target = tileById.get(targetId)
@@ -138,9 +177,9 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
             if (!isPlaced(source.position) || !isPlaced(target.position)) return
             const id = `${sourceId}->${targetId}`
             const key = `${variant}:${id}`
-            if (!byKey.has(key)) byKey.set(key, { id, key, source, target, variant, appearDelay, color })
+            if (!byKey.has(key)) byKey.set(key, { id, key, source, target, variant, appearDelay, color, still, chevrons })
         }
-        for (const l of liveLinks) add(l.source, l.target, l.variant ?? 'beam', l.appearDelay ?? 0, l.color)
+        for (const l of liveLinks) add(l.source, l.target, l.variant ?? 'beam', l.appearDelay ?? 0, l.color, l.still, l.chevrons)
         // Les câbles d'abord : un beam est peint par-dessus la plomberie qu'il emprunte.
         return Array.from(byKey.values()).sort((a, b) => Number(a.variant === 'beam') - Number(b.variant === 'beam'))
     }, [tiles, liveLinks])
@@ -180,7 +219,7 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
     if (routes.length === 0) return null
 
     const cables = routes.filter(route => route.link.variant === 'cable')
-    const traces = routes.filter(route => route.link.variant === 'trace' || route.link.variant === 'belt')
+    const traces = routes.filter(route => (route.link.variant === 'trace' || route.link.variant === 'belt') && !route.link.still)
 
     return (
         <>
@@ -221,12 +260,15 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
                                         {/* Edge glow in the link's colour, the belt's body over it, then its running slats. */}
                                         <path d={d} fill="none" stroke={color} strokeWidth={BELT_WIDTH + 2.4} strokeLinejoin="round" opacity={0.55} />
                                         <path d={d} fill="none" stroke="#0d1122" strokeWidth={BELT_WIDTH} strokeLinejoin="round" />
-                                        <path d={d} className="iso-belt-slats" fill="none" stroke="rgb(var(--iso-glint) / 0.09)" strokeWidth={BELT_WIDTH - 3} strokeDasharray={BELT_SLATS} />
+                                        {link.chevrons && chevronPoints(points, length).map(pts => (
+                                            <polyline key={pts} data-belt-chevron="" points={pts} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" opacity={0.9} />
+                                        ))}
+                                        {!link.still && <path d={d} className="iso-belt-slats" fill="none" stroke="rgb(var(--iso-glint) / 0.09)" strokeWidth={BELT_WIDTH - 3} strokeDasharray={BELT_SLATS} />}
                                     </>
                                 ) : (
                                     <path d={d} fill="none" strokeWidth={1} strokeLinecap="round" strokeLinejoin="round" style={{ stroke: 'rgb(var(--iso-glint) / 0.14)' }} />
                                 )}
-                                {TRACE_TRAIL.map(layer => {
+                                {!link.still && TRACE_TRAIL.map(layer => {
                                     const lit = Math.max(6, length * layer.share)
                                     return (
                                         <path

@@ -14,7 +14,7 @@ def kinds(v):
 
 def full(v):
     """A sample job the producer would print: it always carries history and runs, empty when the sample leaves them out."""
-    return {"history": [], "runs": [], **v}
+    return {"history": [], "runs": [], **{k: x for k, x in v.items() if k not in ("department", "departments")}}
 
 
 class Snapshot(unittest.TestCase):

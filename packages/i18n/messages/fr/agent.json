@@ -884,7 +884,15 @@
         "step": "Étape {number}",
         "noSteps": "Aucune étape enregistrée pour cette exécution.",
         "input": "Entrée",
-        "output": "Sortie"
+        "output": "Sortie",
+        "filters": { "running": "En cours", "failed": "Échecs", "done": "Terminées" },
+        "search": "Rechercher des exécutions",
+        "nothingRunning": "Rien n’est en cours. Voir <failed>Échecs</failed> ou <done>Terminées</done>.",
+        "currentStep": "maintenant : {tool}",
+        "rowTitle": "{stage} #{n} : {title}",
+        "stage": "{stage, select, build {Build} review {Revue} fix {Correction} other {Exécution}}",
+        "goalRow": "Objectif : {prefix}",
+        "noMatch": "Aucune exécution ne correspond à « {query} »"
     },
     "agentRunHistory": {
         "tokens": "{total} tokens",

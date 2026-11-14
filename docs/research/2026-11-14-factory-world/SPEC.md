@@ -7,6 +7,55 @@ The factory is a production line in Rerun's own isometric world, dark by default
 finite, known thing: a feature is cut into a known number of tasks, each task passes known stages, so every
 level on the floor is exact and every motion says something true. Nothing moves for decoration.
 
+## 0. Shape language (binding; owner, 2026-11-14)
+
+**The first rule.** Owner: "Anything animating, glowing or otherwise seeking attention should do so only to
+convey some visual meaning/message to the viewer." Every motion, glow, pulse or colour change on the floor
+must answer "what is it telling the viewer?" with a true fact about the line right now. If it has no answer,
+it does not move or light. An idle floor is therefore still.
+
+Owner: "shapes must mean something", "like in diagrams a shape says something", "the ghosts or replicas
+are the only things transparent", "idle coworkers or other shapes, do not animate the body shape, only
+their faces". Every object on the floor takes its meaning from a flowchart shape (ISO 5807) or, for work in
+flight, a Petri-net token. A new object must use one of these shapes for its meaning, or this table changes
+first.
+
+| Shape | Means | On the floor |
+|---|---|---|
+| Rectangle (process) with a face | a mind that does work | a Rerun coworker in its own colour (the look Rerun derives from its id). Idle (owner: "idle ones have all grey body and a colored head"): grey body, top in its own colour, normal height, faint glow, still, face blinking. Working (owner: "we will have 2x tall, colored top, and colored body with glow"): about twice as tall (Rerun's stretched stance), top AND body in its own colour, a strong glow in that colour around the whole block, the bob, its floor cell lit, the label taking turns between name and "Working". Not gold: on Rerun's board gold marks working; on the floor height and a lit body do, and the colour keeps saying who it is |
+| Rectangle, see-through | the same process running again in parallel | a copy (ghost): drawn only while it runs a job, so always in its coworker's working look (tall, own colour, glow), see-through |
+| Diamond (decision) | a yes/no choice | review: a diamond gate on the belt; pass leaves by one corner, fail by the other |
+| Capsule (terminator) | where the flow starts and ends | the Loader (the delegator): faceless; intake, checks and merge happen there; clicking it opens the Loader tab |
+| Cylinder (stored data) | where results collect | a feature: a tank filling gold as its tasks merge; the reject store: a red tank beside review |
+| Token (Petri net) | one unit of work in flight | a task: a solid sphere, two-tone (filled part in its state colour, the rest dark) |
+| Flow line with arrows | direction of flow | a belt, with chevrons pointing the way work moves; still when nothing is on it |
+| D-shape (delay) | waiting | a hold: a red D-shaped barrier across the belts, with the time left |
+
+**Moods** (owner: "yes moods are important"; Rerun's own moods, `BuddyMood` in `packages/ui/src/iso-grid/types.ts`,
+faces in `components/buddy/BuddyFace.tsx`, motions `MOTION` in `components/buddy/AgentBuddy.tsx`):
+
+| Mood | Face and body (as Rerun draws them) | On the floor, when |
+|---|---|---|
+| idle | eyes blink and look around; body still; grey body, coloured top | it has no run out |
+| working | animated face; the jello bob; about twice as tall; top and body in its colour; stronger glow | it has a run out |
+| error | crossed eyes (glasses, visor and shades keep their frame), a frown, the shudder; its top keeps its colour, the glow turns red | a task it holds is blocked or failed, or its last run ended in error or stalled, until that is resolved |
+| waiting | Rerun's waiting face | its run waits on a person (a question to the owner) |
+| asleep | Rerun's asleep face, dimmed | switched off, or in no pool |
+
+Only copies are see-through. Spheres, tanks, gates and coworkers are solid.
+
+Idle means still bodies: an idle coworker, the Loader, a gate, a tank or a belt does not move its shape (no
+bob, squash, sway, running slats or travelling light). Only faces stay alive when idle: a coworker's eyes
+may blink and look around. Motion of a body says work is happening.
+
+Traces (the thin neon lines between coworkers, and between a coworker and its copies) are still and dim by
+default. Light travels along a trace only while something actually passes between its two ends: a copy
+reporting back, a handoff, one coworker calling another. A belt moves only while a task rides it. Nothing
+on the floor moves to look busy.
+
+Where section 1 below says otherwise (glass spheres, an open bin, a buddy for the loader, a scanner box),
+this section wins; section 1 is kept for what each object is and how it moves while working.
+
 ## 1. Objects
 
 | Object | What it is | How it looks |
@@ -83,6 +132,62 @@ nothing that rides `offset-path` may carry its own scale or translate.
   and Rerun's monitoring cards and charts (`packages/ui/src/monitoring`) summed across the factory coworkers.
 - **Settings:** Rerun's dialog pattern (`PanelEditorShell`, `Segmented`, `Switch`) over the delegator's
   settings: pools, runs per coworker, clocks, holds. Needs a write path to the delegator (later).
+
+## 5a. The page around the floor (owner, 2026-11-14; supersedes the right column of #332)
+
+- **Top bar: the ledger.** The bottom stats panel's frame, reused as one shared component, sits at the top
+  too, centred over the visible floor; both bars re-centre when a side panel opens or closes, and the camera
+  fits the floor between them. Collapsed it is one row of chips with counts (Running, Waiting, Problems,
+  Done today); a chip drops the ledger down under the bar filtered to it; selecting a task (a row or a
+  sphere) drops its card down instead. The drop-down grows downward with its content and scrolls inside
+  above the bottom bar; a click away slides it back up and clears the selection.
+- **Right side: actors only.** Clicking a coworker, "Talk to Boss" or the Loader opens that actor's panel
+  on the right (Rerun's coworker panel; the Loader's own panel from the snapshot). Task information never
+  goes there, so the two never cover each other.
+- **Spheres:** hovering shows a small card (#issue and title, stage, who holds it, time in stage, PR);
+  clicking selects the task. A task being worked docks at a fixed spot in front of the copy or coworker
+  working it; it moves along a belt only during a handoff; waiting tasks queue in order at the Loader.
+
+## 5b. The ledger (owner: "a hierarchical tree of codependency"; "we manage them hierarchically depending on their codependency of how they fit together")
+
+An at-a-glance work breakdown, structured by how the work fits together:
+
+1. **Epic**: what the work is for, of any kind (owner: "sometimes main task will be a code review and
+   fixing"): the parent issue's title, a kind tag (feature, review + fix, fix, upgrade, refactor,
+   research), progress rolled up from all its tasks.
+2. **Layer**: the epic's dependency layers. Layer 1 holds the tasks that need nothing in the epic; layer n
+   holds the tasks whose needs are all in layers below n. The tasks of one layer can run in parallel; the
+   layers are the order the work must go in, which is how the delegator schedules it. A need outside the
+   epic, or already merged, counts as met. A cycle is shown as an error row, never hidden.
+3. **Task**: a factory job: state icon, title, who holds it, "needs #n" for each unmet need, and a
+   department tag in its colour. The department comes from the files its issue allows (`docs/research`
+   design specs: Design; `supabase`: Database; `apps/engine`: Engine; `packages/contracts`,
+   `apps/ui/app/api`: Backend services; `apps/ui`, `packages/ui`, `packages/i18n`: Frontend;
+   `tools/factory`, `.github`, `deploy`: Dispatcher and tooling; other `docs`: Docs); a task touching
+   several takes its main one (most files) and smaller tags for the others.
+4. **Subtask**: the stages the task actually went through (build, review, fix, checks, merge) with who,
+   status, steps, time and tokens; opening one goes to that run's steps.
+
+The critical path (the longest chain of needs through the layers) is lit: the task on it that slips delays
+the epic. Selecting a task lights the chain it waits on and everything waiting on it; a blocked task shows
+its stuck chain in red. Chips filter without flattening the tree: Running, Waiting, Problems, Done today,
+This wave (the layer the delegator is working now), and one per department. Tasks with no epic sit under
+"No epic" at the bottom.
+
+Industry names: the tree is a work breakdown structure; Epic, Task (story), Subtask; the needs form the
+dependency graph and its longest chain the critical path; sprints are not a level (the factory runs waves).
+Data: the snapshot carries each job's department (computed by the delegator from the issue's allowed
+paths) and each epic's title and kind; layers and the critical path are computed on the page from
+`parent` and `dependsOn`.
+
+## 5c. A coworker's run log
+
+Rerun's coworker panel, Activity, Logs: three tabs with counts, Running first and always the opening tab
+(owner: "the running ones are my interest 95% of the time"). Running rows are live (steps, time, the step
+it is on now). Each row says what the run was (#issue, build/review/fix, title; a run with no factory job
+shows its goal or first message); a row opens once to its steps. Done and Failed are their own tabs; the
+Failed count turns red while it has entries. An empty Running tab says so in one line with links to the
+other tabs.
 
 ## 6. Where the data comes from
 

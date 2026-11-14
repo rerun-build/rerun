@@ -963,7 +963,15 @@
         "step": "Step {number}",
         "noSteps": "No steps recorded for this run.",
         "input": "Input",
-        "output": "Output"
+        "output": "Output",
+        "filters": { "running": "Running", "failed": "Failed", "done": "Done" },
+        "search": "Search runs",
+        "nothingRunning": "Nothing is running. See <failed>Failed</failed> or <done>Done</done>.",
+        "currentStep": "now: {tool}",
+        "rowTitle": "{stage} #{n}: {title}",
+        "stage": "{stage, select, build {Build} review {Review} fix {Fix} other {Run}}",
+        "goalRow": "Goal: {prefix}",
+        "noMatch": "No run matches \"{query}\""
     },
     "agentRunHistory": {
         "tokens": "{total} tokens",

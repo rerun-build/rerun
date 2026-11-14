@@ -22,6 +22,8 @@ export type InteractionMode = 'select' | 'draw'
 export type TileStyle = {
     // Couleur de base des trois faces du bloc iso.
     color: string
+    // A buddy that keeps its eyes open and does not blink. Opt-in.
+    still?: boolean
     // Opacité globale du bloc (ex. 0.45 pour « offline »). Défaut: 1.
     opacity?: number
     // Couleur du halo (drop-shadow) quand la tile est levée (survol/sélection/ghost).
@@ -62,6 +64,8 @@ export type TileStyle = {
     // Draws the tile as a buddy: a thick rounded block with a face, its top in the agent's colour,
     // its name in a frosted label. `true` takes every trait from the tile id; an object pins some.
     buddy?: true | BuddyLook
+    // Drawn as a faceless capsule, the flowchart terminator, instead of a buddy's block and face.
+    shape?: 'capsule'
 }
 
 export type BuddyEyes =
@@ -246,7 +250,12 @@ export type Container = {
 // 'trace' = the cable's quiet line with a slow neon trace on top: a glowing head travels end to end, the
 // line behind it lit and fading, the line ahead dark. 'belt' = a conveyor on the floor: a dark band with
 // running slats and a neon edge in the link's colour, with the same trace along its middle.
-export type TileLink = { source: string; target: string; variant?: 'beam' | 'cable' | 'trace' | 'belt'; appearDelay?: number; color?: string }
+export type TileLink = { source: string; target: string; variant?: 'beam' | 'cable' | 'trace' | 'belt'; appearDelay?: number; color?: string
+    // Drawn as a plain line: no slats, no trace light, no comet. Opt-in; a link without it is unchanged.
+    still?: boolean
+    // A belt draws chevrons pointing from `source` to `target`, one per 44 px, still when the belt is still. Opt-in.
+    chevrons?: boolean
+}
 
 // Bulle affichée au-dessus d'une tile, comme un message entre deux collègues : le nom de celui qui
 // parle, puis le message, et une pointe vers sa tuile. Le rendu et l'expiration vivent dans le package.
@@ -380,6 +389,10 @@ export type IsoGridProps = {
     // A tile pulled while it is not draggable, or dropped in a `readOnly` container: it stays where
     // it was, and the host says why.
     onTileMoveRefused?: (id: string) => void
+    // The host's verdict for a tile dropped on `cell`: `null` lands it, a short line says why not. When
+    // given it replaces the board's own occupied and read-only checks, and the dragged ghost follows the
+    // pointer instead of being held inside one box.
+    canDropTile?: (id: string, cell: GridPosition, containerId: string | null) => string | null
     onTileContextMenu?: (id: string, x: number, y: number) => void
     onResizeContainerLocal?: (id: string, patch: ResizePatch) => void
     onResizeContainerCommit?: (id: string) => void
