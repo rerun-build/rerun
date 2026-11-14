@@ -14,7 +14,7 @@ import { useDetailsOpen } from '@/components/workspace-view/useDetailsOpen'
 import { useOpenedAgents } from '@/hooks/useOpenedAgents'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
-import { MessageCircle, PanelRightIcon } from '@/lib/icons'
+import { PanelRightIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
@@ -50,19 +50,7 @@ export const SimpleChatPane = memo(function SimpleChatPane({ chats, onChatsChang
     const locked = !!agent && (access !== 'live' || !!agent.disabledAt)
     const attentionCount = useMemo(() => sessions.filter(s => s.agentId === selectedAgentId && ATTENTION_STATUSES.has(s.status)).length, [sessions, selectedAgentId])
 
-    const headerEnd = (
-        <>
-            <TooltipLabeled label={t('allConversations')}>
-                <Button variant="ghost" size="icon-sm" aria-label={t('allConversations')} aria-expanded={chats !== null} onClick={() => onChatsChange(chats ? null : 'all')} className={cn(chats && 'bg-accent')}>
-                    <span className="relative flex">
-                        <MessageCircle className="size-4" />
-                        {attentionCount > 0 && <span className="absolute -top-1 -right-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
-                    </span>
-                </Button>
-            </TooltipLabeled>
-            <DetailsToggle />
-        </>
-    )
+    const headerEnd = <DetailsToggle />
 
     return (
         <section aria-label={agent?.name} className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col bg-background">
@@ -75,6 +63,8 @@ export const SimpleChatPane = memo(function SimpleChatPane({ chats, onChatsChang
                         selected={selectedAgentId === id && !locked}
                         chats={selectedAgentId === id && !locked ? chats : null}
                         onCloseChats={() => onChatsChange(null)}
+                        onOpenChats={() => onChatsChange('all')}
+                        chatsAttention={selectedAgentId === id ? attentionCount : 0}
                         headerEnd={headerEnd}
                         openSessionRequest={selectedAgentId === id ? openSessionRequest : null}
                         onOpenSessionConsumed={onOpenSessionConsumed}

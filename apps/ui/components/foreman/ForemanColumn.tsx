@@ -105,8 +105,6 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const { threads, entries: threadEntries } = useForemanThreads(open === true && hasThreads)
     const threadWaiting = useMemo(() => threads.some(thread => threadStateOf(thread.status) === 'needs'), [threads])
     const [historyOpen, setHistoryOpen] = useState(false)
-    const openHistory = useCallback(() => setHistoryOpen(true), [])
-    const closeHistory = useCallback(() => setHistoryOpen(false), [])
     const openThread = useCallback((id: string) => useForemanStore.getState().openThread(id), [])
     const backToGeneral = useCallback(() => useForemanStore.getState().showGeneral(), [])
     const threadOnScreen = useMemo(() => {
@@ -459,7 +457,16 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                           )
                 )}
             >
-                <ForemanHeader placement={placement} movable={!pinned} onDragPointerDown={handleHeaderPointerDown} onToggleSheetDetent={toggleDetent} onNewChat={startNewChat} thread={threadOnScreen} onBackToGeneral={backToGeneral} onOpenHistory={hasThreads ? openHistory : undefined} waiting={threadWaiting} />
+                <ForemanHeader
+                    placement={placement}
+                    movable={!pinned}
+                    onDragPointerDown={handleHeaderPointerDown}
+                    onToggleSheetDetent={toggleDetent}
+                    onNewChat={startNewChat}
+                    thread={threadOnScreen}
+                    onBackToGeneral={backToGeneral}
+                    history={hasThreads && <ForemanHistory open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
+                />
                 {/* Masqués et pas démontés hors de l'onglet Assistant : un aller-retour sur Routines
                     ne doit perdre ni le brouillon du composer ni la position dans la conversation. */}
                 {arrivalStep && arrivalPick && (
@@ -522,7 +529,6 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                 </div>
                 <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />
                 {onRoutines && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
-                {hasThreads && <ForemanHistory open={historyOpen} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} onClose={closeHistory} />}
             </div>
             {placement.mode === 'float' && !dragging && open && !pinned && <ForemanResizeHandle panelRef={panelRef} placement={placement} />}
             {placement.mode === 'dock' && !dragging && open && !pinned && <ForemanDockResizeHandle panelRef={panelRef} placement={placement} />}

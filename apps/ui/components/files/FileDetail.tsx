@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { editDisabledTooltip, fileEditBlockReason } from '@/lib/files/editable'
 import { ChevronLeftIcon, ChevronRightIcon } from '@/lib/icons'
+import { isTypingTarget } from '@/lib/typing-target'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -113,10 +114,6 @@ export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onD
             {editingPath === path && <FileEditorDialog fileName={name} initialContent={content ?? ''} onSave={save} onSaved={saved} onClose={() => setEditingPath(null)} />}
         </PanelEditorShell>
     )
-}
-
-function isTypingTarget(target: EventTarget | null) {
-    return target instanceof HTMLElement && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable)
 }
 
 // The workspace files live inside the Knowledge base dialog, so being in a dialog is fine; being in

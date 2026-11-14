@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { type PointerEvent, useState } from 'react'
+import { type PointerEvent, type ReactNode, useState } from 'react'
 
 import { AuthDialog } from '@/components/dialogs/AuthDialog'
 import { ForemanTabs } from '@/components/foreman/ForemanTabs'
@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenu
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import type { SessionStatus } from '@/lib/board/types'
 import type { ForemanPlacement } from '@/lib/foreman-layout'
-import { HistoryIcon, LogInIcon, PanelLeftIcon, PanelRightIcon, PictureInPicture2Icon, PlusIcon } from '@/lib/icons'
+import { LogInIcon, PanelLeftIcon, PanelRightIcon, PictureInPicture2Icon, PlusIcon } from '@/lib/icons'
 import { foremanOrbState, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { type ForemanAnchor, ForemanHeaderBar } from '@rerun/ui/foreman'
@@ -53,8 +53,7 @@ export function ForemanHeader({
     onNewChat,
     thread,
     onBackToGeneral,
-    onOpenHistory,
-    waiting = false,
+    history,
 }: {
     placement: ForemanPlacement
     // False where its place is fixed (the Simple view's middle): no menu to move it.
@@ -65,10 +64,8 @@ export function ForemanHeader({
     /** The thread on screen, null on General. */
     thread: { title: string; status: SessionStatus | null } | null
     onBackToGeneral: () => void
-    /** Opens the list of every conversation; absent where the foreman has a single one. */
-    onOpenHistory?: () => void
-    /** A thread waits on an answer: the clock carries a dot. */
-    waiting?: boolean
+    /** The button to every conversation and the list it opens; absent where the foreman has a single one. */
+    history?: ReactNode
 }) {
     const t = useTranslations('foreman.header')
     const close = useForemanStore(state => state.close)
@@ -127,14 +124,7 @@ export function ForemanHeader({
                             <AuthDialog variant="signin" open={signInOpen} onOpenChange={setSignInOpen} />
                         </>
                     )}
-                    {onOpenHistory && (
-                        <TooltipLabeled label={t('conversations')} side="bottom">
-                            <Button variant="ghost" size="icon-sm" aria-label={t('conversations')} onClick={onOpenHistory} className="relative">
-                                <HistoryIcon className="size-3.5" />
-                                {waiting && <span aria-hidden className="absolute top-1 right-1 size-1.5 rounded-full bg-amber-400" />}
-                            </Button>
-                        </TooltipLabeled>
-                    )}
+                    {history}
                     {!guided && (
                         <Button size="sm" onClick={onNewChat}>
                             <PlusIcon />

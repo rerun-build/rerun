@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { BorderBeam } from '../BorderBeam'
 import { CHROME_SIZE, ChromePill } from '../chrome/ChromeSurface'
 import { cn } from '../cn'
+import { Popover, PopoverAnchor, PopoverContent } from '../forms'
 import { BellIcon, CheckCheckIcon, InboxIcon, Loader2Icon } from '../icons'
 import { Button, Chip, EmptyState, useScrollFade } from '../primitives'
 import { useKitTranslations, useUiLocale } from '../locale'
@@ -160,7 +161,7 @@ export function InboxSurface<T extends InboxEntry>({
     const cardOpen = open || hasDetail
     const [cardMounted, setCardMounted] = useState(cardOpen)
     if (cardOpen && !cardMounted) setCardMounted(true)
-    const dropAnchor = useDropAnchor(rootRef, trigger === 'row', cardOpen)
+    const dropAnchor = useDropAnchor(rootRef, trigger === 'row' && !cardOpen, cardOpen)
     const refocusPillRef = useRef(false)
 
     useEffect(() => {
@@ -188,8 +189,9 @@ export function InboxSurface<T extends InboxEntry>({
         return () => observer.disconnect()
     }, [])
 
+    // The row's card is a Popover, which brings its own outside click and Escape.
     useEffect(() => {
-        if (!cardOpen || keepOpen) return
+        if (trigger === 'row' || !cardOpen || keepOpen) return
         const onPointerDown = (event: globalThis.PointerEvent) => {
             const target = event.target as Node
             if (rootRef.current?.contains(target) || dropLayerRef.current?.contains(target)) return
@@ -206,7 +208,7 @@ export function InboxSurface<T extends InboxEntry>({
             document.removeEventListener('pointerdown', onPointerDown)
             document.removeEventListener('keydown', onKeyDown)
         }
-    }, [cardOpen, keepOpen, onOpenChange])
+    }, [trigger, cardOpen, keepOpen, onOpenChange])
 
     const sections = useMemo(
         () => SECTIONS.map(section => ({ ...section, items: items.filter(i => section.statuses.includes(i.status)) })).filter(section => section.items.length > 0),
@@ -377,84 +379,85 @@ export function InboxSurface<T extends InboxEntry>({
         const needs = items.filter(item => item.status !== 'done').length
         const dropped = reducedMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }
         return (
-            <div ref={rootRef} className="relative">
-                <button
-                    ref={pillRef}
-                    type="button"
-                    aria-expanded={open}
-                    aria-controls={cardId}
-                    aria-label={items.length > 0 ? t('inbox.pillLabel', { summary: pillSummary(items, t) }) : t('inbox.pillLabelEmpty')}
-                    onClick={togglePill}
-                    className={cn('flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground', cardOpen && 'bg-accent text-foreground')}
-                >
-                    <InboxIcon className="size-4 shrink-0" />
-                    <span className="min-w-0 flex-1 truncate text-left">{t('inbox.needsYouRow')}</span>
-                    {needs > 0 && (
-                        <span className="relative flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white tabular-nums">
-                            {pulse > 0 && !reducedMotion && (
-                                <motion.span
-                                    key={pulse}
-                                    aria-hidden
-                                    initial={{ opacity: 0.8, scale: 1 }}
-                                    animate={{ opacity: 0, scale: 1.8 }}
-                                    transition={{ duration: 0.8, ease: 'easeOut' }}
-                                    className="pointer-events-none absolute inset-0 rounded-full border border-red-500"
-                                />
-                            )}
-                            {needs}
-                        </span>
-                    )}
-                </button>
-
-                {/* Out of the list's column: the card is wider than it and a parent clips its overflow. */}
-                {dropAnchor &&
-                    createPortal(
-                        <div ref={dropLayerRef} style={{ top: dropAnchor.top, left: dropAnchor.left }} className="fixed z-40">
-                            <div aria-live="polite" className="absolute top-0 left-0 pt-1">
-                                <AnimatePresence>
-                                    {announcement && !cardOpen && !cardMounted && (
-                                        <motion.button
-                                            key={announcement.key}
-                                            type="button"
-                                            onClick={onAnnouncementClick}
-                                            onPointerEnter={() => onAnnouncementHoldChange?.(true)}
-                                            onPointerLeave={() => onAnnouncementHoldChange?.(false)}
-                                            onFocus={() => onAnnouncementHoldChange?.(true)}
-                                            onBlur={() => onAnnouncementHoldChange?.(false)}
-                                            initial={dropped}
-                                            animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-                                            exit={dropped}
-                                            transition={morph}
-                                            style={{ transformOrigin: 'top left' }}
-                                            className={cn('relative block overflow-hidden rounded-xl border border-border bg-card text-left shadow-2xl transition-colors hover:bg-accent', cardClassName)}
-                                        >
-                                            <AnnouncementLine announcement={announcement} animated={!reducedMotion} />
-                                        </motion.button>
+            <Popover open={cardOpen} onOpenChange={next => !next && onOpenChange(false)}>
+                <PopoverAnchor asChild>
+                    <div ref={rootRef} className="relative">
+                        <button
+                            ref={pillRef}
+                            type="button"
+                            aria-expanded={open}
+                            aria-controls={cardId}
+                            aria-label={items.length > 0 ? t('inbox.pillLabel', { summary: pillSummary(items, t) }) : t('inbox.pillLabelEmpty')}
+                            onClick={togglePill}
+                            className={cn('flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground', cardOpen && 'bg-accent text-foreground')}
+                        >
+                            <InboxIcon className="size-4 shrink-0" />
+                            <span className="min-w-0 flex-1 truncate text-left">{t('inbox.needsYouRow')}</span>
+                            {needs > 0 && (
+                                <span className="relative flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white tabular-nums">
+                                    {pulse > 0 && !reducedMotion && (
+                                        <motion.span
+                                            key={pulse}
+                                            aria-hidden
+                                            initial={{ opacity: 0.8, scale: 1 }}
+                                            animate={{ opacity: 0, scale: 1.8 }}
+                                            transition={{ duration: 0.8, ease: 'easeOut' }}
+                                            className="pointer-events-none absolute inset-0 rounded-full border border-red-500"
+                                        />
                                     )}
-                                </AnimatePresence>
-                            </div>
+                                    {needs}
+                                </span>
+                            )}
+                        </button>
 
-                            <AnimatePresence onExitComplete={() => setCardMounted(false)}>
-                                {cardOpen && (
-                                    <motion.div
-                                        id={cardId}
-                                        role="region"
-                                        aria-label={t('inbox.title')}
-                                        initial={dropped}
-                                        animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-                                        exit={dropped}
-                                        transition={morph}
-                                        style={{ transformOrigin: 'top left' }}
-                                        className="absolute top-0 left-0 mt-1 overflow-hidden rounded-[14px] border border-border bg-card shadow-2xl"
-                                    >
-                                        {hasDetail ? <div className={cn('relative', detailClassName)}>{detail}</div> : <div className={cn('relative flex flex-col', cardClassName, dragging && 'select-none')}>{listBody}</div>}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>,
-                        document.body
-                    )}
-            </div>
+                        {/* Out of the list's column: the announcement is wider than it and a parent clips its overflow. */}
+                        {dropAnchor &&
+                            createPortal(
+                                <div ref={dropLayerRef} style={{ top: dropAnchor.top, left: dropAnchor.left }} className="fixed z-40">
+                                    <div aria-live="polite" className="absolute top-0 left-0 pt-1">
+                                        <AnimatePresence>
+                                            {announcement && !cardOpen && (
+                                                <motion.button
+                                                    key={announcement.key}
+                                                    type="button"
+                                                    onClick={onAnnouncementClick}
+                                                    onPointerEnter={() => onAnnouncementHoldChange?.(true)}
+                                                    onPointerLeave={() => onAnnouncementHoldChange?.(false)}
+                                                    onFocus={() => onAnnouncementHoldChange?.(true)}
+                                                    onBlur={() => onAnnouncementHoldChange?.(false)}
+                                                    initial={dropped}
+                                                    animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                                                    exit={dropped}
+                                                    transition={morph}
+                                                    style={{ transformOrigin: 'top left' }}
+                                                    className={cn('relative block overflow-hidden rounded-xl border border-border bg-card text-left shadow-2xl transition-colors hover:bg-accent', cardClassName)}
+                                                >
+                                                    <AnnouncementLine announcement={announcement} animated={!reducedMotion} />
+                                                </motion.button>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                </div>,
+                                document.body
+                            )}
+                    </div>
+                </PopoverAnchor>
+                <PopoverContent
+                    id={cardId}
+                    aria-label={t('inbox.title')}
+                    align="start"
+                    className="w-auto gap-0 overflow-hidden p-0"
+                    onOpenAutoFocus={event => event.preventDefault()}
+                    // The focus stays on the row: a Tab that leaves it must not close the card, only a click outside or Escape does.
+                    onFocusOutside={event => event.preventDefault()}
+                    onInteractOutside={event => {
+                        if (keepOpen || rootRef.current?.contains(event.target as Node)) event.preventDefault()
+                    }}
+                    onEscapeKeyDown={event => keepOpen && event.preventDefault()}
+                >
+                    {hasDetail ? <div className={cn('relative', detailClassName)}>{detail}</div> : <div className={cn('relative flex flex-col', cardClassName, dragging && 'select-none')}>{listBody}</div>}
+                </PopoverContent>
+            </Popover>
         )
     }
 
