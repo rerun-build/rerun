@@ -253,6 +253,8 @@ export type Container = {
 export type TileLink = { source: string; target: string; variant?: 'beam' | 'cable' | 'trace' | 'belt'; appearDelay?: number; color?: string
     // Drawn as a plain line: no slats, no trace light, no comet. Opt-in; a link without it is unchanged.
     still?: boolean
+    // A belt draws chevrons pointing from `source` to `target`, one per 44 px, still when the belt is still. Opt-in.
+    chevrons?: boolean
 }
 
 // Bulle affichée au-dessus d'une tile, comme un message entre deux collègues : le nom de celui qui
