@@ -1,11 +1,10 @@
 {
     "title": "Vault",
+    "description": "Connectez-vous une fois à une app, puis choisissez les coworkers qui l'utilisent.",
     "search": "Rechercher dans le Vault",
     "noMatch": "Aucun résultat",
     "groups": {
-        "apps": "Apps",
-        "mcp": "Serveurs MCP",
-        "secrets": "Secrets"
+        "apps": "Apps"
     },
     "add": "Ajouter",
     "emptyTitle": "Connectez-vous une fois, partagez avec vos coworkers",
