@@ -98,14 +98,18 @@ class Heap {
     }
 }
 
+// The lattice, one entry per point (index (u - minU) * h + (v - minV)), worked out once per call.
 type Floor = {
     boxes: Box[]
     minU: number; minV: number; w: number; h: number
-    edges: Map<string, number> // lattice edges taken, by `${u},${v},${axis}` from their lower end
-    points: Map<string, number> // lattice points taken, a bit per axis run through them
+    shut: Uint8Array // bit 1: the edge to +u is closed by a tile, bit 2: the edge to +v
+    near: Uint8Array // 1 within two cells of a tile
+    taken: Uint8Array // bit 1/2: the edge to +u/+v carries a route; bit 4/8: a route runs through along u/v
 }
 
-const edgeKey = (u: number, v: number, d: number) => (d % 2 === 0 ? `${Math.min(u, u + DU[d])},${v},0` : `${u},${Math.min(v, v + DV[d])},1`)
+// The lattice point and bit of the edge from point `i` in direction `d`.
+const edgeOf = (floor: Floor, i: number, d: number) =>
+    d === 0 ? [i, 1] : d === 1 ? [i, 2] : d === 2 ? [i - floor.h, 1] : [i - 1, 2]
 
 function closed(boxes: Box[], a: AxisPoint, b: AxisPoint, skip?: Box) {
     const r = { u0: Math.min(a.u, b.u) - CLEAR, u1: Math.max(a.u, b.u) + CLEAR, v0: Math.min(a.v, b.v) - CLEAR, v1: Math.max(a.v, b.v) + CLEAR }
@@ -136,12 +140,17 @@ function search(floor: Floor, a: Box, b: Box, avoid: boolean): { from: number; t
         .map(d => ({ dir: d, tip: tipOf(b, d), inward: (d + 2) % 4, cost: 1 + faceCost(d, -du, -dv) }))
         .filter(g => inside(g.tip))
     if (!goals.length) return null
-    const heuristic = (p: AxisPoint) => Math.min(...goals.map(g => Math.abs(g.tip.u - p.u) + Math.abs(g.tip.v - p.v)))
+    const heuristic = (p: AxisPoint) => {
+        let best = Infinity
+        for (const g of goals) best = Math.min(best, Math.abs(g.tip.u - p.u) + Math.abs(g.tip.v - p.v))
+        return best
+    }
 
     const size = w * h * 4
     const cost = new Float64Array(size).fill(Infinity)
     const prev = new Int32Array(size).fill(-1)
     const startDir = new Int8Array(size).fill(-1)
+    const done = new Uint8Array(size)
     const heap = new Heap()
     for (const d of [0, 1, 2, 3]) {
         const tip = tipOf(a, d)
@@ -158,7 +167,7 @@ function search(floor: Floor, a: Box, b: Box, avoid: boolean): { from: number; t
     // A goal reached is pushed back as a virtual state -1 - (state * 4 + goal), so the cheapest
     // arrival, bend into the face included, is the one popped first.
     while (heap.size) {
-        const [f, s] = heap.pop()
+        const [, s] = heap.pop()
         if (s < 0) {
             const code = -1 - s
             const last = Math.floor(code / 4)
@@ -179,8 +188,9 @@ function search(floor: Floor, a: Box, b: Box, avoid: boolean): { from: number; t
                 path: [onFace(startDir[first], fa.plane, Math.round(fa.centre)), ...states.map(at), onFace(goal.dir, fb.plane, Math.round(fb.centre))],
             }
         }
+        if (done[s]) continue
+        done[s] = 1
         const g = cost[s]
-        if (f - heuristic({ u: Math.floor(Math.floor(s / 4) / h) + minU, v: (Math.floor(s / 4) % h) + minV }) > g + 1e-9) continue
         const cell = Math.floor(s / 4)
         const p = { u: Math.floor(cell / h) + minU, v: (cell % h) + minV }
         const dir = s % 4
@@ -190,10 +200,12 @@ function search(floor: Floor, a: Box, b: Box, avoid: boolean): { from: number; t
         for (const d of [0, 1, 2, 3]) {
             if (d === (dir + 2) % 4) continue
             const q = { u: p.u + DU[d], v: p.v + DV[d] }
-            if (!inside(q) || closed(boxes, p, q)) continue
-            const crossed = (floor.points.get(`${q.u},${q.v}`) ?? 0) & (d % 2 === 0 ? 2 : 1)
-            const hugs = boxes.some(box => q.u >= box.u0 - 2 && q.u <= box.u1 + 2 && q.v >= box.v0 - 2 && q.v <= box.v1 + 2)
-            const step = 1 + (d === dir ? 0 : BEND) + (floor.edges.has(edgeKey(p.u, p.v, d)) ? SHARE : 0) + (crossed ? CROSS : 0) + (hugs ? NEAR : 0)
+            if (!inside(q)) continue
+            const [ei, bit] = edgeOf(floor, cell, d)
+            if (avoid && floor.shut[ei] & bit) continue
+            const qi = cell + DU[d] * h + DV[d]
+            const crossed = floor.taken[qi] & (d % 2 === 0 ? 8 : 4)
+            const step = 1 + (d === dir ? 0 : BEND) + (floor.taken[ei] & bit ? SHARE : 0) + (crossed ? CROSS : 0) + (avoid && floor.near[qi] ? NEAR : 0)
             const t = id(q, d)
             if (g + step < cost[t]) {
                 cost[t] = g + step
@@ -215,15 +227,17 @@ function corners(path: AxisPoint[]) {
 }
 
 function take(floor: Floor, path: AxisPoint[]) {
+    const index = (p: AxisPoint) => (p.u - floor.minU) * floor.h + (p.v - floor.minV)
+    const on = (p: AxisPoint) => p.u >= floor.minU && p.v >= floor.minV && p.u < floor.minU + floor.w && p.v < floor.minV + floor.h
     for (let i = 1; i < path.length; i++) {
         const a = path[i - 1], b = path[i]
+        if (!on(a) || !on(b)) continue
         const axis = a.v === b.v ? 0 : 1
         const d = axis === 0 ? (b.u > a.u ? 0 : 2) : b.v > a.v ? 1 : 3
-        if (Math.abs(b.u - a.u) + Math.abs(b.v - a.v) === 1) floor.edges.set(edgeKey(a.u, a.v, d), 1)
-        for (const p of [a, b]) {
-            const k = `${p.u},${p.v}`
-            floor.points.set(k, (floor.points.get(k) ?? 0) | (axis === 0 ? 1 : 2))
-        }
+        const [ei, bit] = edgeOf(floor, index(a), d)
+        floor.taken[ei] |= bit
+        floor.taken[index(a)] |= axis === 0 ? 4 : 8
+        floor.taken[index(b)] |= axis === 0 ? 4 : 8
     }
 }
 
@@ -261,7 +275,11 @@ function onwardFrom(route: Route, p: AxisPoint, forward: boolean) {
 
 const byName = (a: Route, b: Route) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
 
-export function routeTileLinks(tiles: Tile[], links: TileLink[], obstacles: LinkFootprint[] = []): Map<string, AxisPoint[]> {
+// What routing reads of a tile and of a link.
+export type RoutedTile = Pick<Tile, 'id' | 'position' | 'span'>
+export type RoutedLink = Pick<TileLink, 'source' | 'target' | 'variant'>
+
+export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacles: LinkFootprint[] = []): Map<string, AxisPoint[]> {
     const placed = new Map(tiles.filter(t => isPlaced(t.position)).map(t => [t.id, t]))
     const boxById = new Map([...placed.values()].map(t => [t.id, boxOf(t.position.col, t.position.row, t.span ?? DEFAULT_SPAN)]))
     const boxes = [...[...boxById.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([, b]) => b), ...obstacles.map(o => boxOf(o.col, o.row, o.span))]
@@ -284,11 +302,19 @@ export function routeTileLinks(tiles: Tile[], links: TileLink[], obstacles: Link
     const allV = boxes.flatMap(b => [b.v0, b.v1])
     const minU = Math.floor(Math.min(...all)) - MARGIN
     const minV = Math.floor(Math.min(...allV)) - MARGIN
-    const floor: Floor = {
-        boxes, minU, minV,
-        w: Math.ceil(Math.max(...all)) + MARGIN - minU + 1,
-        h: Math.ceil(Math.max(...allV)) + MARGIN - minV + 1,
-        edges: new Map(), points: new Map(),
+    const w = Math.ceil(Math.max(...all)) + MARGIN - minU + 1
+    const h = Math.ceil(Math.max(...allV)) + MARGIN - minV + 1
+    const floor: Floor = { boxes, minU, minV, w, h, shut: new Uint8Array(w * h), near: new Uint8Array(w * h), taken: new Uint8Array(w * h) }
+    for (const box of boxes) {
+        // Every lattice point and edge the box reaches, plus a margin; the exact test runs on those only.
+        for (let u = Math.max(minU, Math.floor(box.u0) - 2); u <= Math.min(minU + w - 1, Math.ceil(box.u1) + 2); u++) {
+            for (let v = Math.max(minV, Math.floor(box.v0) - 2); v <= Math.min(minV + h - 1, Math.ceil(box.v1) + 2); v++) {
+                const i = (u - minU) * h + (v - minV)
+                floor.near[i] = 1
+                if (closed([box], { u, v }, { u: u + 1, v })) floor.shut[i] |= 1
+                if (closed([box], { u, v }, { u, v: v + 1 })) floor.shut[i] |= 2
+            }
+        }
     }
 
     // 1. Lattice paths, one link after the other: belts first, so the lines that stay take the floor.

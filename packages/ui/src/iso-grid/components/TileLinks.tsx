@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from 'react'
 import { ISO_DIM_MS, ISO_DIM_OPACITY, TILE_H, TILE_W, hashUnit, isPlaced } from '../iso'
-import { BELT_WIDTH, routeTileLinks, type AxisPoint } from '../link-routes'
+import { BELT_WIDTH, routeTileLinks, type AxisPoint, type RoutedLink, type RoutedTile } from '../link-routes'
 import type { Container, Tile, TileLink, WorldOffset } from '../types'
 
 const HALF_W = TILE_W / 2
@@ -153,7 +153,16 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
 
     // Géométrie écran de chaque lien, dans le repère du SVG (origine décalée de svgHalfW/H). Le calque
     // des comètes est un frère du SVG calé sur la même origine, donc il partage ces coordonnées.
-    const routed = useMemo(() => routeTileLinks(tiles, liveLinks), [tiles, liveLinks])
+    // Les tracés ne suivent que le plan du board — places, tailles, paires reliées — : un changement
+    // de statut ou de couleur, fréquent, ne relance pas le routage.
+    const layout = useMemo(
+        () => JSON.stringify([tiles.map(t => ({ id: t.id, position: t.position, span: t.span })), liveLinks.map(l => ({ source: l.source, target: l.target, variant: l.variant }))]),
+        [tiles, liveLinks],
+    )
+    const routed = useMemo(() => {
+        const [routedTiles, routedLinks] = JSON.parse(layout) as [RoutedTile[], RoutedLink[]]
+        return routeTileLinks(routedTiles, routedLinks)
+    }, [layout])
     const routes = useMemo<Route[]>(() => {
         const out: Route[] = []
         for (const link of links) {

@@ -11,6 +11,7 @@ import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type AxisPoint, type Tile } fro
 import { STATUS_COLOR, type CabinetView, type PodView } from './factory-scene'
 
 const QUEUE_GAP = 40 // px between waiting spheres on the loader's line
+const REST_PX = 24 // how far short of the end of its line a sphere being worked rests
 
 type P = { x: number; y: number }
 
@@ -32,8 +33,9 @@ function along(points: P[], f: number): P {
     }
     return points[points.length - 1]
 }
+const lengthOf = (points: P[]) => points.slice(1).reduce((a, p, i) => a + Math.hypot(p.x - points[i].x, p.y - points[i].y), 0)
 const atDistance = (points: P[], px: number): P => {
-    const total = points.slice(1).reduce((a, p, i) => a + Math.hypot(p.x - points[i].x, p.y - points[i].y), 0)
+    const total = lengthOf(points)
     return along(points, total ? Math.min(1, px / total) : 0)
 }
 
@@ -55,23 +57,16 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held }:
         }
         return pts
     }
-    // The path up to the middle of its last line, where a sphere rests while it is worked.
-    const toMiddleOfLast = (ids: string[]): P[] => {
-        const head = ids.length > 2 ? route(ids.slice(0, -1)) : []
-        const last = route(ids.slice(-2))
-        if (last.length < 2) return head
-        const total = last.slice(1).reduce((acc, q, i) => acc + Math.hypot(q.x - last[i].x, q.y - last[i].y), 0)
-        const mid = along(last, 0.5)
-        const kept: P[] = [last[0]]
-        let run = 0
-        for (let i = 1; i < last.length; i++) {
-            const seg = Math.hypot(last[i].x - last[i - 1].x, last[i].y - last[i - 1].y)
-            if (run + seg >= total / 2) break
-            run += seg
-            kept.push(last[i])
-        }
-        kept.push(mid)
-        return head.length ? [...head, ...kept.slice(1)] : kept
+    // A sphere being worked rests just short of the end of its line, in front of whoever works it.
+    // Spheres resting on one line queue back from there instead of stacking on one spot.
+    const settles = (p: PodView) => p.state === 'working' || p.state === 'checks' || p.state === 'fixing'
+    const restRank = new Map<string, number>()
+    const onLine = new Map<string, number>()
+    for (const p of pods) {
+        if (!settles(p)) continue
+        const line = p.path.slice(-2).join('>')
+        restRank.set(p.id, onLine.get(line) ?? 0)
+        onLine.set(line, (onLine.get(line) ?? 0) + 1)
     }
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
@@ -82,10 +77,10 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held }:
                 return t ? <FeatureOrb key={c.issue} cab={c} tile={t} /> : null
             })}
             {pods.map(p => {
-                const settle = p.state === 'working' || p.state === 'checks' || p.state === 'fixing'
-                const pts = settle ? toMiddleOfLast(p.path) : route(p.path)
+                const pts = route(p.path)
                 if (pts.length < 2) return null
-                const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : along(pts, p.travel)
+                const rest = Math.max(0, lengthOf(pts) - REST_PX - (restRank.get(p.id) ?? 0) * QUEUE_GAP)
+                const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : settles(p) ? atDistance(pts, rest * p.travel) : along(pts, p.travel)
                 return p.state === 'working' && p.band === 'review' && p.travel >= 1
                     ? <Scanner key={p.id} pod={p} at={at}><Orb pod={p} at={{ x: 0, y: 0 }} /></Scanner>
                     : <Orb key={p.id} pod={p} at={at} />
