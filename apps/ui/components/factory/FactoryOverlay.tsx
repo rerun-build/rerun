@@ -6,38 +6,12 @@
 // transition between ticks; the slosh, shakes and glows are CSS. Under reduced motion the transitions
 // and loops stop and the spheres step from place to place.
 
-import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
+import { type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
 
+import { along, atDistance, centreOf, inScanner, podPath, restDistances, settles, toWorld, type P } from './factory-rest'
 import { STATUS_COLOR, type CabinetView, type PodView } from './factory-scene'
 
 const QUEUE_GAP = 40 // px between waiting spheres on the loader's line
-const REST_PX = 24 // how far short of the end of its line a sphere being worked rests
-
-type P = { x: number; y: number }
-
-// The world's own frame, as TileLinks draws it: a tile's centre on the grid's two axes, and a point of
-// a route from routeTileLinks in px.
-const CENTER = isoPosition(GRID_SIZE / 2, GRID_SIZE / 2)
-const centreOf = (t: Tile): AxisPoint => { const s = t.span ?? 2; return { u: t.position.col + s / 2, v: t.position.row + s / 2 } }
-const toWorld = (p: AxisPoint): P => ({ x: (p.u - p.v) * (TILE_W / 2) + TILE_W / 2 - CENTER.left, y: (p.u + p.v) * (TILE_H / 2) - CENTER.top })
-
-function along(points: P[], f: number): P {
-    const lens = points.slice(1).map((p, i) => Math.hypot(p.x - points[i].x, p.y - points[i].y))
-    let d = f * lens.reduce((a, b) => a + b, 0)
-    for (let i = 0; i < lens.length; i++) {
-        if (d <= lens[i] || i === lens.length - 1) {
-            const k = lens[i] ? Math.min(1, d / lens[i]) : 1
-            return { x: points[i].x + (points[i + 1].x - points[i].x) * k, y: points[i].y + (points[i + 1].y - points[i].y) * k }
-        }
-        d -= lens[i]
-    }
-    return points[points.length - 1]
-}
-const lengthOf = (points: P[]) => points.slice(1).reduce((a, p, i) => a + Math.hypot(p.x - points[i].x, p.y - points[i].y), 0)
-const atDistance = (points: P[], px: number): P => {
-    const total = lengthOf(points)
-    return along(points, total ? Math.min(1, px / total) : 0)
-}
 
 const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
 
@@ -45,29 +19,9 @@ const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >
 // the belt drawn under it.
 export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
-    // A leg ends on one face of a tile and the next leaves from another, so both points are kept: the
-    // sphere crosses the tile between them. A pair with no line (a blocked job parked at a coworker)
-    // goes straight from centre to centre.
-    const route = (ids: string[]): P[] => {
-        const pts: P[] = []
-        for (let i = 1; i < ids.length; i++) {
-            const a = byId.get(ids[i - 1]), b = byId.get(ids[i])
-            if (!a || !b) continue
-            pts.push(...(routes.get(`${a.id}->${b.id}`) ?? [centreOf(a), centreOf(b)]).map(toWorld))
-        }
-        return pts
-    }
-    // A sphere being worked rests just short of the end of its line, in front of whoever works it.
-    // Spheres resting on one line queue back from there instead of stacking on one spot.
-    const settles = (p: PodView) => p.state === 'working' || p.state === 'checks' || p.state === 'fixing'
-    const restRank = new Map<string, number>()
-    const onLine = new Map<string, number>()
-    for (const p of pods) {
-        if (!settles(p)) continue
-        const line = p.path.slice(-2).join('>')
-        restRank.set(p.id, onLine.get(line) ?? 0)
-        onLine.set(line, (onLine.get(line) ?? 0) + 1)
-    }
+    // A sphere being worked rests short of whoever works it, clear of every block and every other
+    // resting sphere (factory-rest.ts).
+    const rests = restDistances(pods, tiles, routes)
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
             <style>{FAB_CSS}</style>
@@ -77,11 +31,10 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, s
                 return t ? <FeatureOrb key={c.issue} cab={c} tile={t} /> : null
             })}
             {pods.map(p => {
-                const pts = route(p.path)
+                const pts = podPath(p.path, byId, routes)
                 if (pts.length < 2) return null
-                const rest = Math.max(0, lengthOf(pts) - REST_PX - (restRank.get(p.id) ?? 0) * QUEUE_GAP)
-                const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : settles(p) ? atDistance(pts, rest * p.travel) : along(pts, p.travel)
-                return p.state === 'working' && p.band === 'review' && p.travel >= 1
+                const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : settles(p) ? atDistance(pts, (rests.get(p.id) ?? 0) * p.travel) : along(pts, p.travel)
+                return inScanner(p)
                     ? <Scanner key={p.id} pod={p} at={at}><Orb pod={p} at={{ x: 0, y: 0 }} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} /></Scanner>
                     : <Orb key={p.id} pod={p} at={at} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} />
             })}

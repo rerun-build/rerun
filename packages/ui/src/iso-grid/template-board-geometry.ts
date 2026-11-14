@@ -218,8 +218,9 @@ export function buildTemplateBoard(agents: BoardAgent[], connectors: TemplateCon
 }
 
 // Same world coordinates as the grid itself (cf. WORLD_OFFSET in IsoGrid): pan is applied inside
-// the scale, so panning by the opposite of the content center puts the board dead center.
-export function frameTemplateBoard(tiles: Tile[], frame: BoardFrame, maxZoom: number, inset = FIT_INSET) {
+// the scale, so panning by the opposite of the content center puts the board dead center. `minZoom`
+// is the floor of the fit; a host whose board must fit a narrow frame whole passes a lower one.
+export function frameTemplateBoard(tiles: Tile[], frame: BoardFrame, maxZoom: number, inset = FIT_INSET, minZoom = 0.3) {
     let left = Infinity
     let right = -Infinity
     let top = Infinity
@@ -237,7 +238,7 @@ export function frameTemplateBoard(tiles: Tile[], frame: BoardFrame, maxZoom: nu
     }
 
     const fit = Math.min((frame.width * inset) / (right - left), (frame.height * inset) / (bottom - top))
-    return { zoom: Math.min(maxZoom, Math.max(0.3, fit)), pan: { x: -(left + right) / 2, y: -(top + bottom) / 2 } }
+    return { zoom: Math.min(maxZoom, Math.max(minZoom, fit)), pan: { x: -(left + right) / 2, y: -(top + bottom) / 2 } }
 }
 
 

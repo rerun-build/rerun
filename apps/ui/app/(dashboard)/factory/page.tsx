@@ -12,6 +12,9 @@ import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 const POLL_MS = 30_000
+// The task column over the floor's right edge, open and collapsed to its rail: the floor fits beside it.
+const COLUMN_PX = 380
+const RAIL_PX = 12
 const EMPTY_ENDED = { merged: 0, rejected: 0, blocked: 0, failed: 0, returned: 0 }
 
 type Answer = Awaited<ReturnType<typeof readFactorySnapshotAction>>
@@ -82,6 +85,7 @@ export default function FactoryPage() {
             <FactoryWorld
                 {...(snapshot ? { scene, selectedIssue: selected, onSelectJob: onSelect, onOpenCoworker: openByName } : {})}
                 {...(workspace ? { workspace: String(workspace.id) } : {})}
+                rightInset={collapsed ? RAIL_PX : COLUMN_PX}
             />
             <div className="absolute left-4 top-4">
                 <button type="button" disabled={!boss} title={boss ? 'Open the chat with Boss' : 'No coworker named boss in this workspace'}
@@ -92,9 +96,9 @@ export default function FactoryPage() {
             </div>
             {collapsed ? (
                 <button type="button" data-rail aria-label="Open the task column" onClick={() => setCollapsed(false)}
-                    className="absolute inset-y-0 right-0 w-3 border-l border-border/60 bg-background/75 backdrop-blur-xl hover:bg-accent" />
+                    style={{ width: RAIL_PX }} className="absolute inset-y-0 right-0 border-l border-border/60 bg-background/75 backdrop-blur-xl hover:bg-accent" />
             ) : (
-                <aside data-column className="absolute inset-y-0 right-0 flex w-[380px] flex-col border-l border-border/60 bg-background/85 backdrop-blur-xl">
+                <aside data-column style={{ width: COLUMN_PX }} className="absolute inset-y-0 right-0 flex flex-col border-l border-border/60 bg-background/85 backdrop-blur-xl">
                     <div className="flex items-center gap-1 border-b border-border/60 p-2">
                         {tabButton('tasks', 'Tasks')}
                         {tabButton('inspect', 'Inspect')}
@@ -103,7 +107,7 @@ export default function FactoryPage() {
                     </div>
                     <div className="min-h-0 flex-1 overflow-y-auto">
                         {tab === 'tasks'
-                            ? <FactoryTasks jobs={snapshot?.jobs ?? []} repo={snapshot?.repo ?? ''} endedToday={snapshot?.endedToday ?? EMPTY_ENDED} selected={selected} onSelect={onSelect} />
+                            ? <FactoryTasks jobs={snapshot?.jobs ?? []} repo={snapshot?.repo ?? ''} endedToday={snapshot?.endedToday ?? EMPTY_ENDED} selected={selected} onSelect={onSelect} sample={!snapshot} />
                             : <FactoryInspector job={job} jobs={snapshot?.jobs ?? []} repo={snapshot?.repo ?? ''} names={names} onSelect={onSelect} onOpenCoworker={openCoworker} />}
                     </div>
                 </aside>

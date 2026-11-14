@@ -13,7 +13,11 @@ import { LOOP_MS, factoryScene, type Cell, type FactoryFrame } from './factory-s
 
 // The feature spheres and scanner gates stand above the floor, so the camera frames the Boxes with headroom above them.
 const OVERHEAD_PX = 120
+// Room kept under the floor for the bar until it is measured, and the gap around it.
 const BAR_PX = 110
+const BAR_MARGIN_PX = 20
+// Kept free at each side of the floor: a Box's name stands on its upper-left edge and overhangs it.
+const SIDE_PX = 40
 
 const TICK_MS = 250
 
@@ -41,8 +45,9 @@ function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }
 
 // The factory, drawn by the board's own world. The world takes the whole stage; a thin glass bar
 // carries the gauges and the counts, and a band drops in while sending is held.
-// `workspace` keys the owner's own arrangement of the floor in the browser.
-export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void }) {
+// `workspace` keys the owner's own arrangement of the floor in the browser. `rightInset` is the width a
+// column laid over the stage's right edge covers: the floor and the bar fit in what is left of it.
+export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker, rightInset = 0 }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void; rightInset?: number }) {
     const [clock, setClock] = useState(() => ({ start: Date.now(), now: Date.now() }))
     const [expired, setExpired] = useState<Set<string>>(() => new Set())
     useEffect(() => {
@@ -61,11 +66,14 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     const sceneTiles = useStable(frame.tiles)
     const storageKey = layoutStorageKey(workspace)
     const saved = useSyncExternalStore(subscribeLayout, () => loadLayout(storageKey), () => null)
-    const moves = useMemo(() => readMoves(saved, sceneTiles), [saved, sceneTiles])
+    // A stored place outside every Box is refused, so a stale or edited value cannot move a tile off
+    // the floor.
+    const boxes = frame.containers
+    const moves = useMemo(() => readMoves(saved, sceneTiles, boxes), [saved, sceneTiles, boxes])
     const tiles = useMemo(() => applyMoves(sceneTiles, moves), [sceneTiles, moves])
     const onTileMove = useCallback((id: string, cell: Cell) => {
-        if (canMove(sceneTiles, moves, id, cell)) saveLayout(storageKey, { ...moves, [id]: cell })
-    }, [sceneTiles, moves, storageKey])
+        if (canMove(sceneTiles, moves, id, cell, boxes)) saveLayout(storageKey, { ...moves, [id]: cell })
+    }, [sceneTiles, moves, storageKey, boxes])
     const moved = Object.keys(moves).length > 0
     const links = useStable(frame.links)
     // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
@@ -86,17 +94,24 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     }, [fullCabinets])
 
     const { ref, frame: size } = useRenderedFrame()
+    const { ref: barRef, frame: bar } = useRenderedFrame()
     const corners = useMemo(() => frame.containers.flatMap(c => [
         { id: `${c.id}-a`, position: { col: c.col_start, row: c.row_start }, span: 1, style: { color: '' } },
         { id: `${c.id}-b`, position: { col: c.col_end, row: c.row_end }, span: 1, style: { color: '' } },
         { id: `${c.id}-c`, position: { col: c.col_end, row: c.row_start }, span: 1, style: { color: '' } },
         { id: `${c.id}-d`, position: { col: c.col_start, row: c.row_end }, span: 1, style: { color: '' } },
     ] as Tile[]), [frame.containers])
+    // The floor is framed in what the column and the bar leave visible, and centred there: the pan is
+    // in world px inside the zoom, so a shift of k screen px is k / zoom.
+    const barSpace = bar ? bar.height + 2 * BAR_MARGIN_PX : BAR_PX
     const camera = useMemo(() => {
         if (!size) return null
-        const c = frameTemplateBoard(corners, { width: size.width, height: size.height - OVERHEAD_PX - BAR_PX }, 2, 0.94)
-        return { zoom: c.zoom, pan: { x: c.pan.x, y: c.pan.y + (OVERHEAD_PX - BAR_PX) / 2 / c.zoom } }
-    }, [size, corners])
+        const visible = Math.max(1, size.width - rightInset - 2 * SIDE_PX)
+        // The whole floor is always in view: in a narrow stage it is framed below the board's usual
+        // zoom floor rather than cut.
+        const c = frameTemplateBoard(corners, { width: visible, height: Math.max(1, size.height - OVERHEAD_PX - barSpace) }, 2, 0.94, 0.1)
+        return { zoom: c.zoom, pan: { x: c.pan.x - rightInset / 2 / c.zoom, y: c.pan.y + (OVERHEAD_PX - barSpace) / 2 / c.zoom } }
+    }, [size, corners, rightInset, barSpace])
 
     const signInMin = Math.max(0, 412 - Math.floor((clock.now - clock.start) / 60_000))
     // shortcut: the run measures are sample numbers that grow with the loop; the page reads the
@@ -135,15 +150,17 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
                 worldOverlay={worldOverlay}
             />
 
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-5">
-                <div className="pointer-events-auto flex items-stretch gap-4 rounded-2xl border border-border/60 bg-background/75 px-5 py-3 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+            {/* The bar lives in the visible part of the stage and wraps its groups onto more rows when
+                that part is narrow, so no number is ever cut. */}
+            <div className="pointer-events-none absolute bottom-0 left-0 flex justify-center p-5" style={{ right: rightInset }}>
+                <div ref={barRef} className="pointer-events-auto flex max-w-full flex-wrap items-stretch justify-center gap-x-4 gap-y-3 rounded-2xl border border-border/60 bg-background/75 px-5 py-3 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl">
                     <div className="flex items-center gap-2 pr-1">
                         <span className={`size-2 rounded-full ${frame.held ? 'bg-red-500' : 'animate-pulse bg-emerald-500 motion-reduce:animate-none'}`} />
                         <span className="text-sm font-semibold tracking-tight">Factory</span>
                         <span className="text-[10px] text-muted-foreground">sample</span>
                     </div>
                     {(['jobs', 'runs', 'plan'] as const).map(group => (
-                        <div key={group} className="flex items-center gap-4 border-l border-border/70 pl-4">
+                        <div key={group} className="flex flex-wrap items-center justify-center gap-4 border-l border-border/70 pl-4">
                             {METRICS.filter(m => m.group === group).map(m => <Metric key={m.key} def={m} value={values[m.key]} />)}
                         </div>
                     ))}
@@ -158,8 +175,8 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
             </div>
 
             <div
-                className="pointer-events-none absolute inset-x-0 top-6 flex justify-center transition-all duration-500 motion-reduce:transition-none"
-                style={{ opacity: frame.held ? 1 : 0, transform: frame.held ? 'translateY(0)' : 'translateY(-12px)' }}
+                className="pointer-events-none absolute left-0 top-6 flex justify-center transition-all duration-500 motion-reduce:transition-none"
+                style={{ right: rightInset, opacity: frame.held ? 1 : 0, transform: frame.held ? 'translateY(0)' : 'translateY(-12px)' }}
             >
                 <div className="flex items-center gap-3 rounded-full border border-red-500/40 bg-red-500/15 px-4 py-1.5 text-sm text-red-600 shadow-[0_0_24px_rgba(239,68,68,0.35)] backdrop-blur-xl dark:text-red-300">
                     <span className="font-semibold">Line held</span>
