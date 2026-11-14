@@ -111,6 +111,19 @@ export function AgentPanel() {
     // Chromium; the thread and the card stay mounted, only hidden. The way back clears
     // `enteredFrom`, so they are all there again before the screen folds.
     const covered = !!enteredFrom && grownFrom === enteredFrom
+    const surfaceDismissible = !!agent && threadShown && !covered && !!shownSurface
+
+    // Escape does what the scrim does. A key typed in a field (a rename) or in a dialog or a menu opened over the surface is theirs.
+    useEffect(() => {
+        if (!surfaceDismissible) return
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== 'Escape' || event.defaultPrevented) return
+            if (event.target instanceof Element && event.target.closest('input, textarea, [contenteditable="true"], [role="dialog"], [role="alertdialog"], [role="menu"]')) return
+            setSurface(null)
+        }
+        window.addEventListener('keydown', onKeyDown)
+        return () => window.removeEventListener('keydown', onKeyDown)
+    }, [surfaceDismissible])
 
     const screen = agent && displayedTab && (
         <AgentView
@@ -188,7 +201,7 @@ export function AgentPanel() {
             )}
 
             <AnimatePresence>
-                {agent && threadShown && !covered && shownSurface && <Scrim key="scrim" onClose={() => setSurface(null)} />}
+                {surfaceDismissible && <Scrim key="scrim" onClose={() => setSurface(null)} />}
                 {agent && threadShown && shownSurface?.kind === 'card' && (
                     <FloatingSurface key="card" receded={!!enteredFrom} className={cn('inset-x-3 top-16 max-h-[calc(100%-5rem)] md:inset-x-5', covered && 'invisible')}>
                         <AgentCard

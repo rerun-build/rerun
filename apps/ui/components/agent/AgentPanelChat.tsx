@@ -18,7 +18,10 @@ import { OpenChatsTabs } from '@/components/agent/sheet/OpenChatsTabs'
 import { useSessionRename } from '@/components/agent/sheet/SessionRename'
 import { CloseRunningTabDialog } from '@/components/dialogs/CloseRunningTabDialog'
 import { Button } from '@/components/ui/button'
-import { ArrowRightIcon, WrenchIcon } from '@/lib/icons'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { TooltipLabeled } from '@/components/ui/tooltip'
+import { ArrowRightIcon, MessageCircle, WrenchIcon } from '@/lib/icons'
+import { isTypingTarget } from '@/lib/typing-target'
 import { cn } from '@/lib/utils'
 
 // Combien de conversations restent montées derrière celle qu'on lit. Un onglet gardé vivant garde
@@ -47,6 +50,9 @@ type AgentPanelChatProps = {
     // The list of this coworker's conversations, floating over the thread while it is open.
     chats: ChatsFilter | null
     onCloseChats: () => void
+    // Docked only: the list opens from a button of the header, its dot lit while a conversation needs the person.
+    onOpenChats?: () => void
+    chatsAttention?: number
     // `floating`: the panel over the board, its tabs under the pills that float above the thread.
     // `docked`: a column of its own, its tabs a header in the flow, with `headerEnd` at their right.
     presentation?: 'floating' | 'docked'
@@ -56,8 +62,9 @@ type AgentPanelChatProps = {
     onNewThreadConsumed?: () => void
 }
 
-export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats, presentation = 'floating', headerEnd, newThreadRequest = false, onNewThreadConsumed }: AgentPanelChatProps) {
+export function AgentPanelChat({ agentId, agentName, selected, openSessionRequest, onOpenSessionConsumed, chats, onCloseChats, onOpenChats, chatsAttention = 0, presentation = 'floating', headerEnd, newThreadRequest = false, onNewThreadConsumed }: AgentPanelChatProps) {
     const t = useTranslations('agent.agentPanelChat')
+    const tView = useTranslations('workspaceView.chat')
     const { tabs, activeIndex, createNew, selectTab, closeTab, openTab, updateTabByUid, updateTabTitle, setGeneralSessionId } = useSessionTabs(agentId)
     const { threads, refresh: refreshThreads } = useAgentThreads(agentId)
 
@@ -232,12 +239,56 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
 
     const docked = presentation === 'docked'
     const openChatsTabs = <OpenChatsTabs tabs={tabs} activeIndex={activeIndex} onSelect={selectTab} onClose={requestCloseTab} onCreate={createNew} rename={tabRename} />
+    // Closing sets `chats` to null while the popover is still fading out: its list stays on the last filter until it has left.
+    const [lastChats, setLastChats] = useState(chats)
+    if (chats && chats !== lastChats) setLastChats(chats)
+    const listedChats = chats ?? lastChats
+    const chatsList = listedChats && (
+        <AgentChatsList
+            key={listedChats}
+            agentId={agentId}
+            agentName={agentName}
+            activeSessionId={tabs[activeIndex]?.id ?? null}
+            initialFilter={listedChats}
+            onSelect={(sessionId, title) => {
+                openTab(sessionId, title)
+                onCloseChats()
+            }}
+            onRename={renameSession}
+            onCreateNew={() => {
+                createNew()
+                onCloseChats()
+            }}
+            onClose={onCloseChats}
+        />
+    )
 
     return (
         <div className={cn('flex flex-col h-full', docked && '[--chat-column:48rem]')}>
             {docked ? (
                 <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border pr-2">
                     <div className="min-w-0 flex-1">{openChatsTabs}</div>
+                    <Popover open={chats !== null} onOpenChange={open => (open ? onOpenChats?.() : onCloseChats())}>
+                        <TooltipLabeled label={tView('allConversations')}>
+                            <PopoverTrigger asChild>
+                                <Button variant="ghost" size="icon-sm" aria-label={tView('allConversations')} className={cn(chats && 'bg-accent')}>
+                                    <span className="relative flex">
+                                        <MessageCircle className="size-4" />
+                                        {chatsAttention > 0 && <span className="absolute -top-1 -right-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
+                                    </span>
+                                </Button>
+                            </PopoverTrigger>
+                        </TooltipLabeled>
+                        {/* A menu item or a dialog that opens the list hands the focus back to where it came from: only a click outside or Escape closes it. A field keeps its own Escape. */}
+                        <PopoverContent
+                            align="end"
+                            onFocusOutside={event => event.preventDefault()}
+                            onEscapeKeyDown={event => isTypingTarget(event.target) && event.preventDefault()}
+                            className="max-h-[min(36rem,var(--radix-popover-content-available-height))] w-[min(340px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0"
+                        >
+                            {chatsList}
+                        </PopoverContent>
+                    </Popover>
                     {headerEnd}
                 </div>
             ) : (
@@ -295,25 +346,9 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                 )
             })}
             <AnimatePresence>
-                {chats && (
-                    <FloatingSurface key="chats" className={cn('left-3 w-[min(340px,calc(100%-1.5rem))]', docked ? 'top-14 max-h-[calc(100%-4.5rem)]' : 'top-16')}>
-                        <AgentChatsList
-                            key={chats}
-                            agentId={agentId}
-                            agentName={agentName}
-                            activeSessionId={tabs[activeIndex]?.id ?? null}
-                            initialFilter={chats}
-                            onSelect={(sessionId, title) => {
-                                openTab(sessionId, title)
-                                onCloseChats()
-                            }}
-                            onRename={renameSession}
-                            onCreateNew={() => {
-                                createNew()
-                                onCloseChats()
-                            }}
-                            onClose={onCloseChats}
-                        />
+                {!docked && chats && (
+                    <FloatingSurface key="chats" className="top-16 left-3 w-[min(340px,calc(100%-1.5rem))]">
+                        {chatsList}
                     </FloatingSurface>
                 )}
             </AnimatePresence>

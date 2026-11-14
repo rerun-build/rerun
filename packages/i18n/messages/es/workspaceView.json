@@ -37,7 +37,6 @@
         "line": "Pregunta lo que quieras"
     },
     "details": {
-        "close": "Cerrar la ficha",
         "label": "Ficha de {name}"
     },
     "phone": {
