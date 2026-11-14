@@ -5,7 +5,7 @@
   "checks_timeout_s": 3600,
   "clocks": {
     "run_limit_s": 2700,
-    "stall_s": null,
+    "stall_s": 1200,
     "token_cap": 3000000
   },
   "auto_plan_marker": true,
