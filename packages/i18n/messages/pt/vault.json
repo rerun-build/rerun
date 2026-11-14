@@ -1,11 +1,10 @@
 {
     "title": "Vault",
+    "description": "Entre uma vez em um app e escolha os coworkers que o usam.",
     "search": "Buscar no Vault",
     "noMatch": "Nenhum resultado",
     "groups": {
-        "apps": "Apps",
-        "mcp": "Servidores MCP",
-        "secrets": "Segredos"
+        "apps": "Apps"
     },
     "add": "Adicionar",
     "emptyTitle": "Entre uma vez e compartilhe com seus coworkers",

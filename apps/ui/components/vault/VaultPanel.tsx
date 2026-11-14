@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 
 import type { VaultEntryView, VaultListing } from '@/app/api/_services/vault.service'
 import { AddButton } from '@/components/connections/AiProvidersPanel'
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
@@ -14,7 +14,7 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
-import { KeyIcon, SearchIcon, ServerIcon } from '@/lib/icons'
+import { KeyIcon, LockKeyholeIcon, SearchIcon, ServerIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
 import { Badge } from '@rerun/ui/primitives'
 import { VaultAddApp, type VaultAddKind } from './VaultAddApp'
@@ -46,6 +46,8 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
     const t = useTranslations('vault')
     const [page, setPage] = useState<VaultPage>({ kind: 'list' })
     const [query, setQuery] = useState('')
+    // Kept here rather than in the empty state, which unmounts on every trip to the Add page.
+    const [popularApps, setPopularApps] = useState<VaultCatalogApp[] | null>(null)
 
     // Derived rather than synced: an entry deleted here, or gone on a reload, drops the panel back to the list.
     const selected = page.kind === 'detail' ? listing?.entries.find(entry => entry.id === page.id) : undefined
@@ -66,14 +68,20 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
 
     return (
         <>
-            <DialogHeader className="h-12 shrink-0 flex-row items-center justify-between gap-3 border-b pr-12 pl-4">
-                <DialogTitle>{t('title')}</DialogTitle>
-                {stepKey === 'list' && listing && !empty && (
-                    <TooltipDisabledReason reason={addReason}>
-                        <AddButton label={t('add')} disabled={!!addReason} onClick={() => setPage({ kind: 'add' })} />
-                    </TooltipDisabledReason>
-                )}
-            </DialogHeader>
+            <DialogHeaderBar
+                icon={LockKeyholeIcon}
+                title={t('title')}
+                description={t('description')}
+                actions={
+                    stepKey === 'list' &&
+                    listing &&
+                    !empty && (
+                        <TooltipDisabledReason reason={addReason}>
+                            <AddButton label={t('add')} disabled={!!addReason} onClick={() => setPage({ kind: 'add' })} />
+                        </TooltipDisabledReason>
+                    )
+                }
+            />
             <div className="flex min-h-0 flex-1 flex-col">
                 <PanelSteps stepKey={stepKey} depth={stepKey === 'list' ? 0 : 1}>
                     {page.kind === 'add' && listing ? (
@@ -95,7 +103,7 @@ export function VaultPanel({ listing, paid = [], error, onChanged, loadPopularAp
                         error ? <p className="p-4 text-sm text-muted-foreground">{error}</p> : <VaultSkeleton />
                     ) : empty ? (
                         <PanelScroller className="flex flex-col p-4">
-                            <VaultEmpty addReason={addReason} loadApps={loadPopularApps} onPick={app => setPage({ kind: 'add', app })} onAdd={addKind => setPage({ kind: 'add', addKind })} />
+                            <VaultEmpty addReason={addReason} apps={popularApps} onApps={setPopularApps} loadApps={loadPopularApps} onPick={app => setPage({ kind: 'add', app })} onAdd={addKind => setPage({ kind: 'add', addKind })} />
                         </PanelScroller>
                     ) : (
                         <PanelScroller className="space-y-4 p-4">

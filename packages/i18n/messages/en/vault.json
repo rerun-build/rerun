@@ -10,12 +10,11 @@
         "addMcp.header": "An HTTP header name, like Authorization."
     },
     "title": "Vault",
+    "description": "Sign in to an app once, then pick the coworkers that use it.",
     "search": "Search the Vault",
     "noMatch": "Nothing matches",
     "groups": {
-        "apps": "Apps",
-        "mcp": "MCP servers",
-        "secrets": "Secrets"
+        "apps": "Apps"
     },
     "add": "Add",
     "emptyTitle": "Sign in once, share with your coworkers",

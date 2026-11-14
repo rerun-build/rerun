@@ -12,7 +12,7 @@ export type VaultUsage = Pick<VaultEntryView, 'sharedWithAll' | 'coworkers' | 'h
 
 const SHOWN_FACES = 3
 
-export function useUsedByText(): UsedByText {
+function useUsedByText(): UsedByText {
     const t = useTranslations('vault')
     return {
         everyone: t('row.everyone'),
