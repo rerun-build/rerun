@@ -29,6 +29,15 @@ export function usedBySummary(entry: Pick<VaultEntryView, 'sharedWithAll' | 'cow
     return more > 0 ? text.usedByMore(names.join(', '), more) : text.usedBy(names.join(', '))
 }
 
+export type CoworkerFaces = { everyone: boolean; ids: string[]; more: number }
+
+// The same answer drawn instead of written: the first few coworkers' buddies, and how many more.
+export function coworkerFaces(entry: Pick<VaultEntryView, 'sharedWithAll' | 'coworkers' | 'hiddenCoworkers'>, max: number): CoworkerFaces {
+    if (entry.sharedWithAll) return { everyone: true, ids: [], more: 0 }
+    const ids = entry.coworkers.slice(0, max).map(coworker => coworker.id)
+    return { everyone: false, ids, more: entry.coworkers.length - ids.length + entry.hiddenCoworkers }
+}
+
 export function matchesVaultQuery(entry: Pick<VaultEntryView, 'name' | 'label' | 'slug' | 'envKeys' | 'coworkers'>, query: string): boolean {
     const q = query.trim().toLowerCase()
     if (!q) return true

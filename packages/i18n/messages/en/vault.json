@@ -3,13 +3,13 @@
         "title": "The Vault is the product name of the place where a workspace keeps the accounts and keys its coworkers share. Keep \"Vault\" as is.",
         "row.usedBy": "{names} is a comma-separated list of coworker names.",
         "row.usedByMore": "{names} is a comma-separated list of coworker names, {count} how many more there are.",
+        "row.everyoneShort": "A tiny badge on an entry shared with every coworker of the workspace. One short word.",
         "detail.hiddenCoworkers": "Coworkers that sit in Boxes the reader cannot see.",
         "delete.loses": "{names} is a comma-separated list of coworker names.",
         "addSecret.variable": "The environment variable name a coworker reads the secret under, like STRIPE_API_KEY.",
         "addMcp.header": "An HTTP header name, like Authorization."
     },
     "title": "Vault",
-    "description": "Sign in to an app once, then pick the coworkers that use it.",
     "search": "Search the Vault",
     "noMatch": "Nothing matches",
     "groups": {
@@ -22,6 +22,7 @@
     "empty": "Nothing in the Vault yet. Sign in to an app once, every coworker you pick can use it.",
     "row": {
         "everyone": "Every coworker",
+        "everyoneShort": "All",
         "unused": "No coworker yet",
         "usedBy": "{names}",
         "usedByMore": "{names} and {count, plural, one {# other} other {# others}}"

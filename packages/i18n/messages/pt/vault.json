@@ -1,6 +1,5 @@
 {
     "title": "Vault",
-    "description": "Entre uma vez em um app e escolha os coworkers que o usam.",
     "search": "Buscar no Vault",
     "noMatch": "Nenhum resultado",
     "groups": {
@@ -13,6 +12,7 @@
     "empty": "O Vault está vazio. Entre uma vez em um app e cada coworker que você escolher poderá usá-lo.",
     "row": {
         "everyone": "Todos os coworkers",
+        "everyoneShort": "Todos",
         "unused": "Nenhum coworker ainda",
         "usedBy": "{names}",
         "usedByMore": "{names} e mais {count, plural, one {#} other {#}}"
