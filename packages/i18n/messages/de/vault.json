@@ -1,11 +1,10 @@
 {
     "title": "Vault",
+    "description": "Melde dich einmal bei einer App an und wähle die Coworker, die sie nutzen.",
     "search": "Im Vault suchen",
     "noMatch": "Keine Treffer",
     "groups": {
-        "apps": "Apps",
-        "mcp": "MCP-Server",
-        "secrets": "Secrets"
+        "apps": "Apps"
     },
     "add": "Hinzufügen",
     "emptyTitle": "Einmal anmelden, mit deinen Coworkern teilen",

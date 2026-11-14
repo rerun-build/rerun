@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 
 import { vaultPopularAppsAction } from '@/app/api/_actions/vault.actions'
@@ -17,7 +17,15 @@ import type { VaultAddKind } from './VaultAddApp'
 
 const POPULAR_SHOWN = 6
 
-type Props = { addReason?: string; loadApps?: () => Promise<VaultCatalogApp[]>; onPick: (app: VaultCatalogApp) => void; onAdd: (kind: VaultAddKind) => void }
+type Props = {
+    addReason?: string
+    // Null until they are read; the panel holds them so a trip to the Add page does not read them again.
+    apps: VaultCatalogApp[] | null
+    onApps: (apps: VaultCatalogApp[]) => void
+    loadApps?: () => Promise<VaultCatalogApp[]>
+    onPick: (app: VaultCatalogApp) => void
+    onAdd: (kind: VaultAddKind) => void
+}
 
 async function readPopularApps(): Promise<VaultCatalogApp[]> {
     const res = await vaultPopularAppsAction()
@@ -25,19 +33,20 @@ async function readPopularApps(): Promise<VaultCatalogApp[]> {
 }
 
 // An empty Vault offers the apps people add first, one click each, rather than a sentence about them.
-export function VaultEmpty({ addReason, loadApps = readPopularApps, onPick, onAdd }: Props) {
+export function VaultEmpty({ addReason, apps, onApps, loadApps = readPopularApps, onPick, onAdd }: Props) {
     const t = useTranslations('vault')
-    const [apps, setApps] = useState<VaultCatalogApp[] | null>(null)
+    const loaded = apps !== null
 
     useEffect(() => {
+        if (loaded) return
         let cancelled = false
         void loadApps().then(result => {
-            if (!cancelled) setApps(result)
+            if (!cancelled) onApps(result)
         })
         return () => {
             cancelled = true
         }
-    }, [loadApps])
+    }, [loaded, loadApps, onApps])
 
     return (
         <div className="my-auto flex flex-col items-center gap-5 py-4 text-center">
@@ -53,8 +62,8 @@ export function VaultEmpty({ addReason, loadApps = readPopularApps, onPick, onAd
                               </div>
                           ))
                         : apps.slice(0, POPULAR_SHOWN).map(app => (
-                              <TooltipDisabledReason key={app.slug} reason={addReason}>
-                                  <button type="button" disabled={!!addReason} onClick={() => onPick(app)} className={cn(PANEL_CARD, PANEL_CARD_INTERACTIVE, 'flex min-w-0 flex-col items-center gap-2 p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60')}>
+                              <TooltipDisabledReason key={app.slug} reason={addReason} className="flex">
+                                  <button type="button" disabled={!!addReason} onClick={() => onPick(app)} className={cn(PANEL_CARD, PANEL_CARD_INTERACTIVE, 'flex w-full min-w-0 flex-col items-center gap-2 p-3 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-60')}>
                                       <Icon {...serviceIconProps(app.icon, app.category)} size="sm" />
                                       <span className="w-full truncate text-xs">{app.name}</span>
                                   </button>
