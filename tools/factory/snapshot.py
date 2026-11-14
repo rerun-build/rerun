@@ -1,6 +1,7 @@
 """The line as one picture for the app (rerun#319): build_snapshot() returns a dict valid against factorySnapshotSchema
 (packages/contracts/src/factory-snapshot.ts). Read-only on the ledger. No import of dispatch at module level."""
 import datetime
+import json
 
 import cutshape
 import pools
@@ -11,6 +12,7 @@ END = ("merged", "rejected", "blocked", "failed", "returned")
 WAIT_STATES = ("waiting", "queued", "review_wait", "fix_wait")
 TYPES = ("coder", "reviewer", "researcher", "designer")
 MAX_JOBS = 300
+MAX_BYTES = 256 * 1024  # FACTORY_SNAPSHOT_MAX_BYTES in packages/contracts/src/factory-snapshot.ts
 
 
 def iso(t):
@@ -54,6 +56,14 @@ def _job(store, cfg, names, j):
         row = store.db.execute("SELECT steps FROM fires WHERE id=?", (j["fire_id"],)).fetchone()
         steps = row[0] if row else None
     rnd = j.get("round")
+    history = [{"state": r["to_state"], "at": r["at"], "reason": _cut(r["reason"], 300), "runId": _cut(r["run_id"], 64)}
+               for r in store.transitions_of(str(j["issue"])) if r["from_state"] != r["to_state"]][-30:]
+    ids = {n: i for i, n in names.items()}
+    rows = store.db.execute("SELECT stage, coworker, status, intent_at, ended_at, tokens_in, tokens_out, run_id "
+                            "FROM fires WHERE job=? ORDER BY id", (str(j["issue"]),)).fetchall()[-12:]
+    runs = [{"stage": _cut(r[0], 20), "coworkerId": ids.get(r[1]) or _cut(r[1], 64), "status": _cut(r[2], 20),
+             "startedAt": r[3], "endedAt": r[4], "tokensIn": int(r[5] or 0), "tokensOut": int(r[6] or 0),
+             "runId": _cut(r[7], 64)} for r in rows]
     return {
         "issue": j["issue"], "title": str(j.get("title") or "")[:256], "state": j["state"],
         "enteredAt": _entered(store, j), "pr": j.get("pr"),
@@ -62,8 +72,29 @@ def _job(store, cfg, names, j):
         "copy": j.get("copy") if running else None,
         "steps": steps, "tokensIn": None, "tokensOut": None,
         "parent": parsed.get("parent"), "dependsOn": list(parsed.get("deps") or [])[:20],
-        "reason": _reason(j),
+        "reason": _reason(j), "history": history, "runs": runs,
     }
+
+
+def _size(v):
+    return len(json.dumps(v, separators=(",", ":")).encode())
+
+
+def _fit(snap):
+    """Keep the picture at or under MAX_BYTES: drop history and runs of ended jobs, then of the others, oldest enteredAt first."""
+    total = _size(snap)
+    if total <= MAX_BYTES:
+        return snap
+    jobs = snap["jobs"]
+    cost = {id(j): _size([j["history"], j["runs"]]) for j in jobs}
+    empty = _size([[], []])
+    order = sorted(jobs, key=lambda j: (j["state"] not in END, j["enteredAt"]))
+    for j in order:
+        if total <= MAX_BYTES:
+            break
+        total -= cost[id(j)] - empty
+        j["history"], j["runs"] = [], []
+    return snap
 
 
 def build_snapshot(store, cfg, now, holds_active, beat=0):
@@ -80,7 +111,7 @@ def build_snapshot(store, cfg, now, holds_active, beat=0):
     for t, v in pools.types(cfg).items():
         if t in TYPES and len(pool_list) < 8:
             pool_list.append({"type": t, "coworkers": [
-                {"name": c["name"][:64], "runs": _clamp(c["runs"], 1, 32), "out": _clamp(out.get(c["id"], 0), 0, 32)}
+                {"name": c["name"][:64], "id": c["id"][:64], "runs": _clamp(c["runs"], 1, 32), "out": _clamp(out.get(c["id"], 0), 0, 32)}
                 for c in v["coworkers"][:20]]})
     today = ledger_store.now()[:10]
     ended_today = {s: 0 for s in ("merged", "rejected", "blocked", "failed", "returned")}
@@ -88,6 +119,7 @@ def build_snapshot(store, cfg, now, holds_active, beat=0):
         if j["state"] in ended_today and str(j.get("updated_at") or "").startswith(today):
             ended_today[j["state"]] += 1
     holds_list = [{"kind": holds_active["kind"][:40], "until": iso(holds_active["until"])}] if holds_active else []
-    return {"version": 1, "madeAt": iso(now), "beat": beat, "repo": cfg["repo"],
+    snap = {"version": 1, "madeAt": iso(now), "beat": beat, "repo": cfg["repo"],
             "jobs": [_job(store, cfg, names, j) for j in kept], "holds": holds_list, "pools": pool_list,
             "endedToday": ended_today}
+    return _fit(snap)
