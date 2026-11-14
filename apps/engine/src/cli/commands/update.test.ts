@@ -49,7 +49,8 @@ vi.mock('../../runtime/layout.js', async importOriginal => ({
 
 vi.mock('node:child_process', () => ({
     execFileSync: (command: string, args: string[], options?: { cwd?: string; encoding?: string }) => {
-        const line = `${command} ${args.join(' ')}`
+        // hasCommand's shell call reads as the lookup it makes.
+        const line = command === '/bin/sh' && args[1] === 'command -v "$1"' ? `command -v ${args[3]}` : `${command} ${args.join(' ')}`
         state.calls.push(line)
         state.cwds.push(options?.cwd)
         if (state.failing.some(prefix => line.startsWith(prefix))) throw new Error(`${command} exited with 1`)
