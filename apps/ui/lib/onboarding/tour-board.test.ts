@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { routeBetween, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'
+import { routeBoard, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'
 import type { AxisRoute } from '@/lib/board/iso-route'
 import { GRID_SIZE, TILE_H, TILE_W, isoPosition } from '@rerun/ui/iso-grid/iso'
 
@@ -22,14 +22,16 @@ const tileById = new Map(full.tiles.map(tile => [tile.id, tile]))
 const agentIds = new Set(TOUR_AGENTS.map(agent => agent.id))
 const connectorIds = new Set(TOUR_CONNECTORS.map(connector => connector.id))
 
-// Every link an agent draws to one of its connectors, whichever variant it wears: a beam and a cable
-// take the exact same route, so the placement guard rails below have to see both.
+// Every link an agent draws to one of its connectors, whichever variant it wears, as the board draws
+// them: all routed together, so the guard rails below see the lines on screen.
+const drawn = routeBoard(full.tiles, full.links)
 const wires = full.links.map(link => {
-    const source = tileById.get(link.source)
-    const target = tileById.get(link.target)
-    if (!source || !target) throw new Error(`wire to a missing tile: ${linkId(link.source, link.target)}`)
-    return { id: linkId(link.source, link.target), sourceId: link.source, targetId: link.target, points: routeBetween(source, target).slice() }
+    if (!tileById.has(link.source) || !tileById.has(link.target)) throw new Error(`wire to a missing tile: ${linkId(link.source, link.target)}`)
+    return { id: linkId(link.source, link.target), sourceId: link.source, targetId: link.target, points: drawn.get(`${link.source}->${link.target}`) ?? [] }
 })
+// A hand-off is lit as a beam over the whole board, one at a time.
+const handoffRoute = (handoff: (typeof TOUR_HANDOFFS)[number]) =>
+    routeBoard(full.tiles, [...full.links, { source: handoff.source, target: handoff.target, variant: 'beam' }]).get(`${handoff.source}->${handoff.target}`) ?? []
 
 const asRoute = (wire: (typeof wires)[number]): AxisRoute => ({ points: wire.points, sourceId: wire.sourceId })
 
@@ -96,9 +98,8 @@ describe('tour board geometry', () => {
         expect(crossings).toEqual([])
     })
 
-    // Red since #541 moved the Sales and Ops connectors off their mirrored cells. The shipped board
-    // is the moved one, so whether the layout or this guard rail gives way is a call made by eye.
-    it.skip('never runs a wire under a third tile', () => {
+    // Red from #541 on the old single-link routing; it holds on the routes the board draws.
+    it('never runs a wire under a third tile', () => {
         const swallowed: string[] = []
         for (const wire of wires) {
             for (const tile of full.tiles) {
@@ -131,10 +132,8 @@ describe('tour board geometry', () => {
     it.skip('draws every hand-off as one straight run', () => {
         const elbowed: string[] = []
         for (const handoff of TOUR_HANDOFFS) {
-            const source = tileById.get(handoff.source)
-            const target = tileById.get(handoff.target)
-            if (!source || !target) throw new Error(`hand-off to a missing tile: ${handoff.id}`)
-            const points = routeBetween(source, target)
+            if (!tileById.has(handoff.source) || !tileById.has(handoff.target)) throw new Error(`hand-off to a missing tile: ${handoff.id}`)
+            const points = handoffRoute(handoff)
             if (points.length !== 2) elbowed.push(`${handoff.id} (${points.length} points)`)
         }
         expect(elbowed).toEqual([])
@@ -152,7 +151,7 @@ describe('tour board geometry', () => {
     it('never runs a hand-off under an agent', () => {
         const swallowed: string[] = []
         for (const handoff of TOUR_HANDOFFS) {
-            const points = routeBetween(tileById.get(handoff.source)!, tileById.get(handoff.target)!)
+            const points = handoffRoute(handoff)
             for (const agent of TOUR_AGENTS) {
                 if (agent.id === handoff.source || agent.id === handoff.target) continue
                 if (routeHitsBox(points, tileAxisBox(tileById.get(agent.id)!))) swallowed.push(`${handoff.id} under ${agent.id}`)
