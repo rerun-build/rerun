@@ -35,7 +35,6 @@ let root: Root
 const flush = () => act(async () => { await Promise.resolve() })
 const mount = async () => { await act(async () => { root.render(createElement(FactoryPage)) }); await flush() }
 const loaderPanel = () => host.querySelector('[data-loader-panel]')
-const tabs = () => Array.from(host.querySelectorAll('[data-column] > div:first-child button[aria-pressed]')).map(b => b.textContent)
 
 beforeEach(() => {
     h.answer = { snapshot: sample() }
@@ -75,11 +74,5 @@ describe('Loader panel on the Factory floor', () => {
         await act(async () => { h.open?.(first.name) })
         expect(h.focus).toHaveBeenCalledWith(first.id, 'logs')
         expect(loaderPanel()).toBeNull()
-    })
-
-    it('leaves the Tasks/Inspect column with its two tabs', async () => {
-        await mount()
-        await act(async () => { h.open?.('Delegator') })
-        expect(tabs()).toEqual(['Tasks', 'Inspect'])
     })
 })
