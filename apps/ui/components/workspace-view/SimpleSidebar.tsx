@@ -83,7 +83,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                 </TooltipDisabledReason>
             </div>
 
-            <nav aria-label={t('label')} className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+            <nav aria-label={t('label')} className="min-h-0 flex-1 space-y-0.5 overflow-y-auto px-2 pb-2">
                 <ForemanTile />
                 {!previewsLoaded ? (
                     <TileSkeletons />

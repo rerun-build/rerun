@@ -37,7 +37,7 @@ export function ForemanHistory({ open, entries, activeThreadId, onOpenGeneral, o
         <AnimatePresence>
             {open && <Scrim key="scrim" onClose={onClose} />}
             {open && (
-                <FloatingSurface key="history" className="inset-x-3 top-14 max-h-[calc(100%-5rem)]">
+                <FloatingSurface key="history" className="top-14 right-3 max-h-[min(32rem,calc(100%-5rem))] w-[min(360px,calc(100%-1.5rem))]">
                     <div className="flex min-h-0 flex-col">
                         <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 pt-3 pb-1">
                             <span className="flex items-center gap-2 pl-1 text-sm font-semibold">
