@@ -4,11 +4,16 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { EngineRun } from '@/lib/engine/types'
 
-// The runs list opens on what needs a look: Running and Failed on, Done off. The choice and the search
-// are kept per browser, and a filtered-empty list says what is hidden.
+// The runs list is three tabs, Running, Done and Failed. It always opens on Running; the search filters the open tab.
 
-const mocks = vi.hoisted(() => ({ listRunsAction: vi.fn(), getRunStepsAction: vi.fn(async () => []), getRunToolsAction: vi.fn(async () => []) }))
-vi.mock('@/app/api/_actions/agent.actions', () => mocks)
+const mocks = vi.hoisted(() => ({
+    listRunsAction: vi.fn(),
+    getRunStepsAction: vi.fn(async () => []),
+    getRunToolsAction: vi.fn(async (..._a: string[]): Promise<unknown[]> => []),
+    readFactorySnapshotAction: vi.fn(),
+}))
+vi.mock('@/app/api/_actions/agent.actions', () => ({ listRunsAction: mocks.listRunsAction, getRunStepsAction: mocks.getRunStepsAction, getRunToolsAction: mocks.getRunToolsAction }))
+vi.mock('@/app/api/_actions/factory.actions', () => ({ readFactorySnapshotAction: mocks.readFactorySnapshotAction }))
 vi.mock('@/hooks/useVisibleInterval', async () => {
     const { useEffect } = await import('react')
     return { useVisibleInterval: (cb: () => void) => useEffect(() => { void cb() }, [cb]) }
@@ -30,8 +35,9 @@ const storage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: str
 
 let host: HTMLDivElement
 let root: Root
-const chip = (name: string) => Array.from(host.querySelectorAll<HTMLButtonElement>('[data-chip]')).find(b => b.textContent?.startsWith(name))!
-const rowCount = () => host.querySelectorAll('[data-run-row], [data-state]').length
+const tab = (name: string) => Array.from(host.querySelectorAll<HTMLButtonElement>('[role="tab"]')).find(b => b.textContent?.startsWith(name))!
+const rows = () => host.querySelectorAll('[data-run]')
+const typeQuery = async (v: string) => { const input = host.querySelector<HTMLInputElement>('input[type="search"]')!; await act(async () => { const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!; set.call(input, v); input.dispatchEvent(new Event('input', { bubbles: true })) }) }
 async function settle() { for (let i = 0; i < 5; i++) await act(async () => new Promise(r => setTimeout(r, 0))) }
 async function mount() {
     const { AgentPanelLogs } = await import('./AgentPanelLogs')
@@ -43,62 +49,128 @@ beforeEach(() => {
     vi.stubGlobal('localStorage', storage)
     store.clear()
     mocks.listRunsAction.mockResolvedValue(MANY)
+    mocks.getRunToolsAction.mockResolvedValue([])
+    mocks.readFactorySnapshotAction.mockResolvedValue({ snapshot: { jobs: [{ issue: 332, title: 'Fab floor', runs: [{ stage: 'build', runId: 'r1' }] }] }, receivedAt: 0, ageMs: 0 })
     host = document.createElement('div')
     document.body.appendChild(host)
     root = createRoot(host)
     ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 })
-afterEach(() => { act(() => root.unmount()); host.remove(); vi.unstubAllGlobals() })
+afterEach(() => { act(() => root.unmount()); host.remove(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
-describe('AgentPanelLogs filters', () => {
-    it('shows count chips Running 2, Failed 2 (an error, a cancel with an error), Done 42 (41 done and a cancel with no error)', async () => {
+describe('AgentPanelLogs tabs', () => {
+    it('opens on the Running tab with counts on all three tabs', async () => {
+        store.set('rerun.agentLogs.filter', JSON.stringify({ running: false, failed: false, done: true }))
         await mount()
-        expect(chip('Running').textContent).toBe('Running 2')
-        expect(chip('Failed').textContent).toBe('Failed 2')
-        expect(chip('Done').textContent).toBe('Done 42')
+        const tabs = Array.from(host.querySelectorAll('[role="tab"]')).map(b => b.textContent)
+        expect(tabs).toEqual(['Running 2', 'Done 42', 'Failed 2'])
+        expect(tab('Running').getAttribute('aria-selected')).toBe('true')
+        expect(tab('Done').getAttribute('aria-selected')).toBe('false')
+        expect(rows().length).toBe(2)
     })
 
-    it('opens with Running and Failed on and Done off', async () => {
+    it('switches tabs and keeps the search', async () => {
         await mount()
-        expect(chip('Running').getAttribute('aria-pressed')).toBe('true')
-        expect(chip('Failed').getAttribute('aria-pressed')).toBe('true')
-        expect(chip('Done').getAttribute('aria-pressed')).toBe('false')
-        expect(host.querySelectorAll('[data-run]').length).toBe(4)
+        await act(async () => { tab('Done').click() })
+        expect(rows().length).toBe(42)
+        await typeQuery('nightly')
+        expect(rows().length).toBe(1)
+        await act(async () => { tab('Failed').click() })
+        expect(rows().length).toBe(0)
+        expect(host.textContent).toContain('No run matches "nightly"')
+        await typeQuery('')
+        expect(rows().length).toBe(2)
+        await typeQuery('plan limit')
+        expect(rows().length).toBe(1)
     })
 
-    it('turning Done on shows the done runs, and the choice is kept in localStorage and read back by a new mount', async () => {
+    it('marks Failed red while it has runs and not at 0', async () => {
         await mount()
-        await act(async () => { chip('Done').click() })
-        expect(host.querySelectorAll('[data-run]').length).toBe(46)
+        expect(tab('Failed').hasAttribute('data-alert')).toBe(true)
+        expect(tab('Failed').className).toContain('text-destructive')
+        mocks.listRunsAction.mockResolvedValue(MANY.filter(r => r.status === 'running'))
         act(() => root.unmount())
         root = createRoot(host)
         await mount()
-        expect(chip('Done').getAttribute('aria-pressed')).toBe('true')
-        expect(store.size).toBeGreaterThan(0)
+        expect(tab('Failed').textContent).toBe('Failed 0')
+        expect(tab('Failed').hasAttribute('data-alert')).toBe(false)
+        expect(tab('Failed').className).not.toContain('text-destructive')
     })
 
-    it('searches the goal job, trigger, branch, model and error of a run', async () => {
+    it('says nothing is running in one line with links to Failed and Done', async () => {
+        mocks.listRunsAction.mockResolvedValue(MANY.filter(r => r.status !== 'running'))
         await mount()
-        await act(async () => { chip('Done').click() })
-        const input = host.querySelector<HTMLInputElement>('input[type="search"]')!
-        const type = async (v: string) => { await act(async () => { const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!; set.call(input, v); input.dispatchEvent(new Event('input', { bubbles: true })) }) }
-        await type('rerun#332')
-        expect(host.querySelectorAll('[data-run]').length).toBe(1)
-        await type('nightly')
-        expect(host.querySelectorAll('[data-run]').length).toBe(1)
-        await type('plan limit')
-        expect(host.querySelectorAll('[data-run]').length).toBe(1)
+        expect(host.textContent).toContain('Nothing is running. See Failed or Done.')
+        const link = Array.from(host.querySelectorAll<HTMLButtonElement>('button:not([role="tab"])')).find(b => b.textContent === 'Failed')!
+        await act(async () => { link.click() })
+        expect(tab('Failed').getAttribute('aria-selected')).toBe('true')
+        expect(rows().length).toBe(2)
     })
 
-    it('says what is hidden when the filtered list is empty', async () => {
+    it('shows the empty state when there are no runs at all', async () => {
+        mocks.listRunsAction.mockResolvedValue([])
+        await mount()
+        expect(host.textContent).toContain('No runs yet')
+    })
+
+    it('running rows show steps, elapsed time and the step they are on', async () => {
+        vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] })
+        vi.setSystemTime(new Date('2026-11-14T10:01:30Z'))
+        mocks.getRunToolsAction.mockImplementation(async (_a: string, id: string) => (id === 'r1' ? [{ toolName: 'read' }, { toolName: 'shell' }] : []))
+        await mount()
+        const [r1, r2] = Array.from(rows()) as HTMLElement[]
+        expect(r1.textContent).toContain('3 steps')
+        expect(r1.textContent).toContain('1m 30s')
+        expect(r1.textContent).toContain('now: shell')
+        expect(r2.textContent).not.toContain('now:')
+        await act(async () => { vi.advanceTimersByTime(1000) })
+        expect(r1.textContent).toContain('1m 31s')
+        expect(r1.textContent).not.toContain('1m 30s')
+    })
+
+    it('runs no timer when nothing is running', async () => {
+        vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] })
         mocks.listRunsAction.mockResolvedValue(MANY.filter(r => r.status === 'done'))
         await mount()
-        expect(host.textContent).toContain('41 done runs hidden')
-        mocks.listRunsAction.mockResolvedValue([...MANY.filter(r => r.status === 'done').slice(0, 1)])
-        store.clear()
-        act(() => root.unmount())
-        root = createRoot(host)
+        expect(vi.getTimerCount()).toBe(0)
+    })
+
+    it('formats elapsed time', async () => {
+        const { elapsed } = await import('./AgentPanelLogs')
+        expect(elapsed(12_000)).toBe('12s')
+        expect(elapsed(90_000)).toBe('1m 30s')
+        expect(elapsed(91_000)).toBe('1m 31s')
+        expect(elapsed(3_900_000)).toBe('1h 05m')
+    })
+
+    it('names the run: factory job with stage and title, else jobRef, else goal, trigger, start time', async () => {
+        mocks.listRunsAction.mockResolvedValue([
+            run('r1', 'done', { jobRef: 'rerun#332' }),
+            run('x2', 'done', { jobRef: 'rerun#999' }),
+            run('g1', 'done', { goal: { lastLineForms: [{ prefix: 'PR:' }] } as unknown as EngineRun['goal'] }),
+            run('t1', 'done', { triggerSlug: 'nightly' }),
+            run('b1', 'done'),
+        ])
         await mount()
-        expect(host.textContent).toContain('1 done run hidden')
+        await act(async () => { tab('Done').click() })
+        const titles = Array.from(rows()).map(r => r.querySelector('span.truncate')?.textContent)
+        expect(titles.slice(0, 4)).toEqual(['Build #332: Fab floor', 'rerun#999', 'Goal: PR:', 'nightly'])
+        expect(titles[4]).toMatch(/2026/)
+    })
+
+    it('still opens a row once to its steps', async () => {
+        await mount()
+        const trigger = host.querySelector<HTMLButtonElement>('[data-run] button')!
+        await act(async () => { trigger.click() })
+        await settle()
+        expect(mocks.getRunStepsAction).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps working when the snapshot read throws', async () => {
+        mocks.readFactorySnapshotAction.mockRejectedValue(new Error('down'))
+        mocks.listRunsAction.mockResolvedValue([run('r1', 'done', { jobRef: 'rerun#332' })])
+        await mount()
+        await act(async () => { tab('Done').click() })
+        expect(rows()[0]!.textContent).toContain('rerun#332')
     })
 })
