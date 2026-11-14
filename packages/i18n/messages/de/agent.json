@@ -875,7 +875,14 @@
         "step": "Schritt {number}",
         "noSteps": "Für diese Ausführung wurden keine Schritte aufgezeichnet.",
         "input": "Eingabe",
-        "output": "Ausgabe"
+        "output": "Ausgabe",
+        "filters": { "running": "Läuft", "failed": "Fehlgeschlagen", "done": "Fertig" },
+        "search": "Läufe durchsuchen",
+        "hiddenRunning": "{count, plural, one {# laufender Lauf} other {# laufende Läufe}}",
+        "hiddenFailed": "{count, plural, one {# fehlgeschlagener Lauf} other {# fehlgeschlagene Läufe}}",
+        "hiddenDone": "{count, plural, one {# fertiger Lauf} other {# fertige Läufe}}",
+        "hidden": "{parts} ausgeblendet",
+        "noMatch": "Kein Lauf passt zu „{query}“"
     },
     "agentRunHistory": {
         "tokens": "{total} Tokens",

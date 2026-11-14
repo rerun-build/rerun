@@ -963,7 +963,14 @@
         "step": "Step {number}",
         "noSteps": "No steps recorded for this run.",
         "input": "Input",
-        "output": "Output"
+        "output": "Output",
+        "filters": { "running": "Running", "failed": "Failed", "done": "Done" },
+        "search": "Search runs",
+        "hiddenRunning": "{count, plural, one {# running run} other {# running runs}}",
+        "hiddenFailed": "{count, plural, one {# failed run} other {# failed runs}}",
+        "hiddenDone": "{count, plural, one {# done run} other {# done runs}}",
+        "hidden": "{parts} hidden",
+        "noMatch": "No run matches \"{query}\""
     },
     "agentRunHistory": {
         "tokens": "{total} tokens",

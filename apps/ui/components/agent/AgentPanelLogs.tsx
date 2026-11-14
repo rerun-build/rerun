@@ -35,6 +35,40 @@ function prettyJson(raw: string | null): string | null {
     }
 }
 
+export type RunBucket = 'running' | 'failed' | 'done'
+const BUCKETS: RunBucket[] = ['running', 'failed', 'done']
+type BucketFlags = Record<RunBucket, boolean>
+const FILTER_KEY = 'rerun.agentLogs.filter'
+const DEFAULT_FLAGS: BucketFlags = { running: true, failed: true, done: false }
+
+export function bucketOf(run: EngineRun): RunBucket {
+    if (run.status === 'running') return 'running'
+    if (run.status === 'error' || (run.status === 'cancelled' && run.error)) return 'failed'
+    return 'done'
+}
+
+function readFlags(): BucketFlags {
+    try {
+        if (typeof localStorage === 'undefined') return DEFAULT_FLAGS
+        const raw = localStorage.getItem(FILTER_KEY)
+        if (!raw) return DEFAULT_FLAGS
+        const v = JSON.parse(raw) as Partial<Record<RunBucket, unknown>>
+        return {
+            running: typeof v.running === 'boolean' ? v.running : DEFAULT_FLAGS.running,
+            failed: typeof v.failed === 'boolean' ? v.failed : DEFAULT_FLAGS.failed,
+            done: typeof v.done === 'boolean' ? v.done : DEFAULT_FLAGS.done,
+        }
+    } catch {
+        return DEFAULT_FLAGS
+    }
+}
+
+function matchesQuery(run: EngineRun, q: string): boolean {
+    if (!q) return true
+    const fields = [run.jobRef, run.branch, run.triggerSlug, run.triggerSource, run.model, run.error, run.id, ...(run.goal?.lastLineForms.map(f => f.prefix) ?? [])]
+    return fields.some(f => f && f.toLowerCase().includes(q))
+}
+
 type RunDetail = { steps: EngineRunStep[]; tools: EngineToolCall[] }
 
 export function AgentPanelLogs({ agentId }: { agentId: string }) {
@@ -43,6 +77,19 @@ export function AgentPanelLogs({ agentId }: { agentId: string }) {
     const [loading, setLoading] = useState(true)
     const [details, setDetails] = useState<Record<string, RunDetail>>({})
     const loadingDetails = useRef(new Set<string>())
+    const [flags, setFlags] = useState<BucketFlags>(readFlags)
+    const [query, setQuery] = useState('')
+    const locale = useLocale()
+
+    const toggle = (b: RunBucket) => {
+        const next = { ...flags, [b]: !flags[b] }
+        setFlags(next)
+        try {
+            if (typeof localStorage !== 'undefined') localStorage.setItem(FILTER_KEY, JSON.stringify(next))
+        } catch {
+            // blocked storage: the choice just is not kept
+        }
+    }
 
     const load = useCallback(async () => {
         const next = await listRunsAction(agentId, 100)
@@ -82,14 +129,50 @@ export function AgentPanelLogs({ agentId }: { agentId: string }) {
         )
     }
 
+    const counts: Record<RunBucket, number> = { running: 0, failed: 0, done: 0 }
+    for (const r of runs) counts[bucketOf(r)]++
+    const q = query.trim().toLowerCase()
+    const shown = runs.filter(r => flags[bucketOf(r)] && matchesQuery(r, q))
+    const hiddenParts = BUCKETS.filter(b => !flags[b] && counts[b] > 0).map(b => {
+        const count = counts[b]
+        return b === 'running' ? t('hiddenRunning', { count }) : b === 'failed' ? t('hiddenFailed', { count }) : t('hiddenDone', { count })
+    })
+    const hiddenText = t('hidden', { parts: new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' }).format(hiddenParts) })
+
     return (
         <div className="flex h-full flex-col">
             <PanelScroller>
-                <PanelList>
-                    {runs.map(run => (
-                        <RunRow key={run.id} run={run} detail={details[run.id]} onOpen={() => loadDetail(run.id)} />
+                <div className="mb-2 flex flex-wrap items-center gap-1.5">
+                    {BUCKETS.map(b => (
+                        <button
+                            key={b}
+                            type="button"
+                            data-chip
+                            aria-pressed={flags[b]}
+                            onClick={() => toggle(b)}
+                            className={cn('rounded-full border px-2.5 py-0.5 text-xs transition-colors', flags[b] ? 'border-primary/50 bg-primary/10 text-foreground' : 'border-border text-muted-foreground hover:bg-accent/30')}
+                        >
+                            {t(`filters.${b}`)} {counts[b]}
+                        </button>
                     ))}
-                </PanelList>
+                    <input
+                        type="search"
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
+                        aria-label={t('search')}
+                        placeholder={t('search')}
+                        className="min-w-32 flex-1 rounded-md border border-border bg-background px-2 py-1 text-xs"
+                    />
+                </div>
+                {shown.length === 0 ? (
+                    <EmptyState icon={ScrollTextIcon} title={q ? t('noMatch', { query: query.trim() }) : hiddenText} />
+                ) : (
+                    <PanelList>
+                        {shown.map(run => (
+                            <RunRow key={run.id} run={run} detail={details[run.id]} onOpen={() => loadDetail(run.id)} />
+                        ))}
+                    </PanelList>
+                )}
             </PanelScroller>
         </div>
     )
@@ -102,7 +185,7 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
     const usage = tokens ? t('tokens', { total: formatNumber(tokens, locale) }) : ''
     const trigger = run.triggerSlug ?? run.triggerSource
     return (
-        <Collapsible onOpenChange={open => open && onOpen()} className={cn(PANEL_CARD, 'overflow-hidden')}>
+        <Collapsible data-run onOpenChange={open => open && onOpen()} className={cn(PANEL_CARD, 'overflow-hidden')}>
             <CollapsibleTrigger className={cn('group flex w-full flex-col gap-0.5 p-3 text-left', PANEL_CARD_INTERACTIVE)}>
                 <div className="flex items-center gap-2">
                     <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />

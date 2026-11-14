@@ -884,7 +884,14 @@
         "step": "Étape {number}",
         "noSteps": "Aucune étape enregistrée pour cette exécution.",
         "input": "Entrée",
-        "output": "Sortie"
+        "output": "Sortie",
+        "filters": { "running": "En cours", "failed": "Échecs", "done": "Terminées" },
+        "search": "Rechercher des exécutions",
+        "hiddenRunning": "{count, plural, one {# exécution en cours} other {# exécutions en cours}}",
+        "hiddenFailed": "{count, plural, one {# exécution en échec} other {# exécutions en échec}}",
+        "hiddenDone": "{count, plural, one {# exécution terminée} other {# exécutions terminées}}",
+        "hidden": "{parts} masquée(s)",
+        "noMatch": "Aucune exécution ne correspond à « {query} »"
     },
     "agentRunHistory": {
         "tokens": "{total} tokens",
