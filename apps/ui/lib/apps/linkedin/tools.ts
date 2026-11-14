@@ -13,7 +13,9 @@ const count = (max: number) => ({ type: 'integer', minimum: 1, maximum: max, des
 const offset = { type: 'integer', minimum: 0 }
 const cursor = { type: 'string', description: 'next_cursor from the previous answer, to read the next page' }
 const postUrl = { type: 'string', description: 'LinkedIn post URL, e.g. https://www.linkedin.com/feed/update/urn:li:activity:…' }
+const companyUrl = { type: 'string', description: 'LinkedIn company page URL, e.g. https://www.linkedin.com/company/stripe/' }
 const groupUrl = { type: 'string', description: 'LinkedIn group URL or numeric id' }
+const dateField = { type: 'string', description: 'YYYY-MM or YYYY' }
 const eventUrl = { type: 'string', description: 'LinkedIn event URL, urn:li:fsd_professionalEvent:… or numeric id' }
 
 export const LINKEDIN_TOOLS: LinkedinTool[] = [
@@ -101,6 +103,74 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         action: 'get_analytics',
     },
     {
+        name: 'visit_profile',
+        description: 'Visit a profile as the user, so the member sees the user in "Who viewed your profile". A light first touch before an invitation.',
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl }, required: ['profile_url'] },
+        category: 'profiles',
+        action: 'visit',
+        quota: { action: 'profile_view' },
+    },
+    {
+        name: 'update_my_profile',
+        description:
+            "Edit the user's own LinkedIn profile: name, headline, about, website, experience, education, skills, pictures. Changes apply in order. An experience or education entry with an id edits it, with id and delete: true removes it, without id adds one. Read linkedin_pro_get_my_profile first for the ids.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                first_name: { type: 'string' },
+                last_name: { type: 'string' },
+                headline: { type: 'string' },
+                about: { type: 'string' },
+                website: { type: 'string' },
+                experience: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            delete: { type: 'boolean' },
+                            title: { type: 'string', description: 'Required to add an entry' },
+                            company: { type: 'string' },
+                            company_id: { type: 'string', description: 'From linkedin_pro_typeahead type company' },
+                            description: { type: 'string' },
+                            location: { type: 'string' },
+                            location_id: { type: 'string', description: 'From linkedin_pro_typeahead type location' },
+                            start_date: dateField,
+                            end_date: dateField,
+                            is_current: { type: 'boolean' },
+                            notify_network: { type: 'boolean', description: 'Tell the network about it, false by default' },
+                        },
+                    },
+                },
+                education: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            id: { type: 'string' },
+                            delete: { type: 'boolean' },
+                            school: { type: 'string', description: 'Required to add an entry' },
+                            school_id: { type: 'string', description: 'From linkedin_pro_typeahead type school' },
+                            degree: { type: 'string' },
+                            field_of_study: { type: 'string' },
+                            grade: { type: 'string' },
+                            activities: { type: 'string' },
+                            description: { type: 'string' },
+                            start_date: dateField,
+                            end_date: dateField,
+                            notify_network: { type: 'boolean' },
+                        },
+                    },
+                },
+                skills: { type: 'object', properties: { add: { type: 'array', items: { type: 'string' } }, remove: { type: 'array', items: { type: 'string' } } } },
+                profile_picture: { type: 'string', description: 'Public image URL, cropped to a square' },
+                background_image: { type: 'string', description: 'Public image URL, cropped to 1584×396' },
+            },
+        },
+        category: 'profiles',
+        action: 'update',
+    },
+    {
         name: 'typeahead',
         description:
             'Turn a name into the LinkedIn id a search filter takes: a company, a school, a location, an industry, a title. Sales Navigator and Recruiter filters (seniority, function, lead lists, projects, occupations) take their ids from category sales_nav or recruiter.',
@@ -162,6 +232,13 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         action: 'accept',
     },
     {
+        name: 'decline_invitation',
+        description: 'Decline a received invitation, with the entity_urn and shared_secret from linkedin_pro_list_received_invitations. The sender is not told.',
+        inputSchema: { type: 'object', properties: { entity_urn: { type: 'string' }, shared_secret: { type: 'string' } }, required: ['entity_urn', 'shared_secret'] },
+        category: 'network',
+        action: 'decline',
+    },
+    {
         name: 'list_sent_invitations',
         description: 'Invitations the user sent that are still pending.',
         inputSchema: { type: 'object', properties: { count: count(100), offset: { type: 'integer', minimum: 0 } } },
@@ -216,6 +293,33 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         action: 'get_event',
     },
     {
+        name: 'invite_to_event',
+        description: "Invite some of the user's 1st-degree connections to a LinkedIn event, 50 at most per call.",
+        inputSchema: {
+            type: 'object',
+            properties: { event_url: eventUrl, profiles: { type: 'array', items: { type: 'string' }, maxItems: 50, description: 'Profile URLs of 1st-degree connections' } },
+            required: ['event_url', 'profiles'],
+        },
+        category: 'network',
+        action: 'invite_to_event',
+        quota: { action: 'invitation', amount: args => (Array.isArray(args.profiles) ? Math.min(args.profiles.length, 50) : 1) },
+    },
+    {
+        name: 'follow',
+        description: 'Follow a member or a company page as the user.',
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl, company_url: companyUrl, company_id: { type: 'string', description: 'Numeric id of the company page, instead of company_url' } } },
+        category: 'network',
+        action: 'follow',
+        quota: { action: 'engagement' },
+    },
+    {
+        name: 'unfollow',
+        description: 'Stop following a member or a company page.',
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl, company_url: companyUrl, company_id: { type: 'string', description: 'Numeric id of the company page, instead of company_url' } } },
+        category: 'network',
+        action: 'unfollow',
+    },
+    {
         name: 'search_groups',
         description: 'Find LinkedIn groups by keyword.',
         inputSchema: { type: 'object', properties: { keyword: { type: 'string' }, count: count(100), offset } },
@@ -248,8 +352,23 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'send_message',
-        description: 'Send a LinkedIn message to someone the user is connected to. Read the conversation with linkedin_pro_get_conversation first, and never send the same message twice.',
-        inputSchema: { type: 'object', properties: { profile_url: profileUrl, message_text: { type: 'string' } }, required: ['profile_url', 'message_text'] },
+        description:
+            'Send a LinkedIn message to someone the user is connected to, or reply in a conversation by its conversation_id. With inmail: true (and a subject) it goes as an InMail, which needs a Premium or Sales Navigator account and spends one of its InMail credits. Read the conversation with linkedin_pro_get_conversation first, and never send the same message twice. Attach files by public URL.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                profile_url: profileUrl,
+                conversation_id: { type: 'string', description: 'Reply in this conversation instead of naming a profile' },
+                message_text: { type: 'string' },
+                subject: { type: 'string', description: 'InMail only' },
+                inmail: { type: 'boolean' },
+                premium_inmail: { type: 'boolean', description: 'Send with a Premium InMail credit' },
+                media_links: { type: 'array', items: { type: 'string' }, maxItems: 10, description: 'Public URLs of files to attach' },
+                voice_message: { type: 'boolean', description: 'Send the attached audio as a voice note, one minute at most' },
+                quoted_message_id: { type: 'string', description: 'The entity_urn of the message this one replies to, among the last 100' },
+            },
+            required: ['message_text'],
+        },
         category: 'messages',
         action: 'send',
         quota: { action: 'message' },
@@ -257,7 +376,13 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     {
         name: 'list_conversations',
         description: "The user's LinkedIn inbox, most recent first. Pass next_cursor from the last answer to go further back.",
-        inputSchema: { type: 'object', properties: { category: { type: 'string', enum: ['INBOX', 'UNREAD', 'MY_CONNECTIONS', 'INMAIL', 'STARRED'] }, count: count(50), cursor: { type: 'string' } } },
+        inputSchema: { type: 'object', properties: {
+                category: { type: 'string', enum: ['INBOX', 'UNREAD', 'MY_CONNECTIONS', 'INMAIL', 'STARRED'] },
+                since: { type: 'integer', description: 'Only conversations active after this time, in Unix milliseconds' },
+                count: count(50),
+                cursor: { type: 'string' },
+            },
+        },
         category: 'messages',
         action: 'list_inbox',
         clamp: { count: { default: 20, max: 50 } },
@@ -265,10 +390,40 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     {
         name: 'get_conversation',
         description: 'The messages of one conversation, most recent first, by conversation_id or by the other person’s profile_url. A message from the user carries their own profile URL as sender. To open a file in a message, pass its download_url to linkedin_pro_download_attachment: its `url` is LinkedIn’s private link and does not open.',
-        inputSchema: { type: 'object', properties: { conversation_id: { type: 'string' }, profile_url: profileUrl, count: count(50), cursor: { type: 'string' } } },
+        inputSchema: {
+            type: 'object',
+            properties: {
+                conversation_id: { type: 'string' },
+                profile_url: profileUrl,
+                count: count(50),
+                cursor: { type: 'string' },
+                mark_as_read: { type: 'boolean', description: 'Also mark the conversation as read on LinkedIn' },
+            },
+        },
         category: 'messages',
         action: 'get_conversation',
         clamp: { count: { default: 20, max: 50 } },
+    },
+    {
+        name: 'react_to_message',
+        description: 'Put an emoji reaction on a message of a conversation, or take it off with remove: true. message_id is the entity_urn from linkedin_pro_get_conversation.',
+        inputSchema: { type: 'object', properties: { message_id: { type: 'string' }, conversation_id: { type: 'string' }, emoji: { type: 'string' }, remove: { type: 'boolean' } }, required: ['message_id', 'emoji'] },
+        category: 'messages',
+        action: 'react_message',
+    },
+    {
+        name: 'edit_message',
+        description: 'Change the text of a message the user sent, within 60 minutes of sending it.',
+        inputSchema: { type: 'object', properties: { message_id: { type: 'string' }, message_text: { type: 'string' } }, required: ['message_id', 'message_text'] },
+        category: 'messages',
+        action: 'edit_message',
+    },
+    {
+        name: 'delete_message',
+        description: 'Unsend a message the user sent, for everyone, within 60 minutes of sending it.',
+        inputSchema: { type: 'object', properties: { message_id: { type: 'string' } }, required: ['message_id'] },
+        category: 'messages',
+        action: 'delete_message',
     },
     {
         name: 'read_feed',
@@ -322,7 +477,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_post_comments',
-        description: "The comments under a LinkedIn post, each with its tracking_id, comment_urn and the commenter's profile_urn.",
+        description: "The comments under a LinkedIn post, each with the tracking_id, comment_urn and commenter's profile_urn that linkedin_pro_answer_comment needs.",
         inputSchema: { type: 'object', properties: { post_url: postUrl, count: count(1000), offset }, required: ['post_url'] },
         category: 'content',
         action: 'get_comments',
@@ -353,9 +508,47 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         quota: { action: 'engagement' },
     },
     {
+        name: 'answer_comment',
+        description: "Reply to a comment under a LinkedIn post, as the user, with the comment's tracking_id, comment_urn and commenter profile_urn from linkedin_pro_get_post_comments.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                tracking_id: { type: 'string' },
+                comment_urn: { type: 'string' },
+                profile_urn: { type: 'string', description: "The commenter's profile_urn" },
+                comment_text: { type: 'string' },
+                mention_user: { type: 'boolean', description: 'Mention the commenter at the start of the reply' },
+                commenter_name: { type: 'string', description: 'Their name, for the mention' },
+            },
+            required: ['tracking_id', 'comment_urn', 'profile_urn', 'comment_text'],
+        },
+        category: 'content',
+        action: 'answer_comment',
+        quota: { action: 'engagement' },
+    },
+    {
+        name: 'repost',
+        description: "Repost a LinkedIn post on the user's feed.",
+        inputSchema: { type: 'object', properties: { post_url: postUrl }, required: ['post_url'] },
+        category: 'content',
+        action: 'repost',
+        quota: { action: 'engagement' },
+    },
+    {
         name: 'create_post',
-        description: "Publish a text post on the user's LinkedIn feed. Only when the user asked for it or approved the text.",
-        inputSchema: { type: 'object', properties: { message: { type: 'string' } }, required: ['message'] },
+        description:
+            "Publish a post on the user's LinkedIn feed: text, with an image, a video, a document or a carousel by public URL, or a link preview. Only when the user asked for it or approved the text.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                message: { type: 'string' },
+                file: { type: 'string', description: 'Public URL of one image, video or document (pdf, doc, ppt)' },
+                files: { type: 'array', items: { type: 'string' }, description: 'Public URLs of the images of a carousel' },
+                thumbnail: { type: 'string', description: 'Cover image URL, for a video file only' },
+                document_title: { type: 'string', description: 'Title shown on a document, for a document file only' },
+                link: { type: 'string', description: 'A URL shown as a preview card. Not with file or files' },
+            },
+        },
         category: 'content',
         action: 'create',
         quota: { action: 'post' },

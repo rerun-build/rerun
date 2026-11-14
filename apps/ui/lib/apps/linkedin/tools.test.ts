@@ -6,15 +6,16 @@ import { LINKEDIN_TOOLS, linkedinTool } from './tools'
 vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/linkup/client')>()), runFlatEndpoint: vi.fn() }))
 
 describe('the LinkedIn tool set', () => {
-    it('never hands the coworker a login, a deletion or a webhook', () => {
-        const actions = LINKEDIN_TOOLS.map(tool => tool.action)
-        expect(actions).not.toContain('login')
-        expect(actions.some(action => /delete|webhook/.test(action))).toBe(false)
+    it('never hands the coworker the account itself: no login, no checkpoint, no account deletion, no webhook', () => {
+        for (const tool of LINKEDIN_TOOLS) {
+            expect(tool.action).not.toMatch(/login|checkpoint|account|webhook/)
+            expect(['profiles', 'network', 'messages', 'content']).toContain(tool.category)
+        }
         expect(new Set(LINKEDIN_TOOLS.map(tool => tool.name)).size).toBe(LINKEDIN_TOOLS.length)
     })
 
     it('meters every action LinkedIn could restrict the account for', () => {
-        for (const name of ['send_invitation', 'send_message', 'get_profile', 'search_people', 'comment_on_post']) {
+        for (const name of ['send_invitation', 'send_message', 'get_profile', 'search_people', 'comment_on_post', 'visit_profile', 'invite_to_event', 'follow', 'answer_comment', 'repost', 'create_post']) {
             expect(linkedinTool(name)?.quota).toBeDefined()
         }
     })
@@ -52,6 +53,42 @@ describe('reading LinkedIn', () => {
         vi.mocked(runFlatEndpoint).mockResolvedValueOnce({ items: [] })
         await typeahead.run!({ slug: 'linkedin', accountId: 'acc-1', connectionId: 'c', engineAgentId: 'a', engine: vi.fn() }, { type: 'company', keyword: 'Stripe', limit: 10 })
         expect(runFlatEndpoint).toHaveBeenCalledWith('acc-1', 'typeahead', { type: 'company', keyword: 'Stripe', limit: 10 })
+    })
+})
+
+describe('acting on LinkedIn', () => {
+    it('counts an event invitation once per person invited', () => {
+        const invite = linkedinTool('invite_to_event')!
+        expect(invite.quota?.action).toBe('invitation')
+        expect(invite.quota?.amount?.({ profiles: ['a', 'b', 'c'] })).toBe(3)
+        expect(missingRequired(invite, toolParams(invite, { event_url: 'https://www.linkedin.com/events/1' }))).toEqual(['profiles'])
+    })
+
+    it('replies in a conversation or sends an InMail with only the text required', () => {
+        const send = linkedinTool('send_message')!
+        expect(missingRequired(send, toolParams(send, { conversation_id: '2-abc', message_text: 'Thanks' }))).toEqual([])
+        expect(toolParams(send, { profile_url: 'https://www.linkedin.com/in/jane', message_text: 'Hi', subject: 'Intro', inmail: true })).toEqual({
+            profile_url: 'https://www.linkedin.com/in/jane',
+            message_text: 'Hi',
+            subject: 'Intro',
+            inmail: true,
+        })
+    })
+
+    it('publishes a post with a file and no text', () => {
+        const post = linkedinTool('create_post')!
+        expect(missingRequired(post, toolParams(post, { file: 'https://example.com/deck.pdf', document_title: 'Deck' }))).toEqual([])
+    })
+
+    it('edits and unsends the messages the user sent', () => {
+        expect([linkedinTool('edit_message')?.action, linkedinTool('delete_message')?.action, linkedinTool('react_to_message')?.action]).toEqual(['edit_message', 'delete_message', 'react_message'])
+        expect(missingRequired(linkedinTool('delete_message')!, {})).toEqual(['message_id'])
+    })
+
+    it('passes profile edits through whole', () => {
+        const update = linkedinTool('update_my_profile')!
+        const experience = [{ title: 'Founder', company: 'Rerun', start_date: '2024-01', is_current: true }]
+        expect(toolParams(update, { headline: 'Building Rerun', experience, skills: { add: ['AI'] } })).toEqual({ headline: 'Building Rerun', experience, skills: { add: ['AI'] } })
     })
 })
 
