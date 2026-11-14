@@ -145,6 +145,9 @@ export type PodView = {
     state: 'queued' | 'held' | 'working' | 'fixing' | 'checks' | 'complete' | 'rejected'
     verdict?: 'pass' | 'fail' // set while the scanner shows it, at the end of a review
     scan: number // 0..1 through a review, for the scanner's sweep
+    since?: number // epoch ms the task entered its stage
+    holder?: string // the coworker and its copy, `code · 3`
+    pr?: number
 }
 // Status colours, shared by the lines and the spheres.
 export const STATUS_COLOR = { queued: '#8ea2ff', held: '#ef4444', build: '#f5a524', review: '#2dd4a3', fixing: '#fb923c', checks: '#6ea8ff', complete: '#ffe08a', rejected: '#f87171' } as const
@@ -214,7 +217,7 @@ export function factoryScene(t: number, now: number): FactoryFrame {
         const prev = job.legs[legIndex - 1]
         const ride = (t - leg.from) / (TRANSIT_MS * 1.6)
         const pod = (path: string[], travel: number, band: Band, state: PodView['state'], extra: Partial<PodView> = {}) =>
-            pods.push({ id: `pod-${job.issue}`, issue: job.issue, title: job.title, path, travel: ease(clamp(travel)), queue: 0, level, band, state, scan: 0, ...extra })
+            pods.push({ id: `pod-${job.issue}`, issue: job.issue, title: job.title, path, travel: ease(clamp(travel)), queue: 0, level, band, state, scan: 0, since: Math.round(now - (t - leg.from)), ...extra })
         counts.runs += leg.kind === 'queued' ? 0 : 1
 
         if (leg.kind === 'queued') {
