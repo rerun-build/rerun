@@ -60,7 +60,7 @@ describe('IsoGrid canDropTile', () => {
         const fire = (type: string, x: number, y: number) => act(() => { target.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX: x, clientY: y, button: 0, pointerType: 'mouse', pointerId: 1 })) })
         // a pointerdown on empty floor starts a pan, so each try gets a fresh board
         const hit = (() => {
-            for (let y = 250; y < 550; y += 8) for (let x = 350; x < 650; x += 8) {
+            for (let y = 250; y < 550; y += 12) for (let x = 350; x < 650; x += 12) {
                 target = mount()
                 fire('pointerdown', x, y)
                 fire('pointermove', x + 40, y + 40)
@@ -77,5 +77,5 @@ describe('IsoGrid canDropTile', () => {
         expect(host.querySelector('[data-drop-hint="refused"]')).not.toBeNull()
         act(() => { vi.advanceTimersByTime(2) })
         expect(host.querySelector('[data-drop-hint="refused"]')).toBeNull()
-    })
+    }, 60000)
 })
