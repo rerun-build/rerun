@@ -29,20 +29,20 @@ function useStable<T>(value: T): T {
 // The moving parts keep a clock of their own, so the spheres glide while the board stays still.
 type SceneFn = (t: number, now: number) => FactoryFrame
 
-function LiveOverlay({ start, tiles, routes, scene }: { start: number; tiles: Tile[]; routes: Map<string, AxisPoint[]>; scene: SceneFn }) {
+function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }: { start: number; tiles: Tile[]; routes: Map<string, AxisPoint[]>; scene: SceneFn; selectedIssue: number | null; onSelectJob: ((issue: number) => void) | undefined }) {
     const [now, setNow] = useState(() => Date.now())
     useEffect(() => {
         const id = setInterval(() => setNow(Date.now()), TICK_MS)
         return () => clearInterval(id)
     }, [])
     const frame = scene((now - start) % LOOP_MS, now)
-    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} />
+    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} />
 }
 
 // The factory, drawn by the board's own world. The world takes the whole stage; a thin glass bar
 // carries the gauges and the counts, and a band drops in while sending is held.
 // `workspace` keys the owner's own arrangement of the floor in the browser.
-export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample' }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string }) {
+export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void }) {
     const [clock, setClock] = useState(() => ({ start: Date.now(), now: Date.now() }))
     const [expired, setExpired] = useState<Set<string>>(() => new Set())
     useEffect(() => {
@@ -71,7 +71,11 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
     const routes = useMemo(() => routeTileLinks(tiles, links), [tiles, links])
     const onToastExpire = useCallback((id: string) => setExpired(prev => new Set(prev).add(id)), [])
-    const worldOverlay = useCallback(() => <LiveOverlay start={clock.start} tiles={tiles} routes={routes} scene={scene} />, [clock.start, tiles, routes, scene])
+    const worldOverlay = useCallback(() => <LiveOverlay start={clock.start} tiles={tiles} routes={routes} scene={scene} selectedIssue={selectedIssue} onSelectJob={onSelectJob} />, [clock.start, tiles, routes, scene, selectedIssue, onSelectJob])
+    // A coworker's tile opens its panel on a click. A click that ends a drag is not a click: IsoGrid
+    // selects only a press released before the drag threshold.
+    const gridTiles = useMemo(() => (onOpenCoworker ? tiles.map(t => (t.style?.buddy ? { ...t, selectable: true } : t)) : tiles), [tiles, onOpenCoworker])
+    const onTileSelect = useCallback((id: string | null) => { if (id && onOpenCoworker) onOpenCoworker(id) }, [onOpenCoworker])
 
     // A feature whose sphere fills throws the app's own confetti; a single merge has its own shake.
     const fullCabinets = frame.cabinets.filter(c => c.slots.every(s => s.state !== 'empty')).length
@@ -116,7 +120,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     return (
         <div ref={ref} className={`${theme} relative h-dvh w-full overflow-hidden bg-background text-foreground`}>
             <IsoGrid
-                tiles={tiles}
+                tiles={gridTiles}
                 containers={frame.containers}
                 liveLinks={links}
                 toasts={toasts}
@@ -126,6 +130,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
                 showLinks
                 onTileMove={onTileMove}
                 selectedTileId={null}
+                {...(onOpenCoworker ? { onTileSelect } : {})}
                 scrollGestures
                 worldOverlay={worldOverlay}
             />

@@ -43,7 +43,7 @@ const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >
 
 // `routes` are the board's own, from routeTileLinks on the same tiles and links, so a sphere rides
 // the belt drawn under it.
-export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean }) {
+export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
     // A leg ends on one face of a tile and the next leaves from another, so both points are kept: the
     // sphere crosses the tile between them. A pair with no line (a blocked job parked at a coworker)
@@ -82,8 +82,8 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held }:
                 const rest = Math.max(0, lengthOf(pts) - REST_PX - (restRank.get(p.id) ?? 0) * QUEUE_GAP)
                 const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : settles(p) ? atDistance(pts, rest * p.travel) : along(pts, p.travel)
                 return p.state === 'working' && p.band === 'review' && p.travel >= 1
-                    ? <Scanner key={p.id} pod={p} at={at}><Orb pod={p} at={{ x: 0, y: 0 }} /></Scanner>
-                    : <Orb key={p.id} pod={p} at={at} />
+                    ? <Scanner key={p.id} pod={p} at={at}><Orb pod={p} at={{ x: 0, y: 0 }} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} /></Scanner>
+                    : <Orb key={p.id} pod={p} at={at} selected={selectedIssue === p.issue} onSelectJob={onSelectJob} />
             })}
         </div>
     )
@@ -92,7 +92,7 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held }:
 // A task: a glass sphere sitting on the line to whoever works it, filling like a liquid in the colour of
 // its status. The level is the task's progress, exact; the surface sways a little, the glass catches
 // the light, and a soft glow under it lights the line.
-function Orb({ pod, at }: { pod: PodView; at: P }) {
+function Orb({ pod, at, selected = false, onSelectJob }: { pod: PodView; at: P; selected?: boolean; onSelectJob?: (issue: number) => void }) {
     const color = pod.state === 'working' ? STATUS_COLOR[pod.band === 'review' ? 'review' : 'build'] : STATUS_COLOR[pod.state === 'complete' ? 'complete' : pod.state === 'rejected' ? 'rejected' : pod.state === 'held' ? 'held' : pod.state === 'checks' ? 'checks' : pod.state === 'fixing' ? 'fixing' : 'queued']
     const R = 15
     const level = Math.max(0.04, pod.level)
@@ -103,7 +103,17 @@ function Orb({ pod, at }: { pod: PodView; at: P }) {
         <div className="fab-orb-pos absolute" style={{ left: 0, top: 0, transform: `translate(${at.x}px, ${at.y - R - 3}px)` }}>
             <div className="fab-orb" data-state={pod.state} style={{ ['--orb' as string]: color, ['--wobble-delay' as string]: `${-wobble * 3}s` }}>
                 <span className="fab-orb-glow" />
-                <svg className="fab-orb-svg" viewBox={`${-R - 2} ${-R - 2} ${2 * R + 4} ${2 * R + 4}`} width={2 * R + 4} height={2 * R + 4}>
+                <svg
+                    className="fab-orb-svg"
+                    data-orb={pod.issue}
+                    data-selected={selected || undefined}
+                    {...(onSelectJob ? {
+                        // Only the sphere takes the pointer; the rest of the overlay stays click-through.
+                        style: { pointerEvents: 'auto' as const, cursor: 'pointer' },
+                        onPointerDown: (e: React.PointerEvent) => e.stopPropagation(),
+                        onClick: (e: React.MouseEvent) => { e.stopPropagation(); onSelectJob(pod.issue) },
+                    } : {})}
+                    viewBox={`${-R - 2} ${-R - 2} ${2 * R + 4} ${2 * R + 4}`} width={2 * R + 4} height={2 * R + 4}>
                     <defs>
                         <clipPath id={`clip-${uid}`}><circle r={R - 0.8} /></clipPath>
                         <radialGradient id={`liq-${uid}`} cx="40%" cy="30%" r="80%">
@@ -120,6 +130,7 @@ function Orb({ pod, at }: { pod: PodView; at: P }) {
                         </g>
                     </g>
                     <circle r={R} className="fab-orb-rim" />
+                    {selected && <circle r={R + 3} fill="none" stroke={color} strokeWidth={2} className="fab-orb-ring" />}
                     <ellipse cx={-5} cy={-7.5} rx={4.6} ry={2.6} className="fab-orb-shine" />
                 </svg>
                 <span className="fab-orb-tag">#{pod.issue}<b>{Math.round(pod.level * 100)}%</b></span>
