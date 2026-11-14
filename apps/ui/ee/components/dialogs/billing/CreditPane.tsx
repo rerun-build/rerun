@@ -18,7 +18,8 @@ const QUOTE_DEBOUNCE_MS = 250
 
 // What Stripe would charge today for a number of packs. `loading` until the answer for that very
 // number is in; `quote` keeps the last answer meanwhile, so the card on file does not blink at every
-// step. A failed quote reads as none: the pane falls back on the list price and on Checkout.
+// step. A failed quote reads as none: the pane falls back on the list price, and keeps the consent,
+// since the server may still charge the card on file.
 function useCreditQuote(packs: number): { quote: CreditQuote | null; loading: boolean; settled: boolean } {
     const [answer, setAnswer] = useState<{ packs: number; quote: CreditQuote | null } | null>(null)
 
@@ -49,7 +50,7 @@ export function CreditPane({ onBack, onDone }: { onBack?: () => void; onDone: (s
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const { quote, loading, settled } = useCreditQuote(packs)
-    const onCheckout = settled && !quote?.card
+    const onCheckout = !!quote && !quote.card
     // Stripe's Checkout page collects the consent itself.
     const needsConsent = settled && !onCheckout && !accepted
     const listPrice = packs * CREDIT_PACK_PRICE_CENTS

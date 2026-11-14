@@ -14,6 +14,7 @@ import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { checkoutRouteFor, trialOffer, type CheckoutRoute } from '@/ee/lib/billing/checkout-variant'
 import { CreditCardIcon, RefreshCwIcon, TicketIcon } from '@/lib/icons'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
+import { useCreditCheckoutReturn } from '@/ee/lib/billing/useCreditCheckoutReturn'
 import { isLifetimePlan } from '@/ee/lib/billing/plans'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
@@ -43,6 +44,7 @@ export function BillingDialog() {
     const [state, setState] = useState<SubscriptionState | null>(null)
     const [resolved, setResolved] = useState<Resolved>({ kind: 'loading' })
     const [cancelOpen, setCancelOpen] = useState(false)
+    useCreditCheckoutReturn()
 
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
 

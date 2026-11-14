@@ -35,7 +35,7 @@ import {
     type SubscriptionState,
 } from '@/ee/services/billing.service'
 import { loadCancelFlowActivity, type CancelFlowActivity } from '@/ee/services/cancel-flow-activity.service'
-import { buyCredit, quoteCreditPurchase, type CreditPurchaseResult, type CreditQuote } from '@/ee/services/credit-purchase.service'
+import { abandonCreditInvoice, buyCredit, confirmCreditCheckout, quoteCreditPurchase, settleCreditInvoice, type CreditPurchaseResult, type CreditQuote } from '@/ee/services/credit-purchase.service'
 import { getCreditUsage } from '@/ee/services/credit-usage.service'
 import { markPaymentMethodAdded } from '@/app/api/_services/getting-started.service'
 import { CANCEL_COMEBACKS, cancelReasonTextSchema, type CancelReason, type RetentionOfferKind } from '@/ee/lib/billing/cancel-flow'
@@ -48,7 +48,7 @@ import type { TaxIdType } from '@/ee/lib/billing/tax-id'
 import { z } from 'zod'
 import { AppError, failure, failureOf, type ActionFailure, type ErrorCode } from '@/lib/i18n/action-error'
 
-const sessionIdSchema = z.string().trim().min(1).max(200)
+const stripeIdSchema = z.string().trim().min(1).max(200)
 
 const requireBillingAdmin = () => requireAdminContext('adminOnlyBilling')
 
@@ -213,7 +213,7 @@ export async function createPlanCheckoutAction(selection: PlanSelection): Promis
 export async function updatePlanCheckoutAction(sessionId: string, selection: PlanSelection): Promise<{ ok: true } | ActionFailure> {
     try {
         await requireBillingAdmin()
-        await updatePlanCheckoutSession(sessionIdSchema.parse(sessionId), planSelectionSchema.parse(selection))
+        await updatePlanCheckoutSession(stripeIdSchema.parse(sessionId), planSelectionSchema.parse(selection))
         return { ok: true }
     } catch (err) {
         return failureOf(err, 'updatePlanFailed')
@@ -223,7 +223,7 @@ export async function updatePlanCheckoutAction(sessionId: string, selection: Pla
 export async function acceptPlanTermsAction(sessionId: string): Promise<{ ok: true } | ActionFailure> {
     try {
         await requireBillingAdmin()
-        await acceptPlanTerms(sessionIdSchema.parse(sessionId))
+        await acceptPlanTerms(stripeIdSchema.parse(sessionId))
         return { ok: true }
     } catch (err) {
         return failureOf(err, 'recordAcceptanceFailed')
@@ -252,6 +252,9 @@ export async function previewPlanChangeAction(selection: PlanSelection): Promise
 export async function changePlanAction(selection: PlanSelection): Promise<({ ok: true } & PlanChangeResult) | ActionFailure> {
     try {
         await requireBillingAdmin()
+        // A page loaded before credit left the plan still sends its packs. The schema would drop them
+        // and answer a success that bought nothing.
+        if ((selection?.quantities as { credit_pack?: number } | undefined)?.credit_pack) throw new AppError('reloadToBuyCredit')
         return { ok: true, ...(await changePlan(planSelectionSchema.parse(selection))) }
     } catch (err) {
         return planChargeFailure(err)
@@ -286,6 +289,38 @@ export async function buyCreditAction(packs: number): Promise<({ ok: true } & Cr
         return { ok: true, ...(await buyCredit(creditPacksSchema.parse(packs))) }
     } catch (err) {
         return planChargeFailure(err, 'buyCreditFailed')
+    }
+}
+
+export async function settleCreditInvoiceAction(invoiceId: string): Promise<{ ok: true } | ActionFailure> {
+    try {
+        await requireBillingAdmin()
+        await settleCreditInvoice(stripeIdSchema.parse(invoiceId))
+        return { ok: true }
+    } catch (err) {
+        return failureOf(err, 'buyCreditFailed')
+    }
+}
+
+export async function abandonCreditInvoiceAction(invoiceId: string): Promise<{ ok: true } | ActionFailure> {
+    try {
+        await requireBillingAdmin()
+        await abandonCreditInvoice(stripeIdSchema.parse(invoiceId))
+        return { ok: true }
+    } catch (err) {
+        return failureOf(err, 'buyCreditFailed')
+    }
+}
+
+export async function confirmCreditCheckoutAction(sessionId: string): Promise<{ ok: true; packs: number } | ActionFailure> {
+    try {
+        await requireBillingAdmin()
+        return { ok: true, ...(await confirmCreditCheckout(stripeIdSchema.parse(sessionId))) }
+    } catch (err) {
+        if (err instanceof AppError) return failureOf(err)
+        // Stripe's wording of a session it cannot find is for developers.
+        console.error('[billing] credit checkout not confirmed', err)
+        return failure('confirmPurchaseFailed')
     }
 }
 

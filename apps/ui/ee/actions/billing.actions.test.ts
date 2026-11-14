@@ -162,6 +162,12 @@ describe('the thin billing actions', () => {
         await expect(changePlanAction(SELECTION)).resolves.toEqual({ ok: false, error: 'Failed to change your plan', code: 'changePlanFailed' })
     })
 
+    it('refuses the credit packs a page loaded before they left the plan still sends', async () => {
+        const stale = { ...SELECTION, quantities: { ...SELECTION.quantities, credit_pack: 2 } } as never
+        await expect(changePlanAction(stale)).resolves.toMatchObject({ ok: false, code: 'reloadToBuyCredit' })
+        expect(billing.changePlan).not.toHaveBeenCalled()
+    })
+
     it('passes on the decline the service already worded for the customer', async () => {
         vi.mocked(billing.changePlan).mockRejectedValue(new Error('Your card was declined.'))
         await expect(changePlanAction(SELECTION)).resolves.toEqual({ ok: false, error: 'Your card was declined.' })
@@ -188,9 +194,9 @@ describe('the thin billing actions', () => {
         expect(billing.createPlanCheckoutSession).not.toHaveBeenCalled()
     })
 
-    it('drops the agent or credit pack a page loaded before the deploy still sends, rather than refusing the change', async () => {
+    it('drops the agent pack and the empty credit pack a page loaded before the deploy still sends, rather than refusing the change', async () => {
         vi.mocked(billing.changePlan).mockResolvedValue({ trialEnded: true, switchAt: null, paymentClientSecret: null })
-        const stale = { quantities: { agent_pack: 3, credit_pack: 2, linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' } as never
+        const stale = { quantities: { agent_pack: 3, credit_pack: 0, linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' } as never
         await expect(changePlanAction(stale)).resolves.toMatchObject({ ok: true })
         expect(billing.changePlan).toHaveBeenCalledWith({ quantities: { linkedin_slot: 0, whatsapp_slot: 0 }, interval: 'monthly' })
     })

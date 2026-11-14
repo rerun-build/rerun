@@ -5,7 +5,7 @@ import { stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type FakeSupabase } from '@/test/supabase-fake'
 import { assertPaymentAwaitsConfirmation, ensureStripeCustomer } from './billing.service'
-import { buyCredit, quoteCreditPurchase, recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from './credit-purchase.service'
+import { abandonCreditInvoice, buyCredit, confirmCreditCheckout, quoteCreditPurchase, recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase, settleCreditInvoice } from './credit-purchase.service'
 
 vi.mock('@/ee/lib/billing/stripe', async importOriginal => ({ ...(await importOriginal<typeof import('@/ee/lib/billing/stripe')>()), stripe: (await import('@/ee/test/stripe-fake')).fakeStripe() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -88,7 +88,7 @@ describe('buyCredit', () => {
     it('hands the browser the 3-D Secure secret and grants nothing yet', async () => {
         vi.mocked(stripe.invoices.pay).mockRejectedValue(Object.assign(new Error('requires action'), { code: 'invoice_payment_intent_requires_action' }))
         vi.mocked(stripe.invoices.retrieve).mockResolvedValue({ id: 'in_1', confirmation_secret: { client_secret: 'pi_1_secret_x' } } as never)
-        await expect(buyCredit(2)).resolves.toEqual({ kind: 'confirm', clientSecret: 'pi_1_secret_x' })
+        await expect(buyCredit(2)).resolves.toEqual({ kind: 'confirm', clientSecret: 'pi_1_secret_x', invoiceId: 'in_1' })
         expect(assertPaymentAwaitsConfirmation).toHaveBeenCalledWith('pi_1_secret_x')
         expect(stripe.invoices.voidInvoice).not.toHaveBeenCalled()
         expect(grants()).toEqual([])
@@ -100,6 +100,25 @@ describe('buyCredit', () => {
         await expect(buyCredit(2)).rejects.toThrow('Your card was declined.')
         expect(stripe.invoices.voidInvoice).toHaveBeenCalledWith('in_1')
         expect(grants()).toEqual([])
+    })
+
+    it('voids the invoice when the bank is not waiting for a confirmation', async () => {
+        vi.mocked(stripe.invoices.pay).mockRejectedValue(Object.assign(new Error('requires action'), { code: 'invoice_payment_intent_requires_action' }))
+        vi.mocked(stripe.invoices.retrieve).mockResolvedValue({ id: 'in_1', confirmation_secret: { client_secret: 'pi_1_secret_x' } } as never)
+        vi.mocked(assertPaymentAwaitsConfirmation).mockRejectedValueOnce(new Error('Your card was declined.'))
+        vi.mocked(stripe.invoices.voidInvoice).mockResolvedValue({} as never)
+        await expect(buyCredit(2)).rejects.toThrow('Your card was declined.')
+        expect(stripe.invoices.voidInvoice).toHaveBeenCalledWith('in_1')
+    })
+
+    it('answers paid once the card is charged, even when the grant fails', async () => {
+        const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+        db = fakeSupabase(table => (table === 'workspaces' ? { data: workspace } : table === 'rpc:grant_rerun_credit_purchase' ? { error: { message: 'connection lost' } } : undefined))
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+        await expect(buyCredit(2)).resolves.toEqual({ kind: 'paid' })
+        expect(stripe.invoices.voidInvoice).not.toHaveBeenCalled()
+        expect(logged).toHaveBeenCalled()
+        logged.mockRestore()
     })
 
     it('deletes the draft invoice when Stripe refuses to build it', async () => {
@@ -152,6 +171,53 @@ describe('recording a purchase', () => {
     it('grants nothing for a session not paid yet', async () => {
         await recordCreditCheckoutSession({ metadata: METADATA, payment_status: 'unpaid', payment_intent: 'pi_2' } as never)
         expect(grants()).toEqual([])
+    })
+})
+
+describe('the browser back from the payment', () => {
+    const PAID_INVOICE = { id: 'in_1', status: 'paid', metadata: METADATA, payments: { data: [{ payment: { payment_intent: 'pi_1' } }] } }
+
+    it('grants a Checkout session of its workspace ahead of the webhook', async () => {
+        vi.mocked(stripe.checkout.sessions.retrieve).mockResolvedValue({ metadata: METADATA, payment_status: 'paid', payment_intent: 'pi_2', customer: 'cus_1' } as never)
+        await expect(confirmCreditCheckout('cs_1')).resolves.toEqual({ packs: 2 })
+        expect(grants()).toEqual([{ p_workspace_id: 42, p_stripe_ref: 'pi_2', p_packs: 2, p_micros: 20_000_000 }])
+    })
+
+    it('refuses the Checkout session of another workspace', async () => {
+        vi.mocked(stripe.checkout.sessions.retrieve).mockResolvedValue({ metadata: { ...METADATA, workspace_id: '7' }, payment_status: 'paid', payment_intent: 'pi_2' } as never)
+        await expect(confirmCreditCheckout('cs_1')).rejects.toThrow('another workspace')
+        expect(grants()).toEqual([])
+    })
+
+    it('refuses a Checkout session that is not paid', async () => {
+        vi.mocked(stripe.checkout.sessions.retrieve).mockResolvedValue({ metadata: METADATA, payment_status: 'unpaid', payment_intent: 'pi_2' } as never)
+        await expect(confirmCreditCheckout('cs_1')).rejects.toThrow()
+        expect(grants()).toEqual([])
+    })
+
+    it('grants an invoice the bank confirmed', async () => {
+        vi.mocked(stripe.invoices.retrieve).mockResolvedValue(PAID_INVOICE as never)
+        await settleCreditInvoice('in_1')
+        expect(grants()).toEqual([{ p_workspace_id: 42, p_stripe_ref: 'pi_1', p_packs: 2, p_micros: 20_000_000 }])
+    })
+
+    it('refuses to settle the invoice of another workspace', async () => {
+        vi.mocked(stripe.invoices.retrieve).mockResolvedValue({ ...PAID_INVOICE, metadata: { ...METADATA, workspace_id: '7' } } as never)
+        await expect(settleCreditInvoice('in_1')).rejects.toThrow('another workspace')
+        expect(grants()).toEqual([])
+    })
+
+    it('voids an invoice the bank did not confirm', async () => {
+        vi.mocked(stripe.invoices.retrieve).mockResolvedValue({ id: 'in_1', status: 'open', metadata: METADATA } as never)
+        vi.mocked(stripe.invoices.voidInvoice).mockResolvedValue({} as never)
+        await abandonCreditInvoice('in_1')
+        expect(stripe.invoices.voidInvoice).toHaveBeenCalledWith('in_1')
+    })
+
+    it('leaves a paid invoice alone', async () => {
+        vi.mocked(stripe.invoices.retrieve).mockResolvedValue(PAID_INVOICE as never)
+        await abandonCreditInvoice('in_1')
+        expect(stripe.invoices.voidInvoice).not.toHaveBeenCalled()
     })
 })
 

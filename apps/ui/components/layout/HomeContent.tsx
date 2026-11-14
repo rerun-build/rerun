@@ -42,6 +42,7 @@ import { useAgentShareStore } from '@/stores/agent-share.store'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
 import { useResumePendingStart } from '@/lib/onboarding/useResumePendingStart'
+import { clearSearchParams } from '@/lib/clear-search-params'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -60,16 +61,6 @@ import { track } from '@rerun/analytics/client'
 // Durée minimale d'affichage du loader : le temps que le R se trace (45% d'un
 // cycle de 2.8s) pour que l'animation soit perceptible et pas un simple flash.
 const MIN_LOADER_MS = 1300
-
-// `history.replaceState` plutôt que `router.replace` : Next le synchronise avec `useSearchParams`
-// sans repasser par le serveur, donc pas de re-render de la page dynamique (fallback du Suspense
-// qui reflashe) ni de navigation qu'une réponse de server action peut recouvrir.
-function clearSearchParams(...keys: string[]) {
-    const url = new URL(window.location.href)
-    if (!keys.some(key => url.searchParams.has(key))) return
-    for (const key of keys) url.searchParams.delete(key)
-    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
-}
 
 function clearTemplateParam() {
     clearSearchParams('template')

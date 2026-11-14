@@ -23,7 +23,7 @@ export type CreditQuote = {
     card: SavedCard | null
 }
 
-export type CreditPurchaseResult = { kind: 'paid' } | { kind: 'confirm'; clientSecret: string } | { kind: 'checkout'; url: string }
+export type CreditPurchaseResult = { kind: 'paid' } | { kind: 'confirm'; clientSecret: string; invoiceId: string } | { kind: 'checkout'; url: string }
 
 type PurchaseContext = { workspaceId: number; customerId: string | null; paymentMethod: Stripe.PaymentMethod | null }
 
@@ -102,22 +102,58 @@ export async function buyCredit(packs: number): Promise<CreditPurchaseResult> {
         throw err
     }
 
+    let paid: Stripe.Invoice
     try {
-        const paid = await stripe.invoices.pay(invoiceId)
-        await recordCreditInvoice(paid)
-        return { kind: 'paid' }
+        paid = await stripe.invoices.pay(invoiceId)
     } catch (err) {
         if ((err as { code?: string } | null)?.code !== 'invoice_payment_intent_requires_action') {
-            await stripe.invoices.voidInvoice(invoiceId).catch(voidErr => console.error('[credit purchase] could not void a refused invoice', invoiceId, voidErr))
+            await voidUnpaidInvoice(invoiceId)
             throw err
         }
-        // The bank asks for 3-D Secure: the browser confirms, and `invoice.paid` grants the credit.
+        return await awaitBankConfirmation(invoiceId)
+    }
+    // The card is charged: a grant that fails now is `invoice.paid`'s to replay, not a failed purchase
+    // the customer would pay for a second time.
+    await recordCreditInvoice(paid).catch(err => console.error('[credit purchase] grant left to the webhook', invoiceId, err))
+    return { kind: 'paid' }
+}
+
+// The bank asks for 3-D Secure: the browser confirms, then names the invoice again to settle it, or
+// to abandon it when the confirmation failed.
+async function awaitBankConfirmation(invoiceId: string): Promise<CreditPurchaseResult> {
+    try {
         const open = await stripe.invoices.retrieve(invoiceId, { expand: ['confirmation_secret'] })
         const clientSecret = open.confirmation_secret?.client_secret
         if (!clientSecret) throw new AppError('chargeRefused')
         await assertPaymentAwaitsConfirmation(clientSecret)
-        return { kind: 'confirm', clientSecret }
+        return { kind: 'confirm', clientSecret, invoiceId }
+    } catch (err) {
+        await voidUnpaidInvoice(invoiceId)
+        throw err
     }
+}
+
+// Nothing collects a one-off invoice after the dialog: left open, it stays due on the customer.
+async function voidUnpaidInvoice(invoiceId: string): Promise<void> {
+    await stripe.invoices.voidInvoice(invoiceId).catch(err => console.error('[credit purchase] could not void an unpaid invoice', invoiceId, err))
+}
+
+// An invoice the browser names is only acted on when it is a credit purchase of its own workspace.
+async function ownCreditInvoice(invoiceId: string): Promise<Stripe.Invoice> {
+    const workspaceId = await requireWorkspaceId()
+    const invoice = await stripe.invoices.retrieve(invoiceId)
+    if (readPurchaseMetadata(invoice.metadata)?.workspaceId !== workspaceId) throw new AppError('purchaseOtherWorkspace')
+    return invoice
+}
+
+// The browser back from the bank's confirmation: the credit lands without waiting for `invoice.paid`.
+export async function settleCreditInvoice(invoiceId: string): Promise<void> {
+    await recordCreditInvoice(await ownCreditInvoice(invoiceId))
+}
+
+export async function abandonCreditInvoice(invoiceId: string): Promise<void> {
+    const invoice = await ownCreditInvoice(invoiceId)
+    if (invoice.status === 'open') await voidUnpaidInvoice(invoiceId)
 }
 
 async function createCreditCheckoutSession(packs: number): Promise<string> {
@@ -142,7 +178,8 @@ async function createCreditCheckoutSession(packs: number): Promise<string> {
         invoice_creation: { enabled: true },
         ...CREDIT_PURCHASE_CONSENT,
         metadata,
-        success_url: `${origin}/?billing=success`,
+        // {CHECKOUT_SESSION_ID} is a Stripe literal, not a template hole to interpolate.
+        success_url: `${origin}/?credit=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/?billing=cancel`,
     })
     if (!checkout.url) throw new Error('Stripe did not return a checkout URL')
@@ -194,6 +231,17 @@ export async function recordCreditCheckoutSession(session: Stripe.Checkout.Sessi
     if (!meta || session.payment_status !== 'paid' || !intentId) return
     await grantPurchase(meta, intentId)
     await adoptCardWhenNoneOnFile(session, intentId)
+}
+
+// The browser back from Checkout, ahead of `checkout.session.completed`.
+export async function confirmCreditCheckout(sessionId: string): Promise<{ packs: number }> {
+    const workspaceId = await requireWorkspaceId()
+    const session = await stripe.checkout.sessions.retrieve(sessionId)
+    const meta = readPurchaseMetadata(session.metadata)
+    if (meta?.workspaceId !== workspaceId) throw new AppError('purchaseOtherWorkspace')
+    if (session.payment_status !== 'paid') throw new AppError('confirmPurchaseFailed')
+    await recordCreditCheckoutSession(session)
+    return { packs: meta.packs }
 }
 
 // The card typed on Checkout pays the next pack from the dialog, unless the customer already has one.

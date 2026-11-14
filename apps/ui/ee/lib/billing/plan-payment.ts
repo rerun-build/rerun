@@ -1,4 +1,4 @@
-import { buyCreditAction, changePlanAction } from '@/ee/actions/billing.actions'
+import { abandonCreditInvoiceAction, buyCreditAction, changePlanAction, settleCreditInvoiceAction } from '@/ee/actions/billing.actions'
 import type { PlanSelection } from '@/ee/services/billing.service'
 import { stripeBrowser } from '@/ee/lib/billing/stripe-client'
 
@@ -31,15 +31,19 @@ export async function runPlanChange(selection: PlanSelection): ReturnType<typeof
 
 // A credit purchase as the dialog runs it: charged on the card on file, confirmed with the bank when
 // it asks, or handed to a Stripe Checkout page when there is no card to charge. The credit is granted
-// by the server once the payment succeeds, never by this page.
+// by the server once the payment succeeds, never by this page: after the bank's confirmation the page
+// only asks the server to settle the invoice, so the credit is there before `invoice.paid` arrives.
 export async function runCreditPurchase(packs: number): ReturnType<typeof buyCreditAction> {
     const result = await buyCreditAction(packs)
     if (!result.ok || result.kind !== 'confirm') return result
     try {
         await confirmPlanPayment(result.clientSecret)
-        return { ok: true, kind: 'paid' }
     } catch (err) {
+        void abandonCreditInvoiceAction(result.invoiceId).catch(() => undefined)
         const message = err instanceof Error ? err.message : NOT_CONFIRMED
         return message === NOT_CONFIRMED ? { ok: false, error: NOT_CONFIRMED, code: 'bankNotConfirmed' } : { ok: false, error: message }
     }
+    // The payment went through: a settle that fails is the webhook's to catch up, not a refusal.
+    await settleCreditInvoiceAction(result.invoiceId).catch(() => undefined)
+    return { ok: true, kind: 'paid' }
 }

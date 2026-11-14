@@ -431,6 +431,7 @@
     "purchaseOtherWorkspace": "This purchase belongs to another workspace.",
     "changePlanFailed": "Failed to change your plan",
     "buyCreditFailed": "Failed to buy the credit",
+    "reloadToBuyCredit": "Credits are now bought once. Reload the page to buy them.",
     "quoteCreditFailed": "Failed to price the credit",
     "updateBrainProposalFailed": "Could not update the proposal",
     "prepareSandboxFailed": "Could not prepare your sandbox",

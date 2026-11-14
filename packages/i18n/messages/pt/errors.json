@@ -423,6 +423,7 @@
     "purchaseOtherWorkspace": "Esta compra pertence a outro workspace.",
     "changePlanFailed": "Falha ao mudar seu plano",
     "buyCreditFailed": "Não foi possível comprar os créditos",
+    "reloadToBuyCredit": "Os créditos agora são comprados uma vez. Recarregue a página para comprá-los.",
     "quoteCreditFailed": "Não foi possível calcular o preço dos créditos",
     "updateBrainProposalFailed": "Não foi possível atualizar a proposta",
     "prepareSandboxFailed": "Não foi possível preparar seu sandbox",
