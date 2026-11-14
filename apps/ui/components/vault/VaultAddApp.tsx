@@ -22,21 +22,24 @@ import { Segmented } from '@/components/ui/segmented'
 import { vaultSetupDriver } from './vault-setup-driver'
 import { VaultAddMcp, VaultAddSecret } from './VaultAddOther'
 
-type AddKind = 'app' | 'mcp' | 'secret'
+export type VaultAddKind = 'app' | 'mcp' | 'secret'
 
 const SEARCH_DELAY_MS = 250
 
 // Adding an app to the Vault: pick it in the catalog, then sign in or type its key once. Who uses it is
 // picked next, on the entry itself.
-export function VaultAddApp({ listing, onBack, onAdded }: { listing: VaultListing; onBack: () => void; onAdded: (itemId: string) => Promise<void> }) {
+// The empty Vault opens it on an app already picked, or on the MCP or secret form.
+type Props = { listing: VaultListing; initialApp?: VaultCatalogApp; initialKind?: VaultAddKind; onBack: () => void; onAdded: (itemId: string) => Promise<void> }
+
+export function VaultAddApp({ listing, initialApp, initialKind = 'app', onBack, onAdded }: Props) {
     const t = useTranslations('vault')
-    const [picked, setPicked] = useState<VaultCatalogApp | null>(null)
-    const [kind, setKind] = useState<AddKind>('app')
+    const [picked, setPicked] = useState<VaultCatalogApp | null>(initialApp ?? null)
+    const [kind, setKind] = useState<VaultAddKind>(initialKind)
 
     return (
         <PanelSteps stepKey={picked?.slug ?? 'catalog'} depth={picked ? 1 : 0}>
             {picked ? (
-                <VaultAppSetup app={picked} listing={listing} onBack={() => setPicked(null)} onAdded={onAdded} />
+                <VaultAppSetup app={picked} listing={listing} onBack={initialApp ? onBack : () => setPicked(null)} onAdded={onAdded} />
             ) : (
                 <div className="flex h-full flex-col">
                     <PanelEditorHeader title={t('addPage.title')} onBack={onBack} />
