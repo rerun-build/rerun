@@ -1,13 +1,20 @@
 import { attachmentTool } from '@/lib/apps/attachment-tool'
+import { runFlatEndpoint } from '@/lib/apps/linkup/client'
 import type { AppTool } from '@/lib/apps/tools'
 import type { QuotaAction } from './quotas'
 
-// The LinkedIn tools a coworker gets: none of the enrichment actions Linkup bills by the credit.
+// The LinkedIn tools a coworker gets. Linkup bills Rerun by the account, not by the call, so a quota
+// only guards what LinkedIn watches on the user's account.
 
 export type LinkedinTool = AppTool<QuotaAction>
 
 const profileUrl = { type: 'string', description: 'LinkedIn profile URL, e.g. https://www.linkedin.com/in/jane-doe' }
 const count = (max: number) => ({ type: 'integer', minimum: 1, maximum: max, description: `How many to return, at most ${max}.` })
+const offset = { type: 'integer', minimum: 0 }
+const cursor = { type: 'string', description: 'next_cursor from the previous answer, to read the next page' }
+const postUrl = { type: 'string', description: 'LinkedIn post URL, e.g. https://www.linkedin.com/feed/update/urn:li:activity:…' }
+const groupUrl = { type: 'string', description: 'LinkedIn group URL or numeric id' }
+const eventUrl = { type: 'string', description: 'LinkedIn event URL, urn:li:fsd_professionalEvent:… or numeric id' }
 
 export const LINKEDIN_TOOLS: LinkedinTool[] = [
     {
@@ -45,6 +52,77 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         action: 'search_people',
         quota: { action: 'search_result', amount: args => Number(args.count) || 10 },
         clamp: { count: { default: 10, max: 50 } },
+    },
+    {
+        name: 'get_contact_info',
+        description: 'The email, phone numbers and websites a LinkedIn member shares with the user, usually only 1st-degree connections. Counts as a profile view.',
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl }, required: ['profile_url'] },
+        category: 'profiles',
+        action: 'get_contact',
+        quota: { action: 'profile_view' },
+    },
+    {
+        name: 'get_profile_posts',
+        description: "A member's own posts, newest first, each with its published_at date. Also the way to date a post from linkedin_pro_read_feed, which gives none.",
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(500), cursor, include_reshares: { type: 'boolean', description: 'Also return the posts they reshared' } }, required: ['profile_url'] },
+        category: 'profiles',
+        action: 'get_posts',
+        clamp: { count: { default: 20, max: 500 } },
+    },
+    {
+        name: 'get_profile_comments',
+        description: 'The comments a member wrote lately on any post, newest first.',
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(100), cursor }, required: ['profile_url'] },
+        category: 'profiles',
+        action: 'get_comments',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'get_profile_reactions',
+        description: 'The posts a member reacted to lately, newest first.',
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(100), cursor }, required: ['profile_url'] },
+        category: 'profiles',
+        action: 'get_reactions',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'get_profile_viewers',
+        description: "Who viewed the user's profile lately. LinkedIn blurs some viewers, more so on a free account.",
+        inputSchema: { type: 'object', properties: { count: count(100), offset } },
+        category: 'profiles',
+        action: 'get_viewers',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'get_my_analytics',
+        description: "The user's LinkedIn numbers over the last 7 days: profile views, post impressions, search appearances, followers.",
+        inputSchema: { type: 'object', properties: {} },
+        category: 'profiles',
+        action: 'get_analytics',
+    },
+    {
+        name: 'typeahead',
+        description:
+            'Turn a name into the LinkedIn id a search filter takes: a company, a school, a location, an industry, a title. Sales Navigator and Recruiter filters (seniority, function, lead lists, projects, occupations) take their ids from category sales_nav or recruiter.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                type: {
+                    type: 'string',
+                    description:
+                        'classic: location, company, current_company, past_company, school, industry, service_category, title, people. sales_nav adds function, seniority, company_type, profile_language, relationship, lead_interactions, persona, account_list, lead_list. recruiter adds zip, skill, group, occupation, project, company_size, connection_degree, workplace, joined_within, activity_type, scope.',
+                },
+                category: { type: 'string', enum: ['classic', 'sales_nav', 'recruiter'] },
+                keyword: { type: 'string', description: 'Required for classic. Leave out on sales_nav to list a fixed facet' },
+                limit: { type: 'integer', minimum: 1, maximum: 100 },
+                occupation_id: { type: 'string', description: 'Recruiter only, with type title: the id of an occupation, to list its titles' },
+            },
+            required: ['type'],
+        },
+        category: 'profiles',
+        action: 'typeahead',
+        clamp: { limit: { default: 10, max: 100 } },
+        run: (context, params) => runFlatEndpoint(context.accountId, 'typeahead', params),
     },
     {
         name: 'send_invitation',
@@ -92,6 +170,83 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         clamp: { count: { default: 20, max: 100 } },
     },
     {
+        name: 'check_connection',
+        description: 'Whether someone is a 1st-degree connection of the user, from the copy Linkup keeps. Free and silent: nothing reaches LinkedIn.',
+        inputSchema: { type: 'object', properties: { profile_url: profileUrl }, required: ['profile_url'] },
+        category: 'network',
+        action: 'check_connection',
+    },
+    {
+        name: 'list_connections',
+        description: "The user's 1st-degree connections, most recent first: name, headline, profile URL. Page with offset.",
+        inputSchema: { type: 'object', properties: { count: count(1000), offset } },
+        category: 'network',
+        action: 'list_connections',
+        clamp: { count: { default: 50, max: 1000 } },
+    },
+    {
+        name: 'list_followers',
+        description: 'The people who follow the user on LinkedIn.',
+        inputSchema: { type: 'object', properties: { count: count(100), offset } },
+        category: 'network',
+        action: 'list_followers',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'list_following',
+        description: 'The people and pages the user follows on LinkedIn.',
+        inputSchema: { type: 'object', properties: { count: count(100), offset } },
+        category: 'network',
+        action: 'list_following',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'get_recommendations',
+        description: 'The "People you may know" LinkedIn suggests to the user right now.',
+        inputSchema: { type: 'object', properties: { count: count(100) } },
+        category: 'network',
+        action: 'recommendations',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'get_event',
+        description: 'A LinkedIn event: title, organizer, date, attendees count, and whether the user attends.',
+        inputSchema: { type: 'object', properties: { event_url: eventUrl }, required: ['event_url'] },
+        category: 'network',
+        action: 'get_event',
+    },
+    {
+        name: 'search_groups',
+        description: 'Find LinkedIn groups by keyword.',
+        inputSchema: { type: 'object', properties: { keyword: { type: 'string' }, count: count(100), offset } },
+        category: 'network',
+        action: 'search_groups',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'get_group',
+        description: 'A LinkedIn group: name, description, members count, rules. Works on groups the user is not in.',
+        inputSchema: { type: 'object', properties: { group_url: groupUrl }, required: ['group_url'] },
+        category: 'network',
+        action: 'get_group',
+    },
+    {
+        name: 'get_group_members',
+        description: 'The members of a LinkedIn group the user belongs to.',
+        inputSchema: { type: 'object', properties: { group_url: groupUrl, count: count(1000), offset, first_degree_only: { type: 'boolean', description: "Only the user's 1st-degree connections" } }, required: ['group_url'] },
+        category: 'network',
+        action: 'get_group_members',
+        clamp: { count: { default: 50, max: 1000 } },
+    },
+    {
+        name: 'get_group_posts',
+        description: 'The posts of a LinkedIn group the user belongs to, newest first.',
+        inputSchema: { type: 'object', properties: { group_url: groupUrl, count: count(100), cursor }, required: ['group_url'] },
+        category: 'network',
+        action: 'get_group_posts',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
         name: 'send_message',
         description: 'Send a LinkedIn message to someone the user is connected to. Read the conversation with linkedin_pro_get_conversation first, and never send the same message twice.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, message_text: { type: 'string' } }, required: ['profile_url', 'message_text'] },
@@ -114,6 +269,72 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         category: 'messages',
         action: 'get_conversation',
         clamp: { count: { default: 20, max: 50 } },
+    },
+    {
+        name: 'read_feed',
+        description:
+            "Scroll the user's LinkedIn home feed, as they would see it: each post with its author, text, kind (regular, sponsored, reshare), media, reaction, comment and repost counts and its URL. No publication date: get it from linkedin_pro_get_profile_posts of the author. Pass next_cursor from the last answer to scroll further.",
+        inputSchema: { type: 'object', properties: { count: count(100), cursor } },
+        category: 'content',
+        action: 'get_feed',
+        clamp: { count: { default: 20, max: 100 } },
+    },
+    {
+        name: 'get_post',
+        description: 'One LinkedIn post: author, text, media, date and counts.',
+        inputSchema: { type: 'object', properties: { post_url: postUrl }, required: ['post_url'] },
+        category: 'content',
+        action: 'get',
+    },
+    {
+        name: 'get_post_analytics',
+        description: "The numbers of a post the user wrote: impressions, members reached, reactions, comments, reposts, who viewed it. Only the user's own posts.",
+        inputSchema: { type: 'object', properties: { post_url: postUrl }, required: ['post_url'] },
+        category: 'content',
+        action: 'get_analytics',
+    },
+    {
+        name: 'search_posts',
+        description: 'Search LinkedIn posts by keyword, author, company or date, the way LinkedIn search does.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                keyword: { type: 'string' },
+                sort_by: { type: 'string', enum: ['date_posted', 'relevance'] },
+                post_date: { type: 'string', description: 'e.g. past-24h, past-week, past-month' },
+                post_type: { type: 'string', description: 'e.g. VIDEOS, IMAGES, ARTICLES' },
+                posted_by: { type: 'string', enum: ['first', 'following', 'first,following'], description: "first = the user's 1st-degree connections, following = people they follow" },
+                profile_url: { type: 'string', description: 'Only posts by this member' },
+                company_url: { type: 'string', description: 'Only posts by this company page' },
+                author_company: { type: 'string' },
+                author_industry: { type: 'string' },
+                author_job_title: { type: 'string' },
+                mentions_member: { type: 'string' },
+                mentions_organization: { type: 'string' },
+                count: count(1000),
+                offset,
+            },
+        },
+        category: 'content',
+        action: 'search',
+        quota: { action: 'search_result', amount: args => Number(args.count) || 20 },
+        clamp: { count: { default: 20, max: 1000 } },
+    },
+    {
+        name: 'get_post_comments',
+        description: "The comments under a LinkedIn post, each with its tracking_id, comment_urn and the commenter's profile_urn.",
+        inputSchema: { type: 'object', properties: { post_url: postUrl, count: count(1000), offset }, required: ['post_url'] },
+        category: 'content',
+        action: 'get_comments',
+        clamp: { count: { default: 20, max: 1000 } },
+    },
+    {
+        name: 'get_post_reactions',
+        description: 'Who reacted to a LinkedIn post, and how.',
+        inputSchema: { type: 'object', properties: { post_url: postUrl, count: count(1000), offset }, required: ['post_url'] },
+        category: 'content',
+        action: 'get_reactions',
+        clamp: { count: { default: 20, max: 1000 } },
     },
     {
         name: 'react_to_post',

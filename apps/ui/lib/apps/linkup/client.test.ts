@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { LinkupError, downloadAttachment, parseEnvelope } from './client'
+import { LinkupError, downloadAttachment, parseEnvelope, runFlatEndpoint } from './client'
 
 describe('parseEnvelope', () => {
     it('keeps a 19-digit LinkedIn id exact by reading it as a string', () => {
@@ -39,5 +39,22 @@ describe('downloadAttachment', () => {
         const failure = downloadAttachment('acc', { message_id: 'gone' })
         await expect(failure).rejects.toBeInstanceOf(LinkupError)
         await expect(failure).rejects.toMatchObject({ code: 'INVALID_PARAMS', message: 'Attachment not found', status: 400 })
+    })
+})
+
+describe('runFlatEndpoint', () => {
+    afterEach(() => {
+        vi.unstubAllGlobals()
+        vi.unstubAllEnvs()
+    })
+
+    it('sends the parameters flat, with the account it is given whatever the call says', async () => {
+        vi.stubEnv('LINKUP_API_KEY', 'key')
+        const fetchMock = vi.fn().mockResolvedValue(Response.json({ success: true, data: { items: [] } }))
+        vi.stubGlobal('fetch', fetchMock)
+        await expect(runFlatEndpoint('acc', 'typeahead', { type: 'company', keyword: 'Stripe', account_id: 'someone-else' })).resolves.toEqual({ items: [] })
+        const [url, init] = fetchMock.mock.calls[0]
+        expect(url).toBe('https://api.linkupapi.com/v2/typeahead')
+        expect(JSON.parse(init.body)).toEqual({ type: 'company', keyword: 'Stripe', account_id: 'acc' })
     })
 })
