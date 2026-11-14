@@ -22,8 +22,8 @@ first.
 
 | Shape | Means | On the floor |
 |---|---|---|
-| Rectangle (process) with a face | a mind that does work | a Rerun coworker, drawn as Rerun's board draws it. Idle (owner: "idle ones have all grey body and a colored head"): grey body, the top in its own colour (the look Rerun derives from its id), normal height, faint glow, still, face blinking. Working (owner: "once they start working they all get 2x taller and glow gold, not just their top but also body"): about twice as tall (Rerun's stretched stance), top AND body gold, a strong gold glow around the whole block, the bob, its floor cell lit, the label taking turns between name and "Working" |
-| Rectangle, see-through | the same process running again in parallel | a copy (ghost): drawn only while it runs a job, so always in the working look, see-through |
+| Rectangle (process) with a face | a mind that does work | a Rerun coworker in its own colour (the look Rerun derives from its id). Idle (owner: "idle ones have all grey body and a colored head"): grey body, top in its own colour, normal height, faint glow, still, face blinking. Working (owner: "we will have 2x tall, colored top, and colored body with glow"): about twice as tall (Rerun's stretched stance), top AND body in its own colour, a strong glow in that colour around the whole block, the bob, its floor cell lit, the label taking turns between name and "Working". Not gold: on Rerun's board gold marks working; on the floor height and a lit body do, and the colour keeps saying who it is |
+| Rectangle, see-through | the same process running again in parallel | a copy (ghost): drawn only while it runs a job, so always in its coworker's working look (tall, own colour, glow), see-through |
 | Diamond (decision) | a yes/no choice | review: a diamond gate on the belt; pass leaves by one corner, fail by the other |
 | Capsule (terminator) | where the flow starts and ends | the Loader (the delegator): faceless; intake, checks and merge happen there; clicking it opens the Loader tab |
 | Cylinder (stored data) | where results collect | a feature: a tank filling gold as its tasks merge; the reject store: a red tank beside review |
