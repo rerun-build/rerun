@@ -1,13 +1,14 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { MESSAGE_FEEDBACK_CATEGORIES, MESSAGE_FEEDBACK_CATEGORY_VALUES, type MessageFeedbackCategory, type MessageFeedbackRating } from '@rerun/contracts'
-import { Loader2Icon } from '@/lib/icons'
+import { Loader2Icon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
@@ -53,9 +54,7 @@ export function MessageFeedbackDialog({ open, rating, onOpenChange, onSubmit }: 
             <DialogContent className="sm:max-w-md">
                 <Form {...form}>
                     <form onSubmit={submit} className="flex flex-col gap-4">
-                        <DialogHeader>
-                            <DialogTitle>{negative ? t('negativeTitle') : t('positiveTitle')}</DialogTitle>
-                        </DialogHeader>
+                        <DialogHeaderBar icon={negative ? ThumbsDownIcon : ThumbsUpIcon} title={negative ? t('negativeTitle') : t('positiveTitle')} />
                         {negative && (
                             <FormField
                                 control={form.control}

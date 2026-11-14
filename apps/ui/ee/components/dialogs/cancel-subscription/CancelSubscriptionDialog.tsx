@@ -1,10 +1,11 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useErrorText, type Refusal } from '@/hooks/useErrorText'
 import { cancelSubscriptionAction, checkCancelReasonAction, claimRetentionOfferAction, getCancelFlowActivityAction, getCancelFlowStateAction, requestRenewalReminderAction, resumeSubscriptionAction } from '@/ee/actions/billing.actions'
 import type { CancelFlowState } from '@/ee/services/billing.service'
 import type { CancelFlowActivity } from '@/ee/services/cancel-flow-activity.service'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useRerunCredit } from '@/hooks/useRerunCredit'
 import { useBoardStore } from '@/stores/board.store'
@@ -152,23 +153,15 @@ function CancelFlowSkeleton() {
     const t = useTranslations('billing')
     return (
         <div className="flex min-h-0 flex-col">
-            <div className="px-6 pt-6 pb-6">
-                <DialogHeader className="mb-5 gap-0">
-                    <div className="flex flex-col gap-1.5 pr-6">
-                        <Skeleton className="mb-2 size-8 rounded-lg" />
-                        <DialogTitle className="sr-only">{t('cancel.buttons.cancelSubscription')}</DialogTitle>
-                        <Skeleton className="h-8 w-4/5" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-3/5" />
-                    </div>
-                </DialogHeader>
+            <DialogHeaderBar icon={<Skeleton className="size-10 rounded-lg" />} title={t('cancel.buttons.cancelSubscription')} />
+            <div className="p-4">
                 <div className="flex flex-col gap-5">
                     <Skeleton className="h-32 w-full rounded-xl" />
                     <Skeleton className="h-[4.75rem] w-full rounded-xl" />
                     <Skeleton className="h-10 w-full rounded-lg" />
                 </div>
             </div>
-            <DialogFooter className="m-0 px-6 py-4 sm:justify-between">
+            <DialogFooter className="m-0 sm:justify-between">
                 <Skeleton className="h-9 w-20" />
                 <Skeleton className="h-9 w-36" />
             </DialogFooter>

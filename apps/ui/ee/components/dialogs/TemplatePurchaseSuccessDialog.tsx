@@ -1,10 +1,12 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { CheckIcon } from '@/lib/icons'
 import { track } from '@rerun/analytics/client'
 import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { useTemplateImportFlow } from '@/lib/templates/useTemplateImportFlow'
 import { useBillingStore } from '@/stores/billing.store'
@@ -36,20 +38,18 @@ export function TemplatePurchaseSuccessDialog({ slug, sessionId, onOpenChange }:
     return (
         <Dialog open onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>
-                        {state === 'waiting'
-                            ? t('waiting')
-                            : state === 'timeout'
-                              ? t('timeout')
-                              : entitled
-                                ? agentCount === 1
-                                    ? t('readyOne', { title })
-                                    : t('readyMany', { title, count: agentCount })
-                                : t('needsPlan', { title })}
-                    </DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={CheckIcon} title={t('title')} />
+                <DialogDescription>
+                    {state === 'waiting'
+                        ? t('waiting')
+                        : state === 'timeout'
+                          ? t('timeout')
+                          : entitled
+                            ? agentCount === 1
+                                ? t('readyOne', { title })
+                                : t('readyMany', { title, count: agentCount })
+                            : t('needsPlan', { title })}
+                </DialogDescription>
                 <DialogFooter>
                     {state === 'waiting' ? (
                         <Button loading disabled>

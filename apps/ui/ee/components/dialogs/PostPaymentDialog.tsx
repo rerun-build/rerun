@@ -1,12 +1,13 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { useStartPending } from '@/lib/onboarding/useStartPending'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
-import { Loader2Icon } from '@/lib/icons'
+import { Loader2Icon, CreditCardIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
@@ -56,10 +57,8 @@ export function PostPaymentDialog({ open, onOpenChange }: { open: boolean; onOpe
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>{subscriptionReady ? readyDescription : t('finalizing')}</DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={CreditCardIcon} title={t('title')} />
+                <DialogDescription>{subscriptionReady ? readyDescription : t('finalizing')}</DialogDescription>
                 <DialogFooter>
                     <Button onClick={handleStart} disabled={!subscriptionReady || starting}>
                         {(starting || !subscriptionReady) && <Loader2Icon className="size-4 animate-spin" />}

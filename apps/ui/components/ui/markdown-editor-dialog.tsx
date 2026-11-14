@@ -1,8 +1,9 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Loader2Icon } from '@/lib/icons'
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
+import { Loader2Icon, FileTextIcon } from '@/lib/icons'
 import { RichTextEditor } from '@rerun/ui/rich-text-editor'
 import { useTranslations } from 'next-intl'
 import { useCallback, useRef, useState, type ReactNode } from 'react'
@@ -73,10 +74,7 @@ export function MarkdownEditorDialog({
         <Dialog open={open} onOpenChange={handleOpenChange}>
             {/* Radix focuses the content wrapper on open, which would undo the editor's autofocus. */}
             <DialogContent className="sm:max-w-3xl" onOpenAutoFocus={e => e.preventDefault()}>
-                <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                    {description && <DialogDescription>{description}</DialogDescription>}
-                </DialogHeader>
+                <DialogHeaderBar icon={FileTextIcon} title={title} description={description} />
                 <RichTextEditor
                     autoFocus
                     contentClassName="max-h-[60vh] min-h-[35vh] overflow-y-auto sm:min-h-[45vh]"

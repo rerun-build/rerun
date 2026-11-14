@@ -1,13 +1,14 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useErrorText } from '@/hooks/useErrorText'
 import { requestConnectorAction } from '@/app/api/_actions/connector-requests.actions'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2Icon } from '@/lib/icons'
+import { Loader2Icon, ServerIcon } from '@/lib/icons'
 import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
@@ -61,10 +62,7 @@ export function RequestConnectorDialog({ children, agentId }: RequestConnectorDi
             <DialogContent className="sm:max-w-md">
                 <Form {...form}>
                     <form onSubmit={onSubmit}>
-                        <DialogHeader>
-                            <DialogTitle>{t('title')}</DialogTitle>
-                            <DialogDescription>{t('description')}</DialogDescription>
-                        </DialogHeader>
+                        <DialogHeaderBar icon={ServerIcon} title={t('title')} description={t('description')} />
                         <FormField
                             control={form.control}
                             name="description"

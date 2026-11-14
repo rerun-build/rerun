@@ -1,7 +1,8 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { readAgentMonitoringAction } from '@/app/api/_actions/agent.actions'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { StatsChartType, StatsDataset, StatsGroupBy, StatsMetric, StatsTimeRange, UsageTimeRange } from '@rerun/contracts'
@@ -146,9 +147,7 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
 
             <Dialog open={!!expanded} onOpenChange={open => !open && setExpandedKey(null)}>
                 <DialogContent className="sm:max-w-3xl">
-                    <DialogHeader>
-                        <DialogTitle>{expanded?.title}</DialogTitle>
-                    </DialogHeader>
+                    <DialogHeaderBar icon={ActivityIcon} title={expanded?.title} />
                     <div className="h-[60vh] w-full">{expanded?.node}</div>
                 </DialogContent>
             </Dialog>

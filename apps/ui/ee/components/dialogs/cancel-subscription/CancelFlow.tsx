@@ -1,9 +1,10 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import type { CancelFlowState } from '@/ee/services/billing.service'
 import type { CancelFlowActivity } from '@/ee/services/cancel-flow-activity.service'
 import { Button } from '@/components/ui/button'
-import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DialogFooter } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,7 +20,6 @@ import { track } from '@rerun/analytics/client'
 import { formatAmount } from '@rerun/contracts'
 import { formatNumber } from '@rerun/i18n/format'
 import { OptionRow } from '@rerun/ui/chat'
-import { Icon } from '@rerun/ui/primitives'
 import { TemplateBoardPreview, type BoardAgent } from '@rerun/ui/iso-grid'
 import { StepTransition, useStepper } from '@rerun/ui/steps'
 import { useLocale, useTranslations } from 'next-intl'
@@ -209,15 +209,8 @@ export function CancelFlow({ state, activity, activityLoading, agentCount, credi
 
     return (
         <div className="flex min-h-0 flex-col">
-            <div className="px-6 pt-6 pb-6">
-                <DialogHeader className="mb-5 gap-0">
-                    <StepTransition stepKey={contentKey} direction={stepper.direction} variant="header" className="flex flex-col gap-1.5 pr-6">
-                        <Icon icon={header.icon} size="sm" className="mb-2" />
-                        <DialogTitle className="text-2xl leading-tight font-semibold tracking-tight text-balance">{header.title}</DialogTitle>
-                        <DialogDescription>{header.description}</DialogDescription>
-                    </StepTransition>
-                </DialogHeader>
-
+            <DialogHeaderBar icon={header.icon} title={header.title} description={header.description} />
+            <div className="p-4">
                 <StepTransition stepKey={contentKey} direction={stepper.direction}>
                     {step === 'goodbye' && (
                         <div className="flex flex-col gap-5">

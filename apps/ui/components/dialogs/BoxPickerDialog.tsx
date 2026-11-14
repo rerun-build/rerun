@@ -1,12 +1,13 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { PanelRow } from '@/components/ui/panel-row'
 import { useBoxViewer, useManageableSpaceIds } from '@/hooks/useBoxAccess'
-import { ChevronRightIcon } from '@/lib/icons'
+import { ChevronRightIcon, BoxIcon } from '@/lib/icons'
 import { useBoardStore } from '@/stores/board.store'
 
 // Where a coworker made from the Simple view lands, when the workspace has several Boxes the caller
@@ -25,10 +26,7 @@ export function BoxPickerDialog() {
     return (
         <Dialog open={request !== null} onOpenChange={open => !open && choose(null)}>
             <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>{t('description')}</DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={BoxIcon} title={t('title')} description={t('description')} />
                 <div className="-mx-1 flex max-h-[min(24rem,60dvh)] flex-col gap-1.5 overflow-y-auto px-1">
                     {boxes.map(({ space, coworkers }) => (
                         <PanelRow

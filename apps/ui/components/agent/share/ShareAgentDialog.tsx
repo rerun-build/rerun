@@ -1,16 +1,15 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import * as React from 'react'
 import { createAgentShareAction, planAgentShareAction } from '@/app/api/_actions/agent-share.actions'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog'
-import { Icon } from '@/components/ui/icon'
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { formatBytes } from '@/lib/files/format'
 import { Link2 } from '@/lib/icons'
-import { Stripes } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import { ShareAgentLink } from './ShareAgentLink'
 import { ShareAgentOptions, ShareAgentOptionsSkeleton } from './ShareAgentOptions'
@@ -47,20 +46,9 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
 
     return (
         <>
-            {/* Stripes and the icon are painted behind the text, so both rows above it take
-                `relative` rather than the whole block taking a stacking context. */}
-            <div className="relative flex flex-col items-center gap-3 px-6 pt-8 pb-6 text-center">
-                <Stripes />
-                <Icon icon={Link2} className="relative" />
-                <div className="relative flex flex-col gap-1.5">
-                    <DialogTitle>{flow.step === 'link' ? t('titleLink') : t('titleShare', { name: agentName })}</DialogTitle>
-                    <DialogDescription>
-                        {flow.step === 'link' ? t('descriptionLink') : t('descriptionShare')}
-                    </DialogDescription>
-                </div>
-            </div>
+            <DialogHeaderBar icon={Link2} title={flow.step === 'link' ? t('titleLink') : t('titleShare', { name: agentName })} description={flow.step === 'link' ? t('descriptionLink') : t('descriptionShare')} />
 
-            <div className="max-h-[55dvh] overflow-y-auto border-t border-border px-6 py-4">
+            <div className="max-h-[55dvh] overflow-y-auto p-4">
                 {flow.step === 'link' && flow.url ? (
                     <ShareAgentLink url={flow.url} reused={flow.reused} />
                 ) : (
@@ -84,7 +72,7 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
                 {flow.error && <p className="mt-4 text-xs text-destructive">{flow.error}</p>}
             </div>
 
-            <DialogFooter className="m-0 px-6 py-4">
+            <DialogFooter className="m-0">
                 {flow.step === 'link' ? (
                     <Button type="button" onClick={onClose}>
                         {t('done')}

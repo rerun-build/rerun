@@ -1,6 +1,8 @@
 'use client'
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { KeyboardIcon } from '@/lib/icons'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Kbd } from '@/components/ui/kbd'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
 import { useShortcutsStore } from '@/stores/shortcuts.store'
@@ -50,10 +52,7 @@ export function ShortcutsDialog() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <DialogDescription>{t('description')}</DialogDescription>
-                </DialogHeader>
+                <DialogHeaderBar icon={KeyboardIcon} title={t('title')} description={t('description')} />
 
                 <div className="flex flex-col gap-5 py-2">
                     {groups.map(group => (

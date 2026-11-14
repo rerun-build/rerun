@@ -1,5 +1,6 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { useErrorText } from '@/hooks/useErrorText'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
@@ -9,7 +10,7 @@ import { updateWorkspaceAction } from '@/app/api/_actions/workspace.actions'
 import { useLanguagePacksEnabled, usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PublishPolicyField, usePublishPolicyDraft } from '@/components/published/PublishPolicyField'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { Field } from '@/components/ui/field'
 import { FileDropzone } from '@/components/ui/file-dropzone'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -17,7 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BLOB_ILLUSTRATIONS, getBlobByFile } from '@/lib/blobs/catalog'
-import { CheckIcon, GlobeIcon, Loader2Icon, UploadIcon } from '@/lib/icons'
+import { CheckIcon, GlobeIcon, Loader2Icon, UploadIcon, Settings2Icon } from '@/lib/icons'
 import { WORKSPACE_NAME_MAX } from '@/lib/naming/workspace-name'
 import { cn } from '@/lib/utils'
 import { LOGO_ACCEPT, logoLinkImageUrl, NO_LOGO_FOUND, readLogoLink, type LogoLink } from '@/lib/workspace/logo-input'
@@ -152,12 +153,9 @@ export function WorkspaceSettingsForm({
     return (
         <Form {...form}>
             <form onSubmit={onSubmit} className="flex max-h-full min-h-0 flex-1 flex-col">
-                <DialogHeader className="px-6 pt-6 pb-4">
-                    <DialogTitle>{t('title')}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">{t('description')}</p>
-                </DialogHeader>
+                <DialogHeaderBar icon={Settings2Icon} title={t('title')} description={t('description')} />
 
-                <ScrollFade className="min-h-0 flex-1 px-6 pt-1 pb-6">
+                <ScrollFade className="min-h-0 flex-1 p-4">
                     <div className="space-y-6">
                         <div className="flex items-end gap-4">
                             <FileDropzone onFiles={files => upload(files[0])} accept={LOGO_ACCEPT} overlayLabel="" className="shrink-0">
@@ -207,7 +205,7 @@ export function WorkspaceSettingsForm({
                     </div>
                 </ScrollFade>
 
-                <DialogFooter className="m-0 shrink-0 px-6 py-4">
+                <DialogFooter className="m-0 shrink-0">
                     <Button type="button" variant="outline" onClick={onCancel}>
                         {tCommon('cancel')}
                     </Button>

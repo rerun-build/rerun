@@ -1,7 +1,9 @@
 'use client'
 
+import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
+import { PencilIcon } from '@/lib/icons'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useBoxViewer, useCanManageSpace } from '@/hooks/useBoxAccess'
@@ -41,10 +43,7 @@ export function RenameBoxDialog({ space, open, onOpenChange }: { space: SpacePub
             <DialogContent className="sm:max-w-md">
                 <Form {...form}>
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
-                        <DialogHeader>
-                            <DialogTitle>{t('title')}</DialogTitle>
-                            <DialogDescription>{t('description')}</DialogDescription>
-                        </DialogHeader>
+                        <DialogHeaderBar icon={PencilIcon} title={t('title')} description={t('description')} />
 
                         <FormField
                             control={form.control}
